@@ -51,8 +51,8 @@ public class InventoryController : MonoBehaviour {
 			{ "Crit chance", "12%" },
 			{ $"<color=#{UnityEngine.ColorUtility.ToHtmlStringRGB(new Color(1f, 0.99f, 0.85f))}>The Holy Revolution</color> - On every 5th hit there's a 5% chance to spawn an angel that fights for you.", "Blessing:" }
 		}), Tooltip.Lore("Angels cherish this weapon - use it carefully.")).Data), hotbar.slots[3]);
-		CreateItemDisplay(new ItemStack(Registry.Get<Item>("gem"), 1, Tooltip.Plain("Blue Gem").Data), hotbar.slots[9]);
-		CreateItemDisplay(new ItemStack(Registry.Get<Item>("gem"), 50, Tooltip.Plain("Blue Gem").Data), hotbar.slots[8]);
+		CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableItem_test"), 1, Tooltip.Plain("Blue Gem").Data), hotbar.slots[9]);
+		CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableItem_test"), 50, Tooltip.Plain("Blue Gem").Data), hotbar.slots[8]);
 		CreateItemDisplay(Registry.Get<Item>("heavens_judgement"), 1, hotbar.slots[5], CompoundTooltip.Of(new TooltipData[] {
 			new(new TooltipSectionLayout(TooltipSection.Title) {
 				textColor = Color.cyan

@@ -5,7 +5,9 @@ using Unity.VisualScripting;
 using UnityEngine;
 
 public static class Registry {
-	static readonly Dictionary<string, Object> resources = new();
+	static Dictionary<string, Object> resources = new();
+
+	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)] public static void Reset() => resources = new();
 
 	public static T Register<T>(T resource) where T : Object {
 		string ID = resource is ISerializable serializable ? serializable.ID : resource.name;
@@ -36,6 +38,7 @@ public static class Registry {
 		Registry.resources.AddRange(resources.Where(resource => resource is not ISerializable)
 			.Select(resource => new KeyValuePair<string, Object>(resource.name, resource)));
 	}
+
 }
 
 public interface ISerializable {

@@ -43,7 +43,8 @@ public class PlayerController : MonoBehaviour {
 	[SerializeField] private float jumpToFlightTimer;
 	private readonly Dictionary<string, Action<Collision2D>> collisionReactionsByTag = new();
 
-	private ItemStack equippedItemStack;
+	private ItemUsageHandler itemUsageHandler;
+	public ItemStack MainHandItem { get; private set; }
 
 	private void Start() {
 		collisionReactionsByTag.Add("Enemy", (collision) => {
@@ -61,13 +62,15 @@ public class PlayerController : MonoBehaviour {
 			isFlying = false;
 			rb.linearDamping = 0f;
 		});
-
 		Debug.Assert(inputHandler.isActiveAndEnabled, inputHandler);
+
+		itemUsageHandler = new ItemUsageHandler(this);
+		itemUsageHandler.Register<ConsumableItem>(ItemUseTrigger.LeftClick, (item, stack) => item.Consume(stack, this));
 	}
 
 	private void Update() {
 		movement.x = inputHandler.HorizontalMovement;
-		if (movement.x != 0 && !(inputHandler.LeftHold || inputHandler.RightHold) && CanMeleeAttack()) {
+		if (movement.x != 0 && !(inputHandler.LeftHold || inputHandler.RightHold)) {
 			transform.localScale = new Vector3(Mathf.Sign(movement.x), 1, 1);
 		}
 
@@ -82,14 +85,6 @@ public class PlayerController : MonoBehaviour {
 
 			if (inputHandler.LeftHold) {
 
-				// [deprecated]
-				if (CanMeleeAttack()) {
-					animator.SetBool("attacking", true);
-					animator.SetTrigger("attack");
-					//if (currentEquippedObject != null) {
-					//	currentEquippedObject.SetActive(true);
-					//}
-				}
 			} else if (inputHandler.RightHold) {
 
 				// [deprecated]
@@ -186,16 +181,16 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	public void EquipHotbarItem([AllowsNull] ItemStack itemStack) {
-		equippedItemStack = itemStack;
+		MainHandItem = itemStack;
 	}
 
 	public void OnLeftClick(InputAction.CallbackContext actionContext) {
 		if (EventPriorityManager.IsAllowed("ItemUse")) {
-			equippedItemStack?.item?.Tags[0].ExecuteBehavior();
+			itemUsageHandler.HandleInput(ItemUseTrigger.LeftClick);
 		}
 	}
 
-	public void OnRightClick(InputAction.CallbackContext actionContext) { 
+	public void OnRightClick(InputAction.CallbackContext actionContext) {
 	}
 
 	public void OnSpacePressed(InputAction.CallbackContext actionContext) {
@@ -208,6 +203,4 @@ public class PlayerController : MonoBehaviour {
 			}
 		}
 	}
-
-	public bool CanMeleeAttack() => animator.GetComponent<AttackHitbox>().attackHitbox.GetComponent<AttackController>().done;
 }

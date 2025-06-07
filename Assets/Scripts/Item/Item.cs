@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Item", menuName = "Items/Item")]
@@ -9,7 +10,6 @@ public class Item : ScriptableObject, ISerializable {
 	[SerializeField] private Sprite icon;
 	[SerializeField] private GameObject worldPrefab;
 	[SerializeField] private int maxStackSize;
-	[SerializeField] private List<ItemTag> tags;
 
 	public string Name => itemName;
 	public Sprite Icon => icon;
@@ -17,7 +17,4 @@ public class Item : ScriptableObject, ISerializable {
 	public int MaxStackSize => maxStackSize;
 	public bool IsStackable => maxStackSize > 1;
 	public string ID => id;
-	public IReadOnlyList<ItemTag> Tags => tags;
-	public bool HasTag(ItemTag tag) => tags.Contains(tag);
-	public bool HasAnyTag(params ItemTag[] checkTags) => checkTags.Any(tag => tags.Contains(tag));
 }

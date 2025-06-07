@@ -1,17 +1,22 @@
 using System;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 
 [Serializable]
 public class ItemStack {
 	public Item item;
+	private ItemDisplay display;
 
 	private int quantity;
 	public int Quantity {
 		get => quantity;
 		set {
 			quantity = value;
-			if(stackText != null) {
+			if (quantity <= 0) {
+				GameObject.Destroy(display.gameObject);
+			}
+			if(stackText != null && quantity > 0) {
 				UpdateText();
 			}
 		}
@@ -19,7 +24,7 @@ public class ItemStack {
 	public ITooltipSerializer TooltipSerializer { get; set; }
 	private GameObject stackText;
 
-	public ItemStack(Item item, int quantity, ITooltipSerializer tooltipSerializer ) {
+	public ItemStack(Item item, int quantity, ITooltipSerializer tooltipSerializer) {
 		this.item = item;
 		this.Quantity = quantity;
 		TooltipSerializer = tooltipSerializer;
@@ -46,6 +51,7 @@ public class ItemStack {
 		rectTransform.anchoredPosition = Vector3.zero;
 		text.rectTransform.sizeDelta = text.GetPreferredValues(Mathf.Infinity, Mathf.Infinity);
 		this.stackText = stackText;
+		this.display = parent;
 		return stackText;
 	}
 
