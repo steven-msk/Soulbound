@@ -1,0 +1,53 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using TMPro;
+using Unity.VisualScripting;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class CompoundTooltip : AbstractTooltip {
+	private readonly IList<TooltipData> entries;
+	private readonly CompoundTooltipLayout layoutOptions;
+	private readonly CompoundTooltipData data;
+	public CompoundTooltipData Data => data;
+
+	private CompoundTooltip(params TooltipData[] entries) : this(default, entries) {
+	}
+
+	public CompoundTooltip(CompoundTooltipLayout layout, params TooltipData[] entries) {
+		this.layoutOptions = layout ?? new();
+		this.entries = entries.AsReadOnlyList();
+		data = new CompoundTooltipData(entries, layoutOptions);
+	}
+
+	public static CompoundTooltip Of(params TooltipData[] entries) => new(entries);
+
+	public static CompoundTooltip Of(params Tooltip[] tooltips) => new(tooltips.Select(tooltip => tooltip.Data).ToArray());
+
+	public static CompoundTooltip OfCustom(CompoundTooltipLayout layoutOptions, params Tooltip[] tooltips) => new(layoutOptions, tooltips.Select(tooltip => tooltip.Data).ToArray());
+
+	public static CompoundTooltip OfCustom(CompoundTooltipLayout layoutOptions, params TooltipData[] tooltips) => new(layoutOptions, tooltips);
+
+	public override void Show(Vector2 position, Transform parent) {
+		if (tooltipPanel != null) {
+			return;
+		}
+		InventoryController inventory = GameManager.GetPlayerInstance().Inventory;
+		tooltipPanel = InstantiatePanel(parent);
+		layoutOptions.Apply(tooltipPanel.GetComponent<VerticalLayoutGroup>());
+		RectTransform panelRect = tooltipPanel.GetComponent<RectTransform>();
+
+		panelRect.anchoredPosition = position;
+		List<TooltipData> sortedEntries = entries.Where(entry => entry.Layout != null).OrderBy(entry => entry.Layout.Section).ToList();
+		foreach (TooltipData entry in sortedEntries) {
+			TextMeshProUGUI tooltipSection = AbstractTooltip.InstantiateSectionText(tooltipPanel.transform);
+			tooltipSection.autoSizeTextContainer = true;
+			entry.Layout.Apply(tooltipSection);
+			tooltipSection.text = entry.Text;
+		}
+		inventory.ActiveTooltip = this;
+		tooltipPanel.transform.SetParent(inventory.transform, true);
+		tooltipPanel.SetActive(true);
+	}
+}

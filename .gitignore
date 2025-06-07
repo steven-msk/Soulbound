@@ -1,0 +1,50 @@
+# Unity
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+UserSettings/
+MemoryCaptures/
+Assets/Plugins/Editor/JetBrains*
+
+# Visual Studio / Rider
+.vscode/
+.idea/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Crash logs
+sysinfo.txt
+
+# Unity Cache
+*.stacktrace
+*.apk
+*.aab
+
+# Builds and output
+*.exe
+*.app
+*.dll
+*.pdb
+*.mdb
+*.mp4
+*.zip
+*.tar.gz
+*.unitypackage
+
+# Rider auto files
+.idea/
+*.iml
+out/

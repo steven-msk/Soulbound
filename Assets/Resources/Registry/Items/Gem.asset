@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8037c3a927b56b64f815b34bb1f831fd, type: 3}
+  m_Name: Gem
+  m_EditorClassIdentifier: 
+  itemName: Gem
+  id: gem
+  icon: {fileID: 21300000, guid: 016ad1687039f814c986c177b44e6297, type: 3}
+  worldPrefab: {fileID: 6191620887195305990, guid: ad1c5777580d8ad40827b131aa1325b0, type: 3}
+  maxStackSize: 100
+  tags: 03000000

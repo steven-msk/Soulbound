@@ -1,0 +1,84 @@
+using System;
+using TMPro;
+using UnityEngine;
+
+[Serializable]
+public class ItemStack {
+	public Item item;
+
+	private int quantity;
+	public int Quantity {
+		get => quantity;
+		set {
+			quantity = value;
+			if(stackText != null) {
+				UpdateText();
+			}
+		}
+	}
+	public ITooltipSerializer TooltipSerializer { get; set; }
+	private GameObject stackText;
+
+	public ItemStack(Item item, int quantity, ITooltipSerializer tooltipSerializer ) {
+		this.item = item;
+		this.Quantity = quantity;
+		TooltipSerializer = tooltipSerializer;
+	}
+
+	public void UpdateText() => stackText.GetComponent<TextMeshProUGUI>().text = FormatStackCount(Quantity);
+
+	public GameObject CreateStackTextObject(ItemDisplay parent) {
+		GameObject stackText = GameObject.Instantiate(Registry.Get<GameObject>("stackNumberPrefab"), parent.transform);
+		TextMeshProUGUI text = stackText.GetComponent<TextMeshProUGUI>();
+		text.autoSizeTextContainer = true;
+		RectTransform rectTransform = stackText.GetComponent<RectTransform>();
+		if (item.IsStackable) {
+			text.text = $"{FormatStackCount(Quantity)}";
+			InventoryController inventory = GameManager.GetPlayerInstance().Inventory;
+			Color textColor = Color.white;
+			StorageSlot hotbarSlot = parent.GetComponentInParent<StorageSlot>();
+			if (!inventory.PopupOpen && hotbarSlot != null && inventory.Hotbar.ActiveSlot != hotbarSlot) {
+				textColor = inventory.Hotbar.inactiveSlotNumberColor;
+			}
+			text.color = textColor;
+		}
+		rectTransform.pivot = new Vector2(0.77f, 0.42f);
+		rectTransform.anchoredPosition = Vector3.zero;
+		text.rectTransform.sizeDelta = text.GetPreferredValues(Mathf.Infinity, Mathf.Infinity);
+		this.stackText = stackText;
+		return stackText;
+	}
+
+	public void Drop(bool playerAction = false) {
+		//TODO: item drop movement (random force)
+		GameObject pickupItem = GameObject.Instantiate(item.WorldPrefab, null);
+		pickupItem.transform.position = GameManager.GetPlayerInstance().transform.position;
+		pickupItem.AddComponent<Rigidbody2D>().sleepMode = RigidbodySleepMode2D.NeverSleep;
+		BoxCollider2D pickupHitbox = pickupItem.AddComponent<BoxCollider2D>();
+		pickupHitbox.isTrigger = true;
+		pickupHitbox.callbackLayers = LayerMask.GetMask("Player");
+		pickupItem.AddComponent<BoxCollider2D>().excludeLayers = ~LayerMask.GetMask("Ground");
+		PickupItem pickup = pickupItem.AddComponent<PickupItem>();
+		pickup.ItemStack = this;
+		pickup.pickupDelay = playerAction ? 2 : 0;
+	}
+
+	public static string FormatStackCount(int amount) {
+		if (amount < 1000) {
+			return amount.ToString();
+		}
+		if (amount > 999_999) {
+			Debug.LogWarning($"Stack size exceeded max limit: {amount}");
+			return "999k";
+		}
+
+		float divided = amount / 1000f;
+		if (divided >= 999.5f) {
+			return "999k";
+		}
+		if (divided < 9.95f) {
+			return divided.ToString("0.#") + "k";
+		}
+		return Mathf.FloorToInt(divided).ToString() + "k";
+	}
+}

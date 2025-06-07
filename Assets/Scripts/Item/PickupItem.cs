@@ -1,0 +1,25 @@
+using UnityEngine;
+using UnityEngine.UI;
+
+public class PickupItem : MonoBehaviour {
+
+	public ItemStack ItemStack { get; set; }
+	public float pickupDelay = 2f;
+	private float pickupTimer = 0;
+
+	private void OnEnable() {
+		pickupTimer = pickupDelay;
+	}
+
+	private void Update() {
+		pickupTimer -= Time.deltaTime;
+	}
+
+	private void OnTriggerStay2D(Collider2D collision) {
+		if (pickupTimer <= 0) {
+			if (GameManager.GetPlayerInstance().Inventory.PickupItem(ItemStack)) {
+				Destroy(gameObject);
+			}
+		}
+	}
+}
