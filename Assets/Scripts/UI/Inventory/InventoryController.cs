@@ -51,8 +51,8 @@ public class InventoryController : MonoBehaviour {
 			{ "Crit chance", "12%" },
 			{ $"<color=#{UnityEngine.ColorUtility.ToHtmlStringRGB(new Color(1f, 0.99f, 0.85f))}>The Holy Revolution</color> - On every 5th hit there's a 5% chance to spawn an angel that fights for you.", "Blessing:" }
 		}), Tooltip.Lore("Angels cherish this weapon - use it carefully.")).Data), hotbar.slots[3]);
-		CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableItem_test"), 1, Tooltip.Plain("Blue Gem").Data), hotbar.slots[9]);
-		CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableItem_test"), 50, Tooltip.Plain("Blue Gem").Data), hotbar.slots[8]);
+		CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableItem_test"), 1, Tooltip.Plain("Item").Data), hotbar.slots[9]);
+		//CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableItem_test"), 50, Tooltip.Plain("Blue Gem").Data), hotbar.slots[8]);
 		CreateItemDisplay(Registry.Get<Item>("heavens_judgement"), 1, hotbar.slots[5], CompoundTooltip.Of(new TooltipData[] {
 			new(new TooltipSectionLayout(TooltipSection.Title) {
 				textColor = Color.cyan
@@ -109,7 +109,7 @@ public class InventoryController : MonoBehaviour {
 	}
 
 	public bool PickupItem(ItemStack itemStack) {
-		if (!itemStack.item.IsStackable) {
+		if (!itemStack.Item.IsStackable) {
 			StorageSlot emptySlot = GetFirstEmptySlot();
 			if (emptySlot != null) {
 				CreateItemDisplay(itemStack, emptySlot);
@@ -118,10 +118,10 @@ public class InventoryController : MonoBehaviour {
 			return false;
 		} else {
 			int remaining = itemStack.Quantity;
-			foreach (var stackSlot in GetOccupiedSlots(itemStack.item)) {
+			foreach (var stackSlot in GetOccupiedSlots(itemStack.Item)) {
 				ItemStack stackInSlot = stackSlot.ItemStack;
-				if (stackInSlot.Quantity < stackInSlot.item.MaxStackSize) {
-					int availableSpace = stackInSlot.item.MaxStackSize - stackInSlot.Quantity;
+				if (stackInSlot.Quantity < stackInSlot.Item.MaxStackSize) {
+					int availableSpace = stackInSlot.Item.MaxStackSize - stackInSlot.Quantity;
 					int toAdd = Math.Min(remaining, availableSpace);
 					stackInSlot.Quantity += toAdd;
 					remaining -= toAdd;
@@ -135,8 +135,8 @@ public class InventoryController : MonoBehaviour {
 			StorageSlot[] inventory = AllSlots;
 			for (int i = 0; i < inventory.Length; i++){
 				if (!inventory[i].HasItem) {
-					int toAdd = Mathf.Min(remaining, itemStack.item.MaxStackSize);
-					CreateItemDisplay(new ItemStack(itemStack.item, toAdd, itemStack.TooltipSerializer), inventory[i]);
+					int toAdd = Mathf.Min(remaining, itemStack.Item.MaxStackSize);
+					CreateItemDisplay(new ItemStack(itemStack.Item, toAdd, itemStack.TooltipSerializer), inventory[i]);
 					remaining -= toAdd;
 				}
 				if (remaining <= 0) {
@@ -179,14 +179,14 @@ public class InventoryController : MonoBehaviour {
 
 		ItemStack pickupStack = pickupItem.ItemStack;
 		ItemStack slotStack = itemDisplay.ItemStack;
-		if (slotStack.item != pickupStack.item || slotStack.Quantity == slotStack.item.MaxStackSize) {
+		if (slotStack.Item != pickupStack.Item || slotStack.Quantity == slotStack.Item.MaxStackSize) {
 			pickupItem.transform.SetParent(slot.transform, true);
 			pickupItem.DisableMoveMode();
 			pickupItem = itemDisplay;
 			pickupItem.EnableMoveMode();
 			pickupItem.transform.SetParent(gameObject.transform, true);
 		} else {
-			int space = slotStack.item.MaxStackSize - slotStack.Quantity;
+			int space = slotStack.Item.MaxStackSize - slotStack.Quantity;
 			int transfer = Math.Min(space, pickupStack.Quantity);
 			slotStack.Quantity += transfer;
 			pickupStack.Quantity -= transfer;
@@ -209,16 +209,16 @@ public class InventoryController : MonoBehaviour {
 
 	[CanBeNull] public StorageSlot[] GetOccupiedSlots() => AllSlots.Where(slot => slot.HasItem).ToArray();
 
-	[CanBeNull] public StorageSlot[] GetOccupiedSlots(Item item) => GetOccupiedSlots().Where(slot => slot.ItemStack.item.Equals(item)).ToArray();
+	[CanBeNull] public StorageSlot[] GetOccupiedSlots(Item item) => GetOccupiedSlots().Where(slot => slot.ItemStack.Item.Equals(item)).ToArray();
 
 	[CanBeNull] public StorageSlot[] GetEmptySlots() => AllSlots.Where(slot => !slot.HasItem).ToArray();
 	
 	public ItemDisplay CreateItemDisplay(ItemStack itemStack, StorageSlot slot) {
 		GameObject obj = Instantiate(Registry.Get<GameObject>("itemDisplayPrefab"), slot.transform);
 		ItemDisplay display = obj.GetComponent<ItemDisplay>();
-		Debug.Assert(display != null, "Item display prefab does not contain ItemDisplay instance");
+		Debug.Assert(display != null, $"ItemDisplay instance not found in item display prefab");
 		display.ItemStack = itemStack;
-		itemStack.CreateStackTextObject(display);
+		itemStack.Initialize(display);
 		display.Tooltip = itemStack.TooltipSerializer.Generate();
 		return display;
 	}

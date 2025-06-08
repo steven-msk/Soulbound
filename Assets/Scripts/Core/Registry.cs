@@ -38,7 +38,6 @@ public static class Registry {
 		Registry.resources.AddRange(resources.Where(resource => resource is not ISerializable)
 			.Select(resource => new KeyValuePair<string, Object>(resource.name, resource)));
 	}
-
 }
 
 public interface ISerializable {

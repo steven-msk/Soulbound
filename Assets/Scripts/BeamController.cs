@@ -1,5 +1,7 @@
+using System;
 using UnityEngine;
 
+[Obsolete]
 public class BeamController : MonoBehaviour {
 	public Animator animator;
 	public Rigidbody2D rb;

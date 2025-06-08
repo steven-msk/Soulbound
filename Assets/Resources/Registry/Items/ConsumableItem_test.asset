@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 464d89c62aefe724aa1dfa0a87ec7a94, type: 3}
   m_Name: ConsumableItem_test
   m_EditorClassIdentifier: 
-  itemName: 
-  id: 
-  icon: {fileID: 0}
-  worldPrefab: {fileID: 0}
-  maxStackSize: 0
-  consumeAmount: 0
+  itemName: ConsumableItem_test
+  id: consumableItem_test
+  icon: {fileID: 21300000, guid: 8a00d1f0cd0b90e4f8a16980e87bd7bd, type: 3}
+  worldPrefab: {fileID: 4487431087504722001, guid: 76b9051e107fe1049891a6ea43478c0b, type: 3}
+  maxStackSize: 64
+  consumeAction: {fileID: 11400000, guid: 66fbd32daf4ed4346a1e6b737b1e0c9f, type: 2}
+  consumeAmount: 1

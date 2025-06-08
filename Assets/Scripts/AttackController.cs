@@ -1,6 +1,8 @@
+using System;
 using Unity.VisualScripting;
 using UnityEngine;
 
+[Obsolete]
 public class AttackController : MonoBehaviour {
 	public bool done = true;
 

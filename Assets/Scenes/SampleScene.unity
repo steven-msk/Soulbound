@@ -488,7 +488,6 @@ GameObject:
   - component: {fileID: 106475848}
   - component: {fileID: 106475847}
   - component: {fileID: 106475851}
-  - component: {fileID: 106475852}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -595,18 +594,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   flightTimePanel: {fileID: 794986505}
   maskWidth: 50
---- !u!114 &106475852
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 106475846}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f3a9e00ced9bf45459c5b5fbe56f20a9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &135708217
 GameObject:
   m_ObjectHideFlags: 0
@@ -916,7 +903,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &153686589
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1132,6 +1119,7 @@ GameObject:
   - component: {fileID: 202914026}
   - component: {fileID: 202914030}
   - component: {fileID: 202914033}
+  - component: {fileID: 202914034}
   m_Layer: 7
   m_Name: johnny
   m_TagString: Untagged
@@ -1295,28 +1283,13 @@ MonoBehaviour:
     horizontalFlightAcceleration: 2
     verticalFlightAcceleration: 3
     grantedFlightTime: 100
-  movementSpeedPower: 30
-  knockbackStunDuration: 0.5
-  deceleration: 60
-  contactBouncePower: 10
-  jumpHeightPower: 45
-  flightMovementPower: 20
-  jumpToFlightDelay: 0.2
   attackCooldown: 0.3
   attackCombo: 0
   subAttackCombo: 0
   rb: {fileID: 202914026}
   animator: {fileID: 202914027}
-  jumpsLeft: 0
-  flightTime: 0
-  flightTimeReductionMultiplier: 50
-  slowFallTimeReductionMultiplier: 400
-  isFlying: 0
-  movement: {x: 0, y: 0}
   knockbackStunTimer: 0
   attackTimer: 0
-  shouldJump: 0
-  jumpToFlightTimer: 0
 --- !u!61 &202914031
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1377,6 +1350,36 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   attackHitbox: {fileID: 0}
   beam: {fileID: 2069897871}
+--- !u!114 &202914034
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 202914023}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0fdc207c5f6a714493eb287a525a46b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  movementSpeedPower: 30
+  knockbackStunDuration: 0.5
+  deceleration: 60
+  contactBouncePower: 10
+  jumpHeightPower: 45
+  flightMovementPower: 20
+  jumpToFlightDelay: 0.2
+  flightTimePanel: {fileID: 794986505}
+  maskWidth: 50
+  jumpsLeft: 0
+  flightTime: 0
+  flightTimeReductionMultiplier: 50
+  slowFallTimeReductionMultiplier: 400
+  isFlying: 0
+  movement: {x: 0, y: 0}
+  knockbackStunTimer: 0
+  shouldJump: 0
+  jumpToFlightTimer: 0
 --- !u!1 &336363285
 GameObject:
   m_ObjectHideFlags: 0

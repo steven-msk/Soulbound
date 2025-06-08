@@ -5,9 +5,9 @@ using UnityEngine;
 
 [Serializable]
 public class ItemStack {
-	public Item item;
+	public Item Item { get; }
 	private ItemDisplay display;
-
+	private GameObject stackText;
 	private int quantity;
 	public int Quantity {
 		get => quantity;
@@ -21,23 +21,22 @@ public class ItemStack {
 			}
 		}
 	}
-	public ITooltipSerializer TooltipSerializer { get; set; }
-	private GameObject stackText;
+	public ITooltipSerializer TooltipSerializer { get; }
 
 	public ItemStack(Item item, int quantity, ITooltipSerializer tooltipSerializer) {
-		this.item = item;
+		this.Item = item;
 		this.Quantity = quantity;
 		TooltipSerializer = tooltipSerializer;
 	}
 
 	public void UpdateText() => stackText.GetComponent<TextMeshProUGUI>().text = FormatStackCount(Quantity);
 
-	public GameObject CreateStackTextObject(ItemDisplay parent) {
+	public GameObject Initialize(ItemDisplay parent) {
 		GameObject stackText = GameObject.Instantiate(Registry.Get<GameObject>("stackNumberPrefab"), parent.transform);
 		TextMeshProUGUI text = stackText.GetComponent<TextMeshProUGUI>();
 		text.autoSizeTextContainer = true;
 		RectTransform rectTransform = stackText.GetComponent<RectTransform>();
-		if (item.IsStackable) {
+		if (Item.IsStackable) {
 			text.text = $"{FormatStackCount(Quantity)}";
 			InventoryController inventory = GameManager.GetPlayerInstance().Inventory;
 			Color textColor = Color.white;
@@ -57,7 +56,7 @@ public class ItemStack {
 
 	public void Drop(bool playerAction = false) {
 		//TODO: item drop movement (random force)
-		GameObject pickupItem = GameObject.Instantiate(item.WorldPrefab, null);
+		GameObject pickupItem = GameObject.Instantiate(Item.WorldPrefab, null);
 		pickupItem.transform.position = GameManager.GetPlayerInstance().transform.position;
 		pickupItem.AddComponent<Rigidbody2D>().sleepMode = RigidbodySleepMode2D.NeverSleep;
 		BoxCollider2D pickupHitbox = pickupItem.AddComponent<BoxCollider2D>();

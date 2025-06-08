@@ -1,5 +1,7 @@
+using System;
 using UnityEngine;
 
+[Obsolete]
 public class BeamCallback : StateMachineBehaviour {
 	private BeamController controller;
 	private Vector2 facing;

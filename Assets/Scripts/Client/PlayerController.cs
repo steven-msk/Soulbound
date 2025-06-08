@@ -7,73 +7,43 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour {
 
 	[SerializeField] private InputHandler inputHandler;
-	public InputHandler InputHandler { get => inputHandler; }
-	[SerializeField] private InventoryController inventory;
-	public InventoryController Inventory { get => inventory; }
-	[SerializeField] private PlayerStats stats;
+	public InputHandler InputHandler => inputHandler;
 
-	[Header("Movement")]
-	public float movementSpeedPower = 20f;
-	public float knockbackStunDuration = 0.5f;
-	public float deceleration = 60f;
-	public float contactBouncePower = 20f;
-	public float jumpHeightPower = 1300f;
-	public float flightMovementPower = 10f;
-	public float jumpToFlightDelay = 0.2f;
+	[SerializeField] private InventoryController inventory;
+	public InventoryController Inventory => inventory;
+
+	[SerializeField] private PlayerStats stats;
+	public PlayerStats Stats => stats; 
+
+	private PlayerPhysics playerPhysics;
+	public PlayerPhysics Physics => playerPhysics;
 
 	[Header("Combat")]
-	public float attackCooldown = 0.3f;
-	public int attackCombo = 0;
-	public int subAttackCombo = 0;
+	[Obsolete] public float attackCooldown = 0.3f;
+	[Obsolete] public int attackCombo = 0;
+	[Obsolete] public int subAttackCombo = 0;
 
 	[Header("Internal")]
-	public Rigidbody2D rb;
-	public Animator animator;
-	public int jumpsLeft;
-	[SerializeField] private float flightTime;
-	[SerializeField] private float flightTimeReductionMultiplier;
-	[SerializeField] private float slowFallTimeReductionMultiplier;
+	[SerializeField] private Rigidbody2D rb;
+	public Rigidbody2D Rigidbody => rb;
+	[SerializeField] private Animator animator;
+	public Animator Animator => animator;
 
 	[Header("Debug Internal")]
-	[SerializeField] private bool isFlying = false;
-	[SerializeField] private Vector2 movement;
-	[SerializeField] private float knockbackStunTimer = 0f;
-	[SerializeField] private float attackTimer;
-	[SerializeField] private bool shouldJump = false;
-	[SerializeField] private float jumpToFlightTimer;
-	private readonly Dictionary<string, Action<Collision2D>> collisionReactionsByTag = new();
+	[Obsolete] [SerializeField] private float knockbackStunTimer = 0f;
+	[Obsolete] [SerializeField] private float attackTimer;
 
 	private ItemUsageHandler itemUsageHandler;
 	public ItemStack MainHandItem { get; private set; }
 
 	private void Start() {
-		collisionReactionsByTag.Add("Enemy", (collision) => {
-			Vector2 bounce = (transform.position - (Vector3)collision.GetContact(0).point).normalized;
-			rb.linearVelocity = bounce * contactBouncePower;
-			knockbackStunTimer = knockbackStunDuration;
-		});
-
-		collisionReactionsByTag.Add("Ground", (collision) => {
-			animator.SetBool("jumping", false);
-			animator.SetBool("flying", false);
-			animator.SetBool("onGround", true);
-			flightTime = stats.grantedFlightTime;
-			jumpsLeft = stats.maxJumps;
-			isFlying = false;
-			rb.linearDamping = 0f;
-		});
-		Debug.Assert(inputHandler.isActiveAndEnabled, inputHandler);
+		playerPhysics = gameObject.GetComponent<PlayerPhysics>();
 
 		itemUsageHandler = new ItemUsageHandler(this);
 		itemUsageHandler.Register<ConsumableItem>(ItemUseTrigger.LeftClick, (item, stack) => item.Consume(stack, this));
 	}
 
 	private void Update() {
-		movement.x = inputHandler.HorizontalMovement;
-		if (movement.x != 0 && !(inputHandler.LeftHold || inputHandler.RightHold)) {
-			transform.localScale = new Vector3(Mathf.Sign(movement.x), 1, 1);
-		}
-
 		animator.SetFloat("horizontalSpeed", knockbackStunTimer <= 0 ? Mathf.Abs(rb.linearVelocityX) : 0);
 		if (attackTimer > 0) {
 			attackTimer -= Time.deltaTime;
@@ -121,65 +91,6 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
-	private void FixedUpdate() {
-		if (knockbackStunTimer > 0) {
-			knockbackStunTimer -= Time.fixedDeltaTime;
-			return;			// knockback immunity will be a thing
-		}
-
-		if (movement.x != 0) {
-			if (!isFlying) {
-				rb.linearVelocityX += stats.horizontalAcceleration * movementSpeedPower * Time.fixedDeltaTime * movement.x;
-				if (Mathf.Abs(rb.linearVelocityX) > stats.movementSpeed) {
-					rb.linearVelocityX = Mathf.Sign(rb.linearVelocityX) * stats.movementSpeed;
-
-				}
-			} else {
-				float scaledFlightAcceleration = flightMovementPower * stats.horizontalFlightAcceleration;
-				rb.linearVelocityX += scaledFlightAcceleration * Time.fixedDeltaTime * movement.x;
-				if (rb.linearVelocityX > scaledFlightAcceleration) {
-					rb.linearVelocityX = scaledFlightAcceleration;
-				}
-			}
-		}
-		if (shouldJump) {
-			rb.AddForceY(stats.jumpHeight * jumpHeightPower, ForceMode2D.Impulse);
-			shouldJump = false;
-			animator.SetBool("onGround", false);
-			rb.linearDamping = 1f;
-		}
-
-		if (jumpToFlightTimer > 0) {
-			jumpToFlightTimer -= Time.fixedDeltaTime;
-			return;			// flight switch will occur once jump is finished
-		}
-		if (inputHandler.PressingSpace && jumpsLeft == 0 && !shouldJump && flightTime > 0 && jumpToFlightTimer <= 0) {
-			float scaledFlightAcceleration = flightMovementPower * stats.verticalFlightAcceleration;
-			rb.linearVelocityY += scaledFlightAcceleration * Time.fixedDeltaTime;
-			if (rb.linearVelocityY > scaledFlightAcceleration) {
-				rb.linearVelocityY = scaledFlightAcceleration;
-			}
-			isFlying = true;
-			animator.SetBool("flying", true);
-			animator.SetBool("jumping", false);
-			rb.linearDamping = 1;
-			flightTime -= Time.fixedDeltaTime * flightTimeReductionMultiplier;
-			flightTime = Mathf.Clamp(flightTime, 0, stats.grantedFlightTime);
-		} else if (flightTime == 0 && inputHandler.PressingSpace && stats.grantedFlightTime > 0) {
-			if (rb.linearVelocityY <= -rb.gravityScale) {
-				float scaledSlowFallVelocity = Time.fixedDeltaTime * slowFallTimeReductionMultiplier;
-				rb.linearVelocityY = Mathf.Lerp(rb.linearVelocityY, -scaledSlowFallVelocity, scaledSlowFallVelocity);
-			}
-		}
-		GameManager.GetUI().UpdateFlightTimePanel(isFlying, flightTime, stats.grantedFlightTime);
-	}
-
-	private void OnCollisionEnter2D(Collision2D collision) {
-		collisionReactionsByTag.GetValueOrDefault(collision.gameObject.tag, (collision) => {
-			Debug.Log($"Unknown collision callback tag: {collision.gameObject.tag}");
-		}).Invoke(collision);
-	}
-
 	public void EquipHotbarItem([AllowsNull] ItemStack itemStack) {
 		MainHandItem = itemStack;
 	}
@@ -194,13 +105,6 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	public void OnSpacePressed(InputAction.CallbackContext actionContext) {
-		if (jumpsLeft > 0 && knockbackStunTimer <= 0) {
-			shouldJump = true;
-			jumpsLeft--;
-			jumpToFlightTimer = jumpToFlightDelay;
-			if (!isFlying) { 
-				animator.SetBool("jumping", true);
-			}
-		}
+		playerPhysics.OnSpacePressed();
 	}
 }

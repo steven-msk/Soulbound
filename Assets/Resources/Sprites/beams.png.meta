@@ -1,0 +1,358 @@
+fileFormatVersion: 2
+guid: e9bbda5e5f67cc7438889863671bb242
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 8813226132166169265
+    second: beams_0
+  - first:
+      213: -342841500392956471
+    second: beams_1
+  - first:
+      213: -3008786985731672919
+    second: beams_2
+  - first:
+      213: -864346992521728030
+    second: beams_3
+  - first:
+      213: 2448983918405450708
+    second: beams_4
+  - first:
+      213: -224264422132340645
+    second: beams_5
+  - first:
+      213: 3221046606929183262
+    second: beams_6
+  - first:
+      213: 3086281766754650022
+    second: beams_7
+  - first:
+      213: -5887574851830874244
+    second: beams_8
+  - first:
+      213: -3532125607399209406
+    second: beams_9
+  - first:
+      213: -4389689700790840645
+    second: beams_10
+  - first:
+      213: -7550472941382305865
+    second: beams_11
+  - first:
+      213: 1340418249766201452
+    second: beams_12
+  - first:
+      213: -1513116261127942503
+    second: beams_13
+  - first:
+      213: -1065171029721156181
+    second: beams_14
+  - first:
+      213: 6221243194420154528
+    second: beams_15
+  - first:
+      213: 6100613402793374524
+    second: beams_16
+  - first:
+      213: -5481649109184314681
+    second: beams_17
+  - first:
+      213: 4172045527919470226
+    second: beams_18
+  - first:
+      213: 1555915593380633493
+    second: beams_19
+  - first:
+      213: 3117329161928284718
+    second: beams_20
+  - first:
+      213: 7197149788720406248
+    second: beams_21
+  - first:
+      213: -3708074645100094667
+    second: beams_22
+  - first:
+      213: 550197025238284939
+    second: beams_23
+  - first:
+      213: 6657893770769798689
+    second: beams_24
+  - first:
+      213: -4187057815155954561
+    second: beams_25
+  - first:
+      213: -4223754384032259362
+    second: beams_26
+  - first:
+      213: 2183476718214222350
+    second: beams_27
+  - first:
+      213: -8470403037619771882
+    second: beams_28
+  - first:
+      213: -7738437374538900620
+    second: beams_29
+  - first:
+      213: -8381284675905171842
+    second: beams_30
+  - first:
+      213: 5181571790623375139
+    second: beams_31
+  - first:
+      213: 2112879784255247613
+    second: beams_32
+  - first:
+      213: 1560893695569296514
+    second: beams_33
+  - first:
+      213: -4122403361326895116
+    second: beams_34
+  - first:
+      213: 7498665378132165843
+    second: beams_35
+  - first:
+      213: 4647145149307888720
+    second: beams_36
+  - first:
+      213: -101723649237734213
+    second: beams_37
+  - first:
+      213: 3825296469523011728
+    second: beams_38
+  - first:
+      213: -8639704294832099750
+    second: beams_39
+  - first:
+      213: -2462576014434015965
+    second: beams_40
+  - first:
+      213: -1919077881297319850
+    second: beams_41
+  - first:
+      213: 1915607286910376557
+    second: beams_42
+  - first:
+      213: -4466639421194908512
+    second: beams_43
+  - first:
+      213: -3769203906711113032
+    second: beams_44
+  - first:
+      213: 2638821381411442448
+    second: beams_45
+  - first:
+      213: -8076006086675949797
+    second: beams_46
+  - first:
+      213: -7181182688776095764
+    second: beams_47
+  - first:
+      213: 6523675839282231479
+    second: beams_48
+  - first:
+      213: 6809698112737714254
+    second: beams_49
+  - first:
+      213: -9150954616461882458
+    second: beams_50
+  - first:
+      213: 5877039498505239813
+    second: beams_51
+  - first:
+      213: 6726546122845134825
+    second: beams_52
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 16
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 1
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: beams_28
+      rect:
+        serializedVersion: 2
+        x: 201
+        y: 317
+        width: 23
+        height: 23
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 616a84eb055137a80800000000000000
+      internalID: -8470403037619771882
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: beams_35
+      rect:
+        serializedVersion: 2
+        x: 203
+        y: 288
+        width: 20
+        height: 26
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3d486198e6c901860800000000000000
+      internalID: 7498665378132165843
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: beams_41
+      rect:
+        serializedVersion: 2
+        x: 204
+        y: 251
+        width: 19
+        height: 35
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 658c6fca5d01e55e0800000000000000
+      internalID: -1919077881297319850
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 84339b64d7df2f64096069ca72a6f9e3
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      beams_12: -438092970
+      beams_44: -1159362497
+      beams_5: 234656295
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
