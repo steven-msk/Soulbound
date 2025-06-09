@@ -26,14 +26,14 @@ public class Tooltip : AbstractTooltip {
 
 	[CanBeNull] public static Tooltip Lore(string description, TooltipSectionLayout layout = null) => !string.IsNullOrEmpty(description) ? new(description, layout ?? new(TooltipSection.Lore)) : null;
 
-	public static Tooltip Stats(Dictionary<string, object> stats, string title = null) => Tooltip.Stats(stats, TooltipStatPattern.ValueFirst, title);
+	public static Tooltip Stats(Dictionary<StatType<float>, object> stats) => Tooltip.Stats(stats);
 
-	public static Tooltip Stats(Dictionary<string, object> stats, TooltipStatPattern pattern, string title = null, TooltipSectionLayout layout = null) {
+	public static Tooltip Stats(Dictionary<IStatTypeImpl, object> stats, TooltipSectionLayout layout = null) {
 		StringBuilder textBuilder = new();
-		if (title != null) {
-			textBuilder.AppendLine(title);
-		}
-		stats.ToList().ForEach(stat => textBuilder.AppendLine(pattern.GetPattern(stat)));
+		stats.ToList().ForEach(stat => {
+			IStatTypeImpl statType = stat.Key;
+			textBuilder.AppendLine($"{stat.Key.GetFormattedValue(stat.Value)} {statType.GetFormattedName(stat.Value)}");
+		});
 		if (layout != null && layout.Section != TooltipSection.Stats) {
 			Debug.LogWarning($"Mismatched stat tooltip sections: {layout.Section} and {TooltipSection.Stats}. Switching to {TooltipSection.Stats}.");
 			layout.Section = TooltipSection.Stats;

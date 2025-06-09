@@ -10,11 +10,17 @@ using UnityEngine;
 
 [CreateAssetMenu(fileName = "WeaponItem", menuName = "Items/WeaponItem")]
 public class WeaponItem : Item {
-	[SerializeField] private List<Stat> baseStats;
+	[SerializeField]
+	private Dictionary<IStatTypeImpl, object> baseStats = new() {
+		[StatType<int>.PhysicalDamage] = 25,
+		[StatType<int>.RitualDamage] = 20,
+		[StatType<float>.AttackSpeed] = 1.2f,
+		[StatType<float>.CritChance] = 0.05f,
+		[StatType<float>.CritMultiplier] = 1.2f
+	};
 
 	protected override AbstractTooltip GetDefaultTooltip() {
-		Dictionary<string, object> stats = new(baseStats.Select(stat => new KeyValuePair<string, object>(stat.name, stat.value)));
- 		return CompoundTooltip.Of(Tooltip.Title(itemName), Tooltip.Stats(stats), Tooltip.Lore(loreTextTooltip));
+ 		return CompoundTooltip.Of(Tooltip.Title(itemName), Tooltip.Stats(baseStats), Tooltip.Lore(loreTextTooltip));
 	}
 }
 

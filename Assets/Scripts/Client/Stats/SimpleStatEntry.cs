@@ -8,7 +8,7 @@ public class SimpleStatEntry<TProcessor, TValue> : AbstractStatEntry<TValue> whe
 	private readonly List<TValue> bonuses = new();
 	private readonly TProcessor processor = new();
 
-	public SimpleStatEntry(TValue baseValue) : base(baseValue) {
+	public SimpleStatEntry(TValue baseValue, StatType<TValue> typeReference) : base(baseValue, typeReference) {
 	}
 
 	public void AddBonus(TValue value) => bonuses.Add(value);

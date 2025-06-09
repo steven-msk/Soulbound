@@ -9,7 +9,7 @@ public class MultiplicativeStatEntry<TProcessor, TValue> : AbstractStatEntry<TVa
 	private readonly List<float> percentageBonuses = new();
 	private readonly TProcessor processor = new();
 
-	public MultiplicativeStatEntry(TValue baseValue) : base(baseValue) {
+	public MultiplicativeStatEntry(TValue baseValue, StatType<TValue> typeReference) : base(baseValue, typeReference) {
 	}
 
 	public void AddFlatBonus(TValue value) => flatBonuses.Add(value);
