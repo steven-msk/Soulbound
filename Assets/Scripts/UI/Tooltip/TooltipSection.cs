@@ -6,9 +6,9 @@ public enum TooltipSection {
 	Title = 0,
 	Stats,
 	Affixes,
+	Info,
 	Lore,
 	//..
-	None
 }
 
 public static class TooltipSectionLayoutPreset {

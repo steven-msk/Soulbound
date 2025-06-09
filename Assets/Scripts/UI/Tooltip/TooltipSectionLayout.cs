@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class TooltipSectionLayout {
-	public TooltipSection Section { get; set; } = TooltipSection.None;
+	public TooltipSection Section { get; set; } = TooltipSection.Info;
 	public int fontSize = 20;
 	public Color textColor = Color.white;
 	public FontStyles fontStyle = FontStyles.Normal;

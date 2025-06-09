@@ -1,15 +1,18 @@
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Windows;
 
 public class Tooltip : AbstractTooltip {
 	protected readonly TooltipData data;
 	public TooltipData Data => data;
 	public TooltipSectionLayout Layout => data.Layout;
-	private static readonly TooltipSectionLayout defaultLayout = new(TooltipSection.None);
+	private static readonly TooltipSectionLayout defaultLayout = new(TooltipSection.Info);
 	public TooltipSectionLayout DefaultLayout => defaultLayout;
 	public string Text => data.Text;
 
@@ -20,7 +23,7 @@ public class Tooltip : AbstractTooltip {
 		this.data = data;
 	}
 
-	public static Tooltip Plain(string text) => new(text);
+	public static Tooltip Info(string text) => new(text);
 
 	public static Tooltip Title(string title) => new(title, new TooltipSectionLayout(TooltipSection.Title));
 
@@ -28,11 +31,10 @@ public class Tooltip : AbstractTooltip {
 
 	public static Tooltip Stats(Dictionary<StatType<float>, object> stats) => Tooltip.Stats(stats);
 
-	public static Tooltip Stats(Dictionary<IStatTypeImpl, object> stats, TooltipSectionLayout layout = null) {
+	public static Tooltip Stats(Dictionary<IStatTypeImpl, object> stats, TooltipSectionLayout layout = null, bool applyAsBonus = false) {
 		StringBuilder textBuilder = new();
 		stats.ToList().ForEach(stat => {
-			IStatTypeImpl statType = stat.Key;
-			textBuilder.AppendLine($"{stat.Key.GetFormattedValue(stat.Value)} {statType.GetFormattedName(stat.Value)}");
+			textBuilder.AppendLine($"{stat.Key.GetFormattedValue(stat.Value, applyAsBonus)} {stat.Key.GetFormattedName(stat.Value)}");
 		});
 		if (layout != null && layout.Section != TooltipSection.Stats) {
 			Debug.LogWarning($"Mismatched stat tooltip sections: {layout.Section} and {TooltipSection.Stats}. Switching to {TooltipSection.Stats}.");

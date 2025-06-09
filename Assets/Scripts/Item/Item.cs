@@ -21,6 +21,7 @@ public class Item : ScriptableObject, ISerializable {
 	public bool IsStackable => maxStackSize > 1;
 	public string ID => id;
 	public AbstractTooltipSerializer TooltipSerializer => customTooltipSerializer;
+	public string LoreText => loreTextTooltip;
 
 	public virtual AbstractTooltip GetTooltip() {
 		if (customTooltipSerializer != null) {

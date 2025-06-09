@@ -9,5 +9,5 @@ public interface IStatTypeImpl {
 
 	abstract string GetFormattedName(object value);
 
-	abstract string GetFormattedValue(object value);
+	abstract string GetFormattedValue(object value, bool applyAsBonus);
 }
