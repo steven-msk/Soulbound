@@ -31,7 +31,7 @@ Expect:
 
 ## Built with
 
-- **Unity Engine 6000.0.37f1** (URP, new Input System)
+- **Unity Engine 6000.0.37f1** (URP 2D, new Input System)
 - Custom input/event context management system
 - Modular components for UI, entity control, and world interaction
 
@@ -45,3 +45,53 @@ Expect:
 ## License
 
 Private development. License TBD closer to production.
+
+
+---
+# Implementation notes
+---
+
+## Custom tooltips
+
+Architecture overview:
+- `AbstractTooltipSerialzier`: ScriptableObject, assigned per Item, returns a `ITooltipSerializer`
+- `ITooltipSerializer`: return the actual runtime `AbstractTooltip`
+- `AbstractTooltip`: the tooltip instance, handles show/hide/update logic
+
+Custom tooltip implementation should be done using these steps:
+1. Create a new class extending `AbstractTooltip` or an existing tooltip implementation (e.g. `Tooltip`), implement `Update()` and other logic as needed
+2. Create a class `ITooltipSerializer`, return your tooltip instance
+3. Create a `ScriptableObject` extending `AbstractTooltipSerializer` and return your serializer
+4. Assign the ScriptableObject to an `Item`
+
+Example (custom tooltip to set the tooltip text to the current stack number):
+
+```csharp
+[CreateAssetMenu(menuName = "Test/CustomTooltip")]
+public class CustomTooltipSerializer : AbstractTooltipSerializer {
+	public override ITooltipSerializer GetSerializer(Item item) {
+		return new CustomTooltipData();
+	}
+}
+
+public class CustomTooltipData : ITooltipSerializer {
+	public AbstractTooltip Generate() {
+		return new CustomTooltip(Tooltip.Plain("0").Data);
+	}
+}
+
+public class CustomTooltip : Tooltip {
+
+	public CustomTooltip(TooltipData data) : base(data) {
+	}
+
+	public override void Update(ItemStack itemStack) {
+		base.Update(itemStack);
+		data.Text = itemStack.Quantity.ToString();
+		if (tooltipPanel != null) {
+			tooltipPanel.GetComponentInChildren<TextMeshProUGUI>().text = data.Text;
+		}
+	}
+}
+```
+

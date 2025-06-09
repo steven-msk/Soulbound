@@ -7,12 +7,12 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class CompoundTooltip : AbstractTooltip {
-	private readonly IList<TooltipData> entries;
-	private readonly CompoundTooltipLayout layoutOptions;
-	private readonly CompoundTooltipData data;
+	protected readonly IList<TooltipData> entries;
+	protected readonly CompoundTooltipLayout layoutOptions;
+	protected readonly CompoundTooltipData data;
 	public CompoundTooltipData Data => data;
 
-	private CompoundTooltip(params TooltipData[] entries) : this(default, entries) {
+	protected CompoundTooltip(params TooltipData[] entries) : this(default, entries) {
 	}
 
 	public CompoundTooltip(CompoundTooltipLayout layout, params TooltipData[] entries) {
@@ -23,9 +23,9 @@ public class CompoundTooltip : AbstractTooltip {
 
 	public static CompoundTooltip Of(params TooltipData[] entries) => new(entries);
 
-	public static CompoundTooltip Of(params Tooltip[] tooltips) => new(tooltips.Select(tooltip => tooltip.Data).ToArray());
+	public static CompoundTooltip Of(params Tooltip[] tooltips) => new(tooltips.Where(tooltip => tooltip != null).Select(tooltip => tooltip.Data).ToArray());
 
-	public static CompoundTooltip OfCustom(CompoundTooltipLayout layoutOptions, params Tooltip[] tooltips) => new(layoutOptions, tooltips.Select(tooltip => tooltip.Data).ToArray());
+	public static CompoundTooltip OfCustom(CompoundTooltipLayout layoutOptions, params Tooltip[] tooltips) => new(layoutOptions, tooltips.Where(tooltip => tooltip != null).Select(tooltip => tooltip.Data).ToArray());
 
 	public static CompoundTooltip OfCustom(CompoundTooltipLayout layoutOptions, params TooltipData[] tooltips) => new(layoutOptions, tooltips);
 

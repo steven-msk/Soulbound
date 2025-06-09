@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using UnityEngine;
@@ -41,41 +40,43 @@ public class InventoryController : MonoBehaviour {
 	}
 
 	private void Start() {
-		CreateItemDisplay(new ItemStack(Registry.Get<Item>("sword"), 1, CompoundTooltip.OfCustom(CompoundTooltipLayout.SpacingOnly(15), Tooltip.Title("Sword"), Tooltip.Stats(new Dictionary<string, object> {
-			{ "<color=red>Damage</color>", 8 },
-			{ "Crit chance", "5%" }
-		}), Tooltip.Lore("A mighty sword.")).Data), hotbar.slots[1]);
-		CreateItemDisplay(new ItemStack(Registry.Get<Item>("gem"), 100, Tooltip.Plain("Blue Gem").Data), hotbar.slots[2]);
-		CreateItemDisplay(new ItemStack(Registry.Get<Item>("gem_sword"), 1, Tooltip.Compound(Tooltip.Title("Gem Sword"), Tooltip.Stats(new Dictionary<string, object> {
-			{ "Damage", 150 },
-			{ "Crit chance", "12%" },
-			{ $"<color=#{UnityEngine.ColorUtility.ToHtmlStringRGB(new Color(1f, 0.99f, 0.85f))}>The Holy Revolution</color> - On every 5th hit there's a 5% chance to spawn an angel that fights for you.", "Blessing:" }
-		}), Tooltip.Lore("Angels cherish this weapon - use it carefully.")).Data), hotbar.slots[3]);
-		CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableItem_test"), 1, Tooltip.Plain("Item").Data), hotbar.slots[9]);
-		//CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableItem_test"), 50, Tooltip.Plain("Blue Gem").Data), hotbar.slots[8]);
-		CreateItemDisplay(Registry.Get<Item>("heavens_judgement"), 1, hotbar.slots[5], CompoundTooltip.Of(new TooltipData[] {
-			new(new TooltipSectionLayout(TooltipSection.Title) {
-				textColor = Color.cyan
-			}, "Heaven's Judgement"),
+		//CreateItemDisplay(new ItemStack(Registry.Get<Item>("sword"), 1, CompoundTooltip.OfCustom(CompoundTooltipLayout.SpacingOnly(15), Tooltip.Title("Sword"), Tooltip.Stats(new Dictionary<string, object> {
+		//	{ "<color=red>Damage</color>", 8 },
+		//	{ "Crit chance", "5%" }
+		//}), Tooltip.Lore("A mighty sword.")).Data), hotbar.slots[1]);
+		//CreateItemDisplay(new ItemStack(Registry.Get<Item>("gem"), 100, Tooltip.Plain("Blue Gem").Data), hotbar.slots[2]);
+		//CreateItemDisplay(new ItemStack(Registry.Get<Item>("gem_sword"), 1, Tooltip.Compound(Tooltip.Title("Gem Sword"), Tooltip.Stats(new Dictionary<string, object> {
+		//	{ "Damage", 150 },
+		//	{ "Crit chance", "12%" },
+		//	{ $"<color=#{UnityEngine.ColorUtility.ToHtmlStringRGB(new Color(1f, 0.99f, 0.85f))}>The Holy Revolution</color> - On every 5th hit there's a 5% chance to spawn an angel that fights for you.", "Blessing:" }
+		//}), Tooltip.Lore("Angels cherish this weapon - use it carefully.")).Data), hotbar.slots[3]);
+		//CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableItem_test"), 1, Tooltip.Plain("Item").Data), hotbar.slots[9]);
+		////CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableItem_test"), 50, Tooltip.Plain("Blue Gem").Data), hotbar.slots[8]);
+		//CreateItemDisplay(Registry.Get<Item>("heavens_judgement"), 1, hotbar.slots[5], CompoundTooltip.Of(new TooltipData[] {
+		//	new(new TooltipSectionLayout(TooltipSection.Title) {
+		//		textColor = Color.cyan
+		//	}, "Heaven's Judgement"),
 
-			new(new TooltipSectionLayout(TooltipSection.Stats) {
-				textColor = Color.white
-			}, "154 Physical Damage\n" +
-				"38 Soul Damage\n" +
-				"1.25 Attack Speed\n" +
-				"17% Crit Chance\n" +
-				"2.1x Crit Multiplier\n" +
-				"+2 Dash Velocity\n" +
-				"-0.5s Dash Cooldown"),
+		//	new(new TooltipSectionLayout(TooltipSection.Stats) {
+		//		textColor = Color.white
+		//	}, "154 Physical Damage\n" +
+		//		"38 Soul Damage\n" +
+		//		"1.25 Attack Speed\n" +
+		//		"17% Crit Chance\n" +
+		//		"2.1x Crit Multiplier\n" +
+		//		"+2 Dash Velocity\n" +
+		//		"-0.5s Dash Cooldown"),
 
-			new(new TooltipSectionLayout(TooltipSection.Affixes) {
-				textColor = new Color(1f, 0.9f, 0.5f)
-			}, "Blessing: Radiant Edge — Attacks burn enemies with divine flame, dealing 24 Soul Damage over 3s.\n" +
-				"Blessing: Light's Oath — On dash, gain 10% movement speed for 2s. Refreshes on kill."),
-			// TODO: implement affix and ritual tooltip display - rework TooltipSection instance relation
+		//	new(new TooltipSectionLayout(TooltipSection.Affixes) {
+		//		textColor = new Color(1f, 0.9f, 0.5f)
+		//	}, "Blessing: Radiant Edge — Attacks burn enemies with divine flame, dealing 24 Soul Damage over 3s.\n" +
+		//		"Blessing: Light's Oath — On dash, gain 10% movement speed for 2s. Refreshes on kill."),
+		//	// TODO: implement affix and ritual tooltip display - rework TooltipSection instance relation
 
-			new(new TooltipSectionLayout(TooltipSection.Lore), "Forged at the summit of Solspire by the last remaining Starforger, this blade was said to sever the bonds of darkness itself.")
-		}).Data);
+		//	new(new TooltipSectionLayout(TooltipSection.Lore), "Forged at the summit of Solspire by the last remaining Starforger, this blade was said to sever the bonds of darkness itself.")
+		//}).Data);
+
+		CreateItemDisplay(new ItemStack(Registry.Get<Item>("weaponItem_test"), 2), hotbar.slots[1]);
 	}
 
 	[EventContextHandler("InventoryOpen")]
@@ -136,7 +137,7 @@ public class InventoryController : MonoBehaviour {
 			for (int i = 0; i < inventory.Length; i++){
 				if (!inventory[i].HasItem) {
 					int toAdd = Mathf.Min(remaining, itemStack.Item.MaxStackSize);
-					CreateItemDisplay(new ItemStack(itemStack.Item, toAdd, itemStack.TooltipSerializer), inventory[i]);
+					CreateItemDisplay(new ItemStack(itemStack.Item, toAdd), inventory[i]);
 					remaining -= toAdd;
 				}
 				if (remaining <= 0) {
@@ -219,12 +220,12 @@ public class InventoryController : MonoBehaviour {
 		Debug.Assert(display != null, $"ItemDisplay instance not found in item display prefab");
 		display.ItemStack = itemStack;
 		itemStack.Initialize(display);
-		display.Tooltip = itemStack.TooltipSerializer.Generate();
+		display.Tooltip = itemStack.Item.GetTooltip();
 		return display;
 	}
 
-	public ItemDisplay CreateItemDisplay(Item item, int quantity, StorageSlot slot, ITooltipSerializer tooltipSerializer) {
-		ItemStack itemStack = new(item, quantity, tooltipSerializer);
+	public ItemDisplay CreateItemDisplay(Item item, int quantity, StorageSlot slot) {
+		ItemStack itemStack = new(item, quantity);
 		return CreateItemDisplay(itemStack, slot);
 	}
 

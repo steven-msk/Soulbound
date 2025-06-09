@@ -22,7 +22,7 @@ public class ItemDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 		if (moveMode) {
 			gameObject.transform.position = GameManager.GetPlayerInstance().InputHandler.MouseScreenPosition;
 		}
-		tooltip.Update();
+		tooltip.Update(itemStack);
 	}
 
 	public void OnPointerEnter(PointerEventData eventData) {

@@ -11,6 +11,7 @@ Assets/Plugins/Editor/JetBrains*
 
 # Visual Studio / Rider
 .vscode/
+.vs/
 .idea/
 *.csproj
 *.unityproj

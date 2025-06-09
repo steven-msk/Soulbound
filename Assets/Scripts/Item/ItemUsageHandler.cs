@@ -25,8 +25,6 @@ public sealed class ItemUsageHandler {
 
 		if (handlers.TryGetValue((player.MainHandItem.Item.GetType(), trigger), out var action)) {
 			action.Invoke(player.MainHandItem);
-		} else {
-			Debug.Log(player.MainHandItem.Item.GetType());
 		}
 	}
 }

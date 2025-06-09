@@ -1,11 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using JetBrains.Annotations;
 using TMPro;
 using UnityEngine;
 
 public class Tooltip : AbstractTooltip {
-	private readonly TooltipData data;
+	protected readonly TooltipData data;
 	public TooltipData Data => data;
 	public TooltipSectionLayout Layout => data.Layout;
 	private static readonly TooltipSectionLayout defaultLayout = new(TooltipSection.None);
@@ -23,7 +24,7 @@ public class Tooltip : AbstractTooltip {
 
 	public static Tooltip Title(string title) => new(title, new TooltipSectionLayout(TooltipSection.Title));
 
-	public static Tooltip Lore(string description, TooltipSectionLayout layout = null) => new(description, layout ?? new(TooltipSection.Lore));
+	[CanBeNull] public static Tooltip Lore(string description, TooltipSectionLayout layout = null) => !string.IsNullOrEmpty(description) ? new(description, layout ?? new(TooltipSection.Lore)) : null;
 
 	public static Tooltip Stats(Dictionary<string, object> stats, string title = null) => Tooltip.Stats(stats, TooltipStatPattern.ValueFirst, title);
 

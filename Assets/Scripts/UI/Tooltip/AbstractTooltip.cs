@@ -1,11 +1,12 @@
+using JetBrains.Annotations;
 using TMPro;
 using UnityEngine;
 
 public abstract class AbstractTooltip {
 
 	//TODO: implement interactable tooltips, scrollable/collapsable tooltips, position relative to mouse screen pos
-	protected GameObject tooltipPanel;
-	protected GameObject displayParent;
+	[CanBeNull] protected GameObject tooltipPanel;
+	[CanBeNull] protected GameObject displayParent;
 	
 	public GameObject DisplayParent { get => displayParent; set => displayParent = value; }
 
@@ -19,7 +20,7 @@ public abstract class AbstractTooltip {
 		GameManager.GetPlayerInstance().Inventory.ActiveTooltip = null;
 	}
 
-	public virtual void Update() {
+	public virtual void Update(ItemStack itemStack) {
 		if (tooltipPanel != null) {
 			InputHandler inputHandler = GameManager.GetPlayerInstance().InputHandler;
 			tooltipPanel.transform.position = inputHandler.MouseScreenPosition;

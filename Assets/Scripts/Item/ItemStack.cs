@@ -21,12 +21,10 @@ public class ItemStack {
 			}
 		}
 	}
-	public ITooltipSerializer TooltipSerializer { get; }
 
-	public ItemStack(Item item, int quantity, ITooltipSerializer tooltipSerializer) {
+	public ItemStack(Item item, int quantity) {
 		this.Item = item;
 		this.Quantity = quantity;
-		TooltipSerializer = tooltipSerializer;
 	}
 
 	public void UpdateText() => stackText.GetComponent<TextMeshProUGUI>().text = FormatStackCount(Quantity);
