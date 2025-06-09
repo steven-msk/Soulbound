@@ -51,14 +51,14 @@ Private development. License TBD closer to production.
 # Implementation notes
 ---
 
-## Custom tooltips
+## Custom item tooltips
 
 Architecture overview:
 - `AbstractTooltipSerialzier`: ScriptableObject, assigned per Item, returns a `ITooltipSerializer`
 - `ITooltipSerializer`: return the actual runtime `AbstractTooltip`
 - `AbstractTooltip`: the tooltip instance, handles show/hide/update logic
 
-Custom tooltip implementation should be done using these steps:
+Custom item tooltip implementation should be done using these steps:
 1. Create a new class extending `AbstractTooltip` or an existing tooltip implementation (e.g. `Tooltip`), implement `Update()` and other logic as needed
 2. Create a class `ITooltipSerializer`, return your tooltip instance
 3. Create a `ScriptableObject` extending `AbstractTooltipSerializer` and return your serializer

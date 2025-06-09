@@ -12,11 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a16ea39b254d1748a22484986c72c92, type: 3}
   m_Name: WeaponItem_test
   m_EditorClassIdentifier: 
-  itemName: 
-  id: 
-  icon: {fileID: 0}
-  worldPrefab: {fileID: 0}
-  maxStackSize: 0
+  itemName: WeaponItem_test
+  id: weaponItem_test
+  icon: {fileID: 21300000, guid: 264933ba3cbd93b4db726427944f6345, type: 3}
+  worldPrefab: {fileID: 7544269631476792279, guid: a8139fe1729f56f478ff07020d01c085, type: 3}
+  maxStackSize: 1
   customTooltipSerializer: {fileID: 0}
-  loreTextTooltip: 
-  baseStats: []
+  loreTextTooltip: Test sword
+  baseStats:
+  - name: Physical Damage
+    value: 10
+  - name: Soul Damage
+    value: 15
+  - name: Crit Chance
+    value: 8

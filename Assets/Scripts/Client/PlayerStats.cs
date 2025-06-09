@@ -1,91 +1,50 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngineInternal;
 
-[Serializable]
-public struct PlayerStats {
-	private int health;
-	public int Health {
-		readonly get => health;
-		set => health = Mathf.Clamp(value, 0, maxHealth);
-	}
-	public int maxHealth;
-	private int mana;
-	public int Mana {
-		readonly get => mana;
-		set => mana = Mathf.Clamp(value, 0, maxMana);
-	}
-	public int maxMana;
-	public int defense;
-	public int soulSlots;
-	public float movementSpeed;
-	public float jumpHeight;
-	public int maxJumps;
-	public float dashCooldown;
-	public float healthRegen;
-	public float manaRegen;
-	public float rawPhysicalDamage;
-	public float rawRitualDamage;
-	public float attackSpeed;
-	public float critChance;
-	public float critMultiplier;
-	public float luck;
-	public float lootBonus;
-	public float horizontalAcceleration;
-	public float horizontalFlightAcceleration;
-	public float verticalFlightAcceleration;
-	public float grantedFlightTime;
+public class PlayerStats {
+																										  // default values (subject to major changes)
+	public SimpleStatEntry<FlatIntStatProcessor, int> MaxHealth { get; } = new(200);										// 200
+	public SimpleStatEntry<FlatIntStatProcessor, int> MaxMana { get; } = new(50);											// 50
+	public SimpleStatEntry<FlatIntStatProcessor, int> Defense { get; } = new(0);											// 0
+	public SimpleStatEntry<FlatIntStatProcessor, int> SoulSlots { get; } = new(2);											// 2
+	public SimpleStatEntry<PercentageStatProcessor, float> MovementSpeed { get; } = new(8f);								// 8f
+	public SimpleStatEntry<FlatIntStatProcessor, int> JumpHeight { get; } = new(1);											// 1
+	public int MaxJumps { get; set; } = 1;																					// 1
+	public SimpleStatEntry<PercentageStatProcessor, float> DashVelocity { get; } = new(1f);									// 1f
+	public SimpleStatEntry<PercentageStatProcessor, float> DashCooldown { get; } = new(2f);									// 2f
+	public MultiplicativeStatEntry<MultiplicativeFloatStatProcessor, float> HealthRegen { get; } = new(1.5f);				// 1.5f
+	public MultiplicativeStatEntry<MultiplicativeFloatStatProcessor, float> ManaRegen { get; } = new(2f);					// 2f
+	public MultiplicativeStatEntry<MultiplicativeIntStatProcessor, int> RawPhysicalDamage { get; } = new(10);				// 10
+	public MultiplicativeStatEntry<MultiplicativeIntStatProcessor, int> RawRitualDamage { get; } = new(10);					// 10
+	public SimpleStatEntry<PercentageStatProcessor, float> AttackSpeed { get; } = new(1f);									// 1f
+	public SimpleStatEntry<PercentageStatProcessor, float> CritChance { get; } = new(0.05f);								// 0.05f
+	public SimpleStatEntry<FlatFloatStatProcessor, float> CritMultiplier { get; } = new(1.5f);								// 1.5f
+	public SimpleStatEntry<PercentageStatProcessor, float> Luck { get; } = new(0f);											// 0f
+	public SimpleStatEntry<PercentageStatProcessor, float> LootBonus { get; } = new(0f);									// 0f
+	public float HorizontalAcceleration { get; set; } = 1f;																	// 1f
+	public float HorizontalFlightAcceleration { get; set; } = 3f;															// 2f
+	public float VerticalFlightAcceleration { get; set; } = 2f;																// 2f
+	public int GrantedFlightTime { get; set; } = 0;																			// 0
 
-	private float healthRegenAccumulator;
-	private float manaRegenAccumulator;
-
-	public PlayerStats(
-					int maxHealth = 100, int maxMana = 50, int defense = 0, int soulSlots = 2, int maxJumps = 1,
-					float movementSpeed = 10f, float jumpHeight = 1f, float dashCooldown = 2f, float healthRegen = 1.5f,
-					float manaRegen = 2f, float rawPhysicalDamage = 10f, float rawRitualDamage = 10f, float attackSpeed = 1f,
-					float critChance = 0.05f, float critMultiplier = 1.5f, float luck = 0f, float lootBonus = 0f, float grantedFlightTime = 0f,
-					float horizontalAcceleration = 1f, float horizontalFlightAcceleration = 1f, float verticalFlightAcceleration = 2f) {
-		this.health = maxHealth;
-		this.maxHealth = maxHealth;
-		this.mana = maxMana;
-		this.maxMana = maxMana;
-		this.defense = defense;
-		this.soulSlots = soulSlots;
-		this.movementSpeed = movementSpeed;
-		this.jumpHeight = jumpHeight;
-		this.maxJumps = maxJumps;
-		this.dashCooldown = dashCooldown;
-		this.healthRegen = healthRegen;
-		this.manaRegen = manaRegen;
-		this.rawPhysicalDamage = rawPhysicalDamage;
-		this.rawRitualDamage = rawRitualDamage;
-		this.attackSpeed = attackSpeed;
-		this.critChance = critChance;
-		this.critMultiplier = critMultiplier;
-		this.luck = luck;
-		this.lootBonus = lootBonus;
-		this.healthRegenAccumulator = 0f;
-		this.manaRegenAccumulator = 0f;
-		this.horizontalAcceleration = horizontalAcceleration;
-		this.horizontalFlightAcceleration = horizontalFlightAcceleration;
-		this.verticalFlightAcceleration = verticalFlightAcceleration;
-		this.grantedFlightTime = grantedFlightTime;
-	}
+	private float healthRegenAccumulator = 0;
+	private float manaRegenAccumulator = 0;
 
 	// implement stat processing
 
-	public void UpdateRegenStats() {
-		healthRegenAccumulator += healthRegen * Time.deltaTime;
-		if (healthRegenAccumulator >= 1f) {
-			int regenAmount = Mathf.FloorToInt(healthRegenAccumulator);
-			Health += regenAmount;
-			healthRegenAccumulator -= regenAmount;
-		}
+	//public void UpdateRegenStats() {
+	//	healthRegenAccumulator += healthRegen * Time.deltaTime;
+	//	if (healthRegenAccumulator >= 1f) {
+	//		int regenAmount = Mathf.FloorToInt(healthRegenAccumulator);
+	//		Health += regenAmount;
+	//		healthRegenAccumulator -= regenAmount;
+	//	}
 
-		manaRegenAccumulator += manaRegen * Time.deltaTime;
-		if (manaRegenAccumulator >= 1f) {
-			int regenAmount = Mathf.FloorToInt(manaRegenAccumulator);
-			Mana += regenAmount;
-			manaRegenAccumulator -= regenAmount;
-		}
-	}
+	//	manaRegenAccumulator += manaRegen * Time.deltaTime;
+	//	if (manaRegenAccumulator >= 1f) {
+	//		int regenAmount = Mathf.FloorToInt(manaRegenAccumulator);
+	//		Mana += regenAmount;
+	//		manaRegenAccumulator -= regenAmount;
+	//	}
+	//}
 }

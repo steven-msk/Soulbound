@@ -1261,28 +1261,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inputHandler: {fileID: 1916144881}
   inventory: {fileID: 841931896}
-  stats:
-    maxHealth: 100
-    maxMana: 50
-    defense: 0
-    soulSlots: 2
-    movementSpeed: 8
-    jumpHeight: 1
-    maxJumps: 2
-    dashCooldown: 2
-    healthRegen: 1.5
-    manaRegen: 2
-    rawPhysicalDamage: 10
-    rawRitualDamage: 10
-    attackSpeed: 1
-    critChance: 0.05
-    critMultiplier: 1.5
-    luck: 0
-    lootBonus: 0
-    horizontalAcceleration: 1
-    horizontalFlightAcceleration: 2
-    verticalFlightAcceleration: 3
-    grantedFlightTime: 100
   attackCooldown: 0.3
   attackCombo: 0
   subAttackCombo: 0

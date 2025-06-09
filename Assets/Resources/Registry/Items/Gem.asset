@@ -17,4 +17,5 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: 016ad1687039f814c986c177b44e6297, type: 3}
   worldPrefab: {fileID: 6191620887195305990, guid: ad1c5777580d8ad40827b131aa1325b0, type: 3}
   maxStackSize: 100
-  tags: 03000000
+  customTooltipSerializer: {fileID: 11400000, guid: ce5a4a0f64bf7b543b5519d2e325f254, type: 2}
+  loreTextTooltip: Some weird fruit

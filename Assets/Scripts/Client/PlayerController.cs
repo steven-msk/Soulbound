@@ -12,7 +12,7 @@ public class PlayerController : MonoBehaviour {
 	[SerializeField] private InventoryController inventory;
 	public InventoryController Inventory => inventory;
 
-	[SerializeField] private PlayerStats stats;
+	[SerializeField] private PlayerStats stats = new();
 	public PlayerStats Stats => stats; 
 
 	private PlayerPhysics playerPhysics;
