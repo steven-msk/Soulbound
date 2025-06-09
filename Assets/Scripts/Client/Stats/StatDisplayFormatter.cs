@@ -12,4 +12,6 @@ public static class StatDisplayFormatter {
 	public static Func<float, string> PercentageValueFormat() => value => $"{value * 100}%";
 
 	public static Func<TValue, string> PlainValueFormat<TValue>() => value => value.ToString();
+
+	public static Func<TValue, string> ColorPositiveNegative<TValue>() => value => Convert.ToDouble(value) > 0 ? "green" : "red";
 }
