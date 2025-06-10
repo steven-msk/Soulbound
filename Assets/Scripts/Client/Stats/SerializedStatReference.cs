@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public enum SerializedStatReference {
@@ -37,10 +38,10 @@ public static class SerializedToInternalStatExtension {
 		StatBindingAttribute attribute = memberInfo.GetCustomAttribute<StatBindingAttribute>();
 		FieldInfo field = attribute.DeclaringType.GetField(attribute.FieldName, BindingFlags.Public | BindingFlags.Static);
 		if (field == null || attribute == null || memberInfo == null) { 
-			return null; 
+			return null;
 		}
 
-		var value = field.GetValue(null) as IStatTypeImpl;
+		IStatTypeImpl value = field.GetValue(null) as IStatTypeImpl;
 		cached[serializedReference] = value;
 		return value;
 	}

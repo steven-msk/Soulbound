@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class AllTooltipsSerializer : AbstractTooltipSerializer {
@@ -39,5 +40,15 @@ public class AllTooltipsData : ITooltipSerializer {
 			[StatType<float>.Luck] = 0.3f,
 			[StatType<float>.LootBonus] = -0.6f
 		}, applyAsBonus: true), Tooltip.Info("This item is used to display all existing tooltips"),Tooltip.Lore(item.LoreText));
+	}
+}
+
+public class CustomTooltip : Tooltip {
+	public CustomTooltip(TooltipData data) : base(data) {
+	}
+
+	public override void Update(ItemStack itemStack) {
+		base.Update(itemStack);
+
 	}
 }

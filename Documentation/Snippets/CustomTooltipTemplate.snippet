@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippet Format="1.0.0">
+  <Header>
+    <Title>Prioritized Event Template</Title>
+    <Shortcut>prioritizedEventClaim</Shortcut>
+    <Description>Inserts a prioritized event claim</Description>
+    <Author>MineStef2</Author>
+    <SnippetTypes>
+      <SnippetType>Expansion</SnippetType>
+    </SnippetTypes>
+  </Header>
+  <Snippet>
+    <Declarations>
+      <Literal>
+        <ID>objectref</ID>
+        <ToolTip>AbstractTooltipSerializer ScriptableObject override</ToolTip>
+        <Default>CustomTooltipSerializer</Default>
+      </Literal>
+      <Literal>
+        <ID>serializer</ID>
+        <Tooltip>ITooltipSerializer implementation</Tooltip>
+        <Default>CustomTooltipData</Default>
+      </Literal>
+		<Literal>
+			<ID>tooltipOverride</ID>
+			<Tooltip>Tooltip Override name</Tooltip>
+			<Default>CustomTooltip</Default>
+		</Literal>
+		<Literal>
+			<ID>tooltipOverrideBase</ID>
+			<Tooltip>Tooltip Override base</Tooltip>
+			<Default>TooltipBase</Default>
+		</Literal>
+    </Declarations>
+    <Code Language="csharp">
+		<![CDATA[
+using System;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using TMPro;
+using UnityEngine;
+
+public class $objectref$ : AbstractTooltipSerializer {
+
+	public override ITooltipSerializer GetSerializer(Item item) {
+	
+	}
+}
+
+public class $serializer$ : ITooltipSerializer {
+
+
+	public AbstractTooltip Generate() {
+		
+	}
+}
+
+public class $tooltipOverride$ : $tooltipOverrideBase$ {
+
+	
+	public override void Update(ItemStack itemStack) {
+		base.Update(itemStack);
+
+	}
+}
+
+]]></Code>
+  </Snippet>
+</CodeSnippet>
