@@ -23,15 +23,17 @@ public class Tooltip : AbstractTooltip {
 		this.data = data;
 	}
 
-	public static Tooltip Info(string text) => new(text);
+	[CanBeNull] public static Tooltip Info(string text) => !string.IsNullOrEmpty(text) ? new(text) : null;
 
 	public static Tooltip Title(string title) => new(title, new TooltipSectionLayout(TooltipSection.Title));
 
 	[CanBeNull] public static Tooltip Lore(string description, TooltipSectionLayout layout = null) => !string.IsNullOrEmpty(description) ? new(description, layout ?? new(TooltipSection.Lore)) : null;
 
-	public static Tooltip Stats(Dictionary<StatType<float>, object> stats) => Tooltip.Stats(stats);
-
 	public static Tooltip Stats(Dictionary<IStatTypeImpl, object> stats, TooltipSectionLayout layout = null, bool applyAsBonus = false) {
+		if (stats.Count == 0) {
+			return Tooltip.Info("No stats");
+		}
+		
 		StringBuilder textBuilder = new();
 		stats.ToList().ForEach(stat => {
 			textBuilder.AppendLine($"{stat.Key.GetFormattedValue(stat.Value, applyAsBonus)} {stat.Key.GetFormattedName(stat.Value)}");
@@ -41,6 +43,12 @@ public class Tooltip : AbstractTooltip {
 			layout.Section = TooltipSection.Stats;
 		}
 		return new Tooltip(textBuilder.ToString(), layout ?? new TooltipSectionLayout(TooltipSection.Stats));
+	}
+
+	public static Tooltip Stats(IEnumerable<SerializableStat> stats, TooltipSectionLayout layout = null, bool applyAsBonus = false) {
+		return Tooltip.Stats(new Dictionary<IStatTypeImpl, object>(stats.Select(stat => {
+			return new KeyValuePair<IStatTypeImpl, object>(stat.serializedReference.ToStatType(), stat.GetValue());
+		})), layout, applyAsBonus);
 	}
 
 	public static CompoundTooltip Compound(params TooltipData[] entries) => CompoundTooltip.Of(entries);

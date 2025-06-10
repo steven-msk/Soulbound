@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Runtime.Serialization.Json;
-using UnityEngine;
 
 public class StatType<TValue> : IStatTypeImpl {
 	public static readonly StatType<int> MaxHealth = new("Max Health", StatDisplayFormatter.PlainNameFormat<int>(), StatDisplayFormatter.PlainValueFormat<int>(), BonusAdmission<int>.AddAndSubtract, StatDisplayFormatter.ColorPositiveNegative<int>());
@@ -38,6 +35,7 @@ public class StatType<TValue> : IStatTypeImpl {
 
 	private readonly Func<TValue, string> colorSupplier;
 	public Func<TValue, string> ColorSupplier => colorSupplier;
+
 
 	private StatType(string baseName, Func<TValue, string, string> displayNameFormat, Func<TValue, string> valueFormat, 
 			BonusAdmission<TValue> bonusValueAdmission, Func<TValue, string> colorSupplier = null) {

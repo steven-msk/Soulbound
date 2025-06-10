@@ -13,6 +13,7 @@ public class Item : ScriptableObject, ISerializable {
 	[SerializeField] protected int maxStackSize;
 	[SerializeField][CanBeNull] protected AbstractTooltipSerializer customTooltipSerializer;
 	[SerializeField][CanBeNull] protected string loreTextTooltip;
+	[SerializeField][CanBeNull] protected string infoTextTooltip;
 
 	public string Name => itemName;
 	public Sprite Icon => icon;
@@ -22,6 +23,7 @@ public class Item : ScriptableObject, ISerializable {
 	public string ID => id;
 	public AbstractTooltipSerializer TooltipSerializer => customTooltipSerializer;
 	public string LoreText => loreTextTooltip;
+	public string InfoText => infoTextTooltip;
 
 	public virtual AbstractTooltip GetTooltip() {
 		if (customTooltipSerializer != null) {
@@ -31,6 +33,6 @@ public class Item : ScriptableObject, ISerializable {
 	}
 
 	protected virtual AbstractTooltip GetDefaultTooltip() {
-		return CompoundTooltip.Of(Tooltip.Title(itemName), Tooltip.Lore(loreTextTooltip));
+		return CompoundTooltip.Of(Tooltip.Title(itemName), Tooltip.Info(infoTextTooltip), Tooltip.Lore(loreTextTooltip));
 	}
 }
