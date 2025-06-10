@@ -19,10 +19,11 @@ MonoBehaviour:
   maxStackSize: 1
   customTooltipSerializer: {fileID: 0}
   loreTextTooltip: Test sword
+  infoTextTooltip: 
   baseStats:
-  - name: Physical Damage
-    value: 10
-  - name: Soul Damage
-    value: 15
-  - name: Crit Chance
-    value: 8
+  - serializedReference: 9
+    valueType: 1
+    value: 4343
+  - serializedReference: 17
+    valueType: 1
+    value: 1
