@@ -6,7 +6,7 @@ public class ConsumableItem : Item {
 	[SerializeField] private int consumeAmount;
 
 	public void Consume(ItemStack itemStack, PlayerController player) {
+		consumeAction?.OnConsume(player);
 		itemStack.Quantity -= consumeAmount;
-		consumeAction.OnConsume(player);
 	}
 }

@@ -245,4 +245,12 @@ public class InventoryController : MonoBehaviour {
 		PlayerController player = GameManager.GetPlayerInstance();
 		player.EquipHotbarItem(itemDisplay?.ItemStack);
 	}
+
+	public void DestroyDisplay(ItemDisplay display) {
+		PlayerController player = GameManager.GetPlayerInstance();
+		if (display.ItemStack == player.MainHandItem) {
+			player.EquipHotbarItem(null);
+		}
+		GameObject.Destroy(display.gameObject);
+	}
 }
