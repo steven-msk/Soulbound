@@ -14,7 +14,7 @@ public class ItemStack {
 		set {
 			quantity = value;
 			if (quantity <= 0) {
-				GameManager.GetPlayerInstance().Inventory.DestroyDisplay(display);
+				GameManager.GetPlayerInstance().Inventory.DestroyItemDisplay(display);
 			}
 			if(stackText != null && quantity > 0) {
 				UpdateText();
@@ -53,7 +53,7 @@ public class ItemStack {
 	}
 
 	public void Drop(bool playerAction = false) {
-		//TODO: item drop movement (random force)
+		//TODO: item drop movement (throw force)
 		GameObject pickupItem = GameObject.Instantiate(Item.WorldPrefab, null);
 		pickupItem.transform.position = GameManager.GetPlayerInstance().transform.position;
 		pickupItem.AddComponent<Rigidbody2D>().sleepMode = RigidbodySleepMode2D.NeverSleep;

@@ -67,7 +67,7 @@ Custom item tooltip implementation should be done using these steps:
 3. Create a `ScriptableObject` extending `AbstractTooltipSerializer` and return your serializer
 4. Assign the ScriptableObject to an `Item`
 
-Example (custom tooltip to set the tooltip text to the current stack number):
+Example (custom tooltip to set the tooltip text to the current stack number)
 Developers: You can find a template tooltip creation snippet in `Documentation/Snippets/CustomTooltipTemplate`.
 
 ```csharp

@@ -1,12 +1,11 @@
+using JetBrains.Annotations;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Items/ConsumableItem")]
-public class ConsumableItem : Item {
-	[SerializeField] private ConsumableEffect consumeAction;
-	[SerializeField] private int consumeAmount;
+public class ConsumableItem : Item, IConsumable {
+	[CanBeNull] [SerializeField] private ConsumableEffect consumeAction;
+	public ConsumableEffect ConsumeAction => consumeAction;
 
-	public void Consume(ItemStack itemStack, PlayerController player) {
-		consumeAction?.OnConsume(player);
-		itemStack.Quantity -= consumeAmount;
-	}
+	[SerializeField] private int consumeAmount;
+	public int ConsumeAmount => consumeAmount;
 }

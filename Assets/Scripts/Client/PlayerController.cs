@@ -40,7 +40,11 @@ public class PlayerController : MonoBehaviour {
 		playerPhysics = gameObject.GetComponent<PlayerPhysics>();
 
 		itemUsageHandler = new ItemUsageHandler(this);
-		itemUsageHandler.Register<ConsumableItem>(ItemUseTrigger.LeftClick, (item, stack) => item.Consume(stack, this));
+		itemUsageHandler.Register<IConsumable>(ItemUseTrigger.LeftClick, (item, stack) => item.Consume(stack, this));
+		itemUsageHandler.Register<IAttackPerformer>(ItemUseTrigger.LeftClick, (item, stack) => item.PerformAttack(this));
+
+		// alt attack?
+		itemUsageHandler.Register<IAttackPerformer>(ItemUseTrigger.LeftHold, (item, stack) => Debug.Log(stack));
 	}
 
 	private void Update() {
@@ -54,7 +58,7 @@ public class PlayerController : MonoBehaviour {
 			transform.localScale = new Vector3(mousePos.x >= Screen.width / 2 ? 1 : -1, 1, 1);
 
 			if (inputHandler.LeftHold) {
-
+				itemUsageHandler.HandleInput(ItemUseTrigger.LeftHold);
 			} else if (inputHandler.RightHold) {
 
 				// [deprecated]
@@ -96,12 +100,11 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	public void OnLeftClick(InputAction.CallbackContext actionContext) {
-		if (EventPriorityManager.IsAllowed("ItemUse")) {
-			itemUsageHandler.HandleInput(ItemUseTrigger.LeftClick);
-		}
+		itemUsageHandler.HandleInput(ItemUseTrigger.LeftClick);
 	}
 
 	public void OnRightClick(InputAction.CallbackContext actionContext) {
+		itemUsageHandler.HandleInput(ItemUseTrigger.RightClick);
 	}
 
 	public void OnSpacePressed(InputAction.CallbackContext actionContext) {

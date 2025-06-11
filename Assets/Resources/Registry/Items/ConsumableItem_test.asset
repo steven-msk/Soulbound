@@ -17,5 +17,8 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: 8a00d1f0cd0b90e4f8a16980e87bd7bd, type: 3}
   worldPrefab: {fileID: 4487431087504722001, guid: 76b9051e107fe1049891a6ea43478c0b, type: 3}
   maxStackSize: 64
-  consumeAction: {fileID: 11400000, guid: 66fbd32daf4ed4346a1e6b737b1e0c9f, type: 2}
+  customTooltipSerializer: {fileID: 0}
+  loreTextTooltip: 
+  infoTextTooltip: 
+  consumeAction: {fileID: 0}
   consumeAmount: 1

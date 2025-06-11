@@ -19,5 +19,6 @@ MonoBehaviour:
   maxStackSize: 999999
   customTooltipSerializer: {fileID: 11400000, guid: ce5a4a0f64bf7b543b5519d2e325f254, type: 2}
   loreTextTooltip: An interesting item containing all the possible tooltips
-  consumeAction: {fileID: 0}
+  infoTextTooltip: 
+  consumeAction: {fileID: 11400000, guid: 66fbd32daf4ed4346a1e6b737b1e0c9f, type: 2}
   consumeAmount: 1000

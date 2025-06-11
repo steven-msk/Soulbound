@@ -6,6 +6,9 @@ using UnityEngine;
 
 [CreateAssetMenu(fileName = "Item", menuName = "Items/Item")]
 public class Item : ScriptableObject, ISerializable {
+
+	// TODO: implement better item abstraction - inherit interface properties instead of directly abstract classes (IConsumable, IStatProvider, etc.)
+
 	[SerializeField] protected string itemName;
 	[SerializeField] protected string id;
 	[SerializeField] protected Sprite icon;
