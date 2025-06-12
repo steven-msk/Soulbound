@@ -14,6 +14,7 @@ using UnityEngine.SearchService;
 public class SerializableStat {
 	public SerializedStatReference serializedReference;
 	public StatValueType valueType;
+	public StatValueAppliance appliance;
 	public string value;
 
 	[CanBeNull] public object GetValue() {
@@ -24,10 +25,18 @@ public class SerializableStat {
 		};
 	}
 
+	[CanBeNull] public TValue GetValue<TValue>() => (TValue)GetValue();
+
 	[Serializable]
 	public enum StatValueType {
 		Int,
 		Float
+	}
+	
+	[Serializable]
+	public enum StatValueAppliance {
+		Flat,
+		Percentage
 	}
 }
 

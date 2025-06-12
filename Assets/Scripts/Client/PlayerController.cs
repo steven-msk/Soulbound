@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -97,6 +98,9 @@ public class PlayerController : MonoBehaviour {
 
 	public void EquipHotbarItem([AllowsNull] ItemStack itemStack) {
 		MainHandItem = itemStack;
+		if (itemStack?.Item is IStatProvider statProvider && statProvider.ApplyStatsAutomatically) {
+			statProvider.ApplyStats(this);
+		}
 	}
 
 	public void OnLeftClick(InputAction.CallbackContext actionContext) {

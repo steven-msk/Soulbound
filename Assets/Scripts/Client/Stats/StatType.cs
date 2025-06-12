@@ -71,7 +71,6 @@ public class StatType<TValue> : IStatTypeImpl {
 	private readonly Func<TValue, string> colorSupplier;
 	public Func<TValue, string> ColorSupplier => colorSupplier;
 
-
 	private StatType(string baseName, Func<TValue, string, string> displayNameFormat, Func<TValue, string> valueFormat, 
 					 BonusAdmission<TValue> bonusValueAdmission, Func<TValue, string> colorSupplier = null) {
 		this.displayNameFormat = displayNameFormat;
@@ -81,9 +80,9 @@ public class StatType<TValue> : IStatTypeImpl {
 		this.colorSupplier = colorSupplier ?? (_ => "white");
 	}
 
-	public string GetFormattedName(TValue value) => displayNameFormat.Invoke(value, baseName);
 
-	string IStatTypeImpl.GetFormattedName(object value) => GetFormattedName((TValue)value);
+
+	string IStatTypeImpl.GetFormattedName(object value) => displayNameFormat.Invoke((TValue)value, baseName);
 
 	string IStatTypeImpl.GetFormattedValue(object value, bool applyAsBonus) {
 		string formattedValue = valueFormat.Invoke((TValue)value);
