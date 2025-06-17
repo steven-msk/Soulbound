@@ -12,10 +12,10 @@ public enum SerializedStatReference {
 	[StatBinding(typeof(StatType<int>), nameof(StatType<int>.Defense))] Defense,
 	[StatBinding(typeof(StatType<int>), nameof(StatType<int>.SoulSlots))] SoulSlots,
 	[StatBinding(typeof(StatType<float>), nameof(StatType<float>.MovementSpeed))] MovementSpeed,
-	[StatBinding(typeof(StatType<int>), nameof(StatType<int>.JumpHeight))] JumpHeight,
-	[StatBinding(typeof(StatType<int>), nameof(StatType<int>.MaxJumps))] MaxJumps,
 	[StatBinding(typeof(StatType<float>), nameof(StatType<float>.DashVelocity))] DashVelocity,
 	[StatBinding(typeof(StatType<float>), nameof(StatType<float>.DashCooldown))] DashCooldown,
+	[StatBinding(typeof(StatType<int>), nameof(StatType<int>.JumpHeight))] JumpHeight,
+	[StatBinding(typeof(StatType<int>), nameof(StatType<int>.MaxJumps))] MaxJumps,
 	[StatBinding(typeof(StatType<float>), nameof(StatType<float>.HealthRegen))] HealthRegen,
 	[StatBinding(typeof(StatType<float>), nameof(StatType<float>.ManaRegen))] ManaRegen,
 	[StatBinding(typeof(StatType<int>), nameof(StatType<int>.PhysicalDamage))] PhysicalDamage,
@@ -54,5 +54,4 @@ public static class SerializedToInternalStatExtension {
 			}
 		}
 	}
-
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 [Serializable]
 public class TooltipData : ITooltipSerializer {
@@ -11,4 +12,8 @@ public class TooltipData : ITooltipSerializer {
 	}
 
 	public AbstractTooltip Generate() => new Tooltip(this);
+
+	public static TooltipData[] Concat(TooltipData[] first, TooltipData[] second) => first.Concat(second).ToArray();
+
+	public static TooltipData[] Concat(TooltipData[] first, TooltipData second) => Concat(first, new TooltipData[] { second });
 }

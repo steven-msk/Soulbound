@@ -12,10 +12,22 @@ using UnityEngine.SearchService;
 
 [Serializable]
 public class SerializableStat {
-	public SerializedStatReference serializedReference;
-	public StatValueType valueType;
-	public StatValueAppliance appliance;
-	public string value;
+	[SerializeField] private SerializedStatReference serializedReference;
+	[SerializeField] private StatValueType valueType;
+	[SerializeField] private StatApplicationType applicationType;
+	[SerializeField] private string value;
+	[SerializeField] private bool applyAsBonus;
+	public SerializedStatReference SerializedReference => serializedReference;
+	public StatApplicationType ApplicationType => applicationType;
+	public bool ApplyAsBonus => applyAsBonus;
+
+	public SerializableStat(SerializedStatReference serializedReference, StatValueType valueType, StatApplicationType appliance, string value, bool applyAsBonus) {
+		this.serializedReference = serializedReference;
+		this.valueType = valueType;
+		this.applicationType = appliance;
+		this.value = value;
+		this.applyAsBonus = applyAsBonus;
+	}
 
 	[CanBeNull] public object GetValue() {
 		return valueType switch {
@@ -27,6 +39,8 @@ public class SerializableStat {
 
 	[CanBeNull] public TValue GetValue<TValue>() => (TValue)GetValue();
 
+	public string GetFormattedExpression() => serializedReference.ToStatType().GetFormattedExpression(this.GetValue(), applyAsBonus);
+
 	[Serializable]
 	public enum StatValueType {
 		Int,
@@ -34,7 +48,7 @@ public class SerializableStat {
 	}
 	
 	[Serializable]
-	public enum StatValueAppliance {
+	public enum StatApplicationType {
 		Flat,
 		Percentage
 	}

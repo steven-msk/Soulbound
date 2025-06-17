@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PickupItem : MonoBehaviour {
+public class DroppedItem : MonoBehaviour {
 
 	public ItemStack ItemStack { get; set; }
 	public float pickupDelay = 2f;

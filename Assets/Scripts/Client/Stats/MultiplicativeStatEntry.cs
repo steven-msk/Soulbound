@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using UnityEngine;
 
 public class MultiplicativeStatEntry<TProcessor, TValue> : AbstractStatEntry<TValue> where TProcessor : IMultiplicativeStatProcessor<TValue>, new() {
 	private readonly List<TValue> flatBonuses = new();
@@ -22,10 +23,12 @@ public class MultiplicativeStatEntry<TProcessor, TValue> : AbstractStatEntry<TVa
 
 	public override void ApplyToSerialized(SerializableStat serializableStat) {
 		var value = serializableStat.GetValue();
-		if (serializableStat.appliance == SerializableStat.StatValueAppliance.Flat && value is TValue flatValue) {
+		if (serializableStat.ApplicationType == SerializableStat.StatApplicationType.Flat && value is TValue flatValue) {
 			this.AddFlatBonus(flatValue);
-		} else if (serializableStat.appliance == SerializableStat.StatValueAppliance.Percentage && value is float percentageValue) {
+		} else if (serializableStat.ApplicationType == SerializableStat.StatApplicationType.Percentage && value is float percentageValue) {
 			this.AddPercentageBonus(percentageValue);
+		} else {
+			Debug.Log($"Could not apply serialized stats to {this}, unsupported value type {value.GetType()} for entry of type {typeof(TValue)}");
 		}
 	}
 }

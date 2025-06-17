@@ -9,7 +9,13 @@ public interface IConsumable : IItemCapability {
 	public ConsumableEffect ConsumeAction { get; }
 
 	public virtual void Consume(ItemStack itemStack, PlayerController player) {
-		ConsumeAction?.OnConsume(player);
-		itemStack.Quantity -= ConsumeAmount;
+		ConsumableUtils.DefaultConsume(this, itemStack, player);
+	}
+}
+
+public static class ConsumableUtils {
+	public static void DefaultConsume(IConsumable consumable, ItemStack itemStack, PlayerController player) {
+		consumable.ConsumeAction?.OnConsume(player);
+		itemStack.Quantity -= consumable.ConsumeAmount;
 	}
 }

@@ -8,17 +8,18 @@ using UnityEngine;
 
 public class $objectref$ : AbstractTooltipSerializer {
 
-	public override ITooltipSerializer GetSerializer(Item item) {
-
-	}
+	public override ITooltipSerializer GetSerializer(Item item) => new $serializer$(item);
 }
 
 public class $serializer$ : ITooltipSerializer {
 
+	private Item item;
 
+	public $serializer$(Item item) => this.item = item;
+	
 	public AbstractTooltip Generate() {
 
-	}
+}
 }
 
 public class $tooltipOverride$ : $tooltipOverrideBase$ {
@@ -26,7 +27,6 @@ public class $tooltipOverride$ : $tooltipOverrideBase$ {
 
 
 	public override void Update(ItemStack itemStack) {
-	base.Update(itemStack);
-
+		base.Update(itemStack);
 	}
 }

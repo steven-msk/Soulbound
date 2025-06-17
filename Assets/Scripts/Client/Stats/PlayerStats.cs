@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
 using UnityEngineInternal;
 
 public class PlayerStats {
-	private static readonly Dictionary<IStatTypeImpl, IStatEntry> registeredStats = new();
+	private static readonly Dictionary<IStatTypeImpl, IStatEntry> registeredStats = new(); 
 
 	// REMINDER current default values are subject to change
 	public SimpleStatEntry<FlatIntStatProcessor, int> MaxHealth { get; } = new(200, StatType<int>.MaxHealth, RegisterStatInstance);
@@ -38,7 +38,7 @@ public class PlayerStats {
 
 	public void Apply(List<SerializableStat> stats) {
 		stats.ForEach(static stat => {
-			if (registeredStats.TryGetValue(stat.serializedReference.ToStatType(), out var statEntry)) {
+			if (registeredStats.TryGetValue(stat.SerializedReference.ToStatType(), out var statEntry)) {
 				statEntry.ApplyToSerialized(stat);
 			}
 		});

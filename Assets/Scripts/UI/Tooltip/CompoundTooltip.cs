@@ -10,7 +10,7 @@ public class CompoundTooltip : AbstractTooltip {
 	protected readonly IList<TooltipData> entries;
 	protected readonly CompoundTooltipLayout layoutOptions;
 	protected readonly CompoundTooltipData data;
-	public CompoundTooltipData Data => data;
+	public IList<TooltipData> Data => data.tooltips.AsReadOnlyList();
 
 	protected CompoundTooltip(params TooltipData[] entries) : this(default, entries) {
 	}

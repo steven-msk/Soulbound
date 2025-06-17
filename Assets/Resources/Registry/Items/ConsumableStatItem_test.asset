@@ -9,16 +9,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 464d89c62aefe724aa1dfa0a87ec7a94, type: 3}
-  m_Name: AllTooltips_test
+  m_Script: {fileID: 11500000, guid: f9f264778dc04384fb2b9d66aca5feda, type: 3}
+  m_Name: ConsumableStatItem_test
   m_EditorClassIdentifier: 
-  itemName: All Tooltips
-  id: allTooltips_test
+  itemName: ConsumableStatItem_test
+  id: consumableStatItem_test
   icon: {fileID: 21300000, guid: 8a00d1f0cd0b90e4f8a16980e87bd7bd, type: 3}
   worldPrefab: {fileID: 4487431087504722001, guid: 76b9051e107fe1049891a6ea43478c0b, type: 3}
   maxStackSize: 999999
-  customTooltipSerializer: {fileID: 11400000, guid: ce5a4a0f64bf7b543b5519d2e325f254, type: 2}
-  loreTextTooltip: An interesting item containing all the possible tooltips
+  customTooltipSerializer: {fileID: 0}
+  loreTextTooltip: 
   infoTextTooltip: 
-  consumeAction: {fileID: 11400000, guid: 66fbd32daf4ed4346a1e6b737b1e0c9f, type: 2}
-  consumeAmount: 1000
+  consumeAction: {fileID: 0}
+  consumeAmount: 1
+  stats:
+  - serializedReference: 16
+    valueType: 1
+    appliance: 1
+    value: 0.1

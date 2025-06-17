@@ -39,16 +39,6 @@ public class AllTooltipsData : ITooltipSerializer {
 			[StatType<float>.CritMultiplier] = 2.6f,
 			[StatType<float>.Luck] = 0.3f,
 			[StatType<float>.LootBonus] = -0.6f
-		}, applyAsBonus: true), Tooltip.Info("This item is used to display all existing tooltips"),Tooltip.Lore(item.LoreText));
-	}
-}
-
-public class CustomTooltip : Tooltip {
-	public CustomTooltip(TooltipData data) : base(data) {
-	}
-
-	public override void Update(ItemStack itemStack) {
-		base.Update(itemStack);
-
+		}), Tooltip.Info("This item is used to display all existing tooltips"),Tooltip.Lore(item.LoreText));
 	}
 }

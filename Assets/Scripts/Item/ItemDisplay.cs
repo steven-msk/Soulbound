@@ -7,12 +7,14 @@ public class ItemDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
 	[Header("Debug Internal")]
 	[SerializeField] private bool moveMode;
-	[SerializeField] private ItemStack itemStack;
+	[SerializeField] private Item displayedItem;
+	private ItemStack itemStack;
 	public ItemStack ItemStack {
 		get => itemStack;
 		set {
 			itemStack = value;
 			gameObject.GetComponent<Image>().sprite = itemStack.Item.Icon;
+			displayedItem = itemStack.Item;
 		}
 	}
 	[SerializeField] private AbstractTooltip tooltip;

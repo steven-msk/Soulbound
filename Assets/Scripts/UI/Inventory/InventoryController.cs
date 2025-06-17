@@ -77,7 +77,7 @@ public class InventoryController : MonoBehaviour {
 		//}).Data);
 
 		CreateItemDisplay(new ItemStack(Registry.Get<Item>("weaponItem_test"), 2), hotbar.slots[1]);
-		CreateItemDisplay(new ItemStack(Registry.Get<Item>("allTooltips_test"), 2), hotbar.slots[2]);
+		CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableStatItem_test"), 100), hotbar.slots[3]);
 	}
 
 	[EventContextHandler("InventoryOpen")]

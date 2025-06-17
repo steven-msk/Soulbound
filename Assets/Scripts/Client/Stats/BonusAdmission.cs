@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 
 public class BonusAdmission<TValue> {
 	public static BonusAdmission<TValue> None = new(_ => "");
@@ -12,7 +13,7 @@ public class BonusAdmission<TValue> {
 		this.prefixSupplier = prefixSupplier;
 	}
 
-	public string GetPrefix(TValue value) => prefixSupplier(value);
+	public string GetPrefix(TValue value) => prefixSupplier.Invoke(value);
 
 	static BonusAdmission() {
 		if (typeof(TValue) == typeof(int)) {
@@ -22,6 +23,7 @@ public class BonusAdmission<TValue> {
 			Add = new BonusAdmission<TValue>(value => Convert.ToSingle(value) > 0f ? "+" : "");
 			AddAndSubtract = Add;
 		} else {
+			Debug.LogWarning($"Unexpected BonusAdmission type {typeof(TValue)}.");
 			Add = None;
 			AddAndSubtract = None;
 		}

@@ -61,7 +61,7 @@ public class ItemStack {
 		pickupHitbox.isTrigger = true;
 		pickupHitbox.callbackLayers = LayerMask.GetMask("Player");
 		pickupItem.AddComponent<BoxCollider2D>().excludeLayers = ~LayerMask.GetMask("Ground");
-		PickupItem pickup = pickupItem.AddComponent<PickupItem>();
+		DroppedItem pickup = pickupItem.AddComponent<DroppedItem>();
 		pickup.ItemStack = this;
 		pickup.pickupDelay = playerAction ? 2 : 0;
 	}

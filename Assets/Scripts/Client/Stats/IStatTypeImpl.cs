@@ -10,4 +10,8 @@ public interface IStatTypeImpl {
 	abstract string GetFormattedName(object value);
 
 	abstract string GetFormattedValue(object value, bool applyAsBonus);
+
+	virtual string GetFormattedExpression(object value, bool applyAsBonus = false) {
+		return $"{this.GetFormattedValue(value, applyAsBonus)} {this.GetFormattedName(value)}";
+	}
 }

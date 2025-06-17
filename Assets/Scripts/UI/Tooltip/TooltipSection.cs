@@ -4,6 +4,7 @@ using UnityEngine;
 
 public enum TooltipSection {
 	Title = 0,
+	Tags,
 	Stats,
 	Affixes,
 	Info,
