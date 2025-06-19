@@ -71,7 +71,6 @@ public class InventoryController : MonoBehaviour {
 		//		textColor = new Color(1f, 0.9f, 0.5f)
 		//	}, "Blessing: Radiant Edge — Attacks burn enemies with divine flame, dealing 24 Soul Damage over 3s.\n" +
 		//		"Blessing: Light's Oath — On dash, gain 10% movement speed for 2s. Refreshes on kill."),
-		//	// TODO: implement affix and ritual tooltip display - rework TooltipSection instance relation
 
 		//	new(new TooltipSectionLayout(TooltipSection.Lore), "Forged at the summit of Solspire by the last remaining Starforger, this blade was said to sever the bonds of darkness itself.")
 		//}).Data);

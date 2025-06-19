@@ -10,7 +10,7 @@ public class CompoundStatTooltip_test : AbstractTooltipSerializer {
 
 public class CustomTooltipData : ITooltipSerializer {
 
-	private Item item;
+	private readonly Item item;
 
 	public CustomTooltipData(Item item) => this.item = item;
 

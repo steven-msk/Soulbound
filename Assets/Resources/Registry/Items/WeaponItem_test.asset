@@ -17,13 +17,27 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: 264933ba3cbd93b4db726427944f6345, type: 3}
   worldPrefab: {fileID: 7544269631476792279, guid: a8139fe1729f56f478ff07020d01c085, type: 3}
   maxStackSize: 1
-  customTooltipSerializer: {fileID: 0}
+  customTooltipSerializer: {fileID: 11400000, guid: a07ce6fb2f0a37a4cb8bc004138f8a80, type: 2}
   loreTextTooltip: Test sword
   infoTextTooltip: 
   baseStats:
   - serializedReference: 9
     valueType: 1
+    applicationType: 0
     value: 4343
+    applyAsBonus: 0
   - serializedReference: 17
     valueType: 1
+    applicationType: 0
     value: 1
+    applyAsBonus: 0
+  - serializedReference: 3
+    valueType: 0
+    applicationType: 0
+    value: 1
+    applyAsBonus: 1
+  - serializedReference: 16
+    valueType: 1
+    applicationType: 1
+    value: 1
+    applyAsBonus: 1

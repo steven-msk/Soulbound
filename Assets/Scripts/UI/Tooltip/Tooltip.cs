@@ -28,17 +28,16 @@ public class Tooltip : AbstractTooltip {
 
 	[CanBeNull] public static Tooltip Info(string text) => !string.IsNullOrEmpty(text) ? new(text) : null;
 
-	public static Tooltip Tag(string tagName) => new(new TooltipData(new TooltipSectionLayout(TooltipSection.Tags), tagName));
+	public static Tooltip Tag(ItemTag tag) => new(new TooltipData(new TooltipSectionLayout(TooltipSection.Tags), tag.ToDisplayString()));
 
 	public static Tooltip Title(string title) => new(title, new TooltipSectionLayout(TooltipSection.Title));
 
 	[CanBeNull] public static Tooltip Lore(string description, TooltipSectionLayout layout = null) => !string.IsNullOrEmpty(description) ? new(description, layout ?? new(TooltipSection.Lore)) : null;
 
-#warning TODO implement a way to accept both bonus and static stat values on one item - stat tooltips may contain both bonus and static values, along with headers to describe their purpose or appliance rules.
-	// maybe add a special class PredicateStat for predicate-based stat appliances - name is subject to change
+	// TODO: PredicateStat class idea - a special stat entry that only applies when certain conditions are met
+	// some listeners or observers may be required to respond to special triggers
+	// e.g. the affixes' stat modifiers based on what the player does in combat
 
-	// Dictionary<IStatTypeImpl, (object value, bool applyAsValue)> adapted dictionary option 
-	// or remove Dictionary implementation and rely only on IEnumerable<SerializableStat>
 	public static Tooltip Stats(Dictionary<IStatTypeImpl, (object value, bool applyAsBonus)> stats, TooltipSectionLayout layout = null) {
 		if (stats.Count == 0) {
 			return Tooltip.Info("No stats");
@@ -52,7 +51,7 @@ public class Tooltip : AbstractTooltip {
 			Debug.LogWarning($"Mismatched stat tooltip sections: {layout.Section} and {TooltipSection.Stats}. Switching to {TooltipSection.Stats}.");
 			layout.Section = TooltipSection.Stats;
 		}
-		return new Tooltip(textBuilder.ToString(), layout ?? new TooltipSectionLayout(TooltipSection.Stats));
+		return new Tooltip(textBuilder.ToString(), layout ?? TooltipSection.Stats.GetDefaultLayout());
 	}
 
 	public static Tooltip Stats(IEnumerable<SerializableStat> stats, TooltipSectionLayout layout = null) {
@@ -61,31 +60,30 @@ public class Tooltip : AbstractTooltip {
 		})), layout);
 	}
 
-	public static CompoundTooltip CompoundStats(Dictionary<string, IEnumerable<SerializableStat>> statSections) {
+	// TODO: implement CompoundStats custom header layout
+	public static CompoundTooltip CompoundStats(Dictionary<string, IEnumerable<SerializableStat>> statSections, CompoundTooltipLayout compoundLayout = default) {
 		List<TooltipData> data = new();
-		TooltipSectionLayout layout = new(TooltipSection.Stats);
+		TooltipSectionLayout commonLayout = TooltipSection.Stats.GetDefaultLayout();
 
 		foreach ((string header, IEnumerable<SerializableStat> stats) in statSections) {
 			List<string> texts = new() { header };
 			stats.Select(stat => stat.GetFormattedExpression()).ToList().ForEach(texts.Add);
-			data.Add(new TooltipData(layout, string.Join("\n", texts)));
+			data.Add(new TooltipData(commonLayout, string.Join("\n", texts)));
 		}
-		return CompoundTooltip.Of(data.ToArray());
+		return CompoundTooltip.OfCustom(compoundLayout, data.ToArray());
 	}
 
 	public static Tooltip InterpolatedStats(string source, IEnumerable<SerializableStat> interpolatedStats) {
-		return new Tooltip(string.Format(source, interpolatedStats.Select(stat => stat.GetFormattedExpression()).ToArray()), new TooltipSectionLayout(TooltipSection.Stats));
+		return new Tooltip(string.Format(source, interpolatedStats.Select(stat => stat.GetFormattedExpression()).ToArray()), TooltipSection.Stats.GetDefaultLayout());
 	}
 
-	public static CompoundTooltip Compound(params TooltipData[] entries) => CompoundTooltip.Of(entries);
+	public static Tooltip InterpolatedStats(string source, params SerializableStat[] interpolatedStats) => InterpolatedStats(source, interpolatedStats.AsEnumerable());
 
-	public static CompoundTooltip Compound(params Tooltip[] tooltips) => CompoundTooltip.Of(tooltips);
 
 	public override void Show(Vector2 position, Transform parent) {
 		if (tooltipPanel != null) {
 			return;
 		}
-
 		tooltipPanel = AbstractTooltip.InstantiatePanel(parent);
 		RectTransform panelRect = tooltipPanel.GetComponent<RectTransform>();
 		TextMeshProUGUI tooltipSection = AbstractTooltip.InstantiateSectionText(tooltipPanel.transform);

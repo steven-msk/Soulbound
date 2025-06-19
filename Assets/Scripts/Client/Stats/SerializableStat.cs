@@ -21,11 +21,11 @@ public class SerializableStat {
 	public StatApplicationType ApplicationType => applicationType;
 	public bool ApplyAsBonus => applyAsBonus;
 
-	public SerializableStat(SerializedStatReference serializedReference, StatValueType valueType, StatApplicationType appliance, string value, bool applyAsBonus) {
+	public SerializableStat(SerializedStatReference serializedReference, StatValueType valueType, StatApplicationType appliance, object value, bool applyAsBonus) {
 		this.serializedReference = serializedReference;
 		this.valueType = valueType;
 		this.applicationType = appliance;
-		this.value = value;
+		this.value = value.ToString();
 		this.applyAsBonus = applyAsBonus;
 	}
 

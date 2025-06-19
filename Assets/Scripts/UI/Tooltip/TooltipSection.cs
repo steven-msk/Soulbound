@@ -34,4 +34,6 @@ public static class TooltipSectionLayoutPreset {
 		layout.margin = preset.margin;
 		layout.textColor = preset.textColor;
 	}
+
+	public static TooltipSectionLayout GetDefaultLayout(this TooltipSection section) => new(section);
 }

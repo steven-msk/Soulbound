@@ -8,9 +8,9 @@ using UnityEngine.UIElements;
 using UnityEngineInternal;
 
 public class PlayerStats {
-	private static readonly Dictionary<IStatTypeImpl, IStatEntry> registeredStats = new(); 
+	private static readonly Dictionary<IStatTypeImpl, IStatEntry> registeredStats = new();
 
-	// REMINDER current default values are subject to change
+	// REMINDER: current stat default values are subject to change
 	public SimpleStatEntry<FlatIntStatProcessor, int> MaxHealth { get; } = new(200, StatType<int>.MaxHealth, RegisterStatInstance);
 	public SimpleStatEntry<FlatIntStatProcessor, int> MaxMana { get; } = new(50, StatType<int>.MaxMana, RegisterStatInstance);
 	public SimpleStatEntry<FlatIntStatProcessor, int> Defense { get; } = new(0, StatType<int>.Defense, RegisterStatInstance);

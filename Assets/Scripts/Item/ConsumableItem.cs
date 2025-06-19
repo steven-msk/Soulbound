@@ -13,6 +13,6 @@ public class ConsumableItem : Item, IConsumable {
 	public int ConsumeAmount => consumeAmount;
 
 	protected override AbstractTooltip GetDefaultTooltip() {
-		return CompoundTooltip.Of(TooltipData.Concat((base.GetDefaultTooltip() as CompoundTooltip).Data.ToArray(), Tooltip.Tag("Consumable").Data));
+		return CompoundTooltip.Of(TooltipData.Concat((base.GetDefaultTooltip() as CompoundTooltip).Data.ToArray(), Tooltip.Tag(ItemTag.Consumable).Data));
 	}
 }

@@ -27,6 +27,6 @@ public class ConsumableStatItem : Item, IConsumable, IStatProvider {
 
 	protected override AbstractTooltip GetDefaultTooltip() {
 		return CompoundTooltip.Of(TooltipData.Concat((base.GetDefaultTooltip() as CompoundTooltip).Data.ToArray(),
-			new TooltipData[] { Tooltip.Stats(stats).Data, Tooltip.Tag("Consumable").Data }));
+			new TooltipData[] { Tooltip.Stats(stats).Data, Tooltip.Tag(ItemTag.Consumable).Data }));
 	}
 }
