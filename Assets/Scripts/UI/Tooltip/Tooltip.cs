@@ -34,7 +34,7 @@ public class Tooltip : AbstractTooltip {
 
 	[CanBeNull] public static Tooltip Lore(string description, TooltipSectionLayout layout = null) => !string.IsNullOrEmpty(description) ? new(description, layout ?? new(TooltipSection.Lore)) : null;
 
-	// TODO: PredicateStat class idea - a special stat entry that only applies when certain conditions are met
+	// FEATUREIMPL: PredicateStat class idea - a special stat entry that only applies when certain conditions are met
 	// some listeners or observers may be required to respond to special triggers
 	// e.g. the affixes' stat modifiers based on what the player does in combat
 

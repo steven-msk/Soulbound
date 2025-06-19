@@ -7,4 +7,6 @@ using UnityEngine;
 
 public abstract class ConsumableEffect : ScriptableObject {
 	public abstract void OnConsume(PlayerController player);
+
+	// FEATUREIMPL: status effects
 }

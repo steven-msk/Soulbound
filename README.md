@@ -46,12 +46,17 @@ Expect:
 
 Private development. License TBD closer to production.
 
+---  
 
----
+# Developer notes
 
----
+## Task tokens
 
-# Implementation notes
+The following tokens have been introduced for developer use to improve codebase clarity and task management:
+- `FEATUREIMPL` (Priority: High) - indicates a feature that has not yet been implemented but is planned for the near future
+- `REMINDER` (Priority: Low) - used to leave non-critical notes or consideration about future reference.
+- `REFACTOR` (Priority: Normal) - indicates code that works correctly but could be improved for better readability or maintainability.
+
 ---
 
 ## Custom item tooltips
