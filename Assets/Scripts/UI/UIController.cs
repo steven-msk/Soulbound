@@ -7,6 +7,7 @@ public class UIController : MonoBehaviour {
 	[Header("Flight Time Panel")]
 	[SerializeField] private GameObject flightTimePanel;
 	[SerializeField] private float maskWidth;               // maskWidth must be equal to TimeBar width (center&middle anchor)
+	public bool enableScaleFix = true;
 	
 	public void UpdateFlightTimePanel(bool isFlying, float flightTime, float grantedFlightTime) {
 		flightTimePanel.SetActive(isFlying && GameManager.GetPlayerInstance().InputHandler.PressingSpace);
@@ -21,14 +22,16 @@ public class UIController : MonoBehaviour {
 
 	private void Start() {
 		canvasScaler = GetComponent<CanvasScaler>();
-		canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
 	}
 
 	private void Update() {
-		float scaleX = Screen.width / referenceResolution.x;
-		float scaleY = Screen.height / referenceResolution.y;
+		if (enableScaleFix) {
+			canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
+			float scaleX = Screen.width / referenceResolution.x;
+			float scaleY = Screen.height / referenceResolution.y;
 
-		float scale = Mathf.Max(1, Mathf.Min(scaleX, scaleY));
-		canvasScaler.scaleFactor = Mathf.Min(scale, maxScale);
+			float scale = Mathf.Max(1, Mathf.Min(scaleX, scaleY));
+			canvasScaler.scaleFactor = Mathf.Min(scale, maxScale);
+		}
 	}
 }

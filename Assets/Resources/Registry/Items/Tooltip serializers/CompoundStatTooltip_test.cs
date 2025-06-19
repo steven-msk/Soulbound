@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "CompoundStatTooltip_test", menuName = "Scriptable Objects/CompoundStatTooltip_test")]
+[CreateAssetMenu(menuName = "Items/Custom Tooltips/CompoundStatTooltip_test")]
 public class CompoundStatTooltip_test : AbstractTooltipSerializer {
 
 	public override ITooltipSerializer GetSerializer(Item item) {

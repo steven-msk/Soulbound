@@ -11,7 +11,7 @@ public class TooltipData : ITooltipSerializer {
 		Layout = layout;
 	}
 
-	public AbstractTooltip Generate() => new Tooltip(this);
+	public AbstractTooltip Generate() => Tooltip.FromData(this);
 
 	public static TooltipData[] Concat(TooltipData[] first, TooltipData[] second) => first.Concat(second).ToArray();
 

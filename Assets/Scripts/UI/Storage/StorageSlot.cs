@@ -4,6 +4,8 @@ using UnityEngine.EventSystems;
 
 public class StorageSlot : MonoBehaviour, IPointerDownHandler {
 
+	// FEATUREIMPL: equipment slots
+
 	public ItemDisplay ItemDisplay => gameObject.GetComponentInChildren<ItemDisplay>();
 	public bool HasItem => ItemDisplay != null;
 	public bool IsEmpty => ItemDisplay == null;

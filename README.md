@@ -19,7 +19,7 @@ Expect:
 - Spaghetti code in places
 - Untested systems
 - Incomplete or placeholder content
-- Frequent TODO, REMINDER, and FIXME comments
+- Frequent TODO, REMINDER, FIXME, FEATUREIMPL and REFACTOR comments
 
 ## Goals for Prototype Phase
 
@@ -34,8 +34,6 @@ Expect:
 - **Unity Engine 6000.0.37f1** (URP 2D, new Input System)
 - Custom input/event context management system
 - Modular components for UI, entity control, and world interaction
-
----
 
 ## Notes
 
@@ -70,13 +68,19 @@ Custom item tooltip implementation should be done using these steps:
 1. Create a new class extending `AbstractTooltip` or an existing tooltip implementation (e.g. `Tooltip`), implement `Update()` and other logic as needed
 2. Create a class `ITooltipSerializer`, return your tooltip instance
 3. Create a `ScriptableObject` extending `AbstractTooltipSerializer` and return your serializer
-4. Assign the ScriptableObject to an `Item`
+4. Assign the ScriptableObject to an `Item`    
+
+Remember to create a ScriptableObject tooltip asset found in:
+```csharp
+[CreateAssetMenu(menuName = "Items/Custom Tooltips/YourCustomTooltipNameHere")] 
+```
+Then assign the created asset to the desired item.
 
 Example (custom tooltip to set the tooltip text to the current stack number)
 Developers: You can find a template tooltip creation snippet in `Documentation/Snippets/CustomTooltipTemplate`.
 
 ```csharp
-[CreateAssetMenu(menuName = "Test/CustomTooltip")]
+[CreateAssetMenu(menuName = "Items/Custom Tooltips/CustomTooltip")]
 public class CustomTooltipSerializer : AbstractTooltipSerializer {
 	public override ITooltipSerializer GetSerializer(Item item) {
 		return new CustomTooltipData();

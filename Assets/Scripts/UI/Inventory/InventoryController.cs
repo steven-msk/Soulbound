@@ -151,7 +151,7 @@ public class InventoryController : MonoBehaviour {
 	[RequiresEventContext("InventoryOpen", 100)]
 	[EventContextHandler("ItemDrag")]
 	public void OnSlotClick(StorageSlot slot) {
-		if (!popupOpen) {
+		if (!popupOpen || (slot.IsEmpty && pickupItem == null)) {
 			return;
 		}
 		static IEnumerator RevokeInventoryCapabilities() {

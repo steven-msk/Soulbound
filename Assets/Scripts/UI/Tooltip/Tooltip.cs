@@ -22,9 +22,26 @@ public class Tooltip : AbstractTooltip {
 	private Tooltip(string text, TooltipSectionLayout layout = null) : this(new TooltipData(layout ?? defaultLayout, text)) {
 	}
 
-	public Tooltip(TooltipData data) {
-		this.data = data;
+	private Tooltip(TooltipData data) => this.data = data;
+
+	public override void Show(Vector2 position, Transform parent) {
+		if (tooltipPanel != null) {
+			return;
+		}
+		tooltipPanel = AbstractTooltip.InstantiatePanel(parent);
+		RectTransform panelRect = tooltipPanel.GetComponent<RectTransform>();
+		TextMeshProUGUI tooltipSection = AbstractTooltip.InstantiateSectionText(tooltipPanel.transform);
+		panelRect.anchoredPosition = position;
+		data.Layout.Apply(tooltipSection);
+		tooltipSection.text = data.Text;
+
+		InventoryController inventory = GameManager.GetPlayerInstance().Inventory;
+		inventory.ActiveTooltip = this;
+		tooltipPanel.transform.SetParent(inventory.transform, true);
+		tooltipPanel.SetActive(true);
 	}
+
+	public static Tooltip FromData(TooltipData data) => new(data);
 
 	[CanBeNull] public static Tooltip Info(string text) => !string.IsNullOrEmpty(text) ? new(text) : null;
 
@@ -42,7 +59,6 @@ public class Tooltip : AbstractTooltip {
 		if (stats.Count == 0) {
 			return Tooltip.Info("No stats");
 		}
-		
 		StringBuilder textBuilder = new();
 		stats.OrderBy(statEntry => statEntry.Value.applyAsBonus).ToList().ForEach(statEntry => {
 			textBuilder.AppendLine(statEntry.Key.GetFormattedExpression(statEntry.Value.value, statEntry.Value.applyAsBonus));
@@ -73,27 +89,9 @@ public class Tooltip : AbstractTooltip {
 		return CompoundTooltip.OfCustom(compoundLayout, data.ToArray());
 	}
 
-	public static Tooltip InterpolatedStats(string source, IEnumerable<SerializableStat> interpolatedStats) {
+	public static Tooltip InterpolatedStats(string source, IEnumerable<SerializableStat> interpolatedStats) => InterpolatedStats(source, interpolatedStats.ToArray());
+
+	public static Tooltip InterpolatedStats(string source, params SerializableStat[] interpolatedStats) {
 		return new Tooltip(string.Format(source, interpolatedStats.Select(stat => stat.GetFormattedExpression()).ToArray()), TooltipSection.Stats.GetDefaultLayout());
-	}
-
-	public static Tooltip InterpolatedStats(string source, params SerializableStat[] interpolatedStats) => InterpolatedStats(source, interpolatedStats.AsEnumerable());
-
-
-	public override void Show(Vector2 position, Transform parent) {
-		if (tooltipPanel != null) {
-			return;
-		}
-		tooltipPanel = AbstractTooltip.InstantiatePanel(parent);
-		RectTransform panelRect = tooltipPanel.GetComponent<RectTransform>();
-		TextMeshProUGUI tooltipSection = AbstractTooltip.InstantiateSectionText(tooltipPanel.transform);
-		panelRect.anchoredPosition = position;
-		data.Layout.Apply(tooltipSection);
-		tooltipSection.text = data.Text;
-
-		InventoryController inventory = GameManager.GetPlayerInstance().Inventory;
-		inventory.ActiveTooltip = this;
-		tooltipPanel.transform.SetParent(inventory.transform, true);
-		tooltipPanel.SetActive(true);
 	}
 }

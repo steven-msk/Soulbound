@@ -8,7 +8,10 @@ public interface IStatProvider : IItemCapability {
 	public bool ApplyStatsAutomatically { get; }
 	public List<SerializableStat> Stats { get; }
 
-#warning currently stats are statically added, meaning they add to the total bonus. potions or special consumables may add stats but in a restricted manner - upon consume they only *reset* the applied stats - not add to the total value
+	// FEATUREIMPL: buffered stats
+	// Currently stats are statically added, meaning they add to the total bonus. Potions or special
+	// consumables may add stats but in a restricted manner - upon consume they only *reset* the
+	// applied stats - not add to the total value. This is just one type of buffered stats
 
 	public virtual void ApplyStats(PlayerController player) {
 		player.Stats.Apply(Stats);

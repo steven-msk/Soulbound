@@ -27,7 +27,10 @@ public class ItemStack {
 		this.Quantity = quantity;
 	}
 
-	public void UpdateText() => stackText.GetComponent<TextMeshProUGUI>().text = FormatStackCount(Quantity);
+	public void UpdateText() {
+		TextMeshProUGUI stackText = this.stackText.GetComponent<TextMeshProUGUI>();
+		stackText.text = FormatStackCount(Quantity);
+	}
 
 	public GameObject Initialize(ItemDisplay parent) {
 		GameObject stackText = GameObject.Instantiate(Registry.Get<GameObject>("stackNumberPrefab"), parent.transform);
@@ -44,7 +47,7 @@ public class ItemStack {
 			}
 			text.color = textColor;
 		}
-		rectTransform.pivot = new Vector2(0.77f, 0.42f);
+		rectTransform.pivot = new Vector2(1f, 0f);
 		rectTransform.anchoredPosition = Vector3.zero;
 		text.rectTransform.sizeDelta = text.GetPreferredValues(Mathf.Infinity, Mathf.Infinity);
 		this.stackText = stackText;

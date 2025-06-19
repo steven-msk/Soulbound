@@ -25,5 +25,6 @@ MonoBehaviour:
   stats:
   - serializedReference: 16
     valueType: 1
-    appliance: 1
+    applicationType: 0
     value: 0.1
+    applyAsBonus: 1
