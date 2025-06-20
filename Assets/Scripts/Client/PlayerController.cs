@@ -37,12 +37,18 @@ public class PlayerController : MonoBehaviour {
 	private ItemUsageHandler itemUsageHandler;
 	public ItemStack MainHandItem { get; private set; }
 
+	public bool CanAttack { get; set; } = true;
+
 	private void Start() {
 		playerPhysics = gameObject.GetComponent<PlayerPhysics>();
 
 		itemUsageHandler = new ItemUsageHandler(this);
 		itemUsageHandler.Register<IConsumable>(ItemUseTrigger.LeftClick, (item, stack) => item.Consume(stack, this));
-		itemUsageHandler.Register<IAttackPerformer>(ItemUseTrigger.LeftClick, (item, stack) => item.PerformAttack(this));
+		itemUsageHandler.Register<IAttackPerformer>(ItemUseTrigger.LeftClick, (item, stack) => { 
+			if (CanAttack) {
+				item.PerformAttack(this);
+			}
+		});
 
 		// alt attack?
 		itemUsageHandler.Register<IAttackPerformer>(ItemUseTrigger.LeftHold, (item, stack) => Debug.Log(stack));

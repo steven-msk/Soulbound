@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,6 +8,11 @@ public class WeaponItem : Item, IAttackPerformer, IStatProvider {
 	public List<SerializableStat> Stats => baseStats;
 
 	public bool ApplyStatsAutomatically => true;
+
+	[Header("Attack Constraints")]
+	[SerializeField] private float windupTime;
+	[SerializeField] private float cooldown;
+	[SerializeField] private GameObject attackPrefab;
 
 	// FEATUREIMPL: weapon attacks
 	// Each armor and weapon item can be inscriptioned with +4 soul slots. This means that the
@@ -23,7 +29,9 @@ public class WeaponItem : Item, IAttackPerformer, IStatProvider {
 
 
 	public void PerformAttack(PlayerController player) {
-		Debug.Log("attack");
+		GameObject attackObject = GameObject.Instantiate(attackPrefab); 
+		attackObject.GetComponentInChildren<AttackHandler>().Init(player, this);
+		attackObject.transform.position = player.transform.position;
 	}
 
 	protected override AbstractTooltip GetDefaultTooltip() {
