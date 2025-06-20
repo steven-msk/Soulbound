@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -10,10 +7,8 @@ public class AttackHandler : MonoBehaviour {
 	[SerializeField] private Animator animator;
 	[SerializeField] private string attackTrigger;
 	[SerializeField] private string windupTrigger;
-	[SerializeField] private float windupTime;
-	[SerializeField] private float cooldown;
-	private PlayerController player;
-	private WeaponItem weapon;
+	private PlayerController player = null;
+	private WeaponItem weapon = null;
 
 	public void Init(PlayerController player, WeaponItem weapon) {
 		this.player = player;
@@ -24,18 +19,29 @@ public class AttackHandler : MonoBehaviour {
 		StartCoroutine(HandleAttack());
 	}
 
+	public void FinishAttack() {
+		Destroy(transform.parent.gameObject, weapon.Cooldown);
+		gameObject.SetActive(false);
+		player.StartCoroutine(WaitCooldown());
+	}
+
 	private IEnumerator HandleAttack() {
-		yield return new WaitForSeconds(windupTime);
+		if (weapon == null || player == null) {
+			Debug.Log($"Attack Handler not initialized! HandleAttack() in ({gameObject.name})");
+			yield break;
+		}
+
+		yield return new WaitForSeconds(weapon.WindupTime);
 		animator.SetTrigger(attackTrigger);
 	}
 
-	public void FinishAttack() {
-		StartCoroutine(WaitCooldown());
-	}
-
 	private IEnumerator WaitCooldown() {
-		yield return new WaitForSeconds(cooldown);
+		if (weapon == null || player == null) {
+			Debug.Log($"Attack Handler not initialized! WaitCooldown() in ({gameObject.name})");
+			yield break;
+		}
+
+		yield return new WaitForSeconds(weapon.Cooldown);
 		player.CanAttack = true;
-		Destroy(transform.parent.gameObject);
 	}
 }

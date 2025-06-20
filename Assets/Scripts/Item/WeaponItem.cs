@@ -11,7 +11,9 @@ public class WeaponItem : Item, IAttackPerformer, IStatProvider {
 
 	[Header("Attack Constraints")]
 	[SerializeField] private float windupTime;
+	public float WindupTime => windupTime;
 	[SerializeField] private float cooldown;
+	public float Cooldown => cooldown;
 	[SerializeField] private GameObject attackPrefab;
 
 	// FEATUREIMPL: weapon attacks
