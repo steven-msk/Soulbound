@@ -22,7 +22,7 @@ public class InventoryController : MonoBehaviour {
 	public readonly Dictionary<int, StorageSlot> popupSlots = new();
 	[SerializeField] private AbstractTooltip activeTooltip;
 	public AbstractTooltip ActiveTooltip { set => activeTooltip = value; }
-	public StorageSlot[] AllSlots {		// FIXME not optimal
+	public StorageSlot[] AllSlots {		// FIXME: unoptimized AllSlots getter
 		get {
 			List<StorageSlot> slots = new();
 			slots.AddRange(hotbar.slots.Values);

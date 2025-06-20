@@ -72,7 +72,13 @@ public class HotbarController : MonoBehaviour {
 		Vector3 pixelSnappedPos = new(Mathf.Floor(localPos.x), Mathf.Floor(localPos.y), localPos.z);
 		slot.transform.localPosition = pixelSnappedPos;
 		slot.GetComponent<UnityEngine.UI.Image>().color = color;
-		slot.GetComponentInChildren<TextMeshProUGUI>().color = slotNumberColor;
+		foreach (var hotbarSlot in slot.GetComponentsInChildren<Transform>()) {
+			if (hotbarSlot.name != "Slot Number") {
+				continue;
+			}
+			hotbarSlot.GetComponent<TextMeshProUGUI>().color = slotNumberColor;
+			break;
+		}
 		if (!IsEmpty(slot.GetComponent<StorageSlot>())) {
 			slot.GetComponentInChildren<ItemDisplay>().gameObject.GetComponentInChildren<TextMeshProUGUI>().color = itemStackColor;
 		}

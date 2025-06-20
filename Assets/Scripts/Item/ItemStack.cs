@@ -33,6 +33,8 @@ public class ItemStack {
 	}
 
 	public GameObject Initialize(ItemDisplay parent) {
+		// FIXME: poor stack number positioning
+
 		GameObject stackText = GameObject.Instantiate(Registry.Get<GameObject>("stackNumberPrefab"), parent.transform);
 		TextMeshProUGUI text = stackText.GetComponent<TextMeshProUGUI>();
 		text.autoSizeTextContainer = true;

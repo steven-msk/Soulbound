@@ -20,6 +20,10 @@ public class ItemDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 	[SerializeField] private AbstractTooltip tooltip;
 	public AbstractTooltip Tooltip { get => tooltip; set => tooltip = value; }
 
+	private void Start() {
+		transform.SetAsFirstSibling();
+	}
+
 	private void Update() {
 		if (moveMode) {
 			gameObject.transform.position = GameManager.GetPlayerInstance().InputHandler.MouseScreenPosition;
