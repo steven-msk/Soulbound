@@ -31,9 +31,10 @@ public class WeaponItem : Item, IAttackPerformer, IStatProvider {
 
 
 	public void PerformAttack(PlayerController player) {
-		GameObject attackObject = GameObject.Instantiate(attackPrefab); 
+		GameObject attackObject = GameObject.Instantiate(attackPrefab);
+		Debug.Assert(attackObject.GetComponentInChildren<AttackHandler>() != null, 
+			$"AttackHandler not found in chilren of attack prefab asset. Item ID: {ID}, attack prefab: {attackObject.name}");
 		attackObject.GetComponentInChildren<AttackHandler>().Init(player, this);
-		attackObject.transform.position = player.transform.position;
 	}
 
 	protected override AbstractTooltip GetDefaultTooltip() {
