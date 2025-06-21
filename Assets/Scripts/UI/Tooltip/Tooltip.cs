@@ -76,7 +76,7 @@ public class Tooltip : AbstractTooltip {
 		})), layout);
 	}
 
-	// TODO: implement CompoundStats custom header layout
+	// FUTURE TODO: implement CompoundStats custom header layout
 	public static CompoundTooltip CompoundStats(Dictionary<string, IEnumerable<SerializableStat>> statSections, CompoundTooltipLayout compoundLayout = default) {
 		List<TooltipData> data = new();
 		TooltipSectionLayout commonLayout = TooltipSection.Stats.GetDefaultLayout();

@@ -12,7 +12,9 @@ public abstract class AbstractWeaponAttackBehavior : ScriptableObject {
 
 	public abstract Dictionary<string, Action<AttackHandler>> AnimationEventsSupplier { get; }
 
+	public abstract void OnHit(AttackHandler attackHandler);
+
 	public void Destroy(AttackHandler attackHandler) => GameObject.Destroy(attackHandler.transform.parent.gameObject);
 
-	public AttackHandlerEvents GenerateEvents() => new(Setup, AnimationEventsSupplier, PostAttack);
+	public AttackHandlerEvents GenerateEvents() => new(Setup, AnimationEventsSupplier, PostAttack, OnHit);
 }

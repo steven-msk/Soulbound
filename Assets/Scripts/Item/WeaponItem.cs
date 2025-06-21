@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using static UnityEngine.RuleTile.TilingRuleOutput;
 
-[CreateAssetMenu(fileName = "WeaponItem", menuName = "Items/WeaponItem")]
+[CreateAssetMenu(menuName = "Items/Weapon/WeaponItem")]
 public class WeaponItem : Item, IAttackPerformer, IStatProvider {
 	[SerializeField] private List<SerializableStat> baseStats;
 	public List<SerializableStat> Stats => baseStats;
@@ -43,9 +43,9 @@ public class WeaponItem : Item, IAttackPerformer, IStatProvider {
 		attackHandler.Init(player, this, attackBehavior.GenerateEvents());
 		attackHandler.BeginAttack();
 
-		/* REMINDER: Be aware of attacks and their animations. Some attacks need
-		 * to start a frame late in order for the animation to set up properly 
-		 * and prevent visual stutters. */
+		/* REMINDER: careful with start frames of weapon attack's animations
+		 * Some attacks might need to start a frame late in order for the
+		 * animation to set up properly and prevent visual stutters. */
 	}
 
 	protected override AbstractTooltip GetDefaultTooltip() {

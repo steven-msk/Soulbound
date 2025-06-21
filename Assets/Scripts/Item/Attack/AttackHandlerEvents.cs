@@ -10,17 +10,22 @@ using UnityEngine;
 public class AttackHandlerEvents {
 	private readonly Action<AttackHandler> setup;
 	private readonly Action<AttackHandler> postAttack;
+	private readonly Action<AttackHandler> onHit;				// PLANNED: onHit events should take IEntity hitTarget as a parameter
 	private readonly Dictionary<string, Action<AttackHandler>> animationEvents = new();
 
-	public AttackHandlerEvents([AllowsNull] Action<AttackHandler> setup, Dictionary<string, Action<AttackHandler>> animationEvents, [AllowsNull] Action<AttackHandler> postAttack) {
+	public AttackHandlerEvents([AllowsNull] Action<AttackHandler> setup, Dictionary<string, Action<AttackHandler>> animationEvents, 
+			[AllowsNull] Action<AttackHandler> postAttack, [AllowsNull] Action<AttackHandler> onHit) {
 		this.setup = setup ?? (_ => { });
 		this.animationEvents = animationEvents;
 		this.postAttack = postAttack ?? DefaultPostAttack;
+		this.onHit = onHit ?? (_ => { });
 	}
 
 	public void Setup(AttackHandler attackHandler) => setup.Invoke(attackHandler);
 
 	public void PostAttack(AttackHandler attackHandler) => postAttack.Invoke(attackHandler);
+
+	public void OnHit(AttackHandler attackHandler) => onHit.Invoke(attackHandler);
 
 	public void InvokeAnimationEvent(string name, AttackHandler attackHandler) {
 		if (animationEvents.TryGetValue(name, out Action<AttackHandler> @event)) {

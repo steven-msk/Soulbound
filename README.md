@@ -51,8 +51,11 @@ Private development. License TBD closer to production.
 ## Task tokens
 
 The following tokens have been introduced for developer use to improve codebase clarity and task management:
+- `TODO` (Priority: Normal) - used for tasks that need to be implemented or fixed soon. These tasks are relatively high-priority.
+- `FUTURE TODO` (Priority: Low) - indicates a potential upcoming change or design consideration. Similar to `TODO`, but it's not urgent.
 - `FEATUREIMPL` (Priority: High) - indicates a feature that has not yet been implemented but is planned for the near future
 - `REMINDER` (Priority: Low) - used to leave non-critical notes or consideration about future reference.
+- `PLANNED` (Priority: High) - indicates a feature or change that is already decided on, but not implemented yet. Its something you know you want to add, just at a later time.
 - `REFACTOR` (Priority: Normal) - indicates code that works correctly but could be improved for better readability or maintainability.
 
 ---
@@ -136,7 +139,7 @@ public override Dictionary<string, Action<AttackHandler>> AnimationEventsSupplie
 
 Here is an example of custom weapon attack behavior (weapon's movement is defined in a custom `StateMachineBehavior`)
 ```csharp
-[CreateAssetMenu(menuName = "Items/Attack Behaviors/WeaponAttackBevahior_test")]
+[[CreateAssetMenu(menuName = "Items/Weapon/Attack Behaviors/WeaponAttackBevahior_test")]
 public class WeaponAttackBehavior_test : AbstractWeaponAttackBehavior {
 	public override Dictionary<string, Action<AttackHandler>> AnimationEventsSupplier => new() {
 		["AnimEvent"] = _ => Debug.Log("event")
@@ -149,6 +152,10 @@ public class WeaponAttackBehavior_test : AbstractWeaponAttackBehavior {
 	public override void PostAttack(AttackHandler attackHandler) {
 		base.PostAttack(attackHandler);
 		Debug.Log("destroy");
+	}
+
+	public override void OnHit(AttackHandler attackHandler) {
+		Debug.Log("OnHit");
 	}
 }
 ```
