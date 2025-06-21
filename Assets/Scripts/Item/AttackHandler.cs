@@ -17,7 +17,6 @@ public class AttackHandler : MonoBehaviour {
 		if (weapon.WindupTime > 0) {
 			animator.SetTrigger(windupTrigger);
 		}
-		transform.parent.gameObject.transform.position = player.transform.position;
 		player.CanAttack = false;
 		gameObject.SetActive(true);
 		StartCoroutine(HandleAttack());

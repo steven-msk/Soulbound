@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.RuleTile.TilingRuleOutput;
 
 [CreateAssetMenu(fileName = "WeaponItem", menuName = "Items/WeaponItem")]
 public class WeaponItem : Item, IAttackPerformer, IStatProvider {
@@ -35,6 +36,8 @@ public class WeaponItem : Item, IAttackPerformer, IStatProvider {
 		Debug.Assert(attackObject.GetComponentInChildren<AttackHandler>() != null, 
 			$"AttackHandler not found in chilren of attack prefab asset. Item ID: {ID}, attack prefab: {attackObject.name}");
 		attackObject.GetComponentInChildren<AttackHandler>().Init(player, this);
+
+		attackObject.transform.position = player.transform.position;
 	}
 
 	protected override AbstractTooltip GetDefaultTooltip() {

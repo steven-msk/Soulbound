@@ -39,9 +39,11 @@ public class PlayerController : MonoBehaviour {
 
 	public bool CanAttack { get; set; } = true;
 
+	public float Facing => Mathf.Sign(transform.localScale.x);
+	public float Forward => -Facing;
+
 	private void Start() {
 		playerPhysics = gameObject.GetComponent<PlayerPhysics>();
-
 		itemUsageHandler = new ItemUsageHandler(this);
 		itemUsageHandler.Register<IConsumable>(ItemUseTrigger.LeftClick, (item, stack) => item.Consume(stack, this));
 		itemUsageHandler.Register<IAttackPerformer>(ItemUseTrigger.LeftClick, (item, stack) => { 
