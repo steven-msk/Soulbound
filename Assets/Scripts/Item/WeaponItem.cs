@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,10 +18,12 @@ public class WeaponItem : Item, IAttackPerformer, IStatProvider {
 	public float Cooldown => cooldown;
 	[SerializeField] private GameObject attackPrefab;
 
-	// FEATUREIMPL: weapon attacks
+	[SerializeField] private AbstractWeaponAttackBehavior attackBehavior;
+
+	// FEATUREIMPL: weapon attacks - WIP (NOT TESTED)
 	// Each armor and weapon item can be inscriptioned with +4 soul slots. This means that the
 	// maximum amount of souls a player can have is 2 base + 4 * 5 = 22 souls max.
-	// This can only be achieved in late post-inscriptioning due to the high rarity of the 4-soul-slotted
+	// This can only be achieved in late post-inscriptioning due to the high rarity of the 4-slotted
 	// inscriptions, but the gameplay becomes increasingly chaotic because of the extremely high
 	// number of rituals and/or affixes: 22 max souls * 2 or 3 (in extremely rare cases) = 44 or 66
 	// rituals and/or affixes total. Each ritual has high impact on combat, while the affixes impact
@@ -35,9 +38,14 @@ public class WeaponItem : Item, IAttackPerformer, IStatProvider {
 		GameObject attackObject = GameObject.Instantiate(attackPrefab);
 		Debug.Assert(attackObject.GetComponentInChildren<AttackHandler>() != null, 
 			$"AttackHandler not found in chilren of attack prefab asset. Item ID: {ID}, attack prefab: {attackObject.name}");
-		attackObject.GetComponentInChildren<AttackHandler>().Init(player, this);
+		
+		AttackHandler attackHandler = attackObject.GetComponentInChildren<AttackHandler>();
+		attackHandler.Init(player, this, attackBehavior.GenerateEvents());
+		attackHandler.BeginAttack();
 
-		attackObject.transform.position = player.transform.position;
+		/* REMINDER: Be aware of attacks and their animations. Some attacks need
+		 * to start a frame late in order for the animation to set up properly 
+		 * and prevent visual stutters. */
 	}
 
 	protected override AbstractTooltip GetDefaultTooltip() {

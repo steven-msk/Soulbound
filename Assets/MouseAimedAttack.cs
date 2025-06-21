@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngineInternal;
 
 public class MouseAimedAttack : StateMachineBehaviour {
 	public float speed;
@@ -8,11 +9,11 @@ public class MouseAimedAttack : StateMachineBehaviour {
 	public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
 		Vector3 mousePos = GameManager.GetPlayerInstance().InputHandler.MouseWorldPosition;
 		direction = (mousePos - animator.transform.position).normalized;
+		animator.transform.rotation = Quaternion.Euler(0, 0, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg + horizontalAngleOffset);
 	}
 
 	public override void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-		animator.transform.rotation = Quaternion.Euler(0, 0, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg + horizontalAngleOffset);
-		animator.transform.position += (Vector3)direction * speed * Time.deltaTime;
+		animator.transform.position += speed * Time.deltaTime * (Vector3)direction;
 	}
 
 	// OnStateExit is called when a transition ends and the state machine finishes evaluating this state

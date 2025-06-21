@@ -107,4 +107,49 @@ public class CustomTooltip : Tooltip {
 	}
 }
 ```
+---
+
+## Custom Weapon Attack Behaviors
+
+This system uses `AbstractWeaponAttackBehavior` as the foundation for custom attack logic through code.
+Custom behaviors should be created using these steps:
+1. Create a new ScriptableObject extending `AbstractWeaponAttackBehavior`, then override or implement your custom logic
+2. Assign an instance of the newly created behavior to the desired WeaponItem.  
+
+#### Important note:
+`AbstractWeaponAttackBehavior` should not define direct motion logic, as movement should be controlled by the animation clip and its assigned behavior. Instead, use `AbstractWeaponAttackBehavior` to define events that occur before, during, or after the attack is executed.  
+
+However, an exception may be made in cases where the animation clip does not contain a `StateMachineBehavior` or other mechanism to handle motion. In such cases, motion-relateed behavior may be implemented within `AbstractWeaponAttackBehavior`. <b> This approach is not recommended, as it breaks the separation between visual timing and gameplay behavior, and can lead to desynchronized or hard-to-maintain attack logic.</b>
+As a general rule, motion should remain animation-driven, and `AbstractWeaponAttackBehavior`s should be reserved for handling state changes, audio or visual feedback, or gameplay triggers.
+
+Events that occur during the attack animation can be triggered through either animation clip events (defined directly in the animation timeline), or external sources.  
+When invoking animation events, you must call:
+```csharp
+AttackHandler.InvokeAnimationEvent(string eventName);
+```
+where `eventName` must match the name of the action previously registered in the `AbstractWeaponAttackBehavior`:
+```csharp
+public override Dictionary<string, Action<AttackHandler>> AnimationEventsSupplier => new() {
+	["eventName"] = attackHandler => { /* custom logic */ }
+};
+```
+
+Here is an example of custom weapon attack behavior (weapon's movement is defined in a custom `StateMachineBehavior`)
+```csharp
+[CreateAssetMenu(menuName = "Items/Attack Behaviors/WeaponAttackBevahior_test")]
+public class WeaponAttackBehavior_test : AbstractWeaponAttackBehavior {
+	public override Dictionary<string, Action<AttackHandler>> AnimationEventsSupplier => new() {
+		["AnimEvent"] = _ => Debug.Log("event")
+	};
+
+	public override void Setup(AttackHandler attackHandler) { 
+		attackHandler.transform.position = GameManager.GetPlayerInstance().transform.position;
+	}
+
+	public override void PostAttack(AttackHandler attackHandler) {
+		base.PostAttack(attackHandler);
+		Debug.Log("destroy");
+	}
+}
+```
 
