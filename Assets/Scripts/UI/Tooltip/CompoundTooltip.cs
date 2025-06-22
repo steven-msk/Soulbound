@@ -23,7 +23,9 @@ public class CompoundTooltip : AbstractTooltip {
 
 	public static CompoundTooltip Of(params TooltipData[] entries) => new(entries);
 
-	public static CompoundTooltip Of(params Tooltip[] tooltips) => new(tooltips.Where(tooltip => tooltip != null).Select(tooltip => tooltip.Data).ToArray());
+	public static CompoundTooltip Of(params Tooltip[] tooltips) => new(tooltips.Select(tooltip => tooltip.Data).ToArray());
+
+	public static CompoundTooltip OfNullable(params Tooltip[] tooltips) => new(tooltips.Where(tooltip => tooltip != null).Select(tooltip => tooltip.Data).ToArray());
 
 	public static CompoundTooltip OfCustom(CompoundTooltipLayout layoutOptions, params Tooltip[] tooltips) => new(layoutOptions, tooltips.Where(tooltip => tooltip != null).Select(tooltip => tooltip.Data).ToArray());
 

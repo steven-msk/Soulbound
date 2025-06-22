@@ -7,5 +7,6 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 public abstract class ItemUseEffect : ScriptableObject {
-	public abstract void Execute(ItemStack itemStack, PlayerController player);
+	public virtual void Execute(ItemStack itemStack, PlayerController player) {
+	}
 }

@@ -33,6 +33,6 @@ public class Item : ScriptableObject, ISerializable {
 	}
 
 	protected virtual AbstractTooltip GetDefaultTooltip() {
-		return CompoundTooltip.Of(Tooltip.Title(itemName), Tooltip.Info(infoTextTooltip), Tooltip.Lore(loreTextTooltip));
+		return CompoundTooltip.OfNullable(Tooltip.Title(itemName), Tooltip.Info(infoTextTooltip), Tooltip.Lore(loreTextTooltip));
 	}
 }

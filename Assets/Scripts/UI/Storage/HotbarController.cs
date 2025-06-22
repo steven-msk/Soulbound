@@ -20,13 +20,13 @@ public class HotbarController : MonoBehaviour {
 	public Color inactiveItemStackColor;
 
 	[Header("Internal")]
-	[SerializeField] private StorageSlot activeSlot;
-	public StorageSlot ActiveSlot => activeSlot;	
+	[SerializeField] private InventorySlot activeSlot;
+	public InventorySlot ActiveSlot => activeSlot;	
 
-	public readonly Dictionary<int, StorageSlot> slots = new();
+	public readonly Dictionary<int, InventorySlot> slots = new();
 
 	private void Awake() {
-		StorageSlot[] hotbarSlots = gameObject.GetComponentsInChildren<StorageSlot>();
+		InventorySlot[] hotbarSlots = gameObject.GetComponentsInChildren<InventorySlot>();
 		for (int i = 0; i < hotbarSlots.Length; i++) {
 			hotbarSlots[i].SlotNumber = i + 1;
 			slots[i + 1] = hotbarSlots[i];
@@ -39,7 +39,7 @@ public class HotbarController : MonoBehaviour {
 
 	public void SetActiveSlot(int slotKey) {
 		Debug.Assert(slotKey >= 1 && slotKey <= slots.Count, $"Unexpected slotKey {slotKey}");
-		StorageSlot slot = slots[slotKey];
+		InventorySlot slot = slots[slotKey];
 		if (activeSlot == null) {
 			activeSlot = slot;
 			ApplySelectionChanges(activeSlot, activeSlotColor, activeSlotNumberColor, activeItemStackColor, activeSlotOffset, activeSlotScale);
@@ -65,7 +65,7 @@ public class HotbarController : MonoBehaviour {
 		SetActiveSlot(Mathf.Clamp(nextSlot, 1, slots.Count));
 	}
 
-	private void ApplySelectionChanges(StorageSlot slot, Color color, Color slotNumberColor, Color itemStackColor, Vector3 offset, Vector3 scale) {
+	private void ApplySelectionChanges(InventorySlot slot, Color color, Color slotNumberColor, Color itemStackColor, Vector3 offset, Vector3 scale) {
 		slot.transform.localScale = scale;
 		slot.transform.localPosition += offset;
 		Vector3 localPos = slot.transform.localPosition;
@@ -79,7 +79,7 @@ public class HotbarController : MonoBehaviour {
 			hotbarSlot.GetComponent<TextMeshProUGUI>().color = slotNumberColor;
 			break;
 		}
-		if (!IsEmpty(slot.GetComponent<StorageSlot>())) {
+		if (!IsEmpty(slot.GetComponent<InventorySlot>())) {
 			slot.GetComponentInChildren<ItemDisplay>().gameObject.GetComponentInChildren<TextMeshProUGUI>().color = itemStackColor;
 		}
 	}
@@ -94,10 +94,10 @@ public class HotbarController : MonoBehaviour {
 		}
 	}
 
-	public bool IsEmpty(StorageSlot slot) => slot.GetComponentInChildren<ItemDisplay>() == null;
+	public bool IsEmpty(InventorySlot slot) => slot.GetComponentInChildren<ItemDisplay>() == null;
 
 	[Obsolete] public void SetEditMode(bool value) {
-		foreach (StorageSlot slot in slots.Values) {
+		foreach (InventorySlot slot in slots.Values) {
 			slot.EditMode = value;
 		}
 	}

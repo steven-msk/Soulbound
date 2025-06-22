@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 public class AttackHandler : MonoBehaviour {
+
+	// FIXME: inacurrate collision detection between attack hitbox and target hurtbox
+
 	[SerializeField] private Animator animator;
 	[SerializeField] private string attackTrigger;
 	[SerializeField] private string windupTrigger;
@@ -34,7 +37,8 @@ public class AttackHandler : MonoBehaviour {
 		if (collider.gameObject.layer != LayerMask.NameToLayer("Hurtbox")) {
 			throw new Exception($"Unexpected collision callback between weapon hitbox '{gameObject.name}' and non-hurtbox collider '{collider.gameObject.name}'");
 		}
-		Debug.Log("hit");
+		// weapon.DealDamage(ILivingEntity entity)
+		events.OnHit(this);
 	}
 
 	private IEnumerator HandleAttack(float windup) {
@@ -58,6 +62,6 @@ public class AttackHandler : MonoBehaviour {
 
 	public class AttackHandlerInitializationException : Exception {
 		public AttackHandlerInitializationException(string caller)
-			: base($"Attack Handler not initialized! You must call AttackHandler.HandlePreAttack() before handling an attack. ({caller})") { }
+			: base($"Attack Handler not initialized! You must call AttackHandler.Init() before handling an attack. ({caller})") { }
 	}
 }

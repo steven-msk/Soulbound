@@ -10,6 +10,9 @@ using UnityEngine.UI;
 
 public class InventoryController : MonoBehaviour {
 
+	// PLANNED: IContainer interface for shareable item container behavior
+	// PLANNED REFACTOR: adapt InventoryController to have shared container behavior
+
 	[SerializeField] private GameObject itemDropTrigger;
 	[SerializeField] private HotbarController hotbar;
 	public HotbarController Hotbar => hotbar;
@@ -19,12 +22,12 @@ public class InventoryController : MonoBehaviour {
 
 	public bool PopupOpen => popupOpen;
 	[SerializeField] private ItemDisplay pickupItem = null;
-	public readonly Dictionary<int, StorageSlot> popupSlots = new();
+	public readonly Dictionary<int, InventorySlot> popupSlots = new();
 	[SerializeField] private AbstractTooltip activeTooltip;
 	public AbstractTooltip ActiveTooltip { set => activeTooltip = value; }
-	public StorageSlot[] AllSlots {		// FIXME: unoptimized AllSlots getter
+	public InventorySlot[] AllSlots {		// FIXME: unoptimized AllSlots getter
 		get {
-			List<StorageSlot> slots = new();
+			List<InventorySlot> slots = new();
 			slots.AddRange(hotbar.slots.Values);
 			slots.AddRange(popupSlots.Values);
 			return slots.ToArray();
@@ -32,7 +35,7 @@ public class InventoryController : MonoBehaviour {
 	}
 
 	private void Awake() {
-		StorageSlot[] slots = popup.GetComponentsInChildren<StorageSlot>(true);
+		InventorySlot[] slots = popup.GetComponentsInChildren<InventorySlot>(true);
 		slots = slots.OrderBy(slot => Regex.Match(slot.name, @"Slot (\d+)")?.Groups[1].Value).ToArray();
 		for (int i = 0; i < slots.Length; i++) {
 			popupSlots[i + 1] = slots[i];
@@ -77,6 +80,8 @@ public class InventoryController : MonoBehaviour {
 
 		CreateItemDisplay(new ItemStack(Registry.Get<Item>("weaponItem_test"), 2), hotbar.slots[1]);
 		CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableStatItem_test"), 100), hotbar.slots[3]);
+		CreateItemDisplay(new ItemStack(Registry.Get<Item>("equipableItemTest"), 1), hotbar.slots[2]);
+		CreateItemDisplay(new ItemStack(Registry.Get<Item>("equipableItemTest"), 1), hotbar.slots[4]);
 	}
 
 	[EventContextHandler("InventoryOpen")]
@@ -111,7 +116,7 @@ public class InventoryController : MonoBehaviour {
 
 	public bool PickupItem(ItemStack itemStack) {
 		if (!itemStack.Item.IsStackable) {
-			StorageSlot emptySlot = GetFirstEmptySlot();
+			InventorySlot emptySlot = GetFirstEmptySlot();
 			if (emptySlot != null) {
 				CreateItemDisplay(itemStack, emptySlot);
 				return true;
@@ -133,7 +138,7 @@ public class InventoryController : MonoBehaviour {
 			}
 
 
-			StorageSlot[] inventory = AllSlots;
+			InventorySlot[] inventory = AllSlots;
 			for (int i = 0; i < inventory.Length; i++){
 				if (!inventory[i].HasItem) {
 					int toAdd = Mathf.Min(remaining, itemStack.Item.MaxStackSize);
@@ -150,13 +155,9 @@ public class InventoryController : MonoBehaviour {
 
 	[RequiresEventContext("InventoryOpen", 100)]
 	[EventContextHandler("ItemDrag")]
-	public void OnSlotClick(StorageSlot slot) {
+	public void OnSlotClick(IItemSlot slot) {
 		if (!popupOpen || (slot.IsEmpty && pickupItem == null)) {
 			return;
-		}
-		static IEnumerator RevokeInventoryCapabilities() {
-			yield return null;
-			EventPriorityManager.Revoke("ItemDrag");
 		}
 
 		if (pickupItem == null && slot.HasItem) {
@@ -168,20 +169,20 @@ public class InventoryController : MonoBehaviour {
 			return;
 		}
 
-		ItemDisplay itemDisplay = slot.GetComponentInChildren<ItemDisplay>();
-		if (itemDisplay == null) {
-			pickupItem.transform.SetParent(slot.transform, true);
+		if (slot.IsEmpty) {
+			pickupItem.transform.SetParent(slot.GameObject.transform, true);
 			pickupItem.DisableMoveMode();
 			pickupItem = null;
 			itemDropTrigger.SetActive(false);
-			StartCoroutine(RevokeInventoryCapabilities());
+			StartCoroutine(RevokeItemDragEvent());
 			return;
 		}
 
+		ItemDisplay itemDisplay = slot.ItemDisplay;
 		ItemStack pickupStack = pickupItem.ItemStack;
 		ItemStack slotStack = itemDisplay.ItemStack;
 		if (slotStack.Item != pickupStack.Item || slotStack.Quantity == slotStack.Item.MaxStackSize) {
-			pickupItem.transform.SetParent(slot.transform, true);
+			pickupItem.transform.SetParent(slot.GameObject.transform, true);
 			pickupItem.DisableMoveMode();
 			pickupItem = itemDisplay;
 			pickupItem.EnableMoveMode();
@@ -194,12 +195,28 @@ public class InventoryController : MonoBehaviour {
 			if (pickupStack.Quantity <= 0) {
 				Destroy(pickupItem.gameObject);
 				pickupItem = null;
-				StartCoroutine(RevokeInventoryCapabilities());
+				StartCoroutine(RevokeItemDragEvent());
 			}
 		}
 	}
 
-	[CanBeNull] public StorageSlot GetFirstEmptySlot() {
+	[RequiresEventContext("InventoryOpen", 100)]
+	[EventContextHandler("ItemDrag")]
+	public void OnEquipmentSlotClicked(EquipmentSlot slot) {
+		bool justEquipped = false;
+		if (pickupItem?.ItemStack.Item is IEquipable equipableItem && !slot.HasItem) {
+			equipableItem.OnEquip(slot);
+			justEquipped = true;
+		} else if (slot.HasItem) {
+			((IEquipable)slot.ItemStack.Item).OnUnequipped(slot.ItemStack.Item);
+		}
+		this.OnSlotClick(slot);
+		if (slot.HasItem && !justEquipped) {
+			((IEquipable)slot.ItemStack.Item).OnEquip(slot);
+		}
+	}
+
+	[CanBeNull] public InventorySlot GetFirstEmptySlot() {
 		foreach (var slot in AllSlots) {
 			if (slot.IsEmpty) {
 				return slot;
@@ -208,13 +225,13 @@ public class InventoryController : MonoBehaviour {
 		return null;
 	}
 
-	[CanBeNull] public StorageSlot[] GetOccupiedSlots() => AllSlots.Where(slot => slot.HasItem).ToArray();
+	[CanBeNull] public InventorySlot[] GetOccupiedSlots() => AllSlots.Where(slot => slot.HasItem).ToArray();
 
-	[CanBeNull] public StorageSlot[] GetOccupiedSlots(Item item) => GetOccupiedSlots().Where(slot => slot.ItemStack.Item.Equals(item)).ToArray();
+	[CanBeNull] public InventorySlot[] GetOccupiedSlots(Item item) => GetOccupiedSlots().Where(slot => slot.ItemStack.Item.Equals(item)).ToArray();
 
-	[CanBeNull] public StorageSlot[] GetEmptySlots() => AllSlots.Where(slot => !slot.HasItem).ToArray();
+	[CanBeNull] public InventorySlot[] GetEmptySlots() => AllSlots.Where(slot => !slot.HasItem).ToArray();
 	
-	public ItemDisplay CreateItemDisplay(ItemStack itemStack, StorageSlot slot) {
+	public ItemDisplay CreateItemDisplay(ItemStack itemStack, InventorySlot slot) {
 		GameObject obj = Instantiate(Registry.Get<GameObject>("itemDisplayPrefab"), slot.transform);
 		ItemDisplay display = obj.GetComponent<ItemDisplay>();
 		Debug.Assert(display != null, $"ItemDisplay instance not found in item display prefab");
@@ -224,7 +241,7 @@ public class InventoryController : MonoBehaviour {
 		return display;
 	}
 
-	public ItemDisplay CreateItemDisplay(Item item, int quantity, StorageSlot slot) {
+	public ItemDisplay CreateItemDisplay(Item item, int quantity, InventorySlot slot) {
 		ItemStack itemStack = new(item, quantity);
 		return CreateItemDisplay(itemStack, slot);
 	}
@@ -247,9 +264,14 @@ public class InventoryController : MonoBehaviour {
 		}
 	}
 
-	public void EquipHotbarItem(StorageSlot slot) {
+	public void EquipHotbarItem(InventorySlot slot) {
 		ItemDisplay itemDisplay = slot.ItemDisplay;
 		PlayerController player = GameManager.GetPlayerInstance();
 		player.EquipHotbarItem(itemDisplay?.ItemStack);
+	}
+
+	static IEnumerator RevokeItemDragEvent() {
+		yield return null;
+		EventPriorityManager.Revoke("ItemDrag");
 	}
 }

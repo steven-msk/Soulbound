@@ -16,5 +16,5 @@ public abstract class AbstractWeaponAttackBehavior : ScriptableObject {
 
 	public void Destroy(AttackHandler attackHandler) => GameObject.Destroy(attackHandler.transform.parent.gameObject);
 
-	public AttackHandlerEvents GenerateEvents() => new(Setup, AnimationEventsSupplier, PostAttack, OnHit);
+	public AttackHandlerEvents GenerateHandler() => new(Setup, AnimationEventsSupplier, PostAttack, OnHit);
 }
