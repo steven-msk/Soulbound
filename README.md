@@ -19,7 +19,7 @@ Expect:
 - Spaghetti code in places
 - Untested systems
 - Incomplete or placeholder content
-- Frequent TODO, REMINDER, FIXME, FEATUREIMPL and REFACTOR comments
+- Frequent task comments
 
 ## Goals for Prototype Phase
 
@@ -119,7 +119,7 @@ Custom behaviors should be created using these steps:
 1. Create a new ScriptableObject extending `AbstractWeaponAttackBehavior`, then override or implement your custom logic
 2. Assign an instance of the newly created behavior to the desired WeaponItem.  
 
-#### Important note:
+#### Important note
 `AbstractWeaponAttackBehavior` should not define direct motion logic, as movement should be controlled by the animation clip and its assigned behavior. Instead, use `AbstractWeaponAttackBehavior` to define events that occur before, during, or after the attack is executed.  
 
 However, an exception may be made in cases where the animation clip does not contain a `StateMachineBehavior` or other mechanism to handle motion. In such cases, motion-relateed behavior may be implemented within `AbstractWeaponAttackBehavior`. <b> This approach is not recommended, as it breaks the separation between visual timing and gameplay behavior, and can lead to desynchronized or hard-to-maintain attack logic.</b>
@@ -139,7 +139,7 @@ public override Dictionary<string, Action<AttackHandler>> AnimationEventsSupplie
 
 Here is an example of custom weapon attack behavior (weapon's movement is defined in a custom `StateMachineBehavior`)
 ```csharp
-[[CreateAssetMenu(menuName = "Items/Weapon/Attack Behaviors/WeaponAttackBevahior_test")]
+[CreateAssetMenu(menuName = "Items/Weapon/Attack Behaviors/WeaponAttackBevahior_test")]
 public class WeaponAttackBehavior_test : AbstractWeaponAttackBehavior {
 	public override Dictionary<string, Action<AttackHandler>> AnimationEventsSupplier => new() {
 		["AnimEvent"] = _ => Debug.Log("event")
@@ -158,5 +158,75 @@ public class WeaponAttackBehavior_test : AbstractWeaponAttackBehavior {
 		Debug.Log("OnHit");
 	}
 }
+```
+---
+
+## Item Capabilities and Effect Definitions
+
+- The central interface for all item behaviors is `IItemCapability`. <b>This is a marker interface and must not be mocked or implemented directly.</b>
+- The base class for use-triggered item behaviors is `ItemUseEffect`. <b>This class is abstract and should not be instantiated or referenced directly.</b> To define behavior, you must inherit from it.
+
+When introducing a new item behavior, create a new interface that inherits from `IItemCapability`, and optionally register it inside ItemUsageHandler to link capability types with behavior mappings.  
+Defining a new use effect should be done using these steps:
+1. Create an abstract effect class inherited from `ItemUseEffect`, then add fields, shared logic, and any custom behavior. You may override the `Execute()` method, but this is not recommended - it will never be called outside of the class's context.
+2. Create the class containing the effect implementation that inherits from your abstract effect class.
+
+Then assign the effect to an item:
+1. Create a class that inherits both `Item` and the new capability interface
+2. Create an asset of the effect class
+3. Assign the effect asset to the item`s effect field (make sure both the field and the item asset exist first)
+
+The following example is taken from an actual feature in the game's code, but may be outdated due to ongoing development:
+
+#### Capability definition
+```csharp
+public interface IConsumable : IItemCapability {
+	public int ConsumeAmount { get; }
+	public ConsumableEffect ConsumeAction { get; }
+
+	public virtual void Consume(ItemStack itemStack) {
+		ConsumeAction?.OnConsume(this, itemStack);
+		itemStack.Quantity -= ConsumeAmount;
+	}
+}
+```
+
+#### Effect definition
+```csharp
+public abstract class ConsumableEffect : ItemUseEffect {
+	public abstract void OnConsume(IConsumable consumable, ItemStack itemStack);
+}
+```
+
+#### Item asset reference
+```csharp
+[CreateAssetMenu(menuName = "Items/ConsumableItem")]
+public class ConsumableItem : Item, IConsumable {
+	[CanBeNull] [SerializeField] private ConsumableEffect consumeAction;
+
+	public ConsumableEffect ConsumeAction => consumeAction;
+
+	[SerializeField] private int consumeAmount;
+	public int ConsumeAmount => consumeAmount;
+
+	protected override AbstractTooltip GetDefaultTooltip() {
+		return CompoundTooltip.Of(TooltipData.Concat((base.GetDefaultTooltip() as CompoundTooltip).Data.ToArray(), Tooltip.Tag(ItemTag.Consumable).Data));
+	}
+}
+```
+
+#### Effect asset reference
+```csharp
+[CreateAssetMenu(fileName = "ConsumableEffect_test", menuName = "Items/Effects/ConsumableEffect_test")]
+public class ConsumableEffect_test : ConsumableEffect {
+	public override void OnConsume(IConsumable consumable, ItemStack itemStack) {
+		Debug.Log($"consumed {consumable.ConsumeAmount}, remaining: {itemStack.Quantity}");
+	}
+}
+```
+
+#### Use effect registration
+```csharp
+itemUsageHandler.Register<IConsumable>(ItemUseTrigger.LeftClick, (consumable, stack) => consumable.Consume(stack));
 ```
 

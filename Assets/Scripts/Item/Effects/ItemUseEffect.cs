@@ -8,6 +8,5 @@ using UnityEngine;
 
 public abstract class ItemUseEffect : ScriptableObject {
 	public virtual void Execute(ItemStack itemStack, PlayerController player) {
-
 	}
 }
