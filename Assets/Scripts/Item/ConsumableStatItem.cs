@@ -21,7 +21,7 @@ public class ConsumableStatItem : Item, IConsumable, IStatProvider {
 	public bool ApplyStatsAutomatically => false;
 
 	public void Consume(ItemStack itemStack, PlayerController player) {
-		ConsumableUtils.DefaultConsume(this, itemStack, player);
+		ConsumableUtils.DefaultConsume(this, itemStack);
 		((IStatProvider)this).ApplyStats(player);
 	}
 

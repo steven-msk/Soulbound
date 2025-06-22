@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public abstract class ConsumableEffect : ScriptableObject {
-	public abstract void OnConsume(PlayerController player);
+public abstract class ConsumableEffect : ItemUseEffect {
+	public abstract void OnConsume(IConsumable consumable, ItemStack itemStack);
 
 	// FEATUREIMPL: status effects
 }

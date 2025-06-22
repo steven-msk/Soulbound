@@ -45,7 +45,7 @@ public class PlayerController : MonoBehaviour {
 	private void Start() {
 		playerPhysics = gameObject.GetComponent<PlayerPhysics>();
 		itemUsageHandler = new ItemUsageHandler(this);
-		itemUsageHandler.Register<IConsumable>(ItemUseTrigger.LeftClick, (item, stack) => item.Consume(stack, this));
+		itemUsageHandler.Register<IConsumable>(ItemUseTrigger.LeftClick, (consumable, stack) => consumable.Consume(stack));
 		itemUsageHandler.Register<IAttackPerformer>(ItemUseTrigger.LeftClick, (item, stack) => { 
 			if (CanAttack) {
 				item.PerformAttack(this);
