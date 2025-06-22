@@ -4,7 +4,7 @@ using UnityEngine;
 
 public abstract class AbstractTooltip {
 
-	// FUTURE TODO: implement interactable tooltips, scrollable/collapsable tooltips, comparable tooltips for weapons/souls
+	// FUTURE TODO: implement interactable tooltips, scrollable/collapsable tooltips
 	// PLANNED: tooltip tiling and clamping at screen limits
 
 	[CanBeNull] protected GameObject tooltipPanel;

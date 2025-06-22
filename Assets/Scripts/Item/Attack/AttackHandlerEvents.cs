@@ -10,7 +10,7 @@ using UnityEngine;
 public class AttackHandlerEvents {
 	private readonly Action<AttackHandler> setup;
 	private readonly Action<AttackHandler> postAttack;
-	private readonly Action<AttackHandler /*, ILivingEntity */> onHit;				// PLANNED: onHit events should take ILivingEntity hitTarget as a parameter
+	private readonly Action<AttackHandler> onHit;				// PLANNED: onHit events should take IEntity hitTarget as a parameter
 	private readonly Dictionary<string, Action<AttackHandler>> animationEvents = new();
 
 	public AttackHandlerEvents([AllowsNull] Action<AttackHandler> setup, Dictionary<string, Action<AttackHandler>> animationEvents, 

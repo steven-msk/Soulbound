@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.RuleTile.TilingRuleOutput;
 
 [CreateAssetMenu(menuName = "Items/Weapon/WeaponItem")]
 public class WeaponItem : Item, IAttackPerformer, IStatProvider {
@@ -19,7 +20,7 @@ public class WeaponItem : Item, IAttackPerformer, IStatProvider {
 
 	[SerializeField] private AbstractWeaponAttackBehavior attackBehavior;
 
-	// FEATUREIMPL (WIP): weapon attacks (NOT TESTED)
+	// FEATUREIMPL: weapon attacks - WIP (NOT TESTED)
 	// Each armor and weapon item can be inscriptioned with +4 soul slots. This means that the
 	// maximum amount of souls a player can have is 2 base + 4 * 5 = 22 souls max.
 	// This can only be achieved in late post-inscriptioning due to the high rarity of the 4-slotted
@@ -29,7 +30,7 @@ public class WeaponItem : Item, IAttackPerformer, IStatProvider {
 	// the results of the combat. You can instantly notice that, with high-tier souls with powerful
 	// rituals, the gameplay becomes extremely chaotic. Because of this, weapon attacks will be
 	// simple; they should leave the role of the real combat (including detailed effects) to rituals
-	// e.g. a quick slash, horizontal slice, stab, double slash, spinning attack (AoE), parry.
+	// e.g. a quick slash, horizontal slice, stab, double slash, spinning attack (AoE), parry
 	// As you can see, most weapon attacks will consist in slashing, slicing, or swinging.
 
 
@@ -39,7 +40,7 @@ public class WeaponItem : Item, IAttackPerformer, IStatProvider {
 			$"AttackHandler not found in chilren of attack prefab asset. Item ID: {ID}, attack prefab: {attackObject.name}");
 		
 		AttackHandler attackHandler = attackObject.GetComponentInChildren<AttackHandler>();
-		attackHandler.Init(player, this, attackBehavior.GenerateHandler());
+		attackHandler.Init(player, this, attackBehavior.GenerateEvents());
 		attackHandler.BeginAttack();
 
 		/* REMINDER: careful with start frames of weapon attack's animations
@@ -48,6 +49,6 @@ public class WeaponItem : Item, IAttackPerformer, IStatProvider {
 	}
 
 	protected override AbstractTooltip GetDefaultTooltip() {
-		return CompoundTooltip.OfNullable(Tooltip.Title(itemName), Tooltip.Stats(baseStats), Tooltip.Info(infoTextTooltip), Tooltip.Lore(loreTextTooltip));
+		return CompoundTooltip.Of(Tooltip.Title(itemName), Tooltip.Stats(baseStats), Tooltip.Info(infoTextTooltip), Tooltip.Lore(loreTextTooltip));
 	}
 }

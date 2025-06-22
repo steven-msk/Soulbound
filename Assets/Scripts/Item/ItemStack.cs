@@ -43,7 +43,7 @@ public class ItemStack {
 			text.text = $"{FormatStackCount(Quantity)}";
 			InventoryController inventory = GameManager.GetPlayerInstance().Inventory;
 			Color textColor = Color.white;
-			InventorySlot hotbarSlot = parent.GetComponentInParent<InventorySlot>();
+			StorageSlot hotbarSlot = parent.GetComponentInParent<StorageSlot>();
 			if (!inventory.PopupOpen && hotbarSlot != null && inventory.Hotbar.ActiveSlot != hotbarSlot) {
 				textColor = inventory.Hotbar.inactiveSlotNumberColor;
 			}
