@@ -16,22 +16,22 @@ public class WeaponAttackBehavior_test : WeaponAttackBehavior {
 
 	public override HashSet<ItemUseTrigger> RecognizedTriggers => attacks.Keys.ToHashSet();
 
-	public override Dictionary<string, Action<AttackHandler>> AnimationEventsSupplier => new() {
+	public override Dictionary<string, Action<GameObject>> AnimationEventsSupplier => new() {
 		["AnimEvent"] = _ => Debug.Log("event")
 	};
 
-	public override void PreAttack(AttackHandler attackHandler) {
-		attackHandler.transform.position = GameManager.GetPlayerInstance().transform.position;
+	public override void PreAttack(GameObject attackHandlerParent) {
+		attackHandlerParent.transform.position = GameManager.GetPlayerInstance().transform.position;
 	}
 
 	public override Func<ItemUseTrigger, AttackProcedure> AttackProcedureSupplier => (trigger) => attacks.GetValueOrDefault(trigger, null);
 
-	public override void PostAttack(AttackHandler attackHandler, string attack) {
-		base.PostAttack(attackHandler, attack);
+	public override void PostAttack(GameObject attackHandlerParent, string attack) {
+		base.PostAttack(attackHandlerParent, attack);
 		Debug.Log(attack);
 	}
 
-	public override void OnHit(AttackHandler attackHandler) {
+	public override void OnHit(GameObject attackHandlerParent) {
 		Debug.Log("OnHit");
 	}
 }

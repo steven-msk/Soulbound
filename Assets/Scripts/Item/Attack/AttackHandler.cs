@@ -12,12 +12,13 @@ public class AttackHandler : MonoBehaviour {
 	private PlayerController player = null;
 	private WeaponItem weapon = null;
 	private AttackHandlerEvents events = null;
+	public GameObject Parent => transform.parent.gameObject;
 
 	public void Init(WeaponItem weapon, AttackHandlerEvents events) {
 		this.player = GameManager.GetPlayerInstance();
 		this.weapon = weapon;
 		this.events = events;
-		events.PreAttack(this);
+		events.PreAttack(Parent);
 	}
 
 	public void HandleAttack(AttackProcedure procedure) {
@@ -25,22 +26,22 @@ public class AttackHandler : MonoBehaviour {
 			throw new AttackHandlerInitializationException($"BeginAttack() in '{gameObject.name}'");
 		}
 		player.CanAttack = false;
-		transform.parent.gameObject.SetActive(true);
+		Parent.SetActive(true);
 		//player.StartCoroutine(HandleAttack(attackProcedure));
 		procedure.InvokeAnimation(animator);
 		player.StartCoroutine(WaitCooldown(procedure.Cooldown));
 	}
 
-	public void InvokeAnimationEvent(string name) => events.InvokeAnimationEvent(name, this);
+	public void InvokeAnimationEvent(string name) => events.InvokeAnimationEvent(name, Parent);
 
-	public void FinishAttack(string attack) => events.PostAttack(this, attack);
+	internal void FinishAttack(string attack) => events.PostAttack(Parent, attack);
 
 	private void OnTriggerEnter2D(UnityEngine.Collider2D collider) {
 		if (collider.gameObject.layer != LayerMask.NameToLayer("Hurtbox")) {
 			throw new Exception($"Unexpected collision callback between weapon hitbox '{gameObject.name}' and non-hurtbox collider '{collider.gameObject.name}'");
 		}
 		// weapon.DealDamage(ILivingEntity entity)
-		events.OnHit(this);
+		events.OnHit(Parent);
 	}
 
 	private IEnumerator WaitCooldown(float cooldown) {

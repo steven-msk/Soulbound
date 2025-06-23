@@ -38,7 +38,7 @@ public class WeaponItem : Item, IAttackPerformer, IStatProvider {
 		}
 		GameObject attackObject = GameObject.Instantiate(attackPrefab);
 		if (attackObject.GetComponentInChildren<AttackHandler>() == null) {
-			throw new Exception($"AttackHandler not found in chilren of attack prefab asset. Item ID: {ID}, attack prefab: {attackObject.name}");
+			throw new AttackHandlerNotFoundException(this, attackObject);
 		}
 		AttackHandler attackHandler = attackObject.GetComponentInChildren<AttackHandler>();
 		attackHandler.Init(this, attackBehavior.GenerateEvents());
@@ -49,8 +49,13 @@ public class WeaponItem : Item, IAttackPerformer, IStatProvider {
 		return CompoundTooltip.OfNullable(Tooltip.Title(itemName), Tooltip.Stats(baseStats), Tooltip.Info(infoTextTooltip), Tooltip.Lore(loreTextTooltip));
 	}
 
-	private class AttackProcedureNotFoundException : NullReferenceException {
+	public class AttackProcedureNotFoundException : NullReferenceException {
 		public AttackProcedureNotFoundException(string weapon, ItemUseTrigger trigger)
 			: base($"Weapon attack procedure not found: input: '{trigger}', weapon: '{weapon}'") { }
+	}
+
+	public class AttackHandlerNotFoundException : NullReferenceException {
+		public AttackHandlerNotFoundException(WeaponItem weapon, GameObject attackObject) 
+			: base($"AttackHandler not found in chilren of attack prefab asset. Item ID: {weapon.ID}, attack prefab: {attackObject.name}") { }
 	}
 }
