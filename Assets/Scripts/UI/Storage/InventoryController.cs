@@ -97,8 +97,7 @@ public class InventoryController : MonoBehaviour {
 		if (activeTooltip != null && activeTooltip.IsDisplayed) {
 			activeTooltip?.Hide();
 		}
-		hotbar.SetEditMode(popupOpen);
-		hotbar.OnInventoryPopup();
+		hotbar.OnInventoryPopup(); 
 	}
 
 	public void DropItemFromInventory(InputAction.CallbackContext actionContext) {

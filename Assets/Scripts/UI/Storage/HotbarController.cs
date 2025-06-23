@@ -95,13 +95,4 @@ public class HotbarController : MonoBehaviour {
 	}
 
 	public bool IsEmpty(InventorySlot slot) => slot.GetComponentInChildren<ItemDisplay>() == null;
-
-	[Obsolete] public void SetEditMode(bool value) {
-		foreach (InventorySlot slot in slots.Values) {
-			slot.EditMode = value;
-		}
-	}
-
-	[Obsolete] public void EnableEditing() => SetEditMode(true);
-	[Obsolete] public void DisableEditing() => SetEditMode(false);
 }

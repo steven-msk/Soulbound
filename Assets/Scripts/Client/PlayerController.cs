@@ -18,20 +18,11 @@ public class PlayerController : MonoBehaviour {
 	private PlayerPhysics playerPhysics;
 	public PlayerPhysics Physics => playerPhysics;
 
-	[Header("Combat")]
-	[Obsolete] public float attackCooldown = 0.3f;
-	[Obsolete] public int attackCombo = 0;
-	[Obsolete] public int subAttackCombo = 0;
-
 	[Header("Internal")]
 	[SerializeField] private Rigidbody2D rb;
 	public Rigidbody2D Rigidbody => rb;
 	[SerializeField] private Animator animator;
 	public Animator Animator => animator;
-
-	[Header("Debug Internal")]
-	[Obsolete] [SerializeField] private float knockbackStunTimer = 0f;
-	[Obsolete] [SerializeField] private float attackTimer;
 
 	private ItemUsageHandler itemUsageHandler;
 	public ItemUsageHandler ItemUsageHandler => itemUsageHandler;
@@ -41,8 +32,6 @@ public class PlayerController : MonoBehaviour {
 
 	public float Facing => Mathf.Sign(transform.localScale.x);
 	public float Forward => -Facing;
-
-	// TODO: cleanup obsolete fields
 
 	private void Start() {
 		playerPhysics = gameObject.GetComponent<PlayerPhysics>();
@@ -58,12 +47,9 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	private void Update() {
-		animator.SetFloat("horizontalSpeed", knockbackStunTimer <= 0 ? Mathf.Abs(rb.linearVelocityX) : 0);
-		if (attackTimer > 0) {
-			attackTimer -= Time.deltaTime;
-		}
+		animator.SetFloat("horizontalSpeed", Mathf.Abs(rb.linearVelocityX));
 
-		if ((inputHandler.LeftHold || inputHandler.RightHold) && attackTimer <= 0) {
+		if (inputHandler.LeftHold || inputHandler.RightHold) {
 			Vector2 mousePos = inputHandler.MouseScreenPosition;
 			transform.localScale = new Vector3(mousePos.x >= Screen.width / 2 ? 1 : -1, 1, 1);
 
@@ -75,36 +61,6 @@ public class PlayerController : MonoBehaviour {
 				StartCoroutine(HoldNextFrame(ItemUseTrigger.LeftHold));
 			} else if (inputHandler.RightHold) {
 				StartCoroutine(HoldNextFrame(ItemUseTrigger.RightHold));
-				// [deprecated]
-				GameObject CreateBeam(float yoffset, Vector3 pos, Quaternion rotation, Vector2 facing) {
-					GameObject beam = GameObject.Instantiate(animator.GetComponent<AttackHitbox>().beam, pos, rotation);
-					beam.GetComponent<BeamController>().facing = facing;
-					beam.SetActive(true);
-					return beam;
-				}
-				animator.SetBool("attacking", true);
-				animator.SetTrigger("attack");
-				
-				Vector3 mouseWorldPos = inputHandler.MouseWorldPosition;
-				Vector3 facing = (mouseWorldPos - transform.position).normalized;
-				Quaternion rotation = Quaternion.Euler(0, 0, Mathf.Atan2(facing.y, facing.x) * Mathf.Rad2Deg - 90f);
-
-				if (attackCombo >= 2) {
-					Vector2 perp = new(-facing.y, facing.x);
-					Vector3 convergePos = transform.position + facing * (subAttackCombo % 2 == 0 ? 5f : 2f);
-
-					for (float offset = -1f ; offset < 1f; offset += 0.2f) {
-						Vector3 pos = transform.position + (Vector3)(perp * offset);
-						Vector3 subFacing = (convergePos - pos).normalized;
-						CreateBeam(offset, pos, rotation, subFacing);
-					}
-					
-					attackCombo = 0;
-					subAttackCombo++;
-				}
-				CreateBeam(0, transform.position, rotation, facing);
-				attackCombo++;
-				attackTimer = attackCooldown;
 			}
 		}
 	}

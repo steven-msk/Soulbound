@@ -11,9 +11,6 @@ public class InventorySlot : MonoBehaviour, IItemSlot {
 	public bool IsEmpty => ItemDisplay == null;
 	public ItemStack ItemStack => ItemDisplay?.ItemStack;
 
-	// TODO: remove editMode field of InventorySlot
-	[Obsolete] public bool EditMode {  get; set; }
-
 	public int SlotNumber { get; set; }
 
 	public GameObject GameObject => gameObject;
