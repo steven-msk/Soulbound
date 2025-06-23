@@ -1,7 +1,6 @@
 using System;
-using System.Collections.Generic;
+using System.Collections;
 using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -35,7 +34,8 @@ public class PlayerController : MonoBehaviour {
 	[Obsolete] [SerializeField] private float attackTimer;
 
 	private ItemUsageHandler itemUsageHandler;
-	public ItemStack MainHandItem { get; private set; }
+	public ItemUsageHandler ItemUsageHandler => itemUsageHandler;
+	public ItemStack MainHandStack { get; private set; }
 
 	public bool CanAttack { get; set; } = true;
 
@@ -46,14 +46,13 @@ public class PlayerController : MonoBehaviour {
 		playerPhysics = gameObject.GetComponent<PlayerPhysics>();
 		itemUsageHandler = new ItemUsageHandler(this);
 		itemUsageHandler.Register<IConsumable>(ItemUseTrigger.LeftClick, (consumable, stack) => consumable.Consume(stack));
-		itemUsageHandler.Register<IAttackPerformer>(ItemUseTrigger.LeftClick, (item, stack) => { 
-			if (CanAttack) {
-				item.PerformAttack(this);
-			}
-		});
-
-		// alt attack?
-		itemUsageHandler.Register<IAttackPerformer>(ItemUseTrigger.LeftHold, (item, stack) => Debug.Log(stack));
+		foreach (ItemUseTrigger trigger in Enum.GetValues(typeof(ItemUseTrigger))) {
+			itemUsageHandler.Register<IAttackPerformer>(trigger, (attackPerformer, stack) => {
+				if (CanAttack) {
+					attackPerformer.PerformAttack(trigger);
+				}
+			});
+		}
 	}
 
 	private void Update() {
@@ -66,10 +65,14 @@ public class PlayerController : MonoBehaviour {
 			Vector2 mousePos = inputHandler.MouseScreenPosition;
 			transform.localScale = new Vector3(mousePos.x >= Screen.width / 2 ? 1 : -1, 1, 1);
 
+			IEnumerator HoldNextFrame(ItemUseTrigger holdTrigger) {
+				yield return null;
+				itemUsageHandler.HandleMainHandInput(holdTrigger);
+			}
 			if (inputHandler.LeftHold) {
-				itemUsageHandler.HandleInput(ItemUseTrigger.LeftHold);
+				StartCoroutine(HoldNextFrame(ItemUseTrigger.LeftHold));
 			} else if (inputHandler.RightHold) {
-
+				StartCoroutine(HoldNextFrame(ItemUseTrigger.RightHold));
 				// [deprecated]
 				GameObject CreateBeam(float yoffset, Vector3 pos, Quaternion rotation, Vector2 facing) {
 					GameObject beam = GameObject.Instantiate(animator.GetComponent<AttackHitbox>().beam, pos, rotation);
@@ -105,18 +108,18 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	public void EquipHotbarItem([AllowsNull] ItemStack itemStack) {
-		MainHandItem = itemStack;
+		MainHandStack = itemStack;
 		if (itemStack?.Item is IStatProvider statProvider && statProvider.ApplyStatsAutomatically) {
 			statProvider.ApplyStats(this);
 		}
 	}
 
 	public void OnLeftClick(InputAction.CallbackContext actionContext) {
-		itemUsageHandler.HandleInput(ItemUseTrigger.LeftClick);
+		itemUsageHandler.HandleMainHandInput(ItemUseTrigger.LeftClick);
 	}
 
 	public void OnRightClick(InputAction.CallbackContext actionContext) {
-		itemUsageHandler.HandleInput(ItemUseTrigger.RightClick);
+		itemUsageHandler.HandleMainHandInput(ItemUseTrigger.RightClick);
 	}
 
 	public void OnSpacePressed(InputAction.CallbackContext actionContext) {

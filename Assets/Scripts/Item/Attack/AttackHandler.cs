@@ -5,25 +5,30 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 public class AttackHandler : MonoBehaviour {
+
+	// FIXME: inacurrate collision detection between attack hitbox and target hurtbox
+
 	[SerializeField] private Animator animator;
-	[SerializeField] private string attackTrigger;
-	[SerializeField] private string windupTrigger;
-	private PlayerController player = null; 
+	private PlayerController player = null;
 	private WeaponItem weapon = null;
 	private AttackHandlerEvents events = null;
 
-	public void Init(PlayerController player, WeaponItem weapon, AttackHandlerEvents events) {
-		this.player = player;
+	public void Init(WeaponItem weapon, AttackHandlerEvents events) {
+		this.player = GameManager.GetPlayerInstance();
 		this.weapon = weapon;
 		this.events = events;
-		events.Setup(this);
+		events.PreAttack(this);
 	}
 
-	public void BeginAttack() {
+	public void HandleAttack(AttackProcedure procedure) {
+		if (weapon == null || player == null) {
+			throw new AttackHandlerInitializationException($"BeginAttack() in '{gameObject.name}'");
+		}
 		player.CanAttack = false;
 		transform.parent.gameObject.SetActive(true);
-		player.StartCoroutine(HandleAttack(weapon.WindupTime));
-		player.StartCoroutine(WaitCooldown());
+		//player.StartCoroutine(HandleAttack(attackProcedure));
+		procedure.InvokeAnimation(animator);
+		player.StartCoroutine(WaitCooldown(procedure.Cooldown));
 	}
 
 	public void InvokeAnimationEvent(string name) => events.InvokeAnimationEvent(name, this);
@@ -34,30 +39,20 @@ public class AttackHandler : MonoBehaviour {
 		if (collider.gameObject.layer != LayerMask.NameToLayer("Hurtbox")) {
 			throw new Exception($"Unexpected collision callback between weapon hitbox '{gameObject.name}' and non-hurtbox collider '{collider.gameObject.name}'");
 		}
-		Debug.Log("hit");
+		// weapon.DealDamage(ILivingEntity entity)
+		events.OnHit(this);
 	}
 
-	private IEnumerator HandleAttack(float windup) {
-		if (weapon == null || player == null) {
-			throw new AttackHandlerInitializationException($"HandleAttack() in {gameObject.name}");
-		}
-		if (windup > 0) {
-			animator.SetTrigger(windupTrigger);
-			yield return new WaitForSeconds(weapon.WindupTime);
-		}
-		animator.SetTrigger(attackTrigger);
-	}
-
-	private IEnumerator WaitCooldown() {
+	private IEnumerator WaitCooldown(float cooldown) {
 		if (weapon == null || player == null) {
 			throw new AttackHandlerInitializationException($"WaitCooldown() in {gameObject.name}");
 		}
-		yield return new WaitForSeconds(weapon.Cooldown);
+		yield return new WaitForSeconds(cooldown);
 		player.CanAttack = true;
 	}
 
 	public class AttackHandlerInitializationException : Exception {
 		public AttackHandlerInitializationException(string caller)
-			: base($"Attack Handler not initialized! You must call AttackHandler.HandlePreAttack() before handling an attack. ({caller})") { }
+			: base($"Attack Handler not initialized! You must call AttackHandler.Init() before handling an attack. ({caller})") { }
 	}
 }

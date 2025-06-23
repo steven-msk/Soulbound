@@ -11,7 +11,4 @@ public enum ItemUseTrigger {
 	ReleaseLeftHold,
 	RightHold,
 	ReleaseRightHold,
-	Equip,
-	Drop,
-	UseFromInventory
 }

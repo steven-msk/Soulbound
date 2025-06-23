@@ -8,20 +8,20 @@ using Unity.VisualScripting;
 using UnityEngine;
 
 public class AttackHandlerEvents {
-	private readonly Action<AttackHandler> setup;
+	private readonly Action<AttackHandler> preAttack;
 	private readonly Action<AttackHandler> postAttack;
-	private readonly Action<AttackHandler> onHit;				// PLANNED: onHit events should take IEntity hitTarget as a parameter
+	private readonly Action<AttackHandler /*, ILivingEntity */> onHit;				// PLANNED: onHit events should take ILivingEntity hitTarget as a parameter
 	private readonly Dictionary<string, Action<AttackHandler>> animationEvents = new();
 
 	public AttackHandlerEvents([AllowsNull] Action<AttackHandler> setup, Dictionary<string, Action<AttackHandler>> animationEvents, 
 			[AllowsNull] Action<AttackHandler> postAttack, [AllowsNull] Action<AttackHandler> onHit) {
-		this.setup = setup ?? (_ => { });
+		this.preAttack = setup ?? (_ => { });
 		this.animationEvents = animationEvents;
 		this.postAttack = postAttack ?? DefaultPostAttack;
 		this.onHit = onHit ?? (_ => { });
 	}
 
-	public void Setup(AttackHandler attackHandler) => setup.Invoke(attackHandler);
+	public void PreAttack(AttackHandler attackHandler) => preAttack.Invoke(attackHandler);
 
 	public void PostAttack(AttackHandler attackHandler) => postAttack.Invoke(attackHandler);
 

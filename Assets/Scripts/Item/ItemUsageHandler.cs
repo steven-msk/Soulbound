@@ -19,18 +19,20 @@ public sealed class ItemUsageHandler {
 		};
 	}
 
-	public void HandleInput(ItemUseTrigger trigger) {
-		if (player.MainHandItem == null || !EventPriorityManager.IsAllowed("ItemUse")) {
+	public void HandleMainHandInput(ItemUseTrigger trigger) => HandleInput(trigger, player.MainHandStack);
+
+	public void HandleInput(ItemUseTrigger trigger, ItemStack itemStack) {
+		if (itemStack == null || !EventPriorityManager.IsAllowed("ItemUse")) {
 			return;
 		}
 		foreach (var (itemCapability, useTrigger) in handlers.Keys) {
-			if (!itemCapability.IsInstanceOfType(player.MainHandItem.Item) || useTrigger != trigger) {
-				continue;
+			if (!itemCapability.IsInstanceOfType(itemStack.Item) || useTrigger != trigger) {
+				continue; 
 			}
 			if (handlers.TryGetValue((itemCapability, useTrigger), out var action)) {
-				action?.Invoke(player.MainHandItem);
+				action?.Invoke(itemStack);
 			}
-			if (player.MainHandItem == null) {
+			if (itemStack == null) {
 				break;
 			}
 		}

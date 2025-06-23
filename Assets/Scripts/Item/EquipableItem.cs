@@ -1,0 +1,18 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using UnityEngine;
+using static UnityEditor.Progress;
+
+[CreateAssetMenu(menuName = "Items/EquipableItem")]
+public class EquipableItem : Item, IEquipable {
+	[SerializeField] private EquipableDelegate delegates;
+
+	public void OnEquip(EquipmentSlot slot) => delegates.InvokeOrElse(delegates => delegates.OnEquip(slot), LogWarning);
+
+	public void OnUnequipped(Item item) => delegates.InvokeOrElse(delegates => delegates.OnUnequip(item), LogWarning);
+
+	private void LogWarning() => Debug.LogWarning($"Missing EquipableDelegate for item {this.name}");
+}

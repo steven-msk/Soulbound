@@ -5,5 +5,5 @@ using System.Text;
 using System.Threading.Tasks;
 
 public interface IAttackPerformer : IItemCapability {
-	void PerformAttack(PlayerController player);
+	void PerformAttack(ItemUseTrigger useTrigger);
 }

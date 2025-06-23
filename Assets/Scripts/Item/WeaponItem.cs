@@ -1,8 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using static UnityEngine.RuleTile.TilingRuleOutput;
 
 [CreateAssetMenu(menuName = "Items/Weapon/WeaponItem")]
 public class WeaponItem : Item, IAttackPerformer, IStatProvider {
@@ -12,15 +12,13 @@ public class WeaponItem : Item, IAttackPerformer, IStatProvider {
 	public bool ApplyStatsAutomatically => true;
 
 	[Header("Attack Constraints")]
-	[SerializeField] private float windupTime;
-	public float WindupTime => windupTime;
-	[SerializeField] private float cooldown;
-	public float Cooldown => cooldown;
+	[Obsolete] [SerializeField] private float cooldown;
+	[Obsolete] public float Cooldown => cooldown;
 	[SerializeField] private GameObject attackPrefab;
 
 	[SerializeField] private AbstractWeaponAttackBehavior attackBehavior;
 
-	// FEATUREIMPL: weapon attacks - WIP (NOT TESTED)
+	// FEATUREIMPL (WIP): weapon attacks (NOT TESTED)
 	// Each armor and weapon item can be inscriptioned with +4 soul slots. This means that the
 	// maximum amount of souls a player can have is 2 base + 4 * 5 = 22 souls max.
 	// This can only be achieved in late post-inscriptioning due to the high rarity of the 4-slotted
@@ -30,25 +28,29 @@ public class WeaponItem : Item, IAttackPerformer, IStatProvider {
 	// the results of the combat. You can instantly notice that, with high-tier souls with powerful
 	// rituals, the gameplay becomes extremely chaotic. Because of this, weapon attacks will be
 	// simple; they should leave the role of the real combat (including detailed effects) to rituals
-	// e.g. a quick slash, horizontal slice, stab, double slash, spinning attack (AoE), parry
+	// e.g. a quick slash, horizontal slice, stab, double slash, spinning attack (AoE), parry.
 	// As you can see, most weapon attacks will consist in slashing, slicing, or swinging.
 
 
-	public void PerformAttack(PlayerController player) {
+	public void PerformAttack(ItemUseTrigger trigger) {
+		if (!attackBehavior.RecognizedTriggers.Contains(trigger)) {
+			return;
+		}
 		GameObject attackObject = GameObject.Instantiate(attackPrefab);
-		Debug.Assert(attackObject.GetComponentInChildren<AttackHandler>() != null, 
-			$"AttackHandler not found in chilren of attack prefab asset. Item ID: {ID}, attack prefab: {attackObject.name}");
-		
+		if (attackObject.GetComponentInChildren<AttackHandler>() == null) {
+			throw new Exception($"AttackHandler not found in chilren of attack prefab asset. Item ID: {ID}, attack prefab: {attackObject.name}");
+		}
 		AttackHandler attackHandler = attackObject.GetComponentInChildren<AttackHandler>();
-		attackHandler.Init(player, this, attackBehavior.GenerateEvents());
-		attackHandler.BeginAttack();
-
-		/* REMINDER: careful with start frames of weapon attack's animations
-		 * Some attacks might need to start a frame late in order for the
-		 * animation to set up properly and prevent visual stutters. */
+		attackHandler.Init(this, attackBehavior.GenerateEvents());
+		attackHandler.HandleAttack(attackBehavior.AttackProcedureSupplier.Invoke(trigger));
 	}
 
 	protected override AbstractTooltip GetDefaultTooltip() {
-		return CompoundTooltip.Of(Tooltip.Title(itemName), Tooltip.Stats(baseStats), Tooltip.Info(infoTextTooltip), Tooltip.Lore(loreTextTooltip));
+		return CompoundTooltip.OfNullable(Tooltip.Title(itemName), Tooltip.Stats(baseStats), Tooltip.Info(infoTextTooltip), Tooltip.Lore(loreTextTooltip));
+	}
+
+	private class AttackProcedureNotFoundException : NullReferenceException {
+		public AttackProcedureNotFoundException(string weapon, ItemUseTrigger trigger)
+			: base($"Weapon attack procedure not found: input: '{trigger}', weapon: '{weapon}'") { }
 	}
 }
