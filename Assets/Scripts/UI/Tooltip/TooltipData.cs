@@ -2,7 +2,7 @@
 using System.Linq;
 
 [Serializable]
-public class TooltipData : ITooltipSerializer {
+public class TooltipData : ITooltipDeserializer {
 	public string Text { get; set; }
 	public TooltipSectionLayout Layout { get; set; }
 

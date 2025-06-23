@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Items/Weapon/Attack Behaviors/WeaponAttackBevahior_test")]
-public class WeaponAttackBehavior_test : AbstractWeaponAttackBehavior {
+public class WeaponAttackBehavior_test : WeaponAttackBehavior {
 
 	static readonly Dictionary<ItemUseTrigger, AttackProcedure> attacks = new() {
 		[ItemUseTrigger.LeftHold] = AttackProcedure.Triggered("attack", 1f),
@@ -26,9 +26,9 @@ public class WeaponAttackBehavior_test : AbstractWeaponAttackBehavior {
 
 	public override Func<ItemUseTrigger, AttackProcedure> AttackProcedureSupplier => (trigger) => attacks.GetValueOrDefault(trigger, null);
 
-	public override void PostAttack(AttackHandler attackHandler) {
-		base.PostAttack(attackHandler);
-		Debug.Log("destroy");
+	public override void PostAttack(AttackHandler attackHandler, string attack) {
+		base.PostAttack(attackHandler, attack);
+		Debug.Log(attack);
 	}
 
 	public override void OnHit(AttackHandler attackHandler) {

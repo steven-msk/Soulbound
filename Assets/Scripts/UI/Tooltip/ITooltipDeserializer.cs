@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System;
 
-public interface ITooltipSerializer {
+public interface ITooltipDeserializer {
 	abstract AbstractTooltip Generate();
 }

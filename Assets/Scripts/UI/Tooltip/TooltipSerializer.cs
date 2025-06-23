@@ -5,6 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public abstract class AbstractTooltipSerializer : ScriptableObject {
-	public abstract ITooltipSerializer GetSerializer(Item item);
+public abstract class TooltipSerializer : ScriptableObject {
+	public abstract ITooltipDeserializer GetDeserializer(Item item);
 }

@@ -16,7 +16,7 @@ public class WeaponItem : Item, IAttackPerformer, IStatProvider {
 	[Obsolete] public float Cooldown => cooldown;
 	[SerializeField] private GameObject attackPrefab;
 
-	[SerializeField] private AbstractWeaponAttackBehavior attackBehavior;
+	[SerializeField] private WeaponAttackBehavior attackBehavior;
 
 	// FEATUREIMPL (WIP): weapon attacks (NOT TESTED)
 	// Each armor and weapon item can be inscriptioned with +4 soul slots. This means that the

@@ -1,14 +1,14 @@
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Items/Custom Tooltips/CompoundStatTooltip_test")]
-public class CompoundStatTooltip_test : AbstractTooltipSerializer {
+public class CompoundStatTooltip_test : TooltipSerializer {
 
-	public override ITooltipSerializer GetSerializer(Item item) {
+	public override ITooltipDeserializer GetDeserializer(Item item) {
 		return new CustomTooltipData(item);
 	}
 }
 
-public class CustomTooltipData : ITooltipSerializer {
+public class CustomTooltipData : ITooltipDeserializer {
 
 	private readonly Item item;
 

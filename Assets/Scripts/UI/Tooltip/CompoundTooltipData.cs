@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 [Serializable]
-public class CompoundTooltipData : ITooltipSerializer {
+public class CompoundTooltipData : ITooltipDeserializer {
 	public IList<TooltipData> tooltips;
 	public CompoundTooltipLayout layout;
 

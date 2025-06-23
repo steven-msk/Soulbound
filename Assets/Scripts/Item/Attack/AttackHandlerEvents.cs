@@ -9,12 +9,12 @@ using UnityEngine;
 
 public class AttackHandlerEvents {
 	private readonly Action<AttackHandler> preAttack;
-	private readonly Action<AttackHandler> postAttack;
+	private readonly Action<AttackHandler, string> postAttack;
 	private readonly Action<AttackHandler /*, ILivingEntity */> onHit;				// PLANNED: onHit events should take ILivingEntity hitTarget as a parameter
 	private readonly Dictionary<string, Action<AttackHandler>> animationEvents = new();
 
 	public AttackHandlerEvents([AllowsNull] Action<AttackHandler> setup, Dictionary<string, Action<AttackHandler>> animationEvents, 
-			[AllowsNull] Action<AttackHandler> postAttack, [AllowsNull] Action<AttackHandler> onHit) {
+			[AllowsNull] Action<AttackHandler, string> postAttack, [AllowsNull] Action<AttackHandler> onHit) {
 		this.preAttack = setup ?? (_ => { });
 		this.animationEvents = animationEvents;
 		this.postAttack = postAttack ?? DefaultPostAttack;
@@ -23,7 +23,7 @@ public class AttackHandlerEvents {
 
 	public void PreAttack(AttackHandler attackHandler) => preAttack.Invoke(attackHandler);
 
-	public void PostAttack(AttackHandler attackHandler) => postAttack.Invoke(attackHandler);
+	public void PostAttack(AttackHandler attackHandler, string attack) => postAttack.Invoke(attackHandler, attack);
 
 	public void OnHit(AttackHandler attackHandler) => onHit.Invoke(attackHandler);
 
@@ -35,7 +35,7 @@ public class AttackHandlerEvents {
 		}
 	}
 
-	private static void DefaultPostAttack(AttackHandler attackHandler) => GameObject.Destroy(attackHandler.transform.parent.gameObject);
+	private static void DefaultPostAttack(AttackHandler attackHandler, string attack) => GameObject.Destroy(attackHandler.transform.parent.gameObject);
 
 	private class AttackAnimationEventNotFoundException : NullReferenceException {
 		public AttackAnimationEventNotFoundException(string eventName, AttackHandler attackHandler)

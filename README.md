@@ -63,13 +63,13 @@ The following tokens have been introduced for developer use to improve codebase 
 ## Custom item tooltips
 
 Architecture overview:
-- `AbstractTooltipSerialzier`: ScriptableObject, assigned per Item, returns a `ITooltipSerializer`
-- `ITooltipSerializer`: return the actual runtime `AbstractTooltip`
+- `TooltipSerializer`: ScriptableObject, assigned per Item, returns a `ITooltipDeserializer`
+- `ITooltipDeserializer`: return the actual runtime `AbstractTooltip`
 - `AbstractTooltip`: the tooltip instance, handles show/hide/update logic
 
 Custom item tooltip implementation should be done using these steps:
 1. Create a new class extending `AbstractTooltip` or an existing tooltip implementation (e.g. `Tooltip`), implement `Update()` and other logic as needed
-2. Create a class `ITooltipSerializer`, return your tooltip instance
+2. Create a class `ITooltipDeserializer`, return your tooltip instance
 3. Create a `ScriptableObject` extending `AbstractTooltipSerializer` and return your serializer
 4. Assign the ScriptableObject to an `Item`    
 
@@ -85,12 +85,12 @@ Developers: You can find a template tooltip creation snippet in `Documentation/S
 ```csharp
 [CreateAssetMenu(menuName = "Items/Custom Tooltips/CustomTooltip")]
 public class CustomTooltipSerializer : AbstractTooltipSerializer {
-	public override ITooltipSerializer GetSerializer(Item item) {
+	public override ITooltipDeserializer GetSerializer(Item item) {
 		return new CustomTooltipData();
 	}
 }
 
-public class CustomTooltipData : ITooltipSerializer {
+public class CustomTooltipData : ITooltipDeserializer {
 	public AbstractTooltip Generate() {
 		return new CustomTooltip(Tooltip.Plain("0").Data);
 	}
@@ -114,23 +114,23 @@ public class CustomTooltip : Tooltip {
 
 ## Custom Weapon Attack Behaviors
 
-This system uses `AbstractWeaponAttackBehavior` as the foundation for custom attack logic through code.
+This system uses `WeaponAttackBehavior` as the foundation for custom attack logic through code.
 Custom behaviors should be created using these steps:
-1. Create a new ScriptableObject extending `AbstractWeaponAttackBehavior`, then override or implement your custom logic
+1. Create a new ScriptableObject extending `WeaponAttackBehavior`, then override or implement your custom logic
 2. Assign an instance of the newly created behavior to the desired WeaponItem.  
 
 #### Important note
-`AbstractWeaponAttackBehavior` should not define direct motion logic, as movement should be controlled by the animation clip and its assigned behavior. Instead, use `AbstractWeaponAttackBehavior` to define events that occur before, during, or after the attack is executed.  
+`WeaponAttackBehavior` should not define direct motion logic, as movement should be controlled by the animation clip and its assigned behavior. Instead, use `WeaponAttackBehavior` to define events that occur before, during, or after the attack is executed.  
 
-However, an exception may be made in cases where the animation clip does not contain a `StateMachineBehavior` or other mechanism to handle motion. In such cases, motion-relateed behavior may be implemented within `AbstractWeaponAttackBehavior`. <b> This approach is not recommended, as it breaks the separation between visual timing and gameplay behavior, and can lead to desynchronized or hard-to-maintain attack logic.</b>
-As a general rule, motion should remain animation-driven, and `AbstractWeaponAttackBehavior`s should be reserved for handling state changes, audio or visual feedback, or gameplay triggers.
+However, an exception may be made in cases where the animation clip does not contain a `StateMachineBehavior` or other mechanism to handle motion. In such cases, motion-relateed behavior may be implemented within `WeaponAttackBehavior`. <b> This approach is not recommended, as it breaks the separation between visual timing and gameplay behavior, and can lead to desynchronized or hard-to-maintain attack logic.</b>
+As a general rule, motion should remain animation-driven, and `WeaponAttackBehavior`s should be reserved for handling state changes, audio or visual feedback, or gameplay triggers.
 
 Events that occur during the attack animation can be triggered through either animation clip events (defined directly in the animation timeline), or external sources.  
 When invoking animation events, you must call:
 ```csharp
 AttackHandler.InvokeAnimationEvent(string eventName);
 ```
-where `eventName` must match the name of the action previously registered in the `AbstractWeaponAttackBehavior`:
+where `eventName` must match the name of the action previously registered in the `WeaponAttackBehavior`:
 ```csharp
 public override Dictionary<string, Action<AttackHandler>> AnimationEventsSupplier => new() {
 	["eventName"] = attackHandler => { /* custom logic */ }
@@ -140,7 +140,7 @@ public override Dictionary<string, Action<AttackHandler>> AnimationEventsSupplie
 Here is an example of custom weapon attack behavior (weapon's movement is defined in a custom `StateMachineBehavior`)
 ```csharp
 [CreateAssetMenu(menuName = "Items/Weapon/Attack Behaviors/WeaponAttackBevahior_test")]
-public class WeaponAttackBehavior_test : AbstractWeaponAttackBehavior {
+public class WeaponAttackBehavior_test : WeaponAttackBehavior {
 	public override Dictionary<string, Action<AttackHandler>> AnimationEventsSupplier => new() {
 		["AnimEvent"] = _ => Debug.Log("event")
 	};

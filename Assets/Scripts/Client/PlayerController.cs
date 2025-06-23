@@ -42,6 +42,8 @@ public class PlayerController : MonoBehaviour {
 	public float Facing => Mathf.Sign(transform.localScale.x);
 	public float Forward => -Facing;
 
+	// TODO: cleanup obsolete fields
+
 	private void Start() {
 		playerPhysics = gameObject.GetComponent<PlayerPhysics>();
 		itemUsageHandler = new ItemUsageHandler(this);

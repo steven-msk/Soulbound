@@ -33,7 +33,7 @@ public class AttackHandler : MonoBehaviour {
 
 	public void InvokeAnimationEvent(string name) => events.InvokeAnimationEvent(name, this);
 
-	public void FinishAttack() => events.PostAttack(this);
+	public void FinishAttack(string attack) => events.PostAttack(this, attack);
 
 	private void OnTriggerEnter2D(UnityEngine.Collider2D collider) {
 		if (collider.gameObject.layer != LayerMask.NameToLayer("Hurtbox")) {

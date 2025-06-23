@@ -11,7 +11,7 @@ public class Item : ScriptableObject, ISerializable {
 	[SerializeField] protected Sprite icon;
 	[SerializeField] protected GameObject worldPrefab;
 	[SerializeField] protected int maxStackSize;
-	[SerializeField][CanBeNull] protected AbstractTooltipSerializer customTooltipSerializer;
+	[SerializeField][CanBeNull] protected TooltipSerializer customTooltipSerializer;
 	[SerializeField][CanBeNull] protected string loreTextTooltip;
 	[SerializeField][CanBeNull] protected string infoTextTooltip;
 
@@ -21,13 +21,13 @@ public class Item : ScriptableObject, ISerializable {
 	public int MaxStackSize => maxStackSize;
 	public bool IsStackable => maxStackSize > 1;
 	public string ID => id;
-	public AbstractTooltipSerializer TooltipSerializer => customTooltipSerializer;
+	public TooltipSerializer TooltipSerializer => customTooltipSerializer;
 	public string LoreText => loreTextTooltip;
 	public string InfoText => infoTextTooltip;
 
 	public virtual AbstractTooltip GetTooltip() {
 		if (customTooltipSerializer != null) {
-			return customTooltipSerializer.GetSerializer(this).Generate();
+			return customTooltipSerializer.GetDeserializer(this).Generate();
 		}
 		return GetDefaultTooltip();
 	}
