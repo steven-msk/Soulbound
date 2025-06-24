@@ -4,6 +4,7 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
+[Obsolete]
 public static class EventPriorityManager {
 	public static int HighestPriority { get; private set; } = 0;
 	private static readonly List<PrioritizedEvent> eventStack = new();
@@ -22,7 +23,7 @@ public static class EventPriorityManager {
 		}
 		
 		var currentTop = eventStack.Last();
-		if (@event.Priority > currentTop.Priority) {
+		if (@event.Priority >= currentTop.Priority) {
 			PushEvent(@event, @event.Priority, logClaim);
 			return;
 		} else {
@@ -66,15 +67,12 @@ public static class EventPriorityManager {
 		}
 		return true;
 	}
+
+	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+	private static void Reset() => eventStack.Clear();
 }
 
 public class PriorityRequestException : Exception {
-	public PrioritizedEvent Attempted { get; }
-	public PrioritizedEvent Current { get; }
-
 	public PriorityRequestException(PrioritizedEvent attempted, PrioritizedEvent current)
-		: base($"Event context control request failed. Tried {attempted}, but {current} is already active.") {
-		Attempted = attempted;
-		Current = current;
-	}
+		: base($"Event context control request failed. Tried {attempted}, but {current} is already active.") { }
 }

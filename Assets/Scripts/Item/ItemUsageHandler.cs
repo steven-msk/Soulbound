@@ -19,10 +19,10 @@ public sealed class ItemUsageHandler {
 		};
 	}
 
-	public void HandleMainHandInput(ItemUseTrigger trigger) => HandleInput(trigger, player.MainHandStack);
+	public void HandleInput(ItemUseTrigger trigger) => HandleInput(trigger, player.MainHandStack);
 
 	public void HandleInput(ItemUseTrigger trigger, ItemStack itemStack) {
-		if (itemStack == null || !EventPriorityManager.IsAllowed("ItemUse")) {
+		if (itemStack == null) {
 			return;
 		}
 		foreach (var (itemCapability, useTrigger) in handlers.Keys) {

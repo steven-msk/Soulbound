@@ -15,5 +15,8 @@ public class InventorySlot : MonoBehaviour, IItemSlot {
 
 	public GameObject GameObject => gameObject;
 
-	public void OnPointerDown(PointerEventData eventData) => GameManager.GetPlayerInstance().Inventory.OnSlotClick(this);
+	public void OnPointerDown(PointerEventData eventData) {
+		InputHandler.RequestAction(new("ItemDrag", 10, () => GameManager.GetPlayerInstance().Inventory.OnSlotClick(this)));
+		InputHandler.BlockContextUntil("ItemUse", () => GameManager.GetPlayerInstance().InputHandler.LeftHold);
+	}
 }

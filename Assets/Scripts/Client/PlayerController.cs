@@ -52,16 +52,6 @@ public class PlayerController : MonoBehaviour {
 		if (inputHandler.LeftHold || inputHandler.RightHold) {
 			Vector2 mousePos = inputHandler.MouseScreenPosition;
 			transform.localScale = new Vector3(mousePos.x >= Screen.width / 2 ? 1 : -1, 1, 1);
-
-			IEnumerator HoldNextFrame(ItemUseTrigger holdTrigger) {
-				yield return null;
-				itemUsageHandler.HandleMainHandInput(holdTrigger);
-			}
-			if (inputHandler.LeftHold) {
-				StartCoroutine(HoldNextFrame(ItemUseTrigger.LeftHold));
-			} else if (inputHandler.RightHold) {
-				StartCoroutine(HoldNextFrame(ItemUseTrigger.RightHold));
-			}
 		}
 	}
 
@@ -72,13 +62,15 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
-	public void OnLeftClick(InputAction.CallbackContext actionContext) {
-		itemUsageHandler.HandleMainHandInput(ItemUseTrigger.LeftClick);
-	}
+	public void OnLeftClick() => InputHandler.RequestAction(ItemUseRequest(ItemUseTrigger.LeftClick));
 
-	public void OnRightClick(InputAction.CallbackContext actionContext) {
-		itemUsageHandler.HandleMainHandInput(ItemUseTrigger.RightClick);
-	}
+	public void OnRightClick() => InputHandler.RequestAction(ItemUseRequest(ItemUseTrigger.RightClick));
+
+	public void OnLeftHold() => InputHandler.RequestAction(ItemUseRequest(ItemUseTrigger.LeftHold));
+
+	public void OnRightHold() => InputHandler.RequestAction(ItemUseRequest(ItemUseTrigger.RightHold));
+
+	private InputActionRequest ItemUseRequest(ItemUseTrigger useTrigger) => new InputActionRequest("ItemUse", 5, () => itemUsageHandler.HandleInput(useTrigger));
 
 	public void OnSpacePressed(InputAction.CallbackContext actionContext) {
 		playerPhysics.OnSpacePressed();

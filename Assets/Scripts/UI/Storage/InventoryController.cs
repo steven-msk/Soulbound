@@ -87,11 +87,7 @@ public class InventoryController : MonoBehaviour {
 
 	[EventContextHandler("InventoryOpen")]
 	public void ToggleInventory(InputAction.CallbackContext actionContext) {
-		try { EventPriorityManager.RequestControl(new PrioritizedEvent("InventoryOpen", 10, "ItemUse")); } catch (PriorityRequestException) { }
 		popupOpen = !popupOpen;
-		if (!popupOpen) {
-			EventPriorityManager.Revoke("InventoryOpen");
-		}
 		popup.SetActive(popupOpen);
 		LayoutRebuilder.ForceRebuildLayoutImmediate(popup.GetComponent<RectTransform>());
 		if (activeTooltip != null && activeTooltip.IsDisplayed) {
@@ -165,7 +161,6 @@ public class InventoryController : MonoBehaviour {
 			pickupItem.EnableMoveMode();
 			pickupItem.transform.SetParent(gameObject.transform, true);
 			itemDropTrigger.SetActive(true);
-			EventPriorityManager.RequestControl(new PrioritizedEvent("ItemDrag", 100));
 			return;
 		}
 
@@ -174,7 +169,6 @@ public class InventoryController : MonoBehaviour {
 			pickupItem.DisableMoveMode();
 			pickupItem = null;
 			itemDropTrigger.SetActive(false);
-			StartCoroutine(RevokeItemDragEvent());
 			return;
 		}
 
@@ -195,7 +189,6 @@ public class InventoryController : MonoBehaviour {
 			if (pickupStack.Quantity <= 0) {
 				Destroy(pickupItem.gameObject);
 				pickupItem = null;
-				StartCoroutine(RevokeItemDragEvent());
 			}
 		}
 	}
@@ -204,7 +197,6 @@ public class InventoryController : MonoBehaviour {
 	[EventContextHandler("ItemDrag")]
 	public void OnEquipmentSlotClicked(EquipmentSlot slot) {
 		if (pickupItem?.ItemStack.Item is not IEquipable && pickupItem != null) {
-			Debug.Log("1");
 			return;
 		}
 		bool justEquipped = false;
@@ -258,7 +250,6 @@ public class InventoryController : MonoBehaviour {
 		if (pickupItem != null) {
 			Destroy(pickupItem.gameObject);
 			pickupItem = null;
-			EventPriorityManager.Revoke("ItemDrag");
 		}
 	}
 
@@ -266,10 +257,5 @@ public class InventoryController : MonoBehaviour {
 		ItemDisplay itemDisplay = slot.ItemDisplay;
 		PlayerController player = GameManager.GetPlayerInstance();
 		player.EquipHotbarItem(itemDisplay?.ItemStack);
-	}
-
-	static IEnumerator RevokeItemDragEvent() {
-		yield return null;
-		EventPriorityManager.Revoke("ItemDrag");
 	}
 }
