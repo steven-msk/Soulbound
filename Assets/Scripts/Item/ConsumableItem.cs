@@ -12,7 +12,5 @@ public class ConsumableItem : Item, IConsumable {
 	[SerializeField] private int consumeAmount;
 	public int ConsumeAmount => consumeAmount;
 
-	protected override AbstractTooltip GetDefaultTooltip() {
-		return CompoundTooltip.Of(TooltipData.Concat((base.GetDefaultTooltip() as CompoundTooltip).Data.ToArray(), Tooltip.Tag(ItemTag.Consumable).Data));
-	}
+	protected override CompoundTooltip GetDefaultTooltip() => base.GetDefaultTooltip().Concat(Tooltip.Tag(ItemTag.Consumable));
 }

@@ -68,47 +68,47 @@ Architecture overview:
 - `AbstractTooltip`: the tooltip instance, handles show/hide/update logic
 
 Custom item tooltip implementation should be done using these steps:
-1. Create a new class extending `AbstractTooltip` or an existing tooltip implementation (e.g. `Tooltip`), implement `Update()` and other logic as needed
+1. (Optional) Create a new class extending `AbstractTooltip` or an existing tooltip implementation (e.g. `Tooltip`, or `AbstractTooltip` for a completely new tooltip implementation). Implement logic as needed
 2. Create a class `ITooltipDeserializer`, return your tooltip instance
-3. Create a `ScriptableObject` extending `AbstractTooltipSerializer` and return your serializer
+3. Create a `ScriptableObject` extending `TooltipSerializer` and return your serializer
 4. Assign the ScriptableObject to an `Item`    
 
 Remember to create a ScriptableObject tooltip asset found in:
 ```csharp
-[CreateAssetMenu(menuName = "Items/Custom Tooltips/YourCustomTooltipNameHere")] 
+[CreateAssetMenu(fileName = "YourCustomTooltipName", menuName = "Tooltips/YourCustomTooltipNameHere")] 
 ```
 Then assign the created asset to the desired item.
+
+#### Note
+Keep the classes nested and primarily private or internal for better encapsulation. Making them internal may be accepted in cases where you need to instantiate the classes from other sources, but try to keep them private most of the times to reduce confusion.
 
 Example (custom tooltip to set the tooltip text to the current stack number)
 Developers: You can find a template tooltip creation snippet in `Documentation/Snippets/CustomTooltipTemplate`.
 
 ```csharp
-[CreateAssetMenu(menuName = "Items/Custom Tooltips/CustomTooltip")]
-public class CustomTooltipSerializer : AbstractTooltipSerializer {
-	public override ITooltipDeserializer GetSerializer(Item item) {
-		return new CustomTooltipData();
-	}
-}
+[CreateAssetMenu(menuName = "Tooltips/CustomTooltip")]
+public class CustomTooltipSerializer : TooltipSerializer {
+	public override ITooltipDeserializer GetDeserializer(Item item) => new CustomTooltipData();
 
-public class CustomTooltipData : ITooltipDeserializer {
-	public AbstractTooltip Generate() {
-		return new CustomTooltip(Tooltip.Plain("0").Data);
-	}
-}
-
-public class CustomTooltip : Tooltip {
-
-	public CustomTooltip(TooltipData data) : base(data) {
+	private class CustomTooltipData : ITooltipDeserializer {
+		public AbstractTooltip Generate() => new CustomTooltip(Tooltip.Plain("0").Data);
 	}
 
-	public override void Update(ItemStack itemStack) {
-		base.Update(itemStack);
-		data.Text = itemStack.Quantity.ToString();
-		if (tooltipPanel != null) {
-			tooltipPanel.GetComponentInChildren<TextMeshProUGUI>().text = data.Text;
+	private class CustomTooltip : Tooltip {
+		public CustomTooltip(TooltipData data) : base(data) {
+		}
+
+		public override void Update(ItemStack itemStack) {
+			base.Update(itemStack);
+			data.Text = itemStack.Quantity.ToString();
+			if (tooltipPanel != null) {
+				tooltipPanel.GetComponentInChildren<TextMeshProUGUI>().text = data.Text;
+			}
 		}
 	}
 }
+
+
 ```
 ---
 

@@ -5,11 +5,11 @@ using System.Linq;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Items/Weapon/WeaponItem")]
-public class WeaponItem : Item, IAttackPerformer, IStatProvider {
+public class WeaponItem : StatItem, IAttackPerformer {
 	[SerializeField] private List<SerializableStat> baseStats;
-	public List<SerializableStat> Stats => baseStats;
+	public override List<SerializableStat> Stats => baseStats;
 
-	public bool ApplyStatsAutomatically => true;
+	public override bool ApplyStatsAutomatically => true;
 
 	[Header("Attack Constraints")]
 	[Obsolete] [SerializeField] private float cooldown;
@@ -43,10 +43,6 @@ public class WeaponItem : Item, IAttackPerformer, IStatProvider {
 		AttackHandler attackHandler = attackObject.GetComponentInChildren<AttackHandler>();
 		attackHandler.Init(this, attackBehavior.GenerateEvents());
 		attackHandler.HandleAttack(attackBehavior.AttackProcedureSupplier.Invoke(trigger));
-	}
-
-	protected override AbstractTooltip GetDefaultTooltip() {
-		return CompoundTooltip.OfNullable(Tooltip.Title(itemName), Tooltip.Stats(baseStats), Tooltip.Info(infoTextTooltip), Tooltip.Lore(loreTextTooltip));
 	}
 
 	public class AttackProcedureNotFoundException : NullReferenceException {

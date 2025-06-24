@@ -32,7 +32,5 @@ public class Item : ScriptableObject, ISerializable {
 		return GetDefaultTooltip();
 	}
 
-	protected virtual AbstractTooltip GetDefaultTooltip() {
-		return CompoundTooltip.OfNullable(Tooltip.Title(itemName), Tooltip.Info(infoTextTooltip), Tooltip.Lore(loreTextTooltip));
-	}
+	protected virtual CompoundTooltip GetDefaultTooltip() => Tooltip.Default(this);
 }

@@ -19,10 +19,10 @@ public class Tooltip : AbstractTooltip {
 	public TooltipSectionLayout DefaultLayout => defaultLayout;
 	public string Text => data.Text;
 
-	private Tooltip(string text, TooltipSectionLayout layout = null) : this(new TooltipData(layout ?? defaultLayout, text)) {
+	protected Tooltip(string text, TooltipSectionLayout layout = null) : this(new TooltipData(layout ?? defaultLayout, text)) {
 	}
 
-	private Tooltip(TooltipData data) => this.data = data;
+	protected Tooltip(TooltipData data) => this.data = data;
 
 	public override void Show(Vector2 position, Transform parent) {
 		if (tooltipPanel != null) {
@@ -45,7 +45,9 @@ public class Tooltip : AbstractTooltip {
 
 	[CanBeNull] public static Tooltip Info(string text) => !string.IsNullOrEmpty(text) ? new(text) : null;
 
-	public static Tooltip Tag(ItemTag tag) => new(new TooltipData(new TooltipSectionLayout(TooltipSection.Tags), tag.ToDisplayString()));
+	public static Tooltip Tag(ItemTag tag) => Tooltip.Tag(tag.ToDisplayString());
+
+	public static Tooltip Tag(string tag) => new(new TooltipData(new TooltipSectionLayout(TooltipSection.Tags), tag));
 
 	public static Tooltip Title(string title) => new(title, new TooltipSectionLayout(TooltipSection.Title));
 
@@ -94,4 +96,6 @@ public class Tooltip : AbstractTooltip {
 	public static Tooltip InterpolatedStats(string source, params SerializableStat[] interpolatedStats) {
 		return new Tooltip(string.Format(source, interpolatedStats.Select(stat => stat.GetFormattedExpression()).ToArray()), TooltipSection.Stats.GetDefaultLayout());
 	}
+
+	public static CompoundTooltip Default(Item item) => CompoundTooltip.OfNullable(Tooltip.Title(item.name), Tooltip.Info(item.InfoText), Tooltip.Lore(item.LoreText));
 }

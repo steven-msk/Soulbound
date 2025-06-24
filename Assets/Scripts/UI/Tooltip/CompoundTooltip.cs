@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class CompoundTooltip : AbstractTooltip {
-	protected readonly IList<TooltipData> entries;
+	protected readonly List<TooltipData> entries;
 	protected readonly CompoundTooltipLayout layoutOptions;
 	protected readonly CompoundTooltipData data;
 	public IList<TooltipData> Data => data.tooltips.AsReadOnlyList();
@@ -17,19 +17,9 @@ public class CompoundTooltip : AbstractTooltip {
 
 	public CompoundTooltip(CompoundTooltipLayout layout, params TooltipData[] entries) {
 		this.layoutOptions = layout ?? new();
-		this.entries = entries.AsReadOnlyList();
+		this.entries = entries.ToList();
 		data = new CompoundTooltipData(entries, layoutOptions);
 	}
-
-	public static CompoundTooltip Of(params TooltipData[] entries) => new(entries);
-
-	public static CompoundTooltip Of(params Tooltip[] tooltips) => new(tooltips.Select(tooltip => tooltip.Data).ToArray());
-
-	public static CompoundTooltip OfNullable(params Tooltip[] tooltips) => new(tooltips.Where(tooltip => tooltip != null).Select(tooltip => tooltip.Data).ToArray());
-
-	public static CompoundTooltip OfCustom(CompoundTooltipLayout layoutOptions, params Tooltip[] tooltips) => new(layoutOptions, tooltips.Where(tooltip => tooltip != null).Select(tooltip => tooltip.Data).ToArray());
-
-	public static CompoundTooltip OfCustom(CompoundTooltipLayout layoutOptions, params TooltipData[] tooltips) => new(layoutOptions, tooltips);
 
 	public override void Show(Vector2 position, Transform parent) {
 		if (tooltipPanel != null) {
@@ -52,4 +42,19 @@ public class CompoundTooltip : AbstractTooltip {
 		tooltipPanel.transform.SetParent(inventory.transform, true);
 		tooltipPanel.SetActive(true);
 	}
+
+	public CompoundTooltip Concat(params Tooltip[] tooltips) {
+		entries.AddRange(tooltips.Select(tooltip => tooltip.Data));
+		return this;
+	}
+
+	public static CompoundTooltip Of(params TooltipData[] entries) => new(entries);
+
+	public static CompoundTooltip Of(params Tooltip[] tooltips) => new(tooltips.Select(tooltip => tooltip.Data).ToArray());
+
+	public static CompoundTooltip OfNullable(params Tooltip[] tooltips) => new(tooltips.Where(tooltip => tooltip != null).Select(tooltip => tooltip.Data).ToArray());
+
+	public static CompoundTooltip OfCustom(CompoundTooltipLayout layoutOptions, params Tooltip[] tooltips) => new(layoutOptions, tooltips.Where(tooltip => tooltip != null).Select(tooltip => tooltip.Data).ToArray());
+
+	public static CompoundTooltip OfCustom(CompoundTooltipLayout layoutOptions, params TooltipData[] tooltips) => new(layoutOptions, tooltips);
 }
