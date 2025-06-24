@@ -203,7 +203,8 @@ public class InventoryController : MonoBehaviour {
 	[RequiresEventContext("InventoryOpen", 100)]
 	[EventContextHandler("ItemDrag")]
 	public void OnEquipmentSlotClicked(EquipmentSlot slot) {
-		if (pickupItem?.ItemStack.Item is not IEquipable) {
+		if (pickupItem?.ItemStack.Item is not IEquipable && pickupItem != null) {
+			Debug.Log("1");
 			return;
 		}
 		bool justEquipped = false;

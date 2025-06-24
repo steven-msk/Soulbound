@@ -10,8 +10,8 @@ using UnityEngine;
 public class WeaponAttackBehavior_test : WeaponAttackBehavior {
 
 	static readonly Dictionary<ItemUseTrigger, AttackProcedure> attacks = new() {
-		[ItemUseTrigger.LeftHold] = AttackProcedure.Triggered("attack", 1f),
-		[ItemUseTrigger.RightHold] = AttackProcedure.Triggered("attack1", 0.1f)
+		[ItemUseTrigger.LeftHold] = AttackProcedure.Triggered("attack", 0.15f),
+		[ItemUseTrigger.RightHold] = AttackProcedure.Triggered("attack1", 0.5f)
 	};
 
 	public override HashSet<ItemUseTrigger> RecognizedTriggers => attacks.Keys.ToHashSet();
