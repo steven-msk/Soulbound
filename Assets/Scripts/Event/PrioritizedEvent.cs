@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Unity.VisualScripting;
 
+[Obsolete]
 public class PrioritizedEvent {
 	public string Context { get; }
 	public int Priority { get; }

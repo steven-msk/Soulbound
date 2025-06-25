@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+[Obsolete]
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Delegate, Inherited = false)]
 public sealed class RequiresEventContextAttribute : System.Attribute {
 	public string ContextName { get; }

@@ -247,11 +247,14 @@ public class InventoryController : MonoBehaviour {
 
 	[EventContextHandler("ItemDrag")]
 	public void OnDropItemTriggered() {
-		pickupItem?.ItemStack.Drop(true);
-		if (pickupItem != null) {
-			Destroy(pickupItem.gameObject);
-			pickupItem = null;
-		}
+			pickupItem?.ItemStack.Drop(true);
+			if (pickupItem != null) {
+				Destroy(pickupItem.gameObject);
+				pickupItem = null;
+			}
+		//InputHandler.RequestAction(new("ItemDrag", 10, () => {
+		//}));
+		//InputHandler.BlockContextUntil("ItemUse", () => GameManager.GetPlayerInstance().InputHandler.LeftHold);
 	}
 
 	public void EquipHotbarItem(InventorySlot slot) {
