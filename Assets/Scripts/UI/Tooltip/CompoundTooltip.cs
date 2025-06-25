@@ -30,14 +30,21 @@ public class CompoundTooltip : AbstractTooltip {
 		layoutOptions.Apply(tooltipPanel.GetComponent<VerticalLayoutGroup>());
 		RectTransform panelRect = tooltipPanel.GetComponent<RectTransform>();
 
-		panelRect.anchoredPosition = position;
 		List<TooltipData> sortedEntries = entries.Where(entry => entry.Layout != null).OrderBy(entry => entry.Layout.Section).ToList();
+		List<(LayoutElement layoutElement, float preferredWidth)> sectionLayouts = new();
 		foreach (TooltipData entry in sortedEntries) {
 			TextMeshProUGUI tooltipSection = AbstractTooltip.InstantiateSectionText(tooltipPanel.transform);
-			tooltipSection.autoSizeTextContainer = true;
+			//tooltipSection.autoSizeTextContainer = true;
+			tooltipSection.textWrappingMode = TextWrappingModes.Normal;
 			entry.Layout.Apply(tooltipSection);
 			tooltipSection.text = entry.Text;
+			sectionLayouts.Add((tooltipSection.GetComponent<LayoutElement>(), tooltipSection.preferredWidth));
 		}
+		float clampedWidth = Mathf.Min(this.ClampToScreen(panelRect, position), AbstractTooltip.MaxWidth);
+		foreach (var (layoutElement, preferredWidth) in sectionLayouts) {
+			layoutElement.preferredWidth = Mathf.Min(preferredWidth, clampedWidth);
+		}
+		panelRect.anchoredPosition = position;
 		inventory.ActiveTooltip = this;
 		tooltipPanel.transform.SetParent(inventory.transform, true);
 		tooltipPanel.SetActive(true);

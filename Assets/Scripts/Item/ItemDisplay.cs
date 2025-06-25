@@ -33,7 +33,7 @@ public class ItemDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
 	public void OnPointerEnter(PointerEventData eventData) {
 		if (GameManager.GetPlayerInstance().Inventory.PopupOpen) {
-			tooltip.Show(gameObject.GetComponent<RectTransform>().anchoredPosition, transform);
+			tooltip.Show(GameManager.GetPlayerInstance().InputHandler.MouseScreenPosition, transform);
 			tooltip.DisplayParent = gameObject;
 		}
 	}
