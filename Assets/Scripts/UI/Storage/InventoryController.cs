@@ -23,6 +23,7 @@ public class InventoryController : MonoBehaviour {
 
 	public bool PopupOpen => popupOpen;
 	[SerializeField] private ItemDisplay pickupItem = null;
+	public ItemDisplay PickupItem => pickupItem;
 	public readonly Dictionary<int, InventorySlot> popupSlots = new();
 	[SerializeField] private AbstractTooltip activeTooltip;
 	public AbstractTooltip ActiveTooltip { set => activeTooltip = value; }
@@ -111,7 +112,7 @@ public class InventoryController : MonoBehaviour {
 		}
 	}
 
-	public bool PickupItem(ItemStack itemStack) {
+	public bool PickUpItem(ItemStack itemStack) {
 		if (!itemStack.Item.IsStackable) {
 			InventorySlot emptySlot = GetFirstEmptySlot();
 			if (emptySlot != null) {
@@ -162,6 +163,7 @@ public class InventoryController : MonoBehaviour {
 			pickupItem.EnableMoveMode();
 			pickupItem.transform.SetParent(gameObject.transform, true);
 			itemDropTrigger.SetActive(true);
+			GameManager.GetPlayerInstance().EquipHotbarItem(pickupItem.ItemStack);
 			return;
 		}
 
@@ -170,6 +172,7 @@ public class InventoryController : MonoBehaviour {
 			pickupItem.DisableMoveMode();
 			pickupItem = null;
 			itemDropTrigger.SetActive(false);
+			GameManager.GetPlayerInstance().EquipHotbarItem(hotbar.ActiveSlot.ItemStack);
 			return;
 		}
 
@@ -182,6 +185,7 @@ public class InventoryController : MonoBehaviour {
 			pickupItem = itemDisplay;
 			pickupItem.EnableMoveMode();
 			pickupItem.transform.SetParent(gameObject.transform, true);
+			GameManager.GetPlayerInstance().EquipHotbarItem(pickupItem.ItemStack);
 		} else {
 			int space = slotStack.Item.MaxStackSize - slotStack.Quantity;
 			int transfer = Math.Min(space, pickupStack.Quantity);

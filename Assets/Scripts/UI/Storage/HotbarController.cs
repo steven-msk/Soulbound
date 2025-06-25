@@ -92,6 +92,7 @@ public class HotbarController : MonoBehaviour {
 		foreach (var slotEntry in slots.Where(slotEntry => !slotEntry.Value.Equals(activeSlot))) {
 			ApplySelectionChanges(slotEntry.Value, slotColor, slotNumberColor, itemStackColor, Vector3.zero, Vector3.one);
 		}
+		inventory.EquipHotbarItem(activeSlot);	
 	}
 
 	public bool IsEmpty(InventorySlot slot) => slot.GetComponentInChildren<ItemDisplay>() == null;

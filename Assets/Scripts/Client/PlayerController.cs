@@ -56,6 +56,9 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	public void EquipHotbarItem([AllowsNull] ItemStack itemStack) {
+		if (MainHandStack == itemStack) {
+			return;
+		}
 		MainHandStack = itemStack;
 		if (itemStack?.Item is IStatProvider statProvider && statProvider.ApplyStatsAutomatically) {
 			statProvider.ApplyStats(this);
