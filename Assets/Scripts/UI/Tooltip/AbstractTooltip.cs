@@ -6,11 +6,13 @@ public abstract class AbstractTooltip {
 
 	// FUTURE TODO: implement interactable tooltips, scrollable/collapsable tooltips, comparable tooltips for weapons/souls
 	// PLANNED: tooltip tiling and clamping at screen limits
+	// POTENTIAL FEATUREIMPL: legendary tooltips
 
 	[CanBeNull] protected GameObject tooltipPanel;
 	[CanBeNull] protected GameObject displayParent;
 	
 	public GameObject DisplayParent { get => displayParent; set => displayParent = value; }
+	// POTENTIAL: lazy init for tooltips' displayParent to improve performance
 
 	public bool IsDisplayed => tooltipPanel != null;
 

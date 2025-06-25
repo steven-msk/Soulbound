@@ -7,7 +7,7 @@ using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "DefaultStatsTooltip", menuName = "Tooltips/DefaultStatsTooltip")]
-public class DefaultStatsTooltip : TooltipSerializer {
+public class DefaultStatsTooltip : TooltipSerializer { 
 
 	public override ITooltipDeserializer GetDeserializer(Item item) => new StatsTooltipData(item);
 

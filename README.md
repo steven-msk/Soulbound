@@ -57,6 +57,11 @@ The following tokens have been introduced for developer use to improve codebase 
 - `REMINDER` (Priority: Low) - used to leave non-critical notes or consideration about future reference.
 - `PLANNED` (Priority: High) - indicates a feature or change that is already decided on, but not implemented yet. Its something you know you want to add, just at a later time.
 - `REFACTOR` (Priority: Normal) - indicates code that works correctly but could be improved for better readability or maintainability.
+- `POTENTIAL` (Priority: Normal) - indicates a possible feature, rework, or refactor that is under consideration but not yet confirmed.  
+
+Making combination of task tokens is possible and actually recommended. They help clarify an idea or a future commit in the codebase:
+- `POTENTIAL FEATUREIMPL` - indicates a feature implementation that is being considered but has not yet confirmed.
+- `PLANNED REFACTOR` - a refactor that is already decided on, but not implemented yet.
 
 ---
 
