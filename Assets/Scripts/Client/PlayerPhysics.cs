@@ -99,7 +99,7 @@ public class PlayerPhysics : MonoBehaviour {
 
 		if (jumpToFlightTimer > 0) {
 			jumpToFlightTimer -= Time.fixedDeltaTime;
-			return;         // flight switch will occur once jump is finished
+			return;         // flight switch will occur once jump timer is finished
 		}
 		if (inputHandler.PressingSpace && jumpsLeft == 0 && !shouldJump && flightTime > 0 && jumpToFlightTimer <= 0) {
 			float scaledFlightAcceleration = flightMovementPower * stats.VerticalFlightAcceleration;
@@ -141,7 +141,9 @@ public class PlayerPhysics : MonoBehaviour {
 
 	public void UpdateFlightTimePanel(bool isFlying, float flightTime, float grantedFlightTime) {
 		flightTimePanel.SetActive(isFlying && inputHandler.PressingSpace);
-		RectMask2D timeMask = flightTimePanel.GetComponentInChildren(typeof(RectMask2D), true) as RectMask2D;
-		timeMask.padding = new Vector4(maskWidth * (1 - flightTime / grantedFlightTime), 0, 0, 0);
+		if (flightTimePanel.activeSelf) {
+			RectMask2D timeMask = flightTimePanel.GetComponentInChildren(typeof(RectMask2D), true) as RectMask2D;
+			timeMask.padding = new Vector4(maskWidth * (1 - flightTime / grantedFlightTime), 0, 0, 0);
+		}
 	}
 }

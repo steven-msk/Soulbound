@@ -150,6 +150,7 @@ public class InventoryController : MonoBehaviour {
 		}
 	}
 
+	[InputAction("ItemDrag", Priority = 10)]
 	public void OnSlotClick(IItemSlot slot) {
 		if (!popupOpen || (slot.IsEmpty && pickupItem == null)) {
 			return;
@@ -195,6 +196,7 @@ public class InventoryController : MonoBehaviour {
 		}
 	}
 
+	[InputAction("ItemDrag", Priority = 10)]
 	public void OnEquipmentSlotClicked(EquipmentSlot slot) {
 		if (pickupItem?.ItemStack.Item is not IEquipable && pickupItem != null) {
 			return;
