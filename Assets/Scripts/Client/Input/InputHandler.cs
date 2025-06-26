@@ -43,7 +43,7 @@ public class InputHandler : MonoBehaviour {
 		};
 		playerActions.Move.canceled += actionContext => HorizontalMovement = 0;
 
-		playerActions.Jump.performed += player.OnSpacePressed;
+		playerActions.Jump.performed += actionContext => player.Physics.OnSpacePressed();
 		playerActions.Jump.performed += actionContext => PressingSpace = true;
 		playerActions.Jump.canceled += actionContext => PressingSpace = false;
 

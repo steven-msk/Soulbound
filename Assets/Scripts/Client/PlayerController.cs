@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Unity.IO.LowLevel.Unsafe;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -31,7 +32,6 @@ public class PlayerController : MonoBehaviour {
 	public bool CanAttack { get; set; } = true;
 
 	public float Facing => Mathf.Sign(transform.localScale.x);
-	public float Forward => -Facing;
 
 	private void Start() {
 		playerPhysics = gameObject.GetComponent<PlayerPhysics>();
@@ -65,17 +65,17 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
-	public void OnLeftClick() => InputHandler.RequestAction(ItemUseRequest(ItemUseTrigger.LeftClick));
+	[InputAction("ItemUse", Priority = 5)]
+	internal void OnLeftClick() => InputHandler.RequestAction(ItemUseRequest(ItemUseTrigger.LeftClick));
 
-	public void OnRightClick() => InputHandler.RequestAction(ItemUseRequest(ItemUseTrigger.RightClick));
+	[InputAction("ItemUse", Priority = 5)]
+	internal void OnRightClick() => InputHandler.RequestAction(ItemUseRequest(ItemUseTrigger.RightClick));
 
-	public void OnLeftHold() => InputHandler.RequestAction(ItemUseRequest(ItemUseTrigger.LeftHold));
+	[InputAction("ItemUse", Priority = 5)]
+	internal void OnLeftHold() => InputHandler.RequestAction(ItemUseRequest(ItemUseTrigger.LeftHold));
 
-	public void OnRightHold() => InputHandler.RequestAction(ItemUseRequest(ItemUseTrigger.RightHold));
+	[InputAction("ItemUse", Priority = 5)]
+	internal void OnRightHold() => InputHandler.RequestAction(ItemUseRequest(ItemUseTrigger.RightHold));
 
 	private InputActionRequest ItemUseRequest(ItemUseTrigger useTrigger) => new InputActionRequest("ItemUse", 5, () => itemUsageHandler.HandleInput(useTrigger));
-
-	public void OnSpacePressed(InputAction.CallbackContext actionContext) {
-		playerPhysics.OnSpacePressed();
-	}
 }

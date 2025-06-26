@@ -5615,7 +5615,6 @@ GameObject:
   - component: {fileID: 1248408835}
   - component: {fileID: 1248408834}
   - component: {fileID: 1248408836}
-  - component: {fileID: 1248408837}
   m_Layer: 5
   m_Name: ItemDropTrigger
   m_TagString: Untagged
@@ -5693,18 +5692,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ShowMaskGraphic: 1
---- !u!114 &1248408837
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1248408831}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 651c539a56a30d5439ffcb39bfe65e35, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1260214422
 GameObject:
   m_ObjectHideFlags: 0

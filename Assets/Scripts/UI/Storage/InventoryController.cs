@@ -87,7 +87,6 @@ public class InventoryController : MonoBehaviour {
 		CreateItemDisplay(new ItemStack(Registry.Get<Item>("longTooltipItem"), 1), hotbar.slots[5]);
 	}
 
-	[EventContextHandler("InventoryOpen")]
 	public void ToggleInventory(InputAction.CallbackContext actionContext) {
 		popupOpen = !popupOpen;
 		popup.SetActive(popupOpen);
@@ -151,8 +150,6 @@ public class InventoryController : MonoBehaviour {
 		}
 	}
 
-	[RequiresEventContext("InventoryOpen", 100)]
-	[EventContextHandler("ItemDrag")]
 	public void OnSlotClick(IItemSlot slot) {
 		if (!popupOpen || (slot.IsEmpty && pickupItem == null)) {
 			return;
@@ -198,8 +195,6 @@ public class InventoryController : MonoBehaviour {
 		}
 	}
 
-	[RequiresEventContext("InventoryOpen", 100)]
-	[EventContextHandler("ItemDrag")]
 	public void OnEquipmentSlotClicked(EquipmentSlot slot) {
 		if (pickupItem?.ItemStack.Item is not IEquipable && pickupItem != null) {
 			return;
@@ -247,18 +242,6 @@ public class InventoryController : MonoBehaviour {
 			player.EquipHotbarItem(null);
 		}
 		GameObject.Destroy(display.gameObject);
-	}
-
-	[EventContextHandler("ItemDrag")]
-	public void OnDropItemTriggered() {
-			pickupItem?.ItemStack.Drop(true);
-			if (pickupItem != null) {
-				Destroy(pickupItem.gameObject);
-				pickupItem = null;
-			}
-		//InputHandler.RequestAction(new("ItemDrag", 10, () => {
-		//}));
-		//InputHandler.BlockContextUntil("ItemUse", () => GameManager.GetPlayerInstance().InputHandler.LeftHold);
 	}
 
 	public void EquipHotbarItem(InventorySlot slot) {

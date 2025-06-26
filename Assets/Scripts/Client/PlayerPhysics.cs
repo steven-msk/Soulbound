@@ -122,7 +122,7 @@ public class PlayerPhysics : MonoBehaviour {
 		UpdateFlightTimePanel(isFlying, flightTime, stats.GrantedFlightTime);
 	}
 
-	public void OnSpacePressed() {
+	internal void OnSpacePressed() {
 		if (jumpsLeft > 0 && knockbackStunTimer <= 0) {
 			shouldJump = true;
 			jumpsLeft--;
