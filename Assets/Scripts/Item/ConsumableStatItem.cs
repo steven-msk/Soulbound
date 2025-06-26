@@ -22,7 +22,7 @@ public class ConsumableStatItem : StatItem, IConsumable {
 
 	public void Consume(ItemStack itemStack, PlayerController player) {
 		ConsumableUtils.DefaultConsume(this, itemStack);
-		((IStatProvider)this).ApplyStats(player);
+		((IStatProvider)this).ApplyStats(player.Stats);
 	}
 
 	protected override CompoundTooltip GetDefaultTooltip() {

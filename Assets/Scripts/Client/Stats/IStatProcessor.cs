@@ -5,5 +5,5 @@ using System.Threading.Tasks;
 using Unity.VisualScripting;
 
 public interface IStatProcessor<TValue> {
-	public TValue CalculateFinalValue(TValue baseValue, IEnumerable<TValue> modifiers);
+	public TValue ProcessFinalValue(TValue baseValue, IEnumerable<TValue> modifiers);
 }

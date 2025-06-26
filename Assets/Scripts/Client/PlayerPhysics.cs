@@ -78,8 +78,8 @@ public class PlayerPhysics : MonoBehaviour {
 		if (movement.x != 0) {
 			if (!isFlying) {
 				rb.linearVelocityX += stats.HorizontalAcceleration * movementSpeedPower * Time.fixedDeltaTime * movement.x;
-				if (Mathf.Abs(rb.linearVelocityX) > stats.MovementSpeed.GetValue()) {
-					rb.linearVelocityX = Mathf.Sign(rb.linearVelocityX) * stats.MovementSpeed.GetValue();
+				if (Mathf.Abs(rb.linearVelocityX) > stats.MovementSpeed.GetProcessedValue()) {
+					rb.linearVelocityX = Mathf.Sign(rb.linearVelocityX) * stats.MovementSpeed.GetProcessedValue();
 
 				}
 			} else {
@@ -91,7 +91,7 @@ public class PlayerPhysics : MonoBehaviour {
 			}
 		}
 		if (shouldJump) {
-			rb.AddForceY(stats.JumpHeight.GetValue() * jumpHeightPower, ForceMode2D.Impulse);
+			rb.AddForceY(stats.JumpHeight.GetProcessedValue() * jumpHeightPower, ForceMode2D.Impulse);
 			shouldJump = false;
 			animator.SetBool("onGround", false);
 			rb.linearDamping = 1f;

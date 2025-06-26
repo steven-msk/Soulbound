@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 public class FlatFloatStatProcessor : IStatProcessor<float> {
-	public float CalculateFinalValue(float baseValue, IEnumerable<float> flatBonuses) {
+	public float ProcessFinalValue(float baseValue, IEnumerable<float> flatBonuses) {
 		return baseValue + flatBonuses.Sum();
 	}
 }

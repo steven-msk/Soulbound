@@ -59,10 +59,14 @@ public class PlayerController : MonoBehaviour {
 		if (MainHandStack == itemStack) {
 			return;
 		}
-		MainHandStack = itemStack;
-		if (itemStack?.Item is IStatProvider statProvider && statProvider.ApplyStatsAutomatically) {
-			statProvider.ApplyStats(this);
+		static void InvokeStatItem(ItemStack itemStack, Action<IStatProvider> statProviderAction) {
+			if (itemStack?.Item is IStatProvider statProvider && statProvider.ApplyStatsAutomatically) {
+				statProviderAction.Invoke(statProvider);
+			}
 		}
+		InvokeStatItem(MainHandStack, statProvider => statProvider.RevokeStats(this.stats));
+		MainHandStack = itemStack;
+		InvokeStatItem(MainHandStack, statProvider => statProvider.ApplyStats(this.stats));
 	}
 
 	[InputAction("ItemUse", Priority = 5)]

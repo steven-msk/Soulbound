@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Unity.Mathematics;
 using Unity.VisualScripting;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -36,10 +37,20 @@ public class PlayerStats {
 
 	static void RegisterStatInstance(IStatTypeImpl statType, IStatEntry statEntry) => registeredStats[statType] = statEntry;
 
-	public void Apply(List<SerializableStat> stats) {
-		stats.ForEach(static stat => {
+	public void Apply(List<SerializableStat> stats, IStatProvider source) {
+		Invoke(stats, source, (statEntry, serializableStat, source) => statEntry.ApplyToSerialized(serializableStat, source));
+	}
+
+	public void Revoke(List<SerializableStat> stats, IStatProvider source) {
+		Invoke(stats, source, (statEntry, serializableStat, source) => statEntry.RevokeToSerialized(serializableStat, source));
+	}
+
+	private void Invoke(List<SerializableStat> stats, IStatProvider source, Action<IStatEntry, SerializableStat, IStatProvider> statAction) {
+		stats.ForEach(stat => {
 			if (registeredStats.TryGetValue(stat.SerializedReference.ToStatType(), out var statEntry)) {
-				statEntry.ApplyToSerialized(stat);
+				statAction.Invoke(statEntry, stat, source);
+			} else {
+				throw new InvalidStatTypeReferenceBindingException(stat);
 			}
 		});
 	}
@@ -63,6 +74,11 @@ public class PlayerStats {
 	//		manaRegenAccumulator -= regenAmount;
 	//	}
 	//}
+
+	private class InvalidStatTypeReferenceBindingException : NullReferenceException {
+		public InvalidStatTypeReferenceBindingException(SerializableStat stat)
+			: base ($"SerializableStat {stat.GetFormattedExpression()} does not contain a valid stat binding; could not find stat type reference {stat.SerializedReference}") { }
+	}
 }
 
 

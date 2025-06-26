@@ -9,5 +9,7 @@ public abstract class StatItem : Item, IStatProvider {
 
 	public abstract List<SerializableStat> Stats { get; }
 
+	// POTENTIAL: Func<bool> revokePredicate for buffered stats
+
 	protected override CompoundTooltip GetDefaultTooltip() => base.GetDefaultTooltip().Concat(Tooltip.Stats(Stats));
 }

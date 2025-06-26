@@ -10,5 +10,7 @@ public abstract class AbstractStatEntry<TValue> : IStatEntry {
 		onInstantiateAction?.Invoke(typeReference, this);
 	}
 
-	public abstract void ApplyToSerialized(SerializableStat serializableStat);
+	public abstract void ApplyToSerialized(SerializableStat serializableStat, IStatProvider source);
+
+	public abstract void RevokeToSerialized(SerializableStat serializableStat, IStatProvider source);
 }

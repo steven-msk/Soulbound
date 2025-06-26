@@ -2,7 +2,7 @@
 using System.Linq;
 
 public class MultiplicativeFloatStatProcessor : IMultiplicativeStatProcessor<float> {
-	public float CalculateFinalValue(float baseValue, IEnumerable<float> flatBonuses, IEnumerable<float> percentageBonuses) {
+	public float ProcessFinalValue(float baseValue, IEnumerable<float> flatBonuses, IEnumerable<float> percentageBonuses) {
 		return (baseValue + flatBonuses.Sum()) * (1 + percentageBonuses.Sum());
 	}
 }

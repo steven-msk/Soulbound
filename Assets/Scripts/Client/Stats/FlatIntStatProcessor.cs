@@ -2,7 +2,7 @@
 using System.Linq;
 
 public class FlatIntStatProcessor : IStatProcessor<int> {
-	public int CalculateFinalValue(int baseValue, IEnumerable<int> flatBonuses) {
+	public int ProcessFinalValue(int baseValue, IEnumerable<int> flatBonuses) {
 		return baseValue + flatBonuses.Sum();
 	}
 }

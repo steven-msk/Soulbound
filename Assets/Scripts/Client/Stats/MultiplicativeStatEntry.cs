@@ -7,28 +7,36 @@ using System.Xml.Serialization;
 using UnityEngine;
 
 public class MultiplicativeStatEntry<TProcessor, TValue> : AbstractStatEntry<TValue> where TProcessor : IMultiplicativeStatProcessor<TValue>, new() {
-	private readonly List<TValue> flatBonuses = new();
-	private readonly List<float> percentageBonuses = new();
+	private readonly List<(TValue value, IStatProvider source)> flatBonuses = new();
+	private readonly List<(float value, IStatProvider source)> percentageBonuses = new();
 	private readonly TProcessor processor = new();
 
 	public MultiplicativeStatEntry(TValue baseValue, StatType<TValue> typeReference, Action<StatType<TValue>, AbstractStatEntry<TValue>> onInstantiateAction = null) 
 		: base(baseValue, typeReference, onInstantiateAction) {
 	}
 
-	public void AddFlatBonus(TValue value) => flatBonuses.Add(value);
+	public void AddFlatBonus(TValue value, IStatProvider source) => flatBonuses.Add((value, source));
 
-	public void AddPercentageBonus(float value) => percentageBonuses.Add(value);
+	public void AddPercentageBonus(float value, IStatProvider source) => percentageBonuses.Add((value, source));
 
-	public float GetValue() => processor.CalculateFinalValue(BaseValue, flatBonuses, percentageBonuses);
+	public void RemoveFlatBonus(TValue value, IStatProvider source) => flatBonuses.Remove((value, source));
 
-	public override void ApplyToSerialized(SerializableStat serializableStat) {
+	public void RemovePercentageBonus(float value, IStatProvider source) => percentageBonuses.Remove((value, source));
+
+	public float GetProcessedValue() => processor.ProcessFinalValue(BaseValue, flatBonuses.Select(bonus => bonus.value), percentageBonuses.Select(bonus => bonus.value));
+
+	public override void ApplyToSerialized(SerializableStat serializableStat, IStatProvider source) => Invoke(serializableStat, source, AddFlatBonus, AddPercentageBonus);
+
+	public override void RevokeToSerialized(SerializableStat serializableStat, IStatProvider source) => Invoke(serializableStat, source, RemoveFlatBonus, RemovePercentageBonus);
+
+	private void Invoke(SerializableStat serializableStat, IStatProvider source, Action<TValue, IStatProvider> flatAction, Action<float, IStatProvider> percentageAction) {
 		var value = serializableStat.GetValue();
 		if (serializableStat.ApplicationType == SerializableStat.StatApplicationType.Flat && value is TValue flatValue) {
-			this.AddFlatBonus(flatValue);
+			flatAction.Invoke(flatValue, source);
 		} else if (serializableStat.ApplicationType == SerializableStat.StatApplicationType.Percentage && value is float percentageValue) {
-			this.AddPercentageBonus(percentageValue);
+			percentageAction.Invoke(percentageValue, source);
 		} else {
-			Debug.Log($"Could not apply serialized stats to {this}, unsupported value type {value.GetType()} for entry of type {typeof(TValue)}");
+			throw new IStatEntry.UnsupportedSerializableStatTypeException(value, typeof(TValue));
 		}
 	}
 }
