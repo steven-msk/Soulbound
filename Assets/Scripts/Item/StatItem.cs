@@ -5,11 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 
 public abstract class StatItem : Item, IStatProvider {
-	public abstract bool ApplyStatsAutomatically { get; }
+	public abstract bool ApplyInstantStatsAutomatically { get; }
 
-	public abstract List<SerializableStat> Stats { get; }
+	public abstract List<SerializableStat> InstantStats { get; }
 
-	// POTENTIAL: Func<bool> revokePredicate for buffered stats
+	public abstract List<BufferedStat> BufferedStats { get; }
 
-	protected override CompoundTooltip GetDefaultTooltip() => base.GetDefaultTooltip().Concat(Tooltip.Stats(Stats));
+	protected override CompoundTooltip GetDefaultTooltip() => base.GetDefaultTooltip().Concat(Tooltip.Stats(InstantStats));
 }

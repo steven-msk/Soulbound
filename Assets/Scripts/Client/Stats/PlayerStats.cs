@@ -41,9 +41,13 @@ public class PlayerStats {
 		Invoke(stats, source, (statEntry, serializableStat, source) => statEntry.ApplyToSerialized(serializableStat, source));
 	}
 
+	public void Apply(SerializableStat stat, IStatProvider source) => Apply(new List<SerializableStat>() { stat }, source);
+
 	public void Revoke(List<SerializableStat> stats, IStatProvider source) {
 		Invoke(stats, source, (statEntry, serializableStat, source) => statEntry.RevokeToSerialized(serializableStat, source));
 	}
+
+	public void Revoke(SerializableStat stat, IStatProvider source) => Revoke(new List<SerializableStat> { stat }, source);
 
 	private void Invoke(List<SerializableStat> stats, IStatProvider source, Action<IStatEntry, SerializableStat, IStatProvider> statAction) {
 		stats.ForEach(stat => {

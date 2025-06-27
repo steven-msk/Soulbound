@@ -7,6 +7,10 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour {
 
+	// FEATUREIMPL: EventBus system
+	// Will be of 2 types: gameplay-related (GameEvent) and system-related (SystemEvent)
+
+
 	[SerializeField] private InputHandler inputHandler;
 	public InputHandler InputHandler => inputHandler;
 
@@ -60,13 +64,17 @@ public class PlayerController : MonoBehaviour {
 			return;
 		}
 		static void InvokeStatItem(ItemStack itemStack, Action<IStatProvider> statProviderAction) {
-			if (itemStack?.Item is IStatProvider statProvider && statProvider.ApplyStatsAutomatically) {
+			if (itemStack?.Item is IStatProvider statProvider && statProvider.ApplyInstantStatsAutomatically) {
 				statProviderAction.Invoke(statProvider);
 			}
 		}
-		InvokeStatItem(MainHandStack, statProvider => statProvider.RevokeStats(this.stats));
+		InvokeStatItem(MainHandStack, statProvider => statProvider.RevokeInstantStats(this.stats));
+		InvokeStatItem(MainHandStack, statProvider => statProvider.UnsubcribeBuffers(this.stats));
 		MainHandStack = itemStack;
-		InvokeStatItem(MainHandStack, statProvider => statProvider.ApplyStats(this.stats));
+		InvokeStatItem(MainHandStack, statProvider => statProvider.ApplyInstantStats(this.stats));
+		InvokeStatItem(MainHandStack, statProvider => statProvider.SubcribeBuffers(this.stats));
+
+		
 	}
 
 	[InputAction("ItemUse", Priority = 5)]

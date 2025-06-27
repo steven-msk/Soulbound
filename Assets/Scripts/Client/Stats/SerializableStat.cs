@@ -12,11 +12,11 @@ using UnityEngine.SearchService;
 
 [Serializable]
 public class SerializableStat {
-	[SerializeField] private SerializedStatReference serializedReference;
-	[SerializeField] private StatValueType valueType;
-	[SerializeField] private StatApplicationType applicationType;
-	[SerializeField] private string value;
-	[SerializeField] private bool applyAsBonus;
+	[SerializeField] protected SerializedStatReference serializedReference;
+	[SerializeField] protected StatValueType valueType;
+	[SerializeField] protected StatApplicationType applicationType;
+	[SerializeField] protected string value;
+	[SerializeField] protected bool applyAsBonus;
 	public SerializedStatReference SerializedReference => serializedReference;
 	public StatApplicationType ApplicationType => applicationType;
 	public bool ApplyAsBonus => applyAsBonus;

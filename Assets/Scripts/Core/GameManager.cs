@@ -14,12 +14,8 @@ public class GameManager : MonoBehaviour {
 		Registry.RegisterAll<GameObject>("Registry/Prefabs");
 	}
 
-	private void Update() {
-		if (Input.GetKeyDown(KeyCode.P)) {
-			IsPaused = !IsPaused;
-			Time.timeScale = IsPaused ? 0f : 1f;
-		}
-		
+	private void OnApplicationQuit() {
+		EventBus<GameEvent>.Clear();
+		EventBus<SystemEvent>.Clear();
 	}
-
 }

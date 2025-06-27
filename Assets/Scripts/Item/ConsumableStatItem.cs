@@ -16,13 +16,16 @@ public class ConsumableStatItem : StatItem, IConsumable {
 	public int ConsumeAmount => consumeAmount;
 
 	[SerializeField] private List<SerializableStat> stats;
-	public override List<SerializableStat> Stats => stats;
+	public override List<SerializableStat> InstantStats => stats;
+	
+	[SerializeField] private List<BufferedStat> bufferedStats;
+	public override List<BufferedStat> BufferedStats => bufferedStats;
 
-	public override bool ApplyStatsAutomatically => false;
+	public override bool ApplyInstantStatsAutomatically => false;
 
 	public void Consume(ItemStack itemStack, PlayerController player) {
 		ConsumableUtils.DefaultConsume(this, itemStack);
-		((IStatProvider)this).ApplyStats(player.Stats);
+		((IStatProvider)this).ApplyInstantStats(player.Stats);
 	}
 
 	protected override CompoundTooltip GetDefaultTooltip() {

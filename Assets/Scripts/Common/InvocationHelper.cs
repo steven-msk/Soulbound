@@ -6,11 +6,19 @@ using System.Threading.Tasks;
 
 public static class InvocationHelper {
 #nullable enable
-	public static void InvokeOrElse<T>(this T? actionTarget, Action<T> action, Action fallback) where T : class {
+	public static void InvokeNullableOrElse<T>(this T? actionTarget, Action<T> action, Action fallback) where T : class {
 		if (actionTarget != null) {
 			action(actionTarget);
 		} else {
 			fallback();
+		}
+	}
+
+	public static void IfElse(bool condition, Action success, Action fail) {
+		if (condition) {
+			success.Invoke();
+		} else {
+			fail.Invoke();
 		}
 	}
 }

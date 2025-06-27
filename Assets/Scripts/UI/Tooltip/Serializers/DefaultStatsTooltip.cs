@@ -17,7 +17,7 @@ public class DefaultStatsTooltip : TooltipSerializer {
 
 		public StatsTooltipData(Item item) => this.item = item;
 
-		public AbstractTooltip Generate() => Tooltip.Default(item).Concat(Tooltip.Stats(((IStatProvider)item).Stats));
+		public AbstractTooltip Generate() => Tooltip.Default(item).Concat(Tooltip.Stats(((IStatProvider)item).InstantStats));
 	}
 }
 

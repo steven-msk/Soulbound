@@ -7,9 +7,12 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "Items/Weapon/WeaponItem")]
 public class WeaponItem : StatItem, IAttackPerformer {
 	[SerializeField] private List<SerializableStat> baseStats;
-	public override List<SerializableStat> Stats => baseStats;
+	public override List<SerializableStat> InstantStats => baseStats;
 
-	public override bool ApplyStatsAutomatically => true;
+	[SerializeField] private List<BufferedStat> bufferedStats;
+	public override List<BufferedStat> BufferedStats => bufferedStats;
+
+	public override bool ApplyInstantStatsAutomatically => true;
 
 	[Header("Attack Constraints")]
 	[Obsolete] [SerializeField] private float cooldown;

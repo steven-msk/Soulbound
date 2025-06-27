@@ -6,15 +6,21 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 public interface IStatProvider : IItemCapability {
-	public bool ApplyStatsAutomatically { get; }
-	public List<SerializableStat> Stats { get; }
+	public bool ApplyInstantStatsAutomatically { get; }
+	public List<SerializableStat> InstantStats { get; }
+	public List<BufferedStat> BufferedStats { get; }
 
-	// FEATUREIMPL: buffered stats
-	// Currently stats are statically added, meaning they add to the total bonus. Potions or special
-	// consumables may add stats but in a restricted manner - upon consume they only *reset* the
-	// applied stats - not add to the total value. This is just one type of buffered stats
+	// FEATUREIMPL (WIP): buffered stats
 
-	public virtual void ApplyStats(PlayerStats playerStats) => playerStats.Apply(Stats, this);
+	public virtual void ApplyInstantStats(PlayerStats playerStats) => playerStats.Apply(InstantStats, this);
 
-	public virtual void RevokeStats(PlayerStats platerStats) => platerStats.Revoke(Stats, this);
+	public virtual void RevokeInstantStats(PlayerStats platerStats) => platerStats.Revoke(InstantStats, this);
+
+	public virtual void SubcribeBuffers(PlayerStats playerStats) {
+		BufferedStats.ForEach(bufferedStat => bufferedStat.SubscribeBuffers(playerStats, this));
+	}
+
+	public virtual void UnsubcribeBuffers(PlayerStats playerStats) {
+		BufferedStats.ForEach(bufferedStat => bufferedStat.UnsubscribeBuffers(playerStats, this));
+	}
 }

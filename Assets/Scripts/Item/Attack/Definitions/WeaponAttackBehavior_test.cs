@@ -17,7 +17,6 @@ public class WeaponAttackBehavior_test : WeaponAttackBehavior {
 	public override HashSet<ItemUseTrigger> RecognizedTriggers => attacks.Keys.ToHashSet();
 
 	public override Dictionary<string, Action<GameObject>> AnimationEventsSupplier => new() {
-		["AnimEvent"] = _ => Debug.Log("event")
 	};
 
 	public override void PreAttack(GameObject attackHandlerParent) {
@@ -28,7 +27,6 @@ public class WeaponAttackBehavior_test : WeaponAttackBehavior {
 
 	public override void PostAttack(GameObject attackHandlerParent, string attack) {
 		base.PostAttack(attackHandlerParent, attack);
-		Debug.Log(attack);
 	}
 
 	public override void OnHit(GameObject attackHandlerParent) {

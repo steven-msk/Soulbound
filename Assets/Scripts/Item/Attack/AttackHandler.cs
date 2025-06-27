@@ -31,14 +31,17 @@ public class AttackHandler : MonoBehaviour {
 		}
 		player.CanAttack = false;
 		Parent.SetActive(true);
-		//player.StartCoroutine(HandleAttack(attackProcedure));
+		EventBus<GameEvent>.Publish(GameEvent.PlayerAttackStart);
 		procedure.InvokeAnimation(animator);
 		player.StartCoroutine(WaitCooldown(procedure.Cooldown));
 	}
 
 	public void InvokeAnimationEvent(string name) => events.InvokeAnimationEvent(name, Parent);
 
-	internal void FinishAttack(string attack) => events.PostAttack(Parent, attack);
+	internal void FinishAttack(string attack) { 
+		EventBus<GameEvent>.Publish(GameEvent.PlayerAttackEnd);
+		events.PostAttack(Parent, attack);
+	}
 
 	private void OnTriggerEnter2D(UnityEngine.Collider2D collider) {
 		if (collider.gameObject.layer != LayerMask.NameToLayer("Hurtbox")) {
