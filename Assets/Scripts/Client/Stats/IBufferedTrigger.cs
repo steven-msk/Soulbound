@@ -5,7 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 
 public interface IBufferedTrigger {
-	public void Bind(BufferedStat bufferedStat, Action apply, Action revoke);
+	public void Enable(BufferedStat stat);
 
-	public void Unbind();
+	public void Disable(BufferedStat stat);
+
+	protected Func<bool> InvocationValidator { get; }
+
+	public void Invoke(BufferedStat stat, Action action);
 }

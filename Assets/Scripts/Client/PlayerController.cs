@@ -69,10 +69,10 @@ public class PlayerController : MonoBehaviour {
 			}
 		}
 		InvokeStatItem(MainHandStack, statProvider => statProvider.RevokeInstantStats(this.stats));
-		InvokeStatItem(MainHandStack, statProvider => statProvider.UnsubcribeBuffers(this.stats));
+		InvokeStatItem(MainHandStack, statProvider => statProvider.DisableBuffers(this.stats));
 		MainHandStack = itemStack;
 		InvokeStatItem(MainHandStack, statProvider => statProvider.ApplyInstantStats(this.stats));
-		InvokeStatItem(MainHandStack, statProvider => statProvider.SubcribeBuffers(this.stats));
+		InvokeStatItem(MainHandStack, statProvider => statProvider.EnableBuffers(this.stats));
 
 		
 	}

@@ -16,11 +16,11 @@ public interface IStatProvider : IItemCapability {
 
 	public virtual void RevokeInstantStats(PlayerStats platerStats) => platerStats.Revoke(InstantStats, this);
 
-	public virtual void SubcribeBuffers(PlayerStats playerStats) {
-		BufferedStats.ForEach(bufferedStat => bufferedStat.SubscribeBuffers(playerStats, this));
+	public virtual void EnableBuffers(PlayerStats playerStats) {
+		BufferedStats.ForEach(bufferedStat => bufferedStat.EnableBuffers());
 	}
 
-	public virtual void UnsubcribeBuffers(PlayerStats playerStats) {
-		BufferedStats.ForEach(bufferedStat => bufferedStat.UnsubscribeBuffers(playerStats, this));
+	public virtual void DisableBuffers(PlayerStats playerStats) {
+		BufferedStats.ForEach(bufferedStat => bufferedStat.DisableBuffers());
 	}
 }

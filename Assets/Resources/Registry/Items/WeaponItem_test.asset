@@ -41,16 +41,10 @@ MonoBehaviour:
     applicationType: 1
     value: 1
     applyAsBonus: 1
-  bufferedStats:
-  - serializedReference: 0
-    valueType: 0
-    applicationType: 0
-    value: 5
-    applyAsBonus: 0
-    applyHook: PlayerAttackStart
-    revokeHook: PlayerAttackEnd
-    applyBufferCondition: AlwaysTrue
-    revokeBufferCondition: AlwaysTrue
+  bufferedStats: []
   cooldown: 1
   attackPrefab: {fileID: 3460292086189885822, guid: 24e5812c95942f24e808955b54b26f73, type: 3}
   attackBehavior: {fileID: 11400000, guid: 688abe020816b1c4b8d13483ea3f001c, type: 2}
+  references:
+    version: 2
+    RefIds: []
