@@ -4,6 +4,7 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 
 [Serializable]
@@ -43,7 +44,7 @@ public class BufferedStatDrawer : PropertyDrawer {
 		iterator.NextVisible(true);
 
 		while(!SerializedProperty.EqualContents(iterator, endProperty)) {
-			if (iterator.name != "applyBufferedTrigger" || iterator.name != "revokeBufferedTrigger") {
+			if (iterator.name != "applyBufferedTrigger" && iterator.name != "revokeBufferedTrigger") {
 				Rect rect = new(position.x, ypos, position.width, lineHeight);
 				EditorGUI.PropertyField(rect, iterator, true);
 				ypos += lineHeight + verticalSpacing;
@@ -52,8 +53,6 @@ public class BufferedStatDrawer : PropertyDrawer {
 				break;
 			}
 		}
-
-		// FIXME: buffer dropdown overlapping in inspector
 
 		SerializedProperty applyProperty = property.FindPropertyRelative("applyBufferedTrigger");
 		DrawBufferProperty(new Rect(position.x, ypos, position.width, lineHeight), applyProperty, "Apply Buffered Trigger");
@@ -85,7 +84,7 @@ public class BufferedStatDrawer : PropertyDrawer {
 		iterator.NextVisible(true);
 
 		while (!SerializedProperty.EqualContents(iterator, endProperty)) {
-			if (iterator.name != "applyBufferedTrigger" || iterator.name != "revokeBufferedTrigger") {
+			if (iterator.name != "applyBufferedTrigger" && iterator.name != "revokeBufferedTrigger") {
 				height += EditorGUI.GetPropertyHeight(iterator, true) + spacing;
 			}
 			if (!iterator.NextVisible(false)) {
