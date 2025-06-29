@@ -1,38 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
+using System.Text;
+using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Serialization;
-using UnityEngine.UIElements;
-
-[Serializable]
-public class BufferedStat : SerializableStat {
-	[SerializeReference] private IBufferedTrigger applyBufferedTrigger;
-	[SerializeReference] private IBufferedTrigger revokeBufferedTrigger;
-	private bool applied = false;
-
-	public BufferedStat(SerializedStatReference serializedReference, StatValueType valueType, StatApplicationType appliance, object value, bool applyAsBonus,
-						IBufferedTrigger applyBufferedTrigger, IBufferedTrigger revokeBufferedTrigger)
-			: base(serializedReference, valueType, appliance, value, applyAsBonus) {
-		this.applyBufferedTrigger = applyBufferedTrigger;
-		this.revokeBufferedTrigger = revokeBufferedTrigger;
-	}
-
-	public void EnableBuffers() {
-		applyBufferedTrigger.Enable(this);
-		revokeBufferedTrigger.Enable(this);
-	}
-
-	public void DisableBuffers() {
-		applyBufferedTrigger.Disable(this);
-		revokeBufferedTrigger.Disable(this);
-	}
-}
 
 [CustomPropertyDrawer(typeof(BufferedStat))]
-public class BufferedStatDrawer : PropertyDrawer {
+public class BufferedStatInspectorDrawer : PropertyDrawer {
 
 	public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
 		EditorGUI.BeginProperty(position, label, property);
@@ -43,7 +18,7 @@ public class BufferedStatDrawer : PropertyDrawer {
 		SerializedProperty endProperty = iterator.GetEndProperty();
 		iterator.NextVisible(true);
 
-		while(!SerializedProperty.EqualContents(iterator, endProperty)) {
+		while (!SerializedProperty.EqualContents(iterator, endProperty)) {
 			if (iterator.name != "applyBufferedTrigger" && iterator.name != "revokeBufferedTrigger") {
 				Rect rect = new(position.x, ypos, position.width, lineHeight);
 				EditorGUI.PropertyField(rect, iterator, true);
@@ -113,7 +88,7 @@ public class BufferedStatDrawer : PropertyDrawer {
 		void ShowTypeDropdown(SerializedProperty property, string label) {
 			List<Type> allTypes = GetAllImplementationsOf<IBufferedTrigger>();
 			GenericMenu menu = new();
-			foreach(var type in allTypes) {
+			foreach (var type in allTypes) {
 				menu.AddItem(new GUIContent(type.FullName), false, () => {
 					property.serializedObject.Update();
 					property.managedReferenceValue = Activator.CreateInstance(type);

@@ -10,17 +10,17 @@ public interface IStatProvider : IItemCapability {
 	public List<SerializableStat> InstantStats { get; }
 	public List<BufferedStat> BufferedStats { get; }
 
-	// FEATUREIMPL (WIP): buffered stats
+	// FEATUREIMPL (WIP): buffered stats - NOT TESTED
 
 	public virtual void ApplyInstantStats(PlayerStats playerStats) => playerStats.Apply(InstantStats, this);
 
 	public virtual void RevokeInstantStats(PlayerStats platerStats) => platerStats.Revoke(InstantStats, this);
 
 	public virtual void EnableBuffers(PlayerStats playerStats) {
-		BufferedStats.ForEach(bufferedStat => bufferedStat.EnableBuffers());
+		BufferedStats.ForEach(bufferedStat => bufferedStat.EnableBuffers(this));
 	}
 
 	public virtual void DisableBuffers(PlayerStats playerStats) {
-		BufferedStats.ForEach(bufferedStat => bufferedStat.DisableBuffers());
+		BufferedStats.ForEach(bufferedStat => bufferedStat.DisableBuffers(this));
 	}
 }

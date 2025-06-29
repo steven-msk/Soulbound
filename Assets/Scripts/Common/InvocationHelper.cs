@@ -21,4 +21,10 @@ public static class InvocationHelper {
 			fail.Invoke();
 		}
 	}
+
+	public static void If(bool condition, Action action) {
+		if (condition) {
+			action.Invoke();
+		} 
+	}
 }

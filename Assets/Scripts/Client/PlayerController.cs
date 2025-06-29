@@ -6,11 +6,6 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour {
-
-	// FEATUREIMPL: EventBus system
-	// Will be of 2 types: gameplay-related (GameEvent) and system-related (SystemEvent)
-
-
 	[SerializeField] private InputHandler inputHandler;
 	public InputHandler InputHandler => inputHandler;
 
