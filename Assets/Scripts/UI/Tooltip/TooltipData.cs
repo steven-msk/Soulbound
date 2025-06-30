@@ -6,6 +6,8 @@ public class TooltipData : ITooltipDeserializer {
 	public string Text { get; set; }
 	public TooltipSectionLayout Layout { get; set; }
 
+	public bool IsEmpty => string.IsNullOrEmpty(Text);
+
 	public TooltipData(TooltipSectionLayout layout, string text) {
 		Text = text;
 		Layout = layout;

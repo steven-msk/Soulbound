@@ -25,7 +25,7 @@ public class Tooltip : AbstractTooltip {
 	protected Tooltip(TooltipData data) => this.data = data;
 
 	public override void Show(Vector2 position, Transform parent) {
-		if (tooltipPanel != null) {
+		if (tooltipPanel != null || data.IsEmpty) {
 			return;
 		}
 		tooltipPanel = AbstractTooltip.InstantiatePanel(parent);
@@ -40,6 +40,8 @@ public class Tooltip : AbstractTooltip {
 		tooltipPanel.transform.SetParent(inventory.transform, true);
 		tooltipPanel.SetActive(true);
 	}
+
+	public static Tooltip NoTooltip() => new("");
 
 	public static Tooltip FromData(TooltipData data) => new(data);
 
@@ -94,7 +96,12 @@ public class Tooltip : AbstractTooltip {
 	public static Tooltip InterpolatedStats(string source, IEnumerable<SerializableStat> interpolatedStats) => InterpolatedStats(source, interpolatedStats.ToArray());
 
 	public static Tooltip InterpolatedStats(string source, params SerializableStat[] interpolatedStats) {
-		return new Tooltip(string.Format(source, interpolatedStats.Select(stat => stat.GetFormattedExpression()).ToArray()), TooltipSection.Stats.GetDefaultLayout());
+		try {
+			return new Tooltip(string.Format(source, interpolatedStats.Select(stat => stat.GetFormattedExpression()).ToArray()), TooltipSection.Stats.GetDefaultLayout());
+		} catch (FormatException) {
+			Debug.LogError($"Tooltip source has more stat entries than available; source: '{source}', available entries: {interpolatedStats.Length}");
+			return Tooltip.NoTooltip();
+		}
 	}
 
 	public static CompoundTooltip Default(Item item) => CompoundTooltip.OfNullable(Tooltip.Title(item.name), Tooltip.Info(item.InfoText), Tooltip.Lore(item.LoreText));

@@ -6,8 +6,8 @@ using UnityEngine;
 
 [CreateAssetMenu(menuName = "Items/Weapon/WeaponItem")]
 public class WeaponItem : StatItem, IAttackPerformer {
-	[SerializeField] private List<SerializableStat> baseStats;
-	public override List<SerializableStat> InstantStats => baseStats;
+	[SerializeField] private List<SerializableStat> instantStats;
+	public override List<SerializableStat> InstantStats => instantStats;
 
 	[SerializeField] private List<BufferedStat> bufferedStats;
 	public override List<BufferedStat> BufferedStats => bufferedStats;
