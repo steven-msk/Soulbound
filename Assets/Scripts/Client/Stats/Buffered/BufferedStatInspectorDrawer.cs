@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEditor;
+using UnityEditor.Rendering;
 using UnityEngine;
 
 [CustomPropertyDrawer(typeof(BufferedStat))]
@@ -14,6 +15,9 @@ public class BufferedStatInspectorDrawer : PropertyDrawer {
 		float ypos = position.y;
 		float lineHeight = EditorGUIUtility.singleLineHeight;
 		float verticalSpacing = EditorGUIUtility.standardVerticalSpacing;
+		EditorGUI.LabelField(new Rect(position.x, ypos, position.width, lineHeight), property.FindPropertyRelative("serializedReference").GetEnumName<SerializedStatReference>(), EditorStyles.label);
+		ypos += lineHeight + verticalSpacing;
+		EditorGUI.indentLevel++;
 		SerializedProperty iterator = property.Copy();
 		SerializedProperty endProperty = iterator.GetEndProperty();
 		iterator.NextVisible(true);
@@ -48,10 +52,12 @@ public class BufferedStatInspectorDrawer : PropertyDrawer {
 		}
 
 		EditorGUI.EndProperty();
+		EditorGUI.indentLevel--;
 	}
 
 	public override float GetPropertyHeight(SerializedProperty property, GUIContent label) {
 		float height = 0f;
+		float lineHeight = EditorGUIUtility.singleLineHeight;
 		float spacing = EditorGUIUtility.standardVerticalSpacing;
 
 		SerializedProperty iterator = property.Copy();
@@ -68,18 +74,18 @@ public class BufferedStatInspectorDrawer : PropertyDrawer {
 		}
 
 		var applyProperty = property.FindPropertyRelative("applyBufferedTrigger");
-		height += EditorGUIUtility.singleLineHeight + spacing;
+		height += lineHeight + spacing;
 		if (applyProperty.managedReferenceValue != null) {
 			height += EditorGUI.GetPropertyHeight(applyProperty, true) + spacing;
 		}
 
 		var revokeProperty = property.FindPropertyRelative("revokeBufferedTrigger");
-		height += EditorGUIUtility.singleLineHeight + spacing;
+		height += lineHeight + spacing;
 		if (revokeProperty.managedReferenceValue != null) {
 			height += EditorGUI.GetPropertyHeight(revokeProperty, true) + spacing;
 		}
 
-		return height;
+		return height + lineHeight + spacing;
 	}
 
 

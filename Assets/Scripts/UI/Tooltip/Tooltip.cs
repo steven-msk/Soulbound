@@ -93,8 +93,6 @@ public class Tooltip : AbstractTooltip {
 		return CompoundTooltip.OfCustom(compoundLayout, data.ToArray());
 	}
 
-	public static Tooltip InterpolatedStats(string source, IEnumerable<SerializableStat> interpolatedStats) => InterpolatedStats(source, interpolatedStats.ToArray());
-
 	public static Tooltip InterpolatedStats(string source, params SerializableStat[] interpolatedStats) {
 		try {
 			return new Tooltip(string.Format(source, interpolatedStats.Select(stat => stat.GetFormattedExpression()).ToArray()), TooltipSection.Stats.GetDefaultLayout());
@@ -104,5 +102,7 @@ public class Tooltip : AbstractTooltip {
 		}
 	}
 
-	public static CompoundTooltip Default(Item item) => CompoundTooltip.OfNullable(Tooltip.Title(item.name), Tooltip.Info(item.InfoText), Tooltip.Lore(item.LoreText));
+	public static Tooltip InterpolatedStats(string source, IEnumerable<SerializableStat> interpolatedStats) => InterpolatedStats(source, interpolatedStats.ToArray());
+
+	public static CompoundTooltip DefaultItem(Item item) => CompoundTooltip.OfNullable(Tooltip.Title(item.name), Tooltip.Info(item.InfoText), Tooltip.Lore(item.LoreText));
 }

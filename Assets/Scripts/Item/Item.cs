@@ -32,5 +32,5 @@ public class Item : ScriptableObject, ISerializable {
 		return GetDefaultTooltip();
 	}
 
-	protected virtual CompoundTooltip GetDefaultTooltip() => Tooltip.Default(this);
+	protected virtual CompoundTooltip GetDefaultTooltip() => Tooltip.DefaultItem(this);
 }

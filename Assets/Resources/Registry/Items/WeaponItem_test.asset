@@ -20,50 +20,67 @@ MonoBehaviour:
   customTooltipSerializer: {fileID: 11400000, guid: a07ce6fb2f0a37a4cb8bc004138f8a80, type: 2}
   loreTextTooltip: Test sword
   infoTextTooltip: 
-  baseStats:
-  - serializedReference: 9
-    valueType: 1
-    applicationType: 0
-    value: 4343
-    applyAsBonus: 0
-  - serializedReference: 17
-    valueType: 1
-    applicationType: 0
-    value: 1
-    applyAsBonus: 0
-  - serializedReference: 3
+  instantStats:
+  - serializedReference: 0
     valueType: 0
     applicationType: 0
     value: 1
     applyAsBonus: 1
-  - serializedReference: 16
-    valueType: 1
-    applicationType: 1
+  - serializedReference: 0
+    valueType: 0
+    applicationType: 0
+    value: 1
+    applyAsBonus: 1
+  - serializedReference: 0
+    valueType: 0
+    applicationType: 0
+    value: 1
+    applyAsBonus: 1
+  - serializedReference: 0
+    valueType: 0
+    applicationType: 0
     value: 1
     applyAsBonus: 1
   bufferedStats:
   - serializedReference: 0
     valueType: 0
     applicationType: 0
-    value: 1
+    value: 
     applyAsBonus: 0
     applyBufferedTrigger:
-      rid: 6392550273012203609
+      rid: 6392550303463637069
     revokeBufferedTrigger:
-      rid: 6392550273012203610
+      rid: 6392550303463637068
+  - serializedReference: 1
+    valueType: 0
+    applicationType: 0
+    value: 
+    applyAsBonus: 0
+    applyBufferedTrigger:
+      rid: -2
+    revokeBufferedTrigger:
+      rid: 6392550303463637062
   cooldown: 1
   attackPrefab: {fileID: 3460292086189885822, guid: 24e5812c95942f24e808955b54b26f73, type: 3}
   attackBehavior: {fileID: 11400000, guid: 688abe020816b1c4b8d13483ea3f001c, type: 2}
   references:
     version: 2
     RefIds:
-    - rid: 6392550273012203609
+    - rid: -2
+      type: {class: , ns: , asm: }
+    - rid: 6392550303463637062
       type: {class: EventBufferedTrigger, ns: , asm: Assembly-CSharp}
       data:
-        eventID: PlayerAttackStart
+        eventID: 
         condition: 0
-    - rid: 6392550273012203610
+    - rid: 6392550303463637068
       type: {class: EventBufferedTrigger, ns: , asm: Assembly-CSharp}
       data:
-        eventID: PlayerAttackEnd
+        eventID: 
+        condition: 0
+    - rid: 6392550303463637069
+      type: {class: EventTimerBufferedTrigger, ns: , asm: Assembly-CSharp}
+      data:
+        eventID: 
+        waitTime: 0
         condition: 0
