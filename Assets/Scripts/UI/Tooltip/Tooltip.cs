@@ -104,5 +104,10 @@ public class Tooltip : AbstractTooltip {
 
 	public static Tooltip InterpolatedStats(string source, IEnumerable<SerializableStat> interpolatedStats) => InterpolatedStats(source, interpolatedStats.ToArray());
 
+	public static CompoundTooltip InterpolatedStats(string instantSource, IEnumerable<SerializableStat> interpolatedInstantStats,
+			string bufferedSource, IEnumerable<BufferedStat> interpolatedBufferedStats) {
+		return CompoundTooltip.Of(Tooltip.InterpolatedStats(instantSource, interpolatedInstantStats), Tooltip.InterpolatedStats(bufferedSource, interpolatedBufferedStats));
+	}
+
 	public static CompoundTooltip DefaultItem(Item item) => CompoundTooltip.OfNullable(Tooltip.Title(item.name), Tooltip.Info(item.InfoText), Tooltip.Lore(item.LoreText));
 }

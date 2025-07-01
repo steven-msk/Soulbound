@@ -14,9 +14,13 @@ public class WeaponItem : StatItem, IAttackPerformer {
 
 	public override bool ApplyInstantStatsAutomatically => true;
 
+	[SerializeField] private string bufferedInterpolationSource;
+	public override string BufferedInterpolationSource => bufferedInterpolationSource;
+
 	[Header("Attack Constraints")]
 	[Obsolete] [SerializeField] private float cooldown;
 	[Obsolete] public float Cooldown => cooldown;
+
 	[SerializeField] private GameObject attackPrefab;
 
 	[SerializeField] private WeaponAttackBehavior attackBehavior;

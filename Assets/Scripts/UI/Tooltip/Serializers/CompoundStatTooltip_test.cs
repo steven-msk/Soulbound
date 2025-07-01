@@ -15,7 +15,8 @@ public class CompoundStatTooltip_test : TooltipSerializer {
 
 
 		public AbstractTooltip Generate() {
-			return Tooltip.InterpolatedStats("An item with these stats: {0}, {1}, {2}, {3}", ((IStatProvider)item).InstantStats);
+			return Tooltip.InterpolatedStats("An item with these stats: {0}, {1}, {2}, {3}", ((IStatProvider)item).InstantStats,
+				((StatItem)item).BufferedInterpolationSource, (((IStatProvider)item).BufferedStats));
 		}
 	}
 }

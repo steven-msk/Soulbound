@@ -15,7 +15,8 @@ public class BufferedStatInspectorDrawer : PropertyDrawer {
 		float ypos = position.y;
 		float lineHeight = EditorGUIUtility.singleLineHeight;
 		float verticalSpacing = EditorGUIUtility.standardVerticalSpacing;
-		EditorGUI.LabelField(new Rect(position.x, ypos, position.width, lineHeight), property.FindPropertyRelative("serializedReference").GetEnumName<SerializedStatReference>(), EditorStyles.label);
+		string name = property.FindPropertyRelative("serializedReference").GetEnumName<SerializedStatReference>();
+		EditorGUI.LabelField(new Rect(position.x, ypos, position.width, lineHeight), name, EditorStyles.label);
 		ypos += lineHeight + verticalSpacing;
 		EditorGUI.indentLevel++;
 		SerializedProperty iterator = property.Copy();
