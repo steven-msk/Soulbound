@@ -49,15 +49,11 @@ public class Tooltip : AbstractTooltip {
 
 	public static Tooltip Tag(ItemTag tag) => Tooltip.Tag(tag.ToDisplayString());
 
-	public static Tooltip Tag(string tag) => new(new TooltipData(new TooltipSectionLayout(TooltipSection.Tags), tag));
+	public static Tooltip Tag(string tag) => new(new TooltipData(new TooltipSectionLayout(TooltipSection.Tags), tag)); 
 
 	public static Tooltip Title(string title) => new(title, new TooltipSectionLayout(TooltipSection.Title));
 
 	[CanBeNull] public static Tooltip Lore(string description, TooltipSectionLayout layout = null) => !string.IsNullOrEmpty(description) ? new(description, layout ?? new(TooltipSection.Lore)) : null;
-
-	// FEATUREIMPL: PredicateStat class idea - a special stat entry that only applies when certain conditions are met
-	// some listeners or observers may be required to respond to special triggers
-	// e.g. the affixes' stat modifiers based on what the player does in combat
 
 	public static Tooltip Stats(Dictionary<IStatTypeImpl, (object value, bool applyAsBonus)> stats, TooltipSectionLayout layout = null) {
 		if (stats.Count == 0) {

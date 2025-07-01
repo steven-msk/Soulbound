@@ -13,8 +13,6 @@ public class BufferedStat : SerializableStat {
 	[SerializeReference] private IBufferedTrigger revokeBufferedTrigger;
 	private bool applied = false;
 
-	// TODO: add BufferedStat documentation
-
 	public BufferedStat(SerializedStatReference serializedReference, StatValueType valueType, StatApplicationType appliance, object value, bool applyAsBonus,
 						IBufferedTrigger applyBufferedTrigger, IBufferedTrigger revokeBufferedTrigger)
 			: base(serializedReference, valueType, appliance, value, applyAsBonus) {

@@ -112,8 +112,6 @@ public class CustomTooltipSerializer : TooltipSerializer {
 		}
 	}
 }
-
-
 ```
 ---
 
@@ -235,3 +233,67 @@ public class ConsumableEffect_test : ConsumableEffect {
 itemUsageHandler.Register<IConsumable>(ItemUseTrigger.LeftClick, (consumable, stack) => consumable.Consume(stack));
 ```
 
+## BufferedStat implementation
+
+A `BufferedStat` is a special kind of `SerializableStat` that only applies its effects conditionally, based on external triggers defined through `IBufferedTrigger`. This interface acts as a "stat wrapper" that becomes active or inactive depending on event-based or time-based rules.
+
+#### Fields:
+- `IBufferedTrigger applyBufferedTrigger`:  
+Trigger responsible for determining when the stat should be applied (e.g. after a delay, when a condition is met)
+- `IBufferedTrigger revokeBufferedTrigger`:  
+Trigger responsible for determining when the stat should be revoked or unapplied.
+
+#### Methods:
+```csharp
+public void EnableBuffers(IStatProvider source)
+```
+- Binds both the apply and revoke triggers to a stat source
+- Typically called when the stat is activated in the system
+
+```csharp
+public void DisableBuffers(IStatProvider source)
+```
+- Unbinds both the apply and revoke triggers from the stat source
+- Typically called when the stat is being removed or the provider is disposed
+
+### `IBufferedTrigger`
+
+An interface defining how a buffered stat determined when it should apply or revoke its effects. Acts as an abstraction over time-based, event-passed, or condition-based triggers that "buffer" the actual stat changes.
+
+#### Properties:
+
+```csharp
+BufferedTriggerState State { get; set; }
+```
+- The target action of the trigger (Apply or Revoke)
+- Used for state control - <b> Do not change the value at runtime unless specifically needed to</b>
+
+```csharp
+Func<bool> InvocationValidator { get; }
+```
+- A validation delegate to check whether the trigger is allowed to invoke its logic (e.g. avoid redundant invocation or enfore preconditions)
+
+#### Methods:
+
+```csharp
+void Enable(BufferedStat stat, IStatProvider source)
+```
+- Binds the trigger to a `BufferedStat` and its source
+- Usually hooks into an event system or schedules logic for deferred invocation
+
+```csharp
+void Disable(BufferedStat stat, IStatProvider source)
+```
+- Unbinds or cancels the trigger's logic or event subscriptions
+
+```csharp
+void Invoke(BufferedStat stat, Action action)
+```
+- Executes the trigger logic, wrapping a given action (typically applying or revoking the stat)
+- This allows deferred or conditionally controlled stat application
+
+### Conceptual notes:
+- `BufferedStat` provides declarative and serializable control over when a stat is considered active
+- `IBufferedTrigger` provides reactive control, bridging the stat info with gameplay logic (when/how it applies)
+- This abstraction is ideal for temporary buffs/debuffs, event-driven stat effects (e.g. on hit, on move), and environmental or conditional effects
+- Triggers are modular and interchangeable. You can compose complex behavior by mixing different implementations (e.g. `TimedBufferedTrigger` with `EventTimerBufferedTrigger` and so on)
