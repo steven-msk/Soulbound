@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using Unity.VisualScripting;
@@ -51,7 +50,12 @@ public class CompoundTooltip : AbstractTooltip {
 	}
 
 	public CompoundTooltip Concat(params Tooltip[] tooltips) {
-		entries.AddRange(tooltips.Select(tooltip => tooltip.Data));
+		entries.AddRange(tooltips.Where(tooltip => !tooltip.Data.IsEmpty).Select(tooltip => tooltip.Data));
+		return this;
+	}
+
+	public CompoundTooltip CompoundConcat(params CompoundTooltip[] compoundTooltips) {
+		entries.AddRange(compoundTooltips.SelectMany(tooltip => tooltip.Data));
 		return this;
 	}
 
@@ -59,7 +63,7 @@ public class CompoundTooltip : AbstractTooltip {
 
 	public static CompoundTooltip Of(params Tooltip[] tooltips) => new(tooltips.Select(tooltip => tooltip.Data).ToArray());
 
-	public static CompoundTooltip OfNullable(params Tooltip[] tooltips) => new(tooltips.Where(tooltip => tooltip != null).Select(tooltip => tooltip.Data).ToArray());
+	public static CompoundTooltip OfNullable(params Tooltip[] tooltips) => new(tooltips.Where(tooltip => tooltip != null && !tooltip.Data.IsEmpty).Select(tooltip => tooltip.Data).ToArray());
 
 	public static CompoundTooltip OfCustom(CompoundTooltipLayout layoutOptions, params Tooltip[] tooltips) => new(layoutOptions, tooltips.Where(tooltip => tooltip != null).Select(tooltip => tooltip.Data).ToArray());
 

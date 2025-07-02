@@ -24,7 +24,11 @@ public class EventBus<TEvent> where TEvent : IEvent {
 		handlers[@event] -= handler;
 	}
 
-	public static void Publish(TEvent @event) => handlers[@event]?.Invoke();
+	public static void Publish(TEvent @event) { 
+		if (handlers.ContainsKey(@event)) {
+			handlers[@event]?.Invoke();
+		}
+	}
 
 	public static void Clear() => handlers.Clear();
 }

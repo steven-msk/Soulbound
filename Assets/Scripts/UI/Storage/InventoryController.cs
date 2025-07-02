@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using Unity.VisualScripting;
@@ -27,14 +28,8 @@ public class InventoryController : MonoBehaviour {
 	public readonly Dictionary<int, InventorySlot> popupSlots = new();
 	[SerializeField] private AbstractTooltip activeTooltip;
 	public AbstractTooltip ActiveTooltip { set => activeTooltip = value; }
-	public InventorySlot[] AllSlots {		// FIXME: unoptimized AllSlots getter
-		get {
-			List<InventorySlot> slots = new();
-			slots.AddRange(hotbar.slots.Values);
-			slots.AddRange(popupSlots.Values);
-			return slots.ToArray();
-		}
-	}
+
+	public InventorySlot[] AllSlots { get; private set; }
 
 	private void Awake() {
 		InventorySlot[] slots = popup.GetComponentsInChildren<InventorySlot>(true);
@@ -42,6 +37,12 @@ public class InventoryController : MonoBehaviour {
 		for (int i = 0; i < slots.Length; i++) {
 			popupSlots[i + 1] = slots[i];
 		}
+		IEnumerator HotbarLoadCallback() {
+			yield return new WaitUntil(() => hotbar.slots.Count == 9);
+			slots.ToList().AddRange(hotbar.slots.Values);
+			AllSlots = slots.ToArray();
+		}
+		StartCoroutine(HotbarLoadCallback());
 	}
 
 	private void Start() {
@@ -250,5 +251,12 @@ public class InventoryController : MonoBehaviour {
 		ItemDisplay itemDisplay = slot.ItemDisplay;
 		PlayerController player = GameManager.GetPlayerInstance();
 		player.EquipHotbarItem(itemDisplay?.ItemStack);
+	}
+
+	public void HotbarLoadCallback() {
+		List<InventorySlot> slots = new();
+		slots.AddRange(hotbar.slots.Values);
+		slots.AddRange(popupSlots.Values);
+		AllSlots = slots.ToArray();
 	}
 }

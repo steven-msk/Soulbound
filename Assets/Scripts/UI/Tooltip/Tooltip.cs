@@ -78,7 +78,7 @@ public class Tooltip : AbstractTooltip {
 
 	// FUTURE TODO: implement CompoundStats custom header layout
 	public static CompoundTooltip CompoundStats(Dictionary<string, IEnumerable<SerializableStat>> statSections, CompoundTooltipLayout compoundLayout = default) {
-		List<TooltipData> data = new();
+		List<TooltipData> data = new(); 
 		TooltipSectionLayout commonLayout = TooltipSection.Stats.GetDefaultLayout();
 
 		foreach ((string header, IEnumerable<SerializableStat> stats) in statSections) {
@@ -89,7 +89,11 @@ public class Tooltip : AbstractTooltip {
 		return CompoundTooltip.OfCustom(compoundLayout, data.ToArray());
 	}
 
-	public static Tooltip InterpolatedStats(string source, params SerializableStat[] interpolatedStats) {
+	public static CompoundTooltip CompoundStats(string header, IEnumerable<SerializableStat> stats, CompoundTooltipLayout compoundLayout = default) {
+		return Tooltip.CompoundStats(new Dictionary<string, IEnumerable<SerializableStat>>() { [header] = stats }, compoundLayout);
+	}
+
+	[CanBeNull] public static Tooltip InterpolatedStats(string source, params SerializableStat[] interpolatedStats) {
 		try {
 			return new Tooltip(string.Format(source, interpolatedStats.Select(stat => stat.GetFormattedExpression()).ToArray()), TooltipSection.Stats.GetDefaultLayout());
 		} catch (FormatException) {
@@ -102,8 +106,10 @@ public class Tooltip : AbstractTooltip {
 
 	public static CompoundTooltip InterpolatedStats(string instantSource, IEnumerable<SerializableStat> interpolatedInstantStats,
 			string bufferedSource, IEnumerable<BufferedStat> interpolatedBufferedStats) {
-		return CompoundTooltip.Of(Tooltip.InterpolatedStats(instantSource, interpolatedInstantStats), Tooltip.InterpolatedStats(bufferedSource, interpolatedBufferedStats));
+		return CompoundTooltip.OfNullable(Tooltip.InterpolatedStats(instantSource, interpolatedInstantStats), Tooltip.InterpolatedStats(bufferedSource, interpolatedBufferedStats));
 	}
 
-	public static CompoundTooltip DefaultItem(Item item) => CompoundTooltip.OfNullable(Tooltip.Title(item.name), Tooltip.Info(item.InfoText), Tooltip.Lore(item.LoreText));
+	public static CompoundTooltip DefaultItem(Item item) {
+		return CompoundTooltip.OfNullable(Tooltip.Title(item.name), Tooltip.Info(item.InfoText), Tooltip.Lore(item.LoreText));
+	}
 }
