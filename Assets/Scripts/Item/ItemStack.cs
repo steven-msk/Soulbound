@@ -33,8 +33,6 @@ public class ItemStack {
 	}
 
 	public GameObject Initialize(ItemDisplay parent) {
-		// FIXME: poor stack number positioning
-
 		GameObject stackText = GameObject.Instantiate(Registry.Get<GameObject>("stackNumberPrefab"), parent.transform);
 		TextMeshProUGUI text = stackText.GetComponent<TextMeshProUGUI>();
 		text.autoSizeTextContainer = true;
@@ -49,9 +47,13 @@ public class ItemStack {
 			}
 			text.color = textColor;
 		}
+		// Incoming hard-coded values, beware!
 		rectTransform.pivot = new Vector2(1f, 0f);
-		rectTransform.anchoredPosition = Vector3.zero;
+		rectTransform.anchorMax = new Vector2(0.9375f, 0.0625f);
+		rectTransform.anchorMin = rectTransform.anchorMax;
+		rectTransform.anchoredPosition = Vector2.zero;
 		text.rectTransform.sizeDelta = text.GetPreferredValues(Mathf.Infinity, Mathf.Infinity);
+		rectTransform.anchoredPosition = new(Mathf.Max(-4, rectTransform.sizeDelta.x - 19.14f), rectTransform.anchoredPosition.y);
 		this.stackText = stackText;
 		this.display = parent;
 		return stackText;
@@ -71,6 +73,7 @@ public class ItemStack {
 		pickup.pickupDelay = playerAction ? 2 : 0;
 	}
 
+	// POTENTIAL: rework item max stack numbers
 	public static string FormatStackCount(int amount) {
 		if (amount < 1000) {
 			return amount.ToString();

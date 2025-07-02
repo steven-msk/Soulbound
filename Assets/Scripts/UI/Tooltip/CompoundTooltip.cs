@@ -24,7 +24,7 @@ public class CompoundTooltip : AbstractTooltip {
 		if (tooltipPanel != null) {
 			return;
 		}
-		InventoryController inventory = GameManager.GetPlayerInstance().Inventory;
+		InventoryController inventory = GameManager.GetPlayerInstance().Inventory; 
 		tooltipPanel = InstantiatePanel(parent);
 		layoutOptions.Apply(tooltipPanel.GetComponent<VerticalLayoutGroup>());
 		RectTransform panelRect = tooltipPanel.GetComponent<RectTransform>();
@@ -50,7 +50,7 @@ public class CompoundTooltip : AbstractTooltip {
 	}
 
 	public CompoundTooltip Concat(params Tooltip[] tooltips) {
-		entries.AddRange(tooltips.Where(tooltip => !tooltip?.Data.IsEmpty ?? false).Select(tooltip => tooltip.Data));
+		entries.AddRange(tooltips.Where(tooltip => !tooltip?.Data.IsEmpty ?? tooltip != null).Select(tooltip => tooltip.Data));
 		return this;
 	}
 

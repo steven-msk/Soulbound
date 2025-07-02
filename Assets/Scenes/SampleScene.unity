@@ -592,8 +592,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c95f960d1cc2da4d8a451c83684ff94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  flightTimePanel: {fileID: 794986505}
-  maskWidth: 50
   enableScaleFix: 0
 --- !u!1 &135708217
 GameObject:
