@@ -94,11 +94,14 @@ public class Tooltip : AbstractTooltip {
 	}
 
 	[CanBeNull] public static Tooltip InterpolatedStats(string source, params SerializableStat[] interpolatedStats) {
+		if (string.IsNullOrEmpty(source) || interpolatedStats.Count() == 0) {
+			return null;
+		}
 		try {
 			return new Tooltip(string.Format(source, interpolatedStats.Select(stat => stat.GetFormattedExpression()).ToArray()), TooltipSection.Stats.GetDefaultLayout());
 		} catch (FormatException) {
 			Debug.LogError($"Tooltip source has more stat entries than available; source: '{source}', available entries: {interpolatedStats.Length}");
-			return Tooltip.NoTooltip();
+			return null;
 		}
 	}
 

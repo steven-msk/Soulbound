@@ -50,7 +50,7 @@ public class CompoundTooltip : AbstractTooltip {
 	}
 
 	public CompoundTooltip Concat(params Tooltip[] tooltips) {
-		entries.AddRange(tooltips.Where(tooltip => !tooltip.Data.IsEmpty).Select(tooltip => tooltip.Data));
+		entries.AddRange(tooltips.Where(tooltip => !tooltip?.Data.IsEmpty ?? false).Select(tooltip => tooltip.Data));
 		return this;
 	}
 
