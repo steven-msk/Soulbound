@@ -73,7 +73,7 @@ public class ItemStack {
 		pickup.pickupDelay = playerAction ? 2 : 0;
 	}
 
-	// POTENTIAL: rework item max stack numbers
+	// POTENTIAL REWORK: item max stack numbers
 	public static string FormatStackCount(int amount) {
 		if (amount < 1000) {
 			return amount.ToString();
