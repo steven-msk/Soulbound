@@ -11,7 +11,6 @@ using UnityEngine.UIElements;
 public class BufferedStat : SerializableStat {
 	[SerializeReference] private IBufferedTrigger applyBufferedTrigger;
 	[SerializeReference] private IBufferedTrigger revokeBufferedTrigger;
-	private bool applied = false;
 
 	public BufferedStat(SerializedStatReference serializedReference, StatValueType valueType, StatApplicationType appliance, object value, bool applyAsBonus,
 						IBufferedTrigger applyBufferedTrigger, IBufferedTrigger revokeBufferedTrigger)

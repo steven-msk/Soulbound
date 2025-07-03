@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class ItemDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
 
-	[Header("Debug Internal")]
+	[Header("Internal")]
 	[SerializeField] private bool moveMode;
 	[SerializeField] private Item displayedItem;
 	private ItemStack itemStack;
@@ -28,7 +28,9 @@ public class ItemDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 		if (moveMode) {
 			gameObject.transform.position = GameManager.GetPlayerInstance().InputHandler.MouseScreenPosition;
 		}
-		tooltip.Update(itemStack);
+		if (tooltip.IsDisplayed) {
+			tooltip.Update(itemStack);
+		}
 	}
 
 	public void OnPointerEnter(PointerEventData eventData) {

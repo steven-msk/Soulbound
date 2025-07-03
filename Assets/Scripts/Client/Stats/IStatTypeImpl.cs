@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 public interface IStatTypeImpl {
 	string BaseName { get; }
 
+	Type ValueType { get; }
+
+	HashSet<SerializableStat.StatApplicationType> ValidApplications { get; }
+
 	string GetFormattedName(object value);
 
 	string GetFormattedValue(object value, bool applyAsBonus);

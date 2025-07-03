@@ -81,7 +81,7 @@ public class PlayerStats {
 
 	private class InvalidStatTypeReferenceBindingException : NullReferenceException {
 		public InvalidStatTypeReferenceBindingException(SerializableStat stat)
-			: base ($"SerializableStat {stat.GetFormattedExpression()} does not contain a valid stat binding; could not find stat type reference {stat.SerializedReference}") { }
+			: base ($"SerializableStat {stat.GetFormattedExpression()} does not contain a valid stat binding. Could not find stat type reference {stat.SerializedReference}") { }
 	}
 }
 

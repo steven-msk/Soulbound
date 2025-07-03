@@ -33,12 +33,12 @@ public class CompoundTooltip : AbstractTooltip {
 		List<(LayoutElement layoutElement, float preferredWidth)> sectionLayouts = new();
 		foreach (TooltipData entry in sortedEntries) {
 			TextMeshProUGUI tooltipSection = AbstractTooltip.InstantiateSectionText(tooltipPanel.transform);
-			//tooltipSection.autoSizeTextContainer = true;
 			tooltipSection.textWrappingMode = TextWrappingModes.Normal;
 			entry.Layout.Apply(tooltipSection);
 			tooltipSection.text = entry.Text;
 			sectionLayouts.Add((tooltipSection.GetComponent<LayoutElement>(), tooltipSection.preferredWidth));
 		}
+
 		float clampedWidth = Mathf.Min(this.ClampToScreen(panelRect, position), AbstractTooltip.MaxWidth);
 		foreach (var (layoutElement, preferredWidth) in sectionLayouts) {
 			layoutElement.preferredWidth = Mathf.Min(preferredWidth, clampedWidth);

@@ -79,7 +79,7 @@ public class ItemStack {
 			return amount.ToString();
 		}
 		if (amount > 999_999) {
-			Debug.LogWarning($"Stack size exceeded max limit: {amount}");
+			Debug.LogWarning($"Stack size exceeded max limit: {amount}"); 
 			return "999k";
 		}
 
