@@ -10,7 +10,9 @@ using UnityEngine.UIElements;
 [Serializable]
 public class BufferedStat : SerializableStat {
 	[SerializeReference] private IBufferedTrigger applyBufferedTrigger;
+	public IBufferedTrigger ApplyBufferedTrigger => applyBufferedTrigger;
 	[SerializeReference] private IBufferedTrigger revokeBufferedTrigger;
+	public IBufferedTrigger RevokeBufferedTrigger => revokeBufferedTrigger;
 
 	public BufferedStat(SerializedStatReference serializedReference, StatValueType valueType, StatApplicationType appliance, object value, bool applyAsBonus,
 						IBufferedTrigger applyBufferedTrigger, IBufferedTrigger revokeBufferedTrigger)

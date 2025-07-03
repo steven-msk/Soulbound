@@ -24,24 +24,24 @@ public enum SerializedStatReference {
 	[StatBinding(typeof(StatType<float>), nameof(StatType<float>.CritChance))] CritChance,
 	[StatBinding(typeof(StatType<float>), nameof(StatType<float>.CritMultiplier))] CritMultiplier,
 	[StatBinding(typeof(StatType<float>), nameof(StatType<float>.Luck))] Luck,
-	[StatBinding(typeof(StatType<float>), nameof(StatType<float>.LootBonus))] LootBonus
+	[StatBinding(typeof(StatType<int>), nameof(StatType<float>.LootBonus))] LootBonus,
 }
 
 public static class SerializedToInternalStatExtension {
 	private static readonly Dictionary<SerializedStatReference, IStatTypeImpl> cached = new();
 	[CanBeNull] public static IStatTypeImpl ToStatType(this SerializedStatReference serializedReference) {
-		if (cached.TryGetValue(serializedReference, out var statType)) {
-			return statType;
+		if (cached.TryGetValue(serializedReference, out var value)) {
+			return value;
 		}
 
 		MemberInfo memberInfo = typeof(SerializedStatReference).GetMember(serializedReference.ToString()).FirstOrDefault();
-		StatBindingAttribute attribute = memberInfo.GetCustomAttribute<StatBindingAttribute>();
-		FieldInfo field = attribute.DeclaringType.GetField(attribute.FieldName, BindingFlags.Public | BindingFlags.Static);
+		StatBindingAttribute attribute = memberInfo?.GetCustomAttribute<StatBindingAttribute>();
+		FieldInfo field = attribute?.DeclaringType.GetField(attribute.FieldName, BindingFlags.Public | BindingFlags.Static);
 		if (field == null || attribute == null || memberInfo == null) { 
 			return null;
 		}
 
-		IStatTypeImpl value = field.GetValue(null) as IStatTypeImpl;
+		value = field.GetValue(null) as IStatTypeImpl;
 		cached[serializedReference] = value;
 		return value;
 	}

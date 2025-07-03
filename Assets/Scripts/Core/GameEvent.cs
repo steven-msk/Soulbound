@@ -20,5 +20,10 @@ public class GameEvent : IEvent {
 		gameEventsByName[id] = this;
 	}
 
-	public static GameEvent FromID(string ID) => gameEventsByName[ID];
+	[CanBeNull] public static GameEvent FromID(string ID) {
+		if (gameEventsByName.ContainsKey(ID)) {
+			return gameEventsByName[ID];
+		}
+		return null;
+	}
 }

@@ -47,7 +47,7 @@ public class SerializableStat {
 		try {
 			return action.Invoke(value);
 		} catch (FormatException) {
-			Debug.LogError($"Invalid stat value {value} for type {valueType.ToInternalType()}");
+			Debug.LogError($"Invalid stat value {value} for type {valueType.ToInternalType()}. Did you type the wrong format?");
 			return null;
 		}
 	}

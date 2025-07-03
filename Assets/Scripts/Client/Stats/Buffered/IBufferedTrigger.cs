@@ -14,4 +14,6 @@ public interface IBufferedTrigger {
 	public void Disable(BufferedStat stat, IStatProvider source);
 
 	public void Invoke(BufferedStat stat, Action action);
+
+	public bool ValidateExecution(BufferedStat stat, IStatProvider source, bool log);
 }

@@ -18,7 +18,7 @@ public abstract class StatItem : Item, IStatProvider {
 		return base.GetDefaultTooltip().Concat(Tooltip.Stats(InstantStats), Tooltip.InterpolatedStats(BufferedInterpolationSource, BufferedStats)); 
 	}
 
-	private void OnValidate() {
+	private void OnEnable() {
 		IEnumerable<SerializedStatReference> references = InstantStats.Select(stat => stat.SerializedReference);
 		HashSet<SerializedStatReference> referenceInstances = references.ToHashSet();
 		foreach (var reference in referenceInstances) {
@@ -29,19 +29,43 @@ public abstract class StatItem : Item, IStatProvider {
 			}
 		}
 
-		foreach (var stat in InstantStats) {
-			IStatTypeImpl statType = stat.SerializedReference.ToStatType(); 
+		void ValidateStats(IEnumerable<SerializableStat> stats) {
+			foreach (var stat in stats) {
+				IStatTypeImpl statType = stat.SerializedReference.ToStatType(); 
 
-			Type expectedType = statType.ValueType; 
-			Type type = stat.ValueType.ToInternalType();
-			if (type != expectedType) {
-				Debug.LogError($"Invalid stat value '{stat.RawValue}' of type {type.Name} for stat entry of type {expectedType.Name}");
-			}
+				Type expectedType = statType.ValueType; 
+				Type type = stat.ValueType.ToInternalType();
+				if (type != expectedType) {
+					Debug.LogError($"Invalid stat value '{stat.RawValue}' of type {type.Name} for stat entry of type {expectedType.Name}");
+				}
 
-			if (!statType.ValidApplications.Contains(stat.ApplicationType)) {
-				string accepted = string.Join(", ", statType.ValidApplications);
-				Debug.LogWarning($"Mismatched stat value application {stat.ApplicationType} for entry that accepts [{accepted}]: {stat.SerializedReference} @ {this}"); 
+				if (!statType.ValidApplications.Contains(stat.ApplicationType)) {
+					string accepted = string.Join(", ", statType.ValidApplications);
+					Debug.LogWarning($"Mismatched stat value application {stat.ApplicationType} for entry that accepts [{accepted}]: {stat.SerializedReference} @ {this}"); 
+				}
+
+				if (string.IsNullOrEmpty(stat.RawValue)) {
+					Debug.LogError($"No value available for {stat} @ {this}");
+				}
 			}
 		}
+		void ValidateBufferedTriggers(Func<BufferedStat, string> emptyTriggerMessage) {
+			foreach (var stat in BufferedStats) {
+				if (stat.ApplyBufferedTrigger == null) {
+					Debug.LogError(emptyTriggerMessage.Invoke(stat));
+				}
+			}
+		}
+		ValidateStats(InstantStats);
+		ValidateStats(BufferedStats);
+		ValidateBufferedTriggers(stat => $"No apply condition selected for stat {stat.SerializedReference} @ {this}");
+		ValidateBufferedTriggers(stat => $"No revoke condition selected for stat {stat.SerializedReference} @ {this}");
+		BufferedStats.ForEach(stat => {
+			stat.ApplyBufferedTrigger.ValidateExecution(stat, this, true);
+			stat.RevokeBufferedTrigger.ValidateExecution(stat, this, true); 
+		});
+	}
+	 
+	private void OnValidate() {
 	}
 }

@@ -28,7 +28,7 @@ public class ItemDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 		if (moveMode) {
 			gameObject.transform.position = GameManager.GetPlayerInstance().InputHandler.MouseScreenPosition;
 		}
-		if (tooltip.IsDisplayed) {
+		if (tooltip?.IsDisplayed ?? false) {
 			tooltip.Update(itemStack);
 		}
 	}
