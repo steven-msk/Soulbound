@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using Unity.VisualScripting;
+using UnityEditor.Timeline.Actions;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -15,7 +16,6 @@ public class InventoryController : MonoBehaviour {
 	// PLANNED: IContainer interface for shareable item container behavior
 	// PLANNED REFACTOR: adapt InventoryController to have shared container behavior
 
-	[SerializeField] private GameObject itemDropTrigger;
 	[SerializeField] private HotbarController hotbar;
 	public HotbarController Hotbar => hotbar;
 
@@ -23,15 +23,21 @@ public class InventoryController : MonoBehaviour {
 	[SerializeField] private bool popupOpen = false;
 
 	public bool PopupOpen => popupOpen;
-	[SerializeField] private ItemDisplay pickupItem = null;
-	public ItemDisplay PickupItem => pickupItem;
+	[SerializeField] private ItemDisplay grabbedItem = null;
+	public ItemDisplay PickupItem => grabbedItem;
 	public readonly Dictionary<int, InventorySlot> popupSlots = new();
 	[SerializeField] private AbstractTooltip activeTooltip;
 	public AbstractTooltip ActiveTooltip { set => activeTooltip = value; }
 
 	public InventorySlot[] AllSlots { get; private set; }
 
+	private PlayerController player;
+
+	// FIXME: hotbar not prioritised when picking up items
+
 	private void Awake() {
+		player = GameManager.GetPlayerInstance();
+
 		InventorySlot[] slots = popup.GetComponentsInChildren<InventorySlot>(true);
 		slots = slots.OrderBy(slot => Regex.Match(slot.name, @"Slot (\d+)")?.Groups[1].Value).ToArray();
 		for (int i = 0; i < slots.Length; i++) {
@@ -46,41 +52,6 @@ public class InventoryController : MonoBehaviour {
 	}
 
 	private void Start() {
-		//CreateItemDisplay(new ItemStack(Registry.Get<Item>("sword"), 1, CompoundTooltip.OfCustom(CompoundTooltipLayout.SpacingOnly(15), Tooltip.Title("Sword"), Tooltip.Stats(new Dictionary<string, object> {
-		//	{ "<color=red>Damage</color>", 8 },
-		//	{ "Crit chance", "5%" }
-		//}), Tooltip.Lore("A mighty sword.")).Data), hotbar.slots[1]);
-		//CreateItemDisplay(new ItemStack(Registry.Get<Item>("gem"), 100, Tooltip.Plain("Blue Gem").Data), hotbar.slots[2]);
-		//CreateItemDisplay(new ItemStack(Registry.Get<Item>("gem_sword"), 1, Tooltip.Compound(Tooltip.Title("Gem Sword"), Tooltip.Stats(new Dictionary<string, object> {
-		//	{ "Damage", 150 },
-		//	{ "Crit chance", "12%" },
-		//	{ $"<color=#{UnityEngine.ColorUtility.ToHtmlStringRGB(new Color(1f, 0.99f, 0.85f))}>The Holy Revolution</color> - On every 5th hit there's a 5% chance to spawn an angel that fights for you.", "Blessing:" }
-		//}), Tooltip.Lore("Angels cherish this weapon - use it carefully.")).Data), hotbar.slots[3]);
-		//CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableItem_test"), 1, Tooltip.Plain("Item").Data), hotbar.slots[9]);
-		////CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableItem_test"), 50, Tooltip.Plain("Blue Gem").Data), hotbar.slots[8]);
-		//CreateItemDisplay(Registry.Get<Item>("heavens_judgement"), 1, hotbar.slots[5], CompoundTooltip.Of(new TooltipData[] {
-		//	new(new TooltipSectionLayout(TooltipSection.Title) {
-		//		textColor = Color.cyan
-		//	}, "Heaven's Judgement"),
-
-		//	new(new TooltipSectionLayout(TooltipSection.Stats) {
-		//		textColor = Color.white
-		//	}, "154 Physical Damage\n" +
-		//		"38 Soul Damage\n" +
-		//		"1.25 Attack Speed\n" +
-		//		"17% Crit Chance\n" +
-		//		"2.1x Crit Multiplier\n" +
-		//		"+2 Dash Velocity\n" +
-		//		"-0.5s Dash Cooldown"),
-
-		//	new(new TooltipSectionLayout(TooltipSection.Affixes) {
-		//		textColor = new Color(1f, 0.9f, 0.5f)
-		//	}, "Blessing: Radiant Edge — Attacks burn enemies with divine flame, dealing 24 Soul Damage over 3s.\n" +
-		//		"Blessing: Light's Oath — On dash, gain 10% movement speed for 2s. Refreshes on kill."),
-
-		//	new(new TooltipSectionLayout(TooltipSection.Lore), "Forged at the summit of Solspire by the last remaining Starforger, this blade was said to sever the bonds of darkness itself.")
-		//}).Data);
-
 		CreateItemDisplay(new ItemStack(Registry.Get<Item>("weaponItem_test"), 2), hotbar.slots[1]);
 		CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableStatItem_test"), 100), hotbar.slots[3]);
 		CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableStatItem_test"), 21_489), hotbar.slots[6]);
@@ -114,7 +85,18 @@ public class InventoryController : MonoBehaviour {
 		}
 	}
 
-	public bool PickUpItem(ItemStack itemStack) {
+	public void DropGrabbedItem(InputAction.CallbackContext actionContext) {
+		if (grabbedItem != null) {
+			grabbedItem.ItemStack.Drop(true);
+			Destroy(grabbedItem.gameObject);
+			if (grabbedItem.ItemStack == player.MainHandStack) {
+				player.SetMainHandItem(null);
+			}
+			grabbedItem = null;
+		}
+	}
+
+	public bool GrabItem(ItemStack itemStack) {
 		if (!itemStack.Item.IsStackable) {
 			InventorySlot emptySlot = GetFirstEmptySlot();
 			if (emptySlot != null) {
@@ -155,57 +137,61 @@ public class InventoryController : MonoBehaviour {
 
 	[InputAction("ItemDrag", Priority = 10, BlocksContexts = new[] { "ItemUse" })]
 	public void OnSlotClick(IItemSlot slot) {
-		if (!popupOpen || (slot.IsEmpty && pickupItem == null)) {
+		if (!popupOpen || (slot.IsEmpty && grabbedItem == null)) {
 			return;
 		}
 
-		if (pickupItem == null && slot.HasItem) {
-			pickupItem = slot.ItemDisplay;
-			pickupItem.EnableMoveMode();
-			pickupItem.transform.SetParent(gameObject.transform, true);
-			itemDropTrigger.SetActive(true);
-			GameManager.GetPlayerInstance().EquipHotbarItem(pickupItem.ItemStack);
+		if (grabbedItem == null && slot.HasItem) {
+			grabbedItem = slot.ItemDisplay;
+			grabbedItem.EnableMoveMode();
+			grabbedItem.transform.SetParent(gameObject.transform, true);
+			player.ItemUsageHandler.Disable(ItemUseTrigger.RightClick, ItemUseTrigger.RightHold);
+			player.InputHandler.inputActions.Player.RightClick.performed += DropGrabbedItem;
+			player.SetMainHandItem(grabbedItem.ItemStack);
 			return;
 		}
 
 		if (slot.IsEmpty) {
-			pickupItem.transform.SetParent(slot.GameObject.transform, true);
-			pickupItem.DisableMoveMode();
-			pickupItem = null;
-			itemDropTrigger.SetActive(false);
-			GameManager.GetPlayerInstance().EquipHotbarItem(hotbar.ActiveSlot.ItemStack);
+			grabbedItem.transform.SetParent(slot.GameObject.transform, true);
+			grabbedItem.DisableMoveMode();
+			grabbedItem = null;
+			player.ItemUsageHandler.Enable(ItemUseTrigger.RightClick, ItemUseTrigger.RightHold);
+			player.InputHandler.inputActions.Player.RightClick.performed -= DropGrabbedItem;
+			player.SetMainHandItem(hotbar.ActiveSlot.ItemStack);
 			return;
 		}
 
 		ItemDisplay itemDisplay = slot.ItemDisplay;
-		ItemStack pickupStack = pickupItem.ItemStack;
+		ItemStack pickupStack = grabbedItem.ItemStack;
 		ItemStack slotStack = itemDisplay.ItemStack;
 		if (slotStack.Item != pickupStack.Item || slotStack.Quantity == slotStack.Item.MaxStackSize) {
-			pickupItem.transform.SetParent(slot.GameObject.transform, true);
-			pickupItem.DisableMoveMode();
-			pickupItem = itemDisplay;
-			pickupItem.EnableMoveMode();
-			pickupItem.transform.SetParent(gameObject.transform, true);
-			GameManager.GetPlayerInstance().EquipHotbarItem(pickupItem.ItemStack);
+			grabbedItem.transform.SetParent(slot.GameObject.transform, true);
+			grabbedItem.DisableMoveMode();
+			grabbedItem = itemDisplay;
+			grabbedItem.EnableMoveMode();
+			grabbedItem.transform.SetParent(gameObject.transform, true);
+			GameManager.GetPlayerInstance().SetMainHandItem(grabbedItem.ItemStack);
 		} else {
 			int space = slotStack.Item.MaxStackSize - slotStack.Quantity;
 			int transfer = Math.Min(space, pickupStack.Quantity);
 			slotStack.Quantity += transfer;
 			pickupStack.Quantity -= transfer;
 			if (pickupStack.Quantity <= 0) {
-				Destroy(pickupItem.gameObject);
-				pickupItem = null;
+				Destroy(grabbedItem.gameObject);
+				grabbedItem = null;
+				player.ItemUsageHandler.Enable(ItemUseTrigger.RightClick, ItemUseTrigger.RightHold);
+				player.InputHandler.inputActions.Player.RightClick.performed -= DropGrabbedItem;
 			}
 		}
 	}
 
 	[InputAction("ItemDrag", Priority = 10, BlocksContexts = new[] { "ItemUse" })]
 	public void OnEquipmentSlotClicked(EquipmentSlot slot) {
-		if (pickupItem?.ItemStack.Item is not IEquipable && pickupItem != null) {
+		if (grabbedItem?.ItemStack.Item is not IEquipable && grabbedItem != null) {
 			return;
 		}
 		bool justEquipped = false;
-		if (pickupItem?.ItemStack.Item is IEquipable equipable && !slot.HasItem) {
+		if (grabbedItem?.ItemStack.Item is IEquipable equipable && !slot.HasItem) {
 			equipable.OnEquip(slot);
 			justEquipped = true;
 		} else if (slot.HasItem) {
@@ -244,7 +230,7 @@ public class InventoryController : MonoBehaviour {
 	public void DestroyItemDisplay(ItemDisplay display) {
 		PlayerController player = GameManager.GetPlayerInstance();
 		if (display.ItemStack == player.MainHandStack) {
-			player.EquipHotbarItem(null);
+			player.SetMainHandItem(null);
 		}
 		GameObject.Destroy(display.gameObject);
 	}
@@ -252,13 +238,6 @@ public class InventoryController : MonoBehaviour {
 	public void EquipHotbarItem(InventorySlot slot) {
 		ItemDisplay itemDisplay = slot.ItemDisplay;
 		PlayerController player = GameManager.GetPlayerInstance();
-		player.EquipHotbarItem(itemDisplay?.ItemStack);
-	}
-
-	public void HotbarLoadCallback() {
-		List<InventorySlot> slots = new();
-		slots.AddRange(hotbar.slots.Values);
-		slots.AddRange(popupSlots.Values);
-		AllSlots = slots.ToArray();
+		player.SetMainHandItem(itemDisplay?.ItemStack);
 	}
 }

@@ -25,6 +25,11 @@ MonoBehaviour:
   stats:
   - serializedReference: 16
     valueType: 1
-    applicationType: 0
+    applicationType: 1
     value: 0.1
     applyAsBonus: 1
+  bufferedStats: []
+  bufferedInterpolationSource: 
+  references:
+    version: 2
+    RefIds: []

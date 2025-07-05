@@ -36,21 +36,21 @@ MonoBehaviour:
     applicationType: 0
     value: 1
     applyAsBonus: 1
-  - serializedReference: 3
-    valueType: 0
-    applicationType: 0
-    value: 1
+  - serializedReference: 16
+    valueType: 1
+    applicationType: 1
+    value: 0.1
     applyAsBonus: 1
   bufferedStats:
   - serializedReference: 0
     valueType: 0
     applicationType: 0
     value: 1
-    applyAsBonus: 1
+    applyAsBonus: 0
     applyBufferedTrigger:
-      rid: 8881712023574413380
+      rid: 8881712068539711555
     revokeBufferedTrigger:
-      rid: 8881712032331071555
+      rid: 8881712068539711556
   bufferedInterpolationSource: 'buffered: {0}'
   cooldown: 1
   attackPrefab: {fileID: 3460292086189885822, guid: 24e5812c95942f24e808955b54b26f73, type: 3}
@@ -58,13 +58,14 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 8881712023574413380
+    - rid: 8881712068539711555
       type: {class: EventBufferedTrigger, ns: , asm: Assembly-CSharp}
       data:
         eventID: PlayerAttackStart
         condition: 0
-    - rid: 8881712032331071555
-      type: {class: TimerBufferedTrigger, ns: , asm: Assembly-CSharp}
+    - rid: 8881712068539711556
+      type: {class: EventTimerBufferedTrigger, ns: , asm: Assembly-CSharp}
       data:
-        waitTime: 1
+        eventID: PlayerAttackEnd
+        waitTime: 0
         condition: 0

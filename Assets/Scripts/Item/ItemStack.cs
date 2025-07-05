@@ -63,8 +63,10 @@ public class ItemStack {
 		// FUTURE TODO: item drop movement (throw force)
 		GameObject pickupItem = GameObject.Instantiate(Item.WorldPrefab, null);
 		pickupItem.transform.position = GameManager.GetPlayerInstance().transform.position;
-		pickupItem.AddComponent<Rigidbody2D>().sleepMode = RigidbodySleepMode2D.NeverSleep;
+		Rigidbody2D rigidbody = pickupItem.AddComponent<Rigidbody2D>();
+		rigidbody.sleepMode = RigidbodySleepMode2D.NeverSleep;
 		BoxCollider2D pickupHitbox = pickupItem.AddComponent<BoxCollider2D>();
+		rigidbody.AddForce(GameManager.GetPlayerInstance().InputHandler.MouseWorldPosition.normalized * 50f);
 		pickupHitbox.isTrigger = true;
 		pickupHitbox.callbackLayers = LayerMask.GetMask("Player");
 		pickupItem.AddComponent<BoxCollider2D>().excludeLayers = ~LayerMask.GetMask("Ground");

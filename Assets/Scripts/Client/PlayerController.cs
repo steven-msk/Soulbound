@@ -54,7 +54,7 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
-	public void EquipHotbarItem([AllowsNull] ItemStack itemStack) {
+	public void SetMainHandItem([AllowsNull] ItemStack itemStack) {
 		if (MainHandStack == itemStack) {
 			return;
 		}

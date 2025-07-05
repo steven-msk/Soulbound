@@ -27,7 +27,7 @@ public class EventTimerBufferedTrigger : IBufferedTrigger {
 		InvocationHelper.If(ValidateExecution(stat, source, false), () => {
 			EventBus<GameEvent>.Unsubscribe(GameEvent.FromID(eventID), this.CoroutineInvoker(stat, source));
 			if (currentCoroutine != null) {
-				CoroutineRunner.instance.StopCoroutine(currentCoroutine);
+				CoroutineRunner.instance.StopCoroutine(currentCoroutine); 
 				currentCoroutine = null;
 			}
 		});

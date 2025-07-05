@@ -10,7 +10,7 @@ using static PlayerInputActions;
 
 public class InputHandler : MonoBehaviour {
 
-	private PlayerInputActions inputActions;
+	public PlayerInputActions inputActions { get; private set; }
 
 	public Vector2 MouseScreenPosition { get; private set; }
 	public Vector2 MouseWorldPosition => Camera.main.ScreenToWorldPoint(MouseScreenPosition);
