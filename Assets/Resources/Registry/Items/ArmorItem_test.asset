@@ -12,16 +12,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cd00f7c0db95e94da8c7764031984fb, type: 3}
   m_Name: ArmorItem_test
   m_EditorClassIdentifier: 
-  itemName: 
-  id: 
-  icon: {fileID: 0}
-  worldPrefab: {fileID: 0}
-  maxStackSize: 0
+  itemName: Armoritem_test
+  id: armoritem_test
+  icon: {fileID: 7251223402976000308, guid: bb61cb66d4ce7ec4885fb9e566718148, type: 3}
+  worldPrefab: {fileID: 7544269631476792279, guid: a8139fe1729f56f478ff07020d01c085, type: 3}
+  maxStackSize: 1
   customTooltipSerializer: {fileID: 0}
   loreTextTooltip: 
   infoTextTooltip: 
-  armorType: 0
-  instantStats: []
+  armorType: 1
+  instantStats:
+  - serializedReference: 2
+    valueType: 0
+    applicationType: 0
+    value: 10
+    applyAsBonus: 0
   bufferedStats: []
   bufferedInterpolationSource: 
   references:

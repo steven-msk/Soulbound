@@ -23,8 +23,7 @@ public class InventoryController : MonoBehaviour, IContainer {
 	[SerializeField] private bool popupOpen = false;
 
 	public bool PopupOpen => popupOpen;
-	[SerializeField] private ItemDisplay grabbedItem = null;
-	public ItemDisplay PickupItem => grabbedItem;
+	public ItemDisplay GrabbedItem { get; set; }
 
 	[SerializeField] private AbstractTooltip activeTooltip;
 	public AbstractTooltip ActiveTooltip { set => activeTooltip = value; }
@@ -44,7 +43,7 @@ public class InventoryController : MonoBehaviour, IContainer {
 
 	private bool setup = false;
 
-	// FEATUREIMPL: item grabbing controls - this might require a general IContainer implementation
+	// FEATUREIMPL: item grabbing controls - this might require a general implementation in IContainer
 
 	private void Awake() {
 		player = GameManager.GetPlayerInstance();
@@ -76,8 +75,6 @@ public class InventoryController : MonoBehaviour, IContainer {
 			CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableStatItem_test"), 1), hotbar[7]);
 			CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableStatItem_test"), 1), hotbar[8]);
 			CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableStatItem_test"), 1), (InventorySlot)this[2, 8]);
-			CreateItemDisplay(new ItemStack(Registry.Get<Item>("equipableItemTest"), 1), hotbar[2]);
-			CreateItemDisplay(new ItemStack(Registry.Get<Item>("equipableItemTest"), 1), hotbar[4]);
 			CreateItemDisplay(new ItemStack(Registry.Get<Item>("longTooltipItem"), 1), hotbar[5]);
 		}
 		StartCoroutine(Prototype_setupDisplays());
@@ -110,12 +107,12 @@ public class InventoryController : MonoBehaviour, IContainer {
 	// POTENTIAL: OnDrop callback in Item
 
 	public void DropGrabbedItem(InputAction.CallbackContext actionContext) {
-		grabbedItem?.ItemStack.Drop(true);
-		Destroy(grabbedItem?.gameObject);
-		if (grabbedItem?.ItemStack == player.MainHandStack) {
+		GrabbedItem?.ItemStack.Drop(true);
+		Destroy(GrabbedItem?.gameObject);
+		if (GrabbedItem?.ItemStack == player.MainHandStack) {
 			player.SetMainHandItem(null);
 		}
-		grabbedItem = null;
+		GrabbedItem = null;
 	}
 
 	public bool GrabItem(ItemStack itemStack) {
@@ -157,94 +154,9 @@ public class InventoryController : MonoBehaviour, IContainer {
 		}
 	}
 
-	[InputAction("ItemDrag", Priority = 10, BlocksContexts = new[] { "ItemUse" })]
-	public void OnSlotClick(IItemSlot slot) {
-		if (!popupOpen || (slot.IsEmpty && grabbedItem == null)) {
-			return;
-		}
-
-		if (grabbedItem == null && slot.HasItem) {
-			grabbedItem = slot.ItemDisplay;
-			grabbedItem.EnableMoveMode();
-			grabbedItem.transform.SetParent(gameObject.transform, true);
-			player.ItemUsageHandler.Disable(ItemUseTrigger.RightClick, ItemUseTrigger.RightHold);
-			player.InputHandler.inputActions.Player.RightClick.performed += DropGrabbedItem;
-			player.SetMainHandItem(grabbedItem.ItemStack);
-			return;
-		}
-
-		if (slot.IsEmpty) {
-			grabbedItem.transform.SetParent(slot.GameObject.transform, true);
-			grabbedItem.DisableMoveMode();
-			grabbedItem = null;
-			player.ItemUsageHandler.Enable(ItemUseTrigger.RightClick, ItemUseTrigger.RightHold);
-			player.InputHandler.inputActions.Player.RightClick.performed -= DropGrabbedItem;
-			player.SetMainHandItem(hotbar.ActiveSlot.ItemStack);
-			return;
-		}
-
-		ItemDisplay itemDisplay = slot.ItemDisplay;
-		ItemStack pickupStack = grabbedItem.ItemStack;
-		ItemStack slotStack = itemDisplay.ItemStack;
-		if (slotStack.Item != pickupStack.Item || slotStack.Quantity == slotStack.Item.MaxStackSize) {
-			grabbedItem.transform.SetParent(slot.GameObject.transform, true);
-			grabbedItem.DisableMoveMode();
-			grabbedItem = itemDisplay;
-			grabbedItem.EnableMoveMode();
-			grabbedItem.transform.SetParent(gameObject.transform, true);
-			GameManager.GetPlayerInstance().SetMainHandItem(grabbedItem.ItemStack);
-		} else {
-			int space = slotStack.Item.MaxStackSize - slotStack.Quantity;
-			int transfer = Math.Min(space, pickupStack.Quantity);
-			slotStack.Quantity += transfer;
-			pickupStack.Quantity -= transfer;
-			if (pickupStack.Quantity <= 0) {
-				Destroy(grabbedItem.gameObject);
-				grabbedItem = null;
-				player.ItemUsageHandler.Enable(ItemUseTrigger.RightClick, ItemUseTrigger.RightHold);
-				player.InputHandler.inputActions.Player.RightClick.performed -= DropGrabbedItem;
-			}
-		}
-	}
-
-	[InputAction("ItemDrag", Priority = 10, BlocksContexts = new[] { "ItemUse" })]
-	public void OnArmorSlotClicked(ArmorSlot slot) {
-		if ((grabbedItem?.ItemStack.Item is ArmorItem armorItem && slot.AcceptedType == armorItem.ArmorType) || grabbedItem == null) {
-			this.OnEquipmentSlotClicked(slot);
-		}
-	}
-
 	// PLANNED FEATUREIMPL REFACTOR: equipment slots behavior and code restructure
 	// Factor out common equipment slot behavior logic, potentially add a general implementation for
 	// slots that only accept 1 item of some item type along with its behavior logic
-
-	[InputAction("ItemDrag", Priority = 10, BlocksContexts = new[] { "ItemUse" })]
-	public void OnEquipmentSlotClicked(EquipmentSlot slot) {
-		if (grabbedItem?.ItemStack.Item is not IEquipable && grabbedItem != null) {
-			return;
-		}
-		bool justEquipped = false;
-		if (grabbedItem?.ItemStack.Item is IEquipable equipable && !slot.HasItem) {
-			equipable.OnEquip(slot);
-			justEquipped = true;
-			if (slot is ArmorSlot armorSlot) {
-				armorSlot.HideOverlay();
-			}
-		} else if (slot.HasItem) {
-			((IEquipable)slot.ItemStack.Item).OnUnequipped();
-			if (slot is ArmorSlot armorSlot) {
-				armorSlot.ShowOverlay();
-			}
-		}
-		
-		this.OnSlotClick(slot);
-		if (slot.HasItem && !justEquipped) {
-			((IEquipable)slot.ItemStack.Item).OnEquip(slot);
-			if (slot is ArmorSlot armorSlot) {
-				armorSlot.HideOverlay();
-			}
-		}
-	}
 
 	[CanBeNull] public InventorySlot GetFirstEmptySlot() => MainPlayerSlots.First(slot => slot.IsEmpty);
 

@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using static UnityEditor.Progress;
 
-[CreateAssetMenu(menuName = "Items/EquipableItem")]
-public class EquipableItem : Item, IEquipable {
+public abstract class EquipableItem : Item, IEquipable {
 	[SerializeField] private EquipableDelegate delegates;
 
 	public virtual void OnEquip(EquipmentSlot slot) => delegates.InvokeNullableOrElse(delegates => delegates.OnEquip(slot), LogWarning);

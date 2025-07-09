@@ -14,9 +14,12 @@ public class ArmorSlot : EquipmentSlot {
 	[SerializeField] private GameObject overlay;
 	public GameObject Overlay => overlay;
 
-	public override void OnPointerDown(PointerEventData eventData) {
-		InputHandler.RequestAction(new("ItemDrag", 10, () => GameManager.GetPlayerInstance().Inventory.OnArmorSlotClicked(this)));
-		InputHandler.BlockContextUntil("ItemUse", () => GameManager.GetPlayerInstance().InputHandler.LeftHold);
+	[InputAction("ItemDrag", Priority = 10, BlocksContexts = new[] { "ItemUse" })]
+	public override void OnClick(ItemDisplay grabbedItem, InventoryController inventory) {
+		if ((grabbedItem?.ItemStack.Item is ArmorItem armorItem && this.AcceptedType == armorItem.ArmorType) || grabbedItem == null) {
+			base.OnClick(grabbedItem, inventory);
+			InvocationHelper.IfElse(this.ItemDisplay != null, HideOverlay, ShowOverlay);
+		}
 	}
 
 	public void HideOverlay() => overlay.SetActive(false);

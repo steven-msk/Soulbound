@@ -44,12 +44,12 @@ public class ItemDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 		tooltip.Hide();
 	}
 
-	public void EnableMoveMode() {
+	public void EnableGrab() {
 		moveMode = true;
 		gameObject.GetComponent<Image>().raycastTarget = false;
 	}
 
-	public void DisableMoveMode() {
+	public void DisableGrab() {
 		moveMode = false;
 		gameObject.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
 		gameObject.GetComponent<Image>().raycastTarget = true;

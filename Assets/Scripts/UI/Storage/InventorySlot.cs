@@ -13,8 +13,11 @@ public class InventorySlot : MonoBehaviour, IItemSlot {
 
 	public GameObject GameObject => gameObject;
 
+	public void OnClick(ItemDisplay grabbedItem, InventoryController inventory) => this.TranserItems(grabbedItem, inventory);
+
 	public void OnPointerDown(PointerEventData eventData) {
-		InputHandler.RequestAction(new("ItemDrag", 10, () => GameManager.GetPlayerInstance().Inventory.OnSlotClick(this)));
+		InventoryController inventory = GameManager.GetPlayerInstance().Inventory;
+		InputHandler.RequestAction(new("ItemDrag", 10, () => this.OnClick(inventory.GrabbedItem, inventory)));
 		InputHandler.BlockContextUntil("ItemUse", () => GameManager.GetPlayerInstance().InputHandler.LeftHold);
 	}
 }
