@@ -69,7 +69,8 @@ public class InventoryController : MonoBehaviour, IContainer {
 		IEnumerator Prototype_setupDisplays() {
 			yield return new WaitUntil(() => setup);
 			CreateItemDisplay(new ItemStack(Registry.Get<Item>("weaponItem_test"), 2), hotbar[0]);
-			CreateItemDisplay(new ItemStack(Registry.Get<Item>("weaponItem_test"), 2), hotbar[1]);
+			CreateItemDisplay(new ItemStack(Registry.Get<Item>("armoritem_test"), 2), hotbar[1]);
+			CreateItemDisplay(new ItemStack(Registry.Get<Item>("armoritem_test"), 2), popupSlots[0, 0]);
 			CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableStatItem_test"), 100), hotbar[3]);
 			CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableStatItem_test"), 21_489), hotbar[6]);
 			CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableStatItem_test"), 1), hotbar[7]);
@@ -207,6 +208,17 @@ public class InventoryController : MonoBehaviour, IContainer {
 	}
 
 	[InputAction("ItemDrag", Priority = 10, BlocksContexts = new[] { "ItemUse" })]
+	public void OnArmorSlotClicked(ArmorSlot slot) {
+		if ((grabbedItem?.ItemStack.Item is ArmorItem armorItem && slot.AcceptedType == armorItem.ArmorType) || grabbedItem == null) {
+			this.OnEquipmentSlotClicked(slot);
+		}
+	}
+
+	// PLANNED FEATUREIMPL REFACTOR: equipment slots behavior and code restructure
+	// Factor out common equipment slot behavior logic, potentially add a general implementation for
+	// slots that only accept 1 item of some item type along with its behavior logic
+
+	[InputAction("ItemDrag", Priority = 10, BlocksContexts = new[] { "ItemUse" })]
 	public void OnEquipmentSlotClicked(EquipmentSlot slot) {
 		if (grabbedItem?.ItemStack.Item is not IEquipable && grabbedItem != null) {
 			return;
@@ -215,13 +227,22 @@ public class InventoryController : MonoBehaviour, IContainer {
 		if (grabbedItem?.ItemStack.Item is IEquipable equipable && !slot.HasItem) {
 			equipable.OnEquip(slot);
 			justEquipped = true;
+			if (slot is ArmorSlot armorSlot) {
+				armorSlot.HideOverlay();
+			}
 		} else if (slot.HasItem) {
-			((IEquipable)slot.ItemStack.Item).OnUnequipped(slot.ItemStack.Item);
+			((IEquipable)slot.ItemStack.Item).OnUnequipped();
+			if (slot is ArmorSlot armorSlot) {
+				armorSlot.ShowOverlay();
+			}
 		}
 		
 		this.OnSlotClick(slot);
 		if (slot.HasItem && !justEquipped) {
 			((IEquipable)slot.ItemStack.Item).OnEquip(slot);
+			if (slot is ArmorSlot armorSlot) {
+				armorSlot.HideOverlay();
+			}
 		}
 	}
 
@@ -238,7 +259,9 @@ public class InventoryController : MonoBehaviour, IContainer {
 		ItemDisplay display = obj.GetComponent<ItemDisplay>();
 		Debug.Assert(display != null, $"ItemDisplay instance not found in item display prefab");
 		display.ItemStack = itemStack;
-		itemStack.Initialize(display);
+		if (itemStack.Item.IsStackable) {
+			itemStack.InitializeStackText(display);
+		}
 		display.Tooltip = itemStack.Item.GetTooltip();
 		return display;
 	}

@@ -17,5 +17,6 @@ public class GameManager : MonoBehaviour {
 	private void OnApplicationQuit() {
 		EventBus<GameEvent>.Clear();
 		EventBus<SystemEvent>.Clear();
+		Registry.Reset();
 	}
 }

@@ -32,7 +32,7 @@ public class ItemStack {
 		stackText.text = FormatStackCount(Quantity);
 	}
 
-	public GameObject Initialize(ItemDisplay parent) {
+	public GameObject InitializeStackText(ItemDisplay parent) {
 		GameObject stackText = GameObject.Instantiate(Registry.Get<GameObject>("stackNumberPrefab"), parent.transform);
 		TextMeshProUGUI text = stackText.GetComponent<TextMeshProUGUI>();
 		text.autoSizeTextContainer = true;

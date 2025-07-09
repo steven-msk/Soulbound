@@ -14,11 +14,7 @@ public class EquipmentSlot : MonoBehaviour, IItemSlot {
 
 	public GameObject GameObject => gameObject;
 
-	public void OnPointerClick(PointerEventData eventData) {
-		throw new NotImplementedException();
-	}
-
-	public void OnPointerDown(PointerEventData eventData) { 
+	public virtual void OnPointerDown(PointerEventData eventData) { 
 		InputHandler.RequestAction(new("ItemDrag", 10, () => GameManager.GetPlayerInstance().Inventory.OnEquipmentSlotClicked(this)));
 		InputHandler.BlockContextUntil("ItemUse", () => GameManager.GetPlayerInstance().InputHandler.LeftHold);
 	}

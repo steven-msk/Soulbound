@@ -27,4 +27,10 @@ public static class InvocationHelper {
 			action.Invoke();
 		} 
 	}
+
+	public static void PatternIf<T>(object obj, Action<T> success) {
+		if (obj is T patternTarget) {
+			success.Invoke(patternTarget);
+		}
+	}
 }

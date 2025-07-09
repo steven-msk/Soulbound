@@ -65,7 +65,4 @@ public abstract class StatItem : Item, IStatProvider {
 			stat.RevokeBufferedTrigger.ValidateExecution(stat, this, true); 
 		});
 	}
-	 
-	private void OnValidate() {
-	}
 }

@@ -103,7 +103,7 @@ public class HotbarController : MonoBehaviour, IHotbarContainer {
 			hotbarSlot.GetComponent<TextMeshProUGUI>().color = slotNumberColor;
 			break;
 		}
-		if (!IsEmpty(slot.GetComponent<InventorySlot>())) {
+		if (!IsEmpty(slot.GetComponent<InventorySlot>()) && slot.ItemStack.Item.IsStackable) {
 			slot.GetComponentInChildren<ItemDisplay>().gameObject.GetComponentInChildren<TextMeshProUGUI>().color = itemStackColor;
 		}
 	}

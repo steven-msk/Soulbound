@@ -10,9 +10,9 @@ using static UnityEditor.Progress;
 public class EquipableItem : Item, IEquipable {
 	[SerializeField] private EquipableDelegate delegates;
 
-	public void OnEquip(EquipmentSlot slot) => delegates.InvokeNullableOrElse(delegates => delegates.OnEquip(slot), LogWarning);
+	public virtual void OnEquip(EquipmentSlot slot) => delegates.InvokeNullableOrElse(delegates => delegates.OnEquip(slot), LogWarning);
 
-	public void OnUnequipped(Item item) => delegates.InvokeNullableOrElse(delegates => delegates.OnUnequip(item), LogWarning);
+	public virtual void OnUnequipped() => delegates.InvokeNullableOrElse(delegates => delegates.OnUnequip(this), LogWarning);
 
 	private void LogWarning() => Debug.LogWarning($"Missing EquipableDelegate for item {this.name}");
 }
