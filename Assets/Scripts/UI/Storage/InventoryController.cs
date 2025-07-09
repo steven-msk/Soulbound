@@ -11,7 +11,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-public class InventoryController : MonoBehaviour {
+public class InventoryController : MonoBehaviour, IContainer {
 
 	// PLANNED: IContainer interface for shareable item container behavior
 	// PLANNED REFACTOR: adapt InventoryController to have shared container behavior
@@ -25,40 +25,61 @@ public class InventoryController : MonoBehaviour {
 	public bool PopupOpen => popupOpen;
 	[SerializeField] private ItemDisplay grabbedItem = null;
 	public ItemDisplay PickupItem => grabbedItem;
-	public readonly Dictionary<int, InventorySlot> popupSlots = new();
+
 	[SerializeField] private AbstractTooltip activeTooltip;
 	public AbstractTooltip ActiveTooltip { set => activeTooltip = value; }
 
-	public InventorySlot[] AllSlots { get; private set; }
+	public InventorySlot[] MainPlayerSlots { get; private set; }
+
+	[SerializeField] private int rows;
+	public int Rows => rows;
+
+	[SerializeField] private int columns;
+	public int Columns => columns;
+
+	public InventorySlot[,] popupSlots;
+	public IItemSlot this[int row, int col] => popupSlots[row, col];
 
 	private PlayerController player;
 
-	// FIXME: hotbar not prioritised when picking up items
+	private bool setup = false;
+
+	// FEATUREIMPL: item grabbing controls - this might require a general IContainer implementation
 
 	private void Awake() {
 		player = GameManager.GetPlayerInstance();
-
-		InventorySlot[] slots = popup.GetComponentsInChildren<InventorySlot>(true);
-		slots = slots.OrderBy(slot => Regex.Match(slot.name, @"Slot (\d+)")?.Groups[1].Value).ToArray();
-		for (int i = 0; i < slots.Length; i++) {
-			popupSlots[i + 1] = slots[i];
-		}
-		IEnumerator HotbarLoadCallback() {
-			yield return new WaitUntil(() => hotbar.slots.Count == 9);
-			slots.ToList().AddRange(hotbar.slots.Values);
-			AllSlots = slots.ToArray();
-		}
-		StartCoroutine(HotbarLoadCallback());
 	}
 
+#nullable enable
+
+	public void SetupGrid(Action? callback) {
+		InventorySlot[] flatPopupSlots = popup.GetComponentsInChildren<InventorySlot>(true);
+		popupSlots = ArrayHelper.CompressTo2D(flatPopupSlots, rows, columns);
+		callback?.Invoke();
+
+		List<InventorySlot> mainPlayerSlots = hotbar.Slots.ToList();
+		mainPlayerSlots.AddRange(popupSlots);
+		MainPlayerSlots = mainPlayerSlots.ToArray();
+		setup = true;
+	}
+
+#nullable disable
+
 	private void Start() {
-		CreateItemDisplay(new ItemStack(Registry.Get<Item>("weaponItem_test"), 2), hotbar.slots[1]);
-		CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableStatItem_test"), 100), hotbar.slots[3]);
-		CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableStatItem_test"), 21_489), hotbar.slots[6]);
-		CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableStatItem_test"), 1), hotbar.slots[7]);
-		CreateItemDisplay(new ItemStack(Registry.Get<Item>("equipableItemTest"), 1), hotbar.slots[2]);
-		CreateItemDisplay(new ItemStack(Registry.Get<Item>("equipableItemTest"), 1), hotbar.slots[4]);
-		CreateItemDisplay(new ItemStack(Registry.Get<Item>("longTooltipItem"), 1), hotbar.slots[5]);
+		IEnumerator Prototype_setupDisplays() {
+			yield return new WaitUntil(() => setup);
+			CreateItemDisplay(new ItemStack(Registry.Get<Item>("weaponItem_test"), 2), hotbar[0]);
+			CreateItemDisplay(new ItemStack(Registry.Get<Item>("weaponItem_test"), 2), hotbar[1]);
+			CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableStatItem_test"), 100), hotbar[3]);
+			CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableStatItem_test"), 21_489), hotbar[6]);
+			CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableStatItem_test"), 1), hotbar[7]);
+			CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableStatItem_test"), 1), hotbar[8]);
+			CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableStatItem_test"), 1), (InventorySlot)this[2, 8]);
+			CreateItemDisplay(new ItemStack(Registry.Get<Item>("equipableItemTest"), 1), hotbar[2]);
+			CreateItemDisplay(new ItemStack(Registry.Get<Item>("equipableItemTest"), 1), hotbar[4]);
+			CreateItemDisplay(new ItemStack(Registry.Get<Item>("longTooltipItem"), 1), hotbar[5]);
+		}
+		StartCoroutine(Prototype_setupDisplays());
 	}
 
 	public void ToggleInventory(InputAction.CallbackContext actionContext) {
@@ -85,15 +106,15 @@ public class InventoryController : MonoBehaviour {
 		}
 	}
 
+	// POTENTIAL: OnDrop callback in Item
+
 	public void DropGrabbedItem(InputAction.CallbackContext actionContext) {
-		if (grabbedItem != null) {
-			grabbedItem.ItemStack.Drop(true);
-			Destroy(grabbedItem.gameObject);
-			if (grabbedItem.ItemStack == player.MainHandStack) {
-				player.SetMainHandItem(null);
-			}
-			grabbedItem = null;
+		grabbedItem?.ItemStack.Drop(true);
+		Destroy(grabbedItem?.gameObject);
+		if (grabbedItem?.ItemStack == player.MainHandStack) {
+			player.SetMainHandItem(null);
 		}
+		grabbedItem = null;
 	}
 
 	public bool GrabItem(ItemStack itemStack) {
@@ -120,7 +141,7 @@ public class InventoryController : MonoBehaviour {
 			}
 
 
-			InventorySlot[] inventory = AllSlots;
+			InventorySlot[] inventory = MainPlayerSlots;
 			for (int i = 0; i < inventory.Length; i++){
 				if (!inventory[i].HasItem) {
 					int toAdd = Mathf.Min(remaining, itemStack.Item.MaxStackSize);
@@ -204,13 +225,13 @@ public class InventoryController : MonoBehaviour {
 		}
 	}
 
-	[CanBeNull] public InventorySlot GetFirstEmptySlot() => AllSlots.First(slot => slot.IsEmpty);
+	[CanBeNull] public InventorySlot GetFirstEmptySlot() => MainPlayerSlots.First(slot => slot.IsEmpty);
 
-	[CanBeNull] public InventorySlot[] GetOccupiedSlots() => AllSlots.Where(slot => slot.HasItem).ToArray();
+	[CanBeNull] public InventorySlot[] GetOccupiedSlots() => MainPlayerSlots.Where(slot => slot.HasItem).ToArray();
 
 	[CanBeNull] public InventorySlot[] GetOccupiedSlots(Item item) => GetOccupiedSlots().Where(slot => slot.ItemStack.Item.Equals(item)).ToArray();
 
-	[CanBeNull] public InventorySlot[] GetEmptySlots() => AllSlots.Where(slot => !slot.HasItem).ToArray();
+	[CanBeNull] public InventorySlot[] GetEmptySlots() => MainPlayerSlots.Where(slot => !slot.HasItem).ToArray();
 	
 	public ItemDisplay CreateItemDisplay(ItemStack itemStack, InventorySlot slot) {
 		GameObject obj = Instantiate(Registry.Get<GameObject>("itemDisplayPrefab"), slot.transform);

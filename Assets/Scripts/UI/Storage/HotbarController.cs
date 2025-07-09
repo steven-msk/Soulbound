@@ -4,11 +4,12 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
 
-public class HotbarController : MonoBehaviour {
-
+public class HotbarController : MonoBehaviour, IHotbarContainer {
 	[Header("Active Slots")]
 	public Color activeSlotColor;
+
 	public Color activeSlotNumberColor;
 	public Color activeItemStackColor;
 	public Vector3 activeSlotOffset;
@@ -16,53 +17,76 @@ public class HotbarController : MonoBehaviour {
 
 	[Header("Inactive Slots")]
 	public Color inactiveSlotColor;
+
 	public Color inactiveSlotNumberColor;
 	public Color inactiveItemStackColor;
 
-	[Header("Internal")]
-	[SerializeField] private InventorySlot activeSlot;
-	public InventorySlot ActiveSlot => activeSlot;	
+	private (InventorySlot hotbarSlot, int key) active;
+	public InventorySlot ActiveSlot => active.hotbarSlot;
 
-	public readonly Dictionary<int, InventorySlot> slots = new();
+	private InventoryController inventory;
+
+	public int Columns => 9;
+
+	// FIXME: main hand item usage unavailable upon first trigger when entering play mode.
+	// To reproduce this:
+	// 1. Enter play mode
+	// 2. Without changing the current hotbar slot, invoke the usage trigger of the item in the
+	// hotbar slot
+	// 3. If the item doesnt get used, switch to a different slot and go back to the original one;
+	//    if now it gets used thats the bug
+
+	private InventorySlot[] slots;
+	public InventorySlot[] Slots => slots;
+	public InventorySlot this[int index] => slots[index];
 
 	private void Awake() {
-		InventorySlot[] hotbarSlots = gameObject.GetComponentsInChildren<InventorySlot>();
-		for (int i = 0; i < hotbarSlots.Length; i++) {
-			hotbarSlots[i].SlotNumber = i + 1;
-			slots[i + 1] = hotbarSlots[i];
-		}
+		inventory = GameManager.GetPlayerInstance().Inventory;
+		SetupGrid(() => inventory.SetupGrid(null));
+		SetActiveSlot(0);
 	}
 
-	private void Start() {
-		SetActiveSlot(1);           // temporary
+#nullable enable
+
+	public void SetupGrid(Action? callback) {
+		InventorySlot[] hotbarSlots = gameObject.GetComponentsInChildren<InventorySlot>();
+		slots = new InventorySlot[Columns];
+		for (int i = 0; i < Columns; i++) {
+			slots[i] = hotbarSlots[i];
+		}
+		callback?.Invoke();
 	}
+
+#nullable disable
 
 	public void SetActiveSlot(int slotKey) {
-		Debug.Assert(slotKey >= 1 && slotKey <= slots.Count, $"Unexpected slotKey {slotKey}");
-		InventorySlot slot = slots[slotKey];
-		if (activeSlot == null) {
-			activeSlot = slot;
-			ApplySelectionChanges(activeSlot, activeSlotColor, activeSlotNumberColor, activeItemStackColor, activeSlotOffset, activeSlotScale);
+		Debug.Assert(slotKey >= 0 && slotKey < Columns, $"Unexpected hotbar slotKey {slotKey}");
+		InventorySlot hotbarSlot = this[slotKey];
+		if (active.hotbarSlot == null) {
+			active = (hotbarSlot, slotKey);
+			ApplySelectionChanges(active.hotbarSlot, activeSlotColor, activeSlotNumberColor, activeItemStackColor, activeSlotOffset, activeSlotScale);
 		}
 
-		if (slot != activeSlot) {
+		if (hotbarSlot != active.hotbarSlot) {
 			if (!GameManager.GetPlayerInstance().Inventory.PopupOpen) {
-				ApplySelectionChanges(activeSlot, inactiveSlotColor, inactiveSlotNumberColor, inactiveItemStackColor, -activeSlotOffset, Vector3.one);
+				ApplySelectionChanges(active.hotbarSlot, inactiveSlotColor, inactiveSlotNumberColor, inactiveItemStackColor, -activeSlotOffset, Vector3.one);
 			} else {
-				ApplySelectionChanges(activeSlot, activeSlotColor, activeSlotNumberColor, activeItemStackColor, -activeSlotOffset, Vector3.one);
+				ApplySelectionChanges(active.hotbarSlot, activeSlotColor, activeSlotNumberColor, activeItemStackColor, -activeSlotOffset, Vector3.one);
 			}
-			activeSlot = slot;
-			ApplySelectionChanges(activeSlot, activeSlotColor, activeSlotNumberColor, activeItemStackColor, activeSlotOffset, activeSlotScale);
+			active = (hotbarSlot, slotKey);
+			ApplySelectionChanges(active.hotbarSlot, activeSlotColor, activeSlotNumberColor, activeItemStackColor, activeSlotOffset, activeSlotScale);
 		}
+
+		// weird how this gets called in Awake() and sets the slot active, but doesnt actually equip the main hand item
 		GameManager.GetPlayerInstance().Inventory.EquipHotbarItem(slots[slotKey]);
 	}
 
 	public void OnHotbarScroll(float scrollDelta) {
-		int currentSlot = activeSlot.SlotNumber;
-		Debug.Assert(currentSlot >= 1 && currentSlot <= slots.Count);
+		int currentSlot = active.key;
+		Debug.Assert(currentSlot >= 0 && currentSlot < Columns);
 
 		int nextSlot = currentSlot - (int)scrollDelta;
-		SetActiveSlot(Mathf.Clamp(nextSlot, 1, slots.Count));
+		SetActiveSlot(Mathf.Clamp(nextSlot, 0, Columns - 1));
 	}
 
 	private void ApplySelectionChanges(InventorySlot slot, Color color, Color slotNumberColor, Color itemStackColor, Vector3 offset, Vector3 scale) {
@@ -89,10 +113,10 @@ public class HotbarController : MonoBehaviour {
 		Color slotColor = inventory.PopupOpen ? activeSlotColor : inactiveSlotColor;
 		Color slotNumberColor = inventory.PopupOpen ? activeSlotNumberColor : inactiveSlotNumberColor;
 		Color itemStackColor = inventory.PopupOpen ? activeItemStackColor : inactiveItemStackColor;
-		foreach (var slotEntry in slots.Where(slotEntry => !slotEntry.Value.Equals(activeSlot))) {
-			ApplySelectionChanges(slotEntry.Value, slotColor, slotNumberColor, itemStackColor, Vector3.zero, Vector3.one);
+		foreach (var slot in slots.Where(slot => !slot.Equals(active.hotbarSlot))) {
+			ApplySelectionChanges(slot, slotColor, slotNumberColor, itemStackColor, Vector3.zero, Vector3.one);
 		}
-		inventory.EquipHotbarItem(activeSlot);	
+		inventory.EquipHotbarItem(active.hotbarSlot);
 	}
 
 	public bool IsEmpty(InventorySlot slot) => slot.GetComponentInChildren<ItemDisplay>() == null;

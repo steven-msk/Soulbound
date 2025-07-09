@@ -11,8 +11,6 @@ public class InventorySlot : MonoBehaviour, IItemSlot {
 	public bool IsEmpty => ItemDisplay == null;
 	public ItemStack ItemStack => ItemDisplay?.ItemStack;
 
-	public int SlotNumber { get; set; }
-
 	public GameObject GameObject => gameObject;
 
 	public void OnPointerDown(PointerEventData eventData) {

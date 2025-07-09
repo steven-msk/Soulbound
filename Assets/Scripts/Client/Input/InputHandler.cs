@@ -49,7 +49,7 @@ public class InputHandler : MonoBehaviour {
 
 		playerActions.ChangeHotbarSlot.performed += actionContext => {
 			int keySlot = int.Parse(actionContext.control.name);
-			player.Inventory.Hotbar.SetActiveSlot(keySlot);
+			player.Inventory.Hotbar.SetActiveSlot(keySlot - 1);
 		};
 		playerActions.ScrollHotbarSlot.performed += actionContext => {
 			float scrollDelta = actionContext.ReadValue<float>();
