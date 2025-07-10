@@ -27,14 +27,27 @@ public interface IItemSlot : IPointerDownHandler {
 		this.ItemDisplay.EnableGrab();
 		this.ItemDisplay?.transform.SetParent(GameManager.GetPlayerInstance().Inventory.transform, true);
 	}
+
 }
 
-public static class ItemTransferUtility {
+public static class ItemSlotUtility {
+
+	// PLANNED REFACTOR: RequestClickAction() should take pointer event data for further functionality with item management in slots
+	public static void RequestClickAction(this IItemSlot slot) {
+		InventoryController inventory = GameManager.GetPlayerInstance().Inventory;
+		InputHandler.RequestAction(new("ItemDrag", 10, () => {
+			InvocationHelper.If(slot.ValidClickAction(inventory.GrabbedItem), () => slot.OnClick(inventory.GrabbedItem, inventory));
+		}));
+		InputHandler.BlockContextUntil("ItemUse", () => GameManager.GetPlayerInstance().InputHandler.LeftHold);
+	}
+
+	public static bool ValidClickAction(this IItemSlot slot, ItemDisplay grabbedItem) => grabbedItem != null || slot.HasItem;
+
 	public static void TranserItems(this IItemSlot slot, ItemDisplay grabbedItem, InventoryController inventory) {
-		PlayerController player = GameManager.GetPlayerInstance();
 		if (!inventory.PopupOpen) {
 			return;
 		}
+		PlayerController player = GameManager.GetPlayerInstance();
 		void SetDropCapabilities(bool enabled) {
 			if (!enabled) {
 				player.ItemUsageHandler.Disable(ItemUseTrigger.RightClick, ItemUseTrigger.RightHold);

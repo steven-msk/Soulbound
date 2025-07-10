@@ -19,10 +19,13 @@ public class InputHandler : MonoBehaviour {
 	public float HorizontalMovement { get; private set; }
 	public bool PressingSpace { get; private set; }
 
-	private static List<InputActionRequest> intents = new();
+	private static List<InputActionRequest> requests = new();
 	private static Dictionary<string, Func<bool>> blockedContexts = new();
 
 	private void Awake() {
+		requests.Clear();
+		blockedContexts.Clear();
+
 		inputActions = new PlayerInputActions();
 		PlayerActions playerActions = inputActions.Player;
 		PlayerController player = GameManager.GetPlayerInstance();
@@ -70,7 +73,7 @@ public class InputHandler : MonoBehaviour {
 			}
 			blockedContexts.Remove(intent.Context);
 		}
-		intents.Add(intent);
+		requests.Add(intent);
 	}
 
 	private void Update() {
@@ -82,9 +85,9 @@ public class InputHandler : MonoBehaviour {
 	}
 
 	private void LateUpdate() {
-		var chosen = intents.OrderByDescending(intent => intent.Priority).FirstOrDefault();
+		var chosen = requests.OrderByDescending(intent => intent.Priority).FirstOrDefault();
 		chosen?.Action.Invoke();
-		intents.Clear();
+		requests.Clear();
 	}
 
 	private void OnEnable() => inputActions.Enable();

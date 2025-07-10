@@ -10,13 +10,13 @@ public abstract class EquipmentSlot : MonoBehaviour, IItemSlot {
 	public ItemDisplay ItemDisplay => gameObject.GetComponentInChildren<ItemDisplay>();
 	public bool HasItem => ItemDisplay != null;
 	public bool IsEmpty => ItemDisplay == null;
-	public ItemStack ItemStack => ItemDisplay?.ItemStack;
+	public ItemStack ItemStack => ItemDisplay?.ItemStack; 
 
 	public GameObject GameObject => gameObject;
 
 	[InputAction("ItemDrag", Priority = 10, BlocksContexts = new[] { "ItemUse" })]
 	public virtual void OnClick(ItemDisplay grabbedItem, InventoryController inventory) {
-		if (grabbedItem?.ItemStack.Item is not IEquipable && grabbedItem != null) {
+		if ((grabbedItem?.ItemStack.Item is not IEquipable && grabbedItem != null) || (grabbedItem == null && this.IsEmpty)) {
 			return;
 		}
 		bool justEquipped = false;
@@ -34,9 +34,5 @@ public abstract class EquipmentSlot : MonoBehaviour, IItemSlot {
 		}
 	}
 
-	public virtual void OnPointerDown(PointerEventData eventData) { 
-		InventoryController inventory = GameManager.GetPlayerInstance().Inventory;
-		InputHandler.RequestAction(new("ItemDrag", 10, () => this.OnClick(inventory.GrabbedItem, inventory)));
-		InputHandler.BlockContextUntil("ItemUse", () => GameManager.GetPlayerInstance().InputHandler.LeftHold);
-	}
+	public virtual void OnPointerDown(PointerEventData eventData) => this.RequestClickAction();
 }

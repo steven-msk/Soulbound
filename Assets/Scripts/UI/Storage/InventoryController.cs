@@ -20,6 +20,7 @@ public class InventoryController : MonoBehaviour, IContainer {
 	public HotbarController Hotbar => hotbar;
 
 	[SerializeField] private GameObject popup;
+	[SerializeField] private GameObject armorSlots;
 	[SerializeField] private bool popupOpen = false;
 
 	public bool PopupOpen => popupOpen;
@@ -83,11 +84,10 @@ public class InventoryController : MonoBehaviour, IContainer {
 	public void ToggleInventory(InputAction.CallbackContext actionContext) {
 		popupOpen = !popupOpen;
 		popup.SetActive(popupOpen);
+		armorSlots.SetActive(popupOpen);
 		LayoutRebuilder.ForceRebuildLayoutImmediate(popup.GetComponent<RectTransform>());
-		if (activeTooltip != null && activeTooltip.IsDisplayed) {
-			activeTooltip?.Hide();
-		}
-		hotbar.OnInventoryPopup(); 
+		activeTooltip?.Hide();
+		hotbar.OnInventoryPopup();
 	}
 
 	public void DropItemFromInventory(InputAction.CallbackContext actionContext) {
