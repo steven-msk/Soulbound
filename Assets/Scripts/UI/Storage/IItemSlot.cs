@@ -17,22 +17,29 @@ public interface IItemSlot : IPointerDownHandler {
 	public void OnClick(ItemDisplay grabbedItem, InventoryController inventory);
 	
 	// PLANNED REFACTOR: attach and detach slot methods will cause problems later on with serializations
+	// Attaching and detaching should only be made after the player released or grabbed an item from a slot.
+	// This helps with serialization of items inside containers when the client crashes.
+	// As of right now, if a client would crash while they have an item grabbed, there is
+	// nowhere to place the item in the container since the data had already been detached.
 
 	public virtual void AttachItemDisplay(ItemDisplay itemDisplay) {
 		itemDisplay?.transform.SetParent(GameObject.transform, true);
-		itemDisplay.DisableGrab();
+		itemDisplay.DisableGrab(); 
 	}
 
 	public virtual void DetachItemDisplay() {
 		this.ItemDisplay.EnableGrab();
 		this.ItemDisplay?.transform.SetParent(GameManager.GetPlayerInstance().Inventory.transform, true);
 	}
-
 }
 
 public static class ItemSlotUtility {
 
-	// PLANNED REFACTOR: RequestClickAction() should take pointer event data for further functionality with item management in slots
+	// PLANNED REFACTOR: RequestClickAction() should take pointer event data for better functionality with item management in slots
+	// This could require TransferItems() to accept multiple input triggers.
+	// Since a lot of item management features are planned, TransferItems might become too full.
+	// This is an anticipation of a separation of concerns regarding item transfer functionality.
+
 	public static void RequestClickAction(this IItemSlot slot) {
 		InventoryController inventory = GameManager.GetPlayerInstance().Inventory;
 		InputHandler.RequestAction(new("ItemDrag", 10, () => {

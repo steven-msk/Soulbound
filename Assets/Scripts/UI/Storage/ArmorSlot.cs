@@ -16,7 +16,7 @@ public class ArmorSlot : EquipmentSlot {
 
 	[InputAction("ItemDrag", Priority = 10, BlocksContexts = new[] { "ItemUse" })]
 	public override void OnClick(ItemDisplay grabbedItem, InventoryController inventory) {
-		if ((grabbedItem?.ItemStack.Item is ArmorItem armorItem && this.AcceptedType == armorItem.ArmorType) || grabbedItem == null) {
+		if ((grabbedItem?.ItemStack.Item is ArmorItem armorItem && this.AcceptedType == armorItem.ArmorType) || (grabbedItem == null && this.HasItem)) {
 			base.OnClick(grabbedItem, inventory);
 			InvocationHelper.IfElse(this.ItemDisplay != null, HideOverlay, ShowOverlay);
 		}

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Tilemaps;
 
 public class PlayerPhysics : MonoBehaviour {
 
@@ -11,6 +12,10 @@ public class PlayerPhysics : MonoBehaviour {
 	private readonly Dictionary<string, Action<Collision2D>> collisionReactionsByTag = new();
 	private Rigidbody2D rb;
 	private Animator animator;
+
+	// FIXME: wrong jump stop trigger
+	// This happens when the player hits a ground collider mid-jump, which instantly stops the jump animation
+	// This is clearly seen when the player jumps into a ceiling, or jumps into a wall
 
 	public float movementSpeedPower = 30f;
 	public float knockbackStunDuration = 0.5f;
