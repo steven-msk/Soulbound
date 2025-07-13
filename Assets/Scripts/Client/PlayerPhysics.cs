@@ -3,19 +3,17 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Tilemaps;
+using System.Linq;
+using UnityEditor.ShaderGraph.Internal;
 
 public class PlayerPhysics : MonoBehaviour {
-
 	private PlayerController player;
 	private PlayerStats stats;
 	private InputHandler inputHandler;
-	private readonly Dictionary<string, Action<Collision2D>> collisionReactionsByTag = new();
+	private readonly Dictionary<string, (Action<Collision2D> action, Func<bool>? validator)> collisionReactionsByTag = new();
 	private Rigidbody2D rb;
 	private Animator animator;
-
-	// FIXME: wrong jump stop trigger
-	// This happens when the player hits a ground collider mid-jump, which instantly stops the jump animation
-	// This is clearly seen when the player jumps into a ceiling, or jumps into a wall
+	private BoxCollider2D boxCollider;
 
 	public float movementSpeedPower = 30f;
 	public float knockbackStunDuration = 0.5f;
@@ -48,14 +46,15 @@ public class PlayerPhysics : MonoBehaviour {
 		rb = player.Rigidbody;
 		animator = player.Animator;
 		stats = player.Stats;
+		boxCollider = this.GetComponent<BoxCollider2D>();
 
-		collisionReactionsByTag.Add("Enemy", (collision) => {
+		collisionReactionsByTag.Add("Enemy", ((collision) => {
 			Vector2 bounce = (transform.position - (Vector3)collision.GetContact(0).point).normalized;
 			rb.linearVelocity = bounce * contactBouncePower;
 			knockbackStunTimer = knockbackStunDuration;
-		});
+		}, null));
 
-		collisionReactionsByTag.Add("Ground", (collision) => {
+		collisionReactionsByTag.Add("Ground", ((collision) => {
 			animator.SetBool("jumping", false);
 			animator.SetBool("flying", false);
 			animator.SetBool("onGround", true);
@@ -63,7 +62,8 @@ public class PlayerPhysics : MonoBehaviour {
 			jumpsLeft = stats.MaxJumps;
 			isFlying = false;
 			rb.linearDamping = 0f;
-		});
+		}, IsOnGround));
+
 		Debug.Assert(inputHandler.isActiveAndEnabled, inputHandler);
 	}
 
@@ -79,7 +79,7 @@ public class PlayerPhysics : MonoBehaviour {
 			knockbackStunTimer -= Time.fixedDeltaTime;
 			return;         // knockback immunity will be a thing
 		}
-
+	
 		if (movement.x != 0) {
 			if (!isFlying) {
 				rb.linearVelocityX += stats.HorizontalAcceleration * movementSpeedPower * Time.fixedDeltaTime * movement.x;
@@ -138,10 +138,23 @@ public class PlayerPhysics : MonoBehaviour {
 		}
 	}
 
-	private void OnCollisionEnter2D(Collision2D collision) {
-		collisionReactionsByTag.GetValueOrDefault(collision.gameObject.tag, (collision) => {
+	private void OnCollisionStay2D(Collision2D collision) {
+		var collisionResponse = collisionReactionsByTag.GetValueOrDefault(collision.gameObject.tag, ((collision) => {
 			Debug.Log($"Unknown collision callback tag: {collision.gameObject.tag}");
-		}).Invoke(collision);
+		}, null));
+		collisionResponse.action.InvokeIf(collision, collisionResponse.validator);
+	}
+
+	public bool IsOnGround() {
+		Vector2 origin = (Vector2)transform.position + boxCollider.offset + Vector2.down * (boxCollider.size.y * 0.5f);
+		float offsetX = boxCollider.size.x * 0.5f;
+		float distance = 0.1f;
+		int layerMask = LayerMask.GetMask("Ground");
+
+		RaycastHit2D leftHit = Physics2D.Raycast(origin - new Vector2(offsetX, 0), Vector2.down, distance, layerMask);
+		RaycastHit2D middleHit = Physics2D.Raycast(origin, Vector2.down, 0.1f, layerMask);
+		RaycastHit2D rightHit = Physics2D.Raycast(origin + new Vector2(offsetX, 0), Vector2.down, 0.1f, layerMask);
+		return middleHit.collider != null || leftHit.collider != null || rightHit.collider != null;
 	}
 
 	public void UpdateFlightTimePanel(bool isFlying, float flightTime, float grantedFlightTime) {
