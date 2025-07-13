@@ -13,10 +13,11 @@ using UnityEngine.Tilemaps;
 
 public class Level {
 	public static readonly int chunkSize = 32;
-	public static readonly Vector2Int worldSize = new(10_000, 300);
+	public static readonly int worldHeight = 300;
 	
 	private Dictionary<int, WorldChunk> loadedChunks = new();
 	private Dictionary<int, WorldChunk> generatedChunks = new();
+	private ChunkOutlineRenderer chunkOutlineRenderer = new();
 
 	private Grid grid;
 
@@ -50,6 +51,7 @@ public class Level {
 				}
 				loadedChunks[chunkX] = chunk;
 				chunk.Render(tilemap);
+				chunkOutlineRenderer.ShowOutline(chunk);
 			}
 		}
 	}
@@ -63,6 +65,7 @@ public class Level {
 		}
 		foreach (WorldChunk chunk in toRemove) {
 			loadedChunks.Remove(chunk.Xpos);
+			chunkOutlineRenderer.HideOutline(chunk);
 			chunk.Unload(tilemap);
 		}
 	}
@@ -83,8 +86,8 @@ public class Level {
 
 	// NOT TESTED
 	public int HighestPoint(Vector2 worldPos) {
-		Vector2 origin = new Vector2(worldPos.x, Level.worldSize.y);
-		RaycastHit2D hit = Physics2D.Raycast(origin, Vector2.down, Level.worldSize.y, LayerMask.GetMask("Ground"));
+		Vector2 origin = new Vector2(worldPos.x, Level.worldHeight);
+		RaycastHit2D hit = Physics2D.Raycast(origin, Vector2.down, Level.worldHeight, LayerMask.GetMask("Ground"));
 		if (hit.collider != null) {
 			return grid.WorldToCell(hit.point).y;
 		}
