@@ -4,6 +4,7 @@ using Unity.IO.LowLevel.Unsafe;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Tilemaps;
 
 public class PlayerController : MonoBehaviour {
 	[SerializeField] private InputHandler inputHandler;
@@ -44,6 +45,16 @@ public class PlayerController : MonoBehaviour {
 				}
 			});
 		}
+		itemUsageHandler.Register<IPlaceable>(ItemUseTrigger.LeftHold, (placeable, stack) => {
+			Level level = GameManager.instance.Level;
+			Vector2Int blockPos = level.ToBlockPos(Camera.main.ScreenToWorldPoint(inputHandler.MouseScreenPosition));
+			Debug.Log(blockPos);
+
+			// here it should be true, but its not because of the wrong value from TileAt method
+			if (level.TileAt(blockPos) == CommonTiles.air) {
+				placeable.Place(stack, blockPos, level.WorldTilemap);
+			}
+		});
 	}
 
 	private void Update() {
@@ -55,7 +66,6 @@ public class PlayerController : MonoBehaviour {
 		}
 
 		GameManager.instance.Level.UpdateChunks(transform.position);
-
 	}
 
 	public void SetMainHandItem([AllowsNull] ItemStack itemStack) {

@@ -77,6 +77,7 @@ public class InventoryController : MonoBehaviour, IContainer {
 			CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableStatItem_test"), 1), hotbar[8]);
 			CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableStatItem_test"), 1), (InventorySlot)this[2, 8]);
 			CreateItemDisplay(new ItemStack(Registry.Get<Item>("longTooltipItem"), 1), hotbar[5]);
+			CreateItemDisplay(new ItemStack(Registry.Get<Item>("grass_block_item"), 100), popupSlots[0, 1]);
 		}
 		StartCoroutine(Prototype_setupDisplays());
 	}

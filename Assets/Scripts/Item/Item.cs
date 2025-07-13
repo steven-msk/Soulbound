@@ -4,32 +4,33 @@ using JetBrains.Annotations;
 using Unity.VisualScripting;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Item", menuName = "Items/Item")]
+[CreateAssetMenu(menuName = "Items/Item")]
 public class Item : ScriptableObject, ISerializable {
 	[SerializeField] protected string itemName;
-	public string Name => itemName;
+	public virtual string Name => itemName;
 
 	[SerializeField] protected string id;
-	public string ID => id;
+	public virtual string ID => id;
 
+	// TODO: icon preview in inspector
 	[SerializeField] protected Sprite icon;
-	public Sprite Icon => icon;
+	public virtual Sprite Icon => icon;
 
 	[SerializeField] protected GameObject worldPrefab;
-	public GameObject WorldPrefab => worldPrefab;
+	public virtual GameObject WorldPrefab => worldPrefab;
 	
 	[SerializeField] protected int maxStackSize;
-	public int MaxStackSize => maxStackSize;
-	public bool IsStackable => maxStackSize > 1;
+	public virtual int MaxStackSize => maxStackSize;
+	public virtual bool IsStackable => maxStackSize > 1;
 
 	[SerializeField][CanBeNull] protected TooltipSerializer customTooltipSerializer;
 	public TooltipSerializer TooltipSerializer => customTooltipSerializer;
 
 	[SerializeField][CanBeNull] protected string loreTextTooltip;
-	public string LoreText => loreTextTooltip;
+	public virtual string LoreText => loreTextTooltip;
 
 	[SerializeField][CanBeNull] protected string infoTextTooltip;
-	public string InfoText => infoTextTooltip;
+	public virtual string InfoText => infoTextTooltip;
 
 	public virtual AbstractTooltip GetTooltip() {
 		if (customTooltipSerializer != null) {

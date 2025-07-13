@@ -25,7 +25,7 @@ public class GameManager : MonoBehaviour {
 		Registry.RegisterAll<Tile>("Registry/Tiles");
 		Registry.RegisterAll<RuleTile>("Registry/Tiles");
 
-		this.level = new Level(Player, worldTilemap);
+		this.level = new Level(Player, worldTilemap, GameObject.Find("Grid").GetComponent<Grid>());
 	}
 
 	private void OnApplicationQuit() {

@@ -27,12 +27,18 @@ public class Level {
 	private Tilemap tilemap;
 	public Tilemap WorldTilemap => tilemap;
 
-	public Level(PlayerController player, Tilemap tilemap) {
+	public Level(PlayerController player, Tilemap tilemap, Grid grid) {
 		this.player = player;
 		this.tilemap = tilemap;
+		this.grid = grid;
 	}
 
-	// FIXME: unoptimized terrain generation and rendering
+	// PLANNED REWORK: level rendering system
+	// Since this will be an intense tiled game, it will require advanced rendering techniques to
+	// achieve any level of performance. This project is still in prototype phase, so making any
+	// optimization isnt really worth it and might be a waste of time in most cases.
+
+	// FIXME: incorrect TileAt, BlockAt return values
 
 	public void UpdateChunks(Vector2 playerPos) {
 		int playerChunkX = ChunkXAt(playerPos);
@@ -70,11 +76,11 @@ public class Level {
 		}
 	}
 
-	[CanBeNull] public TileBase BlockAt(Vector2 worldPos) {
+	[CanBeNull] public TileBase TileAt(Vector2 worldPos) {
 		int chunkX = ChunkXAt(worldPos);
 		WorldChunk chunk = generatedChunks.GetValueOrDefault(chunkX, null);
 		if (chunk != null) {
-			return chunk.BlockAt(worldPos);
+			return chunk.TileAt(worldPos);
 		}
 		Debug.LogError($"Cannot retrieve block at {worldPos.ToString()} because its not generated");
 		return null;
@@ -83,6 +89,8 @@ public class Level {
 	public int ChunkXAt(Vector2 worldPos) => Mathf.FloorToInt(worldPos.x / chunkSize);
 
 	[CanBeNull] public WorldChunk ChunkAt(Vector2 worldPos) => generatedChunks.GetValueOrDefault(this.ChunkXAt(worldPos), null);
+
+	public Vector2Int ToBlockPos(Vector2 worldPos) => (Vector2Int)grid.WorldToCell(worldPos);
 
 	// NOT TESTED
 	public int HighestPoint(Vector2 worldPos) {

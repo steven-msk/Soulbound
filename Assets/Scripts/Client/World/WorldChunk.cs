@@ -19,9 +19,6 @@ public class WorldChunk {
 
 	// PLANNED REFACTOR: chunk generation logic - required when introducing biomes
 	public void Generate() {
-		TileBase grass = Registry.Get<RuleTile>("grass");
-		TileBase air = Registry.Get<Tile>("air");
-
 		int startX = x * Level.chunkSize;
 		for (int x = 0; x < Level.chunkSize; x++) {
 			int worldX = startX + x;
@@ -31,7 +28,7 @@ public class WorldChunk {
 			int groundHeight = Mathf.FloorToInt(heightRange * 50f + 140f);
 
 			for (int y = 0; y < Level.worldHeight; y++) {
-				Tiles[x, y] = y < groundHeight ? grass : air;
+				Tiles[x, y] = y < groundHeight ? CommonTiles.grass : CommonTiles.air;
 			}
 		}
 		IsGenerated = true;
@@ -62,7 +59,7 @@ public class WorldChunk {
 
 	public Vector2 ToWorldPos(Vector2 chunkPos) => new Vector2(chunkPos.x * Level.chunkSize, chunkPos.y);
 
-	public TileBase BlockAt(Vector2Int chunkPos) => Tiles[chunkPos.x, chunkPos.y];
+	public TileBase TileAt(Vector2Int chunkPos) => Tiles[chunkPos.x, chunkPos.y];
 
-	public TileBase BlockAt(Vector2 worldPos) => BlockAt(this.ToChunkPos(worldPos));
+	public TileBase TileAt(Vector2 worldPos) => this.TileAt(GameManager.instance.Level.ToBlockPos(worldPos));
 }
