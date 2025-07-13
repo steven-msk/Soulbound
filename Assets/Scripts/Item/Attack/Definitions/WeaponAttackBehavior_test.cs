@@ -20,7 +20,7 @@ public class WeaponAttackBehavior_test : WeaponAttackBehavior {
 	};
 
 	public override void PreAttack(GameObject attackHandlerParent) {
-		attackHandlerParent.transform.position = GameManager.GetPlayerInstance().transform.position;
+		attackHandlerParent.transform.position = GameManager.instance.Player.transform.position;
 	}
 
 	public override Func<ItemUseTrigger, AttackProcedure> AttackProcedureSupplier => (trigger) => attacks.GetValueOrDefault(trigger, null);

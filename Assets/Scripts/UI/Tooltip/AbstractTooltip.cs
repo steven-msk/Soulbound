@@ -35,12 +35,12 @@ public abstract class AbstractTooltip {
 	public virtual void Hide() {
 		GameObject.Destroy(tooltipPanel);
 		displayParent = null;
-		GameManager.GetPlayerInstance().Inventory.ActiveTooltip = null;
+		GameManager.instance.Player.Inventory.ActiveTooltip = null;
 	}
 
 	public virtual void Update(ItemStack itemStack) {
 		if (tooltipPanel != null) {
-			InputHandler inputHandler = GameManager.GetPlayerInstance().InputHandler;
+			InputHandler inputHandler = GameManager.instance.Player.InputHandler;
 			tooltipPanel.transform.position = inputHandler.MouseScreenPosition;
 		}
 	}

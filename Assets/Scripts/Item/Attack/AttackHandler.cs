@@ -19,7 +19,7 @@ public class AttackHandler : MonoBehaviour {
 	public GameObject Parent => transform.parent.gameObject;
 
 	public void Init(WeaponItem weapon, AttackHandlerEvents events) {
-		this.player = GameManager.GetPlayerInstance();
+		this.player = GameManager.instance.Player;
 		this.weapon = weapon;
 		this.events = events;
 		events.PreAttack(Parent);

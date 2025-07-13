@@ -31,6 +31,7 @@ public class PlayerController : MonoBehaviour {
 	public bool CanAttack { get; set; } = true;
 
 	public float Facing => Mathf.Sign(transform.localScale.x);
+	public Vector2 position => transform.position;
 
 	private void Start() {
 		playerPhysics = gameObject.GetComponent<PlayerPhysics>();
@@ -54,6 +55,7 @@ public class PlayerController : MonoBehaviour {
 		}
 
 		GameManager.instance.Level.UpdateChunks(transform.position);
+
 	}
 
 	public void SetMainHandItem([AllowsNull] ItemStack itemStack) {

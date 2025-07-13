@@ -24,7 +24,7 @@ public class CompoundTooltip : AbstractTooltip {
 		if (tooltipPanel != null) {
 			return;
 		}
-		InventoryController inventory = GameManager.GetPlayerInstance().Inventory; 
+		InventoryController inventory = GameManager.instance.Player.Inventory; 
 		tooltipPanel = InstantiatePanel(parent);
 		layoutOptions.Apply(tooltipPanel.GetComponent<VerticalLayoutGroup>());
 		RectTransform panelRect = tooltipPanel.GetComponent<RectTransform>();

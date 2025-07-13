@@ -25,8 +25,10 @@ public class WorldChunk {
 		int startX = x * Level.chunkSize;
 		for (int x = 0; x < Level.chunkSize; x++) {
 			int worldX = startX + x;
+
+			// magic numbers o no
 			float heightRange = Mathf.PerlinNoise1D(worldX * 0.01f);
-			int groundHeight = Mathf.FloorToInt(heightRange * 50f + 100f);
+			int groundHeight = Mathf.FloorToInt(heightRange * 50f + 140f);
 
 			for (int y = 0; y < Level.worldSize.y; y++) {
 				Tiles[x, y] = y < groundHeight ? grass : air;
@@ -43,6 +45,15 @@ public class WorldChunk {
 				InvocationHelper.IfElse(tile != null,
 					() => tilemap.SetTile(new Vector3Int(xStart + x, y - Level.worldSize.y / 2, 0), tile),
 					() => Debug.LogError($"Attempted to render ungenerated terrain! pos: ({x}, {y}) at chunk {this.x}"));
+			}
+		}
+	}
+
+	public void Unload(Tilemap tilemap) {
+		int xStart = x * Level.chunkSize;
+		for (int x = 0; x < Level.chunkSize; x++) {
+			for (int y = 0; y < Level.worldSize.y; y++) {
+				tilemap.SetTile(new Vector3Int(xStart + x, y - Level.worldSize.y / 2, 0), null);
 			}
 		}
 	}

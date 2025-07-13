@@ -28,7 +28,7 @@ public class InputHandler : MonoBehaviour {
 
 		inputActions = new PlayerInputActions();
 		PlayerActions playerActions = inputActions.Player;
-		PlayerController player = GameManager.GetPlayerInstance();
+		PlayerController player = GameManager.instance.Player;
 
 		playerActions.MousePosition.performed += actionContext => MouseScreenPosition = actionContext.ReadValue<Vector2>();
 
@@ -78,9 +78,9 @@ public class InputHandler : MonoBehaviour {
 
 	private void Update() {
 		if (LeftHold) {
-			GameManager.GetPlayerInstance().OnLeftHold();
+			GameManager.instance.Player.OnLeftHold();
 		} else if (RightHold) {
-			GameManager.GetPlayerInstance().OnRightHold();
+			GameManager.instance.Player.OnRightHold();
 		}
 	}
 

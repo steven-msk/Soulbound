@@ -47,7 +47,7 @@ public class InventoryController : MonoBehaviour, IContainer {
 	// FEATUREIMPL: item grabbing controls - this might require a general implementation in IContainer
 
 	private void Awake() {
-		player = GameManager.GetPlayerInstance();
+		player = GameManager.instance.Player;
 	}
 
 #nullable enable
@@ -184,7 +184,6 @@ public class InventoryController : MonoBehaviour, IContainer {
 	}
 
 	public void DestroyItemDisplay(ItemDisplay display) {
-		PlayerController player = GameManager.GetPlayerInstance();
 		if (display.ItemStack == player.MainHandStack) {
 			player.SetMainHandItem(null);
 		}
@@ -193,7 +192,6 @@ public class InventoryController : MonoBehaviour, IContainer {
 
 	public void EquipHotbarItem(InventorySlot slot) {
 		ItemDisplay itemDisplay = slot.ItemDisplay;
-		PlayerController player = GameManager.GetPlayerInstance();
 		player.SetMainHandItem(itemDisplay?.ItemStack);
 	}
 }

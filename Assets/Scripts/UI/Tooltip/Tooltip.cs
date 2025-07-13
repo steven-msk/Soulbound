@@ -35,7 +35,7 @@ public class Tooltip : AbstractTooltip {
 		data.Layout.Apply(tooltipSection);
 		tooltipSection.text = data.Text;
 
-		InventoryController inventory = GameManager.GetPlayerInstance().Inventory;
+		InventoryController inventory = GameManager.instance.Player.Inventory;
 		inventory.ActiveTooltip = this;
 		tooltipPanel.transform.SetParent(inventory.transform, true);
 		tooltipPanel.SetActive(true);

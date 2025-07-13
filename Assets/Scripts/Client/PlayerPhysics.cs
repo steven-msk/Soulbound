@@ -7,6 +7,7 @@ using System.Linq;
 using UnityEditor.ShaderGraph.Internal;
 
 public class PlayerPhysics : MonoBehaviour {
+#pragma warning disable CS8632
 	private readonly Dictionary<string, (Action<Collision2D> action, Func<bool>? validator)> collisionReactionsByTag = new();
 	private PlayerController player;
 	private PlayerStats stats;
@@ -41,7 +42,7 @@ public class PlayerPhysics : MonoBehaviour {
 	[SerializeField] private float jumpToFlightTimer;
 
 	private void Start() {
-		player = GameManager.GetPlayerInstance();
+		player = GameManager.instance.Player;
 		inputHandler = player.InputHandler;
 		rb = player.Rigidbody;
 		animator = player.Animator;

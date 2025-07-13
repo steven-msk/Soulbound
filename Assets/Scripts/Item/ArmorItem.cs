@@ -22,13 +22,13 @@ public class ArmorItem : StatItem, IEquipable {
 	public override string BufferedInterpolationSource => bufferedInterpolationSource;
 
 	public void OnEquip(EquipmentSlot slot) {
-		PlayerStats playerStats = GameManager.GetPlayerInstance().Stats;
+		PlayerStats playerStats = GameManager.instance.Player.Stats;
 		playerStats.Apply(instantStats, this);
 		((IStatProvider)this).EnableBuffers(playerStats);
 	}
 
 	public void OnUnequipped() {
-		PlayerStats playerStats = GameManager.GetPlayerInstance().Stats;
+		PlayerStats playerStats = GameManager.instance.Player.Stats;
 		playerStats.Revoke(instantStats, this);
 		((IStatProvider)this).DisableBuffers(playerStats);
 	}

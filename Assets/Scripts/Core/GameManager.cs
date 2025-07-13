@@ -12,7 +12,7 @@ public class GameManager : MonoBehaviour {
 
 	public static bool IsPaused { get; private set; }
 
-	public static PlayerController GetPlayerInstance() => GameObject.Find("johnny").GetComponent<PlayerController>();
+	public PlayerController Player => GameObject.Find("johnny").GetComponent<PlayerController>();
 
 	public static UIController GetUI() => GameObject.Find("Canvas").GetComponent<UIController>();
 
@@ -25,7 +25,7 @@ public class GameManager : MonoBehaviour {
 		Registry.RegisterAll<Tile>("Registry/Tiles");
 		Registry.RegisterAll<RuleTile>("Registry/Tiles");
 
-		this.level = new Level(GetPlayerInstance(), worldTilemap);
+		this.level = new Level(Player, worldTilemap);
 	}
 
 	private void OnApplicationQuit() {

@@ -29,7 +29,7 @@ public interface IItemSlot : IPointerDownHandler {
 
 	public virtual void DetachItemDisplay() {
 		this.ItemDisplay.EnableGrab();
-		this.ItemDisplay?.transform.SetParent(GameManager.GetPlayerInstance().Inventory.transform, true);
+		this.ItemDisplay?.transform.SetParent(GameManager.instance.Player.Inventory.transform, true);
 	}
 }
 
@@ -41,11 +41,11 @@ public static class ItemSlotUtility {
 	// This is an anticipation of a separation of concerns regarding item transfer functionality.
 
 	public static void RequestClickAction(this IItemSlot slot) {
-		InventoryController inventory = GameManager.GetPlayerInstance().Inventory;
+		InventoryController inventory = GameManager.instance.Player.Inventory;
 		InputHandler.RequestAction(new("ItemDrag", 10, () => {
 			InvocationHelper.If(slot.ValidClickAction(inventory.GrabbedItem), () => slot.OnClick(inventory.GrabbedItem, inventory));
 		}));
-		InputHandler.BlockContextUntil("ItemUse", () => GameManager.GetPlayerInstance().InputHandler.LeftHold);
+		InputHandler.BlockContextUntil("ItemUse", () => GameManager.instance.Player.InputHandler.LeftHold);
 	}
 
 	public static bool ValidClickAction(this IItemSlot slot, ItemDisplay grabbedItem) => grabbedItem != null || slot.HasItem;
@@ -54,7 +54,7 @@ public static class ItemSlotUtility {
 		if (!inventory.PopupOpen) {
 			return;
 		}
-		PlayerController player = GameManager.GetPlayerInstance();
+		PlayerController player = GameManager.instance.Player;
 		void SetDropCapabilities(bool enabled) {
 			if (!enabled) {
 				player.ItemUsageHandler.Disable(ItemUseTrigger.RightClick, ItemUseTrigger.RightHold);

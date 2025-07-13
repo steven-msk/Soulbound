@@ -41,7 +41,7 @@ public class HotbarController : MonoBehaviour, IHotbarContainer {
 	public InventorySlot this[int index] => slots[index];
 
 	private void Awake() {
-		inventory = GameManager.GetPlayerInstance().Inventory;
+		inventory = GameManager.instance.Player.Inventory;
 		SetupGrid(() => inventory.SetupGrid(null));
 		SetActiveSlot(0);
 	}
@@ -68,7 +68,7 @@ public class HotbarController : MonoBehaviour, IHotbarContainer {
 		}
 
 		if (hotbarSlot != active.hotbarSlot) {
-			if (!GameManager.GetPlayerInstance().Inventory.PopupOpen) {
+			if (!GameManager.instance.Player.Inventory.PopupOpen) {
 				ApplySelectionChanges(active.hotbarSlot, inactiveSlotColor, inactiveSlotNumberColor, inactiveItemStackColor, -activeSlotOffset, Vector3.one);
 			} else {
 				ApplySelectionChanges(active.hotbarSlot, activeSlotColor, activeSlotNumberColor, activeItemStackColor, -activeSlotOffset, Vector3.one);
@@ -78,7 +78,7 @@ public class HotbarController : MonoBehaviour, IHotbarContainer {
 		}
 
 		// weird how this gets called in Awake() and sets the slot active, but doesnt actually equip the main hand item
-		GameManager.GetPlayerInstance().Inventory.EquipHotbarItem(slots[slotKey]);
+		GameManager.instance.Player.Inventory.EquipHotbarItem(slots[slotKey]);
 	}
 
 	public void OnHotbarScroll(float scrollDelta) {
@@ -109,7 +109,7 @@ public class HotbarController : MonoBehaviour, IHotbarContainer {
 	}
 
 	public void OnInventoryPopup() {
-		InventoryController inventory = GameManager.GetPlayerInstance().Inventory;
+		InventoryController inventory = GameManager.instance.Player.Inventory;
 		Color slotColor = inventory.PopupOpen ? activeSlotColor : inactiveSlotColor;
 		Color slotNumberColor = inventory.PopupOpen ? activeSlotNumberColor : inactiveSlotNumberColor;
 		Color itemStackColor = inventory.PopupOpen ? activeItemStackColor : inactiveItemStackColor;

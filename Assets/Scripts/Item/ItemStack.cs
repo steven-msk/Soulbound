@@ -14,7 +14,7 @@ public class ItemStack {
 		set {
 			quantity = value;
 			if (quantity <= 0) {
-				GameManager.GetPlayerInstance().Inventory.DestroyItemDisplay(display);
+				GameManager.instance.Player.Inventory.DestroyItemDisplay(display);
 			}
 			if(stackText != null && quantity > 0) {
 				UpdateText();
@@ -39,7 +39,7 @@ public class ItemStack {
 		RectTransform rectTransform = stackText.GetComponent<RectTransform>();
 		if (Item.IsStackable) {
 			text.text = $"{FormatStackCount(Quantity)}";
-			InventoryController inventory = GameManager.GetPlayerInstance().Inventory;
+			InventoryController inventory = GameManager.instance.Player.Inventory;
 			Color textColor = Color.white;
 			InventorySlot hotbarSlot = parent.GetComponentInParent<InventorySlot>();
 			if (!inventory.PopupOpen && hotbarSlot != null && inventory.Hotbar.ActiveSlot != hotbarSlot) {
@@ -62,11 +62,11 @@ public class ItemStack {
 	public void Drop(bool playerAction = false) {
 		// FUTURE TODO: item drop movement (throw force)
 		GameObject pickupItem = GameObject.Instantiate(Item.WorldPrefab, null);
-		pickupItem.transform.position = GameManager.GetPlayerInstance().transform.position;
+		pickupItem.transform.position = GameManager.instance.Player.transform.position;
 		Rigidbody2D rigidbody = pickupItem.AddComponent<Rigidbody2D>();
 		rigidbody.sleepMode = RigidbodySleepMode2D.NeverSleep;
 		BoxCollider2D pickupHitbox = pickupItem.AddComponent<BoxCollider2D>();
-		rigidbody.AddForce(GameManager.GetPlayerInstance().InputHandler.MouseWorldPosition.normalized * 50f);
+		rigidbody.AddForce(GameManager.instance.Player.InputHandler.MouseWorldPosition.normalized * 50f);
 		pickupHitbox.isTrigger = true;
 		pickupHitbox.callbackLayers = LayerMask.GetMask("Player");
 		pickupItem.AddComponent<BoxCollider2D>().excludeLayers = ~LayerMask.GetMask("Ground");

@@ -26,7 +26,7 @@ public class ItemDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
 	private void Update() {
 		if (moveMode) {
-			gameObject.transform.position = GameManager.GetPlayerInstance().InputHandler.MouseScreenPosition;
+			gameObject.transform.position = GameManager.instance.Player.InputHandler.MouseScreenPosition;
 		}
 		if (tooltip?.IsDisplayed ?? false) {
 			tooltip.Update(itemStack);
@@ -34,7 +34,7 @@ public class ItemDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 	}
 
 	public void OnPointerEnter(PointerEventData eventData) {
-		if (GameManager.GetPlayerInstance().Inventory.PopupOpen) {
+		if (GameManager.instance.Player.Inventory.PopupOpen) {
 			tooltip.Show(eventData.position, transform);
 			tooltip.DisplayParent = gameObject;
 		}
