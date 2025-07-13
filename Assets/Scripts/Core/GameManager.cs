@@ -3,6 +3,8 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 public class GameManager : MonoBehaviour {
+	public static GameManager instance;
+
 	private Level level;
 	public Level Level => level;
 
@@ -15,6 +17,8 @@ public class GameManager : MonoBehaviour {
 	public static UIController GetUI() => GameObject.Find("Canvas").GetComponent<UIController>();
 
 	private void Awake() {
+		instance = this;
+
 		Registry.RegisterAll<TMP_FontAsset>("Registry/Fonts");
 		Registry.RegisterAll<Item>("Registry/Items");
 		Registry.RegisterAll<GameObject>("Registry/Prefabs");
@@ -22,7 +26,6 @@ public class GameManager : MonoBehaviour {
 		Registry.RegisterAll<RuleTile>("Registry/Tiles");
 
 		this.level = new Level(GetPlayerInstance(), worldTilemap);
-		this.level.Bootstrap();
 	}
 
 	private void OnApplicationQuit() {

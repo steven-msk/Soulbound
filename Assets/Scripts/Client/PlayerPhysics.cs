@@ -7,10 +7,10 @@ using System.Linq;
 using UnityEditor.ShaderGraph.Internal;
 
 public class PlayerPhysics : MonoBehaviour {
+	private readonly Dictionary<string, (Action<Collision2D> action, Func<bool>? validator)> collisionReactionsByTag = new();
 	private PlayerController player;
 	private PlayerStats stats;
 	private InputHandler inputHandler;
-	private readonly Dictionary<string, (Action<Collision2D> action, Func<bool>? validator)> collisionReactionsByTag = new();
 	private Rigidbody2D rb;
 	private Animator animator;
 	private BoxCollider2D boxCollider;
@@ -23,7 +23,7 @@ public class PlayerPhysics : MonoBehaviour {
 	public float flightMovementPower = 20f;
 	public float jumpToFlightDelay = 0.2f;
 
-	[Header("Flight Time Panel")]								 // might me moved to a separate PlayerFlight script
+	[Header("Flight Time Panel")]                                // might me moved to a separate PlayerFlight script
 	[SerializeField] private GameObject flightTimePanel;
 	[SerializeField] private float maskWidth = 50;               // maskWidth must be equal to TimeBar width (center&middle anchor)
 
@@ -79,13 +79,12 @@ public class PlayerPhysics : MonoBehaviour {
 			knockbackStunTimer -= Time.fixedDeltaTime;
 			return;         // knockback immunity will be a thing
 		}
-	
+
 		if (movement.x != 0) {
 			if (!isFlying) {
 				rb.linearVelocityX += stats.HorizontalAcceleration * movementSpeedPower * Time.fixedDeltaTime * movement.x;
 				if (Mathf.Abs(rb.linearVelocityX) > stats.MovementSpeed.GetProcessedValue()) {
 					rb.linearVelocityX = Mathf.Sign(rb.linearVelocityX) * stats.MovementSpeed.GetProcessedValue();
-
 				}
 			} else {
 				float scaledFlightAcceleration = flightMovementPower * stats.HorizontalFlightAcceleration;

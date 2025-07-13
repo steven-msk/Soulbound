@@ -52,6 +52,8 @@ public class PlayerController : MonoBehaviour {
 			Vector2 mousePos = inputHandler.MouseScreenPosition;
 			transform.localScale = new Vector3(mousePos.x >= Screen.width / 2 ? 1 : -1, 1, 1);
 		}
+
+		GameManager.instance.Level.UpdateChunks(transform.position);
 	}
 
 	public void SetMainHandItem([AllowsNull] ItemStack itemStack) {
