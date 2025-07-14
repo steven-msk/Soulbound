@@ -10,9 +10,10 @@ using UnityEngine.Tilemaps;
 public class BlockItem : Item, IPlaceable {
 	[SerializeField] private Block referenceBlock;
 
-	public void Place(ItemStack itemStack, Vector2Int position, Tilemap tilemap) {
+	public Block Place(ItemStack itemStack, Vector2Int position, Tilemap tilemap) {
 		referenceBlock.Place(position, tilemap);
 		itemStack.Quantity--;
+		return referenceBlock;
 	}
 
 	protected override CompoundTooltip GetDefaultTooltip() {

@@ -8,5 +8,5 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 public interface IPlaceable : IItemCapability {
-	void Place(ItemStack itemStack, Vector2Int position, Tilemap tilemap);
+	Block Place(ItemStack itemStack, Vector2Int position, Tilemap tilemap);
 }

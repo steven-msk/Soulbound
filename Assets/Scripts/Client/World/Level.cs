@@ -38,7 +38,7 @@ public class Level {
 	// achieve any level of performance. This project is still in prototype phase, so making any
 	// optimization isnt really worth it and might be a waste of time in most cases.
 
-	// FIXME: incorrect TileAt, BlockAt return values
+	// FIXME: negative chunk x break tiles array - hence they break TileAt, BlockAt return values
 
 	public void UpdateChunks(Vector2 playerPos) {
 		int playerChunkX = ChunkXAt(playerPos);
@@ -61,6 +61,8 @@ public class Level {
 			}
 		}
 	}
+
+	public void UpdateBlockPos(Vector2Int blockPos, Block block) => this.ChunkAt(blockPos).Tiles[blockPos.x, blockPos.y] = block.TileReference;
 
 	public void UnloadDistantChunks(int playerChunkX, int viewDistance) {
 		List<WorldChunk> toRemove = new();

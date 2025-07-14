@@ -49,10 +49,8 @@ public class PlayerController : MonoBehaviour {
 			Level level = GameManager.instance.Level;
 			Vector2Int blockPos = level.ToBlockPos(inputHandler.MouseWorldPosition);
 			
-			// FIXME: continuous block placing even after setting the tile
-
 			if (level.TileAt(blockPos) == CommonTiles.air) {
-				placeable.Place(stack, blockPos, level.WorldTilemap);
+				level.UpdateBlockPos(blockPos, placeable.Place(stack, blockPos, level.WorldTilemap));
 			}
 		});
 	}
