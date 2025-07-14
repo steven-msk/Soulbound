@@ -51,7 +51,6 @@ public class InventoryController : MonoBehaviour, IContainer {
 	}
 
 #nullable enable
-
 	public void SetupGrid(Action? callback) {
 		InventorySlot[] flatPopupSlots = popup.GetComponentsInChildren<InventorySlot>(true);
 		popupSlots = ArrayHelper.CompressTo2D(flatPopupSlots, rows, columns);
@@ -62,7 +61,6 @@ public class InventoryController : MonoBehaviour, IContainer {
 		MainPlayerSlots = mainPlayerSlots.ToArray();
 		setup = true;
 	}
-
 #nullable disable
 
 	private void Start() {

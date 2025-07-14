@@ -33,7 +33,7 @@ public class Level {
 		this.grid = grid;
 	}
 
-	// PLANNED REWORK: level rendering system
+	// PLANNED REWORK: world rendering system
 	// Since this will be an intense tiled game, it will require advanced rendering techniques to
 	// achieve any level of performance. This project is still in prototype phase, so making any
 	// optimization isnt really worth it and might be a waste of time in most cases.

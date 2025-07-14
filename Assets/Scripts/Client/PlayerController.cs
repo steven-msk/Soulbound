@@ -48,9 +48,9 @@ public class PlayerController : MonoBehaviour {
 		itemUsageHandler.Register<IPlaceable>(ItemUseTrigger.LeftHold, (placeable, stack) => {
 			Level level = GameManager.instance.Level;
 			Vector2Int blockPos = level.ToBlockPos(inputHandler.MouseWorldPosition);
-			Debug.Log(inputHandler.MouseWorldPosition);
+			
+			// FIXME: continuous block placing even after setting the tile
 
-			// here it should be true, but its not because of the wrong value from TileAt method
 			if (level.TileAt(blockPos) == CommonTiles.air) {
 				placeable.Place(stack, blockPos, level.WorldTilemap);
 			}

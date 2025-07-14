@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Grass Block
   id: grass_block_item
-  icon: {fileID: -761508718, guid: 1fee4674ec04dc648bc7ea595e1f5d3e, type: 3}
+  icon: {fileID: -1683944374, guid: 1fee4674ec04dc648bc7ea595e1f5d3e, type: 3}
   worldPrefab: {fileID: 2682288603813231797, guid: 0343570ceea9eb14890fab6a5f097a9f, type: 3}
   maxStackSize: 999999
   customTooltipSerializer: {fileID: 0}
