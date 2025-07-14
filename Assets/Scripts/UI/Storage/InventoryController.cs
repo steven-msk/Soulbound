@@ -116,7 +116,8 @@ public class InventoryController : MonoBehaviour, IContainer {
 		GrabbedItem = null;
 	}
 
-	public bool GrabItem(ItemStack itemStack) {
+	public bool PickUpItem(ItemStack itemStack) {
+		Debug.Log(itemStack);
 		if (!itemStack.Item.IsStackable) {
 			InventorySlot emptySlot = GetFirstEmptySlot();
 			if (emptySlot != null) {

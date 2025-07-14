@@ -14,7 +14,7 @@ public class GameManager : MonoBehaviour {
 
 	public PlayerController Player => GameObject.Find("johnny").GetComponent<PlayerController>();
 
-	public static UIController GetUI() => GameObject.Find("Canvas").GetComponent<UIController>();
+	public UIController UI => GameObject.Find("Canvas").GetComponent<UIController>();
 
 	private void Awake() {
 		instance = this;

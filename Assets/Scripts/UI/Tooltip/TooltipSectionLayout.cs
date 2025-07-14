@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class TooltipSectionLayout {
 	public TooltipSection Section { get; set; } = TooltipSection.Info;
-	public int fontSize = 20;
+	public int fontSize = 10;
 	public Color textColor = Color.white;
 	public FontStyles fontStyle = FontStyles.Normal;
 	public TextAlignmentOptions alignment = TextAlignmentOptions.Left;

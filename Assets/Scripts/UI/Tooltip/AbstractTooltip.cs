@@ -20,7 +20,7 @@ public abstract class AbstractTooltip {
 
 	public bool IsDisplayed => tooltipPanel != null;
 
-	public abstract void Show(Vector2 position, Transform displayParent);
+	public abstract void Show(Vector2 position, RectTransform displayParent);
 
 	protected float ClampToScreen(RectTransform tooltipPanelRect, Vector2 panelPos) {
 		bool isLeftSide = panelPos.x < Screen.width / 2f;
@@ -40,14 +40,13 @@ public abstract class AbstractTooltip {
 
 	public virtual void Update(ItemStack itemStack) {
 		if (tooltipPanel != null) {
-			InputHandler inputHandler = GameManager.instance.Player.InputHandler;
-			tooltipPanel.transform.position = inputHandler.MouseScreenPosition;
+			tooltipPanel.transform.position = Input.mousePosition;
 		}
 	}
 
-	protected static GameObject InstantiatePanel(Transform displayParent) => GameObject.Instantiate(Registry.Get<GameObject>("tooltipPanel"), displayParent, true);
+	protected static GameObject InstantiatePanel(RectTransform displayParent) => GameObject.Instantiate(Registry.Get<GameObject>("tooltipPanel"), displayParent);
 
-	protected static GameObject InstantiateSection(Transform tooltipPanel) => GameObject.Instantiate(Registry.Get<GameObject>("tooltipSection"), tooltipPanel);
+	protected static GameObject InstantiateSection(RectTransform tooltipPanel) => GameObject.Instantiate(Registry.Get<GameObject>("tooltipSection"), tooltipPanel);
 
-	protected static TextMeshProUGUI InstantiateSectionText(Transform toolipPanel) => InstantiateSection(toolipPanel).GetComponent<TextMeshProUGUI>();
+	protected static TextMeshProUGUI InstantiateSectionText(RectTransform toolipPanel) => InstantiateSection(toolipPanel).GetComponent<TextMeshProUGUI>();
 }

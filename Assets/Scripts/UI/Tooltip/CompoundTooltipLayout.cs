@@ -3,8 +3,8 @@ using UnityEngine;
 
 
 public class CompoundTooltipLayout {
-	public RectOffset padding = new(20, 20, 15, 15);
-	public float spacing = 8;
+	public RectOffset padding = new(10, 10, 8, 8);
+	public float spacing = 4;
 	public TextAnchor childAlignment = TextAnchor.UpperCenter;
 	public bool reverseArrangement = false;
 	public Bool2 controlChildSize = Bool2.True;

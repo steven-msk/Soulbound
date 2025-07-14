@@ -20,7 +20,7 @@ public class CompoundTooltip : AbstractTooltip {
 		data = new CompoundTooltipData(entries, layoutOptions);
 	}
 
-	public override void Show(Vector2 position, Transform parent) {
+	public override void Show(Vector2 position, RectTransform parent) {
 		if (tooltipPanel != null) {
 			return;
 		}
@@ -32,7 +32,7 @@ public class CompoundTooltip : AbstractTooltip {
 		List<TooltipData> sortedEntries = entries.Where(entry => entry.Layout != null).OrderBy(entry => entry.Layout.Section).ToList();
 		List<(LayoutElement layoutElement, float preferredWidth)> sectionLayouts = new();
 		foreach (TooltipData entry in sortedEntries) {
-			TextMeshProUGUI tooltipSection = AbstractTooltip.InstantiateSectionText(tooltipPanel.transform);
+			TextMeshProUGUI tooltipSection = AbstractTooltip.InstantiateSectionText(tooltipPanel.GetComponent<RectTransform>());
 			tooltipSection.textWrappingMode = TextWrappingModes.Normal;
 			entry.Layout.Apply(tooltipSection);
 			tooltipSection.text = entry.Text;
@@ -45,7 +45,7 @@ public class CompoundTooltip : AbstractTooltip {
 		}
 		panelRect.anchoredPosition = position;
 		inventory.ActiveTooltip = this;
-		tooltipPanel.transform.SetParent(inventory.transform, true);
+		tooltipPanel.transform.SetParent(inventory.transform, false);
 		tooltipPanel.SetActive(true);
 	}
 

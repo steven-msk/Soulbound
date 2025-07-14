@@ -15,7 +15,7 @@ public enum TooltipSection {
 public static class TooltipSectionLayoutPreset {
 	static readonly Dictionary<TooltipSection, TooltipSectionLayout> tooltipSectionPresets = new() {
 		[TooltipSection.Title] = new TooltipSectionLayout(TooltipSection.Title, applyPreset: false)	{
-			fontSize = 24,
+			fontSize = 12,
 			fontStyle = FontStyles.Bold
 		},
 

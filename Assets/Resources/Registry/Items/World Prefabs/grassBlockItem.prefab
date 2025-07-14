@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 3599943918579339478}
   - component: {fileID: 4634926396677825963}
-  - component: {fileID: 2843901992779009171}
   m_Layer: 0
   m_Name: grassBlockItem
   m_TagString: Untagged
@@ -29,7 +28,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 4.23, y: 2.18, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -88,16 +87,3 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &2843901992779009171
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2682288603813231797}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 959cbba0c9fad4e42b3929a7102b7e9d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pickupDelay: 2

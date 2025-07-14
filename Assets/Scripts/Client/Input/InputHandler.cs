@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
+using NUnit.Compatibility;
 using NUnit.Framework;
 using UnityEditor.Timeline.Actions;
 using UnityEngine;
@@ -9,11 +11,23 @@ using UnityEngine.InputSystem;
 using static PlayerInputActions;
 
 public class InputHandler : MonoBehaviour {
-
 	public PlayerInputActions inputActions { get; private set; }
 
 	public Vector2 MouseScreenPosition { get; private set; }
-	public Vector2 MouseWorldPosition => Camera.main.ScreenToWorldPoint(MouseScreenPosition);
+	public Vector2 MouseWorldPosition {
+		get {
+			Vector3 screenPos = MouseScreenPosition;
+			RectTransform rootTransform = GameManager.instance.UI.GetRootTransform();
+			if (RectTransformUtility.ScreenPointToWorldPointInRectangle(rootTransform, MouseScreenPosition, Camera.main, out var worldPoint)) {
+				return worldPoint;
+			}
+			screenPos.z = -Camera.main.transform.position.z; 
+			return Camera.main.ScreenToWorldPoint(screenPos);
+		}
+	}
+
+	public Vector2 MouseLocalPosition => this.ScreenPosToLocalPos(Input.mousePosition);
+
 	public bool LeftHold { get; private set; }
 	public bool RightHold { get; private set; }
 	public float HorizontalMovement { get; private set; }
@@ -88,6 +102,15 @@ public class InputHandler : MonoBehaviour {
 		var chosen = requests.OrderByDescending(intent => intent.Priority).FirstOrDefault();
 		chosen?.Action.Invoke();
 		requests.Clear();
+	}
+
+	public Vector2 ScreenPosToLocalPos(Vector2 screenPos) {
+		RectTransform rootTransfom = GameManager.instance.UI.GetRootTransform();
+		if (RectTransformUtility.ScreenPointToLocalPointInRectangle(rootTransfom, screenPos, GameManager.instance.UI.Canvas.worldCamera, out var localPos)) {
+			return localPos;
+		}
+		Debug.LogError($"Could not retrieve local point from screen point: ({screenPos.x}, {screenPos.y})");
+		return new(-1f, -1f);
 	}
 
 	private void OnEnable() => inputActions.Enable();

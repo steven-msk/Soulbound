@@ -16,8 +16,9 @@ public class DroppedItem : MonoBehaviour {
 	}
 
 	private void OnTriggerStay2D(Collider2D collision) {
+		Debug.Log(ItemStack);
 		if (pickupTimer <= 0) {
-			if (GameManager.instance.Player.Inventory.GrabItem(ItemStack)) {
+			if (GameManager.instance.Player.Inventory.PickUpItem(ItemStack)) {
 				Destroy(gameObject);
 			}
 		}

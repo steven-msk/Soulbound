@@ -47,8 +47,8 @@ public class PlayerController : MonoBehaviour {
 		}
 		itemUsageHandler.Register<IPlaceable>(ItemUseTrigger.LeftHold, (placeable, stack) => {
 			Level level = GameManager.instance.Level;
-			Vector2Int blockPos = level.ToBlockPos(Camera.main.ScreenToWorldPoint(inputHandler.MouseScreenPosition));
-			Debug.Log(blockPos);
+			Vector2Int blockPos = level.ToBlockPos(inputHandler.MouseWorldPosition);
+			Debug.Log(inputHandler.MouseWorldPosition);
 
 			// here it should be true, but its not because of the wrong value from TileAt method
 			if (level.TileAt(blockPos) == CommonTiles.air) {

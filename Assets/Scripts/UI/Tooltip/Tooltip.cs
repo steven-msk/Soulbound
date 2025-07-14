@@ -24,20 +24,20 @@ public class Tooltip : AbstractTooltip {
 
 	protected Tooltip(TooltipData data) => this.data = data;
 
-	public override void Show(Vector2 position, Transform parent) {
+	public override void Show(Vector2 position, RectTransform parent) {
 		if (tooltipPanel != null || data.IsEmpty) {
 			return;
 		}
 		tooltipPanel = AbstractTooltip.InstantiatePanel(parent);
 		RectTransform panelRect = tooltipPanel.GetComponent<RectTransform>();
-		TextMeshProUGUI tooltipSection = AbstractTooltip.InstantiateSectionText(tooltipPanel.transform);
+		TextMeshProUGUI tooltipSection = AbstractTooltip.InstantiateSectionText(tooltipPanel.GetComponent<RectTransform>());
 		panelRect.anchoredPosition = position;
 		data.Layout.Apply(tooltipSection);
 		tooltipSection.text = data.Text;
 
 		InventoryController inventory = GameManager.instance.Player.Inventory;
 		inventory.ActiveTooltip = this;
-		tooltipPanel.transform.SetParent(inventory.transform, true);
+		tooltipPanel.transform.SetParent(inventory.transform, false);
 		tooltipPanel.SetActive(true);
 	}
 

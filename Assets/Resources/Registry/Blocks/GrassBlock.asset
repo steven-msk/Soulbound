@@ -12,4 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4944e31eff380134587550253f4b72ca, type: 3}
   m_Name: GrassBlock
   m_EditorClassIdentifier: 
-  tileReference: {fileID: 0}
+  blockName: Grass Block
+  tileReference: {fileID: 11400000, guid: a9a23760174cd0f4680bebdad7e681ef, type: 2}

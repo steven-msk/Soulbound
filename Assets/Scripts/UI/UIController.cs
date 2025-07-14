@@ -3,10 +3,11 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class UIController : MonoBehaviour {
-
 	public bool enableScaleFix = true;
 	public static readonly Vector2 referenceResolution = new(960, 540);
 	public static readonly float maxScale = 4.0f;
+
+	public Canvas Canvas => this.GetComponent<Canvas>();
 
 	private CanvasScaler canvasScaler;
 
@@ -24,4 +25,6 @@ public class UIController : MonoBehaviour {
 			canvasScaler.scaleFactor = Mathf.Min(scale, maxScale);
 		}
 	}
+
+	public RectTransform GetRootTransform() => this.GetComponent<RectTransform>();
 }
