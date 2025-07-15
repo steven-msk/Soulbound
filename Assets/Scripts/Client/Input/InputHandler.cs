@@ -35,6 +35,7 @@ public class InputHandler : MonoBehaviour {
 
 	private static List<InputActionRequest> requests = new();
 	private static Dictionary<string, Func<bool>> blockedContexts = new();
+	private static List<InputAction> pausableInputs = new();
 
 	private void Awake() {
 		requests.Clear();
@@ -44,38 +45,63 @@ public class InputHandler : MonoBehaviour {
 		PlayerActions playerActions = inputActions.Player;
 		PlayerController player = GameManager.instance.Player;
 
-		playerActions.MousePosition.performed += actionContext => MouseScreenPosition = actionContext.ReadValue<Vector2>();
+		RegisterInputEvent(playerActions.MousePosition, pausable: false, (action) => {
+			action.performed += actionContext => MouseScreenPosition = actionContext.ReadValue<Vector2>();
+		});
 
-		playerActions.LeftClick.performed += actionContext => player.OnLeftClick();
-		playerActions.LeftClick.performed += actionContext => LeftHold = true;
-		playerActions.LeftClick.canceled += actionContext => LeftHold = false;
+		RegisterInputEvent(playerActions.LeftClick, pausable: false, (action) => {
+			action.performed += actionContext => player.OnLeftClick();
+			action.performed += actionContext => LeftHold = true;
+			action.canceled += actionContext => LeftHold = false;
+		});
+		RegisterInputEvent(playerActions.RightClick, pausable: false, (action) => {
+			action.performed += actionContext => player.OnRightClick();
+			action.performed += actionContext => RightHold = true;
+			action.canceled += actionContext => RightHold = false;
+		});
 
-		playerActions.RightClick.performed += actionContext => player.OnRightClick();
-		playerActions.RightClick.performed += actionContext => RightHold = true;
-		playerActions.RightClick.canceled += actionContext => RightHold = false;
+		RegisterInputEvent(playerActions.Move, pausable: true, (action) => {
+			action.performed += actionContext => HorizontalMovement = actionContext.ReadValue<Vector2>().x;
+			action.canceled += actionContext => HorizontalMovement = 0;
+		});
 
-		playerActions.Move.performed += actionContext => {
-			Vector2 movement = actionContext.ReadValue<Vector2>();
-			HorizontalMovement = movement.x;
-		};
-		playerActions.Move.canceled += actionContext => HorizontalMovement = 0;
+		RegisterInputEvent(playerActions.Jump, pausable: true, (action) => {
+			action.performed += actionContext => player.Physics.OnSpacePressed();
+			action.performed += actionContext => PressingSpace = true;
+			action.canceled += actionContext => PressingSpace = false;
+		});
 
-		playerActions.Jump.performed += actionContext => player.Physics.OnSpacePressed();
-		playerActions.Jump.performed += actionContext => PressingSpace = true;
-		playerActions.Jump.canceled += actionContext => PressingSpace = false;
+		RegisterInputEvent(playerActions.ChangeHotbarSlot, pausable: true, (action) => {
+			action.performed += actionContext => {
+				int keySlot = int.Parse(actionContext.control.name);
+				player.Inventory.Hotbar.SetActiveSlot(keySlot - 1);
+			};
+		});
+		RegisterInputEvent(playerActions.ScrollHotbarSlot, pausable: true, (action) => {
+			action.performed += actionContext => {
+				float scrollDelta = actionContext.ReadValue<float>();
+				player.Inventory.Hotbar.OnHotbarScroll(scrollDelta);
+			};
+		});
 
-		playerActions.ChangeHotbarSlot.performed += actionContext => {
-			int keySlot = int.Parse(actionContext.control.name);
-			player.Inventory.Hotbar.SetActiveSlot(keySlot - 1);
-		};
-		playerActions.ScrollHotbarSlot.performed += actionContext => {
-			float scrollDelta = actionContext.ReadValue<float>();
-			player.Inventory.Hotbar.OnHotbarScroll(scrollDelta);
-		};
+		RegisterInputEvent(playerActions.ToggleInventory, pausable: true, (action) => {
+			action.performed += player.Inventory.ToggleInventory;
+		});
 
-		playerActions.ToggleInventory.performed += player.Inventory.ToggleInventory;
+		RegisterInputEvent(playerActions.DropItem, pausable: true, (action) => {
+			action.performed += player.Inventory.DropItemFromInventory;
+		});
 
-		playerActions.DropItem.performed += player.Inventory.DropItemFromInventory;
+		RegisterInputEvent(playerActions.PauseGame, pausable: false, (action) => {
+			action.performed += actionContext => GameManager.instance.TogglePauseGame();
+		});
+	}
+
+	private static void RegisterInputEvent(InputAction inputAction, bool pausable, Action<InputAction> callbackBinding) {
+		if (pausable) {
+			pausableInputs.Add(inputAction);
+		}
+		callbackBinding.Invoke(inputAction);
 	}
 
 	public static void BlockContextUntil(string context, Func<bool> unblockPredicate) => blockedContexts[context] = unblockPredicate;
@@ -99,8 +125,8 @@ public class InputHandler : MonoBehaviour {
 	}
 
 	private void LateUpdate() {
-		var chosen = requests.OrderByDescending(intent => intent.Priority).FirstOrDefault();
-		chosen?.Action.Invoke();
+		InputActionRequest highestPriorityRequest = requests.OrderByDescending(intent => intent.Priority).FirstOrDefault();
+		highestPriorityRequest?.Action.Invoke();
 		requests.Clear();
 	}
 
@@ -116,4 +142,8 @@ public class InputHandler : MonoBehaviour {
 	private void OnEnable() => inputActions.Enable();
 
 	private void OnDisable() => inputActions.Disable();
+
+	public static void PauseInputs() => pausableInputs.ForEach(inputAction => inputAction.Disable());
+
+	public static void UnpauseInputs() => pausableInputs.ForEach(inputAction => inputAction.Enable());
 }
