@@ -27,7 +27,7 @@ public class WorldChunk {
 			// magic numbers o no
 			float heightRange = Mathf.PerlinNoise1D(worldX * 0.01f);
 			int groundHeight = Mathf.FloorToInt(heightRange * 50f);
-			surfaceLevels.Add(worldX, groundHeight);
+			surfaceLevels.Add(worldX, groundHeight + 1);
 			for (int y = 0; y < Level.worldHeight; y++) {
 				Tiles[x, y] = y < groundHeight ? CommonTiles.grass : CommonTiles.air;
 			}

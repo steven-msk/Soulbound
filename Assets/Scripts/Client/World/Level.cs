@@ -99,7 +99,5 @@ public class Level {
 
 	public int GetSurfaceY(Vector2 worldPos) => GetSurfaceY(worldPos.x);
 
-	public int GetSurfaceY(float xpos) {
-		return surfaceYByXpos.GetValueOrDefault<int, int>((int)xpos, 0);
-	}
+	public int GetSurfaceY(float xpos) => surfaceYByXpos.GetValueOrDefault<int, int>((int)xpos, 0);
 }
