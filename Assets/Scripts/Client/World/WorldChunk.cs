@@ -55,11 +55,16 @@ public class WorldChunk {
 		}
 	}
 
-	public Vector2 ToChunkPos(Vector2 worldPos) => new Vector2(worldPos.x / Level.chunkSize, worldPos.y);
-
-	public Vector2 ToWorldPos(Vector2 chunkPos) => new Vector2(chunkPos.x * Level.chunkSize, chunkPos.y);
+	public Vector2Int ToChunkBlock(Vector2 pos) {
+		Level level = GameManager.instance.Level;
+		int chunkX = level.ChunkXAt(pos);
+		int chunkBlockX = Mathf.FloorToInt(pos.x - (chunkX * Level.chunkSize));
+		return new Vector2Int(chunkBlockX, Mathf.FloorToInt(pos.y));
+	}
 
 	public TileBase TileAt(Vector2Int chunkPos) => Tiles[chunkPos.x, chunkPos.y];
 
-	public TileBase TileAt(Vector2 worldPos) => this.TileAt(GameManager.instance.Level.ToBlockPos(worldPos));
+	public TileBase TileAt(Vector2 worldPos) {
+		return this.TileAt(this.ToChunkBlock(worldPos));
+	}
 }
