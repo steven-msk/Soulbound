@@ -18,20 +18,22 @@ public class WorldChunk {
 	public WorldChunk(int x) => this.x = x;
 
 	// PLANNED REFACTOR: chunk generation logic - required when introducing biomes
-	public void Generate() {
+	public Dictionary<int, int> Generate() {
 		int startX = x * Level.chunkSize;
+		Dictionary<int, int> surfaceLevels = new();
 		for (int x = 0; x < Level.chunkSize; x++) {
 			int worldX = startX + x;
 
 			// magic numbers o no
 			float heightRange = Mathf.PerlinNoise1D(worldX * 0.01f);
 			int groundHeight = Mathf.FloorToInt(heightRange * 50f);
-
+			surfaceLevels.Add(worldX, groundHeight);
 			for (int y = 0; y < Level.worldHeight; y++) {
 				Tiles[x, y] = y < groundHeight ? CommonTiles.grass : CommonTiles.air;
 			}
 		}
 		IsGenerated = true;
+		return surfaceLevels;
 	}
 
 	public void Render(Tilemap tilemap) {

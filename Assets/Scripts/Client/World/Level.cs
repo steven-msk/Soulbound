@@ -18,6 +18,7 @@ public class Level {
 	private Dictionary<int, WorldChunk> loadedChunks = new();
 	private Dictionary<int, WorldChunk> generatedChunks = new();
 	private ChunkOutlineRenderer chunkOutlineRenderer = new();
+	private Dictionary<int, int> surfaceYByXpos = new();
 
 	private Grid grid;
 
@@ -48,7 +49,7 @@ public class Level {
 			if (!loadedChunks.ContainsKey(chunkX)) {
 				WorldChunk chunk = new(chunkX);
 				if (!generatedChunks.ContainsKey(chunkX)) {
-					chunk.Generate();
+					surfaceYByXpos.AddRange(chunk.Generate());
 					generatedChunks[chunkX] = chunk;
 				} else {
 					chunk = generatedChunks[chunkX];
@@ -96,13 +97,9 @@ public class Level {
 
 	public Vector2Int ToBlockPos(Vector2 worldPos) => (Vector2Int)grid.WorldToCell(worldPos);
 
-	// NOT TESTED
-	public int HighestPoint(Vector2 worldPos) {
-		Vector2 origin = new Vector2(worldPos.x, Level.worldHeight);
-		RaycastHit2D hit = Physics2D.Raycast(origin, Vector2.down, Level.worldHeight, LayerMask.GetMask("Ground"));
-		if (hit.collider != null) {
-			return grid.WorldToCell(hit.point).y;
-		}
-		return -1;
+	public int GetSurfaceY(Vector2 worldPos) => GetSurfaceY(worldPos.x);
+
+	public int GetSurfaceY(float xpos) {
+		return surfaceYByXpos.GetValueOrDefault<int, int>((int)xpos, 0);
 	}
 }

@@ -19,6 +19,8 @@ public class PlayerController : MonoBehaviour {
 	private PlayerPhysics playerPhysics;
 	public PlayerPhysics Physics => playerPhysics;
 
+	private Level level;
+
 	[Header("Internal")]
 	[SerializeField] private Rigidbody2D rb;
 	public Rigidbody2D Rigidbody => rb;
@@ -37,6 +39,7 @@ public class PlayerController : MonoBehaviour {
 	private void Start() {
 		playerPhysics = gameObject.GetComponent<PlayerPhysics>();
 		itemUsageHandler = new ItemUsageHandler(this);
+		level = GameManager.instance.Level;
 		itemUsageHandler.Register<IConsumable>(ItemUseTrigger.LeftClick, (consumable, stack) => consumable.Consume(stack));
 		foreach (ItemUseTrigger trigger in Enum.GetValues(typeof(ItemUseTrigger))) {
 			itemUsageHandler.Register<IAttackPerformer>(trigger, (attackPerformer, stack) => {
@@ -53,6 +56,12 @@ public class PlayerController : MonoBehaviour {
 				level.UpdateBlockPos(blockPos, placeable.Place(stack, blockPos, level.WorldTilemap));
 			}
 		});
+
+		IEnumerator SpawnPlayer() {
+			yield return new WaitUntil(() => level.ChunkAt(position) != null);
+			transform.SetPositionAndRotation(new(position.x, level.GetSurfaceY(position.x), transform.position.z), Quaternion.identity);
+		}
+		StartCoroutine(SpawnPlayer());
 	}
 
 	private void Update() {
