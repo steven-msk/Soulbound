@@ -12,13 +12,15 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 public class Level {
-	public static readonly int chunkSize = 32;
+	public static readonly int chunkLength = 32;
 	public static readonly int worldHeight = 300;
+	public static readonly int surfaceToUndergroundLevel = worldHeight / 2;
 	
 	private Dictionary<int, WorldChunk> loadedChunks = new();
 	private Dictionary<int, WorldChunk> generatedChunks = new();
 	private ChunkOutlineRenderer chunkOutlineRenderer = new();
 	private Dictionary<int, int> surfaceYByXpos = new();
+	private int renderDistance;
 
 	private Grid grid;
 
@@ -28,10 +30,11 @@ public class Level {
 	private Tilemap tilemap;
 	public Tilemap WorldTilemap => tilemap;
 
-	public Level(PlayerController player, Tilemap tilemap, Grid grid) {
+	public Level(PlayerController player, Tilemap tilemap, Grid grid, int renderDistance) {
 		this.player = player;
 		this.tilemap = tilemap;
 		this.grid = grid;
+		this.renderDistance = renderDistance;
 	}
 
 	// PLANNED REWORK: world rendering system
@@ -39,12 +42,24 @@ public class Level {
 	// achieve any level of performance. This project is still in prototype phase, so making any
 	// optimization isnt really worth it and might be a waste of time in most cases.
 
+	public void EarlyGenerateChunks(Vector2 playerPos) {
+		int playerChunkX = ChunkXAt(playerPos);
+		for (int dx = -renderDistance; dx <= renderDistance; dx++) {
+			int chunkX = playerChunkX + dx;
+			WorldChunk chunk = new(chunkX);
+			surfaceYByXpos.AddRange(chunk.Generate());
+			generatedChunks[chunkX] = chunk;
+			loadedChunks[chunkX] = chunk;
+			chunk.Render(tilemap);
+			chunkOutlineRenderer.ShowOutline(chunk);
+		}
+	}
+
 	public void UpdateChunks(Vector2 playerPos) {
 		int playerChunkX = ChunkXAt(playerPos);
-		int viewDistance = 4;
-		this.UnloadDistantChunks(playerChunkX, viewDistance);
+		this.UnloadDistantChunks(playerChunkX, renderDistance);
 
-		for (int dx = -viewDistance; dx <= viewDistance; dx++) {
+		for (int dx = -renderDistance; dx <= renderDistance; dx++) {
 			int chunkX = playerChunkX + dx;
 			if (!loadedChunks.ContainsKey(chunkX)) {
 				WorldChunk chunk = new(chunkX);
@@ -91,7 +106,7 @@ public class Level {
 		return null;
 	}
 
-	public int ChunkXAt(Vector2 worldPos) => Mathf.FloorToInt(worldPos.x / chunkSize);
+	public int ChunkXAt(Vector2 worldPos) => Mathf.FloorToInt(worldPos.x / chunkLength);
 
 	[CanBeNull] public WorldChunk ChunkAt(Vector2 worldPos) => generatedChunks.GetValueOrDefault(this.ChunkXAt(worldPos), null);
 

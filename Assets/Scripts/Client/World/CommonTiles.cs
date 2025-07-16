@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 public static class CommonTiles {
-	public static TileBase air = Registry.Get<Tile>("air");
+	public static Tile air = Registry.Get<Tile>("air");
 	public static RuleTile grass = Registry.Get<RuleTile>("grass");
+	public static Tile stone = Registry.Get<Tile>("stone");
 }

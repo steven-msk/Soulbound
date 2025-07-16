@@ -26,7 +26,8 @@ public class GameManager : MonoBehaviour {
 		Registry.RegisterAll<Tile>("Registry/Tiles");
 		Registry.RegisterAll<RuleTile>("Registry/Tiles");
 
-		this.level = new Level(Player, worldTilemap, GameObject.Find("Grid").GetComponent<Grid>());
+		this.level = new Level(Player, worldTilemap, GameObject.Find("Grid").GetComponent<Grid>(), renderDistance: 2);
+		this.level.EarlyGenerateChunks(Player.position);
 		LogUtil.LogAwake(this);
 	}
 
@@ -39,7 +40,7 @@ public class GameManager : MonoBehaviour {
 			if (!this.IsPaused) {
 				// TODO: implement ticking system
 			}
-			yield return new WaitForSecondsRealtime(0.1f);
+			yield return new WaitForSecondsRealtime(0.1f);		// TODO: decide on a tick rate
 		}
 	}
 
