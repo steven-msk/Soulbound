@@ -95,6 +95,8 @@ public class InputHandler : MonoBehaviour {
 		RegisterInputEvent(playerActions.PauseGame, pausable: false, (action) => {
 			action.performed += actionContext => GameManager.instance.TogglePauseGame();
 		});
+
+		LogUtil.LogAwake(this);
 	}
 
 	private static void RegisterInputEvent(InputAction inputAction, bool pausable, Action<InputAction> callbackBinding) {

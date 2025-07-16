@@ -44,10 +44,10 @@ public class HotbarController : MonoBehaviour, IHotbarContainer {
 		inventory = GameManager.instance.Player.Inventory;
 		SetupGrid(() => inventory.SetupGrid(null));
 		SetActiveSlot(0);
+		LogUtil.LogAwake(this);
 	}
 
 #nullable enable
-
 	public void SetupGrid(Action? callback) {
 		InventorySlot[] hotbarSlots = gameObject.GetComponentsInChildren<InventorySlot>();
 		slots = new InventorySlot[Columns];
@@ -56,7 +56,6 @@ public class HotbarController : MonoBehaviour, IHotbarContainer {
 		}
 		callback?.Invoke();
 	}
-
 #nullable disable
 
 	public void SetActiveSlot(int slotKey) {

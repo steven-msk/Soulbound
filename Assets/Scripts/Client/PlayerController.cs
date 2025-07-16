@@ -36,7 +36,7 @@ public class PlayerController : MonoBehaviour {
 	public float Facing => Mathf.Sign(transform.localScale.x);
 	public Vector2 position => transform.position;
 
-	private void Start() {
+	private void Awake() {
 		playerPhysics = gameObject.GetComponent<PlayerPhysics>();
 		itemUsageHandler = new ItemUsageHandler(this);
 		level = GameManager.instance.Level;
@@ -51,12 +51,15 @@ public class PlayerController : MonoBehaviour {
 		itemUsageHandler.Register<IPlaceable>(ItemUseTrigger.LeftHold, (placeable, stack) => {
 			Level level = GameManager.instance.Level;
 			Vector2Int blockPos = level.ToBlockPos(inputHandler.MouseWorldPosition);
-			
+
 			if (level.TileAt(blockPos) == CommonTiles.air) {
 				level.UpdateBlockPos(blockPos, placeable.Place(stack, blockPos, level.WorldTilemap));
 			}
 		});
+		LogUtil.LogAwake(this);
+	}
 
+	private void Start() {
 		IEnumerator SpawnPlayer() {
 			yield return new WaitUntil(() => level.ChunkAt(position) != null);
 			transform.SetPositionAndRotation(new(position.x, level.GetSurfaceY(position.x), transform.position.z), Quaternion.identity);
@@ -89,8 +92,6 @@ public class PlayerController : MonoBehaviour {
 		MainHandStack = itemStack;
 		InvokeStatItem(MainHandStack, statProvider => statProvider.ApplyInstantStats(this.stats));
 		InvokeStatItem(MainHandStack, statProvider => statProvider.EnableBuffers(this.stats));
-
-		
 	}
 
 	[InputAction("ItemUse", Priority = 5)]

@@ -42,6 +42,10 @@ public class PlayerPhysics : MonoBehaviour {
 	[SerializeField] private bool shouldJump = false;
 	[SerializeField] private float jumpToFlightTimer;
 
+	private void Awake() {
+		LogUtil.LogAwake(this);
+	}
+
 	private void Start() {
 		player = GameManager.instance.Player;
 		inputHandler = player.InputHandler;

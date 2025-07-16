@@ -48,6 +48,7 @@ public class InventoryController : MonoBehaviour, IContainer {
 
 	private void Awake() {
 		player = GameManager.instance.Player;
+		LogUtil.LogAwake(this);
 	}
 
 #nullable enable
