@@ -17,6 +17,9 @@ public class GameManager : MonoBehaviour {
 
 	public UIController UI => GameObject.Find("Canvas").GetComponent<UIController>();
 
+	// FEATUREIMPL: settings menu
+	// FEATUREIMPL: pause menu
+
 	private void Awake() {
 		instance = this;
 

@@ -19,7 +19,6 @@ public class WorldChunk {
 	public int Xpos => x;
 
 	private TileBase[,] tiles = new TileBase[Level.chunkLength, Level.worldHeight];
-	public TileBase[,] Tiles => tiles;
 
 	public bool IsGenerated { get; set; }
 
@@ -47,7 +46,7 @@ public class WorldChunk {
 				} else {
 					tile = CommonTiles.stone;
 				}
-				Tiles[x, yIndex] = tile;
+				tiles[x, yIndex] = tile;
 			}
 		}
 		IsGenerated = true;
@@ -63,7 +62,7 @@ public class WorldChunk {
 		for (int x = 0; x < Level.chunkLength; x++) {
 			for (int y = minY; y < maxY; y++) {
 				int yIndex = WorldYToIndex(y);
-				TileBase tile = Tiles[x, yIndex];
+				TileBase tile = tiles[x, yIndex];
 				InvocationHelper.IfElse(tile != null,
 					() => tilemap.SetTile(new Vector3Int(xStart + x, y, 0), tile),
 					() => Debug.LogError($"Attempted to render ungenerated terrain! pos: ({x}, {y}) at chunk {this.x}"));
@@ -87,9 +86,9 @@ public class WorldChunk {
 		return new Vector2Int(chunkBlockX, Mathf.FloorToInt(pos.y));
 	}
 
-	public TileBase TileAt(Vector2Int chunkPos) => Tiles[chunkPos.x, WorldYToIndex(chunkPos.y)];
+	public void SetTile(Vector2Int worldPos, TileBase tile) => tiles[worldPos.x, WorldYToIndex(worldPos.y)] = tile;
 
-	public TileBase TileAt(Vector2 worldPos) {
-		return this.TileAt(this.ToChunkBlock(worldPos));
-	}
+	public TileBase TileAt(Vector2Int chunkPos) => tiles[chunkPos.x, WorldYToIndex(chunkPos.y)];
+
+	public TileBase TileAt(Vector2 worldPos) => this.TileAt(this.ToChunkBlock(worldPos));
 }

@@ -51,7 +51,7 @@ public class Level {
 			generatedChunks[chunkX] = chunk;
 			loadedChunks[chunkX] = chunk;
 			chunk.Render(tilemap);
-			chunkOutlineRenderer.ShowOutline(chunk);
+			//chunkOutlineRenderer.ShowOutline(chunk);
 		}
 	}
 
@@ -71,7 +71,7 @@ public class Level {
 				}
 				loadedChunks[chunkX] = chunk;
 				chunk.Render(tilemap);
-				chunkOutlineRenderer.ShowOutline(chunk);
+				//chunkOutlineRenderer.ShowOutline(chunk);
 			}
 		}
 	}
@@ -79,7 +79,7 @@ public class Level {
 	public void UpdateBlockPos(Vector2Int blockPos, Block block) { 
 		WorldChunk chunk = this.ChunkAt(blockPos);
 		Vector2Int chunkPos = chunk.ToChunkBlock(blockPos);
-		chunk.Tiles[chunkPos.x, chunkPos.y] = block.TileReference;
+		chunk.SetTile(chunkPos, block.TileReference);
 	}
 
 	public void UnloadDistantChunks(int playerChunkX, int viewDistance) {
