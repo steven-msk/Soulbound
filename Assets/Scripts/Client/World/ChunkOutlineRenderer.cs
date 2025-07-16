@@ -13,10 +13,10 @@ public sealed class ChunkOutlineRenderer {
 		LineRenderer renderer = obj.GetComponent<LineRenderer>();
 		outlines[chunk] = renderer;
 
-		int startX = chunk.Xpos * Level.chunkLength;
+		int startX = chunk.Xpos * Level.CHUNK_LENGTH;
 		int offsetY = -140;
-		int height = Level.worldHeight;
-		int width = Level.chunkLength;
+		int height = Level.WORLD_HEIGHT;
+		int width = Level.CHUNK_LENGTH;
 		Vector3[] points = new Vector3[5] {
 			new Vector3(startX, offsetY, 0),
 			new Vector3(startX, height + offsetY, 0),

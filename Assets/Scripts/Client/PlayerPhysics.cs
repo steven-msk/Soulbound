@@ -46,6 +46,11 @@ public class PlayerPhysics : MonoBehaviour {
 		LogUtil.LogAwake(this);
 	}
 
+	// FIXME: inconsistent movement
+	// When the player holds either left or right mouse button while moving towards the opposite
+	// direction, the player is thrown towards the opposite direction (the facing where the mouse
+	// button is held).
+
 	private void Start() {
 		player = GameManager.instance.Player;
 		inputHandler = player.InputHandler;
@@ -85,20 +90,6 @@ public class PlayerPhysics : MonoBehaviour {
 			knockbackStunTimer -= Time.fixedDeltaTime;
 			return;         // knockback immunity will be a thing
 		}
-
-		//Vector2 playerBottom = new(player.position.x + boxCollider.bounds.size.x / 2f * player.Facing, boxCollider.bounds.min.y + 0.05f);
-		//Vector2 direction = Vector2.right * player.Facing;
-		//RaycastHit2D wallHit = Physics2D.Raycast(playerBottom, direction, stepCheckDistance, LayerMask.GetMask("Ground"));
-		//Debug.DrawLine(playerBottom, (playerBottom + new Vector2(stepCheckDistance, 0)), Color.white);
-		//if (wallHit.collider != null) {
-		//	Vector2 stepCheckOrigin = playerBottom + Vector2.up * stepHeight;
-		//	RaycastHit2D stepHit = Physics2D.Raycast(stepCheckOrigin, direction, stepCheckDistance, LayerMask.GetMask("Ground"));
-		//	if (stepHit.collider == null) {
-		//		transform.position += new Vector3(0.2f, 0) * player.Facing;
-		//		float preserved = rb.linearVelocityX;
-		//		StartCoroutine(SmoothStepUp(0.1f, 1.0f, preserved));
-		//	}
-		//}
 
 		if (movement.x != 0) {
 			if (!isFlying) {
@@ -146,19 +137,6 @@ public class PlayerPhysics : MonoBehaviour {
 		}
 		UpdateFlightTimePanel(isFlying, flightTime, stats.GrantedFlightTime);
 	}
-
-	//private IEnumerator SmoothStepUp(float duration, float height, float preservedHorizontalVelocity) {
-	//	Vector3 start = transform.position;
-	//	Vector3 end = start + Vector3.up * height;
-	//	rb.position = end;
-	//	float time = 0;
-	//	while (time < duration) {
-	//		transform.position = Vector3.Lerp(start, end, time / duration);
-	//		time += Time.deltaTime;
-	//		yield return null;
-	//	}
-	//	transform.position = end;
-	//}
 
 	internal void OnSpacePressed() {
 		if (jumpsLeft > 0 && knockbackStunTimer <= 0) {

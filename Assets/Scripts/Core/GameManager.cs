@@ -1,5 +1,6 @@
 using System.Collections;
 using TMPro;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -19,6 +20,7 @@ public class GameManager : MonoBehaviour {
 
 	// FEATUREIMPL: settings menu
 	// FEATUREIMPL: pause menu
+	// Pause menu -> Settings menu
 
 	private void Awake() {
 		instance = this;
@@ -29,7 +31,7 @@ public class GameManager : MonoBehaviour {
 		Registry.RegisterAll<Tile>("Registry/Tiles");
 		Registry.RegisterAll<RuleTile>("Registry/Tiles");
 
-		this.level = new Level(Player, worldTilemap, GameObject.Find("Grid").GetComponent<Grid>(), renderDistance: 2);
+		this.level = new Level(Player, worldTilemap, GameObject.Find("Grid").GetComponent<Grid>(), seed: UnityEngine.Random.Range(int.MinValue, int.MaxValue), renderDistance: 2);
 		this.level.EarlyGenerateChunks(Player.position);
 		LogUtil.LogAwake(this);
 	}
@@ -50,7 +52,7 @@ public class GameManager : MonoBehaviour {
 	public void TogglePauseGame() {
 		this.IsPaused = !this.IsPaused;
 		Time.timeScale = this.IsPaused ? 0f : 1f;
-		AudioListener.pause = this.IsPaused;
+		AudioListener.pause = this.IsPaused;		// FEATUREIMPL: sound effects and music
 		InvocationHelper.IfElse(this.IsPaused, InputHandler.PauseInputs, InputHandler.UnpauseInputs);
 		
 	}

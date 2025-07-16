@@ -12,10 +12,12 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 public class Level {
-	public static readonly int chunkLength = 32;
-	public static readonly int worldHeight = 300;
-	public static readonly int surfaceToUndergroundLevel = worldHeight / 2;
+	public const int CHUNK_LENGTH = 32;
+	public const int WORLD_HEIGHT = 300;
+	public const int SURFACE_TO_UNDERGROUND_DELIMITER = WORLD_HEIGHT / 2;
 	
+	private readonly int seed;
+	private readonly PerlinNoiseGenerator1D heightGenerator;
 	private Dictionary<int, WorldChunk> loadedChunks = new();
 	private Dictionary<int, WorldChunk> generatedChunks = new();
 	private ChunkOutlineRenderer chunkOutlineRenderer = new();
@@ -30,11 +32,13 @@ public class Level {
 	private Tilemap tilemap;
 	public Tilemap WorldTilemap => tilemap;
 
-	public Level(PlayerController player, Tilemap tilemap, Grid grid, int renderDistance) {
+	public Level(PlayerController player, Tilemap tilemap, Grid grid, int seed, int renderDistance) {
 		this.player = player;
 		this.tilemap = tilemap;
 		this.grid = grid;
 		this.renderDistance = renderDistance;
+		this.seed = seed;
+		this.heightGenerator = new PerlinNoiseGenerator1D(this.seed, WorldChunk.HEIGHT_SPREAD);
 	}
 
 	// PLANNED REWORK: world rendering system
@@ -47,7 +51,7 @@ public class Level {
 		for (int dx = -renderDistance; dx <= renderDistance; dx++) {
 			int chunkX = playerChunkX + dx;
 			WorldChunk chunk = new(chunkX);
-			surfaceYByXpos.AddRange(chunk.Generate());
+			surfaceYByXpos.AddRange(chunk.Generate(this.heightGenerator));
 			generatedChunks[chunkX] = chunk;
 			loadedChunks[chunkX] = chunk;
 			chunk.Render(tilemap);
@@ -64,7 +68,7 @@ public class Level {
 			if (!loadedChunks.ContainsKey(chunkX)) {
 				WorldChunk chunk = new(chunkX);
 				if (!generatedChunks.ContainsKey(chunkX)) {
-					surfaceYByXpos.AddRange(chunk.Generate());
+					surfaceYByXpos.AddRange(chunk.Generate(this.heightGenerator));
 					generatedChunks[chunkX] = chunk;
 				} else {
 					chunk = generatedChunks[chunkX];
@@ -106,7 +110,7 @@ public class Level {
 		return null;
 	}
 
-	public int ChunkXAt(Vector2 worldPos) => Mathf.FloorToInt(worldPos.x / chunkLength);
+	public int ChunkXAt(Vector2 worldPos) => Mathf.FloorToInt(worldPos.x / CHUNK_LENGTH);
 
 	[CanBeNull] public WorldChunk ChunkAt(Vector2 worldPos) => generatedChunks.GetValueOrDefault(this.ChunkXAt(worldPos), null);
 
