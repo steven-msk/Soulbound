@@ -28,14 +28,6 @@ public class HotbarController : MonoBehaviour, IHotbarContainer {
 
 	public int Columns => 9;
 
-	// FIXME: main hand item usage unavailable upon first trigger when entering play mode.
-	// To reproduce this:
-	// 1. Enter play mode
-	// 2. Without changing the current hotbar slot, invoke the usage trigger of the item in the
-	// hotbar slot
-	// 3. If the item doesnt get used, switch to a different slot and go back to the original one;
-	//    if now it gets used thats the bug
-
 	private InventorySlot[] slots;
 	public InventorySlot[] Slots => slots;
 	public InventorySlot this[int index] => slots[index];
@@ -43,7 +35,6 @@ public class HotbarController : MonoBehaviour, IHotbarContainer {
 	private void Awake() {
 		inventory = GameManager.instance.Player.Inventory;
 		SetupGrid(() => inventory.SetupGrid(null));
-		SetActiveSlot(0);
 		LogUtil.LogAwake(this);
 	}
 
@@ -76,7 +67,6 @@ public class HotbarController : MonoBehaviour, IHotbarContainer {
 			ApplySelectionChanges(active.hotbarSlot, activeSlotColor, activeSlotNumberColor, activeItemStackColor, activeSlotOffset, activeSlotScale);
 		}
 
-		// weird how this gets called in Awake() and sets the slot active, but doesnt actually equip the main hand item
 		GameManager.instance.Player.Inventory.EquipHotbarItem(slots[slotKey]);
 	}
 

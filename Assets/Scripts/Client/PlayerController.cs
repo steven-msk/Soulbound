@@ -40,12 +40,10 @@ public class PlayerController : MonoBehaviour {
 		playerPhysics = gameObject.GetComponent<PlayerPhysics>();
 		itemUsageHandler = new ItemUsageHandler(this);
 		level = GameManager.instance.Level;
-		itemUsageHandler.Register<IConsumable>(ItemUseTrigger.LeftClick, (consumable, stack) => consumable.Consume(stack));
+		itemUsageHandler.Register<IConsumable>(ItemUseTrigger.RightClick, (consumable, stack) => consumable.Consume(stack));
 		foreach (ItemUseTrigger trigger in Enum.GetValues(typeof(ItemUseTrigger))) {
 			itemUsageHandler.Register<IAttackPerformer>(trigger, (attackPerformer, stack) => {
-				if (CanAttack) {
-					attackPerformer.PerformAttack(trigger);
-				}
+				InvocationHelper.If(CanAttack, () => attackPerformer.PerformAttack(trigger));
 			});
 		}
 		itemUsageHandler.Register<IPlaceable>(ItemUseTrigger.LeftHold, (placeable, stack) => {
@@ -53,18 +51,14 @@ public class PlayerController : MonoBehaviour {
 			Vector2Int blockPos = level.ToBlockPos(inputHandler.MouseWorldPosition);
 
 			if (level.TileAt(blockPos) == CommonTiles.air) {
-				level.UpdateBlockPos(blockPos, placeable.Place(stack, blockPos, level.WorldTilemap));
+				level.SetBlockAndUpdate(blockPos, placeable.Place(stack, blockPos));
 			}
 		});
 		LogUtil.LogAwake(this);
 	}
 
 	private void Start() {
-		IEnumerator SpawnPlayer() {
-			yield return new WaitUntil(() => level.ChunkAt(position) != null);
-			transform.SetPositionAndRotation(new(position.x, level.GetSurfaceY(position.x), transform.position.z), Quaternion.identity);
-		}
-		StartCoroutine(SpawnPlayer());
+		transform.SetPositionAndRotation(new(position.x, level.GetSurfaceY(position.x), transform.position.z), Quaternion.identity);
 	}
 
 	private void Update() {

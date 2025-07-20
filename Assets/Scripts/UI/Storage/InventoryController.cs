@@ -77,6 +77,9 @@ public class InventoryController : MonoBehaviour, IContainer {
 			CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableStatItem_test"), 1), (InventorySlot)this[2, 8]);
 			CreateItemDisplay(new ItemStack(Registry.Get<Item>("longTooltipItem"), 1), hotbar[5]);
 			CreateItemDisplay(new ItemStack(Registry.Get<Item>("grass_block_item"), 100), popupSlots[0, 1]);
+			Debug.Log("<color=green>[INVENTORY]</color> Player inventory loaded");				// might factor out in LogUtil
+			// POTENTIAL: LogUtil modularity - implement different color coded logging sections marked between [ ]
+			hotbar.SetActiveSlot(0);
 		}
 		StartCoroutine(Prototype_setupDisplays());
 	}
@@ -154,7 +157,7 @@ public class InventoryController : MonoBehaviour, IContainer {
 			return remaining <= 0;
 		}
 	}
-
+	 
 	// PLANNED FEATUREIMPL REFACTOR: equipment slots behavior and code restructure
 	// Factor out common equipment slot behavior logic, potentially add a general implementation for
 	// slots that only accept 1 item of some item type along with its behavior logic

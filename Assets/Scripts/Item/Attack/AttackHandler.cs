@@ -7,7 +7,7 @@ using UnityEngine;
 public class AttackHandler : MonoBehaviour {
 
 	// FIXME: inacurrate collision detection between attack hitbox and target hurtbox
-	// to test this, set the cooldown of some fast attack to something very small (like 0.15f)
+	// To test this, set the cooldown of some fast attack to something very small (like 0.15f)
 	// then repeatedly attack an enemy and count the logs of the attack and hit callbacks
 	// the number of attack logs should be equal to the number of hit callbacks invoked
 	// if thats not the case, youve got yourself a bug

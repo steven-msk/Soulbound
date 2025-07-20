@@ -1,27 +1,34 @@
 ﻿using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
 public class WorldChunk {
-	private static readonly int minY = -Level.WORLD_HEIGHT / 2;
-	private static readonly int maxY = Level.WORLD_HEIGHT / 2 - 1;
+	public static readonly int minY = -Level.WORLD_HEIGHT / 2;
+	public static readonly int maxY = Level.WORLD_HEIGHT / 2 - 1;
 	public const float HEIGHT_SPREAD = 0.01f;
 	public const float SURFACE_HEIGHT_RANGE = 50f;
 	public const float UNDERGROUND_HEIGHT_RANGE = 20f;
 
+	private ChunkGenerationData generationData;
+	public ChunkGenerationData GenerationData => generationData;
+
 	private int x;
-	public int Xpos => x;
+	public int xpos => x;
 
 	private TileBase[,] tiles = new TileBase[Level.CHUNK_LENGTH, Level.WORLD_HEIGHT];
 
-	public bool IsGenerated { get; set; }
 
 	public WorldChunk(int x) => this.x = x;
 
+	// TODO: implement BlockPos and ChunkBlock to differentiate between world-relative block and chunk-relative block
+
 	// PLANNED REFACTOR: chunk generation logic - required when introducing biomes
-	public Dictionary<int, int> Generate(INoiseGenerator1D heightGenerator) {
+	public ChunkGenerationData Generate(INoiseGenerator1D heightGenerator) {
 		int startX = x * Level.CHUNK_LENGTH;
 		Dictionary<int, int> surfaceLevels = new();
+		int highestStone = 0;
+
 		for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
 			int worldX = startX + x;
 			float heightNoise = heightGenerator.GenerateNoise1D(worldX);
@@ -29,6 +36,7 @@ public class WorldChunk {
 			int undergroundHeight = Mathf.FloorToInt(heightNoise * UNDERGROUND_HEIGHT_RANGE);
 			surfaceLevels.Add(worldX, groundHeight + 1);
 
+			highestStone = Mathf.Max(highestStone, undergroundHeight);
 			for (int y = minY; y < maxY; y++) {
 				int yIndex = WorldYToIndex(y);
 				TileBase tile = default(TileBase);
@@ -42,15 +50,17 @@ public class WorldChunk {
 				tiles[x, yIndex] = tile;
 			}
 		}
-		IsGenerated = true;
-		return surfaceLevels;
+
+		ChunkGenerationData generationData = new ChunkGenerationData(surfaceLevels, highestStone);
+		this.generationData = generationData;
+		return generationData;
 	}
 
 	int WorldYToIndex(int worldY) => worldY - minY;
 
 	int IndexToWorldY(int yIndex) => yIndex + minY;
 
-	public void Render(Tilemap tilemap) {
+	public void Render(Tilemap tilemap, ChunkOutlineRenderer outlineRenderer) {
 		int xStart = x * Level.CHUNK_LENGTH;
 		for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
 			for (int y = minY; y < maxY; y++) {
@@ -61,9 +71,10 @@ public class WorldChunk {
 					() => Debug.LogError($"Attempted to render ungenerated terrain! pos: ({x}, {y}) at chunk {this.x}"));
 			}
 		}
+		outlineRenderer.ShowOutline(this);
 	}
 
-	public void Unload(Tilemap tilemap) {
+	public void Unload(Tilemap tilemap, ChunkOutlineRenderer outlineRenderer) {
 		int xStart = x * Level.CHUNK_LENGTH;
 		for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
 			for (int y = minY; y < maxY; y++) {
@@ -79,7 +90,9 @@ public class WorldChunk {
 		return new Vector2Int(chunkBlockX, Mathf.FloorToInt(pos.y));
 	}
 
-	public void SetTile(Vector2Int worldPos, TileBase tile) => tiles[worldPos.x, WorldYToIndex(worldPos.y)] = tile;
+	public Vector2Int ToWorldBlock(Vector2Int chunkPos) => new Vector2Int(chunkPos.x + this.x * Level.CHUNK_LENGTH, chunkPos.y);
+
+	public void SetTile(Vector2Int chunkPos, TileBase tile) => tiles[chunkPos.x, WorldYToIndex(chunkPos.y)] = tile;
 
 	public TileBase TileAt(Vector2Int chunkPos) => tiles[chunkPos.x, WorldYToIndex(chunkPos.y)];
 

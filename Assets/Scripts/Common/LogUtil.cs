@@ -7,6 +7,6 @@ using UnityEngine;
 
 public static class LogUtil {
 	public static void LogAwake(MonoBehaviour script) {
-		Debug.Log($"[AWAKE] {script.GetType().Name} on '{script.gameObject.name}'");
+		Debug.Log($"<color=cyan>[AWAKE]</color> {script.GetType().Name} on '{script.gameObject.name}'");
 	}
 }

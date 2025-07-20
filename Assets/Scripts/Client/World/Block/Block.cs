@@ -13,8 +13,4 @@ public class Block : ScriptableObject {
 
 	[SerializeField] private TileBase tileReference;
 	public TileBase TileReference => tileReference;
-
-	public void Place(Vector2Int position, Tilemap tilemap) {
-		tilemap.SetTile((Vector3Int)position, tileReference);
-	}
 }

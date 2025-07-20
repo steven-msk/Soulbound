@@ -15,7 +15,7 @@ public class PlayerPhysics : MonoBehaviour {
 	private InputHandler inputHandler;
 	private Rigidbody2D rb;
 	private Animator animator;
-	private BoxCollider2D boxCollider;
+	private CapsuleCollider2D collider;
 
 	public float movementSpeedPower = 30f;
 	public float knockbackStunDuration = 0.5f;
@@ -57,7 +57,7 @@ public class PlayerPhysics : MonoBehaviour {
 		rb = player.Rigidbody;
 		animator = player.Animator;
 		stats = player.Stats;
-		boxCollider = this.GetComponent<BoxCollider2D>();
+		collider = this.GetComponent<CapsuleCollider2D>();
 
 		collisionReactionsByTag.Add("Enemy", ((collision) => {
 			Vector2 bounce = (transform.position - (Vector3)collision.GetContact(0).point).normalized;
@@ -105,6 +105,9 @@ public class PlayerPhysics : MonoBehaviour {
 					rb.linearVelocityX = scaledFlightAcceleration;
 				}
 			}
+		} else {
+			float deceleration = 10f;
+			rb.linearVelocityX = Mathf.Lerp(rb.linearVelocityX, 0, deceleration * Time.fixedDeltaTime);
 		}
 		if (shouldJump) {
 			rb.AddForceY(stats.JumpHeight.GetProcessedValue() * jumpHeightPower, ForceMode2D.Impulse);
@@ -157,8 +160,8 @@ public class PlayerPhysics : MonoBehaviour {
 	}
 
 	public bool IsOnGround() {
-		Vector2 origin = (Vector2)transform.position + boxCollider.offset + Vector2.down * (boxCollider.size.y * 0.5f);
-		float offsetX = boxCollider.size.x * 0.5f;
+		Vector2 origin = (Vector2)transform.position + collider.offset + Vector2.down * (collider.size.y * 0.5f);
+		float offsetX = collider.size.x * 0.5f;
 		float distance = 0.1f;
 		int layerMask = LayerMask.GetMask("Ground");
 

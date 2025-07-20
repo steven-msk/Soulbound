@@ -10,6 +10,7 @@ using Unity.VisualScripting;
 using UnityEditor.Tilemaps;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using Random = UnityEngine.Random;
 
 public class Level {
 	public const int CHUNK_LENGTH = 32;
@@ -21,7 +22,6 @@ public class Level {
 	private Dictionary<int, WorldChunk> loadedChunks = new();
 	private Dictionary<int, WorldChunk> generatedChunks = new();
 	private ChunkOutlineRenderer chunkOutlineRenderer = new();
-	private Dictionary<int, int> surfaceYByXpos = new();
 	private int renderDistance;
 
 	private Grid grid;
@@ -51,11 +51,10 @@ public class Level {
 		for (int dx = -renderDistance; dx <= renderDistance; dx++) {
 			int chunkX = playerChunkX + dx;
 			WorldChunk chunk = new(chunkX);
-			surfaceYByXpos.AddRange(chunk.Generate(this.heightGenerator));
+			chunk.Generate(this.heightGenerator);
 			generatedChunks[chunkX] = chunk;
 			loadedChunks[chunkX] = chunk;
-			chunk.Render(tilemap);
-			//chunkOutlineRenderer.ShowOutline(chunk);
+			chunk.Render(tilemap, chunkOutlineRenderer);
 		}
 	}
 
@@ -68,23 +67,25 @@ public class Level {
 			if (!loadedChunks.ContainsKey(chunkX)) {
 				WorldChunk chunk = new(chunkX);
 				if (!generatedChunks.ContainsKey(chunkX)) {
-					surfaceYByXpos.AddRange(chunk.Generate(this.heightGenerator));
+					chunk.Generate(this.heightGenerator);
 					generatedChunks[chunkX] = chunk;
 				} else {
 					chunk = generatedChunks[chunkX];
 				}
 				loadedChunks[chunkX] = chunk;
-				chunk.Render(tilemap);
-				//chunkOutlineRenderer.ShowOutline(chunk);
+				chunk.Render(tilemap, chunkOutlineRenderer);
 			}
 		}
 	}
 
-	public void UpdateBlockPos(Vector2Int blockPos, Block block) { 
-		WorldChunk chunk = this.ChunkAt(blockPos);
-		Vector2Int chunkPos = chunk.ToChunkBlock(blockPos);
-		chunk.SetTile(chunkPos, block.TileReference);
+	private void SetTileAndUpdate(Vector2Int tilePos, TileBase tile) {
+		WorldChunk chunk = this.ChunkAt(tilePos);
+		Vector2Int chunkPos = chunk.ToChunkBlock(tilePos);
+		chunk.SetTile(chunkPos, tile);
+		tilemap.SetTile((Vector3Int)tilePos, tile);
 	}
+
+	public void SetBlockAndUpdate(Vector2Int blockPos, Block block) => this.SetTileAndUpdate(blockPos, block.TileReference);
 
 	public void UnloadDistantChunks(int playerChunkX, int viewDistance) {
 		List<WorldChunk> toRemove = new();
@@ -94,9 +95,9 @@ public class Level {
 			}
 		}
 		foreach (WorldChunk chunk in toRemove) {
-			loadedChunks.Remove(chunk.Xpos);
+			loadedChunks.Remove(chunk.xpos);
 			chunkOutlineRenderer.HideOutline(chunk);
-			chunk.Unload(tilemap);
+			chunk.Unload(tilemap, chunkOutlineRenderer);
 		}
 	}
 
@@ -114,9 +115,11 @@ public class Level {
 
 	[CanBeNull] public WorldChunk ChunkAt(Vector2 worldPos) => generatedChunks.GetValueOrDefault(this.ChunkXAt(worldPos), null);
 
+	[CanBeNull] public WorldChunk ChunkAt(float xpos) => ChunkAt(new Vector2(xpos, 0));
+
 	public Vector2Int ToBlockPos(Vector2 worldPos) => (Vector2Int)grid.WorldToCell(worldPos);
 
 	public int GetSurfaceY(Vector2 worldPos) => GetSurfaceY(worldPos.x);
 
-	public int GetSurfaceY(float xpos) => surfaceYByXpos.GetValueOrDefault<int, int>((int)xpos, 0);
+	public int GetSurfaceY(float xpos) => this.ChunkAt(xpos)?.GenerationData.surfaceLevels[(int)xpos] ?? 0;
 }

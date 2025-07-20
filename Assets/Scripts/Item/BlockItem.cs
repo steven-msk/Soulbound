@@ -10,8 +10,7 @@ using UnityEngine.Tilemaps;
 public class BlockItem : Item, IPlaceable {
 	[SerializeField] private Block referenceBlock;
 
-	public Block Place(ItemStack itemStack, Vector2Int position, Tilemap tilemap) {
-		referenceBlock.Place(position, tilemap);
+	public Block Place(ItemStack itemStack, Vector2Int position) {
 		itemStack.Quantity--;
 		return referenceBlock;
 	}

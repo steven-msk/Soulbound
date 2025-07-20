@@ -31,7 +31,8 @@ public class GameManager : MonoBehaviour {
 		Registry.RegisterAll<Tile>("Registry/Tiles");
 		Registry.RegisterAll<RuleTile>("Registry/Tiles");
 
-		this.level = new Level(Player, worldTilemap, GameObject.Find("Grid").GetComponent<Grid>(), seed: UnityEngine.Random.Range(int.MinValue, int.MaxValue), renderDistance: 2);
+		int seed = 10090;           // UnityEngine.Random.Range(int.MinValue, int.MaxValue)
+		this.level = new Level(Player, worldTilemap, GameObject.Find("Grid").GetComponent<Grid>(), seed, renderDistance: 2);
 		this.level.EarlyGenerateChunks(Player.position);
 		LogUtil.LogAwake(this);
 	}

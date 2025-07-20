@@ -6,9 +6,9 @@ PhysicsMaterial2D:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Terrain
+  m_Name: 0 friction
   serializedVersion: 2
-  friction: 0.5
+  friction: 0
   bounciness: 0
   m_FrictionCombine: 4
   m_BounceCombine: 4
