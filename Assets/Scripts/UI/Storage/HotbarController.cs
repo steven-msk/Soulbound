@@ -9,7 +9,6 @@ using UnityEngine.UIElements;
 public class HotbarController : MonoBehaviour, IHotbarContainer {
 	[Header("Active Slots")]
 	public Color activeSlotColor;
-
 	public Color activeSlotNumberColor;
 	public Color activeItemStackColor;
 	public Vector3 activeSlotOffset;
@@ -17,9 +16,11 @@ public class HotbarController : MonoBehaviour, IHotbarContainer {
 
 	[Header("Inactive Slots")]
 	public Color inactiveSlotColor;
-
 	public Color inactiveSlotNumberColor;
 	public Color inactiveItemStackColor;
+
+	[Header("")]
+	[SerializeField] private TextMeshProUGUI activeItemText;
 
 	private (InventorySlot hotbarSlot, int key) active;
 	public InventorySlot ActiveSlot => active.hotbarSlot;
@@ -67,6 +68,7 @@ public class HotbarController : MonoBehaviour, IHotbarContainer {
 			ApplySelectionChanges(active.hotbarSlot, activeSlotColor, activeSlotNumberColor, activeItemStackColor, activeSlotOffset, activeSlotScale);
 		}
 
+		activeItemText.text = slots[slotKey].ItemStack?.Item.Name;
 		GameManager.instance.Player.Inventory.EquipHotbarItem(slots[slotKey]);
 	}
 
