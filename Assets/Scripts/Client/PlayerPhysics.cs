@@ -53,9 +53,6 @@ public class PlayerPhysics : MonoBehaviour {
 	}
 
 	// FIXME: inconsistent movement
-	// When the player holds either left or right mouse button while moving towards the opposite
-	// direction, the player is thrown towards the opposite direction (the facing where the mouse
-	// button is held).
 
 	private void Start() {
 		collisionReactionsByTag.Add("Enemy", ((collision) => {
@@ -79,7 +76,7 @@ public class PlayerPhysics : MonoBehaviour {
 
 	private void Update() {
 		movement.x = inputHandler.HorizontalMovement;
-		if (movement.x != 0 && !(inputHandler.LeftHold || inputHandler.RightHold)) {
+		if (movement.x != 0 && !(inputHandler.LeftHold || inputHandler.RightHold) && !GameManager.instance.IsPaused) {
 			transform.localScale = new Vector3(Mathf.Sign(movement.x), 1, 1);
 		}
 	}
@@ -165,8 +162,8 @@ public class PlayerPhysics : MonoBehaviour {
 		int layerMask = LayerMask.GetMask("Ground");
 
 		RaycastHit2D leftHit = Physics2D.Raycast(origin - new Vector2(offsetX, 0), Vector2.down, distance, layerMask);
-		RaycastHit2D middleHit = Physics2D.Raycast(origin, Vector2.down, 0.1f, layerMask);
-		RaycastHit2D rightHit = Physics2D.Raycast(origin + new Vector2(offsetX, 0), Vector2.down, 0.1f, layerMask);
+		RaycastHit2D middleHit = Physics2D.Raycast(origin, Vector2.down, distance, layerMask);
+		RaycastHit2D rightHit = Physics2D.Raycast(origin + new Vector2(offsetX, 0), Vector2.down, distance, layerMask);
 		return middleHit.collider != null || leftHit.collider != null || rightHit.collider != null;
 	}
 

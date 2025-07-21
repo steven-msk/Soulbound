@@ -33,7 +33,15 @@ public class PlayerController : MonoBehaviour {
 
 	public bool CanAttack { get; set; } = true;
 
-	public float facing => Mathf.Sign(transform.localScale.x);
+	private int lastFacing = 1;
+	public float facing {
+		get {
+			if (Rigidbody.linearVelocityX != 0f) {
+				lastFacing = (int)Mathf.Sign(Rigidbody.linearVelocityX);
+			}
+			return lastFacing;
+		}
+	}
 	public Vector2 position => transform.position;
 	public BlockPos blockPos => level.ToBlockPos(this.position);
 	public ChunkBlockPos chunkBlockPos => blockPos.ToChunkBlockPos(level.ChunkXAt(position));
