@@ -33,8 +33,10 @@ public class PlayerController : MonoBehaviour {
 
 	public bool CanAttack { get; set; } = true;
 
-	public float Facing => Mathf.Sign(transform.localScale.x);
+	public float facing => Mathf.Sign(transform.localScale.x);
 	public Vector2 position => transform.position;
+	public BlockPos blockPos => level.ToBlockPos(this.position);
+	public ChunkBlockPos chunkBlockPos => blockPos.ToChunkBlockPos(level.ChunkXAt(position));
 
 	private void Awake() {
 		playerPhysics = gameObject.GetComponent<PlayerPhysics>();
@@ -48,7 +50,7 @@ public class PlayerController : MonoBehaviour {
 		}
 		itemUsageHandler.Register<IPlaceable>(ItemUseTrigger.LeftHold, (placeable, stack) => {
 			Level level = GameManager.instance.Level;
-			Vector2Int blockPos = level.ToBlockPos(inputHandler.MouseWorldPosition);
+			BlockPos blockPos = level.ToBlockPos(inputHandler.MouseWorldPosition);
 
 			if (level.TileAt(blockPos) == CommonTiles.air) {
 				level.SetBlockAndUpdate(blockPos, placeable.Place(stack, blockPos));
@@ -58,7 +60,7 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	private void Start() {
-		transform.SetPositionAndRotation(new(position.x, level.GetSurfaceY(position.x), transform.position.z), Quaternion.identity);
+		transform.SetPositionAndRotation(new(position.x, level.GetSurfaceY(blockPos.x), transform.position.z), Quaternion.identity);
 	}
 
 	private void Update() {

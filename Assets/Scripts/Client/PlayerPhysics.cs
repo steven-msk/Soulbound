@@ -15,7 +15,7 @@ public class PlayerPhysics : MonoBehaviour {
 	private InputHandler inputHandler;
 	private Rigidbody2D rb;
 	private Animator animator;
-	private CapsuleCollider2D collider;
+	new private CapsuleCollider2D collider;
 
 	public float movementSpeedPower = 30f;
 	public float knockbackStunDuration = 0.5f;
@@ -43,6 +43,12 @@ public class PlayerPhysics : MonoBehaviour {
 	[SerializeField] private float jumpToFlightTimer;
 
 	private void Awake() {
+		player = GameManager.instance.Player;
+		inputHandler = player.InputHandler;
+		rb = player.Rigidbody;
+		animator = player.Animator;
+		stats = player.Stats;
+		collider = this.GetComponent<CapsuleCollider2D>();
 		LogUtil.LogAwake(this);
 	}
 
@@ -52,13 +58,6 @@ public class PlayerPhysics : MonoBehaviour {
 	// button is held).
 
 	private void Start() {
-		player = GameManager.instance.Player;
-		inputHandler = player.InputHandler;
-		rb = player.Rigidbody;
-		animator = player.Animator;
-		stats = player.Stats;
-		collider = this.GetComponent<CapsuleCollider2D>();
-
 		collisionReactionsByTag.Add("Enemy", ((collision) => {
 			Vector2 bounce = (transform.position - (Vector3)collision.GetContact(0).point).normalized;
 			rb.linearVelocity = bounce * contactBouncePower;
@@ -96,7 +95,7 @@ public class PlayerPhysics : MonoBehaviour {
 				rb.linearVelocityX += stats.HorizontalAcceleration * movementSpeedPower * Time.fixedDeltaTime * movement.x;
 				float speedLimit = stats.MovementSpeed.GetProcessedValue();
 				if (Mathf.Abs(rb.linearVelocityX) > speedLimit) {
-					rb.linearVelocityX = player.Facing * speedLimit;
+					rb.linearVelocityX = player.facing * speedLimit;
 				}
 			} else {
 				float scaledFlightAcceleration = flightMovementPower * stats.HorizontalFlightAcceleration;

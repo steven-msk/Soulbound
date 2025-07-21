@@ -35,10 +35,8 @@ public class ItemDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 	}
 
 	public void OnPointerEnter(PointerEventData eventData) {
-		if (GameManager.instance.Player.Inventory.PopupOpen) {
-			tooltip.Show(eventData.position, this.GetComponent<RectTransform>());
-			tooltip.DisplayParent = gameObject;
-		}
+		tooltip.Show(eventData.position, this.GetComponent<RectTransform>());
+		tooltip.DisplayParent = gameObject;
 	}
 
 	public void OnPointerExit(PointerEventData eventData) {

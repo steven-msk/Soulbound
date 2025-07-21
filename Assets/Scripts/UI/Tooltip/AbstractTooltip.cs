@@ -14,9 +14,7 @@ public abstract class AbstractTooltip {
 	[CanBeNull] protected GameObject displayParent;
 	
 	public GameObject DisplayParent { get => displayParent; set => displayParent = value; }
-	// POTENTIAL: lazy init for tooltips' displayParent to improve performance;
-	// or
-	// POTENTIAL REFACTOR: change tooltip backend logic - Show, Hide, and Update
+	// PLANNED REFACTOR: CompoundTooltip implementation should be integrated in Tooltip to reduce concerns and confusion between tooltip types 
 
 	public bool IsDisplayed => tooltipPanel != null;
 

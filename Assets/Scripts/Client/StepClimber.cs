@@ -106,7 +106,7 @@ public class StepClimber : MonoBehaviour {
 			return false;
 		}
 		Vector2 stepUpPoint = new Vector2(stepTestContactPoint.point.x, hit.point.y + 0.0001f) + (stepTestInvDir * stepSearchOvershoot);
-		stepUpOffset = stepUpPoint - new Vector2(stepTestContactPoint.point.x, ground.point.y) + new Vector2(0.2f * player.Facing, 0);
+		stepUpOffset = stepUpPoint - new Vector2(stepTestContactPoint.point.x, ground.point.y) + new Vector2(0.2f * player.facing, 0);
 		return true;
 	}
 }

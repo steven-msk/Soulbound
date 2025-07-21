@@ -83,18 +83,7 @@ public class WorldChunk {
 		}
 	}
 
-	public Vector2Int ToChunkBlock(Vector2 pos) {
-		Level level = GameManager.instance.Level;
-		int chunkX = level.ChunkXAt(pos);
-		int chunkBlockX = Mathf.FloorToInt(pos.x - (chunkX * Level.CHUNK_LENGTH));
-		return new Vector2Int(chunkBlockX, Mathf.FloorToInt(pos.y));
-	}
+	public void SetTile(ChunkBlockPos chunkPos, TileBase tile) => tiles[chunkPos.x, WorldYToIndex(chunkPos.y)] = tile;
 
-	public Vector2Int ToWorldBlock(Vector2Int chunkPos) => new Vector2Int(chunkPos.x + this.x * Level.CHUNK_LENGTH, chunkPos.y);
-
-	public void SetTile(Vector2Int chunkPos, TileBase tile) => tiles[chunkPos.x, WorldYToIndex(chunkPos.y)] = tile;
-
-	public TileBase TileAt(Vector2Int chunkPos) => tiles[chunkPos.x, WorldYToIndex(chunkPos.y)];
-
-	public TileBase TileAt(Vector2 worldPos) => this.TileAt(this.ToChunkBlock(worldPos));
+	public TileBase TileAt(ChunkBlockPos chunkPos) => tiles[chunkPos.x, WorldYToIndex(chunkPos.y)];
 }

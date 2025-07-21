@@ -78,14 +78,13 @@ public class Level {
 		}
 	}
 
-	private void SetTileAndUpdate(Vector2Int tilePos, TileBase tile) {
+	public void SetBlockAndUpdate(BlockPos tilePos, Block block) {
 		WorldChunk chunk = this.ChunkAt(tilePos);
-		Vector2Int chunkPos = chunk.ToChunkBlock(tilePos);
-		chunk.SetTile(chunkPos, tile);
-		tilemap.SetTile((Vector3Int)tilePos, tile);
+		ChunkBlockPos chunkPos = tilePos.ToChunkBlockPos(chunk.xpos);
+		TileBase referenceTile = block.TileReference;
+		chunk.SetTile(chunkPos, referenceTile);
+		tilemap.SetTile((Vector3Int)tilePos.AsVector(), referenceTile);
 	}
-
-	public void SetBlockAndUpdate(Vector2Int blockPos, Block block) => this.SetTileAndUpdate(blockPos, block.TileReference);
 
 	public void UnloadDistantChunks(int playerChunkX, int viewDistance) {
 		List<WorldChunk> toRemove = new();
@@ -101,25 +100,28 @@ public class Level {
 		}
 	}
 
-	[CanBeNull] public TileBase TileAt(Vector2 worldPos) {
-		int chunkX = ChunkXAt(worldPos);
-		WorldChunk chunk = generatedChunks.GetValueOrDefault(chunkX, null);
+
+	[CanBeNull] public TileBase TileAt(BlockPos blockPos) {
+		WorldChunk chunk = ChunkAt(blockPos);
 		if (chunk != null) {
-			return chunk.TileAt(worldPos);
+			return chunk.TileAt(blockPos.ToChunkBlockPos(chunk.xpos));
 		}
-		Debug.LogError($"Cannot retrieve block at {worldPos.ToString()} because its not generated");
+		Debug.LogError($"Cannot retrieve block at {blockPos.ToString()} because its not generated");
 		return null;
 	}
 
 	public int ChunkXAt(Vector2 worldPos) => Mathf.FloorToInt(worldPos.x / CHUNK_LENGTH);
 
-	[CanBeNull] public WorldChunk ChunkAt(Vector2 worldPos) => generatedChunks.GetValueOrDefault(this.ChunkXAt(worldPos), null);
+	[CanBeNull] public WorldChunk ChunkAt(BlockPos blockPos) => generatedChunks.GetValueOrDefault(this.ChunkXAt(blockPos.AsVector()), null);
 
-	[CanBeNull] public WorldChunk ChunkAt(float xpos) => ChunkAt(new Vector2(xpos, 0));
+	[CanBeNull] public WorldChunk ChunkAt(int xpos) => ChunkAt(new BlockPos(xpos, 0));
 
-	public Vector2Int ToBlockPos(Vector2 worldPos) => (Vector2Int)grid.WorldToCell(worldPos);
+	public BlockPos ToBlockPos(Vector2 worldPos) { 
+		Vector2Int intPos = (Vector2Int)grid.WorldToCell(worldPos); 
+		return new BlockPos(intPos.x, intPos.y);
+	}
 
-	public int GetSurfaceY(Vector2 worldPos) => GetSurfaceY(worldPos.x);
+	public int GetSurfaceY(BlockPos blockPos) => GetSurfaceY(blockPos.x);
 
-	public int GetSurfaceY(float xpos) => this.ChunkAt(xpos)?.GenerationData.surfaceLevels[(int)xpos] ?? 0;
+	public int GetSurfaceY(int xpos) => this.ChunkAt(xpos)?.GenerationData.surfaceLevels[xpos] ?? 0;
 }
