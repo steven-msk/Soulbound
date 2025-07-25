@@ -25,8 +25,6 @@ public sealed class ItemUsageHandler {
 
 	public void Disable(params ItemUseTrigger[] triggers) => disabledTriggers.AddRange(triggers);
 
-	public void HandleInput(ItemUseTrigger trigger) => HandleInput(trigger, player.MainHandStack);
-
 	public void HandleInput(ItemUseTrigger trigger, ItemStack itemStack) {
 		if (itemStack == null || IsDisabled(trigger)) {
 			return;

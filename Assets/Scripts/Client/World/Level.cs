@@ -78,10 +78,10 @@ public class Level {
 		}
 	}
 
-	public void SetBlockAndUpdate(BlockPos tilePos, Block block) {
+	public void SetBlockAndUpdate(BlockPos tilePos, [CanBeNull] Block block) {
 		WorldChunk chunk = this.ChunkAt(tilePos);
 		ChunkBlockPos chunkPos = tilePos.ToChunkBlockPos(chunk.xpos);
-		TileBase referenceTile = block.TileReference;
+		TileBase referenceTile = block?.TileReference ?? CommonTiles.air;
 		chunk.SetTile(chunkPos, referenceTile);
 		tilemap.SetTile((Vector3Int)tilePos.AsVector(), referenceTile);
 	}

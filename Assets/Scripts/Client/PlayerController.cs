@@ -105,10 +105,24 @@ public class PlayerController : MonoBehaviour {
 	internal void OnRightClick() => InputHandler.RequestAction(ItemUseRequest(ItemUseTrigger.RightClick));
 
 	[InputAction("ItemUse", Priority = 5)]
-	internal void OnLeftHold() => InputHandler.RequestAction(ItemUseRequest(ItemUseTrigger.LeftHold));
+	internal void OnLeftHold() { 
+		if (MainHandStack != null) {
+			InputHandler.RequestAction(ItemUseRequest(ItemUseTrigger.LeftHold));
+		} else {		// placeholder
+			Debug.Log("empty hand");
+			Level level = GameManager.instance.Level;
+			BlockPos blockPos = level.ToBlockPos(inputHandler.MouseWorldPosition);
+
+			if (level.TileAt(blockPos) != CommonTiles.air) {
+				level.SetBlockAndUpdate(blockPos, null);
+			}
+		}
+	}
 
 	[InputAction("ItemUse", Priority = 5)]
 	internal void OnRightHold() => InputHandler.RequestAction(ItemUseRequest(ItemUseTrigger.RightHold));
 
-	private InputActionRequest ItemUseRequest(ItemUseTrigger useTrigger) => new InputActionRequest("ItemUse", 5, () => itemUsageHandler.HandleInput(useTrigger));
+	private InputActionRequest ItemUseRequest(ItemUseTrigger useTrigger) {
+		return new InputActionRequest("ItemUse", 5, () => itemUsageHandler.HandleInput(useTrigger, MainHandStack));
+	}
 }
