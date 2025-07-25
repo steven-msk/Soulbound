@@ -118,7 +118,7 @@ public class PlayerController : MonoBehaviour {
 				BlockPos blockPos = level.ToBlockPos(inputHandler.MouseWorldPosition);
 
 				if (this.IsInBlockReach(blockPos.AsVector()) && level.TileAt(blockPos) != CommonTiles.air) {
-					level.SetBlockAndUpdate(blockPos, null);
+					level.SetBlockAndUpdate(blockPos, Registry.Get<Block>("grass_block"));
 				}
 			}));
 		}

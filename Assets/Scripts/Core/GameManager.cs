@@ -46,6 +46,7 @@ public class GameManager : MonoBehaviour {
 		Registry.RegisterAll<GameObject>("Registry/Prefabs");
 		Registry.RegisterAll<Tile>("Registry/Tiles");
 		Registry.RegisterAll<RuleTile>("Registry/Tiles");
+		Registry.RegisterAll<Block>("Registry/Blocks");
 	}
 
 	IEnumerator GameTickLoop() {
