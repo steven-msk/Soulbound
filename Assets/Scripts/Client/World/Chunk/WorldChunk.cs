@@ -42,9 +42,9 @@ public class WorldChunk {
 				TileBase tile = default(TileBase);
 				if (y > groundHeight) {
 					tile = CommonTiles.air;
-				} else if (y <= groundHeight && y >= groundHeight - 1) {
+				} else if (y == groundHeight) {
 					tile = CommonTiles.grass;
-				} else if (y < groundHeight - 1 && y >= undergroundHeight) {
+				} else if (y < groundHeight && y >= undergroundHeight) {
 					tile = CommonTiles.dirt;
 				} else {
 					tile = CommonTiles.stone;
