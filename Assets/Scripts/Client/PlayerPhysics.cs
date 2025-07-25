@@ -16,6 +16,7 @@ public class PlayerPhysics : MonoBehaviour {
 	private Rigidbody2D rb;
 	private Animator animator;
 	new private CapsuleCollider2D collider;
+	public CapsuleCollider2D Collider => collider;
 
 	public float movementSpeedPower = 30f;
 	public float knockbackStunDuration = 0.5f;

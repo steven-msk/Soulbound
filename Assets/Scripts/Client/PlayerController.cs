@@ -115,10 +115,11 @@ public class PlayerController : MonoBehaviour {
 		} else {		// placeholder
 			InputHandler.RequestAction(new InputActionRequest("BlockBreak", 5, () => {
 				Level level = GameManager.instance.Level;
-				BlockPos blockPos = level.ToBlockPos(inputHandler.MouseWorldPosition);
+				Vector2 worldMousePos = inputHandler.MouseWorldPosition;
+				BlockPos blockPos = level.ToBlockPos(worldMousePos);
 
-				if (this.IsInBlockReach(blockPos.AsVector()) && level.TileAt(blockPos) != CommonTiles.air) {
-					level.SetBlockAndUpdate(blockPos, Registry.Get<Block>("grass_block"));
+				if (this.IsInBlockReach(worldMousePos) && level.TileAt(blockPos) != CommonTiles.air) {
+					level.SetBlockAndUpdate(blockPos, null);
 				}
 			}));
 		}
@@ -132,6 +133,7 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	public bool IsInBlockReach(Vector2 worldPos) {
-		return Vector2.Distance(worldPos, this.position) <= MaxBlockReach;
+		float dist = Vector2.Distance(worldPos, this.position);
+		return dist <= MaxBlockReach && dist > 1.5f;
 	}
 }

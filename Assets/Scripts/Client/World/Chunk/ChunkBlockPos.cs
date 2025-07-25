@@ -22,5 +22,5 @@ public struct ChunkBlockPos {
 
 	public int WorldYToIndex() => WorldYToIndex(this.y);
 
-	public static int WorldYToIndex(int worldY) => worldY - WorldChunk.maxY; 
+	public static int WorldYToIndex(int worldY) => worldY - WorldChunk.maxY;
 }

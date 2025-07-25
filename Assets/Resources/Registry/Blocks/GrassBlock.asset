@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: GrassBlock
   m_EditorClassIdentifier: 
   blockName: Grass Block
+  blockID: grass_block
   tileReference: {fileID: 11400000, guid: a9a23760174cd0f4680bebdad7e681ef, type: 2}

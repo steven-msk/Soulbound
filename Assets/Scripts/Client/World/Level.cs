@@ -17,7 +17,7 @@ public class Level {
 	public const int WORLD_HEIGHT = 300;
 	public const int SURFACE_TO_UNDERGROUND_DELIMITER = WORLD_HEIGHT / 2;
 	
-	private readonly int seed;
+	public int seed { get; private set; }
 	private readonly PerlinNoiseGenerator1D heightGenerator;
 	private Dictionary<int, WorldChunk> loadedChunks = new();
 	private Dictionary<int, WorldChunk> generatedChunks = new();
@@ -77,6 +77,7 @@ public class Level {
 			}
 		}
 	}
+
 
 	public void SetBlockAndUpdate(BlockPos tilePos, [CanBeNull] Block block) {
 		WorldChunk chunk = this.ChunkAt(tilePos);
