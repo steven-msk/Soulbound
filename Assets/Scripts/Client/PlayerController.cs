@@ -109,13 +109,14 @@ public class PlayerController : MonoBehaviour {
 		if (MainHandStack != null) {
 			InputHandler.RequestAction(ItemUseRequest(ItemUseTrigger.LeftHold));
 		} else {		// placeholder
-			Debug.Log("empty hand");
-			Level level = GameManager.instance.Level;
-			BlockPos blockPos = level.ToBlockPos(inputHandler.MouseWorldPosition);
+			InputHandler.RequestAction(new InputActionRequest("BlockBreak", 5, () => {
+				Level level = GameManager.instance.Level;
+				BlockPos blockPos = level.ToBlockPos(inputHandler.MouseWorldPosition);
 
-			if (level.TileAt(blockPos) != CommonTiles.air) {
-				level.SetBlockAndUpdate(blockPos, null);
-			}
+				if (level.TileAt(blockPos) != CommonTiles.air) {
+					level.SetBlockAndUpdate(blockPos, null);
+				}
+			}));
 		}
 	}
 
