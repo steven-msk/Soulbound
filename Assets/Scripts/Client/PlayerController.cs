@@ -46,6 +46,8 @@ public class PlayerController : MonoBehaviour {
 	public BlockPos blockPos => level.ToBlockPos(this.position);
 	public ChunkBlockPos chunkBlockPos => blockPos.ToChunkBlockPos(level.ChunkXAt(position));
 
+	public float MaxBlockReach => 5f;
+
 	private void Awake() {
 		playerPhysics = gameObject.GetComponent<PlayerPhysics>();
 		itemUsageHandler = new ItemUsageHandler(this);
@@ -60,7 +62,7 @@ public class PlayerController : MonoBehaviour {
 			Level level = GameManager.instance.Level;
 			BlockPos blockPos = level.ToBlockPos(inputHandler.MouseWorldPosition);
 
-			if (level.TileAt(blockPos) == CommonTiles.air) {
+			if (this.IsInBlockReach(blockPos.AsVector()) && level.TileAt(blockPos) == CommonTiles.air) {
 				level.SetBlockAndUpdate(blockPos, placeable.Place(stack, blockPos));
 			}
 		});
@@ -104,6 +106,8 @@ public class PlayerController : MonoBehaviour {
 	[InputAction("ItemUse", Priority = 5)]
 	internal void OnRightClick() => InputHandler.RequestAction(ItemUseRequest(ItemUseTrigger.RightClick));
 
+	// POTENTIAL FEATUREIMPL: add Reach int stat
+
 	[InputAction("ItemUse", Priority = 5)]
 	internal void OnLeftHold() { 
 		if (MainHandStack != null) {
@@ -113,7 +117,7 @@ public class PlayerController : MonoBehaviour {
 				Level level = GameManager.instance.Level;
 				BlockPos blockPos = level.ToBlockPos(inputHandler.MouseWorldPosition);
 
-				if (level.TileAt(blockPos) != CommonTiles.air) {
+				if (this.IsInBlockReach(blockPos.AsVector()) && level.TileAt(blockPos) != CommonTiles.air) {
 					level.SetBlockAndUpdate(blockPos, null);
 				}
 			}));
@@ -125,5 +129,9 @@ public class PlayerController : MonoBehaviour {
 
 	private InputActionRequest ItemUseRequest(ItemUseTrigger useTrigger) {
 		return new InputActionRequest("ItemUse", 5, () => itemUsageHandler.HandleInput(useTrigger, MainHandStack));
+	}
+
+	public bool IsInBlockReach(Vector2 worldPos) {
+		return Vector2.Distance(worldPos, this.position) <= MaxBlockReach;
 	}
 }
