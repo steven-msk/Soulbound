@@ -8,7 +8,6 @@ using UnityEngine;
 public static class Registry {
 	static Dictionary<string, Object> resources = new();
 
-	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)] 
 	public static void Reset() => resources = new();
 
 	public static T Register<T>(T resource) where T : Object {
@@ -25,7 +24,7 @@ public static class Registry {
 		if (resources.ContainsKey(ID)) {
 			return (T)resources[ID];
 		}
-		Debug.LogError($"Could not find resource '{ID}' in registry");
+		Debug.LogError($"Could not find resource '{ID}' in registry"); 
 		return (T)resources.GetValueOrDefault(ID, default);
 	}
 

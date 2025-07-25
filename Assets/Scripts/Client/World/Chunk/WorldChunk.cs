@@ -34,16 +34,18 @@ public class WorldChunk {
 			float heightNoise = heightGenerator.GenerateNoise1D(worldX);
 			int groundHeight = Mathf.FloorToInt(heightNoise * SURFACE_HEIGHT_RANGE);
 			int undergroundHeight = Mathf.FloorToInt(heightNoise * UNDERGROUND_HEIGHT_RANGE);
-			surfaceLevels.Add(worldX, groundHeight + 1);
+			surfaceLevels.Add(worldX, groundHeight + 2);
 
 			highestStone = Mathf.Max(highestStone, undergroundHeight);
 			for (int y = minY; y < maxY; y++) {
 				int yIndex = WorldYToIndex(y);
 				TileBase tile = default(TileBase);
-				if (y >= groundHeight) {
+				if (y > groundHeight) {
 					tile = CommonTiles.air;
-				} else if (y < groundHeight && y >= undergroundHeight) {
+				} else if (y <= groundHeight && y >= groundHeight - 1) {
 					tile = CommonTiles.grass;
+				} else if (y < groundHeight - 1 && y >= undergroundHeight) {
+					tile = CommonTiles.dirt;
 				} else {
 					tile = CommonTiles.stone;
 				}
@@ -71,7 +73,18 @@ public class WorldChunk {
 					() => Debug.LogError($"Attempted to render ungenerated terrain! pos: ({x}, {y}) at chunk {this.x}"));
 			}
 		}
+		this.RefreshTiles(tilemap);
 		outlineRenderer.ShowOutline(this);
+	}
+
+	public void RefreshTiles(Tilemap tilemap) {
+		int xStart = x * Level.CHUNK_LENGTH;
+		for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
+			for (int y = minY; y < maxY; y++) {
+				int yIndex = WorldYToIndex(y);
+				tilemap.RefreshTile(new Vector3Int(xStart + x, y, 0));
+			}
+		}
 	}
 
 	public void Unload(Tilemap tilemap, ChunkOutlineRenderer outlineRenderer) {

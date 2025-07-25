@@ -25,20 +25,27 @@ public class GameManager : MonoBehaviour {
 	private void Awake() {
 		instance = this;
 
-		Registry.RegisterAll<TMP_FontAsset>("Registry/Fonts");
-		Registry.RegisterAll<Item>("Registry/Items");
-		Registry.RegisterAll<GameObject>("Registry/Prefabs");
-		Registry.RegisterAll<Tile>("Registry/Tiles");
-		Registry.RegisterAll<RuleTile>("Registry/Tiles");
+		ResetRegistries();
 
-		int seed = 10090;           // UnityEngine.Random.Range(int.MinValue, int.MaxValue)
+		int seed = UnityEngine.Random.Range(int.MinValue, int.MaxValue);           // UnityEngine.Random.Range(int.MinValue, int.MaxValue)
 		this.level = new Level(Player, worldTilemap, GameObject.Find("Grid").GetComponent<Grid>(), seed, renderDistance: 2);
 		this.level.EarlyGenerateChunks(Player.position);
 		LogUtil.LogAwake(this);
 	}
 
+	private void OnValidate() => ResetRegistries();
+
 	private void Start() {
 		StartCoroutine(GameTickLoop());
+	}
+
+	private void ResetRegistries() {
+		Registry.Reset();
+		Registry.RegisterAll<TMP_FontAsset>("Registry/Fonts");
+		Registry.RegisterAll<Item>("Registry/Items");
+		Registry.RegisterAll<GameObject>("Registry/Prefabs");
+		Registry.RegisterAll<Tile>("Registry/Tiles");
+		Registry.RegisterAll<RuleTile>("Registry/Tiles");
 	}
 
 	IEnumerator GameTickLoop() {
@@ -61,6 +68,5 @@ public class GameManager : MonoBehaviour {
 	private void OnApplicationQuit() {
 		EventBus<GameEvent>.Clear();
 		EventBus<SystemEvent>.Clear();
-		Registry.Reset();
 	}
 }
