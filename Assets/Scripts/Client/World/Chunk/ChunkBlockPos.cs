@@ -16,6 +16,12 @@ public struct ChunkBlockPos {
 		this.chunkX = chunkX;
 	}
 
+	public static ChunkBlockPos FromBlockPos(BlockPos blockPos) {
+		int chunkX = Mathf.FloorToInt((float)blockPos.x / Level.CHUNK_LENGTH);
+		int localX = blockPos.x - chunkX * Level.CHUNK_LENGTH;
+		return new ChunkBlockPos(localX, blockPos.y, chunkX);
+	}
+
 	public override string ToString() => $"cx:{x}, cy:{y}, c:{chunkX}";
 
 	public BlockPos ToWorldBlockPos() => new BlockPos(this.x + this.chunkX * Level.CHUNK_LENGTH, this.y);

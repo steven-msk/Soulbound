@@ -15,8 +15,8 @@ public class WorldChunk {
 	public const float SURFACE_HEIGHT_RANGE = 50f;
 	public const float UNDERGROUND_HEIGHT_RANGE = 20f;
 
-	private ChunkGenerationData generationData;
-	public ChunkGenerationData GenerationData => generationData;
+	private ChunkHeightmapData heightmapData;
+	public ChunkHeightmapData HeightmapData => heightmapData;
 
 	private int x;
 	public int xpos => x;
@@ -26,10 +26,8 @@ public class WorldChunk {
 
 	public WorldChunk(int x) => this.x = x;
 
-	// TODO: implement BlockPos and ChunkBlock to differentiate between world-relative block and chunk-relative block
-
 	// PLANNED REFACTOR: chunk generation logic - required when introducing biomes
-	public ChunkGenerationData Generate(INoiseGenerator1D heightGenerator) {
+	public ChunkHeightmapData GenerateHeightmap(INoiseGenerator1D heightGenerator) {
 		int startX = x * Level.CHUNK_LENGTH;
 		Dictionary<int, int> surfaceLevels = new();
 		int highestStone = 0;
@@ -59,54 +57,8 @@ public class WorldChunk {
 			}
 		}
 
-		// TODO: factor out tree generation algorithm
-
-		int minHeight = 5;
-		int maxHeight = 20;
-		int crownRadius = 2;
-		float treeFrequency = 0.5f;
-		float treeDisparity = 0.5f;
-		Tile woodTile = Registry.Get<Tile>("wood");
-		Tile leafTile = Registry.Get<Tile>("leaf");
-		HashSet<ChunkBlockPos> placedTrees = new();
-		for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
-			float treeNoise = Mathf.PerlinNoise(cx * treeFrequency, level.seed);
-			Debug.Log(treeNoise);
-			if (treeNoise > treeDisparity) {
-				ChunkBlockPos treeOrigin = new(cx, surfaceLevels[cx + (this.x * Level.CHUNK_LENGTH)], this.x);
-				ChunkBlockPos trunkPos = new ChunkBlockPos(treeOrigin.x, treeOrigin.y, this.x);
-
-				for (int ty = 0; ty < Random.Range(minHeight, maxHeight + 1); ty++) {
-					SetTile(trunkPos, woodTile);
-					trunkPos.y++;
-				}
-				Dictionary<int, List<int>> rowToXs = new();
-				float angularStep = 1f;
-
-				for (float angle = 0; angle < 360f; angle += angularStep) {
-					float rad = angle * Mathf.Deg2Rad;
-					int x = Mathf.RoundToInt(trunkPos.x + crownRadius * Mathf.Cos(rad));
-					int y = Mathf.RoundToInt(trunkPos.y + crownRadius * Mathf.Sin(rad));
-					if (!rowToXs.ContainsKey(y)) {
-						rowToXs[y] = new List<int>();
-					}
-					rowToXs[y].Add(x);
-				}
-				foreach (var kvp in rowToXs) {
-					int y = kvp.Key;
-					List<int> xs = kvp.Value;
-					for (int x = xs.Min(); x <= xs.Max(); x++) {
-						ChunkBlockPos leafPos = new(x, y, this.x);
-						try {
-							InvocationHelper.If(TileAt(leafPos) == CommonTiles.air, () => SetTile(leafPos, leafTile));
-						} catch(IndexOutOfRangeException) {}
-					}
-				}
-			}
-		}
-
-		ChunkGenerationData generationData = new ChunkGenerationData(surfaceLevels, highestStone);
-		this.generationData = generationData;
+		ChunkHeightmapData generationData = new ChunkHeightmapData(surfaceLevels, highestStone);
+		this.heightmapData = generationData;
 		return generationData;
 	}
 

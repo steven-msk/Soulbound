@@ -14,12 +14,14 @@ public struct BlockPos {
 		this.y = y;
 	}
 
+	public static BlockPos FromWorld(Vector2 worldPos) => GameManager.instance.Level.ToBlockPos(worldPos);
+
 	public override string ToString() => $"bx:{x}, by:{y}";
 
 	public ChunkBlockPos ToChunkBlockPos(int chunkX) {
 		Level level = GameManager.instance.Level;
 		int chunkBlockX = Mathf.FloorToInt(this.x - (chunkX * Level.CHUNK_LENGTH));
-		return new ChunkBlockPos(chunkBlockX, Mathf.FloorToInt(this.y), chunkX);
+		return new ChunkBlockPos(chunkBlockX, this.y, chunkX);
 	}
 
 	public Vector2Int AsVector() => new Vector2Int(this.x, this.y);
