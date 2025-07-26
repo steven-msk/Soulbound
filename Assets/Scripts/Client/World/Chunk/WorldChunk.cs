@@ -98,6 +98,7 @@ public class WorldChunk {
 				tilemap.SetTile(new Vector3Int(xStart + x, y, 0), null);
 			}
 		}
+		outlineRenderer.HideOutline(this);
 	}
 
 	public void SetTile(ChunkBlockPos chunkPos, TileBase tile) => tiles[chunkPos.x, WorldYToIndex(chunkPos.y)] = tile;

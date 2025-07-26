@@ -18,12 +18,16 @@ public struct TerrainFeature {
 	}
 
 	public void OverrideTiles() {
+		Level level = GameManager.instance.Level;
+
 		foreach (var tileOverride in tileOverrides) {
 			ChunkBlockPos chunkBlockPos = tileOverride.Key;
 			TileBase tile = tileOverride.Value;
-			WorldChunk chunk = GameManager.instance.Level.ChunkAt(chunkBlockPos.ToWorldBlockPos());
-			//Debug.Log(chunkBlockPos);
-			chunk?.SetTile(chunkBlockPos, tile);
+			WorldChunk chunk = level.ChunkAt(chunkBlockPos.ToWorldBlockPos());
+			//Debug.Log(chunkBlockPos.ToWorldBlockPos() + $", chunkPos [{chunkBlockPos}]"+", chunk "+ chunk?.xpos);
+			InvocationHelper.IfElse(chunk == null, 
+				() => level.PendUpdate(chunkBlockPos.chunkX, chunkBlockPos, tile), 
+				() => chunk.SetTile(chunkBlockPos, tile));
 		}
 	}
 }

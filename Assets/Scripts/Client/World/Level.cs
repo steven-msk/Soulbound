@@ -1,29 +1,23 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using JetBrains.Annotations;
-using Unity.Mathematics;
-using Unity.VisualScripting;
-using UnityEditor.Tilemaps;
 using UnityEngine;
-using UnityEngine.InputSystem.XR;
 using UnityEngine.Tilemaps;
+using static Unity.Collections.AllocatorManager;
 using Random = UnityEngine.Random;
 
 public class Level {
 	public const int CHUNK_LENGTH = 32;
 	public const int WORLD_HEIGHT = 300;
 	public const int SURFACE_TO_UNDERGROUND_DELIMITER = WORLD_HEIGHT / 2;
-	
+
 	public readonly int seed;
 	private readonly PerlinNoiseGenerator1D heightGenerator;
 	private Dictionary<int, WorldChunk> loadedChunks = new();
 	private Dictionary<int, WorldChunk> generatedChunks = new();
 	private ChunkOutlineRenderer chunkOutlineRenderer = new();
 	private Dictionary<int, List<TerrainFeature>> features = new();
+	private Dictionary<int, List<(ChunkBlockPos chunkBlockPos, TileBase tile)>> pendingUpdates = new();
 	private int renderDistance;
 
 	private Grid grid;
@@ -52,10 +46,7 @@ public class Level {
 		int playerChunkX = ChunkXAt(playerPos);
 		for (int dx = -renderDistance; dx <= renderDistance; dx++) {
 			int chunkX = playerChunkX + dx;
-			WorldChunk chunk = new(chunkX);
-			ChunkHeightmapData heightmapData = chunk.GenerateHeightmap(this.heightGenerator);
-			generatedChunks[chunkX] = chunk;
-			this.prototype_GenerateTreeFeatures(chunk, heightmapData);
+			this.GenerateNewChunk(chunkX);
 		}
 	}
 
@@ -75,10 +66,6 @@ public class Level {
 				features[chunkX].Add(treeFeature);
 			}
 		}
-
-		foreach (var chunkFeatures in features.Values) {
-			chunkFeatures.ForEach(feature => feature.OverrideTiles());
-		}
 	}
 
 	public void UpdateChunks(Vector2 playerPos) {
@@ -90,9 +77,12 @@ public class Level {
 			if (!loadedChunks.ContainsKey(chunkX)) {
 				WorldChunk chunk = new(chunkX);
 				if (!generatedChunks.ContainsKey(chunkX)) {
-					ChunkHeightmapData heightmapData = chunk.GenerateHeightmap(this.heightGenerator);
+					chunk = this.GenerateNewChunk(chunkX);
 					generatedChunks[chunkX] = chunk;
-					this.prototype_GenerateTreeFeatures(chunk, heightmapData);
+					if (pendingUpdates.TryGetValue(chunkX, out var tileUpdates)) {
+						tileUpdates.ForEach(tileUpdate => chunk.SetTile(tileUpdate.chunkBlockPos, tileUpdate.tile));
+						pendingUpdates.Remove(chunkX);
+					}
 				} else {
 					chunk = generatedChunks[chunkX];
 				}
@@ -100,6 +90,35 @@ public class Level {
 				chunk.Render(tilemap, chunkOutlineRenderer);
 			}
 		}
+	}
+
+	private WorldChunk GenerateNewChunk(int chunkX) {
+		WorldChunk chunk = new(chunkX);
+		ChunkHeightmapData heightmapData = chunk.GenerateHeightmap(this.heightGenerator);
+		generatedChunks[chunkX] = chunk;
+		this.prototype_GenerateTreeFeatures(chunk, heightmapData);
+
+		List<TerrainFeature> newFeatures = new();
+		foreach (var chunkFeatures in features.Values) {
+			newFeatures.AddRange(chunkFeatures.Where(feature => feature.origin.chunkX == chunkX));
+		}
+
+		newFeatures.ForEach(feature => {
+			foreach (var tileOverride in feature.tileOverrides) {
+				ChunkBlockPos chunkBlockPos = tileOverride.Key;
+				TileBase tile = tileOverride.Value;
+				WorldChunk chunk = ChunkAt(chunkBlockPos.ToWorldBlockPos());
+				if (chunk == null) {
+					PendUpdate(chunkX, chunkBlockPos, tile);
+					Debug.Log(chunkBlockPos);
+				} else if (loadedChunks.ContainsKey(chunkBlockPos.chunkX) && chunk != null) {
+					SetTileAndUpdate(chunkBlockPos, tile);
+				} else {
+					chunk.SetTile(chunkBlockPos, tile);
+				}
+			}
+		});
+		return chunk;
 	}
 
 	public TerrainFeature GenerateTerrainFeature(TerrainFeatureType type, int chunkBlockX, int chunkX, ChunkHeightmapData heightmapData) {
@@ -149,12 +168,35 @@ public class Level {
 		}
 	}
 
-	public void SetBlockAndUpdate(BlockPos tilePos, [CanBeNull] Block block) {
+	public void SetBlockAndUpdate(BlockPos tilePos, [CanBeNull] Block block) => this.SetTileAndUpdate(tilePos, block?.TileReference ?? CommonTiles.air);
+
+	public void SetTileAndUpdate(BlockPos tilePos, TileBase tile) {
 		WorldChunk chunk = this.ChunkAt(tilePos);
 		ChunkBlockPos chunkPos = tilePos.ToChunkBlockPos(chunk.xpos);
-		TileBase referenceTile = block?.TileReference ?? CommonTiles.air;
-		chunk.SetTile(chunkPos, referenceTile);
-		tilemap.SetTile((Vector3Int)tilePos.AsVector(), referenceTile);
+		chunk.SetTile(chunkPos, tile);
+		tilemap.SetTile((Vector3Int)tilePos.AsVector(), tile);
+	}
+
+	public void SetTileAndUpdate(ChunkBlockPos chunkBlockPos, TileBase tile) {
+		BlockPos blockPos = chunkBlockPos.ToWorldBlockPos();
+		WorldChunk chunk = this.ChunkAt(blockPos);
+		chunk.SetTile(chunkBlockPos, tile);
+		tilemap.SetTile((Vector3Int)blockPos.AsVector(), tile);
+	}
+
+	public void PendUpdates(int chunkX, List<(ChunkBlockPos chunkBlockpos, TileBase tile)> tileUpdates) {
+		if (pendingUpdates.ContainsKey(chunkX)) {
+			pendingUpdates[chunkX].AddRange(tileUpdates);
+		} else {
+			pendingUpdates.Add(chunkX, tileUpdates);
+		}
+	}
+
+	public void PendUpdate(int chunkX, ChunkBlockPos chunkBlockPos, TileBase tileUpdate) {
+		if (!pendingUpdates.ContainsKey(chunkX)) {
+			pendingUpdates[chunkX] = new List<(ChunkBlockPos chunkBlockPos, TileBase tile)>();
+		}
+		pendingUpdates[chunkX].Add((chunkBlockPos, tileUpdate));
 	}
 
 	public void UnloadDistantChunks(int playerChunkX, int viewDistance) {
@@ -166,13 +208,13 @@ public class Level {
 		}
 		foreach (WorldChunk chunk in toRemove) {
 			loadedChunks.Remove(chunk.xpos);
-			chunkOutlineRenderer.HideOutline(chunk);
 			chunk.Unload(tilemap, chunkOutlineRenderer);
+			Debug.Log($"unloaded chunk at x: {chunk.xpos}");
 		}
 	}
 
-
-	[CanBeNull] public TileBase TileAt(BlockPos blockPos) {
+	[CanBeNull]
+	public TileBase TileAt(BlockPos blockPos) {
 		WorldChunk chunk = ChunkAt(blockPos);
 		if (chunk != null) {
 			return chunk.TileAt(blockPos.ToChunkBlockPos(chunk.xpos));
@@ -189,8 +231,8 @@ public class Level {
 
 	[CanBeNull] public WorldChunk ChunkAt(int xpos) => ChunkAt(new BlockPos(xpos, 0));
 
-	public BlockPos ToBlockPos(Vector2 worldPos) { 
-		Vector2Int intPos = (Vector2Int)grid.WorldToCell(worldPos); 
+	public BlockPos ToBlockPos(Vector2 worldPos) {
+		Vector2Int intPos = (Vector2Int)grid.WorldToCell(worldPos);
 		return new BlockPos(intPos.x, intPos.y);
 	}
 
