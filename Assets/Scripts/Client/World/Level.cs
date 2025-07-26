@@ -98,26 +98,23 @@ public class Level {
 		generatedChunks[chunkX] = chunk;
 		this.prototype_GenerateTreeFeatures(chunk, heightmapData);
 
-		List<TerrainFeature> newFeatures = new();
 		foreach (var chunkFeatures in features.Values) {
-			newFeatures.AddRange(chunkFeatures.Where(feature => feature.origin.chunkX == chunkX));
-		}
-
-		newFeatures.ForEach(feature => {
-			foreach (var tileOverride in feature.tileOverrides) {
-				ChunkBlockPos chunkBlockPos = tileOverride.Key;
-				TileBase tile = tileOverride.Value;
-				WorldChunk chunk = ChunkAt(chunkBlockPos.ToWorldBlockPos());
-				if (chunk == null) {
-					PendUpdate(chunkX, chunkBlockPos, tile);
-					Debug.Log(chunkBlockPos);
-				} else if (loadedChunks.ContainsKey(chunkBlockPos.chunkX) && chunk != null) {
-					SetTileAndUpdate(chunkBlockPos, tile);
-				} else {
-					chunk.SetTile(chunkBlockPos, tile);
+			List<TerrainFeature> newFeatures = chunkFeatures.Where(feature => feature.origin.chunkX == chunkX).ToList();
+			newFeatures.ForEach(feature => {
+				foreach (var tileOverride in feature.tileOverrides) {
+					ChunkBlockPos chunkBlockPos = tileOverride.Key;
+					TileBase tile = tileOverride.Value;
+					WorldChunk chunk = ChunkAt(chunkBlockPos.ToWorldBlockPos());
+					if (chunk == null) {
+						PendUpdate(chunkBlockPos.chunkX, chunkBlockPos, tile);
+					} else if (loadedChunks.ContainsKey(chunkBlockPos.chunkX) && chunk != null) {
+						SetTileAndUpdate(chunkBlockPos, tile);
+					} else {
+						chunk.SetTile(chunkBlockPos, tile);
+					}
 				}
-			}
-		});
+			});
+		}
 		return chunk;
 	}
 
@@ -209,7 +206,6 @@ public class Level {
 		foreach (WorldChunk chunk in toRemove) {
 			loadedChunks.Remove(chunk.xpos);
 			chunk.Unload(tilemap, chunkOutlineRenderer);
-			Debug.Log($"unloaded chunk at x: {chunk.xpos}");
 		}
 	}
 
