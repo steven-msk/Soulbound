@@ -1,9 +1,10 @@
-﻿using System;
+﻿using JetBrains.Annotations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.WSA;
 using static Unity.Collections.AllocatorManager;
 using Random = UnityEngine.Random;
 
@@ -18,7 +19,7 @@ public class Level {
 	private Dictionary<int, WorldChunk> generatedChunks = new();
 	private ChunkOutlineRenderer chunkOutlineRenderer = new();
 	private Dictionary<int, List<TerrainFeature>> features = new();
-	private Dictionary<int, List<(ChunkBlockPos chunkBlockPos, TileBase tile)>> pendingUpdates = new();
+	private Dictionary<int, List<(ChunkBlockPos chunkBlockPos, BlockState state)>> pendingUpdates = new();
 	private int renderDistance;
 
 	private Grid grid;
@@ -80,8 +81,8 @@ public class Level {
 				if (!generatedChunks.ContainsKey(chunkX)) {
 					chunk = this.GenerateNewChunk(chunkX);
 					generatedChunks[chunkX] = chunk;
-					if (pendingUpdates.TryGetValue(chunkX, out var tileUpdates)) {
-						tileUpdates.ForEach(tileUpdate => chunk.SetTile(tileUpdate.chunkBlockPos, tileUpdate.tile));
+					if (pendingUpdates.TryGetValue(chunkX, out var stateUpdates)) {
+						stateUpdates.ForEach(stateUpdate => chunk.SetBlock(stateUpdate.chunkBlockPos, stateUpdate.state));
 						pendingUpdates.Remove(chunkX);
 					}
 				} else {
@@ -91,10 +92,6 @@ public class Level {
 				chunk.Render(tilemap, chunkOutlineRenderer);
 			}
 		}
-
-		Debug.Log(FeatureAt(player.blockPos, out TerrainFeature feature)
-			? $"{feature}"
-			: $"No feature at {ChunkBlockPos.FromBlockPos(player.blockPos)}");
     }
 
 	private WorldChunk GenerateNewChunk(int chunkX) {
@@ -106,16 +103,16 @@ public class Level {
 		foreach (var chunkFeatures in features.Values) {
 			List<TerrainFeature> newFeatures = chunkFeatures.Where(feature => feature.origin.chunkX == chunkX).ToList();
 			newFeatures.ForEach(feature => {
-				foreach (var tileOverride in feature.tileOverrides) {
-					ChunkBlockPos chunkBlockPos = tileOverride.Key;
-					TileBase tile = tileOverride.Value;
+				foreach (var stateOverride in feature.stateOverrides) {
+					ChunkBlockPos chunkBlockPos = stateOverride.Key;
+					BlockState blockState = stateOverride.Value;
 					WorldChunk chunk = ChunkAt(chunkBlockPos.ToWorldBlockPos());
 					if (chunk == null) {
-						PendUpdate(chunkBlockPos.chunkX, chunkBlockPos, tile);
+						PendUpdate(chunkBlockPos.chunkX, chunkBlockPos, blockState);
 					} else if (loadedChunks.ContainsKey(chunkBlockPos.chunkX) && chunk != null) {
-						SetTileAndUpdate(chunkBlockPos, tile);
+						SetBlockAndUpdate(chunkBlockPos, blockState);
 					} else {
-						chunk.SetTile(chunkBlockPos, tile);
+						chunk.SetBlock(chunkBlockPos, blockState);
 					}
 				}
 			});
@@ -129,15 +126,15 @@ public class Level {
 				int minHeight = 5;
 				int maxHeight = 20;
 				int crownRadius = 2;
-				Tile woodTile = Registry.Get<Tile>("wood");
-				Tile leafTile = Registry.Get<Tile>("leaf");
+				BlockState woodTile = new BlockState(Blocks.wood);
+                BlockState leafTile = new BlockState(Blocks.leaf);
 
 				ChunkBlockPos treeOrigin = new(chunkBlockX, heightmapData.surfaceLevels[ToWorldX(chunkBlockX, chunkX)], chunkX);
 				ChunkBlockPos trunkPos = new ChunkBlockPos(treeOrigin.x, treeOrigin.y, chunkX);
-				Dictionary<ChunkBlockPos, TileBase> tileOverrides = new();
+				Dictionary<ChunkBlockPos, BlockState> stateOverrides = new();
 
 				for (int ty = 0; ty < Random.Range(minHeight, maxHeight + 1); ty++) {
-					tileOverrides[trunkPos] = woodTile;
+					stateOverrides[trunkPos] = woodTile;
 					trunkPos.y++;
 				}
 
@@ -158,11 +155,11 @@ public class Level {
 					for (int x = xs.Min(); x <= xs.Max(); x++) {
 						BlockPos blockPos = new(ToWorldX(x, chunkX), y);
 						ChunkBlockPos leafChunkPos = blockPos.ToChunkBlockPos(ChunkXAt(blockPos.x));
-						tileOverrides[leafChunkPos] = leafTile;
+						stateOverrides[leafChunkPos] = leafTile;
 					}
 				}
 
-				TerrainFeature feature = new(treeOrigin, type, tileOverrides);
+				TerrainFeature feature = new(treeOrigin, type, stateOverrides);
 				return feature;
 			}
 
@@ -175,44 +172,37 @@ public class Level {
 		if (features.TryGetValue(chunkX, out var chunkFeatures)) {
 			ChunkBlockPos chunkBlockPos = blockPos.ToChunkBlockPos(chunkX);
 			feature = chunkFeatures.FirstOrDefault(f => f.origin == chunkBlockPos);
-			if (!feature.UncheckedExistence()) {
-				feature = chunkFeatures.FirstOrDefault(f => f.tileOverrides.ContainsKey(chunkBlockPos));
+			if (!feature.PersistentExistence()) {
+				feature = chunkFeatures.FirstOrDefault(f => f.stateOverrides.ContainsKey(chunkBlockPos));
 			}
-            return feature.UncheckedExistence();
+            return feature.PersistentExistence();
         }
 		feature = default(TerrainFeature);
 		return false;
     }
 
-    public void SetBlockAndUpdate(BlockPos tilePos, [CanBeNull] Block block) => this.SetTileAndUpdate(tilePos, block?.TileReference ?? CommonTiles.air);
-
-	public void SetTileAndUpdate(BlockPos tilePos, TileBase tile) {
-		WorldChunk chunk = this.ChunkAt(tilePos);
-		ChunkBlockPos chunkPos = tilePos.ToChunkBlockPos(chunk.xpos);
-		chunk.SetTile(chunkPos, tile);
-		tilemap.SetTile((Vector3Int)tilePos.AsVector(), tile);
-	}
-
-	public void SetTileAndUpdate(ChunkBlockPos chunkBlockPos, TileBase tile) {
-		BlockPos blockPos = chunkBlockPos.ToWorldBlockPos();
+	public void SetBlockAndUpdate(BlockPos blockPos, [CanBeNull] BlockState blockState) {
 		WorldChunk chunk = this.ChunkAt(blockPos);
-		chunk.SetTile(chunkBlockPos, tile);
-		tilemap.SetTile((Vector3Int)blockPos.AsVector(), tile);
+		TileBase referencedTile = blockState?.block.TileReference ?? CommonTiles.air;
+        chunk.SetBlock(blockPos.ToChunkBlockPos(chunk.xpos), blockState);
+        tilemap.SetTile((Vector3Int)blockPos.AsVector(), referencedTile);
 	}
 
-	public void PendUpdates(int chunkX, List<(ChunkBlockPos chunkBlockpos, TileBase tile)> tileUpdates) {
-		if (pendingUpdates.ContainsKey(chunkX)) {
-			pendingUpdates[chunkX].AddRange(tileUpdates);
-		} else {
-			pendingUpdates.Add(chunkX, tileUpdates);
+	public void SetBlockAndUpdate(ChunkBlockPos chunkBlockPos, [CanBeNull] BlockState blockState) => SetBlockAndUpdate(chunkBlockPos.ToWorldBlockPos(), blockState);
+
+    public void PendUpdates(int chunkX, List<(ChunkBlockPos chunkBlockpos, BlockState state)> blockStateUpdates) {
+		if (pendingUpdates.TryGetValue(chunkX, out var existingUpdates)) {
+			existingUpdates.AddRange(blockStateUpdates);
+        } else {
+			pendingUpdates.Add(chunkX, blockStateUpdates);
 		}
 	}
 
-	public void PendUpdate(int chunkX, ChunkBlockPos chunkBlockPos, TileBase tileUpdate) {
+	public void PendUpdate(int chunkX, ChunkBlockPos chunkBlockPos, BlockState blockState) {
 		if (!pendingUpdates.ContainsKey(chunkX)) {
-			pendingUpdates[chunkX] = new List<(ChunkBlockPos chunkBlockPos, TileBase tile)>();
+			pendingUpdates[chunkX] = new List<(ChunkBlockPos, BlockState)>();
 		}
-		pendingUpdates[chunkX].Add((chunkBlockPos, tileUpdate));
+		pendingUpdates[chunkX].Add((chunkBlockPos, blockState));
 	}
 
 	public void UnloadDistantChunks(int playerChunkX, int viewDistance) {
@@ -229,16 +219,26 @@ public class Level {
 	}
 
 	[CanBeNull]
-	public TileBase TileAt(BlockPos blockPos) {
+	public BlockState BlockStateAt(BlockPos blockPos, bool logFlag = true) {
 		WorldChunk chunk = ChunkAt(blockPos);
 		if (chunk != null) {
-			return chunk.TileAt(blockPos.ToChunkBlockPos(chunk.xpos));
+			return chunk.BlockAt(blockPos.ToChunkBlockPos(chunk.xpos));
 		}
-		Debug.LogError($"Cannot retrieve block at {blockPos.ToString()} because its not generated");
+		logFlag.If(() => Debug.LogError($"Cannot retrieve block state at {blockPos.ToString()} because its not generated"));
 		return null;
 	}
 
-	public int ChunkXAt(Vector2 worldPos) => Mathf.FloorToInt(worldPos.x / CHUNK_LENGTH);
+	[CanBeNull]
+	public Block BlockAt(BlockPos blockPos) {
+		BlockState blockState = BlockStateAt(blockPos, logFlag: false);
+		if (blockState != null) {
+			return blockState.block;
+		}
+		Debug.LogError($"Cannot retrieve block at {blockPos.ToString()} because its not generated");
+		return Blocks.air;
+    }
+
+    public int ChunkXAt(Vector2 worldPos) => Mathf.FloorToInt(worldPos.x / CHUNK_LENGTH);
 
 	public int ChunkXAt(float x) => Mathf.FloorToInt(x / CHUNK_LENGTH);
 

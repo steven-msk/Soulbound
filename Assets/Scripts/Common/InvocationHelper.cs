@@ -75,7 +75,7 @@ public static class InvocationHelper {
 		}
 	}
 
-	public static void IfElse(bool condition, Action success, Action fail) {
+	public static void IfElse(this bool condition, Action success, Action fail) {
 		if (condition) {
 			success.Invoke();
 		} else {
@@ -83,15 +83,24 @@ public static class InvocationHelper {
 		}
 	}
 
-	public static void If(bool condition, Action action) {
+
+	public static void If(this bool condition, Action action) {
 		if (condition) {
 			action.Invoke();
 		} 
 	}
 
-	public static void PatternIf<T>(object obj, Action<T> success) {
+	public static void PatternIf<T>(this object obj, Action<T> success) {
 		if (obj is T patternTarget) {
 			success.Invoke(patternTarget);
+		}
+	}
+
+	public static void PatternIfElse<T>(this object obj, Action<T> success, Action fail) {
+		if (obj is T patternTarget) {
+			success.Invoke(patternTarget);
+        } else {
+			fail.Invoke();
 		}
 	}
 }

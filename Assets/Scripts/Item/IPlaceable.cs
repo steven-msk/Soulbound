@@ -8,5 +8,5 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 public interface IPlaceable : IItemCapability {
-	Block Place(ItemStack itemStack, BlockPos position);
+	BlockState Place(ItemStack itemStack, BlockPos position);
 }

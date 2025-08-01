@@ -25,7 +25,7 @@ public class GameManager : MonoBehaviour {
 	private void Awake() {
 		instance = this;
 
-		ResetRegistries();
+		ReloadRegistries();
 
 		int seed = 745632;           // UnityEngine.Random.Range(int.MinValue, int.MaxValue)
 		this.level = new Level(Player, worldTilemap, GameObject.Find("Grid").GetComponent<Grid>(), seed, renderDistance: 2);
@@ -34,13 +34,13 @@ public class GameManager : MonoBehaviour {
 		LogUtil.LogAwake(this);
 	}
 
-	private void OnValidate() => ResetRegistries();
+	private void OnValidate() => ReloadRegistries();
 
 	private void Start() {
 		StartCoroutine(GameTickLoop());
 	}
 
-	private void ResetRegistries() {
+	private void ReloadRegistries() {
 		Registry.Reset();
 		Registry.RegisterAll<TMP_FontAsset>("Registry/Fonts");
 		Registry.RegisterAll<Item>("Registry/Items");

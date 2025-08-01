@@ -56,14 +56,14 @@ public class PlayerController : MonoBehaviour {
 		itemUsageHandler.Register<IConsumable>(ItemUseTrigger.RightClick, (consumable, stack) => consumable.Consume(stack));
 		foreach (ItemUseTrigger trigger in Enum.GetValues(typeof(ItemUseTrigger))) {
 			itemUsageHandler.Register<IAttackPerformer>(trigger, (attackPerformer, stack) => {
-				InvocationHelper.If(CanAttack, () => attackPerformer.PerformAttack(trigger));
+				CanAttack.If(() => attackPerformer.PerformAttack(trigger));
 			});
 		}
 		itemUsageHandler.Register<IPlaceable>(ItemUseTrigger.LeftHold, (placeable, stack) => {
 			Level level = GameManager.instance.Level;
 			BlockPos blockPos = level.ToBlockPos(inputHandler.MouseWorldPosition);
 
-			if (this.IsInBlockReach(blockPos.AsVector()) && level.TileAt(blockPos) == CommonTiles.air) {
+			if (this.IsInBlockReach(blockPos.AsVector()) && level.BlockStateAt(blockPos).block == Blocks.air) {
 				level.SetBlockAndUpdate(blockPos, placeable.Place(stack, blockPos));
 			}
 		});
@@ -119,7 +119,7 @@ public class PlayerController : MonoBehaviour {
 				Vector2 worldMousePos = inputHandler.MouseWorldPosition;
 				BlockPos blockPos = level.ToBlockPos(worldMousePos);
 
-				if (this.IsInBlockReach(worldMousePos) && level.TileAt(blockPos) != CommonTiles.air) {
+				if (this.IsInBlockReach(worldMousePos) && level.BlockAt(blockPos) != Blocks.air) {
 					level.SetBlockAndUpdate(blockPos, null);
 				}
 			}));

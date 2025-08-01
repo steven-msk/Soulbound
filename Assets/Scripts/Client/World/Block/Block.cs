@@ -17,5 +17,4 @@ public class Block : ScriptableObject, ISerializable {
 
 	[SerializeField] private TileBase tileReference;
 	public TileBase TileReference => tileReference;
-
 }

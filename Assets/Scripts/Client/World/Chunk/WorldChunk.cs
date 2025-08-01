@@ -21,7 +21,7 @@ public class WorldChunk {
 	private int x;
 	public int xpos => x;
 
-	private TileBase[,] tiles = new TileBase[Level.CHUNK_LENGTH, Level.WORLD_HEIGHT];
+	private BlockState[,] blockStates = new BlockState[Level.CHUNK_LENGTH, Level.WORLD_HEIGHT];
 
 
 	public WorldChunk(int x) => this.x = x;
@@ -43,17 +43,17 @@ public class WorldChunk {
 			highestStone = Mathf.Max(highestStone, undergroundHeight);
 			for (int y = minY; y < maxY; y++) {
 				int yIndex = WorldYToIndex(y);
-				TileBase tile = default(TileBase);
+				BlockState blockState = default(BlockState);
 				if (y > groundHeight) {
-					tile = CommonTiles.air;
+					blockState = new BlockState(Blocks.air);
 				} else if (y == groundHeight) {
-					tile = CommonTiles.grass;
+					blockState = new BlockState(Blocks.grass);
 				} else if (y < groundHeight && y >= undergroundHeight) {
-					tile = CommonTiles.dirt;
+					blockState = new BlockState(Blocks.dirt);
 				} else {
-					tile = CommonTiles.stone;
+					blockState = new BlockState(Blocks.stone);
 				}
-				tiles[x, yIndex] = tile;
+				blockStates[x, yIndex] = blockState;
 			}
 		}
 
@@ -71,10 +71,10 @@ public class WorldChunk {
 		for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
 			for (int y = minY; y < maxY; y++) {
 				int yIndex = WorldYToIndex(y);
-				TileBase tile = tiles[x, yIndex];
-				InvocationHelper.IfElse(tile != null,
-					() => tilemap.SetTile(new Vector3Int(xStart + x, y, 0), tile),
-					() => Debug.LogError($"Attempted to render ungenerated terrain! pos: ({x}, {y}) at chunk {this.x}"));
+				BlockState blockState = blockStates[x, yIndex];
+				InvocationHelper.IfElse(blockState != null,
+					() => tilemap.SetTile(new Vector3Int(xStart + x, y), blockState.block.TileReference),
+					() => Debug.LogError($"Attempted to render ungenerated terrain! {new ChunkBlockPos(x, y, this.x).ToString()}"));
 			}
 		}
 		this.RefreshTiles(tilemap);
@@ -101,7 +101,7 @@ public class WorldChunk {
 		outlineRenderer.HideOutline(this);
 	}
 
-	public void SetTile(ChunkBlockPos chunkPos, TileBase tile) => tiles[chunkPos.x, WorldYToIndex(chunkPos.y)] = tile;
+	public void SetBlock(ChunkBlockPos chunkPos, BlockState blockState) => blockStates[chunkPos.x, WorldYToIndex(chunkPos.y)] = blockState;
 
-	public TileBase TileAt(ChunkBlockPos chunkPos) => tiles[chunkPos.x, WorldYToIndex(chunkPos.y)];
+	public BlockState BlockAt(ChunkBlockPos chunkPos) => blockStates[chunkPos.x, WorldYToIndex(chunkPos.y)];
 }
