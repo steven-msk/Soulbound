@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using UnityEngine;
@@ -90,7 +91,11 @@ public class Level {
 				chunk.Render(tilemap, chunkOutlineRenderer);
 			}
 		}
-	}
+
+		Debug.Log(FeatureAt(player.blockPos, out TerrainFeature feature)
+			? $"{feature}"
+			: $"No feature at {ChunkBlockPos.FromBlockPos(player.blockPos)}");
+    }
 
 	private WorldChunk GenerateNewChunk(int chunkX) {
 		WorldChunk chunk = new(chunkX);
@@ -165,7 +170,21 @@ public class Level {
 		}
 	}
 
-	public void SetBlockAndUpdate(BlockPos tilePos, [CanBeNull] Block block) => this.SetTileAndUpdate(tilePos, block?.TileReference ?? CommonTiles.air);
+	public bool FeatureAt(BlockPos blockPos, out TerrainFeature feature) {
+		int chunkX = ChunkXAt(blockPos.AsVector());
+		if (features.TryGetValue(chunkX, out var chunkFeatures)) {
+			ChunkBlockPos chunkBlockPos = blockPos.ToChunkBlockPos(chunkX);
+			feature = chunkFeatures.FirstOrDefault(f => f.origin == chunkBlockPos);
+			if (!feature.UncheckedExistence()) {
+				feature = chunkFeatures.FirstOrDefault(f => f.tileOverrides.ContainsKey(chunkBlockPos));
+			}
+            return feature.UncheckedExistence();
+        }
+		feature = default(TerrainFeature);
+		return false;
+    }
+
+    public void SetBlockAndUpdate(BlockPos tilePos, [CanBeNull] Block block) => this.SetTileAndUpdate(tilePos, block?.TileReference ?? CommonTiles.air);
 
 	public void SetTileAndUpdate(BlockPos tilePos, TileBase tile) {
 		WorldChunk chunk = this.ChunkAt(tilePos);
@@ -244,4 +263,8 @@ public class Level {
 	public int GetSurfaceY(BlockPos blockPos) => GetSurfaceY(blockPos.x);
 
 	public int GetSurfaceY(int xpos) => this.ChunkAt(xpos)?.HeightmapData.surfaceLevels[xpos] ?? 0;
+
+    public bool IsInWorldBounds(Vector2 pos) => pos.y >= WorldChunk.minY && pos.y <= WorldChunk.maxY;
+
+	public bool IsInWorldBounds(BlockPos blockPos) => IsInWorldBounds(blockPos.AsVector());
 }
