@@ -43,6 +43,7 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 	public Vector2 position => transform.position;
+	public Vector2 center => Physics.Collider.bounds.center;
 	public BlockPos blockPos => level.ToBlockPos(this.position);
 	public ChunkBlockPos chunkBlockPos => blockPos.ToChunkBlockPos(level.ChunkXAt(position));
 
@@ -133,7 +134,7 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	public bool IsInBlockReach(Vector2 worldPos) {
-		float dist = Vector2.Distance(worldPos, this.position);
+		float dist = Vector2.Distance(worldPos, this.center);
 		return dist <= MaxBlockReach && dist > 1.5f;
 	}
 }

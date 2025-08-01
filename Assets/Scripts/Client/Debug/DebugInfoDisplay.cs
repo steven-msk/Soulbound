@@ -10,6 +10,7 @@ public class DebugInfoDisplay : MonoBehaviour {
 	[SerializeField] private VectorCoordinateVisual worldPos;
 	[SerializeField] private BlockCoordinateVisual blockPos;
 	[SerializeField] private ChunkCoordinateVisual chunkPos;
+	[SerializeField] private VectorCoordinateVisual velocity;
 
     private void Awake() {
 		this.player = GameManager.instance.Player;
@@ -25,6 +26,7 @@ public class DebugInfoDisplay : MonoBehaviour {
 		worldPos?.UpdateDisplayComponent(worldPos, player.position);
 		blockPos?.UpdateDisplayComponent(blockPos, player.blockPos);
 		chunkPos?.UpdateDisplayComponent(chunkPos, ChunkBlockPos.FromBlockPos(player.blockPos));
+		velocity?.UpdateDisplayComponent(velocity, player.Rigidbody.linearVelocity);
     }
 
 	public string Coordinates {
