@@ -21,4 +21,6 @@ public class BlockState {
         // For now, we will just log the change
         Debug.Log($"Block at {selfPos} changed neighbor at {neighborPos} from {oldState.block.name} to {newState.block.name}");
     }
+
+    // TODO: override BlockState ToString() for better debugging
 }

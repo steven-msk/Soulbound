@@ -15,6 +15,10 @@ public class Level {
     public const int WORLD_HEIGHT = 300;
     public const int SURFACE_TO_UNDERGROUND_DELIMITER = WORLD_HEIGHT / 2;
 
+    public event Action<BlockChangedEvent> BlockStateChanged;
+    public event Action<BlockChangedEvent> BlockPlaced;
+    public event Action<BlockChangedEvent> BlockBroken;
+
     public readonly int seed;
     private readonly PerlinNoiseGenerator1D heightGenerator;
     private Dictionary<int, WorldChunk> loadedChunks = new();
@@ -52,6 +56,27 @@ public class Level {
             int chunkX = playerChunkX + dx;
             this.GenerateNewChunk(chunkX);
         }
+        BlockStateChanged += blockChangedEvent => {
+            // placeholder for the only feature that exists for now (trees)
+            bool foundFeature = this.FeatureAt(blockChangedEvent.pos, out TerrainFeature feature);
+            BlockPos changePos = blockChangedEvent.pos;
+            BlockState oldState = blockChangedEvent.oldState;
+            BlockState newState = blockChangedEvent.newState;
+            if (!foundFeature) {
+                return;
+            }
+            if (oldState.block == Blocks.wood && feature.stateOverrides.ContainsKey(ChunkBlockPos.FromBlockPos(changePos))) {
+                var toRemove = feature.stateOverrides.Where(stateOverride => stateOverride.Key.y > changePos.y);
+                toRemove.ToList().ForEach(stateOverride => {
+                    feature.stateOverrides.Remove(stateOverride.Key);
+                    SetBlockAndUpdate(stateOverride.Key.ToWorldBlockPos(), null);
+                });
+                if (ChunkBlockPos.FromBlockPos(changePos) == feature.origin) {
+                    features[feature.origin.chunkX].Remove(feature);
+                    Debug.Log($"Removed feature at {feature.origin} because its trunk was broken.");
+                }
+            }
+        };
     }
 
     private void prototype_GenerateTreeFeatures(WorldChunk chunk, ChunkHeightmapData heightmapData) {
@@ -94,8 +119,6 @@ public class Level {
                 chunk.Render(tilemap, chunkOutlineRenderer);
             }
         }
-
-        Debug.Log(FeatureAt(player.blockPos, out var feature) ? $"{feature}" : $"No feature at {player.blockPos}");
     }
 
     private WorldChunk GenerateNewChunk(int chunkX) {
@@ -195,7 +218,14 @@ public class Level {
         blockPos.ForEachAdjacent((direction, neighborPos) => {
             BlockState neighborBlockState = BlockStateAt(neighborPos);
             neighborBlockState?.OnNeighborChanged(neighborPos, blockPos, oldState, newState);
+            tilemap.RefreshTile((Vector3Int)neighborPos);
         });
+        BlockStateChanged?.Invoke(new BlockChangedEvent(blockPos, oldState, newState));
+        if (blockState != null && oldState == new BlockState(Blocks.air)) {
+            BlockPlaced?.Invoke(new BlockChangedEvent(blockPos, oldState, newState));
+        } else if (oldState != new BlockState(Blocks.air) && blockState == null) {
+            BlockBroken?.Invoke(new BlockChangedEvent(blockPos, oldState, newState));
+        }
     }
 
     public void SetBlockAndUpdate(ChunkBlockPos chunkBlockPos, [CanBeNull] BlockState blockState) => SetBlockAndUpdate(chunkBlockPos.ToWorldBlockPos(), blockState);
