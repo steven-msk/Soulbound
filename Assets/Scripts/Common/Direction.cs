@@ -92,4 +92,6 @@ public static class DirectionUtility {
         }
         return null;
     }
+
+    public static BlockPos GetAdjacent(this BlockPos blockPos, Direction direction) => blockPos + direction.AsVector2Int();
 }

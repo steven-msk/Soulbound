@@ -7,7 +7,12 @@ using UnityEngine.Tilemaps;
 public class GameManager : MonoBehaviour {
 	public static GameManager instance;
 
-	private Level level;
+	// POTENTIAL FEATUREIMPL (unlikely, but possible): make Level class NOT a singleton.
+	// In this case, it represents the current dimension or world the player is in (e.g., overworld, nether, end).
+	// The GameManager holds a reference to the active Level instance.
+	// If implementing multiple dimensions, switch the Level reference as the player moves between them.
+
+    private Level level;
 	public Level Level => level;
 
 	[SerializeField] private Tilemap worldTilemap;
@@ -17,7 +22,7 @@ public class GameManager : MonoBehaviour {
 	public PlayerController Player => GameObject.Find("johnny").GetComponent<PlayerController>();
 
 	public UIController UI => GameObject.Find("Canvas").GetComponent<UIController>();
-
+	 
 	// FEATUREIMPL: settings menu
 	// FEATUREIMPL: pause menu
 	// Pause menu -> Settings menu

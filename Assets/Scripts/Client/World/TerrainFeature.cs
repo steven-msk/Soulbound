@@ -1,17 +1,18 @@
 ﻿using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public struct TerrainFeature {
+public class TerrainFeature {
     public ChunkBlockPos origin;
     public TerrainFeatureType type;
     public BoundsInt2D bounds;
-    public Dictionary<ChunkBlockPos, BlockState>? stateOverrides;
+    public Dictionary<ChunkBlockPos, BlockState> stateOverrides = new();
 
     public TerrainFeature(ChunkBlockPos origin, TerrainFeatureType type, Dictionary<ChunkBlockPos, BlockState> tileOverrides, BoundsInt2D bounds) {
         this.origin = origin;
@@ -23,11 +24,8 @@ public struct TerrainFeature {
     public static bool operator !=(TerrainFeature feature1, TerrainFeature feature2) => !(feature1 == feature2);
 
     public static bool operator ==(TerrainFeature feature1, TerrainFeature feature2) {
-        bool nullOrEmptyOverrides1 = feature1.stateOverrides == null || feature1.stateOverrides.Count == 0;
-        bool nullOrEmptyOverrides2 = feature2.stateOverrides == null || feature2.stateOverrides.Count == 0;
         return feature1.origin == feature2.origin &&
                feature1.type == feature2.type &&
-               !nullOrEmptyOverrides1 && !nullOrEmptyOverrides2 &&
                feature1.stateOverrides.Count == feature2.stateOverrides.Count &&
                feature1.stateOverrides.All(kvp => feature2.stateOverrides.TryGetValue(kvp.Key, out var state) && state == kvp.Value);
     }

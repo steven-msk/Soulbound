@@ -20,6 +20,7 @@ public class Level {
     public event Action<BlockChangedEvent>? BlockStateChanged;
     public event Action<BlockChangedEvent>? BlockPlaced;
     public event Action<BlockChangedEvent>? BlockBroken;
+    // POTENTIAL: post world events to the ticking system
 
     public readonly int seed;
     private readonly PerlinNoiseGenerator1D heightGenerator;
@@ -59,24 +60,27 @@ public class Level {
             this.GenerateNewChunk(chunkX);
         }
         BlockStateChanged += blockChangedEvent => {
-            // placeholder for the only feature that exists for now (trees)
             bool foundFeature = this.FeatureAt(blockChangedEvent.pos, out TerrainFeature feature);
+
+            // placeholder for the only feature that exists for now (trees)
             BlockPos changePos = blockChangedEvent.pos;
             BlockState oldState = blockChangedEvent.oldState;
-            BlockState newState = blockChangedEvent.newState;
+            bool flag_brokenUnderneath = false;
             if (!foundFeature) {
-                return;
+                BlockPos upNeighbor = changePos.GetAdjacent(Direction.Up);
+                foundFeature = this.FeatureAt(upNeighbor, out feature);
+                if (!foundFeature || ChunkBlockPos.FromBlockPos(upNeighbor) != feature.origin) {
+                    return;
+                }
+                flag_brokenUnderneath = true;
             }
-            if (oldState.block == Blocks.wood && feature.stateOverrides.ContainsKey(ChunkBlockPos.FromBlockPos(changePos))) {
+            if ((oldState.block == Blocks.wood && feature.stateOverrides.ContainsKey(ChunkBlockPos.FromBlockPos(changePos))) || flag_brokenUnderneath) {
+                features[feature.origin.chunkX].Remove(feature);
                 var toRemove = feature.stateOverrides.Where(stateOverride => stateOverride.Key.y > changePos.y);
                 toRemove.ToList().ForEach(stateOverride => {
                     feature.stateOverrides.Remove(stateOverride.Key);
                     SetBlockAndUpdate(stateOverride.Key.ToWorldBlockPos(), null);
                 });
-                if (ChunkBlockPos.FromBlockPos(changePos) == feature.origin) {
-                    features[feature.origin.chunkX].Remove(feature);
-                    Debug.Log($"Removed feature at {feature.origin} because its trunk was broken.");
-                }
             }
         };
     }
@@ -203,9 +207,9 @@ public class Level {
         if (features.TryGetValue(chunkX, out var chunkFeatures)) {
             ChunkBlockPos chunkBlockPos = blockPos.ToChunkBlockPos(chunkX);
             feature = chunkFeatures.FirstOrDefault(f => f.bounds.Contains((Vector2Int)chunkBlockPos));
-            return feature.PersistentExistence();
+            return feature?.PersistentExistence() ?? false;
         }
-        feature = default(TerrainFeature);
+        feature = null;
         return false;
     }
 
@@ -214,6 +218,9 @@ public class Level {
         TileBase referencedTile = blockState?.block.TileReference ?? CommonTiles.air;
         BlockState oldState = chunk.BlockStateAt(blockPos.ToChunkBlockPos(chunk.xpos));
         BlockState newState = blockState ?? new BlockState(Blocks.air);
+        if (oldState == newState) {
+            return;
+        }
 
         chunk.SetBlock(blockPos.ToChunkBlockPos(chunk.xpos), newState);
         tilemap.SetTile((Vector3Int)blockPos, referencedTile);
@@ -230,7 +237,10 @@ public class Level {
         }
     }
 
-    public void SetBlockAndUpdate(ChunkBlockPos chunkBlockPos, BlockState? blockState) => SetBlockAndUpdate(chunkBlockPos.ToWorldBlockPos(), blockState);
+    public void SetBlockAndUpdate(ChunkBlockPos chunkBlockPos, BlockState? blockState) {
+        SetBlockAndUpdate(chunkBlockPos.ToWorldBlockPos(), blockState);
+    }
+
 
     public void PendUpdates(int chunkX, List<(ChunkBlockPos chunkBlockpos, BlockState state)> blockStateUpdates) {
         if (pendingUpdates.TryGetValue(chunkX, out var existingUpdates)) {
