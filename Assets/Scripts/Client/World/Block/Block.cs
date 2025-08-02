@@ -48,11 +48,13 @@ public class BlockEditor : Editor {
 			stateBehaviorProperty.managedReferenceValue = Activator.CreateInstance(selectedType);
 			selectedIndex = newIndex;
         }
-
 		EditorGUILayout.Space();
 
-		if (stateBehaviorProperty.managedReferenceValue != null) {
-			SerializedProperty iterator = stateBehaviorProperty.Copy();
+		if (stateBehaviorProperty.managedReferenceValue is IBlockStateBehavior stateBehavior) {
+			EditorGUILayout.Space(-8);
+			EditorGUILayout.HelpBox(stateBehavior.Description, MessageType.None);
+
+            SerializedProperty iterator = stateBehaviorProperty.Copy();
 			SerializedProperty end = iterator.GetEndProperty();
 			bool enterChildren = true;
 

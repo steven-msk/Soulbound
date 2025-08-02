@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 public class DefaultBlockStateBehavior : IBlockStateBehavior {
+    public string Description => "Drops a single item on break, does not update neighbors";
+
     public List<ItemStack> DroppedItemsUponBroken(BlockState blockState) {
         return new List<ItemStack>() {
             new ItemStack(BlockItem.FromBlock(blockState.block), 1)
