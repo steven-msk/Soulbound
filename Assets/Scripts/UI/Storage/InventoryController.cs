@@ -76,7 +76,7 @@ public class InventoryController : MonoBehaviour, IContainer {
 			CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableStatItem_test"), 1), hotbar[8]);
 			CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableStatItem_test"), 1), (InventorySlot)this[2, 8]);
 			CreateItemDisplay(new ItemStack(Registry.Get<Item>("longTooltipItem"), 1), hotbar[5]);
-			CreateItemDisplay(new ItemStack(Registry.Get<Item>("grass_block_item"), 100), popupSlots[0, 1]);
+			CreateItemDisplay(new ItemStack(Registry.Get<Item>("grass_block_item"), 100), hotbar[2]);
 			Debug.Log("<color=green>[INVENTORY]</color> Player inventory loaded");				// might factor out in LogUtil
 			// POTENTIAL: LogUtil modularity - implement different color coded logging sections marked between [ ]
 			hotbar.SetActiveSlot(0);
@@ -84,7 +84,10 @@ public class InventoryController : MonoBehaviour, IContainer {
 		StartCoroutine(Prototype_setupDisplays());
 	}
 
-	public void ToggleInventory(InputAction.CallbackContext actionContext) {
+    // FIXME: the two top rows of the inventory popup are not clickable
+	// the pointer events are not being registered
+
+    public void ToggleInventory(InputAction.CallbackContext actionContext) {
 		popupOpen = !popupOpen;
 		popup.SetActive(popupOpen);
 		armorSlots.SetActive(popupOpen);
@@ -96,13 +99,13 @@ public class InventoryController : MonoBehaviour, IContainer {
 	public void DropItemFromInventory(InputAction.CallbackContext actionContext) {
 		if (activeTooltip != null) {
 			ItemDisplay itemDisplay = activeTooltip.DisplayParent?.GetComponent<ItemDisplay>();
-			itemDisplay?.ItemStack.Drop(true);
+			itemDisplay?.ItemStack.Drop(player.position, true);
 			Destroy(itemDisplay?.gameObject);
 			activeTooltip.Hide();
 			activeTooltip = null;
 		} else {
 			ItemDisplay item = hotbar.ActiveSlot.ItemDisplay;
-			item?.ItemStack.Drop(true);
+			item?.ItemStack.Drop(player.position, true);
 			Destroy(item?.gameObject);
 		}
 	}
@@ -110,7 +113,7 @@ public class InventoryController : MonoBehaviour, IContainer {
 	// POTENTIAL: OnDrop callback in Item
 
 	public void DropGrabbedItem(InputAction.CallbackContext actionContext) {
-		GrabbedItem?.ItemStack.Drop(true);
+		GrabbedItem?.ItemStack.Drop(player.position, true);
 		Destroy(GrabbedItem?.gameObject);
 		if (GrabbedItem?.ItemStack == player.MainHandStack) {
 			player.SetMainHandItem(null);
@@ -119,7 +122,6 @@ public class InventoryController : MonoBehaviour, IContainer {
 	}
 
 	public bool PickUpItem(ItemStack itemStack) {
-		Debug.Log(itemStack);
 		if (!itemStack.Item.IsStackable) {
 			InventorySlot emptySlot = GetFirstEmptySlot();
 			if (emptySlot != null) {

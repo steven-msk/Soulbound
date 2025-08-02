@@ -18,4 +18,9 @@ public class BlockItem : Item, IPlaceable {
 	protected override CompoundTooltip GetDefaultTooltip() {
 		return CompoundTooltip.Of(Tooltip.Info(this.itemName));
 	}
+
+	public static BlockItem FromBlock(Block block) {
+		List<BlockItem> allBlockItems = GameManager.instance.GetAll<BlockItem>();
+		return allBlockItems.FirstOrDefault(item => item.referenceBlock == block) ?? null;
+    }
 }

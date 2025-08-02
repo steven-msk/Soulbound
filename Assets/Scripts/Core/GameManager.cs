@@ -1,8 +1,11 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using TMPro;
-using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using Object = UnityEngine.Object;
 
 public class GameManager : MonoBehaviour {
 	public static GameManager instance;
@@ -12,7 +15,7 @@ public class GameManager : MonoBehaviour {
 	// The GameManager holds a reference to the active Level instance.
 	// If implementing multiple dimensions, switch the Level reference as the player moves between them.
 
-    private Level level;
+	private Level level;
 	public Level Level => level;
 
 	[SerializeField] private Tilemap worldTilemap;
@@ -22,7 +25,9 @@ public class GameManager : MonoBehaviour {
 	public PlayerController Player => GameObject.Find("johnny").GetComponent<PlayerController>();
 
 	public UIController UI => GameObject.Find("Canvas").GetComponent<UIController>();
-	 
+
+	private Dictionary<Type, List<Object>> registriesByType = new();
+
 	// FEATUREIMPL: settings menu
 	// FEATUREIMPL: pause menu
 	// Pause menu -> Settings menu
@@ -46,15 +51,41 @@ public class GameManager : MonoBehaviour {
 	}
 
 	private void ReloadRegistries() {
-		Registry.Reset();
-		Registry.RegisterAll<TMP_FontAsset>("Registry/Fonts");
-		Registry.RegisterAll<Item>("Registry/Items");
-		Registry.RegisterAll<GameObject>("Registry/Prefabs");
-		Registry.RegisterAll<Tile>("Registry/Tiles");
-		Registry.RegisterAll<RuleTile>("Registry/Tiles");
-		Registry.RegisterAll<Block>("Registry/Blocks");
-	}
+		if (registriesByType.Count > 0) {
+			Debug.LogWarning("Registries already loaded. Skipping reload.");
+            return;
+        }
 
+        Registry.Reset();
+		registriesByType.Clear();
+		RegisterByType<TMP_FontAsset>(Registry.RegisterAll<TMP_FontAsset>("Registry/Fonts"));
+		RegisterByType<Item>(Registry.RegisterAll<Item>("Registry/Items"));
+		RegisterBySubclassedType<Item, BlockItem>(registriesByType[typeof(Item)].Cast<Item>().ToList());
+		RegisterByType<GameObject>(Registry.RegisterAll<GameObject>("Registry/Prefabs"));
+		RegisterByType<Tile>(Registry.RegisterAll<Tile>("Registry/Tiles"));
+		RegisterByType<RuleTile>(Registry.RegisterAll<RuleTile>("Registry/Tiles"));
+		RegisterByType<Block>(Registry.RegisterAll<Block>("Registry/Blocks"));
+    }
+
+	public List<T> GetAll<T>() where T : UnityEngine.Object {
+		if (registriesByType.TryGetValue(typeof(T), out List<Object> resources)) {
+			return resources.Cast<T>().ToList();
+		}
+		Debug.LogError($"No resources of type '{typeof(T).Name}' found in registries.");
+		return new List<T>();
+    }
+
+    private void RegisterByType<T>(List<T> registeredResources, bool logRegistration = true) where T : UnityEngine.Object {
+		registriesByType[typeof(T)] = registeredResources.Select(resource => (Object)resource).ToList();
+		logRegistration.If(() => Debug.Log($"Registered {registeredResources.Count} resources of type '{typeof(T).Name}'"));
+    }
+
+	private void RegisterBySubclassedType<T, TSub>(List<T> registered) where T : UnityEngine.Object where TSub : T {
+		List<TSub> subclassed = registered.Where(resource => resource is TSub).Cast<TSub>().ToList();
+		RegisterByType<TSub>(subclassed, logRegistration: false);
+		Debug.Log($"Registered {subclassed.Count} resources of type '{typeof(TSub).Name}' as subclassed type of '{typeof(T).Name}'");
+    }
+ 
 	IEnumerator GameTickLoop() {
 		while (Application.isPlaying) {
 			if (!this.IsPaused) {

@@ -93,7 +93,7 @@ public class BufferedStatInspectorDrawer : PropertyDrawer {
 	private void DrawBufferProperty(Rect position, SerializedProperty property, string label) {
 		EditorGUI.BeginProperty(position, GUIContent.none, property);
 		void ShowTypeDropdown(SerializedProperty property, string label) {
-			List<Type> allTypes = GetAllImplementationsOf<IBufferedTrigger>();
+			List<Type> allTypes = Implementations.GetAllImplementationsOf<IBufferedTrigger>();
 			GenericMenu menu = new();
 			foreach (var type in allTypes) {
 				menu.AddItem(new GUIContent(type.FullName), false, () => {
@@ -116,12 +116,5 @@ public class BufferedStatInspectorDrawer : PropertyDrawer {
 			}
 		}
 		EditorGUI.EndProperty();
-	}
-
-	private static List<Type> GetAllImplementationsOf<T>() {
-		return AppDomain.CurrentDomain.GetAssemblies()
-			.SelectMany(assemblies => assemblies.GetTypes())
-			.Where(type => typeof(T).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
-			.ToList();
 	}
 }

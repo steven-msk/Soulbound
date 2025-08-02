@@ -63,6 +63,8 @@ public struct BlockPos {
         return new BlockPos(pos.x / scalar, pos.y / scalar);
     }
 
+    public Vector2 CenterAligned() => new Vector2(x + 0.5f, y + 0.5f);
+
     public override bool Equals(object obj) {
         if (obj is BlockPos other) {
             return this == other;

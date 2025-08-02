@@ -59,10 +59,10 @@ public class ItemStack {
 		return stackText;
 	}
 
-	public void Drop(bool playerAction = false) {
+	public void Drop(Vector2 pos, bool playerAction = false) {
 		// FUTURE TODO: item drop movement (throw force)
 		GameObject pickupItem = GameObject.Instantiate(Item.WorldPrefab, null);
-		pickupItem.transform.position = GameManager.instance.Player.transform.position;
+		pickupItem.transform.position = pos;
 		Rigidbody2D rigidbody = pickupItem.AddComponent<Rigidbody2D>();
 		rigidbody.sleepMode = RigidbodySleepMode2D.NeverSleep;
 		BoxCollider2D pickupHitbox = pickupItem.AddComponent<BoxCollider2D>();
@@ -72,7 +72,7 @@ public class ItemStack {
 		pickupItem.AddComponent<BoxCollider2D>().excludeLayers = ~LayerMask.GetMask("Ground");
 		DroppedItem pickup = pickupItem.AddComponent<DroppedItem>();
 		pickup.ItemStack = this;
-		pickup.pickupDelay = playerAction ? 2 : 0;
+		pickup.pickupDelay = (playerAction ? 2 : 0);
 	}
 
 	// POTENTIAL REWORK: item max stack numbers

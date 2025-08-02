@@ -15,3 +15,11 @@ MonoBehaviour:
   blockName: Wood Block
   blockID: wood_block
   tileReference: {fileID: 11400000, guid: 232c21752ec71d44ba1ed3d459668765, type: 2}
+  stateBehavior:
+    rid: 6961233574288162888
+  references:
+    version: 2
+    RefIds:
+    - rid: 6961233574288162888
+      type: {class: DefaultBlockStateBehavior, ns: , asm: Assembly-CSharp}
+      data: 

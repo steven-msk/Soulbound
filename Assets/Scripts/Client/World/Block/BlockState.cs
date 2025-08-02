@@ -11,15 +11,24 @@ public class BlockState {
     // this is a placeholder for future properties like metadata, state, etc.
 
     public Block block { get; private set; }
+    public Dictionary<string, object> properties { get; private set; } = new();
+    // might be replaced with a type-safe data structure in the future
 
     public BlockState(Block block) {
         this.block = block ?? throw new ArgumentNullException(nameof(block));
     }
 
-    public void OnNeighborChanged(BlockPos selfPos, BlockPos neighborPos, BlockState oldState, BlockState newState) {
-        // This method needs to be flexible to handle different block types
-        // For now, we will just log the change
-        //Debug.Log($"Block at {selfPos} changed neighbor at {neighborPos} from {oldState.block.name} to {newState.block.name}");
+    public void OnNeighborStateChanged(BlockPos selfPos, BlockPos neighborPos, BlockState oldState, BlockState newState) {
+        block.StateBehavior.OnNeighborStateChanged(selfPos, neighborPos, oldState, newState);
+    }
+
+    // TODO: implement block items for stone, wood, and dirt blocks
+    // FIXME: unexpected delay when picking up items from blocks
+
+    public void DropOnBroken(BlockPos pos) {
+        List<ItemStack> itemsDropped = block.StateBehavior.DroppedItemsUponBroken(this);
+        itemsDropped.ForEach(itemStack => itemStack.Drop(pos.CenterAligned()));
+        Debug.Log($"Dropped {itemsDropped.Count} items from block at {pos}");
     }
 
     // temporary operator overloads for easy comparison

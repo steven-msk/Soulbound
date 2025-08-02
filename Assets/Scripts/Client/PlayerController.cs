@@ -120,8 +120,8 @@ public class PlayerController : MonoBehaviour {
 				BlockPos blockPos = level.ToBlockPos(worldMousePos);
 
 				if (this.IsInBlockReach(worldMousePos) && level.BlockAt(blockPos) != Blocks.air) {
-					level.SetBlockAndUpdate(blockPos, null);
-				}
+					level.BreakBlock(blockPos);
+                }
 			}));
 		}
 	}

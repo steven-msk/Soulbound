@@ -41,7 +41,7 @@ public static class ItemSlotUtility {
 	// This is an anticipation of a separation of concerns regarding item transfer functionality.
 
 	public static void RequestClickAction(this IItemSlot slot) {
-		InventoryController inventory = GameManager.instance.Player.Inventory;
+        InventoryController inventory = GameManager.instance.Player.Inventory;
 		InputHandler.RequestAction(new("ItemDrag", 10, () => {
 			InvocationHelper.If(slot.ValidClickAction(inventory.GrabbedItem), () => slot.OnClick(inventory.GrabbedItem, inventory));
 		}));

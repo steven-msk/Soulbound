@@ -15,3 +15,11 @@ MonoBehaviour:
   blockName: Stone Block
   blockID: stone_block
   tileReference: {fileID: 11400000, guid: 45600b170ff257f4d88d332a54ef803b, type: 2}
+  stateBehavior:
+    rid: 6961233574288162887
+  references:
+    version: 2
+    RefIds:
+    - rid: 6961233574288162887
+      type: {class: DefaultBlockStateBehavior, ns: , asm: Assembly-CSharp}
+      data: 

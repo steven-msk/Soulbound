@@ -226,7 +226,7 @@ public class Level {
         tilemap.SetTile((Vector3Int)blockPos, referencedTile);
         blockPos.ForEachAdjacent((direction, neighborPos) => {
             BlockState neighborBlockState = BlockStateAt(neighborPos);
-            neighborBlockState?.OnNeighborChanged(neighborPos, blockPos, oldState, newState);
+            neighborBlockState?.OnNeighborStateChanged(neighborPos, blockPos, oldState, newState);
             tilemap.RefreshTile((Vector3Int)neighborPos);
         });
         BlockStateChanged?.Invoke(new BlockChangedEvent(blockPos, oldState, newState));
@@ -241,6 +241,13 @@ public class Level {
         SetBlockAndUpdate(chunkBlockPos.ToWorldBlockPos(), blockState);
     }
 
+    // in the future this will also contain the information about how the block was broken
+    public void BreakBlock(BlockPos blockPos) {
+        BlockState brokenBlock = BlockStateAt(blockPos);
+        SetBlockAndUpdate(blockPos, null);
+        brokenBlock.DropOnBroken(blockPos);
+        // drop block
+    }
 
     public void PendUpdates(int chunkX, List<(ChunkBlockPos chunkBlockpos, BlockState state)> blockStateUpdates) {
         if (pendingUpdates.TryGetValue(chunkX, out var existingUpdates)) {
