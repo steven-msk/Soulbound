@@ -59,12 +59,7 @@ public struct TerrainFeature {
     public override string ToString() {
         StringBuilder sb = new StringBuilder();
         sb.Append($"TerrainFeature @ {origin}, Type: {type}");
-        if (stateOverrides != null && stateOverrides.Count > 0) {
-            sb.Append(", State Overrides: ");
-            foreach (var stateOverride in stateOverrides) {
-                sb.Append($"[{stateOverride.Key} -> {stateOverride.Value?.block.ID ?? "null"}] ");
-            }
-        }
+        sb.Append($", Bounds: {bounds}");
         return sb.ToString();
     }
 }

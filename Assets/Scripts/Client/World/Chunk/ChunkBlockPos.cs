@@ -28,6 +28,8 @@ public struct ChunkBlockPos {
         return pos1.x == pos2.x && pos1.y == pos2.y && pos1.chunkX == pos2.chunkX;
     }
 
+    public static explicit operator Vector2Int(ChunkBlockPos pos) => new Vector2Int(pos.x, pos.y);
+
     public override string ToString() => $"cx:{x}, cy:{y}, c:{chunkX}";
 
     public BlockPos ToWorldBlockPos() => new BlockPos(this.x + this.chunkX * Level.CHUNK_LENGTH, this.y);

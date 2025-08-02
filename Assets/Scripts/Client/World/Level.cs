@@ -94,6 +94,8 @@ public class Level {
                 chunk.Render(tilemap, chunkOutlineRenderer);
             }
         }
+
+        Debug.Log(FeatureAt(player.blockPos, out var feature) ? $"{feature}" : $"No feature at {player.blockPos}");
     }
 
     private WorldChunk GenerateNewChunk(int chunkX) {
@@ -175,10 +177,7 @@ public class Level {
         int chunkX = ChunkXAt((Vector2Int)blockPos);
         if (features.TryGetValue(chunkX, out var chunkFeatures)) {
             ChunkBlockPos chunkBlockPos = blockPos.ToChunkBlockPos(chunkX);
-            feature = chunkFeatures.FirstOrDefault(f => f.origin == chunkBlockPos);
-            if (!feature.PersistentExistence()) {
-                feature = chunkFeatures.FirstOrDefault(f => f.stateOverrides.ContainsKey(chunkBlockPos));
-            }
+            feature = chunkFeatures.FirstOrDefault(f => f.bounds.Contains((Vector2Int)chunkBlockPos));
             return feature.PersistentExistence();
         }
         feature = default(TerrainFeature);
