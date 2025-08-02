@@ -35,7 +35,7 @@ public class SerializableStat {
 		this.applyAsBonus = applyAsBonus;
 	}
 
-	[CanBeNull] public object GetValue() {
+	public object? GetValue() {
 		return valueType switch {
 			StatValueType.Int => TryGetValue(value => Convert.ToInt32(value)),
 			StatValueType.Float => TryGetValue(value => Convert.ToSingle(value)),
@@ -52,7 +52,7 @@ public class SerializableStat {
 		}
 	}
 
-	[CanBeNull] public TValue GetValue<TValue>() => (TValue)GetValue();
+	public TValue? GetValue<TValue>() => (TValue)GetValue();
 
 	public string GetFormattedExpression() => serializedReference.ToStatType().GetFormattedExpression(this.GetValue(), applyAsBonus);
 

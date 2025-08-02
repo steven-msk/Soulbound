@@ -11,7 +11,7 @@ public struct TerrainFeature {
     public ChunkBlockPos origin;
     public TerrainFeatureType type;
     public BoundsInt2D bounds;
-    [CanBeNull] public Dictionary<ChunkBlockPos, BlockState> stateOverrides;
+    public Dictionary<ChunkBlockPos, BlockState>? stateOverrides;
 
     public TerrainFeature(ChunkBlockPos origin, TerrainFeatureType type, Dictionary<ChunkBlockPos, BlockState> tileOverrides, BoundsInt2D bounds) {
         this.origin = origin;

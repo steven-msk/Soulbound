@@ -10,19 +10,21 @@ using UnityEngine.WSA;
 using static Unity.Collections.AllocatorManager;
 using Random = UnityEngine.Random;
 
+#nullable enable
+
 public class Level {
     public const int CHUNK_LENGTH = 32;
     public const int WORLD_HEIGHT = 300;
     public const int SURFACE_TO_UNDERGROUND_DELIMITER = WORLD_HEIGHT / 2;
 
-    public event Action<BlockChangedEvent> BlockStateChanged;
-    public event Action<BlockChangedEvent> BlockPlaced;
-    public event Action<BlockChangedEvent> BlockBroken;
+    public event Action<BlockChangedEvent>? BlockStateChanged;
+    public event Action<BlockChangedEvent>? BlockPlaced;
+    public event Action<BlockChangedEvent>? BlockBroken;
 
     public readonly int seed;
     private readonly PerlinNoiseGenerator1D heightGenerator;
     private Dictionary<int, WorldChunk> loadedChunks = new();
-    private Dictionary<int, WorldChunk> generatedChunks = new();
+    private Dictionary<int, WorldChunk> generatedChunks = new(); 
     private ChunkOutlineRenderer chunkOutlineRenderer = new();
     private Dictionary<int, List<TerrainFeature>> features = new();
     private Dictionary<int, List<(ChunkBlockPos chunkBlockPos, BlockState state)>> pendingUpdates = new();
@@ -207,7 +209,7 @@ public class Level {
         return false;
     }
 
-    public void SetBlockAndUpdate(BlockPos blockPos, [CanBeNull] BlockState blockState) {
+    public void SetBlockAndUpdate(BlockPos blockPos, BlockState? blockState) {
         WorldChunk chunk = this.ChunkAt(blockPos);
         TileBase referencedTile = blockState?.block.TileReference ?? CommonTiles.air;
         BlockState oldState = chunk.BlockStateAt(blockPos.ToChunkBlockPos(chunk.xpos));
@@ -228,7 +230,7 @@ public class Level {
         }
     }
 
-    public void SetBlockAndUpdate(ChunkBlockPos chunkBlockPos, [CanBeNull] BlockState blockState) => SetBlockAndUpdate(chunkBlockPos.ToWorldBlockPos(), blockState);
+    public void SetBlockAndUpdate(ChunkBlockPos chunkBlockPos, BlockState? blockState) => SetBlockAndUpdate(chunkBlockPos.ToWorldBlockPos(), blockState);
 
     public void PendUpdates(int chunkX, List<(ChunkBlockPos chunkBlockpos, BlockState state)> blockStateUpdates) {
         if (pendingUpdates.TryGetValue(chunkX, out var existingUpdates)) {
@@ -258,8 +260,7 @@ public class Level {
         }
     }
 
-    [CanBeNull]
-    public BlockState BlockStateAt(BlockPos blockPos, bool logFlag = true) {
+    public BlockState? BlockStateAt(BlockPos blockPos, bool logFlag = true) {
         WorldChunk chunk = ChunkAt(blockPos);
         if (chunk != null) {
             return chunk.BlockStateAt(blockPos.ToChunkBlockPos(chunk.xpos));
@@ -268,8 +269,7 @@ public class Level {
         return null;
     }
 
-    [CanBeNull]
-    public Block BlockAt(BlockPos blockPos) {
+    public Block? BlockAt(BlockPos blockPos) {
         BlockState blockState = BlockStateAt(blockPos, logFlag: false);
         if (blockState != null) {
             return blockState.block;
@@ -278,8 +278,7 @@ public class Level {
         return null;
     }
 
-    [CanBeNull]
-    public BlockState GetAdjacentBlockState(BlockPos startPos, Direction direction) {
+    public BlockState? GetAdjacentBlockState(BlockPos startPos, Direction direction) {
         BlockPos adjacentPos = startPos + direction.AsVector();
         return BlockStateAt(adjacentPos);
     }
@@ -288,9 +287,9 @@ public class Level {
 
     public int ChunkXAt(float x) => Mathf.FloorToInt(x / CHUNK_LENGTH);
 
-    [CanBeNull] public WorldChunk ChunkAt(BlockPos blockPos) => generatedChunks.GetValueOrDefault(this.ChunkXAt((Vector2)blockPos), null);
+    public WorldChunk? ChunkAt(BlockPos blockPos) => generatedChunks.GetValueOrDefault(this.ChunkXAt((Vector2)blockPos), null);
 
-    [CanBeNull] public WorldChunk ChunkAt(int xpos) => ChunkAt(new BlockPos(xpos, 0));
+    public WorldChunk? ChunkAt(int xpos) => ChunkAt(new BlockPos(xpos, 0)); 
 
     public BlockPos ToBlockPos(Vector2 worldPos) {
         Vector2Int intPos = (Vector2Int)grid.WorldToCell(worldPos);

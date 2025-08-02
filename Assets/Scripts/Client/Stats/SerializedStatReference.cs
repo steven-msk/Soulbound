@@ -29,7 +29,7 @@ public enum SerializedStatReference {
 
 public static class SerializedToInternalStatExtension {
 	private static readonly Dictionary<SerializedStatReference, IStatTypeImpl> cached = new();
-	[CanBeNull] public static IStatTypeImpl ToStatType(this SerializedStatReference serializedReference) {
+	public static IStatTypeImpl? ToStatType(this SerializedStatReference serializedReference) {
 		if (cached.TryGetValue(serializedReference, out var value)) {
 			return value;
 		}

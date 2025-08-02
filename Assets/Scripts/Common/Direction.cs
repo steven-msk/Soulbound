@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JetBrains.Annotations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -73,5 +74,22 @@ public static class DirectionUtility {
             BlockPos neighborPos = pos + direction.AsVector();
             neighborAction.Invoke(direction, neighborPos);
         }
+    }
+
+    public static bool IsAdjacent(this BlockPos pos1, BlockPos pos2) {
+        int dx = Mathf.Abs(pos1.x - pos2.x);
+        int dy = Mathf.Abs(pos1.y - pos2.y);
+        return (dx == 1 && dy == 0) || (dx == 0 && dy == 1);
+    }
+
+    public static Direction? GetDirectionTo(this BlockPos from, BlockPos to) {
+        if (from.x == to.x) {
+            if (from.y < to.y) return Direction.Up;
+            if (from.y > to.y) return Direction.Down;
+        } else if (from.y == to.y) {
+            if (from.x < to.x) return Direction.Right;
+            if (from.x > to.x) return Direction.Left;
+        }
+        return null;
     }
 }
