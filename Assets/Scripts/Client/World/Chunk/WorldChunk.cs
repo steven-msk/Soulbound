@@ -103,5 +103,5 @@ public class WorldChunk {
 
 	public void SetBlock(ChunkBlockPos chunkPos, BlockState blockState) => blockStates[chunkPos.x, WorldYToIndex(chunkPos.y)] = blockState;
 
-	public BlockState BlockAt(ChunkBlockPos chunkPos) => blockStates[chunkPos.x, WorldYToIndex(chunkPos.y)];
+	public BlockState BlockStateAt(ChunkBlockPos chunkPos) => blockStates[chunkPos.x, WorldYToIndex(chunkPos.y)];
 }

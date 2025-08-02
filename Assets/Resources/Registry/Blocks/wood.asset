@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 957055e2e87955a449c284b11fbcb1dc, type: 3}
   m_Name: wood
   m_EditorClassIdentifier: 
-  blockName: 
-  blockID: 
-  tileReference: {fileID: 0}
+  blockName: Wood Block
+  blockID: wood_block
+  tileReference: {fileID: 11400000, guid: 232c21752ec71d44ba1ed3d459668765, type: 2}

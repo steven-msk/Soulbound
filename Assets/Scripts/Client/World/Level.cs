@@ -184,7 +184,7 @@ public class Level {
 	public void SetBlockAndUpdate(BlockPos blockPos, [CanBeNull] BlockState blockState) {
 		WorldChunk chunk = this.ChunkAt(blockPos);
 		TileBase referencedTile = blockState?.block.TileReference ?? CommonTiles.air;
-        chunk.SetBlock(blockPos.ToChunkBlockPos(chunk.xpos), blockState);
+        chunk.SetBlock(blockPos.ToChunkBlockPos(chunk.xpos), blockState ?? new BlockState(Blocks.air));
         tilemap.SetTile((Vector3Int)blockPos.AsVector(), referencedTile);
 	}
 
@@ -222,7 +222,7 @@ public class Level {
 	public BlockState BlockStateAt(BlockPos blockPos, bool logFlag = true) {
 		WorldChunk chunk = ChunkAt(blockPos);
 		if (chunk != null) {
-			return chunk.BlockAt(blockPos.ToChunkBlockPos(chunk.xpos));
+			return chunk.BlockStateAt(blockPos.ToChunkBlockPos(chunk.xpos));
 		}
 		logFlag.If(() => Debug.LogError($"Cannot retrieve block state at {blockPos.ToString()} because its not generated"));
 		return null;
