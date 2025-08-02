@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor.Experimental.GraphView;
+using UnityEditor.TerrainTools;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.WSA;
@@ -185,9 +186,15 @@ public class Level {
 	public void SetBlockAndUpdate(BlockPos blockPos, [CanBeNull] BlockState blockState) {
 		WorldChunk chunk = this.ChunkAt(blockPos);
 		TileBase referencedTile = blockState?.block.TileReference ?? CommonTiles.air;
-        chunk.SetBlock(blockPos.ToChunkBlockPos(chunk.xpos), blockState ?? new BlockState(Blocks.air));
-        tilemap.SetTile((Vector3Int)blockPos, referencedTile);
+		BlockState oldState = chunk.BlockStateAt(blockPos.ToChunkBlockPos(chunk.xpos));
+		BlockState newState = blockState ?? new BlockState(Blocks.air);
 
+        chunk.SetBlock(blockPos.ToChunkBlockPos(chunk.xpos), newState);
+        tilemap.SetTile((Vector3Int)blockPos, referencedTile);
+		blockPos.ForEachAdjacent((direction, neighborPos) => {
+			BlockState neighborBlockState = BlockStateAt(neighborPos);
+			neighborBlockState?.OnNeighborChanged(neighborPos, blockPos, oldState, newState);
+        });
 	}
 
 	public void SetBlockAndUpdate(ChunkBlockPos chunkBlockPos, [CanBeNull] BlockState blockState) => SetBlockAndUpdate(chunkBlockPos.ToWorldBlockPos(), blockState);
@@ -240,7 +247,13 @@ public class Level {
 		return Blocks.air;
     }
 
-    public int ChunkXAt(Vector2 worldPos) => Mathf.FloorToInt(worldPos.x / CHUNK_LENGTH);
+	[CanBeNull]
+	public BlockState GetAdjacentBlockState(BlockPos startPos, Direction direction) {
+		BlockPos adjacentPos = startPos + direction.AsVector();
+		return BlockStateAt(adjacentPos);
+    }
+
+	public int ChunkXAt(Vector2 worldPos) => Mathf.FloorToInt(worldPos.x / CHUNK_LENGTH);
 
 	public int ChunkXAt(float x) => Mathf.FloorToInt(x / CHUNK_LENGTH);
 

@@ -12,7 +12,7 @@ public enum Direction {
     Right
 }
 
-public static class DirectionExtensions {
+public static class Directions {
     public static Direction Opposite(this Direction direction) {
         return direction switch {
             Direction.Up => Direction.Down,
@@ -67,4 +67,11 @@ public static class DirectionExtensions {
     }
 
     public static Direction FromVector((int x, int y) vector) => FromVector(vector.x, vector.y);
+
+    public static void ForEachAdjacent(this BlockPos pos, Action<Direction, BlockPos> neighborAction) {
+        foreach (Direction direction in Enum.GetValues(typeof(Direction))) {
+            BlockPos neighborPos = pos + direction.AsVector();
+            neighborAction.Invoke(direction, neighborPos);
+        }
+    }
 }
