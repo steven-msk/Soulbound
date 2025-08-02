@@ -84,9 +84,6 @@ public class InventoryController : MonoBehaviour, IContainer {
 		StartCoroutine(Prototype_setupDisplays());
 	}
 
-    // FIXME: the two top rows of the inventory popup are not clickable
-	// the pointer events are not being registered
-
     public void ToggleInventory(InputAction.CallbackContext actionContext) {
 		popupOpen = !popupOpen;
 		popup.SetActive(popupOpen);
