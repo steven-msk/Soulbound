@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.WSA;
@@ -168,7 +169,7 @@ public class Level {
 	}
 
 	public bool FeatureAt(BlockPos blockPos, out TerrainFeature feature) {
-		int chunkX = ChunkXAt(blockPos.AsVector());
+		int chunkX = ChunkXAt((Vector2Int)blockPos);
 		if (features.TryGetValue(chunkX, out var chunkFeatures)) {
 			ChunkBlockPos chunkBlockPos = blockPos.ToChunkBlockPos(chunkX);
 			feature = chunkFeatures.FirstOrDefault(f => f.origin == chunkBlockPos);
@@ -185,7 +186,8 @@ public class Level {
 		WorldChunk chunk = this.ChunkAt(blockPos);
 		TileBase referencedTile = blockState?.block.TileReference ?? CommonTiles.air;
         chunk.SetBlock(blockPos.ToChunkBlockPos(chunk.xpos), blockState ?? new BlockState(Blocks.air));
-        tilemap.SetTile((Vector3Int)blockPos.AsVector(), referencedTile);
+        tilemap.SetTile((Vector3Int)blockPos, referencedTile);
+
 	}
 
 	public void SetBlockAndUpdate(ChunkBlockPos chunkBlockPos, [CanBeNull] BlockState blockState) => SetBlockAndUpdate(chunkBlockPos.ToWorldBlockPos(), blockState);
@@ -242,7 +244,7 @@ public class Level {
 
 	public int ChunkXAt(float x) => Mathf.FloorToInt(x / CHUNK_LENGTH);
 
-	[CanBeNull] public WorldChunk ChunkAt(BlockPos blockPos) => generatedChunks.GetValueOrDefault(this.ChunkXAt(blockPos.AsVector()), null);
+	[CanBeNull] public WorldChunk ChunkAt(BlockPos blockPos) => generatedChunks.GetValueOrDefault(this.ChunkXAt((Vector2)blockPos), null);
 
 	[CanBeNull] public WorldChunk ChunkAt(int xpos) => ChunkAt(new BlockPos(xpos, 0));
 
@@ -266,5 +268,5 @@ public class Level {
 
     public bool IsInWorldBounds(Vector2 pos) => pos.y >= WorldChunk.minY && pos.y <= WorldChunk.maxY;
 
-	public bool IsInWorldBounds(BlockPos blockPos) => IsInWorldBounds(blockPos.AsVector());
+	public bool IsInWorldBounds(BlockPos blockPos) => IsInWorldBounds((Vector2)blockPos);
 }

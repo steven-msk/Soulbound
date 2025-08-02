@@ -24,12 +24,43 @@ public struct BlockPos {
         return new ChunkBlockPos(chunkBlockX, this.y, chunkX);
     }
 
-    public Vector2Int AsVector() => new Vector2Int(this.x, this.y);
-
     public static bool operator !=(BlockPos pos1, BlockPos pos2) => !(pos1 == pos2);
 
     public static bool operator ==(BlockPos pos1, BlockPos pos2) {
         return pos1.x == pos2.x && pos1.y == pos2.y;
+    }
+
+    public static explicit operator Vector2Int(BlockPos pos) => new Vector2Int(pos.x, pos.y);
+
+    public static explicit operator BlockPos(Vector2Int vec) => new BlockPos(vec.x, vec.y);
+
+    public static explicit operator Vector2(BlockPos pos) => new Vector2(pos.x, pos.y);
+
+    public static explicit operator BlockPos(Vector2 vec) => new BlockPos(Mathf.FloorToInt(vec.x), Mathf.FloorToInt(vec.y));
+
+    public static explicit operator Vector3(BlockPos pos) => new Vector3(pos.x, pos.y, 0f);
+
+    public static explicit operator BlockPos(Vector3 vec) => new BlockPos(Mathf.FloorToInt(vec.x), Mathf.FloorToInt(vec.y));
+
+    public static explicit operator Vector3Int(BlockPos pos) => new Vector3Int(pos.x, pos.y, 0);
+
+    public static explicit operator BlockPos(Vector3Int vec) => new BlockPos(vec.x, vec.y);
+
+    public static BlockPos operator +(BlockPos pos, Vector2Int vec) => new BlockPos(pos.x + vec.x, pos.y + vec.y);
+
+    public static BlockPos operator +(BlockPos pos, (int x, int y) vec) => new BlockPos(pos.x + vec.x, pos.y + vec.y);
+
+    public static BlockPos operator -(BlockPos pos, Vector2Int vec) => new BlockPos(pos.x - vec.x, pos.y - vec.y);
+
+    public static BlockPos operator -(BlockPos pos, (int x, int y) vec) => new BlockPos(pos.x - vec.x, pos.y - vec.y);
+
+    public static BlockPos operator *(BlockPos pos, int scalar) => new BlockPos(pos.x * scalar, pos.y * scalar);
+
+    public static BlockPos operator /(BlockPos pos, int scalar) {
+        if (scalar == 0) { 
+            throw new DivideByZeroException("Cannot divide BlockPos by zero.");
+        }
+        return new BlockPos(pos.x / scalar, pos.y / scalar);
     }
 
     public override bool Equals(object obj) {

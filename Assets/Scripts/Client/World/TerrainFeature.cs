@@ -60,7 +60,7 @@ public struct TerrainFeature {
         if (stateOverrides != null && stateOverrides.Count > 0) {
             sb.Append(", State Overrides: ");
             foreach (var stateOverride in stateOverrides) {
-                sb.Append($"[{stateOverride.Key} -> {stateOverride.Value?.block.name ?? "null"}] ");
+                sb.Append($"[{stateOverride.Key} -> {stateOverride.Value?.block.ID ?? "null"}] ");
             }
         }
         return sb.ToString();

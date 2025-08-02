@@ -10,7 +10,7 @@ using UnityEngine.Tilemaps;
 [CreateAssetMenu(menuName = "Block")]
 public class Block : ScriptableObject, ISerializable {
 	[SerializeField] private string blockName; 
-	public string BlockName => blockName;
+	public new string name => blockName;
 
 	[SerializeField] private string blockID;
 	public string ID => blockID;
