@@ -10,12 +10,14 @@ using UnityEngine.Tilemaps;
 public struct TerrainFeature {
     public ChunkBlockPos origin;
     public TerrainFeatureType type;
+    public BoundsInt2D bounds;
     [CanBeNull] public Dictionary<ChunkBlockPos, BlockState> stateOverrides;
 
-    public TerrainFeature(ChunkBlockPos origin, TerrainFeatureType type, Dictionary<ChunkBlockPos, BlockState> tileOverrides) {
+    public TerrainFeature(ChunkBlockPos origin, TerrainFeatureType type, Dictionary<ChunkBlockPos, BlockState> tileOverrides, BoundsInt2D bounds) {
         this.origin = origin;
         this.type = type;
         this.stateOverrides = tileOverrides;
+        this.bounds = bounds;
     }
 
     public static bool operator !=(TerrainFeature feature1, TerrainFeature feature2) => !(feature1 == feature2);

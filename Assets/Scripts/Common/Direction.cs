@@ -12,7 +12,7 @@ public enum Direction {
     Right
 }
 
-public static class Directions {
+public static class DirectionUtility {
     public static Direction Opposite(this Direction direction) {
         return direction switch {
             Direction.Up => Direction.Down,
