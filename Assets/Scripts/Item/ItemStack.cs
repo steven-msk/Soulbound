@@ -33,7 +33,7 @@ public class ItemStack {
 	}
 
 	public GameObject InitializeStackText(ItemDisplay parent) {
-		GameObject stackText = GameObject.Instantiate(Registry.Get<GameObject>("stackNumberPrefab"), parent.transform);
+		GameObject stackText = GameObject.Instantiate(AssetRegistry.Get<GameObject>("stackNumberPrefab"), parent.transform);
 		TextMeshProUGUI text = stackText.GetComponent<TextMeshProUGUI>();
 		text.autoSizeTextContainer = true;
 		RectTransform rectTransform = stackText.GetComponent<RectTransform>();
@@ -71,9 +71,10 @@ public class ItemStack {
 		pickupHitbox.callbackLayers = LayerMask.GetMask("Player");
 		pickupItem.AddComponent<BoxCollider2D>().excludeLayers = ~LayerMask.GetMask("Ground");
 		DroppedItem pickup = pickupItem.AddComponent<DroppedItem>();
-		pickup.ItemStack = this;
-		pickup.pickupDelay = (playerAction ? 2 : 0);
-	}
+		pickup.Init(this, playerAction ? 2f : 0f);
+    }
+
+	// FEATUREIMPL: dropped item stacks converging to avoid lag
 
 	// POTENTIAL REWORK: item max stack numbers
 	public static string FormatStackCount(int amount) {

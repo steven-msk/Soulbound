@@ -20,7 +20,7 @@ public class BlockItem : Item, IPlaceable {
 	}
 
 	public static BlockItem FromBlock(Block block) {
-		List<BlockItem> allBlockItems = GameManager.instance.GetAll<BlockItem>();
+		List<BlockItem> allBlockItems = AssetRegistry.GetAll<BlockItem>();
 		return allBlockItems.FirstOrDefault(item => item.referenceBlock == block) ?? null;
     }
 }

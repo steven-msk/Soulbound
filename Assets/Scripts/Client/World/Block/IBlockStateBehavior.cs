@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 public interface IBlockStateBehavior {
     // all of these method implementations are subject to change in the future
 
-    string Description { get; }
+    string Description { get; }      // solely for inspector display, not used in-game
 
     List<ItemStack> DroppedItemsUponBroken(BlockState blockState);
 

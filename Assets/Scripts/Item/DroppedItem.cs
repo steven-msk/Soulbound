@@ -2,18 +2,19 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class DroppedItem : MonoBehaviour {
-
 	public ItemStack ItemStack { get; set; }
-	public float pickupDelay = 2f;
+	public float pickupDelay = 0f;
 	private float pickupTimer = 0;
 
-	private void OnEnable() {
-		pickupTimer = pickupDelay;
-	}
+	public void Init(ItemStack itemStack, float pickupDelay) {
+		this.ItemStack = itemStack;
+		this.pickupDelay = pickupDelay;
+		OnEnable();
+    }
 
-	private void Update() {
-		pickupTimer -= Time.deltaTime;
-	}
+	private void OnEnable() => pickupTimer = pickupDelay;
+
+	private void Update() => pickupTimer -= Time.deltaTime;
 
 	private void OnTriggerStay2D(Collider2D collision) {
 		if (pickupTimer <= 0) {

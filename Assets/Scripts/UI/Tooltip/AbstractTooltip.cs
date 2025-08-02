@@ -42,9 +42,9 @@ public abstract class AbstractTooltip {
 		}
 	}
 
-	protected static GameObject InstantiatePanel(RectTransform displayParent) => GameObject.Instantiate(Registry.Get<GameObject>("tooltipPanel"), displayParent);
+	protected static GameObject InstantiatePanel(RectTransform displayParent) => GameObject.Instantiate(AssetRegistry.Get<GameObject>("tooltipPanel"), displayParent);
 
-	protected static GameObject InstantiateSection(RectTransform tooltipPanel) => GameObject.Instantiate(Registry.Get<GameObject>("tooltipSection"), tooltipPanel);
+	protected static GameObject InstantiateSection(RectTransform tooltipPanel) => GameObject.Instantiate(AssetRegistry.Get<GameObject>("tooltipSection"), tooltipPanel);
 
 	protected static TextMeshProUGUI InstantiateSectionText(RectTransform toolipPanel) => InstantiateSection(toolipPanel).GetComponent<TextMeshProUGUI>();
 }

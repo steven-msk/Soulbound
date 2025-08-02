@@ -9,7 +9,7 @@ using Object = UnityEngine.Object;
 
 #nullable enable
 
-public static class Registry {
+public static class AssetRegistry {
 	public static Dictionary<string, Object> resources = new();
 
 	public static void Reset() => resources.Clear();
@@ -44,14 +44,14 @@ public static class Registry {
 		}
 		List<T> addedResources = new();
         foreach (var resource in resources) {
-			if (Registry.resources.TryGetValue(resource.name, out var resourceTest) && resourceTest.GetType() == typeof(T)) {
+			if (AssetRegistry.resources.TryGetValue(resource.name, out var resourceTest) && resourceTest.GetType() == typeof(T)) {
 				Debug.LogWarning($"Duplicate resource found: {resource.name} at path '{path}'. Skipping registration.");
 				continue;
 			}
             try {
 				InvocationHelper.PatternIfElse<ISerializable>(resource, 
-					(serializable) => Registry.resources.Add(serializable.ID, resource), 
-					() => Registry.resources.Add(resource.name, resource));
+					(serializable) => AssetRegistry.resources.Add(serializable.ID, resource), 
+					() => AssetRegistry.resources.Add(resource.name, resource));
 				addedResources.Add((T)resource);
             } catch (Exception e) {
 				Debug.LogError($"Failed to register resource '{resource.name}' at path '{path}': {e.Message}");

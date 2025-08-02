@@ -67,16 +67,16 @@ public class InventoryController : MonoBehaviour, IContainer {
 	private void Start() {
 		IEnumerator Prototype_setupDisplays() {
 			yield return new WaitUntil(() => setup);
-			CreateItemDisplay(new ItemStack(Registry.Get<Item>("weaponItem_test"), 2), hotbar[0]);
-			CreateItemDisplay(new ItemStack(Registry.Get<Item>("armoritem_test"), 2), hotbar[1]);
-			CreateItemDisplay(new ItemStack(Registry.Get<Item>("armoritem_test"), 2), popupSlots[0, 0]);
-			CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableStatItem_test"), 100), hotbar[3]);
-			CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableStatItem_test"), 21_489), hotbar[6]);
-			CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableStatItem_test"), 1), hotbar[7]);
-			CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableStatItem_test"), 1), hotbar[8]);
-			CreateItemDisplay(new ItemStack(Registry.Get<Item>("consumableStatItem_test"), 1), (InventorySlot)this[2, 8]);
-			CreateItemDisplay(new ItemStack(Registry.Get<Item>("longTooltipItem"), 1), hotbar[5]);
-			CreateItemDisplay(new ItemStack(Registry.Get<Item>("grass_block_item"), 100), hotbar[2]);
+			CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("weaponItem_test"), 2), hotbar[0]);
+			CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("armoritem_test"), 2), hotbar[1]);
+			CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("armoritem_test"), 2), popupSlots[0, 0]);
+			CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("consumableStatItem_test"), 100), hotbar[3]);
+			CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("consumableStatItem_test"), 21_489), hotbar[6]);
+			CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("consumableStatItem_test"), 1), hotbar[7]);
+			CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("consumableStatItem_test"), 1), hotbar[8]);
+			CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("consumableStatItem_test"), 1), (InventorySlot)this[2, 8]);
+			CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("longTooltipItem"), 1), hotbar[5]);
+			CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("grass_block_item"), 100), hotbar[2]);
 			Debug.Log("<color=green>[INVENTORY]</color> Player inventory loaded");				// might factor out in LogUtil
 			// POTENTIAL: LogUtil modularity - implement different color coded logging sections marked between [ ]
 			hotbar.SetActiveSlot(0);
@@ -170,7 +170,7 @@ public class InventoryController : MonoBehaviour, IContainer {
 	[CanBeNull] public InventorySlot[] GetEmptySlots() => MainPlayerSlots.Where(slot => !slot.HasItem).ToArray();
 	
 	public ItemDisplay CreateItemDisplay(ItemStack itemStack, InventorySlot slot) {
-		GameObject obj = Instantiate(Registry.Get<GameObject>("itemDisplayPrefab"), slot.transform);
+		GameObject obj = Instantiate(AssetRegistry.Get<GameObject>("itemDisplayPrefab"), slot.transform);
 		ItemDisplay display = obj.GetComponent<ItemDisplay>();
 		Debug.Assert(display != null, $"ItemDisplay instance not found in item display prefab");
 		display.ItemStack = itemStack;

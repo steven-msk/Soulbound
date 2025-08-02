@@ -16,10 +16,10 @@ MonoBehaviour:
   blockID: air_block
   tileReference: {fileID: 11400000, guid: 83c473769b53ff544936a65baf59fb6c, type: 2}
   stateBehavior:
-    rid: 6961233574288162890
+    rid: 6961233574288162893
   references:
     version: 2
     RefIds:
-    - rid: 6961233574288162890
+    - rid: 6961233574288162893
       type: {class: NullBlockStateBehavior, ns: , asm: Assembly-CSharp}
       data: 

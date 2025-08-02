@@ -56,15 +56,15 @@ public class GameManager : MonoBehaviour {
             return;
         }
 
-        Registry.Reset();
+        AssetRegistry.Reset();
 		registriesByType.Clear();
-		RegisterByType<TMP_FontAsset>(Registry.RegisterAll<TMP_FontAsset>("Registry/Fonts"));
-		RegisterByType<Item>(Registry.RegisterAll<Item>("Registry/Items"));
+		RegisterByType<TMP_FontAsset>(AssetRegistry.RegisterAll<TMP_FontAsset>("Registry/Fonts"));
+		RegisterByType<Item>(AssetRegistry.RegisterAll<Item>("Registry/Items"));
 		RegisterBySubclassedType<Item, BlockItem>(registriesByType[typeof(Item)].Cast<Item>().ToList());
-		RegisterByType<GameObject>(Registry.RegisterAll<GameObject>("Registry/Prefabs"));
-		RegisterByType<Tile>(Registry.RegisterAll<Tile>("Registry/Tiles"));
-		RegisterByType<RuleTile>(Registry.RegisterAll<RuleTile>("Registry/Tiles"));
-		RegisterByType<Block>(Registry.RegisterAll<Block>("Registry/Blocks"));
+		RegisterByType<GameObject>(AssetRegistry.RegisterAll<GameObject>("Registry/Prefabs"));
+		RegisterByType<Tile>(AssetRegistry.RegisterAll<Tile>("Registry/Tiles"));
+		RegisterByType<RuleTile>(AssetRegistry.RegisterAll<RuleTile>("Registry/Tiles"));
+		RegisterByType<Block>(AssetRegistry.RegisterAll<Block>("Registry/Blocks"));
     }
 
 	public List<T> GetAll<T>() where T : UnityEngine.Object {

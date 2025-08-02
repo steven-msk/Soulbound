@@ -9,7 +9,7 @@ public class TooltipSectionLayout {
 	public FontStyles fontStyle = FontStyles.Normal;
 	public TextAlignmentOptions alignment = TextAlignmentOptions.Left;
 	public Vector4 margin = Vector4.zero;
-	public TMP_FontAsset fontAsset = Registry.Get<TMP_FontAsset>("Urbanist-SemiBold SDF");
+	public TMP_FontAsset fontAsset = AssetRegistry.Get<TMP_FontAsset>("Urbanist-SemiBold SDF");
 	//...animations, shaders?
 
 	public TooltipSectionLayout(TooltipSection section, bool applyPreset = true) {

@@ -23,7 +23,6 @@ public class BlockState {
     }
 
     // TODO: implement block items for stone, wood, and dirt blocks
-    // FIXME: unexpected delay when picking up items from blocks
 
     public void DropOnBroken(BlockPos pos) {
         List<ItemStack> itemsDropped = block.StateBehavior.DroppedItemsUponBroken(this);
