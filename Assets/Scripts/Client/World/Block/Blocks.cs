@@ -12,5 +12,5 @@ public static class Blocks {
     public static Block wood = FromRegistry("wood_block");
     public static Block leaf = FromRegistry("leaf_block");
 
-    private static Block FromRegistry(string id) => AssetRegistry.Get<Block>(id);
+    public static Block FromRegistry(string id) => AssetRegistry.Get<Block>(id);
 }

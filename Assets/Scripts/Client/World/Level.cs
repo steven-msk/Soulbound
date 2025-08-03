@@ -79,7 +79,7 @@ public class Level {
                 var toRemove = feature.stateOverrides.Where(stateOverride => stateOverride.Key.y > changePos.y);
                 toRemove.ToList().ForEach(stateOverride => {
                     feature.stateOverrides.Remove(stateOverride.Key);
-                    BreakBlock(stateOverride.Key.ToWorldBlockPos());
+                    BreakBlock(stateOverride.Key.ToWorldBlockPos(), BreakSource.NonPlayer);
                 });
             }
         };
@@ -242,10 +242,10 @@ public class Level {
     }
 
     // in the future this will also contain the information about how the block was broken
-    public void BreakBlock(BlockPos blockPos) {
+    public void BreakBlock(BlockPos blockPos, BreakSource source) {
         BlockState brokenBlock = BlockStateAt(blockPos);
         SetBlockAndUpdate(blockPos, null);
-        brokenBlock.DropOnBroken(blockPos);
+        brokenBlock.DropOnBroken(blockPos, source);
         // drop block
     }
 

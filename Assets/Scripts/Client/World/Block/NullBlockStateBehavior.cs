@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 public class NullBlockStateBehavior : IBlockStateBehavior {
     public string Description => "No drops, no neighbor updates";
 
-    public List<ItemStack> GetDrops(BlockState blockState) => new List<ItemStack>();
+    public List<ItemStack> GetDrops(BlockState blockState, BreakSource source) => new List<ItemStack>();
 
     public void OnNeighborStateChanged(BlockPos selfPos, BlockPos neighborPos, BlockState oldState, BlockState newState) {
     }

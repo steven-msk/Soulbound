@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+#nullable enable
+
 [CreateAssetMenu(menuName = "Items/BlockItem")]
 public class BlockItem : Item, IPlaceable {
 	[SerializeField] private Block referenceBlock;
@@ -19,8 +21,5 @@ public class BlockItem : Item, IPlaceable {
 		return CompoundTooltip.Of(Tooltip.Info(this.itemName));
 	}
 
-	public static BlockItem FromBlock(Block block) {
-		List<BlockItem> allBlockItems = AssetRegistry.GetAll<BlockItem>();
-		return allBlockItems.FirstOrDefault(item => item.referenceBlock == block) ?? null;
-    }
+	public static BlockItem? FromBlock(Block block) => block.BlockItemReference;
 }

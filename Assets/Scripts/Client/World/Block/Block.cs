@@ -8,6 +8,8 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+#nullable enable
+
 [CreateAssetMenu(menuName = "Block")]
 public class Block : ScriptableObject, ISerializable {
 	[SerializeField] private string blockName; 
@@ -21,6 +23,9 @@ public class Block : ScriptableObject, ISerializable {
 
 	[HideInInspector] [SerializeReference] private IBlockStateBehavior stateBehavior;
 	public IBlockStateBehavior StateBehavior => stateBehavior;
+
+	[SerializeField] private BlockItem? blockItemReference;
+	public BlockItem? BlockItemReference => blockItemReference;
 }
 
 [CustomEditor(typeof(Block))]

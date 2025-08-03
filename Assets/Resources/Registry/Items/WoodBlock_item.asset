@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Wood Block
   id: wood_block_item
-  icon: {fileID: 0}
-  worldPrefab: {fileID: 0}
+  icon: {fileID: 21300000, guid: fd80548b50fd0534b857322d5b44ea5a, type: 3}
+  worldPrefab: {fileID: 2682288603813231797, guid: 8d07e25f999eba0449ed9045f9a83c8c, type: 3}
   maxStackSize: 999999
   customTooltipSerializer: {fileID: 0}
   loreTextTooltip: 
   infoTextTooltip: 
-  referenceBlock: {fileID: 0}
+  referenceBlock: {fileID: 11400000, guid: f488f6b3335f70a438c9d47a48251f93, type: 2}

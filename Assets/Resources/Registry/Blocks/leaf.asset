@@ -16,10 +16,11 @@ MonoBehaviour:
   blockID: leaf_block
   tileReference: {fileID: 11400000, guid: 91313985e638b4846bc2ac26367b1fc4, type: 2}
   stateBehavior:
-    rid: 6961233574288162891
+    rid: 6961233590941909060
+  blockItemReference: {fileID: 0}
   references:
     version: 2
     RefIds:
-    - rid: 6961233574288162891
-      type: {class: NullBlockStateBehavior, ns: , asm: Assembly-CSharp}
+    - rid: 6961233590941909060
+      type: {class: LeafBlockStateBehavior, ns: , asm: Assembly-CSharp}
       data: 
