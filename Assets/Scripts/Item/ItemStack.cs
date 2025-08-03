@@ -59,11 +59,11 @@ public class ItemStack {
 		return stackText;
 	}
 
-	public void Drop(Vector2 pos, bool playerAction = false) {
+	public void Drop(Vector2 pos, Vector2 dropForce, bool playerAction = false) {
 		// FUTURE TODO: item drop movement (throw force)
 		GameObject pickupItem = GameObject.Instantiate(Item.WorldPrefab, null);
 		DroppedItem pickup = pickupItem.AddComponent<DroppedItem>();
-		pickup.Init(this, playerAction ? 2f : 0f, pos);
+		pickup.Init(this, playerAction ? 2f : 0f, pos, dropForce);
     }
 
 	// FEATUREIMPL: dropped item stacks converging to avoid lag

@@ -50,6 +50,15 @@ public class PlayerController : MonoBehaviour {
 	public BlockPos blockPos => level.ToBlockPos(this.position);
 	public ChunkBlockPos chunkBlockPos => blockPos.ToChunkBlockPos(level.ChunkXAt(position));
 
+    // FIXME: inconsistency in item drop force direction
+    public Vector2 itemDropForce {
+		get {
+			Vector2 force = new Vector2(3f, 4f);
+			force.x *= facing;
+			return force;
+        }
+	}
+
 	public float MaxBlockReach => 5f;
 
 	private void Awake() {

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class BlockState {
     // subject to change in the future
@@ -27,7 +28,8 @@ public class BlockState {
     public void DropOnBroken(BlockPos pos, BreakSource source) {
         if (block.BlockItemReference != null) {
             List<ItemStack> itemsDropped = block.StateBehavior.GetDrops(this, source);
-            itemsDropped.ForEach(itemStack => itemStack.Drop(pos.CenterAligned()));
+            Vector2 dropForce = block.StateBehavior.dropForce;
+            itemsDropped.ForEach(itemStack => itemStack.Drop(pos.CenterAligned(), dropForce));
         }
     }
 

@@ -17,7 +17,7 @@ MonoBehaviour:
   tileReference: {fileID: 11400000, guid: 91313985e638b4846bc2ac26367b1fc4, type: 2}
   stateBehavior:
     rid: 6961233590941909060
-  blockItemReference: {fileID: 0}
+  blockItemReference: {fileID: 11400000, guid: 13f4842a6cb11d54f95c5743426cf3bb, type: 2}
   references:
     version: 2
     RefIds:

@@ -93,13 +93,13 @@ public class InventoryController : MonoBehaviour, IContainer {
 	public void DropItemFromInventory(InputAction.CallbackContext actionContext) {
 		if (activeTooltip != null) {
 			ItemDisplay itemDisplay = activeTooltip.DisplayParent?.GetComponent<ItemDisplay>();
-			itemDisplay?.ItemStack.Drop(player.position, true);
+			itemDisplay?.ItemStack.Drop(player.center, player.itemDropForce, true);
 			Destroy(itemDisplay?.gameObject);
 			activeTooltip.Hide();
 			activeTooltip = null;
 		} else {
 			ItemDisplay item = hotbar.ActiveSlot.ItemDisplay;
-			item?.ItemStack.Drop(player.position, true);
+			item?.ItemStack.Drop(player.center, player.itemDropForce, true);
 			Destroy(item?.gameObject);
 		}
 	}
@@ -107,7 +107,7 @@ public class InventoryController : MonoBehaviour, IContainer {
 	// POTENTIAL: OnDrop callback in Item
 
 	public void DropGrabbedItem(InputAction.CallbackContext actionContext) {
-		GrabbedItem?.ItemStack.Drop(player.position, true);
+		GrabbedItem?.ItemStack.Drop(player.center, player.itemDropForce, true);
 		Destroy(GrabbedItem?.gameObject);
 		if (GrabbedItem?.ItemStack == player.MainHandStack) {
 			player.SetMainHandItem(null);
