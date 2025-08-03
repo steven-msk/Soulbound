@@ -18,9 +18,6 @@ public class GrassTile : RuleTile<GrassTile.Neighbor> {
 	// This can be fixed manually by updating the position with a tile brush,
 	// but this is not maintainable and works only in editor
 	
-	// TODO: make a better implementation for grass tiles
-	// This is also a reminder that future tile types will require further modulation
-
 	public override bool RuleMatch(int neighbor, TileBase other) {
 		return neighbor switch { 
 			Neighbor.This => other == this,

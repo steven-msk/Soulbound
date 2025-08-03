@@ -12,10 +12,6 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class InventoryController : MonoBehaviour, IContainer {
-
-	// PLANNED: IContainer interface for shareable item container behavior
-	// PLANNED REFACTOR: adapt InventoryController to have shared container behavior
-
 	[SerializeField] private HotbarController hotbar;
 	public HotbarController Hotbar => hotbar;
 
@@ -158,10 +154,6 @@ public class InventoryController : MonoBehaviour, IContainer {
 		}
 	}
 	 
-	// PLANNED FEATUREIMPL REFACTOR: equipment slots behavior and code restructure
-	// Factor out common equipment slot behavior logic, potentially add a general implementation for
-	// slots that only accept 1 item of some item type along with its behavior logic
-
 	[CanBeNull] public InventorySlot GetFirstEmptySlot() => MainPlayerSlots.First(slot => slot.IsEmpty);
 
 	[CanBeNull] public InventorySlot[] GetOccupiedSlots() => MainPlayerSlots.Where(slot => slot.HasItem).ToArray();

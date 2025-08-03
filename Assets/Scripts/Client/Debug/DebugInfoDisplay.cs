@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -28,23 +29,4 @@ public class DebugInfoDisplay : MonoBehaviour {
 		chunkPos?.UpdateDisplayComponent(chunkPos, ChunkBlockPos.FromBlockPos(player.blockPos));
 		velocity?.UpdateDisplayComponent(velocity, player.Rigidbody.linearVelocity);
     }
-
-	public string Coordinates {
-		get {
-			Vector2 worldPos = player.position;
-			BlockPos blockPos = level.ToBlockPos(worldPos);
-			int chunkX = level.ChunkXAt(worldPos);
-			ChunkBlockPos chunkPos = blockPos.ToChunkBlockPos(chunkX);
-			return $"x:{worldPos.x}, y:{worldPos.y}\n" +
-				   $"{blockPos.ToString()}\n" +
-				   $"{chunkPos.ToString()}";
-		}
-	}
-
-	public string Velocity {
-		get {
-			Vector2 velocity = player.Rigidbody.linearVelocity;
-			return $"Current velocity XY: {velocity.ToString()}";
-		}
-	}
 }

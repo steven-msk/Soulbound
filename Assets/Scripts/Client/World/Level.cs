@@ -82,7 +82,7 @@ public class Level {
                 features[feature.origin.chunkX].Remove(feature);
                 var toRemove = feature.stateOverrides.Where(stateOverride => stateOverride.Key.y > changePos.y);
                 toRemove.ToList().ForEach(stateOverride => {
-                    feature.stateOverrides.Remove(stateOverride.Key);
+                    feature.stateOverrides.Remove(stateOverride.Key); 
                     BreakBlock(stateOverride.Key.ToWorldBlockPos(), BreakSource.NonPlayer);
                 });
             }
