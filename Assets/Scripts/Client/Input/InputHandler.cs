@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using NUnit.Compatibility;
 using NUnit.Framework;
+using Unity.VisualScripting;
 using UnityEditor.Timeline.Actions;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -41,7 +42,7 @@ public class InputHandler : MonoBehaviour {
 		requests.Clear();
 		blockedContexts.Clear();
 
-		inputActions = new PlayerInputActions();
+        inputActions = new PlayerInputActions();
 		PlayerActions playerActions = inputActions.Player;
 		PlayerController player = GameManager.instance.Player;
 
@@ -106,28 +107,28 @@ public class InputHandler : MonoBehaviour {
 		callbackBinding.Invoke(inputAction);
 	}
 
-	public static void BlockContextUntil(string context, Func<bool> unblockPredicate) => blockedContexts[context] = unblockPredicate;
 
-	public static void RequestAction(InputActionRequest intent) {
-		if (blockedContexts.TryGetValue(intent.Context, out var predicate)) {
-			if (predicate.Invoke()) {
-				return;
-			}
-			blockedContexts.Remove(intent.Context);
-		}
-		requests.Add(intent);
-	}
+	public static void BlockContext(string context, Func<bool> unblockPredicate) => blockedContexts[context] = unblockPredicate;
+
+    public static void RequestAction(InputActionRequest action) => requests.Add(action);
 
 	private void Update() {
-		if (LeftHold) {
-			GameManager.instance.Player.OnLeftHold();
-		} else if (RightHold) {
-			GameManager.instance.Player.OnRightHold();
-		}
-	}
+		LeftHold.If(GameManager.instance.Player.OnLeftHold);
+		RightHold.If(GameManager.instance.Player.OnRightHold);
+
+		List<string> unblockedPersistent = new();
+        foreach (var kvp in blockedContexts) {
+            if (kvp.Value.Invoke()) {
+				unblockedPersistent.Add(kvp.Key);
+            }
+        }
+		unblockedPersistent.ForEach(context => blockedContexts.Remove(context));
+    }
 
 	private void LateUpdate() {
-		InputActionRequest highestPriorityRequest = requests.OrderByDescending(intent => intent.Priority).FirstOrDefault();
+		var availableRequests = requests.Where(action => !blockedContexts.ContainsKey(action.Context));
+		InputActionRequest highestPriorityRequest = availableRequests.OrderByDescending(intent => intent.Priority).FirstOrDefault();
+		highestPriorityRequest?.Callback.Invoke();
 		highestPriorityRequest?.Action.Invoke();
 		requests.Clear();
 	}

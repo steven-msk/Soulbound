@@ -1,10 +1,13 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using Unity.IO.LowLevel.Unsafe;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
+
+#nullable enable
 
 public class PlayerController : MonoBehaviour {
 	[SerializeField] private InputHandler inputHandler;
@@ -29,7 +32,7 @@ public class PlayerController : MonoBehaviour {
 
 	private ItemUsageHandler itemUsageHandler;
 	public ItemUsageHandler ItemUsageHandler => itemUsageHandler;
-	public ItemStack MainHandStack { get; private set; }
+	public ItemStack? MainHandStack { get; private set; }
 
 	public bool CanAttack { get; set; } = true;
 
@@ -89,7 +92,7 @@ public class PlayerController : MonoBehaviour {
 		if (MainHandStack == itemStack) {
 			return;
 		}
-		static void InvokeStatItem(ItemStack itemStack, Action<IStatProvider> statProviderAction) {
+		static void InvokeStatItem(ItemStack? itemStack, Action<IStatProvider> statProviderAction) {
 			if (itemStack?.Item is IStatProvider statProvider && statProvider.ApplyInstantStatsAutomatically) {
 				statProviderAction.Invoke(statProvider);
 			}
@@ -102,18 +105,29 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	[InputAction("ItemUse", Priority = 5)]
-	internal void OnLeftClick() => InputHandler.RequestAction(ItemUseRequest(ItemUseTrigger.LeftClick));
+	internal void OnLeftClick() {
+   //     Item? usedItem = MainHandStack?.Item;
+   //     InputHandler.RequestAction(new("ItemUse", 5, () => itemUsageHandler.HandleInput(ItemUseTrigger.LeftClick, MainHandStack), null));
+   //     if (usedItem is IPlaceable) {
+			//Debug.Log("Suppressing block break after placeable item use");
+   //         InputHandler.BlockContextUntil("BlockBreak", () => MainHandStack == null);
+   //     }
+    }
 
 	[InputAction("ItemUse", Priority = 5)]
-	internal void OnRightClick() => InputHandler.RequestAction(ItemUseRequest(ItemUseTrigger.RightClick));
+	internal void OnRightClick() => RequestMainHandUse(ItemUseTrigger.RightClick, null);
 
 	// POTENTIAL FEATUREIMPL: add Reach int stat
 
-	[InputAction("ItemUse", Priority = 5)]
+    [InputAction("ItemUse", Priority = 5)]
 	internal void OnLeftHold() { 
 		if (MainHandStack != null) {
-			InputHandler.RequestAction(ItemUseRequest(ItemUseTrigger.LeftHold));
-		} else {		// placeholder
+			Item usedItem = MainHandStack.Item;
+            InputHandler.RequestAction(new("ItemUse", 5, () => itemUsageHandler.HandleInput(ItemUseTrigger.LeftHold, MainHandStack), null));
+			if (usedItem is IPlaceable) {
+				InputHandler.BlockContext("BlockBreak", () => !InputHandler.LeftHold);
+			}
+		} else {
 			InputHandler.RequestAction(new InputActionRequest("BlockBreak", 5, () => {
 				Level level = GameManager.instance.Level;
 				Vector2 worldMousePos = inputHandler.MouseWorldPosition;
@@ -122,16 +136,41 @@ public class PlayerController : MonoBehaviour {
 				if (this.IsInBlockReach(worldMousePos) && level.BlockAt(blockPos) != Blocks.air) {
 					level.BreakBlock(blockPos, BreakSource.Player);
                 }
-			}));
+			}, null));
 		}
 	}
 
-	[InputAction("ItemUse", Priority = 5)]
-	internal void OnRightHold() => InputHandler.RequestAction(ItemUseRequest(ItemUseTrigger.RightHold));
-
-	private InputActionRequest ItemUseRequest(ItemUseTrigger useTrigger) {
-		return new InputActionRequest("ItemUse", 5, () => itemUsageHandler.HandleInput(useTrigger, MainHandStack));
+	private void RequestMainHandUse(ItemUseTrigger trigger, Action? callback) {
+		InputHandler.RequestAction(new("ItemUse", 5, () => itemUsageHandler.HandleInput(trigger, MainHandStack), callback));
 	}
+
+	//private void SuppressBreakAfterBlockPlace() {
+	//	if (MainHandStack?.Item is IPlaceable) {
+	//		InputHandler.BlockContextUntil("BlockBreak", () => !InputHandler.LeftHold);
+ //       }
+	//}
+
+	[InputAction("ItemUse", Priority = 5)]
+	internal void OnRightHold() => RequestMainHandUse(ItemUseTrigger.RightHold, null);
+
+	//private void RequestMainHandUse(ItemUseTrigger trigger, Dictionary<Type, List<(string blockedContext, Func<bool> unblockPredicate)>>? blockedContextsByCapability, bool emptyHandFallback) {
+	//	InputHandler.RequestAction(new("ItemUse", 5, () => itemUsageHandler.HandleInput(trigger, MainHandStack), null));
+	//	if (blockedContextsByCapability != null) {
+	//		foreach (var kvp in blockedContextsByCapability) {
+	//			Type capabilityType = kvp.Key;
+	//			if (MainHandStack?.Item.HasCapability(capabilityType) ?? true) {
+	//				var blockedContexts = kvp.Value;
+	//				blockedContexts.ForEach(context => InputHandler.BlockContextUntil(context.blockedContext, context.unblockPredicate));
+	//			}
+	//		}
+	//	}
+	//}
+
+	//private void SuppressBreakAfterBlockPlace(ItemUseTrigger trigger) {
+	//	RequestMainHandUse(trigger, new Dictionary<Type, List<(string, Func<bool>)>>() {
+	//		[typeof(IPlaceable)] = new List<(string, Func<bool>)>() { ("BlockBreak", () => !InputHandler.LeftHold) }
+	//	}, emptyHandFallback: true);
+	//}
 
 	public bool IsInBlockReach(Vector2 worldPos) {
 		float dist = Vector2.Distance(worldPos, this.center);

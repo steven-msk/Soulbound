@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -43,4 +44,12 @@ public class Item : ScriptableObject, ISerializable {
 	}
 
 	protected virtual CompoundTooltip GetDefaultTooltip() => Tooltip.DefaultItem(this);
+
+	public bool HasCapability<T>() where T : IItemCapability {
+		return typeof(T).IsAssignableFrom(this.GetType());
+    }
+
+	public bool HasCapability(Type type) {
+		return type.IsAssignableFrom(this.GetType());
+    }
 }

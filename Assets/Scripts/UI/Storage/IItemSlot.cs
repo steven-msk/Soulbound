@@ -44,8 +44,8 @@ public static class ItemSlotUtility {
         InventoryController inventory = GameManager.instance.Player.Inventory;
 		InputHandler.RequestAction(new("ItemDrag", 10, () => {
 			InvocationHelper.If(slot.ValidClickAction(inventory.GrabbedItem), () => slot.OnClick(inventory.GrabbedItem, inventory));
-		}));
-		InputHandler.BlockContextUntil("ItemUse", () => GameManager.instance.Player.InputHandler.LeftHold);
+		}, null));
+		InputHandler.BlockContext("ItemUse", () => !GameManager.instance.Player.InputHandler.LeftHold);
 	}
 
 	public static bool ValidClickAction(this IItemSlot slot, ItemDisplay grabbedItem) => grabbedItem != null || slot.HasItem;
