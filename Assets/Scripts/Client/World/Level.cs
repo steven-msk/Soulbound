@@ -60,7 +60,7 @@ public class Level {
             this.GenerateNewChunk(chunkX);
         }
         BlockStateChanged += blockChangedEvent => {
-            bool foundFeature = this.FeatureAt(blockChangedEvent.pos, out TerrainFeature feature);
+            bool foundFeature = this.FeatureAt(blockChangedEvent.pos, out TerrainFeature? feature);
 
             // placeholder for the only feature that exists for now (trees)
             BlockPos changePos = blockChangedEvent.pos;
@@ -75,7 +75,14 @@ public class Level {
                 flag_brokenUnderneath = true;
             }
             if (oldState.block == Blocks.leaf && feature.stateOverrides.ContainsKey(ChunkBlockPos.FromBlockPos(changePos))) {
-                features[feature.origin.chunkX].Remove(feature);
+                if (OverlappingFeatures(changePos, out var overlapping)) {
+                    foreach (TerrainFeature overlappingFeature in overlapping) {
+                        if (overlappingFeature == feature && overlappingFeature.bounds.Contains((Vector2Int)changePos)) {
+                            features[feature.origin.chunkX].Remove(feature);
+                            break;
+                        }
+                    }
+                }
                 return;
             }
             if ((oldState.block == Blocks.wood && feature.stateOverrides.ContainsKey(ChunkBlockPos.FromBlockPos(changePos))) || flag_brokenUnderneath) {
@@ -206,7 +213,7 @@ public class Level {
         }
     }
 
-    public bool FeatureAt(BlockPos blockPos, out TerrainFeature feature) {
+    public bool FeatureAt(BlockPos blockPos, out TerrainFeature? feature) {
         int chunkX = ChunkXAt((Vector2Int)blockPos);
         if (features.TryGetValue(chunkX, out var chunkFeatures)) {
             ChunkBlockPos chunkBlockPos = blockPos.ToChunkBlockPos(chunkX);
@@ -214,6 +221,17 @@ public class Level {
             return feature?.PersistentExistence() ?? false;
         }
         feature = null;
+        return false;
+    }
+
+    public bool OverlappingFeatures(BlockPos blockPos, out List<TerrainFeature> overlappingFeatures) {
+        int chunkX = ChunkXAt((Vector2Int)blockPos);
+        if (features.TryGetValue(chunkX, out var chunkFeatures)) {
+            ChunkBlockPos chunkBlockPos = blockPos.ToChunkBlockPos(chunkX);
+            overlappingFeatures = chunkFeatures.Where(f => f.bounds.Contains((Vector2Int)chunkBlockPos)).ToList();
+            return overlappingFeatures.Count > 0;
+        }
+        overlappingFeatures = new List<TerrainFeature>();
         return false;
     }
 
