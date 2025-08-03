@@ -74,6 +74,10 @@ public class Level {
                 }
                 flag_brokenUnderneath = true;
             }
+            if (oldState.block == Blocks.leaf && feature.stateOverrides.ContainsKey(ChunkBlockPos.FromBlockPos(changePos))) {
+                features[feature.origin.chunkX].Remove(feature);
+                return;
+            }
             if ((oldState.block == Blocks.wood && feature.stateOverrides.ContainsKey(ChunkBlockPos.FromBlockPos(changePos))) || flag_brokenUnderneath) {
                 features[feature.origin.chunkX].Remove(feature);
                 var toRemove = feature.stateOverrides.Where(stateOverride => stateOverride.Key.y > changePos.y);
