@@ -9,7 +9,7 @@ public interface IBlockStateBehavior {
 
     string Description { get; }      // solely for inspector display, not used in-game
 
-    List<ItemStack> DroppedItemsUponBroken(BlockState blockState);
+    List<ItemStack> GetDrops(BlockState blockState);
 
     void OnNeighborStateChanged(BlockPos selfPos, BlockPos neighborPos, BlockState oldState, BlockState newState);
 }

@@ -4,6 +4,8 @@ using JetBrains.Annotations;
 using Unity.VisualScripting;
 using UnityEngine;
 
+#nullable enable
+
 [CreateAssetMenu(menuName = "Items/Item")]
 public class Item : ScriptableObject, ISerializable {
 	[SerializeField] protected string itemName;
@@ -16,6 +18,7 @@ public class Item : ScriptableObject, ISerializable {
 	[SerializeField] protected Sprite icon;
 	public virtual Sprite Icon => icon;
 
+	// POTENTIAL REWORK: item world prefab serialization
 	[SerializeField] protected GameObject worldPrefab;
 	public virtual GameObject WorldPrefab => worldPrefab;
 	
@@ -23,14 +26,14 @@ public class Item : ScriptableObject, ISerializable {
 	public virtual int MaxStackSize => maxStackSize;
 	public virtual bool IsStackable => maxStackSize > 1;
 
-	[SerializeField][CanBeNull] protected TooltipSerializer customTooltipSerializer;
-	public TooltipSerializer TooltipSerializer => customTooltipSerializer;
+	[SerializeField]protected TooltipSerializer? customTooltipSerializer;
+	public TooltipSerializer? TooltipSerializer => customTooltipSerializer;
 
-	[SerializeField][CanBeNull] protected string loreTextTooltip;
-	public virtual string LoreText => loreTextTooltip;
+	[SerializeField] protected string? loreTextTooltip;
+	public virtual string? LoreText => loreTextTooltip;
 
-	[SerializeField][CanBeNull] protected string infoTextTooltip;
-	public virtual string InfoText => infoTextTooltip;
+	[SerializeField] protected string? infoTextTooltip;
+	public virtual string? InfoText => infoTextTooltip;
 
 	public virtual AbstractTooltip GetTooltip() {
 		if (customTooltipSerializer != null) {

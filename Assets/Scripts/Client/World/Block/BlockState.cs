@@ -25,7 +25,7 @@ public class BlockState {
     // TODO: implement block items for stone, wood, and dirt blocks
 
     public void DropOnBroken(BlockPos pos) {
-        List<ItemStack> itemsDropped = block.StateBehavior.DroppedItemsUponBroken(this);
+        List<ItemStack> itemsDropped = block.StateBehavior.GetDrops(this);
         itemsDropped.ForEach(itemStack => itemStack.Drop(pos.CenterAligned()));
         Debug.Log($"Dropped {itemsDropped.Count} items from block at {pos}");
     }

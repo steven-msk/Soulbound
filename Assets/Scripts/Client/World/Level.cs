@@ -79,7 +79,7 @@ public class Level {
                 var toRemove = feature.stateOverrides.Where(stateOverride => stateOverride.Key.y > changePos.y);
                 toRemove.ToList().ForEach(stateOverride => {
                     feature.stateOverrides.Remove(stateOverride.Key);
-                    SetBlockAndUpdate(stateOverride.Key.ToWorldBlockPos(), null);
+                    BreakBlock(stateOverride.Key.ToWorldBlockPos());
                 });
             }
         };

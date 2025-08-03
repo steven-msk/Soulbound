@@ -77,7 +77,8 @@ public class InventoryController : MonoBehaviour, IContainer {
 			CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("consumableStatItem_test"), 1), (InventorySlot)this[2, 8]);
 			CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("longTooltipItem"), 1), hotbar[5]);
 			CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("grass_block_item"), 100), hotbar[2]);
-			Debug.Log("<color=green>[INVENTORY]</color> Player inventory loaded");				// might factor out in LogUtil
+			CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("wood_block_item"), 100), (InventorySlot)this[0, 1]);
+            Debug.Log("<color=green>[INVENTORY]</color> Player inventory loaded");				// might factor out in LogUtil
 			// POTENTIAL: LogUtil modularity - implement different color coded logging sections marked between [ ]
 			hotbar.SetActiveSlot(0);
 		}
