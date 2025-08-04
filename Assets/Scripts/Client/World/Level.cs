@@ -17,17 +17,16 @@ public class Level {
     public const int WORLD_HEIGHT = 300;
     public const int SURFACE_TO_UNDERGROUND_DELIMITER = WORLD_HEIGHT / 2;
 
-    public event Action<BlockChangedEvent>? BlockStateChanged;
-    public event Action<BlockChangedEvent>? BlockPlaced;
-    public event Action<BlockChangedEvent>? BlockBroken;
+    public event Action<BlockChangeInfo>? BlockStateChanged;
     // POTENTIAL: post world events to the ticking system
 
     public readonly int seed;
+    static Dictionary<string, StructureTemplate> registeredStructureTemplates = new();
     private readonly PerlinNoiseGenerator1D heightGenerator;
     private Dictionary<int, WorldChunk> loadedChunks = new();
     private Dictionary<int, WorldChunk> generatedChunks = new(); 
     private ChunkOutlineRenderer chunkOutlineRenderer = new();
-    private Dictionary<int, List<TerrainFeature>> features = new();
+    private Dictionary<int, List<StructurePlacement>> structurePlacements = new();
     private Dictionary<int, List<(ChunkBlockPos chunkBlockPos, BlockState state)>> pendingUpdates = new();
     private int renderDistance;
 
@@ -53,63 +52,15 @@ public class Level {
     // achieve any level of performance. This project is still in prototype phase, so making any
     // optimization isnt really worth it and might be a waste of time in most cases.
 
-    public void EarlyGenerateChunks(Vector2 playerPos) {
+    public void BootstrapWorld(Vector2 playerPos) {
         int playerChunkX = ChunkXAt(playerPos);
         for (int dx = -renderDistance; dx <= renderDistance; dx++) {
             int chunkX = playerChunkX + dx;
             this.GenerateNewChunk(chunkX);
         }
-        BlockStateChanged += blockChangedEvent => {
-            bool foundFeature = this.FeatureAt(blockChangedEvent.pos, out TerrainFeature? feature);
-
-            // placeholder for the only feature that exists for now (trees)
-            BlockPos changePos = blockChangedEvent.pos;
-            BlockState oldState = blockChangedEvent.oldState;
-            bool flag_brokenUnderneath = false;
-            if (!foundFeature) {
-                BlockPos upNeighbor = changePos.GetAdjacent(Direction.Up);
-                foundFeature = this.FeatureAt(upNeighbor, out feature);
-                if (!foundFeature || ChunkBlockPos.FromBlockPos(upNeighbor) != feature.origin) {
-                    return;
-                }
-                flag_brokenUnderneath = true;
-            }
-            if (oldState.block == Blocks.leaf && feature.stateOverrides.ContainsKey(ChunkBlockPos.FromBlockPos(changePos))) {
-                if (OverlappingFeatures(changePos, out var overlapping)) {
-                    foreach (TerrainFeature overlappingFeature in overlapping) {
-                        if (overlappingFeature == feature && overlappingFeature.bounds.Contains((Vector2Int)changePos)) {
-                            features[feature.origin.chunkX].Remove(feature);
-                            break;
-                        }
-                    }
-                }
-                return;
-            }
-            if ((oldState.block == Blocks.wood && feature.stateOverrides.ContainsKey(ChunkBlockPos.FromBlockPos(changePos))) || flag_brokenUnderneath) {
-                features[feature.origin.chunkX].Remove(feature);
-                var toRemove = feature.stateOverrides.Where(stateOverride => stateOverride.Key.y > changePos.y);
-                toRemove.ToList().ForEach(stateOverride => {
-                    feature.stateOverrides.Remove(stateOverride.Key); 
-                    BreakBlock(stateOverride.Key.ToWorldBlockPos(), BreakSource.NonPlayer);
-                });
-            }
-        };
-    }
-
-    private void prototype_GenerateTreeFeatures(WorldChunk chunk, ChunkHeightmapData heightmapData) {
-        float treeFrequency = 0.5f;
-        float treeDisparity = 0.5f;
-        int chunkX = chunk.xpos;
-
-        for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
-            float treeNoise = Mathf.PerlinNoise(cx * treeFrequency, seed);
-            if (treeNoise > treeDisparity) {
-                TerrainFeature treeFeature = GenerateTerrainFeature(TerrainFeatureType.Tree, cx, chunkX, heightmapData);
-                ChunkBlockPos featureOrigin = new(treeFeature.origin.x, treeFeature.origin.y, chunkX);
-                if (!features.ContainsKey(chunkX)) {
-                    features.Add(chunkX, new List<TerrainFeature>());
-                }
-                features[chunkX].Add(treeFeature);
+        foreach (var structureTemplate in registeredStructureTemplates.Values) {
+            if (structureTemplate?.blockStateChangedCallback is not null) {
+                BlockStateChanged += structureTemplate.blockStateChangedCallback;
             }
         }
     }
@@ -142,98 +93,67 @@ public class Level {
         WorldChunk chunk = new(chunkX);
         ChunkHeightmapData heightmapData = chunk.GenerateHeightmap(this.heightGenerator);
         generatedChunks[chunkX] = chunk;
-        this.prototype_GenerateTreeFeatures(chunk, heightmapData);
-
-        foreach (var chunkFeatures in features.Values) {
-            List<TerrainFeature> newFeatures = chunkFeatures.Where(feature => feature.origin.chunkX == chunkX).ToList();
-            newFeatures.ForEach(feature => {
-                foreach (var stateOverride in feature.stateOverrides) {
+        for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
+            if (CheckStructureAvailability(cx, chunk.xpos, heightmapData, out var structurePlacement)) {
+                if (!structurePlacements.ContainsKey(chunkX)) {
+                    structurePlacements.Add(chunkX, new List<StructurePlacement>());
+                }
+                structurePlacements[chunkX].Add(structurePlacement);
+                foreach (var stateOverride in structurePlacement.stateOverrides) {
                     ChunkBlockPos chunkBlockPos = stateOverride.Key;
                     BlockState blockState = stateOverride.Value;
-                    WorldChunk chunk = ChunkAt(chunkBlockPos.ToWorldBlockPos());
-                    if (chunk == null) {
+                    WorldChunk? underlyingChunk = ChunkAt(chunkBlockPos.ToWorldBlockPos());
+                    if (underlyingChunk == null) {
                         PendUpdate(chunkBlockPos.chunkX, chunkBlockPos, blockState);
-                    } else if (loadedChunks.ContainsKey(chunkBlockPos.chunkX) && chunk != null) {
+                    } else if (loadedChunks.ContainsKey(chunkBlockPos.chunkX) && underlyingChunk != null) {
                         SetBlockAndUpdate(chunkBlockPos, blockState);
                     } else {
-                        chunk.SetBlock(chunkBlockPos, blockState);
+                        underlyingChunk.SetBlock(chunkBlockPos, blockState);
                     }
                 }
-            });
+            }
         }
         return chunk;
     }
 
-    public TerrainFeature GenerateTerrainFeature(TerrainFeatureType type, int chunkBlockX, int chunkX, ChunkHeightmapData heightmapData) {
-        switch (type) {
-            case TerrainFeatureType.Tree: {
-                int minHeight = 5;
-                int maxHeight = 20;
-                int crownRadius = 2;
-                BlockState woodTile = new BlockState(Blocks.wood);
-                BlockState leafTile = new BlockState(Blocks.leaf);
-
-                ChunkBlockPos treeOrigin = new(chunkBlockX, heightmapData.surfaceLevels[ToWorldX(chunkBlockX, chunkX)], chunkX);
-                int height = Random.Range(minHeight, maxHeight + 1);
-                BoundsInt2D bounds = new(treeOrigin.x - crownRadius, treeOrigin.y, crownRadius * 2 + 1, height);
-                ChunkBlockPos trunkPos = new ChunkBlockPos(treeOrigin.x, treeOrigin.y, chunkX);
-                Dictionary<ChunkBlockPos, BlockState> stateOverrides = new();
-
-                for (int ty = 0; ty < bounds.size.y; ty++) {
-                    stateOverrides[trunkPos] = woodTile;
-                    trunkPos.y++;
-                }
-
-                Dictionary<int, List<int>> rowToXs = new();
-                float angularStep = 1f;
-                for (float angle = 0; angle < 360f; angle += angularStep) {
-                    float rad = angle * Mathf.Deg2Rad;
-                    int x = Mathf.RoundToInt(trunkPos.x + crownRadius * Mathf.Cos(rad));
-                    int y = Mathf.RoundToInt(trunkPos.y + crownRadius * Mathf.Sin(rad));
-                    if (!rowToXs.ContainsKey(y)) {
-                        rowToXs[y] = new List<int>();
-                    }
-                    rowToXs[y].Add(x);
-                }
-                foreach (var kvp in rowToXs) {
-                    int y = kvp.Key;
-                    List<int> xs = kvp.Value;
-                    for (int x = xs.Min(); x <= xs.Max(); x++) {
-                        BlockPos blockPos = new(ToWorldX(x, chunkX), y);
-                        ChunkBlockPos leafChunkPos = blockPos.ToChunkBlockPos(ChunkXAt(blockPos.x));
-                        stateOverrides[leafChunkPos] = leafTile;
-                    }
-                }
-
-                TerrainFeature feature = new(treeOrigin, type, stateOverrides, bounds);
-                return feature;
+    public bool CheckStructureAvailability(int chunkBlockX, int chunkX, ChunkHeightmapData heightmapData, out StructurePlacement structurePlacement) {
+        foreach (var structureID in registeredStructureTemplates.Keys) {
+            StructureTemplate structure = registeredStructureTemplates[structureID];
+            StructureGenerationContext context = new StructureGenerationContext(chunkBlockX, chunkX, heightmapData, this);
+            PreliminaryStructureData? data = structure.placementFunction.Invoke(context);
+            if (data != null && structure.validationFunction.Invoke(context, (PreliminaryStructureData)data)) {
+                StructurePlacementConstraints placementConstraints = structure.placementGenerator.Invoke(context, (PreliminaryStructureData)data);
+                structurePlacement = structure.FinalizePlacement(placementConstraints);
+                return true;
             }
-
-            default: return default(TerrainFeature);
         }
-    }
-
-    public bool FeatureAt(BlockPos blockPos, out TerrainFeature? feature) {
-        int chunkX = ChunkXAt((Vector2Int)blockPos);
-        if (features.TryGetValue(chunkX, out var chunkFeatures)) {
-            ChunkBlockPos chunkBlockPos = blockPos.ToChunkBlockPos(chunkX);
-            feature = chunkFeatures.FirstOrDefault(f => f.bounds.Contains((Vector2Int)chunkBlockPos));
-            return feature?.PersistentExistence() ?? false;
-        }
-        feature = null;
+        structurePlacement = null;
         return false;
     }
 
-    public bool OverlappingFeatures(BlockPos blockPos, out List<TerrainFeature> overlappingFeatures) {
+    public bool StructureAt(BlockPos blockPos, out StructurePlacement structure) {
         int chunkX = ChunkXAt((Vector2Int)blockPos);
-        if (features.TryGetValue(chunkX, out var chunkFeatures)) {
+        if (structurePlacements.TryGetValue(chunkX, out var chunkFeatures)) {
             ChunkBlockPos chunkBlockPos = blockPos.ToChunkBlockPos(chunkX);
-            overlappingFeatures = chunkFeatures.Where(f => f.bounds.Contains((Vector2Int)chunkBlockPos)).ToList();
-            return overlappingFeatures.Count > 0;
+            structure = chunkFeatures.FirstOrDefault(f => f.bounds.Contains((Vector2Int)chunkBlockPos));
+            return structure?.PersistentExistence() ?? false;
         }
-        overlappingFeatures = new List<TerrainFeature>();
+        structure = null;
         return false;
     }
+
+    public bool OverlappingStructures(BlockPos blockPos, out List<StructurePlacement> overlappingStructures) {
+        int chunkX = ChunkXAt((Vector2Int)blockPos);
+        if (structurePlacements.TryGetValue(chunkX, out var chunkFeatures)) {
+            ChunkBlockPos chunkBlockPos = blockPos.ToChunkBlockPos(chunkX);
+            overlappingStructures = chunkFeatures.Where(f => f.bounds.Contains((Vector2Int)chunkBlockPos)).ToList();
+            return overlappingStructures.Count > 0;
+        }
+        overlappingStructures = new List<StructurePlacement>();
+        return false;
+    }
+
+    public void MarkStructureDirty(StructurePlacement placement) => structurePlacements[placement.origin.chunkX].Remove(placement);
 
     public void SetBlockAndUpdate(BlockPos blockPos, BlockState? blockState) {
         WorldChunk chunk = this.ChunkAt(blockPos);
@@ -243,20 +163,20 @@ public class Level {
         if (oldState == newState) {
             return;
         }
-
         chunk.SetBlock(blockPos.ToChunkBlockPos(chunk.xpos), newState);
         tilemap.SetTile((Vector3Int)blockPos, referencedTile);
         blockPos.ForEachAdjacent((direction, neighborPos) => {
-            BlockState neighborBlockState = BlockStateAt(neighborPos);
+            BlockState? neighborBlockState = BlockStateAt(neighborPos);
             neighborBlockState?.OnNeighborStateChanged(neighborPos, blockPos, oldState, newState);
             tilemap.RefreshTile((Vector3Int)neighborPos);
         });
-        BlockStateChanged?.Invoke(new BlockChangedEvent(blockPos, oldState, newState));
+        BlockEventType blockEventType = BlockEventType.StateMutated;
         if (blockState != null && oldState == new BlockState(Blocks.air)) {
-            BlockPlaced?.Invoke(new BlockChangedEvent(blockPos, oldState, newState));
+            blockEventType = BlockEventType.Placed;
         } else if (oldState != new BlockState(Blocks.air) && blockState == null) {
-            BlockBroken?.Invoke(new BlockChangedEvent(blockPos, oldState, newState));
+            blockEventType = BlockEventType.Broken;
         }
+        BlockStateChanged?.Invoke(new BlockChangeInfo(blockPos, oldState, newState, this, blockEventType));
     }
 
     public void SetBlockAndUpdate(ChunkBlockPos chunkBlockPos, BlockState? blockState) {
@@ -268,7 +188,6 @@ public class Level {
         BlockState brokenBlock = BlockStateAt(blockPos);
         SetBlockAndUpdate(blockPos, null);
         brokenBlock.DropOnBroken(blockPos, source);
-        // drop block
     }
 
     public void PendUpdates(int chunkX, List<(ChunkBlockPos chunkBlockpos, BlockState state)> blockStateUpdates) {
@@ -351,4 +270,12 @@ public class Level {
     public bool IsInWorldBounds(Vector2 pos) => pos.y >= WorldChunk.minY && pos.y <= WorldChunk.maxY;
 
     public bool IsInWorldBounds(BlockPos blockPos) => IsInWorldBounds((Vector2)blockPos);
+
+    private static void RegisterStructure(StructureTemplate structure) {
+        registeredStructureTemplates.Add(structure.ID, structure);
+    }
+
+    static Level() {
+        RegisterStructure(TreeStructure.instance);
+    }
 }

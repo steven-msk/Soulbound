@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-public enum TerrainFeatureType {
-	Tree,
-	//...
+public enum BlockEventType {
+    StateMutated,
+    Placed,
+    Broken,
 }
