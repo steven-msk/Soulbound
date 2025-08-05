@@ -10,7 +10,7 @@ public class StructureTemplate {
     /// </summary>
     /// <param name="context">The context used to decide whether to sketch out the structure at some certain position.</param>
     /// <returns>The rough data of a placement. The return value can be null.</returns>
-    public delegate PreliminaryStructureData? PlacementFunction(StructureGenerationContext context);
+    public delegate PreliminaryStructureData? PlacementFunction(StructureGenerationContext context, bool forcePlacement);
 
     /// <summary>
     /// Function that validates the given preliminary data for the structure.
@@ -28,7 +28,7 @@ public class StructureTemplate {
     /// <param name="context">The context of the placement.</param>
     /// <param name="preliminaryData">The preliminary data of the structure.</param>
     /// <returns>The constraints of the structure. Pass this in <see cref="FinalizePlacement(StructurePlacementConstraints)"/> to generate the final placement.</returns>
-    public delegate StructurePlacementConstraints PlacementGenerator(StructureGenerationContext context, PreliminaryStructureData preliminaryData);
+    public delegate StructurePlacementConstraints PlacementGenerator(StructureGenerationContext context, PreliminaryStructureData? preliminaryData);
 
     public string ID { get; private set; }
     public PlacementFunction placementFunction { get; private set; }

@@ -14,20 +14,23 @@ public static class TreeStructure {
     public const float treeDisparity = 0.5f;
 
     public static readonly StructureTemplate instance = StructureTemplateBuilder.CreateNewStructure("tree")
-        .PlacementFunction(generationContext => {
+        .PlacementFunction((generationContext, forcePlacement) => {
             float noise = Mathf.PerlinNoise(generationContext.chunkBlockX * treeFrequency, generationContext.seed);
-            if (noise > treeDisparity) {
-                int worldX = generationContext.level.ToWorldX(generationContext.chunkBlockX, generationContext.chunkX);
-                int ypos = generationContext.heightmapData.surfaceLevels[worldX];
-                ChunkBlockPos origin = new ChunkBlockPos(generationContext.chunkBlockX, ypos, generationContext.chunkX);
-
-                int height = Random.Range(minHeight, maxHeight + 1);
-                BoundsInt2D bounds = new(origin.x - crownRadius, origin.y, crownRadius * 2 + 1, height);
-                return new PreliminaryStructureData(bounds, origin);
+            if (noise <= treeDisparity && !forcePlacement) {
+                return null;
             }
-            return null;
+            int worldX = generationContext.level.ToWorldX(generationContext.chunkBlockX, generationContext.chunkX);
+            int ypos = generationContext.heightmapData.surfaceLevels[worldX];
+            ChunkBlockPos origin = new ChunkBlockPos(generationContext.chunkBlockX, ypos, generationContext.chunkX);
+
+            int height = Random.Range(minHeight, maxHeight + 1);
+            BoundsInt2D bounds = new(origin.x - crownRadius, origin.y, crownRadius * 2 + 1, height);
+            return new PreliminaryStructureData(bounds, origin, forcePlacement);
         })
         .ValidationFunction((generationContext, preliminaryData) => {
+            if (preliminaryData.forced) {
+                return true;
+            }
             bool valid = true;
             int worldX = generationContext.level.ToWorldX(preliminaryData.origin.x, generationContext.chunkX);
             int ypos = generationContext.heightmapData.surfaceLevels[worldX];
@@ -39,8 +42,8 @@ public static class TreeStructure {
         .PlacementGenerator((generationContext, preliminaryData) => {
             Dictionary<ChunkBlockPos, BlockState> stateOverrides = new();
             Level level = generationContext.level;
-            ChunkBlockPos origin = preliminaryData.origin;
-            BoundsInt2D bounds = preliminaryData.estimatedBounds;
+            ChunkBlockPos origin = preliminaryData.Value.origin;
+            BoundsInt2D bounds = preliminaryData.Value.estimatedBounds;
             ChunkBlockPos trunkPos = new ChunkBlockPos(origin.x, origin.y, generationContext.chunkX);
             BlockState woodBlock = new BlockState(Blocks.wood);
             BlockState leafBlock = new BlockState(Blocks.leaf);

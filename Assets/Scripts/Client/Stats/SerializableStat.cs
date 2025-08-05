@@ -10,6 +10,8 @@ using Unity.VisualScripting.FullSerializer.Internal;
 using UnityEngine;
 using UnityEngine.SearchService;
 
+#nullable enable
+
 [Serializable]
 public class SerializableStat {
 	[SerializeField] protected SerializedStatReference serializedReference;
@@ -43,7 +45,7 @@ public class SerializableStat {
 		};
 	}
 
-	private object TryGetValue(Func<string, object> action) {
+	private object? TryGetValue(Func<string, object> action) {
 		try {
 			return action.Invoke(value);
 		} catch (FormatException) {
@@ -52,7 +54,7 @@ public class SerializableStat {
 		}
 	}
 
-	public TValue? GetValue<TValue>() => (TValue)GetValue();
+	public TValue? GetValue<TValue>() => (TValue?)GetValue();
 
 	public string GetFormattedExpression() => serializedReference.ToStatType().GetFormattedExpression(this.GetValue(), applyAsBonus);
 
@@ -74,7 +76,7 @@ public static class ValueTypeIdentification {
 		return valueType switch {
 			SerializableStat.StatValueType.Int => typeof(int),
 			SerializableStat.StatValueType.Float => typeof(float),
-			_ => null
+			_ => typeof(Null)
 		};
 	}
 }

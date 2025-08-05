@@ -33,6 +33,8 @@ public class BlockState {
         }
     }
 
+    public void OnPlace(BlockPos pos) => block.StateBehavior.OnPlace(pos, this);
+
     // temporary operator overloads for easy comparison
     // these will be replaced with more robust methods in the future
     // they will also check equality between properties of the block state in the future

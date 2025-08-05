@@ -31,7 +31,6 @@ public class Block : ScriptableObject, ISerializable {
 [CustomEditor(typeof(Block))]
 public class BlockEditor : Editor {
 	private SerializedProperty stateBehaviorProperty;
-
 	private List<Type> behaviorTypes;
 	private string[] dropdownOptions;
 	private int selectedIndex = -1;

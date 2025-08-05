@@ -76,7 +76,7 @@ public class PlayerController : MonoBehaviour {
 			BlockPos blockPos = level.ToBlockPos(inputHandler.MouseWorldPosition);
 
 			if (this.IsInBlockReach((Vector2Int)blockPos) && level.BlockAt(blockPos) == Blocks.air) {
-				level.SetBlockAndUpdate(blockPos, placeable.Place(stack, blockPos));
+				level.SetBlock(blockPos, placeable.Place(stack, blockPos));
 			}
 		});
 		LogUtil.LogAwake(this);

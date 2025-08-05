@@ -16,4 +16,6 @@ public interface IBlockStateBehavior {
     List<ItemStack> GetDrops(BlockState blockState, BreakSource source);
 
     void OnNeighborStateChanged(BlockPos selfPos, BlockPos neighborPos, BlockState oldState, BlockState newState);
+
+    void OnPlace(BlockPos blockPos, BlockState blockState);
 }

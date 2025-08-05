@@ -9,6 +9,7 @@ public struct ChunkBlockPos {
     public int x;
     public int y;
     public int chunkX;
+    public WorldChunk underlyingChunk => GameManager.instance.Level.ChunkAt(this.ToWorldBlockPos());
 
     public ChunkBlockPos(int x, int y, int chunkX) {
         this.x = x;
@@ -37,6 +38,7 @@ public struct ChunkBlockPos {
     public int WorldYToIndex() => WorldYToIndex(this.y);
 
     public static int WorldYToIndex(int worldY) => worldY - WorldChunk.maxY;
+
 
     public override bool Equals(object obj) {
         if (!(obj is ChunkBlockPos)) { 

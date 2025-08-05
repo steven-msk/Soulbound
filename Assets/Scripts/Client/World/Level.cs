@@ -42,7 +42,7 @@ public class Level {
         this.player = player;
         this.tilemap = tilemap;
         this.grid = grid;
-        this.renderDistance = renderDistance;
+        this.renderDistance = renderDistance; 
         this.seed = seed;
         this.heightGenerator = new PerlinNoiseGenerator1D(this.seed, WorldChunk.HEIGHT_SPREAD);
     }
@@ -95,22 +95,7 @@ public class Level {
         generatedChunks[chunkX] = chunk;
         for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
             if (CheckStructureAvailability(cx, chunk.xpos, heightmapData, out var structurePlacement)) {
-                if (!structurePlacements.ContainsKey(chunkX)) {
-                    structurePlacements.Add(chunkX, new List<StructurePlacement>());
-                }
-                structurePlacements[chunkX].Add(structurePlacement);
-                foreach (var stateOverride in structurePlacement.stateOverrides) {
-                    ChunkBlockPos chunkBlockPos = stateOverride.Key;
-                    BlockState blockState = stateOverride.Value;
-                    WorldChunk? underlyingChunk = ChunkAt(chunkBlockPos.ToWorldBlockPos());
-                    if (underlyingChunk == null) {
-                        PendUpdate(chunkBlockPos.chunkX, chunkBlockPos, blockState);
-                    } else if (loadedChunks.ContainsKey(chunkBlockPos.chunkX) && underlyingChunk != null) {
-                        SetBlockAndUpdate(chunkBlockPos, blockState);
-                    } else {
-                        underlyingChunk.SetBlock(chunkBlockPos, blockState);
-                    }
-                }
+                PlaceStructure(chunkX, structurePlacement);
             }
         }
         return chunk;
@@ -120,7 +105,7 @@ public class Level {
         foreach (var structureID in registeredStructureTemplates.Keys) {
             StructureTemplate structure = registeredStructureTemplates[structureID];
             StructureGenerationContext context = new StructureGenerationContext(chunkBlockX, chunkX, heightmapData, this);
-            PreliminaryStructureData? data = structure.placementFunction.Invoke(context);
+            PreliminaryStructureData? data = structure.placementFunction.Invoke(context, false);
             if (data != null && structure.validationFunction.Invoke(context, (PreliminaryStructureData)data)) {
                 StructurePlacementConstraints placementConstraints = structure.placementGenerator.Invoke(context, (PreliminaryStructureData)data);
                 structurePlacement = structure.FinalizePlacement(placementConstraints);
@@ -129,6 +114,13 @@ public class Level {
         }
         structurePlacement = null;
         return false;
+    }
+
+    public StructurePlacement ForceGeneratePlacement(ChunkBlockPos chunkBlockPos, StructureTemplate template) {
+        WorldChunk? chunk = chunkBlockPos.underlyingChunk;
+        StructureGenerationContext context = new(chunkBlockPos.x, chunkBlockPos.chunkX, chunk.HeightmapData, this);
+        PreliminaryStructureData? structureData = template.placementFunction.Invoke(context, true);
+        return template.FinalizePlacement(template.placementGenerator.Invoke(context, structureData));
     }
 
     public bool StructureAt(BlockPos blockPos, out StructurePlacement structure) {
@@ -153,17 +145,42 @@ public class Level {
         return false;
     }
 
+    public void PlaceStructure(int chunkX, StructurePlacement placement) {
+        if (!structurePlacements.ContainsKey(chunkX)) {
+            structurePlacements.Add(chunkX, new List<StructurePlacement>());
+        }
+        structurePlacements[chunkX].Add(placement);
+        foreach (var stateOverride in placement.stateOverrides) {
+            ChunkBlockPos chunkBlockPos = stateOverride.Key;
+            BlockState blockState = stateOverride.Value;
+            WorldChunk? underlyingChunk = ChunkAt(chunkBlockPos.ToWorldBlockPos());
+            if (underlyingChunk == null) {
+                PendUpdate(chunkBlockPos.chunkX, chunkBlockPos, blockState);
+            } else if (loadedChunks.ContainsKey(chunkBlockPos.chunkX) && underlyingChunk != null) {
+                SetBlock(chunkBlockPos, blockState, updateStates: false);
+            } else {
+                underlyingChunk?.SetBlock(chunkBlockPos, blockState);
+            }
+        }
+    }
+
+    public void ForcePlaceStructure(ChunkBlockPos chunkBlockPos, StructureTemplate template) {
+        WorldChunk? chunk = ChunkAt(chunkBlockPos.chunkX);
+        StructurePlacement placement = this.ForceGeneratePlacement(chunkBlockPos, template);
+        this.PlaceStructure(chunkBlockPos.chunkX, placement);
+    }
+
     public void MarkStructureDirty(StructurePlacement placement) => structurePlacements[placement.origin.chunkX].Remove(placement);
 
-    public void SetBlockAndUpdate(BlockPos blockPos, BlockState? blockState) {
-        WorldChunk chunk = this.ChunkAt(blockPos);
+    public void SetBlock(BlockPos blockPos, BlockState? blockState, bool broadcastStateChange = true) {
+        WorldChunk? chunk = this.ChunkAt(blockPos);
         TileBase referencedTile = blockState?.block.TileReference ?? CommonTiles.air;
-        BlockState oldState = chunk.BlockStateAt(blockPos.ToChunkBlockPos(chunk.xpos));
+        BlockState? oldState = chunk?.BlockStateAt(blockPos.ToChunkBlockPos(chunk.xpos));
         BlockState newState = blockState ?? new BlockState(Blocks.air);
         if (oldState == newState) {
             return;
         }
-        chunk.SetBlock(blockPos.ToChunkBlockPos(chunk.xpos), newState);
+        chunk?.SetBlock(blockPos.ToChunkBlockPos(chunk.xpos), newState);
         tilemap.SetTile((Vector3Int)blockPos, referencedTile);
         blockPos.ForEachAdjacent((direction, neighborPos) => {
             BlockState? neighborBlockState = BlockStateAt(neighborPos);
@@ -176,18 +193,21 @@ public class Level {
         } else if (oldState != new BlockState(Blocks.air) && blockState == null) {
             blockEventType = BlockEventType.Broken;
         }
-        BlockStateChanged?.Invoke(new BlockChangeInfo(blockPos, oldState, newState, this, blockEventType));
+        InvocationHelper.If(blockEventType == BlockEventType.Placed, () => newState?.OnPlace(blockPos));
+        if (broadcastStateChange) {
+            BlockStateChanged?.Invoke(new BlockChangeInfo(blockPos, oldState, newState, this, blockEventType));
+        }
     }
 
-    public void SetBlockAndUpdate(ChunkBlockPos chunkBlockPos, BlockState? blockState) {
-        SetBlockAndUpdate(chunkBlockPos.ToWorldBlockPos(), blockState);
+    public void SetBlock(ChunkBlockPos chunkBlockPos, BlockState? blockState, bool updateStates = true) {
+        SetBlock(chunkBlockPos.ToWorldBlockPos(), blockState, updateStates);
     }
 
     // in the future this will also contain the information about how the block was broken
     public void BreakBlock(BlockPos blockPos, BreakSource source) {
-        BlockState brokenBlock = BlockStateAt(blockPos);
-        SetBlockAndUpdate(blockPos, null);
-        brokenBlock.DropOnBroken(blockPos, source);
+        BlockState? brokenBlock = BlockStateAt(blockPos);
+        SetBlock(blockPos, null);
+        brokenBlock?.DropOnBroken(blockPos, source);
     }
 
     public void PendUpdates(int chunkX, List<(ChunkBlockPos chunkBlockpos, BlockState state)> blockStateUpdates) {
@@ -219,7 +239,7 @@ public class Level {
     }
 
     public BlockState? BlockStateAt(BlockPos blockPos, bool logFlag = true) {
-        WorldChunk chunk = ChunkAt(blockPos);
+        WorldChunk? chunk = ChunkAt(blockPos);
         if (chunk != null) {
             return chunk.BlockStateAt(blockPos.ToChunkBlockPos(chunk.xpos));
         }
@@ -228,7 +248,7 @@ public class Level {
     }
 
     public Block? BlockAt(BlockPos blockPos) {
-        BlockState blockState = BlockStateAt(blockPos, logFlag: false);
+        BlockState? blockState = BlockStateAt(blockPos, logFlag: false);
         if (blockState != null) {
             return blockState.block;
         }

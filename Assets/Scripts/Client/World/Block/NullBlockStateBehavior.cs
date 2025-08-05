@@ -11,4 +11,7 @@ public class NullBlockStateBehavior : IBlockStateBehavior {
 
     public void OnNeighborStateChanged(BlockPos selfPos, BlockPos neighborPos, BlockState oldState, BlockState newState) {
     }
+
+    public void OnPlace(BlockPos blockPos, BlockState blockState) {
+    }
 }
