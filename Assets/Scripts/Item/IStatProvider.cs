@@ -6,21 +6,21 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 public interface IStatProvider : IItemCapability {
-	public bool ApplyInstantStatsAutomatically { get; }
-	public List<SerializableStat> InstantStats { get; }
-	public List<BufferedStat> BufferedStats { get; }
+	public bool applyInstantStatsAutomatically { get; }
+	public List<SerializableStat> instantStats { get; }
+	public List<BufferedStat> bufferedStats { get; }
 
 	// FEATUREIMPL (WIP): buffered stats - NOT TESTED
 
-	public virtual void ApplyInstantStats(PlayerStats playerStats) => playerStats.Apply(InstantStats, this);
+	public virtual void ApplyInstantStats(PlayerStats playerStats) => playerStats.Apply(instantStats, this);
 
-	public virtual void RevokeInstantStats(PlayerStats platerStats) => platerStats.Revoke(InstantStats, this);
+	public virtual void RevokeInstantStats(PlayerStats platerStats) => platerStats.Revoke(instantStats, this);
 
 	public virtual void EnableBuffers(PlayerStats playerStats) {
-		BufferedStats.ForEach(bufferedStat => bufferedStat.EnableBuffers(this));
+		bufferedStats.ForEach(bufferedStat => bufferedStat.EnableBuffers(this));
 	}
 
 	public virtual void DisableBuffers(PlayerStats playerStats) {
-		BufferedStats.ForEach(bufferedStat => bufferedStat.DisableBuffers(this));
+		bufferedStats.ForEach(bufferedStat => bufferedStat.DisableBuffers(this));
 	}
 }

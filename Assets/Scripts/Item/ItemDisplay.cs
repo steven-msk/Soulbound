@@ -14,7 +14,7 @@ public class ItemDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 		get => itemStack;
 		set {
 			itemStack = value;
-			gameObject.GetComponent<Image>().sprite = itemStack.Item.Icon;
+			gameObject.GetComponent<Image>().sprite = itemStack.Item.icon;
 			displayedItem = itemStack.Item;
 		}
 	}

@@ -9,7 +9,7 @@ public class DefaultBlockStateBehavior : IBlockStateBehavior {
 
     public List<ItemStack> GetDrops(BlockState blockState, BreakSource source) {
         return new List<ItemStack>() {
-            new ItemStack(blockState.block.BlockItemReference, 1)
+            new ItemStack(blockState.block.itemReference, 1)
         };
     }
 

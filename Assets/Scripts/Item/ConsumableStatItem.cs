@@ -7,26 +7,23 @@ using JetBrains.Annotations;
 using Unity.VisualScripting;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Items/ConsumableStatItem")]
-public class ConsumableStatItem : StatItem, IConsumable {
-	[CanBeNull][SerializeField] private ConsumableEffect consumeAction;
-	public ConsumableEffect ConsumeAction => consumeAction;
+#nullable enable
 
-	[SerializeField] private int consumeAmount;
-	public int ConsumeAmount => consumeAmount;
+public class ConsumableStatItem : StatItemDefinition, IConsumable {
+    public override bool applyInstantStatsAutomatically => false;
+    public IConsumable.ConsumeAction consumeAction { get; }
+    public int consumeAmount { get; }
 
-	[SerializeField] private List<SerializableStat> stats;
-	public override List<SerializableStat> InstantStats => stats;
-	
-	[SerializeField] private List<BufferedStat> bufferedStats;
-	public override List<BufferedStat> BufferedStats => bufferedStats;
+    public ConsumableStatItem(string name, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize, Func<Item, AbstractTooltip> tooltipSupplier, 
+            List<SerializableStat> instantStats, List<BufferedStat> bufferedStats, string interpolationSource,
+            IConsumable.ConsumeAction consumeAction, int consumeAmount)
+        : base(name, icon, worldPrefabSupplier, maxStackSize, tooltipSupplier, instantStats, bufferedStats, interpolationSource) {
+        this.consumeAction = consumeAction;
+        this.consumeAmount = consumeAmount;
+    }
 
-	public override bool ApplyInstantStatsAutomatically => false;
 
-	[SerializeField] private string bufferedInterpolationSource;
-	public override string BufferedInterpolationSource => bufferedInterpolationSource;
-
-	public void Consume(ItemStack itemStack, PlayerController player) {
+    public void Consume(ItemStack itemStack, PlayerController player) {
 		ConsumableUtils.DefaultConsume(this, itemStack);
 		((IStatProvider)this).ApplyInstantStats(player.Stats);
 	}

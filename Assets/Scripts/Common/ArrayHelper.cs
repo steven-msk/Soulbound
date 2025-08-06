@@ -17,4 +17,8 @@ public static class ArrayHelper {
 		}
 		return result;
 	}
+
+}
+public static partial class List {
+	public static List<T> Empty<T>() => new List<T>();
 }

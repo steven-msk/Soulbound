@@ -63,19 +63,19 @@ public class InventoryController : MonoBehaviour, IContainer {
 	private void Start() {
 		IEnumerator Prototype_setupDisplays() {
 			yield return new WaitUntil(() => setup);
-			CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("weaponItem_test"), 2), hotbar[0]);
-			CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("armoritem_test"), 2), hotbar[1]);
-			CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("armoritem_test"), 2), popupSlots[0, 0]);
-			CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("consumableStatItem_test"), 100), hotbar[3]);
-			CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("consumableStatItem_test"), 21_489), hotbar[6]);
-			CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("consumableStatItem_test"), 1), hotbar[7]);
-			CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("consumableStatItem_test"), 1), hotbar[8]);
-			CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("consumableStatItem_test"), 1), (InventorySlot)this[2, 8]);
-			CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("longTooltipItem"), 1), hotbar[5]);
-			CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("grass_block_item"), 100), hotbar[2]);
-			CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("wood_block_item"), 100), (InventorySlot)this[0, 1]);
-			CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("tree_sapling_item"), 10), (InventorySlot)this[0, 2]);
-            Debug.Log("<color=green>[INVENTORY]</color> Player inventory loaded");				// might factor out in LogUtil
+			//CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("weaponItem_test"), 2), hotbar[0]);
+			//CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("armoritem_test"), 2), hotbar[1]);
+			//CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("armoritem_test"), 2), popupSlots[0, 0]);
+			//CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("consumableStatItem_test"), 100), hotbar[3]);
+			//CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("consumableStatItem_test"), 21_489), hotbar[6]);
+			//CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("consumableStatItem_test"), 1), hotbar[7]);
+			//CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("consumableStatItem_test"), 1), hotbar[8]);
+			//CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("consumableStatItem_test"), 1), (InventorySlot)this[2, 8]);
+			//CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("longTooltipItem"), 1), hotbar[5]);
+			CreateItemDisplay(new ItemStack(Items.grassBlock, 100), hotbar[2]);
+			//CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("wood_block_item"), 100), (InventorySlot)this[0, 1]);
+			//CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("tree_sapling_item"), 10), (InventorySlot)this[0, 2]);
+			Debug.Log("<color=green>[INVENTORY]</color> Player inventory loaded");				// might factor out in LogUtil
 			// POTENTIAL: LogUtil modularity - implement different color coded logging sections marked between [ ]
 			hotbar.SetActiveSlot(0);
 		}
@@ -128,8 +128,8 @@ public class InventoryController : MonoBehaviour, IContainer {
 			int remaining = itemStack.Quantity;
 			foreach (var stackSlot in GetOccupiedSlots(itemStack.Item)) {
 				ItemStack stackInSlot = stackSlot.ItemStack;
-				if (stackInSlot.Quantity < stackInSlot.Item.MaxStackSize) {
-					int availableSpace = stackInSlot.Item.MaxStackSize - stackInSlot.Quantity;
+				if (stackInSlot.Quantity < stackInSlot.Item.maxStackSize) {
+					int availableSpace = stackInSlot.Item.maxStackSize - stackInSlot.Quantity;
 					int toAdd = Math.Min(remaining, availableSpace);
 					stackInSlot.Quantity += toAdd;
 					remaining -= toAdd;
@@ -138,12 +138,10 @@ public class InventoryController : MonoBehaviour, IContainer {
 					}
 				}
 			}
-
-
 			InventorySlot[] inventory = MainPlayerSlots;
 			for (int i = 0; i < inventory.Length; i++){
 				if (!inventory[i].HasItem) {
-					int toAdd = Mathf.Min(remaining, itemStack.Item.MaxStackSize);
+					int toAdd = Mathf.Min(remaining, itemStack.Item.maxStackSize);
 					CreateItemDisplay(new ItemStack(itemStack.Item, toAdd), inventory[i]);
 					remaining -= toAdd;
 				}

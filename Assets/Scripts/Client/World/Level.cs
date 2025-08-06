@@ -174,9 +174,10 @@ public class Level {
 
     public void SetBlock(BlockPos blockPos, BlockState? blockState, bool broadcastStateChange = true) {
         WorldChunk? chunk = this.ChunkAt(blockPos);
-        TileBase referencedTile = blockState?.block.TileReference ?? CommonTiles.air;
-        BlockState? oldState = chunk?.BlockStateAt(blockPos.ToChunkBlockPos(chunk.xpos));
-        BlockState newState = blockState ?? new BlockState(Blocks.air);
+        BlockState air = Blocks.air.defaultState;
+        BlockState oldState = chunk?.BlockStateAt(blockPos.ToChunkBlockPos(chunk.xpos)) ?? air;
+        BlockState newState = blockState ?? air;
+        TileBase referencedTile = newState.block.tileReference;
         if (oldState == newState) {
             return;
         }
@@ -188,9 +189,9 @@ public class Level {
             tilemap.RefreshTile((Vector3Int)neighborPos);
         });
         BlockEventType blockEventType = BlockEventType.StateMutated;
-        if (blockState != null && oldState == new BlockState(Blocks.air)) {
+        if (newState != air && oldState == air) {
             blockEventType = BlockEventType.Placed;
-        } else if (oldState != new BlockState(Blocks.air) && blockState == null) {
+        } else if (oldState != air && newState == air) {
             blockEventType = BlockEventType.Broken;
         }
         InvocationHelper.If(blockEventType == BlockEventType.Placed, () => newState?.OnPlace(blockPos));

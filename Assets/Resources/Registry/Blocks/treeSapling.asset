@@ -14,13 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   blockName: Tree Sapling
   blockID: tree_sapling
-  tileReference: {fileID: 0}
+  tileReference: {fileID: 11400000, guid: 6e1058c05ee291a40be639758601c3f2, type: 2}
   stateBehavior:
-    rid: 6961233637408243780
-  blockItemReference: {fileID: 11400000, guid: 62a2c723f0b15e34b8906247235bdb0a, type: 2}
+    rid: 6961233637408243782
   references:
     version: 2
     RefIds:
-    - rid: 6961233637408243780
-      type: {class: NullBlockStateBehavior, ns: , asm: Assembly-CSharp}
+    - rid: 6961233637408243782
+      type: {class: SaplingStateBehavior, ns: , asm: Assembly-CSharp}
       data: 

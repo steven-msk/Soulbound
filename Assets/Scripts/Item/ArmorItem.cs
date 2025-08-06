@@ -1,29 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Unity.VisualScripting.Antlr3.Runtime.Tree;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Items/ArmorItem")]
-public class ArmorItem : StatItem, IEquipable {
-	[SerializeField] private ArmorType armorType;
-	public ArmorType ArmorType => armorType;
+#nullable enable
 
-	public override bool ApplyInstantStatsAutomatically => false;
+public class ArmorItem : StatItemDefinition, IEquipable {
+    public ArmorType armorType { get; }
+    public override bool applyInstantStatsAutomatically => true;
 
-	[SerializeField] private List<SerializableStat> instantStats;
-	public override List<SerializableStat> InstantStats => instantStats;
+    public ArmorItem(string name, ArmorType armorType, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize, Func<Item, AbstractTooltip> tooltipSupplier, 
+			List<SerializableStat> instantStats, List<BufferedStat> bufferedStats, string interpolationSource)
+		: base(name, icon, worldPrefabSupplier, maxStackSize, tooltipSupplier, instantStats, bufferedStats, interpolationSource) {
+		this.armorType = armorType;
+    }
 
-	[SerializeField] private List<BufferedStat> bufferedStats;
-	public override List<BufferedStat> BufferedStats => bufferedStats;
-
-	[SerializeField] private string bufferedInterpolationSource;
-	public override string BufferedInterpolationSource => bufferedInterpolationSource;
-
-	public void OnEquip(EquipmentSlot slot) {
+    public void OnEquip(EquipmentSlot slot) {
 		PlayerStats playerStats = GameManager.instance.Player.Stats;
-		playerStats.Apply(instantStats, this);
+		base.ValidateStats();
+		playerStats.Apply(this.instantStats, this);
 		((IStatProvider)this).EnableBuffers(playerStats);
 	}
 

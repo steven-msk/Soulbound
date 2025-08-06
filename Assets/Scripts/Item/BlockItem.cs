@@ -8,18 +8,23 @@ using UnityEngine.Tilemaps;
 
 #nullable enable
 
-[CreateAssetMenu(menuName = "Items/BlockItem")]
-public class BlockItem : Item, IPlaceable {
-	[SerializeField] private Block referenceBlock;
+public class BlockItem : ItemDefinition, IPlaceable {
+	public Func<Block> blockGetter { get; }
+    public Block referenceBlock => blockGetter() ?? throw new InvalidOperationException("Block reference is not yet initialized.");
 
-	public BlockState Place(ItemStack itemStack, BlockPos position) {
+    public BlockItem(string name, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize, Func<Block> blockGetter, Func<Item, AbstractTooltip>? tooltipSupplier)
+		: base(name, icon, worldPrefabSupplier, maxStackSize, tooltipSupplier) {
+        this.blockGetter = blockGetter;
+    }
+
+    public BlockState Place(ItemStack itemStack, BlockPos position) {
 		itemStack.Quantity--;
-		return new BlockState(referenceBlock);
+		return referenceBlock.defaultState;
 	}
 
 	protected override CompoundTooltip GetDefaultTooltip() {
-		return CompoundTooltip.Of(Tooltip.Info(this.itemName));
+		return CompoundTooltip.Of(Tooltip.Info(this.name));
 	}
 
-	public static BlockItem? FromBlock(Block block) => block.BlockItemReference;
+	public static BlockItem? FromBlock(Block block) => block.itemReference;
 }

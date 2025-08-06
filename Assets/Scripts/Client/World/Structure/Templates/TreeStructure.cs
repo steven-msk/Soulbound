@@ -45,8 +45,8 @@ public static class TreeStructure {
             ChunkBlockPos origin = preliminaryData.Value.origin;
             BoundsInt2D bounds = preliminaryData.Value.estimatedBounds;
             ChunkBlockPos trunkPos = new ChunkBlockPos(origin.x, origin.y, generationContext.chunkX);
-            BlockState woodBlock = new BlockState(Blocks.wood);
-            BlockState leafBlock = new BlockState(Blocks.leaf);
+            BlockState woodBlock = Blocks.wood.defaultState;
+            BlockState leavesBlock = Blocks.leaves.defaultState;
 
             for (int ty = 0; ty < bounds.size.y; ty++) {
                 stateOverrides[trunkPos] = woodBlock;
@@ -69,7 +69,7 @@ public static class TreeStructure {
                 for (int x = xs.Min(); x <= xs.Max(); x++) {
                     BlockPos blockPos = new(level.ToWorldX(x, generationContext.chunkX), y);
                     ChunkBlockPos leafChunkPos = blockPos.ToChunkBlockPos(level.ChunkXAt(blockPos.x));
-                    stateOverrides[leafChunkPos] = leafBlock;
+                    stateOverrides[leafChunkPos] = leavesBlock;
                 }
             }
             return new StructurePlacementConstraints(origin, bounds, stateOverrides);
@@ -88,7 +88,7 @@ public static class TreeStructure {
                 }
                 flag_brokenUnderneath = true;
             }
-            if (oldState.block == Blocks.leaf && structure.stateOverrides.ContainsKey(ChunkBlockPos.FromBlockPos(changePos))) {
+            if (oldState.block == Blocks.leaves && structure.stateOverrides.ContainsKey(ChunkBlockPos.FromBlockPos(changePos))) {
                 if (level.OverlappingStructures(changePos, out var overlapping)) {
                     foreach (StructurePlacement overlappingStructure in overlapping) {
                         if (overlappingStructure == structure && overlappingStructure.bounds.Contains((Vector2Int)changePos)) {

@@ -4,26 +4,18 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Items/Weapon/WeaponItem")]
-public class WeaponItem : StatItem, IAttackPerformer {
-	[SerializeField] private List<SerializableStat> instantStats;
-	public override List<SerializableStat> InstantStats => instantStats;
+public abstract class WeaponItem : StatItemDefinition, IAttackPerformer {
+	public override bool applyInstantStatsAutomatically => true;
+	public abstract GameObject attackPrefab { get; protected set; }
+	public abstract WeaponAttackBehavior attackBehavior { get; protected set; }
 
-	[SerializeField] private List<BufferedStat> bufferedStats;
-	public override List<BufferedStat> BufferedStats => bufferedStats;
-
-	public override bool ApplyInstantStatsAutomatically => true;
-
-	[SerializeField] private string bufferedInterpolationSource;
-	public override string BufferedInterpolationSource => bufferedInterpolationSource;
-
-	[Header("Attack Constraints")]
-	[Obsolete] [SerializeField] private float cooldown;
-	[Obsolete] public float Cooldown => cooldown;
-
-	[SerializeField] private GameObject attackPrefab;
-
-	[SerializeField] private WeaponAttackBehavior attackBehavior;
+    public WeaponItem(string name, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize, Func<Item, AbstractTooltip> tooltipSupplier,
+			List<SerializableStat> instantStats, List<BufferedStat> bufferedStats, string interpolationSource,
+			GameObject attackPrefab, WeaponAttackBehavior attackBehavior)
+		: base(name, icon, worldPrefabSupplier, maxStackSize, tooltipSupplier, instantStats, bufferedStats, interpolationSource) {
+		this.attackPrefab = attackPrefab;
+		this.attackBehavior = attackBehavior;
+    }
 
 	// FEATUREIMPL (WIP): weapon attacks (NOT TESTED)
 	// Each armor and weapon item can be inscriptioned with +4 soul slots. This means that the
@@ -59,6 +51,6 @@ public class WeaponItem : StatItem, IAttackPerformer {
 
 	public class AttackHandlerNotFoundException : NullReferenceException {
 		public AttackHandlerNotFoundException(WeaponItem weapon, GameObject attackObject) 
-			: base($"AttackHandler not found in chilren of attack prefab asset. Item ID: {weapon.ID}, attack prefab: {attackObject.name}") { }
+			: base($"AttackHandler not found in chilren of attack prefab asset. Item name: {weapon.name}, attack prefab: {attackObject.name}") { }
 	}
 }

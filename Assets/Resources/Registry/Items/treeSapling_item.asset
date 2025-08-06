@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Tree Sapling
   id: tree_sapling_item
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 4120839f6d0261d459c258ca60b47bd5, type: 3}
   worldPrefab: {fileID: 0}
   maxStackSize: 999999
   customTooltipSerializer: {fileID: 0}

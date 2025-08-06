@@ -102,7 +102,7 @@ public class PlayerController : MonoBehaviour {
 			return;
 		}
 		static void InvokeStatItem(ItemStack? itemStack, Action<IStatProvider> statProviderAction) {
-			if (itemStack?.Item is IStatProvider statProvider && statProvider.ApplyInstantStatsAutomatically) {
+			if (itemStack?.Item is IStatProvider statProvider && statProvider.applyInstantStatsAutomatically) {
 				statProviderAction.Invoke(statProvider);
 			}
 		}

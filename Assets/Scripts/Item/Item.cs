@@ -7,43 +7,41 @@ using UnityEngine;
 
 #nullable enable
 
-[CreateAssetMenu(menuName = "Items/Item")]
-public class Item : ScriptableObject, ISerializable {
-	[SerializeField] protected string itemName;
-	public virtual string Name => itemName;
+public abstract class Item {
+	public static readonly int universalMaxStack = 999_999;
 
-	[SerializeField] protected string id;
-	public virtual string ID => id;
-
-	// TODO: icon preview in inspector
-	[SerializeField] protected Sprite icon;
-	public virtual Sprite Icon => icon;
-
+	public abstract string name { get; }
+	public abstract Sprite icon { get; }
 	// POTENTIAL REWORK: item world prefab serialization
-	[SerializeField] protected GameObject worldPrefab;
-	public virtual GameObject WorldPrefab => worldPrefab;
-	
-	[SerializeField] protected int maxStackSize;
-	public virtual int MaxStackSize => maxStackSize;
-	public virtual bool IsStackable => maxStackSize > 1;
+	public abstract Func<GameObject> worldPrefabSupplier { get; }
+	public abstract int maxStackSize { get; }
+	public bool IsStackable => maxStackSize > 1;
+	protected abstract Func<Item, AbstractTooltip>? tooltipSupplier { get; }
+	[Obsolete] public abstract string? loreText { get; }
+	[Obsolete] public abstract string? infoText { get; }
 
-	[SerializeField]protected TooltipSerializer? customTooltipSerializer;
-	public TooltipSerializer? TooltipSerializer => customTooltipSerializer;
+	public virtual GameObject FallbackWorldPrefab() {
+		GameObject fallback = InstantiateDefaultWorldPrefab();
+		fallback.GetComponent<SpriteRenderer>().sprite = icon;
+		return fallback;
+	}
 
-	[SerializeField] protected string? loreTextTooltip;
-	public virtual string? LoreText => loreTextTooltip;
+	public static GameObject InstantiateDefaultWorldPrefab() {
+		return GameObject.Instantiate(AssetRegistry.Get<GameObject>("droppedItem"))!;
+	}
 
-	[SerializeField] protected string? infoTextTooltip;
-	public virtual string? InfoText => infoTextTooltip;
-
-	public virtual AbstractTooltip GetTooltip() {
-		if (customTooltipSerializer != null) {
-			return customTooltipSerializer.GetDeserializer(this).Generate();
+	[Obsolete]
+	public AbstractTooltip GetTooltip() {
+		if (tooltipSupplier != null) {
+			return tooltipSupplier(this);
 		}
 		return GetDefaultTooltip();
 	}
 
+	[Obsolete]
 	protected virtual CompoundTooltip GetDefaultTooltip() => Tooltip.DefaultItem(this);
+
+	public static int CustomMaxStack(int maxStack) => maxStack;
 
 	public bool HasCapability<T>() where T : IItemCapability {
 		return typeof(T).IsAssignableFrom(this.GetType());
@@ -51,5 +49,9 @@ public class Item : ScriptableObject, ISerializable {
 
 	public bool HasCapability(Type type) {
 		return type.IsAssignableFrom(this.GetType());
+    }
+
+    public override string ToString() {
+		return name;
     }
 }

@@ -1,16 +1,19 @@
+using System;
 using System.Linq;
 using JetBrains.Annotations;
 using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "Items/ConsumableItem")]
-public class ConsumableItem : Item, IConsumable {
-	[CanBeNull] [SerializeField] private ConsumableEffect consumeAction;
+public class ConsumableItem : ItemDefinition, IConsumable {
+    public IConsumable.ConsumeAction consumeAction { get; }
+    public virtual int consumeAmount { get; }
 
-	public ConsumableEffect ConsumeAction => consumeAction;
+    public ConsumableItem(string name, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize, Func<Item, AbstractTooltip> tooltipSupplier,
+            IConsumable.ConsumeAction consumeAction, int consumeAmount)
+        : base(name, icon, worldPrefabSupplier, maxStackSize, tooltipSupplier) {
+        this.consumeAction = consumeAction;
+        this.consumeAmount = consumeAmount;
+    }
 
-	[SerializeField] private int consumeAmount;
-	public int ConsumeAmount => consumeAmount;
-
-	protected override CompoundTooltip GetDefaultTooltip() => base.GetDefaultTooltip().Concat(Tooltip.Tag(ItemTag.Consumable));
+    protected override CompoundTooltip GetDefaultTooltip() => base.GetDefaultTooltip().Concat(Tooltip.Tag(ItemTag.Consumable));
 }

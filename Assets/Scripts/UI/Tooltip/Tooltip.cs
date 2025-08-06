@@ -113,6 +113,6 @@ public class Tooltip : AbstractTooltip {
 	}
 
 	public static CompoundTooltip DefaultItem(Item item) {
-		return CompoundTooltip.OfNullable(Tooltip.Title(item.name), Tooltip.Info(item.InfoText), Tooltip.Lore(item.LoreText));
+		return CompoundTooltip.OfNullable(Tooltip.Title(item.name), Tooltip.Info(item.infoText), Tooltip.Lore(item.loreText));
 	}
 }

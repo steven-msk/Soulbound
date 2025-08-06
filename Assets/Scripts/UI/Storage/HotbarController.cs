@@ -68,7 +68,7 @@ public class HotbarController : MonoBehaviour, IHotbarContainer {
 			ApplySelectionChanges(active.hotbarSlot, activeSlotColor, activeSlotNumberColor, activeItemStackColor, activeSlotOffset, activeSlotScale);
 		}
 
-		activeItemText.text = slots[slotKey].ItemStack?.Item.Name;
+		activeItemText.text = slots[slotKey].ItemStack?.Item.name;
 		GameManager.instance.Player.Inventory.EquipHotbarItem(slots[slotKey]);
 	}
 

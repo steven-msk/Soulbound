@@ -6,34 +6,37 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
+#nullable enable
+
 public class BlockState {
-    // subject to change in the future
-    // for now, it is just a reference to the block type
-    // this is a placeholder for future properties like metadata, state, etc.
-
     public Block block { get; private set; }
-    public Dictionary<string, object> properties { get; private set; } = new();
-    // might be replaced with a type-safe data structure in the future
 
-    public BlockState(Block block) {
+    // might be replaced with a type-safe data structure in the future
+    public Dictionary<string, object> properties { get; private set; } = new();
+
+    public IBlockStateBehavior stateBehavior { get; private set; }
+
+    public BlockState(Block block, Dictionary<string, object>? properties, IBlockStateBehavior stateBehavior) {
         this.block = block ?? throw new ArgumentNullException(nameof(block));
+        this.properties = properties ?? new Dictionary<string, object>();
+        this.stateBehavior = stateBehavior;
     }
 
     public void OnNeighborStateChanged(BlockPos selfPos, BlockPos neighborPos, BlockState oldState, BlockState newState) {
-        block.StateBehavior.OnNeighborStateChanged(selfPos, neighborPos, oldState, newState);
+        stateBehavior.OnNeighborStateChanged(selfPos, neighborPos, oldState, newState);
     }
 
     // TODO: implement block items for stone, wood, and dirt blocks
 
     public void DropOnBroken(BlockPos pos, BreakSource source) {
-        if (block.BlockItemReference != null) {
-            List<ItemStack> itemsDropped = block.StateBehavior.GetDrops(this, source);
-            Vector2 dropForce = block.StateBehavior.dropForce;
+        if (block != Blocks.air) {
+            List<ItemStack> itemsDropped = stateBehavior.GetDrops(this, source);
+            Vector2 dropForce = stateBehavior.dropForce;
             itemsDropped.ForEach(itemStack => itemStack.Drop(pos.CenterAligned(), dropForce));
         }
     }
 
-    public void OnPlace(BlockPos pos) => block.StateBehavior.OnPlace(pos, this);
+    public void OnPlace(BlockPos pos) => stateBehavior.OnPlace(pos, this);
 
     // temporary operator overloads for easy comparison
     // these will be replaced with more robust methods in the future
@@ -51,9 +54,9 @@ public class BlockState {
         return false;
     }
 
-    public override int GetHashCode() {
-        return block != null ? block.GetHashCode() : 0;
-    }
+    public override int GetHashCode() => block.GetHashCode();
 
-    // TODO: override BlockState ToString() for better debugging
+    public override string ToString() {
+        return $"BlockState[{block.name}]";
+    }
 }

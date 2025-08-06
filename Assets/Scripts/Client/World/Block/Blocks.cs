@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
+using UnityEngine.Tilemaps;
 
-public static class Blocks {
-    public static Block air = FromRegistry("air_block");
-    public static Block stone = FromRegistry("stone_block");
-    public static Block dirt = FromRegistry("dirt_block");
-    public static Block grass = FromRegistry("grass_block");
-    public static Block wood = FromRegistry("wood_block");
-    public static Block leaf = FromRegistry("leaf_block");
+public static partial class Blocks {
+    // REMINDER: since block state properties are unavailable as of right now, keep in mind that block behavior definitions might change when they have actual purpose
 
-    public static Block FromRegistry(string id) => AssetRegistry.Get<Block>(id);
+    public static readonly Block air = new GenericBlock("Air", AssetRegistry.Get<Tile>("air"), null);
+    public static readonly Block grass = new GenericBlock("Grass Block", AssetRegistry.Get<RuleTile>("grass"), Items.grassBlock);
+    public static readonly Block dirt = new GenericBlock("Dirt Block", AssetRegistry.Get<Tile>("dirt"), Items.dirtBlock);
+    public static readonly Block stone = new GenericBlock("Stone Block", AssetRegistry.Get<Tile>("stone"), Items.stoneBlock);
+    public static readonly Block wood = new GenericBlock("Wood", AssetRegistry.Get<Tile>("wood"), Items.woodBlock);
+    public static readonly Block leaves = new GenericBlock("Leaves", AssetRegistry.Get<Tile>("leaves"), Items.leavesBlock, _ => BlockBehaviors.DropIfPlayerBroke());
 }

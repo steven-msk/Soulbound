@@ -45,13 +45,13 @@ public class WorldChunk {
 				int yIndex = WorldYToIndex(y);
 				BlockState blockState = default(BlockState);
 				if (y > groundHeight) {
-					blockState = new BlockState(Blocks.air);
+					blockState = Blocks.air.defaultState;
 				} else if (y == groundHeight) {
-					blockState = new BlockState(Blocks.grass);
+					blockState = Blocks.grass.defaultState;
 				} else if (y < groundHeight && y >= undergroundHeight) {
-					blockState = new BlockState(Blocks.dirt);
+					blockState = Blocks.dirt.defaultState;
 				} else {
-					blockState = new BlockState(Blocks.stone);
+					blockState = Blocks.stone.defaultState;
 				}
 				blockStates[x, yIndex] = blockState;
 			}
@@ -73,7 +73,7 @@ public class WorldChunk {
 				int yIndex = WorldYToIndex(y);
 				BlockState blockState = blockStates[x, yIndex];
 				InvocationHelper.IfElse(blockState != null,
-					() => tilemap.SetTile(new Vector3Int(xStart + x, y), blockState.block.TileReference),
+					() => tilemap.SetTile(new Vector3Int(xStart + x, y), blockState.block.tileReference),
 					() => Debug.LogError($"Attempted to render ungenerated terrain! {new ChunkBlockPos(x, y, this.x).ToString()}"));
 			}
 		}

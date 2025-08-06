@@ -11,8 +11,6 @@ public interface IBlockStateBehavior {
 
     virtual Vector2 dropForce => new(Random.Range(-1f, 1f), Random.Range(2.5f, 3f));
 
-    string Description { get; }      // solely for inspector display, not used in-game
-
     List<ItemStack> GetDrops(BlockState blockState, BreakSource source);
 
     void OnNeighborStateChanged(BlockPos selfPos, BlockPos neighborPos, BlockState oldState, BlockState newState);

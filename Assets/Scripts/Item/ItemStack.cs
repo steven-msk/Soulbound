@@ -47,7 +47,6 @@ public class ItemStack {
 			}
 			text.color = textColor;
 		}
-		// Incoming hard-coded values, beware!
 		rectTransform.pivot = new Vector2(1f, 0f);
 		rectTransform.anchorMax = new Vector2(0.9375f, 0.0625f);
 		rectTransform.anchorMin = rectTransform.anchorMax;
@@ -60,8 +59,12 @@ public class ItemStack {
 	}
 
 	public void Drop(Vector2 pos, Vector2 dropForce, bool playerAction = false) {
-		// FUTURE TODO: item drop movement (throw force)
-		GameObject pickupItem = GameObject.Instantiate(Item.WorldPrefab, null);
+		GameObject worldPrefab = Item.worldPrefabSupplier?.Invoke();
+		if (Item.worldPrefabSupplier == null) {
+			Debug.LogError($"Item '{Item}' does not supply world prefab. Using fallback world prefab");
+			worldPrefab = Item.FallbackWorldPrefab();
+		}
+		GameObject pickupItem = worldPrefab;
 		DroppedItem pickup = pickupItem.AddComponent<DroppedItem>();
 		pickup.Init(this, playerAction ? 2f : 0f, pos, dropForce);
     }

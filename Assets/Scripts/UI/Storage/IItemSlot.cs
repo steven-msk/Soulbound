@@ -88,7 +88,7 @@ public static class ItemSlotUtility {
 			slot.AttachItemDisplay(previousGrabbed);
 			player.SetMainHandItem(inventory.GrabbedItem.ItemStack);
 		} else {
-			int space = slot.ItemStack.Item.MaxStackSize - slot.ItemStack.Quantity;
+			int space = slot.ItemStack.Item.maxStackSize - slot.ItemStack.Quantity;
 			int transfer = Math.Min(space, inventory.GrabbedItem.ItemStack.Quantity);
 			slot.ItemStack.Quantity += transfer;
 			inventory.GrabbedItem.ItemStack.Quantity -= transfer;
