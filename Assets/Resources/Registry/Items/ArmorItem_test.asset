@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cd00f7c0db95e94da8c7764031984fb, type: 3}
+  m_Name: ArmorItem_test
+  m_EditorClassIdentifier: 
+  itemName: Armoritem_test
+  id: armoritem_test
+  icon: {fileID: 7251223402976000308, guid: bb61cb66d4ce7ec4885fb9e566718148, type: 3}
+  worldPrefab: {fileID: 7544269631476792279, guid: a8139fe1729f56f478ff07020d01c085, type: 3}
+  maxStackSize: 1
+  customTooltipSerializer: {fileID: 0}
+  loreTextTooltip: 
+  infoTextTooltip: 
+  armorType: 1
+  instantStats:
+  - serializedReference: 2
+    valueType: 0
+    applicationType: 0
+    value: 10
+    applyAsBonus: 0
+  bufferedStats: []
+  bufferedInterpolationSource: 
+  references:
+    version: 2
+    RefIds: []

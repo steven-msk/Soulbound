@@ -1,0 +1,34 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using JetBrains.Annotations;
+using Unity.VisualScripting;
+using UnityEngine;
+
+#nullable enable
+
+public class ConsumableStatItem : StatItemDefinition, IConsumable {
+    public override bool applyInstantStatsAutomatically => false;
+    public IConsumable.ConsumeAction consumeAction { get; }
+    public int consumeAmount { get; }
+
+    public ConsumableStatItem(string name, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize, Func<Item, AbstractTooltip> tooltipSupplier, 
+            List<SerializableStat> instantStats, List<BufferedStat> bufferedStats, string interpolationSource,
+            IConsumable.ConsumeAction consumeAction, int consumeAmount)
+        : base(name, icon, worldPrefabSupplier, maxStackSize, tooltipSupplier, instantStats, bufferedStats, interpolationSource) {
+        this.consumeAction = consumeAction;
+        this.consumeAmount = consumeAmount;
+    }
+
+
+    public void Consume(ItemStack itemStack, PlayerController player) {
+		ConsumableUtils.DefaultConsume(this, itemStack);
+		((IStatProvider)this).ApplyInstantStats(player.Stats);
+	}
+
+	protected override CompoundTooltip GetDefaultTooltip() {
+		return base.GetDefaultTooltip().Concat(Tooltip.Tag(ItemTag.Consumable));
+	}
+}

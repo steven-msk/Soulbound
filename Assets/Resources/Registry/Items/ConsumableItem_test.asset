@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 464d89c62aefe724aa1dfa0a87ec7a94, type: 3}
+  m_Name: ConsumableItem_test
+  m_EditorClassIdentifier: 
+  itemName: ConsumableItem_test
+  id: consumableItem_test
+  icon: {fileID: 21300000, guid: 8a00d1f0cd0b90e4f8a16980e87bd7bd, type: 3}
+  worldPrefab: {fileID: 4487431087504722001, guid: 76b9051e107fe1049891a6ea43478c0b, type: 3}
+  maxStackSize: 64
+  customTooltipSerializer: {fileID: 0}
+  loreTextTooltip: 
+  infoTextTooltip: 
+  consumeAction: {fileID: 0}
+  consumeAmount: 1

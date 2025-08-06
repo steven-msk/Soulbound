@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 957055e2e87955a449c284b11fbcb1dc, type: 3}
+  m_Name: leaf
+  m_EditorClassIdentifier: 
+  blockName: Leaf Block
+  blockID: leaf_block
+  tileReference: {fileID: 11400000, guid: 91313985e638b4846bc2ac26367b1fc4, type: 2}
+  stateBehavior:
+    rid: 6961233590941909060
+  blockItemReference: {fileID: 11400000, guid: 13f4842a6cb11d54f95c5743426cf3bb, type: 2}
+  references:
+    version: 2
+    RefIds:
+    - rid: 6961233590941909060
+      type: {class: LeafBlockStateBehavior, ns: , asm: Assembly-CSharp}
+      data: 

@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8037c3a927b56b64f815b34bb1f831fd, type: 3}
+  m_Name: HeavensJudgement
+  m_EditorClassIdentifier: 
+  itemName: Heaven's Judgement
+  id: heavens_judgement
+  icon: {fileID: 21300000, guid: 12b09cd57637f1a4991eb51c9fa4eae1, type: 3}
+  worldPrefab: {fileID: 7544269631476792279, guid: a8139fe1729f56f478ff07020d01c085, type: 3}
+  maxStackSize: 1
+  tags: 0000000003000000
