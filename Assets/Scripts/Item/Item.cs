@@ -16,10 +16,12 @@ public abstract class Item {
 	public abstract Func<GameObject> worldPrefabSupplier { get; }
 	public abstract int maxStackSize { get; }
 	public bool IsStackable => maxStackSize > 1;
-	protected abstract Func<Item, AbstractTooltip>? tooltipSupplier { get; }
+	protected abstract Func<Item, AbstractTooltip?> tooltipSupplier { get; }
+
+	public AbstractTooltip? GetTooltip() => tooltipSupplier.Invoke(this);
 
 	public virtual GameObject FallbackWorldPrefab() {
-		GameObject fallback = InstantiateDefaultWorldPrefab();
+		GameObject fallback = InstantiateDefaultWorldPrefab(); 
 		fallback.GetComponent<SpriteRenderer>().sprite = icon;
 		return fallback;
 	}
@@ -28,16 +30,16 @@ public abstract class Item {
 		return GameObject.Instantiate(AssetRegistry.Get<GameObject>("droppedItem"))!;
 	}
 
-	[Obsolete]
-	public AbstractTooltip GetTooltip() {
-		if (tooltipSupplier != null) {
-			return tooltipSupplier(this);
-		}
-		return GetDefaultTooltip();
-	}
+	//[Obsolete]
+	//public AbstractTooltip GetTooltip() {
+	//	if (tooltipSupplier != null) {
+	//		return tooltipSupplier(this);
+	//	}
+	//	return GetDefaultTooltip();
+	//}
 
 	[Obsolete]
-	protected virtual CompoundTooltip GetDefaultTooltip() => Tooltip.DefaultItem(this);
+	//protected virtual CompoundTooltip GetDefaultTooltip() => Tooltip.DefaultItem(this);
 
 	public static int CustomMaxStack(int maxStack) => maxStack;
 

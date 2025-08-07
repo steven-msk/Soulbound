@@ -112,7 +112,7 @@ public class Tooltip : AbstractTooltip {
 		return CompoundTooltip.OfNullable(Tooltip.InterpolatedStats(instantSource, interpolatedInstantStats), Tooltip.InterpolatedStats(bufferedSource, interpolatedBufferedStats));
 	}
 
-	public static CompoundTooltip DefaultItem(Item item) {
-		return CompoundTooltip.OfNullable(Tooltip.Title(item.name), Tooltip.Info(item.infoText), Tooltip.Lore(item.loreText));
-	}
+	//public static CompoundTooltip DefaultItem(Item item) {
+	//	return CompoundTooltip.OfNullable(Tooltip.Title(item.name), Tooltip.Info(item.infoText), Tooltip.Lore(item.loreText));
+	//}
 }

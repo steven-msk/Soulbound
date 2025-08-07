@@ -112,7 +112,7 @@ public class Level {
                 return true;
             }
         }
-        structurePlacement = null;
+        structurePlacement = null!;
         return false;
     }
 
@@ -123,6 +123,11 @@ public class Level {
         return template.FinalizePlacement(template.placementGenerator.Invoke(context, structureData));
     }
 
+    public void ForcePlaceStructure(ChunkBlockPos chunkBlockPos, StructureTemplate template) {
+        StructurePlacement placement = ForceGeneratePlacement(chunkBlockPos, template);
+        PlaceStructure(chunkBlockPos.chunkX, placement);
+    }
+
     public bool StructureAt(BlockPos blockPos, out StructurePlacement structure) {
         int chunkX = ChunkXAt((Vector2Int)blockPos);
         if (structurePlacements.TryGetValue(chunkX, out var chunkFeatures)) {
@@ -130,7 +135,7 @@ public class Level {
             structure = chunkFeatures.FirstOrDefault(f => f.bounds.Contains((Vector2Int)chunkBlockPos));
             return structure?.PersistentExistence() ?? false;
         }
-        structure = null;
+        structure = null!;
         return false;
     }
 
@@ -166,7 +171,7 @@ public class Level {
 
     public void MarkStructureDirty(StructurePlacement placement) => structurePlacements[placement.origin.chunkX].Remove(placement);
 
-    public void SetBlockAndUpdate(BlockPos blockPos, BlockState? blockState) {
+    public void SetBlock(BlockPos blockPos, BlockState? blockState, bool broadcastStateChange = true) {
         WorldChunk? chunk = this.ChunkAt(blockPos);
         BlockState air = Blocks.air.defaultState;
         BlockState oldState = chunk?.BlockStateAt(blockPos.ToChunkBlockPos(chunk.xpos)) ?? air;
@@ -260,9 +265,9 @@ public class Level {
 
     public int ChunkXAt(float x) => Mathf.FloorToInt(x / CHUNK_LENGTH);
 
-    public WorldChunk? ChunkAt(BlockPos blockPos) => generatedChunks.GetValueOrDefault(this.ChunkXAt((Vector2)blockPos), null);
+    public WorldChunk? ChunkAt(BlockPos blockPos) => generatedChunks!.GetValueOrDefault(this.ChunkXAt((Vector2)blockPos), null);
 
-    public WorldChunk? ChunkAt(int xpos) => ChunkAt(new BlockPos(xpos, 0)); 
+    public WorldChunk? ChunkAt(int xpos) => ChunkAt(new BlockPos(xpos, 0));
 
     public BlockPos ToBlockPos(Vector2 worldPos) {
         Vector2Int intPos = (Vector2Int)grid.WorldToCell(worldPos);

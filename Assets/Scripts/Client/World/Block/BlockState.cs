@@ -36,14 +36,13 @@ public class BlockState {
         }
     }
 
-    // temporary operator overloads for easy comparison
-    // these will be replaced with more robust methods in the future
-    // they will also check equality between properties of the block state in the future
-    public static bool operator ==(BlockState state1, BlockState state2) {
+    public void OnPlace(BlockPos blockPos) => stateBehavior.OnPlace(blockPos, this);
+
+    public static bool operator ==(BlockState? state1, BlockState? state2) {
         return state1 is not null && state2 is not null && state1.block == state2.block;
     }
 
-    public static bool operator !=(BlockState state1, BlockState state2) => !(state1 == state2);
+    public static bool operator !=(BlockState? state1, BlockState? state2) => !(state1! == state2!);
 
     public override bool Equals(object obj) {
         if (obj is BlockState other) {

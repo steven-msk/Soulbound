@@ -15,5 +15,5 @@ public class ConsumableItem : ItemDefinition, IConsumable {
         this.consumeAmount = consumeAmount;
     }
 
-    protected override CompoundTooltip GetDefaultTooltip() => base.GetDefaultTooltip().Concat(Tooltip.Tag(ItemTag.Consumable));
+    //protected override CompoundTooltip GetDefaultTooltip() => base.GetDefaultTooltip().Concat(Tooltip.Tag(ItemTag.Consumable));
 }

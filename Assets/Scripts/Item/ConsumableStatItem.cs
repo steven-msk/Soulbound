@@ -28,7 +28,7 @@ public class ConsumableStatItem : StatItemDefinition, IConsumable {
 		((IStatProvider)this).ApplyInstantStats(player.Stats);
 	}
 
-	protected override CompoundTooltip GetDefaultTooltip() {
-		return base.GetDefaultTooltip().Concat(Tooltip.Tag(ItemTag.Consumable));
-	}
+	//protected override CompoundTooltip GetDefaultTooltip() {
+	//	return base.GetDefaultTooltip().Concat(Tooltip.Tag(ItemTag.Consumable));
+	//}
 }

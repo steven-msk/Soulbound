@@ -71,14 +71,14 @@ public class PlayerController : MonoBehaviour {
 				CanAttack.If(() => attackPerformer.PerformAttack(trigger));
 			});
 		}
-		itemUsageHandler.Register<IPlaceable>(ItemUseTrigger.LeftHold, (placeable, stack) => {
-			Level level = GameManager.instance.Level;
-			BlockPos blockPos = level.ToBlockPos(inputHandler.MouseWorldPosition);
+        itemUsageHandler.Register<IPlaceable>(ItemUseTrigger.LeftHold, (Action<IPlaceable, ItemStack>)((placeable, stack) => {
+            Level level = GameManager.instance.Level;
+            BlockPos blockPos = level.ToBlockPos(inputHandler.MouseWorldPosition);
 
 			if (this.IsInBlockReach((Vector2Int)blockPos) && level.BlockAt(blockPos) == Blocks.air) {
 				level.SetBlock(blockPos, placeable.Place(stack, blockPos));
 			}
-		});
+		}));
 		LogUtil.LogAwake(this);
 	}
 

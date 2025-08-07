@@ -10,5 +10,5 @@ using UnityEditor.UIElements;
 public static class ItemTooltips {
     public static Func<Item, AbstractTooltip?> NoTooltip() => item => null;
 
-    public static Func<Item, AbstractTooltip?> DefaultTitle() => item => Tooltip.Title(item.name);
+    public static Func<Item, AbstractTooltip?> DefaultTitle() => item => CompoundTooltip.Of(Tooltip.Title(item.name));
 }

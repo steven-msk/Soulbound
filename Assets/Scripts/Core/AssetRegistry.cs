@@ -29,7 +29,7 @@ public static class AssetRegistry {
 			return (T)resources[ID];
 		}
 		Debug.LogError($"Could not find resource '{ID}' in registry"); 
-		return (T?)resources.GetValueOrDefault(ID, null);
+		return (T?)resources!.GetValueOrDefault(ID, null);
 	}
 
 	public static List<T> GetAll<T>() where T : Object => GameManager.instance.GetAll<T>();
