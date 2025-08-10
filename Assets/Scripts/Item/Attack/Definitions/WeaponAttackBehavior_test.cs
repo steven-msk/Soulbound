@@ -30,6 +30,6 @@ public class WeaponAttackBehavior_test : WeaponAttackBehavior {
 	}
 
 	public override void OnHit(GameObject attackHandlerParent) {
-		Debug.Log("OnHit");
+		UnityEngine.Debug.Log("OnHit");
 	}
 }

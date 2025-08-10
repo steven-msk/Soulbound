@@ -7,7 +7,7 @@ using UnityEngine;
 
 public static class ArrayHelper {
 	public static T[,] CompressTo2D<T>(T[] input, int rows, int columns) {
-		Debug.Assert(input.Length == rows * columns);
+		UnityEngine.Debug.Assert(input.Length == rows * columns);
 		T[,] result = new T[rows, columns];
 
 		for (int i = 0; i < input.Length; i++) {

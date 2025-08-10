@@ -61,7 +61,7 @@ public class ItemStack {
 	public void Drop(Vector2 pos, Vector2 dropForce, bool playerAction = false) {
 		GameObject worldPrefab = Item.worldPrefabSupplier?.Invoke();
 		if (Item.worldPrefabSupplier == null) {
-			Debug.LogError($"Item '{Item}' does not supply world prefab. Using fallback world prefab");
+			UnityEngine.Debug.LogError($"Item '{Item}' does not supply world prefab. Using fallback world prefab");
 			worldPrefab = Item.FallbackWorldPrefab();
 		}
 		GameObject pickupItem = worldPrefab;
@@ -77,7 +77,7 @@ public class ItemStack {
 			return amount.ToString();
 		}
 		if (amount > 999_999) {
-			Debug.LogWarning($"Stack size exceeded max limit: {amount}"); 
+			UnityEngine.Debug.LogWarning($"Stack size exceeded max limit: {amount}"); 
 			return "999k";
 		}
 

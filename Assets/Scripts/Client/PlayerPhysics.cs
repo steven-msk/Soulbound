@@ -7,9 +7,10 @@ using System.Linq;
 using UnityEditor.ShaderGraph.Internal;
 using System.Collections;
 
+
 public class PlayerPhysics : MonoBehaviour {
-#pragma warning disable CS8632
-	private readonly Dictionary<string, (Action<Collision2D> action, Func<bool>? validator)> collisionReactionsByTag = new();
+	private static readonly Logger logger = Logger.CreateInstance();
+	private readonly Dictionary<string, (Action<Collision2D> action, Func<bool> validator)> collisionReactionsByTag = new();
 	private PlayerController player;
 	private PlayerStats stats;
 	private InputHandler inputHandler;
@@ -43,6 +44,8 @@ public class PlayerPhysics : MonoBehaviour {
 	[SerializeField] private bool shouldJump = false;
 	[SerializeField] private float jumpToFlightTimer;
 
+#nullable enable
+
 	private void Awake() {
 		player = GameManager.instance.Player;
 		inputHandler = player.InputHandler;
@@ -50,7 +53,6 @@ public class PlayerPhysics : MonoBehaviour {
 		animator = player.Animator;
 		stats = player.Stats;
 		collider = this.GetComponent<CapsuleCollider2D>();
-		LogUtil.LogAwake(this);
 	}
 
 	// FIXME: inconsistent movement
@@ -72,7 +74,7 @@ public class PlayerPhysics : MonoBehaviour {
 			rb.linearDamping = 0f;
 		}, IsOnGround));
 
-		Debug.Assert(inputHandler.isActiveAndEnabled, inputHandler);
+		UnityEngine.Debug.Assert(inputHandler.isActiveAndEnabled, inputHandler);
 	}
 
 	private void Update() {
@@ -151,7 +153,7 @@ public class PlayerPhysics : MonoBehaviour {
 
 	private void OnCollisionStay2D(Collision2D collision) {
 		var collisionResponse = collisionReactionsByTag.GetValueOrDefault(collision.gameObject.tag, ((collision) => {
-			Debug.Log($"Unknown collision callback tag: {collision.gameObject.tag}");
+			UnityEngine.Debug.Log($"Unknown collision callback tag: {collision.gameObject.tag}");
 		}, null));
 		collisionResponse.action.InvokeIf(collision, collisionResponse.validator);
 	}
@@ -171,8 +173,8 @@ public class PlayerPhysics : MonoBehaviour {
 	public void UpdateFlightTimePanel(bool isFlying, float flightTime, float grantedFlightTime) {
 		flightTimePanel.SetActive(isFlying && inputHandler.PressingSpace);
 		if (flightTimePanel.activeSelf) {
-			RectMask2D timeMask = flightTimePanel.GetComponentInChildren(typeof(RectMask2D), true) as RectMask2D;
-			timeMask.padding = new Vector4(maskWidth * (1 - flightTime / grantedFlightTime), 0, 0, 0);
+			RectMask2D? timeMask = flightTimePanel.GetComponentInChildren(typeof(RectMask2D), true) as RectMask2D;
+			timeMask!.padding = new Vector4(maskWidth * (1 - flightTime / grantedFlightTime), 0, 0, 0);
 		}
 	}
 }

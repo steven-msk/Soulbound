@@ -26,7 +26,7 @@ public abstract class StatItemDefinition : ItemDefinition, IStatProvider {
             IEnumerable<SerializableStat> mapped = instantStats.Where(stat => stat.SerializedReference == reference);
             if (mapped.Count() > 1) {
                 string duplicateEntries = string.Join(", ", mapped.Select(stat => $"{stat.RawValue} {stat.SerializedReference}"));
-                Debug.LogWarning($"Duplicate instant stat entries: [{duplicateEntries}] @ {this}");
+				UnityEngine.Debug.LogWarning($"Duplicate instant stat entries: [{duplicateEntries}] @ {this}");
             }
         }
 
@@ -37,21 +37,21 @@ public abstract class StatItemDefinition : ItemDefinition, IStatProvider {
                 Type expectedType = statType.ValueType;
                 Type type = stat.ValueType.ToInternalType();
                 if (type != expectedType) {
-                    Debug.LogError($"Invalid stat value '{stat.RawValue}' of type {type.Name} for stat entry of type {expectedType.Name}");
+					UnityEngine.Debug.LogError($"Invalid stat value '{stat.RawValue}' of type {type.Name} for stat entry of type {expectedType.Name}");
                 }
                 if (!statType.ValidApplications.Contains(stat.ApplicationType)) {
                     string accepted = string.Join(", ", statType.ValidApplications);
-                    Debug.LogWarning($"Mismatched stat value application {stat.ApplicationType} for entry that accepts [{accepted}]: {stat.SerializedReference} @ {this}");
+					UnityEngine.Debug.LogWarning($"Mismatched stat value application {stat.ApplicationType} for entry that accepts [{accepted}]: {stat.SerializedReference} @ {this}");
                 }
                 if (string.IsNullOrEmpty(stat.RawValue)) {
-                    Debug.LogError($"No value available for {stat} @ {this}");
+					UnityEngine.Debug.LogError($"No value available for {stat} @ {this}");
                 }
             }
         }
         void ValidateBufferedTriggers(Func<BufferedStat, string> emptyTriggerMessage) {
             foreach (var stat in bufferedStats) {
                 if (stat.ApplyBufferedTrigger == null) {
-                    Debug.LogError(emptyTriggerMessage.Invoke(stat));
+					UnityEngine.Debug.LogError(emptyTriggerMessage.Invoke(stat));
                 }
             }
         }

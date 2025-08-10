@@ -36,7 +36,6 @@ public class HotbarController : MonoBehaviour, IHotbarContainer {
 	private void Awake() {
 		inventory = GameManager.instance.Player.Inventory;
 		SetupGrid(() => inventory.SetupGrid(null));
-		LogUtil.LogAwake(this);
 	}
 
 #nullable enable
@@ -51,7 +50,7 @@ public class HotbarController : MonoBehaviour, IHotbarContainer {
 #nullable disable
 
 	public void SetActiveSlot(int slotKey) {
-		Debug.Assert(slotKey >= 0 && slotKey < Columns, $"Unexpected hotbar slotKey {slotKey}");
+		UnityEngine.Debug.Assert(slotKey >= 0 && slotKey < Columns, $"Unexpected hotbar slotKey {slotKey}");
 		InventorySlot hotbarSlot = this[slotKey];
 		if (active.hotbarSlot == null) {
 			active = (hotbarSlot, slotKey);
@@ -74,7 +73,7 @@ public class HotbarController : MonoBehaviour, IHotbarContainer {
 
 	public void OnHotbarScroll(float scrollDelta) {
 		int currentSlot = active.key;
-		Debug.Assert(currentSlot >= 0 && currentSlot < Columns);
+		UnityEngine.Debug.Assert(currentSlot >= 0 && currentSlot < Columns);
 
 		int nextSlot = currentSlot - (int)scrollDelta;
 		SetActiveSlot(Mathf.Clamp(nextSlot, 0, Columns - 1));

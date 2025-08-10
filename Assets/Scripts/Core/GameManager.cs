@@ -39,7 +39,6 @@ public class GameManager : MonoBehaviour {
 		this.level = new Level(Player, worldTilemap, GameObject.Find("Grid").GetComponent<Grid>(), seed, renderDistance: 2);
 		this.level.BootstrapWorld(Player.position);
 		UnityEngine.Random.InitState(seed);
-		LogUtil.LogAwake(this);
 	}
 
 	private void OnValidate() => ResourceGroups.Bootstrap();

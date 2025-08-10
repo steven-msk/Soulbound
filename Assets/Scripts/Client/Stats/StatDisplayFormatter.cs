@@ -8,7 +8,7 @@ public static class StatDisplayFormatter {
 		if (UnityEngine.ColorUtility.TryParseHtmlString(hexColor, out var color)) {
 			return PlainNameFormat<TValue>(color);
 		} else {
-			Debug.LogError($"Invalid hex color string {hexColor}. Are you sure the string starts with # ?");
+			UnityEngine.Debug.LogError($"Invalid hex color string {hexColor}. Are you sure the string starts with # ?");
 			return PlainNameFormat<TValue>();
 		}
 	}
@@ -23,7 +23,7 @@ public static class StatDisplayFormatter {
 		if (UnityEngine.ColorUtility.TryParseHtmlString(hexColor, out var color)) {
 			return PluralAdaptedNameFormat<TValue>(color);
 		} else {
-			Debug.LogError($"Invalid hex color string {hexColor}. Are you sure the string starts with # ?");
+			UnityEngine.Debug.LogError($"Invalid hex color string {hexColor}. Are you sure the string starts with # ?");
 			return PluralAdaptedNameFormat<TValue>();
 		}
 	}

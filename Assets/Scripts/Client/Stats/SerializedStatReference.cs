@@ -50,7 +50,7 @@ public static class SerializedToInternalStatExtension {
 	public static void ValidateStatEnumBindings() {
 		foreach (SerializedStatReference serializedReference in Enum.GetValues(typeof(SerializedStatReference))) {
 			if (serializedReference.ToStatType() == null) {
-				Debug.LogWarning($"Missing or invalid StatBinding for {serializedReference}");
+				UnityEngine.Debug.LogWarning($"Missing or invalid StatBinding for {serializedReference}");
 			}
 		}
 	}

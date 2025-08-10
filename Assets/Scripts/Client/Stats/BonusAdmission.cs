@@ -23,7 +23,7 @@ public class BonusAdmission<TValue> {
 			Add = new BonusAdmission<TValue>(value => Convert.ToSingle(value) > 0f ? "+" : "");
 			AddAndSubtract = Add;
 		} else {
-			Debug.LogWarning($"Unexpected BonusAdmission type {typeof(TValue)}.");
+			UnityEngine.Debug.LogWarning($"Unexpected BonusAdmission type {typeof(TValue)}.");
 			Add = None;
 			AddAndSubtract = None;
 		}

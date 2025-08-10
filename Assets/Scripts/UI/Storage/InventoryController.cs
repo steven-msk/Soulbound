@@ -45,7 +45,6 @@ public class InventoryController : MonoBehaviour, IContainer {
 
 	private void Awake() {
 		player = GameManager.instance.Player;
-		LogUtil.LogAwake(this);
 	}
 
 #nullable enable
@@ -76,7 +75,7 @@ public class InventoryController : MonoBehaviour, IContainer {
 			CreateItemDisplay(new ItemStack(Items.grassBlock, 100), hotbar[2]);
 			//CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("wood_block_item"), 100), (InventorySlot)this[0, 1]);
 			//CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("tree_sapling_item"), 10), (InventorySlot)this[0, 2]);
-            Debug.Log("<color=green>[INVENTORY]</color> Player inventory loaded");				// might factor out in LogUtil
+			UnityEngine.Debug.Log("<color=green>[INVENTORY]</color> Player inventory loaded");				// might factor out in LogUtil
 			// POTENTIAL: LogUtil modularity - implement different color coded logging sections marked between [ ]
 			hotbar.SetActiveSlot(0);
 		}
@@ -165,7 +164,7 @@ public class InventoryController : MonoBehaviour, IContainer {
 	public ItemDisplay CreateItemDisplay(ItemStack itemStack, InventorySlot slot) {
 		GameObject obj = Instantiate(ResourceManager.Get<GameObject, ResourceGroups.Prefabs>("itemDisplayPrefab"), slot.transform);
 		ItemDisplay display = obj.GetComponent<ItemDisplay>();
-		Debug.Assert(display != null, $"ItemDisplay instance not found in item display prefab");
+		UnityEngine.Debug.Assert(display != null, $"ItemDisplay instance not found in item display prefab");
 		display.ItemStack = itemStack;
 		if (itemStack.Item.IsStackable) {
 			itemStack.InitializeStackText(display);

@@ -38,7 +38,7 @@ public class TimerBufferedTrigger : IBufferedTrigger {
 
 	public bool ValidateExecution(BufferedStat stat, IStatProvider source, bool log) {
 		InvocationHelper.If(log && waitTime == 0, () => {
-			Debug.LogWarning($"WaitTime field of TimerBufferedTrigger in {stat.SerializedReference} @ {source} is set to 0. " +
+			UnityEngine.Debug.LogWarning($"WaitTime field of TimerBufferedTrigger in {stat.SerializedReference} @ {source} is set to 0. " +
 				$"This might be an intentional value, but in most cases indicates a broken trigger behavior");
 		});
 		return true;

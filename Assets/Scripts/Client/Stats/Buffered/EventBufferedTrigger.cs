@@ -30,11 +30,11 @@ public class EventBufferedTrigger : IBufferedTrigger {
 	public bool ValidateExecution(BufferedStat stat, IStatProvider source, bool log) {
 		bool valid = true;
 		if (string.IsNullOrEmpty(eventID)) {
-			InvocationHelper.If(log, () => Debug.LogError($"Null or empty eventID for EventBufferedTrigger in {stat.SerializedReference} @ {source}"));
+			InvocationHelper.If(log, () => UnityEngine.Debug.LogError($"Null or empty eventID for EventBufferedTrigger in {stat.SerializedReference} @ {source}"));
 			valid = false;
 		}
 		if (GameEvent.FromID(eventID) == null && valid){
-			InvocationHelper.If(log, () => Debug.LogError($"Invalid eventID: {eventID} for EventBufferedTrigger in {stat.SerializedReference} @ {source}"));
+			InvocationHelper.If(log, () => UnityEngine.Debug.LogError($"Invalid eventID: {eventID} for EventBufferedTrigger in {stat.SerializedReference} @ {source}"));
 			valid = false;
 		}
 		return valid;

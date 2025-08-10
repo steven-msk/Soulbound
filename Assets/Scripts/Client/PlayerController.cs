@@ -7,8 +7,6 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
 
-#nullable enable
-
 public class PlayerController : MonoBehaviour {
 	[SerializeField] private InputHandler inputHandler;
 	public InputHandler InputHandler => inputHandler;
@@ -30,8 +28,10 @@ public class PlayerController : MonoBehaviour {
 	[SerializeField] private Animator animator;
 	public Animator Animator => animator;
 
+#nullable enable
+
 	private ItemUsageHandler itemUsageHandler;
-	public ItemUsageHandler ItemUsageHandler => itemUsageHandler;
+	public ItemUsageHandler ItemUsageHandler => itemUsageHandler!;
 	public ItemStack? MainHandStack { get; private set; }
 
 	public bool CanAttack { get; set; } = true;
@@ -79,7 +79,6 @@ public class PlayerController : MonoBehaviour {
 				level.SetBlock(blockPos, placeable.Place(stack, blockPos));
 			}
 		}));
-		LogUtil.LogAwake(this);
 	}
 
 	private void Start() {

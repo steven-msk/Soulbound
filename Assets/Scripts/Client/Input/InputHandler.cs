@@ -96,8 +96,6 @@ public class InputHandler : MonoBehaviour {
 		RegisterInputEvent(playerActions.PauseGame, pausable: false, (action) => {
 			action.performed += actionContext => GameManager.instance.TogglePauseGame();
 		});
-
-		LogUtil.LogAwake(this);
 	}
 
 	private static void RegisterInputEvent(InputAction inputAction, bool pausable, Action<InputAction> callbackBinding) {
@@ -138,7 +136,7 @@ public class InputHandler : MonoBehaviour {
 		if (RectTransformUtility.ScreenPointToLocalPointInRectangle(rootTransfom, screenPos, GameManager.instance.UI.Canvas.worldCamera, out var localPos)) {
 			return localPos;
 		}
-		Debug.LogError($"Could not retrieve local point from screen point: ({screenPos.x}, {screenPos.y})");
+		UnityEngine.Debug.LogError($"Could not retrieve local point from screen point: ({screenPos.x}, {screenPos.y})");
 		return new(-1f, -1f);
 	}
 

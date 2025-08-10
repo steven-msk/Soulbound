@@ -20,7 +20,7 @@ public static class BufferedTriggerConditionRegistry {
 		if (conditions.TryGetValue(condition, out var validator)) {
 			return validator;
 		} else {
-			Debug.LogError($"BufferedTriggerCondition not found: {condition}. This should really not happen...");
+			UnityEngine.Debug.LogError($"BufferedTriggerCondition not found: {condition}. This should really not happen...");
 		}
 		return conditions[BufferedTriggerCondition.AlwaysTrue];
 	}

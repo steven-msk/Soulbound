@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 public static class ResourceGroups {
+	private static readonly Logger logger = Logger.CreateInstance();
 	static Dictionary<Type, string> addressesByGroupType = new();
 	static Dictionary<string, ResourceGroup> groupsByAddress = new();
 
@@ -29,7 +30,7 @@ public static class ResourceGroups {
 			where TAsset : UnityEngine.Object
 			where TGroup : IResourceGroupDefinition<TAsset> {
 		if (addressesByGroupType.TryAdd(typeof(TGroup), group.address)) {
-			Debug.Log($"Registered resource group definition '{group.address}' of type {typeof(TGroup)}");
+			logger.LogInfo(LogModules.resource, "Registered resource group definition '{}' of type {}", group.address, typeof(TGroup));
 		}
 	}
 

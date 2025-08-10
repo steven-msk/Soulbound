@@ -64,7 +64,7 @@ public class Tooltip : AbstractTooltip {
 			textBuilder.AppendLine(statEntry.Key.GetFormattedExpression(statEntry.Value.value, statEntry.Value.applyAsBonus));
 		});
 		if (layout != null && layout.Section != TooltipSection.Stats) {
-			Debug.LogWarning($"Mismatched stat tooltip sections: {layout.Section} and {TooltipSection.Stats}. Switching to {TooltipSection.Stats}.");
+			UnityEngine.Debug.LogWarning($"Mismatched stat tooltip sections: {layout.Section} and {TooltipSection.Stats}. Switching to {TooltipSection.Stats}.");
 			layout.Section = TooltipSection.Stats;
 		}
 		return new Tooltip(textBuilder.ToString(), layout ?? TooltipSection.Stats.GetDefaultLayout());
@@ -100,7 +100,7 @@ public class Tooltip : AbstractTooltip {
 		try {
 			return new Tooltip(string.Format(source, interpolatedStats.Select(stat => stat.GetFormattedExpression()).ToArray()), TooltipSection.Stats.GetDefaultLayout());
 		} catch (FormatException) {
-			Debug.LogError($"Tooltip source has more stat entries than available; source: '{source}', available entries: {interpolatedStats.Length}");
+			UnityEngine.Debug.LogError($"Tooltip source has more stat entries than available; source: '{source}', available entries: {interpolatedStats.Length}");
 			return null;
 		}
 	}

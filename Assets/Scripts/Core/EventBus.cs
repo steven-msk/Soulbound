@@ -18,7 +18,7 @@ public class EventBus<TEvent> where TEvent : IEvent {
 
 	public static void Unsubscribe(TEvent @event, Action handler) {
 		if (!handlers.ContainsKey(@event)) {
-			Debug.LogWarning($"Unable to unsubscribe event: missing event mapping '{@event.ID}'");
+			UnityEngine.Debug.LogWarning($"Unable to unsubscribe event: missing event mapping '{@event.ID}'");
 			return;
 		}
 		handlers[@event] -= handler;

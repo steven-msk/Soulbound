@@ -74,7 +74,7 @@ public class WorldChunk {
 				BlockState blockState = blockStates[x, yIndex];
 				InvocationHelper.IfElse(blockState != null,
 					() => tilemap.SetTile(new Vector3Int(xStart + x, y), blockState.block.tileReference),
-					() => Debug.LogError($"Attempted to render ungenerated terrain! {new ChunkBlockPos(x, y, this.x).ToString()}"));
+					() => UnityEngine.Debug.LogError($"Attempted to render ungenerated terrain! {new ChunkBlockPos(x, y, this.x).ToString()}"));
 			}
 		}
 		this.RefreshTiles(tilemap);

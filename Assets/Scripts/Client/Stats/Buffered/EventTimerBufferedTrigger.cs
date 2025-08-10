@@ -47,15 +47,15 @@ public class EventTimerBufferedTrigger : IBufferedTrigger {
 	public bool ValidateExecution(BufferedStat stat, IStatProvider source, bool log) {
 		bool valid = true;
 		InvocationHelper.If(log && waitTime == 0, () => {
-			Debug.LogWarning($"WaitTime field of EventTimerBufferedTrigger in {stat.SerializedReference} @ {source} is set to 0. " +
+			UnityEngine.Debug.LogWarning($"WaitTime field of EventTimerBufferedTrigger in {stat.SerializedReference} @ {source} is set to 0. " +
 				$"This might be an intentional value, but in most cases indicates a broken trigger behavior");
 		});
 		if (string.IsNullOrEmpty(eventID)) {
-			InvocationHelper.If(log, () => Debug.LogError($"Null or empty eventID for EventTimerBufferedTrigger in {stat.SerializedReference} @ {source}"));
+			InvocationHelper.If(log, () => UnityEngine.Debug.LogError($"Null or empty eventID for EventTimerBufferedTrigger in {stat.SerializedReference} @ {source}"));
 			valid = false;
 		}
 		if (GameEvent.FromID(eventID) == null && valid) {
-			InvocationHelper.If(log, () => Debug.LogError($"Invalid eventID: {eventID} for EventTimerBufferedTrigger in {stat.SerializedReference} @ {source}"));
+			InvocationHelper.If(log, () => UnityEngine.Debug.LogError($"Invalid eventID: {eventID} for EventTimerBufferedTrigger in {stat.SerializedReference} @ {source}"));
 			valid = false; 
 		}
 		return valid;
