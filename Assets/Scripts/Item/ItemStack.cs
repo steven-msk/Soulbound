@@ -33,7 +33,7 @@ public class ItemStack {
 	}
 
 	public GameObject InitializeStackText(ItemDisplay parent) {
-		GameObject stackText = GameObject.Instantiate(AssetRegistry.Get<GameObject>("stackNumberPrefab"), parent.transform);
+		GameObject stackText = GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.Prefabs>("stackNumberPrefab"), parent.transform);
 		TextMeshProUGUI text = stackText.GetComponent<TextMeshProUGUI>();
 		text.autoSizeTextContainer = true;
 		RectTransform rectTransform = stackText.GetComponent<RectTransform>();

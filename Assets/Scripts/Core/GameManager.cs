@@ -26,8 +26,6 @@ public class GameManager : MonoBehaviour {
 
 	public UIController UI => GameObject.Find("Canvas").GetComponent<UIController>();
 
-	private Dictionary<Type, List<Object>> registriesByType = new();
-
 	// FEATUREIMPL: settings menu
 	// FEATUREIMPL: pause menu
 	// Pause menu -> Settings menu
@@ -36,7 +34,6 @@ public class GameManager : MonoBehaviour {
 		instance = this;
 
 		ResourceGroups.Bootstrap();
-		ReloadRegistries();
 
 		int seed = 745632;           // UnityEngine.Random.Range(int.MinValue, int.MaxValue)
 		this.level = new Level(Player, worldTilemap, GameObject.Find("Grid").GetComponent<Grid>(), seed, renderDistance: 2);
@@ -45,49 +42,12 @@ public class GameManager : MonoBehaviour {
 		LogUtil.LogAwake(this);
 	}
 
-	private void OnValidate() => ReloadRegistries();
+	private void OnValidate() => ResourceGroups.Bootstrap();
 
 	private void Start() {
 		StartCoroutine(GameTickLoop());
 	}
 
-	private void ReloadRegistries() {
-		if (registriesByType.Count > 0) {
-			Debug.LogWarning("Registries already loaded. Skipping reload.");
-            return;
-        }
-
-        AssetRegistry.Reset();
-		registriesByType.Clear();
-		RegisterByType<TMP_FontAsset>(AssetRegistry.RegisterAll<TMP_FontAsset>("Registry/Fonts"));
-		//RegisterByType<Item>(AssetRegistry.RegisterAll<Item>("Registry/Items"));
-		//RegisterBySubclassedType<Item, BlockItem>(registriesByType[typeof(Item)].Cast<Item>().ToList());
-		RegisterByType<GameObject>(AssetRegistry.RegisterAll<GameObject>("Registry/Prefabs"));
-		RegisterByType<Tile>(AssetRegistry.RegisterAll<Tile>("Registry/Tiles"));
-		RegisterByType<RuleTile>(AssetRegistry.RegisterAll<RuleTile>("Registry/Tiles"));
-		RegisterByType<Sprite>(AssetRegistry.RegisterAll<Sprite>("Registry/Sprites"));
-		//RegisterByType<Block>(AssetRegistry.RegisterAll<Block>("Registry/Blocks"));
-    }
-
-	public List<T> GetAll<T>() where T : UnityEngine.Object {
-		if (registriesByType.TryGetValue(typeof(T), out List<Object> resources)) {
-			return resources.Cast<T>().ToList();
-		}
-		Debug.LogError($"No resources of type '{typeof(T).Name}' found in registries.");
-		return new List<T>();
-    }
-
-    private void RegisterByType<T>(List<T> registeredResources, bool logRegistration = true) where T : UnityEngine.Object {
-		registriesByType[typeof(T)] = registeredResources.Select(resource => (Object)resource).ToList();
-		logRegistration.If(() => Debug.Log($"Registered {registeredResources.Count} resources of type '{typeof(T).Name}'"));
-    }
-
-	private void RegisterBySubclassedType<T, TSub>(List<T> registered) where T : UnityEngine.Object where TSub : T {
-		List<TSub> subclassed = registered.Where(resource => resource is TSub).Cast<TSub>().ToList();
-		RegisterByType<TSub>(subclassed, logRegistration: false);
-		Debug.Log($"Registered {subclassed.Count} resources of type '{typeof(TSub).Name}' as subclassed type of '{typeof(T).Name}'");
-    }
- 
 	IEnumerator GameTickLoop() {
 		while (Application.isPlaying) {
 			if (!this.IsPaused) {

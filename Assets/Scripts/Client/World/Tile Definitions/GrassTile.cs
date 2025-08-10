@@ -22,8 +22,8 @@ public class GrassTile : RuleTile<GrassTile.Neighbor> {
 		return neighbor switch { 
 			Neighbor.This => other == this,
 			Neighbor.NotThis => other != this,
-			Neighbor.IsAir => other == null || other == CommonTiles.air,
-			Neighbor.ThisOrDirt => other != null && (other == this || other == CommonTiles.dirt),
+			Neighbor.IsAir => other == null || other == Tiles.air,
+			Neighbor.ThisOrDirt => other != null && (other == this || other == Tiles.dirt),
 			_ => base.RuleMatch(neighbor, other)
 		};
 	}

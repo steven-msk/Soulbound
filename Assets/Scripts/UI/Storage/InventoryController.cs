@@ -163,7 +163,7 @@ public class InventoryController : MonoBehaviour, IContainer {
 	[CanBeNull] public InventorySlot[] GetEmptySlots() => MainPlayerSlots.Where(slot => !slot.HasItem).ToArray();
 	
 	public ItemDisplay CreateItemDisplay(ItemStack itemStack, InventorySlot slot) {
-		GameObject obj = Instantiate(AssetRegistry.Get<GameObject>("itemDisplayPrefab"), slot.transform);
+		GameObject obj = Instantiate(ResourceManager.Get<GameObject, ResourceGroups.Prefabs>("itemDisplayPrefab"), slot.transform);
 		ItemDisplay display = obj.GetComponent<ItemDisplay>();
 		Debug.Assert(display != null, $"ItemDisplay instance not found in item display prefab");
 		display.ItemStack = itemStack;

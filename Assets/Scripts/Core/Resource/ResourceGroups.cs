@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -50,6 +51,18 @@ public static class ResourceGroups {
 		public static readonly Tiles instance = new();
 		static Tiles() => RegisterGroupDefinition<Tiles, TileBase>(instance);
 		public string address => "tiles/";
+	}
+
+	public sealed class Prefabs : IResourceGroupDefinition<GameObject> {
+		public static readonly Prefabs instance = new();
+		static Prefabs() => RegisterGroupDefinition<Prefabs, GameObject>(instance);
+		public string address => "prefabs/";
+	}
+
+	public sealed class Fonts : IResourceGroupDefinition<TMP_FontAsset> {
+		public static readonly Fonts instance = new();
+		static Fonts() => RegisterGroupDefinition<Fonts, TMP_FontAsset>(instance);
+		public string address => "fonts/";
 	}
 
 	public interface IResourceGroupDefinition<TAsset> where TAsset : UnityEngine.Object {

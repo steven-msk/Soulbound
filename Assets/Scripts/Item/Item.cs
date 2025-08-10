@@ -27,7 +27,7 @@ public abstract class Item {
 	}
 
 	public static GameObject InstantiateDefaultWorldPrefab() {
-		return GameObject.Instantiate(AssetRegistry.Get<GameObject>("droppedItem"))!;
+		return GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.Prefabs>("droppedItem"))!;
 	}
 
 	//[Obsolete]
