@@ -35,6 +35,7 @@ public class GameManager : MonoBehaviour {
 	private void Awake() {
 		instance = this;
 
+		ResourceGroups.Bootstrap();
 		ReloadRegistries();
 
 		int seed = 745632;           // UnityEngine.Random.Range(int.MinValue, int.MaxValue)
