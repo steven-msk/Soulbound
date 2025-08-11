@@ -3,12 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using Object = UnityEngine.Object;
 
 public class GameManager : MonoBehaviour {
+	private static readonly Logger logger = Logger.CreateInstance();
 	public static GameManager instance;
+	public const float tickRate = 0.02f;        // 50 tps
+	private float tickStartTime;
 
 	// POTENTIAL FEATUREIMPL (unlikely, but possible): make Level class NOT a singleton.
 	// In this case, it represents the current dimension or world the player is in (e.g., overworld, nether, end).
@@ -47,12 +51,32 @@ public class GameManager : MonoBehaviour {
 		StartCoroutine(GameTickLoop());
 	}
 
+	private void Update() {
+		this.level.Update(Time.deltaTime);
+	}
+
 	IEnumerator GameTickLoop() {
+		WaitForSecondsRealtime tickDelay = new(tickRate);
 		while (Application.isPlaying) {
 			if (!this.IsPaused) {
-				// TODO: implement ticking system
+				StartTick();
+				// do things
+				level.EntityManager.Tick();
+				// TODO: implement proper ticking system
+				EndTick();
 			}
-			yield return new WaitForSecondsRealtime(0.1f);		// TODO: decide on a tick rate
+			yield return tickDelay;
+		}
+	}
+
+	private void StartTick() {
+		tickStartTime = Time.realtimeSinceStartup;
+	}
+
+	private void EndTick() {
+		float elapsed = Time.realtimeSinceStartup - tickStartTime;
+		if (elapsed > tickRate) {
+			logger.LogWarning(null, $"Tick lag detected! Tick took {elapsed * 1000f:F1} ms");
 		}
 	}
 

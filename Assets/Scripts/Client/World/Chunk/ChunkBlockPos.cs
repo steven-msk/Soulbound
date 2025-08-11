@@ -23,6 +23,8 @@ public struct ChunkBlockPos {
         return new ChunkBlockPos(localX, blockPos.y, chunkX);
     }
 
+    public static ChunkBlockPos FromWorld(Vector2 position) => FromBlockPos(BlockPos.FromWorld(position));
+
     public static bool operator !=(ChunkBlockPos pos1, ChunkBlockPos pos2) => !(pos1 == pos2);
 
     public static bool operator ==(ChunkBlockPos pos1, ChunkBlockPos pos2) {

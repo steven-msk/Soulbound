@@ -12,7 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ad4006c27bb7ee48815cdc626f0d239, type: 3}
   m_Name: tilesGroup
   m_EditorClassIdentifier: 
-  groupAddress: 
-  searchFolder: Assets/Resources/
-  assetType: 
-  resources: []
+  groupAddress: tiles/
+  searchFolder: Assets/Resources/Registry/Tiles
+  assetType: TileBase
+  resources:
+  - {fileID: 11400000, guid: 5c5dbc3200a937c498da76e029222e08, type: 2}
+  - {fileID: 11400000, guid: 7350909f237a6674fa7ddcd933435fe2, type: 2}
+  - {fileID: 11400000, guid: 22de33d73f0feda4e9a52553b3394a28, type: 2}
+  - {fileID: 11400000, guid: 4b0ef74baad2bf6428410446463b874f, type: 2}
+  - {fileID: 11400000, guid: 6dba1d9a1a8ab8244bbe1ac62086a249, type: 2}
+  - {fileID: 11400000, guid: 9270827d9dd361140a7264d2052a621d, type: 2}

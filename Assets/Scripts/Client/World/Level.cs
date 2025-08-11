@@ -29,6 +29,8 @@ public class Level {
     private Dictionary<int, List<StructurePlacement>> structurePlacements = new();
     private Dictionary<int, List<(ChunkBlockPos chunkBlockPos, BlockState state)>> pendingUpdates = new();
     private int renderDistance;
+    private EntityManager entityManager;
+    public EntityManager EntityManager => entityManager;
 
     private Grid grid;
 
@@ -45,6 +47,7 @@ public class Level {
         this.renderDistance = renderDistance; 
         this.seed = seed;
         this.heightGenerator = new PerlinNoiseGenerator1D(this.seed, WorldChunk.HEIGHT_SPREAD);
+        this.entityManager = new EntityManager(this);
     }
 
     // PLANNED REWORK: world rendering system
@@ -85,8 +88,14 @@ public class Level {
                 }
                 loadedChunks[chunkX] = chunk;
                 chunk.Render(tilemap, chunkOutlineRenderer);
+                entityManager.OnChunkLoaded(chunk);
             }
         }
+    }
+
+    public void Update(float deltaTime) {
+        this.UpdateChunks(player.position);
+        entityManager.Update(deltaTime);
     }
 
     private WorldChunk GenerateNewChunk(int chunkX) {
@@ -106,8 +115,8 @@ public class Level {
             StructureTemplate structure = registeredStructureTemplates[structureID];
             StructureGenerationContext context = new StructureGenerationContext(chunkBlockX, chunkX, heightmapData, this);
             PreliminaryStructureData? data = structure.placementFunction.Invoke(context, false);
-            if (data != null && structure.validationFunction.Invoke(context, (PreliminaryStructureData)data)) {
-                StructurePlacementConstraints placementConstraints = structure.placementGenerator.Invoke(context, (PreliminaryStructureData)data);
+            if (data != null && structure.validationFunction.Invoke(context, data.Value)) {
+                StructurePlacementConstraints placementConstraints = structure.placementGenerator.Invoke(context, data.Value);
                 structurePlacement = structure.FinalizePlacement(placementConstraints);
                 return true;
             }
@@ -235,6 +244,7 @@ public class Level {
         foreach (WorldChunk chunk in toRemove) {
             loadedChunks.Remove(chunk.xpos);
             chunk.Unload(tilemap, chunkOutlineRenderer);
+            entityManager.OnChunkUnloaded(chunk);
         }
     }
 
