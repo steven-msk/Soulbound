@@ -56,6 +56,16 @@ public sealed class EntityManager {
 		}
 	}
 
+	public void HandleChunkChange(Entity entity, int oldChunkX, int newChunkX) {
+		bool newLoaded = level.IsChunkLoaded(newChunkX);
+		bool oldLoaded = level.IsChunkLoaded(oldChunkX);
+		if (oldLoaded && !newLoaded) {
+			entity.OnChunkUnloaded();
+		} else if (!oldLoaded && newLoaded) {
+			entity.OnChunkLoaded();
+		}
+	}
+
 	public HashSet<Entity> GetEntitiesInChunk(WorldChunk chunk) {
 		return allEntities.Values
 			.Where(entity => ChunkBlockPos.FromWorld(entity.position).underlyingChunk == chunk)

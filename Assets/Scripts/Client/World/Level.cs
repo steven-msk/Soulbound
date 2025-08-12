@@ -98,6 +98,10 @@ public class Level {
         entityManager.Update(deltaTime);
     }
 
+    public bool IsChunkLoaded(WorldChunk chunk) => loadedChunks.ContainsValue(chunk);
+
+    public bool IsChunkLoaded(int chunkX) => loadedChunks.ContainsKey(chunkX);
+
     private WorldChunk GenerateNewChunk(int chunkX) {
         WorldChunk chunk = new(chunkX);
         ChunkHeightmapData heightmapData = chunk.GenerateHeightmap(this.heightGenerator);
