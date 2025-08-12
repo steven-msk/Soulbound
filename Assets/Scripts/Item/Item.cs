@@ -10,6 +10,8 @@ using UnityEngine;
 public abstract class Item {
 	public static readonly int universalMaxStack = 999_999;
 
+	// FIXME: mismatched README version - item dev notes are obsolete
+
 	public abstract string name { get; }
 	public abstract Sprite icon { get; }
 	// POTENTIAL REWORK: item world prefab serialization

@@ -5,7 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public abstract class WeaponAttackBehavior : ScriptableObject {
+// FIXME: incomplete weapon item fields and behavior
+
+public abstract class WeaponAttackBehavior {
 	public abstract void PreAttack(GameObject attackHandlerParent);
 	
 	public virtual void PostAttack(GameObject attackHandlerParent, string attack) => GameObject.Destroy(attackHandlerParent);

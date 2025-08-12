@@ -1,6 +1,6 @@
 # Soulbound - Prototype
 
-This repository contains the early-stage prototype of Soulbound, a solo-developed RPG inspired by games like Terraria, Hollow Knight and Undertale.
+This repository contains the early-stage prototype of Soulbound, a solo-developed RPG inspired by Terraria, Hollow Knight and Undertale.
 It serves as the foundation for gameplay systems, architecture, and experimentation before moving into the full production phase.
 
 ---
@@ -9,10 +9,11 @@ It serves as the foundation for gameplay systems, architecture, and experimentat
 
 This is **not** a production-ready project.
 All code, systems, and structures are exerimental and subject to heavy future changes. The purpose is to explore:
-- Core mechanics like inventory, item usage, and event systems
+- Core mechanics
 - Input and interaction models
 - UI/UX experimentation
 - Data structures and gameplay flow
+- Gamedev features
 
 Expect:
 - Rapid iteration
@@ -20,12 +21,7 @@ Expect:
 - Untested systems
 - Incomplete or placeholder content
 - Frequent task comments
-
-## Goals for Prototype Phase
-
-- Lay down the foundation systems for input, inventory, combat, world stability
-- Explore soul-binding mechanics and item interactions
-- Establish a flexible architecture which can support heavy content expansion later
+- Messy commits (im not the best with git)
 
 ---
 
@@ -38,7 +34,7 @@ Expect:
 ## Notes
 
 - Branching strategy may be used later - currently all changes live in `prototype` branch until probject stabilization.
-- This repo may be squashed or restructured before tansitioning to production.
+- This repo may be squashed or restructured before transitioning to production.
 
 ## License
 
@@ -66,104 +62,8 @@ Making combination of task tokens is possible and actually recommended. They hel
 
 ---
 
-## Custom item tooltips
-
-Architecture overview:
-- `TooltipSerializer`: ScriptableObject, assigned per Item, returns a `ITooltipDeserializer`
-- `ITooltipDeserializer`: return the actual runtime `AbstractTooltip`
-- `AbstractTooltip`: the tooltip instance, handles show/hide/update logic
-
-Custom item tooltip implementation should be done using these steps:
-1. (Optional) Create a new class extending `AbstractTooltip` or an existing tooltip implementation (e.g. `Tooltip`, or `AbstractTooltip` for a completely new tooltip implementation). Implement logic as needed
-2. Create a class `ITooltipDeserializer`, return your tooltip instance
-3. Create a `ScriptableObject` extending `TooltipSerializer` and return your serializer
-4. Assign the ScriptableObject to an `Item`    
-
-Remember to create a ScriptableObject tooltip asset found in:
-```csharp
-[CreateAssetMenu(fileName = "YourCustomTooltipName", menuName = "Tooltips/YourCustomTooltipNameHere")] 
-```
-Then assign the created asset to the desired item.
-
-#### Note
-Keep the classes nested and primarily private or internal for better encapsulation. Making them internal may be accepted in cases where you need to instantiate the classes from other sources, but try to keep them private most of the times to reduce confusion.
-
-Example (custom tooltip to set the tooltip text to the current stack number)
-Developers: You can find a template tooltip creation snippet in `Documentation/Snippets/CustomTooltipTemplate`.
-
-```csharp
-[CreateAssetMenu(menuName = "Tooltips/CustomTooltip")]
-public class CustomTooltipSerializer : TooltipSerializer {
-	public override ITooltipDeserializer GetDeserializer(Item item) => new CustomTooltipData();
-
-	private class CustomTooltipData : ITooltipDeserializer {
-		public AbstractTooltip Generate() => new CustomTooltip(Tooltip.Plain("0").Data);
-	}
-
-	private class CustomTooltip : Tooltip {
-		public CustomTooltip(TooltipData data) : base(data) {
-		}
-
-		public override void Update(ItemStack itemStack) {
-			base.Update(itemStack);
-			data.Text = itemStack.Quantity.ToString();
-			if (tooltipPanel != null) {
-				tooltipPanel.GetComponentInChildren<TextMeshProUGUI>().text = data.Text;
-			}
-		}
-	}
-}
-```
----
-
-## Custom Weapon Attack Behaviors
-
-This system uses `WeaponAttackBehavior` as the foundation for custom attack logic through code.
-Custom behaviors should be created using these steps:
-1. Create a new ScriptableObject extending `WeaponAttackBehavior`, then override or implement your custom logic
-2. Assign an instance of the newly created behavior to the desired WeaponItem.  
-
-#### Important note
-`WeaponAttackBehavior` should not define direct motion logic, as movement should be controlled by the animation clip and its assigned behavior. Instead, use `WeaponAttackBehavior` to define events that occur before, during, or after the attack is executed.  
-
-However, an exception may be made in cases where the animation clip does not contain a `StateMachineBehavior` or other mechanism to handle motion. In such cases, motion-relateed behavior may be implemented within `WeaponAttackBehavior`. <b> This approach is not recommended, as it breaks the separation between visual timing and gameplay behavior, and can lead to desynchronized or hard-to-maintain attack logic.</b>
-As a general rule, motion should remain animation-driven, and `WeaponAttackBehavior`s should be reserved for handling state changes, audio or visual feedback, or gameplay triggers.
-
-Events that occur during the attack animation can be triggered through either animation clip events (defined directly in the animation timeline), or external sources.  
-When invoking animation events, you must call:
-```csharp
-AttackHandler.InvokeAnimationEvent(string eventName);
-```
-where `eventName` must match the name of the action previously registered in the `WeaponAttackBehavior`:
-```csharp
-public override Dictionary<string, Action<AttackHandler>> AnimationEventsSupplier => new() {
-	["eventName"] = attackHandler => { /* custom logic */ }
-};
-```
-
-Here is an example of custom weapon attack behavior (weapon's movement is defined in a custom `StateMachineBehavior`)
-```csharp
-[CreateAssetMenu(menuName = "Items/Weapon/Attack Behaviors/WeaponAttackBevahior_test")]
-public class WeaponAttackBehavior_test : WeaponAttackBehavior {
-	public override Dictionary<string, Action<AttackHandler>> AnimationEventsSupplier => new() {
-		["AnimEvent"] = _ => Debug.Log("event")
-	};
-
-	public override void Setup(AttackHandler attackHandler) { 
-		attackHandler.transform.position = GameManager.GetPlayerInstance().transform.position;
-	}
-
-	public override void PostAttack(AttackHandler attackHandler) {
-		base.PostAttack(attackHandler);
-		Debug.Log("destroy");
-	}
-
-	public override void OnHit(AttackHandler attackHandler) {
-		Debug.Log("OnHit");
-	}
-}
-```
----
+<!---
+incoherent capability definitions: capabilities are not instantiatable and arent referenced in each item definition
 
 ## Item Capabilities and Effect Definitions
 
@@ -181,6 +81,8 @@ Then assign the effect to an item:
 3. Assign the effect asset to the item`s effect field (make sure both the field and the item asset exist first)
 
 The following example is taken from an actual feature in the game's code, but may be outdated due to ongoing development:
+
+
 
 #### Capability definition
 ```csharp
@@ -233,6 +135,14 @@ public class ConsumableEffect_test : ConsumableEffect {
 ```csharp
 itemUsageHandler.Register<IConsumable>(ItemUseTrigger.LeftClick, (consumable, stack) => consumable.Consume(stack));
 ```
+-->
+
+
+
+
+
+<!---
+may be moved in code documentation files
 
 ## BufferedStat implementation
 
@@ -298,3 +208,4 @@ void Invoke(BufferedStat stat, Action action)
 - `IBufferedTrigger` provides reactive control, bridging the stat info with gameplay logic (when/how it applies)
 - This abstraction is ideal for temporary buffs/debuffs, event-driven stat effects (e.g. on hit, on move), and environmental or conditional effects
 - Triggers are modular and interchangeable. You can compose complex behavior by mixing different implementations (e.g. `TimedBufferedTrigger` with `EventTimerBufferedTrigger` and so on)
+-->

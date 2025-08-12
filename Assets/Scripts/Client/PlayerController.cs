@@ -154,7 +154,6 @@ public class PlayerController : Entity {
 
 	public bool CanPlaceBlockAt(BlockPos blockPos) {
 		Vector2 worldPos = (Vector2)blockPos;
-		Debug.Log(IsInBlockReach(worldPos));
 		return IsInBlockReach(worldPos)
 			   && level.BlockAt(blockPos) == Blocks.air;
 	}
