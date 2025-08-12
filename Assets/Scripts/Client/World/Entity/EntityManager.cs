@@ -25,6 +25,11 @@ public sealed class EntityManager {
 		}
 	}
 
+	public void SpawnEntity(Entity entity, EntitySpawnData spawnData) {
+		this.AddEntity(entity, spawnData.position);
+		entity.Spawn(spawnData);
+	}
+
 	public void RemoveEntity(Entity entity) => pendingRemovals.Add(entity);
 
 	public void Tick() {

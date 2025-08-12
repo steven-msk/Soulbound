@@ -66,7 +66,8 @@ public class ItemStack {
 		}
 		GameObject pickupItem = worldPrefab;
 		DroppedItem pickup = pickupItem.AddComponent<DroppedItem>();
-		pickup.Init(this, playerAction ? 2f : 0f, pos, dropForce);
+		EntitySpawnData spawnData = new DroppedItemSpawnData(this, playerAction ? 2f : 0f, pos, dropForce);
+		GameManager.instance.Level.EntityManager.SpawnEntity(pickup, spawnData);
     }
 
 	// FEATUREIMPL: dropped item stacks converging to avoid lag

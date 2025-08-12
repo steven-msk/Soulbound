@@ -24,6 +24,18 @@ public abstract class Entity : MonoBehaviour {
 		}
 	}
 
+	public abstract void Spawn(EntitySpawnData spawnData);
+
+	public virtual void Despawn() {
+		GameManager.instance.Level.EntityManager.RemoveEntity(this);
+	}
+
+	public void ValidateSpawnData<TData>(EntitySpawnData spawnData, Action<TData> spawn) where TData : EntitySpawnData {
+		spawnData.PatternIfElse<TData>(
+			(spawnData) => spawn.Invoke(spawnData),
+			() => throw new MismatchedEntitySpawnDataTypeException(typeof(TData), spawnData.GetType()));
+	}
+
 	public abstract void OnChunkLoaded();
 	public abstract void OnChunkUnloaded();
 }
