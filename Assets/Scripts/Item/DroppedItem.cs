@@ -3,13 +3,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using static UnityEditor.PlayerSettings;
 
-public class DroppedItem : MonoBehaviour, IEntity {
-	public const float defaultLifespanSeconds = 60f;			// TODO: decide on a dropped item lifespan duration
-	public ItemStack ItemStack { get; set; }
+public class DroppedItem : Entity {
+	public const float defaultLifespanSeconds = 120f;			// TODO: decide on a dropped item lifespan duration
+	public ItemStack ItemStack { get; set; } 
 	private float despawnTimer;
 	private bool isFrozen;
-	public System.Guid id { get; set; }
-	public Vector2 position { get; set; }
 
 	public float pickupDelay;
 	private float pickupTimer;
@@ -38,12 +36,13 @@ public class DroppedItem : MonoBehaviour, IEntity {
 	private void OnTriggerStay2D(Collider2D collision) {
 		if (pickupTimer <= 0) {
 			if (GameManager.instance.Player.Inventory.PickUpItem(ItemStack)) {
+				GameManager.instance.Level.EntityManager.RemoveEntity(this);
 				Destroy(gameObject);
 			}
 		}
 	}
 
-	void IEntity.Update(float deltaTime) {
+	public override void EntityUpdate(float deltaTime) {
 		if (isFrozen) {
 			return;
 		}
@@ -55,12 +54,12 @@ public class DroppedItem : MonoBehaviour, IEntity {
 		}
 	}
 
-	public void OnChunkLoaded() {
+	public override void OnChunkLoaded() {
 		gameObject.SetActive(true);
 		isFrozen = false;
 	}
 
-	public void OnChunkUnloaded() { 
+	public override void OnChunkUnloaded() { 
 		gameObject.SetActive(false);
 		isFrozen = true;
 	}

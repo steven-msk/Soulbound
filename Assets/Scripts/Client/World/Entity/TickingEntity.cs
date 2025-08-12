@@ -4,6 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-public interface ITickingEntity : IEntity {
-	void Tick();
+public abstract class TickingEntity : Entity {
+	public abstract void Tick();
 }
