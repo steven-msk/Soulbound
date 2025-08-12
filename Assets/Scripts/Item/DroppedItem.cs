@@ -5,7 +5,8 @@ using static UnityEditor.PlayerSettings;
 
 public class DroppedItem : Entity {
 	public const float defaultLifespanSeconds = 120f;			// TODO: decide on a dropped item lifespan duration
-	public ItemStack ItemStack { get; set; } 
+
+	public ItemStack ItemStack { get; set; }
 	private float despawnTimer;
 	private bool isFrozen;
 
@@ -37,7 +38,6 @@ public class DroppedItem : Entity {
 		if (pickupTimer <= 0) {
 			if (GameManager.instance.Player.Inventory.PickUpItem(ItemStack)) {
 				GameManager.instance.Level.EntityManager.RemoveEntity(this);
-				Destroy(gameObject);
 			}
 		}
 	}
@@ -50,7 +50,6 @@ public class DroppedItem : Entity {
 		despawnTimer -= deltaTime;
 		if (despawnTimer <= 0) {
 			GameManager.instance.Level.EntityManager.RemoveEntity(this);
-			Destroy(gameObject);
 		}
 	}
 

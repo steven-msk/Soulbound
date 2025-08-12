@@ -37,6 +37,7 @@ public sealed class EntityManager {
 			if (entity is TickingEntity tickingEntity) {
 				tickingEntities.Remove(tickingEntity);
 			}
+			GameObject.Destroy(entity.gameObject);
 		});
 		pendingRemovals.Clear();
 		foreach (var entity in allEntities.Values) {
