@@ -305,6 +305,18 @@ public class Level {
 
     public bool IsInWorldBounds(BlockPos blockPos) => IsInWorldBounds((Vector2)blockPos);
 
+    public List<BlockPos> GetTilesCovered(Bounds bounds) {
+        List<BlockPos> coveredTiles = new();
+        Vector2Int min = (Vector2Int)grid.WorldToCell(bounds.min);
+        Vector2Int max = (Vector2Int)grid.WorldToCell(bounds.max);
+        for (int x = min.x; x <= max.x; x++) {
+            for (int y = min.y; y <= max.y; y++) {
+                coveredTiles.Add(new BlockPos(x, y));
+            }
+        }
+        return coveredTiles;
+    }
+
     private static void RegisterStructure(StructureTemplate structure) {
         registeredStructureTemplates.Add(structure.ID, structure);
     }

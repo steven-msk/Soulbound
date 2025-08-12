@@ -63,4 +63,6 @@ public class DroppedItem : Entity {
 		gameObject.SetActive(false);
 		isFrozen = true;
 	}
+
+	public override Bounds GetBounds() => this.GetColliderBounds();
 }

@@ -72,9 +72,18 @@ public sealed class EntityManager {
 		}
 	}
 
+#nullable enable
+
 	public HashSet<Entity> GetEntitiesInChunk(WorldChunk chunk) {
 		return allEntities.Values
 			.Where(entity => ChunkBlockPos.FromWorld(entity.position).underlyingChunk == chunk)
 			.ToHashSet();
+	}
+
+	public Entity? GetEntityById(Guid id) {
+		if (allEntities.TryGetValue(id, out var entity)) {
+			return entity;
+		}
+		return null;
 	}
 }

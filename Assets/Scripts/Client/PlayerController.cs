@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
 
-public class PlayerController : MonoBehaviour {
+public class PlayerController : Entity {
 	[SerializeField] private InputHandler inputHandler;
 	public InputHandler InputHandler => inputHandler;
 
@@ -45,7 +45,6 @@ public class PlayerController : MonoBehaviour {
 			return lastFacing;
 		}
 	}
-	public Vector2 position => transform.position;
 	public Vector2 center => Physics.Collider.bounds.center;
 	public BlockPos blockPos => level.ToBlockPos(this.position);
 	public ChunkBlockPos chunkBlockPos => blockPos.ToChunkBlockPos(level.ChunkXAt(position));
@@ -75,17 +74,19 @@ public class PlayerController : MonoBehaviour {
             Level level = GameManager.instance.Level;
             BlockPos blockPos = level.ToBlockPos(inputHandler.MouseWorldPosition);
 
-			if (this.IsInBlockReach((Vector2Int)blockPos) && level.BlockAt(blockPos) == Blocks.air) {
+			if (CanPlaceBlockAt(blockPos)) {
 				level.SetBlock(blockPos, placeable.Place(stack, blockPos));
 			}
 		}));
 	}
 
-	private void Start() {
+	protected override void Start() {
+		base.Start();
 		transform.SetPositionAndRotation(new(position.x, level.GetSurfaceY(blockPos.x), transform.position.z), Quaternion.identity);
 	}
 
-	private void Update() {
+	protected override void Update() {
+		base.Update();
 		animator.SetFloat("horizontalSpeed", Mathf.Abs(rb.linearVelocityX));
 
 		if (inputHandler.LeftHold || inputHandler.RightHold) {
@@ -128,7 +129,7 @@ public class PlayerController : MonoBehaviour {
 				Vector2 worldMousePos = inputHandler.MouseWorldPosition;
 				BlockPos blockPos = level.ToBlockPos(worldMousePos);
 
-				if (this.IsInBlockReach(worldMousePos) && level.BlockAt(blockPos) != Blocks.air) {
+				if (IsInBlockReach((Vector2)blockPos) && level.BlockAt(blockPos) != Blocks.air) {
 					level.BreakBlock(blockPos, BreakSource.Player);
                 }
 			}, null));
@@ -151,8 +152,36 @@ public class PlayerController : MonoBehaviour {
 		InputHandler.RequestAction(new("ItemUse", 5, () => itemUsageHandler.HandleInput(trigger, MainHandStack), callback));
 	}
 
+	public bool CanPlaceBlockAt(BlockPos blockPos) {
+		Vector2 worldPos = (Vector2)blockPos;
+		Debug.Log(IsInBlockReach(worldPos));
+		return IsInBlockReach(worldPos)
+			   && level.BlockAt(blockPos) == Blocks.air;
+	}
+
 	public bool IsInBlockReach(Vector2 worldPos) {
 		float dist = Vector2.Distance(worldPos, this.center);
-		return dist <= MaxBlockReach && dist > 1.5f;
+		return dist <= MaxBlockReach && !level.GetTilesCovered(playerPhysics.Collider.bounds).Contains(BlockPos.FromWorld(worldPos));
 	}
+
+	// since this is a lazy player entity addition, not all methods need implementation (for now)
+	// TODO: properly implement player entity methods
+
+	public override void EntityUpdate(float deltaTime) {
+		throw new NotImplementedException();
+	}
+
+	public override void Spawn(EntitySpawnData spawnData) {
+		throw new NotImplementedException();
+	}
+
+	public override void OnChunkLoaded() {
+		throw new NotImplementedException();
+	}
+
+	public override void OnChunkUnloaded() {
+		throw new NotImplementedException();
+	}
+
+	public override Bounds GetBounds() => this.GetColliderBounds();
 }

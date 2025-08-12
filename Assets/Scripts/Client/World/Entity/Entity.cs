@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public abstract class Entity : MonoBehaviour {
@@ -38,4 +39,20 @@ public abstract class Entity : MonoBehaviour {
 
 	public abstract void OnChunkLoaded();
 	public abstract void OnChunkUnloaded();
+
+	public abstract Bounds GetBounds();
+}
+
+public static class EnityBounds {
+	public static Bounds GetBoundsOrFallback(this Entity entity, Vector2 fallbackSize) {
+		Collider2D collider = entity.GetComponent<Collider2D>();
+		if (collider != null) {
+			return collider.bounds;
+		}
+		return new Bounds(entity.position, fallbackSize);
+	}
+
+	public static Bounds GetColliderBounds(this Entity entity) {
+		return entity.GetComponent<Collider2D>().bounds;
+	}
 }
