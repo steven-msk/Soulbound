@@ -8,7 +8,7 @@ using UnityEngine;
 public sealed class EntityManager {
 	private readonly Level level;
 	private readonly Dictionary<Guid, Entity> allEntities = new();
-	private readonly List<TickingEntity> tickingEntities = new();
+	private readonly List<ITickable> tickables = new();
 	private readonly List<Entity> pendingRemovals = new();
 
 	public EntityManager(Level level) {
@@ -20,8 +20,8 @@ public sealed class EntityManager {
 	public void AddEntity(Entity entity, Vector2 position) {
 		entity.id = Guid.NewGuid();
 		allEntities.Add(entity.id, entity);
-		if (entity is TickingEntity tickingEntity) {
-			tickingEntities.Add(tickingEntity);
+		if (entity is ITickable tickable) {
+			tickables.Add(tickable);
 		}
 	}
 
@@ -33,14 +33,14 @@ public sealed class EntityManager {
 	public void RemoveEntity(Entity entity) => pendingRemovals.Add(entity);
 
 	public void Tick() {
-		tickingEntities.ForEach(tickingEntity => tickingEntity.Tick());
+		tickables.ForEach(tickingEntity => tickingEntity.Tick());
 	}
 
 	public void Update(float deltaTime) {
 		pendingRemovals.ForEach(entity => {
 			allEntities.Remove(entity.id);
-			if (entity is TickingEntity tickingEntity) {
-				tickingEntities.Remove(tickingEntity);
+			if (entity is ITickable tickable) {
+				tickables.Remove(tickable);
 			}
 			GameObject.Destroy(entity.gameObject);
 		});

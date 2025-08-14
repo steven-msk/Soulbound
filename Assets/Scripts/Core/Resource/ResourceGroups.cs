@@ -36,7 +36,9 @@ public static class ResourceGroups {
 
 	public static void RegisterGroupByAddress(ResourceGroup group) => groupsByAddress.Add(group.groupAddress, group);
 
-	public static ResourceGroup GetGroupByAddress(string address) => groupsByAddress[address]; 
+	public static ResourceGroup GetGroupByAddress(string address) {
+		return groupsByAddress[address];
+	}
 
 	public static class Items {
 		private static string parentAddress = "items/";

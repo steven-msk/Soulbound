@@ -83,6 +83,8 @@ public class PlayerController : Entity {
 	protected override void Start() {
 		base.Start();
 		transform.SetPositionAndRotation(new(position.x, level.GetSurfaceY(blockPos.x), transform.position.z), Quaternion.identity);
+		AIEntity_test test = GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.Prefabs>("ai test"))!.GetComponent<AIEntity_test>();
+		level.EntityManager.SpawnEntity(test, new EntitySpawnData(position));
 	}
 
 	protected override void Update() {
