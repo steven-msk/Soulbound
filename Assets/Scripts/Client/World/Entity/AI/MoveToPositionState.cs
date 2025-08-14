@@ -28,13 +28,21 @@ public class MoveToPositionState : IMutableAIState<MoveToPositionState> {
 	}
 
 	public void Tick() {
+
+	}
+
+	public void OnUpdate(float deltaTime) {
 		Vector2 dir = (target.value - entity.position);
 		if (dir.magnitude < 0.1f) {
 			isFinished = true;
 			return;
 		}
 		dir.Normalize();
-		entity.transform.position += (Vector3)dir * GameManager.tickRate * 10f;
+		entity.transform.position += (Vector3)dir * deltaTime * 10f;
+	}
+
+	public void Mutate(Action<MoveToPositionState> fieldUpdater) {
+		fieldUpdater.Invoke(this);
 	}
 
 	public override bool Equals(object obj) {
@@ -46,9 +54,5 @@ public class MoveToPositionState : IMutableAIState<MoveToPositionState> {
 		hash += target.GetHashCode();
 		hash += entity.GetHashCode();
 		return hash;
-	}
-
-	public void Mutate(Action<MoveToPositionState> fieldUpdater) {
-		fieldUpdater.Invoke(this);
 	}
 }

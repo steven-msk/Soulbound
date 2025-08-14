@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 public class AIController : ITickable {
 	public delegate IAIState StateResolver();
@@ -21,16 +22,22 @@ public class AIController : ITickable {
 	
 	public void Tick() {
 		IAIState state = stateResolver.Invoke();
-		if (state != currentState && (currentState.isInterruptable || currentState.isFinished)) {
-			SetState(state);
-		} else if (!stateQueue.Contains(state)) {
-			stateQueue.Enqueue(state); 
+		if (state != currentState) {
+			if (currentState.isInterruptable || currentState.isFinished) {
+				SetState(state);
+			} else if (!stateQueue.Contains(state)) {
+				stateQueue.Enqueue(state);
+			}
 		}
 		currentState.Tick();
 
 		if (currentState.isFinished && stateQueue.Count > 0) {
 			SetState(stateQueue.Dequeue());
 		}
+	}
+
+	public void UpdateCurrentState(float deltaTime) {
+		currentState.OnUpdate(deltaTime);
 	}
 
 	public void SetState(IAIState state) {

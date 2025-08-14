@@ -20,6 +20,9 @@ public class IdleState : IAIState {
 		Debug.Log("idling");
 	}
 
+	public void OnUpdate(float deltaTime) {
+	}
+
 	public override bool Equals(object obj) {
 		return obj is IdleState;
 	}
@@ -30,4 +33,5 @@ public class IdleState : IAIState {
 		hash += (isFinished ? 1 : 0);
 		return hash;
 	}
+
 }

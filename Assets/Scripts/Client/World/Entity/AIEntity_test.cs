@@ -25,6 +25,11 @@ public sealed class AIEntity_test : Entity, ITickable {
 	}
 
 	public override void EntityUpdate(float deltaTime) {
+		aiController.UpdateCurrentState(deltaTime);
+	}
+
+	public void Tick() {
+		aiController.Tick();
 	}
 
 	public override Bounds GetBounds() => this.GetColliderBounds();
@@ -35,9 +40,5 @@ public sealed class AIEntity_test : Entity, ITickable {
 
 	public override void OnChunkUnloaded() {
 		gameObject.SetActive(false);
-	}
-
-	public void Tick() {
-		aiController.Tick();
 	}
 }

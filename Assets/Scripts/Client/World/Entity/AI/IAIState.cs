@@ -10,5 +10,6 @@ public interface IAIState {
 
 	void OnEnter();
 	void OnExit();
+	void OnUpdate(float deltaTime);
 	void Tick();
 }
