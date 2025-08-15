@@ -14,6 +14,8 @@ public static class ResourceGroups {
 	static Dictionary<string, ResourceGroup> groupsByAddress = new();
 
 	public static void Bootstrap() {
+		logger.LogInfo(LogModules.resource, "Bootstrapping resource group types");
+		Resources.LoadAll<ResourceGroup>(".");
 		var groupTypes = AppDomain.CurrentDomain.GetAssemblies()
 			.SelectMany(a => a.GetTypes())
 			.Where(t => t.IsClass && !t.IsAbstract)

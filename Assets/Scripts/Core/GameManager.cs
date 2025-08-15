@@ -36,8 +36,9 @@ public class GameManager : MonoBehaviour {
 
 	private void Awake() {
 		instance = this;
-
+#if !UNITY_EDITOR
 		ResourceGroups.Bootstrap();
+#endif
 
 		int seed = 745632;           // UnityEngine.Random.Range(int.MinValue, int.MaxValue)
 		this.level = new Level(Player, worldTilemap, GameObject.Find("Grid").GetComponent<Grid>(), seed, renderDistance: 2);

@@ -14,9 +14,9 @@ public sealed class AIEntity_test : Entity, ITickable {
 		});
 		IdleState idle = new();
 		PlayerController player = GameManager.instance.Player;
-		MoveToPositionState move = new(this, player.position);
+		MoveToPositionState move = new(this, player.position, speed: 5f, isInterruptable: true);
 		aiController = new(this, () => {
-			if (Vector2.Distance(position, player.position) > 10f) {
+			if (Vector2.Distance(position, player.position) < 10f) {
 				move.Mutate((moveState) => moveState.target.MutateValue(player.position));
 				return move;
 			}

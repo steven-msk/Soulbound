@@ -8,14 +8,16 @@ using UnityEngine;
 public class MoveToPositionState : IMutableAIState<MoveToPositionState> {
 	public MutableStateProperty<Vector2> target { get; }
 	private Entity entity;
+	private float speed;
 
 	public bool isInterruptable { get; protected set; }
 	public bool isFinished { get; protected set; }
 
-	public MoveToPositionState(Entity entity, Vector2 target, bool isInterruptable = false) {
+	public MoveToPositionState(Entity entity, Vector2 target, float speed, bool isInterruptable = false) {
 		this.target = new MutableStateProperty<Vector2>(target);
 		this.entity = entity;
 		this.isInterruptable = isInterruptable;
+		this.speed = speed;
 	}
 
 	public void OnEnter() {
@@ -28,7 +30,6 @@ public class MoveToPositionState : IMutableAIState<MoveToPositionState> {
 	}
 
 	public void Tick() {
-
 	}
 
 	public void OnUpdate(float deltaTime) {
@@ -38,7 +39,7 @@ public class MoveToPositionState : IMutableAIState<MoveToPositionState> {
 			return;
 		}
 		dir.Normalize();
-		entity.transform.position += (Vector3)dir * deltaTime * 10f;
+		entity.transform.position += (Vector3)dir * deltaTime * speed;
 	}
 
 	public void Mutate(Action<MoveToPositionState> fieldUpdater) {

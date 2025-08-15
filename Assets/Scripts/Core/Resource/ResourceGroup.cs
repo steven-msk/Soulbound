@@ -6,6 +6,7 @@ using Object = UnityEngine.Object;
 
 [CreateAssetMenu(menuName = "Resource Group")]
 public class ResourceGroup : ScriptableObject {
+	private static readonly Logger logger = Logger.CreateInstance();
 	public string groupAddress;
 	public string searchFolder = "Assets/Resources/";
 	[SerializeField] private string assetType;
@@ -26,13 +27,15 @@ public class ResourceGroup : ScriptableObject {
 
 		EditorUtility.SetDirty(this);
 	}
-
 #endif
 
 	public TAsset GetAsset<TAsset>(string name) where TAsset : UnityEngine.Object {
 		return (TAsset)resources.First(r => r.name == name);
 	}
 
-	private void OnEnable() => ResourceGroups.RegisterGroupByAddress(this);
+	private void OnEnable() {
+		ResourceGroups.RegisterGroupByAddress(this);
+		logger.LogInfo(LogModules.resource, "Registered resource group with address '{}'", groupAddress);
+	}
 }
 
