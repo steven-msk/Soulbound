@@ -6,7 +6,7 @@ using UnityEngine;
 [Serializable]
 public class ItemStack {
 	public Item Item { get; }
-	private ItemDisplay display;
+	private ItemDisplay display; 
 	private GameObject stackText;
 	private int quantity;
 	public int Quantity {
