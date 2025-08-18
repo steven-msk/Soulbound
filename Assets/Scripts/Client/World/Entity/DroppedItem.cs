@@ -12,6 +12,7 @@ public class DroppedItem : Entity {
 
 	public float pickupDelay;
 	private float pickupTimer;
+	private bool flag_pickupLocked = false;
 
 	public override void Spawn(EntitySpawnData spawnData) {
 		base.Spawn(spawnData);
@@ -34,9 +35,10 @@ public class DroppedItem : Entity {
 	}
 
 	private void OnTriggerStay2D(Collider2D collision) {
-		if (pickupTimer <= 0) {
+		if (pickupTimer <= 0 && !flag_pickupLocked) {
 			if (GameManager.instance.Player.Inventory.PickUpItem(ItemStack)) {
-				this.Despawn();
+				flag_pickupLocked = true;
+				GameManager.instance.Level.EntityManager.RemoveEntityImmediately(this, destroy: true);
 			}
 		}
 	}
