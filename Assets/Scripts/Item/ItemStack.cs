@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
@@ -66,7 +67,11 @@ public class ItemStack {
 		}
 		GameObject pickupItem = worldPrefab;
 		DroppedItem pickup = pickupItem.AddComponent<DroppedItem>();
-		EntitySpawnData spawnData = new DroppedItemSpawnData(this, playerAction ? 2f : 0f, pos, dropForce);
+		EntitySpawnData spawnData = new(pos) {
+			[SpawnDataKey.Of("itemStack")] = new SpawnDataValue<ItemStack>(this),
+			[SpawnDataKey.Of("pickupDelay")] = new SpawnDataValue<float>((playerAction ? 2f : 0f)),
+			[SpawnDataKey.Of("dropForce")] = new SpawnDataValue<Vector2>(dropForce)
+		};
 		GameManager.instance.Level.EntityManager.SpawnEntity(pickup, spawnData);
     }
 

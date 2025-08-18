@@ -33,6 +33,10 @@ public class ResourceGroup : ScriptableObject {
 		return (TAsset)resources.First(r => r.name == name);
 	}
 
+	static ResourceGroup() {
+		logger.LogInfo(null, "hgfuagvfbaeujfaefa");	
+	}
+
 	private void OnEnable() {
 		ResourceGroups.RegisterGroupByAddress(this);
 		logger.LogInfo(LogModules.resource, "Registered resource group with address '{}'", groupAddress);

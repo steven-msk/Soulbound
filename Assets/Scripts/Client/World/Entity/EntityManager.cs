@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using Unity.VisualScripting;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using System.Linq;
 
 public sealed class EntityManager {
 	private readonly Level level;
 	private readonly Dictionary<Guid, Entity> allEntities = new();
 	private readonly List<ITickable> tickables = new();
-	private readonly List<Entity> pendingRemovals = new();
+	private readonly List<(Entity entity, bool destroy)> pendingRemovals = new();
 
 	public EntityManager(Level level) {
 		this.level = level;
@@ -17,7 +18,7 @@ public sealed class EntityManager {
 
 	// FIXME: inconsistent chunk-entity relation
 
-	public void AddEntity(Entity entity, Vector2 position) {
+	public void AddExistingEntity(Entity entity) {
 		entity.id = Guid.NewGuid();
 		allEntities.Add(entity.id, entity);
 		if (entity is ITickable tickable) {
@@ -26,24 +27,28 @@ public sealed class EntityManager {
 	}
 
 	public void SpawnEntity(Entity entity, EntitySpawnData spawnData) {
-		this.AddEntity(entity, spawnData.position);
 		entity.Spawn(spawnData);
+		this.AddExistingEntity(entity);
 	}
 
-	public void RemoveEntity(Entity entity) => pendingRemovals.Add(entity);
+	public void RemoveEntity(Entity entity, bool destroy) => pendingRemovals.Add((entity, destroy));
+
+	public void RemoveEntityImmediately(Entity entity, bool destroy) {
+		allEntities.Remove(entity.id);
+		if (entity is ITickable tickable) {
+			tickables.Remove(tickable);
+		}
+		if (destroy) {
+			GameObject.Destroy(entity.gameObject);
+		}
+	}
 
 	public void Tick() {
 		tickables.ForEach(tickingEntity => tickingEntity.Tick());
 	}
 
 	public void Update(float deltaTime) {
-		pendingRemovals.ForEach(entity => {
-			allEntities.Remove(entity.id);
-			if (entity is ITickable tickable) {
-				tickables.Remove(tickable);
-			}
-			GameObject.Destroy(entity.gameObject);
-		});
+		pendingRemovals.ForEach(entry => RemoveEntityImmediately(entry.entity, entry.destroy));
 		pendingRemovals.Clear();
 		foreach (var entity in allEntities.Values) {
 			entity.EntityUpdate(deltaTime);
@@ -73,11 +78,9 @@ public sealed class EntityManager {
 	}
 
 #nullable enable
-
 	public HashSet<Entity> GetEntitiesInChunk(WorldChunk chunk) {
-		return allEntities.Values
-			.Where(entity => ChunkBlockPos.FromWorld(entity.position).underlyingChunk == chunk)
-			.ToHashSet();
+		var entities = allEntities.Values.Where(entity => ChunkBlockPos.FromWorld(entity.position).underlyingChunk == chunk);
+		return System.Linq.Enumerable.ToHashSet(entities);
 	}
 
 	public Entity? GetEntityById(Guid id) {

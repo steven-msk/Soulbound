@@ -26,10 +26,10 @@ public class PlayerController : Entity, IGameInitializable<PlayerController> {
 	[SerializeField] private Animator animator;
 	public Animator Animator => animator;
 
-#nullable enable
 
 	private ItemUsageHandler itemUsageHandler;
 	public ItemUsageHandler ItemUsageHandler => itemUsageHandler!;
+#nullable enable
 	public ItemStack? MainHandStack { get; private set; }
 
 	public bool CanAttack { get; set; } = true;

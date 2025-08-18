@@ -15,19 +15,17 @@ public class DroppedItem : Entity {
 
 	public override void Spawn(EntitySpawnData spawnData) {
 		base.Spawn(spawnData);
-		base.ValidateSpawnData<DroppedItemSpawnData>(spawnData, (spawnData) => {
-			this.ItemStack = spawnData.itemStack;
-			this.pickupDelay = spawnData.pickupDelay;
-			Rigidbody2D rigidbody = gameObject.AddComponent<Rigidbody2D>();
-			rigidbody.sleepMode = RigidbodySleepMode2D.NeverSleep;
-			BoxCollider2D pickupHitbox = gameObject.AddComponent<BoxCollider2D>();
-			pickupHitbox.isTrigger = true;
-			pickupHitbox.callbackLayers = LayerMask.GetMask("Player");
-			gameObject.AddComponent<BoxCollider2D>().excludeLayers = ~LayerMask.GetMask("Ground");
-			Vector2 force = new Vector2(Random.Range(1f, 1.5f), Random.Range(1f, 1.5f)) * spawnData.dropForce;
-			rigidbody.AddForce(force, ForceMode2D.Impulse);
-			OnEnable();
-		});
+		this.ItemStack = spawnData.Get<ItemStack>("itemStack");
+		this.pickupDelay = spawnData.Get<float>("pickupDelay");
+		Rigidbody2D rigidbody = gameObject.AddComponent<Rigidbody2D>();
+		rigidbody.sleepMode = RigidbodySleepMode2D.NeverSleep;
+		BoxCollider2D pickupHitbox = gameObject.AddComponent<BoxCollider2D>();
+		pickupHitbox.isTrigger = true;
+		pickupHitbox.callbackLayers = LayerMask.GetMask("Player");
+		gameObject.AddComponent<BoxCollider2D>().excludeLayers = ~LayerMask.GetMask("Ground");
+		Vector2 force = new Vector2(Random.Range(1f, 1.5f), Random.Range(1f, 1.5f)) * spawnData.Get<Vector2>("dropForce");
+		rigidbody.AddForce(force, ForceMode2D.Impulse);
+		OnEnable();
 	}
 
 	private void OnEnable() {

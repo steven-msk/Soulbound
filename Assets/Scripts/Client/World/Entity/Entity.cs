@@ -26,18 +26,11 @@ public abstract class Entity : MonoBehaviour {
 	}
 
 	public virtual void Spawn(EntitySpawnData spawnData) {
-		transform.position = spawnData.position;
+		transform.position = spawnData.Get<Vector2>(SpawnDataKeys.position);
 	}
 
 	public virtual void Despawn() {
-		GameManager.instance.Level.EntityManager.RemoveEntity(this);
-		Destroy(gameObject);
-	}
-
-	public void ValidateSpawnData<TData>(EntitySpawnData spawnData, Action<TData> spawn) where TData : EntitySpawnData {
-		spawnData.PatternIfElse<TData>(
-			(spawnData) => spawn.Invoke(spawnData),
-			() => throw new MismatchedEntitySpawnDataTypeException(typeof(TData), spawnData.GetType()));
+		GameManager.instance.Level.EntityManager.RemoveEntity(this, destroy: true);
 	}
 
 	public abstract void OnChunkLoaded();
