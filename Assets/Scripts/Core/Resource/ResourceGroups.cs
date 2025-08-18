@@ -16,7 +16,7 @@ public static class ResourceGroups {
 	public static void Bootstrap() {
 		logger.LogInfo(LogModules.resource, "Bootstrapping resource group types");
 		Resources.LoadAll<ResourceGroup>(".");
-		var groupTypes = AppDomain.CurrentDomain.GetAssemblies()
+		var groupTypes = AppDomain.CurrentDomain.GetAssemblies() 
 			.SelectMany(a => a.GetTypes())
 			.Where(t => t.IsClass && !t.IsAbstract)
 			.Where(t => t.GetInterfaces().Any(i =>

@@ -11,9 +11,5 @@ public interface IContainer {
 
 	public int Columns { get; }
 
-#nullable enable
-
-	public void SetupGrid(Action? callback);
-
-#nullable disable
+	void SetupGrid();
 }

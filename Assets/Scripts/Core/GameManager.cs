@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour {
 	public static GameManager instance;
 	public const float tickRate = 0.02f;        // 50 tps
 	private float tickStartTime;
+	public bool IsPaused { get; private set; }
 
 	// POTENTIAL FEATUREIMPL (unlikely, but possible): make Level class NOT a singleton.
 	// In this case, it represents the current dimension or world the player is in (e.g., overworld, nether, end).
@@ -22,13 +23,13 @@ public class GameManager : MonoBehaviour {
 	private Level level;
 	public Level Level => level;
 
+	[SerializeField] private GameObject playerInstancePrefab;
+	private PlayerController player;
+	public PlayerController Player => player;
+
+	public UIManager UIManager => GameObject.Find("Canvas").GetComponent<UIManager>();
+
 	[SerializeField] private Tilemap worldTilemap;
-
-	public bool IsPaused { get; private set; }
-
-	public PlayerController Player => GameObject.Find("johnny").GetComponent<PlayerController>();
-
-	public UIController UI => GameObject.Find("Canvas").GetComponent<UIController>();
 
 	// FEATUREIMPL: settings menu
 	// FEATUREIMPL: pause menu
@@ -39,10 +40,11 @@ public class GameManager : MonoBehaviour {
 #if !UNITY_EDITOR
 		ResourceGroups.Bootstrap();
 #endif
-
+		this.player = GameObject.Instantiate(playerInstancePrefab).GetComponent<PlayerController>().OnGameInit();
 		int seed = 745632;           // UnityEngine.Random.Range(int.MinValue, int.MaxValue)
-		this.level = new Level(Player, worldTilemap, GameObject.Find("Grid").GetComponent<Grid>(), seed, renderDistance: 2);
-		this.level.BootstrapWorld(Player.position);
+		this.level = new Level(player, worldTilemap, GameObject.Find("Grid").GetComponent<Grid>(), seed, renderDistance: 2);
+		this.level.BootstrapWorld(Vector2.zero);				// pos will be replaced with 'lastPlayerPos' once world serialization is a thing
+		this.level.EntityManager.SpawnEntity(player, new EntitySpawnData(new Vector2(0, 0)));
 		UnityEngine.Random.InitState(seed);
 	}
 

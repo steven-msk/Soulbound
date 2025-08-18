@@ -12,7 +12,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-public class InventoryController : MonoBehaviour, IContainer {
+public class InventoryController : MonoBehaviour, IContainer, IDependencyInitializable<InventoryController, PlayerController> {
 	[SerializeField] private HotbarController hotbar;
 	public HotbarController Hotbar => hotbar;
 
@@ -39,50 +39,36 @@ public class InventoryController : MonoBehaviour, IContainer {
 
 	private PlayerController player;
 
-	private bool setup = false;
 
 	// FEATUREIMPL: item grabbing controls - this might require a general implementation in IContainer
 
-	private void Awake() {
-		player = GameManager.instance.Player;
-	}
+	public InventoryController OnGameInit(PlayerController dependency) {
+		player = dependency;
+		hotbar.OnGameInit(this);
+		popup.SetActive(false);
+		armorSlots.SetActive(false);
+		this.SetupGrid();
 
-#nullable enable
-	public void SetupGrid(Action? callback) {
-		InventorySlot[] flatPopupSlots = popup.GetComponentsInChildren<InventorySlot>(true);
-		popupSlots = ArrayHelper.CompressTo2D(flatPopupSlots, rows, columns);
-		callback?.Invoke();
+		// There seems to be a weird occlusion where inventory children get enabled at instantiation,
+		// though in the prefab they are not. There are no SetActive(true) calls either.
 
 		List<InventorySlot> mainPlayerSlots = hotbar.Slots.ToList();
 		mainPlayerSlots.AddRange(popupSlots);
 		MainPlayerSlots = mainPlayerSlots.ToArray();
-		setup = true;
+		return this;
 	}
-#nullable disable
+
+	public void SetupGrid() {
+		InventorySlot[] flatPopupSlots = popup.GetComponentsInChildren<InventorySlot>(true);
+		popupSlots = ArrayHelper.CompressTo2D(flatPopupSlots, rows, columns);
+	}
 
 	private void Start() {
-		IEnumerator Prototype_setupDisplays() {
-			yield return new WaitUntil(() => setup);
-			//CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("weaponItem_test"), 2), hotbar[0]);
-			//CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("armoritem_test"), 2), hotbar[1]);
-			//CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("armoritem_test"), 2), popupSlots[0, 0]);
-			//CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("consumableStatItem_test"), 100), hotbar[3]);
-			//CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("consumableStatItem_test"), 21_489), hotbar[6]);
-			//CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("consumableStatItem_test"), 1), hotbar[7]);
-			//CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("consumableStatItem_test"), 1), hotbar[8]);
-			//CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("consumableStatItem_test"), 1), (InventorySlot)this[2, 8]);
-			//CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("longTooltipItem"), 1), hotbar[5]);
-			CreateItemDisplay(new ItemStack(Items.grassBlock, 100), hotbar[2]);
-			//CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("wood_block_item"), 100), (InventorySlot)this[0, 1]);
-			//CreateItemDisplay(new ItemStack(AssetRegistry.Get<Item>("tree_sapling_item"), 10), (InventorySlot)this[0, 2]);
-			UnityEngine.Debug.Log("<color=green>[INVENTORY]</color> Player inventory loaded");				// might factor out in LogUtil
-			// POTENTIAL: LogUtil modularity - implement different color coded logging sections marked between [ ]
-			hotbar.SetActiveSlot(0);
-		}
-		StartCoroutine(Prototype_setupDisplays());
+		CreateItemDisplay(new ItemStack(Items.grassBlock, 100), hotbar[2]);
+		hotbar.SetActiveSlot(0);
 	}
 
-    public void ToggleInventory(InputAction.CallbackContext actionContext) {
+    public void ToggleInventory() {
 		popupOpen = !popupOpen;
 		popup.SetActive(popupOpen);
 		armorSlots.SetActive(popupOpen);
@@ -91,7 +77,7 @@ public class InventoryController : MonoBehaviour, IContainer {
 		hotbar.OnInventoryPopup();
 	}
 
-	public void DropItemFromInventory(InputAction.CallbackContext actionContext) {
+	public void DropItemFromInventory() {
 		if (activeTooltip != null) {
 			ItemDisplay itemDisplay = activeTooltip.DisplayParent?.GetComponent<ItemDisplay>();
 			itemDisplay?.ItemStack.Drop(player.center, player.itemDropForce, true);
@@ -107,7 +93,7 @@ public class InventoryController : MonoBehaviour, IContainer {
 
 	// POTENTIAL: OnDrop callback in Item
 
-	public void DropGrabbedItem(InputAction.CallbackContext actionContext) {
+	public void DropGrabbedItem() {
 		GrabbedItem?.ItemStack.Drop(player.center, player.itemDropForce, true);
 		Destroy(GrabbedItem?.gameObject);
 		if (GrabbedItem?.ItemStack == player.MainHandStack) {
@@ -152,7 +138,7 @@ public class InventoryController : MonoBehaviour, IContainer {
 			return remaining <= 0;
 		}
 	}
-	 
+
 	[CanBeNull] public InventorySlot GetFirstEmptySlot() => MainPlayerSlots.First(slot => slot.IsEmpty);
 
 	[CanBeNull] public InventorySlot[] GetOccupiedSlots() => MainPlayerSlots.Where(slot => slot.HasItem).ToArray();

@@ -9,9 +9,7 @@ public sealed class AIEntity_test : Entity, ITickable {
 	private AIController aiController;
 
 	public override void Spawn(EntitySpawnData spawnData) {
-		base.ValidateSpawnData<EntitySpawnData>(spawnData, (spawnData) => {
-			transform.position = spawnData.position;
-		});
+		base.Spawn(spawnData);
 		IdleState idle = new();
 		PlayerController player = GameManager.instance.Player;
 		MoveToPositionState move = new(this, player.position, speed: 5f, isInterruptable: true);

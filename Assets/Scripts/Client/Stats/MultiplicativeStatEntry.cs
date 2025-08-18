@@ -23,11 +23,19 @@ public class MultiplicativeStatEntry<TProcessor, TValue> : AbstractStatEntry<TVa
 
 	public void RemovePercentageBonus(float value, IStatProvider source) => percentageBonuses.Remove((value, source));
 
-	public float GetProcessedValue() => processor.ProcessFinalValue(BaseValue, flatBonuses.Select(bonus => bonus.value), percentageBonuses.Select(bonus => bonus.value));
+	public float GetProcessedValue() {
+		return processor.ProcessFinalValue(BaseValue, flatBonuses.Select(bonus => bonus.value), percentageBonuses.Select(bonus => bonus.value));
+	}
 
-	public override void ApplyToSerialized(SerializableStat serializableStat, IStatProvider source) => Invoke(serializableStat, source, AddFlatBonus, AddPercentageBonus);
+	public override object Abstract_GetProcessedValue() => GetProcessedValue();
 
-	public override void RevokeToSerialized(SerializableStat serializableStat, IStatProvider source) => Invoke(serializableStat, source, RemoveFlatBonus, RemovePercentageBonus);
+	public override void ApplyToSerialized(SerializableStat serializableStat, IStatProvider source) { 
+		Invoke(serializableStat, source, AddFlatBonus, AddPercentageBonus);
+	}
+
+	public override void RevokeToSerialized(SerializableStat serializableStat, IStatProvider source) { 
+		Invoke(serializableStat, source, RemoveFlatBonus, RemovePercentageBonus);
+	}
 
 	private void Invoke(SerializableStat serializableStat, IStatProvider source, Action<TValue, IStatProvider> flatAction, Action<float, IStatProvider> percentageAction) {
 		var value = serializableStat.GetValue();

@@ -58,10 +58,10 @@ public static class ItemSlotUtility {
 		void SetDropCapabilities(bool enabled) {
 			if (!enabled) {
 				player.ItemUsageHandler.Disable(ItemUseTrigger.RightClick, ItemUseTrigger.RightHold);
-				player.InputHandler.inputActions.Player.RightClick.performed += inventory.DropGrabbedItem;
+				player.InputHandler.inputActions.Player.RightClick.performed += actionContext => inventory.DropGrabbedItem();
 			} else {
 				player.ItemUsageHandler.Enable(ItemUseTrigger.RightClick, ItemUseTrigger.RightHold);
-				player.InputHandler.inputActions.Player.RightClick.performed -= inventory.DropGrabbedItem;
+				player.InputHandler.inputActions.Player.RightClick.performed -= actionContext => inventory.DropGrabbedItem();
 			}
 		}
 

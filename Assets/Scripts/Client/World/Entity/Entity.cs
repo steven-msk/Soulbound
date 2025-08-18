@@ -25,10 +25,13 @@ public abstract class Entity : MonoBehaviour {
 		}
 	}
 
-	public abstract void Spawn(EntitySpawnData spawnData);
+	public virtual void Spawn(EntitySpawnData spawnData) {
+		transform.position = spawnData.position;
+	}
 
 	public virtual void Despawn() {
 		GameManager.instance.Level.EntityManager.RemoveEntity(this);
+		Destroy(gameObject);
 	}
 
 	public void ValidateSpawnData<TData>(EntitySpawnData spawnData, Action<TData> spawn) where TData : EntitySpawnData {

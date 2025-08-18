@@ -11,14 +11,14 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using static PlayerInputActions;
 
-public class InputHandler : MonoBehaviour {
+public class InputHandler : MonoBehaviour, IDependencyInitializable<InputHandler, PlayerController> {
 	public PlayerInputActions inputActions { get; private set; }
 
 	public Vector2 MouseScreenPosition { get; private set; }
 	public Vector2 MouseWorldPosition {
 		get {
 			Vector3 screenPos = MouseScreenPosition;
-			RectTransform rootTransform = GameManager.instance.UI.GetRootTransform();
+			RectTransform rootTransform = GameManager.instance.UIManager.GetRootTransform();
 			if (RectTransformUtility.ScreenPointToWorldPointInRectangle(rootTransform, MouseScreenPosition, Camera.main, out var worldPoint)) {
 				return worldPoint;
 			}
@@ -38,13 +38,14 @@ public class InputHandler : MonoBehaviour {
 	private static Dictionary<string, Func<bool>> blockedContexts = new();
 	private static List<InputAction> pausableInputs = new();
 
-	private void Awake() {
+	public InputHandler OnGameInit(PlayerController dependency) {
 		requests.Clear();
 		blockedContexts.Clear();
+		pausableInputs.Clear();
 
         inputActions = new PlayerInputActions();
 		PlayerActions playerActions = inputActions.Player;
-		PlayerController player = GameManager.instance.Player;
+		PlayerController player = dependency;
 
 		RegisterInputEvent(playerActions.MousePosition, pausable: false, (action) => {
 			action.performed += actionContext => MouseScreenPosition = actionContext.ReadValue<Vector2>();
@@ -86,16 +87,19 @@ public class InputHandler : MonoBehaviour {
 		});
 
 		RegisterInputEvent(playerActions.ToggleInventory, pausable: true, (action) => {
-			action.performed += player.Inventory.ToggleInventory;
+			action.performed += actionContext => player.Inventory.ToggleInventory();
 		});
 
 		RegisterInputEvent(playerActions.DropItem, pausable: true, (action) => {
-			action.performed += player.Inventory.DropItemFromInventory;
+			action.performed += actionContext => player.Inventory.DropItemFromInventory();
 		});
 
 		RegisterInputEvent(playerActions.PauseGame, pausable: false, (action) => {
 			action.performed += actionContext => GameManager.instance.TogglePauseGame();
 		});
+
+		inputActions.Enable();
+		return this;
 	}
 
 	private static void RegisterInputEvent(InputAction inputAction, bool pausable, Action<InputAction> callbackBinding) {
@@ -132,17 +136,13 @@ public class InputHandler : MonoBehaviour {
 	}
 
 	public Vector2 ScreenPosToLocalPos(Vector2 screenPos) {
-		RectTransform rootTransfom = GameManager.instance.UI.GetRootTransform();
-		if (RectTransformUtility.ScreenPointToLocalPointInRectangle(rootTransfom, screenPos, GameManager.instance.UI.Canvas.worldCamera, out var localPos)) {
+		RectTransform rootTransfom = GameManager.instance.UIManager.GetRootTransform();
+		if (RectTransformUtility.ScreenPointToLocalPointInRectangle(rootTransfom, screenPos, GameManager.instance.UIManager.Canvas.worldCamera, out var localPos)) {
 			return localPos;
 		}
 		UnityEngine.Debug.LogError($"Could not retrieve local point from screen point: ({screenPos.x}, {screenPos.y})");
 		return new(-1f, -1f);
 	}
-
-	private void OnEnable() => inputActions.Enable();
-
-	private void OnDisable() => inputActions.Disable();
 
 	public static void PauseInputs() => pausableInputs.ForEach(inputAction => inputAction.Disable());
 

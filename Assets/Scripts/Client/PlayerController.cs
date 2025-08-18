@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
 
-public class PlayerController : Entity {
+public class PlayerController : Entity, IGameInitializable<PlayerController> {
 	[SerializeField] private InputHandler inputHandler;
 	public InputHandler InputHandler => inputHandler;
 
@@ -19,8 +19,6 @@ public class PlayerController : Entity {
 
 	private PlayerPhysics playerPhysics;
 	public PlayerPhysics Physics => playerPhysics;
-
-	private Level level;
 
 	[Header("Internal")]
 	[SerializeField] private Rigidbody2D rb;
@@ -46,8 +44,8 @@ public class PlayerController : Entity {
 		}
 	}
 	public Vector2 center => Physics.Collider.bounds.center;
-	public BlockPos blockPos => level.ToBlockPos(this.position);
-	public ChunkBlockPos chunkBlockPos => blockPos.ToChunkBlockPos(level.ChunkXAt(position));
+	public BlockPos blockPos => GameManager.instance.Level.ToBlockPos(this.position);
+	public ChunkBlockPos chunkBlockPos => blockPos.ToChunkBlockPos(GameManager.instance.Level.ChunkXAt(position));
 
     // FIXME: inconsistency in item drop force direction
     public Vector2 itemDropForce {
@@ -60,31 +58,33 @@ public class PlayerController : Entity {
 
 	public float MaxBlockReach => 5f;
 
-	private void Awake() {
-		playerPhysics = gameObject.GetComponent<PlayerPhysics>();
+	public PlayerController OnGameInit() {
+		inputHandler = GameObject.Instantiate(inputHandler).OnGameInit(this);
+		inventory = GameManager.instance.UIManager.InstantiateInUILevel(inventory).GetComponent<InventoryController>().OnGameInit(this);
+		playerPhysics = gameObject.GetComponent<PlayerPhysics>().OnGameInit(this);
 		itemUsageHandler = new ItemUsageHandler(this);
-		level = GameManager.instance.Level;
 		itemUsageHandler.Register<IConsumable>(ItemUseTrigger.RightClick, (consumable, stack) => consumable.Consume(stack));
 		foreach (ItemUseTrigger trigger in Enum.GetValues(typeof(ItemUseTrigger))) {
 			itemUsageHandler.Register<IAttackPerformer>(trigger, (attackPerformer, stack) => {
 				CanAttack.If(() => attackPerformer.PerformAttack(trigger));
 			});
 		}
-        itemUsageHandler.Register<IPlaceable>(ItemUseTrigger.LeftHold, (Action<IPlaceable, ItemStack>)((placeable, stack) => {
+        itemUsageHandler.Register<IPlaceable>(ItemUseTrigger.LeftHold, (placeable, stack) => {
             Level level = GameManager.instance.Level;
             BlockPos blockPos = level.ToBlockPos(inputHandler.MouseWorldPosition);
 
 			if (CanPlaceBlockAt(blockPos)) {
 				level.SetBlock(blockPos, placeable.Place(stack, blockPos));
 			}
-		}));
+		});
+		return this;
 	}
 
 	protected override void Start() {
 		base.Start();
-		transform.SetPositionAndRotation(new(position.x, level.GetSurfaceY(blockPos.x), transform.position.z), Quaternion.identity);
+		transform.SetPositionAndRotation(new(position.x, GameManager.instance.Level.GetSurfaceY(blockPos.x), transform.position.z), Quaternion.identity);
 		AIEntity_test test = GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.Prefabs>("ai test"))!.GetComponent<AIEntity_test>();
-		level.EntityManager.SpawnEntity(test, new EntitySpawnData(position));
+		GameManager.instance.Level.EntityManager.SpawnEntity(test, new EntitySpawnData(position));
 	}
 
 	protected override void Update() {
@@ -157,31 +157,24 @@ public class PlayerController : Entity {
 	public bool CanPlaceBlockAt(BlockPos blockPos) {
 		Vector2 worldPos = (Vector2)blockPos;
 		return IsInBlockReach(worldPos)
-			   && level.BlockAt(blockPos) == Blocks.air;
+			   && GameManager.instance.Level.BlockAt(blockPos) == Blocks.air;
 	}
 
 	public bool IsInBlockReach(Vector2 worldPos) {
 		float dist = Vector2.Distance(worldPos, this.center);
-		return dist <= MaxBlockReach && !level.GetTilesCovered(playerPhysics.Collider.bounds).Contains(BlockPos.FromWorld(worldPos));
+		return dist <= MaxBlockReach && !GameManager.instance.Level.GetTilesCovered(playerPhysics.Collider.bounds).Contains(BlockPos.FromWorld(worldPos));
 	}
 
 	// since this is a lazy player entity addition, not all methods need implementation (for now)
 	// TODO: properly implement player entity methods
 
 	public override void EntityUpdate(float deltaTime) {
-		throw new NotImplementedException();
-	}
-
-	public override void Spawn(EntitySpawnData spawnData) {
-		throw new NotImplementedException();
 	}
 
 	public override void OnChunkLoaded() {
-		throw new NotImplementedException();
 	}
 
 	public override void OnChunkUnloaded() {
-		throw new NotImplementedException();
 	}
 
 	public override Bounds GetBounds() => this.GetColliderBounds();

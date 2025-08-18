@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
 
-public class HotbarController : MonoBehaviour, IHotbarContainer {
+public class HotbarController : MonoBehaviour, IHotbarContainer, IDependencyInitializable<HotbarController, InventoryController> {
 	[Header("Active Slots")]
 	public Color activeSlotColor;
 	public Color activeSlotNumberColor;
@@ -34,21 +34,21 @@ public class HotbarController : MonoBehaviour, IHotbarContainer {
 	public InventorySlot[] Slots => slots;
 	public InventorySlot this[int index] => slots[index];
 
-	private void Awake() {
-		inventory = GameManager.instance.Player.Inventory;
-		SetupGrid(() => inventory.SetupGrid(null));
+#nullable enable
+
+	public HotbarController OnGameInit(InventoryController dependency) {
+		inventory = dependency;
+		this.SetupGrid();
+		return this;
 	}
 
-#nullable enable
-	public void SetupGrid(Action? callback) {
+	public void SetupGrid() {
 		InventorySlot[] hotbarSlots = gameObject.GetComponentsInChildren<InventorySlot>();
 		slots = new InventorySlot[Columns];
 		for (int i = 0; i < Columns; i++) {
 			slots[i] = hotbarSlots[i];
 		}
-		callback?.Invoke();
 	}
-#nullable disable
 
 	public void SetActiveSlot(int slotKey) {
 		UnityEngine.Debug.Assert(slotKey >= 0 && slotKey < Columns, $"Unexpected hotbar slotKey {slotKey}");

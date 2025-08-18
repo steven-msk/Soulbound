@@ -22,4 +22,6 @@ public class SimpleStatEntry<TProcessor, TValue> : AbstractStatEntry<TValue> whe
 	public override void RevokeToSerialized(SerializableStat serializableStat, IStatProvider source) => this.RemoveBonus(serializableStat.GetValue<TValue>(), source);
 
 	public TValue GetProcessedValue() => processor.ProcessFinalValue(BaseValue, bonuses.Select(bonus => bonus.value));
+
+	public override object Abstract_GetProcessedValue() => GetProcessedValue();
 }

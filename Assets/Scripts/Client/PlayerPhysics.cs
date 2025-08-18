@@ -7,7 +7,7 @@ using System.Linq;
 using System.Collections;
 
 
-public class PlayerPhysics : MonoBehaviour {
+public class PlayerPhysics : MonoBehaviour, IDependencyInitializable<PlayerPhysics, PlayerController> {
 	private static readonly Logger logger = Logger.CreateInstance();
 	private readonly Dictionary<string, (Action<Collision2D> action, Func<bool> validator)> collisionReactionsByTag = new();
 	private PlayerController player;
@@ -45,24 +45,19 @@ public class PlayerPhysics : MonoBehaviour {
 
 #nullable enable
 
-	private void Awake() {
-		player = GameManager.instance.Player;
+	public PlayerPhysics OnGameInit(PlayerController dependency) {
+		player = dependency;
 		inputHandler = player.InputHandler;
 		rb = player.Rigidbody;
 		animator = player.Animator;
 		stats = player.Stats;
 		collider = this.GetComponent<CapsuleCollider2D>();
-	}
 
-	// FIXME: inconsistent movement
-
-	private void Start() {
 		collisionReactionsByTag.Add("Enemy", ((collision) => {
 			Vector2 bounce = (transform.position - (Vector3)collision.GetContact(0).point).normalized;
 			rb.linearVelocity = bounce * contactBouncePower;
 			knockbackStunTimer = knockbackStunDuration;
 		}, null));
-
 		collisionReactionsByTag.Add("Ground", ((collision) => {
 			animator.SetBool("jumping", false);
 			animator.SetBool("flying", false);
@@ -73,6 +68,12 @@ public class PlayerPhysics : MonoBehaviour {
 			rb.linearDamping = 0f;
 		}, IsOnGround));
 
+		return this;
+	}
+
+	// FIXME: inconsistent movement
+
+	private void Start() {
 		UnityEngine.Debug.Assert(inputHandler.isActiveAndEnabled, inputHandler);
 	}
 
@@ -154,7 +155,7 @@ public class PlayerPhysics : MonoBehaviour {
 		var collisionResponse = collisionReactionsByTag.GetValueOrDefault(collision.gameObject.tag, ((collision) => {
 			UnityEngine.Debug.Log($"Unknown collision callback tag: {collision.gameObject.tag}");
 		}, null));
-		collisionResponse.action.InvokeIf(collision, collisionResponse.validator);
+		collisionResponse.action.InvokeIf(collision, collisionResponse.validator ?? (() => true));
 	}
 
 	public bool IsOnGround() {

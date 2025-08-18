@@ -14,10 +14,10 @@ public class DroppedItem : Entity {
 	private float pickupTimer;
 
 	public override void Spawn(EntitySpawnData spawnData) {
+		base.Spawn(spawnData);
 		base.ValidateSpawnData<DroppedItemSpawnData>(spawnData, (spawnData) => {
 			this.ItemStack = spawnData.itemStack;
 			this.pickupDelay = spawnData.pickupDelay;
-			this.transform.position = spawnData.position;
 			Rigidbody2D rigidbody = gameObject.AddComponent<Rigidbody2D>();
 			rigidbody.sleepMode = RigidbodySleepMode2D.NeverSleep;
 			BoxCollider2D pickupHitbox = gameObject.AddComponent<BoxCollider2D>();
@@ -38,7 +38,7 @@ public class DroppedItem : Entity {
 	private void OnTriggerStay2D(Collider2D collision) {
 		if (pickupTimer <= 0) {
 			if (GameManager.instance.Player.Inventory.PickUpItem(ItemStack)) {
-				GameManager.instance.Level.EntityManager.RemoveEntity(this);
+				this.Despawn();
 			}
 		}
 	}
@@ -50,7 +50,7 @@ public class DroppedItem : Entity {
 		pickupTimer -= deltaTime;
 		despawnTimer -= deltaTime;
 		if (despawnTimer <= 0) {
-			GameManager.instance.Level.EntityManager.RemoveEntity(this);
+			this.Despawn();
 		}
 	}
 
