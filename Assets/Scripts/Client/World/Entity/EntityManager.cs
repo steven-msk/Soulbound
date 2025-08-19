@@ -8,6 +8,7 @@ using System.Linq;
 
 public sealed class EntityManager {
 	private readonly Level level;
+	private PlayerController player;
 	private readonly Dictionary<Guid, Entity> allEntities = new();
 	private readonly List<ITickable> tickables = new();
 	private readonly List<(Entity entity, bool destroy)> pendingRemovals = new();
@@ -29,6 +30,11 @@ public sealed class EntityManager {
 	public void SpawnEntity(Entity entity, EntitySpawnData spawnData) {
 		entity.Spawn(spawnData);
 		this.AddExistingEntity(entity);
+	}
+
+	public void SpawnPlayer(PlayerController player, EntitySpawnData playerSpawnData) {
+		this.SpawnEntity(player, playerSpawnData);
+		this.player = player;
 	}
 
 	public void RemoveEntity(Entity entity, bool destroy) => pendingRemovals.Add((entity, destroy));

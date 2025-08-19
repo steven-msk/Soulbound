@@ -7,7 +7,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
 
-public class PlayerController : Entity, IGameInitializable<PlayerController> {
+public class PlayerController : LivingEntity, IGameInitializable<PlayerController> {
+	private static readonly Logger logger = Logger.CreateInstance();
 	[SerializeField] private InputHandler inputHandler;
 	public InputHandler InputHandler => inputHandler;
 
@@ -82,9 +83,9 @@ public class PlayerController : Entity, IGameInitializable<PlayerController> {
 
 	protected override void Start() {
 		base.Start();
-		transform.SetPositionAndRotation(new(position.x, GameManager.instance.Level.GetSurfaceY(blockPos.x), transform.position.z), Quaternion.identity);
-		AIEntity_test test = GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.Prefabs>("ai test"))!.GetComponent<AIEntity_test>();
-		GameManager.instance.Level.EntityManager.SpawnEntity(test, new EntitySpawnData(position));
+		//transform.SetPositionAndRotation(new(position.x, GameManager.instance.Level.GetSurfaceY(blockPos.x), transform.position.z), Quaternion.identity);
+		//AIEntity_test test = GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.Prefabs>("ai test"))!.GetComponent<AIEntity_test>();
+		//GameManager.instance.Level.EntityManager.SpawnEntity(test, new EntitySpawnData(position));
 	}
 
 	protected override void Update() {
@@ -168,6 +169,11 @@ public class PlayerController : Entity, IGameInitializable<PlayerController> {
 	// since this is a lazy player entity addition, not all methods need implementation (for now)
 	// TODO: properly implement player entity methods
 
+	public override void Spawn(EntitySpawnData spawnData) {
+		base.Spawn(spawnData);
+		logger.LogInfo(null, "Player spawned at {}", spawnData.Get<Vector2>("position"));
+	}
+
 	public override void EntityUpdate(float deltaTime) {
 	}
 
@@ -178,4 +184,12 @@ public class PlayerController : Entity, IGameInitializable<PlayerController> {
 	}
 
 	public override Bounds GetBounds() => this.GetColliderBounds();
+
+	public override void OnDeath() {
+		logger.LogInfo(null, "Player died");
+	}
+
+	public override void OnDamageTaken(float damage) {
+		logger.LogInfo(null, "Player has taken {} damage", damage);
+	}
 }

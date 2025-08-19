@@ -34,7 +34,7 @@ public class ResourceGroup : ScriptableObject {
 	}
 
 	static ResourceGroup() {
-		logger.LogInfo(null, "hgfuagvfbaeujfaefa");	
+		logger.LogInfo(LogModules.resource, "ResourceGroup type loaded");	
 	}
 
 	private void OnEnable() {

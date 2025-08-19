@@ -44,7 +44,6 @@ public class GameManager : MonoBehaviour {
 		int seed = 745632;           // UnityEngine.Random.Range(int.MinValue, int.MaxValue)
 		this.level = new Level(player, worldTilemap, GameObject.Find("Grid").GetComponent<Grid>(), seed, renderDistance: 2);
 		this.level.BootstrapWorld(Vector2.zero);				// pos will be replaced with 'lastPlayerPos' once world serialization is a thing
-		this.level.EntityManager.SpawnEntity(player, new EntitySpawnData(new Vector2(0, 0)));
 		UnityEngine.Random.InitState(seed);
 	}
 

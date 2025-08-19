@@ -55,8 +55,8 @@ public class Level {
     // achieve any level of performance. This project is still in prototype phase, so making any
     // optimization isnt really worth it and might be a waste of time in most cases.
 
-    public void BootstrapWorld(Vector2 playerPos) {
-        int playerChunkX = ChunkXAt(playerPos);
+    public void BootstrapWorld(Vector2 lastPlayerPos) {
+        int playerChunkX = ChunkXAt(lastPlayerPos);
         for (int dx = -renderDistance; dx <= renderDistance; dx++) {
             int chunkX = playerChunkX + dx;
             this.GenerateNewChunk(chunkX);
@@ -66,6 +66,8 @@ public class Level {
                 BlockStateChanged += structureTemplate.blockStateChangedCallback;
             }
         }
+        Vector2 spawnPos = new(0f, GetSurfaceY(0));
+        entityManager.SpawnPlayer(player, new EntitySpawnData(spawnPos));
     }
 
     public void UpdateChunks(Vector2 playerPos) {
