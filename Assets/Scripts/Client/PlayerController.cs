@@ -33,6 +33,8 @@ public class PlayerController : LivingEntity, IGameInitializable<PlayerControlle
 #nullable enable
 	public ItemStack? MainHandStack { get; private set; }
 
+	private float immunityTimer;
+
 	public bool CanAttack { get; set; } = true;
 
 	private int lastFacing = 1;
@@ -168,6 +170,8 @@ public class PlayerController : LivingEntity, IGameInitializable<PlayerControlle
 	}
 
 	public override void EntityUpdate(float deltaTime) {
+		immunityTimer -= deltaTime;
+		isImmune = immunityTimer > 0;
 	}
 
 	public override void OnChunkLoaded() {
@@ -184,5 +188,10 @@ public class PlayerController : LivingEntity, IGameInitializable<PlayerControlle
 
 	public override void OnDamageTaken(float damage) {
 		logger.LogInfo(null, "Player has taken {} damage", damage);
+	}
+
+	public void MakeImmuneFor(float seconds) {
+		this.isImmune = true;
+		this.immunityTimer = seconds;
 	}
 }

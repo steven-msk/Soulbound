@@ -7,6 +7,7 @@ public abstract class LivingEntity : Entity {
 	private float maxHealth;
 	private float currentHealth;
 	public float CurrentHealth => currentHealth;
+	public bool isImmune { get; protected set; }
 
 	public override void Spawn(EntitySpawnData spawnData) {
 		base.Spawn(spawnData);

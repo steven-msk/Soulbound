@@ -44,9 +44,7 @@ public class PlayerPhysics : MonoBehaviour, IDependencyInitializable<PlayerPhysi
 	[SerializeField] private bool shouldJump = false;
 	[SerializeField] private float jumpToFlightTimer;
 
-	private bool immune = false;
-	private float immuneTime;
-	private float immuneTimeSeconds = 0.5f;
+	private float immunityTimeSeconds = 0.5f;
 
 #nullable enable
 
@@ -75,8 +73,8 @@ public class PlayerPhysics : MonoBehaviour, IDependencyInitializable<PlayerPhysi
 
 		triggerReactionsByLayer.Add(LayerMask.NameToLayer("Hitbox"), (collision => {
 			player.TakeDamage(1);
-			immuneTime = immuneTimeSeconds;
-		}, () => !immune));
+			player.MakeImmuneFor(immunityTimeSeconds); 
+		}, () => !player.isImmune));
 
 		return this;
 	}
@@ -92,9 +90,6 @@ public class PlayerPhysics : MonoBehaviour, IDependencyInitializable<PlayerPhysi
 		if (movement.x != 0 && !(inputHandler.LeftHold || inputHandler.RightHold) && !GameManager.instance.IsPaused) {
 			transform.localScale = new Vector3(Mathf.Sign(movement.x), 1, 1);
 		}
-
-		immuneTime -= Time.deltaTime;
-		immune = immuneTime > 0;
 	}
 
 	private void FixedUpdate() {
