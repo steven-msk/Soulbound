@@ -7,6 +7,7 @@ public abstract class LivingEntity : Entity {
 	private float maxHealth;
 	private float currentHealth;
 	public float CurrentHealth => currentHealth;
+	private float immunityTimer;
 	public bool isImmune { get; protected set; }
 
 	public override void Spawn(EntitySpawnData spawnData) {
@@ -15,10 +16,16 @@ public abstract class LivingEntity : Entity {
 		this.currentHealth = maxHealth;
 	}
 
-	public void TakeDamage(float damage) {
-		if (!CheckDeath(() => this.currentHealth -= damage)) {
+	public override void EntityUpdate(float deltaTime) {
+		immunityTimer = Mathf.Clamp(immunityTimer - deltaTime, 0f, immunityTimer);
+		isImmune = immunityTimer > 0;
+	}
+
+	public bool TakeDamage(float damage) {
+		if (!CheckDeath(() => this.currentHealth -= damage) && !this.isImmune) {
 			this.OnDamageTaken(damage);
 		}
+		return !this.isImmune;
 	}
 
 	public void SetHealth(float health) {
@@ -32,6 +39,11 @@ public abstract class LivingEntity : Entity {
 	public void HandleDeath() {
 		//...?
 		this.OnDeath();
+	}
+
+	public void MakeImmuneFor(float seconds) {
+		this.isImmune = true;
+		this.immunityTimer = seconds;
 	}
 
 	private bool CheckDeath(Action? action) {

@@ -56,11 +56,11 @@ public class PlayerPhysics : MonoBehaviour, IDependencyInitializable<PlayerPhysi
 		stats = player.Stats;
 		collider = this.GetComponent<CapsuleCollider2D>();
 
-		collisionReactionsByTag.Add("Enemy", ((collision) => {
-			Vector2 bounce = (transform.position - (Vector3)collision.GetContact(0).point).normalized;
-			rb.linearVelocity = bounce * contactBouncePower;
-			knockbackStunTimer = knockbackStunDuration;
-		}, null));
+		//collisionReactionsByTag.Add("Enemy", ((collision) => {
+		//	Vector2 bounce = (transform.position - (Vector3)collision.GetContact(0).point).normalized;
+		//	rb.linearVelocity = bounce * contactBouncePower;
+		//	knockbackStunTimer = knockbackStunDuration;
+		//}, null));
 		collisionReactionsByTag.Add("Ground", ((collision) => {
 			animator.SetBool("jumping", false);
 			animator.SetBool("flying", false);
@@ -73,7 +73,10 @@ public class PlayerPhysics : MonoBehaviour, IDependencyInitializable<PlayerPhysi
 
 		triggerReactionsByLayer.Add(LayerMask.NameToLayer("Hitbox"), (collision => {
 			player.TakeDamage(1);
-			player.MakeImmuneFor(immunityTimeSeconds); 
+			player.MakeImmuneFor(immunityTimeSeconds);
+			Vector2 bounce = (transform.position - collision.transform.position).normalized;
+			rb.linearVelocity = bounce * contactBouncePower;
+			knockbackStunTimer = knockbackStunDuration * Mathf.Clamp(Mathf.Abs(bounce.y), 0.1f, 1f);
 		}, () => !player.isImmune));
 
 		return this;

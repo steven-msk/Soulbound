@@ -169,11 +169,6 @@ public class PlayerController : LivingEntity, IGameInitializable<PlayerControlle
 		logger.LogInfo(null, "Player spawned at {}", spawnData.Get<Vector2>("position"));
 	}
 
-	public override void EntityUpdate(float deltaTime) {
-		immunityTimer -= deltaTime;
-		isImmune = immunityTimer > 0;
-	}
-
 	public override void OnChunkLoaded() {
 	}
 
@@ -188,10 +183,5 @@ public class PlayerController : LivingEntity, IGameInitializable<PlayerControlle
 
 	public override void OnDamageTaken(float damage) {
 		logger.LogInfo(null, "Player has taken {} damage", damage);
-	}
-
-	public void MakeImmuneFor(float seconds) {
-		this.isImmune = true;
-		this.immunityTimer = seconds;
 	}
 }
