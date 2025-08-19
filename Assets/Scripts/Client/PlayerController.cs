@@ -81,13 +81,6 @@ public class PlayerController : LivingEntity, IGameInitializable<PlayerControlle
 		return this;
 	}
 
-	protected override void Start() {
-		base.Start();
-		//transform.SetPositionAndRotation(new(position.x, GameManager.instance.Level.GetSurfaceY(blockPos.x), transform.position.z), Quaternion.identity);
-		//AIEntity_test test = GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.Prefabs>("ai test"))!.GetComponent<AIEntity_test>();
-		//GameManager.instance.Level.EntityManager.SpawnEntity(test, new EntitySpawnData(position));
-	}
-
 	protected override void Update() {
 		base.Update();
 		animator.SetFloat("horizontalSpeed", Mathf.Abs(rb.linearVelocityX));

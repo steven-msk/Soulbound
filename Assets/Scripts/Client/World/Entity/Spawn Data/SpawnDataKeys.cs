@@ -6,4 +6,5 @@ using System.Threading.Tasks;
 
 public static partial class SpawnDataKeys {
 	public static SpawnDataKey position = new("position");
+	public static SpawnDataKey maxHealth = new("maxHealth");
 }

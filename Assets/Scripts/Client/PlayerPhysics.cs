@@ -10,6 +10,7 @@ using System.Collections;
 public class PlayerPhysics : MonoBehaviour, IDependencyInitializable<PlayerPhysics, PlayerController> {
 	private static readonly Logger logger = Logger.CreateInstance();
 	private readonly Dictionary<string, (Action<Collision2D> action, Func<bool> validator)> collisionReactionsByTag = new();
+	private readonly Dictionary<int, (Action<Collider2D> action, Func<bool> validator)> triggerReactionsByLayer = new();
 	private PlayerController player;
 	private PlayerStats stats;
 	private InputHandler inputHandler;
@@ -43,6 +44,10 @@ public class PlayerPhysics : MonoBehaviour, IDependencyInitializable<PlayerPhysi
 	[SerializeField] private bool shouldJump = false;
 	[SerializeField] private float jumpToFlightTimer;
 
+	private bool immune = false;
+	private float immuneTime;
+	private float immuneTimeSeconds = 0.5f;
+
 #nullable enable
 
 	public PlayerPhysics OnGameInit(PlayerController dependency) {
@@ -68,6 +73,11 @@ public class PlayerPhysics : MonoBehaviour, IDependencyInitializable<PlayerPhysi
 			rb.linearDamping = 0f;
 		}, IsOnGround));
 
+		triggerReactionsByLayer.Add(LayerMask.NameToLayer("Hitbox"), (collision => {
+			player.TakeDamage(1);
+			immuneTime = immuneTimeSeconds;
+		}, () => !immune));
+
 		return this;
 	}
 
@@ -82,6 +92,9 @@ public class PlayerPhysics : MonoBehaviour, IDependencyInitializable<PlayerPhysi
 		if (movement.x != 0 && !(inputHandler.LeftHold || inputHandler.RightHold) && !GameManager.instance.IsPaused) {
 			transform.localScale = new Vector3(Mathf.Sign(movement.x), 1, 1);
 		}
+
+		immuneTime -= Time.deltaTime;
+		immune = immuneTime > 0;
 	}
 
 	private void FixedUpdate() {
@@ -152,10 +165,17 @@ public class PlayerPhysics : MonoBehaviour, IDependencyInitializable<PlayerPhysi
 	}
 
 	private void OnCollisionStay2D(Collision2D collision) {
-		var collisionResponse = collisionReactionsByTag.GetValueOrDefault(collision.gameObject.tag, ((collision) => {
-			UnityEngine.Debug.Log($"Unknown collision callback tag: {collision.gameObject.tag}");
+		var collisionResponse = collisionReactionsByTag.GetValueOrDefault(collision.gameObject.tag, (collision => {
+			logger.LogWarning(null, "Unknown collision callback tag: {}", collision.gameObject.tag);
 		}, null));
 		collisionResponse.action.InvokeIf(collision, collisionResponse.validator ?? (() => true));
+	}
+
+	private void OnTriggerStay2D(Collider2D collision) {
+		var triggerResponse = triggerReactionsByLayer.GetValueOrDefault(collision.gameObject.layer, (collision => {
+			logger.LogWarning(null, "Unknown trigger callback layer: {}", LayerMask.LayerToName(collision.gameObject.layer));
+		}, null));
+		triggerResponse.action.InvokeIf(collision, triggerResponse.validator ?? (() => true));
 	}
 
 	public bool IsOnGround() {

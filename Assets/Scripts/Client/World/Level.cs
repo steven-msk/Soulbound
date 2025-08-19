@@ -67,7 +67,9 @@ public class Level {
             }
         }
         Vector2 spawnPos = new(0f, GetSurfaceY(0));
-        entityManager.SpawnPlayer(player, new EntitySpawnData(spawnPos));
+        entityManager.SpawnPlayer(player, new EntitySpawnData(spawnPos) {
+            [SpawnDataKeys.maxHealth] = new SpawnDataValue<float>(100f)
+        });
     }
 
     public void UpdateChunks(Vector2 playerPos) {
