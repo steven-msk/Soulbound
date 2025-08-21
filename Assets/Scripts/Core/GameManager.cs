@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using TMPro;
 using Unity.Plastic.Newtonsoft.Json;
@@ -37,7 +38,7 @@ public class GameManager : MonoBehaviour {
 	// FEATUREIMPL: pause menu
 	// Pause menu -> Settings menu
 
-	public const string worldDumpFile = "worldDump.json";
+	public const string worldDump = "worldDump.json";
 
 	private void Awake() {
 		instance = this;
@@ -47,7 +48,14 @@ public class GameManager : MonoBehaviour {
 		this.player = GameObject.Instantiate(playerInstancePrefab).GetComponent<PlayerController>().OnGameInit();
 		int seed = 745632;           // UnityEngine.Random.Range(int.MinValue, int.MaxValue)
 		this.level = new Level(player, worldTilemap, GameObject.Find("Grid").GetComponent<Grid>(), seed, renderDistance: 2);
-		this.level.BootstrapWorld(Vector2.zero);				// pos will be replaced with 'lastPlayerPos' once world serialization is a thing
+		WorldDump? worldDump;
+		try {
+			worldDump = JsonConvert.DeserializeObject<WorldDump>(File.ReadAllText(Level.worldDumpFile));
+		} catch (FileNotFoundException) {
+			logger.LogError(null, "Cannot find world dump file");
+			worldDump = null;
+		}
+		this.level.BootstrapWorld(worldDump);				// pos will be replaced with 'lastPlayerPos' once world serialization is a thing
 		UnityEngine.Random.InitState(seed);
 	}
 

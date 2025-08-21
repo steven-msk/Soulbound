@@ -57,7 +57,7 @@ public class Logger {
 	}
 
 	public void LogError(LogModule? module, string compoundMessage, params object[] args) {
-		this.LogMessage(module, UnityEngine.Debug.Log, FormatPlaceholders(compoundMessage, compoundPlaceholder, args));
+		this.LogMessage(module, UnityEngine.Debug.LogError, FormatPlaceholders(compoundMessage, compoundPlaceholder, args));
 	}
 
 	private string FormatPlaceholders(string template, string placeholder, params object[] args) {

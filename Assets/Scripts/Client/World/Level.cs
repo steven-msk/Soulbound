@@ -22,7 +22,7 @@ public class Level {
 	public const int CHUNK_LENGTH = 32;
     public const int WORLD_HEIGHT = 300;
     public const int SURFACE_TO_UNDERGROUND_DELIMITER = WORLD_HEIGHT / 2;
-    public static string worldDumpFile => Path.Combine(Application.persistentDataPath, GameManager.worldDumpFile);
+    public static string worldDumpFile => Path.Combine(Application.persistentDataPath, GameManager.worldDump);
 
 	public event Action<BlockChangeInfo>? BlockStateChanged;
     // POTENTIAL: post world events to the ticking system
@@ -62,22 +62,15 @@ public class Level {
     // achieve any level of performance. This project is still in prototype phase, so making any
     // optimization isnt really worth it and might be a waste of time in most cases.
 
-    public void BootstrapWorld(Vector2 lastPlayerPos) {
+    public void BootstrapWorld(WorldDump? dump) {
         Dictionary<int, int[][]> chunkIDmap = new();
-        int playerChunkX = ChunkXAt(lastPlayerPos);
 
-        if (!File.Exists(worldDumpFile)) {
-            logger.LogWarning(null, "World dump file not found, generating new world");
-            for (int dx = -renderDistance; dx <= renderDistance; dx++) {
-                int chunkX = playerChunkX + dx;
-                this.GenerateNewChunk(chunkX);
-            }
-        } else {
-            string json = File.ReadAllText(worldDumpFile);
-            WorldDump dump = JsonConvert.DeserializeObject<WorldDump>(json, new JsonSerializerSettings() {
-                Converters = { new WorldChunk.JsonChunkConverter() }
-            });
-            this.generatedChunks = dump.generatedChunks.ToDictionary(chunk => chunk.xpos, chunk => chunk);
+        if (dump == null) {
+			for (int dx = -renderDistance; dx <= renderDistance; dx++) {
+				this.GenerateNewChunk(dx);
+			}
+		} else {
+            this.generatedChunks = dump.Value.generatedChunks.ToDictionary(chunk => chunk.xpos, chunk => chunk);
         }
 
         foreach (var structureTemplate in registeredStructureTemplates.Values) {
@@ -85,14 +78,14 @@ public class Level {
 				BlockStateChanged += structureTemplate.blockStateChangedCallback;
 			}
 		}
-		Vector2 spawnPos = new(0f, GetSurfaceY(0));
+		Vector2 spawnPos = dump == null ? new(0f, GetSurfaceY(0)) : dump.Value.lastPlayerPos;
         entityManager.SpawnPlayer(player, new EntitySpawnData(spawnPos) {
             [SpawnDataKeys.maxHealth] = new SpawnDataValue<float>(100f)
         });
     }
 
     public void Save() {
-        WorldDump dump = new(generatedChunks.Values.ToArray());
+        WorldDump dump = new(generatedChunks.Values.ToArray(), player.position);
 		string json = JsonConvert.SerializeObject(dump, new JsonSerializerSettings() {
             Converters = { new WorldChunk.JsonChunkConverter() },
 		});
