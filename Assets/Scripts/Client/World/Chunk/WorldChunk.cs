@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using JetBrains.Annotations;
+using Unity.Plastic.Newtonsoft.Json;
+using Unity.Plastic.Newtonsoft.Json.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using Random = UnityEngine.Random;
 
+[JsonConverter(typeof(WorldChunk.JsonChunkConverter))]
 public class WorldChunk {
 	public static readonly int minY = -Level.WORLD_HEIGHT / 2;
-	public static readonly int maxY = Level.WORLD_HEIGHT / 2 - 1;
+	public static readonly int maxY = Level.WORLD_HEIGHT / 2;
 	public const float HEIGHT_SPREAD = 0.01f;
 	public const float SURFACE_HEIGHT_RANGE = 50f;
 	public const float UNDERGROUND_HEIGHT_RANGE = 20f;
@@ -21,10 +24,14 @@ public class WorldChunk {
 	private int x;
 	public int xpos => x;
 
-	private BlockState[,] blockStates = new BlockState[Level.CHUNK_LENGTH, Level.WORLD_HEIGHT];
+	private BlockState[][] blockStates = new BlockState[Level.CHUNK_LENGTH][];
 
-
-	public WorldChunk(int x) => this.x = x;
+	public WorldChunk(int x) { 
+		this.x = x;
+		for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
+			blockStates[cx] = new BlockState[Level.WORLD_HEIGHT];
+		}
+	}
 
 	// PLANNED REFACTOR: chunk generation logic - required when introducing biomes
 	public ChunkHeightmapData GenerateHeightmap(INoiseGenerator1D heightGenerator) {
@@ -53,7 +60,7 @@ public class WorldChunk {
 				} else {
 					blockState = Blocks.stone.defaultState;
 				}
-				blockStates[x, yIndex] = blockState;
+				blockStates[x][yIndex] = blockState;
 			}
 		}
 
@@ -71,7 +78,7 @@ public class WorldChunk {
 		for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
 			for (int y = minY; y < maxY; y++) {
 				int yIndex = WorldYToIndex(y);
-				BlockState blockState = blockStates[x, yIndex];
+				BlockState blockState = blockStates[x][yIndex];
 				InvocationHelper.IfElse(blockState != null,
 					() => tilemap.SetTile(new Vector3Int(xStart + x, y), blockState.block.tileReference),
 					() => UnityEngine.Debug.LogError($"Attempted to render ungenerated terrain! {new ChunkBlockPos(x, y, this.x).ToString()}"));
@@ -101,7 +108,62 @@ public class WorldChunk {
 		outlineRenderer.HideOutline(this);
 	}
 
-	public void SetBlock(ChunkBlockPos chunkPos, BlockState blockState) => blockStates[chunkPos.x, WorldYToIndex(chunkPos.y)] = blockState;
+	public void SetBlock(ChunkBlockPos chunkPos, BlockState blockState) => blockStates[chunkPos.x][WorldYToIndex(chunkPos.y)] = blockState;
 
-	public BlockState BlockStateAt(ChunkBlockPos chunkPos) => blockStates[chunkPos.x, WorldYToIndex(chunkPos.y)];
+	public BlockState BlockStateAt(ChunkBlockPos chunkPos) => blockStates[chunkPos.x][WorldYToIndex(chunkPos.y)];
+
+	public sealed class JsonChunkConverter : JsonConverter<WorldChunk> {
+		public override WorldChunk ReadJson(JsonReader reader, Type objectType, WorldChunk existingValue, bool hasExistingValue, JsonSerializer serializer) {
+			if (reader.TokenType == JsonToken.Null) {
+				return null;
+			}
+
+			JObject obj = JObject.Load(reader);
+			int xpos = obj["xpos"].Value<int>();
+			ChunkHeightmapData heightmap = obj["heightmapData"].ToObject<ChunkHeightmapData>(serializer);
+
+			JArray rows = (JArray)obj["blockStates"];
+			BlockState[][] blockStates = new BlockState[rows.Count][];
+			for (int x = 0; x < rows.Count; x++) {
+				JArray row = (JArray)rows[x];
+				blockStates[x] = new BlockState[row.Count];
+				for (int y = 0; y < row.Count; y++) {
+					int blockID = row[y]!.Value<int>();
+					Block block = Blocks.ByID(blockID);
+					blockStates[x][y] = block.defaultState;
+				}
+			}
+
+			return new WorldChunk(xpos) {
+				heightmapData = heightmap,
+				blockStates = blockStates
+			};
+		}
+
+		public override void WriteJson(JsonWriter writer, WorldChunk value, JsonSerializer serializer) {
+			if (value == null) {
+				writer.WriteNull();
+				return;
+			}
+			writer.WriteStartObject();
+			writer.WritePropertyName("xpos");
+			writer.WriteValue(value.xpos);
+
+			writer.WritePropertyName("heightmapData");
+			serializer.Serialize(writer, value.HeightmapData);
+
+			writer.WritePropertyName("blockStates");
+			writer.WriteStartArray();
+			foreach (var row in value.blockStates) {
+				writer.WriteStartArray();
+				foreach (var blockState in row) {
+					writer.WriteValue(blockState.block.id);
+				}
+				writer.WriteEndArray();
+			}
+			writer.WriteEndArray();
+
+			writer.WriteEndObject();
+		}
+	}
 }

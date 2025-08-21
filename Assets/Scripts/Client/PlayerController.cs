@@ -23,7 +23,7 @@ public class PlayerController : LivingEntity, IGameInitializable<PlayerControlle
 
 	[Header("Internal")]
 	[SerializeField] private Rigidbody2D rb;
-	public Rigidbody2D Rigidbody => rb;
+	public Rigidbody2D Rigidbody => rb; 
 	[SerializeField] private Animator animator;
 	public Animator Animator => animator;
 
@@ -32,8 +32,6 @@ public class PlayerController : LivingEntity, IGameInitializable<PlayerControlle
 	public ItemUsageHandler ItemUsageHandler => itemUsageHandler!;
 #nullable enable
 	public ItemStack? MainHandStack { get; private set; }
-
-	private float immunityTimer;
 
 	public bool CanAttack { get; set; } = true;
 

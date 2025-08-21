@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using Unity.Plastic.Newtonsoft.Json;
+using Unity.Plastic.Newtonsoft.Json.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -34,6 +36,8 @@ public class GameManager : MonoBehaviour {
 	// FEATUREIMPL: settings menu
 	// FEATUREIMPL: pause menu
 	// Pause menu -> Settings menu
+
+	public const string worldDumpFile = "worldDump.json";
 
 	private void Awake() {
 		instance = this;
@@ -93,5 +97,6 @@ public class GameManager : MonoBehaviour {
 	private void OnApplicationQuit() {
 		EventBus<GameEvent>.Clear();
 		EventBus<SystemEvent>.Clear();
+		level.Save();
 	}
 }

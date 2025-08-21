@@ -17,7 +17,7 @@ public class BlockState {
     public IBlockStateBehavior stateBehavior { get; private set; }
 
     public BlockState(Block block, Dictionary<string, object>? properties, IBlockStateBehavior stateBehavior) {
-        this.block = block ?? throw new ArgumentNullException(nameof(block));
+        this.block = block ?? Blocks.air;
         this.properties = properties ?? new Dictionary<string, object>();
         this.stateBehavior = stateBehavior;
     }
