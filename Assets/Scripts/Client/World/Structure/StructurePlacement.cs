@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -12,7 +13,9 @@ public class StructurePlacement {
     public ChunkBlockPos origin { get; private set; }
     public string ID { get; private set; }
     public BoundsInt2D bounds { get; private set; }
-    public Dictionary<ChunkBlockPos, BlockState> stateOverrides { get; set; } = new();
+
+    [JsonConverter(typeof(JsonDictionaryConverter<ChunkBlockPos, BlockState>))]
+	public Dictionary<ChunkBlockPos, BlockState> stateOverrides { get; set; } = new();
 
     public StructurePlacement(ChunkBlockPos origin, string ID, Dictionary<ChunkBlockPos, BlockState> stateOverrides, BoundsInt2D bounds) {
         this.origin = origin;

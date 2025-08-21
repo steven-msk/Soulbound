@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
 
+[JsonConverter(typeof(ChunkBlockPosJsonConverter))]
 public struct ChunkBlockPos {
     public int x;
     public int y;
     public int chunkX;
-    public WorldChunk underlyingChunk => GameManager.instance.Level.ChunkAt(this.ToWorldBlockPos());
+    [JsonIgnore] public WorldChunk underlyingChunk => GameManager.instance.Level.ChunkAt(this.ToWorldBlockPos());
 
     public ChunkBlockPos(int x, int y, int chunkX) {
         this.x = x;

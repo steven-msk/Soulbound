@@ -71,6 +71,7 @@ public class Level {
 			}
 		} else {
             this.generatedChunks = dump.Value.generatedChunks.ToDictionary(chunk => chunk.xpos, chunk => chunk);
+            this.structurePlacements = dump.Value.structurePlacements;
         }
 
         foreach (var structureTemplate in registeredStructureTemplates.Values) {
@@ -78,17 +79,15 @@ public class Level {
 				BlockStateChanged += structureTemplate.blockStateChangedCallback;
 			}
 		}
-		Vector2 spawnPos = dump == null ? new(0f, GetSurfaceY(0)) : dump.Value.lastPlayerPos;
-        entityManager.SpawnPlayer(player, new EntitySpawnData(spawnPos) {
+		Vector2 playerPos = dump == null ? new(0f, GetSurfaceY(0)) : dump.Value.lastPlayerPos;
+        entityManager.SpawnPlayer(player, new EntitySpawnData(playerPos) {
             [SpawnDataKeys.maxHealth] = new SpawnDataValue<float>(100f)
         });
     }
 
     public void Save() {
-        WorldDump dump = new(generatedChunks.Values.ToArray(), player.position);
-		string json = JsonConvert.SerializeObject(dump, new JsonSerializerSettings() {
-            Converters = { new WorldChunk.JsonChunkConverter() },
-		});
+        WorldDump dump = new(generatedChunks.Values.ToArray(), player.position, this.structurePlacements);
+		string json = JsonConvert.SerializeObject(dump);
         File.WriteAllText(worldDumpFile, json);
 	}
 

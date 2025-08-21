@@ -13,9 +13,9 @@ using UnityEngine.Tilemaps;
 
 public abstract partial class Block {
 	public abstract string name { get; }
-	[JsonIgnore] public abstract TileBase tileReference { get; }
-	[JsonIgnore] public abstract BlockItem? itemReference { get; }
-	[JsonIgnore] public abstract BlockState defaultState { get; }
+	public abstract TileBase tileReference { get; }
+	public abstract BlockItem? itemReference { get; }
+	public abstract BlockState defaultState { get; }
 
 	public virtual BlockState CreateState(Dictionary<string, object> properties) {
 		return defaultState;

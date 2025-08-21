@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 #nullable enable
 
+[JsonConverter(typeof(BlockStateJsonConverter))]
 public class BlockState {
     public Block block { get; private set; }
 

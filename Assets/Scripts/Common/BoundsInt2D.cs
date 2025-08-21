@@ -3,20 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
 
+[JsonConverter(typeof(BoundsInt2DJsonConverter))]
 public struct BoundsInt2D {
     public int xMin;
     public int yMin;
     public int xMax;
     public int yMax;
 
-    public int width => xMax - xMin;
-    public int height => yMax - yMin;
-    public Vector2Int min => new Vector2Int(xMin, yMin);
-    public Vector2Int max => new Vector2Int(xMax, yMax);
-    public Vector2Int center => new Vector2Int((xMin + xMax) / 2, (yMin + yMax) / 2);
-    public Vector2Int size => new Vector2Int(width, height);
+    [JsonIgnore] public int width => xMax - xMin;
+    [JsonIgnore] public int height => yMax - yMin;
+    [JsonIgnore] public Vector2Int min => new Vector2Int(xMin, yMin);
+    [JsonIgnore] public Vector2Int max => new Vector2Int(xMax, yMax);
+    [JsonIgnore] public Vector2Int center => new Vector2Int((xMin + xMax) / 2, (yMin + yMax) / 2);
+    [JsonIgnore] public Vector2Int size => new Vector2Int(width, height);
 
     public BoundsInt2D(Vector2Int min, Vector2Int max) {
         this.xMin = min.x;

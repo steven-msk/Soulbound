@@ -10,7 +10,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using Random = UnityEngine.Random;
 
-[JsonConverter(typeof(WorldChunk.JsonChunkConverter))]
+[JsonConverter(typeof(WorldChunkJsonConverter))]
 public class WorldChunk {
 	public static readonly int minY = -Level.WORLD_HEIGHT / 2;
 	public static readonly int maxY = Level.WORLD_HEIGHT / 2;
@@ -112,7 +112,7 @@ public class WorldChunk {
 
 	public BlockState BlockStateAt(ChunkBlockPos chunkPos) => blockStates[chunkPos.x][WorldYToIndex(chunkPos.y)];
 
-	public sealed class JsonChunkConverter : JsonConverter<WorldChunk> {
+	public sealed class WorldChunkJsonConverter : JsonConverter<WorldChunk> {
 		public override WorldChunk ReadJson(JsonReader reader, Type objectType, WorldChunk existingValue, bool hasExistingValue, JsonSerializer serializer) {
 			if (reader.TokenType == JsonToken.Null) {
 				return null;
@@ -147,7 +147,7 @@ public class WorldChunk {
 			}
 			writer.WriteStartObject();
 			writer.WritePropertyName("xpos");
-			writer.WriteValue(value.xpos);
+			serializer.Serialize(writer, value.xpos);
 
 			writer.WritePropertyName("heightmapData");
 			serializer.Serialize(writer, value.HeightmapData);
@@ -157,7 +157,7 @@ public class WorldChunk {
 			foreach (var row in value.blockStates) {
 				writer.WriteStartArray();
 				foreach (var blockState in row) {
-					writer.WriteValue(blockState.block.id);
+					serializer.Serialize(writer, blockState);
 				}
 				writer.WriteEndArray();
 			}
