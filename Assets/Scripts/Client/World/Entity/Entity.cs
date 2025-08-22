@@ -43,9 +43,9 @@ public abstract class Entity : MonoBehaviour, ISerializable<SerializedEntity> {
 
 	public abstract Bounds GetBounds();
 
-	public abstract List<AbstractSerializedEntityProperty> GetSerializedProperties();
+	public abstract SerializedEntityPropertyList GetSerializedProperties();
 
-	public abstract void ApplySerializedProperties(List<AbstractSerializedEntityProperty> properties);
+	public abstract void ApplySerializedProperties(SerializedEntityPropertyList properties);
 
 	public SerializedEntity Serialize() {
 		return new(this.entityScriptType, this.id.Value, this.prefabDefinitionID, this.position, this.GetSerializedProperties());
@@ -62,7 +62,7 @@ public abstract class Entity : MonoBehaviour, ISerializable<SerializedEntity> {
 			spawnData.Set(new SpawnDataKey(candidate), property.ToSpawnDataValue());
 		}
 		this.Spawn(spawnData);
-		this.ApplySerializedProperties(serialized.properties);
+		this.ApplySerializedProperties(SerializedEntityPropertyList.From(serialized.properties));
 	}
 }
 

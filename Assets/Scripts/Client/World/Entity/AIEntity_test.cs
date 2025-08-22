@@ -42,10 +42,8 @@ public sealed class AIEntity_test : Entity, ITickable {
 		gameObject.SetActive(false);
 	}
 
-	public override List<AbstractSerializedEntityProperty> GetSerializedProperties() {
-		return new List<AbstractSerializedEntityProperty>();
-	}
+	public override SerializedEntityPropertyList GetSerializedProperties() => SerializedEntityPropertyList.Empty();
 
-	public override void ApplySerializedProperties(List<AbstractSerializedEntityProperty> properties) {
+	public override void ApplySerializedProperties(SerializedEntityPropertyList properties) {
 	}
 }

@@ -185,10 +185,8 @@ public class PlayerController : LivingEntity, IGameInitializable<PlayerControlle
 		logger.LogInfo(null, "Player has taken {} damage", damage);
 	}
 
-	public override List<AbstractSerializedEntityProperty> GetSerializedProperties() {
-		return new List<AbstractSerializedEntityProperty>();
-	}
+	public override SerializedEntityPropertyList GetSerializedProperties() => SerializedEntityPropertyList.Empty();
 
-	public override void ApplySerializedProperties(List<AbstractSerializedEntityProperty> properties) {
+	public override void ApplySerializedProperties(SerializedEntityPropertyList properties) {
 	}
 }

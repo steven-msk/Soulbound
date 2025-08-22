@@ -41,26 +41,25 @@ public class DroppedItem : Entity {
 		OnEnable();
 	}
 
-	public override List<AbstractSerializedEntityProperty> GetSerializedProperties() {
-		return new List<AbstractSerializedEntityProperty>() {
-			new SerializedEntityProperty<ItemStack>("itemStack", this.ItemStack),
-			new SerializedEntityProperty<float>("pickupDelay", this.pickupDelay),
-			new SerializedEntityProperty<float>("pickupTimer", this.pickupTimer),
-			new SerializedEntityProperty<float>("despawnTimer", this.despawnTimer),
-			new SerializedEntityProperty<bool>("isFrozen", this.isFrozen),
-			new SerializedEntityProperty<bool>("flag_pickupLocked", this.flag_pickupLocked),
-			new SerializedEntityProperty<string>("spriteID", this.spriteID),
-		};
+	public override SerializedEntityPropertyList GetSerializedProperties() {
+		return new SerializedEntityPropertyList()
+			.Add("itemStack", this.ItemStack)
+			.Add("pickupDelay", this.pickupDelay)
+			.Add("pickupTimer", this.pickupTimer)
+			.Add("despawnTimer", this.despawnTimer)
+			.Add("isFrozen", this.isFrozen)
+			.Add("flag_pickupLocked", this.flag_pickupLocked)
+			.Add("spriteID", this.spriteID);
 	}
 
-	public override void ApplySerializedProperties(List<AbstractSerializedEntityProperty> properties) {
-		this.ItemStack = properties.First(p => p.GetKey() == "itemStack").GetValue<ItemStack>();
-		this.pickupDelay = properties.First(p => p.GetKey() == "pickupDelay").GetValue<float>();
-		this.pickupTimer = properties.First(p => p.GetKey() == "pickupTimer").GetValue<float>();
-		this.despawnTimer = properties.First(p => p.GetKey() == "despawnTimer").GetValue<float>();
-		this.isFrozen = properties.First(p => p.GetKey() == "isFrozen").GetValue<bool>();
-		this.flag_pickupLocked = properties.First(p => p.GetKey() == "flag_pickupLocked").GetValue<bool>();
-		this.spriteID = properties.First(p => p.GetKey() == "spriteID").GetValue<string>();
+	public override void ApplySerializedProperties(SerializedEntityPropertyList properties) {
+		this.ItemStack = properties.Get<ItemStack>("itemStack");
+		this.pickupDelay = properties.Get<float>("pickupDelay");
+		this.pickupTimer = properties.Get<float>("pickupTimer");
+		this.despawnTimer = properties.Get<float>("despawnTimer");
+		this.isFrozen = properties.Get<bool>("isFrozen");
+		this.flag_pickupLocked = properties.Get<bool>("flag_pickupLocked");
+		this.spriteID = properties.Get<string>("spriteID");
 	}
 
 	private void OnEnable() {
