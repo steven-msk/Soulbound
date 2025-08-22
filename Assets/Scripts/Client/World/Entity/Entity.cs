@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 
-public abstract class Entity : MonoBehaviour {
-	public Guid id { get; set; }
+public abstract class Entity : MonoBehaviour, ISerializable<SerializedEntity> {
+	public Guid? id { get; set; } = null;
 	public Vector2 position => transform.position;
 	public int currentChunkX { get; private set; }
+	public abstract Type entityScriptType { get; }
+	public abstract string prefabDefinitionID { get; }
 
 	public abstract void EntityUpdate(float deltaTime);
 
@@ -25,6 +29,7 @@ public abstract class Entity : MonoBehaviour {
 		}
 	}
 
+	[EntitySpawnPropertyCandidates("position")]
 	public virtual void Spawn(EntitySpawnData spawnData) {
 		transform.position = spawnData.Get<Vector2>(SpawnDataKeys.position);
 	}
@@ -37,6 +42,28 @@ public abstract class Entity : MonoBehaviour {
 	public abstract void OnChunkUnloaded();
 
 	public abstract Bounds GetBounds();
+
+	public abstract List<AbstractSerializedEntityProperty> GetSerializedProperties();
+
+	public abstract void ApplySerializedProperties(List<AbstractSerializedEntityProperty> properties);
+
+	public SerializedEntity Serialize() {
+		return new(this.entityScriptType, this.id.Value, this.prefabDefinitionID, this.position, this.GetSerializedProperties());
+	}
+
+	public void Deserialize(SerializedEntity serialized) {
+		this.id = serialized.id;
+		var attributes = this.GetType().GetMethod("Spawn").GetCustomAttributes<EntitySpawnPropertyCandidatesAttribute>(true); 
+		string[] propertyCandidates = attributes.SelectMany(attribute => attribute.candidates).Distinct().ToArray();
+		string[] spawnDataCandidates = propertyCandidates.Where(c => serialized.properties.Any(p => p.GetKey() == c)).ToArray();
+		EntitySpawnData spawnData = new(serialized.lastPosition);
+		foreach (string candidate in spawnDataCandidates) {
+			var property = serialized.properties.First(p => p.GetKey() == candidate);
+			spawnData.Set(new SpawnDataKey(candidate), property.ToSpawnDataValue());
+		}
+		this.Spawn(spawnData);
+		this.ApplySerializedProperties(serialized.properties);
+	}
 }
 
 public static class EnityBounds {

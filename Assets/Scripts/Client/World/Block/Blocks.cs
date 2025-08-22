@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Unity.Plastic.Newtonsoft.Json;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -36,6 +37,19 @@ public partial class Blocks : IResourceModule {
 		return block;
 	}
 }
+
+[JsonConverter(typeof(Block.BlockJsonConverter))]
 abstract partial class Block {
     public int id { get; internal set; }
+
+	public sealed class BlockJsonConverter : JsonConverter<Block> {
+		public override Block ReadJson(JsonReader reader, Type objectType, Block existingValue, bool hasExistingValue, JsonSerializer serializer) {
+            int id = Convert.ToInt32(reader.Value);
+			return Blocks.ByID(id);
+		}
+
+		public override void WriteJson(JsonWriter writer, Block value, JsonSerializer serializer) {
+			writer.WriteValue(value.id);
+		}
+	}
 }

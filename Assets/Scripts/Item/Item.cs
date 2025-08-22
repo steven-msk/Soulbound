@@ -7,7 +7,7 @@ using UnityEngine;
 
 #nullable enable
 
-public abstract class Item {
+public abstract partial class Item {
 	public static readonly int universalMaxStack = 999_999;
 
 	// FIXME: mismatched README version - item dev notes are obsolete

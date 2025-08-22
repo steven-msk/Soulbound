@@ -9,9 +9,11 @@ using System.Linq;
 public sealed class EntityManager {
 	private readonly Level level;
 	private PlayerController player;
-	private readonly Dictionary<Guid, Entity> allEntities = new();
-	private readonly List<ITickable> tickables = new();
-	private readonly List<(Entity entity, bool destroy)> pendingRemovals = new();
+	private Dictionary<Guid, Entity> allEntities = new();
+	private List<ITickable> tickables = new();
+	private List<(Entity entity, bool destroy)> pendingRemovals = new();
+
+	public Dictionary<Guid, Entity> AllExistingEntities => allEntities;
 
 	public EntityManager(Level level) {
 		this.level = level;
@@ -19,9 +21,18 @@ public sealed class EntityManager {
 
 	// FIXME: inconsistent chunk-entity relation
 
+	public void Boostrap(Dictionary<Guid, SerializedEntity> serializedEntities) {
+		foreach (var serializedEntity in serializedEntities.Values) {
+			GameObject entityPrefab = ResourceManager.Get<GameObject, ResourceGroups.Prefabs>(serializedEntity.prefabDefinitionID);
+			Entity entity = (Entity)GameObject.Instantiate(entityPrefab).GetComponent(serializedEntity.entityScriptType);
+			entity.Deserialize(serializedEntity);
+			this.AddExistingEntity(entity);
+		}
+	}
+
 	public void AddExistingEntity(Entity entity) {
 		entity.id = Guid.NewGuid();
-		allEntities.Add(entity.id, entity);
+		allEntities.Add(entity.id.Value, entity);
 		if (entity is ITickable tickable) {
 			tickables.Add(tickable);
 		}
@@ -40,7 +51,7 @@ public sealed class EntityManager {
 	public void RemoveEntity(Entity entity, bool destroy) => pendingRemovals.Add((entity, destroy));
 
 	public void RemoveEntityImmediately(Entity entity, bool destroy) {
-		allEntities.Remove(entity.id);
+		allEntities.Remove(entity.id.Value);
 		if (entity is ITickable tickable) {
 			tickables.Remove(tickable);
 		}

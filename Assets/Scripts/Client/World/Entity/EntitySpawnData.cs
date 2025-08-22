@@ -26,6 +26,10 @@ public class EntitySpawnData : Dictionary<SpawnDataKey, SpawnDataValue> {
 		return Get<TValue>(new SpawnDataKey(keyName), defaultValue);
 	}
 
+	public bool Exists(SpawnDataKey key) => this.ContainsKey(key);
+
+	public bool Exists(string keyName) => this.ContainsKey(new SpawnDataKey(keyName));
+
 	public SpawnDataValue<TValue> GetWrapped<TValue>(SpawnDataKey key, SpawnDataValue<TValue> defaultWrapped = default) {
 		if (this.TryGetValue(key, out var wrappedValue) && wrappedValue is SpawnDataValue<TValue> typedValue) {
 			return typedValue;
@@ -42,4 +46,6 @@ public class EntitySpawnData : Dictionary<SpawnDataKey, SpawnDataValue> {
 	public void Set<TValue>(string keyName, TValue value) {
 		this.Set<TValue>(new SpawnDataKey(keyName), new SpawnDataValue<TValue>(value));
 	}
+
+	public void Set(SpawnDataKey key, SpawnDataValue value) => this.Add(key, value);
 }

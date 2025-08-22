@@ -9,6 +9,8 @@ using UnityEngine.Tilemaps;
 
 public class PlayerController : LivingEntity, IGameInitializable<PlayerController> {
 	private static readonly Logger logger = Logger.CreateInstance();
+	public override Type entityScriptType => typeof(PlayerController);
+	public override string prefabDefinitionID => "johnny";
 	[SerializeField] private InputHandler inputHandler;
 	public InputHandler InputHandler => inputHandler;
 
@@ -181,5 +183,12 @@ public class PlayerController : LivingEntity, IGameInitializable<PlayerControlle
 
 	public override void OnDamageTaken(float damage) {
 		logger.LogInfo(null, "Player has taken {} damage", damage);
+	}
+
+	public override List<AbstractSerializedEntityProperty> GetSerializedProperties() {
+		return new List<AbstractSerializedEntityProperty>();
+	}
+
+	public override void ApplySerializedProperties(List<AbstractSerializedEntityProperty> properties) {
 	}
 }

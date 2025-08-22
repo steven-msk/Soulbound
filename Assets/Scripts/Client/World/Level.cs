@@ -79,15 +79,23 @@ public class Level {
 				BlockStateChanged += structureTemplate.blockStateChangedCallback;
 			}
 		}
-		Vector2 playerPos = dump == null ? new(0f, GetSurfaceY(0)) : dump.Value.lastPlayerPos;
+        InvocationHelper.If(dump != null, () => entityManager.Boostrap(dump!.Value.serializedEntities));
+        Vector2 playerPos = dump == null ? new(0f, GetSurfaceY(0)) : dump.Value.lastPlayerPos;
         entityManager.SpawnPlayer(player, new EntitySpawnData(playerPos) {
             [SpawnDataKeys.maxHealth] = new SpawnDataValue<float>(100f)
         });
     }
 
     public void Save() {
-        WorldDump dump = new(generatedChunks.Values.ToArray(), player.position, this.structurePlacements);
-		string json = JsonConvert.SerializeObject(dump);
+        Dictionary<Guid, SerializedEntity> serializedEntities = entityManager.AllExistingEntities
+            .Where(entity => entity.Value is not PlayerController)
+            .ToDictionary(guid => guid.Key, entity => entity.Value.Serialize());
+		WorldDump dump = new(generatedChunks.Values.ToArray(), player.position, this.structurePlacements, serializedEntities);
+		string json = JsonConvert.SerializeObject(dump, new JsonSerializerSettings() {
+            TypeNameHandling = TypeNameHandling.Auto,
+            TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
+			Converters = new List<JsonConverter> { new Vector2JsonConverter(), new Vector3JsonConverter() },
+		});
         File.WriteAllText(worldDumpFile, json);
 	}
 

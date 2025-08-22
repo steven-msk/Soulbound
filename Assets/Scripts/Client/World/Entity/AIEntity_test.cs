@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 public sealed class AIEntity_test : Entity, ITickable {
+	public override Type entityScriptType => typeof(AIEntity_test);
+	public override string prefabDefinitionID => "ai test";
 	private AIController aiController;
 
 	public override void Spawn(EntitySpawnData spawnData) {
@@ -38,5 +40,12 @@ public sealed class AIEntity_test : Entity, ITickable {
 
 	public override void OnChunkUnloaded() {
 		gameObject.SetActive(false);
+	}
+
+	public override List<AbstractSerializedEntityProperty> GetSerializedProperties() {
+		return new List<AbstractSerializedEntityProperty>();
+	}
+
+	public override void ApplySerializedProperties(List<AbstractSerializedEntityProperty> properties) {
 	}
 }

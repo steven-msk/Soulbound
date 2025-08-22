@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-public interface ISerializable {
-	abstract string ID { get; }
+public interface ISerializable<T> {
+	public T Serialize();
+
+	public void Deserialize(T serialized);
 }

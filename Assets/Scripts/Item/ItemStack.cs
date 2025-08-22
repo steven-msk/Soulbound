@@ -66,13 +66,14 @@ public class ItemStack {
 			worldPrefab = Item.FallbackWorldPrefab();
 		}
 		GameObject pickupItem = worldPrefab;
-		DroppedItem pickup = pickupItem.AddComponent<DroppedItem>();
-		EntitySpawnData spawnData = new(pos) {
+		DroppedItem pickup = pickupItem.GetComponent<DroppedItem>();
+		string spriteID = worldPrefab.GetComponent<SpriteRenderer>().sprite.name;
+		GameManager.instance.Level.EntityManager.SpawnEntity(pickup, new(pos) {
 			[SpawnDataKey.Of("itemStack")] = new SpawnDataValue<ItemStack>(this),
 			[SpawnDataKey.Of("pickupDelay")] = new SpawnDataValue<float>((playerAction ? 2f : 0f)),
-			[SpawnDataKey.Of("dropForce")] = new SpawnDataValue<Vector2>(dropForce)
-		};
-		GameManager.instance.Level.EntityManager.SpawnEntity(pickup, spawnData);
+			[SpawnDataKey.Of("dropForce")] = new SpawnDataValue<Vector2>(dropForce),
+			[SpawnDataKey.Of("spriteID")] = new SpawnDataValue<string>(spriteID)
+		});
     }
 
 	// FEATUREIMPL: dropped item stacks converging to avoid lag
