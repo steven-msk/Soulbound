@@ -34,13 +34,13 @@ public class PlayerStats {
 	}
 
 	public void Apply(List<AbstractSerializableStat> stats, IStatProvider source) {
-		Invoke(stats, source, (statEntry, serializableStat, source) => statEntry.AddModifier(serializableStat, source));
+		Invoke(stats, source, (statEntry, serializableStat, source) => statEntry.Add(serializableStat, source));
 	}
 
 	public void Apply(AbstractSerializableStat stat, IStatProvider source) => Apply(new List<AbstractSerializableStat>() { stat }, source);
 
 	public void Revoke(List<AbstractSerializableStat> stats, IStatProvider source) {
-		Invoke(stats, source, (statEntry, serializableStat, source) => statEntry.RemoveModifier(serializableStat, source));
+		Invoke(stats, source, (statEntry, serializableStat, source) => statEntry.Remove(serializableStat, source));
 	}
 
 	public void Revoke(AbstractSerializableStat stat, IStatProvider source) => Revoke(new List<AbstractSerializableStat> { stat }, source);

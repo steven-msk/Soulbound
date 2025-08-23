@@ -10,4 +10,6 @@ public abstract class AbstractSerializableStat {
 	public abstract object GetBoxedValue();
 	public abstract string GetFormattedExpression();
 	public abstract bool applyAsBonus { get; }
+
+	public abstract override string ToString();
 }

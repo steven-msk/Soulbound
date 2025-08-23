@@ -124,6 +124,7 @@ public class PlayerPhysics : MonoBehaviour, IDependencyInitializable<PlayerPhysi
 			shouldJump = false;
 			animator.SetBool("onGround", false);
 			rb.linearDamping = 1f;
+			stats.JumpHeight.Add(new SerializableStat<int>(StatDefinition<int>.MaxHealth, 1, StatApplicationType.Flat, false), null);
 		}
 
 		if (jumpToFlightTimer > 0) {

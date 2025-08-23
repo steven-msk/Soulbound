@@ -60,6 +60,11 @@ public class Logger {
 		this.LogMessage(module, UnityEngine.Debug.LogError, FormatPlaceholders(compoundMessage, compoundPlaceholder, args));
 	}
 
+	public void ThrowException(LogModule? module, Exception exception) {
+		this.LogMessage(module, UnityEngine.Debug.LogError, FormatPlaceholders("Exception thrown! {}", compoundPlaceholder, exception));
+		throw exception;
+	}
+
 	private string FormatPlaceholders(string template, string placeholder, params object[] args) {
 		if (string.IsNullOrEmpty(template) || args == null || args.Length == 0) {
 			return template;

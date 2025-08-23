@@ -185,4 +185,8 @@ public class StatDefinition<TValue> : IStatDefinitionImpl where TValue : struct,
 		}
 		return formattedValue;
 	}
+
+	public override string ToString() {
+		return $"StatDefinition[type: {valueType}, baseName: {baseName}]";
+	}
 }

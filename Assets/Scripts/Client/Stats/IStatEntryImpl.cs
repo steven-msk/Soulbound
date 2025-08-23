@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 public interface IStatEntryImpl {
-	void AddModifier(AbstractSerializableStat serializableStat, IStatProvider source);
+	void Add(AbstractSerializableStat serializableStat, IStatProvider source);
 
-	void RemoveModifier(AbstractSerializableStat serializableStat, IStatProvider source);
+	void Remove(AbstractSerializableStat serializableStat, IStatProvider source);
 
 	object GetBoxedValue();
 
