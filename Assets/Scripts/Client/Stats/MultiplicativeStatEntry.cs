@@ -6,13 +6,15 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using UnityEngine;
 
-public class MultiplicativeStatEntry<TProcessor, TValue> : AbstractStatEntry<TValue> where TProcessor : IMultiplicativeStatProcessor<TValue>, new() {
+public class MultiplicativeStatEntry<TValue> : AbstractStatEntry<TValue> where TValue : struct, IComparable<TValue> {
 	private readonly List<(TValue value, IStatProvider source)> flatBonuses = new();
 	private readonly List<(float value, IStatProvider source)> percentageBonuses = new();
-	private readonly TProcessor processor = new();
+	private readonly IMultiplicativeStatProcessor<TValue> processor;
 
-	public MultiplicativeStatEntry(TValue baseValue, StatDefinition<TValue> typeReference, Action<StatDefinition<TValue>, AbstractStatEntry<TValue>> onInstantiateAction = null) 
+	public MultiplicativeStatEntry(TValue baseValue, StatDefinition<TValue> typeReference, IMultiplicativeStatProcessor<TValue> processor,
+			Action<StatDefinition<TValue>, AbstractStatEntry<TValue>> onInstantiateAction = null) 
 		: base(baseValue, typeReference, onInstantiateAction) {
+		this.processor = processor;
 	}
 
 	public void AddFlatBonus(TValue value, IStatProvider source) => flatBonuses.Add((value, source));

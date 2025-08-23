@@ -5,11 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class SimpleStatEntry<TProcessor, TValue> : AbstractStatEntry<TValue> where TProcessor : IStatProcessor<TValue>, new() {
+public class SimpleStatEntry<TValue> : AbstractStatEntry<TValue> where TValue : struct, IComparable<TValue> {
 	private readonly List<(TValue value, IStatProvider source)> bonuses = new();
-	private readonly TProcessor processor = new();
+	private readonly IStatProcessor<TValue> processor;
 
-	public SimpleStatEntry(TValue baseValue, StatDefinition<TValue> typeReference, Action<StatDefinition<TValue>, AbstractStatEntry<TValue>> onInstantiateAction = null) 
+	public SimpleStatEntry(TValue baseValue, StatDefinition<TValue> typeReference, IStatProcessor<TValue> processor,
+			Action<StatDefinition<TValue>, AbstractStatEntry<TValue>> onInstantiateAction = null) 
 		: base(baseValue, typeReference, onInstantiateAction) {
 	}
 
