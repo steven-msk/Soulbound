@@ -70,18 +70,18 @@ public class Tooltip : AbstractTooltip {
 		return new Tooltip(textBuilder.ToString(), layout ?? TooltipSection.Stats.GetDefaultLayout());
 	}
 
-	public static Tooltip Stats(IEnumerable<SerializableStat> stats, TooltipSectionLayout layout = null) {
-		return Tooltip.Stats(new Dictionary<IStatTypeImpl, (object, bool)>(stats.OrderBy(stat => stat.SerializedReference).Select(stat => {
-			return new KeyValuePair<IStatTypeImpl, (object, bool)>(stat.SerializedReference.ToStatType(), (stat.GetValue(), stat.ApplyAsBonus));
+	public static Tooltip Stats(IEnumerable<AbstractSerializableStat> stats, TooltipSectionLayout layout = null) {
+		return Tooltip.Stats(new Dictionary<IStatTypeImpl, (object, bool)>(stats.OrderBy(stat => stat.GetStatType()).Select(stat => {
+			return new KeyValuePair<IStatTypeImpl, (object, bool)>(stat.GetStatType(), (stat.GetBoxedValue(), stat.applyAsBonus));
 		})), layout);
 	}
 
 	// FUTURE TODO: implement CompoundStats custom header layout
-	public static CompoundTooltip CompoundStats(Dictionary<string, IEnumerable<SerializableStat>> statSections, CompoundTooltipLayout compoundLayout = default) {
+	public static CompoundTooltip CompoundStats(Dictionary<string, IEnumerable<AbstractSerializableStat>> statSections, CompoundTooltipLayout compoundLayout = default) {
 		List<TooltipData> data = new(); 
 		TooltipSectionLayout commonLayout = TooltipSection.Stats.GetDefaultLayout();
 
-		foreach ((string header, IEnumerable<SerializableStat> stats) in statSections) {
+		foreach ((string header, IEnumerable<AbstractSerializableStat> stats) in statSections) {
 			List<string> texts = new() { header };
 			stats.Select(stat => stat.GetFormattedExpression()).ToList().ForEach(texts.Add);
 			data.Add(new TooltipData(commonLayout, string.Join("\n", texts)));
@@ -89,11 +89,11 @@ public class Tooltip : AbstractTooltip {
 		return CompoundTooltip.OfCustom(compoundLayout, data.ToArray());
 	}
 
-	public static CompoundTooltip CompoundStats(string header, IEnumerable<SerializableStat> stats, CompoundTooltipLayout compoundLayout = default) {
-		return Tooltip.CompoundStats(new Dictionary<string, IEnumerable<SerializableStat>>() { [header] = stats }, compoundLayout);
+	public static CompoundTooltip CompoundStats(string header, IEnumerable<AbstractSerializableStat> stats, CompoundTooltipLayout compoundLayout = default) {
+		return Tooltip.CompoundStats(new Dictionary<string, IEnumerable<AbstractSerializableStat>>() { [header] = stats }, compoundLayout);
 	}
 
-	[CanBeNull] public static Tooltip InterpolatedStats(string source, params SerializableStat[] interpolatedStats) {
+	[CanBeNull] public static Tooltip InterpolatedStats(string source, params AbstractSerializableStat[] interpolatedStats) {
 		if (string.IsNullOrEmpty(source) || interpolatedStats.Count() == 0) {
 			return null;
 		}
@@ -105,11 +105,12 @@ public class Tooltip : AbstractTooltip {
 		}
 	}
 
-	public static Tooltip InterpolatedStats(string source, IEnumerable<SerializableStat> interpolatedStats) => InterpolatedStats(source, interpolatedStats.ToArray());
+	public static Tooltip InterpolatedStats(string source, IEnumerable<AbstractSerializableStat> interpolatedStats) => InterpolatedStats(source, interpolatedStats.ToArray());
 
-	public static CompoundTooltip InterpolatedStats(string instantSource, IEnumerable<SerializableStat> interpolatedInstantStats,
-			string bufferedSource, IEnumerable<BufferedStat> interpolatedBufferedStats) {
-		return CompoundTooltip.OfNullable(Tooltip.InterpolatedStats(instantSource, interpolatedInstantStats), Tooltip.InterpolatedStats(bufferedSource, interpolatedBufferedStats));
+	public static CompoundTooltip InterpolatedStats(string instantSource, IEnumerable<AbstractSerializableStat> interpolatedInstantStats,
+			string bufferedSource, IEnumerable<IBufferedStatImpl> interpolatedBufferedStats) {
+		return CompoundTooltip.OfNullable(Tooltip.InterpolatedStats(instantSource, interpolatedInstantStats), 
+			Tooltip.InterpolatedStats(bufferedSource, interpolatedBufferedStats.Cast<AbstractSerializableStat>()));
 	}
 
 	//public static CompoundTooltip DefaultItem(Item item) {

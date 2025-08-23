@@ -9,11 +9,11 @@ public interface IBufferedTrigger {
 
 	public Func<bool> InvocationValidator { get; }
 
-	public void Enable(BufferedStat stat, IStatProvider source);
+	public void Enable(IBufferedStatImpl stat, IStatProvider source);
 
-	public void Disable(BufferedStat stat, IStatProvider source);
+	public void Disable(IBufferedStatImpl stat, IStatProvider source);
 
-	public void Invoke(BufferedStat stat, Action action);
+	public void Invoke(IBufferedStatImpl stat, Action action);
 
-	public bool ValidateExecution(BufferedStat stat, IStatProvider source, bool log);
+	public bool ValidateExecution(IBufferedStatImpl stat, IStatProvider source, bool log);
 }

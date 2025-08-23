@@ -7,8 +7,8 @@ using UnityEngine;
 
 public interface IStatProvider : IItemCapability {
 	public bool applyInstantStatsAutomatically { get; }
-	public List<SerializableStat> instantStats { get; }
-	public List<BufferedStat> bufferedStats { get; }
+	public List<AbstractSerializableStat> instantStats { get; }
+	public List<IBufferedStatImpl> bufferedStats { get; }
 
 	// FEATUREIMPL (WIP): buffered stats - NOT TESTED
 

@@ -12,7 +12,7 @@ public abstract class AbstractStatEntry<TValue> : IStatEntry {
 
 	public abstract object Abstract_GetProcessedValue();
 
-	public abstract void ApplyToSerialized(SerializableStat serializableStat, IStatProvider source);
+	public abstract void ApplyToSerialized(AbstractSerializableStat serializableStat, IStatProvider source);
 
-	public abstract void RevokeToSerialized(SerializableStat serializableStat, IStatProvider source);
+	public abstract void RevokeToSerialized(AbstractSerializableStat serializableStat, IStatProvider source);
 }

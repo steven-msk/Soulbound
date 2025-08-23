@@ -7,16 +7,13 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UIElements;
 
-[Serializable]
-public class BufferedStat : SerializableStat {
-	[SerializeReference] private IBufferedTrigger applyBufferedTrigger;
-	public IBufferedTrigger ApplyBufferedTrigger => applyBufferedTrigger;
-	[SerializeReference] private IBufferedTrigger revokeBufferedTrigger;
-	public IBufferedTrigger RevokeBufferedTrigger => revokeBufferedTrigger;
+public class BufferedStat<TValue> : SerializableStat<TValue>, IBufferedStatImpl where TValue : struct, IComparable<TValue> {
+	public IBufferedTrigger applyBufferedTrigger;
+	public IBufferedTrigger revokeBufferedTrigger;
 
-	public BufferedStat(SerializedStatReference serializedReference, StatValueType valueType, StatApplicationType appliance, object value, bool applyAsBonus,
+	public BufferedStat(StatType<TValue> statType, TValue value, StatApplicationType appliance, bool applyAsBonus,
 						IBufferedTrigger applyBufferedTrigger, IBufferedTrigger revokeBufferedTrigger)
-			: base(serializedReference, valueType, appliance, value, applyAsBonus) {
+			: base(statType, value, appliance, applyAsBonus) {
 		this.applyBufferedTrigger = applyBufferedTrigger;
 		this.revokeBufferedTrigger = revokeBufferedTrigger;
 	}

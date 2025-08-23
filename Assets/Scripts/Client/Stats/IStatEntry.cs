@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 public interface IStatEntry {
-	void ApplyToSerialized(SerializableStat serializableStat, IStatProvider source);
+	void ApplyToSerialized(AbstractSerializableStat serializableStat, IStatProvider source);
 
-	void RevokeToSerialized(SerializableStat serializableStat, IStatProvider source);
+	void RevokeToSerialized(AbstractSerializableStat serializableStat, IStatProvider source);
 
 
 	internal class UnsupportedSerializableStatTypeException : NullReferenceException {

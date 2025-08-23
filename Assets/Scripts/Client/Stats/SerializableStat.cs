@@ -11,73 +11,25 @@ using UnityEngine.SearchService;
 
 #nullable enable
 
-[Serializable]
-public class SerializableStat {
-	[SerializeField] protected SerializedStatReference serializedReference;
-	public SerializedStatReference SerializedReference => serializedReference;
+public class SerializableStat<TValue> : AbstractSerializableStat where TValue : struct, IComparable<TValue> {
+	public StatType<TValue> statType;
+	public TValue value;
+	public StatApplicationType applicationType;
+	public override bool applyAsBonus { get; }
 
-	[SerializeField] protected StatValueType valueType;
-	public StatValueType ValueType => valueType;
-
-	[SerializeField] protected StatApplicationType applicationType;
-	public StatApplicationType ApplicationType => applicationType;
-
-	[SerializeField] protected string value;
-	public string RawValue => value;
-
-	[SerializeField] protected bool applyAsBonus;
-	public bool ApplyAsBonus => applyAsBonus;
-
-	public SerializableStat(SerializedStatReference serializedReference, StatValueType valueType, StatApplicationType appliance, object value, bool applyAsBonus) {
-		this.serializedReference = serializedReference;
-		this.valueType = valueType;
+	public SerializableStat(StatType<TValue> statType, TValue value, StatApplicationType appliance, bool applyAsBonus) {
+		this.statType = statType;
+		this.value = value;
 		this.applicationType = appliance;
-		this.value = value.ToString();
 		this.applyAsBonus = applyAsBonus;
 	}
 
-	public object? GetValue() {
-		return valueType switch {
-			StatValueType.Int => TryGetValue(value => Convert.ToInt32(value)),
-			StatValueType.Float => TryGetValue(value => Convert.ToSingle(value)),
-			_ => null
-		};
-	}
+	public override StatApplicationType GetApplicationType() => applicationType;
 
-	private object? TryGetValue(Func<string, object> action) {
-		try {
-			return action.Invoke(value);
-		} catch (FormatException) {
-			UnityEngine.Debug.LogError($"Invalid stat value {value} for type {valueType.ToInternalType()}. Did you type the wrong format?");
-			return null;
-		}
-	}
+	public override object GetBoxedValue() => value;
 
-	public TValue? GetValue<TValue>() => (TValue?)GetValue();
+	public override string GetFormattedExpression() => (statType as IStatTypeImpl).GetFormattedExpression(value, applyAsBonus);
 
-	public string GetFormattedExpression() => serializedReference.ToStatType().GetFormattedExpression(this.GetValue(), applyAsBonus);
-
-	[Serializable]
-	public enum StatValueType {
-		Int,
-		Float
-	}
-	
-	[Serializable]
-	public enum StatApplicationType {
-		Flat,
-		Percentage
-	}
+	public override IStatTypeImpl GetStatType() => statType;
 }
-
-public static class ValueTypeIdentification {
-	public static Type ToInternalType(this SerializableStat.StatValueType valueType) {
-		return valueType switch {
-			SerializableStat.StatValueType.Int => typeof(int),
-			SerializableStat.StatValueType.Float => typeof(float),
-			_ => typeof(Null)
-		};
-	}
-}
-
 

@@ -15,7 +15,7 @@ public class ConsumableStatItem : StatItemDefinition, IConsumable {
     public int consumeAmount { get; }
 
     public ConsumableStatItem(string name, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize, Func<Item, AbstractTooltip> tooltipSupplier, 
-            List<SerializableStat> instantStats, List<BufferedStat> bufferedStats, string interpolationSource,
+            List<AbstractSerializableStat> instantStats, List<IBufferedStatImpl> bufferedStats, string interpolationSource,
             IConsumable.ConsumeAction consumeAction, int consumeAmount)
         : base(name, icon, worldPrefabSupplier, maxStackSize, tooltipSupplier, instantStats, bufferedStats, interpolationSource) {
         this.consumeAction = consumeAction;

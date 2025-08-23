@@ -2,6 +2,7 @@
 using UnityEngine;
 
 public class BonusAdmission<TValue> {
+	private static readonly Logger logger = Logger.CreateInstance();
 	public static BonusAdmission<TValue> None = new(_ => "");
 	public static BonusAdmission<TValue> Add;
 	public static BonusAdmission<TValue> AddAndSubtract;
@@ -23,7 +24,7 @@ public class BonusAdmission<TValue> {
 			Add = new BonusAdmission<TValue>(value => Convert.ToSingle(value) > 0f ? "+" : "");
 			AddAndSubtract = Add;
 		} else {
-			UnityEngine.Debug.LogWarning($"Unexpected BonusAdmission type {typeof(TValue)}.");
+			logger.LogWarning(null, "Unexpected BonusAdmission type {}", typeof(TValue));
 			Add = None;
 			AddAndSubtract = None;
 		}

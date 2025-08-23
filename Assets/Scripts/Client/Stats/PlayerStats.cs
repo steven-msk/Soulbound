@@ -37,21 +37,21 @@ public class PlayerStats {
 
 	static void RegisterStatInstance(IStatTypeImpl statType, IStatEntry statEntry) => registeredStats[statType] = statEntry;
 
-	public void Apply(List<SerializableStat> stats, IStatProvider source) {
+	public void Apply(List<AbstractSerializableStat> stats, IStatProvider source) {
 		Invoke(stats, source, (statEntry, serializableStat, source) => statEntry.ApplyToSerialized(serializableStat, source));
 	}
 
-	public void Apply(SerializableStat stat, IStatProvider source) => Apply(new List<SerializableStat>() { stat }, source);
+	public void Apply(AbstractSerializableStat stat, IStatProvider source) => Apply(new List<AbstractSerializableStat>() { stat }, source);
 
-	public void Revoke(List<SerializableStat> stats, IStatProvider source) {
+	public void Revoke(List<AbstractSerializableStat> stats, IStatProvider source) {
 		Invoke(stats, source, (statEntry, serializableStat, source) => statEntry.RevokeToSerialized(serializableStat, source));
 	}
 
-	public void Revoke(SerializableStat stat, IStatProvider source) => Revoke(new List<SerializableStat> { stat }, source);
+	public void Revoke(AbstractSerializableStat stat, IStatProvider source) => Revoke(new List<AbstractSerializableStat> { stat }, source);
 
-	private void Invoke(List<SerializableStat> stats, IStatProvider source, Action<IStatEntry, SerializableStat, IStatProvider> statAction) {
+	private void Invoke(List<AbstractSerializableStat> stats, IStatProvider source, Action<IStatEntry, AbstractSerializableStat, IStatProvider> statAction) {
 		stats.ForEach(stat => {
-			if (registeredStats.TryGetValue(stat.SerializedReference.ToStatType(), out var statEntry)) {
+			if (registeredStats.TryGetValue(stat.GetStatType(), out var statEntry)) {
 				statAction.Invoke(statEntry, stat, source);
 			} else {
 				throw new InvalidStatTypeReferenceBindingException(stat);
@@ -80,8 +80,8 @@ public class PlayerStats {
 	//}
 
 	private class InvalidStatTypeReferenceBindingException : NullReferenceException {
-		public InvalidStatTypeReferenceBindingException(SerializableStat stat)
-			: base ($"SerializableStat {stat.GetFormattedExpression()} does not contain a valid stat binding. Could not find stat type reference {stat.SerializedReference}") { }
+		public InvalidStatTypeReferenceBindingException(AbstractSerializableStat stat)
+			: base ($"SerializableStat {stat.GetStatType()} does not contain a valid stat binding. Could not find stat type reference {stat.GetStatType()}") { }
 	}
 }
 

@@ -17,13 +17,13 @@ public class EventTimerBufferedTrigger : IBufferedTrigger {
 
 	public Func<bool> InvocationValidator => condition.ToValidator();
 
-	public void Enable(BufferedStat stat, IStatProvider source) {
+	public void Enable(IBufferedStatImpl stat, IStatProvider source) {
 		InvocationHelper.If(ValidateExecution(stat, source, false), () => {
 			EventBus<GameEvent>.Subscribe(GameEvent.FromID(eventID), this.CoroutineInvoker(stat, source));
 		});
 	}
 
-	public void Disable(BufferedStat stat, IStatProvider source) {
+	public void Disable(IBufferedStatImpl stat, IStatProvider source) {
 		InvocationHelper.If(ValidateExecution(stat, source, false), () => {
 			EventBus<GameEvent>.Unsubscribe(GameEvent.FromID(eventID), this.CoroutineInvoker(stat, source));
 			if (currentCoroutine != null) {
@@ -33,29 +33,29 @@ public class EventTimerBufferedTrigger : IBufferedTrigger {
 		});
 	}
 
-	public void Invoke(BufferedStat stat, Action action) => InvocationHelper.If(InvocationValidator.Invoke(), action);
+	public void Invoke(IBufferedStatImpl stat, Action action) => InvocationHelper.If(InvocationValidator.Invoke(), action);
 
 	private IEnumerator DelayedInvoke(Action invokeAction) {
 		yield return new WaitForSeconds(waitTime);
 		invokeAction.Invoke();
 	}
 
-	private Action CoroutineInvoker(BufferedStat stat, IStatProvider source) {
+	private Action CoroutineInvoker(IBufferedStatImpl stat, IStatProvider source) {
 		return () => currentCoroutine = CoroutineRunner.instance.StartCoroutine(this.DelayedInvoke(State.GetInvokeAction(this, stat, source)));
 	}
 
-	public bool ValidateExecution(BufferedStat stat, IStatProvider source, bool log) {
+	public bool ValidateExecution(IBufferedStatImpl stat, IStatProvider source, bool log) {
 		bool valid = true;
 		InvocationHelper.If(log && waitTime == 0, () => {
-			UnityEngine.Debug.LogWarning($"WaitTime field of EventTimerBufferedTrigger in {stat.SerializedReference} @ {source} is set to 0. " +
+			UnityEngine.Debug.LogWarning($"WaitTime field of EventTimerBufferedTrigger in {stat.GetStatType()} @ {source} is set to 0. " +
 				$"This might be an intentional value, but in most cases indicates a broken trigger behavior");
 		});
 		if (string.IsNullOrEmpty(eventID)) {
-			InvocationHelper.If(log, () => UnityEngine.Debug.LogError($"Null or empty eventID for EventTimerBufferedTrigger in {stat.SerializedReference} @ {source}"));
+			InvocationHelper.If(log, () => UnityEngine.Debug.LogError($"Null or empty eventID for EventTimerBufferedTrigger in {stat.GetStatType()} @ {source}"));
 			valid = false;
 		}
 		if (GameEvent.FromID(eventID) == null && valid) {
-			InvocationHelper.If(log, () => UnityEngine.Debug.LogError($"Invalid eventID: {eventID} for EventTimerBufferedTrigger in {stat.SerializedReference} @ {source}"));
+			InvocationHelper.If(log, () => UnityEngine.Debug.LogError($"Invalid eventID: {eventID} for EventTimerBufferedTrigger in {stat.GetStatType()} @ {source}"));
 			valid = false; 
 		}
 		return valid;

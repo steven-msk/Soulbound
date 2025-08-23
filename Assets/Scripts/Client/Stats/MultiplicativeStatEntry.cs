@@ -29,19 +29,19 @@ public class MultiplicativeStatEntry<TProcessor, TValue> : AbstractStatEntry<TVa
 
 	public override object Abstract_GetProcessedValue() => GetProcessedValue();
 
-	public override void ApplyToSerialized(SerializableStat serializableStat, IStatProvider source) { 
+	public override void ApplyToSerialized(AbstractSerializableStat serializableStat, IStatProvider source) { 
 		Invoke(serializableStat, source, AddFlatBonus, AddPercentageBonus);
 	}
 
-	public override void RevokeToSerialized(SerializableStat serializableStat, IStatProvider source) { 
+	public override void RevokeToSerialized(AbstractSerializableStat serializableStat, IStatProvider source) { 
 		Invoke(serializableStat, source, RemoveFlatBonus, RemovePercentageBonus);
 	}
 
-	private void Invoke(SerializableStat serializableStat, IStatProvider source, Action<TValue, IStatProvider> flatAction, Action<float, IStatProvider> percentageAction) {
-		var value = serializableStat.GetValue();
-		if (serializableStat.ApplicationType == SerializableStat.StatApplicationType.Flat && value is TValue flatValue) {
+	private void Invoke(AbstractSerializableStat serializableStat, IStatProvider source, Action<TValue, IStatProvider> flatAction, Action<float, IStatProvider> percentageAction) {
+		var value = serializableStat.GetBoxedValue();
+		if (serializableStat.GetApplicationType().Supports(StatApplicationType.Flat) && value is TValue flatValue) {
 			flatAction.Invoke(flatValue, source);
-		} else if (serializableStat.ApplicationType == SerializableStat.StatApplicationType.Percentage && value is float percentageValue) {
+		} else if (serializableStat.GetApplicationType().Supports(StatApplicationType.Percentage) && value is float percentageValue) {
 			percentageAction.Invoke(percentageValue, source);
 		} else {
 			throw new IStatEntry.UnsupportedSerializableStatTypeException(value, typeof(TValue));

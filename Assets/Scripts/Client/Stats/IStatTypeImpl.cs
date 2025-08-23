@@ -5,11 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 public interface IStatTypeImpl {
-	string BaseName { get; }
-
-	Type ValueType { get; }
-
-	HashSet<SerializableStat.StatApplicationType> ValidApplications { get; }
+	string baseName { get; }
+	Type valueType { get; }
+	StatApplicationType validApplications { get; }
 
 	string GetFormattedName(object value);
 

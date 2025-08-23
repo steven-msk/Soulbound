@@ -10,11 +10,11 @@ public enum BufferedTriggerState {
 }
 
 public static class BufferStateAction {
-	public static Action GetInvokeAction(this BufferedTriggerState state, IBufferedTrigger trigger, BufferedStat bufferedStat, IStatProvider source) {
+	public static Action GetInvokeAction(this BufferedTriggerState state, IBufferedTrigger trigger, IBufferedStatImpl bufferedStat, IStatProvider source) {
 		PlayerStats playerStats = GameManager.instance.Player.Stats;
 		return state switch {
-			BufferedTriggerState.Apply => () => trigger.Invoke(bufferedStat, () => playerStats.Apply(bufferedStat, source)),
-			BufferedTriggerState.Revoke => () => trigger.Invoke(bufferedStat, () => playerStats.Revoke(bufferedStat, source)),
+			BufferedTriggerState.Apply => () => trigger.Invoke(bufferedStat, () => playerStats.Apply(bufferedStat.Cast(), source)),
+			BufferedTriggerState.Revoke => () => trigger.Invoke(bufferedStat, () => playerStats.Revoke(bufferedStat.Cast(), source)),
 			_ => null
 		};
 	}

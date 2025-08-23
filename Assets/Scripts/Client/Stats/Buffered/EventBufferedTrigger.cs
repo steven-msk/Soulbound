@@ -13,28 +13,28 @@ public class EventBufferedTrigger : IBufferedTrigger {
 
 	public Func<bool> InvocationValidator => condition.ToValidator();
 
-	public void Enable(BufferedStat stat, IStatProvider source) {
+	public void Enable(IBufferedStatImpl stat, IStatProvider source) {
 		InvocationHelper.If(ValidateExecution(stat, source, false), () => { 
 			EventBus<GameEvent>.Subscribe(GameEvent.FromID(eventID), State.GetInvokeAction(this, stat, source));
 		});
 	}
 
-	public void Disable(BufferedStat stat, IStatProvider source) {
+	public void Disable(IBufferedStatImpl stat, IStatProvider source) {
 		InvocationHelper.If(ValidateExecution(stat, source, false), () => {
 			EventBus<GameEvent>.Unsubscribe(GameEvent.FromID(eventID), State.GetInvokeAction(this, stat, source));
 		});
 	}
 
-	public void Invoke(BufferedStat stat, Action action) => InvocationHelper.If(InvocationValidator.Invoke(), action);
+	public void Invoke(IBufferedStatImpl stat, Action action) => InvocationHelper.If(InvocationValidator.Invoke(), action);
 
-	public bool ValidateExecution(BufferedStat stat, IStatProvider source, bool log) {
+	public bool ValidateExecution(IBufferedStatImpl stat, IStatProvider source, bool log) {
 		bool valid = true;
 		if (string.IsNullOrEmpty(eventID)) {
-			InvocationHelper.If(log, () => UnityEngine.Debug.LogError($"Null or empty eventID for EventBufferedTrigger in {stat.SerializedReference} @ {source}"));
+			InvocationHelper.If(log, () => UnityEngine.Debug.LogError($"Null or empty eventID for EventBufferedTrigger in {stat.GetStatType()} @ {source}"));
 			valid = false;
 		}
 		if (GameEvent.FromID(eventID) == null && valid){
-			InvocationHelper.If(log, () => UnityEngine.Debug.LogError($"Invalid eventID: {eventID} for EventBufferedTrigger in {stat.SerializedReference} @ {source}"));
+			InvocationHelper.If(log, () => UnityEngine.Debug.LogError($"Invalid eventID: {eventID} for EventBufferedTrigger in {stat.GetStatType()} @ {source}"));
 			valid = false;
 		}
 		return valid;

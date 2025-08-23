@@ -17,9 +17,13 @@ public class SimpleStatEntry<TProcessor, TValue> : AbstractStatEntry<TValue> whe
 
 	public void RemoveBonus(TValue value, IStatProvider source) => bonuses.Remove((value, source));
 
-	public override void ApplyToSerialized(SerializableStat serializableStat, IStatProvider source) => this.AddBonus(serializableStat.GetValue<TValue>(), source);
+	public override void ApplyToSerialized(AbstractSerializableStat serializableStat, IStatProvider source) { 
+		this.AddBonus((TValue)serializableStat.GetBoxedValue(), source);
+	}
 
-	public override void RevokeToSerialized(SerializableStat serializableStat, IStatProvider source) => this.RemoveBonus(serializableStat.GetValue<TValue>(), source);
+	public override void RevokeToSerialized(AbstractSerializableStat serializableStat, IStatProvider source) { 
+		this.RemoveBonus((TValue)serializableStat.GetBoxedValue(), source); 
+	}
 
 	public TValue GetProcessedValue() => processor.ProcessFinalValue(BaseValue, bonuses.Select(bonus => bonus.value));
 
