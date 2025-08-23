@@ -5,18 +5,21 @@ using System.Text;
 using System.Threading.Tasks;
 
 public static class StatProcessors {
-	private sealed class MultiplicativeStatProcessor<TValue> : IMultiplicativeStatProcessor<TValue> where TValue : struct, IComparable<TValue> {
-		private readonly Func<TValue, TValue, TValue> flatAdder;
-		private readonly Func<TValue, float, float> productResolver;
+	private sealed class MultiplicativeStatProcessor<TValue> : IStatProcessor<TValue> where TValue : struct, IComparable<TValue> {
+		private readonly Func<TValue, TValue, TValue> adder;
+		private readonly Func<TValue, float, TValue> productResolver;
 
-		internal MultiplicativeStatProcessor(Func<TValue, TValue, TValue> flatAdder, Func<TValue, float, float> productResolver) {
-			this.flatAdder = flatAdder;
+		internal MultiplicativeStatProcessor(Func<TValue, TValue, TValue> flatAdder, Func<TValue, float, TValue> productResolver) {
+			this.adder = flatAdder;
 			this.productResolver = productResolver;
 		}
 
-		public float ProcessFinalValue(TValue baseValue, IEnumerable<TValue> flatBonuses, IEnumerable<float> percentageBonuses) {
-			TValue flatAddition = StatProcessors.Add(baseValue, flatBonuses, flatAdder);
-			float percentageAddition = 1 + percentageBonuses.Sum();
+		public TValue ProcessFinalValue(TValue baseValue, IEnumerable<SerializableStat<TValue>> modifiers) {
+			var flatModifiers = modifiers.Where(m => m.applicationType == StatApplicationType.Flat);
+			var percentageModifiers = modifiers.Where(m => m.applicationType == StatApplicationType.Percentage)
+				.Cast<SerializableStat<float>>();		// Safe cast because percentage stats are always floats
+			TValue flatAddition = StatProcessors.Add(baseValue, flatModifiers.Select(m => m.value), adder);
+			float percentageAddition = 1 + percentageModifiers.Sum(m => m.value);
 			return productResolver.Invoke(flatAddition, percentageAddition);
 		}
 	}
@@ -28,14 +31,14 @@ public static class StatProcessors {
 			this.adder = adder;
 		}
 
-		public TValue ProcessFinalValue(TValue baseValue, IEnumerable<TValue> flatBonuses) { 
-			return StatProcessors.Add(baseValue, flatBonuses, adder); 
+		public TValue ProcessFinalValue(TValue baseValue, IEnumerable<SerializableStat<TValue>> modifiers) { 
+			return StatProcessors.Add(baseValue, modifiers.Select(m => m.value), adder); 
 		}
 	}
 
 	private sealed class PercentageStatProcessor : IStatProcessor<float> {
-		public float ProcessFinalValue(float baseValue, IEnumerable<float> percentageBonuses) {
-			return baseValue * (1 + percentageBonuses.Sum());
+		public float ProcessFinalValue(float baseValue, IEnumerable<SerializableStat<float>> modifiers) {
+			return baseValue * (1 + modifiers.Sum(m => m.value));
 		}
 	}
 
@@ -51,21 +54,29 @@ public static class StatProcessors {
 
 	public static IStatProcessor<float> FlatFloat() => new FlatStatProcessor<float>((a, b) => a + b);
 
-	public static IStatProcessor<float> Percentage() => new PercentageStatProcessor();
-
-	public static IMultiplicativeStatProcessor<int> MultiplicativeInt() {
-		return new MultiplicativeStatProcessor<int>((a, b) => a + b, (a, b) => a * b);
+	public static IStatProcessor<TValue> Flat<TValue>() where TValue : struct, IComparable<TValue> {
+		return default(TValue) switch {
+			int => (IStatProcessor<TValue>)FlatInt(),
+			float => (IStatProcessor<TValue>)FlatFloat(),
+			_ => throw new NotSupportedException($"Unsuppoted flat stat processor type {typeof(TValue)}")
+		};
 	}
 
-	public static IMultiplicativeStatProcessor<float> MultiplicativeFloat() {
+	public static IStatProcessor<float> Percentage() => new PercentageStatProcessor();
+
+	public static IStatProcessor<int> MultiplicativeInt() {
+		return new MultiplicativeStatProcessor<int>((a, b) => a + b, (a, b) => (int)(a * b));
+	}
+
+	public static IStatProcessor<float> MultiplicativeFloat() {
 		return new MultiplicativeStatProcessor<float>((a, b) => a + b, (a, b) => a * b);
 	}
 
-	public static IMultiplicativeStatProcessor<TValue> Multiplicative<TValue>() where TValue : struct, IComparable<TValue> {
+	public static IStatProcessor<TValue> Multiplicative<TValue>() where TValue : struct, IComparable<TValue> {
 		return default(TValue) switch {
-			int => (IMultiplicativeStatProcessor<TValue>)MultiplicativeInt(),
-			float => (IMultiplicativeStatProcessor<TValue>)MultiplicativeFloat(),
-			_ => throw new NotSupportedException($"Unsuppoted stat value type {typeof(TValue)}")
+			int => (IStatProcessor<TValue>)MultiplicativeInt(),
+			float => (IStatProcessor<TValue>)MultiplicativeFloat(),
+			_ => throw new NotSupportedException($"Unsuppoted multiplicative stat processor type {typeof(TValue)}")
 		};
 	}
 }

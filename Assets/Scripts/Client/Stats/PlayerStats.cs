@@ -1,55 +1,51 @@
 ﻿using System;
 using System.Collections.Generic;
-using Unity.Mathematics;
-using Unity.VisualScripting;
-using Unity.VisualScripting.Antlr3.Runtime.Misc;
-using UnityEditor;
-using UnityEngine;
-using UnityEngine.UIElements;
-using UnityEngineInternal;
 
 public class PlayerStats {
-	private static readonly Dictionary<IStatDefinitionImpl, IStatEntry> registeredStats = new();
+	private static readonly Dictionary<IStatDefinitionImpl, IStatEntryImpl> registeredStats = new();
 
 	// REMINDER: current stat default values are subject to change
-	public SimpleStatEntry<int> MaxHealth { get; } = new(200, StatDefinition<int>.MaxHealth, StatProcessors.FlatInt(), RegisterStatInstance);
-	public SimpleStatEntry<int> MaxMana { get; } = new(50, StatDefinition<int>.MaxMana, StatProcessors.FlatInt(), RegisterStatInstance);
-	public SimpleStatEntry<int> Defense { get; } = new(0, StatDefinition<int>.Defense, StatProcessors.FlatInt(), RegisterStatInstance);
-	public SimpleStatEntry<int> SoulSlots { get; } = new(2, StatDefinition<int>.SoulSlots, StatProcessors.FlatInt(), RegisterStatInstance);
-	public SimpleStatEntry<float> MovementSpeed { get; } = new(8f, StatDefinition<float>.MovementSpeed, StatProcessors.Percentage(), RegisterStatInstance);
-	public SimpleStatEntry<int> JumpHeight { get; } = new(1, StatDefinition<int>.JumpHeight, StatProcessors.FlatInt(), RegisterStatInstance);
+	public StatEntry<int> MaxHealth { get; } = InjectStatEntry<int>(new(200, StatDefinition<int>.MaxHealth));
+	public StatEntry<int> MaxMana { get; } = InjectStatEntry<int>(new(50, StatDefinition<int>.MaxMana));
+	public StatEntry<int> Defense { get; } = InjectStatEntry<int>(new(0, StatDefinition<int>.Defense));
+	public StatEntry<int> SoulSlots { get; } = InjectStatEntry<int>(new(2, StatDefinition<int>.SoulSlots));
+	public StatEntry<float> MovementSpeed { get; } = InjectStatEntry<float>(new(8f, StatDefinition<float>.MovementSpeed));
+	public StatEntry<int> JumpHeight { get; } = InjectStatEntry<int>(new(1, StatDefinition<int>.JumpHeight));
 	public int MaxJumps { get; set; } = 1;
-	public SimpleStatEntry<float> DashVelocity { get; } = new(1f, StatDefinition<float>.DashVelocity, StatProcessors.Percentage(), RegisterStatInstance);
-	public SimpleStatEntry<float> DashCooldown { get; } = new(2f, StatDefinition<float>.DashCooldown, StatProcessors.Percentage(), RegisterStatInstance);
-	public MultiplicativeStatEntry<float> HealthRegen { get; } = new(1.5f, StatDefinition<float>.HealthRegen, StatProcessors.Multiplicative<float>(), RegisterStatInstance);
-	public MultiplicativeStatEntry<float> ManaRegen { get; } = new(2f, StatDefinition<float>.ManaRegen, StatProcessors.Multiplicative<float>(), RegisterStatInstance);
-	public MultiplicativeStatEntry<int> RawPhysicalDamage { get; } = new(10, StatDefinition<int>.PhysicalDamage, StatProcessors.Multiplicative<int>(), RegisterStatInstance);
-	public MultiplicativeStatEntry<int> RawRitualDamage { get; } = new(10, StatDefinition<int>.RitualDamage, StatProcessors.Multiplicative<int>(), RegisterStatInstance);
-	public SimpleStatEntry<float> AttackSpeed { get; } = new(1f, StatDefinition<float>.AttackSpeed, StatProcessors.Percentage(), RegisterStatInstance);
-	public SimpleStatEntry<float> CritChance { get; } = new(0.05f, StatDefinition<float>.CritChance, StatProcessors.Percentage(), RegisterStatInstance);
-	public SimpleStatEntry<float> CritMultiplier { get; } = new(1.5f, StatDefinition<float>.CritMultiplier, StatProcessors.FlatFloat(), RegisterStatInstance);
-	public SimpleStatEntry<float> Luck { get; } = new(0f, StatDefinition<float>.Luck, StatProcessors.Percentage(), RegisterStatInstance);
-	public SimpleStatEntry<float> LootBonus { get; } = new(0f, StatDefinition<float>.LootBonus, StatProcessors.Percentage(), RegisterStatInstance);
+	public StatEntry<float> DashVelocity { get; } = InjectStatEntry<float>(new(1f, StatDefinition<float>.DashVelocity));
+	public StatEntry<float> DashCooldown { get; } = InjectStatEntry<float>(new(2f, StatDefinition<float>.DashCooldown));
+	public StatEntry<float> HealthRegen { get; } = InjectStatEntry<float>(new(1.5f, StatDefinition<float>.HealthRegen));
+	public StatEntry<float> ManaRegen { get; } = InjectStatEntry<float>(new(2f, StatDefinition<float>.ManaRegen));
+	public StatEntry<int> RawPhysicalDamage { get; } = InjectStatEntry<int>(new(10, StatDefinition<int>.PhysicalDamage));
+	public StatEntry<int> RawRitualDamage { get; } = InjectStatEntry<int>(new(10, StatDefinition<int>.RitualDamage));
+	public StatEntry<float> AttackSpeed { get; } = InjectStatEntry<float>(new(1f, StatDefinition<float>.AttackSpeed));
+	public StatEntry<float> CritChance { get; } = InjectStatEntry<float>(new(0.05f, StatDefinition<float>.CritChance));
+	public StatEntry<float> CritMultiplier { get; } = InjectStatEntry<float>(new(1.5f, StatDefinition<float>.CritMultiplier));
+	public StatEntry<float> Luck { get; } = InjectStatEntry<float>(new(0f, StatDefinition<float>.Luck));
+	public StatEntry<float> LootBonus { get; } = InjectStatEntry<float>(new(0f, StatDefinition<float>.LootBonus));
 	public float HorizontalAcceleration { get; set; } = 1f;
 	public float HorizontalFlightAcceleration { get; set; } = 3f;
 	public float VerticalFlightAcceleration { get; set; } = 2f;
 	public int GrantedFlightTime { get; set; } = 0;
 
-	static void RegisterStatInstance(IStatDefinitionImpl statType, IStatEntry statEntry) => registeredStats[statType] = statEntry;
+	static StatEntry<TValue> InjectStatEntry<TValue>(StatEntry<TValue> statEntry) where TValue : struct, IComparable<TValue> {
+		registeredStats[statEntry.definitionReference] = statEntry;
+		return statEntry;
+	}
 
 	public void Apply(List<AbstractSerializableStat> stats, IStatProvider source) {
-		Invoke(stats, source, (statEntry, serializableStat, source) => statEntry.ApplyToSerialized(serializableStat, source));
+		Invoke(stats, source, (statEntry, serializableStat, source) => statEntry.AddModifier(serializableStat, source));
 	}
 
 	public void Apply(AbstractSerializableStat stat, IStatProvider source) => Apply(new List<AbstractSerializableStat>() { stat }, source);
 
 	public void Revoke(List<AbstractSerializableStat> stats, IStatProvider source) {
-		Invoke(stats, source, (statEntry, serializableStat, source) => statEntry.RevokeToSerialized(serializableStat, source));
+		Invoke(stats, source, (statEntry, serializableStat, source) => statEntry.RemoveModifier(serializableStat, source));
 	}
 
 	public void Revoke(AbstractSerializableStat stat, IStatProvider source) => Revoke(new List<AbstractSerializableStat> { stat }, source);
 
-	private void Invoke(List<AbstractSerializableStat> stats, IStatProvider source, Action<IStatEntry, AbstractSerializableStat, IStatProvider> statAction) {
+	private void Invoke(List<AbstractSerializableStat> stats, IStatProvider source, Action<IStatEntryImpl, AbstractSerializableStat, IStatProvider> statAction) {
 		stats.ForEach(stat => {
 			if (registeredStats.TryGetValue(stat.GetStatDefinition(), out var statEntry)) {
 				statAction.Invoke(statEntry, stat, source);

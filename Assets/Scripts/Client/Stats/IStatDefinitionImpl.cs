@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 public interface IStatDefinitionImpl {
 	string baseName { get; }
 	Type valueType { get; }
-	StatApplicationType validApplications { get; }
+	SupportedApplicationType supportedApplications { get; }
 
 	string GetFormattedName(object value);
 
@@ -15,5 +15,9 @@ public interface IStatDefinitionImpl {
 
 	virtual string GetFormattedExpression(object value, bool applyAsBonus = false) {
 		return $"{this.GetFormattedValue(value, applyAsBonus)} {this.GetFormattedName(value)}";
+	}
+
+	public bool SupportsApplication(StatApplicationType applicationType) {
+		return supportedApplications.HasFlag(applicationType);
 	}
 }

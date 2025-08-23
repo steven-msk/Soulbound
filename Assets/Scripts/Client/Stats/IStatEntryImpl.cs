@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-public interface IStatEntry {
-	void ApplyToSerialized(AbstractSerializableStat serializableStat, IStatProvider source);
+public interface IStatEntryImpl {
+	void AddModifier(AbstractSerializableStat serializableStat, IStatProvider source);
 
-	void RevokeToSerialized(AbstractSerializableStat serializableStat, IStatProvider source);
+	void RemoveModifier(AbstractSerializableStat serializableStat, IStatProvider source);
+
+	object GetBoxedValue();
 
 
 	internal class UnsupportedSerializableStatTypeException : NullReferenceException {
