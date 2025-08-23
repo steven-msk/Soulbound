@@ -61,4 +61,17 @@ public abstract class LivingEntity : Entity {
 	public abstract void OnDeath();
 
 	public abstract void OnDamageTaken(float damage);
+
+	public override SerializedEntityPropertyList GetSerializedProperties() {
+		return new SerializedEntityPropertyList()
+			.Add("maxHealth", maxHealth)
+			.Add("currentHealth", currentHealth)
+			.Add("immunityTimer", immunityTimer);
+	}
+
+	public override void ApplySerializedProperties(SerializedEntityPropertyList properties) {
+		this.maxHealth = properties.Get<float>("maxHealth");
+		this.currentHealth = properties.Get<float>("currentHealth");
+		this.immunityTimer = properties.Get<float>("immunityTimer");
+	}
 }

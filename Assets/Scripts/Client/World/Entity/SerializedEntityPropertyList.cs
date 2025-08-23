@@ -17,8 +17,12 @@ public sealed class SerializedEntityPropertyList : List<AbstractSerializedEntity
 
 	public static SerializedEntityPropertyList Empty() => new();
 
-	public TValue Get<TValue>(string key) {
-		return this.FirstOrDefault(prop => prop.GetKey() == key).GetValue<TValue>();
+	public TValue Get<TValue>(string key, TValue defalultValue = default) {
+		var property = this.FirstOrDefault(property => property.GetKey() == key);
+		if (property == default) {
+			return defalultValue;
+		}
+		return property.GetValue<TValue>();
 	}
 
 	public SerializedEntityPropertyList Add<TValue>(string key, TValue value) {

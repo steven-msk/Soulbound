@@ -24,9 +24,10 @@ public class DroppedItem : Entity {
 	[EntitySpawnPropertyCandidates("itemStack", "pickupDelay", "dropForce", "spriteID")]
 	public override void Spawn(EntitySpawnData spawnData) {
 		base.Spawn(spawnData);
+		InvocationHelper.If(!spawnData.Contains("spriteID"), 
+			() => logger.LogError(null, "Could not find spriteID for dropped item with id {}", this.id));
 		this.spriteID = spawnData.Get<string>("spriteID", null);
 		GetComponent<SpriteRenderer>().sprite = spriteID != null ? ResourceManager.Get<Sprite, ResourceGroups.Items.Icons>(spriteID) : null;
-		InvocationHelper.If(spriteID == null, () => logger.LogError(null, "Could not find spriteID for dropped item with id {}", this.id));
 		this.ItemStack = spawnData.Get<ItemStack>("itemStack");
 		this.pickupDelay = spawnData.Get<float>("pickupDelay");
 		Rigidbody2D rigidbody = gameObject.AddComponent<Rigidbody2D>();
@@ -36,7 +37,9 @@ public class DroppedItem : Entity {
 		pickupHitbox.callbackLayers = LayerMask.GetMask("Player");
 		gameObject.AddComponent<BoxCollider2D>().excludeLayers = ~LayerMask.GetMask("Ground");
 		Vector2 dropForce = spawnData.Get<Vector2>("dropForce", Vector2.zero);
-		Vector2 force = new Vector2(spawnData.Exists("dropForce") ? UnityEngine.Random.Range(1f, 1.5f) : 0f, UnityEngine.Random.Range(1f, 1.5f)) * dropForce;
+		float xForce = UnityEngine.Random.Range(1f, 1.5f);
+		float yForce = UnityEngine.Random.Range(1f, 1.5f);
+		Vector2 force = new Vector2(spawnData.Contains("dropForce") ? xForce : 0f, yForce) * dropForce;
 		rigidbody.AddForce(force, ForceMode2D.Impulse);
 		OnEnable();
 	}

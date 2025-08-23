@@ -18,7 +18,6 @@ public class EntitySpawnData : Dictionary<SpawnDataKey, SpawnDataValue> {
 		if (this.TryGetValue(key, out var value) && value is SpawnDataValue<TValue> typedValue) {
 			return typedValue.value;
 		}
-		logger.LogWarning(null, "Missing entity spawn data value for '{}' of type {}", key.name, typeof(TValue));
 		return defaultValue;
 	}
 
@@ -26,9 +25,9 @@ public class EntitySpawnData : Dictionary<SpawnDataKey, SpawnDataValue> {
 		return Get<TValue>(new SpawnDataKey(keyName), defaultValue);
 	}
 
-	public bool Exists(SpawnDataKey key) => this.ContainsKey(key);
+	public bool Contains(SpawnDataKey key) => this.ContainsKey(key);
 
-	public bool Exists(string keyName) => this.ContainsKey(new SpawnDataKey(keyName));
+	public bool Contains(string keyName) => this.ContainsKey(new SpawnDataKey(keyName));
 
 	public SpawnDataValue<TValue> GetWrapped<TValue>(SpawnDataKey key, SpawnDataValue<TValue> defaultWrapped = default) {
 		if (this.TryGetValue(key, out var wrappedValue) && wrappedValue is SpawnDataValue<TValue> typedValue) {

@@ -4,15 +4,17 @@ using System.Linq;
 using System;
 using Object = UnityEngine.Object;
 
+
 [CreateAssetMenu(menuName = "Resource Group")]
 public class ResourceGroup : ScriptableObject {
 	private static readonly Logger logger = Logger.CreateInstance();
-	public string groupAddress;
+	public string groupAddress = "";
 	public string searchFolder = "Assets/Resources/";
-	[SerializeField] private string assetType;
-	public Type AssetType => string.IsNullOrEmpty(assetType) ? null : Type.GetType(assetType);
+	[SerializeField] private string assetType = "";
+	public Type AssetType => string.IsNullOrEmpty(assetType) ? null! : Type.GetType(assetType);
 	[SerializeField] private Object[] resources;
 
+#nullable enable
 
 #if UNITY_EDITOR
 	[ContextMenu("Refresh Group")]
@@ -29,8 +31,13 @@ public class ResourceGroup : ScriptableObject {
 	}
 #endif
 
-	public TAsset GetAsset<TAsset>(string name) where TAsset : UnityEngine.Object {
-		return (TAsset)resources.First(r => r.name == name);
+	public TAsset? GetAsset<TAsset>(string name) where TAsset : UnityEngine.Object {
+		TAsset? asset = resources.FirstOrDefault(resource => resource.name == name) as TAsset;
+		if (asset == default) {
+			logger.LogError(LogModules.resource, "Could not find asset '{}' of type {} in resource group '{}'", name, typeof(TAsset), groupAddress);
+			return default;
+		}
+		return asset;
 	}
 
 	static ResourceGroup() {
