@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-public interface IStatTypeImpl {
+public interface IStatDefinitionImpl {
 	string baseName { get; }
 	Type valueType { get; }
 	StatApplicationType validApplications { get; }

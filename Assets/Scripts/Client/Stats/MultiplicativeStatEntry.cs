@@ -11,7 +11,7 @@ public class MultiplicativeStatEntry<TProcessor, TValue> : AbstractStatEntry<TVa
 	private readonly List<(float value, IStatProvider source)> percentageBonuses = new();
 	private readonly TProcessor processor = new();
 
-	public MultiplicativeStatEntry(TValue baseValue, StatType<TValue> typeReference, Action<StatType<TValue>, AbstractStatEntry<TValue>> onInstantiateAction = null) 
+	public MultiplicativeStatEntry(TValue baseValue, StatDefinition<TValue> typeReference, Action<StatDefinition<TValue>, AbstractStatEntry<TValue>> onInstantiateAction = null) 
 		: base(baseValue, typeReference, onInstantiateAction) {
 	}
 

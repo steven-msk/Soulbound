@@ -12,12 +12,12 @@ using UnityEngine.SearchService;
 #nullable enable
 
 public class SerializableStat<TValue> : AbstractSerializableStat where TValue : struct, IComparable<TValue> {
-	public StatType<TValue> statType;
+	public StatDefinition<TValue> statType;
 	public TValue value;
 	public StatApplicationType applicationType;
 	public override bool applyAsBonus { get; }
 
-	public SerializableStat(StatType<TValue> statType, TValue value, StatApplicationType appliance, bool applyAsBonus) {
+	public SerializableStat(StatDefinition<TValue> statType, TValue value, StatApplicationType appliance, bool applyAsBonus) {
 		this.statType = statType;
 		this.value = value;
 		this.applicationType = appliance;
@@ -28,8 +28,8 @@ public class SerializableStat<TValue> : AbstractSerializableStat where TValue : 
 
 	public override object GetBoxedValue() => value;
 
-	public override string GetFormattedExpression() => (statType as IStatTypeImpl).GetFormattedExpression(value, applyAsBonus);
+	public override string GetFormattedExpression() => (statType as IStatDefinitionImpl).GetFormattedExpression(value, applyAsBonus);
 
-	public override IStatTypeImpl GetStatType() => statType;
+	public override IStatDefinitionImpl GetStatDefinition() => statType;
 }
 

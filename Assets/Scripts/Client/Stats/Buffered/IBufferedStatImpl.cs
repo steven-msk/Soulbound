@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 public interface IBufferedStatImpl {
-	public IStatTypeImpl GetStatType();
+	public IStatDefinitionImpl GetStatDefinition();
 	public void EnableBuffers(IStatProvider source);
 	public void DisableBuffers(IStatProvider source);
 

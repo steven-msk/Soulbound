@@ -7,30 +7,30 @@ using Unity.VisualScripting;
 using UnityEngine;
 
 public enum SerializedStatReference {
-	[StatBinding(typeof(StatType<int>), nameof(StatType<int>.MaxHealth))] MaxHealth,
-	[StatBinding(typeof(StatType<int>), nameof(StatType<int>.MaxMana))] MaxMana,
-	[StatBinding(typeof(StatType<int>), nameof(StatType<int>.Defense))] Defense,
-	[StatBinding(typeof(StatType<int>), nameof(StatType<int>.SoulSlots))] SoulSlots,
-	[StatBinding(typeof(StatType<float>), nameof(StatType<float>.MovementSpeed))] MovementSpeed,
-	[StatBinding(typeof(StatType<float>), nameof(StatType<float>.DashVelocity))] DashVelocity,
-	[StatBinding(typeof(StatType<float>), nameof(StatType<float>.DashCooldown))] DashCooldown,
-	[StatBinding(typeof(StatType<int>), nameof(StatType<int>.JumpHeight))] JumpHeight,
-	[StatBinding(typeof(StatType<int>), nameof(StatType<int>.MaxJumps))] MaxJumps,
-	[StatBinding(typeof(StatType<float>), nameof(StatType<float>.HealthRegen))] HealthRegen,
-	[StatBinding(typeof(StatType<float>), nameof(StatType<float>.ManaRegen))] ManaRegen,
-	[StatBinding(typeof(StatType<int>), nameof(StatType<int>.PhysicalDamage))] PhysicalDamage,
-	[StatBinding(typeof(StatType<int>), nameof(StatType<int>.RitualDamage))] RitualDamage,
-	[StatBinding(typeof(StatType<float>), nameof(StatType<float>.AttackSpeed))] AttackSpeed,
-	[StatBinding(typeof(StatType<float>), nameof(StatType<float>.CritChance))] CritChance,
-	[StatBinding(typeof(StatType<float>), nameof(StatType<float>.CritMultiplier))] CritMultiplier,
-	[StatBinding(typeof(StatType<float>), nameof(StatType<float>.Luck))] Luck,
-	[StatBinding(typeof(StatType<int>), nameof(StatType<float>.LootBonus))] LootBonus,
+	[StatBinding(typeof(StatDefinition<int>), nameof(StatDefinition<int>.MaxHealth))] MaxHealth,
+	[StatBinding(typeof(StatDefinition<int>), nameof(StatDefinition<int>.MaxMana))] MaxMana,
+	[StatBinding(typeof(StatDefinition<int>), nameof(StatDefinition<int>.Defense))] Defense,
+	[StatBinding(typeof(StatDefinition<int>), nameof(StatDefinition<int>.SoulSlots))] SoulSlots,
+	[StatBinding(typeof(StatDefinition<float>), nameof(StatDefinition<float>.MovementSpeed))] MovementSpeed,
+	[StatBinding(typeof(StatDefinition<float>), nameof(StatDefinition<float>.DashVelocity))] DashVelocity,
+	[StatBinding(typeof(StatDefinition<float>), nameof(StatDefinition<float>.DashCooldown))] DashCooldown,
+	[StatBinding(typeof(StatDefinition<int>), nameof(StatDefinition<int>.JumpHeight))] JumpHeight,
+	[StatBinding(typeof(StatDefinition<int>), nameof(StatDefinition<int>.MaxJumps))] MaxJumps,
+	[StatBinding(typeof(StatDefinition<float>), nameof(StatDefinition<float>.HealthRegen))] HealthRegen,
+	[StatBinding(typeof(StatDefinition<float>), nameof(StatDefinition<float>.ManaRegen))] ManaRegen,
+	[StatBinding(typeof(StatDefinition<int>), nameof(StatDefinition<int>.PhysicalDamage))] PhysicalDamage,
+	[StatBinding(typeof(StatDefinition<int>), nameof(StatDefinition<int>.RitualDamage))] RitualDamage,
+	[StatBinding(typeof(StatDefinition<float>), nameof(StatDefinition<float>.AttackSpeed))] AttackSpeed,
+	[StatBinding(typeof(StatDefinition<float>), nameof(StatDefinition<float>.CritChance))] CritChance,
+	[StatBinding(typeof(StatDefinition<float>), nameof(StatDefinition<float>.CritMultiplier))] CritMultiplier,
+	[StatBinding(typeof(StatDefinition<float>), nameof(StatDefinition<float>.Luck))] Luck,
+	[StatBinding(typeof(StatDefinition<int>), nameof(StatDefinition<float>.LootBonus))] LootBonus,
 }
 
 public static class SerializedToInternalStatExtension {
-	private static readonly Dictionary<SerializedStatReference, IStatTypeImpl> cached = new();
+	private static readonly Dictionary<SerializedStatReference, IStatDefinitionImpl> cached = new();
 
-	public static IStatTypeImpl ToStatType(this SerializedStatReference serializedReference) {
+	public static IStatDefinitionImpl ToStatType(this SerializedStatReference serializedReference) {
 		if (cached.TryGetValue(serializedReference, out var value)) {
 			return value;
 		}
@@ -42,7 +42,7 @@ public static class SerializedToInternalStatExtension {
 			return null;
 		}
 
-		value = field.GetValue(null) as IStatTypeImpl;
+		value = field.GetValue(null) as IStatDefinitionImpl;
 		cached[serializedReference] = value;
 		return value;
 	}

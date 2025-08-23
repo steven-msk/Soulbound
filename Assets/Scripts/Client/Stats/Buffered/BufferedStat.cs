@@ -11,7 +11,7 @@ public class BufferedStat<TValue> : SerializableStat<TValue>, IBufferedStatImpl 
 	public IBufferedTrigger applyBufferedTrigger;
 	public IBufferedTrigger revokeBufferedTrigger;
 
-	public BufferedStat(StatType<TValue> statType, TValue value, StatApplicationType appliance, bool applyAsBonus,
+	public BufferedStat(StatDefinition<TValue> statType, TValue value, StatApplicationType appliance, bool applyAsBonus,
 						IBufferedTrigger applyBufferedTrigger, IBufferedTrigger revokeBufferedTrigger)
 			: base(statType, value, appliance, applyAsBonus) {
 		this.applyBufferedTrigger = applyBufferedTrigger;

@@ -9,7 +9,7 @@ public class SimpleStatEntry<TProcessor, TValue> : AbstractStatEntry<TValue> whe
 	private readonly List<(TValue value, IStatProvider source)> bonuses = new();
 	private readonly TProcessor processor = new();
 
-	public SimpleStatEntry(TValue baseValue, StatType<TValue> typeReference, Action<StatType<TValue>, AbstractStatEntry<TValue>> onInstantiateAction = null) 
+	public SimpleStatEntry(TValue baseValue, StatDefinition<TValue> typeReference, Action<StatDefinition<TValue>, AbstractStatEntry<TValue>> onInstantiateAction = null) 
 		: base(baseValue, typeReference, onInstantiateAction) {
 	}
 

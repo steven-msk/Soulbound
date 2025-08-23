@@ -55,7 +55,7 @@ public class Tooltip : AbstractTooltip {
 
 	[CanBeNull] public static Tooltip Lore(string description, TooltipSectionLayout layout = null) => !string.IsNullOrEmpty(description) ? new(description, layout ?? new(TooltipSection.Lore)) : null;
 
-	public static Tooltip Stats(Dictionary<IStatTypeImpl, (object value, bool applyAsBonus)> stats, TooltipSectionLayout layout = null) {
+	public static Tooltip Stats(Dictionary<IStatDefinitionImpl, (object value, bool applyAsBonus)> stats, TooltipSectionLayout layout = null) {
 		if (stats.Count == 0) {
 			return Tooltip.Info("No stats");
 		}
@@ -71,8 +71,8 @@ public class Tooltip : AbstractTooltip {
 	}
 
 	public static Tooltip Stats(IEnumerable<AbstractSerializableStat> stats, TooltipSectionLayout layout = null) {
-		return Tooltip.Stats(new Dictionary<IStatTypeImpl, (object, bool)>(stats.OrderBy(stat => stat.GetStatType()).Select(stat => {
-			return new KeyValuePair<IStatTypeImpl, (object, bool)>(stat.GetStatType(), (stat.GetBoxedValue(), stat.applyAsBonus));
+		return Tooltip.Stats(new Dictionary<IStatDefinitionImpl, (object, bool)>(stats.OrderBy(stat => stat.GetStatDefinition()).Select(stat => {
+			return new KeyValuePair<IStatDefinitionImpl, (object, bool)>(stat.GetStatDefinition(), (stat.GetBoxedValue(), stat.applyAsBonus));
 		})), layout);
 	}
 
