@@ -39,6 +39,13 @@ public class GameManager : MonoBehaviour {
 	// Pause menu -> Settings menu
 
 	public const string worldDump = "worldDump.json";
+	public static readonly JsonSerializerSettings globalJsonSettings = new() {
+		TypeNameHandling = TypeNameHandling.Auto,
+		TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
+		Converters = new List<JsonConverter> { 
+			new Vector2JsonConverter(), new Vector3JsonConverter(), new ColorJsonConverter()
+		},
+	};
 
 	private void Awake() {
 		instance = this;
@@ -50,11 +57,7 @@ public class GameManager : MonoBehaviour {
 		this.level = new Level(player, worldTilemap, GameObject.Find("Grid").GetComponent<Grid>(), seed, renderDistance: 2);
 		WorldDump? worldDump;
 		try {
-			worldDump = JsonConvert.DeserializeObject<WorldDump>(File.ReadAllText(Level.worldDumpFile), new JsonSerializerSettings() {
-				TypeNameHandling = TypeNameHandling.Auto,
-				TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
-				Converters = new List<JsonConverter> { new Vector2JsonConverter(), new Vector3JsonConverter() },
-			});
+			worldDump = JsonConvert.DeserializeObject<WorldDump>(File.ReadAllText(Level.worldDumpFile), globalJsonSettings);
 		} catch (FileNotFoundException) {
 			logger.LogError(null, "Cannot find world dump file");
 			worldDump = null;

@@ -1,35 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
+using Unity.Plastic.Newtonsoft.Json;
+using Unity.VisualScripting;
 
-public class PlayerStats {
-	private static readonly Dictionary<IStatDefinitionImpl, IStatEntryImpl> registeredStats = new();
+public sealed class PlayerStats {
+	private static readonly Logger logger = Logger.CreateInstance();
+	private static readonly LogModule playerStats = new LogModule("PLAYER STATS", "#00FFFF");
+
+	[JsonProperty]
+	[JsonConverter(typeof(JsonDictionaryConverter<IStatDefinitionImpl, IStatEntryImpl>))]
+	private static readonly Dictionary<IStatDefinitionImpl, IStatEntryImpl> injected = new();
 
 	// REMINDER: current stat default values are subject to change
-	public StatEntry<int> MaxHealth { get; } = InjectStatEntry<int>(new(200, StatDefinition<int>.MaxHealth));
-	public StatEntry<int> MaxMana { get; } = InjectStatEntry<int>(new(50, StatDefinition<int>.MaxMana));
-	public StatEntry<int> Defense { get; } = InjectStatEntry<int>(new(0, StatDefinition<int>.Defense));
-	public StatEntry<int> SoulSlots { get; } = InjectStatEntry<int>(new(2, StatDefinition<int>.SoulSlots));
-	public StatEntry<float> MovementSpeed { get; } = InjectStatEntry<float>(new(8f, StatDefinition<float>.MovementSpeed));
-	public StatEntry<int> JumpHeight { get; } = InjectStatEntry<int>(new(1, StatDefinition<int>.JumpHeight));
+	[JsonIgnore] public StatEntry<int> MaxHealth { get; } = InjectStatEntry<int>(new(200, StatDefinition<int>.MaxHealth));
+	[JsonIgnore] public StatEntry<int> MaxMana { get; } = InjectStatEntry<int>(new(50, StatDefinition<int>.MaxMana));
+	[JsonIgnore] public StatEntry<int> Defense { get; } = InjectStatEntry<int>(new(0, StatDefinition<int>.Defense));
+	[JsonIgnore] public StatEntry<int> SoulSlots { get; } = InjectStatEntry<int>(new(2, StatDefinition<int>.SoulSlots));
+	[JsonIgnore] public StatEntry<float> MovementSpeed { get; } = InjectStatEntry<float>(new(8f, StatDefinition<float>.MovementSpeed));
+	[JsonIgnore] public StatEntry<int> JumpHeight { get; } = InjectStatEntry<int>(new(1, StatDefinition<int>.JumpHeight));
 	public int MaxJumps { get; set; } = 1;
-	public StatEntry<float> DashVelocity { get; } = InjectStatEntry<float>(new(1f, StatDefinition<float>.DashVelocity));
-	public StatEntry<float> DashCooldown { get; } = InjectStatEntry<float>(new(2f, StatDefinition<float>.DashCooldown));
-	public StatEntry<float> HealthRegen { get; } = InjectStatEntry<float>(new(1.5f, StatDefinition<float>.HealthRegen));
-	public StatEntry<float> ManaRegen { get; } = InjectStatEntry<float>(new(2f, StatDefinition<float>.ManaRegen));
-	public StatEntry<int> RawPhysicalDamage { get; } = InjectStatEntry<int>(new(10, StatDefinition<int>.PhysicalDamage));
-	public StatEntry<int> RawRitualDamage { get; } = InjectStatEntry<int>(new(10, StatDefinition<int>.RitualDamage));
-	public StatEntry<float> AttackSpeed { get; } = InjectStatEntry<float>(new(1f, StatDefinition<float>.AttackSpeed));
-	public StatEntry<float> CritChance { get; } = InjectStatEntry<float>(new(0.05f, StatDefinition<float>.CritChance));
-	public StatEntry<float> CritMultiplier { get; } = InjectStatEntry<float>(new(1.5f, StatDefinition<float>.CritMultiplier));
-	public StatEntry<float> Luck { get; } = InjectStatEntry<float>(new(0f, StatDefinition<float>.Luck));
-	public StatEntry<float> LootBonus { get; } = InjectStatEntry<float>(new(0f, StatDefinition<float>.LootBonus));
+	[JsonIgnore] public StatEntry<float> DashVelocity { get; } = InjectStatEntry<float>(new(1f, StatDefinition<float>.DashVelocity));
+	[JsonIgnore] public StatEntry<float> DashCooldown { get; } = InjectStatEntry<float>(new(2f, StatDefinition<float>.DashCooldown));
+	[JsonIgnore] public StatEntry<float> HealthRegen { get; } = InjectStatEntry<float>(new(1.5f, StatDefinition<float>.HealthRegen));
+	[JsonIgnore] public StatEntry<float> ManaRegen { get; } = InjectStatEntry<float>(new(2f, StatDefinition<float>.ManaRegen));
+	[JsonIgnore] public StatEntry<int> RawPhysicalDamage { get; } = InjectStatEntry<int>(new(10, StatDefinition<int>.PhysicalDamage));
+	[JsonIgnore] public StatEntry<int> RawRitualDamage { get; } = InjectStatEntry<int>(new(10, StatDefinition<int>.RitualDamage));
+	[JsonIgnore] public StatEntry<float> AttackSpeed { get; } = InjectStatEntry<float>(new(1f, StatDefinition<float>.AttackSpeed));
+	[JsonIgnore] public StatEntry<float> CritChance { get; } = InjectStatEntry<float>(new(0.05f, StatDefinition<float>.CritChance));
+	[JsonIgnore] public StatEntry<float> CritMultiplier { get; } = InjectStatEntry<float>(new(1.5f, StatDefinition<float>.CritMultiplier));
+	[JsonIgnore] public StatEntry<float> Luck { get; } = InjectStatEntry<float>(new(0f, StatDefinition<float>.Luck));
+	[JsonIgnore] public StatEntry<float> LootBonus { get; } = InjectStatEntry<float>(new(0f, StatDefinition<float>.LootBonus));
 	public float HorizontalAcceleration { get; set; } = 1f;
 	public float HorizontalFlightAcceleration { get; set; } = 3f;
 	public float VerticalFlightAcceleration { get; set; } = 2f;
 	public int GrantedFlightTime { get; set; } = 0;
 
-	static StatEntry<TValue> InjectStatEntry<TValue>(StatEntry<TValue> statEntry) where TValue : struct, IComparable<TValue> {
-		registeredStats[statEntry.definitionReference] = statEntry;
+	internal static StatEntry<TValue> InjectStatEntry<TValue>(StatEntry<TValue> statEntry) where TValue : struct, IComparable<TValue> {
+		injected[statEntry.definitionReference] = statEntry;
 		return statEntry;
 	}
 
@@ -45,12 +52,13 @@ public class PlayerStats {
 
 	public void Revoke(AbstractSerializableStat stat, IStatProvider source) => Revoke(new List<AbstractSerializableStat> { stat }, source);
 
+	
 	private void Invoke(List<AbstractSerializableStat> stats, IStatProvider source, Action<IStatEntryImpl, AbstractSerializableStat, IStatProvider> statAction) {
 		stats.ForEach(stat => {
-			if (registeredStats.TryGetValue(stat.GetStatDefinition(), out var statEntry)) {
-				statAction.Invoke(statEntry, stat, source);
+			if (injected.TryGetValue(stat.GetStatDefinition(), out var statDefinition)) {
+				statAction.Invoke(statDefinition, stat, source);
 			} else {
-				throw new InvalidStatTypeReferenceBindingException(stat);
+				throw new InvalidStatDefinitionBindingException(stat);
 			}
 		});
 	}
@@ -75,9 +83,9 @@ public class PlayerStats {
 	//	}
 	//}
 
-	private class InvalidStatTypeReferenceBindingException : NullReferenceException {
-		public InvalidStatTypeReferenceBindingException(AbstractSerializableStat stat)
-			: base ($"SerializableStat {stat.GetStatDefinition()} does not contain a valid stat binding. Could not find stat type reference {stat.GetStatDefinition()}") { }
+	private class InvalidStatDefinitionBindingException : NullReferenceException {
+		public InvalidStatDefinitionBindingException(AbstractSerializableStat stat)
+			: base ($"SerializableStat {stat.GetStatDefinition()} does not contain a valid stat binding. Could not find stat definition {stat.GetStatDefinition()}") { }
 	}
 }
 

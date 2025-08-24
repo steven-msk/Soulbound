@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Unity.Plastic.Newtonsoft.Json;
 
 public class StatEntry<TValue> : IStatEntryImpl where TValue : struct, IComparable<TValue> {
 	private static readonly Logger logger = Logger.CreateInstance();
+	[JsonProperty]
 	private readonly List<(SerializableStat<TValue> stat, IStatProvider source)> modifiers = new();
 	public TValue baseValue { get; protected set; }
 	public StatDefinition<TValue> definitionReference { get; protected set; }
@@ -24,13 +26,30 @@ public class StatEntry<TValue> : IStatEntryImpl where TValue : struct, IComparab
 		}
 	}
 
+	public void AddRange(params (AbstractSerializableStat stat, IStatProvider source)[] modifiers) {
+		modifiers.ToList().ForEach(modifier => this.Add(modifier.stat, modifier.source));
+	}
+
 	public void Remove(AbstractSerializableStat serializableStat, IStatProvider source) {
 		if (Validate(serializableStat, source)) {
 			modifiers.Remove(((SerializableStat<TValue>)serializableStat, source));
 		}
 	}
 
+	public void RemoveRange(params (AbstractSerializableStat stat, IStatProvider source)[] modifiers) {
+		modifiers.ToList().ForEach(modifier => this.Remove(modifier.stat, modifier.source));
+	}
+
+	public void SetModifiers(List<(AbstractSerializableStat stat, IStatProvider source)> modifiers) {
+		this.modifiers.Clear();
+		this.AddRange(modifiers.ToArray());
+	}
+
 	public object GetBoxedValue() => this.GetProcessedValue();
+
+	public List<(AbstractSerializableStat, IStatProvider)> GetBoxedModifiers() {
+		return modifiers.Cast<(AbstractSerializableStat, IStatProvider)>().ToList();
+	}
 
 	private bool Validate(AbstractSerializableStat serializableStat, IStatProvider source) {
 		string failedApplication = "Failed to apply serializedStat:";

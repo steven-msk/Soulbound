@@ -24,9 +24,9 @@ public sealed class JsonDictionaryConverter<TKey, TValue> : JsonConverter<Dictio
 		foreach (var kvp in value) {
 			writer.WriteStartObject();
 			writer.WritePropertyName("key");
-			serializer.Serialize(writer, kvp.Key);
+			serializer.Serialize(writer, kvp.Key, typeof(TKey));
 			writer.WritePropertyName("value");
-			serializer.Serialize(writer, kvp.Value);
+			serializer.Serialize(writer, kvp.Value, typeof(TValue));
 			writer.WriteEndObject();
 		}
 		writer.WriteEndArray();
