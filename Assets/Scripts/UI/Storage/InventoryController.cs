@@ -12,12 +12,14 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-public class InventoryController : MonoBehaviour, IContainer, IDependencyInitializable<InventoryController, PlayerController> {
+public class InventoryController : MonoBehaviour, IContainer<InventorySlot>, IDependencyInitializable<InventoryController, PlayerController>, ISerializable<SerializedInventory> {
+	private static readonly Logger logger = Logger.CreateInstance();
 	[SerializeField] private HotbarController hotbar;
 	public HotbarController Hotbar => hotbar;
 
 	[SerializeField] private GameObject popup;
 	[SerializeField] private GameObject armorSlots;
+	private static Dictionary<int, ArmorSlot> armorSlotsByIndex = new();
 	[SerializeField] private bool popupOpen = false;
 
 	public bool PopupOpen => popupOpen;
@@ -34,8 +36,9 @@ public class InventoryController : MonoBehaviour, IContainer, IDependencyInitial
 	[SerializeField] private int columns;
 	public int Columns => columns;
 
+	private static Dictionary<int, InventorySlot> popupSlotsByIndex = new();
 	public InventorySlot[,] popupSlots;
-	public IItemSlot this[int row, int col] => popupSlots[row, col];
+	public InventorySlot this[int row, int col] => popupSlots[row, col];
 
 	private PlayerController player;
 
@@ -55,18 +58,59 @@ public class InventoryController : MonoBehaviour, IContainer, IDependencyInitial
 		List<InventorySlot> mainPlayerSlots = hotbar.Slots.ToList();
 		mainPlayerSlots.AddRange(popupSlots);
 		MainPlayerSlots = mainPlayerSlots.ToArray();
+		hotbar.SetActiveSlot(0);
 		return this;
 	}
 
 	public void SetupGrid() {
 		InventorySlot[] flatPopupSlots = popup.GetComponentsInChildren<InventorySlot>(true);
+		for (int i = 0; i < flatPopupSlots.Length; i++) {
+			flatPopupSlots[i].index = i;
+			popupSlotsByIndex[i] = flatPopupSlots[i];
+		}
 		popupSlots = ArrayHelper.CompressTo2D(flatPopupSlots, rows, columns);
+		ArmorSlot[] armorSlots = this.armorSlots.GetComponentsInChildren<ArmorSlot>(true);
+		for (int i = 0; i < armorSlots.Length; i++) {
+			armorSlots[i].index = i;
+			armorSlotsByIndex[i] = armorSlots[i];
+		}
 	}
 
-	private void Start() {
-		CreateItemDisplay(new ItemStack(Items.grassBlock, 100), hotbar[2]);
-		hotbar.SetActiveSlot(0);
+	public SerializedInventory Serialize() {
+		var serializedHotbar = hotbar.Slots.Cast<IItemSlot>().Select(s => s.Serialize()).ToList();
+		var serializedPopup = popupSlots.Flatten().Cast<IItemSlot>().Select(s => s.Serialize()).ToList();
+		ArmorSlot[] armorSlots = this.armorSlots.GetComponentsInChildren<ArmorSlot>(true);
+		var serializedArmor = armorSlots.Cast<IItemSlot>().Select(s => s.Serialize()).ToList();
+		return new SerializedInventory(hotbar.ActiveKey, new Dictionary<string, List<SerializedItemSlot>>() {
+			["hotbar"] = serializedHotbar, 
+			["popup"] = serializedPopup,
+			["armor"] = serializedArmor
+		});
 	}
+
+	public void Deserialize(SerializedInventory serialized) {
+		TryDeserialize("hotbar", serialized.regions, hotbar.GetSlotByIndex);
+		TryDeserialize("popup", serialized.regions, this.GetSlotByIndex);
+		TryDeserialize("armor", serialized.regions, (index) => armorSlotsByIndex[index]);
+		hotbar.SetActiveSlot(serialized.lastHotbarIndex);
+	}
+
+	private void TryDeserialize<TSlot>(string region, Dictionary<string, List<SerializedItemSlot>> regions, Func<int, TSlot> slotSupplier)
+				where TSlot : MonoBehaviour, IItemSlot {
+		if (regions.TryGetValue(region, out var serializedRegion)) {
+			serializedRegion.ForEach(serialized => {
+				if (serialized.itemStack != null) {
+					ItemDisplay.Create(serialized.itemStack, slotSupplier.Invoke(serialized.index));
+				}
+			});
+		} else {
+			logger.LogError(null, "Unknown inventory region: {}", region);
+		}
+	}
+
+	//private void Start() {
+	//	ItemDisplay.Create(new ItemStack(Items.grassBlock, 100), hotbar[2]);
+	//}
 
     public void ToggleInventory() {
 		popupOpen = !popupOpen;
@@ -106,7 +150,7 @@ public class InventoryController : MonoBehaviour, IContainer, IDependencyInitial
 		if (!itemStack.Item.IsStackable) {
 			InventorySlot emptySlot = GetFirstEmptySlot();
 			if (emptySlot != null) {
-				CreateItemDisplay(itemStack, emptySlot);
+				ItemDisplay.Create(itemStack, emptySlot);
 				return true;
 			}
 			return false;
@@ -128,7 +172,7 @@ public class InventoryController : MonoBehaviour, IContainer, IDependencyInitial
 			for (int i = 0; i < inventory.Length; i++){
 				if (!inventory[i].HasItem) {
 					int toAdd = Mathf.Min(remaining, itemStack.Item.maxStackSize);
-					CreateItemDisplay(new ItemStack(itemStack.Item, toAdd), inventory[i]);
+					ItemDisplay.Create(new ItemStack(itemStack.Item, toAdd), inventory[i]);
 					remaining -= toAdd;
 				}
 				if (remaining <= 0) {
@@ -147,32 +191,10 @@ public class InventoryController : MonoBehaviour, IContainer, IDependencyInitial
 
 	[CanBeNull] public InventorySlot[] GetEmptySlots() => MainPlayerSlots.Where(slot => !slot.HasItem).ToArray();
 	
-	public ItemDisplay CreateItemDisplay(ItemStack itemStack, InventorySlot slot) {
-		GameObject obj = Instantiate(ResourceManager.Get<GameObject, ResourceGroups.Prefabs>("itemDisplayPrefab"), slot.transform);
-		ItemDisplay display = obj.GetComponent<ItemDisplay>();
-		UnityEngine.Debug.Assert(display != null, $"ItemDisplay instance not found in item display prefab");
-		display.ItemStack = itemStack;
-		if (itemStack.Item.IsStackable) {
-			itemStack.InitializeStackText(display);
-		}
-		display.Tooltip = itemStack.Item.GetTooltip();
-		return display;
-	}
-
-	public ItemDisplay CreateItemDisplay(Item item, int quantity, InventorySlot slot) {
-		ItemStack itemStack = new(item, quantity);
-		return CreateItemDisplay(itemStack, slot);
-	}
-
-	public void DestroyItemDisplay(ItemDisplay display) {
-		if (display.ItemStack == player.MainHandStack) {
-			player.SetMainHandItem(null);
-		}
-		GameObject.Destroy(display.gameObject);
-	}
-
 	public void EquipHotbarItem(InventorySlot slot) {
 		ItemDisplay itemDisplay = slot.ItemDisplay;
 		player.SetMainHandItem(itemDisplay?.ItemStack);
 	}
+
+	public InventorySlot GetSlotByIndex(int index) => popupSlotsByIndex[index];
 }

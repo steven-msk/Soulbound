@@ -187,10 +187,13 @@ public class PlayerController : LivingEntity, IGameInitializable<PlayerControlle
 
 	public override void ApplySerializedProperties(SerializedEntityPropertyList properties) {
 		base.ApplySerializedProperties(properties);
-		this.stats = properties.Get<PlayerStats>("stats");
+		this.stats = properties.GetOrThrow<PlayerStats>("stats");
+		inventory.Deserialize(properties.GetOrThrow<SerializedInventory>("inventory"));
 	}
 
 	public override SerializedEntityPropertyList GetSerializedProperties() {
-		return base.GetSerializedProperties().Add("stats", this.stats);
+		return base.GetSerializedProperties()
+			.Add("stats", this.stats)
+			.Add("inventory", inventory.Serialize());
 	}
 }

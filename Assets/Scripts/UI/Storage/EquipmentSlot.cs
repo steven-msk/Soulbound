@@ -8,11 +8,16 @@ using UnityEngine.EventSystems;
 
 public abstract class EquipmentSlot : MonoBehaviour, IItemSlot {
 	public ItemDisplay ItemDisplay => gameObject.GetComponentInChildren<ItemDisplay>();
+	public abstract int index { get; set; }
 	public bool HasItem => ItemDisplay != null;
 	public bool IsEmpty => ItemDisplay == null;
 	public ItemStack ItemStack => ItemDisplay?.ItemStack; 
 
 	public GameObject GameObject => gameObject;
+
+	public void Deserialize(SerializedItemSlot serialized) {
+		ItemDisplay.Create(serialized.itemStack, this);
+	}
 
 	[InputAction("ItemDrag", Priority = 10, BlocksContexts = new[] { "ItemUse" })]
 	public virtual void OnClick(ItemDisplay grabbedItem, InventoryController inventory) {

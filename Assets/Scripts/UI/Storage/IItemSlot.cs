@@ -7,8 +7,9 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public interface IItemSlot : IPointerDownHandler {
+public interface IItemSlot : IPointerDownHandler, ISerializable<SerializedItemSlot> {
 	public ItemDisplay ItemDisplay { get; }
+	public int index { get; set; }
 	public bool HasItem => ItemDisplay != null;
 	public bool IsEmpty => ItemDisplay == null;
 	public ItemStack ItemStack => ItemDisplay?.ItemStack;
@@ -30,6 +31,10 @@ public interface IItemSlot : IPointerDownHandler {
 	public virtual void DetachItemDisplay() {
 		this.ItemDisplay.EnableGrab();
 		this.ItemDisplay?.transform.SetParent(GameManager.instance.Player.Inventory.transform, true);
+	}
+
+	SerializedItemSlot ISerializable<SerializedItemSlot>.Serialize() {
+		return new SerializedItemSlot(index, ItemStack);
 	}
 }
 
@@ -94,7 +99,7 @@ public static class ItemSlotUtility {
 			inventory.GrabbedItem.ItemStack.Quantity -= transfer;
 			if (inventory.GrabbedItem.ItemStack.Quantity <= 0) {
 				SetDropCapabilities(true);
-				inventory.DestroyItemDisplay(inventory.GrabbedItem);
+				inventory.GrabbedItem.Destroy();
 				inventory.GrabbedItem = null;
 			}
 		}

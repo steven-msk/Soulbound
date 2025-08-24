@@ -13,6 +13,7 @@ public class ArmorSlot : EquipmentSlot {
 
 	[SerializeField] private GameObject overlay;
 	public GameObject Overlay => overlay;
+	public override int index { get; set; }
 
 	[InputAction("ItemDrag", Priority = 10, BlocksContexts = new[] { "ItemUse" })]
 	public override void OnClick(ItemDisplay grabbedItem, InventoryController inventory) {

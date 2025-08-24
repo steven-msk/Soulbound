@@ -7,12 +7,17 @@ public class InventorySlot : MonoBehaviour, IItemSlot {
 	// FEATUREIMPL (PARTIALLY IMPLEMENTED): equipment slots (NOT TESTED)
 
 	public ItemDisplay ItemDisplay => gameObject.GetComponentInChildren<ItemDisplay>();
+	public int index { get; set; }
 	public bool HasItem => ItemDisplay != null;
 	public bool IsEmpty => ItemDisplay == null;
 
 	public ItemStack ItemStack => ItemDisplay?.ItemStack;
 
 	public GameObject GameObject => gameObject;
+
+	public void Deserialize(SerializedItemSlot serialized) {
+		ItemDisplay.Create(serialized.itemStack, this);
+	}
 
 	public void OnClick(ItemDisplay grabbedItem, InventoryController inventory) => this.TranserItems(grabbedItem, inventory);
 

@@ -80,11 +80,9 @@ public class Level {
 			}
 		}
         InvocationHelper.If(dump != null, () => entityManager.Boostrap(dump!.Value.serializedEntities));
-        Vector2 playerPos = dump == null ? new(0f, GetSurfaceY(0)) : dump.Value.player.lastPosition;
-        entityManager.SpawnPlayer(player, new EntitySpawnData(playerPos) {
-            [SpawnDataKeys.maxHealth] = new SpawnDataValue<float>(100f)
-        });
-    }
+		entityManager.SpawnPlayer(player, dump!.Value.player);
+
+	}
 
     public void Save() {
         Dictionary<Guid, SerializedEntity> serializedEntities = entityManager.AllExistingEntities

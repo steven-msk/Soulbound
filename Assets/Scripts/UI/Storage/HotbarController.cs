@@ -25,6 +25,7 @@ public class HotbarController : MonoBehaviour, IHotbarContainer, IDependencyInit
 
 	private (InventorySlot hotbarSlot, int key) active;
 	public InventorySlot ActiveSlot => active.hotbarSlot;
+	public int ActiveKey => active.key;
 
 	private InventoryController inventory;
 
@@ -33,6 +34,7 @@ public class HotbarController : MonoBehaviour, IHotbarContainer, IDependencyInit
 	private InventorySlot[] slots;
 	public InventorySlot[] Slots => slots;
 	public InventorySlot this[int index] => slots[index];
+	private static Dictionary<int, InventorySlot> slotsByIndex = new();
 
 #nullable enable
 
@@ -43,10 +45,10 @@ public class HotbarController : MonoBehaviour, IHotbarContainer, IDependencyInit
 	}
 
 	public void SetupGrid() {
-		InventorySlot[] hotbarSlots = gameObject.GetComponentsInChildren<InventorySlot>();
-		slots = new InventorySlot[Columns];
+		slots = gameObject.GetComponentsInChildren<InventorySlot>();
 		for (int i = 0; i < Columns; i++) {
-			slots[i] = hotbarSlots[i];
+			slots[i].index = i;
+			slotsByIndex[i] = slots[i];
 		}
 	}
 
@@ -59,7 +61,7 @@ public class HotbarController : MonoBehaviour, IHotbarContainer, IDependencyInit
 		}
 
 		if (hotbarSlot != active.hotbarSlot) {
-			if (!GameManager.instance.Player.Inventory.PopupOpen) {
+			if (!inventory.PopupOpen) {
 				ApplySelectionChanges(active.hotbarSlot, inactiveSlotColor, inactiveSlotNumberColor, inactiveItemStackColor, -activeSlotOffset, Vector3.one);
 			} else {
 				ApplySelectionChanges(active.hotbarSlot, activeSlotColor, activeSlotNumberColor, activeItemStackColor, -activeSlotOffset, Vector3.one);
@@ -69,7 +71,7 @@ public class HotbarController : MonoBehaviour, IHotbarContainer, IDependencyInit
 		}
 
 		activeItemText.text = slots[slotKey].ItemStack?.Item.name;
-		GameManager.instance.Player.Inventory.EquipHotbarItem(slots[slotKey]);
+		inventory.EquipHotbarItem(slots[slotKey]);
 	}
 
 	public void OnHotbarScroll(float scrollDelta) {
@@ -111,4 +113,6 @@ public class HotbarController : MonoBehaviour, IHotbarContainer, IDependencyInit
 	}
 
 	public bool IsEmpty(InventorySlot slot) => slot.GetComponentInChildren<ItemDisplay>() == null;
+
+	public InventorySlot GetSlotByIndex(int index) => slotsByIndex[index];
 }

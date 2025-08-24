@@ -21,6 +21,25 @@ public class ItemDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 	[SerializeField] private AbstractTooltip tooltip;
 	public AbstractTooltip Tooltip { get => tooltip; set => tooltip = value; }
 
+#nullable enable
+	public static ItemDisplay Create<TSlot>(ItemStack itemStack, TSlot? slot) where TSlot : MonoBehaviour, IItemSlot {
+		GameObject? obj = Instantiate(ResourceManager.Get<GameObject, ResourceGroups.Prefabs>("itemDisplayPrefab"), slot?.transform ?? null);
+		ItemDisplay? display = obj?.GetComponent<ItemDisplay>();
+		UnityEngine.Debug.Assert(display != null, $"ItemDisplay component not found in item display prefab");
+		display!.ItemStack = itemStack;
+		if (itemStack.Item.IsStackable) {
+			itemStack.InitializeStackText(display);
+		}
+		display.Tooltip = itemStack.Item.GetTooltip();
+		return display;
+	}
+
+	public static ItemDisplay Create<TSlot>(Item item, int quantity, TSlot? slot) where TSlot : MonoBehaviour, IItemSlot {
+		ItemStack itemStack = new(item, quantity);
+		return Create(itemStack, slot);
+	}
+#nullable disable
+
 	private void Start() {
 		transform.SetAsFirstSibling();
 	}
@@ -32,6 +51,13 @@ public class ItemDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 		if (tooltip?.IsDisplayed ?? false) {
 			tooltip.Update(itemStack);
 		}
+	}
+
+	public void Destroy() {
+		if (ItemStack == GameManager.instance.Player.MainHandStack) {
+			GameManager.instance.Player.SetMainHandItem(null);
+		}
+		GameObject.Destroy(gameObject);
 	}
 
 	public void OnPointerEnter(PointerEventData eventData) {

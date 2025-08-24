@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 public static class ArrayHelper {
-	public static T[,] CompressTo2D<T>(T[] input, int rows, int columns) {
+	public static T[,] CompressTo2D<T>(this T[] input, int rows, int columns) {
 		UnityEngine.Debug.Assert(input.Length == rows * columns);
 		T[,] result = new T[rows, columns];
 
@@ -18,7 +18,17 @@ public static class ArrayHelper {
 		return result;
 	}
 
-}
-public static partial class List {
-	public static List<T> Empty<T>() => new List<T>();
+	public static T[] Flatten<T>(this T[,] source) {
+		int rows = source.GetLength(0);
+		int columns = source.GetLength(1);
+		T[] result = new T[rows * columns];
+
+		int index = 0;
+		for (int r = 0; r < rows; r++) {
+			for (int c = 0; c < columns; c++) {
+				result[index++] = source[r, c];
+			}
+		}
+		return result;
+	}
 }

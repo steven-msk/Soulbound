@@ -15,7 +15,7 @@ public class ItemStack {
 		set {
 			quantity = value;
 			if (quantity <= 0) {
-				GameManager.instance.Player.Inventory.DestroyItemDisplay(display);
+				display.Destroy();
 			}
 			if(stackText != null && quantity > 0) {
 				UpdateText();

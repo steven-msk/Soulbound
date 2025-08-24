@@ -43,8 +43,8 @@ public sealed class EntityManager {
 		this.AddExistingEntity(entity);
 	}
 
-	public void SpawnPlayer(PlayerController player, EntitySpawnData playerSpawnData) {
-		this.SpawnEntity(player, playerSpawnData);
+	public void SpawnPlayer(PlayerController player, SerializedEntity serialized) {
+		player.Deserialize(serialized);
 		this.player = player;
 	}
 
