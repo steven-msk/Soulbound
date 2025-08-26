@@ -16,6 +16,8 @@ using UnityEngine.UI;
 
 #nullable enable
 public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyInitializable<InventoryController, PlayerController>, ISerializable<SerializedInventory> {
+	public delegate void InterpretationFunction(IItemSlot clickedSlot, RefBox<ItemDisplay> grabbedItem);
+
 	private static readonly Logger logger = Logger.CreateInstance();
 	public HotbarController Hotbar => hotbar;
 	[SerializeField] private HotbarController hotbar;
@@ -234,19 +236,17 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 
 	public void OnPointerDown(IItemSlot slot, PointerEventData eventData) {
 		this.dragButton = eventData.button;
-		SlotClickInterpretation interpretation = InterpretClick(slot, eventData);
-		if (interpretation == null) {
+		InterpretationFunction? interpretationFunction = InterpretClick(slot, eventData);
+		if (interpretationFunction == null) {
 			return;
 		}
-		InputHandler.RequestAction(new(interpretation.context, interpretation.priority, () => {
-			ItemDisplay? grabbedReference = GrabbedItem;
-			InvocationHelper.If(slot.ValidClickAction(GrabbedItem), () => {
-				interpretation.interpretationFunction.Invoke(slot, ref grabbedReference);
-				if (GrabbedItem != null) {
-					this.StartDrag(slot);
-				}
-			});
-			this.GrabbedItem = grabbedReference;
+		InputHandler.RequestAction(new("ItemSlotAction", 10, () => {
+			RefBox<ItemDisplay> grabbedReference = new(this.GrabbedItem);
+			interpretationFunction.Invoke(slot, grabbedReference);
+			if (GrabbedItem != null) {
+				this.StartDrag(slot);
+			}
+			this.GrabbedItem = grabbedReference.value;
 		}, null));
 		InputHandler.BlockContext("ItemUse", () => !GameManager.instance.Player.InputHandler.LeftHold);
 	}
@@ -261,67 +261,69 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		GrabbedItem = grabbedReference;
 	}
 
-	public SlotClickInterpretation InterpretClick(IItemSlot clickedSlot, PointerEventData eventData) {
+	public InterpretationFunction? InterpretClick(IItemSlot clickedSlot, PointerEventData eventData) {
 		bool shift = Keyboard.current.shiftKey.isPressed;
 		bool ctrl = Keyboard.current.ctrlKey.isPressed;
 		bool alt = Keyboard.current.altKey.isPressed;
 
 		if (eventData.button == PointerEventData.InputButton.Left) {
 			if (!shift && !ctrl && !alt) {
-				return new SlotClickInterpretation("ItemTransferGrabbed", 10, TransferGrabbed);
+				return TransferGrabbed;
 			}
 		} else if (eventData.button == PointerEventData.InputButton.Right) {
 			if (!shift && !alt && !ctrl) {
-				return new SlotClickInterpretation("ItemTransferGrabbed", 10, HalveStack);
+				if (GrabbedItem != null && !clickedSlot.HasItem) {
+					return TransferSingleToSlot;
+				}
+				if (GrabbedItem != null) {
+					return HalveStackFromSlot;
+				}
+				return HalveStackFromSlot;
 			}
 		}
 		return null!;
 	}
 
-	public delegate void InterpretationFunction(IItemSlot clickedSlot, ref ItemDisplay? grabbedItem);
-
-	public record SlotClickInterpretation {
-		public string context;
-		public int priority;
-		public InterpretationFunction interpretationFunction;
-
-		public SlotClickInterpretation(string context, int priority, InterpretationFunction interpretationFunction) {
-			this.context = context;
-			this.priority = priority;
-			this.interpretationFunction = interpretationFunction;
-		}
-	}
-
-	public void HalveStack(IItemSlot clickedSlot, ref ItemDisplay? grabbedItem) {
-		if (grabbedItem != null && clickedSlot.HasItem) {
-			ItemStack stackReference = clickedSlot.ItemStack!;
-			this.AddToGrabbed(ref stackReference, ref grabbedItem, 1);
-			clickedSlot.ItemStack!.Quantity = stackReference.Quantity;
+	[InterpretationFunctionSubmodule]
+	public void HalveStackFromSlot(IItemSlot clickedSlot, RefBox<ItemDisplay> grabbedItem) {
+		if (clickedSlot.ItemStack == null || grabbedItem.value != null) {
 			return;
 		}
-		if (grabbedItem != null) {
-			clickedSlot.TryAddStack(1, grabbedItem.ItemStack.Item);
-			grabbedItem.ItemStack.Quantity--;
-			return;
-		}
-
-		int amount = clickedSlot.ItemStack!.Quantity / 2;
+		int amount = clickedSlot.ItemStack.Quantity / 2;
 		amount += clickedSlot.ItemStack.Quantity % 2;
 		clickedSlot.ItemStack.Quantity -= amount;
-		CreateGrabbedDisplay(ref grabbedItem, new ItemStack(clickedSlot.ItemStack.Item, amount));
+		CreateGrabbedDisplay(grabbedItem, new ItemStack(clickedSlot.ItemStack.Item, amount));
 	}
 
-	public void AddToGrabbed(ref ItemStack from, ref ItemDisplay? grabbedItem, int amount) {
-		if (grabbedItem == null) {
-			CreateGrabbedDisplay(ref grabbedItem, new ItemStack(from.Item, 0));
+	[InterpretationFunctionSubmodule]
+	public void TransferSingleToSlot(IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
+		if (grabbedItem.value == null) {
+			return;
 		}
-		if (from.Quantity < amount) {
-			grabbedItem!.ItemStack.Quantity += from.Quantity;
-			from.Quantity = 0;
-		} else {
-			from.Quantity -= amount;
-			grabbedItem!.ItemStack.Quantity += amount;
+		slot.TryAddStack(1, grabbedItem.value.ItemStack.Item);
+		grabbedItem.value.ItemStack.Quantity--;
+	}
+
+	[InterpretationFunctionSubmodule]
+	public void TransferSingleToGrabbed(IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
+		if (slot.ItemStack == null) {
+			return;
 		}
+		this.AddToGrabbed(slot, grabbedItem, 1);
+		slot.ItemStack.Quantity--;
+	}
+
+	[InterpretationFunctionSubmodule]
+	public void AddToGrabbed(IItemSlot slot, RefBox<ItemDisplay> grabbedItem, int amount) {
+		if (slot.ItemStack == null) {
+			return;
+		}
+		if (grabbedItem.value == null) {
+			CreateGrabbedDisplay(grabbedItem, new ItemStack(slot.ItemStack.Item, 0));
+		}
+		int transfer = Mathf.Min(amount, slot.ItemStack.Quantity);
+		slot.ItemStack.Quantity -= transfer;
+		grabbedItem.value!.ItemStack.Quantity += transfer;
 	}
 
 	public ItemDisplay CreateGrabbedDisplay(ItemStack itemStack, Func<Transform?>? parentSupplier = null) {
@@ -330,12 +332,13 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		return grabbed;
 	}
 
-	public void CreateGrabbedDisplay(ref ItemDisplay? grabbedReference, ItemStack itemStack, Func<Transform?>? parentSupplier = null) {
+	public void CreateGrabbedDisplay(RefBox<ItemDisplay> grabbedReference, ItemStack itemStack, Func<Transform?>? parentSupplier = null) {
 		ItemDisplay grabbed = CreateGrabbedDisplay(itemStack, parentSupplier);
-		grabbedReference = grabbed;
+		grabbedReference.value = grabbed;
 	}
 
-	public void TransferGrabbed(IItemSlot slot, ref ItemDisplay? grabbedItem) {
+	[InterpretationFunctionSubmodule]
+	public void TransferGrabbed(IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
 		if (!PopupOpen) {
 			return;
 		}
@@ -345,42 +348,72 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 			action.Invoke(new ItemUseTrigger[] { ItemUseTrigger.RightClick, ItemUseTrigger.RightHold });
 		}
 
-		// Grab item
-		if (grabbedItem == null && slot.HasItem) {
+		// Grab if slot has item, grabbed is empty
+		if (grabbedItem.value == null && slot.HasItem) {
 			SetRightClickAvailable(false);
-			player.SetMainHandItem(slot.ItemStack!);
-			grabbedItem = slot.ItemDisplay;
-			slot.DetachItemDisplay();
+			this.GrabItemFromSlot(slot, grabbedItem);
 			return;
 		}
 
-		// Release item
-		if (grabbedItem != null && !slot.HasItem) {
+		// Release if slot is empty, grabbed has item
+		if (grabbedItem.value != null && !slot.HasItem) {
 			SetRightClickAvailable(true);
-			(slot as IItemSlot).AttachItemDisplay(grabbedItem);
-			player.SetMainHandItem(Hotbar.ActiveSlot.ItemStack);
-			grabbedItem = null;
+			this.ReleaseItemInSlot(slot, grabbedItem);
 			return;
 		}
 
 		// Swap items
-		if (slot.ItemStack?.Item != grabbedItem!.ItemStack.Item || grabbedItem.ItemStack.HasMaxStack() || slot.ItemStack.HasMaxStack()) {
-			ItemDisplay previousGrabbed = grabbedItem;
-			grabbedItem = slot.ItemDisplay;
-			slot.DetachItemDisplay();
-			slot.AttachItemDisplay(previousGrabbed);
-			player.SetMainHandItem(grabbedItem.ItemStack);
+		if (slot.ItemStack?.Item != grabbedItem.value!.ItemStack.Item || grabbedItem.value.ItemStack.HasMaxStack() || slot.ItemStack.HasMaxStack()) {
+			this.SwapItems(slot, grabbedItem);
 		} else {    // Merge/flow items
-			int space = slot.ItemStack.Item.maxStackSize - slot.ItemStack.Quantity;
-			int transfer = Math.Min(space, grabbedItem.ItemStack.Quantity);
-			slot.ItemStack.Quantity += transfer;
-			grabbedItem.ItemStack.Quantity -= transfer;
-			if (grabbedItem.ItemStack.Quantity <= 0) {
-				SetRightClickAvailable(true);
-				grabbedItem.Destroy();
-				grabbedItem = null;
-			}
+			SetRightClickAvailable(MergeFromGrabbed(slot, grabbedItem));
 		}
+	}
+
+	[InterpretationFunctionSubmodule]
+	public void GrabItemFromSlot(IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
+		if (slot.IsEmpty || grabbedItem.value != null) {
+			return;
+		}
+		grabbedItem.value = slot.ItemDisplay;
+		slot.DetachItemDisplay();
+		player.SetMainHandItem(grabbedItem.value.ItemStack);
+	}
+
+	[InterpretationFunctionSubmodule]
+	public void ReleaseItemInSlot(IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
+		if (slot.HasItem || grabbedItem.value == null) {
+			return;
+		}
+		(slot as IItemSlot).AttachItemDisplay(grabbedItem.value);
+		player.SetMainHandItem(Hotbar.ActiveSlot.ItemStack);
+		grabbedItem.value = null;
+	}
+
+	[InterpretationFunctionSubmodule]
+	public void SwapItems(IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
+		if (slot.IsEmpty || grabbedItem.value == null) {
+			return;
+		}
+		ItemDisplay previousGrabbed = grabbedItem.value;
+		grabbedItem.value = slot.ItemDisplay;
+		slot.DetachItemDisplay();
+		slot.AttachItemDisplay(previousGrabbed);
+		player.SetMainHandItem(grabbedItem.value.ItemStack);
+	}
+
+	[InterpretationFunctionSubmodule("Returns true if the grabbed stack fit in the slot stack")]
+	public bool MergeFromGrabbed(IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
+		int space = slot.ItemStack.Item.maxStackSize - slot.ItemStack.Quantity;
+		int transfer = Math.Min(space, grabbedItem.value.ItemStack.Quantity);
+		slot.ItemStack.Quantity += transfer;
+		grabbedItem.value.ItemStack.Quantity -= transfer;
+		if (grabbedItem.value.ItemStack.Quantity <= 0) {
+			grabbedItem.value.Destroy();
+			grabbedItem.value = null;
+			return true;
+		}
+		return false;
 	}
 
 	public void StartDrag(IItemSlot dragOrigin) { 
