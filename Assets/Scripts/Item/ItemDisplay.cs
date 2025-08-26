@@ -20,6 +20,7 @@ public class ItemDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 			displayedItem = itemStack.Item;
 		}
 	}
+	public Item? DisplayedItem => ItemStack?.Item;
 	[SerializeField] private AbstractTooltip tooltip;
 	public AbstractTooltip Tooltip { get => tooltip; set => tooltip = value; }
 

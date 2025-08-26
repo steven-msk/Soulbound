@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
@@ -55,6 +56,9 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 	private int startDragStack;
 	private Dictionary<IItemSlot, int> quantitySnapshots = new();
 	private PointerEventData.InputButton dragButton;
+	private float doubleClickThreshold = 0.2f;
+	private float lastClickTime;
+	private IItemSlot lastClickedSlot;
 
 	// FEATUREIMPL: item grabbing controls - this might require a general implementation in IContainer
 
@@ -218,13 +222,13 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		}
 	}
 
-	[CanBeNull] public InventorySlot GetFirstEmptySlot() => MainPlayerSlots.First(slot => slot.IsEmpty);
+	public InventorySlot? GetFirstEmptySlot() => MainPlayerSlots.First(slot => slot.IsEmpty) ?? null;
 
-	[CanBeNull] public InventorySlot[] GetOccupiedSlots() => MainPlayerSlots.Where(slot => slot.HasItem).ToArray();
+	public InventorySlot[]? GetOccupiedSlots() => MainPlayerSlots.Where(slot => slot.HasItem)?.ToArray();
 
-	[CanBeNull] public InventorySlot[] GetOccupiedSlots(Item item) => GetOccupiedSlots().Where(slot => slot.ItemStack.Item.Equals(item)).ToArray();
+	public InventorySlot[]? GetOccupiedSlots(Item item) => GetOccupiedSlots().Where(slot => slot.ItemStack.Item.Equals(item))?.ToArray();
 
-	[CanBeNull] public InventorySlot[] GetEmptySlots() => MainPlayerSlots.Where(slot => !slot.HasItem).ToArray();
+	public InventorySlot[]? GetEmptySlots() => MainPlayerSlots.Where(slot => !slot.HasItem)?.ToArray();
 	
 	public void EquipHotbarItem(InventorySlot slot) {
 		ItemDisplay itemDisplay = slot.ItemDisplay;
@@ -235,15 +239,23 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 	IItemSlot IItemContainer.GetSlotByIndex(int index) => popupSlotsByIndex[index];
 
 	public void OnPointerDown(IItemSlot slot, PointerEventData eventData) {
+		float time = Time.time;
+		bool doubleClick = lastClickedSlot == slot && (time - lastClickTime) <= doubleClickThreshold;
+		lastClickTime = time;
+		lastClickedSlot = slot;
+
 		this.dragButton = eventData.button;
-		InterpretationFunction? interpretationFunction = InterpretClick(slot, eventData);
+		InterpretationFunction? interpretationFunction = InterpretClick(slot, eventData, doubleClick);
+		Debug.Log(doubleClick);
 		if (interpretationFunction == null) {
+			logger.ThrowException(null, new InvalidOperationException("InterpretClick() returned null!"));
 			return;
 		}
+
 		InputHandler.RequestAction(new("ItemSlotAction", 10, () => {
 			RefBox<ItemDisplay> grabbedReference = new(this.GrabbedItem);
 			interpretationFunction.Invoke(slot, grabbedReference);
-			if (GrabbedItem != null) {
+			if (GrabbedItem != null && !doubleClick) {
 				this.StartDrag(slot);
 			}
 			this.GrabbedItem = grabbedReference.value;
@@ -261,22 +273,32 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		}
 		RefBox<ItemDisplay> grabbedReference = new(this.GrabbedItem);
 		InterpretationFunction? interpretationFunction = this.InterpretDrag(slot, grabbedReference);
-		if (interpretationFunction != null) {
-			interpretationFunction.Invoke(slot, grabbedReference);
-			this.GrabbedItem = grabbedReference.value;
+		if (interpretationFunction == null) {
+			logger.ThrowException(null, new InvalidOperationException("InterpretDrag() return null!"));
+			return;
 		}
+		interpretationFunction.Invoke(slot, grabbedReference);
+		this.GrabbedItem = grabbedReference.value;
 	}
 
-	public InterpretationFunction? InterpretClick(IItemSlot clickedSlot, PointerEventData eventData) {
+	public InterpretationFunction? InterpretClick(IItemSlot clickedSlot, PointerEventData eventData, bool doubleClick) {
 		bool shift = Keyboard.current.shiftKey.isPressed;
 		bool ctrl = Keyboard.current.ctrlKey.isPressed;
 		bool alt = Keyboard.current.altKey.isPressed;
 
 		if (eventData.button == PointerEventData.InputButton.Left) {
 			if (!shift && !ctrl && !alt) {
+				if (doubleClick && GrabbedItem != null) {
+					return (slot, grabbedItem) => CollectAllStacksInGrabbed(grabbedItem.value!.ItemStack.Item, grabbedItem);
+				}
 				return TransferGrabbed;
 			}
 		} else if (eventData.button == PointerEventData.InputButton.Right) {
+			if (GrabbedItem != null && clickedSlot.ContainedItem != null) {
+				if (GrabbedItem?.DisplayedItem != clickedSlot.ItemDisplay?.DisplayedItem) {
+					return null;
+				}
+			}
 			if (!shift && !alt && !ctrl) {
 				if (GrabbedItem != null && !clickedSlot.HasItem) {
 					return TransferSingleToSlot;
@@ -288,8 +310,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 			}
 		}
 
-		logger.ThrowException(null, new InvalidOperationException("InterpretClick() returned null!"));
-		return null!;
+		return null;
 	}
 
 	public InterpretationFunction? InterpretDrag(IItemSlot draggedSlot, RefBox<ItemDisplay> grabbedItem) {
@@ -330,10 +351,12 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 				}
 			};
 		} else if (dragButton == PointerEventData.InputButton.Right && grabbedItem.value != null && grabbedItem.value.ItemStack.Quantity > 0) {
+			//if (draggedSlot.ContainedItem != null && grabbedItem.value.DisplayedItem != draggedSlot.ContainedItem) {
+			//	return null;
+			//}
 			return TransferSingleToSlot;
 		}
 
-		logger.ThrowException(null, new InvalidOperationException("InterpretDrag() return null!"));
 		return null;
 	}
 
@@ -361,7 +384,30 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		this.dragOrigin = null;
 	}
 
-	[InterpretationFunctionSubmodule]
+	[InterpretationFunctionCandidate]
+	public void CollectAllStacksInGrabbed(Item item, RefBox<ItemDisplay> grabbedItem) {
+		if (grabbedItem.value == null) {
+			return;
+		}
+
+		var slots = GetOccupiedSlots(item);
+		if (slots == null) {
+			return;
+		}
+		int totalQuantity = grabbedItem.value.ItemStack.Quantity;
+		for (int i = 0; i < slots.Count(); i++) {
+			var slot = slots[i];
+
+			totalQuantity += slot.ItemStack.Quantity;
+			if (totalQuantity > item.maxStackSize) {
+				break;
+			}
+			slot.ItemStack.Quantity = 0;
+		}
+		grabbedItem.value.ItemStack.Quantity = totalQuantity;
+	}
+
+	[InterpretationFunctionCandidate]
 	public void HalveStackFromSlot(IItemSlot clickedSlot, RefBox<ItemDisplay> grabbedItem) {
 		if (clickedSlot.ItemStack == null || grabbedItem.value != null) {
 			return;
@@ -372,7 +418,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		CreateGrabbedDisplay(grabbedItem, new ItemStack(clickedSlot.ItemStack.Item, amount));
 	}
 
-	[InterpretationFunctionSubmodule]
+	[InterpretationFunctionCandidate]
 	public void TransferSingleToSlot(IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
 		if (grabbedItem.value == null) {
 			return;
@@ -381,7 +427,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		grabbedItem.value.ItemStack.Quantity--;
 	}
 
-	[InterpretationFunctionSubmodule]
+	[InterpretationFunctionCandidate]
 	public void TransferSingleToGrabbed(IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
 		if (slot.ItemStack == null) {
 			return;
@@ -390,7 +436,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		slot.ItemStack.Quantity--;
 	}
 
-	[InterpretationFunctionSubmodule]
+	[InterpretationFunctionCandidate]
 	public void AddToGrabbed(IItemSlot slot, RefBox<ItemDisplay> grabbedItem, int amount) {
 		if (slot.ItemStack == null) {
 			return;
@@ -414,7 +460,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		grabbedReference.value = grabbed;
 	}
 
-	[InterpretationFunctionSubmodule]
+	[InterpretationFunctionCandidate]
 	public void TransferGrabbed(IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
 		if (!PopupOpen) {
 			return;
@@ -439,15 +485,15 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 			return;
 		}
 
-		// Swap items
-		if (slot.ItemStack?.Item != grabbedItem.value!.ItemStack.Item || grabbedItem.value.ItemStack.HasMaxStack() || slot.ItemStack.HasMaxStack()) {
+		// Swap if different items or max quantity exists in either stack
+		if (slot.ContainedItem != grabbedItem.value!.ItemStack.Item || grabbedItem.value.ItemStack.HasMaxStack() || slot.ItemStack.HasMaxStack()) {
 			this.SwapItems(slot, grabbedItem);
-		} else {    // Merge/flow items
-			SetRightClickAvailable(MergeFromGrabbed(slot, grabbedItem));
+		} else {    // Merge in slot for compatible stacks
+			SetRightClickAvailable(MergeInSlot(slot, grabbedItem));
 		}
 	}
 
-	[InterpretationFunctionSubmodule]
+	[InterpretationFunctionCandidate]
 	public void GrabItemFromSlot(IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
 		if (slot.IsEmpty || grabbedItem.value != null) {
 			return;
@@ -457,7 +503,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		player.SetMainHandItem(grabbedItem.value.ItemStack);
 	}
 
-	[InterpretationFunctionSubmodule]
+	[InterpretationFunctionCandidate]
 	public void ReleaseItemInSlot(IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
 		if (slot.HasItem || grabbedItem.value == null) {
 			return;
@@ -467,7 +513,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		grabbedItem.value = null;
 	}
 
-	[InterpretationFunctionSubmodule]
+	[InterpretationFunctionCandidate]
 	public void SwapItems(IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
 		if (slot.IsEmpty || grabbedItem.value == null) {
 			return;
@@ -479,9 +525,16 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		player.SetMainHandItem(grabbedItem.value.ItemStack);
 	}
 
-	[InterpretationFunctionSubmodule("Returns true if the grabbed stack fit in the slot stack")]
-	public bool MergeFromGrabbed(IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
-		int space = slot.ItemStack.Item.maxStackSize - slot.ItemStack.Quantity;
+	[InterpretationFunctionCandidate("Returns true if the grabbed stack fit in the slot stack")]
+	public bool MergeInSlot(IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
+		if (grabbedItem.value == null) {
+			return false;
+		}
+		if (slot.IsEmpty) {
+			this.ReleaseItemInSlot(slot, grabbedItem);
+			return true;
+		}
+		int space = slot.ItemStack!.Item.maxStackSize - slot.ItemStack.Quantity;
 		int transfer = Math.Min(space, grabbedItem.value.ItemStack.Quantity);
 		slot.ItemStack.Quantity += transfer;
 		grabbedItem.value.ItemStack.Quantity -= transfer;
