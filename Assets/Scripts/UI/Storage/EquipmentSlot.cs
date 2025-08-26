@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 public abstract class EquipmentSlot : MonoBehaviour, IItemSlot {
+	public abstract IItemContainer2D container { get; }
 	public ItemDisplay ItemDisplay => gameObject.GetComponentInChildren<ItemDisplay>();
 	public abstract int index { get; set; }
 	public bool HasItem => ItemDisplay != null;
@@ -33,7 +34,7 @@ public abstract class EquipmentSlot : MonoBehaviour, IItemSlot {
 			((IEquipable)this.ItemStack.Item).OnUnequipped();
 		}
 
-		this.TranserItems(grabbedItem, inventory);
+		this.TransferGrabbed(grabbedItem, inventory);
 		if (this.HasItem && !justEquipped) {
 			((IEquipable)this.ItemStack.Item).OnEquip(this);
 		}

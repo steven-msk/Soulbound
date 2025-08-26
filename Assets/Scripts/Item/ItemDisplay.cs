@@ -1,5 +1,7 @@
 using Mono.Cecil;
+using System;
 using Unity.VisualScripting;
+using UnityEditor.Graphs;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -23,7 +25,15 @@ public class ItemDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
 #nullable enable
 	public static ItemDisplay Create<TSlot>(ItemStack itemStack, TSlot? slot) where TSlot : MonoBehaviour, IItemSlot {
-		GameObject? obj = Instantiate(ResourceManager.Get<GameObject, ResourceGroups.Prefabs>("itemDisplayPrefab"), slot?.transform ?? null);
+		return Create(itemStack, () => slot?.transform ?? null);
+	}
+
+	public static ItemDisplay Create<TSlot>(Item item, int quantity, TSlot? slot) where TSlot : MonoBehaviour, IItemSlot {
+		return Create(new ItemStack(item, quantity), slot);
+	}
+
+	public static ItemDisplay Create(ItemStack itemStack, Func<Transform?> parentSupplier) {
+		GameObject? obj = Instantiate(ResourceManager.Get<GameObject, ResourceGroups.Prefabs>("itemDisplayPrefab"), parentSupplier.Invoke());
 		ItemDisplay? display = obj?.GetComponent<ItemDisplay>();
 		UnityEngine.Debug.Assert(display != null, $"ItemDisplay component not found in item display prefab");
 		display!.ItemStack = itemStack;
@@ -31,18 +41,10 @@ public class ItemDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 			itemStack.InitializeStackText(display);
 		}
 		display.Tooltip = itemStack.Item.GetTooltip();
+		display.transform.SetAsLastSibling();
 		return display;
 	}
-
-	public static ItemDisplay Create<TSlot>(Item item, int quantity, TSlot? slot) where TSlot : MonoBehaviour, IItemSlot {
-		ItemStack itemStack = new(item, quantity);
-		return Create(itemStack, slot);
-	}
 #nullable disable
-
-	private void Start() {
-		transform.SetAsFirstSibling();
-	}
 
 	private void Update() {
 		if (moveMode) {

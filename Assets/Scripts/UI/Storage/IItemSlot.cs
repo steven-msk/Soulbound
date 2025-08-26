@@ -1,18 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
-public interface IItemSlot : IPointerDownHandler, ISerializable<SerializedItemSlot> {
+#nullable enable
+
+public interface IItemSlot : IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, ISerializable<SerializedItemSlot> {
 	public ItemDisplay ItemDisplay { get; }
+	public IItemContainer2D container { get; }
 	public int index { get; set; }
 	public bool HasItem => ItemDisplay != null;
 	public bool IsEmpty => ItemDisplay == null;
-	public ItemStack ItemStack => ItemDisplay?.ItemStack;
+	public ItemStack? ItemStack => ItemDisplay?.ItemStack;
+	public Item? ContainedItem => ItemStack?.Item;
 	public GameObject GameObject { get; }
 	
 	public void OnClick(ItemDisplay grabbedItem, InventoryController inventory);
@@ -25,7 +31,7 @@ public interface IItemSlot : IPointerDownHandler, ISerializable<SerializedItemSl
 
 	public virtual void AttachItemDisplay(ItemDisplay itemDisplay) {
 		itemDisplay?.transform.SetParent(GameObject.transform, true);
-		itemDisplay.DisableGrab(); 
+		itemDisplay?.DisableGrab();
 	}
 
 	public virtual void DetachItemDisplay() {
@@ -33,11 +39,44 @@ public interface IItemSlot : IPointerDownHandler, ISerializable<SerializedItemSl
 		this.ItemDisplay?.transform.SetParent(GameManager.instance.Player.Inventory.transform, true);
 	}
 
-	SerializedItemSlot ISerializable<SerializedItemSlot>.Serialize() {
-		return new SerializedItemSlot(index, ItemStack);
+	SerializedItemSlot ISerializable<SerializedItemSlot>.Serialize() => new(index, ItemStack);
+
+	public void TrySetStack(int quantity, Item fallback) {
+		CreateDisplayIfEmpty(new ItemStack(fallback, quantity));
+		this.ItemStack!.Quantity = quantity;
 	}
+
+	public void TryAddStack(int add, Item fallback) {
+		CreateDisplayIfEmpty(new ItemStack(fallback, add));
+		this.ItemStack!.Quantity += add;
+	}
+
+	public void CreateDisplay(ItemStack itemStack) {
+		this.AttachItemDisplay(ItemDisplay.Create(itemStack, () => GameObject.transform));
+	}
+
+	public bool CreateDisplayIfEmpty(ItemStack itemStack) {
+		if (this.ItemStack == null) {
+			CreateDisplay(itemStack);
+			return true;
+		}
+		return false;
+	}
+
+	new public void OnPointerDown(PointerEventData eventData) {
+		container.OnPointerDown(this, eventData);
+	}
+	new public void OnPointerUp(PointerEventData eventData) { 
+		container.OnPointerUp(this, eventData);
+	}
+	new public void OnPointerEnter(PointerEventData eventData) => container.OnPointerEnter(this, eventData);
+
+	void IPointerDownHandler.OnPointerDown(PointerEventData eventData) => this.OnPointerDown(eventData);
+	void IPointerUpHandler.OnPointerUp(PointerEventData eventData) => this.OnPointerUp(eventData);
+	void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData) => this.OnPointerEnter(eventData);
 }
 
+#nullable enable
 public static class ItemSlotUtility {
 
 	// PLANNED REFACTOR: RequestClickAction() should take pointer event data for better functionality with item management in slots
@@ -45,6 +84,7 @@ public static class ItemSlotUtility {
 	// Since a lot of item management features are planned, TransferItems might become too full.
 	// This is an anticipation of a separation of concerns regarding item transfer functionality.
 
+	[Obsolete]
 	public static void RequestClickAction(this IItemSlot slot) {
         InventoryController inventory = GameManager.instance.Player.Inventory;
 		InputHandler.RequestAction(new("ItemDrag", 10, () => {
@@ -53,9 +93,11 @@ public static class ItemSlotUtility {
 		InputHandler.BlockContext("ItemUse", () => !GameManager.instance.Player.InputHandler.LeftHold);
 	}
 
-	public static bool ValidClickAction(this IItemSlot slot, ItemDisplay grabbedItem) => grabbedItem != null || slot.HasItem;
+	[Obsolete]
+	public static bool ValidClickAction(this IItemSlot slot, ItemDisplay? grabbedItem) => grabbedItem != null || slot.HasItem;
 
-	public static void TranserItems(this IItemSlot slot, ItemDisplay grabbedItem, InventoryController inventory) {
+	[Obsolete]
+	public static void TransferGrabbed(this IItemSlot slot, ItemDisplay? grabbedItem, InventoryController inventory) {
 		if (!inventory.PopupOpen) {
 			return;
 		}
@@ -70,31 +112,36 @@ public static class ItemSlotUtility {
 			}
 		}
 
+		//Debug.Log(grabbedItem?.ItemStack +", "+ slot.ItemStack + ", "+ (grabbedItem?.ItemStack.Item == slot.ItemStack?.Item));
+
+		// Grab item
 		if (grabbedItem == null && slot.HasItem) { 
 			SetDropCapabilities(false);
-			player.SetMainHandItem(slot.ItemStack);
+			player.SetMainHandItem(slot.ItemStack!);
 			inventory.GrabbedItem = slot.ItemDisplay;
 			slot.DetachItemDisplay();
 			return;
 		} 
 
+		// Release item
 		if (grabbedItem != null && slot.IsEmpty) {
 			SetDropCapabilities(true);
-			((IItemSlot)slot).AttachItemDisplay(inventory.GrabbedItem);
+			(slot as IItemSlot).AttachItemDisplay(inventory.GrabbedItem);
 			player.SetMainHandItem(inventory.Hotbar.ActiveSlot.ItemStack);
 			inventory.GrabbedItem = null;
 			return;
 		}
 		
-		if (slot.ItemStack.Item != inventory.GrabbedItem.ItemStack.Item || (inventory.GrabbedItem.ItemStack.Quantity == slot.ItemStack.Quantity)) {
+		// Swap items
+		if (slot.ItemStack?.Item != inventory.GrabbedItem.ItemStack.Item || inventory.GrabbedItem.ItemStack.HasMaxStack() || slot.ItemStack.HasMaxStack()) {
 			ItemDisplay previousGrabbed = inventory.GrabbedItem;
 			inventory.GrabbedItem = slot.ItemDisplay;
 			slot.DetachItemDisplay();
 			slot.AttachItemDisplay(previousGrabbed);
 			player.SetMainHandItem(inventory.GrabbedItem.ItemStack);
-		} else {
+		} else {	// Merge/flow items
 			int space = slot.ItemStack.Item.maxStackSize - slot.ItemStack.Quantity;
-			int transfer = Math.Min(space, inventory.GrabbedItem.ItemStack.Quantity);
+			int transfer = Math.Min(space, inventory.GrabbedItem.ItemStack.Quantity); 
 			slot.ItemStack.Quantity += transfer;
 			inventory.GrabbedItem.ItemStack.Quantity -= transfer;
 			if (inventory.GrabbedItem.ItemStack.Quantity <= 0) {

@@ -15,6 +15,8 @@ public class ArmorSlot : EquipmentSlot {
 	public GameObject Overlay => overlay;
 	public override int index { get; set; }
 
+	public override IItemContainer2D container => throw new NotImplementedException();
+
 	[InputAction("ItemDrag", Priority = 10, BlocksContexts = new[] { "ItemUse" })]
 	public override void OnClick(ItemDisplay grabbedItem, InventoryController inventory) {
 		if ((grabbedItem?.ItemStack.Item is ArmorItem armorItem && this.AcceptedType == armorItem.armorType) || (grabbedItem == null && this.HasItem)) {

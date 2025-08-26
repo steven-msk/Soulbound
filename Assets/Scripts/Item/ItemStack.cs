@@ -7,7 +7,7 @@ using UnityEngine;
 [Serializable]
 public class ItemStack {
 	public Item Item { get; }
-	private ItemDisplay display; 
+	private ItemDisplay? display; 
 	private GameObject stackText;
 	private int quantity;
 	public int Quantity {
@@ -15,7 +15,7 @@ public class ItemStack {
 		set {
 			quantity = value;
 			if (quantity <= 0) {
-				display.Destroy();
+				display?.Destroy();
 			}
 			if(stackText != null && quantity > 0) {
 				UpdateText();
@@ -75,6 +75,8 @@ public class ItemStack {
 			[SpawnDataKey.Of("spriteID")] = new SpawnDataValue<string>(spriteID)
 		});
     }
+
+	public bool HasMaxStack() => quantity == Item.maxStackSize;
 
 	// FEATUREIMPL: dropped item stacks converging to avoid lag
 

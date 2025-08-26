@@ -6,6 +6,7 @@ public class InventorySlot : MonoBehaviour, IItemSlot {
 
 	// FEATUREIMPL (PARTIALLY IMPLEMENTED): equipment slots (NOT TESTED)
 
+	public IItemContainer2D container => gameObject.GetComponentInParent<InventoryController>(true);
 	public ItemDisplay ItemDisplay => gameObject.GetComponentInChildren<ItemDisplay>();
 	public int index { get; set; }
 	public bool HasItem => ItemDisplay != null;
@@ -19,7 +20,8 @@ public class InventorySlot : MonoBehaviour, IItemSlot {
 		ItemDisplay.Create(serialized.itemStack, this);
 	}
 
-	public void OnClick(ItemDisplay grabbedItem, InventoryController inventory) => this.TranserItems(grabbedItem, inventory);
+	[Obsolete]
+	public void OnClick(ItemDisplay grabbedItem, InventoryController inventory) => this.TransferGrabbed(grabbedItem, inventory);
 
-	public void OnPointerDown(PointerEventData eventData) => this.RequestClickAction();
+	//public void OnPointerDown(PointerEventData eventData) => this.RequestClickAction();
 }

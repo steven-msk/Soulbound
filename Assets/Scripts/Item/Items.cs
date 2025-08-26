@@ -62,4 +62,8 @@ abstract partial class Item {
 			writer.WriteValue(value.id);
 		}
 	}
+
+	public override bool Equals(object obj) {
+        return obj is Item other && other.id == this.id;
+	}
 }

@@ -4,10 +4,11 @@ using System.Linq;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
 
-public class HotbarController : MonoBehaviour, IHotbarContainer, IDependencyInitializable<HotbarController, InventoryController> {
+public class HotbarController : MonoBehaviour, IItemContainer, IDependencyInitializable<HotbarController, InventoryController> {
 	[Header("Active Slots")]
 	public Color activeSlotColor;
 	public Color activeSlotNumberColor;
@@ -28,11 +29,12 @@ public class HotbarController : MonoBehaviour, IHotbarContainer, IDependencyInit
 	public int ActiveKey => active.key;
 
 	private InventoryController inventory;
-
-	public int Columns => 9;
+	public static int length => 9;
 
 	private InventorySlot[] slots;
 	public InventorySlot[] Slots => slots;
+	IReadOnlyList<IItemSlot> IItemContainer.slots => slots;
+
 	public InventorySlot this[int index] => slots[index];
 	private static Dictionary<int, InventorySlot> slotsByIndex = new();
 
@@ -46,14 +48,14 @@ public class HotbarController : MonoBehaviour, IHotbarContainer, IDependencyInit
 
 	public void SetupGrid() {
 		slots = gameObject.GetComponentsInChildren<InventorySlot>();
-		for (int i = 0; i < Columns; i++) {
+		for (int i = 0; i < length; i++) {
 			slots[i].index = i;
 			slotsByIndex[i] = slots[i];
 		}
 	}
 
 	public void SetActiveSlot(int slotKey) {
-		UnityEngine.Debug.Assert(slotKey >= 0 && slotKey < Columns, $"Unexpected hotbar slotKey {slotKey}");
+		UnityEngine.Debug.Assert(slotKey >= 0 && slotKey < length, $"Unexpected hotbar slotKey {slotKey}");
 		InventorySlot hotbarSlot = this[slotKey];
 		if (active.hotbarSlot == null) {
 			active = (hotbarSlot, slotKey);
@@ -76,10 +78,10 @@ public class HotbarController : MonoBehaviour, IHotbarContainer, IDependencyInit
 
 	public void OnHotbarScroll(float scrollDelta) {
 		int currentSlot = active.key;
-		UnityEngine.Debug.Assert(currentSlot >= 0 && currentSlot < Columns);
+		UnityEngine.Debug.Assert(currentSlot >= 0 && currentSlot < length);
 
 		int nextSlot = currentSlot - (int)scrollDelta;
-		SetActiveSlot(Mathf.Clamp(nextSlot, 0, Columns - 1));
+		SetActiveSlot(Mathf.Clamp(nextSlot, 0, length - 1));
 	}
 
 	private void ApplySelectionChanges(InventorySlot slot, Color color, Color slotNumberColor, Color itemStackColor, Vector3 offset, Vector3 scale) {
@@ -96,8 +98,8 @@ public class HotbarController : MonoBehaviour, IHotbarContainer, IDependencyInit
 			hotbarSlot.GetComponent<TextMeshProUGUI>().color = slotNumberColor;
 			break;
 		}
-		if (!IsEmpty(slot.GetComponent<InventorySlot>()) && slot.ItemStack.Item.IsStackable) {
-			slot.GetComponentInChildren<ItemDisplay>().gameObject.GetComponentInChildren<TextMeshProUGUI>().color = itemStackColor;
+		if (!slot.IsEmpty && slot.ItemStack.Item.IsStackable) {
+			slot.ItemDisplay.gameObject.GetComponentInChildren<TextMeshProUGUI>().color = itemStackColor;
 		}
 	}
 
@@ -112,7 +114,18 @@ public class HotbarController : MonoBehaviour, IHotbarContainer, IDependencyInit
 		inventory.EquipHotbarItem(active.hotbarSlot);
 	}
 
-	public bool IsEmpty(InventorySlot slot) => slot.GetComponentInChildren<ItemDisplay>() == null;
-
 	public InventorySlot GetSlotByIndex(int index) => slotsByIndex[index];
+	IItemSlot IItemContainer.GetSlotByIndex(int index) => slotsByIndex[index];
+
+	public void OnPointerDown(IItemSlot slot, PointerEventData eventData) {
+		throw new NotImplementedException();
+	}
+
+	public void OnPointerUp(IItemSlot slot, PointerEventData eventData) {
+		throw new NotImplementedException();
+	}
+
+	public void OnPointerEnter(IItemSlot slot, PointerEventData data) {
+		throw new NotImplementedException();
+	}
 }
