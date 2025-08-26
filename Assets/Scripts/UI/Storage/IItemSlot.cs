@@ -47,8 +47,9 @@ public interface IItemSlot : IPointerDownHandler, IPointerUpHandler, IPointerEnt
 	}
 
 	public void TryAddStack(int add, Item fallback) {
-		CreateDisplayIfEmpty(new ItemStack(fallback, add));
-		this.ItemStack!.Quantity += add;
+		if (!CreateDisplayIfEmpty(new ItemStack(fallback, add))) {
+			this.ItemStack!.Quantity += add;
+		}
 	}
 
 	public void CreateDisplay(ItemStack itemStack) {

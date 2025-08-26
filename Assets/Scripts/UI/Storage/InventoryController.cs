@@ -49,9 +49,10 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 
 	private bool draggingSlots;
 	private List<IItemSlot> draggedSlots = new();
-	private IItemSlot? dragSplitSource;
-	private int startDragSplitStack;
+	private IItemSlot? dragOrigin;
+	private int startDragStack;
 	private Dictionary<IItemSlot, int> quantitySnapshots = new();
+	private PointerEventData.InputButton dragButton;
 
 	// FEATUREIMPL: item grabbing controls - this might require a general implementation in IContainer
 
@@ -232,6 +233,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 	IItemSlot IItemContainer.GetSlotByIndex(int index) => popupSlotsByIndex[index];
 
 	public void OnPointerDown(IItemSlot slot, PointerEventData eventData) {
+		this.dragButton = eventData.button;
 		SlotClickInterpretation interpretation = InterpretClick(slot, eventData);
 		if (interpretation == null) {
 			return;
@@ -254,7 +256,9 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 	}
 
 	public void OnPointerEnter(IItemSlot slot, PointerEventData eventData) {
-		InvocationHelper.If(draggingSlots, () => this.OnSlotDrag(slot, eventData));
+		ItemDisplay? grabbedReference = GrabbedItem;
+		InvocationHelper.If(draggingSlots, () => this.OnSlotDrag(slot, ref grabbedReference));
+		GrabbedItem = grabbedReference;
 	}
 
 	public SlotClickInterpretation InterpretClick(IItemSlot clickedSlot, PointerEventData eventData) {
@@ -295,15 +299,14 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 			clickedSlot.ItemStack!.Quantity = stackReference.Quantity;
 			return;
 		}
-		if (clickedSlot.IsEmpty) {
-			this.TransferGrabbed(clickedSlot, ref grabbedItem);
+		if (grabbedItem != null) {
+			clickedSlot.TryAddStack(1, grabbedItem.ItemStack.Item);
+			grabbedItem.ItemStack.Quantity--;
 			return;
 		}
 
 		int amount = clickedSlot.ItemStack!.Quantity / 2;
-		if (clickedSlot.ItemStack.Quantity % 2 == 1) {
-			amount++;
-		}
+		amount += clickedSlot.ItemStack.Quantity % 2;
 		clickedSlot.ItemStack.Quantity -= amount;
 		CreateGrabbedDisplay(ref grabbedItem, new ItemStack(clickedSlot.ItemStack.Item, amount));
 	}
@@ -380,60 +383,68 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		}
 	}
 
-	public void StartDrag(IItemSlot dragSplitSource) { 
+	public void StartDrag(IItemSlot dragOrigin) { 
 		draggingSlots = true;
-		this.dragSplitSource = dragSplitSource;
-		this.startDragSplitStack = dragSplitSource.ItemStack!.Quantity;
+		this.dragOrigin = dragOrigin;
+		this.startDragStack = dragOrigin.ItemStack!.Quantity;
 		quantitySnapshots.Clear();
-		foreach (var slot in slots.Where(s => s != this.dragSplitSource && s.ContainedItem == dragSplitSource.ContainedItem)) {
+		foreach (var slot in slots.Where(s => s != this.dragOrigin && s.ContainedItem == dragOrigin.ContainedItem)) {
 			quantitySnapshots[slot] = slot.ItemStack!.Quantity;
 		}
-		draggedSlots.Add(dragSplitSource);
+		Debug.Log("starting drag: " + dragButton);
+		draggedSlots.Add(dragOrigin);
 	}
 
-	public void OnSlotDrag(IItemSlot draggedSlot, PointerEventData eventData) {
+	public void OnSlotDrag(IItemSlot draggedSlot, ref ItemDisplay? grabbedItem) {
 		if (!draggingSlots) {
 			return;
 		}
-		if (draggedSlots.Contains(draggedSlot) || (draggedSlot.HasItem && draggedSlot.ContainedItem != dragSplitSource!.ContainedItem)) {
-			return;
-		}
-		// Clone to preview distribution
-		List<IItemSlot> cloned = new(draggedSlots) { draggedSlot };
 
-		int toSplit = startDragSplitStack;
-		int splitAmount = toSplit / (cloned.Count);
-		if (splitAmount <= 0) {
-			return;
-		}
-		// Commit the slot to dragged list
-		draggedSlots.Add(draggedSlot);
-		int remainder = toSplit % (draggedSlots.Count);
-
-		for (int i = 0; i < draggedSlots.Count; i++) {
-			var slot = draggedSlots[i];
-			int amount = splitAmount + (i < remainder ? 1 : 0);
-
-			if (slot.ItemStack == null) {
-				slot.CreateDisplay(new ItemStack(dragSplitSource!.ItemStack!.Item, amount));
+		if (dragButton == PointerEventData.InputButton.Left) {
+			if (draggedSlots.Contains(draggedSlot) || (draggedSlot.HasItem && draggedSlot.ContainedItem != dragOrigin!.ContainedItem)) {
+				return;
 			}
-			if (quantitySnapshots.TryGetValue(slot, out var quantity) && slot != this.dragSplitSource) {
-				slot.ItemStack!.Quantity = quantity + amount;
-			} else {
-				slot.ItemStack!.Quantity = amount;
+
+			// Clone to preview distribution
+			List<IItemSlot> preview = new(draggedSlots) { draggedSlot };
+
+			int toSplit = startDragStack;
+			int splitAmount = toSplit / (preview.Count);
+			if (splitAmount <= 0) {
+				return;
 			}
+			// Commit the slot to dragged list
+			draggedSlots.Add(draggedSlot);
+			int remainder = toSplit % (draggedSlots.Count);
+
+			for (int i = 0; i < draggedSlots.Count; i++) {
+				var slot = draggedSlots[i];
+				int amount = splitAmount + (i < remainder ? 1 : 0);
+
+				if (slot.ItemStack == null) {
+					slot.CreateDisplay(new ItemStack(dragOrigin!.ItemStack!.Item, amount));
+				}
+				if (quantitySnapshots.TryGetValue(slot, out var quantity) && slot != this.dragOrigin) {
+					slot.ItemStack!.Quantity = quantity + amount;
+				} else {
+					slot.ItemStack!.Quantity = amount;
+				}
+			}
+		} else if (dragButton == PointerEventData.InputButton.Right && grabbedItem != null && grabbedItem.ItemStack.Quantity > 0) {
+			draggedSlot.TryAddStack(1, grabbedItem.ItemStack.Item);
+			grabbedItem.ItemStack.Quantity--;
 		}
 	}
 
 	public void EndDrag() {
 		if (draggedSlots.Count == 0) {
 			draggingSlots = false;
-			this.dragSplitSource = null;
+			this.dragOrigin = null;
 			return;
 		}
 
 		draggingSlots = false;
 		draggedSlots.Clear();
-		this.dragSplitSource = null;
+		this.dragOrigin = null;
 	}
 }
