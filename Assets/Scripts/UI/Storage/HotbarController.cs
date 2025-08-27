@@ -65,7 +65,7 @@ public class HotbarController : MonoBehaviour, IItemContainer, IDependencyInitia
 
 		if (hotbarSlot != active.hotbarSlot) {
 			if (!inventory.PopupOpen) {
-				ApplySelectionChanges(active.hotbarSlot, inactiveSlotColor, inactiveSlotNumberColor, inactiveItemStackColor, -activeSlotOffset, Vector3.one);
+				ApplySelectionChanges(active.hotbarSlot, inactiveSlotColor, inactiveSlotNumberColor, inactiveItemStackColor, -activeSlotOffset, Vector3.one); 
 			} else {
 				ApplySelectionChanges(active.hotbarSlot, activeSlotColor, activeSlotNumberColor, activeItemStackColor, -activeSlotOffset, Vector3.one);
 			}
