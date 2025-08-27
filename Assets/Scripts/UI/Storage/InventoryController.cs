@@ -253,6 +253,11 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		}
 
 		InputHandler.RequestAction(new("ItemSlotAction", 10, () => {
+
+			// Might replace with a validator specified by IItemSlot
+			if (GrabbedItem == null && slot.IsEmpty) {
+				return;		
+			}
 			RefBox<ItemDisplay> grabbedReference = new(this.GrabbedItem);
 			interpretationFunction.Invoke(slot, grabbedReference);
 			hotbar.OnItemTransfer(slot, grabbedReference);
