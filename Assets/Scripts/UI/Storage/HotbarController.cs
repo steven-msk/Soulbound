@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using TMPro;
 using Unity.VisualScripting;
@@ -72,7 +73,7 @@ public class HotbarController : MonoBehaviour, IItemContainer, IDependencyInitia
 			ApplySelectionChanges(active.hotbarSlot, activeSlotColor, activeSlotNumberColor, activeItemStackColor, activeSlotOffset, activeSlotScale);
 		}
 
-		activeItemText.text = slots[slotKey].ItemStack?.Item.name;
+		activeItemText.text = slots[slotKey].ItemStack?.Item.name ?? "";
 		inventory.EquipHotbarItem(slots[slotKey]);
 	}
 
@@ -112,6 +113,13 @@ public class HotbarController : MonoBehaviour, IItemContainer, IDependencyInitia
 			ApplySelectionChanges(slot, slotColor, slotNumberColor, itemStackColor, Vector3.zero, Vector3.one);
 		}
 		inventory.EquipHotbarItem(active.hotbarSlot);
+	}
+
+	public void OnItemTransfer(IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
+		activeItemText.text = active.hotbarSlot.ItemStack?.Item.name ?? "";
+		if (slot.IsEmpty && grabbedItem.value != null && slot == (IItemSlot)active.hotbarSlot) {
+			grabbedItem.value.transform.localScale = Vector3.one;
+		}
 	}
 
 	public InventorySlot GetSlotByIndex(int index) => slotsByIndex[index];

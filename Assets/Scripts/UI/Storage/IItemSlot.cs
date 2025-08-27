@@ -72,7 +72,6 @@ public interface IItemSlot : IPointerDownHandler, IPointerUpHandler, IPointerEnt
 	}
 	new public void OnPointerEnter(PointerEventData eventData) { 
 		container.OnPointerEnter(this, eventData);
-		Debug.Log(container);
 	}
 
 	void IPointerDownHandler.OnPointerDown(PointerEventData eventData) => this.OnPointerDown(eventData);

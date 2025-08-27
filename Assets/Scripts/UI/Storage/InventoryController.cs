@@ -183,7 +183,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 
 	public bool PickUpItem(ItemStack itemStack) {
 		if (!itemStack.Item.IsStackable) {
-			InventorySlot emptySlot = GetFirstEmptySlot();
+			InventorySlot? emptySlot = GetFirstEmptySlot();
 			if (emptySlot != null) {
 				ItemDisplay.Create(itemStack, emptySlot);
 				return true;
@@ -193,9 +193,9 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 			int remaining = itemStack.Quantity;
 
 			// Search for stack with the same item
-			foreach (var stackSlot in GetOccupiedSlots(itemStack.Item)) {
-				ItemStack stackInSlot = stackSlot.ItemStack;
-				if (stackInSlot.Quantity < stackInSlot.Item.maxStackSize) {
+			foreach (var stackSlot in GetOccupiedSlots(itemStack.Item) ?? new List<IItemSlot>().ToArray()) {
+				ItemStack? stackInSlot = stackSlot.ItemStack;
+				if (stackInSlot!.Quantity < stackInSlot!.Item.maxStackSize) {
 					int availableSpace = stackInSlot.Item.maxStackSize - stackInSlot.Quantity;
 					int toAdd = Math.Min(remaining, availableSpace);
 					stackInSlot.Quantity += toAdd;
@@ -255,6 +255,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		InputHandler.RequestAction(new("ItemSlotAction", 10, () => {
 			RefBox<ItemDisplay> grabbedReference = new(this.GrabbedItem);
 			interpretationFunction.Invoke(slot, grabbedReference);
+			hotbar.OnItemTransfer(slot, grabbedReference);
 			if (GrabbedItem != null && !doubleClick) {
 				this.StartDrag(slot);
 			}
@@ -278,6 +279,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 			return;
 		}
 		interpretationFunction.Invoke(slot, grabbedReference);
+		hotbar.OnItemTransfer(slot, grabbedReference);
 		this.GrabbedItem = grabbedReference.value;
 	}
 
@@ -472,14 +474,14 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		}
 
 		// Grab if slot has item, grabbed is empty
-		if (grabbedItem.value == null && slot.HasItem) {
+		if (grabbedItem.value == null && slot.ItemStack != null) {
 			SetRightClickAvailable(false);
 			this.GrabItemFromSlot(slot, grabbedItem);
 			return;
 		}
 
 		// Release if slot is empty, grabbed has item
-		if (grabbedItem.value != null && !slot.HasItem) {
+		if (grabbedItem.value != null && slot.ItemStack == null) {
 			SetRightClickAvailable(true);
 			this.ReleaseItemInSlot(slot, grabbedItem);
 			return;
