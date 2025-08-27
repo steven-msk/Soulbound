@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using PlasticGui.WorkspaceWindow;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,6 +14,7 @@ using UnityEditor.Timeline.Actions;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 #nullable enable
@@ -137,7 +139,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		popupOpen = !popupOpen;
 		popup.SetActive(popupOpen);
 		armorSlots.SetActive(popupOpen);
-		LayoutRebuilder.ForceRebuildLayoutImmediate(popup.GetComponent<RectTransform>());
+		LayoutRebuilder.ForceRebuildLayoutImmediate(popup.GetComponent<RectTransform>()); 
 		activeTooltip?.Hide();
 		hotbar.OnInventoryPopup();
 		if (!popupOpen && GrabbedItem != null) {
@@ -182,7 +184,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 	}
 
 	public bool PickUpItem(ItemStack itemStack) {
-		if (!itemStack.Item.IsStackable) {
+		if (!itemStack.item.IsStackable) {
 			InventorySlot? emptySlot = GetFirstEmptySlot();
 			if (emptySlot != null) {
 				ItemDisplay.Create(itemStack, emptySlot);
@@ -190,15 +192,15 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 			}
 			return false;
 		} else {
-			int remaining = itemStack.Quantity;
+			int remaining = itemStack.quantity;
 
 			// Search for stack with the same item
-			foreach (var stackSlot in GetOccupiedSlots(itemStack.Item) ?? new List<IItemSlot>().ToArray()) {
+			foreach (var stackSlot in GetOccupiedSlots(itemStack.item) ?? new List<IItemSlot>().ToArray()) {
 				ItemStack? stackInSlot = stackSlot.ItemStack;
-				if (stackInSlot!.Quantity < stackInSlot!.Item.maxStackSize) {
-					int availableSpace = stackInSlot.Item.maxStackSize - stackInSlot.Quantity;
+				if (stackInSlot!.quantity < stackInSlot!.item.maxStackSize) {
+					int availableSpace = stackInSlot.item.maxStackSize - stackInSlot.quantity;
 					int toAdd = Math.Min(remaining, availableSpace);
-					stackInSlot.Quantity += toAdd;
+					stackInSlot.Increment(toAdd);
 					remaining -= toAdd;
 					if (remaining <= 0) {
 						return true;
@@ -210,8 +212,8 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 			InventorySlot[] availableSlots = MainPlayerSlots;
 			for (int i = 0; i < availableSlots.Length; i++){
 				if (!availableSlots[i].HasItem) {
-					int toAdd = Mathf.Min(remaining, itemStack.Item.maxStackSize);
-					ItemDisplay.Create(new ItemStack(itemStack.Item, toAdd), availableSlots[i]);
+					int toAdd = Mathf.Min(remaining, itemStack.item.maxStackSize);
+					ItemDisplay.Create(new ItemStack(itemStack.item, toAdd), availableSlots[i]);
 					remaining -= toAdd;
 				}
 				if (remaining <= 0) {
@@ -226,7 +228,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 
 	public InventorySlot[]? GetOccupiedSlots() => MainPlayerSlots.Where(slot => slot.HasItem)?.ToArray();
 
-	public InventorySlot[]? GetOccupiedSlots(Item item) => GetOccupiedSlots().Where(slot => slot.ItemStack.Item.Equals(item))?.ToArray();
+	public InventorySlot[]? GetOccupiedSlots(Item item) => GetOccupiedSlots().Where(slot => slot.ItemStack.item.Equals(item))?.ToArray();
 
 	public InventorySlot[]? GetEmptySlots() => MainPlayerSlots.Where(slot => !slot.HasItem)?.ToArray();
 	
@@ -246,7 +248,6 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 
 		this.dragButton = eventData.button;
 		InterpretationFunction? interpretationFunction = InterpretClick(slot, eventData, doubleClick);
-		Debug.Log(doubleClick);
 		if (interpretationFunction == null) {
 			logger.ThrowException(null, new InvalidOperationException("InterpretClick() returned null!"));
 			return;
@@ -296,7 +297,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		if (eventData.button == PointerEventData.InputButton.Left) {
 			if (!shift && !ctrl && !alt) {
 				if (doubleClick && GrabbedItem != null) {
-					return (slot, grabbedItem) => CollectAllStacksInGrabbed(grabbedItem.value!.ItemStack.Item, grabbedItem);
+					return (slot, grabbedItem) => CollectAllStacksInGrabbed(grabbedItem.value!.ItemStack.item, grabbedItem);
 				}
 				return TransferGrabbed;
 			}
@@ -327,7 +328,9 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 
 		if (dragButton == PointerEventData.InputButton.Left) {
 			return (slot, grabbedItem) => {
-				if (draggedSlots.Contains(slot) || (slot.HasItem && slot.ContainedItem != dragOrigin!.ContainedItem)) {
+				if (draggedSlots.Contains(slot) 
+						|| (slot.HasItem && slot.ContainedItem != dragOrigin!.ContainedItem)
+						|| (slot.HasItem && slot.ItemStack!.IsFull())) {
 					return;
 				}
 
@@ -348,19 +351,19 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 					int amount = splitAmount + (i < remainder ? 1 : 0);
 
 					if (draggedSlot.ItemStack == null) {
-						draggedSlot.CreateDisplay(new ItemStack(dragOrigin!.ItemStack!.Item, amount));
+						draggedSlot.CreateDisplay(new ItemStack(dragOrigin!.ItemStack!.item, amount));
 					}
-					if (quantitySnapshots.TryGetValue(draggedSlot, out var quantity) && draggedSlot != this.dragOrigin) {
-						draggedSlot.ItemStack!.Quantity = quantity + amount;
+					if (quantitySnapshots.TryGetValue(draggedSlot, out var snapshot) && draggedSlot != this.dragOrigin) {
+						draggedSlot.ItemStack!.SetQuantity(snapshot + amount);
 					} else {
-						draggedSlot.ItemStack!.Quantity = amount;
+						draggedSlot.ItemStack!.SetQuantity(amount);
 					}
 				}
 			};
-		} else if (dragButton == PointerEventData.InputButton.Right && grabbedItem.value != null && grabbedItem.value.ItemStack.Quantity > 0) {
-			//if (draggedSlot.ContainedItem != null && grabbedItem.value.DisplayedItem != draggedSlot.ContainedItem) {
-			//	return null;
-			//}
+		} else if (dragButton == PointerEventData.InputButton.Right && grabbedItem.value != null && grabbedItem.value.ItemStack.quantity > 0) {
+			if (draggedSlot.ContainedItem != null && grabbedItem.value.DisplayedItem != draggedSlot.ContainedItem) {
+				return null;
+			}
 			return TransferSingleToSlot;
 		}
 
@@ -370,10 +373,10 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 	public void StartDrag(IItemSlot dragOrigin) {
 		draggingSlots = true;
 		this.dragOrigin = dragOrigin;
-		this.startDragStack = dragOrigin.ItemStack!.Quantity;
+		this.startDragStack = dragOrigin.ItemStack!.quantity;
 		quantitySnapshots.Clear();
 		foreach (var slot in slots.Where(s => s != this.dragOrigin && s.ContainedItem == dragOrigin.ContainedItem)) {
-			quantitySnapshots[slot] = slot.ItemStack!.Quantity;
+			quantitySnapshots[slot] = slot.ItemStack!.quantity;
 		}
 		Debug.Log("starting drag: " + dragButton);
 		draggedSlots.Add(dragOrigin);
@@ -393,25 +396,26 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 
 	[InterpretationFunctionCandidate]
 	public void CollectAllStacksInGrabbed(Item item, RefBox<ItemDisplay> grabbedItem) {
-		if (grabbedItem.value == null) {
+		if (grabbedItem.value == null || grabbedItem.value.ItemStack.IsFull()) {
 			return;
 		}
 
-		var slots = GetOccupiedSlots(item);
-		if (slots == null) {
+		var slots = GetOccupiedSlots(item)?.OrderBy(slot => slot.ItemStack.quantity).ToList();
+		if (slots == null || slots.Count == 0) {
 			return;
 		}
-		int totalQuantity = grabbedItem.value.ItemStack.Quantity;
-		for (int i = 0; i < slots.Count(); i++) {
-			var slot = slots[i];
 
-			totalQuantity += slot.ItemStack.Quantity;
-			if (totalQuantity > item.maxStackSize) {
+		ItemStack grabbedStack = grabbedItem.value.ItemStack;
+		int spaceLeft = item.maxStackSize - grabbedStack.quantity;
+		foreach (var slot in slots) { 
+			if (spaceLeft <= 0) {
 				break;
 			}
-			slot.ItemStack.Quantity = 0;
+
+			int transfer = grabbedStack.Increment(slot.ItemStack.quantity);
+			slot.ItemStack.Decrement(transfer);
+			spaceLeft -= transfer;
 		}
-		grabbedItem.value.ItemStack.Quantity = totalQuantity;
 	}
 
 	[InterpretationFunctionCandidate]
@@ -419,10 +423,11 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		if (clickedSlot.ItemStack == null || grabbedItem.value != null) {
 			return;
 		}
-		int amount = clickedSlot.ItemStack.Quantity / 2;
-		amount += clickedSlot.ItemStack.Quantity % 2;
-		clickedSlot.ItemStack.Quantity -= amount;
-		CreateGrabbedDisplay(grabbedItem, new ItemStack(clickedSlot.ItemStack.Item, amount));
+		int half = clickedSlot.ItemStack.quantity / 2;
+		int remainder = clickedSlot.ItemStack.quantity % 2;
+		int transfer = half + remainder;
+		clickedSlot.ItemStack.Decrement(transfer);
+		CreateGrabbedDisplay(grabbedItem, new ItemStack(clickedSlot.ItemStack.item, transfer));
 	}
 
 	[InterpretationFunctionCandidate]
@@ -430,8 +435,11 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		if (grabbedItem.value == null) {
 			return;
 		}
-		slot.TryAddStack(1, grabbedItem.value.ItemStack.Item);
-		grabbedItem.value.ItemStack.Quantity--;
+		int added = slot.TryAddStack(1, grabbedItem.value.ItemStack.item);
+		if (added > 0) {
+			grabbedItem.value.ItemStack.Decrement(added);
+			DestroyGrabbedIfEmpty(grabbedItem);
+		}
 	}
 
 	[InterpretationFunctionCandidate]
@@ -440,7 +448,6 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 			return;
 		}
 		this.AddToGrabbed(slot, grabbedItem, 1);
-		slot.ItemStack.Quantity--;
 	}
 
 	[InterpretationFunctionCandidate]
@@ -449,11 +456,11 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 			return;
 		}
 		if (grabbedItem.value == null) {
-			CreateGrabbedDisplay(grabbedItem, new ItemStack(slot.ItemStack.Item, 0));
+			CreateGrabbedDisplay(grabbedItem, new ItemStack(slot.ItemStack.item, 0));
 		}
-		int transfer = Mathf.Min(amount, slot.ItemStack.Quantity);
-		slot.ItemStack.Quantity -= transfer;
-		grabbedItem.value!.ItemStack.Quantity += transfer;
+		int transfer = Mathf.Min(amount, slot.ItemStack.quantity);
+		slot.ItemStack.Decrement(transfer);
+		grabbedItem.value!.ItemStack.Increment(transfer);
 	}
 
 	public ItemDisplay CreateGrabbedDisplay(ItemStack itemStack, Func<Transform?>? parentSupplier = null) {
@@ -493,7 +500,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		}
 
 		// Swap if different items or max quantity exists in either stack
-		if (slot.ContainedItem != grabbedItem.value!.ItemStack.Item || grabbedItem.value.ItemStack.HasMaxStack() || slot.ItemStack.HasMaxStack()) {
+		if (slot.ContainedItem != grabbedItem.value!.ItemStack.item || grabbedItem.value.ItemStack.IsFull() || slot.ItemStack.IsFull()) {
 			this.SwapItems(slot, grabbedItem);
 		} else {    // Merge in slot for compatible stacks
 			SetRightClickAvailable(MergeInSlot(slot, grabbedItem));
@@ -532,7 +539,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		player.SetMainHandItem(grabbedItem.value.ItemStack);
 	}
 
-	[InterpretationFunctionCandidate("Returns true if the grabbed stack fit in the slot stack")]
+	[InterpretationFunctionCandidate("Attempts to merge the grabbed stack into the clicked slot. Returns true if fully merged")]
 	public bool MergeInSlot(IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
 		if (grabbedItem.value == null) {
 			return false;
@@ -541,11 +548,25 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 			this.ReleaseItemInSlot(slot, grabbedItem);
 			return true;
 		}
-		int space = slot.ItemStack!.Item.maxStackSize - slot.ItemStack.Quantity;
-		int transfer = Math.Min(space, grabbedItem.value.ItemStack.Quantity);
-		slot.ItemStack.Quantity += transfer;
-		grabbedItem.value.ItemStack.Quantity -= transfer;
-		if (grabbedItem.value.ItemStack.Quantity <= 0) {
+		if (slot.ItemStack!.item != grabbedItem.value.ItemStack.item) {
+			return false;
+		}
+
+		int space = slot.ItemStack!.item.maxStackSize - slot.ItemStack.quantity;
+		if (space < 0) {
+			return false;
+		}
+		int transfer = Math.Min(space, grabbedItem.value.ItemStack.quantity);
+		slot.ItemStack.Increment(transfer);
+		grabbedItem.value.ItemStack.Decrement(transfer);
+		return DestroyGrabbedIfEmpty(grabbedItem);
+	}
+
+	private bool DestroyGrabbedIfEmpty(RefBox<ItemDisplay> grabbedItem) {
+		if (grabbedItem.value == null) {
+			return false;
+		}
+		if (grabbedItem.value.ItemStack.IsEmpty()) {
 			grabbedItem.value.Destroy();
 			grabbedItem.value = null;
 			return true;

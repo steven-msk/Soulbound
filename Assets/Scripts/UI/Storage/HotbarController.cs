@@ -73,7 +73,7 @@ public class HotbarController : MonoBehaviour, IItemContainer, IDependencyInitia
 			ApplySelectionChanges(active.hotbarSlot, activeSlotColor, activeSlotNumberColor, activeItemStackColor, activeSlotOffset, activeSlotScale);
 		}
 
-		activeItemText.text = slots[slotKey].ItemStack?.Item.name ?? "";
+		activeItemText.text = slots[slotKey].ItemStack?.item.name ?? "";
 		inventory.EquipHotbarItem(slots[slotKey]);
 	}
 
@@ -99,7 +99,7 @@ public class HotbarController : MonoBehaviour, IItemContainer, IDependencyInitia
 			hotbarSlot.GetComponent<TextMeshProUGUI>().color = slotNumberColor;
 			break;
 		}
-		if (!slot.IsEmpty && slot.ItemStack.Item.IsStackable) {
+		if (!slot.IsEmpty && slot.ItemStack.item.IsStackable) {
 			slot.ItemDisplay.gameObject.GetComponentInChildren<TextMeshProUGUI>().color = itemStackColor;
 		}
 	}
@@ -116,7 +116,7 @@ public class HotbarController : MonoBehaviour, IItemContainer, IDependencyInitia
 	}
 
 	public void OnItemTransfer(IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
-		activeItemText.text = active.hotbarSlot.ItemStack?.Item.name ?? "";
+		activeItemText.text = active.hotbarSlot.ItemStack?.item.name ?? "";
 		if (slot == (IItemSlot)active.hotbarSlot) {
 			if (slot.IsEmpty && grabbedItem.value != null) {
 				grabbedItem.value.transform.localScale = Vector3.one;

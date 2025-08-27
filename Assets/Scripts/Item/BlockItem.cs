@@ -23,7 +23,7 @@ public class BlockItem : ItemDefinition, IPlaceable {
 		: this(name, icon, worldPrefabSupplier, maxStackSize, blockGetter, ItemTooltips.DefaultTitle()) { }
 
     public BlockState Place(ItemStack itemStack, BlockPos position) {
-		itemStack.Quantity--;
+		itemStack.Decrement();
 		return referenceBlock.defaultState;
 	}
 

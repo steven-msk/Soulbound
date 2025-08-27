@@ -18,6 +18,6 @@ public interface IConsumable : IItemCapability {
 public static class ConsumableUtils {
 	public static void DefaultConsume(IConsumable consumable, ItemStack itemStack) {
 		consumable.consumeAction.Invoke(consumable, itemStack);
-		itemStack.Quantity -= consumable.consumeAmount;
+		itemStack.Decrement(consumable.consumeAmount);
 	}
 }

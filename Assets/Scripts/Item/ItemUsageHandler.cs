@@ -15,7 +15,7 @@ public sealed class ItemUsageHandler {
 
 	public void Register<T>(ItemUseTrigger trigger, Action<T, ItemStack> action) where T : IItemCapability {
 		handlers[(typeof(T), trigger)] = (itemStack => {
-			if (itemStack.Item is T item) {
+			if (itemStack.item is T item) {
 				action.Invoke(item, itemStack);
 			}
 		});
@@ -30,7 +30,7 @@ public sealed class ItemUsageHandler {
 			return;
 		}
 		foreach (var (itemCapability, useTrigger) in handlers.Keys) {
-			if (!itemCapability.IsInstanceOfType(itemStack.Item) || useTrigger != trigger) {
+			if (!itemCapability.IsInstanceOfType(itemStack.item) || useTrigger != trigger) {
 				continue; 
 			}
 			if (handlers.TryGetValue((itemCapability, useTrigger), out var action)) {

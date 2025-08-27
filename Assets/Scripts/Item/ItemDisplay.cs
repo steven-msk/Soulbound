@@ -16,11 +16,11 @@ public class ItemDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 		get => itemStack;
 		set {
 			itemStack = value;
-			gameObject.GetComponent<Image>().sprite = itemStack.Item.icon;
-			displayedItem = itemStack.Item;
+			gameObject.GetComponent<Image>().sprite = itemStack.item.icon;
+			displayedItem = itemStack.item;
 		}
 	}
-	public Item? DisplayedItem => ItemStack?.Item;
+	public Item? DisplayedItem => ItemStack?.item;
 	[SerializeField] private AbstractTooltip tooltip;
 	public AbstractTooltip Tooltip { get => tooltip; set => tooltip = value; }
 
@@ -38,10 +38,10 @@ public class ItemDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 		ItemDisplay? display = obj?.GetComponent<ItemDisplay>();
 		UnityEngine.Debug.Assert(display != null, $"ItemDisplay component not found in item display prefab");
 		display!.ItemStack = itemStack;
-		if (itemStack.Item.IsStackable) {
+		if (itemStack.item.IsStackable) {
 			itemStack.InitializeStackText(display);
 		}
-		display.Tooltip = itemStack.Item.GetTooltip();
+		display.Tooltip = itemStack.item.GetTooltip();
 		display.transform.SetAsLastSibling();
 		return display;
 	}

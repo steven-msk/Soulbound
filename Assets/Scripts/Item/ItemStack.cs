@@ -1,36 +1,26 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
 
 [Serializable]
 public class ItemStack {
-	public Item Item { get; }
+	public Item item { get; }
 	private ItemDisplay? display; 
 	private GameObject stackText;
-	private int quantity;
-	public int Quantity {
-		get => quantity;
-		set {
-			quantity = value;
-			if (quantity <= 0) {
-				display?.Destroy();
-			}
-			if(stackText != null && quantity > 0) {
-				UpdateText();
-			}
-		}
-	}
+	public int quantity { get; private set; }
+	public int MaxStackSize => item.maxStackSize;
 
 	public ItemStack(Item item, int quantity) {
-		this.Item = item;
-		this.Quantity = quantity;
+		this.item = item;
+		this.quantity = Mathf.Min(quantity, item.maxStackSize);
 	}
 
 	public void UpdateText() {
 		TextMeshProUGUI stackText = this.stackText.GetComponent<TextMeshProUGUI>();
-		stackText.text = FormatStackCount(Quantity);
+		stackText.text = FormatStackCount(quantity);
 	}
 
 	public GameObject InitializeStackText(ItemDisplay parent) {
@@ -38,8 +28,8 @@ public class ItemStack {
 		TextMeshProUGUI text = stackText.GetComponent<TextMeshProUGUI>();
 		text.autoSizeTextContainer = true;
 		RectTransform rectTransform = stackText.GetComponent<RectTransform>();
-		if (Item.IsStackable) {
-			text.text = $"{FormatStackCount(Quantity)}";
+		if (item.IsStackable) {
+			text.text = $"{FormatStackCount(quantity)}";
 			InventoryController inventory = GameManager.instance.Player.Inventory;
 			Color textColor = Color.white;
 			InventorySlot hotbarSlot = parent.GetComponentInParent<InventorySlot>();
@@ -60,10 +50,10 @@ public class ItemStack {
 	}
 
 	public void Drop(Vector2 pos, Vector2 dropForce, bool playerAction = false) {
-		GameObject worldPrefab = Item.worldPrefabSupplier?.Invoke();
-		if (Item.worldPrefabSupplier == null) {
-			UnityEngine.Debug.LogError($"Item '{Item}' does not supply world prefab. Using fallback world prefab");
-			worldPrefab = Item.FallbackWorldPrefab();
+		GameObject worldPrefab = item.worldPrefabSupplier?.Invoke();
+		if (item.worldPrefabSupplier == null) {
+			UnityEngine.Debug.LogError($"Item '{item}' does not supply world prefab. Using fallback world prefab");
+			worldPrefab = item.FallbackWorldPrefab();
 		}
 		GameObject pickupItem = worldPrefab;
 		DroppedItem pickup = pickupItem.GetComponent<DroppedItem>();
@@ -76,7 +66,46 @@ public class ItemStack {
 		});
     }
 
-	public bool HasMaxStack() => quantity == Item.maxStackSize;
+	public bool IsFull() => quantity >= item.maxStackSize;
+	public bool IsEmpty() => quantity <= 0;
+
+	public void SetQuantity(int amount) {
+		int oldQuantity = quantity;
+		this.quantity = Mathf.Min(amount, MaxStackSize);
+		OnQuantityChanged(oldQuantity, quantity);
+	}
+
+	// Try to add items, return how many were actually added
+	public int Increment(int amount = 1) {
+		if (amount <= 0) {
+			return 0;
+		}
+		int space = MaxStackSize - quantity;
+		int added = Mathf.Min(space, amount);
+		quantity += added;
+		OnQuantityChanged(quantity - added, quantity);
+		return added;
+	}
+
+	// Try to remove items, returns how many were actually removed
+	public int Decrement(int amount = 1) {
+		if (amount <= 0) {
+			return 0;
+		}
+		int removed = Mathf.Min(quantity, amount);
+		quantity -= removed;
+		OnQuantityChanged(quantity + removed, quantity);
+		return removed;
+	}
+
+	private void OnQuantityChanged(int old, int @new) {
+		if (quantity <= 0) {
+			display?.Destroy();
+		}
+		if (stackText != null && quantity > 0) {
+			UpdateText();
+		}
+	}
 
 	// FEATUREIMPL: dropped item stacks converging to avoid lag
 

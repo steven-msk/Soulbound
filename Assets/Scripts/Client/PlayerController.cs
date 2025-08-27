@@ -98,7 +98,7 @@ public class PlayerController : LivingEntity, IGameInitializable<PlayerControlle
 			return;
 		}
 		static void InvokeStatItem(ItemStack? itemStack, Action<IStatProvider> statProviderAction) {
-			if (itemStack?.Item is IStatProvider statProvider && statProvider.applyInstantStatsAutomatically) {
+			if (itemStack?.item is IStatProvider statProvider && statProvider.applyInstantStatsAutomatically) {
 				statProviderAction.Invoke(statProvider);
 			}
 		}
@@ -138,7 +138,7 @@ public class PlayerController : LivingEntity, IGameInitializable<PlayerControlle
 	internal void OnRightHold() => RequestMainHandUse(ItemUseTrigger.RightHold, null);
 
 	private void RequestSuppressedMainHandUse(ItemUseTrigger trigger) {
-        Item? usedItem = MainHandStack?.Item;
+        Item? usedItem = MainHandStack?.item;
 		RequestMainHandUse(trigger, null);
         InputHandler.RequestAction(new("ItemUse", 5, () => itemUsageHandler.HandleInput(trigger, MainHandStack), null));
         if (usedItem is IPlaceable) {

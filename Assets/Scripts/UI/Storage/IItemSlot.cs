@@ -18,7 +18,7 @@ public interface IItemSlot : IPointerDownHandler, IPointerUpHandler, IPointerEnt
 	public bool HasItem => ItemDisplay != null;
 	public bool IsEmpty => ItemDisplay == null;
 	public ItemStack? ItemStack => ItemDisplay?.ItemStack;
-	public Item? ContainedItem => ItemStack?.Item;
+	public Item? ContainedItem => ItemStack?.item;
 	public GameObject GameObject { get; }
 	
 	public void OnClick(ItemDisplay grabbedItem, InventoryController inventory);
@@ -43,13 +43,15 @@ public interface IItemSlot : IPointerDownHandler, IPointerUpHandler, IPointerEnt
 
 	public void TrySetStack(int quantity, Item fallback) {
 		CreateDisplayIfEmpty(new ItemStack(fallback, quantity));
-		this.ItemStack!.Quantity = quantity;
+		this.ItemStack!.SetQuantity(quantity);
 	}
 
-	public void TryAddStack(int add, Item fallback) {
-		if (!CreateDisplayIfEmpty(new ItemStack(fallback, add))) {
-			this.ItemStack!.Quantity += add;
+	public int TryAddStack(int add, Item fallback) {
+		if (!CreateDisplayIfEmpty(new ItemStack(fallback, 0))) {
+			return this.ItemStack!.Increment(add);
 		}
+		this.ItemStack!.Increment(add);
+		return add;
 	}
 
 	public void CreateDisplay(ItemStack itemStack) {
@@ -136,18 +138,18 @@ public static class ItemSlotUtility {
 		}
 		
 		// Swap items
-		if (slot.ItemStack?.Item != inventory.GrabbedItem.ItemStack.Item || inventory.GrabbedItem.ItemStack.HasMaxStack() || slot.ItemStack.HasMaxStack()) {
+		if (slot.ItemStack?.item != inventory.GrabbedItem.ItemStack.item || inventory.GrabbedItem.ItemStack.IsFull() || slot.ItemStack.IsFull()) {
 			ItemDisplay previousGrabbed = inventory.GrabbedItem;
 			inventory.GrabbedItem = slot.ItemDisplay;
 			slot.DetachItemDisplay();
 			slot.AttachItemDisplay(previousGrabbed);
 			player.SetMainHandItem(inventory.GrabbedItem.ItemStack);
 		} else {	// Merge/flow items
-			int space = slot.ItemStack.Item.maxStackSize - slot.ItemStack.Quantity;
-			int transfer = Math.Min(space, inventory.GrabbedItem.ItemStack.Quantity); 
-			slot.ItemStack.Quantity += transfer;
-			inventory.GrabbedItem.ItemStack.Quantity -= transfer;
-			if (inventory.GrabbedItem.ItemStack.Quantity <= 0) {
+			int space = slot.ItemStack.item.maxStackSize - slot.ItemStack.quantity;
+			int transfer = Math.Min(space, inventory.GrabbedItem.ItemStack.quantity); 
+			slot.ItemStack.Increment(transfer);
+			inventory.GrabbedItem.ItemStack.Decrement(transfer);
+			if (inventory.GrabbedItem.ItemStack.quantity <= 0) {
 				SetDropCapabilities(true);
 				inventory.GrabbedItem.Destroy();
 				inventory.GrabbedItem = null;

@@ -22,21 +22,21 @@ public abstract class EquipmentSlot : MonoBehaviour, IItemSlot {
 
 	[InputAction("ItemDrag", Priority = 10, BlocksContexts = new[] { "ItemUse" })]
 	public virtual void OnClick(ItemDisplay grabbedItem, InventoryController inventory) {
-		if ((grabbedItem?.ItemStack.Item is not IEquipable && grabbedItem != null) || (grabbedItem == null && this.IsEmpty)) {
+		if ((grabbedItem?.ItemStack.item is not IEquipable && grabbedItem != null) || (grabbedItem == null && this.IsEmpty)) {
 			return;
 		}
 		bool justEquipped = false;
-		if (grabbedItem?.ItemStack.Item is IEquipable equipable && !this.HasItem) {
+		if (grabbedItem?.ItemStack.item is IEquipable equipable && !this.HasItem) {
 			equipable.OnEquip(this);
 			justEquipped = true;
 
 		} else if (this.HasItem) {
-			((IEquipable)this.ItemStack.Item).OnUnequipped();
+			((IEquipable)this.ItemStack.item).OnUnequipped();
 		}
 
 		this.TransferGrabbed(grabbedItem, inventory);
 		if (this.HasItem && !justEquipped) {
-			((IEquipable)this.ItemStack.Item).OnEquip(this);
+			((IEquipable)this.ItemStack.item).OnEquip(this);
 		}
 	}
 
