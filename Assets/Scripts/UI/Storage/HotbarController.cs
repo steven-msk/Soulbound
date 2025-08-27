@@ -117,8 +117,12 @@ public class HotbarController : MonoBehaviour, IItemContainer, IDependencyInitia
 
 	public void OnItemTransfer(IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
 		activeItemText.text = active.hotbarSlot.ItemStack?.Item.name ?? "";
-		if (slot.IsEmpty && grabbedItem.value != null && slot == (IItemSlot)active.hotbarSlot) {
-			grabbedItem.value.transform.localScale = Vector3.one;
+		if (slot == (IItemSlot)active.hotbarSlot) {
+			if (slot.IsEmpty && grabbedItem.value != null) {
+				grabbedItem.value.transform.localScale = Vector3.one;
+			} else if (slot.HasItem && grabbedItem.value == null) {
+				slot.ItemDisplay.transform.localScale = Vector3.one;
+			}
 		}
 	}
 
