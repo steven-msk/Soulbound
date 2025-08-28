@@ -273,7 +273,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 	}
 
 	public void OnPointerEnter(IItemSlot slot, PointerEventData eventData) {
-		if (!draggingSlots) {
+		if (!draggingSlots || !slot.Handshake(GrabbedItem)) {
 			return;
 		}
 		RefBox<ItemDisplay> grabbedReference = new(this.GrabbedItem);
