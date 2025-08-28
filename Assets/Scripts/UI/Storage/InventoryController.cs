@@ -254,7 +254,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		}
 
 		InputHandler.RequestAction(new("ItemSlotAction", 10, () => {
-			if (!slot.Handshake(GrabbedItem)) {
+			if (!slot.Handshake(GrabbedItem, SlotInteractionMode.Click)) {
 				return;
 			}
 			RefBox<ItemDisplay> grabbedReference = new(this.GrabbedItem);
@@ -273,7 +273,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 	}
 
 	public void OnPointerEnter(IItemSlot slot, PointerEventData eventData) {
-		if (!draggingSlots || !slot.Handshake(GrabbedItem)) {
+		if (!draggingSlots || !slot.Handshake(GrabbedItem, SlotInteractionMode.Drag)) {
 			return;
 		}
 		RefBox<ItemDisplay> grabbedReference = new(this.GrabbedItem);
@@ -375,7 +375,6 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		foreach (var slot in slots.Where(s => s != this.dragOrigin && s.ContainedItem == dragOrigin.ContainedItem)) {
 			quantitySnapshots[slot] = slot.ItemStack!.quantity;
 		}
-		Debug.Log("starting drag: " + dragButton);
 		draggedSlots.Add(dragOrigin);
 	}
 
@@ -434,7 +433,6 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 
 	[InterpretationFunctionCandidate]
 	public void TransferSingleToSlot(IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
-		Debug.Log("single to slot");
 		if (grabbedItem.value == null) {
 			return;
 		}
@@ -447,7 +445,6 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 
 	[InterpretationFunctionCandidate]
 	public void TransferSingleToGrabbed(IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
-		Debug.Log("single to grabbed");
 		if (slot.ItemStack == null) {
 			return;
 		}
@@ -504,7 +501,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		}
 
 		// Swap if different items or max quantity exists in either stack
-		if (slot.ContainedItem != grabbedItem.value!.ItemStack.item || grabbedItem.value.ItemStack.IsFull() || slot.ItemStack.IsFull()) {
+		if (slot.ContainedItem != grabbedItem.value!.ItemStack.item || grabbedItem.value.ItemStack.IsFull() || slot.ItemStack!.IsFull()) {
 			this.SwapItems(slot, grabbedItem);
 		} else {    // Merge in slot for compatible stacks
 			SetRightClickAvailable(MergeInSlot(slot, grabbedItem));

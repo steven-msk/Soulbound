@@ -78,11 +78,12 @@ public interface IItemSlot : IPointerDownHandler, IPointerUpHandler, IPointerEnt
 	}
 
 	/// <summary>
-	/// Validates whether this slot agrees to interact with the given item
+	/// Validates whether this slot agrees to interact with the given item upon the given interaction mode
 	/// </summary>
-	virtual bool Handshake(ItemDisplay? grabbedItem) {
-		return !(grabbedItem == null && this.IsEmpty);
+	virtual bool Handshake(ItemDisplay? grabbedItem, SlotInteractionMode interactionMode) {
+		return interactionMode == SlotInteractionMode.Click ? !(grabbedItem == null && this.IsEmpty) : true;
 	}
+
 
 	void IPointerDownHandler.OnPointerDown(PointerEventData eventData) => this.OnPointerDown(eventData);
 	void IPointerUpHandler.OnPointerUp(PointerEventData eventData) => this.OnPointerUp(eventData);
