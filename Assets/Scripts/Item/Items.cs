@@ -13,7 +13,7 @@ public partial class Items : IResourceModule {
     private static int idCounter = 0;
     private static Dictionary<int, Item> itemsById = new();
 
-    public static readonly BlockItem grassBlock = InjectID(new BlockItem("Grass Block", Icon("grass_icon"), WorldPrefab("grass_top"), 210, () => Blocks.grass));
+    public static readonly BlockItem grassBlock = InjectID(new BlockItem("Grass Block", Icon("grass_icon"), WorldPrefab("grass_top"), Item.universalMaxStack, () => Blocks.grass));
     public static readonly BlockItem stoneBlock = InjectID(new BlockItem("Stone Block", Icon("stone_icon"), null, Item.universalMaxStack, () => Blocks.stone));
     public static readonly BlockItem dirtBlock = InjectID(new BlockItem("Dirt Block", Icon("dirt_icon"), null, Item.universalMaxStack, () => Blocks.dirt));
     public static readonly BlockItem woodBlock = InjectID(new BlockItem("Wood Block", Icon("wood_icon"), null, Item.universalMaxStack, () => Blocks.wood));

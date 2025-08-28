@@ -335,12 +335,15 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 				List<IItemSlot> preview = new(draggedSlots) { slot };
 
 				int toSplit = startDragStack;
+				//Debug.Log("toSplit: " + startDragStack);
+				//Debug.Log("split count: " + preview.Count);
 				int splitAmount = toSplit / (preview.Count);
 				if (splitAmount <= 0) {
 					return;
 				}
 				// Commit the slot to dragged list
 				draggedSlots.Add(slot);
+				//Debug.Log("added slot:" + slot.index);
 				int remainder = toSplit % (draggedSlots.Count);
 
 				for (int i = 0; i < draggedSlots.Count; i++) {
@@ -361,6 +364,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 			if (draggedSlot.ContainedItem != null && grabbedItem.value.DisplayedItem != draggedSlot.ContainedItem) {
 				return DoNothing;
 			}
+			//Debug.Log("transferring single");
 			return TransferSingleToSlot;
 		}
 
@@ -375,7 +379,9 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		foreach (var slot in slots.Where(s => s != this.dragOrigin && s.ContainedItem == dragOrigin.ContainedItem)) {
 			quantitySnapshots[slot] = slot.ItemStack!.quantity;
 		}
-		draggedSlots.Add(dragOrigin);
+		if (!draggedSlots.Contains(dragOrigin)) {
+			draggedSlots.Add(dragOrigin);
+		}
 	}
 
 	public void EndDrag() {
