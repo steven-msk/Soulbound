@@ -254,10 +254,8 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		}
 
 		InputHandler.RequestAction(new("ItemSlotAction", 10, () => {
-
-			// Might replace with a validator specified by IItemSlot
-			if (GrabbedItem == null && slot.IsEmpty) {
-				return;		
+			if (!slot.Handshake(GrabbedItem)) {
+				return;
 			}
 			RefBox<ItemDisplay> grabbedReference = new(this.GrabbedItem);
 			interpretationFunction.Invoke(slot, grabbedReference);
@@ -295,29 +293,25 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		bool alt = Keyboard.current.altKey.isPressed;
 
 		if (eventData.button == PointerEventData.InputButton.Left) {
-			if (!shift && !ctrl && !alt) {
-				if (doubleClick && GrabbedItem != null) {
-					cancelDrag = false;
-					return (slot, grabbedItem) => CollectAllStacksInGrabbed(grabbedItem.value!.ItemStack.item, grabbedItem);
-				}
+			if (doubleClick && GrabbedItem != null) {
 				cancelDrag = false;
-				return TransferGrabbed;
+				return (slot, grabbedItem) => CollectAllStacksInGrabbed(grabbedItem.value!.ItemStack.item, grabbedItem);
 			}
+			cancelDrag = false;
+			return TransferGrabbed;
 		} else if (eventData.button == PointerEventData.InputButton.Right) {
 			if (GrabbedItem != null && clickedSlot.ContainedItem != null) {
 				if (GrabbedItem?.DisplayedItem != clickedSlot.ItemDisplay?.DisplayedItem) {
 					cancelDrag = false;
-					return null;
+					return DoNothing;
 				}
 			}
-			if (!shift && !alt && !ctrl) {
-				if (GrabbedItem != null) {
-					cancelDrag = false;
-					return TransferSingleToSlot;
-				}
+			if (GrabbedItem != null) {
 				cancelDrag = false;
-				return HalveStackFromSlot;
+				return TransferSingleToSlot;
 			}
+			cancelDrag = false;
+			return HalveStackFromSlot;
 		}
 		cancelDrag = false;
 		return null;
@@ -325,6 +319,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 
 	public InterpretationFunction? InterpretDrag(IItemSlot draggedSlot, RefBox<ItemDisplay> grabbedItem) {
 		if (!draggingSlots) {
+			logger.LogError(null, "InterpretDrag() called while not dragging slots. This should really not happen.");
 			return null;
 		}
 
@@ -364,7 +359,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 			};
 		} else if (dragButton == PointerEventData.InputButton.Right && grabbedItem.value?.ItemStack.quantity > 0) {
 			if (draggedSlot.ContainedItem != null && grabbedItem.value.DisplayedItem != draggedSlot.ContainedItem) {
-				return null;
+				return DoNothing;
 			}
 			return TransferSingleToSlot;
 		}
@@ -394,6 +389,11 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		draggingSlots = false;
 		draggedSlots.Clear();
 		this.dragOrigin = null;
+	}
+
+	[InterpretationFunctionCandidate]
+	public void DoNothing(IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
+		// Intended implementation to remove "Interpret returned null!" spam
 	}
 
 	[InterpretationFunctionCandidate]

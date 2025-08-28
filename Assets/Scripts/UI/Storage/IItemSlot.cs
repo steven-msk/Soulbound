@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
+using UnityEditor.Graphs;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -74,6 +75,13 @@ public interface IItemSlot : IPointerDownHandler, IPointerUpHandler, IPointerEnt
 	}
 	new public void OnPointerEnter(PointerEventData eventData) { 
 		container.OnPointerEnter(this, eventData);
+	}
+
+	/// <summary>
+	/// Validates whether this slot agrees to interact with the given item
+	/// </summary>
+	virtual bool Handshake(ItemDisplay? grabbedItem) {
+		return !(grabbedItem == null && this.IsEmpty);
 	}
 
 	void IPointerDownHandler.OnPointerDown(PointerEventData eventData) => this.OnPointerDown(eventData);
