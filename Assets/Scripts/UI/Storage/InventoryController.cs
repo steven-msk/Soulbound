@@ -247,7 +247,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		lastClickedSlot = slot;
 
 		this.dragButton = eventData.button;
-		InterpretationFunction? interpretationFunction = InterpretClick(slot, eventData, doubleClick);
+		InterpretationFunction? interpretationFunction = InterpretClick(slot, eventData, doubleClick, out bool cancelDrag);
 		if (interpretationFunction == null) {
 			logger.ThrowException(null, new InvalidOperationException("InterpretClick() returned null!"));
 			return;
@@ -262,7 +262,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 			RefBox<ItemDisplay> grabbedReference = new(this.GrabbedItem);
 			interpretationFunction.Invoke(slot, grabbedReference);
 			hotbar.OnItemTransfer(slot, grabbedReference);
-			if (GrabbedItem != null && !doubleClick) {
+			if (GrabbedItem != null && !doubleClick && !cancelDrag) {
 				this.StartDrag(slot);
 			}
 			this.GrabbedItem = grabbedReference.value;
@@ -281,7 +281,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		RefBox<ItemDisplay> grabbedReference = new(this.GrabbedItem);
 		InterpretationFunction? interpretationFunction = this.InterpretDrag(slot, grabbedReference);
 		if (interpretationFunction == null) {
-			logger.ThrowException(null, new InvalidOperationException("InterpretDrag() return null!"));
+			logger.ThrowException(null, new InvalidOperationException("InterpretDrag() returned null!"));
 			return;
 		}
 		interpretationFunction.Invoke(slot, grabbedReference);
@@ -289,7 +289,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		this.GrabbedItem = grabbedReference.value;
 	}
 
-	public InterpretationFunction? InterpretClick(IItemSlot clickedSlot, PointerEventData eventData, bool doubleClick) {
+	public InterpretationFunction? InterpretClick(IItemSlot clickedSlot, PointerEventData eventData, bool doubleClick, out bool cancelDrag) {
 		bool shift = Keyboard.current.shiftKey.isPressed;
 		bool ctrl = Keyboard.current.ctrlKey.isPressed;
 		bool alt = Keyboard.current.altKey.isPressed;
@@ -297,27 +297,29 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		if (eventData.button == PointerEventData.InputButton.Left) {
 			if (!shift && !ctrl && !alt) {
 				if (doubleClick && GrabbedItem != null) {
+					cancelDrag = false;
 					return (slot, grabbedItem) => CollectAllStacksInGrabbed(grabbedItem.value!.ItemStack.item, grabbedItem);
 				}
+				cancelDrag = false;
 				return TransferGrabbed;
 			}
 		} else if (eventData.button == PointerEventData.InputButton.Right) {
 			if (GrabbedItem != null && clickedSlot.ContainedItem != null) {
 				if (GrabbedItem?.DisplayedItem != clickedSlot.ItemDisplay?.DisplayedItem) {
+					cancelDrag = false;
 					return null;
 				}
 			}
 			if (!shift && !alt && !ctrl) {
-				if (GrabbedItem != null && !clickedSlot.HasItem) {
+				if (GrabbedItem != null) {
+					cancelDrag = false;
 					return TransferSingleToSlot;
 				}
-				if (GrabbedItem != null) {
-					return TransferSingleToGrabbed;
-				}
+				cancelDrag = false;
 				return HalveStackFromSlot;
 			}
 		}
-
+		cancelDrag = false;
 		return null;
 	}
 
@@ -360,7 +362,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 					}
 				}
 			};
-		} else if (dragButton == PointerEventData.InputButton.Right && grabbedItem.value != null && grabbedItem.value.ItemStack.quantity > 0) {
+		} else if (dragButton == PointerEventData.InputButton.Right && grabbedItem.value?.ItemStack.quantity > 0) {
 			if (draggedSlot.ContainedItem != null && grabbedItem.value.DisplayedItem != draggedSlot.ContainedItem) {
 				return null;
 			}
@@ -432,6 +434,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 
 	[InterpretationFunctionCandidate]
 	public void TransferSingleToSlot(IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
+		Debug.Log("single to slot");
 		if (grabbedItem.value == null) {
 			return;
 		}
@@ -444,6 +447,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 
 	[InterpretationFunctionCandidate]
 	public void TransferSingleToGrabbed(IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
+		Debug.Log("single to grabbed");
 		if (slot.ItemStack == null) {
 			return;
 		}
