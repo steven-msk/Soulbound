@@ -45,7 +45,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 
 	private PlayerController player;
 
-	private float doubleClickThreshold = 0.2f;
+	private float doubleClickThreshold = 0.15f;
 	private float lastClickTime;
 	private IItemSlot lastClickedSlot;
 	private DragHandler? activeDragHandler;
