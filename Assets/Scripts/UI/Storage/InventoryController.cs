@@ -80,6 +80,9 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 	}
 
 	public SerializedInventory Serialize() {
+		if (GrabbedContext.value != null) {
+			TryReleaseGrabbed(GrabbedContext.lastKnownSlot);
+		}
 		var serializedHotbar = hotbar.Slots.Cast<IItemSlot>().Select(s => s.Serialize()).ToList();
 		var serializedPopup = popupSlots.Flatten().Cast<IItemSlot>().Select(s => s.Serialize()).ToList();
 		ArmorSlot[] armorSlots = this.armorSlots.GetComponentsInChildren<ArmorSlot>(true);
@@ -127,15 +130,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		activeTooltip?.Hide();
 		hotbar.OnInventoryPopup();
 		if (!popupOpen && GrabbedContext.value != null) {
-			IItemSlot? slot = GrabbedContext.lastKnownSlot;
-			InvocationHelper.IfElse(slot != null,
-				() => {
-					NewGrabbedReference(slot, (slot, grabbedItem) => {
-						if (!MergeInSlot(slot!, grabbedItem)) {
-							ForceReleaseGrabbedItem();
-						}
-					});
-				}, ForceReleaseGrabbedItem);
+			TryReleaseGrabbed(GrabbedContext.lastKnownSlot);
 		}
 	}
 
@@ -163,7 +158,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		GrabbedContext.Set(null, null);
 	}
 
-	public void ForceReleaseGrabbedItem() {
+	public void ForceReleaseGrabbed() {
 		if (GrabbedContext.value == null) {
 			return;
 		}
@@ -172,6 +167,16 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 			GrabbedContext.Set(null, null);
 		} else {
 			DropGrabbedItem();
+		}
+	}
+
+	private void TryReleaseGrabbed(IItemSlot? slot) {
+		if (slot != null) {
+			ExecuteOnGrabbedReference(slot, (slot, grabbedItem) => {
+				InvocationHelper.If(!MergeInSlot(slot!, grabbedItem), ForceReleaseGrabbed);
+			});
+		} else {
+			ForceReleaseGrabbed();
 		}
 	}
 
@@ -249,13 +254,13 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 			if (!slot.Handshake(GrabbedContext.value, SlotInteractionMode.Click)) {
 				return;
 			}
-			RefBox<ItemDisplay> grabbedReference = new(GrabbedContext.value);
-			interpretationFunction.Invoke(slot, grabbedReference);
-			hotbar.OnItemTransfer(slot, grabbedReference);
-			if (GrabbedContext.value != null && !doubleClick && !cancelDrag) {
-				activeDragHandler = this.StartDrag(slot, dragButton);
-			}
-			GrabbedContext.Set(grabbedReference.value, slot);
+			ExecuteOnGrabbedReference(slot, (slot, grabbedReference) => {
+				interpretationFunction.Invoke(slot!, grabbedReference);
+				hotbar.OnItemTransfer(slot!, grabbedReference);
+				if (GrabbedContext.value != null && !doubleClick && !cancelDrag) {
+					activeDragHandler = this.StartDrag(slot!, dragButton);
+				}
+			});
 		}, null));
 		InputHandler.BlockContext("ItemUse", () => !GameManager.instance.Player.InputHandler.LeftHold);
 	}
@@ -365,7 +370,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		activeDragHandler = null;
 	}
 
-	private void NewGrabbedReference(IItemSlot? slot, Action<IItemSlot?, RefBox<ItemDisplay>> referenceAction) {
+	private void ExecuteOnGrabbedReference(IItemSlot? slot, Action<IItemSlot?, RefBox<ItemDisplay>> referenceAction) {
 		RefBox<ItemDisplay> grabbedReference = new(GrabbedContext.value);
 		referenceAction.Invoke(slot, grabbedReference);
 		GrabbedContext.Set(grabbedReference.value, slot);
