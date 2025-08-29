@@ -17,13 +17,13 @@ public class ArmorSlot : EquipmentSlot {
 
 	public override IItemContainer2D container => throw new NotImplementedException();
 
-	[InputAction("ItemDrag", Priority = 10, BlocksContexts = new[] { "ItemUse" })]
-	public override void OnClick(ItemDisplay grabbedItem, InventoryController inventory) {
-		if ((grabbedItem?.ItemStack.item is ArmorItem armorItem && this.AcceptedType == armorItem.armorType) || (grabbedItem == null && this.HasItem)) {
-			base.OnClick(grabbedItem, inventory);
-			InvocationHelper.IfElse(this.ItemDisplay != null, HideOverlay, ShowOverlay);
-		}
-	}
+	//[InputAction("ItemDrag", Priority = 10, BlocksContexts = new[] { "ItemUse" })]
+	//public override void OnClick(ItemDisplay grabbedItem, InventoryController inventory) {
+	//	if ((grabbedItem?.ItemStack.item is ArmorItem armorItem && this.AcceptedType == armorItem.armorType) || (grabbedItem == null && this.HasItem)) {
+	//		base.OnClick(grabbedItem, inventory);
+	//		InvocationHelper.IfElse(this.ItemDisplay != null, HideOverlay, ShowOverlay);
+	//	}
+	//}
 
 	public void HideOverlay() => overlay.SetActive(false);
 

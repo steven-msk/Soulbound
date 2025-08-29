@@ -19,9 +19,4 @@ public class InventorySlot : MonoBehaviour, IItemSlot {
 	public void Deserialize(SerializedItemSlot serialized) {
 		ItemDisplay.Create(serialized.itemStack, this);
 	}
-
-	[Obsolete]
-	public void OnClick(ItemDisplay grabbedItem, InventoryController inventory) => this.TransferGrabbed(grabbedItem, inventory);
-
-	//public void OnPointerDown(PointerEventData eventData) => this.RequestClickAction();
 }
