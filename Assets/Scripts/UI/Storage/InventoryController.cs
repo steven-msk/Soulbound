@@ -1,25 +1,18 @@
-﻿using JetBrains.Annotations;
-using PlasticGui.WorkspaceWindow;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
+using System.Runtime.InteropServices.WindowsRuntime;
 using Unity.VisualScripting;
 using UnityEditor;
-using UnityEditor.Graphs;
-using UnityEditor.Timeline.Actions;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
-using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 #nullable enable
 public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyInitializable<InventoryController, PlayerController>, ISerializable<SerializedInventory> {
-	public delegate void InterpretationFunction(IItemSlot clickedSlot, RefBox<ItemDisplay> grabbedItem);
+	public delegate void InterpretationFunction(IItemSlot slot, RefBox<ItemDisplay> grabbedItem);
+	public delegate InterpretationFunction? InterpretationProvider(DragHandler handler, IItemSlot draggedSlot, RefBox<ItemDisplay> grabbedItem);
 
 	private static readonly Logger logger = Logger.CreateInstance();
 	public HotbarController Hotbar => hotbar;
@@ -52,15 +45,10 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 
 	private PlayerController player;
 
-	private bool draggingSlots;
-	private List<IItemSlot> draggedSlots = new();
-	private IItemSlot? dragOrigin;
-	private int startDragStack;
-	private Dictionary<IItemSlot, int> quantitySnapshots = new();
-	private PointerEventData.InputButton dragButton;
 	private float doubleClickThreshold = 0.2f;
 	private float lastClickTime;
 	private IItemSlot lastClickedSlot;
+	private DragHandler? activeDragHandler;
 
 	// FEATUREIMPL: item grabbing controls - this might require a general implementation in IContainer
 
@@ -246,7 +234,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		lastClickTime = time;
 		lastClickedSlot = slot;
 
-		this.dragButton = eventData.button;
+		PointerEventData.InputButton dragButton = eventData.button;
 		InterpretationFunction? interpretationFunction = InterpretClick(slot, eventData, doubleClick, out bool cancelDrag);
 		if (interpretationFunction == null) {
 			logger.ThrowException(null, new InvalidOperationException("InterpretClick() returned null!"));
@@ -261,28 +249,26 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 			interpretationFunction.Invoke(slot, grabbedReference);
 			hotbar.OnItemTransfer(slot, grabbedReference);
 			if (GrabbedItem != null && !doubleClick && !cancelDrag) {
-				this.StartDrag(slot);
+				activeDragHandler = this.StartDrag(slot, dragButton);
 			}
 			this.GrabbedItem = grabbedReference.value;
 		}, null));
 		InputHandler.BlockContext("ItemUse", () => !GameManager.instance.Player.InputHandler.LeftHold);
 	}
 
-	public void OnPointerUp(IItemSlot slot, PointerEventData eventData) { 
-		InvocationHelper.If(draggingSlots, this.EndDrag);
+	public void OnPointerUp(IItemSlot slot, PointerEventData eventData) {
+		this.EndDrag();
 	}
 
 	public void OnPointerEnter(IItemSlot slot, PointerEventData eventData) {
-		if (!draggingSlots || !slot.Handshake(GrabbedItem, SlotInteractionMode.Drag)) {
+		if (activeDragHandler == null || !slot.Handshake(GrabbedItem, SlotInteractionMode.Drag)) {
 			return;
 		}
 		RefBox<ItemDisplay> grabbedReference = new(this.GrabbedItem);
-		InterpretationFunction? interpretationFunction = this.InterpretDrag(slot, grabbedReference);
-		if (interpretationFunction == null) {
-			logger.ThrowException(null, new InvalidOperationException("InterpretDrag() returned null!"));
+		if (!this.activeDragHandler.ExecuteInterpretation(slot, grabbedReference)) {
+			logger.ThrowException(null, new InvalidOperationException("Drag interpretation function returned null!"));
 			return;
 		}
-		interpretationFunction.Invoke(slot, grabbedReference);
 		hotbar.OnItemTransfer(slot, grabbedReference);
 		this.GrabbedItem = grabbedReference.value;
 	}
@@ -317,83 +303,62 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		return null;
 	}
 
-	public InterpretationFunction? InterpretDrag(IItemSlot draggedSlot, RefBox<ItemDisplay> grabbedItem) {
-		if (!draggingSlots) {
-			logger.LogError(null, "InterpretDrag() called while not dragging slots. This should really not happen.");
-			return null;
-		}
-
-		if (dragButton == PointerEventData.InputButton.Left) {
+	public InterpretationFunction? InterpretDrag(DragHandler handler, IItemSlot draggedSlot, RefBox<ItemDisplay> grabbedItem) {
+		if (handler.dragButton == PointerEventData.InputButton.Left) {
 			return (slot, grabbedItem) => {
-				if (draggedSlots.Contains(slot) 
-						|| (slot.HasItem && slot.ContainedItem != dragOrigin!.ContainedItem)
+				if (handler.DraggedSlots.Contains(slot) 
+						|| (slot.HasItem && slot.ContainedItem != handler.origin!.ContainedItem)
 						|| (slot.HasItem && slot.ItemStack!.IsFull())) {
 					return;
 				}
 
 				// Clone to preview distribution
-				List<IItemSlot> preview = new(draggedSlots) { slot };
+				List<IItemSlot> preview = new(handler.DraggedSlots) { slot };
 
-				int toSplit = startDragStack;
-				//Debug.Log("toSplit: " + startDragStack);
-				//Debug.Log("split count: " + preview.Count);
+				int toSplit = handler.startDragStack;
 				int splitAmount = toSplit / (preview.Count);
 				if (splitAmount <= 0) {
 					return;
 				}
 				// Commit the slot to dragged list
-				draggedSlots.Add(slot);
-				//Debug.Log("added slot:" + slot.index);
-				int remainder = toSplit % (draggedSlots.Count);
+				handler.AddDraggedSlot(slot);
+				int remainder = toSplit % (handler.DraggedSlots.Count);
 
-				for (int i = 0; i < draggedSlots.Count; i++) {
-					var draggedSlot = draggedSlots[i];
+				for (int i = 0; i < handler.DraggedSlots.Count; i++) {
+					var draggedSlot = handler.DraggedSlots[i];
 					int amount = splitAmount + (i < remainder ? 1 : 0);
 
 					if (draggedSlot.ItemStack == null) {
-						draggedSlot.CreateDisplay(new ItemStack(dragOrigin!.ItemStack!.item, amount));
+						draggedSlot.CreateDisplay(new ItemStack(handler.origin!.ItemStack!.item, amount));
 					}
-					if (quantitySnapshots.TryGetValue(draggedSlot, out var snapshot) && draggedSlot != this.dragOrigin) {
+					if (handler.quantitySnapshots.TryGetValue(draggedSlot, out var snapshot) && draggedSlot != handler.origin) {
 						draggedSlot.ItemStack!.SetQuantity(snapshot + amount);
 					} else {
 						draggedSlot.ItemStack!.SetQuantity(amount);
 					}
 				}
 			};
-		} else if (dragButton == PointerEventData.InputButton.Right && grabbedItem.value?.ItemStack.quantity > 0) {
-			if (draggedSlot.ContainedItem != null && grabbedItem.value.DisplayedItem != draggedSlot.ContainedItem) {
+		} else if (handler.dragButton == PointerEventData.InputButton.Right) {
+			if (draggedSlot.ContainedItem != null && (!grabbedItem.value?.DisplayedItem!.Equals(draggedSlot.ContainedItem) ?? true)) {
 				return DoNothing;
 			}
-			//Debug.Log("transferring single");
 			return TransferSingleToSlot;
 		}
 
 		return null;
 	}
 
-	public void StartDrag(IItemSlot dragOrigin) {
-		draggingSlots = true;
-		this.dragOrigin = dragOrigin;
-		this.startDragStack = dragOrigin.ItemStack!.quantity;
-		quantitySnapshots.Clear();
-		foreach (var slot in slots.Where(s => s != this.dragOrigin && s.ContainedItem == dragOrigin.ContainedItem)) {
+	public DragHandler StartDrag(IItemSlot dragOrigin, PointerEventData.InputButton dragButton) {
+		Dictionary<IItemSlot, int> quantitySnapshots = new();
+		var snapshotSlots = slots.Where(s => s != dragOrigin && s.ContainedItem == dragOrigin.ContainedItem);
+		foreach (var slot in snapshotSlots) {
 			quantitySnapshots[slot] = slot.ItemStack!.quantity;
 		}
-		if (!draggedSlots.Contains(dragOrigin)) {
-			draggedSlots.Add(dragOrigin);
-		}
+		return new DragHandler(dragOrigin, () => slots.ToArray(), this.InterpretDrag, quantitySnapshots, dragButton);
 	}
 
 	public void EndDrag() {
-		if (draggedSlots.Count == 0) {
-			draggingSlots = false;
-			this.dragOrigin = null;
-			return;
-		}
-
-		draggingSlots = false;
-		draggedSlots.Clear();
-		this.dragOrigin = null;
+		activeDragHandler = null;
 	}
 
 	[InterpretationFunctionCandidate]
