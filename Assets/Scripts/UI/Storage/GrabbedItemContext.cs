@@ -21,7 +21,6 @@ public class GrabbedItemContext {
 		this.value = value;
 		if (slot != null) {
 			this.lastKnownSlot = slot;
-			Debug.Log("lastKnownSlot: " + slot.index);
 		}
 	}
 }

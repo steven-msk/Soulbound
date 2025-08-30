@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Codice.Client.BaseCommands;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -162,10 +163,11 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		if (GrabbedContext.value == null) {
 			return;
 		}
-		if (PickUpItem(GrabbedContext.value.ItemStack)) {
+		if (PickUpItem(GrabbedContext.value.ItemStack, out int leftover)) {
 			GrabbedContext.value.Destroy();
 			GrabbedContext.Set(null, null);
 		} else {
+			GrabbedContext.value.ItemStack.SetQuantity(leftover);
 			DropGrabbedItem();
 		}
 	}
@@ -180,26 +182,30 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		}
 	}
 
-	public bool PickUpItem(ItemStack itemStack) {
+	public bool PickUpItem(ItemStack itemStack, out int remaining) {
 		if (!itemStack.item.IsStackable) {
 			InventorySlot? emptySlot = GetFirstEmptySlot();
 			if (emptySlot != null) {
 				ItemDisplay.Create(itemStack, emptySlot);
+				remaining = 0;
 				return true;
 			}
+			remaining = 1;
 			return false;
 		} else {
-			int remaining = itemStack.quantity;
+			void ClampRemaining(ref int remaining) => remaining = Mathf.Max(remaining, 0);
+			remaining = itemStack.quantity;
 
 			// Search for stack with the same item
 			foreach (var stackSlot in GetOccupiedSlots(itemStack.item) ?? new List<IItemSlot>().ToArray()) {
 				ItemStack? stackInSlot = stackSlot.ItemStack;
-				if (stackInSlot!.quantity < stackInSlot!.item.maxStackSize) {
-					int availableSpace = stackInSlot.item.maxStackSize - stackInSlot.quantity;
+				if (stackInSlot!.quantity < itemStack.item.maxStackSize) {
+					int availableSpace = itemStack.item.maxStackSize - stackInSlot.quantity;
 					int toAdd = Math.Min(remaining, availableSpace);
 					stackInSlot.Increment(toAdd);
 					remaining -= toAdd;
-					if (remaining <= 0) {
+					ClampRemaining(ref remaining);
+					if (remaining == 0) {
 						return true;
 					}
 				}
@@ -213,7 +219,8 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 					ItemDisplay.Create(new ItemStack(itemStack.item, toAdd), availableSlots[i]);
 					remaining -= toAdd;
 				}
-				if (remaining <= 0) {
+				ClampRemaining(ref remaining);
+				if (remaining == 0) {
 					return true;
 				}
 			}
@@ -237,24 +244,24 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 	public InventorySlot GetSlotByIndex(int index) => popupSlotsByIndex[index];
 	IItemSlot IItemContainer.GetSlotByIndex(int index) => popupSlotsByIndex[index];
 
-	public void OnPointerDown(IItemSlot slot, PointerEventData eventData) {
+	public void OnPointerDown(IItemSlot clickedSlot, PointerEventData eventData) {
 		float time = Time.time;
-		bool doubleClick = lastClickedSlot == slot && (time - lastClickTime) <= doubleClickThreshold;
+		bool doubleClick = lastClickedSlot == clickedSlot && (time - lastClickTime) <= doubleClickThreshold;
 		lastClickTime = time;
-		lastClickedSlot = slot;
+		lastClickedSlot = clickedSlot;
 
 		PointerEventData.InputButton dragButton = eventData.button;
-		InterpretationFunction? interpretationFunction = InterpretClick(slot, eventData, doubleClick, out bool cancelDrag);
+		InterpretationFunction? interpretationFunction = InterpretClick(clickedSlot, eventData, doubleClick, out bool cancelDrag);
 		if (interpretationFunction == null) {
 			logger.ThrowException(null, new InvalidOperationException("InterpretClick() returned null!"));
 			return;
 		}
 
 		InputHandler.RequestAction(new("ItemSlotAction", 10, () => {
-			if (!slot.Handshake(GrabbedContext.value, SlotInteractionMode.Click)) {
+			if (!clickedSlot.Handshake(GrabbedContext.value, SlotInteractionMode.Click)) {
 				return;
 			}
-			ExecuteOnGrabbedReference(slot, (slot, grabbedReference) => {
+			ExecuteOnGrabbedReference(clickedSlot, (slot, grabbedReference) => {
 				interpretationFunction.Invoke(slot!, grabbedReference);
 				hotbar.OnItemTransfer(slot!, grabbedReference);
 				if (GrabbedContext.value != null && !doubleClick && !cancelDrag) {
