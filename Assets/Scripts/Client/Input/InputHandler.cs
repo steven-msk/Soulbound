@@ -91,7 +91,7 @@ public class InputHandler : MonoBehaviour, IDependencyInitializable<InputHandler
 		});
 
 		RegisterInputEvent(playerActions.DropItem, pausable: true, (action) => {
-			action.performed += actionContext => player.Inventory.DropItemFromInventory();
+			action.performed += actionContext => player.Inventory.DropHoveredOrActiveItem();
 		});
 
 		RegisterInputEvent(playerActions.PauseGame, pausable: false, (action) => {

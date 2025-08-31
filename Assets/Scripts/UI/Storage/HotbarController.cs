@@ -64,7 +64,7 @@ public class HotbarController : MonoBehaviour, IItemContainer, IDependencyInitia
 		}
 
 		if (hotbarSlot != active.hotbarSlot) {
-			if (!inventory.PopupOpen) {
+			if (!inventory.IsOpened) {
 				ApplySelectionChanges(active.hotbarSlot, inactiveSlotColor, inactiveSlotNumberColor, inactiveItemStackColor, -activeSlotOffset, Vector3.one); 
 			} else {
 				ApplySelectionChanges(active.hotbarSlot, activeSlotColor, activeSlotNumberColor, activeItemStackColor, -activeSlotOffset, Vector3.one);
@@ -106,9 +106,9 @@ public class HotbarController : MonoBehaviour, IItemContainer, IDependencyInitia
 
 	public void OnInventoryPopup() {
 		InventoryController inventory = GameManager.instance.Player.Inventory;
-		Color slotColor = inventory.PopupOpen ? activeSlotColor : inactiveSlotColor;
-		Color slotNumberColor = inventory.PopupOpen ? activeSlotNumberColor : inactiveSlotNumberColor;
-		Color itemStackColor = inventory.PopupOpen ? activeItemStackColor : inactiveItemStackColor;
+		Color slotColor = inventory.IsOpened ? activeSlotColor : inactiveSlotColor;
+		Color slotNumberColor = inventory.IsOpened ? activeSlotNumberColor : inactiveSlotNumberColor;
+		Color itemStackColor = inventory.IsOpened ? activeItemStackColor : inactiveItemStackColor;
 		foreach (var slot in slots.Where(slot => !slot.Equals(active.hotbarSlot))) {
 			ApplySelectionChanges(slot, slotColor, slotNumberColor, itemStackColor, Vector3.zero, Vector3.one);
 		}
@@ -138,6 +138,10 @@ public class HotbarController : MonoBehaviour, IItemContainer, IDependencyInitia
 	}
 
 	public void OnPointerEnter(IItemSlot slot, PointerEventData data) {
+		throw new NotImplementedException();
+	}
+
+	public void OnPointerExit(IItemSlot slot, PointerEventData data) {
 		throw new NotImplementedException();
 	}
 }

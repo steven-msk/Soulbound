@@ -22,14 +22,11 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 	[SerializeField] private GameObject popup;
 	[SerializeField] private GameObject armorSlots;
 	private static Dictionary<int, ArmorSlot> armorSlotsByIndex = new();
-	[SerializeField] private bool popupOpen = false;
+	[SerializeField] private bool opened = false;
+	public bool IsOpened => opened;
 
-	public bool PopupOpen => popupOpen;
 	public GrabbedItemContext GrabbedContext { get; set; } = new(null, null);
 	private IItemSlot? lastKnownGrabbedSlot;
-
-	public Tooltip ActiveTooltip { set => activeTooltip = value; }
-	[SerializeField] private Tooltip activeTooltip;
 
 	public InventorySlot[] MainPlayerSlots { get; private set; }
 
@@ -51,6 +48,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 	private float lastClickTime;
 	private IItemSlot? lastClickedSlot;
 	private DragHandler? activeDragHandler;
+	private IItemSlot? hoveredSlot;
 
 	public InventoryController OnGameInit(PlayerController dependency) {
 		player = dependency;
@@ -124,28 +122,23 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 	}
 
 	public void ToggleInventory() {
-		popupOpen = !popupOpen;
-		popup.SetActive(popupOpen);
-		armorSlots.SetActive(popupOpen);
+		opened = !opened;
+		popup.SetActive(opened);
+		armorSlots.SetActive(opened);
 		LayoutRebuilder.ForceRebuildLayoutImmediate(popup.GetComponent<RectTransform>());
-		activeTooltip?.Hide();
 		hotbar.OnInventoryPopup();
-		if (!popupOpen && GrabbedContext.value != null) {
+		if (!opened && GrabbedContext.value != null) {
 			TryReleaseGrabbed(GrabbedContext.lastKnownSlot);
+		}
+		foreach (var slot in popupSlots) {
+			slot.OnInventoryPopup(opened);
 		}
 	}
 
-	public void DropItemFromInventory() {
-		//ItemDisplay itemDisplay = default(ItemDisplay)!;
-		//if (activeTooltip != null) {
-		//	itemDisplay = activeTooltip.DisplayParent?.GetComponent<ItemDisplay>()!;
-		//	activeTooltip.Hide();
-		//	activeTooltip = null!;
-		//} else {
-		//	itemDisplay = hotbar.ActiveSlot.ItemDisplay;
-		//}
-		//itemDisplay?.ItemStack.Drop(player.center, player.itemDropForce, true);
-		//Destroy(itemDisplay?.gameObject);
+	public void DropHoveredOrActiveItem() {
+		ItemDisplay? hoveredDisplay = hoveredSlot?.ItemDisplay ?? hotbar.ActiveSlot.ItemDisplay ?? null;
+		hoveredDisplay?.ItemStack.Drop(player.center, player.itemDropForce, true);
+		hoveredDisplay?.Destroy();
 	}
 
 	// POTENTIAL: OnDrop callback in Item
@@ -277,6 +270,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 	}
 
 	public void OnPointerEnter(IItemSlot slot, PointerEventData eventData) {
+		this.hoveredSlot = slot;	
 		if (activeDragHandler == null || !slot.Handshake(GrabbedContext.value, SlotInteractionMode.Drag)) {
 			return;
 		}
@@ -287,6 +281,10 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		}
 		hotbar.OnItemTransfer(slot, grabbedReference);
 		this.GrabbedContext.Set(grabbedReference.value, null);
+	}
+
+	public void OnPointerExit(IItemSlot slot, PointerEventData eventData) {
+		this.hoveredSlot = null;
 	}
 
 	public InterpretationFunction? InterpretClick(IItemSlot clickedSlot, PointerEventData eventData, bool doubleClick, out bool cancelDrag) {
@@ -459,7 +457,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 
 	public ItemDisplay CreateGrabbedDisplay(ItemStack itemStack, Func<Transform?>? parentSupplier = null) {
 		ItemDisplay grabbed = ItemDisplay.Create(itemStack, parentSupplier ?? (() => this.transform));
-		grabbed.EnableGrab();
+		grabbed.OnGrab();
 		return grabbed;
 	}
 
@@ -470,7 +468,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 
 	[InterpretationFunctionCandidate]
 	public void TransferGrabbed(IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
-		if (!PopupOpen) {
+		if (!IsOpened) {
 			return;
 		}
 		PlayerController player = GameManager.instance.Player;

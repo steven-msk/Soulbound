@@ -12,7 +12,7 @@ using UnityEngine.InputSystem;
 
 #nullable enable
 
-public interface IItemSlot : IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, ISerializable<SerializedItemSlot> {
+public interface IItemSlot : IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler, ISerializable<SerializedItemSlot> {
 	public ItemDisplay ItemDisplay { get; }
 	public IItemContainer2D container { get; }
 	public int index { get; set; }
@@ -22,19 +22,13 @@ public interface IItemSlot : IPointerDownHandler, IPointerUpHandler, IPointerEnt
 	public Item? ContainedItem => ItemStack?.item;
 	public GameObject GameObject { get; }
 		
-	// PLANNED REFACTOR: attach and detach slot methods will cause problems later on with serializations
-	// Attaching and detaching should only be made after the player released or grabbed an item from a slot.
-	// This helps with serialization of items inside containers when the client crashes.
-	// As of right now, if a client would crash while they have an item grabbed, there is
-	// nowhere to place the item in the container since the data had already been detached.
-
 	public virtual void AttachItemDisplay(ItemDisplay itemDisplay) {
 		itemDisplay?.transform.SetParent(GameObject.transform, true);
-		itemDisplay?.DisableGrab();
+		itemDisplay?.OnRelease();
 	}
 
 	public virtual void DetachItemDisplay() {
-		this.ItemDisplay.EnableGrab();
+		this.ItemDisplay.OnGrab();
 		this.ItemDisplay?.transform.SetParent(GameManager.instance.Player.Inventory.transform, true);
 	}
 
@@ -75,6 +69,10 @@ public interface IItemSlot : IPointerDownHandler, IPointerUpHandler, IPointerEnt
 		container.OnPointerEnter(this, eventData);
 	}
 
+	new public void OnPointerExit(PointerEventData eventData) {
+		container.OnPointerExit(this, eventData);
+	}
+
 	/// <summary>
 	/// Validates whether this slot agrees to interact with the given item upon the given interaction mode
 	/// </summary>
@@ -82,8 +80,8 @@ public interface IItemSlot : IPointerDownHandler, IPointerUpHandler, IPointerEnt
 		return interactionMode == SlotInteractionMode.Click ? !(grabbedItem == null && this.IsEmpty) : true;
 	}
 
-
 	void IPointerDownHandler.OnPointerDown(PointerEventData eventData) => this.OnPointerDown(eventData);
 	void IPointerUpHandler.OnPointerUp(PointerEventData eventData) => this.OnPointerUp(eventData);
 	void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData) => this.OnPointerEnter(eventData);
+	void IPointerExitHandler.OnPointerExit(PointerEventData eventData) => this.OnPointerExit(eventData);
 }

@@ -13,4 +13,5 @@ public interface IItemContainer {
 	void OnPointerDown(IItemSlot slot, PointerEventData eventData);
 	void OnPointerUp(IItemSlot slot, PointerEventData eventData);
 	void OnPointerEnter(IItemSlot slot, PointerEventData data);
+	void OnPointerExit(IItemSlot slot, PointerEventData data);
 }

@@ -22,7 +22,7 @@ public class ItemDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 	}
 	public TooltipRenderer tooltipRenderer { get; private set; }
 	public Item? DisplayedItem => ItemStack?.item;
-	private Tooltip? activeTooltip = null;
+	public Tooltip? activeTooltip { get; private set; } = null;
 
 	public static ItemDisplay Create<TSlot>(ItemStack itemStack, TSlot? slot) where TSlot : MonoBehaviour, IItemSlot {
 		return Create(itemStack, () => slot?.transform ?? null);
@@ -57,6 +57,7 @@ public class ItemDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 		if (ItemStack == GameManager.instance.Player.MainHandStack) {
 			GameManager.instance.Player.SetMainHandItem(null);
 		}
+		DestroyTooltip();
 		GameObject.Destroy(gameObject);
 	}
 
@@ -65,19 +66,22 @@ public class ItemDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 		activeTooltip?.SetParent(GameManager.instance.Player.Inventory.transform, true);
 	}
 
-	public void OnPointerExit(PointerEventData eventData) {
-		activeTooltip?.Hide();
-		activeTooltip = null;
-	}
+	public void OnPointerExit(PointerEventData eventData) => DestroyTooltip();
 
-	public void EnableGrab() {
+	public void OnGrab() {
 		moveMode = true;
 		gameObject.GetComponent<Image>().raycastTarget = false;
+		DestroyTooltip();
 	}
 
-	public void DisableGrab() {
+	public void OnRelease() {
 		moveMode = false;
 		gameObject.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
 		gameObject.GetComponent<Image>().raycastTarget = true;
+	}
+
+	public void DestroyTooltip() {
+		activeTooltip?.Hide();
+		activeTooltip = null;
 	}
 }
