@@ -5,13 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
+#nullable enable
+
 public abstract class StatItemDefinition : ItemDefinition, IStatProvider {
     public abstract bool applyInstantStatsAutomatically { get; }
     public List<AbstractSerializableStat> instantStats { get; }
     public List<IBufferedStatImpl> bufferedStats { get; }
     public virtual string bufferedInterpolationSource { get; }
 
-    public StatItemDefinition(string name, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize, Func<Item, AbstractTooltip> tooltipSupplier,
+    public StatItemDefinition(string name, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize, Func<Item, TooltipData?> tooltipSupplier,
             List<AbstractSerializableStat> instantStats, List<IBufferedStatImpl> bufferedStats, string interpolationSource)
         : base(name, icon, worldPrefabSupplier, maxStackSize, tooltipSupplier) {
         this.instantStats = instantStats;

@@ -18,9 +18,7 @@ public abstract partial class Item {
 	public abstract Func<GameObject> worldPrefabSupplier { get; }
 	public abstract int maxStackSize { get; }
 	public bool IsStackable => maxStackSize > 1;
-	protected abstract Func<Item, AbstractTooltip?> tooltipSupplier { get; }
-
-	public AbstractTooltip? GetTooltip() => tooltipSupplier.Invoke(this);
+	protected abstract Func<Item, TooltipData?> tooltipSupplier { get; }
 
 	public virtual GameObject FallbackWorldPrefab() {
 		GameObject fallback = InstantiateDefaultWorldPrefab(); 
@@ -32,16 +30,7 @@ public abstract partial class Item {
 		return GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.Prefabs>("droppedItem"))!;
 	}
 
-	//[Obsolete]
-	//public AbstractTooltip GetTooltip() {
-	//	if (tooltipSupplier != null) {
-	//		return tooltipSupplier(this);
-	//	}
-	//	return GetDefaultTooltip();
-	//}
-
-	[Obsolete]
-	//protected virtual CompoundTooltip GetDefaultTooltip() => Tooltip.DefaultItem(this);
+	public TooltipData? GetTooltipData() => tooltipSupplier.Invoke(this);
 
 	public static int CustomMaxStack(int maxStack) => maxStack;
 

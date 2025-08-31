@@ -8,7 +8,7 @@ using UnityEditor.UIElements;
 #nullable enable
 
 public static class ItemTooltips {
-    public static Func<Item, AbstractTooltip?> NoTooltip() => item => null;
+    public static Func<Item, Tooltip?> NoTooltip() => item => null;
 
-    public static Func<Item, AbstractTooltip?> DefaultTitle() => item => CompoundTooltip.Of(Tooltip.Title(item.name));
+    //public static Func<Item, AbstractTooltip?> DefaultTitle() => item => CompoundTooltip.Of(Tooltip.Title(item.name));
 }

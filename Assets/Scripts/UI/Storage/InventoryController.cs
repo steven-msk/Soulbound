@@ -28,8 +28,8 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 	public GrabbedItemContext GrabbedContext { get; set; } = new(null, null);
 	private IItemSlot? lastKnownGrabbedSlot;
 
-	public AbstractTooltip ActiveTooltip { set => activeTooltip = value; }
-	[SerializeField] private AbstractTooltip activeTooltip;
+	public Tooltip ActiveTooltip { set => activeTooltip = value; }
+	[SerializeField] private Tooltip activeTooltip;
 
 	public InventorySlot[] MainPlayerSlots { get; private set; }
 
@@ -127,7 +127,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		popupOpen = !popupOpen;
 		popup.SetActive(popupOpen);
 		armorSlots.SetActive(popupOpen);
-		LayoutRebuilder.ForceRebuildLayoutImmediate(popup.GetComponent<RectTransform>()); 
+		LayoutRebuilder.ForceRebuildLayoutImmediate(popup.GetComponent<RectTransform>());
 		activeTooltip?.Hide();
 		hotbar.OnInventoryPopup();
 		if (!popupOpen && GrabbedContext.value != null) {
@@ -136,16 +136,16 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 	}
 
 	public void DropItemFromInventory() {
-		ItemDisplay itemDisplay = default(ItemDisplay)!;
-		if (activeTooltip != null) {
-			itemDisplay = activeTooltip.DisplayParent?.GetComponent<ItemDisplay>()!;
-			activeTooltip.Hide();
-			activeTooltip = null!;
-		} else {
-			itemDisplay = hotbar.ActiveSlot.ItemDisplay;
-		}
-		itemDisplay?.ItemStack.Drop(player.center, player.itemDropForce, true);
-		Destroy(itemDisplay?.gameObject);
+		//ItemDisplay itemDisplay = default(ItemDisplay)!;
+		//if (activeTooltip != null) {
+		//	itemDisplay = activeTooltip.DisplayParent?.GetComponent<ItemDisplay>()!;
+		//	activeTooltip.Hide();
+		//	activeTooltip = null!;
+		//} else {
+		//	itemDisplay = hotbar.ActiveSlot.ItemDisplay;
+		//}
+		//itemDisplay?.ItemStack.Drop(player.center, player.itemDropForce, true);
+		//Destroy(itemDisplay?.gameObject);
 	}
 
 	// POTENTIAL: OnDrop callback in Item

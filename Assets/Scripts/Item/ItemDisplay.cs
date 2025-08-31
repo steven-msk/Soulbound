@@ -6,9 +6,9 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class ItemDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
+#nullable enable
 
-	[Header("Internal")]
+public class ItemDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
 	[SerializeField] private bool moveMode;
 	[SerializeField] private Item displayedItem;
 	private ItemStack itemStack;
@@ -20,11 +20,10 @@ public class ItemDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 			displayedItem = itemStack.item;
 		}
 	}
+	public TooltipRenderer tooltipRenderer { get; private set; }
 	public Item? DisplayedItem => ItemStack?.item;
-	[SerializeField] private AbstractTooltip tooltip;
-	public AbstractTooltip Tooltip { get => tooltip; set => tooltip = value; }
+	private Tooltip? activeTooltip = null;
 
-#nullable enable
 	public static ItemDisplay Create<TSlot>(ItemStack itemStack, TSlot? slot) where TSlot : MonoBehaviour, IItemSlot {
 		return Create(itemStack, () => slot?.transform ?? null);
 	}
@@ -41,19 +40,17 @@ public class ItemDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 		if (itemStack.item.IsStackable) {
 			itemStack.InitializeStackText(display);
 		}
-		display.Tooltip = itemStack.item.GetTooltip();
+		display.tooltipRenderer = new TooltipRenderer(TooltipNodeStylePresets.PresetProvider());
 		display.transform.SetAsLastSibling();
 		return display;
 	}
-#nullable disable
 
 	private void Update() {
+		InputHandler inputHandler = GameManager.instance.Player.InputHandler;
 		if (moveMode) {
-			gameObject.transform.position = Input.mousePosition;
+			gameObject.transform.position = inputHandler.MouseScreenPosition;
 		}
-		if (tooltip?.IsDisplayed ?? false) {
-			tooltip.Update(itemStack);
-		}
+		activeTooltip?.SetPosition(inputHandler.MouseScreenPosition);
 	}
 
 	public void Destroy() {
@@ -64,12 +61,17 @@ public class ItemDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 	}
 
 	public void OnPointerEnter(PointerEventData eventData) {
-		tooltip.Show(eventData.position, this.GetComponent<RectTransform>());
-		tooltip.DisplayParent = gameObject;
+		TooltipData? tooltipData = itemStack.item.GetTooltipData();
+		if (tooltipData != null) {
+			activeTooltip = new Tooltip(tooltipRenderer, tooltipData);
+			activeTooltip.Show(eventData.position, this.GetComponent<RectTransform>());
+			activeTooltip.SetParent(GameManager.instance.Player.Inventory.GetComponent<RectTransform>(), true);
+		}
 	}
 
 	public void OnPointerExit(PointerEventData eventData) {
-		tooltip.Hide();
+		activeTooltip?.Hide();
+		activeTooltip = null;
 	}
 
 	public void EnableGrab() {

@@ -13,7 +13,7 @@ public class ArmorItem : StatItemDefinition, IEquipable {
     public ArmorType armorType { get; }
     public override bool applyInstantStatsAutomatically => true;
 
-    public ArmorItem(string name, ArmorType armorType, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize, Func<Item, AbstractTooltip> tooltipSupplier, 
+    public ArmorItem(string name, ArmorType armorType, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize, Func<Item, TooltipData?> tooltipSupplier, 
 			List<AbstractSerializableStat> instantStats, List<IBufferedStatImpl> bufferedStats, string interpolationSource)
 		: base(name, icon, worldPrefabSupplier, maxStackSize, tooltipSupplier, instantStats, bufferedStats, interpolationSource) {
 		this.armorType = armorType;
@@ -21,7 +21,6 @@ public class ArmorItem : StatItemDefinition, IEquipable {
 
     public void OnEquip(EquipmentSlot slot) {
 		PlayerStats playerStats = GameManager.instance.Player.Stats;
-		//base.ValidateStats();
 		playerStats.Apply(this.instantStats, this);
 		((IStatProvider)this).EnableBuffers(playerStats);
 	}

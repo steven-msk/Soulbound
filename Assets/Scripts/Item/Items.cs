@@ -13,11 +13,17 @@ public partial class Items : IResourceModule {
     private static int idCounter = 0;
     private static Dictionary<int, Item> itemsById = new();
 
-    public static readonly BlockItem grassBlock = InjectID(new BlockItem("Grass Block", Icon("grass_icon"), WorldPrefab("grass_top"), 210, () => Blocks.grass));
+    public static readonly BlockItem grassBlock = InjectID(new BlockItem("Grass Block", Icon("grass_icon"), WorldPrefab("grass_top"), 210, () => Blocks.grass, NameTooltip));
     public static readonly BlockItem stoneBlock = InjectID(new BlockItem("Stone Block", Icon("stone_icon"), null, Item.universalMaxStack, () => Blocks.stone));
     public static readonly BlockItem dirtBlock = InjectID(new BlockItem("Dirt Block", Icon("dirt_icon"), null, Item.universalMaxStack, () => Blocks.dirt));
     public static readonly BlockItem woodBlock = InjectID(new BlockItem("Wood Block", Icon("wood_icon"), null, Item.universalMaxStack, () => Blocks.wood));
     public static readonly BlockItem leavesBlock = InjectID(new BlockItem("Leaves Block", Icon("leaves_icon"), null, Item.universalMaxStack, () => Blocks.leaves));
+
+#nullable enable
+
+    public static TooltipData? NameTooltip(Item item) {
+        return new TooltipData(new List<TooltipNodeData>() { new(TooltipNode.None, item.name) });
+	}
 
     private static Sprite Icon(string name) {
         return IResourceModule.Resource<Sprite, ResourceGroups.Items.Icons>(name);
@@ -47,6 +53,8 @@ public partial class Items : IResourceModule {
         throw new KeyNotFoundException($"Item ID {id} not found.");
 	}
 }
+
+#nullable disable
 
 [JsonConverter(typeof(Item.ItemJsonConverter))]
 abstract partial class Item {

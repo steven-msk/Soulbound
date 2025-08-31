@@ -1,21 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-[Serializable]
+#nullable enable
+
 public class TooltipData {
-	public string Text { get; set; }
-	public TooltipSectionLayout Layout { get; set; }
+	public List<TooltipNodeData> nodes { get; private set; } = new();
+	public CompoundTooltipLayout layout { get; private set; }
 
-	public bool IsEmpty => string.IsNullOrEmpty(Text);
-
-	public TooltipData(TooltipSectionLayout layout, string text) {
-		Text = text;
-		Layout = layout;
+	public TooltipData(IEnumerable<TooltipNodeData> nodes, CompoundTooltipLayout? layout = null) {
+		this.nodes.AddRange(nodes);
+		this.layout = layout ?? CompoundTooltipLayout.Default();
 	}
-
-	public AbstractTooltip Generate() => Tooltip.FromData(this);
-
-	public static TooltipData[] Concat(TooltipData[] first, TooltipData[] second) => first.Concat(second).ToArray();
-
-	public static TooltipData[] Concat(TooltipData[] first, TooltipData second) => Concat(first, new TooltipData[] { second });
 }

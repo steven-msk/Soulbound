@@ -12,9 +12,9 @@ public abstract class ItemDefinition : Item {
     public override Sprite icon { get; }
     public override Func<GameObject> worldPrefabSupplier { get; }
     public override int maxStackSize { get; }
-    protected override Func<Item, AbstractTooltip?> tooltipSupplier { get; }
+    protected override Func<Item, TooltipData?> tooltipSupplier { get; }
 
-    public ItemDefinition(string name, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize, Func<Item, AbstractTooltip?> tooltipSupplier) {
+    public ItemDefinition(string name, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize, Func<Item, TooltipData?> tooltipSupplier) {
         this.name = name;
         this.icon = icon;
         this.worldPrefabSupplier = worldPrefabSupplier;
@@ -23,5 +23,5 @@ public abstract class ItemDefinition : Item {
     }
 
     public ItemDefinition(string name, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize)
-        : this(name, icon, worldPrefabSupplier, maxStackSize, ItemTooltips.DefaultTitle()) { }
+        : this(name, icon, worldPrefabSupplier, maxStackSize, (item) => null) { }
 }

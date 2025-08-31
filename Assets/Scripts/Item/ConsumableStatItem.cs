@@ -14,7 +14,7 @@ public class ConsumableStatItem : StatItemDefinition, IConsumable {
     public IConsumable.ConsumeAction consumeAction { get; }
     public int consumeAmount { get; }
 
-    public ConsumableStatItem(string name, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize, Func<Item, AbstractTooltip> tooltipSupplier, 
+    public ConsumableStatItem(string name, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize, Func<Item, TooltipData?> tooltipSupplier, 
             List<AbstractSerializableStat> instantStats, List<IBufferedStatImpl> bufferedStats, string interpolationSource,
             IConsumable.ConsumeAction consumeAction, int consumeAmount)
         : base(name, icon, worldPrefabSupplier, maxStackSize, tooltipSupplier, instantStats, bufferedStats, interpolationSource) {
@@ -27,8 +27,4 @@ public class ConsumableStatItem : StatItemDefinition, IConsumable {
 		ConsumableUtils.DefaultConsume(this, itemStack);
 		((IStatProvider)this).ApplyInstantStats(player.Stats);
 	}
-
-	//protected override CompoundTooltip GetDefaultTooltip() {
-	//	return base.GetDefaultTooltip().Concat(Tooltip.Tag(ItemTag.Consumable));
-	//}
 }

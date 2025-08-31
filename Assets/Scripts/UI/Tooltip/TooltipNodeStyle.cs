@@ -2,8 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TooltipSectionLayout {
-	public TooltipSection Section { get; set; } = TooltipSection.Info;
+public class TooltipNodeStyle {
 	public int fontSize = 10;
 	public Color textColor = Color.white;
 	public FontStyles fontStyle = FontStyles.Normal;
@@ -11,13 +10,6 @@ public class TooltipSectionLayout {
 	public Vector4 margin = Vector4.zero;
 	public TMP_FontAsset fontAsset = ResourceManager.Get<TMP_FontAsset, ResourceGroups.Fonts>("Urbanist-SemiBold SDF");
 	//...animations, shaders?
-
-	public TooltipSectionLayout(TooltipSection section, bool applyPreset = true) {
-		Section = section;
-		if (applyPreset) {
-			section.ApplyLayoutPreset(this);
-		}
-	}
 
 	public void Apply(TextMeshProUGUI textComponent) {
 		textComponent.font = fontAsset;

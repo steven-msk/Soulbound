@@ -12,7 +12,7 @@ public class BlockItem : ItemDefinition, IPlaceable {
 	public Func<Block> blockGetter { get; }
     public Block referenceBlock => blockGetter() ?? throw new InvalidOperationException("Block reference is not yet initialized.");
 
-    public BlockItem(string name, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize, Func<Block> blockGetter, Func<Item, AbstractTooltip?> tooltipSupplier)
+    public BlockItem(string name, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize, Func<Block> blockGetter, Func<Item, TooltipData?> tooltipSupplier)
 		: base(name, icon, worldPrefabSupplier, maxStackSize, tooltipSupplier) {
         this.blockGetter = blockGetter;
     }
@@ -20,7 +20,7 @@ public class BlockItem : ItemDefinition, IPlaceable {
 	// TODO: add constructors for all types which extend ItemDefinitions
 
     public BlockItem(string name, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize, Func<Block> blockGetter) 
-		: this(name, icon, worldPrefabSupplier, maxStackSize, blockGetter, ItemTooltips.DefaultTitle()) { }
+		: this(name, icon, worldPrefabSupplier, maxStackSize, blockGetter, (item) => null) { }
 
     public BlockState Place(ItemStack itemStack, BlockPos position) {
 		itemStack.Decrement();

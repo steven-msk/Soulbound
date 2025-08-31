@@ -9,7 +9,7 @@ public abstract class WeaponItem : StatItemDefinition, IAttackPerformer {
 	public abstract GameObject attackPrefab { get; protected set; }
 	public abstract WeaponAttackBehavior attackBehavior { get; protected set; }
 
-    public WeaponItem(string name, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize, Func<Item, AbstractTooltip> tooltipSupplier,
+    public WeaponItem(string name, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize, Func<Item, TooltipData?> tooltipSupplier,
 			List<AbstractSerializableStat> instantStats, List<IBufferedStatImpl> bufferedStats, string interpolationSource,
 			GameObject attackPrefab, WeaponAttackBehavior attackBehavior)
 		: base(name, icon, worldPrefabSupplier, maxStackSize, tooltipSupplier, instantStats, bufferedStats, interpolationSource) {

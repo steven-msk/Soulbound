@@ -25,4 +25,6 @@ public class CompoundTooltipLayout {
 	}
 
 	public static CompoundTooltipLayout SpacingOnly(float spacing) => new() { spacing = spacing };
+
+	public static CompoundTooltipLayout Default() => new();
 }
