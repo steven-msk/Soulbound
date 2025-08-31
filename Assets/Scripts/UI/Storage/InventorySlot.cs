@@ -15,6 +15,7 @@ public class InventorySlot : MonoBehaviour, IItemSlot {
 	public bool IsEmpty => ItemDisplay == null;
 
 	public ItemStack? ItemStack => ItemDisplay?.ItemStack;
+	public bool showTooltip { get; set; } = true;
 
 	public GameObject GameObject => gameObject;
 

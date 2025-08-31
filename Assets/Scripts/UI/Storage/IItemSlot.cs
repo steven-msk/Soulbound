@@ -21,6 +21,7 @@ public interface IItemSlot : IPointerDownHandler, IPointerUpHandler, IPointerEnt
 	public ItemStack? ItemStack => ItemDisplay?.ItemStack;
 	public Item? ContainedItem => ItemStack?.item;
 	public GameObject GameObject { get; }
+	public bool showTooltip { get; set; }
 		
 	public virtual void AttachItemDisplay(ItemDisplay itemDisplay) {
 		itemDisplay?.transform.SetParent(GameObject.transform, true);
@@ -65,12 +66,15 @@ public interface IItemSlot : IPointerDownHandler, IPointerUpHandler, IPointerEnt
 	new public void OnPointerUp(PointerEventData eventData) { 
 		container.OnPointerUp(this, eventData);
 	}
-	new public void OnPointerEnter(PointerEventData eventData) { 
+	new public void OnPointerEnter(PointerEventData eventData) {
 		container.OnPointerEnter(this, eventData);
+		Debug.Log(showTooltip);
+		InvocationHelper.If(showTooltip, () => ItemDisplay?.ShowTooltip(eventData.position));
 	}
 
 	new public void OnPointerExit(PointerEventData eventData) {
 		container.OnPointerExit(this, eventData);
+		ItemDisplay?.DestroyTooltip();
 	}
 
 	/// <summary>

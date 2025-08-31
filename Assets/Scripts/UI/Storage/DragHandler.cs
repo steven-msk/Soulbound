@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using static InventoryController;
 
@@ -29,19 +31,28 @@ public class DragHandler {
 		this.dragButton = dragButton;
 	}
 
-	// POTENTIAL: move drag callbacks in handler context, possibly add OnDragStart and OnDragEnd callbacks
-
 	public bool ExecuteInterpretation(IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
 		InterpretationFunction? function = interpretationProvider.Invoke(this, slot, grabbedItem);
+		if (function != null) {
+			var method = function.Method;
+			if (method.GetCustomAttribute<InterpretationFunctionCandidateAttribute>() != null) {
+				this.AddDraggedSlot(slot);
+			}
+		}
 		function?.Invoke(slot, grabbedItem);
 		return function != null;
 	}
 
-	public bool AddDraggedSlot(IItemSlot slot, bool allowDuplicates = false) {
-		if (draggedSlots.Contains(slot) && allowDuplicates) {
+	public bool AddDraggedSlot(IItemSlot slot, bool allowDuplicates = false, bool showTooltip = false) {
+		if (draggedSlots.Contains(slot) && !allowDuplicates) {
 			return false;
 		}
+		slot.showTooltip = showTooltip;
 		draggedSlots.Add(slot);
 		return true;
+	}
+
+	public void OnDragEnd() {
+		draggedSlots.ForEach(slot => slot.showTooltip = true);
 	}
 }

@@ -13,6 +13,7 @@ public abstract class EquipmentSlot : MonoBehaviour, IItemSlot {
 	public bool HasItem => ItemDisplay != null;
 	public bool IsEmpty => ItemDisplay == null;
 	public ItemStack ItemStack => ItemDisplay?.ItemStack; 
+	public abstract bool showTooltip { get; set; }
 
 	public GameObject GameObject => gameObject;
 

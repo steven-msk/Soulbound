@@ -230,7 +230,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 	public InventorySlot[]? GetEmptySlots() => MainPlayerSlots.Where(slot => !slot.HasItem)?.ToArray();
 	
 	public void EquipHotbarItem(InventorySlot slot) {
-		ItemDisplay itemDisplay = slot.ItemDisplay;
+		ItemDisplay? itemDisplay = slot.ItemDisplay;
 		player.SetMainHandItem(itemDisplay?.ItemStack!);
 	}
 
@@ -372,6 +372,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 	}
 
 	public void EndDrag() {
+		activeDragHandler?.OnDragEnd();
 		activeDragHandler = null;
 	}
 

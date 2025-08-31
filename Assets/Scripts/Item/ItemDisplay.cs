@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 #nullable enable
 
-public class ItemDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
+public class ItemDisplay : MonoBehaviour {
 	[SerializeField] private bool moveMode;
 	[SerializeField] private Item displayedItem;
 	private ItemStack itemStack;
@@ -61,12 +61,10 @@ public class ItemDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 		GameObject.Destroy(gameObject);
 	}
 
-	public void OnPointerEnter(PointerEventData eventData) {
-		activeTooltip = itemStack.item.RenderTooltip(eventData.position, this.transform);
+	public void ShowTooltip(Vector2 position) {
+		activeTooltip = itemStack.item.RenderTooltip(position, this.transform);
 		activeTooltip?.SetParent(GameManager.instance.Player.Inventory.transform, true);
 	}
-
-	public void OnPointerExit(PointerEventData eventData) => DestroyTooltip();
 
 	public void OnGrab() {
 		moveMode = true;
