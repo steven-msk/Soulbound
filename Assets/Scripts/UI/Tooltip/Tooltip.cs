@@ -23,7 +23,7 @@ public class Tooltip {
 	private TooltipRenderer renderer;
 	private GameObject? panel;
 
-	//public bool IsDisplayed => tooltipPanel != null;
+	public bool IsDisplaying => panel != null;
 
 	public Tooltip(TooltipRenderer renderer, TooltipData data) {
 		this.data = data;
@@ -33,18 +33,6 @@ public class Tooltip {
 	public void Show(Vector2 position, Transform parent) {
 		panel = renderer.Render(data, position, parent);
 		panel.SetActive(true);
-
-		//tooltipPanel = AbstractTooltip.InstantiatePanel(parent);
-		//RectTransform panelRect = tooltipPanel.GetComponent<RectTransform>();
-		//TextMeshProUGUI tooltipSection = AbstractTooltip.InstantiateSectionText(tooltipPanel.GetComponent<RectTransform>());
-		//panelRect.anchoredPosition = position;
-		//data.Layout.Apply(tooltipSection);
-		//tooltipSection.text = data.text;
-
-		//InventoryController inventory = GameManager.instance.Player.Inventory;
-		//inventory.ActiveTooltip = this;
-		//tooltipPanel.transform.SetParent(inventory.transform, false);
-		//tooltipPanel.SetActive(true);
 	}
 
 	public void Hide() {
@@ -61,6 +49,10 @@ public class Tooltip {
 		this.panel.NullOrElse((panel) => {
 			panel.transform.position = screenPosition;
 		}, () => logger.LogWarning(null, "Discarded attempt to set position to null tooltip panel"));
+	}
+
+	private void WarnIfNullPanel(Action<GameObject> panelAction, string warnMessage) {
+		this.panel.NullOrElse(panelAction, () => logger.LogWarning(null, warnMessage));
 	}
 
 	//public virtual void Update(ItemStack itemStack) {
