@@ -14,8 +14,9 @@ public abstract class StatItemDefinition : ItemDefinition, IStatProvider {
     public virtual string bufferedInterpolationSource { get; }
 
     public StatItemDefinition(string name, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize, Func<Item, TooltipData?> tooltipSupplier,
-            List<AbstractSerializableStat> instantStats, List<IBufferedStatImpl> bufferedStats, string interpolationSource)
-        : base(name, icon, worldPrefabSupplier, maxStackSize, tooltipSupplier) {
+            List<AbstractSerializableStat> instantStats, List<IBufferedStatImpl> bufferedStats, string interpolationSource,
+            TooltipRenderer.NodeStyleProvider? nodeStyleProvider = null)
+        : base(name, icon, worldPrefabSupplier, maxStackSize, tooltipSupplier, nodeStyleProvider) {
         this.instantStats = instantStats;
         this.bufferedStats = bufferedStats;
         this.bufferedInterpolationSource = interpolationSource;

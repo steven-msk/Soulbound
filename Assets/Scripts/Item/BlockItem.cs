@@ -12,24 +12,19 @@ public class BlockItem : ItemDefinition, IPlaceable {
 	public Func<Block> blockGetter { get; }
     public Block referenceBlock => blockGetter() ?? throw new InvalidOperationException("Block reference is not yet initialized.");
 
-    public BlockItem(string name, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize, Func<Block> blockGetter, Func<Item, TooltipData?> tooltipSupplier)
-		: base(name, icon, worldPrefabSupplier, maxStackSize, tooltipSupplier) {
+    public BlockItem(string name, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize, Func<Block> blockGetter, Func<Item, TooltipData?> tooltipSupplier,
+					 TooltipRenderer.NodeStyleProvider? nodeStyleProvider = null)
+		: base(name, icon, worldPrefabSupplier, maxStackSize, tooltipSupplier, nodeStyleProvider) {
         this.blockGetter = blockGetter;
     }
 
-	// TODO: add constructors for all types which extend ItemDefinitions
-
     public BlockItem(string name, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize, Func<Block> blockGetter) 
-		: this(name, icon, worldPrefabSupplier, maxStackSize, blockGetter, (item) => null) { }
+		: this(name, icon, worldPrefabSupplier, maxStackSize, blockGetter, (item) => null, null) { }
 
     public BlockState Place(ItemStack itemStack, BlockPos position) {
 		itemStack.Decrement();
 		return referenceBlock.defaultState;
 	}
-
-	//protected override CompoundTooltip GetDefaultTooltip() {
-	//	return CompoundTooltip.Of(Tooltip.Info(this.name));
-	//}
 
 	public static BlockItem? FromBlock(Block block) => block.itemReference;
 }

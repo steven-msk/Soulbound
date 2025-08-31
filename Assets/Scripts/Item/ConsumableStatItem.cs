@@ -16,8 +16,8 @@ public class ConsumableStatItem : StatItemDefinition, IConsumable {
 
     public ConsumableStatItem(string name, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize, Func<Item, TooltipData?> tooltipSupplier, 
             List<AbstractSerializableStat> instantStats, List<IBufferedStatImpl> bufferedStats, string interpolationSource,
-            IConsumable.ConsumeAction consumeAction, int consumeAmount)
-        : base(name, icon, worldPrefabSupplier, maxStackSize, tooltipSupplier, instantStats, bufferedStats, interpolationSource) {
+            IConsumable.ConsumeAction consumeAction, int consumeAmount, TooltipRenderer.NodeStyleProvider? nodeStyleProvider = null)
+        : base(name, icon, worldPrefabSupplier, maxStackSize, tooltipSupplier, instantStats, bufferedStats, interpolationSource, nodeStyleProvider) {
         this.consumeAction = consumeAction;
         this.consumeAmount = consumeAmount;
     }

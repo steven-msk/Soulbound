@@ -30,6 +30,8 @@ public class Tooltip {
 		this.renderer = renderer;
 	}
 
+	public static TooltipData Plain(string text) => new TooltipData.Builder().AddNode(TooltipNode.None, text).Finish();
+
 	public void Show(Vector2 position, Transform parent) {
 		panel = renderer.Render(data, position, parent);
 		panel.SetActive(true);

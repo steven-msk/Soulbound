@@ -14,4 +14,26 @@ public class TooltipData {
 		this.nodes.AddRange(nodes);
 		this.layout = layout ?? CompoundTooltipLayout.Default();
 	}
+
+#nullable disable
+
+	public class Builder {
+		private List<TooltipNodeData> nodes = new();
+		private CompoundTooltipLayout layout;
+
+		public Builder(CompoundTooltipLayout layout = null) {
+			this.layout = layout;
+		}
+
+		public Builder AddNode(TooltipNodeData node) {
+			this.nodes.Add(node);
+			return this;
+		}
+
+		public Builder AddNode(TooltipNode node, string text) {
+			return this.AddNode(new TooltipNodeData(node, text));
+		}
+
+		public TooltipData Finish() => new TooltipData(nodes, layout);
+	}
 }

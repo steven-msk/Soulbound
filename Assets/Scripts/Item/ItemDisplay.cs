@@ -61,12 +61,8 @@ public class ItemDisplay : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 	}
 
 	public void OnPointerEnter(PointerEventData eventData) {
-		TooltipData? tooltipData = itemStack.item.GetTooltipData();
-		if (tooltipData != null) {
-			activeTooltip = new Tooltip(tooltipRenderer, tooltipData);
-			activeTooltip.Show(eventData.position, this.GetComponent<RectTransform>());
-			activeTooltip.SetParent(GameManager.instance.Player.Inventory.GetComponent<RectTransform>(), true);
-		}
+		activeTooltip = itemStack.item.RenderTooltip(eventData.position, this.transform);
+		activeTooltip?.SetParent(GameManager.instance.Player.Inventory.transform, true);
 	}
 
 	public void OnPointerExit(PointerEventData eventData) {

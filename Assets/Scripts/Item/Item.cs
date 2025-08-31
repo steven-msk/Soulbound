@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using log4net.Core;
 using Unity.VisualScripting;
 using UnityEngine;
 
 #nullable enable
 
 public abstract partial class Item {
+	private static readonly Logger logger = Logger.CreateInstance();
 	public static readonly int universalMaxStack = 999_999;
 
 	// FIXME: mismatched README version - item dev notes are obsolete
@@ -19,6 +21,7 @@ public abstract partial class Item {
 	public abstract int maxStackSize { get; }
 	public bool IsStackable => maxStackSize > 1;
 	protected abstract Func<Item, TooltipData?> tooltipSupplier { get; }
+	protected abstract TooltipRenderer.NodeStyleProvider? nodeStyleProvider { get; }
 
 	public virtual GameObject FallbackWorldPrefab() {
 		GameObject fallback = InstantiateDefaultWorldPrefab(); 
@@ -30,7 +33,17 @@ public abstract partial class Item {
 		return GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.Prefabs>("droppedItem"))!;
 	}
 
-	public TooltipData? GetTooltipData() => tooltipSupplier.Invoke(this);
+	public Tooltip? RenderTooltip(Vector2 position, Transform parent) {
+		if (tooltipSupplier == null) {
+			logger.LogWarning(null, "No tooltip supplier for item '{}'. This may be intentional.", this.name);
+			return null;
+		}
+		TooltipData tooltipData = tooltipSupplier.Invoke(this) ?? Tooltip.Plain(this.name);
+		TooltipRenderer renderer = new(nodeStyleProvider ?? TooltipNodeStylePresets.PresetProvider());
+		Tooltip tooltip = new Tooltip(renderer, tooltipData);
+		tooltip.Show(position, parent);
+		return tooltip;
+	}
 
 	public static int CustomMaxStack(int maxStack) => maxStack;
 
