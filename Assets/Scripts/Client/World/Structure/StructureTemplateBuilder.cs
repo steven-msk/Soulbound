@@ -4,14 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-#nullable enable
-
 public class StructureTemplateBuilder {
     public string ID;
     public StructureTemplate.PlacementFunction placementFunction;
     public StructureTemplate.PlacementValidationFunction validationFunction;
     public StructureTemplate.PlacementGenerator placementGenerator;
-    public Action<BlockChangeInfo>? blockChangedEvent = null;
+    public Action<BlockChangeInfo> blockChangedEvent = null;
 
     public StructureTemplateBuilder(string ID) => this.ID = ID;
 

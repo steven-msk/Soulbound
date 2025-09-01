@@ -93,7 +93,7 @@ public class PlayerController : LivingEntity, IGameInitializable<PlayerControlle
 		}
 	}
 
-	public void SetMainHandItem([AllowsNull] ItemStack itemStack) {
+	public void SetMainHandItem(ItemStack? itemStack) {
 		if (MainHandStack == itemStack) {
 			return;
 		}

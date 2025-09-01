@@ -38,7 +38,7 @@ public class ItemDisplay : MonoBehaviour {
 		UnityEngine.Debug.Assert(display != null, $"ItemDisplay component not found in item display prefab");
 		display!.ItemStack = itemStack;
 		if (itemStack.item.IsStackable) {
-			itemStack.InitializeStackText(display);
+			itemStack.ApplyToDisplay(display);
 		}
 		display.tooltipRenderer = new TooltipRenderer(TooltipNodeStylePresets.PresetProvider());
 		display.transform.SetAsLastSibling();

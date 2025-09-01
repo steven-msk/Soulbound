@@ -5,11 +5,12 @@ using TMPro;
 using UnityEditor;
 using UnityEngine;
 
-[Serializable]
+#nullable enable
+
 public class ItemStack {
 	public Item item { get; }
 	private ItemDisplay? display; 
-	private GameObject stackText;
+	private GameObject? stackText;
 	public int quantity { get; private set; }
 	public int MaxStackSize => item.maxStackSize;
 
@@ -19,15 +20,17 @@ public class ItemStack {
 	}
 
 	public void UpdateText() {
-		TextMeshProUGUI stackText = this.stackText.GetComponent<TextMeshProUGUI>();
-		stackText.text = FormatStackCount(quantity);
+		TextMeshProUGUI? stackText = this.stackText?.GetComponent<TextMeshProUGUI>();
+		if (stackText != null) {
+			stackText.text = FormatStackCount(quantity);
+		}
 	}
 
-	public GameObject InitializeStackText(ItemDisplay parent) {
-		GameObject stackText = GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.Prefabs>("stackNumberPrefab"), parent.transform);
-		TextMeshProUGUI text = stackText.GetComponent<TextMeshProUGUI>();
-		text.autoSizeTextContainer = true;
-		RectTransform rectTransform = stackText.GetComponent<RectTransform>();
+	public GameObject ApplyToDisplay(ItemDisplay parent) {
+		GameObject? stackText = GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.Prefabs>("stackNumberPrefab"), parent.transform);
+		TextMeshProUGUI? text = stackText!.GetComponent<TextMeshProUGUI>();
+		text!.autoSizeTextContainer = true;
+		RectTransform rectTransform = stackText!.GetComponent<RectTransform>();
 		if (item.IsStackable) {
 			text.text = $"{FormatStackCount(quantity)}";
 			InventoryController inventory = GameManager.instance.Player.Inventory;
@@ -50,14 +53,14 @@ public class ItemStack {
 	}
 
 	public void Drop(Vector2 pos, Vector2 dropForce, bool playerAction = false) {
-		GameObject worldPrefab = item.worldPrefabSupplier?.Invoke();
+		GameObject? worldPrefab = item.worldPrefabSupplier?.Invoke();
 		if (item.worldPrefabSupplier == null) {
 			UnityEngine.Debug.LogError($"Item '{item}' does not supply world prefab. Using fallback world prefab");
 			worldPrefab = item.FallbackWorldPrefab();
 		}
-		GameObject pickupItem = worldPrefab;
+		GameObject pickupItem = worldPrefab!;
 		DroppedItem pickup = pickupItem.GetComponent<DroppedItem>();
-		string spriteID = worldPrefab.GetComponent<SpriteRenderer>().sprite.name;
+		string spriteID = worldPrefab!.GetComponent<SpriteRenderer>().sprite.name;
 		GameManager.instance.Level.EntityManager.SpawnEntity(pickup, new(pos) {
 			[SpawnDataKey.Of("itemStack")] = new SpawnDataValue<ItemStack>(this),
 			[SpawnDataKey.Of("pickupDelay")] = new SpawnDataValue<float>((playerAction ? 2f : 0f)),
