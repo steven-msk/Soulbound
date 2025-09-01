@@ -7,7 +7,7 @@ using UnityEngine;
 
 #nullable enable
 
-public abstract class ItemDefinition : Item {
+public abstract class ConstructableItemDefinition : Item {
     public override string name { get; }
     public override Sprite icon { get; }
     public override Func<GameObject> worldPrefabSupplier { get; }
@@ -15,8 +15,8 @@ public abstract class ItemDefinition : Item {
     protected override Func<Item, TooltipData?> tooltipSupplier { get; }
 	protected override TooltipRenderer.NodeStyleProvider? nodeStyleProvider { get; }
 
-    public ItemDefinition(string name, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize, Func<Item, TooltipData?> tooltipSupplier,
-                          TooltipRenderer.NodeStyleProvider? nodeStyleProvider = null) {
+    public ConstructableItemDefinition(string name, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize, 
+            Func<Item, TooltipData?> tooltipSupplier, TooltipRenderer.NodeStyleProvider? nodeStyleProvider = null) {
         this.name = name;
         this.icon = icon;
         this.worldPrefabSupplier = worldPrefabSupplier;
@@ -25,6 +25,7 @@ public abstract class ItemDefinition : Item {
         this.nodeStyleProvider = nodeStyleProvider;
     }
 
-    public ItemDefinition(string name, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize)
-        : this(name, icon, worldPrefabSupplier, maxStackSize, (item) => null) { }
+    public ConstructableItemDefinition(string name, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize)
+        : this(name, icon, worldPrefabSupplier, maxStackSize, (item) => null) { 
+    }
 }

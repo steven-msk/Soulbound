@@ -9,16 +9,9 @@ using UnityEngine;
 
 #nullable enable
 
-public class ArmorItem : StatItemDefinition, IEquipable {
-    public ArmorType armorType { get; }
-    public override bool applyInstantStatsAutomatically => true;
-
-    public ArmorItem(string name, ArmorType armorType, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize, Func<Item, TooltipData?> tooltipSupplier, 
-			List<AbstractSerializableStat> instantStats, List<IBufferedStatImpl> bufferedStats, string interpolationSource,
-			TooltipRenderer.NodeStyleProvider? nodeStyleProvider = null)
-		: base(name, icon, worldPrefabSupplier, maxStackSize, tooltipSupplier, instantStats, bufferedStats, interpolationSource, nodeStyleProvider) {
-		this.armorType = armorType;
-    }
+public abstract class ArmorItem : StatItem, IEquipable {
+    public abstract ArmorType armorType { get; }
+    public override bool applyInstantStatsOnHoverOrSelect => true;
 
     public void OnEquip(EquipmentSlot slot) {
 		PlayerStats playerStats = GameManager.instance.Player.Stats;

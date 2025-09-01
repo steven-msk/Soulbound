@@ -58,4 +58,8 @@ public abstract partial class Item {
     public override string ToString() {
 		return name;
     }
+
+	public override int GetHashCode() {
+		return HashCode.Combine(name, icon, worldPrefabSupplier, maxStackSize, IsStackable, tooltipSupplier, nodeStyleProvider, id);
+	}
 }

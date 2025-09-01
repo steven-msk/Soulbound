@@ -7,20 +7,11 @@ using UnityEngine;
 
 #nullable enable
 
-public abstract class StatItemDefinition : ItemDefinition, IStatProvider {
-    public abstract bool applyInstantStatsAutomatically { get; }
-    public List<AbstractSerializableStat> instantStats { get; }
-    public List<IBufferedStatImpl> bufferedStats { get; }
-    public virtual string bufferedInterpolationSource { get; }
-
-    public StatItemDefinition(string name, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize, Func<Item, TooltipData?> tooltipSupplier,
-            List<AbstractSerializableStat> instantStats, List<IBufferedStatImpl> bufferedStats, string interpolationSource,
-            TooltipRenderer.NodeStyleProvider? nodeStyleProvider = null)
-        : base(name, icon, worldPrefabSupplier, maxStackSize, tooltipSupplier, nodeStyleProvider) {
-        this.instantStats = instantStats;
-        this.bufferedStats = bufferedStats;
-        this.bufferedInterpolationSource = interpolationSource;
-    }
+public abstract class StatItem : Item, IStatProvider {
+    public abstract bool applyInstantStatsOnHoverOrSelect { get; }
+    public abstract List<AbstractSerializableStat> instantStats { get; }
+    public abstract List<IBufferedStatImpl> bufferedStats { get; }
+    public abstract string bufferedInterpolationSource { get; }
 
     //public virtual void ValidateStats() {
     //    IEnumerable<SerializedStatReference> references = instantStats.Select(stat => stat.SerializedReference);

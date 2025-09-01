@@ -9,19 +9,10 @@ using UnityEngine;
 
 #nullable enable
 
-public class ConsumableStatItem : StatItemDefinition, IConsumable {
-    public override bool applyInstantStatsAutomatically => false;
-    public IConsumable.ConsumeAction consumeAction { get; }
-    public int consumeAmount { get; }
-
-    public ConsumableStatItem(string name, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize, Func<Item, TooltipData?> tooltipSupplier, 
-            List<AbstractSerializableStat> instantStats, List<IBufferedStatImpl> bufferedStats, string interpolationSource,
-            IConsumable.ConsumeAction consumeAction, int consumeAmount, TooltipRenderer.NodeStyleProvider? nodeStyleProvider = null)
-        : base(name, icon, worldPrefabSupplier, maxStackSize, tooltipSupplier, instantStats, bufferedStats, interpolationSource, nodeStyleProvider) {
-        this.consumeAction = consumeAction;
-        this.consumeAmount = consumeAmount;
-    }
-
+public abstract class ConsumableStatItem : StatItem, IConsumable {
+    public override bool applyInstantStatsOnHoverOrSelect => false;
+    public abstract IConsumable.ConsumeAction consumeAction { get; }
+    public abstract int consumeAmount { get; }
 
     public void Consume(ItemStack itemStack, PlayerController player) {
 		ConsumableUtils.DefaultConsume(this, itemStack);

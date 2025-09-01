@@ -8,12 +8,12 @@ using UnityEngine.Tilemaps;
 
 #nullable enable
 
-public class BlockItem : ItemDefinition, IPlaceable {
-	public Func<Block> blockGetter { get; }
+public class BlockItem : ConstructableItemDefinition, IPlaceable {
+	public virtual Func<Block> blockGetter { get; }
     public Block referenceBlock => blockGetter() ?? throw new InvalidOperationException("Block reference is not yet initialized.");
 
-    public BlockItem(string name, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize, Func<Block> blockGetter, Func<Item, TooltipData?> tooltipSupplier,
-					 TooltipRenderer.NodeStyleProvider? nodeStyleProvider = null)
+    public BlockItem(string name, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize, Func<Block> blockGetter,
+			Func<Item, TooltipData?> tooltipSupplier, TooltipRenderer.NodeStyleProvider? nodeStyleProvider = null)
 		: base(name, icon, worldPrefabSupplier, maxStackSize, tooltipSupplier, nodeStyleProvider) {
         this.blockGetter = blockGetter;
     }

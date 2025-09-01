@@ -7,7 +7,7 @@ using UnityEngine;
 
 #nullable enable
 
-public class GenericItem : Item {
+public class GenericItem : ConstructableItemDefinition {
     public override string name { get; }
     public override Sprite icon { get; }
     public override Func<GameObject> worldPrefabSupplier { get; }
@@ -15,13 +15,13 @@ public class GenericItem : Item {
     protected override Func<Item, TooltipData?> tooltipSupplier { get; }
     protected override TooltipRenderer.NodeStyleProvider? nodeStyleProvider { get; }
 
-    public GenericItem(string name, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize, Func<Item, TooltipData?> tooltipSupplier,
-                       TooltipRenderer.NodeStyleProvider? nodeStyleProvider = null) {
+    public GenericItem(string name, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize, 
+            Func<Item, TooltipData?> tooltipSupplier, TooltipRenderer.NodeStyleProvider? nodeStyleProvider = null) 
+        : base(name, icon, worldPrefabSupplier, maxStackSize, tooltipSupplier, nodeStyleProvider) {
         this.name = name;
         this.icon = icon;
         this.worldPrefabSupplier = worldPrefabSupplier;
         this.maxStackSize = maxStackSize;
         this.tooltipSupplier = tooltipSupplier;
-        this.nodeStyleProvider = nodeStyleProvider;
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 public interface IStatProvider : IItemCapability {
-	public bool applyInstantStatsAutomatically { get; }
+	public bool applyInstantStatsOnHoverOrSelect { get; }
 	public List<AbstractSerializableStat> instantStats { get; }
 	public List<IBufferedStatImpl> bufferedStats { get; }
 
