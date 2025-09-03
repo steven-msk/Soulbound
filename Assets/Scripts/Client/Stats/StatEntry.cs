@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Unity.Plastic.Newtonsoft.Json;
+using UnityEngine;
 
 public class StatEntry<TValue> : IStatEntryImpl where TValue : struct, IComparable<TValue> {
 	private static readonly Logger logger = Logger.CreateInstance();

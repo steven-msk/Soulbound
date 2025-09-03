@@ -60,19 +60,18 @@ public interface IItemSlot : IPointerDownHandler, IPointerUpHandler, IPointerEnt
 		return false;
 	}
 
-	new public void OnPointerDown(PointerEventData eventData) {
+	new public virtual void OnPointerDown(PointerEventData eventData) {
 		container.OnPointerDown(this, eventData);
 	}
-	new public void OnPointerUp(PointerEventData eventData) { 
+	new public virtual void OnPointerUp(PointerEventData eventData) { 
 		container.OnPointerUp(this, eventData);
 	}
-	new public void OnPointerEnter(PointerEventData eventData) {
+	new public virtual void OnPointerEnter(PointerEventData eventData) {
 		container.OnPointerEnter(this, eventData);
-		Debug.Log(showTooltip);
 		InvocationHelper.If(showTooltip, () => ItemDisplay?.ShowTooltip(eventData.position));
 	}
 
-	new public void OnPointerExit(PointerEventData eventData) {
+	new public virtual void OnPointerExit(PointerEventData eventData) {
 		container.OnPointerExit(this, eventData);
 		ItemDisplay?.DestroyTooltip();
 	}

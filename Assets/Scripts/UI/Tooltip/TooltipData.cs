@@ -15,6 +15,18 @@ public class TooltipData {
 		this.layout = layout ?? CompoundTooltipLayout.Default();
 	}
 
+	public void PurgeInvalidNodes() {
+		List<TooltipNodeData> toRemove = new();
+		foreach (var node in nodes) {
+			if (string.IsNullOrEmpty(node.text)) {
+				toRemove.Add(node);
+			}
+		}
+		foreach (var node in toRemove) {
+			this.nodes.Remove(node);			
+		}
+	}
+
 #nullable disable
 
 	public class Builder {

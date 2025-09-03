@@ -21,6 +21,10 @@ public abstract class EquipmentSlot : MonoBehaviour, IItemSlot {
 		ItemDisplay.Create(serialized.itemStack, this);
 	}
 
+	bool IItemSlot.Handshake(ItemDisplay grabbedItem, SlotInteractionMode interactionMode) {
+		throw new NotImplementedException();
+	}
+
 	//[InputAction("ItemDrag", Priority = 10, BlocksContexts = new[] { "ItemUse" })]
 	//public virtual void OnClick(ItemDisplay grabbedItem, InventoryController inventory) {
 	//	if ((grabbedItem?.ItemStack.item is not IEquipable && grabbedItem != null) || (grabbedItem == null && this.IsEmpty)) {

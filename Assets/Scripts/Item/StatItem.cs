@@ -9,9 +9,7 @@ using UnityEngine;
 
 public abstract class StatItem : Item, IStatProvider {
     public abstract bool applyInstantStatsOnHoverOrSelect { get; }
-    public abstract List<AbstractSerializableStat> instantStats { get; }
-    public abstract List<IBufferedStatImpl> bufferedStats { get; }
-    public abstract string bufferedInterpolationSource { get; }
+    public abstract List<AbstractSerializableStat> stats { get; }
 
     //public virtual void ValidateStats() {
     //    IEnumerable<SerializedStatReference> references = instantStats.Select(stat => stat.SerializedReference);

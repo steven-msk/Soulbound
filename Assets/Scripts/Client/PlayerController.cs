@@ -103,10 +103,8 @@ public class PlayerController : LivingEntity, IGameInitializable<PlayerControlle
 			}
 		}
 		InvokeStatItem(MainHandStack, statProvider => statProvider.RevokeInstantStats(this.stats));
-		InvokeStatItem(MainHandStack, statProvider => statProvider.DisableBuffers(this.stats));
 		MainHandStack = itemStack;
 		InvokeStatItem(MainHandStack, statProvider => statProvider.ApplyInstantStats(this.stats));
-		InvokeStatItem(MainHandStack, statProvider => statProvider.EnableBuffers(this.stats));
 	}
 
 	[InputAction("ItemUse", Priority = 5)]
@@ -187,8 +185,13 @@ public class PlayerController : LivingEntity, IGameInitializable<PlayerControlle
 
 	public override void ApplySerializedProperties(SerializedEntityPropertyList properties) {
 		base.ApplySerializedProperties(properties);
-		this.stats = properties.GetOrThrow<PlayerStats>("stats");
-		inventory.Deserialize(properties.GetOrThrow<SerializedInventory>("inventory"));
+		try {
+			this.stats = properties.GetOrThrow<PlayerStats>("stats");
+			inventory.Deserialize(properties.GetOrThrow<SerializedInventory>("inventory"));
+		} catch (Exception e) {
+			this.stats = new();
+			logger.LogError(null, e);
+		}
 	}
 
 	public override SerializedEntityPropertyList GetSerializedProperties() {

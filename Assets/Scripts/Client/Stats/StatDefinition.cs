@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Unity.Plastic.Newtonsoft.Json;
+using Unity.VisualScripting;
 using UnityEngine;
 
 #nullable enable
@@ -18,9 +19,9 @@ public class StatDefinition<TValue> : IStatDefinitionImpl where TValue : struct,
 	));
 	public static readonly StatDefinition<int> MaxMana = InjectID("maxMana", new StatDefinition<int>("Max Mana",
 		StatDisplayFormatter.PlainNameFormat<int>("#6BCBFF"),
-		StatDisplayFormatter.PlainValueFormat<int>(), 
+		StatDisplayFormatter.PlainValueFormat<int>(),
 		StatDisplayFormatter.ColorPositiveNegative<int>(),
-		BonusAdmission<int>.AddAndSubtract, 
+		BonusAdmission<int>.AddAndSubtract,
 		SupportedApplicationType.Flat,
 		StatProcessors.Flat<int>()
 	));
@@ -166,7 +167,7 @@ public class StatDefinition<TValue> : IStatDefinitionImpl where TValue : struct,
 
 
 	private StatDefinition(string baseName, Func<TValue, string, string> displayNameFormat, Func<TValue, string> valueFormat,
-					Func<TValue, string>? valueColorSupplier, BonusAdmission<TValue> bonusValueAdmission,	
+					Func<TValue, string>? valueColorSupplier, BonusAdmission<TValue> bonusValueAdmission,
 					SupportedApplicationType supportedApplications, IStatProcessor<TValue> processor) {
 		this.displayNameFormat = displayNameFormat;
 		this.baseName = baseName;
@@ -185,7 +186,7 @@ public class StatDefinition<TValue> : IStatDefinitionImpl where TValue : struct,
 			formattedValue = string.Concat(bonusValueAdmission.GetPrefix((TValue)value), formattedValue);
 			formattedValue = $"<color={valueColorSupplier((TValue)value)}>{formattedValue}</color>";
 		} else {
-			formattedValue = displayNameFormat.Invoke((TValue) value, formattedValue).Replace("s", "");						// hard-coded, not optimal
+			formattedValue = displayNameFormat.Invoke((TValue)value, formattedValue).Replace("s", "");                      // hard-coded, not optimal
 		}
 		return formattedValue;
 	}
@@ -198,6 +199,24 @@ public class StatDefinition<TValue> : IStatDefinitionImpl where TValue : struct,
 	}
 
 	public override string ToString() {
-		return $"StatDefinition[type: {valueType}, baseName: {baseName}]";
+		return $"StatDefinition<{typeof(TValue)}>[type: {valueType}, baseName: {baseName}]";
+	}
+
+	// POTENTIAL FIXME: there could be some memory leaks regarding StatDefinition<> instances - some types get instantiated through serialization while other through static definition
+
+	public override int GetHashCode() {
+		return this.id!.GetHashCode();
+	}
+
+	public override bool Equals(object obj) {
+		return obj is IStatDefinitionImpl other && other.id == this.id;
+	}
+
+	public static bool operator ==(StatDefinition<TValue> first, StatDefinition<TValue> second) {
+		return first.id == second.id;
+	}
+
+	public static bool operator !=(StatDefinition<TValue> first, StatDefinition<TValue> second) {
+		return !(first == second);
 	}
 }

@@ -19,6 +19,8 @@ public partial class Items : IResourceModule {
     public static readonly BlockItem woodBlock = InjectID(new BlockItem("Wood Block", Icon("wood_icon"), null, Item.universalMaxStack, () => Blocks.wood));
     public static readonly BlockItem leavesBlock = InjectID(new BlockItem("Leaves Block", Icon("leaves_icon"), null, Item.universalMaxStack, () => Blocks.leaves));
 
+    public static readonly ArmorItem_test armorItem_test = InjectID(new ArmorItem_test());
+
 #nullable enable
 
     public static TooltipData? NameTooltip(Item item) {

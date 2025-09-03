@@ -21,7 +21,7 @@ public class BlockItem : ConstructableItemDefinition, IPlaceable {
     public BlockItem(string name, Sprite icon, Func<GameObject> worldPrefabSupplier, int maxStackSize, Func<Block> blockGetter) 
 		: this(name, icon, worldPrefabSupplier, maxStackSize, blockGetter, (item) => null, null) { }
 
-    public BlockState Place(ItemStack itemStack, BlockPos position) {
+    public virtual BlockState Place(ItemStack itemStack, BlockPos position) {
 		itemStack.Decrement();
 		return referenceBlock.defaultState;
 	}

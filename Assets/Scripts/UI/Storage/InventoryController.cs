@@ -114,11 +114,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 	}
 
 	private void Start() {
-		foreach (var slot in MainPlayerSlots) {
-			if (slot.IsEmpty) {
-				ItemDisplay.Create(Items.grassBlock, 1, slot);
-			}
-		}
+		ItemDisplay.Create(new ItemStack(Items.armorItem_test, 1), this[0, 0]);
 	}
 
 	public void ToggleInventory() {

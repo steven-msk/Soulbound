@@ -21,6 +21,7 @@ public interface IStatEntryImpl {
 
 	internal class UnsupportedSerializableStatTypeException : NullReferenceException {
 		public UnsupportedSerializableStatTypeException(object value, Type expectedType)
-			: base ($"Unsupported stat value type {value.GetType()} for entry of type {expectedType}") {}
+			: base ($"Unsupported stat value type {value.GetType()} for entry of type {expectedType}") {
+		}
 	}
 }

@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using Codice.CM.SEIDInfo;
+using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -80,8 +81,8 @@ public class Level {
 			}
 		}
         InvocationHelper.If(dump != null, () => entityManager.Boostrap(dump!.Value.serializedEntities));
-		entityManager.SpawnPlayer(player, dump!.Value.player);
-
+        SerializedEntity fallback = new(typeof(PlayerController), Guid.NewGuid(), player.prefabDefinitionID, new Vector2(0f, GetSurfaceY(0)), null);
+		entityManager.SpawnPlayer(player, dump?.player ?? fallback);
 	}
 
     public void Save() {

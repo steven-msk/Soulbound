@@ -11,17 +11,17 @@ using UnityEngine;
 
 public abstract class ArmorItem : StatItem, IEquipable {
     public abstract ArmorType armorType { get; }
-    public override bool applyInstantStatsOnHoverOrSelect => true;
+    public override bool applyInstantStatsOnHoverOrSelect => false;
 
     public void OnEquip(EquipmentSlot slot) {
+		Debug.Log("equipped");
 		PlayerStats playerStats = GameManager.instance.Player.Stats;
-		playerStats.Apply(this.instantStats, this);
-		((IStatProvider)this).EnableBuffers(playerStats);
+		playerStats.Apply(this.stats, this);
 	}
 
 	public void OnUnequipped() {
+		Debug.Log("unequipped");
 		PlayerStats playerStats = GameManager.instance.Player.Stats;
-		playerStats.Revoke(instantStats, this);
-		((IStatProvider)this).DisableBuffers(playerStats);
+		playerStats.Revoke(stats, this);
 	}
 }

@@ -60,8 +60,9 @@ public class Logger {
 		this.LogMessage(module, UnityEngine.Debug.LogError, FormatPlaceholders(compoundMessage, compoundPlaceholder, args));
 	}
 
-	public void ThrowException(LogModule? module, Exception exception) {
-		this.LogMessage(module, UnityEngine.Debug.LogError, FormatPlaceholders("Exception thrown! {}", compoundPlaceholder, exception));
+	public void ThrowException(LogModule? module, Exception exception, string? comment = null) {
+		comment ??= "";
+		this.LogMessage(module, UnityEngine.Debug.LogError, FormatPlaceholders("Exception thrown! {}: {}", compoundPlaceholder, comment, exception));
 		throw exception;
 	}
 

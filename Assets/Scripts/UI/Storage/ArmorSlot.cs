@@ -7,7 +7,9 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class ArmorSlot : EquipmentSlot {
+#nullable enable
+
+public class ArmorSlot : EquipmentSlot, IItemSlot {
 	[SerializeField] private ArmorType armorType;
 	public ArmorType AcceptedType => armorType;
 
@@ -16,7 +18,7 @@ public class ArmorSlot : EquipmentSlot {
 	public override int index { get; set; }
 	public override bool showTooltip { get; set; } = true;
 
-	public override IItemContainer2D container => throw new NotImplementedException();
+	public override IItemContainer2D container => this.GetComponentInParent<InventoryController>();
 
 
 	//[InputAction("ItemDrag", Priority = 10, BlocksContexts = new[] { "ItemUse" })]
@@ -26,6 +28,26 @@ public class ArmorSlot : EquipmentSlot {
 	//		InvocationHelper.IfElse(this.ItemDisplay != null, HideOverlay, ShowOverlay);
 	//	}
 	//}
+
+	bool IItemSlot.Handshake(ItemDisplay? grabbedItem, SlotInteractionMode interactionMode) {
+		if (interactionMode == SlotInteractionMode.Drag) {
+			return false;
+		}
+		if (grabbedItem?.DisplayedItem is ArmorItem armor && armor.armorType == this.AcceptedType) {
+			if (this.HasItem) {
+				this.CastDisplayed()!.OnUnequipped();
+			}
+			armor.OnEquip(this);
+			return true;
+		}
+		if (grabbedItem == null && this.HasItem) {
+			this.CastDisplayed()?.OnUnequipped();
+			return true;
+		}
+		return false;
+	}
+
+	private ArmorItem? CastDisplayed() => this.ItemStack?.item as ArmorItem;
 
 	public void HideOverlay() => overlay.SetActive(false);
 

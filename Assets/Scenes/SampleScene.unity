@@ -2921,6 +2921,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1024955233546454646, guid: b8e974e7315dc3b408e80437cd281dee, type: 3}
+      propertyPath: armorType
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 1091321869244478550, guid: b8e974e7315dc3b408e80437cd281dee, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0

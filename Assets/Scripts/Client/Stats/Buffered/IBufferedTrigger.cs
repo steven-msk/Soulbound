@@ -4,14 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+[Obsolete]
 public interface IBufferedTrigger {
-	public BufferedTriggerState State { get; set; }
-
 	public Func<bool> InvocationValidator { get; }
 
-	public void Enable(IBufferedStatImpl stat, IStatProvider source);
+	public void Enable(IBufferedStatImpl stat, IStatProvider source, BufferedTriggerState state);
 
-	public void Disable(IBufferedStatImpl stat, IStatProvider source);
+	public void Disable(IBufferedStatImpl stat, IStatProvider source, BufferedTriggerState state);
 
 	public void Invoke(IBufferedStatImpl stat, Action action);
 

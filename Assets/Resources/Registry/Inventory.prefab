@@ -3912,7 +3912,7 @@ MonoBehaviour:
   hotbar: {fileID: 8937003118061734494}
   popup: {fileID: 2871857869530736114}
   armorSlots: {fileID: 8269136043629395857}
-  popupOpen: 0
+  opened: 0
   rows: 3
   columns: 9
 --- !u!1 &7022710234032899632
@@ -4724,7 +4724,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea5e66a4961d1aa4d904a7ba65234ed7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  armorType: 2
+  armorType: 3
   overlay: {fileID: 7448766904817365942}
 --- !u!1 &7927695693330013499
 GameObject:

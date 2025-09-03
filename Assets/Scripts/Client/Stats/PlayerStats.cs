@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Unity.Plastic.Newtonsoft.Json;
 using Unity.VisualScripting;
+using UnityEngine;
 
 public sealed class PlayerStats {
 	private static readonly Logger logger = Logger.CreateInstance();
@@ -40,27 +41,29 @@ public sealed class PlayerStats {
 		return statEntry;
 	}
 
-	public void Apply(List<AbstractSerializableStat> stats, IStatProvider source) {
+	public void Apply(IEnumerable<AbstractSerializableStat> stats, IStatProvider source) {
+		Debug.Log("applying stats");
 		Invoke(stats, source, (statEntry, serializableStat, source) => statEntry.Add(serializableStat, source));
 	}
 
 	public void Apply(AbstractSerializableStat stat, IStatProvider source) => Apply(new List<AbstractSerializableStat>() { stat }, source);
 
-	public void Revoke(List<AbstractSerializableStat> stats, IStatProvider source) {
+	public void Revoke(IEnumerable<AbstractSerializableStat> stats, IStatProvider source) {
+		Debug.Log("revoking stats");
 		Invoke(stats, source, (statEntry, serializableStat, source) => statEntry.Remove(serializableStat, source));
 	}
 
 	public void Revoke(AbstractSerializableStat stat, IStatProvider source) => Revoke(new List<AbstractSerializableStat> { stat }, source);
 
 	
-	private void Invoke(List<AbstractSerializableStat> stats, IStatProvider source, Action<IStatEntryImpl, AbstractSerializableStat, IStatProvider> statAction) {
-		stats.ForEach(stat => {
+	private void Invoke(IEnumerable<AbstractSerializableStat> stats, IStatProvider source, Action<IStatEntryImpl, AbstractSerializableStat, IStatProvider> statAction) {
+		foreach (var stat in stats) {
 			if (injected.TryGetValue(stat.GetStatDefinition(), out var statDefinition)) {
 				statAction.Invoke(statDefinition, stat, source);
 			} else {
-				throw new InvalidStatDefinitionBindingException(stat);
+				logger.LogError(null, new InvalidStatDefinitionBindingException(stat));
 			}
-		});
+		}
 	}
 
 	//private float healthRegenAccumulator = 0;
@@ -85,7 +88,7 @@ public sealed class PlayerStats {
 
 	private class InvalidStatDefinitionBindingException : NullReferenceException {
 		public InvalidStatDefinitionBindingException(AbstractSerializableStat stat)
-			: base ($"SerializableStat {stat.GetStatDefinition()} does not contain a valid stat binding. Could not find stat definition {stat.GetStatDefinition()}") { }
+			: base ($"SerializableStat {stat} does not contain a valid stat binding. Could not find stat definition {stat.GetStatDefinition()}") { }
 	}
 }
 

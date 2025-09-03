@@ -23,6 +23,7 @@ public class TooltipRenderer {
 			logger.ThrowException(null, new ArgumentException("Unable to render tooltip with null data"));
 			return null;
 		}
+		data.PurgeInvalidNodes();
 		GameObject panel = GameObject.Instantiate(GetTooltipPrefab("tooltipPanel"), parent, false);
 		Transform panelTransform = panel.GetComponent<Transform>();
 

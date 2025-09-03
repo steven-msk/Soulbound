@@ -4,28 +4,33 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Unity.Plastic.Newtonsoft.Json;
 using Unity.VisualScripting;
 using UnityEngine;
 
 public class EventTimerBufferedTrigger : IBufferedTrigger {
-	[SerializeField] private string eventID;
-	[SerializeField] private float waitTime;
-	[SerializeField] private BufferedTriggerCondition condition;
+	[JsonProperty] private readonly string eventID;
+	[JsonProperty] private readonly float waitTime;
+	[JsonProperty] private readonly BufferedTriggerCondition condition;
 	private Coroutine currentCoroutine = null;
 
-	public BufferedTriggerState State { get; set; }
+	public EventTimerBufferedTrigger(string eventID, float waitTime, BufferedTriggerCondition condition) {
+		this.eventID = eventID;
+		this.waitTime = waitTime;
+		this.condition = condition;
+	}
 
-	public Func<bool> InvocationValidator => condition.ToValidator();
+	[JsonIgnore] public Func<bool> InvocationValidator => condition.ToValidator();
 
-	public void Enable(IBufferedStatImpl stat, IStatProvider source) {
+	public void Enable(IBufferedStatImpl stat, IStatProvider source, BufferedTriggerState state) {
 		InvocationHelper.If(ValidateExecution(stat, source, false), () => {
-			EventBus<GameEvent>.Subscribe(GameEvent.FromID(eventID), this.CoroutineInvoker(stat, source));
+			EventBus<GameEvent>.Subscribe(GameEvent.FromID(eventID), this.CoroutineInvoker(stat, source, state));
 		});
 	}
 
-	public void Disable(IBufferedStatImpl stat, IStatProvider source) {
+	public void Disable(IBufferedStatImpl stat, IStatProvider source, BufferedTriggerState state) {
 		InvocationHelper.If(ValidateExecution(stat, source, false), () => {
-			EventBus<GameEvent>.Unsubscribe(GameEvent.FromID(eventID), this.CoroutineInvoker(stat, source));
+			EventBus<GameEvent>.Unsubscribe(GameEvent.FromID(eventID), this.CoroutineInvoker(stat, source, state));
 			if (currentCoroutine != null) {
 				CoroutineRunner.instance.StopCoroutine(currentCoroutine); 
 				currentCoroutine = null;
@@ -40,8 +45,8 @@ public class EventTimerBufferedTrigger : IBufferedTrigger {
 		invokeAction.Invoke();
 	}
 
-	private Action CoroutineInvoker(IBufferedStatImpl stat, IStatProvider source) {
-		return () => currentCoroutine = CoroutineRunner.instance.StartCoroutine(this.DelayedInvoke(State.GetInvokeAction(this, stat, source)));
+	private Action CoroutineInvoker(IBufferedStatImpl stat, IStatProvider source, BufferedTriggerState state) {
+		return () => currentCoroutine = CoroutineRunner.instance.StartCoroutine(this.DelayedInvoke(state.GetInvokeAction(this, stat, source)));
 	}
 
 	public bool ValidateExecution(IBufferedStatImpl stat, IStatProvider source, bool log) {
