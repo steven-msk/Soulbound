@@ -4,7 +4,7 @@ using Unity.Plastic.Newtonsoft.Json;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public sealed class PlayerStats {
+public sealed class PlayerStats : IStatSource {
 	private static readonly Logger logger = Logger.CreateInstance();
 	private static readonly LogModule playerStats = new LogModule("PLAYER STATS", "#00FFFF");
 
@@ -41,27 +41,22 @@ public sealed class PlayerStats {
 		return statEntry;
 	}
 
-	public void Apply(IEnumerable<AbstractSerializableStat> stats, IStatProvider source) {
-		Debug.Log("applying stats");
-		Invoke(stats, source, (statEntry, serializableStat, source) => statEntry.Add(serializableStat, source));
-	}
-
-	public void Apply(AbstractSerializableStat stat, IStatProvider source) => Apply(new List<AbstractSerializableStat>() { stat }, source);
-
-	public void Revoke(IEnumerable<AbstractSerializableStat> stats, IStatProvider source) {
-		Debug.Log("revoking stats");
-		Invoke(stats, source, (statEntry, serializableStat, source) => statEntry.Remove(serializableStat, source));
-	}
-
-	public void Revoke(AbstractSerializableStat stat, IStatProvider source) => Revoke(new List<AbstractSerializableStat> { stat }, source);
-
-	
-	private void Invoke(IEnumerable<AbstractSerializableStat> stats, IStatProvider source, Action<IStatEntryImpl, AbstractSerializableStat, IStatProvider> statAction) {
-		foreach (var stat in stats) {
-			if (injected.TryGetValue(stat.GetStatDefinition(), out var statDefinition)) {
-				statAction.Invoke(statDefinition, stat, source);
+	public void ApplyProvider(IStatProvider provider) {
+		foreach (var stat in provider.stats) {
+			if (injected.TryGetValue(stat.GetStatDefinition(), out var statEntry)) {
+				statEntry.Add(stat, provider);
 			} else {
-				logger.LogError(null, new InvalidStatDefinitionBindingException(stat));
+				logger.LogError(null, new ArgumentException($"Could not apply stat to player source: unknown player stat definition {stat.GetStatDefinition()}"));
+			}
+		}
+	}
+
+	public void RevokeProvider(IStatProvider provider) {
+		foreach (var stat in provider.stats) {
+			if (injected.TryGetValue(stat.GetStatDefinition(), out var statEntry)) {
+				statEntry.Remove(stat, provider);
+			} else {
+				logger.LogError(null, new ArgumentException($"Could not revoke stat to player source: unknown player stat definition {stat.GetStatDefinition()}"));
 			}
 		}
 	}
@@ -85,11 +80,6 @@ public sealed class PlayerStats {
 	//		manaRegenAccumulator -= regenAmount;
 	//	}
 	//}
-
-	private class InvalidStatDefinitionBindingException : NullReferenceException {
-		public InvalidStatDefinitionBindingException(AbstractSerializableStat stat)
-			: base ($"SerializableStat {stat} does not contain a valid stat binding. Could not find stat definition {stat.GetStatDefinition()}") { }
-	}
 }
 
 

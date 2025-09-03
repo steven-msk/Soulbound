@@ -14,9 +14,9 @@ public interface IStatProvider : IItemCapability {
 
 	// FEATUREIMPL (WIP): buffered stats - NOT TESTED
 
-	public virtual void ApplyInstantStats(PlayerStats playerStats) => playerStats.Apply(stats, this);
+	public virtual void ApplyStats(IStatSource source) => source.ApplyProvider(this);
 
-	public virtual void RevokeInstantStats(PlayerStats platerStats) => platerStats.Revoke(stats, this);
+	public virtual void RevokeStats(IStatSource source) => source.RevokeProvider(this);
 
 #nullable enable
 

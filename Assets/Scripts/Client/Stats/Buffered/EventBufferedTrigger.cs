@@ -18,28 +18,28 @@ public class EventBufferedTrigger : IBufferedTrigger {
 
 	[JsonIgnore] public Func<bool> InvocationValidator => condition.ToValidator();
 
-	public void Enable(IBufferedStatImpl stat, IStatProvider source, BufferedTriggerState state) {
-		InvocationHelper.If(ValidateExecution(stat, source, false), () => { 
-			EventBus<GameEvent>.Subscribe(GameEvent.FromID(eventID), state.GetInvokeAction(this, stat, source));
+	public void Enable(IBufferedStatImpl stat, IStatProvider provider, BufferedTriggerState state) {
+		InvocationHelper.If(ValidateExecution(stat, provider, false), () => { 
+			EventBus<GameEvent>.Subscribe(GameEvent.FromID(eventID), state.GetInvokeAction(this, stat, provider));
 		});
 	}
 
-	public void Disable(IBufferedStatImpl stat, IStatProvider source, BufferedTriggerState state) {
-		InvocationHelper.If(ValidateExecution(stat, source, false), () => {
-			EventBus<GameEvent>.Unsubscribe(GameEvent.FromID(eventID), state.GetInvokeAction(this, stat, source));
+	public void Disable(IBufferedStatImpl stat, IStatProvider provider, BufferedTriggerState state) {
+		InvocationHelper.If(ValidateExecution(stat, provider, false), () => {
+			EventBus<GameEvent>.Unsubscribe(GameEvent.FromID(eventID), state.GetInvokeAction(this, stat, provider));
 		});
 	}
 
 	public void Invoke(IBufferedStatImpl stat, Action action) => InvocationHelper.If(InvocationValidator.Invoke(), action);
 
-	public bool ValidateExecution(IBufferedStatImpl stat, IStatProvider source, bool log) {
+	public bool ValidateExecution(IBufferedStatImpl stat, IStatProvider provider, bool log) {
 		bool valid = true;
 		if (string.IsNullOrEmpty(eventID)) {
-			InvocationHelper.If(log, () => UnityEngine.Debug.LogError($"Null or empty eventID for EventBufferedTrigger in {stat.GetStatDefinition()} @ {source}"));
+			InvocationHelper.If(log, () => UnityEngine.Debug.LogError($"Null or empty eventID for EventBufferedTrigger in {stat.GetStatDefinition()} @ {provider}"));
 			valid = false;
 		}
 		if (GameEvent.FromID(eventID) == null && valid){
-			InvocationHelper.If(log, () => UnityEngine.Debug.LogError($"Invalid eventID: {eventID} for EventBufferedTrigger in {stat.GetStatDefinition()} @ {source}"));
+			InvocationHelper.If(log, () => UnityEngine.Debug.LogError($"Invalid eventID: {eventID} for EventBufferedTrigger in {stat.GetStatDefinition()} @ {provider}"));
 			valid = false;
 		}
 		return valid;

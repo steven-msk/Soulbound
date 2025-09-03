@@ -5,15 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 
 public interface IStatEntryImpl {
-	void Add(AbstractSerializableStat serializableStat, IStatProvider source);
+	void Add(AbstractSerializableStat serializableStat, IStatProvider provider);
 
-	void AddRange(params (AbstractSerializableStat stat, IStatProvider source)[] modifiers);
+	void AddRange(params (AbstractSerializableStat stat, IStatProvider provider)[] modifiers);
 
-	void Remove(AbstractSerializableStat serializableStat, IStatProvider source);
+	void Remove(AbstractSerializableStat serializableStat, IStatProvider provider);
 
-	void RemoveRange(params (AbstractSerializableStat stat, IStatProvider source)[] modifiers);
+	void RemoveRange(params (AbstractSerializableStat stat, IStatProvider provider)[] modifiers);
 
-	void SetModifiers(List<(AbstractSerializableStat stat, IStatProvider source)> modifiers);
+	void SetModifiers(List<(AbstractSerializableStat stat, IStatProvider provider)> modifiers);
 
 	object GetBoxedValue();
 

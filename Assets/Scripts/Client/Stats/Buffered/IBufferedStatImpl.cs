@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 [Obsolete]
 public interface IBufferedStatImpl {
 	public IStatDefinitionImpl GetStatDefinition();
-	public void EnableBuffers(IStatProvider source);
-	public void DisableBuffers(IStatProvider source);
+	public void EnableBuffers(IStatProvider provider);
+	public void DisableBuffers(IStatProvider provider);
 
 	public AbstractSerializableStat GetSerializable();
 }

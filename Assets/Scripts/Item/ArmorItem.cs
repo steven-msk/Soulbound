@@ -16,12 +16,12 @@ public abstract class ArmorItem : StatItem, IEquipable {
     public void OnEquip(EquipmentSlot slot) {
 		Debug.Log("equipped");
 		PlayerStats playerStats = GameManager.instance.Player.Stats;
-		playerStats.Apply(this.stats, this);
+		playerStats.ApplyProvider(this);
 	}
 
 	public void OnUnequipped() {
 		Debug.Log("unequipped");
 		PlayerStats playerStats = GameManager.instance.Player.Stats;
-		playerStats.Revoke(stats, this);
+		playerStats.RevokeProvider(this);
 	}
 }

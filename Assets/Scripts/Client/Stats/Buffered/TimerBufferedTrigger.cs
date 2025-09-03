@@ -22,15 +22,15 @@ public class TimerBufferedTrigger : IBufferedTrigger {
 
 	[JsonIgnore] public Func<bool> InvocationValidator => condition.ToValidator();
 
-	public void Enable(IBufferedStatImpl stat, IStatProvider source, BufferedTriggerState state) {
-		InvocationHelper.If(ValidateExecution(stat, source, false), () => {
-			currentCoroutine = CoroutineRunner.instance.StartCoroutine(this.DelayedInvoke(state.GetInvokeAction(this, stat, source)));
+	public void Enable(IBufferedStatImpl stat, IStatProvider provider, BufferedTriggerState state) {
+		InvocationHelper.If(ValidateExecution(stat, provider, false), () => {
+			currentCoroutine = CoroutineRunner.instance.StartCoroutine(this.DelayedInvoke(state.GetInvokeAction(this, stat, provider)));
 		});
 		Debug.Log("timer buffer enabled");
 	}
 
-	public void Disable(IBufferedStatImpl stat, IStatProvider source, BufferedTriggerState state) {
-		InvocationHelper.If(currentCoroutine != null && ValidateExecution(stat, source, false), () => {
+	public void Disable(IBufferedStatImpl stat, IStatProvider provider, BufferedTriggerState state) {
+		InvocationHelper.If(currentCoroutine != null && ValidateExecution(stat, provider, false), () => {
 			CoroutineRunner.instance.StopCoroutine(currentCoroutine);
 			currentCoroutine = null;
 		});
@@ -45,9 +45,9 @@ public class TimerBufferedTrigger : IBufferedTrigger {
 		invokeAction.Invoke();
 	}
 
-	public bool ValidateExecution(IBufferedStatImpl stat, IStatProvider source, bool log) {
+	public bool ValidateExecution(IBufferedStatImpl stat, IStatProvider provider, bool log) {
 		InvocationHelper.If(log && waitTimeSeconds == 0, () => {
-			UnityEngine.Debug.LogWarning($"WaitTime field of TimerBufferedTrigger in {stat.GetStatDefinition()} @ {source} is set to 0. " +
+			UnityEngine.Debug.LogWarning($"WaitTime field of TimerBufferedTrigger in {stat.GetStatDefinition()} @ {provider} is set to 0. " +
 				$"This might be an intentional value, but in most cases indicates a broken trigger behavior");
 		});
 		return true;

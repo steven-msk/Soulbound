@@ -22,15 +22,15 @@ public class EventTimerBufferedTrigger : IBufferedTrigger {
 
 	[JsonIgnore] public Func<bool> InvocationValidator => condition.ToValidator();
 
-	public void Enable(IBufferedStatImpl stat, IStatProvider source, BufferedTriggerState state) {
-		InvocationHelper.If(ValidateExecution(stat, source, false), () => {
-			EventBus<GameEvent>.Subscribe(GameEvent.FromID(eventID), this.CoroutineInvoker(stat, source, state));
+	public void Enable(IBufferedStatImpl stat, IStatProvider provider, BufferedTriggerState state) {
+		InvocationHelper.If(ValidateExecution(stat, provider, false), () => {
+			EventBus<GameEvent>.Subscribe(GameEvent.FromID(eventID), this.CoroutineInvoker(stat, provider, state));
 		});
 	}
 
-	public void Disable(IBufferedStatImpl stat, IStatProvider source, BufferedTriggerState state) {
-		InvocationHelper.If(ValidateExecution(stat, source, false), () => {
-			EventBus<GameEvent>.Unsubscribe(GameEvent.FromID(eventID), this.CoroutineInvoker(stat, source, state));
+	public void Disable(IBufferedStatImpl stat, IStatProvider provider, BufferedTriggerState state) {
+		InvocationHelper.If(ValidateExecution(stat, provider, false), () => {
+			EventBus<GameEvent>.Unsubscribe(GameEvent.FromID(eventID), this.CoroutineInvoker(stat, provider, state));
 			if (currentCoroutine != null) {
 				CoroutineRunner.instance.StopCoroutine(currentCoroutine); 
 				currentCoroutine = null;
@@ -45,22 +45,22 @@ public class EventTimerBufferedTrigger : IBufferedTrigger {
 		invokeAction.Invoke();
 	}
 
-	private Action CoroutineInvoker(IBufferedStatImpl stat, IStatProvider source, BufferedTriggerState state) {
-		return () => currentCoroutine = CoroutineRunner.instance.StartCoroutine(this.DelayedInvoke(state.GetInvokeAction(this, stat, source)));
+	private Action CoroutineInvoker(IBufferedStatImpl stat, IStatProvider provider, BufferedTriggerState state) {
+		return () => currentCoroutine = CoroutineRunner.instance.StartCoroutine(this.DelayedInvoke(state.GetInvokeAction(this, stat, provider)));
 	}
 
-	public bool ValidateExecution(IBufferedStatImpl stat, IStatProvider source, bool log) {
+	public bool ValidateExecution(IBufferedStatImpl stat, IStatProvider provider, bool log) {
 		bool valid = true;
 		InvocationHelper.If(log && waitTime == 0, () => {
-			UnityEngine.Debug.LogWarning($"WaitTime field of EventTimerBufferedTrigger in {stat.GetStatDefinition()} @ {source} is set to 0. " +
+			UnityEngine.Debug.LogWarning($"WaitTime field of EventTimerBufferedTrigger in {stat.GetStatDefinition()} @ {provider} is set to 0. " +
 				$"This might be an intentional value, but in most cases indicates a broken trigger behavior");
 		});
 		if (string.IsNullOrEmpty(eventID)) {
-			InvocationHelper.If(log, () => UnityEngine.Debug.LogError($"Null or empty eventID for EventTimerBufferedTrigger in {stat.GetStatDefinition()} @ {source}"));
+			InvocationHelper.If(log, () => UnityEngine.Debug.LogError($"Null or empty eventID for EventTimerBufferedTrigger in {stat.GetStatDefinition()} @ {provider}"));
 			valid = false;
 		}
 		if (GameEvent.FromID(eventID) == null && valid) {
-			InvocationHelper.If(log, () => UnityEngine.Debug.LogError($"Invalid eventID: {eventID} for EventTimerBufferedTrigger in {stat.GetStatDefinition()} @ {source}"));
+			InvocationHelper.If(log, () => UnityEngine.Debug.LogError($"Invalid eventID: {eventID} for EventTimerBufferedTrigger in {stat.GetStatDefinition()} @ {provider}"));
 			valid = false; 
 		}
 		return valid;

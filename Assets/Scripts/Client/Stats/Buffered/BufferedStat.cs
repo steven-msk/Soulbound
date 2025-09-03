@@ -19,14 +19,14 @@ public class BufferedStat<TValue> : SerializableStat<TValue>, IBufferedStatImpl 
 		this.revokeTrigger = revokeBufferedTrigger;
 	}
 
-	public void EnableBuffers(IStatProvider source) {
-		applyTrigger.Enable(this, source, BufferedTriggerState.Apply);
-		revokeTrigger.Enable(this, source, BufferedTriggerState.Revoke);
+	public void EnableBuffers(IStatProvider provider) {
+		applyTrigger.Enable(this, provider, BufferedTriggerState.Apply);
+		revokeTrigger.Enable(this, provider, BufferedTriggerState.Revoke);
 	}
 
-	public void DisableBuffers(IStatProvider source) {
-		applyTrigger.Disable(this, source, BufferedTriggerState.Apply);
-		revokeTrigger.Disable(this, source, BufferedTriggerState.Revoke);
+	public void DisableBuffers(IStatProvider provider) {
+		applyTrigger.Disable(this, provider, BufferedTriggerState.Apply);
+		revokeTrigger.Disable(this, provider, BufferedTriggerState.Revoke);
 	}
 
 	public AbstractSerializableStat GetSerializable() => this as AbstractSerializableStat;
