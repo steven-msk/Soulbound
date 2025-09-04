@@ -105,16 +105,13 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		if (regions.TryGetValue(region, out var serializedRegion)) {
 			serializedRegion.ForEach(serialized => {
 				if (serialized.itemStack != null) {
-					ItemDisplay.Create(serialized.itemStack, slotSupplier.Invoke(serialized.index));
+					IItemSlot slot = slotSupplier.Invoke(serialized.index);
+					slot.Deserialize(serialized);
 				}
 			});
 		} else {
 			logger.LogError(null, "Unknown inventory region: {}", region);
 		}
-	}
-
-	private void Start() {
-		ItemDisplay.Create(new ItemStack(Items.armorItem_test, 1), this[0, 0]);
 	}
 
 	public void ToggleInventory() {
@@ -380,7 +377,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 
 	[InterpretationFunctionCandidate]
 	public void DoNothing(IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
-		// Intended implementation to remove "Interpret returned null!" spam
+		// Intended implementation
 	}
 
 	[InterpretationFunctionCandidate]

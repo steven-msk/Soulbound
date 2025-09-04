@@ -38,6 +38,12 @@ public class ArmorSlot : EquipmentSlot, IItemSlot {
 		}
 		return false;
 	}
+	
 
 	private ArmorItem? CastDisplayed() => this.ItemStack?.item as ArmorItem;
+
+	public override void Deserialize(SerializedItemSlot serialized) {
+		ItemDisplay.Create(serialized.itemStack, this);
+		this.overlay.SetActive(!this.HasItem);
+	}
 }

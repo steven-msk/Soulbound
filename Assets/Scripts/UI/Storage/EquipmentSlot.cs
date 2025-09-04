@@ -17,13 +17,7 @@ public abstract class EquipmentSlot : MonoBehaviour, IItemSlot {
 
 	public GameObject GameObject => gameObject;
 
-	public void Deserialize(SerializedItemSlot serialized) {
-		ItemDisplay.Create(serialized.itemStack, this);
-	}
-
-	bool IItemSlot.Handshake(ItemDisplay grabbedItem, SlotInteractionMode interactionMode) {
-		throw new NotImplementedException();
-	}
+	public abstract void Deserialize(SerializedItemSlot serialized);
 
 	//[InputAction("ItemDrag", Priority = 10, BlocksContexts = new[] { "ItemUse" })]
 	//public virtual void OnClick(ItemDisplay grabbedItem, InventoryController inventory) {

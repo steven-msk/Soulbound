@@ -8,7 +8,7 @@ using UnityEngine;
 #nullable enable
 
 public sealed class ArmorItem_test : ArmorItem {
-	public override ArmorType armorType => ArmorType.Boots;
+	public override ArmorType armorType => ArmorType.Chestplate;
 
 	public override List<AbstractSerializableStat> stats => new() {
 		new SerializableStat<int>(StatDefinition<int>.MaxHealth, 1, StatApplicationType.Flat, true)
