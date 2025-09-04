@@ -14,20 +14,10 @@ public class ArmorSlot : EquipmentSlot, IItemSlot {
 	public ArmorType AcceptedType => armorType;
 
 	[SerializeField] private GameObject overlay;
-	public GameObject Overlay => overlay;
 	public override int index { get; set; }
 	public override bool showTooltip { get; set; } = true;
 
 	public override IItemContainer2D container => this.GetComponentInParent<InventoryController>();
-
-
-	//[InputAction("ItemDrag", Priority = 10, BlocksContexts = new[] { "ItemUse" })]
-	//public override void OnClick(ItemDisplay grabbedItem, InventoryController inventory) {
-	//	if ((grabbedItem?.ItemStack.item is ArmorItem armorItem && this.AcceptedType == armorItem.armorType) || (grabbedItem == null && this.HasItem)) {
-	//		base.OnClick(grabbedItem, inventory);
-	//		InvocationHelper.IfElse(this.ItemDisplay != null, HideOverlay, ShowOverlay);
-	//	}
-	//}
 
 	bool IItemSlot.Handshake(ItemDisplay? grabbedItem, SlotInteractionMode interactionMode) {
 		if (interactionMode == SlotInteractionMode.Drag) {
@@ -38,10 +28,12 @@ public class ArmorSlot : EquipmentSlot, IItemSlot {
 				this.CastDisplayed()!.OnUnequipped();
 			}
 			armor.OnEquip(this);
+			overlay.SetActive(false);
 			return true;
 		}
 		if (grabbedItem == null && this.HasItem) {
 			this.CastDisplayed()?.OnUnequipped();
+			overlay.SetActive(true);
 			return true;
 		}
 		return false;
