@@ -26,7 +26,7 @@ public class ItemStack {
 		}
 	}
 
-	public GameObject ApplyToDisplay(ItemDisplay parent) {
+	public GameObject AssignDisplay(ItemDisplay parent) {
 		GameObject? stackText = GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.Prefabs>("stackNumberPrefab"), parent.transform);
 		TextMeshProUGUI? text = stackText!.GetComponent<TextMeshProUGUI>();
 		text!.autoSizeTextContainer = true;
@@ -40,13 +40,13 @@ public class ItemStack {
 				textColor = inventory.Hotbar.inactiveSlotNumberColor;
 			}
 			text.color = textColor;
+			rectTransform.pivot = new Vector2(1f, 0f);
+			rectTransform.anchorMax = new Vector2(0.9375f, 0.0625f);
+			rectTransform.anchorMin = rectTransform.anchorMax;
+			rectTransform.anchoredPosition = Vector2.zero;
+			text.rectTransform.sizeDelta = text.GetPreferredValues(Mathf.Infinity, Mathf.Infinity);
+			rectTransform.anchoredPosition = new(Mathf.Max(-4, rectTransform.sizeDelta.x - 19.14f), rectTransform.anchoredPosition.y);
 		}
-		rectTransform.pivot = new Vector2(1f, 0f);
-		rectTransform.anchorMax = new Vector2(0.9375f, 0.0625f);
-		rectTransform.anchorMin = rectTransform.anchorMax;
-		rectTransform.anchoredPosition = Vector2.zero;
-		text.rectTransform.sizeDelta = text.GetPreferredValues(Mathf.Infinity, Mathf.Infinity);
-		rectTransform.anchoredPosition = new(Mathf.Max(-4, rectTransform.sizeDelta.x - 19.14f), rectTransform.anchoredPosition.y);
 		this.stackText = stackText;
 		this.display = parent;
 		return stackText;
@@ -102,10 +102,10 @@ public class ItemStack {
 	}
 
 	private void OnQuantityChanged(int old, int @new) {
-		if (quantity <= 0) {
+		if (@new <= 0) {
 			display?.Destroy();
 		}
-		if (stackText != null && quantity > 0) {
+		if (stackText != null && @new > 0) {
 			UpdateText();
 		}
 	}

@@ -40,8 +40,4 @@ public class ArmorSlot : EquipmentSlot, IItemSlot {
 	}
 
 	private ArmorItem? CastDisplayed() => this.ItemStack?.item as ArmorItem;
-
-	public void HideOverlay() => overlay.SetActive(false);
-
-	public void ShowOverlay() => overlay.SetActive(true);
 }
