@@ -10,7 +10,7 @@ using UnityEngine;
 
 public abstract partial class Item {
 	private static readonly Logger logger = Logger.CreateInstance();
-	public static readonly int universalMaxStack = 999_999;
+	public const int DEFAULT_MAX_STACK = 256;
 
 	// FIXME: mismatched README version - item dev notes are obsolete
 

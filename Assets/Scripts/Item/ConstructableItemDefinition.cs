@@ -10,7 +10,7 @@ using UnityEngine;
 public abstract class ConstructableItemDefinition : Item {
     public override string name { get; }
     public override ItemAspect aspect { get; }
-    public override int maxStackSize { get; }
+    public override int maxStackSize { get; } = Item.DEFAULT_MAX_STACK;
     protected override Func<Item, TooltipData?> tooltipSupplier { get; }
 	protected override TooltipRenderer.NodeStyleProvider? nodeStyleProvider { get; }
 

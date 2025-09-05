@@ -23,7 +23,7 @@ public class ItemStack {
 	public void UpdateText() {
 		TextMeshProUGUI? stackText = this.stackText?.GetComponent<TextMeshProUGUI>();
 		if (stackText != null) {
-			stackText.text = FormatStackCount(quantity);
+			stackText.text = quantity.ToString();
 		}
 	}
 
@@ -33,7 +33,7 @@ public class ItemStack {
 		text!.autoSizeTextContainer = true;
 		RectTransform rectTransform = stackText!.GetComponent<RectTransform>();
 		if (item.IsStackable) {
-			text.text = $"{FormatStackCount(quantity)}";
+			text.text = quantity.ToString();
 			InventoryController inventory = GameManager.instance.Player.Inventory;
 			Color textColor = Color.white;
 			InventorySlot hotbarSlot = parent.GetComponentInParent<InventorySlot>();
@@ -110,24 +110,4 @@ public class ItemStack {
 	}
 
 	// FEATUREIMPL: dropped item stacks converging to avoid lag
-
-	// POTENTIAL REWORK: item max stack numbers
-	public static string FormatStackCount(int amount) {
-		if (amount < 1000) {
-			return amount.ToString();
-		}
-		if (amount > 999_999) {
-			UnityEngine.Debug.LogWarning($"Stack size exceeded max limit: {amount}"); 
-			return "999k";
-		}
-
-		float divided = amount / 1000f;
-		if (divided >= 999.5f) {
-			return "999k";
-		}
-		if (divided < 9.95f) {
-			return divided.ToString("0.#") + "k";
-		}
-		return Mathf.FloorToInt(divided).ToString() + "k";
-	}
 }

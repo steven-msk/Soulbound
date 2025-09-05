@@ -14,10 +14,10 @@ public partial class Items : IResourceModule {
     private static Dictionary<int, Item> itemsById = new();
 
     public static readonly BlockItem grassBlock = InjectID(new BlockItem("Grass Block", ItemAspect.Simple("grass_icon", ppu: 16), 210, () => Blocks.grass));
-    public static readonly BlockItem stoneBlock = InjectID(new BlockItem("Stone Block", ItemAspect.Simple("stone_icon", ppu: 8), Item.universalMaxStack, () => Blocks.stone));
-    public static readonly BlockItem dirtBlock = InjectID(new BlockItem("Dirt Block", ItemAspect.Simple("dirt_icon", ppu: 8), Item.universalMaxStack, () => Blocks.dirt));
-    public static readonly BlockItem woodBlock = InjectID(new BlockItem("Wood Block", ItemAspect.Simple("wood_icon", ppu: 8), Item.universalMaxStack, () => Blocks.wood));
-    public static readonly BlockItem leavesBlock = InjectID(new BlockItem("Leaves Block", ItemAspect.Simple("leaves_icon", ppu: 8), Item.universalMaxStack, () => Blocks.leaves));
+    public static readonly BlockItem stoneBlock = InjectID(new BlockItem("Stone Block", ItemAspect.Simple("stone_icon", ppu: 8), Item.DEFAULT_MAX_STACK, () => Blocks.stone));
+    public static readonly BlockItem dirtBlock = InjectID(new BlockItem("Dirt Block", ItemAspect.Simple("dirt_icon", ppu: 8), Item.DEFAULT_MAX_STACK, () => Blocks.dirt));
+    public static readonly BlockItem woodBlock = InjectID(new BlockItem("Wood Block", ItemAspect.Simple("wood_icon", ppu: 8), Item.DEFAULT_MAX_STACK, () => Blocks.wood));
+    public static readonly BlockItem leavesBlock = InjectID(new BlockItem("Leaves Block", ItemAspect.Simple("leaves_icon", ppu: 8), Item.DEFAULT_MAX_STACK, () => Blocks.leaves));
 
     public static readonly ArmorItem_test armorItem_test = InjectID(new ArmorItem_test());
 
