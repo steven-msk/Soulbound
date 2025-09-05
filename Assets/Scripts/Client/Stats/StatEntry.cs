@@ -7,26 +7,27 @@ using UnityEditor;
 using UnityEngine;
 
 public class StatEntry<TValue> : IStatEntryImpl where TValue : struct, IComparable<TValue> {
+
 	private static readonly Logger logger = Logger.CreateInstance();
 	[JsonProperty]
 	[JsonConverter(typeof(JsonDictionaryConverter<IStatProvider, List<AbstractSerializableStat>>))]
-	public Dictionary<IStatProvider, List<AbstractSerializableStat>> modifiers { get; }
+	private Dictionary<IStatProvider, List<AbstractSerializableStat>> modifiers = new();
+	public event Action<StatEntry<TValue>> OnModifiersChanged;
 	public TValue baseValue { get; protected set; }
 	public StatDefinition<TValue> definitionReference { get; protected set; }
+	private bool flag_blockUpdate = false;
 
 	public StatEntry(TValue baseValue, StatDefinition<TValue> definitionReference) {
 		this.baseValue = baseValue;
 		this.definitionReference = definitionReference;
-		modifiers = new();
 	}
 
 	public TValue GetProcessedValue() {
 		try {
 			IEnumerable<SerializableStat<TValue>> casted = modifiers.SelectMany(m => m.Value.Cast<SerializableStat<TValue>>());
-			Debug.Log(modifiers.Count);
 			return this.definitionReference.processor.ProcessFinalValue(baseValue, casted);
 		} catch (InvalidCastException e) {
-			logger.ThrowException(null, e);
+			logger.LogError(null, e);
 			return default(TValue);
 		}
 	}
@@ -36,13 +37,16 @@ public class StatEntry<TValue> : IStatEntryImpl where TValue : struct, IComparab
 			if (!modifiers.ContainsKey(provider)) {
 				modifiers.Add(provider, new List<AbstractSerializableStat>());
 			}
-			Debug.Log($"Adding provider {provider} hash: {provider.GetHashCode()}");
 			modifiers[provider].Add(serializableStat as SerializableStat<TValue>);
 		}
+		InvocationHelper.If(!flag_blockUpdate, () => OnModifiersChanged?.Invoke(this));
 	}
 
 	public void AddRange(params (AbstractSerializableStat stat, IStatProvider provider)[] modifiers) {
+		flag_blockUpdate = true;
 		modifiers.ToList().ForEach(modifier => this.Add(modifier.stat, modifier.provider));
+		OnModifiersChanged?.Invoke(this);
+		flag_blockUpdate = false;
 	}
 
 	public void Remove(AbstractSerializableStat serializableStat, IStatProvider provider) {
@@ -52,10 +56,14 @@ public class StatEntry<TValue> : IStatEntryImpl where TValue : struct, IComparab
 				modifiers.Remove(provider);
 			}
 		}
+		InvocationHelper.If(!flag_blockUpdate, () => OnModifiersChanged?.Invoke(this));
 	}
 
 	public void RemoveRange(params (AbstractSerializableStat stat, IStatProvider provider)[] modifiers) {
+		flag_blockUpdate = true;
 		modifiers.ToList().ForEach(modifier => this.Remove(modifier.stat, modifier.provider));
+		OnModifiersChanged?.Invoke(this);
+		flag_blockUpdate = false;
 	}
 
 	public void SetModifiers(List<(AbstractSerializableStat stat, IStatProvider provider)> modifiers) {

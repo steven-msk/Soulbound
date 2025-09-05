@@ -82,6 +82,8 @@ public class PlayerController : LivingEntity, IGameInitializable<PlayerControlle
 			Vector2 mousePos = inputHandler.MouseScreenPosition;
 			transform.localScale = new Vector3(mousePos.x >= Screen.width / 2 ? 1 : -1, 1, 1);
 		}
+
+		Debug.Log("maxHealth:" + maxHealth + ", current: "+ currentHealth);
 	}
 
 	public void SetMainHandItem(ItemStack? itemStack) {
@@ -184,9 +186,15 @@ public class PlayerController : LivingEntity, IGameInitializable<PlayerControlle
 			logger.LogError(null, e);
 		} finally {
 			stats.UpdateInjectedMappings();
+			stats.MaxHealth.OnModifiersChanged += maxHealth => {
+				bool wasFullHealth = this.currentHealth == this.maxHealth;
+				this.maxHealth = maxHealth.GetProcessedValue();
+				if (wasFullHealth) {
+					this.currentHealth = this.maxHealth;
+				}
+			};
 			this.maxHealth = stats.MaxHealth.GetProcessedValue();
 			this.currentHealth = maxHealth;         // might cause problems later with OnDeath handling
-			Debug.Log(this.maxHealth);
 		}
 	}
 

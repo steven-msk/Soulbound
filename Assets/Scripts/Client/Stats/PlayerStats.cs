@@ -45,8 +45,6 @@ public sealed class PlayerStats : IStatSource {
 		foreach (var stat in provider.stats) {
 			if (injected.TryGetValue(stat.GetStatDefinition(), out var statEntry)) {
 				statEntry.Add(stat, provider);
-				Debug.Log("added: " + statEntry);
-				Debug.Log(statEntry.GetHashCode() + ", " + this.MaxHealth.GetHashCode());
 			} else {
 				logger.LogError(null, new ArgumentException($"Could not apply stat to player source: unknown player stat definition {stat.GetStatDefinition()}"));
 			}
