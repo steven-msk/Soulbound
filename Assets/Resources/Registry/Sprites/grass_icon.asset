@@ -208,12 +208,10 @@ Sprite:
     uvTransform: {x: 8, y: 16, z: 8, w: 15}
     downscaleMultiplier: 1
   m_PhysicsShape:
-  - - {x: -1.125, y: -1.25}
-    - {x: 1.125, y: -1.25}
-    - {x: 1.125, y: 0.5}
-    - {x: 0.875, y: 1}
-    - {x: -1, y: 1}
-    - {x: -1.125, y: 0.5}
+  - - {x: 0.875, y: 0.75}
+    - {x: -0.875, y: 0.75}
+    - {x: -0.875, y: -1}
+    - {x: 0.875, y: -1}
   m_Bones: []
   m_ScriptableObjects: []
   m_SpriteID: 73ea32be6e0b3214089cf32cffd7d282

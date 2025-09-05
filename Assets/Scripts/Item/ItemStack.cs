@@ -8,6 +8,7 @@ using UnityEngine;
 #nullable enable
 
 public class ItemStack {
+	private static readonly Logger logger = Logger.CreateInstance();
 	public Item item { get; }
 	private ItemDisplay? display; 
 	private GameObject? stackText;
@@ -53,19 +54,17 @@ public class ItemStack {
 	}
 
 	public void Drop(Vector2 pos, Vector2 dropForce, bool playerAction = false) {
-		GameObject? worldPrefab = item.worldPrefabSupplier?.Invoke();
-		if (item.worldPrefabSupplier == null) {
-			UnityEngine.Debug.LogError($"Item '{item}' does not supply world prefab. Using fallback world prefab");
-			worldPrefab = item.FallbackWorldPrefab();
+		GameObject? worldPrefab = item.aspect.worldPrefabSupplier?.Invoke();
+		if (item.aspect.worldPrefabSupplier == null) {
+			logger.LogError(null, "No world prefab supplier for item {}. Using icon fallback.", item);
+			worldPrefab = WorldPrefabFactory.FromIcon(item.aspect.icon).Invoke();
 		}
-		GameObject pickupItem = worldPrefab!;
-		DroppedItem pickup = pickupItem.GetComponent<DroppedItem>();
-		string spriteID = worldPrefab!.GetComponent<SpriteRenderer>().sprite.name;
-		GameManager.instance.Level.EntityManager.SpawnEntity(pickup, new(pos) {
+		GameObject droppedItem = worldPrefab!;
+		DroppedItem pickup = droppedItem.GetComponent<DroppedItem>() ?? droppedItem.AddComponent<DroppedItem>();
+		GameManager.instance.Level.EntityManager.SpawnEntity(pickup, new EntitySpawnData(pos) {
 			[SpawnDataKey.Of("itemStack")] = new SpawnDataValue<ItemStack>(this),
 			[SpawnDataKey.Of("pickupDelay")] = new SpawnDataValue<float>((playerAction ? 2f : 0f)),
 			[SpawnDataKey.Of("dropForce")] = new SpawnDataValue<Vector2>(dropForce),
-			[SpawnDataKey.Of("spriteID")] = new SpawnDataValue<string>(spriteID)
 		});
     }
 

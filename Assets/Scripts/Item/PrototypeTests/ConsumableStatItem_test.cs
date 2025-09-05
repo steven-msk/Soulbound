@@ -13,9 +13,7 @@ public class ConsumableStatItem_test : ConsumableStatItem {
 	public override List<AbstractSerializableStat> stats => throw new NotImplementedException();
 	public override string name => throw new NotImplementedException();
 
-	public override Sprite icon => throw new NotImplementedException();
-
-	public override Func<GameObject> worldPrefabSupplier => throw new NotImplementedException();
+	public override ItemAspect aspect => throw new NotImplementedException();
 
 	public override int maxStackSize => throw new NotImplementedException();
 

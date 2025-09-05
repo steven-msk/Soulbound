@@ -37,15 +37,7 @@ public class PlayerController : LivingEntity, IGameInitializable<PlayerControlle
 
 	public bool CanAttack { get; set; } = true;
 
-	private int lastFacing = 1;
-	public float facing {
-		get {
-			if (Rigidbody.linearVelocityX != 0f) {
-				lastFacing = (int)Mathf.Sign(Rigidbody.linearVelocityX);
-			}
-			return lastFacing;
-		}
-	}
+	public float facing => playerPhysics.facing;
 	public Vector2 center => Physics.Collider.bounds.center;
 	public BlockPos blockPos => GameManager.instance.Level.ToBlockPos(this.position);
 	public ChunkBlockPos chunkBlockPos => blockPos.ToChunkBlockPos(GameManager.instance.Level.ChunkXAt(position));

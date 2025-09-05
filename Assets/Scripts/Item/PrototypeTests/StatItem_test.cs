@@ -12,9 +12,7 @@ public class StatItem_test : StatItem {
 
 	public override string name => throw new NotImplementedException();
 
-	public override Sprite icon => throw new NotImplementedException();
-
-	public override Func<GameObject> worldPrefabSupplier => throw new NotImplementedException();
+	public override ItemAspect aspect => throw new NotImplementedException();
 
 	public override int maxStackSize => throw new NotImplementedException();
 

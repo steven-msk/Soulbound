@@ -46,6 +46,17 @@ public class PlayerPhysics : MonoBehaviour, IDependencyInitializable<PlayerPhysi
 
 	private float immunityTimeSeconds = 0.5f;
 
+	private float _facing = 1f;
+	public float facing {
+		get => _facing;
+		set {
+			_facing = value;
+			Vector3 scale = transform.localScale;
+			scale.x = _facing;
+			transform.localScale = scale;
+		}
+	}
+
 #nullable enable
 
 	public PlayerPhysics OnGameInit(PlayerController dependency) {
@@ -89,9 +100,15 @@ public class PlayerPhysics : MonoBehaviour, IDependencyInitializable<PlayerPhysi
 	}
 
 	private void Update() {
+		if (GameManager.instance.IsPaused) {
+			return;
+		}
 		movement.x = inputHandler.HorizontalMovement;
-		if (movement.x != 0 && !(inputHandler.LeftHold || inputHandler.RightHold) && !GameManager.instance.IsPaused) {
-			transform.localScale = new Vector3(Mathf.Sign(movement.x), 1, 1);
+		if (movement.x != 0) {
+			this.facing = Mathf.Sign(movement.x);
+		}
+		if (inputHandler.RightHold || inputHandler.LeftHold) {
+			this.facing = Mathf.Sign(inputHandler.MouseScreenPosition.x - Screen.width / 2);
 		}
 	}
 
@@ -106,7 +123,7 @@ public class PlayerPhysics : MonoBehaviour, IDependencyInitializable<PlayerPhysi
 				rb.linearVelocityX += stats.HorizontalAcceleration * movementSpeedPower * Time.fixedDeltaTime * movement.x;
 				float speedLimit = stats.MovementSpeed.GetProcessedValue();
 				if (Mathf.Abs(rb.linearVelocityX) > speedLimit) {
-					rb.linearVelocityX = player.facing * speedLimit;
+					rb.linearVelocityX = Mathf.Sign(rb.linearVelocityX) * speedLimit;
 				}
 			} else {
 				float scaledFlightAcceleration = flightMovementPower * stats.HorizontalFlightAcceleration;

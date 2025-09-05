@@ -16,9 +16,7 @@ public sealed class ArmorItem_test : ArmorItem {
 
 	public override string name => "armorItem_test";
 
-	public override Sprite icon => ResourceManager.Get<Sprite, ResourceGroups.Items.Icons>("chestplate_overlay");
-
-	public override Func<GameObject> worldPrefabSupplier => null;
+	public override ItemAspect aspect => ItemAspect.Simple("chestplate_overlay");
 
 	public override int maxStackSize => 1;
 

@@ -15,19 +15,11 @@ public abstract partial class Item {
 	// FIXME: mismatched README version - item dev notes are obsolete
 
 	public abstract string name { get; }
-	public abstract Sprite icon { get; }
-	// POTENTIAL REWORK: item world prefab serialization
-	public abstract Func<GameObject> worldPrefabSupplier { get; }
+	public abstract ItemAspect aspect { get; }
 	public abstract int maxStackSize { get; }
 	public bool IsStackable => maxStackSize > 1;
 	protected abstract Func<Item, TooltipData?> tooltipSupplier { get; }
 	protected abstract TooltipRenderer.NodeStyleProvider? nodeStyleProvider { get; }
-
-	public virtual GameObject FallbackWorldPrefab() {
-		GameObject fallback = InstantiateDefaultWorldPrefab(); 
-		fallback.GetComponent<SpriteRenderer>().sprite = icon;
-		return fallback;
-	}
 
 	public static GameObject InstantiateDefaultWorldPrefab() {
 		return GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.Prefabs>("droppedItem"))!;
@@ -61,6 +53,6 @@ public abstract partial class Item {
     }
 
 	public override int GetHashCode() {
-		return HashCode.Combine(name, icon, worldPrefabSupplier, maxStackSize, IsStackable, tooltipSupplier, nodeStyleProvider, id);
+		return HashCode.Combine(name, aspect, maxStackSize, IsStackable, tooltipSupplier, nodeStyleProvider, id);
 	}
 }

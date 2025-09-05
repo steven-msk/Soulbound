@@ -16,7 +16,7 @@ public class ItemDisplay : MonoBehaviour {
 		get => itemStack;
 		set {
 			itemStack = value;
-			gameObject.GetComponent<Image>().sprite = itemStack.item.icon;
+			gameObject.GetComponent<Image>().sprite = itemStack.item.aspect.icon.sprite;
 			displayedItem = itemStack.item;
 		}
 	}
