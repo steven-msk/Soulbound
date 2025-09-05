@@ -78,18 +78,20 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		}
 	}
 
+	private void Start() {
+		ItemDisplay.Create(Items.armorItem_test, 1, this[0, 0]);
+	}
+
 	public SerializedInventory Serialize() {
 		if (GrabbedContext.value != null) {
 			TryReleaseGrabbed(GrabbedContext.lastKnownSlot);
 		}
-		var serializedHotbar = hotbar.Slots.Cast<IItemSlot>().Select(s => s.Serialize()).ToList();
-		var serializedPopup = popupSlots.Flatten().Cast<IItemSlot>().Select(s => s.Serialize()).ToList();
 		ArmorSlot[] armorSlots = this.armorSlots.GetComponentsInChildren<ArmorSlot>(true);
-		var serializedArmor = armorSlots.Cast<IItemSlot>().Select(s => s.Serialize()).ToList();
+
 		return new SerializedInventory(hotbar.ActiveKey, new Dictionary<string, List<SerializedItemSlot>>() {
-			["hotbar"] = serializedHotbar, 
-			["popup"] = serializedPopup,
-			["armor"] = serializedArmor
+			["hotbar"] = hotbar.Slots.Cast<IItemSlot>().Select(s => s.Serialize()).ToList(), 
+			["popup"] = popupSlots.Flatten().Cast<IItemSlot>().Select(s => s.Serialize()).ToList(),
+			["armor"] = armorSlots.Cast<IItemSlot>().Select(s => s.Serialize()).ToList()
 		});
 	}
 
@@ -149,11 +151,11 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 		if (GrabbedContext.value == null) {
 			return;
 		}
-		if (PickUpItem(GrabbedContext.value.ItemStack, out int leftover)) {
+		if (PickUpItem(GrabbedContext.value.ItemStack, out int remaining)) {
 			GrabbedContext.value.Destroy();
 			GrabbedContext.Set(null, null);
 		} else {
-			GrabbedContext.value.ItemStack.SetQuantity(leftover);
+			GrabbedContext.value.ItemStack.SetQuantity(remaining);
 			DropGrabbedItem();
 		}
 	}

@@ -17,7 +17,7 @@ public class PlayerController : LivingEntity, IGameInitializable<PlayerControlle
 	[SerializeField] private InventoryController inventory;
 	public InventoryController Inventory => inventory;
 
-	[SerializeField] private PlayerStats stats = new();
+	[SerializeField] private PlayerStats stats;
 	public PlayerStats Stats => stats; 
 
 	private PlayerPhysics playerPhysics;
@@ -177,11 +177,16 @@ public class PlayerController : LivingEntity, IGameInitializable<PlayerControlle
 	public override void ApplySerializedProperties(SerializedEntityPropertyList properties) {
 		base.ApplySerializedProperties(properties);
 		try {
-			this.stats = properties.GetOrThrow<PlayerStats>("stats");
 			inventory.Deserialize(properties.GetOrThrow<SerializedInventory>("inventory"));
+			this.stats = properties.GetOrThrow<PlayerStats>("stats");
 		} catch (Exception e) {
 			this.stats = new();
 			logger.LogError(null, e);
+		} finally {
+			stats.UpdateInjectedMappings();
+			this.maxHealth = stats.MaxHealth.GetProcessedValue();
+			this.currentHealth = maxHealth;         // might cause problems later with OnDeath handling
+			Debug.Log(this.maxHealth);
 		}
 	}
 

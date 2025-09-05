@@ -28,7 +28,7 @@ public sealed class SerializedEntityPropertyList : List<AbstractSerializedEntity
 	public TValue GetOrThrow<TValue>(string key) {
 		TValue value = this.Get<TValue>(key);
 		if (value == null) {
-			throw new ArgumentException($"Could not find property with key {key} in entity property list");
+			throw new ArgumentException($"Could not find property with key '{key}' in entity property list");
 		}
 		return value;
 	}

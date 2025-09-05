@@ -4,8 +4,8 @@ using UnityEngine;
 #nullable enable
 
 public abstract class LivingEntity : Entity {
-	private float maxHealth;
-	private float currentHealth;
+	protected float maxHealth;
+	protected float currentHealth;
 	public float CurrentHealth => currentHealth;
 	private float immunityTimer;
 	public bool isImmune { get; protected set; }

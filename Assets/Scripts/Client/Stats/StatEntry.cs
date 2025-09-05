@@ -10,18 +10,20 @@ public class StatEntry<TValue> : IStatEntryImpl where TValue : struct, IComparab
 	private static readonly Logger logger = Logger.CreateInstance();
 	[JsonProperty]
 	[JsonConverter(typeof(JsonDictionaryConverter<IStatProvider, List<AbstractSerializableStat>>))]
-	private readonly Dictionary<IStatProvider, List<AbstractSerializableStat>> modifiers = new();
+	public Dictionary<IStatProvider, List<AbstractSerializableStat>> modifiers { get; }
 	public TValue baseValue { get; protected set; }
 	public StatDefinition<TValue> definitionReference { get; protected set; }
 
 	public StatEntry(TValue baseValue, StatDefinition<TValue> definitionReference) {
 		this.baseValue = baseValue;
 		this.definitionReference = definitionReference;
+		modifiers = new();
 	}
 
 	public TValue GetProcessedValue() {
 		try {
 			IEnumerable<SerializableStat<TValue>> casted = modifiers.SelectMany(m => m.Value.Cast<SerializableStat<TValue>>());
+			Debug.Log(modifiers.Count);
 			return this.definitionReference.processor.ProcessFinalValue(baseValue, casted);
 		} catch (InvalidCastException e) {
 			logger.ThrowException(null, e);
@@ -34,6 +36,7 @@ public class StatEntry<TValue> : IStatEntryImpl where TValue : struct, IComparab
 			if (!modifiers.ContainsKey(provider)) {
 				modifiers.Add(provider, new List<AbstractSerializableStat>());
 			}
+			Debug.Log($"Adding provider {provider} hash: {provider.GetHashCode()}");
 			modifiers[provider].Add(serializableStat as SerializableStat<TValue>);
 		}
 	}
@@ -87,7 +90,7 @@ public class StatEntry<TValue> : IStatEntryImpl where TValue : struct, IComparab
 	}
 
 	public override string ToString() {
-		string modifiers = string.Join(", ", this.modifiers.SelectMany(m => $"{m.Key}:{m.Value}"));
+		string modifiers = this.modifiers.ToString();
 		if (string.IsNullOrEmpty(modifiers)) {
 			modifiers = "null";
 		}

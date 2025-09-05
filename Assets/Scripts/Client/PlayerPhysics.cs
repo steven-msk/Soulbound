@@ -12,7 +12,6 @@ public class PlayerPhysics : MonoBehaviour, IDependencyInitializable<PlayerPhysi
 	private readonly Dictionary<string, (Action<Collision2D> action, Func<bool> validator)> collisionReactionsByTag = new();
 	private readonly Dictionary<int, (Action<Collider2D> action, Func<bool> validator)> triggerReactionsByLayer = new();
 	private PlayerController player;
-	private PlayerStats stats;
 	private InputHandler inputHandler;
 	private Rigidbody2D rb;
 	private Animator animator;
@@ -64,7 +63,6 @@ public class PlayerPhysics : MonoBehaviour, IDependencyInitializable<PlayerPhysi
 		inputHandler = player.InputHandler;
 		rb = player.Rigidbody;
 		animator = player.Animator;
-		stats = player.Stats;
 		collider = this.GetComponent<CapsuleCollider2D>();
 
 		//collisionReactionsByTag.Add("Enemy", ((collision) => {
@@ -76,8 +74,8 @@ public class PlayerPhysics : MonoBehaviour, IDependencyInitializable<PlayerPhysi
 			animator.SetBool("jumping", false);
 			animator.SetBool("flying", false);
 			animator.SetBool("onGround", true);
-			flightTime = stats.GrantedFlightTime;
-			jumpsLeft = stats.MaxJumps;
+			flightTime = player.Stats.GrantedFlightTime;
+			jumpsLeft = player.Stats.MaxJumps;
 			isFlying = false;
 			rb.linearDamping = 0f;
 		}, IsOnGround));
@@ -120,13 +118,13 @@ public class PlayerPhysics : MonoBehaviour, IDependencyInitializable<PlayerPhysi
 
 		if (movement.x != 0) {
 			if (!isFlying) {
-				rb.linearVelocityX += stats.HorizontalAcceleration * movementSpeedPower * Time.fixedDeltaTime * movement.x;
-				float speedLimit = stats.MovementSpeed.GetProcessedValue();
+				rb.linearVelocityX += player.Stats.HorizontalAcceleration * movementSpeedPower * Time.fixedDeltaTime * movement.x;
+				float speedLimit = player.Stats.MovementSpeed.GetProcessedValue();
 				if (Mathf.Abs(rb.linearVelocityX) > speedLimit) {
 					rb.linearVelocityX = Mathf.Sign(rb.linearVelocityX) * speedLimit;
 				}
 			} else {
-				float scaledFlightAcceleration = flightMovementPower * stats.HorizontalFlightAcceleration;
+				float scaledFlightAcceleration = flightMovementPower * player.Stats.HorizontalFlightAcceleration;
 				rb.linearVelocityX += scaledFlightAcceleration * Time.fixedDeltaTime * movement.x;
 				if (rb.linearVelocityX > scaledFlightAcceleration) {
 					rb.linearVelocityX = scaledFlightAcceleration;
@@ -137,7 +135,7 @@ public class PlayerPhysics : MonoBehaviour, IDependencyInitializable<PlayerPhysi
 			rb.linearVelocityX = Mathf.Lerp(rb.linearVelocityX, 0, deceleration * Time.fixedDeltaTime);
 		}
 		if (shouldJump) {
-			rb.AddForceY(stats.JumpHeight.GetProcessedValue() * jumpHeightPower, ForceMode2D.Impulse);
+			rb.AddForceY(player.Stats.JumpHeight.GetProcessedValue() * jumpHeightPower, ForceMode2D.Impulse);
 			shouldJump = false;
 			animator.SetBool("onGround", false);
 			rb.linearDamping = 1f;
@@ -148,7 +146,7 @@ public class PlayerPhysics : MonoBehaviour, IDependencyInitializable<PlayerPhysi
 			return;         // flight switch will occur once jump timer is finished
 		}
 		if (inputHandler.PressingSpace && jumpsLeft == 0 && !shouldJump && flightTime > 0 && jumpToFlightTimer <= 0) {
-			float scaledFlightAcceleration = flightMovementPower * stats.VerticalFlightAcceleration;
+			float scaledFlightAcceleration = flightMovementPower * player.Stats.VerticalFlightAcceleration;
 			rb.linearVelocityY += scaledFlightAcceleration * Time.fixedDeltaTime;
 			if (rb.linearVelocityY > scaledFlightAcceleration) {
 				rb.linearVelocityY = scaledFlightAcceleration;
@@ -158,14 +156,14 @@ public class PlayerPhysics : MonoBehaviour, IDependencyInitializable<PlayerPhysi
 			animator.SetBool("jumping", false);
 			rb.linearDamping = 1;
 			flightTime -= Time.fixedDeltaTime * flightTimeReductionMultiplier;
-			flightTime = Mathf.Clamp(flightTime, 0, stats.GrantedFlightTime);
-		} else if (flightTime == 0 && inputHandler.PressingSpace && stats.GrantedFlightTime > 0) {
+			flightTime = Mathf.Clamp(flightTime, 0, player.Stats.GrantedFlightTime);
+		} else if (flightTime == 0 && inputHandler.PressingSpace && player.Stats.GrantedFlightTime > 0) {
 			if (rb.linearVelocityY <= -rb.gravityScale) {
 				float scaledSlowFallVelocity = Time.fixedDeltaTime * slowFallTimeReductionMultiplier;
 				rb.linearVelocityY = Mathf.Lerp(rb.linearVelocityY, -scaledSlowFallVelocity, scaledSlowFallVelocity);
 			}
 		}
-		UpdateFlightTimePanel(isFlying, flightTime, stats.GrantedFlightTime);
+		UpdateFlightTimePanel(isFlying, flightTime, player.Stats.GrantedFlightTime);
 	}
 
 	internal void OnSpacePressed() {

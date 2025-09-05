@@ -10,13 +10,15 @@ using UnityEngine;
 public sealed class ArmorItem_test : ArmorItem {
 	public override ArmorType armorType => ArmorType.Chestplate;
 
-	public override List<AbstractSerializableStat> stats => new() {
+	public override List<AbstractSerializableStat> stats => _stats;
+	private List<AbstractSerializableStat> _stats = new() {
 		new SerializableStat<int>(StatDefinition<int>.MaxHealth, 1, StatApplicationType.Flat, true)
 	};
 
 	public override string name => "armorItem_test";
 
-	public override ItemAspect aspect => ItemAspect.Simple("chestplate_overlay");
+	public override ItemAspect aspect => _aspect;
+	private ItemAspect _aspect = ItemAspect.Simple("chestplate_overlay");
 
 	public override int maxStackSize => 1;
 
