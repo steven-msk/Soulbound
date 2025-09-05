@@ -75,7 +75,7 @@ public static class InvocationHelper {
 		}
 	}
 
-	public static void IfElse(this bool condition, Action success, Action fail) {
+	public static void IfElse(bool condition, Action success, Action fail) {
 		if (condition) {
 			success.Invoke();
 		} else {
@@ -84,7 +84,7 @@ public static class InvocationHelper {
 	}
 
 
-	public static void If(this bool condition, Action action) {
+	public static void If(bool condition, Action action) {
 		if (condition) {
 			action.Invoke();
 		} 

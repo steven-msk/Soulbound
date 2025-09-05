@@ -115,8 +115,8 @@ public class InputHandler : MonoBehaviour, IDependencyInitializable<InputHandler
     public static void RequestAction(InputActionRequest action) => requests.Add(action);
 
 	private void Update() {
-		LeftHold.If(GameManager.instance.Player.OnLeftHold);
-		RightHold.If(GameManager.instance.Player.OnRightHold);
+		InvocationHelper.If(LeftHold, GameManager.instance.Player.OnLeftHold);
+		InvocationHelper.If(RightHold, GameManager.instance.Player.OnRightHold);
 
 		List<string> unblockedPersistent = new();
         foreach (var kvp in blockedContexts) {

@@ -283,7 +283,7 @@ public class Level {
         if (chunk != null) {
             return chunk.BlockStateAt(blockPos.ToChunkBlockPos(chunk.xpos));
         }
-        logFlag.If(() => UnityEngine.Debug.LogError($"Cannot retrieve block state at {blockPos.ToString()} because its not generated"));
+        InvocationHelper.If(logFlag, () => UnityEngine.Debug.LogError($"Cannot retrieve block state at {blockPos.ToString()} because its not generated"));
         return null;
     }
 

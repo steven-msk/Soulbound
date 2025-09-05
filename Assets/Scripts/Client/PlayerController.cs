@@ -60,7 +60,7 @@ public class PlayerController : LivingEntity, IGameInitializable<PlayerControlle
 		itemUsageHandler.Register<IConsumable>(ItemUseTrigger.RightClick, (consumable, stack) => consumable.Consume(stack));
 		foreach (ItemUseTrigger trigger in Enum.GetValues(typeof(ItemUseTrigger))) {
 			itemUsageHandler.Register<IAttackPerformer>(trigger, (attackPerformer, stack) => {
-				CanAttack.If(() => attackPerformer.PerformAttack(trigger));
+				InvocationHelper.If(CanAttack, () => attackPerformer.PerformAttack(trigger));
 			});
 		}
         itemUsageHandler.Register<IPlaceable>(ItemUseTrigger.LeftHold, (placeable, stack) => {
@@ -188,6 +188,9 @@ public class PlayerController : LivingEntity, IGameInitializable<PlayerControlle
 			};
 			this.maxHealth = stats.MaxHealth.GetProcessedValue();
 			this.currentHealth = maxHealth;         // might cause problems later with OnDeath handling
+			// If the player were to leave while having the death screen active,
+			// Upon rejoining it would reset their health to max, completely overriding the death state.
+			// Death screen implementation should be prioritized when deserializing.
 		}
 	}
 
