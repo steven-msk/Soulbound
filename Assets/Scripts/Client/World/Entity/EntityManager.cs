@@ -19,8 +19,6 @@ public sealed class EntityManager {
 		this.level = level;
 	}
 
-	// FIXME: inconsistent chunk-entity relation
-
 	public void Boostrap(Dictionary<Guid, SerializedEntity> serializedEntities) {
 		foreach (var serializedEntity in serializedEntities.Values) {
 			GameObject entityPrefab = ResourceManager.Get<GameObject, ResourceGroups.Prefabs>(serializedEntity.prefabDefinitionID);

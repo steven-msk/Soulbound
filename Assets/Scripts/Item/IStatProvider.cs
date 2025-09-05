@@ -12,7 +12,7 @@ public interface IStatProvider : IItemCapability {
 	public bool applyInstantStatsOnHoverOrSelect { get; }
 	public List<AbstractSerializableStat> stats { get; }
 
-	// FEATUREIMPL (WIP): buffered stats - NOT TESTED
+	// FEATUREIMPL: stats that apply or revoke upon special triggers
 
 	public virtual void ApplyStats(IStatSource source) => source.ApplyProvider(this);
 

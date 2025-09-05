@@ -28,8 +28,6 @@ public class BlockState {
         stateBehavior.OnNeighborStateChanged(selfPos, neighborPos, oldState, newState);
     }
 
-    // TODO: implement block items for stone, wood, and dirt blocks
-
     public void DropOnBroken(BlockPos pos, BreakSource source) {
         if (block != Blocks.air) {
             List<ItemStack> itemsDropped = stateBehavior.GetDrops(this, source);

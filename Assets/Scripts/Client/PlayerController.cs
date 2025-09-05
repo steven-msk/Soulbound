@@ -42,7 +42,6 @@ public class PlayerController : LivingEntity, IGameInitializable<PlayerControlle
 	public BlockPos blockPos => GameManager.instance.Level.ToBlockPos(this.position);
 	public ChunkBlockPos chunkBlockPos => blockPos.ToChunkBlockPos(GameManager.instance.Level.ChunkXAt(position));
 
-    // FIXME: inconsistency in item drop force direction
     public Vector2 itemDropForce {
 		get {
 			Vector2 force = new Vector2(3f, 4f);

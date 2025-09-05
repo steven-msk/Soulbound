@@ -5,9 +5,6 @@ using UnityEngine.EventSystems;
 #nullable enable
 
 public class InventorySlot : MonoBehaviour, IItemSlot {
-
-	// FEATUREIMPL (PARTIALLY IMPLEMENTED): equipment slots (NOT TESTED)
-
 	public IItemContainer2D container => gameObject.GetComponentInParent<InventoryController>(true);
 	public ItemDisplay? ItemDisplay => gameObject.GetComponentInChildren<ItemDisplay>();
 	public int index { get; set; }

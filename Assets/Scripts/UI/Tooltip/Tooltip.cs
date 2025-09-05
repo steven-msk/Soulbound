@@ -108,7 +108,6 @@ public class Tooltip {
 	//	})), layout);
 	//}
 
-	//// FUTURE TODO: implement CompoundStats custom header layout
 	//public static CompoundTooltip CompoundStats(Dictionary<string, IEnumerable<AbstractSerializableStat>> statSections, CompoundTooltipLayout compoundLayout = default) {
 	//	List<TooltipNodeData> data = new(); 
 	//	TooltipNodeStyle commonLayout = TooltipNode.Stats.GetDefaultLayout();

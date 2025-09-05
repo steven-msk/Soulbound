@@ -36,7 +36,7 @@ public class PlayerPhysics : MonoBehaviour, IDependencyInitializable<PlayerPhysi
 	[SerializeField] private float flightTime = 0;
 	[SerializeField] private float flightTimeReductionMultiplier = 50;
 	[SerializeField] private float slowFallTimeReductionMultiplier = 400;
-
+	 
 	[Header("Debug Internal")]
 	[SerializeField] private bool isFlying = false;
 	[SerializeField] private Vector2 movement;
