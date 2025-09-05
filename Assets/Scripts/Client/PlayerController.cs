@@ -77,13 +77,6 @@ public class PlayerController : LivingEntity, IGameInitializable<PlayerControlle
 	protected override void Update() {
 		base.Update();
 		animator.SetFloat("horizontalSpeed", Mathf.Abs(rb.linearVelocityX));
-
-		if (inputHandler.LeftHold || inputHandler.RightHold) {
-			Vector2 mousePos = inputHandler.MouseScreenPosition;
-			transform.localScale = new Vector3(mousePos.x >= Screen.width / 2 ? 1 : -1, 1, 1);
-		}
-
-		Debug.Log("maxHealth:" + maxHealth + ", current: "+ currentHealth);
 	}
 
 	public void SetMainHandItem(ItemStack? itemStack) {
