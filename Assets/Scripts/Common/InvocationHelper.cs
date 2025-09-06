@@ -83,7 +83,6 @@ public static class InvocationHelper {
 		}
 	}
 
-
 	public static void If(bool condition, Action action) {
 		if (condition) {
 			action.Invoke();

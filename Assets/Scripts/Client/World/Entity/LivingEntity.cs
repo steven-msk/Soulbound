@@ -41,7 +41,7 @@ public abstract class LivingEntity : Entity {
 		this.OnDeath();
 	}
 
-	public void MakeImmuneFor(float seconds) {
+	public void GrantImmunity(float seconds) {
 		this.isImmune = true;
 		this.immunityTimer = seconds;
 	}

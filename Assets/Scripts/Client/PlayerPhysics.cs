@@ -82,7 +82,7 @@ public class PlayerPhysics : MonoBehaviour, IDependencyInitializable<PlayerPhysi
 
 		triggerReactionsByLayer.Add(LayerMask.NameToLayer("Hitbox"), (collision => {
 			player.TakeDamage(1);
-			player.MakeImmuneFor(immunityTimeSeconds);
+			player.GrantImmunity(immunityTimeSeconds);
 			Vector2 bounce = (transform.position - collision.transform.position).normalized;
 			rb.linearVelocity = bounce * contactBouncePower;
 			knockbackStunTimer = knockbackStunDuration * Mathf.Clamp(Mathf.Abs(bounce.y), 0.1f, 1f);

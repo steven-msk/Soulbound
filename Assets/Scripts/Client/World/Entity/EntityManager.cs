@@ -68,6 +68,7 @@ public sealed class EntityManager {
 		foreach (var entity in allEntities.Values) {
 			entity.EntityUpdate(deltaTime);
 		}
+		this.player.EntityUpdate(deltaTime);
 	}
 
 	public void OnChunkLoaded(WorldChunk chunk) {
