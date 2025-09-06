@@ -22,17 +22,16 @@ public class ItemStack {
 
 	public void UpdateText() {
 		TextMeshProUGUI? stackText = this.stackText?.GetComponent<TextMeshProUGUI>();
-		if (stackText != null) {
-			stackText.text = quantity.ToString();
-		}
+		stackText!.text = quantity.ToString();
 	}
 
 	public GameObject AssignDisplay(ItemDisplay parent) {
 		GameObject? stackText = GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.Prefabs>("stackNumberPrefab"), parent.transform);
 		TextMeshProUGUI? text = stackText!.GetComponent<TextMeshProUGUI>();
-		text!.autoSizeTextContainer = true;
+		text.enabled = item.IsStackable;
 		RectTransform rectTransform = stackText!.GetComponent<RectTransform>();
 		if (item.IsStackable) {
+			text!.autoSizeTextContainer = true;
 			text.text = quantity.ToString();
 			InventoryController inventory = GameManager.instance.Player.Inventory;
 			Color textColor = Color.white;
