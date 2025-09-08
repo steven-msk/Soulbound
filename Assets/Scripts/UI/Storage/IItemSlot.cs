@@ -14,7 +14,7 @@ using UnityEngine.InputSystem;
 
 public interface IItemSlot : IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler, ISerializable<SerializedItemSlot> {
 	public ItemDisplay ItemDisplay { get; }
-	public IItemContainer2D container { get; }
+	public IItemContainer container { get; }
 	public int index { get; set; }
 	public bool HasItem => ItemDisplay != null;
 	public bool IsEmpty => ItemDisplay == null;

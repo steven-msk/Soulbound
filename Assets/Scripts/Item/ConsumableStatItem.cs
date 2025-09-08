@@ -16,6 +16,6 @@ public abstract class ConsumableStatItem : StatItem, IConsumable {
 
     public virtual void Consume(ItemStack itemStack, PlayerController player) {
 		ConsumableUtils.DefaultConsume(this, itemStack);
-		((IStatProvider)this).ApplyStats(player.Stats);
+		//((IStatProvider)this).ApplyStats(player.Stats);
 	}
 }

@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 #nullable enable
 
 public class InventorySlot : MonoBehaviour, IItemSlot {
-	public IItemContainer2D container => gameObject.GetComponentInParent<InventoryController>(true);
+	public IItemContainer container => gameObject.GetComponentInParent<InventoryController>(true);
 	public ItemDisplay? ItemDisplay => gameObject.GetComponentInChildren<ItemDisplay>();
 	public int index { get; set; }
 	public bool HasItem => ItemDisplay != null;

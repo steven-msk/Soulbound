@@ -10,13 +10,21 @@ using UnityEngine;
 public interface IStatProvider : IItemCapability {
 	// PLANNED REWORK: stat providers trigger other than on hover or select
 	public bool applyInstantStatsOnHoverOrSelect { get; }
-	public List<AbstractSerializableStat> stats { get; }
+	public IEnumerable<StatMapping> statMappings { get; }
 
 	// FEATUREIMPL: stats that apply or revoke upon special triggers
 
-	public virtual void ApplyStats(IStatSource source) => source.ApplyProvider(this);
+	public void StartActivators(IStatSource source) {
+		GetActivators().ToList().ForEach(a => a.Start(source));
+	}
 
-	public virtual void RevokeStats(IStatSource source) => source.RevokeProvider(this);
+	public void DiscardActivators(IStatSource source) {
+		GetActivators().ToList().ForEach(a => a.Discard(source));
+	}
+
+	protected HashSet<IStatActivator> GetActivators() {
+		return statMappings.SelectMany(sm => sm.activators).Distinct().ToHashSet();
+	}
 
 #nullable enable
 

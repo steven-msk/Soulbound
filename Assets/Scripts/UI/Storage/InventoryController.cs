@@ -11,6 +11,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 #nullable enable
+
 public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyInitializable<InventoryController, PlayerController>, ISerializable<SerializedInventory> {
 	public delegate void InterpretationFunction(IItemSlot slot, RefBox<ItemDisplay> grabbedItem);
 	public delegate InterpretationFunction? InterpretationProvider(DragHandler handler, IItemSlot draggedSlot, RefBox<ItemDisplay> grabbedItem);
@@ -43,6 +44,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 	public IReadOnlyList<IItemSlot> slots => popupSlots.Flatten();
 
 	private PlayerController player;
+	public InventoryEventHandler eventHandler { get; private set; }
 
 	private float doubleClickThreshold = 0.15f;
 	private float lastClickTime;
@@ -51,6 +53,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 	private IItemSlot? hoveredSlot;
 
 	public InventoryController OnGameInit(PlayerController dependency) {
+		this.eventHandler = new InventoryEventHandler();
 		player = dependency;
 		hotbar.OnGameInit(this);
 		popup.SetActive(false);

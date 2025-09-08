@@ -24,7 +24,7 @@ public class TimerBufferedTrigger : IBufferedTrigger {
 
 	public void Enable(IBufferedStatImpl stat, IStatProvider provider, BufferedTriggerState state) {
 		InvocationHelper.If(ValidateExecution(stat, provider, false), () => {
-			currentCoroutine = CoroutineRunner.instance.StartCoroutine(this.DelayedInvoke(state.GetInvokeAction(this, stat, provider)));
+			//currentCoroutine = CoroutineRunner.instance.StartCoroutine(this.DelayedInvoke(state.GetInvokeAction(this, stat, provider)));
 		});
 		Debug.Log("timer buffer enabled");
 	}

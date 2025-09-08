@@ -46,7 +46,8 @@ public class EventTimerBufferedTrigger : IBufferedTrigger {
 	}
 
 	private Action CoroutineInvoker(IBufferedStatImpl stat, IStatProvider provider, BufferedTriggerState state) {
-		return () => currentCoroutine = CoroutineRunner.instance.StartCoroutine(this.DelayedInvoke(state.GetInvokeAction(this, stat, provider)));
+		return null;
+		//return () => currentCoroutine = CoroutineRunner.instance.StartCoroutine(this.DelayedInvoke(state.GetInvokeAction(this, stat, provider)));
 	}
 
 	public bool ValidateExecution(IBufferedStatImpl stat, IStatProvider provider, bool log) {

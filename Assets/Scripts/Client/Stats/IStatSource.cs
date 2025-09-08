@@ -4,8 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-public interface IStatSource {
-	public void ApplyProvider(IStatProvider provider);
+#nullable enable
 
-	public void RevokeProvider(IStatProvider provider);
+public interface IStatSource {
+
+	public void ApplyStats(IEnumerable<AbstractSerializableStat> stats, IStatProvider provider);
+
+	public void RevokeStats(IEnumerable<AbstractSerializableStat> stats, IStatProvider provider);
 }

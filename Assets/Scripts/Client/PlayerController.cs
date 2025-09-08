@@ -88,9 +88,9 @@ public class PlayerController : LivingEntity, IGameInitializable<PlayerControlle
 				statProviderAction.Invoke(statProvider);
 			}
 		}
-		InvokeStatItem(MainHandStack, statProvider => statProvider.RevokeStats(this.stats));
+		//InvokeStatItem(MainHandStack, statProvider => statProvider.RevokeStats(this.stats));
 		MainHandStack = itemStack;
-		InvokeStatItem(MainHandStack, statProvider => statProvider.ApplyStats(this.stats));
+		//InvokeStatItem(MainHandStack, statProvider => statProvider.ApplyStats(this.stats));
 	}
 
 	[InputAction("ItemUse", Priority = 5)]

@@ -9,19 +9,21 @@ using UnityEngine;
 
 #nullable enable
 
-public abstract class ArmorItem : StatItem, IEquipable {
+public abstract class ArmorItem : StatItem {
     public abstract ArmorType armorType { get; }
     public override bool applyInstantStatsOnHoverOrSelect => false;
 
-    public void OnEquip(EquipmentSlot slot) {
+    public void OnEquip(IStatSource source) {
+		(this as IStatProvider).StartActivators(source);
 		Debug.Log("equipped");
-		PlayerStats playerStats = GameManager.instance.Player.Stats;
-		(this as IStatProvider).ApplyStats(playerStats);
+		//PlayerStats playerStats = GameManager.instance.Player.Stats;
+		//(this as IStatProvider).ApplyStats(playerStats);
 	}
 
-	public void OnUnequipped() {
+	public void OnUnequipped(IStatSource source) {
+		(this as IStatProvider).DiscardActivators(source);
 		Debug.Log("unequipped");
-		PlayerStats playerStats = GameManager.instance.Player.Stats;
-		(this as IStatProvider).RevokeStats(playerStats);
+		//PlayerStats playerStats = GameManager.instance.Player.Stats;
+		//(this as IStatProvider).RevokeStats(playerStats);
 	}
 }

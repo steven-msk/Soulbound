@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Plastic.Newtonsoft.Json;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -11,6 +12,8 @@ public sealed class PlayerStats : IStatSource {
 	[JsonProperty]
 	[JsonConverter(typeof(JsonDictionaryConverter<IStatDefinitionImpl, IStatEntryImpl>))]
 	private static Dictionary<IStatDefinitionImpl, IStatEntryImpl> injected = new();
+
+	private readonly InventoryController inventory;
 
 	// REMINDER: current stat default values are subject to change
 	[JsonIgnore] public StatEntry<int> MaxHealth { get; private set; } = InjectStatEntry<int>(new(200, StatDefinition<int>.MaxHealth));
@@ -36,25 +39,31 @@ public sealed class PlayerStats : IStatSource {
 	public float VerticalFlightAcceleration { get; set; } = 2f;
 	public int GrantedFlightTime { get; set; } = 0;
 
+	public PlayerStats() {
+		inventory = GameManager.instance.Player.Inventory;
+	}
+
 	internal static StatEntry<TValue> InjectStatEntry<TValue>(StatEntry<TValue> statEntry) where TValue : struct, IComparable<TValue> {
 		injected[statEntry.definitionReference] = statEntry;
 		return statEntry;
 	}
 
-	public void ApplyProvider(IStatProvider provider) {
-		foreach (var stat in provider.stats) {
+	public void ApplyStats(IEnumerable<AbstractSerializableStat> stats, IStatProvider provider) {
+		foreach (var stat in stats) {
 			if (injected.TryGetValue(stat.GetStatDefinition(), out var statEntry)) {
 				statEntry.Add(stat, provider);
+				Debug.Log("added stats: "+ stat);
 			} else {
 				logger.LogError(null, new ArgumentException($"Could not apply stat to player source: unknown player stat definition {stat.GetStatDefinition()}"));
 			}
 		}
 	}
 
-	public void RevokeProvider(IStatProvider provider) {
-		foreach (var stat in provider.stats) {
+	public void RevokeStats(IEnumerable<AbstractSerializableStat> stats, IStatProvider provider) {
+		foreach (var stat in stats) {
 			if (injected.TryGetValue(stat.GetStatDefinition(), out var statEntry)) {
 				statEntry.Remove(stat, provider);
+				Debug.Log("removed stats: " + stat);
 			} else {
 				logger.LogError(null, new ArgumentException($"Could not revoke stat to player source: unknown player stat definition {stat.GetStatDefinition()}"));
 			}
