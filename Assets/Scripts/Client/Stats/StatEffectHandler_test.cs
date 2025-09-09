@@ -20,4 +20,8 @@ public sealed class StatEffectHandler_test : IStatEffectHandler {
 	public void Disable(IStatSource source) {
 		source.RevokeStats(usedStats, provider);
 	}
+
+	public IEnumerable<AbstractSerializableStat> SuppliedStats() {
+		return usedStats;
+	}
 }

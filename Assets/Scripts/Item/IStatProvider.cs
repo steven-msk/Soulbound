@@ -12,8 +12,6 @@ public interface IStatProvider : IItemCapability {
 	public bool applyInstantStatsOnHoverOrSelect { get; }
 	public IEnumerable<StatMapping> statMappings { get; }
 
-	// FEATUREIMPL: stats that apply or revoke upon special triggers
-
 	public void StartActivators(IStatSource source) {
 		GetActivators().ToList().ForEach(a => a.Start(source));
 	}
@@ -24,6 +22,10 @@ public interface IStatProvider : IItemCapability {
 
 	protected HashSet<IStatActivator> GetActivators() {
 		return statMappings.SelectMany(sm => sm.activators).Distinct().ToHashSet();
+	}
+
+	public IEnumerable<AbstractSerializableStat> GetStats() {
+		return statMappings.Select(sm => sm.stat);
 	}
 
 #nullable enable

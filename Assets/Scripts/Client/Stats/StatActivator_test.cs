@@ -24,4 +24,8 @@ public sealed class StatActivator_test : IStatActivator {
 	public void Discard(IStatSource source) {
 		OnDeactivated?.Invoke(source);
 	}
+
+	public IStatEffectHandler SuppliedEffectHandler() {
+		return effectHandler;
+	}
 }

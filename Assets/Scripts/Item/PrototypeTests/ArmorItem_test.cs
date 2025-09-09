@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading.Tasks; 
 using UnityEngine;
 
 #nullable enable
@@ -32,11 +34,20 @@ public sealed class ArmorItem_test : ArmorItem {
 	protected override TooltipRenderer.NodeStyleProvider? nodeStyleProvider => null;
 
 	public ArmorItem_test() {
-		SerializableStat<int> maxHealth = new(StatDefinition<int>.MaxHealth, 1, StatApplicationType.Flat, true);
-		IStatEffectHandler effectHandler = new StatEffectHandler_test(this, new List<AbstractSerializableStat>() { maxHealth });
-		IEnumerable<IStatActivator> activators = new List<IStatActivator>() {
-			new StatActivator_test(effectHandler)
-		};
-		statMappings = new List<StatMapping>() { new StatMapping(maxHealth, activators) };
+		statMappings = new StatMappingBuilder()
+			.SetStats( () => {
+				return new DynamicMap<AbstractSerializableStat>() {
+					["maxHealth"] = new SerializableStat<int>(StatDefinition<int>.MaxHealth, 1, StatApplicationType.Flat, true)
+				};
+			})
+			.BindEffectHandlers((stats) => {
+				return new DynamicMap<IStatEffectHandler>() {
+					["effectHandler"] = new StatEffectHandler_test(this, new List<AbstractSerializableStat>() { stats["maxHealth"] })
+				};
+			})
+			.BindActivators((handlers) => {
+				return new List<IStatActivator>() { new StatActivator_test(handlers["effectHandler"]) };
+			})
+			.ResolveMappings();
 	}
 }
