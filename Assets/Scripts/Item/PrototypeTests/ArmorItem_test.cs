@@ -35,7 +35,7 @@ public sealed class ArmorItem_test : ArmorItem {
 
 	public ArmorItem_test() {
 		statMappings = new StatMappingBuilder()
-			.SetStats( () => {
+			.SetStats(() => {
 				return new DynamicMap<AbstractSerializableStat>() {
 					["maxHealth"] = new SerializableStat<int>(StatDefinition<int>.MaxHealth, 1, StatApplicationType.Flat, true)
 				};
