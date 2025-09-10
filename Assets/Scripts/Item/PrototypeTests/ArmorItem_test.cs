@@ -33,16 +33,19 @@ public sealed class ArmorItem_test : ArmorItem {
 		statMappings = new StatMappingBuilder()
 			.SetStats(() => {
 				return new DynamicMap<AbstractSerializableStat>() {
-					["maxHealth"] = new SerializableStat<int>(StatDefinition<int>.MaxHealth, 1, StatApplicationType.Flat, true, persistent: false)
+					["maxHealth"] = new SerializableStat<int>(StatDefinition<int>.MaxHealth, 1, StatApplicationType.Flat, true),
+					["defense"] = new SerializableStat<int>(StatDefinition<int>.Defense, 10, StatApplicationType.Flat, true)
 				};
 			})
 			.BindEffectHandlers((stats) => {
 				return new DynamicMap<IStatEffectHandler>() {
-					["effectHandler"] = new StatEffectHandler_test(this, new List<AbstractSerializableStat>() { stats["maxHealth"] })
+					["healthHandler"] = IStatEffectHandler.Timed(5f, this, stats["maxHealth"]),
+					["defenseHandler"] = IStatEffectHandler.Static(this, stats["defense"])
 				};
 			})
 			.BindActivators((handlers) => {
-				return new List<IStatActivator>() { new StatActivator_test(handlers["effectHandler"]) };
+				return new List<IStatActivator>() { new StatActivator_test(handlers["healthHandler"]), 
+													new StatActivator_test(handlers["defenseHandler"])};
 			})
 			.ResolveMappings();
 	}
