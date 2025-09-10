@@ -7,10 +7,9 @@ using UnityEditor;
 using UnityEngine;
 
 public class StatEntry<TValue> : IStatEntryImpl where TValue : struct, IComparable<TValue> {
-
 	private static readonly Logger logger = Logger.CreateInstance();
 	[JsonProperty]
-	[JsonConverter(typeof(JsonDictionaryConverter<IStatProvider, List<AbstractSerializableStat>>))]
+	[JsonConverter(typeof(ModifierDictionaryConverter))]
 	private Dictionary<IStatProvider, List<AbstractSerializableStat>> modifiers = new();
 	public event Action<StatEntry<TValue>> OnModifiersChanged;
 	public TValue baseValue { get; protected set; }
@@ -103,5 +102,25 @@ public class StatEntry<TValue> : IStatEntryImpl where TValue : struct, IComparab
 			modifiers = "null";
 		}
 		return $"StatEntry[type: {typeof(TValue)}, baseValue: {baseValue}, definitionReference: {definitionReference}, modifiers: {modifiers}]";
+	}
+
+}
+sealed class ModifierDictionaryConverter : JsonDictionaryConverter<IStatProvider, List<AbstractSerializableStat>> {
+	public override void WriteJson(JsonWriter writer, Dictionary<IStatProvider, List<AbstractSerializableStat>> value, JsonSerializer serializer) {
+		writer.WriteStartArray();
+		foreach (var kvp in value) {
+			var persistentStats = kvp.Value.Where(stat => stat.persistent).ToList();
+			if (persistentStats.Count == 0) {
+				continue;
+			}
+
+			writer.WriteStartObject();
+			writer.WritePropertyName("key");
+			serializer.Serialize(writer, kvp.Key, typeof(IStatProvider));
+			writer.WritePropertyName("value");
+			serializer.Serialize(writer, persistentStats, typeof(List<AbstractSerializableStat>));
+			writer.WriteEndObject();
+		}
+		writer.WriteEndArray();
 	}
 }

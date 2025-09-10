@@ -7,31 +7,26 @@ using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public sealed class StatEffectHandler_test : IStatEffectHandler {
+public sealed class StatEffectHandler_test : NonPersistentStatEffectHandler {
 	private IStatProvider provider;
-	private IEnumerable<AbstractSerializableStat> usedStats;
 	private Coroutine runningCoroutine = null;
 
-	public StatEffectHandler_test(IStatProvider provider, IEnumerable<AbstractSerializableStat> usedStats) {
+	public StatEffectHandler_test(IStatProvider provider, IEnumerable<AbstractSerializableStat> usedStats)
+		: base(usedStats) {
 		this.provider = provider;
-		this.usedStats = usedStats;
 	}
 
-	public void Enable(IStatSource source) {
+	public override void Enable(IStatSource source) {
 		source.ApplyStats(usedStats, provider);
 		runningCoroutine = CoroutineRunner.instance.StartCoroutine(Countdown(source));
 	}
 
-	public void Disable(IStatSource source) {
+	public override void Disable(IStatSource source) {
 		if (runningCoroutine != null) {
 			CoroutineRunner.instance.StopCoroutine(runningCoroutine);
 			runningCoroutine = null;
 		}
 		source.RevokeStats(usedStats, provider);
-	}
-
-	public IEnumerable<AbstractSerializableStat> SuppliedStats() {
-		return usedStats;
 	}
 
 	private IEnumerator Countdown(IStatSource source) {

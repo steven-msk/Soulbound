@@ -10,6 +10,7 @@ public abstract class AbstractSerializableStat {
 	public abstract object GetBoxedValue();
 	public abstract string GetFormattedExpression();
 	public abstract bool applyAsBonus { get; }
+	public abstract bool persistent { get; set; }
 
 	public abstract override string ToString();
 
@@ -20,6 +21,8 @@ public abstract class AbstractSerializableStat {
 	public override bool Equals(object other) {
 		return other is AbstractSerializableStat stat && stat.GetHashCode() == this.GetHashCode();
 	}
+
+	internal abstract object Clone();
 
 	public static bool operator ==(AbstractSerializableStat first, AbstractSerializableStat second) {
 		return first.Equals(second);

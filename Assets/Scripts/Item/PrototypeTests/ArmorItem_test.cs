@@ -12,10 +12,6 @@ using UnityEngine;
 public sealed class ArmorItem_test : ArmorItem {
 	public override ArmorType armorType => ArmorType.Chestplate;
 
-	//public override List<AbstractSerializableStat> stats => _stats;
-	//private List<AbstractSerializableStat> _stats = new() {
-	//	new SerializableStat<int>(StatDefinition<int>.MaxHealth, 1, StatApplicationType.Flat, true)
-	//};
 	public override IEnumerable<StatMapping> statMappings { get; }
 
 	public override string name => "armorItem_test";
@@ -37,7 +33,7 @@ public sealed class ArmorItem_test : ArmorItem {
 		statMappings = new StatMappingBuilder()
 			.SetStats(() => {
 				return new DynamicMap<AbstractSerializableStat>() {
-					["maxHealth"] = new SerializableStat<int>(StatDefinition<int>.MaxHealth, 1, StatApplicationType.Flat, true)
+					["maxHealth"] = new SerializableStat<int>(StatDefinition<int>.MaxHealth, 1, StatApplicationType.Flat, true, persistent: false)
 				};
 			})
 			.BindEffectHandlers((stats) => {

@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
+using Unity.Plastic.Newtonsoft.Json;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SearchService;
@@ -17,12 +18,14 @@ public class SerializableStat<TValue> : AbstractSerializableStat where TValue : 
 	public TValue value;
 	public StatApplicationType applicationType;
 	public override bool applyAsBonus { get; }
+	public override bool persistent { get; set; }
 
-	public SerializableStat(StatDefinition<TValue> statDefinition, TValue value, StatApplicationType applicationType, bool applyAsBonus) {
+	public SerializableStat(StatDefinition<TValue> statDefinition, TValue value, StatApplicationType applicationType, bool applyAsBonus, bool persistent = true) {
 		this.statDefinition = statDefinition;
 		this.value = value;
 		this.applicationType = applicationType;
 		this.applyAsBonus = applyAsBonus;
+		this.persistent = persistent;
 		
 		if (applicationType == StatApplicationType.Percentage && typeof(TValue) == typeof(int)) {
 			logger.LogWarning(null, "Unsupported stat application type 'percentage' for stat value type 'int'. Overriding with flat application type");
@@ -40,6 +43,10 @@ public class SerializableStat<TValue> : AbstractSerializableStat where TValue : 
 
 	public override string ToString() {
 		return $"SerializableStat[type: {typeof(TValue)}, statDefinition: {statDefinition}, value: {value}, applicationType: {applicationType}]";
+	}
+
+	internal override object Clone() {
+		return new SerializableStat<TValue>(this.statDefinition, this.value, this.applicationType, this.applyAsBonus, this.persistent);
 	}
 }
 
