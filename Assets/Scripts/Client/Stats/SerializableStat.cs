@@ -14,9 +14,9 @@ using UnityEngine.SearchService;
 
 public class SerializableStat<TValue> : AbstractSerializableStat where TValue : struct, IComparable<TValue> {
 	private static readonly Logger logger = Logger.CreateInstance();
-	public StatDefinition<TValue> statDefinition;
-	public TValue value;
-	public StatApplicationType applicationType;
+	[JsonProperty] private StatDefinition<TValue> statDefinition;
+	public TValue value { get; set; }
+	public StatApplicationType applicationType { get; }
 	public override bool showAsBonus { get; }
 	public override bool persistent { get; set; }
 
