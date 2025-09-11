@@ -9,7 +9,7 @@ public abstract class AbstractSerializableStat {
 	public abstract StatApplicationType GetApplicationType();
 	public abstract object GetBoxedValue();
 	public abstract string GetFormattedExpression();
-	public abstract bool applyAsBonus { get; }
+	public abstract bool showAsBonus { get; }
 	public abstract bool persistent { get; set; }
 
 	public abstract override string ToString();

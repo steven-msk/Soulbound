@@ -33,8 +33,8 @@ public sealed class ArmorItem_test : ArmorItem {
 		statMappings = new StatMappingBuilder()
 			.SetStats(() => {
 				return new DynamicMap<AbstractSerializableStat>() {
-					["maxHealth"] = new SerializableStat<int>(StatDefinition.MaxHealth, 1, StatApplicationType.Flat, true),
-					["defense"] = new SerializableStat<int>(StatDefinition.Defense, 10, StatApplicationType.Flat, true)
+					["maxHealth"] = new SerializableStat<int>(StatDefinition.MaxHealth, 1, showAsBonus: true),
+					["defense"] = new SerializableStat<int>(StatDefinition.Defense, 10, showAsBonus: true)
 				};
 			})
 			.BindEffectHandlers((stats) => {

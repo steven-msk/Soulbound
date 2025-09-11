@@ -17,14 +17,17 @@ public class SerializableStat<TValue> : AbstractSerializableStat where TValue : 
 	public StatDefinition<TValue> statDefinition;
 	public TValue value;
 	public StatApplicationType applicationType;
-	public override bool applyAsBonus { get; }
+	public override bool showAsBonus { get; }
 	public override bool persistent { get; set; }
 
-	public SerializableStat(StatDefinition<TValue> statDefinition, TValue value, StatApplicationType applicationType, bool applyAsBonus, bool persistent = true) {
+	public SerializableStat(StatDefinition<TValue> statDefinition, TValue value, 
+			StatApplicationType applicationType = StatApplicationType.Flat, 
+			bool showAsBonus = false, 
+			bool persistent = true) {
 		this.statDefinition = statDefinition;
 		this.value = value;
 		this.applicationType = applicationType;
-		this.applyAsBonus = applyAsBonus;
+		this.showAsBonus = showAsBonus;
 		this.persistent = persistent;
 		
 		if (applicationType == StatApplicationType.Percentage && typeof(TValue) == typeof(int)) {
@@ -37,7 +40,7 @@ public class SerializableStat<TValue> : AbstractSerializableStat where TValue : 
 
 	public override object GetBoxedValue() => value;
 
-	public override string GetFormattedExpression() => (statDefinition as IStatDefinitionImpl).GetFormattedExpression(value, applyAsBonus);
+	public override string GetFormattedExpression() => (statDefinition as IStatDefinitionImpl).GetFormattedExpression(value, showAsBonus);
 
 	public override IStatDefinitionImpl GetStatDefinition() => statDefinition;
 
@@ -46,7 +49,7 @@ public class SerializableStat<TValue> : AbstractSerializableStat where TValue : 
 	}
 
 	internal override object Clone() {
-		return new SerializableStat<TValue>(this.statDefinition, this.value, this.applicationType, this.applyAsBonus, this.persistent);
+		return new SerializableStat<TValue>(this.statDefinition, this.value, this.applicationType, this.showAsBonus, this.persistent);
 	}
 }
 
