@@ -45,7 +45,9 @@ public class SerializableStat<TValue> : AbstractSerializableStat where TValue : 
 	public override IStatDefinitionImpl GetStatDefinition() => statDefinition;
 
 	public override string ToString() {
-		return $"SerializableStat[type: {typeof(TValue)}, statDefinition: {statDefinition}, value: {value}, applicationType: {applicationType}]";
+		return $"SerializableStat[type: {typeof(TValue)}, statDefinition: {statDefinition}, " +
+			$"value: {value}, applicationType: {applicationType}," +
+			$" showAsBonus: {showAsBonus}, persistent: {persistent}]";
 	}
 
 	internal override object Clone() {

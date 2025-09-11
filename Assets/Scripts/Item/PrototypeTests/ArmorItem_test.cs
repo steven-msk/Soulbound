@@ -39,7 +39,7 @@ public sealed class ArmorItem_test : ArmorItem {
 			})
 			.BindEffectHandlers((stats) => {
 				return new DynamicMap<IStatEffectHandler>() {
-					["healthHandler"] = IStatEffectHandler.Timed(5f, this, stats["maxHealth"]),
+					["healthHandler"] = IStatEffectHandler.Timed(5f, this, stats["maxHealth"], stats["defense"]),
 					["defenseHandler"] = IStatEffectHandler.Static(this, stats["defense"])
 				};
 			})

@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.CSharp;
 using Unity.VisualScripting;
+using UnityEngine;
 
 public sealed class StatMappingBuilder {
 	public DynamicMap<AbstractSerializableStat> dynamicStats { get; private set; }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JetBrains.Annotations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,7 +16,7 @@ public abstract class AbstractSerializableStat {
 	public abstract override string ToString();
 
 	public override int GetHashCode() {
-		return this.GetFormattedExpression().GetHashCode();
+		return HashCode.Combine(this.GetFormattedExpression(), persistent);
 	}
 
 	public override bool Equals(object other) {

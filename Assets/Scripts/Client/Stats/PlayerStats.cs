@@ -52,7 +52,7 @@ public sealed class PlayerStats : IStatSource {
 		foreach (var stat in stats) {
 			if (injected.TryGetValue(stat.GetStatDefinition(), out var statEntry)) {
 				statEntry.Add(stat, provider);
-				Debug.Log("added stats: "+ stat);
+				Debug.Log("added stat: " + stat.GetHashCode() + ": " + stat);
 			} else {
 				logger.LogError(null, new ArgumentException($"Could not apply stat to player source: unknown player stat definition {stat.GetStatDefinition()}"));
 			}
@@ -63,7 +63,7 @@ public sealed class PlayerStats : IStatSource {
 		foreach (var stat in stats) {
 			if (injected.TryGetValue(stat.GetStatDefinition(), out var statEntry)) {
 				statEntry.Remove(stat, provider);
-				Debug.Log("removed stats: " + stat);
+				Debug.Log("removed stat: " + stat.GetHashCode() + ": " + stat);
 			} else {
 				logger.LogError(null, new ArgumentException($"Could not revoke stat to player source: unknown player stat definition {stat.GetStatDefinition()}"));
 			}
