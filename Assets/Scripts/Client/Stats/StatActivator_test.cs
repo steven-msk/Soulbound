@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 public sealed class StatActivator_test : IStatActivator {
 	public event Action<IStatSource>? OnActivated;
 	public event Action<IStatSource>? OnDeactivated;
-	private IStatEffectHandler effectHandler;
+	private IEnumerable<IStatEffectHandler> effectHandlers;
 
-	public StatActivator_test(IStatEffectHandler effectHandler) {
-		this.effectHandler = effectHandler;
-		OnActivated += effectHandler.Enable;
-		OnDeactivated += effectHandler.Disable;
+	public StatActivator_test(params IStatEffectHandler[] effectHandlers) {
+		this.effectHandlers = effectHandlers;
+		OnActivated += (source) => effectHandlers.ToList().ForEach(h => h.Enable(source));
+		OnDeactivated += (source) => effectHandlers.ToList().ForEach(h => h.Disable(source));
 	}
 
 	public void Start(IStatSource source) {
@@ -25,7 +25,7 @@ public sealed class StatActivator_test : IStatActivator {
 		OnDeactivated?.Invoke(source);
 	}
 
-	public IStatEffectHandler SuppliedEffectHandler() {
-		return effectHandler;
+	public IEnumerable<IStatEffectHandler> SuppliedEffectHandlers() {
+		return effectHandlers;
 	}
 }

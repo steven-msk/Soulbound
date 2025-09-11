@@ -40,7 +40,7 @@ public sealed class StatMappingBuilder {
 	public List<StatMapping> ResolveMappings() {
 		Dictionary<IStatActivator, IEnumerable<AbstractSerializableStat>> statsByActivator = new();
 		foreach (var activator in activators) {
-			statsByActivator[activator] = activator.SuppliedEffectHandler().SuppliedStats();
+			statsByActivator[activator] = activator.SuppliedEffectHandlers().SelectMany(s => s.SuppliedStats());
 		}
 
 		// "Reverse" dictionary to return activators by stat

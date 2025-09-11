@@ -39,13 +39,12 @@ public sealed class ArmorItem_test : ArmorItem {
 			})
 			.BindEffectHandlers((stats) => {
 				return new DynamicMap<IStatEffectHandler>() {
-					["healthHandler"] = IStatEffectHandler.Timed(5f, this, stats["maxHealth"], stats["defense"]),
+					["healthHandler"] = IStatEffectHandler.Timed(5f, this, stats["maxHealth"]),
 					["defenseHandler"] = IStatEffectHandler.Static(this, stats["defense"])
 				};
 			})
 			.BindActivators((handlers) => {
-				return new List<IStatActivator>() { new StatActivator_test(handlers["healthHandler"]), 
-													new StatActivator_test(handlers["defenseHandler"])};
+				return new List<IStatActivator>() { new StatActivator_test(handlers["healthHandler"], handlers["defenseHandler"]) }; 
 			})
 			.ResolveMappings();
 	}
