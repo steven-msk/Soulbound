@@ -8,7 +8,64 @@ using UnityEngine;
 
 #nullable enable
 
-public class StatDefinition<TValue> : IStatDefinitionImpl where TValue : struct, IComparable<TValue> {
+public partial class StatDefinition<TValue> : IStatDefinitionImpl where TValue : struct, IComparable<TValue> {
+	public string baseName { get; }
+	public Func<TValue, string, string> displayNameFormat { get; }
+	public Func<TValue, string> valueFormat { get; }
+	public BonusAdmission<TValue> bonusValueAdmission { get; }
+	public Func<TValue, string>? valueColorSupplier { get; }
+	public SupportedApplicationType supportedApplications { get; }
+	public IStatProcessor<TValue> processor { get; }
+	public string? id { get; set; }
+	public Type valueType => typeof(TValue);
+
+	internal StatDefinition(string baseName, Func<TValue, string, string> displayNameFormat, Func<TValue, string> valueFormat,
+					Func<TValue, string>? valueColorSupplier, BonusAdmission<TValue> bonusValueAdmission,
+					SupportedApplicationType supportedApplications, IStatProcessor<TValue> processor) {
+		this.displayNameFormat = displayNameFormat;
+		this.baseName = baseName;
+		this.valueFormat = valueFormat;
+		this.bonusValueAdmission = bonusValueAdmission;
+		this.valueColorSupplier = valueColorSupplier;
+		this.supportedApplications = supportedApplications;
+		this.processor = processor;
+	}
+
+	string IStatDefinitionImpl.GetFormattedName(object value) => displayNameFormat.Invoke((TValue)value, baseName);
+
+	string IStatDefinitionImpl.GetFormattedValue(object value, bool applyAsBonus) {
+		string formattedValue = valueFormat.Invoke((TValue)value);
+		if (applyAsBonus && valueColorSupplier != null) {
+			formattedValue = string.Concat(bonusValueAdmission.GetPrefix((TValue)value), formattedValue);
+			formattedValue = $"<color={valueColorSupplier((TValue)value)}>{formattedValue}</color>";
+		} else {
+			formattedValue = displayNameFormat.Invoke((TValue)value, formattedValue).Replace("s", "");                      // hard-coded, not optimal
+		}
+		return formattedValue;
+	}
+
+	public override string ToString() {
+		return $"StatDefinition<{typeof(TValue)}>[type: {valueType}, baseName: {baseName}]";
+	}
+
+	public override int GetHashCode() {
+		return this.id!.GetHashCode();
+	}
+
+	public override bool Equals(object obj) {
+		return obj is IStatDefinitionImpl other && other.id == this.id;
+	}
+
+	public static bool operator ==(StatDefinition<TValue> first, StatDefinition<TValue> second) {
+		return first.id == second.id;
+	}
+
+	public static bool operator !=(StatDefinition<TValue> first, StatDefinition<TValue> second) {
+		return !(first == second);
+	}
+}
+
+public partial class StatDefinition {
 	public static readonly StatDefinition<int> MaxHealth = InjectID("maxHealth", new StatDefinition<int>("Max Health",
 		StatDisplayFormatter.PlainNameFormat<int>("#FF6B6B"),
 		StatDisplayFormatter.PlainValueFormat<int>(),
@@ -154,69 +211,10 @@ public class StatDefinition<TValue> : IStatDefinitionImpl where TValue : struct,
 		StatProcessors.Percentage()
 	));
 
-
-	public string baseName { get; }
-	public Func<TValue, string, string> displayNameFormat { get; }
-	public Func<TValue, string> valueFormat { get; }
-	public BonusAdmission<TValue> bonusValueAdmission { get; }
-	public Func<TValue, string>? valueColorSupplier { get; }
-	public SupportedApplicationType supportedApplications { get; }
-	public IStatProcessor<TValue> processor { get; }
-	public string? id { get; set; }
-	public Type valueType => typeof(TValue);
-
-
-	private StatDefinition(string baseName, Func<TValue, string, string> displayNameFormat, Func<TValue, string> valueFormat,
-					Func<TValue, string>? valueColorSupplier, BonusAdmission<TValue> bonusValueAdmission,
-					SupportedApplicationType supportedApplications, IStatProcessor<TValue> processor) {
-		this.displayNameFormat = displayNameFormat;
-		this.baseName = baseName;
-		this.valueFormat = valueFormat;
-		this.bonusValueAdmission = bonusValueAdmission;
-		this.valueColorSupplier = valueColorSupplier;
-		this.supportedApplications = supportedApplications;
-		this.processor = processor;
-	}
-
-	string IStatDefinitionImpl.GetFormattedName(object value) => displayNameFormat.Invoke((TValue)value, baseName);
-
-	string IStatDefinitionImpl.GetFormattedValue(object value, bool applyAsBonus) {
-		string formattedValue = valueFormat.Invoke((TValue)value);
-		if (applyAsBonus && valueColorSupplier != null) {
-			formattedValue = string.Concat(bonusValueAdmission.GetPrefix((TValue)value), formattedValue);
-			formattedValue = $"<color={valueColorSupplier((TValue)value)}>{formattedValue}</color>";
-		} else {
-			formattedValue = displayNameFormat.Invoke((TValue)value, formattedValue).Replace("s", "");                      // hard-coded, not optimal
-		}
-		return formattedValue;
-	}
-
 	protected static StatDefinition<TInnerValue> InjectID<TInnerValue>(string id, StatDefinition<TInnerValue> definition)
-			where TInnerValue : struct, IComparable<TInnerValue> {
+		where TInnerValue : struct, IComparable<TInnerValue> {
 		definition.id = id;
 		IStatDefinitionImpl.Register(id, definition);
 		return definition;
-	}
-
-	public override string ToString() {
-		return $"StatDefinition<{typeof(TValue)}>[type: {valueType}, baseName: {baseName}]";
-	}
-
-	// POTENTIAL FIXME: there could be some memory leaks regarding StatDefinition<> instances - some types get instantiated through serialization while other through static definition
-
-	public override int GetHashCode() {
-		return this.id!.GetHashCode();
-	}
-
-	public override bool Equals(object obj) {
-		return obj is IStatDefinitionImpl other && other.id == this.id;
-	}
-
-	public static bool operator ==(StatDefinition<TValue> first, StatDefinition<TValue> second) {
-		return first.id == second.id;
-	}
-
-	public static bool operator !=(StatDefinition<TValue> first, StatDefinition<TValue> second) {
-		return !(first == second);
 	}
 }

@@ -28,7 +28,7 @@ public interface IStatDefinitionImpl {
 		throw new ArgumentException($"No stat definition found for id {id}");
 	}
 
-	protected static void Register(string id, IStatDefinitionImpl definition) {
+	internal static void Register(string id, IStatDefinitionImpl definition) {
 		registered[id] = definition;
 	}
 		 
