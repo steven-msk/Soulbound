@@ -12,14 +12,15 @@ public class StatActivator {
 	public event Action<IStatReceiver>? OnDeactivated;
 	public IEnumerable<IStatEffectHandler> effectHandlers { get; private set; }
 
-	public StatActivator(params IStatEffectHandler[] effectHandlers) : this(null, null, effectHandlers) {
-	}
-
-	public StatActivator(Action<Action<IStatReceiver>>? activationBinder, Action<Action<IStatReceiver>>? deactivationBinder, 
-			params IStatEffectHandler[] effectHandlers) {
+	public StatActivator(params IStatEffectHandler[] effectHandlers) {
 		this.effectHandlers = effectHandlers;
 		OnActivated += (receiver) => effectHandlers.ToList().ForEach(h => h.Enable(receiver));
 		OnDeactivated += (receiver) => effectHandlers.ToList().ForEach(h => h.Disable(receiver));
+	}
+
+	public StatActivator(Action<Action<IStatReceiver>>? activationBinder, Action<Action<IStatReceiver>>? deactivationBinder, 
+			params IStatEffectHandler[] effectHandlers) 
+		: this(effectHandlers) {
 		activationBinder?.Invoke(BeginContext);
 		deactivationBinder?.Invoke(EndContext);
 	}
