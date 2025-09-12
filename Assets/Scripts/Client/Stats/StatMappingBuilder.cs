@@ -11,7 +11,7 @@ using UnityEngine;
 public sealed class StatMappingBuilder {
 	public DynamicMap<AbstractSerializableStat> dynamicStats { get; private set; }
 	public DynamicMap<IStatEffectHandler> dynamicEffectHandlers { get; private set; }
-	public IEnumerable<IStatActivator> activators { get; private set; } 
+	public IEnumerable<StatActivator> activators { get; private set; } 
 	
 	public StatMappingBuilder(Func<DynamicMap<AbstractSerializableStat>> dynamicStatSupplier = null) {
 		dynamicStats = dynamicStatSupplier?.Invoke() ?? new DynamicMap<AbstractSerializableStat>();
@@ -32,15 +32,15 @@ public sealed class StatMappingBuilder {
 		return this;
 	}
 
-	public StatMappingBuilder BindActivators(Func<DynamicMap<IStatEffectHandler>, IEnumerable<IStatActivator>> activatorBinder) {
+	public StatMappingBuilder BindActivators(Func<DynamicMap<IStatEffectHandler>, IEnumerable<StatActivator>> activatorBinder) {
 		activators = activatorBinder.Invoke(dynamicEffectHandlers);
 		return this;
 	}
 
 	public List<StatMapping> ResolveMappings() {
-		Dictionary<IStatActivator, IEnumerable<AbstractSerializableStat>> statsByActivator = new();
+		Dictionary<StatActivator, IEnumerable<AbstractSerializableStat>> statsByActivator = new();
 		foreach (var activator in activators) {
-			statsByActivator[activator] = activator.SuppliedEffectHandlers().SelectMany(s => s.SuppliedStats());
+			statsByActivator[activator] = activator.effectHandlers.SelectMany(s => s.SuppliedStats());
 		}
 
 		// "Reverse" dictionary to return activators by stat

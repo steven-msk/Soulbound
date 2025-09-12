@@ -7,9 +7,9 @@ using Unity.VisualScripting;
 
 public sealed class StatMapping {
 	public AbstractSerializableStat stat { get; }
-	public IReadOnlyList<IStatActivator> activators { get; }
+	public IReadOnlyList<StatActivator> activators { get; }
 
-	public StatMapping(AbstractSerializableStat stat, IEnumerable<IStatActivator> activators) {
+	public StatMapping(AbstractSerializableStat stat, IEnumerable<StatActivator> activators) {
 		this.stat = stat;
 		this.activators = activators.ToList();
 	}

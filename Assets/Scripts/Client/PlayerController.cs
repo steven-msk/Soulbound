@@ -52,6 +52,12 @@ public class PlayerController : LivingEntity, IGameInitializable<PlayerControlle
 
 	public float MaxBlockReach => 5f;
 
+	public event Action<IStatReceiver>? onArmorEquipped;
+	public event Action<IStatReceiver>? onArmorUnequipped;
+
+	public void InvokeArmorEquipped() => onArmorEquipped?.Invoke(this.stats);
+	public void InvokeArmorUnequipped() => onArmorUnequipped?.Invoke(this.stats);
+
 	public PlayerController OnGameInit() {
 		inputHandler = GameObject.Instantiate(inputHandler).OnGameInit(this);
 		inventory = GameManager.instance.UIManager.InstantiateInUILevel(inventory).GetComponent<InventoryController>().OnGameInit(this);

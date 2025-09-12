@@ -14,16 +14,12 @@ public abstract class ArmorItem : StatItem {
     public override bool applyInstantStatsOnHoverOrSelect => false;
 
     public void OnEquip(IStatReceiver receiver) {
-		(this as IStatProvider).StartActivators(receiver);
+		(this as IStatProvider).BeginActivatorContexts(receiver);
 		Debug.Log("equipped");
-		//PlayerStats playerStats = GameManager.instance.Player.Stats;
-		//(this as IStatProvider).ApplyStats(playerStats);
 	}
 
 	public void OnUnequipped(IStatReceiver receiver) {
-		(this as IStatProvider).DiscardActivators(receiver);
+		(this as IStatProvider).EndActivatorContexts(receiver);
 		Debug.Log("unequipped");
-		//PlayerStats playerStats = GameManager.instance.Player.Stats;
-		//(this as IStatProvider).RevokeStats(playerStats);
 	}
 }

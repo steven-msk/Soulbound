@@ -44,7 +44,7 @@ public sealed class ArmorItem_test : ArmorItem {
 				};
 			})
 			.BindActivators((handlers) => {
-				return new List<IStatActivator>() { new StatActivator_test(handlers["healthHandler"], handlers["defenseHandler"]) }; 
+				return new List<StatActivator>() { new StatActivator(handlers["healthHandler"], handlers["defenseHandler"]) }; 
 			})
 			.ResolveMappings();
 	}
