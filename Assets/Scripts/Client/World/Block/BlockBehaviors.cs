@@ -66,8 +66,8 @@ public static class BlockBehaviors {
             this.onPlace = onPlace;
         }
 
-        public List<ItemStack> GetDrops(BlockState blockState, BreakSource source) {
-            return dropsGetter.Invoke(blockState, source);
+        public List<ItemStack> GetDrops(BlockState blockState, BreakSource receiver) {
+            return dropsGetter.Invoke(blockState, receiver);
         }
 
         public void OnNeighborStateChanged(BlockPos selfPos, BlockPos neighborPos, BlockState oldState, BlockState newState) {

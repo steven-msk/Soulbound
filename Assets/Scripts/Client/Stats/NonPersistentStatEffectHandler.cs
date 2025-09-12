@@ -17,8 +17,8 @@ public abstract class NonPersistentStatEffectHandler : IStatEffectHandler {
 		});
 	}
 
-	public abstract void Disable(IStatSource source);
-	public abstract void Enable(IStatSource source);
+	public abstract void Disable(IStatReceiver receiver);
+	public abstract void Enable(IStatReceiver receiver);
 
 	public IEnumerable<AbstractSerializableStat> SuppliedStats() {
 		return usedStats;

@@ -5,7 +5,7 @@ using Unity.Plastic.Newtonsoft.Json;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public sealed class PlayerStats : IStatSource {
+public sealed class PlayerStats : IStatReceiver {
 	private static readonly Logger logger = Logger.CreateInstance();
 	private static readonly LogModule playerStats = new LogModule("PLAYER STATS", "#00FFFF");
 
@@ -48,24 +48,24 @@ public sealed class PlayerStats : IStatSource {
 		return statEntry;
 	}
 
-	public void ApplyStats(IEnumerable<AbstractSerializableStat> stats, IStatProvider provider) {
+	public void ApplyStats(IEnumerable<AbstractSerializableStat> stats, IStatProvider receiver) {
 		foreach (var stat in stats) {
 			if (injected.TryGetValue(stat.GetStatDefinition(), out var statEntry)) {
-				statEntry.Add(stat, provider);
+				statEntry.Add(stat, receiver);
 				Debug.Log("added stat: " + stat.GetHashCode() + ": " + stat);
 			} else {
-				logger.LogError(null, new ArgumentException($"Could not apply stat to player source: unknown player stat definition {stat.GetStatDefinition()}"));
+				logger.LogError(null, new ArgumentException($"Could not apply stat to player receiver: unknown player stat definition {stat.GetStatDefinition()}"));
 			}
 		}
 	}
 
-	public void RevokeStats(IEnumerable<AbstractSerializableStat> stats, IStatProvider provider) {
+	public void RevokeStats(IEnumerable<AbstractSerializableStat> stats, IStatProvider receiver) {
 		foreach (var stat in stats) {
 			if (injected.TryGetValue(stat.GetStatDefinition(), out var statEntry)) {
-				statEntry.Remove(stat, provider);
+				statEntry.Remove(stat, receiver);
 				Debug.Log("removed stat: " + stat.GetHashCode() + ": " + stat);
 			} else {
-				logger.LogError(null, new ArgumentException($"Could not revoke stat to player source: unknown player stat definition {stat.GetStatDefinition()}"));
+				logger.LogError(null, new ArgumentException($"Could not revoke stat to player receiver: unknown player stat definition {stat.GetStatDefinition()}"));
 			}
 		}
 	}

@@ -16,14 +16,14 @@ public class DynamicMap<T> : Dictionary<string, T> {
 		}
 	}
 
-	public void AddRange(object source) {
-		if (source == null) {
+	public void AddRange(object other) {
+		if (other == null) {
 			return;
 		}
 
-		var properties = source.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+		var properties = other.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
 		foreach (var property in properties) {
-			if (property.GetValue(source) is T value) {
+			if (property.GetValue(other) is T value) {
 				this[property.Name] = value;
 			} else {
 				logger.LogError(null, new InvalidOperationException($"Property '{property.Name}' is not of type {typeof(T).Name}"));

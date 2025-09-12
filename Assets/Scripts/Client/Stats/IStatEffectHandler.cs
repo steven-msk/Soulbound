@@ -7,15 +7,15 @@ using Unity.VisualScripting;
 
 public interface IStatEffectHandler {
 	public IEnumerable<AbstractSerializableStat> SuppliedStats();
-	public void Enable(IStatSource source);
-	public void Disable(IStatSource source);
+	public void Enable(IStatReceiver receiver);
+	public void Disable(IStatReceiver receiver);
 
 	public static IEnumerable<AbstractSerializableStat> SupplyStats(params AbstractSerializableStat[] stats) {
 		return StatSupplier.Of(stats);
 	}
 
 	public static IStatEffectHandler Static(IStatProvider provider, params AbstractSerializableStat[] stats) {
-		return new DelegatedStatEffectHandler(source => source.ApplyStats(stats, provider), source => source.RevokeStats(stats, provider), stats);
+		return new DelegatedStatEffectHandler(receiver => receiver.ApplyStats(stats, provider), receiver => receiver.RevokeStats(stats, provider), stats);
 	}
 
 	public static IStatEffectHandler Timed(float durationSeconds, IStatProvider provider, params AbstractSerializableStat[] stats) {

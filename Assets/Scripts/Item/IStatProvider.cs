@@ -12,12 +12,12 @@ public interface IStatProvider : IItemCapability {
 	public bool applyInstantStatsOnHoverOrSelect { get; }
 	public IEnumerable<StatMapping> statMappings { get; }
 
-	public void StartActivators(IStatSource source) {
-		GetActivators().ToList().ForEach(a => a.Start(source));
+	public void StartActivators(IStatReceiver receiver) {
+		GetActivators().ToList().ForEach(a => a.Start(receiver));
 	}
 
-	public void DiscardActivators(IStatSource source) {
-		GetActivators().ToList().ForEach(a => a.Discard(source));
+	public void DiscardActivators(IStatReceiver receiver) {
+		GetActivators().ToList().ForEach(a => a.Discard(receiver));
 	}
 
 	protected HashSet<IStatActivator> GetActivators() {

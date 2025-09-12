@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-public interface IStatSource {
+public interface IStatReceiver {
 
 	public void ApplyStats(IEnumerable<AbstractSerializableStat> stats, IStatProvider provider);
 

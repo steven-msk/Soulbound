@@ -18,15 +18,15 @@ public static class ArrayHelper {
 		return result;
 	}
 
-	public static T[] Flatten<T>(this T[,] source) {
-		int rows = source.GetLength(0);
-		int columns = source.GetLength(1);
+	public static T[] Flatten<T>(this T[,] other) {
+		int rows = other.GetLength(0);
+		int columns = other.GetLength(1);
 		T[] result = new T[rows * columns];
 
 		int index = 0;
 		for (int r = 0; r < rows; r++) {
 			for (int c = 0; c < columns; c++) {
-				result[index++] = source[r, c];
+				result[index++] = other[r, c];
 			}
 		}
 		return result;

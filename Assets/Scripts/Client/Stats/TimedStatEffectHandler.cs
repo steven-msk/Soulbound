@@ -18,22 +18,22 @@ public class TimedStatEffectHandler : NonPersistentStatEffectHandler {
 		this.durationSeconds = durationSeconds;
 	}
 
-	public override void Enable(IStatSource source) {
-		source.ApplyStats(usedStats, provider);
-		runningCoroutine = CoroutineRunner.instance.StartCoroutine(Countdown(source));
+	public override void Enable(IStatReceiver receiver) {
+		receiver.ApplyStats(usedStats, provider);
+		runningCoroutine = CoroutineRunner.instance.StartCoroutine(Countdown(receiver));
 	}
 
-	public override void Disable(IStatSource source) {
+	public override void Disable(IStatReceiver receiver) {
 		if (runningCoroutine != null) {
 			CoroutineRunner.instance.StopCoroutine(runningCoroutine);
 			runningCoroutine = null;
 		}
-		source.RevokeStats(usedStats, provider);
+		receiver.RevokeStats(usedStats, provider);
 	}
 
-	private IEnumerator Countdown(IStatSource source) {
+	private IEnumerator Countdown(IStatReceiver receiver) {
 		yield return new WaitForSecondsRealtime(durationSeconds);
-		source.RevokeStats(usedStats, provider);
+		receiver.RevokeStats(usedStats, provider);
 		runningCoroutine = null;
 	}
 }

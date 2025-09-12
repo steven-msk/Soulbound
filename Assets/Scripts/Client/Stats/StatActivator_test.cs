@@ -7,22 +7,22 @@ using System.Threading.Tasks;
 #nullable enable
 
 public sealed class StatActivator_test : IStatActivator {
-	public event Action<IStatSource>? OnActivated;
-	public event Action<IStatSource>? OnDeactivated;
+	public event Action<IStatReceiver>? OnActivated;
+	public event Action<IStatReceiver>? OnDeactivated;
 	private IEnumerable<IStatEffectHandler> effectHandlers;
 
 	public StatActivator_test(params IStatEffectHandler[] effectHandlers) {
 		this.effectHandlers = effectHandlers;
-		OnActivated += (source) => effectHandlers.ToList().ForEach(h => h.Enable(source));
-		OnDeactivated += (source) => effectHandlers.ToList().ForEach(h => h.Disable(source));
+		OnActivated += (receiver) => effectHandlers.ToList().ForEach(h => h.Enable(receiver));
+		OnDeactivated += (receiver) => effectHandlers.ToList().ForEach(h => h.Disable(receiver));
 	}
 
-	public void Start(IStatSource source) {
-		OnActivated?.Invoke(source);
+	public void Start(IStatReceiver receiver) {
+		OnActivated?.Invoke(receiver);
 	}
 
-	public void Discard(IStatSource source) {
-		OnDeactivated?.Invoke(source);
+	public void Discard(IStatReceiver receiver) {
+		OnDeactivated?.Invoke(receiver);
 	}
 
 	public IEnumerable<IStatEffectHandler> SuppliedEffectHandlers() {

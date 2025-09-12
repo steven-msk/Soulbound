@@ -6,21 +6,21 @@ using System.Threading.Tasks;
 
 public sealed class DelegatedStatEffectHandler : IStatEffectHandler {
 	private IEnumerable<AbstractSerializableStat> suppliedStats;
-	private Action<IStatSource> enableAction;
-	private Action<IStatSource> disableAction;
+	private Action<IStatReceiver> enableAction;
+	private Action<IStatReceiver> disableAction;
 
-	public DelegatedStatEffectHandler(Action<IStatSource> enableAction, Action<IStatSource> disableAction, IEnumerable<AbstractSerializableStat> suppliedStats) {
+	public DelegatedStatEffectHandler(Action<IStatReceiver> enableAction, Action<IStatReceiver> disableAction, IEnumerable<AbstractSerializableStat> suppliedStats) {
 		this.enableAction = enableAction;
 		this.disableAction = disableAction;
 		this.suppliedStats = suppliedStats;
 	}
 
-	public void Enable(IStatSource source) {
-		enableAction.Invoke(source);
+	public void Enable(IStatReceiver receiver) {
+		enableAction.Invoke(receiver);
 	}
 
-	public void Disable(IStatSource source) {
-		disableAction.Invoke(source);
+	public void Disable(IStatReceiver receiver) {
+		disableAction.Invoke(receiver);
 	}
 
 	public IEnumerable<AbstractSerializableStat> SuppliedStats() {
