@@ -20,6 +20,9 @@ public class ConsumableStatItem_test : ConsumableStatItem {
 
 	protected override TooltipRenderer.NodeStyleProvider nodeStyleProvider => null;
 
+	public override IEnumerable<IConsumptionRestriction> restrictions => _restrictions;
+	private readonly IEnumerable<IConsumptionRestriction> _restrictions = IConsumptionRestriction.Single(new CooldownRestriction(5f));
+
 	public ConsumableStatItem_test() {
 		StatMappingBuilder mappingBuilder = new StatMappingBuilder()
 			.SetStats(() => new DynamicMap<AbstractSerializableStat>() {

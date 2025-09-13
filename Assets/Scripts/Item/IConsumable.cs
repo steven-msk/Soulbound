@@ -12,6 +12,11 @@ public interface IConsumable : IItemCapability {
 
 	public ConsumeAction? consumeAction { get; }
     public int consumeAmount { get; }
+	public IEnumerable<IConsumptionRestriction>? restrictions { get; }
+
+	public virtual bool CanConsume(ItemStack itemStack) {
+		return restrictions == null || restrictions.All(r => r.CanConsume(this, itemStack));
+	}
 
 	public virtual void Consume(ItemStack itemStack) {
 		Consumables.DefaultConsume(this, itemStack);
@@ -20,7 +25,10 @@ public interface IConsumable : IItemCapability {
 
 public static class Consumables {
 	public static void DefaultConsume(IConsumable consumable, ItemStack itemStack) {
-		consumable.consumeAction?.Invoke(consumable, itemStack);
-		itemStack.Decrement(consumable.consumeAmount);
+		if (consumable.CanConsume(itemStack)) {
+			consumable.consumeAction?.Invoke(consumable, itemStack);
+			itemStack.Decrement(consumable.consumeAmount);
+			consumable.restrictions.ToList().ForEach(r => r.NotifyConsumed(itemStack));
+		}
 	}
 }
