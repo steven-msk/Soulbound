@@ -82,7 +82,7 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 	}
 
 	private void Start() {
-		ItemDisplay.Create(Items.armorItem_test, 1, this[0, 0]);
+		ItemDisplay.Create(Items.consumableStatItem_test, Item.DEFAULT_MAX_STACK, this[0, 0]);
 	}
 
 	public SerializedInventory Serialize() {

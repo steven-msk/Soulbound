@@ -6,19 +6,44 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 public class ConsumableStatItem_test : ConsumableStatItem {
-	public override IConsumable.ConsumeAction consumeAction => throw new NotImplementedException();
+	public override IConsumable.ConsumeAction consumeAction => null;
 
-	public override int consumeAmount => throw new NotImplementedException();
+	public override int consumeAmount => 1;
 
-	public override string name => throw new NotImplementedException();
+	public override string name => "ConsumableStatItem_test";
 
-	public override ItemAspect aspect => throw new NotImplementedException();
+	public override ItemAspect aspect => _aspect;
+	private readonly ItemAspect _aspect = ItemAspect.Simple("fruit_icon");
 
-	public override int maxStackSize => throw new NotImplementedException();
+	public override int maxStackSize => Item.DEFAULT_MAX_STACK;
 
-	public override IEnumerable<StatMapping> statMappings => throw new NotImplementedException();
+	public override IEnumerable<StatMapping> statMappings { get; }
 
-	protected override Func<Item, TooltipData> tooltipSupplier => throw new NotImplementedException();
+	protected override Func<Item, TooltipData> tooltipSupplier { get; }
 
-	protected override TooltipRenderer.NodeStyleProvider nodeStyleProvider => throw new NotImplementedException();
+	protected override TooltipRenderer.NodeStyleProvider nodeStyleProvider => null;
+
+	public ConsumableStatItem_test() {
+		StatMappingBuilder mappingBuilder = new StatMappingBuilder()
+			.SetStats(() => new DynamicMap<AbstractSerializableStat>() {
+				["luck"] = new SerializableStat<float>(StatDefinition.Luck, 0.1f, StatApplicationType.Percentage)
+			})
+			.WithTooltipNodes(stats => new List<TooltipNodeData>() {
+				new TooltipNodeData(TooltipNode.Stats, $"Grants {stats["luck"]} for 3s.")
+			})
+			.BindEffectHandlers(stats => new DynamicMap<IStatEffectHandler>() {
+				["luckHandler"] = IStatEffectHandler.Timed(3f, this, stats["luck"])
+			})
+			.BindActivators(handlers => new List<StatActivator>() {
+				new StatActivator(
+					activationBinder: callback => onConsumed += callback,
+					deactivationBinder: null,
+					handlers["luckHandler"])
+			});
+		this.statMappings = mappingBuilder.ResolveMappings();
+		this.tooltipSupplier = item => new TooltipData.Builder()
+			.AddNode(TooltipNode.Title, this.name)
+			.AddNodes(mappingBuilder.ResolveTooltipNodes())
+			.Finish();
+	}
 }

@@ -97,7 +97,9 @@ public class PlayerController : LivingEntity, IGameInitializable<PlayerControlle
 	internal void OnLeftClick() => RequestSuppressedMainHandUse(ItemUseTrigger.LeftClick);
 
 	[InputAction("ItemUse", Priority = 5)]
-	internal void OnRightClick() => RequestMainHandUse(ItemUseTrigger.RightClick, null);
+	internal void OnRightClick() {
+		RequestMainHandUse(ItemUseTrigger.RightClick, null); 
+	}
 
 	// POTENTIAL FEATUREIMPL: add Reach int stat
 
@@ -119,7 +121,9 @@ public class PlayerController : LivingEntity, IGameInitializable<PlayerControlle
 	}
 
 	[InputAction("ItemUse", Priority = 5)]
-	internal void OnRightHold() => RequestMainHandUse(ItemUseTrigger.RightHold, null);
+	internal void OnRightHold() { 
+		RequestMainHandUse(ItemUseTrigger.RightHold, null); 
+	}
 
 	private void RequestSuppressedMainHandUse(ItemUseTrigger trigger) {
         Item? usedItem = MainHandStack?.item;

@@ -20,6 +20,7 @@ public partial class Items : IResourceModule {
     public static readonly BlockItem leavesBlock = InjectID(new BlockItem("Leaves Block", ItemAspect.Simple("leaves_icon", ppu: 8), Item.DEFAULT_MAX_STACK, () => Blocks.leaves));
 
     public static readonly ArmorItem_test armorItem_test = InjectID(new ArmorItem_test());
+    public static readonly ConsumableStatItem_test consumableStatItem_test = InjectID(new ConsumableStatItem_test());
 
 #nullable enable
 

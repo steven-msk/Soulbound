@@ -10,12 +10,13 @@ using UnityEngine;
 #nullable enable
 
 public abstract class ConsumableStatItem : StatItem, IConsumable {
+    public event Action<IStatReceiver>? onConsumed;
     public override bool applyInstantStatsOnHoverOrSelect => false;
     public abstract IConsumable.ConsumeAction consumeAction { get; }
-    public abstract int consumeAmount { get; }
+    public virtual int consumeAmount { get; } = 1;
 
-    public virtual void Consume(ItemStack itemStack, PlayerController player) {
+    public virtual void Consume(ItemStack itemStack) {
 		ConsumableUtils.DefaultConsume(this, itemStack);
-		//((IStatProvider)this).ApplyStats(player.Stats);
+        onConsumed?.Invoke(GameManager.instance.Player.Stats);
 	}
 }
