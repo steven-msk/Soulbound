@@ -1,4 +1,7 @@
-﻿public readonly struct PreliminaryStructureData {
+﻿using SoulboundBackend.Client.World.Chunk;
+using SoulboundBackend.Common;
+
+public readonly struct PreliminaryStructureData {
     public readonly BoundsInt2D estimatedBounds;
     public readonly ChunkBlockPos origin;
     public readonly bool forced;

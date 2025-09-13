@@ -1,5 +1,7 @@
-﻿public interface ISerializable<T> {
-	public T Serialize();
+﻿namespace SoulboundBackend.Core {
+	public interface ISerializable<T> {
+		public T Serialize();
 
-	public void Deserialize(T serialized);
+		public void Deserialize(T serialized);
+	}
 }

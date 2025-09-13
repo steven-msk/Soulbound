@@ -1,3 +1,4 @@
+using SoulboundBackend.Core;
 using UnityEngine;
 using UnityEngineInternal;
 

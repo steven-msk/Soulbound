@@ -1,25 +1,28 @@
 ﻿using JetBrains.Annotations;
 using System.Collections.Generic;
 
-public class GameEvent : IEvent {
-	internal static readonly Dictionary<string, GameEvent> gameEventsByName = new();
-	
-	public static readonly GameEvent PlayerAttackStart = new("PlayerAttackStart");
-	public static readonly GameEvent PlayerAttackEnd = new("PlayerAttackEnd");
-	//...
+namespace SoulboundBackend.Core {
+	public class GameEvent : IEvent {
+		internal static readonly Dictionary<string, GameEvent> gameEventsByName = new();
 
-	private string id;
-	public string ID => id;
+		public static readonly GameEvent PlayerAttackStart = new("PlayerAttackStart");
+		public static readonly GameEvent PlayerAttackEnd = new("PlayerAttackEnd");
+		//...
 
-	public GameEvent(string id) {
-		this.id = id;
-		gameEventsByName[id] = this;
-	}
+		private string id;
+		public string ID => id;
 
-	[CanBeNull] public static GameEvent FromID(string ID) {
-		if (gameEventsByName.ContainsKey(ID)) {
-			return gameEventsByName[ID];
+		public GameEvent(string id) {
+			this.id = id;
+			gameEventsByName[id] = this;
 		}
-		return null;
+
+		[CanBeNull]
+		public static GameEvent FromID(string ID) {
+			if (gameEventsByName.ContainsKey(ID)) {
+				return gameEventsByName[ID];
+			}
+			return null;
+		}
 	}
 }

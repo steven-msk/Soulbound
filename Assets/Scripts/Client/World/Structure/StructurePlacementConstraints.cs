@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using SoulboundBackend.Client.World.BlockSystem;
+using SoulboundBackend.Client.World.Chunk;
+using SoulboundBackend.Common;
+using System.Collections.Generic;
 
 public readonly struct StructurePlacementConstraints {
     public readonly ChunkBlockPos origin;

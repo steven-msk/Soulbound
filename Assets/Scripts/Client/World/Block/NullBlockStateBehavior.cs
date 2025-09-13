@@ -1,13 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using SoulboundBackend.Client.ItemSystem;
+using System.Collections.Generic;
 
-public class NullBlockStateBehavior : IBlockStateBehavior {
-    public string Description => "No drops, no neighbor updates";
+namespace SoulboundBackend.Client.World.BlockSystem {
+	public class NullBlockStateBehavior : IBlockStateBehavior {
+		public string Description => "No drops, no neighbor updates";
 
-    public List<ItemStack> GetDrops(BlockState blockState, BreakSource source) => new List<ItemStack>();
+		public List<ItemStack> GetDrops(BlockState blockState, BreakSource source) => new List<ItemStack>();
 
-    public void OnNeighborStateChanged(BlockPos selfPos, BlockPos neighborPos, BlockState oldState, BlockState newState) {
-    }
+		public void OnNeighborStateChanged(BlockPos selfPos, BlockPos neighborPos, BlockState oldState, BlockState newState) {
+		}
 
-    public void OnPlace(BlockPos blockPos, BlockState blockState) {
-    }
+		public void OnPlace(BlockPos blockPos, BlockState blockState) {
+		}
+	}
 }

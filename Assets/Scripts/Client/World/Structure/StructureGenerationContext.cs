@@ -1,4 +1,7 @@
-﻿public readonly struct StructureGenerationContext {
+﻿using SoulboundBackend.Client.World;
+using SoulboundBackend.Client.World.Chunk;
+
+public readonly struct StructureGenerationContext {
     public readonly int chunkBlockX;
     public readonly int chunkX;
     public readonly ChunkHeightmapData heightmapData;

@@ -1,12 +1,14 @@
 ﻿using System;
 
-[AttributeUsage(AttributeTargets.Method | AttributeTargets.Constructor, AllowMultiple = false)]
-public class InputActionAttribute : System.Attribute {
-	public string Context { get; }
-	public int Priority { get; set; }
-	public string[] BlocksContexts { get; set; } = Array.Empty<string>();
+namespace SoulboundBackend.Client.Input {
+	[AttributeUsage(AttributeTargets.Method | AttributeTargets.Constructor, AllowMultiple = false)]
+	public class InputActionAttribute : System.Attribute {
+		public string Context { get; }
+		public int Priority { get; set; }
+		public string[] BlocksContexts { get; set; } = Array.Empty<string>();
 
-	public InputActionAttribute(string context) {
-		Context = context;
+		public InputActionAttribute(string context) {
+			Context = context;
+		}
 	}
 }

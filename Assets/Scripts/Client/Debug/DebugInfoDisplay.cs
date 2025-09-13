@@ -1,6 +1,10 @@
+using SoulboundBackend.Client.World;
+using SoulboundBackend.Client.World.Chunk;
+using SoulboundBackend.Core;
 using UnityEngine;
 
-public class DebugInfoDisplay : MonoBehaviour {
+namespace SoulboundBackend.Client.Debug {
+	public class DebugInfoDisplay : MonoBehaviour {
 	private PlayerController player;
 	private Level level;
 
@@ -25,4 +29,5 @@ public class DebugInfoDisplay : MonoBehaviour {
 		chunkPos?.UpdateDisplayComponent(chunkPos, ChunkBlockPos.FromBlockPos(player.blockPos));
 		velocity?.UpdateDisplayComponent(velocity, player.Rigidbody.linearVelocity);
     }
+}
 }

@@ -1,5 +1,6 @@
 using System.Collections;
 using NUnit.Framework;
+using SoulboundBackend.Core;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;

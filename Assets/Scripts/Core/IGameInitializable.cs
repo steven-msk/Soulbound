@@ -1,3 +1,5 @@
-﻿public interface IGameInitializable<TInstance> {
-	public TInstance OnGameInit();
+﻿namespace SoulboundBackend.Core {
+	public interface IGameInitializable<TInstance> {
+		public TInstance OnGameInit();
+	}
 }

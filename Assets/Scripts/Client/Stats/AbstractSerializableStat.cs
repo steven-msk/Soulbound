@@ -1,32 +1,35 @@
 ﻿using System;
 
-public abstract class AbstractSerializableStat {
-	public abstract IStatDefinitionImpl GetStatDefinition();
-	public abstract StatApplicationType GetApplicationType();
-	public abstract object GetBoxedValue();
-	public abstract string GetFormattedExpression();
-	public abstract bool showAsBonus { get; }
-	public abstract bool persistent { get; set; }
+namespace SoulboundBackend.Client.Stats {
+	public abstract class AbstractSerializableStat {
+		public abstract IStatDefinitionImpl GetStatDefinition();
+		public abstract StatApplicationType GetApplicationType();
+		public abstract object GetBoxedValue();
+		public abstract string GetFormattedExpression();
+		public abstract bool showAsBonus { get; }
+		public abstract bool persistent { get; set; }
 
-	public override string ToString() => GetFormattedExpression();
+		public override string ToString() => GetFormattedExpression();
 
-	public abstract string GetInfo();
+		public abstract string GetInfo();
 
-	public override int GetHashCode() {
-		return HashCode.Combine(this.GetFormattedExpression(), persistent);
+		public override int GetHashCode() {
+			return HashCode.Combine(this.GetFormattedExpression(), persistent);
+		}
+
+		public override bool Equals(object other) {
+			return other is AbstractSerializableStat stat && stat.GetHashCode() == this.GetHashCode();
+		}
+
+		internal abstract object Clone();
+
+		public static bool operator ==(AbstractSerializableStat first, AbstractSerializableStat second) {
+			return first.Equals(second);
+		}
+
+		public static bool operator !=(AbstractSerializableStat first, AbstractSerializableStat second) {
+			return !(first == second);
+		}
 	}
 
-	public override bool Equals(object other) {
-		return other is AbstractSerializableStat stat && stat.GetHashCode() == this.GetHashCode();
-	}
-
-	internal abstract object Clone();
-
-	public static bool operator ==(AbstractSerializableStat first, AbstractSerializableStat second) {
-		return first.Equals(second);
-	}
-
-	public static bool operator !=(AbstractSerializableStat first, AbstractSerializableStat second) {
-		return !(first == second);
-	}
 }

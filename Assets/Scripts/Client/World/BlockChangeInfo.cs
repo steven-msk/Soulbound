@@ -1,4 +1,7 @@
-﻿public readonly struct BlockChangeInfo {
+﻿using SoulboundBackend.Client.World;
+using SoulboundBackend.Client.World.BlockSystem;
+
+public readonly struct BlockChangeInfo {
     public readonly BlockPos pos;
     public readonly BlockState oldState;
     public readonly BlockState newState;

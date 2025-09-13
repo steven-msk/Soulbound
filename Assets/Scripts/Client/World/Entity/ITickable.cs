@@ -1,3 +1,6 @@
-﻿public interface ITickable {
-	void Tick();
+﻿namespace SoulboundBackend.Client.World.Entity {
+	public interface ITickable {
+		void Tick();
+	}
 }
+

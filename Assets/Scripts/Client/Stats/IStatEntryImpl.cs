@@ -1,24 +1,27 @@
-﻿using System;
+﻿using SoulboundBackend.Client.ItemSystem;
+using System;
 using System.Collections.Generic;
 
-public interface IStatEntryImpl {
-	void Add(AbstractSerializableStat serializableStat, IStatProvider provider);
+namespace SoulboundBackend.Client.Stats {
+	public interface IStatEntryImpl {
+		void Add(AbstractSerializableStat serializableStat, IStatProvider provider);
 
-	void AddRange(params (AbstractSerializableStat stat, IStatProvider provider)[] modifiers);
+		void AddRange(params (AbstractSerializableStat stat, IStatProvider provider)[] modifiers);
 
-	void Remove(AbstractSerializableStat serializableStat, IStatProvider provider);
+		void Remove(AbstractSerializableStat serializableStat, IStatProvider provider);
 
-	void RemoveRange(params (AbstractSerializableStat stat, IStatProvider provider)[] modifiers);
+		void RemoveRange(params (AbstractSerializableStat stat, IStatProvider provider)[] modifiers);
 
-	void SetModifiers(List<(AbstractSerializableStat stat, IStatProvider provider)> modifiers);
+		void SetModifiers(List<(AbstractSerializableStat stat, IStatProvider provider)> modifiers);
 
-	object GetBoxedValue();
+		object GetBoxedValue();
 
-	List<(AbstractSerializableStat, IStatProvider)> GetBoxedModifiers();
+		List<(AbstractSerializableStat, IStatProvider)> GetBoxedModifiers();
 
-	internal class UnsupportedSerializableStatTypeException : NullReferenceException {
-		public UnsupportedSerializableStatTypeException(object value, Type expectedType)
-			: base ($"Unsupported stat value type {value.GetType()} for entry of type {expectedType}") {
+		internal class UnsupportedSerializableStatTypeException : NullReferenceException {
+			public UnsupportedSerializableStatTypeException(object value, Type expectedType)
+				: base($"Unsupported stat value type {value.GetType()} for entry of type {expectedType}") {
+			}
 		}
 	}
 }
