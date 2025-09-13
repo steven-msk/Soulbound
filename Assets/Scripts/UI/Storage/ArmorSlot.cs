@@ -40,7 +40,6 @@ public class ArmorSlot : EquipmentSlot, IItemSlot {
 		}
 		return false;
 	}
-	
 
 	private ArmorItem? CastDisplayed() => this.ItemStack?.item as ArmorItem;
 
