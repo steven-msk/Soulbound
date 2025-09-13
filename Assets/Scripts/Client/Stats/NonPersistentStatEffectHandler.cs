@@ -14,7 +14,7 @@ public abstract class NonPersistentStatEffectHandler : IStatEffectHandler {
 			copy.persistent = false;
 			Debug.Log("cloned to non-persistent: "+ copy.GetHashCode() + ": "+ copy);
 			return copy;
-		});
+		}).ToList();
 	}
 
 	public abstract void Disable(IStatReceiver receiver);
