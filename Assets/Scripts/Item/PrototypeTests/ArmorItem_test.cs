@@ -21,36 +21,34 @@ public sealed class ArmorItem_test : ArmorItem {
 
 	public override int maxStackSize => 1;
 
-	protected override Func<Item, TooltipData> tooltipSupplier => (item) => {
-		return new TooltipData.Builder()
-			.AddNode(TooltipNode.Title, "ArmorItem_test")
-			.Finish();
-	};
+	protected override Func<Item, TooltipData> tooltipSupplier { get; }
 
 	protected override TooltipRenderer.NodeStyleProvider? nodeStyleProvider => null;
 
 	public ArmorItem_test() {
-		statMappings = new StatMappingBuilder()
-			.SetStats(() => {
-				return new DynamicMap<AbstractSerializableStat>() {
-					["maxHealth"] = new SerializableStat<int>(StatDefinition.MaxHealth, 1, showAsBonus: true),
-					["defense"] = new SerializableStat<int>(StatDefinition.Defense, 10, showAsBonus: true)
-				};
+		StatMappingBuilder mappingBuilder = new StatMappingBuilder()
+			.SetStats(() => new DynamicMap<AbstractSerializableStat>() {
+				["maxHealth"] = new SerializableStat<int>(StatDefinition.MaxHealth, 1, showAsBonus: true),
+				["defense"] = new SerializableStat<int>(StatDefinition.Defense, 10, showAsBonus: true)
 			})
-			.BindEffectHandlers((stats) => {
-				return new DynamicMap<IStatEffectHandler>() {
-					["healthHandler"] = IStatEffectHandler.Timed(5f, this, stats["maxHealth"]),
-					["defenseHandler"] = IStatEffectHandler.Static(this, stats["defense"])
-				};
+			.WithTooltipNodes((stats) => new List<TooltipNodeData>() {
+				new TooltipNodeData(TooltipNode.Stats, stats["defense"].ToString()),
+				new TooltipNodeData(TooltipNode.Stats, $"When equipped, gain {stats["maxHealth"]} for 5s")
 			})
-			.BindActivators((handlers) => {
-				return new List<StatActivator>() { 
-					new StatActivator(
-						activationBinder: callback => onEquipped += callback,
-						deactivationBinder: callback => onUnequipped += callback,
-						handlers["healthHandler"], handlers["defenseHandler"])
-				}; 
+			.BindEffectHandlers((stats) => new DynamicMap<IStatEffectHandler>() {
+				["healthHandler"] = IStatEffectHandler.Timed(5f, this, stats["maxHealth"]),
+				["defenseHandler"] = IStatEffectHandler.Static(this, stats["defense"])
 			})
-			.ResolveMappings();
+			.BindActivators((handlers) => new List<StatActivator>() {
+				new StatActivator(
+					activationBinder: callback => onEquipped += callback,
+					deactivationBinder: callback => onUnequipped += callback,
+					handlers["healthHandler"], handlers["defenseHandler"])
+			});
+		this.statMappings = mappingBuilder.ResolveMappings();
+		this.tooltipSupplier = (item) => new TooltipData.Builder()
+			.AddNode(TooltipNode.Title, this.name)
+			.AddNodes(mappingBuilder.ResolveTooltipNodes())
+			.Finish();
 	}
 }

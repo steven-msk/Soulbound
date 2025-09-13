@@ -46,6 +46,15 @@ public class TooltipData {
 			return this.AddNode(new TooltipNodeData(node, text));
 		}
 
+		public Builder AddNodes(params TooltipNodeData[] nodes) {
+			nodes.ToList().ForEach((node) => this.AddNode(node));
+			return this;
+		}
+
+		public Builder AddNodes(params (TooltipNode node, string text)[] nodes) {
+			return this.AddNodes(nodes.Select(entry => new TooltipNodeData(entry.node, entry.text)).ToArray());
+		}
+
 		public TooltipData Finish() => new TooltipData(nodes, layout);
 	}
 }

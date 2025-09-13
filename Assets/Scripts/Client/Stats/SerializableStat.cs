@@ -44,7 +44,7 @@ public class SerializableStat<TValue> : AbstractSerializableStat where TValue : 
 
 	public override IStatDefinitionImpl GetStatDefinition() => statDefinition;
 
-	public override string ToString() {
+	public override string GetInfo() {
 		return $"SerializableStat[type: {typeof(TValue)}, statDefinition: {statDefinition}, " +
 			$"value: {value}, applicationType: {applicationType}," +
 			$" showAsBonus: {showAsBonus}, persistent: {persistent}]";

@@ -13,7 +13,9 @@ public abstract class AbstractSerializableStat {
 	public abstract bool showAsBonus { get; }
 	public abstract bool persistent { get; set; }
 
-	public abstract override string ToString();
+	public override string ToString() => GetFormattedExpression();
+
+	public abstract string GetInfo();
 
 	public override int GetHashCode() {
 		return HashCode.Combine(this.GetFormattedExpression(), persistent);

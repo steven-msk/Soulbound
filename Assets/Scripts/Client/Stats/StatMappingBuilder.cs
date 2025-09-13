@@ -11,8 +11,9 @@ using UnityEngine;
 public sealed class StatMappingBuilder {
 	public DynamicMap<AbstractSerializableStat> dynamicStats { get; private set; }
 	public DynamicMap<IStatEffectHandler> dynamicEffectHandlers { get; private set; }
-	public IEnumerable<StatActivator> activators { get; private set; } 
-	
+	public IEnumerable<StatActivator> activators { get; private set; }
+	public IEnumerable<TooltipNodeData> tooltipNodes { get; private set; }
+
 	public StatMappingBuilder(Func<DynamicMap<AbstractSerializableStat>> dynamicStatSupplier = null) {
 		dynamicStats = dynamicStatSupplier?.Invoke() ?? new DynamicMap<AbstractSerializableStat>();
 	}
@@ -37,6 +38,11 @@ public sealed class StatMappingBuilder {
 		return this;
 	}
 
+	public StatMappingBuilder WithTooltipNodes(Func<DynamicMap<AbstractSerializableStat>, IEnumerable<TooltipNodeData>> nodesSupplier) {
+		this.tooltipNodes = nodesSupplier.Invoke(dynamicStats);
+		return this;
+	}
+
 	public List<StatMapping> ResolveMappings() {
 		Dictionary<StatActivator, IEnumerable<AbstractSerializableStat>> statsByActivator = new();
 		foreach (var activator in activators) {
@@ -50,5 +56,9 @@ public sealed class StatMappingBuilder {
 			.ToDictionary(g => g.Key, g => g.ToList())
 			.Select(kvp => new StatMapping(kvp.Key, kvp.Value))
 			.ToList();
+	}
+
+	public TooltipNodeData[] ResolveTooltipNodes() {
+		return this.tooltipNodes.ToArray();
 	}
 }
