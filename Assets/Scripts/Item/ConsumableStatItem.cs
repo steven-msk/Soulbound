@@ -16,7 +16,7 @@ public abstract class ConsumableStatItem : StatItem, IConsumable {
     public virtual int consumeAmount { get; } = 1;
 
     public virtual void Consume(ItemStack itemStack) {
-		ConsumableUtils.DefaultConsume(this, itemStack);
+		Consumables.DefaultConsume(this, itemStack);
         onConsumed?.Invoke(GameManager.instance.Player.Stats);
 	}
 }

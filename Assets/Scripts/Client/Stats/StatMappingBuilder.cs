@@ -9,10 +9,10 @@ using Unity.VisualScripting;
 using UnityEngine;
 
 public sealed class StatMappingBuilder {
-	public DynamicMap<AbstractSerializableStat> dynamicStats { get; private set; }
-	public DynamicMap<IStatEffectHandler> dynamicEffectHandlers { get; private set; }
-	public IEnumerable<StatActivator> activators { get; private set; }
-	public IEnumerable<TooltipNodeData> tooltipNodes { get; private set; }
+	public DynamicMap<AbstractSerializableStat> dynamicStats { get; private set; } = new();
+	public DynamicMap<IStatEffectHandler> dynamicEffectHandlers { get; private set; } = new();
+	public List<StatActivator> activators { get; private set; } = new();
+	public List<TooltipNodeData> tooltipNodes { get; private set; } = new();
 
 	public StatMappingBuilder(Func<DynamicMap<AbstractSerializableStat>> dynamicStatSupplier = null) {
 		dynamicStats = dynamicStatSupplier?.Invoke() ?? new DynamicMap<AbstractSerializableStat>();
@@ -24,22 +24,27 @@ public sealed class StatMappingBuilder {
 	}
 
 	public StatMappingBuilder SetStats(Func<DynamicMap<AbstractSerializableStat>> dynamicStatSupplier) {
-		dynamicStats = dynamicStatSupplier.Invoke();
+		dynamicStats.AddRange(dynamicStatSupplier.Invoke());
 		return this;
 	}
 
 	public StatMappingBuilder BindEffectHandlers(Func<DynamicMap<AbstractSerializableStat>, DynamicMap<IStatEffectHandler>> effectHandlerBinder) {
-		dynamicEffectHandlers = effectHandlerBinder.Invoke(dynamicStats);
+		dynamicEffectHandlers.AddRange(effectHandlerBinder.Invoke(dynamicStats));
 		return this;
 	}
 
 	public StatMappingBuilder BindActivators(Func<DynamicMap<IStatEffectHandler>, IEnumerable<StatActivator>> activatorBinder) {
-		activators = activatorBinder.Invoke(dynamicEffectHandlers);
+		activators.AddRange(activatorBinder.Invoke(dynamicEffectHandlers));
+		return this;
+	}
+
+	public StatMappingBuilder BindActivator(Func<DynamicMap<IStatEffectHandler>, StatActivator> activatorBinder) {
+		activators.Add(activatorBinder.Invoke(dynamicEffectHandlers));
 		return this;
 	}
 
 	public StatMappingBuilder WithTooltipNodes(Func<DynamicMap<AbstractSerializableStat>, IEnumerable<TooltipNodeData>> nodesSupplier) {
-		this.tooltipNodes = nodesSupplier.Invoke(dynamicStats);
+		this.tooltipNodes.AddRange(nodesSupplier.Invoke(dynamicStats));
 		return this;
 	}
 

@@ -14,11 +14,11 @@ public interface IConsumable : IItemCapability {
     public int consumeAmount { get; }
 
 	public virtual void Consume(ItemStack itemStack) {
-		ConsumableUtils.DefaultConsume(this, itemStack);
+		Consumables.DefaultConsume(this, itemStack);
 	}
 }
 
-public static class ConsumableUtils {
+public static class Consumables {
 	public static void DefaultConsume(IConsumable consumable, ItemStack itemStack) {
 		consumable.consumeAction?.Invoke(consumable, itemStack);
 		itemStack.Decrement(consumable.consumeAmount);

@@ -8,8 +8,6 @@ using UnityEngine;
 public class ConsumableStatItem_test : ConsumableStatItem {
 	public override IConsumable.ConsumeAction consumeAction => null;
 
-	public override int consumeAmount => 1;
-
 	public override string name => "ConsumableStatItem_test";
 
 	public override ItemAspect aspect => _aspect;
@@ -34,12 +32,11 @@ public class ConsumableStatItem_test : ConsumableStatItem {
 			.BindEffectHandlers(stats => new DynamicMap<IStatEffectHandler>() {
 				["luckHandler"] = IStatEffectHandler.Timed(3f, this, stats["luck"])
 			})
-			.BindActivators(handlers => new List<StatActivator>() {
-				new StatActivator(
-					activationBinder: callback => onConsumed += callback,
-					deactivationBinder: null,
-					handlers["luckHandler"])
-			});
+			.BindActivator(handlers => new StatActivator(
+				activationBinder: callback => onConsumed += callback,
+				deactivationBinder: null,
+				handlers["luckHandler"]
+			));
 		this.statMappings = mappingBuilder.ResolveMappings();
 		this.tooltipSupplier = item => new TooltipData.Builder()
 			.AddNode(TooltipNode.Title, this.name)
