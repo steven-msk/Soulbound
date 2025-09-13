@@ -51,6 +51,8 @@ public class GameManager : MonoBehaviour {
 		instance = this;
 #if !UNITY_EDITOR
 		ResourceGroups.Bootstrap();
+#else
+		StaticResetManager.ResetAll();
 #endif
 		this.player = GameObject.Instantiate(playerInstancePrefab).GetComponent<PlayerController>().OnGameInit();
 		int seed = 745632;           // UnityEngine.Random.Range(int.MinValue, int.MaxValue)
@@ -62,7 +64,7 @@ public class GameManager : MonoBehaviour {
 			logger.LogError(null, "Cannot find world dump file");
 			worldDump = null;
 		}
-		this.level.BootstrapWorld(worldDump);				// pos will be replaced with 'lastPlayerPos' once world serialization is a thing
+		this.level.BootstrapWorld(worldDump);
 		UnityEngine.Random.InitState(seed);
 	}
 

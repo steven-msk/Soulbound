@@ -25,10 +25,12 @@ public interface IConsumable : IItemCapability {
 
 public static class Consumables {
 	public static void DefaultConsume(IConsumable consumable, ItemStack itemStack) {
+		Debug.Log("attempting to consume");
 		if (consumable.CanConsume(itemStack)) {
 			consumable.consumeAction?.Invoke(consumable, itemStack);
 			itemStack.Decrement(consumable.consumeAmount);
 			consumable.restrictions.ToList().ForEach(r => r.NotifyConsumed(itemStack));
+			Debug.Log("successfully consumed");
 		}
 	}
 }

@@ -5,19 +5,23 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public class CooldownRestriction : IConsumptionRestriction {
+public class CooldownRestriction : IConsumptionRestriction, IStaticResettable {
 	private readonly float cooldown;
-	private float lastConsumed = -999f;
+	private float lastConsumed = float.NegativeInfinity;
 
 	public CooldownRestriction(float cooldown) {
 		this.cooldown = cooldown;
+		StaticResetManager.Register(this);
 	}
 
 	public bool CanConsume(IConsumable consumable, ItemStack itemStack) {
-		return !(Time.time - lastConsumed < cooldown);
+		Debug.Log(lastConsumed);
+		return !(Time.timeSinceLevelLoad - lastConsumed < cooldown);
 	}
 
 	public void NotifyConsumed(ItemStack itemStack) {
-		lastConsumed = Time.time;
+		lastConsumed = Time.timeSinceLevelLoad;
 	}
+
+	public void StaticReset() => lastConsumed = float.NegativeInfinity;
 }

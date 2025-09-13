@@ -82,7 +82,9 @@ public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyI
 	}
 
 	private void Start() {
-		ItemDisplay.Create(Items.consumableStatItem_test, Item.DEFAULT_MAX_STACK, this[0, 0]);
+		if (hotbar[0].IsEmpty) {
+			ItemDisplay.Create(Items.consumableStatItem_test, Item.DEFAULT_MAX_STACK, hotbar[0]);
+		}
 	}
 
 	public SerializedInventory Serialize() {

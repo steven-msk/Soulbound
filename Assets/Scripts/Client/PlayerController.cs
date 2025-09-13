@@ -98,6 +98,7 @@ public class PlayerController : LivingEntity, IGameInitializable<PlayerControlle
 
 	[InputAction("ItemUse", Priority = 5)]
 	internal void OnRightClick() {
+		Debug.Log("right click");
 		RequestMainHandUse(ItemUseTrigger.RightClick, null); 
 	}
 
