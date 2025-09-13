@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TMPro;
-using UnityEditor;
+﻿using TMPro;
 
 public interface IDebugVisual<TValue> {
     public TextMeshProUGUI TextComponent { get; }

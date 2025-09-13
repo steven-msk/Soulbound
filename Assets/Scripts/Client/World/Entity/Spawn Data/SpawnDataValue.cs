@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-public abstract class SpawnDataValue {
+﻿public abstract class SpawnDataValue {
 	public abstract object GetValue();
 	public abstract void SetValue(object value);
 }

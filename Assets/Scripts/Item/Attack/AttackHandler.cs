@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using UnityEngine;
 
 public class AttackHandler : MonoBehaviour {

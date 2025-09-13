@@ -1,13 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
-using UnityEngine.UIElements;
 
 public class HotbarController : MonoBehaviour, IItemContainer, IDependencyInitializable<HotbarController, InventoryController> {
 	[Header("Active Slots")]

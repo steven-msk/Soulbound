@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 
 public class TooltipNodeData {
 	public string text { get; set; }

@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using TMPro;
-using UnityEngine;
-
-public enum TooltipNode {
+﻿public enum TooltipNode {
 	None,
 	Title,
 	Tags,

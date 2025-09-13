@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-
-public static class ArrayHelper {
+﻿public static class ArrayHelper {
 	public static T[,] CompressTo2D<T>(this T[] input, int rows, int columns) {
 		UnityEngine.Debug.Assert(input.Length == rows * columns);
 		T[,] result = new T[rows, columns];

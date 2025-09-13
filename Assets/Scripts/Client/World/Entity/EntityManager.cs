@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
 using System.Linq;
+using UnityEngine;
 
 public sealed class EntityManager {
 	private readonly Level level;

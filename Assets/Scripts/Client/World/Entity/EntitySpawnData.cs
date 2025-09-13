@@ -1,11 +1,5 @@
-﻿using Codice.CM.SEIDInfo;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class EntitySpawnData : Dictionary<SpawnDataKey, SpawnDataValue> {
 	private static readonly Logger logger = Logger.CreateInstance();

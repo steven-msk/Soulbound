@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
 
 public class ConsumableStatItem_test : ConsumableStatItem {
 	public override IConsumable.ConsumeAction consumeAction => null;

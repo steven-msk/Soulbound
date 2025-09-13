@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-using UnityEngine.EventSystems;
+﻿using UnityEngine;
 
 public abstract class EquipmentSlot : MonoBehaviour, IItemSlot {
 	public abstract IItemContainer container { get; }

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-public readonly struct BlockChangeInfo {
+﻿public readonly struct BlockChangeInfo {
     public readonly BlockPos pos;
     public readonly BlockState oldState;
     public readonly BlockState newState;

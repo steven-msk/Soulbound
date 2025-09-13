@@ -1,10 +1,7 @@
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Tilemaps;
-using System.Linq;
-using System.Collections;
 
 
 public class PlayerPhysics : MonoBehaviour, IDependencyInitializable<PlayerPhysics, PlayerController> {

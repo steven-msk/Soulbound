@@ -1,5 +1,4 @@
 ﻿using System;
-using UnityEngine;
 
 public class BonusAdmission<TValue> {
 	private static readonly Logger logger = Logger.CreateInstance();

@@ -1,9 +1,5 @@
-﻿using Codice.CM.Common;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 public static class ItemAspectRegistry {
 	private static readonly Dictionary<RuntimeTypeHandle, ItemAspect> mappings = new();

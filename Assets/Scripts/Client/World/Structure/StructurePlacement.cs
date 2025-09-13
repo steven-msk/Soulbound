@@ -1,13 +1,7 @@
-﻿using JetBrains.Annotations;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Unity.Plastic.Newtonsoft.Json;
-using UnityEngine;
-using UnityEngine.Tilemaps;
 
 public class StructurePlacement {
     public ChunkBlockPos origin { get; private set; }

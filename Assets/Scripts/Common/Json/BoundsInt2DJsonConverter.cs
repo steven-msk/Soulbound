@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Text;
-using System.Threading.Tasks;
 using Unity.Plastic.Newtonsoft.Json;
 using Unity.Plastic.Newtonsoft.Json.Linq;
-using UnityEngine;
 
 public sealed class BoundsInt2DJsonConverter : JsonConverter<BoundsInt2D> {
 	public override BoundsInt2D ReadJson(JsonReader reader, Type objectType, BoundsInt2D existingValue, bool hasExistingValue, JsonSerializer serializer) {

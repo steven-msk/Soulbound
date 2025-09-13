@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Unity.Plastic.Newtonsoft.Json;
-using UnityEditor;
-using UnityEngine;
+﻿using System.Collections.Generic;
 using UnityEngine.Tilemaps;
 
 #nullable enable

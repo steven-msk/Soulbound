@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-public readonly struct StructureGenerationContext {
+﻿public readonly struct StructureGenerationContext {
     public readonly int chunkBlockX;
     public readonly int chunkX;
     public readonly ChunkHeightmapData heightmapData;

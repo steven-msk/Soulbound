@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 public class DynamicMap<T> : Dictionary<string, T> {
 	private static readonly Logger logger = Logger.CreateInstance();

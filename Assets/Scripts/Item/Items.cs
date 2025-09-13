@@ -1,13 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Unity.Plastic.Newtonsoft.Json;
-using Unity.VisualScripting;
-using UnityEditor;
-using UnityEngine;
 
 public partial class Items : IResourceModule {
     private static int idCounter = 0;
