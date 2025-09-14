@@ -21,8 +21,8 @@ public class ConsumableStatItem_test : ConsumableStatItem {
 
 	protected override TooltipRenderer.NodeStyleProvider nodeStyleProvider => null;
 
-	public override IEnumerable<IConsumptionRestriction> restrictions => _restrictions;
-	private readonly IEnumerable<IConsumptionRestriction> _restrictions = IConsumptionRestriction.Single(new CooldownRestriction(5f));
+	public override IConsumptionRestriction restriction => _restriction;
+	private readonly IConsumptionRestriction _restriction = new CooldownRestriction(5f);
 
 	public ConsumableStatItem_test() {
 		StatMappingBuilder mappingBuilder = new StatMappingBuilder()
@@ -46,6 +46,4 @@ public class ConsumableStatItem_test : ConsumableStatItem {
 			.AddNodes(mappingBuilder.ResolveTooltipNodes())
 			.Finish();
 	}
-
-	public record Consumption(bool e);
 }

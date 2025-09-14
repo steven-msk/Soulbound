@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+
+#nullable enable
 
 namespace SoulboundBackend.Client.ItemSystem {
 	public interface IConsumptionRestriction {

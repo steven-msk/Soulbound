@@ -10,10 +10,10 @@ namespace SoulboundBackend.Client.ItemSystem {
 
 		public ConsumeAction? consumeAction { get; }
 		public int consumeAmount { get; }
-		public IEnumerable<IConsumptionRestriction>? restrictions { get; }
+		public IConsumptionRestriction restriction { get; }
 
 		public virtual bool CanConsume(ItemStack itemStack) {
-			return restrictions == null || restrictions.All(r => r.CanConsume(this, itemStack));
+			return restriction == null || restriction.CanConsume(this, itemStack);
 		}
 
 		public virtual void Consume(ItemStack itemStack) {
@@ -27,7 +27,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 			if (consumable.CanConsume(itemStack)) {
 				consumable.consumeAction?.Invoke(consumable, itemStack);
 				itemStack.Decrement(consumable.consumeAmount);
-				consumable.restrictions.ToList().ForEach(r => r.NotifyConsumed(itemStack));
+				consumable.restriction.NotifyConsumed(itemStack);
 				UnityEngine.Debug.Log("successfully consumed");
 			}
 		}
