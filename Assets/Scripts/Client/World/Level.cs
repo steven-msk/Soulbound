@@ -90,7 +90,7 @@ namespace SoulboundBackend.Client.World {
             Dictionary<Guid, SerializedEntity> serializedEntities = entityManager.AllExistingEntities
                 .Where(entity => entity.Value is not PlayerController)
                 .ToDictionary(guid => guid.Key, entity => entity.Value.Serialize());
-		    WorldDump dump = new(generatedChunks.Values.ToArray(), player.Serialize(), this.structurePlacements, serializedEntities);
+		    WorldDump dump = new(this.seed, generatedChunks.Values.ToArray(), player.Serialize(), this.structurePlacements, serializedEntities);
 		    string json = JsonConvert.SerializeObject(dump, GameManager.globalJsonSettings);
             File.WriteAllText(worldDumpFile, json);
 	    }

@@ -59,16 +59,17 @@ namespace SoulboundBackend.Core {
 	#endif
 			this.player = GameObject.Instantiate(playerInstancePrefab).GetComponent<PlayerController>().OnGameInit();
 			int seed = 745632;           // UnityEngine.Random.Range(int.MinValue, int.MaxValue)
-			this.level = new Level(player, worldTilemap, GameObject.Find("Grid").GetComponent<Grid>(), seed, renderDistance: 2);
 			WorldDump? worldDump;
 			try {
 				worldDump = JsonConvert.DeserializeObject<WorldDump>(File.ReadAllText(Level.worldDumpFile), globalJsonSettings);
+				seed = worldDump?.seed ?? seed;
 			} catch (FileNotFoundException) {
 				logger.LogError(null, "Cannot find world dump file");
 				worldDump = null;
 			}
-			this.level.BootstrapWorld(worldDump);
 			UnityEngine.Random.InitState(seed);
+			this.level = new Level(player, worldTilemap, GameObject.Find("Grid").GetComponent<Grid>(), seed, renderDistance: 2);
+			this.level.BootstrapWorld(worldDump);
 		}
 
 		private void OnValidate() => ResourceGroups.Bootstrap();
