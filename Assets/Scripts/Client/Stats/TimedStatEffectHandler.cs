@@ -8,7 +8,7 @@ namespace SoulboundBackend.Client.Stats {
 	public class TimedStatEffectHandler : NonPersistentStatEffectHandler {
 		private IStatProvider provider;
 		private float durationSeconds;
-		private Coroutine runningCoroutine = null;
+		private (Coroutine coroutine, IStatReceiver receiver)? active;
 
 		public TimedStatEffectHandler(IStatProvider provider, IEnumerable<AbstractSerializableStat> usedStats, float durationSeconds)
 			: base(usedStats) {
@@ -18,21 +18,34 @@ namespace SoulboundBackend.Client.Stats {
 
 		public override void Enable(IStatReceiver receiver) {
 			receiver.ApplyStats(usedStats, provider);
-			runningCoroutine = CoroutineRunner.instance.StartCoroutine(Countdown(receiver));
+			active = StartTimer(receiver);
 		}
 
 		public override void Disable(IStatReceiver receiver) {
-			if (runningCoroutine != null) {
-				CoroutineRunner.instance.StopCoroutine(runningCoroutine);
-				runningCoroutine = null;
+			if (active != null) {
+				CoroutineRunner.instance.StopCoroutine(active.Value.coroutine);
+				active = null;
 			}
 			receiver.RevokeStats(usedStats, provider);
 		}
 
+		public void ResetTimer() {
+			if (active != null) {
+				CoroutineRunner.instance.StopCoroutine(active.Value.coroutine);
+				active = StartTimer(active.Value.receiver);
+			}
+		}
+
+		private (Coroutine, IStatReceiver) StartTimer(IStatReceiver receiver) {
+			return (CoroutineRunner.instance.StartCoroutine(Countdown(receiver)), receiver);
+		}
+
+		public bool IsActive() => active != null;
+
 		private IEnumerator Countdown(IStatReceiver receiver) {
 			yield return new WaitForSecondsRealtime(durationSeconds);
 			receiver.RevokeStats(usedStats, provider);
-			runningCoroutine = null;
+			active = null;
 		}
 	}
 }

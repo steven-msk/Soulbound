@@ -12,24 +12,28 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public int consumeAmount { get; }
 		public IConsumptionRestriction restriction { get; }
 
-		public virtual bool CanConsume(ItemStack itemStack) {
-			return restriction == null || restriction.CanConsume(this, itemStack);
-		}
-
-		public virtual void Consume(ItemStack itemStack) {
-			Consumables.DefaultConsume(this, itemStack);
+		public virtual ConsumptionResult Consume(ItemStack itemStack) {
+			return Consumables.DefaultConsume(this, itemStack);
 		}
 	}
 
+	public record ConsumptionResult(ConsumeMode mode);
+
 	public static class Consumables {
-		public static void DefaultConsume(IConsumable consumable, ItemStack itemStack) {
+		public static ConsumptionResult DefaultConsume(IConsumable consumable, ItemStack itemStack) {
 			UnityEngine.Debug.Log("attempting to consume");
-			if (consumable.CanConsume(itemStack)) {
-				consumable.consumeAction?.Invoke(consumable, itemStack);
-				itemStack.Decrement(consumable.consumeAmount);
-				consumable.restriction.NotifyConsumed(itemStack);
-				UnityEngine.Debug.Log("successfully consumed");
+			ConsumptionDirective directive = consumable.restriction?.Evaluate(consumable, itemStack) ?? new(ConsumeMode.Allow);
+			if (directive.mode == ConsumeMode.Block) {
+				return new ConsumptionResult(ConsumeMode.Block);
 			}
+			consumable.consumeAction?.Invoke(consumable, itemStack);
+			if (directive.mode == ConsumeMode.Override) {
+				directive.customEffect?.Invoke(itemStack);
+			}
+			itemStack.Decrement(consumable.consumeAmount);
+			consumable.restriction?.NotifyConsumed(itemStack);
+			UnityEngine.Debug.Log("successfully consumed");
+			return new ConsumptionResult(directive.mode);
 		}
 	}
 

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace SoulboundBackend.Client.ItemSystem {
 	public interface IConsumptionRestriction {
-		bool CanConsume(IConsumable consumable, ItemStack itemStack);
+		ConsumptionDirective Evaluate(IConsumable consumable, ItemStack itemStack);
 
 		void NotifyConsumed(ItemStack itemStack);
 
@@ -13,4 +13,6 @@ namespace SoulboundBackend.Client.ItemSystem {
 			return new IConsumptionRestriction[] { restriction };
 		}
 	}
+
+	public record ConsumptionDirective(ConsumeMode mode, Action<ItemStack>? customEffect = null);
 }

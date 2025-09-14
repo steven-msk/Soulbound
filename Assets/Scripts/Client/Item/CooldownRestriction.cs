@@ -2,24 +2,26 @@
 using UnityEngine;
 
 namespace SoulboundBackend.Client.ItemSystem {
-	public class CooldownRestriction : IConsumptionRestriction, IStaticResettable {
+	public class CooldownRestriction : IConsumptionRestriction {
 		private readonly float cooldown;
-		private float lastConsumed = float.NegativeInfinity;
+		private float activeUntil;
 
 		public CooldownRestriction(float cooldown) {
 			this.cooldown = cooldown;
-			StaticResetManager.Register(this);
 		}
 
-		public bool CanConsume(IConsumable consumable, ItemStack itemStack) {
-			UnityEngine.Debug.Log(lastConsumed);
-			return !(Time.timeSinceLevelLoad - lastConsumed < cooldown);
+		ConsumptionDirective IConsumptionRestriction.Evaluate(IConsumable consumable, ItemStack itemStack) {
+			if (Time.time < activeUntil) {
+				return new ConsumptionDirective(ConsumeMode.Override, itemStack => ResetTimer());
+			}
+			return new ConsumptionDirective(ConsumeMode.Allow);
 		}
 
-		public void NotifyConsumed(ItemStack itemStack) {
-			lastConsumed = Time.timeSinceLevelLoad;
-		}
+		void IConsumptionRestriction.NotifyConsumed(ItemStack itemStack) => ResetTimer();
 
-		public void StaticReset() => lastConsumed = float.NegativeInfinity;
+		public void ResetTimer() {
+			UnityEngine.Debug.Log("resetting timer");
+			activeUntil = Time.time + cooldown;
+		}
 	}
 }

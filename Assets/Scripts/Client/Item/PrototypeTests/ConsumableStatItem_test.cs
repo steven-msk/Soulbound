@@ -5,6 +5,8 @@ using SoulboundBackend.Client.UI.Tooltip;
 using SoulboundBackend.Common;
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
+using UnityEngine;
 
 public class ConsumableStatItem_test : ConsumableStatItem {
 	public override IConsumable.ConsumeAction consumeAction => null;
@@ -21,8 +23,7 @@ public class ConsumableStatItem_test : ConsumableStatItem {
 
 	protected override TooltipRenderer.NodeStyleProvider nodeStyleProvider => null;
 
-	public override IConsumptionRestriction restriction => _restriction;
-	private readonly IConsumptionRestriction _restriction = new CooldownRestriction(5f);
+	public override IConsumptionRestriction restriction { get; }
 
 	public ConsumableStatItem_test() {
 		StatMappingBuilder mappingBuilder = new StatMappingBuilder()
@@ -45,5 +46,28 @@ public class ConsumableStatItem_test : ConsumableStatItem {
 			.AddNode(TooltipNode.Title, this.name)
 			.AddNodes(mappingBuilder.ResolveTooltipNodes())
 			.Finish();
+		this.restriction = new ResettableTimedStatRestriction((TimedStatEffectHandler)mappingBuilder.dynamicEffectHandlers["luckHandler"]);
+	}
+
+	private sealed class ResettableTimedStatRestriction : IConsumptionRestriction {
+		private TimedStatEffectHandler timedHandler;
+
+		public ResettableTimedStatRestriction(TimedStatEffectHandler timedHandler) {
+			this.timedHandler = timedHandler;
+		}
+
+		ConsumptionDirective IConsumptionRestriction.Evaluate(IConsumable consumable, ItemStack itemStack) {
+			if (timedHandler.IsActive()) {
+				return new ConsumptionDirective(ConsumeMode.Override, itemStack => ResetTimer());
+			}
+			return new ConsumptionDirective(ConsumeMode.Allow);
+		}
+
+		void IConsumptionRestriction.NotifyConsumed(ItemStack itemStack) => ResetTimer();
+
+		public void ResetTimer() {
+			UnityEngine.Debug.Log("resetting timer");
+			timedHandler.ResetTimer();
+		}
 	}
 }
