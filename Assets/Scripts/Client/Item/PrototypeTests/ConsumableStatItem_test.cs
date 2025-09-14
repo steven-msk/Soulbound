@@ -46,29 +46,6 @@ public class ConsumableStatItem_test : ConsumableStatItem {
 			.AddNode(TooltipNode.Title, this.name)
 			.AddNodes(mappingBuilder.ResolveTooltipNodes())
 			.Finish();
-		//this.restriction = new ResettableTimedStatRestriction((TimedStatEffectHandler)mappingBuilder.dynamicEffectHandlers["luckHandler"]);
 		this.restriction = null;
-	}
-
-	private sealed class ResettableTimedStatRestriction : IConsumptionRestriction {
-		private TimedStatEffectHandler timedHandler;
-
-		public ResettableTimedStatRestriction(TimedStatEffectHandler timedHandler) {
-			this.timedHandler = timedHandler;
-		}
-
-		ConsumptionDirective IConsumptionRestriction.Evaluate(IConsumable consumable, ItemStack itemStack) {
-			if (timedHandler.IsActive()) {
-				return new ConsumptionDirective(ConsumeMode.Override, itemStack => ResetTimer());
-			}
-			return new ConsumptionDirective(ConsumeMode.Allow);
-		}
-
-		void IConsumptionRestriction.NotifyConsumed(ItemStack itemStack) { }
-
-		public void ResetTimer() {
-			UnityEngine.Debug.Log("resetting timer");
-			timedHandler.ResetTimer();
-		}
 	}
 }
