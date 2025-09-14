@@ -1,4 +1,5 @@
-﻿using SoulboundBackend.Client.ItemSystem;
+﻿using GluonGui.WorkspaceWindow.Views.WorkspaceExplorer.Explorer;
+using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.Stats;
 using SoulboundBackend.Client.UI.Tooltip;
 using SoulboundBackend.Common;
@@ -45,4 +46,6 @@ public class ConsumableStatItem_test : ConsumableStatItem {
 			.AddNodes(mappingBuilder.ResolveTooltipNodes())
 			.Finish();
 	}
+
+	public record Consumption(bool e);
 }
