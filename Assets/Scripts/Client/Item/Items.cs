@@ -17,6 +17,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 
 		public static readonly ArmorItem_test armorItem_test = InjectID(new ArmorItem_test());
 		public static readonly ConsumableStatItem_test consumableStatItem_test = InjectID(new ConsumableStatItem_test());
+		public static readonly StatItem_test statItem_test = InjectID(new StatItem_test());
 
 #nullable enable
 
