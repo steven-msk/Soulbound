@@ -34,7 +34,7 @@ public class ConsumableStatItem_test : ConsumableStatItem {
 				new TooltipNodeData(TooltipNode.Stats, $"Grants {stats["luck"]} for 3s.")
 			})
 			.BindEffectHandlers(stats => new DynamicMap<IStatEffectHandler>() {
-				["luckHandler"] = IStatEffectHandler.Timed(3f, this, stats["luck"])
+				["luckHandler"] = IStatEffectHandler.Timed(3f, resetOnEnable: true, this, stats["luck"])
 			})
 			.BindActivator(handlers => new StatActivator(
 				activationBinder: callback => onConsumed += callback,
@@ -46,7 +46,8 @@ public class ConsumableStatItem_test : ConsumableStatItem {
 			.AddNode(TooltipNode.Title, this.name)
 			.AddNodes(mappingBuilder.ResolveTooltipNodes())
 			.Finish();
-		this.restriction = new ResettableTimedStatRestriction((TimedStatEffectHandler)mappingBuilder.dynamicEffectHandlers["luckHandler"]);
+		//this.restriction = new ResettableTimedStatRestriction((TimedStatEffectHandler)mappingBuilder.dynamicEffectHandlers["luckHandler"]);
+		this.restriction = null;
 	}
 
 	private sealed class ResettableTimedStatRestriction : IConsumptionRestriction {
@@ -63,7 +64,7 @@ public class ConsumableStatItem_test : ConsumableStatItem {
 			return new ConsumptionDirective(ConsumeMode.Allow);
 		}
 
-		void IConsumptionRestriction.NotifyConsumed(ItemStack itemStack) => ResetTimer();
+		void IConsumptionRestriction.NotifyConsumed(ItemStack itemStack) { }
 
 		public void ResetTimer() {
 			UnityEngine.Debug.Log("resetting timer");

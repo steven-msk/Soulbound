@@ -8,17 +8,23 @@ namespace SoulboundBackend.Client.Stats {
 	public class TimedStatEffectHandler : NonPersistentStatEffectHandler {
 		private IStatProvider provider;
 		private float durationSeconds;
+		private bool resetOnEnable;
 		private (Coroutine coroutine, IStatReceiver receiver)? active;
 
-		public TimedStatEffectHandler(IStatProvider provider, IEnumerable<AbstractSerializableStat> usedStats, float durationSeconds)
+		public TimedStatEffectHandler(IStatProvider provider, IEnumerable<AbstractSerializableStat> usedStats, float durationSeconds, bool resetOnEnable)
 			: base(usedStats) {
 			this.provider = provider;
 			this.durationSeconds = durationSeconds;
+			this.resetOnEnable = resetOnEnable;
 		}
 
 		public override void Enable(IStatReceiver receiver) {
-			receiver.ApplyStats(usedStats, provider);
-			active = StartTimer(receiver);
+			if (IsActive() && resetOnEnable) {
+				this.ResetTimer();
+			} else {
+				receiver.ApplyStats(usedStats, provider);
+				active = StartTimer(receiver);
+			}
 		}
 
 		public override void Disable(IStatReceiver receiver) {

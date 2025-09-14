@@ -17,8 +17,8 @@ namespace SoulboundBackend.Client.Stats {
 			return new DelegatedStatEffectHandler(receiver => receiver.ApplyStats(stats, provider), receiver => receiver.RevokeStats(stats, provider), stats);
 		}
 
-		public static IStatEffectHandler Timed(float durationSeconds, IStatProvider provider, params AbstractSerializableStat[] stats) {
-			return new TimedStatEffectHandler(provider, stats, durationSeconds);
+		public static IStatEffectHandler Timed(float durationSeconds, bool resetOnEnable, IStatProvider provider, params AbstractSerializableStat[] stats) {
+			return new TimedStatEffectHandler(provider, stats, durationSeconds, resetOnEnable);
 		}
 
 		public class StatSupplier {

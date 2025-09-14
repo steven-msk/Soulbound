@@ -34,7 +34,7 @@ public sealed class ArmorItem_test : ArmorItem {
 					new TooltipNodeData(TooltipNode.Stats, $"When equipped, gain {stats["maxHealth"]} for 5s")
 				})
 				.BindEffectHandlers((stats) => new DynamicMap<IStatEffectHandler>() {
-					["healthHandler"] = IStatEffectHandler.Timed(5f, this, stats["maxHealth"]),
+					["healthHandler"] = IStatEffectHandler.Timed(5f, false, this, stats["maxHealth"]),
 					["defenseHandler"] = IStatEffectHandler.Static(this, stats["defense"])
 				})
 				.BindActivators((handlers) => new List<StatActivator>() {
