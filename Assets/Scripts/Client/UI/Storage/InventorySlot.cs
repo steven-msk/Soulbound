@@ -1,4 +1,5 @@
 using SoulboundBackend.Client.ItemSystem;
+using System;
 using UnityEngine;
 
 #nullable enable

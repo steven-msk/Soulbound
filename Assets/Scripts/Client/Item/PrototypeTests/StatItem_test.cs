@@ -1,9 +1,12 @@
-﻿using SoulboundBackend.Client.ItemSystem;
+﻿using SoulboundBackend.Client;
+using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.Stats;
 using SoulboundBackend.Client.UI.Tooltip;
 using SoulboundBackend.Common;
+using SoulboundBackend.Core;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 public class StatItem_test : StatItem {
 	public override bool applyInstantStatsOnHoverOrSelect => false;
@@ -20,6 +23,9 @@ public class StatItem_test : StatItem {
 
 	protected override TooltipRenderer.NodeStyleProvider nodeStyleProvider => null;
 
+	private event Action<IStatReceiver> onContextReceived;
+	private event Action<IStatReceiver> onContextLost;
+
 	public StatItem_test() {
 		StatMappingBuilder mappingBuilder = new StatMappingBuilder()
 			.SetStats(() => new DynamicMap<AbstractSerializableStat>() {
@@ -32,6 +38,8 @@ public class StatItem_test : StatItem {
 				["physicalDamageHandler"] = IStatEffectHandler.Static(this, stats["physicalDamage"])
 			})
 			.BindActivator(handlers => new StatActivator(
+				activationBinder: callback => onContextReceived += callback,
+				deactivationBinder: callback => onContextLost += callback,
 				handlers["physicalDamageHandler"]
 			));
 		this.statMappings = mappingBuilder.ResolveMappings();
@@ -39,5 +47,13 @@ public class StatItem_test : StatItem {
 			.AddNode(TooltipNode.Title, this.name)
 			.AddNodes(mappingBuilder.ResolveTooltipNodes())
 			.Finish();
+		PlayerController player = GameManager.instance.Player;
+		this.SetSlotHook(new SlotHook(
+			onAttached: (itemDisplay, slot) => {
+				UnityEngine.Debug.Log(player.Inventory.GetOccupiedSlots(itemDisplay.DisplayedItem).Count());
+				onContextReceived.Invoke(player.Stats);
+			},
+			onDetached: (itemDisplay, slot) => onContextLost.Invoke(player.Stats)
+		));
 	}
 }

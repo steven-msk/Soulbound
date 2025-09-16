@@ -26,11 +26,13 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public Item? DisplayedItem => ItemStack?.item;
 		public Tooltip? activeTooltip { get; private set; } = null;
 
-		public static ItemDisplay Create<TSlot>(ItemStack itemStack, TSlot? slot) where TSlot : MonoBehaviour, IItemSlot {
-			return Create(itemStack, () => slot?.transform ?? null);
+		public static ItemDisplay Create(ItemStack itemStack, IItemSlot slot) {
+			ItemDisplay display = Create(itemStack, () => slot.GameObject.transform);
+			slot.AttachItemDisplay(display);
+			return display;
 		}
 
-		public static ItemDisplay Create<TSlot>(Item item, int quantity, TSlot? slot) where TSlot : MonoBehaviour, IItemSlot {
+		public static ItemDisplay Create(Item item, int quantity, IItemSlot slot) {
 			return Create(new ItemStack(item, quantity), slot);
 		}
 

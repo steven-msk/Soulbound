@@ -5,6 +5,7 @@ using SoulboundBackend.Client.UI.Tooltip;
 using System.Resources;
 using SoulboundBackend.Core.Resource;
 using ResourceManager = SoulboundBackend.Core.Resource.ResourceManager;
+using SoulboundBackend.Client.UI.Storage;
 
 #nullable enable
 
@@ -21,6 +22,10 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public bool IsStackable => maxStackSize > 1;
 		protected abstract Func<Item, TooltipData?> tooltipSupplier { get; }
 		protected abstract TooltipRenderer.NodeStyleProvider? nodeStyleProvider { get; }
+		private SlotHook? slotHook;
+
+		public SlotHook? GetSlotHook() => slotHook;
+		public void SetSlotHook(SlotHook? slotHook) => this.slotHook = slotHook;
 
 		public static GameObject InstantiateDefaultWorldPrefab() {
 			return GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.Prefabs>("droppedItem"))!;
@@ -57,4 +62,6 @@ namespace SoulboundBackend.Client.ItemSystem {
 			return HashCode.Combine(name, aspect, maxStackSize, IsStackable, tooltipSupplier, nodeStyleProvider, id);
 		}
 	}
+
+	public record SlotHook(Action<ItemDisplay, IItemSlot>? onAttached, Action<ItemDisplay, IItemSlot>? onDetached);
 }

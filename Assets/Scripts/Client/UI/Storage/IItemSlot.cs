@@ -1,6 +1,7 @@
 ﻿using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core;
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -18,14 +19,16 @@ namespace SoulboundBackend.Client.UI.Storage {
 		public GameObject GameObject { get; }
 		public bool showTooltip { get; set; }
 
-		public virtual void AttachItemDisplay(ItemDisplay itemDisplay) {
-			itemDisplay?.transform.SetParent(GameObject.transform, true);
-			itemDisplay?.OnRelease();
+		public void AttachItemDisplay(ItemDisplay itemDisplay) {
+			itemDisplay.transform.SetParent(GameObject.transform, true);
+			itemDisplay.OnRelease();
+			itemDisplay.DisplayedItem?.GetSlotHook()?.onAttached?.Invoke(itemDisplay, this);
 		}
 
-		public virtual void DetachItemDisplay() {
-			this.ItemDisplay.OnGrab();
-			this.ItemDisplay?.transform.SetParent(GameManager.instance.Player.Inventory.transform, true);
+		public void DetachItemDisplay() {
+			ItemDisplay.DisplayedItem?.GetSlotHook()?.onDetached?.Invoke(ItemDisplay, this);
+			ItemDisplay.OnGrab();
+			ItemDisplay?.transform.SetParent(GameManager.instance.Player.Inventory.transform, true);
 		}
 
 		SerializedItemSlot ISerializable<SerializedItemSlot>.Serialize() => new(index, ItemStack);
