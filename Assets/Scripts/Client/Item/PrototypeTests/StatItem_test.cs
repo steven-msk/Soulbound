@@ -23,9 +23,6 @@ public class StatItem_test : StatItem {
 
 	protected override TooltipRenderer.NodeStyleProvider nodeStyleProvider => null;
 
-	private event Action<IStatReceiver> onContextReceived;
-	private event Action<IStatReceiver> onContextLost;
-
 	public StatItem_test() {
 		StatMappingBuilder mappingBuilder = new StatMappingBuilder()
 			.SetStats(() => new DynamicMap<AbstractSerializableStat>() {
@@ -51,9 +48,9 @@ public class StatItem_test : StatItem {
 		this.SetSlotHook(new SlotHook(
 			onAttached: (itemDisplay, slot) => {
 				UnityEngine.Debug.Log(player.Inventory.GetOccupiedSlots(itemDisplay.DisplayedItem).Count());
-				onContextReceived.Invoke(player.Stats);
+				this.OnContextReceived(player.Stats);
 			},
-			onDetached: (itemDisplay, slot) => onContextLost.Invoke(player.Stats)
+			onDetached: (itemDisplay, slot) => this.OnContextLost(player.Stats)
 		));
 	}
 }
