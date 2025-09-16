@@ -19,14 +19,22 @@ namespace SoulboundBackend.Client.UI.Storage {
 		public GameObject GameObject { get; }
 		public bool showTooltip { get; set; }
 
-		public void AttachItemDisplay(ItemDisplay itemDisplay) {
+		internal void AttachItemDisplay(ItemDisplay itemDisplay, bool suppressHook = false) {
 			itemDisplay.transform.SetParent(GameObject.transform, true);
 			itemDisplay.OnRelease();
+			InvocationHelper.If(!suppressHook, () => OnAttached(itemDisplay));
+		}
+
+		private void OnAttached(ItemDisplay itemDisplay) {
 			itemDisplay.DisplayedItem?.GetSlotHook()?.onAttached?.Invoke(itemDisplay, this);
 		}
 
-		public void DetachItemDisplay() {
-			ItemDisplay.DisplayedItem?.GetSlotHook()?.onDetached?.Invoke(ItemDisplay, this);
+		internal void NotifyDeserializedHook() => OnAttached(ItemDisplay);
+
+		internal void DetachItemDisplay(bool suppressHook = false) {
+			if (!suppressHook) {
+				ItemDisplay.DisplayedItem?.GetSlotHook()?.onDetached?.Invoke(ItemDisplay, this);
+			}
 			ItemDisplay.OnGrab();
 			ItemDisplay?.transform.SetParent(GameManager.instance.Player.Inventory.transform, true);
 		}
@@ -46,8 +54,8 @@ namespace SoulboundBackend.Client.UI.Storage {
 			return add;
 		}
 
-		public void CreateDisplay(ItemStack itemStack) {
-			this.AttachItemDisplay(ItemDisplay.Create(itemStack, () => GameObject.transform));
+		public void CreateDisplay(ItemStack itemStack, bool suppressHook = false) {
+			this.AttachItemDisplay(ItemDisplay.Create(itemStack, () => GameObject.transform), suppressHook);
 		}
 
 		public bool CreateDisplayIfEmpty(ItemStack itemStack) {
@@ -85,5 +93,11 @@ namespace SoulboundBackend.Client.UI.Storage {
 		void IPointerUpHandler.OnPointerUp(PointerEventData eventData) => this.OnPointerUp(eventData);
 		void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData) => this.OnPointerEnter(eventData);
 		void IPointerExitHandler.OnPointerExit(PointerEventData eventData) => this.OnPointerExit(eventData);
+	}
+
+	public static class ItemSlotDeserializer {
+		public static void Deserialize(this IItemSlot slot, SerializedItemSlot serialized) {
+			slot.CreateDisplay(serialized.itemStack, suppressHook: true);
+		}
 	}
 }

@@ -18,7 +18,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 		public GameObject GameObject => gameObject;
 
 		public void Deserialize(SerializedItemSlot serialized) {
-			ItemDisplay.Create(serialized.itemStack, this);
+			ItemSlotDeserializer.Deserialize(this, serialized);
 		}
 
 		public void OnInventoryPopup(bool opened) {

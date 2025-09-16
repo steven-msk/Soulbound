@@ -13,6 +13,7 @@ using SoulboundBackend.Client.World.Chunk;
 using SoulboundBackend.Client.World;
 using SoulboundBackend.Common;
 using SoulboundBackend.Client.World.BlockSystem;
+using System.Collections.Generic;
 
 namespace SoulboundBackend.Client {
 	public class PlayerController : LivingEntity, IGameInitializable<PlayerController> {
@@ -184,8 +185,9 @@ namespace SoulboundBackend.Client {
 
 		public override void ApplySerializedProperties(SerializedEntityPropertyList properties) {
 			base.ApplySerializedProperties(properties);
+			List<IItemSlot>? pendingAttachUpdates = null;
 			try {
-				inventory.Deserialize(properties.GetOrThrow<SerializedInventory>("inventory"));
+				pendingAttachUpdates = inventory.Deserialize(properties.GetOrThrow<SerializedInventory>("inventory"));
 				this.stats = properties.GetOrThrow<PlayerStats>("stats");
 			} catch (Exception e) {
 				this.stats = new();
@@ -204,6 +206,7 @@ namespace SoulboundBackend.Client {
 														// If the player were to leave while having the death screen active,
 														// Upon rejoining it would reset their health to max, completely overriding the death state.
 														// Death screen implementation should be prioritized when deserializing.
+				pendingAttachUpdates?.ForEach(s => s.NotifyDeserializedHook());
 			}
 		}
 

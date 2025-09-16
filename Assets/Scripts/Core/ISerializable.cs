@@ -4,4 +4,10 @@
 
 		public void Deserialize(T serialized);
 	}
+
+	public interface ISerializable<TSerialized, TResult> {
+		public TSerialized Serialize();
+
+		public TResult Deserialize(TSerialized serialized);
+	}
 }

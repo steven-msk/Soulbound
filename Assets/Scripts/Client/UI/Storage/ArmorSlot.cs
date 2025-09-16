@@ -41,7 +41,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 		private ArmorItem? CastDisplayed() => this.ItemStack?.item as ArmorItem;
 
 		public override void Deserialize(SerializedItemSlot serialized) {
-			ItemDisplay.Create(serialized.itemStack, this);
+			ItemSlotDeserializer.Deserialize(this, serialized);
 			this.overlay.SetActive(!this.HasItem);
 		}
 	}

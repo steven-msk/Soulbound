@@ -17,7 +17,8 @@ using Logger = SoulboundBackend.Common.Logging.Logger;
 #nullable enable
 
 namespace SoulboundBackend.Client.UI.Storage {
-	public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyInitializable<InventoryController, PlayerController>, ISerializable<SerializedInventory> {
+	public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyInitializable<InventoryController, PlayerController>, 
+			ISerializable<SerializedInventory, List<IItemSlot>> {
 		public delegate void InterpretationFunction(IItemSlot slot, RefBox<ItemDisplay> grabbedItem);
 		public delegate InterpretationFunction? InterpretationProvider(DragHandler handler, IItemSlot draggedSlot, RefBox<ItemDisplay> grabbedItem);
 
@@ -96,34 +97,42 @@ namespace SoulboundBackend.Client.UI.Storage {
 			if (GrabbedContext.value != null) {
 				TryReleaseGrabbed(GrabbedContext.lastKnownSlot);
 			}
+			List<SerializedItemSlot> Serialize<TSlot>(TSlot[] slots) where TSlot : IItemSlot {
+				return slots.Cast<IItemSlot>().Select(s => s.Serialize()).ToList();
+			}
 			ArmorSlot[] armorSlots = this.armorSlots.GetComponentsInChildren<ArmorSlot>(true);
 
 			return new SerializedInventory(hotbar.ActiveKey, new Dictionary<string, List<SerializedItemSlot>>() {
-				["hotbar"] = hotbar.Slots.Cast<IItemSlot>().Select(s => s.Serialize()).ToList(),
-				["popup"] = popupSlots.Flatten().Cast<IItemSlot>().Select(s => s.Serialize()).ToList(),
-				["armor"] = armorSlots.Cast<IItemSlot>().Select(s => s.Serialize()).ToList()
+				["hotbar"] = Serialize(hotbar.Slots),
+				["popup"] = Serialize(popupSlots.Flatten()),
+				["armor"] = Serialize(armorSlots)
 			});
 		}
 
-		public void Deserialize(SerializedInventory serialized) {
-			TryDeserialize("hotbar", serialized.regions, hotbar.GetSlotByIndex);
-			TryDeserialize("popup", serialized.regions, this.GetSlotByIndex);
-			TryDeserialize("armor", serialized.regions, (index) => armorSlotsByIndex[index]);
+		public List<IItemSlot> Deserialize(SerializedInventory serialized) {
+			var pendingUpdates = TryDeserialize("hotbar", serialized.regions, hotbar.GetSlotByIndex)
+				.Concat(TryDeserialize("popup", serialized.regions, this.GetSlotByIndex))
+				.Concat(TryDeserialize("armor", serialized.regions, index => armorSlotsByIndex[index]));
 			hotbar.SetActiveSlot(serialized.lastHotbarIndex);
+			return pendingUpdates.ToList();
 		}
 
-		private void TryDeserialize<TSlot>(string region, Dictionary<string, List<SerializedItemSlot>> regions, Func<int, TSlot> slotSupplier)
+		private IItemSlot[] TryDeserialize<TSlot>(string region, Dictionary<string, List<SerializedItemSlot>> regions, Func<int, TSlot> slotSupplier)
 					where TSlot : MonoBehaviour, IItemSlot {
-			if (regions.TryGetValue(region, out var serializedRegion)) {
-				serializedRegion.ForEach(serialized => {
-					if (serialized.itemStack != null) {
-						IItemSlot slot = slotSupplier.Invoke(serialized.index);
-						slot.Deserialize(serialized);
-					}
-				});
-			} else {
+			List<TSlot> pendingAttachUpdates = new();
+
+			if (!regions.TryGetValue(region, out var serializedRegion)) {
 				logger.LogError(null, "Unknown inventory region: {}", region);
+				return null!;
 			}
+			foreach (var serializedSlot in serializedRegion) {
+				if (serializedSlot.itemStack != null) {
+					TSlot slot = slotSupplier.Invoke(serializedSlot.index);
+					slot.Deserialize(serializedSlot);
+					pendingAttachUpdates.Add(slot);
+				}
+			}
+			return pendingAttachUpdates.ToArray();
 		}
 
 		public void ToggleInventory() {
