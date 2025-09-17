@@ -150,9 +150,14 @@ namespace SoulboundBackend.Client.UI.Storage {
 		}
 
 		public void DropHoveredOrActiveItem() {
-			ItemDisplay? hoveredDisplay = hoveredSlot?.ItemDisplay ?? hotbar.ActiveSlot.ItemDisplay ?? null;
-			hoveredDisplay?.ItemStack.Drop(player.center, player.itemDropForce, true);
-			hoveredDisplay?.Destroy();
+			IItemSlot? slot = hoveredSlot ?? hotbar.ActiveSlot ?? null;
+			if (slot == null) {
+				return;
+			}
+			ItemDisplay hoveredDisplay = slot.ItemDisplay;
+			slot.DetachItemDisplay();
+			hoveredDisplay.ItemStack.Drop(player.center, player.itemDropForce, true);
+			hoveredDisplay.Destroy();
 		}
 
 		// POTENTIAL: OnDrop callback in Item
