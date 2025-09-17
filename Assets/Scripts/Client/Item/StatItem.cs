@@ -10,15 +10,23 @@ namespace SoulboundBackend.Client.ItemSystem {
 
 		public abstract IEnumerable<StatMapping> statMappings { get; }
 
+
 		protected event Action<IStatReceiver>? onContextReceived;
 		protected event Action<IStatReceiver>? onContextLost;
+		protected bool hasContext { get; set; }
 
 		protected void OnContextReceived(IStatReceiver receiver) {
-			onContextReceived?.Invoke(receiver);
+			if (!hasContext) {
+				onContextReceived?.Invoke(receiver);
+				hasContext = true;
+			}
 		}
 
 		protected void OnContextLost(IStatReceiver receiver) {
-			onContextLost?.Invoke(receiver);
+			if (this.hasContext) {
+				onContextLost?.Invoke(receiver);
+			}
+			hasContext = false;
 		}
 
 		//public virtual void ValidateStats() {

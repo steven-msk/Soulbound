@@ -32,11 +32,12 @@ namespace SoulboundBackend.Client.UI.Storage {
 		internal void NotifyDeserializedHook() => OnAttached(ItemDisplay);
 
 		internal void DetachItemDisplay(bool suppressHook = false) {
-			if (!suppressHook) {
-				ItemDisplay.DisplayedItem?.GetSlotHook()?.onDetached?.Invoke(ItemDisplay, this);
-			}
+			ItemDisplay detached = this.ItemDisplay;
 			ItemDisplay.OnGrab();
 			ItemDisplay?.transform.SetParent(GameManager.instance.Player.Inventory.transform, true);
+			if (!suppressHook) {
+				detached.DisplayedItem?.GetSlotHook()?.onDetached?.Invoke(detached, this);
+			}
 		}
 
 		SerializedItemSlot ISerializable<SerializedItemSlot>.Serialize() => new(index, ItemStack);

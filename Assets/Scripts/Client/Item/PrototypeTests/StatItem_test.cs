@@ -50,12 +50,15 @@ public class StatItem_test : StatItem {
 	public override SlotHook GetSlotHook() => new SlotHook(
 		onAttached: (itemDisplay, slot) => {
 			PlayerController player = GameManager.instance.Player;
-			UnityEngine.Debug.Log(player.Inventory.GetOccupiedSlots(itemDisplay.DisplayedItem).Count());
-			this.OnContextReceived(player.Stats);
+			if (player.Inventory.GetOccupiedSlots(this).Count() >= 1) {
+				this.OnContextReceived(player.Stats);
+			}
 		},
 		onDetached: (itemDisplay, slot) => {
 			PlayerController player = GameManager.instance.Player;
-			this.OnContextLost(player.Stats);
+			if (player.Inventory.GetOccupiedSlots(this).Count() == 0) {
+				this.OnContextLost(player.Stats);
+			}
 		}
 	);
 }
