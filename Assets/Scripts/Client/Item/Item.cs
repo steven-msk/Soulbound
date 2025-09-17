@@ -6,11 +6,12 @@ using System.Resources;
 using SoulboundBackend.Core.Resource;
 using ResourceManager = SoulboundBackend.Core.Resource.ResourceManager;
 using SoulboundBackend.Client.UI.Storage;
+using SoulboundBackend.Core;
 
 #nullable enable
 
 namespace SoulboundBackend.Client.ItemSystem {
-	public abstract partial class Item {
+	public abstract partial class Item : IStaticResettable {
 		private static readonly Logger logger = Logger.CreateInstance();
 		public const int DEFAULT_MAX_STACK = 256;
 
@@ -22,10 +23,8 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public bool IsStackable => maxStackSize > 1;
 		protected abstract Func<Item, TooltipData?> tooltipSupplier { get; }
 		protected abstract TooltipRenderer.NodeStyleProvider? nodeStyleProvider { get; }
-		private SlotHook? slotHook;
 
-		public SlotHook? GetSlotHook() => slotHook;
-		public void SetSlotHook(SlotHook? slotHook) => this.slotHook = slotHook;
+		public virtual SlotHook? GetSlotHook() => null;
 
 		public static GameObject InstantiateDefaultWorldPrefab() {
 			return GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.Prefabs>("droppedItem"))!;
@@ -60,6 +59,9 @@ namespace SoulboundBackend.Client.ItemSystem {
 
 		public override int GetHashCode() {
 			return HashCode.Combine(name, aspect, maxStackSize, IsStackable, tooltipSupplier, nodeStyleProvider, id);
+		}
+
+		public virtual void StaticReset() {
 		}
 	}
 

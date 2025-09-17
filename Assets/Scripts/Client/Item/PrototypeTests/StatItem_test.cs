@@ -44,13 +44,18 @@ public class StatItem_test : StatItem {
 			.AddNode(TooltipNode.Title, this.name)
 			.AddNodes(mappingBuilder.ResolveTooltipNodes())
 			.Finish();
-		PlayerController player = GameManager.instance.Player;
-		this.SetSlotHook(new SlotHook(
-			onAttached: (itemDisplay, slot) => {
-				UnityEngine.Debug.Log(player.Inventory.GetOccupiedSlots(itemDisplay.DisplayedItem).Count());
-				this.OnContextReceived(player.Stats);
-			},
-			onDetached: (itemDisplay, slot) => this.OnContextLost(player.Stats)
-		));
+		StaticResetManager.Register(this);
 	}
+
+	public override SlotHook GetSlotHook() => new SlotHook(
+		onAttached: (itemDisplay, slot) => {
+			PlayerController player = GameManager.instance.Player;
+			UnityEngine.Debug.Log(player.Inventory.GetOccupiedSlots(itemDisplay.DisplayedItem).Count());
+			this.OnContextReceived(player.Stats);
+		},
+		onDetached: (itemDisplay, slot) => {
+			PlayerController player = GameManager.instance.Player;
+			this.OnContextLost(player.Stats);
+		}
+	);
 }
