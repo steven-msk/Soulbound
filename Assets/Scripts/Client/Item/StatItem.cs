@@ -1,4 +1,5 @@
 ﻿using SoulboundBackend.Client.Stats;
+using SoulboundBackend.Core;
 using System;
 using System.Collections.Generic;
 
@@ -10,16 +11,15 @@ namespace SoulboundBackend.Client.ItemSystem {
 
 		public abstract IEnumerable<StatMapping> statMappings { get; }
 
-
 		protected event Action<IStatReceiver>? onContextReceived;
 		protected event Action<IStatReceiver>? onContextLost;
 		protected bool hasContext { get; set; }
 
+		protected StatItem() => StaticResetManager.Register(this);
+
 		protected void OnContextReceived(IStatReceiver receiver) {
-			if (!hasContext) {
-				onContextReceived?.Invoke(receiver);
-				hasContext = true;
-			}
+			onContextReceived?.Invoke(receiver);
+			hasContext = true;
 		}
 
 		protected void OnContextLost(IStatReceiver receiver) {
@@ -28,6 +28,8 @@ namespace SoulboundBackend.Client.ItemSystem {
 			}
 			hasContext = false;
 		}
+
+		public override void StaticReset() => hasContext = false;
 
 		//public virtual void ValidateStats() {
 		//    IEnumerable<SerializedStatReference> references = instantStats.Select(stat => stat.SerializedReference);

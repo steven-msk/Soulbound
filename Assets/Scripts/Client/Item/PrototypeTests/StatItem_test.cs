@@ -23,7 +23,7 @@ public class StatItem_test : StatItem {
 
 	protected override TooltipRenderer.NodeStyleProvider nodeStyleProvider => null;
 
-	public StatItem_test() {
+	public StatItem_test() : base() {
 		StatMappingBuilder mappingBuilder = new StatMappingBuilder()
 			.SetStats(() => new DynamicMap<AbstractSerializableStat>() {
 				["physicalDamage"] = new SerializableStat<int>(StatDefinition.PhysicalDamage, 10, StatApplicationType.Percentage, showAsBonus: true)
@@ -44,13 +44,12 @@ public class StatItem_test : StatItem {
 			.AddNode(TooltipNode.Title, this.name)
 			.AddNodes(mappingBuilder.ResolveTooltipNodes())
 			.Finish();
-		StaticResetManager.Register(this);
 	}
 
 	public override SlotHook GetSlotHook() => new SlotHook(
 		onAttached: (itemDisplay, slot) => {
 			PlayerController player = GameManager.instance.Player;
-			if (player.Inventory.GetOccupiedSlots(this).Count() >= 1) {
+			if (player.Inventory.GetOccupiedSlots(this).Count() >= 1 && !this.hasContext) {
 				this.OnContextReceived(player.Stats);
 			}
 		},
