@@ -11,6 +11,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 		// PLANNED REWORK: stat providers trigger other than on hover or select
 		public bool applyInstantStatsOnHoverOrSelect { get; }
 		public IEnumerable<StatMapping> statMappings { get; }
+		public ContextHandle<IStatReceiver> contextHandle { get; }
 
 		public void BeginActivatorContexts(IStatReceiver receiver) {
 			GetActivators().ToList().ForEach(a => a.BeginContext(receiver));

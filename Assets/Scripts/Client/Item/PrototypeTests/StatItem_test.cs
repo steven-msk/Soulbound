@@ -35,8 +35,8 @@ public class StatItem_test : StatItem {
 				["physicalDamageHandler"] = IStatEffectHandler.Static(this, stats["physicalDamage"])
 			})
 			.BindActivator(handlers => new StatActivator(
-				activationBinder: callback => onContextReceived += callback,
-				deactivationBinder: callback => onContextLost += callback,
+				activationBinder: callback => contextHandle.onContextReceived += callback,
+				deactivationBinder: callback => contextHandle.onContextLost += callback,
 				handlers["physicalDamageHandler"]
 			));
 		this.statMappings = mappingBuilder.ResolveMappings();
@@ -50,13 +50,13 @@ public class StatItem_test : StatItem {
 		onAttached: (itemDisplay, slot) => {
 			PlayerController player = GameManager.instance.Player;
 			if (player.Inventory.GetOccupiedSlots(this).Count() >= 1 && !this.hasContext) {
-				this.OnContextReceived(player.Stats);
+				contextHandle.OnContextReceived(player.Stats);
 			}
 		},
 		onDetached: (itemDisplay, slot) => {
 			PlayerController player = GameManager.instance.Player;
 			if (player.Inventory.GetOccupiedSlots(this).Count() == 0) {
-				this.OnContextLost(player.Stats);
+				contextHandle.OnContextLost(player.Stats);
 			}
 		}
 	);
