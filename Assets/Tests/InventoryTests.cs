@@ -1,5 +1,6 @@
 using System.Collections;
 using NUnit.Framework;
+using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Core;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -15,5 +16,18 @@ public class InventoryTests {
 		var inv = GameManager.instance.Player.Inventory;
 		var f = inv.GetFirstEmptySlot();
 		Assert.IsTrue(inv.GetFirstEmptySlot().ItemStack == null, $"{f.name} is not empty");
+	}
+
+	[UnityTest]
+	public IEnumerator CreateItemDisplay_AssignsToFirstEmptySlot_WhenSlotExists() {
+		SceneManager.LoadScene("SampleScene");
+		yield return null;
+		var inv = GameManager.instance?.Player?.Inventory;
+		Assert.IsNotNull(inv, "Inventory never initialized");
+		ItemStack stack = new ItemStack(Items.consumableStatItem_test, 1);
+		var slot = inv.GetFirstEmptySlot();
+		Assert.IsNotNull(slot, "No empty slot available");
+		ItemDisplay display = ItemDisplay.Create(stack, slot);
+		Assert.That(slot.ItemDisplay, Is.EqualTo(display), () => "ItemDisplay did not assign correctly in slot");
 	}
 }
