@@ -8,7 +8,7 @@ using UnityEngine.InputSystem;
 using static PlayerInputActions;
 
 namespace SoulboundBackend.Client.Input {
-	public class InputHandler : MonoBehaviour, IDependencyInitializable<InputHandler, PlayerController> {
+	public class InputHandler : MonoBehaviour, IDependencyBootstrappable<InputHandler, PlayerController> {
 		public PlayerInputActions inputActions { get; private set; }
 
 		public Vector2 MouseScreenPosition { get; private set; }
@@ -35,7 +35,7 @@ namespace SoulboundBackend.Client.Input {
 		private static Dictionary<string, Func<bool>> blockedContexts = new();
 		private static List<InputAction> pausableInputs = new();
 
-		public InputHandler OnGameInit(PlayerController dependency) {
+		public InputHandler OnBootstrap(PlayerController dependency) {
 			requests.Clear();
 			blockedContexts.Clear();
 			pausableInputs.Clear();

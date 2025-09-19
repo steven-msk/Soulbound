@@ -16,7 +16,7 @@ using SoulboundBackend.Client.World.BlockSystem;
 using System.Collections.Generic;
 
 namespace SoulboundBackend.Client {
-	public class PlayerController : LivingEntity, IGameInitializable<PlayerController> {
+	public class PlayerController : LivingEntity, IBootstrappable<PlayerController> {
 		private static readonly Logger logger = Logger.CreateInstance();
 		public override Type entityScriptType => typeof(PlayerController);
 		public override string prefabDefinitionID => "johnny";
@@ -61,10 +61,10 @@ namespace SoulboundBackend.Client {
 
 		public float MaxBlockReach => 5f;
 
-		public PlayerController OnGameInit() {
-			inputHandler = GameObject.Instantiate(inputHandler).OnGameInit(this);
-			inventory = GameManager.instance.UIManager.InstantiateInUILevel(inventory).GetComponent<InventoryController>().OnGameInit(this);
-			playerPhysics = gameObject.GetComponent<PlayerPhysics>().OnGameInit(this);
+		public PlayerController OnBootstrap() {
+			inputHandler = GameObject.Instantiate(inputHandler).OnBootstrap(this);
+			inventory = GameManager.instance.UIManager.InstantiateInUILevel(inventory).GetComponent<InventoryController>().OnBootstrap(this);
+			playerPhysics = gameObject.GetComponent<PlayerPhysics>().OnBootstrap(this);
 			itemUsageHandler = new ItemUsageHandler(this);
 			itemUsageHandler.Register<IConsumable>(ItemUseTrigger.RightClick, (consumable, stack) => consumable.Consume(stack));
 			foreach (ItemUseTrigger trigger in Enum.GetValues(typeof(ItemUseTrigger))) {

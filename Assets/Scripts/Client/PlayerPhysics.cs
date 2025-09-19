@@ -9,7 +9,7 @@ using SoulboundBackend.Common;
 using UnityEngine.UI;
 
 namespace SoulboundBackend.Client {
-	public class PlayerPhysics : MonoBehaviour, IDependencyInitializable<PlayerPhysics, PlayerController> {
+	public class PlayerPhysics : MonoBehaviour, IDependencyBootstrappable<PlayerPhysics, PlayerController> {
 		private static readonly Logger logger = Logger.CreateInstance();
 		private readonly Dictionary<string, (Action<Collision2D> action, Func<bool> validator)> collisionReactionsByTag = new();
 		private readonly Dictionary<int, (Action<Collider2D> action, Func<bool> validator)> triggerReactionsByLayer = new();
@@ -60,7 +60,7 @@ namespace SoulboundBackend.Client {
 
 #nullable enable
 
-		public PlayerPhysics OnGameInit(PlayerController dependency) {
+		public PlayerPhysics OnBootstrap(PlayerController dependency) {
 			player = dependency;
 			inputHandler = player.InputHandler;
 			rb = player.Rigidbody;

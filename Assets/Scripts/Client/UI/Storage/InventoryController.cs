@@ -17,7 +17,7 @@ using Logger = SoulboundBackend.Common.Logging.Logger;
 #nullable enable
 
 namespace SoulboundBackend.Client.UI.Storage {
-	public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyInitializable<InventoryController, PlayerController>, 
+	public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyBootstrappable<InventoryController, PlayerController>, 
 			ISerializable<SerializedInventory, List<IItemSlot>> {
 		public delegate void InterpretationFunction(IItemSlot slot, RefBox<ItemDisplay> grabbedItem);
 		public delegate InterpretationFunction? InterpretationProvider(DragHandler handler, IItemSlot draggedSlot, RefBox<ItemDisplay> grabbedItem);
@@ -58,10 +58,10 @@ namespace SoulboundBackend.Client.UI.Storage {
 		private DragHandler? activeDragHandler;
 		private IItemSlot? hoveredSlot;
 
-		public InventoryController OnGameInit(PlayerController dependency) {
+		public InventoryController OnBootstrap(PlayerController dependency) {
 			this.eventHandler = new InventoryEventHandler();
 			player = dependency;
-			hotbar.OnGameInit(this);
+			hotbar.OnBootstrap(this);
 			popup.SetActive(false);
 			armorSlots.SetActive(false);
 			this.SetupGrid();

@@ -9,7 +9,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace SoulboundBackend.Client.UI.Storage {
-	public class HotbarController : MonoBehaviour, IItemContainer, IDependencyInitializable<HotbarController, InventoryController> {
+	public class HotbarController : MonoBehaviour, IItemContainer, IDependencyBootstrappable<HotbarController, InventoryController> {
 		[Header("Active Slots")]
 		public Color activeSlotColor;
 		public Color activeSlotNumberColor;
@@ -41,7 +41,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 
 #nullable enable
 
-		public HotbarController OnGameInit(InventoryController dependency) {
+		public HotbarController OnBootstrap(InventoryController dependency) {
 			inventory = dependency;
 			this.SetupGrid();
 			return this;

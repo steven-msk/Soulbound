@@ -57,7 +57,7 @@ namespace SoulboundBackend.Core {
 	#else
 			StaticResetManager.ResetAll();
 	#endif
-			this.player = GameObject.Instantiate(playerInstancePrefab).GetComponent<PlayerController>().OnGameInit();
+			this.player = GameObject.Instantiate(playerInstancePrefab).GetComponent<PlayerController>().OnBootstrap();
 			int seed = 745632;           // UnityEngine.Random.Range(int.MinValue, int.MaxValue)
 			WorldDump? worldDump;
 			try {
