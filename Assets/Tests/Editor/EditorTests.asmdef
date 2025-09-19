@@ -1,12 +1,14 @@
 {
-    "name": "Tests",
+    "name": "EditorTests",
     "rootNamespace": "",
     "references": [
-        "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "SoulboundBackend"
+        "SoulboundBackend",
+        "UnityEngine.TestRunner"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,
