@@ -8,7 +8,7 @@ using UnityEngine.Tilemaps;
 using Logger = SoulboundBackend.Common.Logging.Logger;
 
 namespace SoulboundBackend.Core.Resource {
-	public static class ResourceGroups {
+	public static partial class ResourceGroups {
 		private static readonly Logger logger = Logger.CreateInstance();
 		static Dictionary<Type, string> addressesByGroupType = new(); 
 		static Dictionary<string, ResourceGroup> groupsByAddress = new();
@@ -40,7 +40,7 @@ namespace SoulboundBackend.Core.Resource {
 
 		public static string GetAddressFromGroupDefinition<TGroup>() => addressesByGroupType[typeof(TGroup)];
 
-		static void RegisterGroupDefinition<TGroup, TAsset>(TGroup group)
+		public static void RegisterGroupDefinition<TGroup, TAsset>(TGroup group)
 				where TAsset : UnityEngine.Object
 				where TGroup : IResourceGroupDefinition<TAsset> {
 			if (addressesByGroupType.TryAdd(typeof(TGroup), group.address)) {

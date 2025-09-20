@@ -13,8 +13,7 @@ namespace SoulboundBackend.Core.Resource {
 		private static readonly Logger logger = Logger.CreateInstance();
 		public string groupAddress = "";
 		public string searchFolder = "Assets/Resources/";
-		[SerializeField] private string assetType = "";
-		public Type AssetType => string.IsNullOrEmpty(assetType) ? null! : Type.GetType(assetType);
+		public string assetType = "";
 		[SerializeField] private Object[] resources;
 
 #nullable enable
