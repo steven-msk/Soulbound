@@ -54,8 +54,17 @@ namespace SoulboundBackend.Core.Resource {
 			return groupsByAddress[address];
 		}
 
+		public static class Runtime {
+			const string parentAddress = "runtime/";
+			public sealed class Prefabs : IResourceGroupDefinition<GameObject> {
+				public static readonly Prefabs instance = new();
+				static Prefabs() => RegisterGroupDefinition<Prefabs, GameObject>(instance);
+				public string address => $"{Runtime.parentAddress}prefabs/";
+			}
+		}
+
 		public static class Items {
-			private static string parentAddress = "items/";
+			const string parentAddress = "items/";
 
 			public sealed class Icons : IResourceGroupDefinition<Sprite> {
 				public static readonly Icons instance = new();
