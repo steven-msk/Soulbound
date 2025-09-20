@@ -7,9 +7,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using SoulboundBackend.Common;
 using UnityEngine.UI;
+using SoulboundBackend.Core.Bootstrap;
 
 namespace SoulboundBackend.Client {
-	public class PlayerPhysics : MonoBehaviour, IDependencyBootstrappable<PlayerPhysics, PlayerController> {
+	[BootstrappableChildOf(typeof(PlayerController))]
+	public class PlayerPhysics : MonoBehaviour, IBootstrappable {
 		private static readonly Logger logger = Logger.CreateInstance();
 		private readonly Dictionary<string, (Action<Collision2D> action, Func<bool> validator)> collisionReactionsByTag = new();
 		private readonly Dictionary<int, (Action<Collider2D> action, Func<bool> validator)> triggerReactionsByLayer = new();
@@ -60,9 +62,9 @@ namespace SoulboundBackend.Client {
 
 #nullable enable
 
-		public PlayerPhysics OnBootstrap(PlayerController dependency) {
-			player = dependency;
-			inputHandler = player.InputHandler;
+		public void OnBootstrap(DependencyContainer dependencyContainer) {
+			player = dependencyContainer.Resolve<PlayerController>();
+			inputHandler = dependencyContainer.Resolve<InputHandler>();
 			rb = player.Rigidbody;
 			animator = player.Animator;
 			collider = this.GetComponent<CapsuleCollider2D>();
@@ -89,15 +91,13 @@ namespace SoulboundBackend.Client {
 				rb.linearVelocity = bounce * contactBouncePower;
 				knockbackStunTimer = knockbackStunDuration * Mathf.Clamp(Mathf.Abs(bounce.y), 0.1f, 1f);
 			}, () => !player.isImmune));
+		}
 
-			return this;
+		public void OnEarlyBootstrap(DependencyContainer dependencyContainer) {
+			dependencyContainer.Register<PlayerPhysics>(this);
 		}
 
 		// FIXME: inconsistent movement
-
-		private void Start() {
-			UnityEngine.Debug.Assert(inputHandler.isActiveAndEnabled, inputHandler);
-		}
 
 		private void Update() {
 			if (GameManager.instance.IsPaused) {

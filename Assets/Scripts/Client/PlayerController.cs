@@ -14,9 +14,14 @@ using SoulboundBackend.Client.World;
 using SoulboundBackend.Common;
 using SoulboundBackend.Client.World.BlockSystem;
 using System.Collections.Generic;
+using SoulboundBackend.Core.Bootstrap;
 
 namespace SoulboundBackend.Client {
-	public class PlayerController : LivingEntity, IBootstrappable<PlayerController> {
+	[BootstrappableParentOf(typeof(InputHandler))]
+	[BootstrappableParentOf(typeof(InventoryController))]
+	[BootstrappableParentOf(typeof(PlayerPhysics))]
+	[BootstrappableParentOf(typeof(ItemUsageHandler))]
+    public class PlayerController : LivingEntity, IBootstrappable {
 		private static readonly Logger logger = Logger.CreateInstance();
 		public override Type entityScriptType => typeof(PlayerController);
 		public override string prefabDefinitionID => "johnny";
@@ -61,26 +66,35 @@ namespace SoulboundBackend.Client {
 
 		public float MaxBlockReach => 5f;
 
-		public PlayerController OnBootstrap() {
-			inputHandler = GameObject.Instantiate(inputHandler).OnBootstrap(this);
-			inventory = GameManager.instance.UIManager.InstantiateInUILevel(inventory).GetComponent<InventoryController>().OnBootstrap(this);
-			playerPhysics = gameObject.GetComponent<PlayerPhysics>().OnBootstrap(this);
-			itemUsageHandler = new ItemUsageHandler(this);
-			itemUsageHandler.Register<IConsumable>(ItemUseTrigger.RightClick, (consumable, stack) => consumable.Consume(stack));
-			foreach (ItemUseTrigger trigger in Enum.GetValues(typeof(ItemUseTrigger))) {
-				itemUsageHandler.Register<IAttackPerformer>(trigger, (attackPerformer, stack) => {
-					InvocationHelper.If(CanAttack, () => attackPerformer.PerformAttack(trigger));
-				});
-			}
-			itemUsageHandler.Register<IPlaceable>(ItemUseTrigger.LeftHold, (placeable, stack) => {
-				Level level = GameManager.instance.Level;
-				BlockPos blockPos = level.ToBlockPos(inputHandler.MouseWorldPosition);
+		public void OnBootstrap(DependencyContainer dependencyContainer) {
+			inputHandler = dependencyContainer.Resolve<InputHandler>();
+			inventory = dependencyContainer.Resolve<InventoryController>();
+			playerPhysics = dependencyContainer.Resolve<PlayerPhysics>();
+			itemUsageHandler = dependencyContainer.Resolve<ItemUsageHandler>();
 
-				if (CanPlaceBlockAt(blockPos)) {
-					level.SetBlock(blockPos, placeable.Place(stack, blockPos));
-				}
-			});
-			return this;
+			//inputHandler = GameObject.Instantiate(inputHandler).OnBootstrap(this);
+			//inventory = GameManager.instance.UIManager.InstantiateInUILevel(inventory).GetComponent<InventoryController>().OnBootstrap(this);
+			//playerPhysics = gameObject.GetComponent<PlayerPhysics>().OnBootstrap(this);
+			//itemUsageHandler = new ItemUsageHandler(this);
+
+			//itemUsageHandler.Register<IConsumable>(ItemUseTrigger.RightClick, (consumable, stack) => consumable.Consume(stack));
+			//foreach (ItemUseTrigger trigger in Enum.GetValues(typeof(ItemUseTrigger))) {
+			//	itemUsageHandler.Register<IAttackPerformer>(trigger, (attackPerformer, stack) => {
+			//		InvocationHelper.If(CanAttack, () => attackPerformer.PerformAttack(trigger));
+			//	});
+			//}
+			//itemUsageHandler.Register<IPlaceable>(ItemUseTrigger.LeftHold, (placeable, stack) => {
+			//	Level level = GameManager.instance.Level;
+			//	BlockPos blockPos = level.ToBlockPos(inputHandler.MouseWorldPosition);
+
+			//	if (CanPlaceBlockAt(blockPos)) {
+			//		level.SetBlock(blockPos, placeable.Place(stack, blockPos));
+			//	}
+			//});
+		}
+
+		public void OnEarlyBootstrap(DependencyContainer dependencyContainer) {
+			dependencyContainer.Register<PlayerController>(this);
 		}
 
 		protected override void Update() {

@@ -1,6 +1,7 @@
 using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core;
+using SoulboundBackend.Core.Bootstrap;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,8 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace SoulboundBackend.Client.UI.Storage {
-	public class HotbarController : MonoBehaviour, IItemContainer, IDependencyBootstrappable<HotbarController, InventoryController> {
+	[BootstrappableChildOf(typeof(InventoryController))]
+	public class HotbarController : MonoBehaviour, IItemContainer, IBootstrappable {
 		[Header("Active Slots")]
 		public Color activeSlotColor;
 		public Color activeSlotNumberColor;
@@ -41,10 +43,13 @@ namespace SoulboundBackend.Client.UI.Storage {
 
 #nullable enable
 
-		public HotbarController OnBootstrap(InventoryController dependency) {
-			inventory = dependency;
+		public void OnBootstrap(DependencyContainer dependencyContainer) {
+			inventory = dependencyContainer.Resolve<InventoryController>();
 			this.SetupGrid();
-			return this;
+		}
+
+		public void OnEarlyBootstrap(DependencyContainer dependencyContainer) {
+			dependencyContainer.Register<HotbarController>(this);
 		}
 
 		public void SetupGrid() {

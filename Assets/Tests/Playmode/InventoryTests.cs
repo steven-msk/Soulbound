@@ -26,7 +26,7 @@ public class InventoryTests {
 		InventoryController inventory = GameObject.Instantiate(invPrefab).GetComponent<InventoryController>();
 		Assert.That(inventory != null, () => "Could not instantiate InventoryController");
 
-		inventory.OnBootstrap(player);
+		//inventory.OnBootstrap(player);
 
 		var f = inventory.GetFirstEmptySlot();
 		Assert.IsTrue(inventory.GetFirstEmptySlot().ItemStack == null, $"{f.name} is not empty");
@@ -42,7 +42,7 @@ public class InventoryTests {
 		Assert.That(invPrefab != null, () => "Could not find Inventory prefab");
 		InventoryController inventory = GameObject.Instantiate(invPrefab).GetComponent<InventoryController>();
 		Assert.That(inventory != null, () => "Could not instantiate InventoryController");
-		inventory.OnBootstrap(player);
+		//inventory.OnBootstrap(player);
 
 		ItemStack stack = new ItemStack(Items.consumableStatItem_test, 1);
 		var slot = inventory.GetFirstEmptySlot();

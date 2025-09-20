@@ -1,17 +1,21 @@
+using SoulboundBackend.Client;
+using SoulboundBackend.Client.Input;
+using SoulboundBackend.Client.ItemSystem;
+using SoulboundBackend.Client.UI;
+using SoulboundBackend.Client.UI.Storage;
 using SoulboundBackend.Client.World;
+using SoulboundBackend.Common;
+using SoulboundBackend.Common.Json;
+using SoulboundBackend.Core.Bootstrap;
+using SoulboundBackend.Core.Resource;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using Unity.Plastic.Newtonsoft.Json;
-using Logger = SoulboundBackend.Common.Logging.Logger;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using SoulboundBackend.Client;
-using SoulboundBackend.Client.UI;
-using SoulboundBackend.Common.Json;
-using SoulboundBackend.Core.Resource;
-using SoulboundBackend.Common;
-using SoulboundBackend.Client.Input;
+using Logger = SoulboundBackend.Common.Logging.Logger;
 
 namespace SoulboundBackend.Core {
 	public class GameManager : MonoBehaviour {
@@ -57,8 +61,21 @@ namespace SoulboundBackend.Core {
 	#else
 			StaticResetManager.ResetAll();
 	#endif
-			this.player = GameObject.Instantiate(playerInstancePrefab).GetComponent<PlayerController>().OnBootstrap();
-			int seed = 745632;           // UnityEngine.Random.Range(int.MinValue, int.MaxValue)
+			this.player = GameObject.Instantiate(playerInstancePrefab).GetComponent<PlayerController>();
+			var inventory = UIManager.InstantiateInUILevel(player.Inventory).GetComponent<InventoryController>();
+			var hotbar = inventory.Hotbar;
+            var inputHandler = GameObject.Instantiate(player.InputHandler).GetComponent<InputHandler>();
+			var playerPhysics = player.GetComponent<PlayerPhysics>();
+			var itemUsageHandler = new ItemUsageHandler(player);
+
+			List<IBootstrappable> bootstrappables = new() { player, inventory, hotbar, inputHandler, playerPhysics, itemUsageHandler };
+			BootstrapTreeBuilder bootstrapTreeBuilder = new(bootstrappables);
+			var tree = bootstrapTreeBuilder.BuildTree<BootstrappableParentOfAttribute>(typeof(PlayerController));
+			Bootstrapper bootstrapper = new Bootstrapper();
+			DependencyContainer dependencyContainer = bootstrapper.EarlyBootstrap(tree);
+			bootstrapper.Bootstrap(tree, dependencyContainer);
+
+            int seed = 745632;           // UnityEngine.Random.Range(int.MinValue, int.MaxValue)
 			WorldDump? worldDump;
 			try {
 				worldDump = JsonConvert.DeserializeObject<WorldDump>(File.ReadAllText(Level.worldDumpFile), globalJsonSettings);

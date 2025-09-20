@@ -1,10 +1,15 @@
 ﻿using SoulboundBackend.Client;
+using SoulboundBackend.Client.World;
+using SoulboundBackend.Common;
+using SoulboundBackend.Core;
+using SoulboundBackend.Core.Bootstrap;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace SoulboundBackend.Client.ItemSystem {
-	public sealed class ItemUsageHandler {
+	[BootstrappableChildOf(typeof(PlayerController))]
+    public sealed class ItemUsageHandler : IBootstrappable {
 		private readonly Dictionary<(Type itemCapability, ItemUseTrigger useTrigger), Action<ItemStack>> handlers = new();
 		private readonly List<ItemUseTrigger> disabledTriggers = new();
 		private readonly PlayerController player;
@@ -43,6 +48,27 @@ namespace SoulboundBackend.Client.ItemSystem {
 		}
 
 		public bool IsDisabled(ItemUseTrigger trigger) => disabledTriggers.Contains((trigger));
-	}
+
+        public void OnBootstrap(DependencyContainer dependencyContainer) {
+            Register<IConsumable>(ItemUseTrigger.RightClick, (consumable, stack) => consumable.Consume(stack));
+            foreach (ItemUseTrigger trigger in Enum.GetValues(typeof(ItemUseTrigger))) {
+                Register<IAttackPerformer>(trigger, (attackPerformer, stack) => {
+                    InvocationHelper.If(player.CanAttack, () => attackPerformer.PerformAttack(trigger));
+                });
+            }
+            Register<IPlaceable>(ItemUseTrigger.LeftHold, (placeable, stack) => {
+                Level level = GameManager.instance.Level;
+                BlockPos blockPos = level.ToBlockPos(player.InputHandler.MouseWorldPosition);
+
+                if (player.CanPlaceBlockAt(blockPos)) {
+                    level.SetBlock(blockPos, placeable.Place(stack, blockPos));
+                }
+            });
+        }
+
+        public void OnEarlyBootstrap(DependencyContainer dependencyContainer) {
+			dependencyContainer.Register<ItemUsageHandler>(this);
+        }
+    }
 }
 

@@ -3,6 +3,7 @@ using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Common;
 using SoulboundBackend.Common.UI.Storage;
 using SoulboundBackend.Core;
+using SoulboundBackend.Core.Bootstrap;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,8 +18,9 @@ using Logger = SoulboundBackend.Common.Logging.Logger;
 #nullable enable
 
 namespace SoulboundBackend.Client.UI.Storage {
-	public class InventoryController : MonoBehaviour, IItemContainer2D, IDependencyBootstrappable<InventoryController, PlayerController>, 
-			ISerializable<SerializedInventory, List<IItemSlot>> {
+	[BootstrappableChildOf(typeof(PlayerController))]
+	[BootstrappableParentOf(typeof(HotbarController))]
+    public class InventoryController : MonoBehaviour, IItemContainer2D, IBootstrappable, ISerializable<SerializedInventory, List<IItemSlot>> {
 		public delegate void InterpretationFunction(IItemSlot slot, RefBox<ItemDisplay> grabbedItem);
 		public delegate InterpretationFunction? InterpretationProvider(DragHandler handler, IItemSlot draggedSlot, RefBox<ItemDisplay> grabbedItem);
 
@@ -58,10 +60,10 @@ namespace SoulboundBackend.Client.UI.Storage {
 		private DragHandler? activeDragHandler;
 		private IItemSlot? hoveredSlot;
 
-		public InventoryController OnBootstrap(PlayerController dependency) {
+		public void OnBootstrap(DependencyContainer dependencyContainer) {
 			this.eventHandler = new InventoryEventHandler();
-			player = dependency;
-			hotbar.OnBootstrap(this);
+			player = dependencyContainer.Resolve<PlayerController>();
+			//hotbar.OnBootstrap(this);
 			popup.SetActive(false);
 			armorSlots.SetActive(false);
 			this.SetupGrid();
@@ -70,7 +72,10 @@ namespace SoulboundBackend.Client.UI.Storage {
 			mainPlayerSlots.AddRange(popupSlots);
 			MainPlayerSlots = mainPlayerSlots.ToArray();
 			hotbar.SetActiveSlot(0);
-			return this;
+		}
+
+		public void OnEarlyBootstrap(DependencyContainer dependencyContainer) {
+			dependencyContainer.Register<InventoryController>(this);
 		}
 
 		public void SetupGrid() {

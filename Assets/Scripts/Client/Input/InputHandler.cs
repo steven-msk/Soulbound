@@ -1,5 +1,6 @@
 ﻿using SoulboundBackend.Common;
 using SoulboundBackend.Core;
+using SoulboundBackend.Core.Bootstrap;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,8 @@ using UnityEngine.InputSystem;
 using static PlayerInputActions;
 
 namespace SoulboundBackend.Client.Input {
-	public class InputHandler : MonoBehaviour, IDependencyBootstrappable<InputHandler, PlayerController> {
+	[BootstrappableChildOf(typeof(PlayerController))]
+	public class InputHandler : MonoBehaviour, IBootstrappable {
 		public PlayerInputActions inputActions { get; private set; }
 
 		public Vector2 MouseScreenPosition { get; private set; }
@@ -35,14 +37,14 @@ namespace SoulboundBackend.Client.Input {
 		private static Dictionary<string, Func<bool>> blockedContexts = new();
 		private static List<InputAction> pausableInputs = new();
 
-		public InputHandler OnBootstrap(PlayerController dependency) {
+		public void OnBootstrap(DependencyContainer dependencyContainer) {
 			requests.Clear();
 			blockedContexts.Clear();
 			pausableInputs.Clear();
 
 			inputActions = new PlayerInputActions();
 			PlayerActions playerActions = inputActions.Player;
-			PlayerController player = dependency;
+			PlayerController player = dependencyContainer.Resolve<PlayerController>();
 
 			RegisterInputEvent(playerActions.MousePosition, pausable: false, (action) => {
 				action.performed += actionContext => MouseScreenPosition = actionContext.ReadValue<Vector2>();
@@ -96,7 +98,10 @@ namespace SoulboundBackend.Client.Input {
 			});
 
 			inputActions.Enable();
-			return this;
+		}
+
+		public void OnEarlyBootstrap(DependencyContainer dependencyContainer) {
+			dependencyContainer.Register<InputHandler>(this);
 		}
 
 		private static void RegisterInputEvent(InputAction inputAction, bool pausable, Action<InputAction> callbackBinding) {
@@ -105,7 +110,6 @@ namespace SoulboundBackend.Client.Input {
 			}
 			callbackBinding.Invoke(inputAction);
 		}
-
 
 		public static void BlockContext(string context, Func<bool> unblockPredicate) => blockedContexts[context] = unblockPredicate;
 
