@@ -63,7 +63,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 		public void OnBootstrap(DependencyContainer dependencyContainer) {
 			this.eventHandler = new InventoryEventHandler();
 			player = dependencyContainer.Resolve<PlayerController>();
-			//hotbar.OnBootstrap(this);
+			hotbar.OnBootstrap(dependencyContainer);
 			popup.SetActive(false);
 			armorSlots.SetActive(false);
 			this.SetupGrid();
