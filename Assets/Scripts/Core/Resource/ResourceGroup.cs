@@ -46,11 +46,6 @@ namespace SoulboundBackend.Core.Resource {
 		static ResourceGroup() {
 			logger.LogInfo(LogModules.resource, "ResourceGroup type loaded");
 		}
-
-		private void OnEnable() {
-			ResourceGroups.RegisterGroupByAddress(this);
-			logger.LogInfo(LogModules.resource, "Registered resource group with address '{}'", groupAddress);
-		}
 	}
 }
 

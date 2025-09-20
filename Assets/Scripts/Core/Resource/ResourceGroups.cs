@@ -12,10 +12,21 @@ namespace SoulboundBackend.Core.Resource {
 		private static readonly Logger logger = Logger.CreateInstance();
 		static Dictionary<Type, string> addressesByGroupType = new();
 		static Dictionary<string, ResourceGroup> groupsByAddress = new();
+		static bool bootstrapped = false;
 
 		public static void Bootstrap() {
+			if (bootstrapped) {
+				logger.LogInfo(LogModules.resource, "Resource group types already bootstrapped, skipping");
+				return;
+			}
+
 			logger.LogInfo(LogModules.resource, "Bootstrapping resource group types");
-			Resources.LoadAll<ResourceGroup>("Resources/");
+			ResourceGroup[] groups = Resources.LoadAll<ResourceGroup>("");
+			logger.LogInfo(LogModules.resource, "Found {} resource group instances", groups.Length);
+			foreach (var group in groups) {
+				groupsByAddress.Add(group.groupAddress, group);
+			}
+
 			var groupTypes = AppDomain.CurrentDomain.GetAssemblies()
 				.SelectMany(a => a.GetTypes())
 				.Where(t => t.IsClass && !t.IsAbstract)
@@ -24,6 +35,7 @@ namespace SoulboundBackend.Core.Resource {
 			foreach (var type in groupTypes) {
 				System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(type.TypeHandle);
 			}
+			bootstrapped = true;
 		}
 
 		public static string GetAddressFromGroupDefinition<TGroup>() => addressesByGroupType[typeof(TGroup)];
@@ -68,10 +80,6 @@ namespace SoulboundBackend.Core.Resource {
 			public static readonly Fonts instance = new();
 			static Fonts() => RegisterGroupDefinition<Fonts, TMP_FontAsset>(instance);
 			public string address => "fonts/";
-		}
-
-		public interface IResourceGroupDefinition<TAsset> where TAsset : UnityEngine.Object {
-			public string address { get; }
 		}
 	}
 }

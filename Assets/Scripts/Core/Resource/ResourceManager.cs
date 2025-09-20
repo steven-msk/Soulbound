@@ -5,7 +5,7 @@ namespace SoulboundBackend.Core.Resource {
 
 		public static TAsset? Get<TAsset, TGroup>(string name)
 				where TAsset : UnityEngine.Object
-				where TGroup : ResourceGroups.IResourceGroupDefinition<TAsset> {
+				where TGroup : IResourceGroupDefinition<TAsset> {
 			string address = ResourceGroups.GetAddressFromGroupDefinition<TGroup>();
 			ResourceGroup group = ResourceGroups.GetGroupByAddress(address);
 			return group.GetAsset<TAsset>(name);
