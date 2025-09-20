@@ -36,12 +36,12 @@ namespace SoulboundBackend.Client.ItemSystem {
 			if (item.IsStackable) {
 				text!.autoSizeTextContainer = true;
 				text.text = quantity.ToString();
-				InventoryController inventory = GameManager.instance.Player.Inventory;
+				//InventoryController inventory = GameManager.instance.Player.Inventory;
 				Color textColor = Color.white;
 				InventorySlot hotbarSlot = parent.GetComponentInParent<InventorySlot>();
-				if (!inventory.IsOpened && hotbarSlot != null && inventory.Hotbar.ActiveSlot != hotbarSlot) {
-					textColor = inventory.Hotbar.inactiveSlotNumberColor;
-				}
+				//if (!inventory.IsOpened && hotbarSlot != null && inventory.Hotbar.ActiveSlot != hotbarSlot) {
+				//	textColor = inventory.Hotbar.inactiveSlotNumberColor;
+				//}
 				text.color = textColor;
 				rectTransform.pivot = new Vector2(1f, 0f);
 				rectTransform.anchorMax = new Vector2(0.9375f, 0.0625f);
