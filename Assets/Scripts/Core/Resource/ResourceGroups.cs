@@ -10,7 +10,7 @@ using Logger = SoulboundBackend.Common.Logging.Logger;
 namespace SoulboundBackend.Core.Resource {
 	public static class ResourceGroups {
 		private static readonly Logger logger = Logger.CreateInstance();
-		static Dictionary<Type, string> addressesByGroupType = new();
+		static Dictionary<Type, string> addressesByGroupType = new(); 
 		static Dictionary<string, ResourceGroup> groupsByAddress = new();
 		static bool bootstrapped = false;
 

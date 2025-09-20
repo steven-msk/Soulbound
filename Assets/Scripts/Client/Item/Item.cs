@@ -15,8 +15,6 @@ namespace SoulboundBackend.Client.ItemSystem {
 		private static readonly Logger logger = Logger.CreateInstance();
 		public const int DEFAULT_MAX_STACK = 256;
 
-		// FIXME: mismatched README version - item dev notes are obsolete
-
 		public abstract string name { get; }
 		public abstract ItemAspect aspect { get; }
 		public abstract int maxStackSize { get; }

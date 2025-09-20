@@ -18,8 +18,6 @@ namespace SoulboundBackend.Client.Debug {
 		this.level = GameManager.instance.Level;
 	}
 
-    // TODO: rework debug visuals - make it so its not painful to look at coordinates while moving
-
     private void Update() {
 
 		// FIXME: unexpected null reference exceptions with debug visual components

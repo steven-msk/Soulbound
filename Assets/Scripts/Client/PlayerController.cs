@@ -92,14 +92,7 @@ namespace SoulboundBackend.Client {
 			if (MainHandStack == itemStack) {
 				return;
 			}
-			static void InvokeStatItem(ItemStack? itemStack, Action<IStatProvider> statProviderAction) {
-				if (itemStack?.item is IStatProvider statProvider && statProvider.applyInstantStatsOnHoverOrSelect) {
-					statProviderAction.Invoke(statProvider);
-				}
-			}
-			//InvokeStatItem(MainHandStack, statProvider => statProvider.RevokeStats(this.stats));
 			MainHandStack = itemStack;
-			//InvokeStatItem(MainHandStack, statProvider => statProvider.ApplyStats(this.stats));
 		}
 
 		[InputAction("ItemUse", Priority = 5)]
