@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SoulboundBackend.Core.Bootstrap {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    public class BootstrappableParentOfAttribute : Attribute, IBootstrappableNodeIndicator {
+    public class BootstrappableParentOfAttribute : Attribute, IBootstrappableNodeHandle {
         public Type Dependency { get; }
 
         public BootstrappableParentOfAttribute(Type dependency) {
