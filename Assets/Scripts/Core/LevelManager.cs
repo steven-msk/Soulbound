@@ -56,11 +56,11 @@ namespace SoulboundBackend.Core {
 			},
 		};
 
-		public void Init(List<IBootstrappable> bootstrappables, Func<BootstrapTreeBuilder, IEnumerable<IBootstrappable>> treeFunc) {
+		public void Init(BootstrappableInstanceFactory instanceFactory, Func<BootstrapTreeBuilder, IEnumerable<IBootstrappable>> treeFunc) {
             instance = this;
 
             Bootstrapper bootstrapper = new();
-			BootstrapTreeBuilder treeBuilder = new(bootstrappables);
+			BootstrapTreeBuilder treeBuilder = new(null, instanceFactory);
 			var tree = treeFunc.Invoke(treeBuilder).ToList();
 			
 			DependencyContainer dependencyContainer = bootstrapper.EarlyBootstrap(tree);

@@ -9,10 +9,12 @@ using System.Xml;
 namespace SoulboundBackend.Core.Bootstrap {
 	public class BootstrapTreeBuilder {
 		private readonly Dictionary<Type, IBootstrappable> registry;
+		private readonly BootstrappableInstanceFactory instanceFactory;
 
-		public BootstrapTreeBuilder(IEnumerable<IBootstrappable> bootstrappables) {
-			registry = bootstrappables.ToDictionary(b => b.GetType());
-		}
+        public BootstrapTreeBuilder(IEnumerable<IBootstrappable> bootstrappables, BootstrappableInstanceFactory instanceFactory) {
+			registry = bootstrappables?.ToDictionary(b => b.GetType()) ?? new Dictionary<Type, IBootstrappable>();
+			this.instanceFactory = instanceFactory;
+        }
 
 		public List<IBootstrappable> BuildTree<THandle>(Type startType) where THandle : Attribute, IBootstrappableNodeHandle {
 			var result = new List<IBootstrappable>();
@@ -30,7 +32,7 @@ namespace SoulboundBackend.Core.Bootstrap {
 			foreach (var req in requires) {
 				BuildRecursive(req.Dependency, list, visited, handle);
 			}
-			list.Add(registry[type]);
-		}
+			list.Add(registry.GetValueOrDefault(type) ?? instanceFactory.Create(type));
+        }
 	}
 }

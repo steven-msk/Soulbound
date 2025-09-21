@@ -14,33 +14,47 @@ using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public sealed class GameEntryPoint : MonoBehaviour {
+public sealed class GameEntryPoint : MonoBehaviour, IStaticResettable {
     private LevelManager levelManager;
+    private static BootstrappableInstanceFactory defaultInstanceFactory = null;
 
-    private void Awake() {
-#if !UNITY_EDITOR
-			ResourceGroups.Bootstrap();
-#else
-        StaticResetManager.ResetAll();
-#endif
+    public static BootstrappableInstanceFactory DefaultInstanceFactory(LevelManager levelManager) {
+        if (defaultInstanceFactory != null) {
+            return defaultInstanceFactory;
+        }
+        BootstrappableInstanceFactory factory = new();
         var playerInstancePrefab = ResourceManager.Get<GameObject, ResourceGroups.Runtime.Prefabs>("player");
-        var uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
+        var uiManager = (GameObject.FindWithTag("MainCanvas") 
+            ?? GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.Runtime.Prefabs>("Canvas")))
+            .GetComponent<UIManager>();
 
         var player = GameObject.Instantiate(playerInstancePrefab).GetComponent<PlayerController>();
         var inventory = uiManager.InstantiateInUILevel(player.Inventory).GetComponent<InventoryController>();
-        var hotbar = inventory.Hotbar;
-        var inputHandler = GameObject.Instantiate(player.InputHandler).GetComponent<InputHandler>();
-        var playerPhysics = player.GetComponent<PlayerPhysics>();
-        var itemUsageHandler = new ItemUsageHandler(player);
 
+        factory.Register<LevelManager>(() => levelManager);
+        factory.Register<PlayerController>(() => player);
+        factory.Register<InventoryController>(() => inventory);
+        factory.Register<HotbarController>(() => inventory.Hotbar);
+        factory.Register<PlayerPhysics>(() => player.GetComponent<PlayerPhysics>());
+        factory.Register<InputHandler>(() => GameObject.Instantiate(player.InputHandler).GetComponent<InputHandler>());
+        factory.Register<ItemUsageHandler>(() => new ItemUsageHandler(player));
+
+        defaultInstanceFactory = factory;
+        return factory;
+    }
+
+    private void Awake() {
         GameObject levelManagerPrefab = ResourceManager.Get<GameObject, ResourceGroups.Runtime.Prefabs>("levelManager");
         this.levelManager = GameObject.Instantiate(levelManagerPrefab).GetComponent<LevelManager>();
-        List<IBootstrappable> bootstrappables = new() {
-            player, inventory, hotbar, inputHandler, playerPhysics, itemUsageHandler, levelManager
-        };
-        levelManager.Init(bootstrappables, treeBuilder => treeBuilder.BuildTree<BootstrappableParentOfAttribute>(typeof(LevelManager)));
+        levelManager.Init(DefaultInstanceFactory(levelManager), treeBuilder => treeBuilder.BuildTree<BootstrappableParentOfAttribute>(typeof(LevelManager)));
         levelManager.BootstrapWorld();
     }
 
-    private void OnValidate() => ResourceGroups.Bootstrap();
+    private void OnValidate() {
+        StaticResetManager.Register(this);
+        StaticResetManager.ResetAll();
+        ResourceGroups.Bootstrap();
+    }
+
+    public void StaticReset() => defaultInstanceFactory = null;
 }

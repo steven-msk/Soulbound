@@ -2,6 +2,7 @@
 using SoulboundBackend.Client;
 using SoulboundBackend.Client.Input;
 using SoulboundBackend.Client.ItemSystem;
+using SoulboundBackend.Client.UI;
 using SoulboundBackend.Client.UI.Storage;
 using SoulboundBackend.Core;
 using SoulboundBackend.Core.Bootstrap;
@@ -20,18 +21,12 @@ public class InventoryTests {
 	private InventoryController CreateTestEnvironment() {
         SceneManager.SetActiveScene(SceneManager.CreateScene(Guid.NewGuid().ToString()));
 
-        GameObject playerPrefab = ResourceManager.Get<GameObject, ResourceGroups.Runtime.Prefabs>("player");
-        PlayerController player = GameObject.Instantiate(playerPrefab).GetComponent<PlayerController>();
-        InventoryController inventory = GameObject.Instantiate(player.Inventory).GetComponent<InventoryController>();
-
         GameObject levelManagerPrefab = ResourceManager.Get<GameObject, ResourceGroups.Runtime.Prefabs>("levelManager");
         var levelManager = GameObject.Instantiate(levelManagerPrefab).GetComponent<LevelManager>();
-        List<IBootstrappable> bootstrappables = new() {
-            player, inventory, levelManager
-        };
-        levelManager.Init(bootstrappables, treeBuilder => treeBuilder.BuildTree<BootstrappableChildOfAttribute>(typeof(InventoryController)));
+        levelManager.Init(GameEntryPoint.DefaultInstanceFactory(levelManager),
+			treeBuilder => treeBuilder.BuildTree<BootstrappableChildOfAttribute>(typeof(InventoryController)));
 
-		return inventory;
+        return LevelManager.instance.Player.Inventory;
     }
 
 	[Test]
