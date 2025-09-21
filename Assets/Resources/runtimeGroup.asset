@@ -16,6 +16,7 @@ MonoBehaviour:
   searchFolder: Assets/Resources/Registry/Runtime
   assetType: GameObject
   resources:
+  - {fileID: 3830647433562336461, guid: 912e916946948ac4284086ac7f5aff5c, type: 3}
   - {fileID: 1734506996010338159, guid: 2f4fa2d652bbd884b95bb39ae884fbb9, type: 3}
   - {fileID: 243267408137811895, guid: 4572b6f108dc5d94fab0d8c105f8b89f, type: 3}
   - {fileID: 6758222006781929819, guid: b8e974e7315dc3b408e80437cd281dee, type: 3}
