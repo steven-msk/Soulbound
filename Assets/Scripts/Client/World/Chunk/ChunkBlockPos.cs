@@ -9,7 +9,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 		public int x;
 		public int y;
 		public int chunkX;
-		[JsonIgnore] public WorldChunk underlyingChunk => GameManager.instance.Level.ChunkAt(this.ToWorldBlockPos());
+		[JsonIgnore] public WorldChunk underlyingChunk => LevelManager.instance.Level.ChunkAt(this.ToWorldBlockPos());
 
 		public ChunkBlockPos(int x, int y, int chunkX) {
 			this.x = x;

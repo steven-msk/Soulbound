@@ -36,7 +36,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 			if (item.IsStackable) {
 				text!.autoSizeTextContainer = true;
 				text.text = quantity.ToString();
-				InventoryController inventory = GameManager.instance.Player.Inventory;
+				InventoryController inventory = LevelManager.instance.Player.Inventory;
 				Color textColor = Color.white;
 				InventorySlot hotbarSlot = parent.GetComponentInParent<InventorySlot>();
 				if (!inventory.IsOpened && hotbarSlot != null && inventory.Hotbar.ActiveSlot != hotbarSlot) {
@@ -63,7 +63,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 			}
 			GameObject droppedItem = worldPrefab!;
 			DroppedItem pickup = droppedItem.GetComponent<DroppedItem>() ?? droppedItem.AddComponent<DroppedItem>();
-			GameManager.instance.Level.EntityManager.SpawnEntity(pickup, new EntitySpawnData(pos) {
+			LevelManager.instance.Level.EntityManager.SpawnEntity(pickup, new EntitySpawnData(pos) {
 				[SpawnDataKey.Of("itemStack")] = new SpawnDataValue<ItemStack>(this),
 				[SpawnDataKey.Of("pickupDelay")] = new SpawnDataValue<float>((playerAction ? 2f : 0f)),
 				[SpawnDataKey.Of("dropForce")] = new SpawnDataValue<Vector2>(dropForce),

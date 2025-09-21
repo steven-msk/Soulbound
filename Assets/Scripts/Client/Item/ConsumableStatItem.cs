@@ -16,7 +16,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public virtual ConsumptionResult Consume(ItemStack itemStack) {
 			ConsumptionResult result = Consumables.DefaultConsume(this, itemStack);
 			if (result.mode == ConsumeMode.Allow) {
-				onConsumed?.Invoke(GameManager.instance.Player.Stats);
+				onConsumed?.Invoke(LevelManager.instance.Player.Stats);
 			}
 			return result;
 		}

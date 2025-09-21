@@ -24,7 +24,7 @@ namespace SoulboundBackend.Client.World {
 	    public const int CHUNK_LENGTH = 32;
         public const int WORLD_HEIGHT = 300;
         public const int SURFACE_TO_UNDERGROUND_DELIMITER = WORLD_HEIGHT / 2;
-        public static string worldDumpFile => Path.Combine(Application.persistentDataPath, GameManager.worldDump);
+        public static string worldDumpFile => Path.Combine(Application.persistentDataPath, LevelManager.worldDump);
 
 	    public event Action<BlockChangeInfo>? BlockStateChanged;
         // POTENTIAL: post world events to the ticking system
@@ -91,7 +91,7 @@ namespace SoulboundBackend.Client.World {
                 .Where(entity => entity.Value is not PlayerController)
                 .ToDictionary(guid => guid.Key, entity => entity.Value.Serialize());
 		    WorldDump dump = new(this.seed, generatedChunks.Values.ToArray(), player.Serialize(), this.structurePlacements, serializedEntities);
-		    string json = JsonConvert.SerializeObject(dump, GameManager.globalJsonSettings);
+		    string json = JsonConvert.SerializeObject(dump, LevelManager.globalJsonSettings);
             File.WriteAllText(worldDumpFile, json);
 	    }
 

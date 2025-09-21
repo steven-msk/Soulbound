@@ -18,9 +18,9 @@ using UnityEngine.Tilemaps;
 using Logger = SoulboundBackend.Common.Logging.Logger;
 
 namespace SoulboundBackend.Core {
-	public class GameManager : MonoBehaviour {
+	public class LevelManager : MonoBehaviour {
 		private static readonly Logger logger = Logger.CreateInstance();
-		public static GameManager instance;
+		public static LevelManager instance;
 		public const float tickRate = 0.02f;        // 50 tps
 		private float tickStartTime;
 		public bool IsPaused { get; private set; }

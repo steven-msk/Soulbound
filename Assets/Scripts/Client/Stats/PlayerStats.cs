@@ -44,7 +44,7 @@ namespace SoulboundBackend.Client.Stats {
 		public int GrantedFlightTime { get; set; } = 0;
 
 		public PlayerStats() {
-			inventory = GameManager.instance.Player.Inventory;
+			inventory = LevelManager.instance.Player.Inventory;
 		}
 
 		internal static StatEntry<TValue> InjectStatEntry<TValue>(StatEntry<TValue> statEntry) where TValue : struct, IComparable<TValue> {

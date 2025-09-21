@@ -48,7 +48,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 		}
 
 		private void Update() {
-			InputHandler inputHandler = GameManager.instance.Player.InputHandler;
+			InputHandler inputHandler = LevelManager.instance.Player.InputHandler;
 			if (moveMode) {
 				gameObject.transform.position = inputHandler.MouseScreenPosition;
 			}
@@ -56,8 +56,8 @@ namespace SoulboundBackend.Client.ItemSystem {
 		}
 
 		public void Destroy() {
-			if (ItemStack == GameManager.instance.Player.MainHandStack) {
-				GameManager.instance.Player.SetMainHandItem(null);
+			if (ItemStack == LevelManager.instance.Player.MainHandStack) {
+				LevelManager.instance.Player.SetMainHandItem(null);
 			}
 			DestroyTooltip();
 			GameObject.Destroy(gameObject);
@@ -65,7 +65,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 
 		public void ShowTooltip(Vector2 position) {
 			activeTooltip = itemStack.item.RenderTooltip(position, this.transform);
-			activeTooltip?.SetParent(GameManager.instance.Player.Inventory.transform, true);
+			activeTooltip?.SetParent(LevelManager.instance.Player.Inventory.transform, true);
 		}
 
 		public void OnGrab() {

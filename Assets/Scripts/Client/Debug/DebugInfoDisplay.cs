@@ -14,8 +14,8 @@ namespace SoulboundBackend.Client.Debug {
 	[SerializeField] private VectorCoordinateVisual velocity;
 
     private void Awake() {
-		this.player = GameManager.instance.Player;
-		this.level = GameManager.instance.Level;
+		this.player = LevelManager.instance.Player;
+		this.level = LevelManager.instance.Level;
 	}
 
     private void Update() {

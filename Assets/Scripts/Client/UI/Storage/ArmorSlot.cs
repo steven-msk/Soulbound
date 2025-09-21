@@ -20,7 +20,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 			if (interactionMode == SlotInteractionMode.Drag) {
 				return false;
 			}
-			PlayerStats playerStats = GameManager.instance.Player.Stats;
+			PlayerStats playerStats = LevelManager.instance.Player.Stats;
 
 			if (grabbedItem?.DisplayedItem is ArmorItem armor && armor.armorType == this.AcceptedType) {
 				if (this.HasItem) {

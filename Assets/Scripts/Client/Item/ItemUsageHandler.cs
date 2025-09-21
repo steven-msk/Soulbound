@@ -57,7 +57,7 @@ namespace SoulboundBackend.Client.ItemSystem {
                 });
             }
             Register<IPlaceable>(ItemUseTrigger.LeftHold, (placeable, stack) => {
-                Level level = GameManager.instance.Level;
+                Level level = LevelManager.instance.Level;
                 BlockPos blockPos = level.ToBlockPos(player.InputHandler.MouseWorldPosition);
 
                 if (player.CanPlaceBlockAt(blockPos)) {

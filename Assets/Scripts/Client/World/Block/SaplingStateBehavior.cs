@@ -18,7 +18,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		// CanPlaceAt?
 
 		public void OnPlace(BlockPos blockPos, BlockState blockState) {
-			Level level = GameManager.instance.Level;
+			Level level = LevelManager.instance.Level;
 			level.ForcePlaceStructure(ChunkBlockPos.FromBlockPos(blockPos), TreeStructure.instance);
 		}
 	}

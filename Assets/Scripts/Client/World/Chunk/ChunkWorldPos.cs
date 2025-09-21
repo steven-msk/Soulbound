@@ -7,7 +7,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 		public float y;
 		public int chunkX;
 
-		public WorldChunk underlyingChunk => GameManager.instance.Level.ChunkAt(this.ToWorldBlockPos());
+		public WorldChunk underlyingChunk => LevelManager.instance.Level.ChunkAt(this.ToWorldBlockPos());
 
 		public ChunkWorldPos(float x, float y, int chunkX) {
 			this.x = x;
@@ -22,7 +22,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 		}
 
 		public static ChunkWorldPos FromWorld(Vector2 position) {
-			int chunkX = GameManager.instance.Level.ChunkXAt(position);
+			int chunkX = LevelManager.instance.Level.ChunkXAt(position);
 			return new ChunkWorldPos(position.x, position.y, chunkX);
 		}
 

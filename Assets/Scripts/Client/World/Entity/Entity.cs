@@ -23,7 +23,7 @@ namespace SoulboundBackend.Client.World.Entity {
 		protected virtual void Update() {
 			ChunkWorldPos currentPos = ChunkWorldPos.FromWorld(this.position);
 			if (currentPos.chunkX != currentChunkX) {
-				GameManager.instance.Level.EntityManager.HandleChunkChange(this, currentChunkX, currentPos.chunkX);
+				LevelManager.instance.Level.EntityManager.HandleChunkChange(this, currentChunkX, currentPos.chunkX);
 				currentChunkX = currentPos.chunkX;
 			}
 		}
@@ -34,7 +34,7 @@ namespace SoulboundBackend.Client.World.Entity {
 		}
 
 		public virtual void Despawn() {
-			GameManager.instance.Level.EntityManager.RemoveEntity(this, destroy: true);
+			LevelManager.instance.Level.EntityManager.RemoveEntity(this, destroy: true);
 		}
 
 		public abstract void OnChunkLoaded();

@@ -17,7 +17,7 @@ namespace SoulboundBackend.Client.Input {
 		public Vector2 MouseWorldPosition {
 			get {
 				Vector3 screenPos = MouseScreenPosition;
-				RectTransform rootTransform = GameManager.instance.UIManager.GetRootTransform();
+				RectTransform rootTransform = LevelManager.instance.UIManager.GetRootTransform();
 				if (RectTransformUtility.ScreenPointToWorldPointInRectangle(rootTransform, MouseScreenPosition, Camera.main, out var worldPoint)) {
 					return worldPoint;
 				}
@@ -94,7 +94,7 @@ namespace SoulboundBackend.Client.Input {
 			});
 
 			RegisterInputEvent(playerActions.PauseGame, pausable: false, (action) => {
-				action.performed += actionContext => GameManager.instance.TogglePauseGame();
+				action.performed += actionContext => LevelManager.instance.TogglePauseGame();
 			});
 
 			inputActions.Enable();
@@ -116,8 +116,8 @@ namespace SoulboundBackend.Client.Input {
 		public static void RequestAction(InputActionRequest action) => requests.Add(action);
 
 		private void Update() {
-			InvocationHelper.If(LeftHold, GameManager.instance.Player.OnLeftHold);
-			InvocationHelper.If(RightHold, GameManager.instance.Player.OnRightHold);
+			InvocationHelper.If(LeftHold, LevelManager.instance.Player.OnLeftHold);
+			InvocationHelper.If(RightHold, LevelManager.instance.Player.OnRightHold);
 
 			List<string> unblockedPersistent = new();
 			foreach (var kvp in blockedContexts) {
@@ -137,8 +137,8 @@ namespace SoulboundBackend.Client.Input {
 		}
 
 		public Vector2 ScreenPosToLocalPos(Vector2 screenPos) {
-			RectTransform rootTransfom = GameManager.instance.UIManager.GetRootTransform();
-			if (RectTransformUtility.ScreenPointToLocalPointInRectangle(rootTransfom, screenPos, GameManager.instance.UIManager.Canvas.worldCamera, out var localPos)) {
+			RectTransform rootTransfom = LevelManager.instance.UIManager.GetRootTransform();
+			if (RectTransformUtility.ScreenPointToLocalPointInRectangle(rootTransfom, screenPos, LevelManager.instance.UIManager.Canvas.worldCamera, out var localPos)) {
 				return localPos;
 			}
 			UnityEngine.Debug.LogError($"Could not retrieve local point from screen point: ({screenPos.x}, {screenPos.y})");

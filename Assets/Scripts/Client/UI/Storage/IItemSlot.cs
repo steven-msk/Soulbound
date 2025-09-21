@@ -37,7 +37,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 			}
 			ItemDisplay detached = this.ItemDisplay;
 			ItemDisplay.OnGrab();
-			ItemDisplay.transform.SetParent(GameManager.instance.Player.Inventory.transform, true);
+			ItemDisplay.transform.SetParent(LevelManager.instance.Player.Inventory.transform, true);
 			if (!suppressHook) {
 				detached.DisplayedItem?.GetSlotHook()?.onDetached?.Invoke(detached, this);
 			}

@@ -16,7 +16,7 @@ namespace SoulboundBackend.Client {
 		Coroutine stepCoroutine = null;
 
 		private void Start() {
-			player = GameManager.instance.Player;
+			player = LevelManager.instance.Player;
 			rb = this.GetComponent<Rigidbody2D>();
 		}
 

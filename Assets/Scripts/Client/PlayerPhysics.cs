@@ -100,7 +100,7 @@ namespace SoulboundBackend.Client {
 		// FIXME: inconsistent movement
 
 		private void Update() {
-			if (GameManager.instance.IsPaused) {
+			if (LevelManager.instance.IsPaused) {
 				return;
 			}
 			movement.x = inputHandler.HorizontalMovement;
