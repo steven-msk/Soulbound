@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using SoulboundBackend.Client;
+using SoulboundBackend.Client.Input;
 using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.UI.Storage;
 using SoulboundBackend.Core;
@@ -22,12 +23,13 @@ public class InventoryTests {
         GameObject playerPrefab = ResourceManager.Get<GameObject, ResourceGroups.Runtime.Prefabs>("player");
         PlayerController player = GameObject.Instantiate(playerPrefab).GetComponent<PlayerController>();
         InventoryController inventory = GameObject.Instantiate(player.Inventory).GetComponent<InventoryController>();
-        Assert.That(inventory != null, () => "Could not instantiate InventoryController");
 
-        Bootstrapper bootstrapper = new();
-        BootstrapTreeBuilder treeBuilder = new(new List<IBootstrappable>() { player, inventory });
-        var tree = treeBuilder.BuildTree<BootstrappableChildOfAttribute>(typeof(InventoryController));
-        bootstrapper.Bootstrap(tree, bootstrapper.EarlyBootstrap(tree));
+        GameObject levelManagerPrefab = ResourceManager.Get<GameObject, ResourceGroups.Runtime.Prefabs>("levelManager");
+        var levelManager = GameObject.Instantiate(levelManagerPrefab).GetComponent<LevelManager>();
+        List<IBootstrappable> bootstrappables = new() {
+            player, inventory, levelManager
+        };
+        levelManager.Init(bootstrappables, treeBuilder => treeBuilder.BuildTree<BootstrappableChildOfAttribute>(typeof(InventoryController)));
 
 		return inventory;
     }

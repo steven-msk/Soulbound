@@ -39,6 +39,7 @@ public sealed class GameEntryPoint : MonoBehaviour {
             player, inventory, hotbar, inputHandler, playerPhysics, itemUsageHandler, levelManager
         };
         levelManager.Init(bootstrappables, treeBuilder => treeBuilder.BuildTree<BootstrappableParentOfAttribute>(typeof(LevelManager)));
+        levelManager.BootstrapWorld();
     }
 
     private void OnValidate() => ResourceGroups.Bootstrap();

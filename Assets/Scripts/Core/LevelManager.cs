@@ -67,6 +67,9 @@ namespace SoulboundBackend.Core {
 			bootstrapper.Bootstrap(tree, dependencyContainer);
 
 			this.player = dependencyContainer.Resolve<PlayerController>();
+        }
+
+		public void BootstrapWorld() {
             int seed = 745632;           // UnityEngine.Random.Range(int.MinValue, int.MaxValue)
             WorldDump? worldDump;
             try {
