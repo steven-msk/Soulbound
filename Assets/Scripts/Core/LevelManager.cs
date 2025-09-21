@@ -8,9 +8,11 @@ using SoulboundBackend.Common;
 using SoulboundBackend.Common.Json;
 using SoulboundBackend.Core.Bootstrap;
 using SoulboundBackend.Core.Resource;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Unity.Plastic.Newtonsoft.Json;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -18,7 +20,8 @@ using UnityEngine.Tilemaps;
 using Logger = SoulboundBackend.Common.Logging.Logger;
 
 namespace SoulboundBackend.Core {
-	public class LevelManager : MonoBehaviour {
+	[BootstrappableParentOf(typeof(PlayerController))]
+	public class LevelManager : MonoBehaviour, IBootstrappable {
 		private static readonly Logger logger = Logger.CreateInstance();
 		public static LevelManager instance;
 		public const float tickRate = 0.02f;        // 50 tps
@@ -33,7 +36,6 @@ namespace SoulboundBackend.Core {
 		private Level level;
 		public Level Level => level;
 
-		[SerializeField] private GameObject playerInstancePrefab;
 		private PlayerController player;
 		public PlayerController Player => player;
 
@@ -54,44 +56,39 @@ namespace SoulboundBackend.Core {
 			},
 		};
 
-		private void Awake() {
-			instance = this;
-	#if !UNITY_EDITOR
-			ResourceGroups.Bootstrap();
-	#else
-			StaticResetManager.ResetAll();
-	#endif
-			this.player = GameObject.Instantiate(playerInstancePrefab).GetComponent<PlayerController>();
-			var inventory = UIManager.InstantiateInUILevel(player.Inventory).GetComponent<InventoryController>();
-			var hotbar = inventory.Hotbar;
-            var inputHandler = GameObject.Instantiate(player.InputHandler).GetComponent<InputHandler>();
-			var playerPhysics = player.GetComponent<PlayerPhysics>();
-			var itemUsageHandler = new ItemUsageHandler(player);
+		public void Init(List<IBootstrappable> bootstrappables, Func<BootstrapTreeBuilder, IEnumerable<IBootstrappable>> treeFunc) {
+            instance = this;
 
-			List<IBootstrappable> bootstrappables = new() { player, inventory, hotbar, inputHandler, playerPhysics, itemUsageHandler };
-			BootstrapTreeBuilder bootstrapTreeBuilder = new(bootstrappables);
-			var tree = bootstrapTreeBuilder.BuildTree<BootstrappableParentOfAttribute>(typeof(PlayerController));
-			Bootstrapper bootstrapper = new Bootstrapper();
+            Bootstrapper bootstrapper = new();
+			BootstrapTreeBuilder treeBuilder = new(bootstrappables);
+			var tree = treeFunc.Invoke(treeBuilder).ToList();
+			
 			DependencyContainer dependencyContainer = bootstrapper.EarlyBootstrap(tree);
 			bootstrapper.Bootstrap(tree, dependencyContainer);
 
+			this.player = dependencyContainer.Resolve<PlayerController>();
             int seed = 745632;           // UnityEngine.Random.Range(int.MinValue, int.MaxValue)
-			WorldDump? worldDump;
-			try {
-				worldDump = JsonConvert.DeserializeObject<WorldDump>(File.ReadAllText(Level.worldDumpFile), globalJsonSettings);
-				seed = worldDump?.seed ?? seed;
-			} catch (FileNotFoundException) {
-				logger.LogError(null, "Cannot find world dump file");
-				worldDump = null;
-			}
-			UnityEngine.Random.InitState(seed);
-			this.level = new Level(player, worldTilemap, GameObject.Find("Grid").GetComponent<Grid>(), seed, renderDistance: 2);
-			this.level.BootstrapWorld(worldDump);
-		}
+            WorldDump? worldDump;
+            try {
+                worldDump = JsonConvert.DeserializeObject<WorldDump>(File.ReadAllText(Level.worldDumpFile), globalJsonSettings);
+                seed = worldDump?.seed ?? seed;
+            } catch (FileNotFoundException) {
+                logger.LogError(null, "Cannot find world dump file");
+                worldDump = null;
+            }
+            UnityEngine.Random.InitState(seed);
+            this.level = new Level(player, worldTilemap, GameObject.Find("Grid").GetComponent<Grid>(), seed, renderDistance: 2);
+            this.level.BootstrapWorld(worldDump);
+        }
 
-		private void OnValidate() => ResourceGroups.Bootstrap();
+        public void OnBootstrap(DependencyContainer dependencyContainer) {
+        }
 
-		private void Start() {
+        public void OnEarlyBootstrap(DependencyContainer dependencyContainer) {
+			dependencyContainer.Register<LevelManager>(this);
+        }
+
+        private void Start() {
 			StartCoroutine(GameTickLoop());
 		}
 
@@ -137,5 +134,5 @@ namespace SoulboundBackend.Core {
 			EventBus<SystemEvent>.Clear();
 			level.Save();
 		}
-	}
+    }
 }
