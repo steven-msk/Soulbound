@@ -18,7 +18,7 @@ using UnityEngine.TestTools;
 
 public class InventoryTests {
 	private InventoryController CreateTestEnvironment() {
-        SceneManager.SetActiveScene(SceneManager.CreateScene("testScene"));
+        SceneManager.SetActiveScene(SceneManager.CreateScene(Guid.NewGuid().ToString()));
 
         GameObject playerPrefab = ResourceManager.Get<GameObject, ResourceGroups.Runtime.Prefabs>("player");
         PlayerController player = GameObject.Instantiate(playerPrefab).GetComponent<PlayerController>();
