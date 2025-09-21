@@ -86,13 +86,18 @@ namespace SoulboundBackend.Client.World {
 		    entityManager.SpawnPlayer(player, dump?.player ?? fallback);
 	    }
 
-        public void Save() {
+        public WorldDump Save() {
             Dictionary<Guid, SerializedEntity> serializedEntities = entityManager.AllExistingEntities
                 .Where(entity => entity.Value is not PlayerController)
                 .ToDictionary(guid => guid.Key, entity => entity.Value.Serialize());
-		    WorldDump dump = new(this.seed, generatedChunks.Values.ToArray(), player.Serialize(), this.structurePlacements, serializedEntities);
-		    string json = JsonConvert.SerializeObject(dump, LevelManager.globalJsonSettings);
-            File.WriteAllText(worldDumpFile, json);
+		    WorldDump dump = new(
+                this.seed, 
+                generatedChunks.Values.ToArray(), 
+                player.Serialize(),
+                this.structurePlacements, 
+                serializedEntities
+            );
+            return dump;
 	    }
 
         public void UpdateChunks(Vector2 playerPos) {

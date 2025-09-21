@@ -23,10 +23,14 @@ public class InventoryTests {
 
         GameObject levelManagerPrefab = ResourceManager.Get<GameObject, ResourceGroups.Runtime.Prefabs>("levelManager");
         var levelManager = GameObject.Instantiate(levelManagerPrefab).GetComponent<LevelManager>();
-        levelManager.Init(GameEntryPoint.DefaultInstanceFactory(levelManager),
-			treeBuilder => treeBuilder.BuildTree<BootstrappableChildOfAttribute>(typeof(InventoryController)));
 
-        return LevelManager.instance.Player.Inventory;
+        levelManager.Init(null, null,
+			GameEntryPoint.DefaultInstanceFactory(levelManager),
+			treeBuilder => treeBuilder.BuildTree<BootstrappableChildOfAttribute>(typeof(InventoryController))
+		);
+
+        return LevelManager.instance.Player.Inventory 
+			?? throw new ArgumentException("Test environment not initialized properly");
     }
 
 	[Test]

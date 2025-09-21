@@ -44,10 +44,8 @@ public sealed class GameEntryPoint : MonoBehaviour, IStaticResettable {
     }
 
     private void Awake() {
-        GameObject levelManagerPrefab = ResourceManager.Get<GameObject, ResourceGroups.Runtime.Prefabs>("levelManager");
-        this.levelManager = GameObject.Instantiate(levelManagerPrefab).GetComponent<LevelManager>();
-        levelManager.Init(DefaultInstanceFactory(levelManager), treeBuilder => treeBuilder.BuildTree<BootstrappableParentOfAttribute>(typeof(LevelManager)));
-        levelManager.BootstrapWorld();
+        WorldManager worldManager = new("saves");
+        worldManager.LoadWorld("dev");
     }
 
     private void OnValidate() {

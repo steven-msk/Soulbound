@@ -29,10 +29,10 @@ namespace SoulboundBackend.Core {
 		public bool IsPaused { get; private set; }
 
 		// POTENTIAL FEATUREIMPL (unlikely, but possible): make Level class NOT a singleton.
-		// In this case, it represents the current dimension or world the player is in (e.g., overworld, nether, end).
-		// The GameManager holds a reference to the active Level instance.
-		// If implementing multiple dimensions, switch the Level reference as the player moves between them.
+		// This means a possibility to have multiple dimensions.
 
+		private WorldManager worldManager;
+		private string world;
 		private Level level;
 		public Level Level => level;
 
@@ -56,8 +56,11 @@ namespace SoulboundBackend.Core {
 			},
 		};
 
-		public void Init(BootstrappableInstanceFactory instanceFactory, Func<BootstrapTreeBuilder, IEnumerable<IBootstrappable>> treeFunc) {
+		public void Init(WorldManager worldManager, string world, BootstrappableInstanceFactory instanceFactory,
+				Func<BootstrapTreeBuilder, IEnumerable<IBootstrappable>> treeFunc) {
             instance = this;
+			this.worldManager = worldManager;
+			this.world = world;
 
             Bootstrapper bootstrapper = new();
 			BootstrapTreeBuilder treeBuilder = new(null, instanceFactory);
@@ -69,22 +72,12 @@ namespace SoulboundBackend.Core {
 			this.player = dependencyContainer.Resolve<PlayerController>();
         }
 
-		public void BootstrapWorld() {
-            int seed = 745632;           // UnityEngine.Random.Range(int.MinValue, int.MaxValue)
-            WorldDump? worldDump;
-            try {
-                worldDump = JsonConvert.DeserializeObject<WorldDump>(File.ReadAllText(Level.worldDumpFile), globalJsonSettings);
-                seed = worldDump?.seed ?? seed;
-            } catch (FileNotFoundException) {
-                logger.LogError(null, "Cannot find world dump file");
-                worldDump = null;
-            }
-            UnityEngine.Random.InitState(seed);
+		public void BootstrapWorld(WorldDump? dump, int seed) {
             this.level = new Level(player, worldTilemap, GameObject.Find("Grid").GetComponent<Grid>(), seed, renderDistance: 2);
-            this.level.BootstrapWorld(worldDump);
+            this.level.BootstrapWorld(dump);
         }
 
-        public void OnBootstrap(DependencyContainer dependencyContainer) {
+        void IBootstrappable.OnBootstrap(DependencyContainer dependencyContainer) {
         }
 
         public void OnEarlyBootstrap(DependencyContainer dependencyContainer) {
@@ -135,7 +128,7 @@ namespace SoulboundBackend.Core {
 		private void OnApplicationQuit() {
 			EventBus<GameEvent>.Clear();
 			EventBus<SystemEvent>.Clear();
-			level.Save();
+			worldManager.SaveWorld(world, level.Save());
 		}
     }
 }
