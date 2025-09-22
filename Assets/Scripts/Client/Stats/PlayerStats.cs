@@ -17,7 +17,6 @@ namespace SoulboundBackend.Client.Stats {
 		[JsonConverter(typeof(JsonDictionaryConverter<IStatDefinitionImpl, IStatEntryImpl>))]
 		private static Dictionary<IStatDefinitionImpl, IStatEntryImpl> injected = new();
 
-		private readonly InventoryController inventory;
 
 		// REMINDER: current stat default values are subject to change
 		[JsonIgnore] public StatEntry<int> MaxHealth { get; private set; } = InjectStatEntry<int>(new(200, StatDefinition.MaxHealth));
@@ -42,10 +41,6 @@ namespace SoulboundBackend.Client.Stats {
 		public float HorizontalFlightAcceleration { get; set; } = 3f;
 		public float VerticalFlightAcceleration { get; set; } = 2f;
 		public int GrantedFlightTime { get; set; } = 0;
-
-		public PlayerStats() {
-			inventory = LevelManager.instance.Player.Inventory;
-		}
 
 		internal static StatEntry<TValue> InjectStatEntry<TValue>(StatEntry<TValue> statEntry) where TValue : struct, IComparable<TValue> {
 			injected[statEntry.definitionReference] = statEntry;
