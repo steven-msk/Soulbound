@@ -7,6 +7,7 @@ using SoulboundBackend.Core;
 using SoulboundBackend.Core.Bootstrap;
 using SoulboundBackend.Core.Resource;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -43,12 +44,13 @@ public sealed class GameEntryPoint : MonoBehaviour, IStaticResettable {
         return factory;
     }
 
-    private void Awake() {
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+    public static void StartWorld() {
         WorldManager worldManager = new("saves");
-        worldManager.LoadWorld("dev");
+        worldManager.LoadWorld("dev", null);
     }
 
-    private void OnValidate() {
+    private void Awake() {
         StaticResetManager.Register(this);
         StaticResetManager.ResetAll();
         ResourceGroups.Bootstrap();

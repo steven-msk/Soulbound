@@ -41,8 +41,6 @@ namespace SoulboundBackend.Core {
 
 		public UIManager UIManager => GameObject.Find("Canvas").GetComponent<UIManager>();
 
-		[SerializeField] private Tilemap worldTilemap;
-
 		// FEATUREIMPL: settings menu
 		// FEATUREIMPL: pause menu
 		// Pause menu -> Settings menu
@@ -58,33 +56,34 @@ namespace SoulboundBackend.Core {
 
 		public void Init(WorldManager worldManager, string world, BootstrappableInstanceFactory instanceFactory,
 				Func<BootstrapTreeBuilder, IEnumerable<IBootstrappable>> treeFunc) {
-            instance = this;
+			instance = this;
 			this.worldManager = worldManager;
 			this.world = world;
 
-            Bootstrapper bootstrapper = new();
+			Bootstrapper bootstrapper = new();
 			BootstrapTreeBuilder treeBuilder = new(null, instanceFactory);
 			var tree = treeFunc.Invoke(treeBuilder).ToList();
 			
 			DependencyContainer dependencyContainer = bootstrapper.EarlyBootstrap(tree);
-			bootstrapper.Bootstrap(tree, dependencyContainer);
+			bootstrapper.Bootstrap(tree, dependencyContainer); 
 
 			this.player = dependencyContainer.Resolve<PlayerController>();
-        }
+		}
 
-		public void BootstrapWorld(WorldDump? dump, int seed) {
-            this.level = new Level(player, worldTilemap, GameObject.Find("Grid").GetComponent<Grid>(), seed, renderDistance: 2);
-            this.level.BootstrapWorld(dump);
-        }
+		public void BootstrapWorld(WorldDump? dump, int seed, LevelGridContext gridContext) {
+			UnityEngine.Random.InitState(seed);
+            this.level = new Level(player, gridContext, seed, renderDistance: 2);
+			this.level.BootstrapWorld(dump);
+		}
 
-        void IBootstrappable.OnBootstrap(DependencyContainer dependencyContainer) {
-        }
+		void IBootstrappable.OnBootstrap(DependencyContainer dependencyContainer) {
+		}
 
-        public void OnEarlyBootstrap(DependencyContainer dependencyContainer) {
+		public void OnEarlyBootstrap(DependencyContainer dependencyContainer) {
 			dependencyContainer.Register<LevelManager>(this);
-        }
+		}
 
-        private void Start() {
+		private void Start() {
 			StartCoroutine(GameTickLoop());
 		}
 
@@ -121,7 +120,10 @@ namespace SoulboundBackend.Core {
 			this.IsPaused = !this.IsPaused;
 			Time.timeScale = this.IsPaused ? 0f : 1f;
 			AudioListener.pause = this.IsPaused;		// FEATUREIMPL: sound effects and music
-			InvocationHelper.IfElse(this.IsPaused, InputHandler.PauseInputs, InputHandler.UnpauseInputs);
+			InvocationHelper.IfElse(this.IsPaused, 
+				InputHandler.PauseInputs, 
+				InputHandler.UnpauseInputs
+			);
 		
 		}
 
@@ -129,8 +131,8 @@ namespace SoulboundBackend.Core {
 			EventBus<GameEvent>.Clear();
 			EventBus<SystemEvent>.Clear();
 			worldManager.SaveWorld(world, level.Save());
-		}
-    }
+		} 
+	}
 
 	public record LevelGridContext(Grid grid, Tilemap tilemap) {
 		public static LevelGridContext FromRuntimePrefabs() {

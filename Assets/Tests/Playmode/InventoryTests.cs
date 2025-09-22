@@ -50,6 +50,7 @@ public class InventoryTests {
 
 		ItemStack stack = new ItemStack(Items.consumableStatItem_test, 1);
 		ItemDisplay display = ItemDisplay.Create(stack, slot);
-		Assert.That(slot.ItemDisplay, Is.EqualTo(display), () => "ItemDisplay did not assign correctly in slot");
+		Assert.That(slot.ItemDisplay, Is.EqualTo(display),
+			() => "ItemDisplay did not assign correctly in slot");
 	}
 }

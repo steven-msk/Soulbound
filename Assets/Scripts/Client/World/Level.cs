@@ -21,6 +21,7 @@ using Logger = SoulboundBackend.Common.Logging.Logger;
 namespace SoulboundBackend.Client.World {
     public class Level {
         private static readonly Logger logger = Logger.CreateInstance();
+        public static readonly LogModule level = new LogModule("LEVEL", "#4682B4");
 	    public const int CHUNK_LENGTH = 32;
         public const int WORLD_HEIGHT = 300;
         public const int SURFACE_TO_UNDERGROUND_DELIMITER = WORLD_HEIGHT / 2;
@@ -38,21 +39,17 @@ namespace SoulboundBackend.Client.World {
         private Dictionary<int, List<StructurePlacement>> structurePlacements = new();
         private Dictionary<int, List<(ChunkBlockPos chunkBlockPos, BlockState state)>> pendingUpdates = new();
         private int renderDistance;
+        private LevelGridContext gridContext;
         private EntityManager entityManager;
         public EntityManager EntityManager => entityManager;
-
-        private Grid grid;
 
         private PlayerController player;
         public PlayerController Player => player;
 
-        private Tilemap tilemap;
-        public Tilemap WorldTilemap => tilemap;
 
-        public Level(PlayerController player, Tilemap tilemap, Grid grid, int seed, int renderDistance) {
+        public Level(PlayerController player, LevelGridContext gridContext, int seed, int renderDistance) {
             this.player = player;
-            this.tilemap = tilemap;
-            this.grid = grid;
+            this.gridContext = gridContext;
             this.renderDistance = renderDistance; 
             this.seed = seed;
             this.heightGenerator = new PerlinNoiseGenerator1D(this.seed, WorldChunk.HEIGHT_SPREAD);
@@ -81,8 +78,13 @@ namespace SoulboundBackend.Client.World {
 				    BlockStateChanged += structureTemplate.blockStateChangedCallback;
 			    }
 		    }
-            InvocationHelper.If(dump != null, () => entityManager.Boostrap(dump!.Value.serializedEntities));
-            SerializedEntity fallback = new(typeof(PlayerController), Guid.NewGuid(), player.prefabDefinitionID, new Vector2(0f, GetSurfaceY(0)), null);
+
+            InvocationHelper.If(dump != null, 
+                () => entityManager.Boostrap(dump!.Value.serializedEntities));
+            SerializedEntity fallback = new(typeof(PlayerController), 
+                Guid.NewGuid(), player.prefabDefinitionID,
+                new Vector2(0f, GetSurfaceY(0)), null
+            );
 		    entityManager.SpawnPlayer(player, dump?.player ?? fallback);
 	    }
 
@@ -90,6 +92,7 @@ namespace SoulboundBackend.Client.World {
             Dictionary<Guid, SerializedEntity> serializedEntities = entityManager.AllExistingEntities
                 .Where(entity => entity.Value is not PlayerController)
                 .ToDictionary(guid => guid.Key, entity => entity.Value.Serialize());
+
 		    WorldDump dump = new(
                 this.seed, 
                 generatedChunks.Values.ToArray(), 
@@ -108,18 +111,23 @@ namespace SoulboundBackend.Client.World {
                 int chunkX = playerChunkX + dx;
                 if (!loadedChunks.ContainsKey(chunkX)) {
                     WorldChunk chunk = new(chunkX);
+
                     if (!generatedChunks.ContainsKey(chunkX)) {
                         chunk = this.GenerateNewChunk(chunkX);
                         generatedChunks[chunkX] = chunk;
+
                         if (pendingUpdates.TryGetValue(chunkX, out var stateUpdates)) {
-                            stateUpdates.ForEach(stateUpdate => chunk.SetBlock(stateUpdate.chunkBlockPos, stateUpdate.state));
+                            stateUpdates.ForEach(stateUpdate => {
+                                chunk.SetBlock(stateUpdate.chunkBlockPos, stateUpdate.state);
+                            });
                             pendingUpdates.Remove(chunkX);
                         }
                     } else {
                         chunk = generatedChunks[chunkX];
                     }
+
                     loadedChunks[chunkX] = chunk;
-                    chunk.Render(tilemap, chunkOutlineRenderer);
+                    chunk.Render(gridContext.tilemap, chunkOutlineRenderer);
                     entityManager.OnChunkLoaded(chunk);
                 }
             }
@@ -138,33 +146,38 @@ namespace SoulboundBackend.Client.World {
             WorldChunk chunk = new(chunkX);
             ChunkHeightmapData heightmapData = chunk.GenerateHeightmap(this.heightGenerator);
             generatedChunks[chunkX] = chunk;
+
             for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
                 if (CheckStructureAvailability(cx, chunk.xpos, heightmapData, out var structurePlacement)) {
                     PlaceStructure(chunkX, structurePlacement);
                 }
             }
+
             return chunk;
         }
 
         public bool CheckStructureAvailability(int chunkBlockX, int chunkX, ChunkHeightmapData heightmapData, out StructurePlacement structurePlacement) {
             foreach (var structureID in registeredStructureTemplates.Keys) {
                 StructureTemplate structure = registeredStructureTemplates[structureID];
-                StructureGenerationContext context = new StructureGenerationContext(chunkBlockX, chunkX, heightmapData, this);
-                PreliminaryStructureData? data = structure.placementFunction.Invoke(context, false);
+                var context = new StructureGenerationContext(chunkBlockX, chunkX, heightmapData, this);
+                var data = structure.placementFunction.Invoke(context, false);
+
                 if (data != null && structure.validationFunction.Invoke(context, data.Value)) {
-                    StructurePlacementConstraints placementConstraints = structure.placementGenerator.Invoke(context, data.Value);
+                    var placementConstraints = structure.placementGenerator.Invoke(context, data.Value);
                     structurePlacement = structure.FinalizePlacement(placementConstraints);
                     return true;
                 }
             }
+
             structurePlacement = null!;
             return false;
         }
 
         public StructurePlacement ForceGeneratePlacement(ChunkBlockPos chunkBlockPos, StructureTemplate template) {
             WorldChunk? chunk = chunkBlockPos.underlyingChunk;
-            StructureGenerationContext context = new(chunkBlockPos.x, chunkBlockPos.chunkX, chunk.HeightmapData, this);
-            PreliminaryStructureData? structureData = template.placementFunction.Invoke(context, true);
+            var context = new StructureGenerationContext(chunkBlockPos.x, chunkBlockPos.chunkX, chunk.HeightmapData, this);
+            var structureData = template.placementFunction.Invoke(context, true);
+
             return template.FinalizePlacement(template.placementGenerator.Invoke(context, structureData));
         }
 
@@ -177,20 +190,25 @@ namespace SoulboundBackend.Client.World {
             int chunkX = ChunkXAt((Vector2Int)blockPos);
             if (structurePlacements.TryGetValue(chunkX, out var chunkFeatures)) {
                 ChunkBlockPos chunkBlockPos = blockPos.ToChunkBlockPos(chunkX);
-                structure = chunkFeatures.FirstOrDefault(f => f.bounds.Contains((Vector2Int)chunkBlockPos));
+                structure = chunkFeatures
+                    .FirstOrDefault(f => f.bounds.Contains((Vector2Int)chunkBlockPos));
                 return structure?.PersistentExistence() ?? false;
             }
+
             structure = null!;
             return false;
         }
 
         public bool OverlappingStructures(BlockPos blockPos, out List<StructurePlacement> overlappingStructures) {
             int chunkX = ChunkXAt((Vector2Int)blockPos);
+
             if (structurePlacements.TryGetValue(chunkX, out var chunkFeatures)) {
                 ChunkBlockPos chunkBlockPos = blockPos.ToChunkBlockPos(chunkX);
-                overlappingStructures = chunkFeatures.Where(f => f.bounds.Contains((Vector2Int)chunkBlockPos)).ToList();
+                overlappingStructures = chunkFeatures
+                    .Where(f => f.bounds.Contains((Vector2Int)chunkBlockPos)).ToList();
                 return overlappingStructures.Count > 0;
             }
+
             overlappingStructures = new List<StructurePlacement>();
             return false;
         }
@@ -200,10 +218,12 @@ namespace SoulboundBackend.Client.World {
                 structurePlacements.Add(chunkX, new List<StructurePlacement>());
             }
             structurePlacements[chunkX].Add(placement);
+
             foreach (var stateOverride in placement.stateOverrides) {
                 ChunkBlockPos chunkBlockPos = stateOverride.Key;
                 BlockState blockState = stateOverride.Value;
                 WorldChunk? underlyingChunk = ChunkAt(chunkBlockPos.ToWorldBlockPos());
+
                 if (underlyingChunk == null) {
                     PendUpdate(chunkBlockPos.chunkX, chunkBlockPos, blockState);
                 } else if (loadedChunks.ContainsKey(chunkBlockPos.chunkX) && underlyingChunk != null) {
@@ -214,7 +234,9 @@ namespace SoulboundBackend.Client.World {
             }
         }
 
-        public void MarkStructureDirty(StructurePlacement placement) => structurePlacements[placement.origin.chunkX].Remove(placement);
+        public void MarkStructureDirty(StructurePlacement placement) { 
+            structurePlacements[placement.origin.chunkX].Remove(placement);
+        }
 
         public void SetBlock(BlockPos blockPos, BlockState? blockState, bool broadcastStateChange = true) {
             WorldChunk? chunk = this.ChunkAt(blockPos);
@@ -225,22 +247,28 @@ namespace SoulboundBackend.Client.World {
             if (oldState == newState) {
                 return;
             }
+
             chunk?.SetBlock(blockPos.ToChunkBlockPos(chunk.xpos), newState);
-            tilemap.SetTile((Vector3Int)blockPos, referencedTile);
+            gridContext.tilemap.SetTile((Vector3Int)blockPos, referencedTile);
             blockPos.ForEachAdjacent((direction, neighborPos) => {
                 BlockState? neighborBlockState = BlockStateAt(neighborPos);
                 neighborBlockState?.OnNeighborStateChanged(neighborPos, blockPos, oldState, newState);
-                tilemap.RefreshTile((Vector3Int)neighborPos);
+                gridContext.tilemap.RefreshTile((Vector3Int)neighborPos);
             });
+
             BlockEventType blockEventType = BlockEventType.StateMutated;
             if (newState != air && oldState == air) {
                 blockEventType = BlockEventType.Placed;
             } else if (oldState != air && newState == air) {
                 blockEventType = BlockEventType.Broken;
             }
-            InvocationHelper.If(blockEventType == BlockEventType.Placed, () => newState?.OnPlace(blockPos));
+
+            InvocationHelper.If(blockEventType == BlockEventType.Placed,
+                () => newState?.OnPlace(blockPos));
             if (broadcastStateChange) {
-                BlockStateChanged?.Invoke(new BlockChangeInfo(blockPos, oldState, newState, this, blockEventType));
+                BlockStateChanged?.Invoke(
+                    new BlockChangeInfo(blockPos, oldState, newState, this, blockEventType)
+                );
             }
         }
 
@@ -272,24 +300,29 @@ namespace SoulboundBackend.Client.World {
 
         public void UnloadDistantChunks(int playerChunkX, int viewDistance) {
             List<WorldChunk> toRemove = new();
+
             foreach (int chunkX in loadedChunks.Keys) {
                 if (Mathf.Abs(chunkX - playerChunkX) > viewDistance) {
                     toRemove.Add(loadedChunks[chunkX]);
                 }
             }
+
             foreach (WorldChunk chunk in toRemove) {
                 loadedChunks.Remove(chunk.xpos);
-                chunk.Unload(tilemap, chunkOutlineRenderer);
+                chunk.Unload(gridContext.tilemap, chunkOutlineRenderer);
                 entityManager.OnChunkUnloaded(chunk);
             }
         }
 
         public BlockState? BlockStateAt(BlockPos blockPos, bool logFlag = true) {
             WorldChunk? chunk = ChunkAt(blockPos);
+
             if (chunk != null) {
                 return chunk.BlockStateAt(blockPos.ToChunkBlockPos(chunk.xpos));
             }
-            InvocationHelper.If(logFlag, () => UnityEngine.Debug.LogError($"Cannot retrieve block state at {blockPos.ToString()} because its not generated"));
+
+            InvocationHelper.If(logFlag,
+                () => logger.LogError(level, $"Cannot retrieve block state at {blockPos.ToString()} because its not generated"));
             return null;
         }
 
@@ -298,7 +331,8 @@ namespace SoulboundBackend.Client.World {
             if (blockState != null) {
                 return blockState.block;
             }
-		    UnityEngine.Debug.LogError($"Cannot retrieve block at {blockPos.ToString()} because its not generated");
+
+		    logger.LogError(level, $"Cannot retrieve block at {blockPos.ToString()} because its not generated");
             return null;
         }
 
@@ -311,12 +345,14 @@ namespace SoulboundBackend.Client.World {
 
         public int ChunkXAt(float x) => Mathf.FloorToInt(x / CHUNK_LENGTH);
 
-        public WorldChunk? ChunkAt(BlockPos blockPos) => generatedChunks!.GetValueOrDefault(this.ChunkXAt((Vector2)blockPos), null);
+        public WorldChunk? ChunkAt(BlockPos blockPos) { 
+            return generatedChunks!.GetValueOrDefault(this.ChunkXAt((Vector2)blockPos), null);
+        }
 
         public WorldChunk? ChunkAt(int xpos) => ChunkAt(new BlockPos(xpos, 0));
 
         public BlockPos ToBlockPos(Vector2 worldPos) {
-            Vector2Int intPos = (Vector2Int)grid.WorldToCell(worldPos);
+            Vector2Int intPos = (Vector2Int)gridContext.grid.WorldToCell(worldPos);
             return new BlockPos(intPos.x, intPos.y);
         }
 
@@ -339,8 +375,9 @@ namespace SoulboundBackend.Client.World {
 
         public List<BlockPos> GetTilesCovered(Bounds bounds) {
             List<BlockPos> coveredTiles = new();
-            Vector2Int min = (Vector2Int)grid.WorldToCell(bounds.min);
-            Vector2Int max = (Vector2Int)grid.WorldToCell(bounds.max);
+            Vector2Int min = (Vector2Int)gridContext.grid.WorldToCell(bounds.min);
+            Vector2Int max = (Vector2Int)gridContext.grid.WorldToCell(bounds.max);
+
             for (int x = min.x; x <= max.x; x++) {
                 for (int y = min.y; y <= max.y; y++) {
                     coveredTiles.Add(new BlockPos(x, y));

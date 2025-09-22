@@ -52,14 +52,19 @@ namespace SoulboundBackend.Client.World.Entity {
 
 		public void Deserialize(SerializedEntity serialized) {
 			this.id = serialized.id;
-			var attributes = this.GetType().GetMethod("Spawn").GetCustomAttributes<EntitySpawnPropertyCandidatesAttribute>(true);
-			string[] propertyCandidates = attributes.SelectMany(attribute => attribute.candidates).Distinct().ToArray();
-			string[] spawnDataCandidates = propertyCandidates.Where(c => serialized.properties.Any(p => p.GetKey() == c)).ToArray();
+			var attributes = this.GetType().GetMethod("Spawn")
+				.GetCustomAttributes<EntitySpawnPropertyCandidatesAttribute>(true);
+			string[] propertyCandidates = attributes
+				.SelectMany(attribute => attribute.candidates).Distinct().ToArray();
+			string[] spawnDataCandidates = propertyCandidates
+				.Where(c => serialized.properties.Any(p => p.GetKey() == c)).ToArray();
 			EntitySpawnData spawnData = new(serialized.lastPosition);
+
 			foreach (string candidate in spawnDataCandidates) {
 				var property = serialized.properties.First(p => p.GetKey() == candidate);
 				spawnData.Set(new SpawnDataKey(candidate), property.ToSpawnDataValue());
 			}
+
 			this.Spawn(spawnData);
 			this.ApplySerializedProperties(SerializedEntityPropertyList.From(serialized.properties));
 		}

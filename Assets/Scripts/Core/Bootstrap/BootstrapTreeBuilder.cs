@@ -12,7 +12,8 @@ namespace SoulboundBackend.Core.Bootstrap {
 		private readonly BootstrappableInstanceFactory instanceFactory;
 
         public BootstrapTreeBuilder(IEnumerable<IBootstrappable> bootstrappables, BootstrappableInstanceFactory instanceFactory) {
-			registry = bootstrappables?.ToDictionary(b => b.GetType()) ?? new Dictionary<Type, IBootstrappable>();
+			registry = bootstrappables?
+				.ToDictionary(b => b.GetType()) ?? new Dictionary<Type, IBootstrappable>();
 			this.instanceFactory = instanceFactory;
         }
 

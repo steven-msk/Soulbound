@@ -92,11 +92,11 @@ namespace SoulboundBackend.Client.UI.Storage {
 			}
 		}
 
-		private void Start() {
-			if (hotbar[0].IsEmpty) {
-				ItemDisplay.Create(Items.statItem_test, Item.DEFAULT_MAX_STACK, hotbar[0]);
-			}
-		}
+		//private void Start() {
+		//	if (hotbar[0].IsEmpty) {
+		//		ItemDisplay.Create(Items.statItem_test, Item.DEFAULT_MAX_STACK, hotbar[0]);
+		//	}
+		//}
 
 		public SerializedInventory Serialize() {
 			if (GrabbedContext.value != null) {
