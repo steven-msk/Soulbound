@@ -131,4 +131,20 @@ namespace SoulboundBackend.Core {
 			worldManager.SaveWorld(world, level.Save());
 		}
     }
+
+	public record LevelGridContext(Grid grid, Tilemap tilemap) {
+		public static LevelGridContext FromRuntimePrefabs() {
+			var gridPrefab = ResourceManager.Get<GameObject, ResourceGroups.Runtime.Prefabs>("Grid");
+			var tilemapPrefab = ResourceManager.Get<GameObject, ResourceGroups.Runtime.Prefabs>("tilemap");
+
+			var gridObj = GameObject.Instantiate(gridPrefab);
+			var tilemapObj = GameObject.Instantiate(tilemapPrefab, gridObj.transform);
+			tilemapObj.transform.SetParent(gridObj.transform);
+
+            return new LevelGridContext(
+				gridObj.GetComponent<Grid>(),
+				tilemapObj.GetComponent<Tilemap>()
+            );
+        }
+	}
 }
