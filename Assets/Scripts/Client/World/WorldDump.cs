@@ -13,6 +13,7 @@ namespace SoulboundBackend.Client.World {
 		public Dictionary<int, List<StructurePlacement>> structurePlacements;
 		public SerializedEntity player;
 		public Dictionary<Guid, SerializedEntity> serializedEntities;
+		public bool nonNulled;
 
 		public WorldDump(int seed, WorldChunk[] generatedChunks, SerializedEntity player, Dictionary<int, List<StructurePlacement>> structurePlacements,
 						 Dictionary<Guid, SerializedEntity> serializedEntities) {
@@ -21,6 +22,7 @@ namespace SoulboundBackend.Client.World {
 			this.structurePlacements = structurePlacements;
 			this.serializedEntities = serializedEntities;
 			this.player = player;
+			this.nonNulled = true;
 		}
 	}
 }

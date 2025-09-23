@@ -29,9 +29,6 @@ namespace SoulboundBackend.Core {
 		public bool isWorldLoaded { get; private set; } = false;
 		public bool IsPaused { get; private set; }
 
-		// POTENTIAL FEATUREIMPL (unlikely, but possible): make Level class NOT a singleton.
-		// This means a possibility to have multiple dimensions.
-
 		private WorldManager worldManager;
 		private string world;
 		private Level level;

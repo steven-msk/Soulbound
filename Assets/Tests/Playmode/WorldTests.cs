@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using SoulboundBackend.Client.UI.Storage;
+using SoulboundBackend.Client.World;
 using SoulboundBackend.Core;
 using SoulboundBackend.Core.Bootstrap;
 using SoulboundBackend.Core.Resource;
@@ -13,11 +14,9 @@ using UnityEngine.TestTools;
 public class WorldTests {
 	[Test]
 	public void World_LoadsSuccessfully_WhenSceneProvided() {
-		TestingEnvironment.Prepare(); 
-
 		Scene scene = SceneManager.CreateScene(Guid.NewGuid().ToString());
 
-		WorldManager worldManager = new("testSaves");
+		WorldManager worldManager = new("testSaves", new DoNotSaveWorldStrategy());
 		worldManager.LoadWorld("test1", scene);
 
 		Assert.That(LevelManager.instance.Level.isBootstrapped);
@@ -25,9 +24,7 @@ public class WorldTests {
 
 	[UnityTest] 
 	public IEnumerator World_LoadsSuccessfully_WhenNoSceneProvided() {
-		TestingEnvironment.Prepare();
-
-        WorldManager worldManager = new("testSaves");
+        WorldManager worldManager = new("testSaves", new DoNotSaveWorldStrategy());
         worldManager.LoadWorld("test1", null);
 		yield return new WaitUntil(() => LevelManager.instance?.Level?.isBootstrapped ?? false);
 		Assert.Pass();

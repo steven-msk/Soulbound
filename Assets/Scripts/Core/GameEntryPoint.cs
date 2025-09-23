@@ -3,6 +3,7 @@ using SoulboundBackend.Client.Input;
 using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.UI;
 using SoulboundBackend.Client.UI.Storage;
+using SoulboundBackend.Client.World;
 using SoulboundBackend.Core;
 using SoulboundBackend.Core.Bootstrap;
 using SoulboundBackend.Core.Resource;
@@ -52,8 +53,8 @@ public sealed class GameEntryPoint : MonoBehaviour {
 			return;
 		}
 #endif
-		WorldManager worldManager = new("saves");
-		worldManager.LoadWorld("dev", null);
+		WorldManager worldManager = new("saves", new WorldSaveStrategy());
+		worldManager.LoadWorld("devWorld", null);
 	}
 
 	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]

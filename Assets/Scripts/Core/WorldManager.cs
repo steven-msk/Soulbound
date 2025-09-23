@@ -25,9 +25,11 @@ using CoroutineRunner = SoulboundBackend.Core.CoroutineRunner;
 public sealed class WorldManager {
 	private readonly string savesRoot;
 	private LevelManager? activeLevelManager;
+	private readonly ISaveStrategy<WorldDump> saveStrategy;
 
-	public WorldManager(string savesRoot) {
+	public WorldManager(string savesRoot, ISaveStrategy<WorldDump> saveStrategy) {
 		this.savesRoot = savesRoot;
+		this.saveStrategy = saveStrategy;
 	}
 
 	public IEnumerable<string> QuerySaves() {
@@ -42,23 +44,18 @@ public sealed class WorldManager {
 	}
 
 	public void LoadWorld(string world, Scene? levelScene) {
-		string dumpPath = GetDumpPath(world);
+		string dumpPath = GetDumpPath(world, createIfAbsent: false);
 
-		WorldDump? dump = null;
-		int seed = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
-
-		if (File.Exists(dumpPath)) {
-			dump = JsonConvert.DeserializeObject<WorldDump>(
-				File.ReadAllText(dumpPath),
-				LevelManager.globalJsonSettings
-			);
-			seed = dump?.seed ?? seed;
+		WorldDump? dump = saveStrategy.Load(dumpPath);
+		if (!dump?.nonNulled ?? true) {
+			dump = null;
 		}
+		int seed = dump?.seed ?? UnityEngine.Random.Range(int.MinValue, int.MaxValue);
 
 		GameObject? levelManagerPrefab = ResourceManager.Get<GameObject, ResourceGroups.Runtime.Prefabs>("levelManager");
 		BootstrappableInstanceFactory instanceFactory = new();
 		LevelManager InstantiateLevelManager() {
-			return GameObject.Instantiate(levelManagerPrefab)?.GetComponent<LevelManager>()
+			return GameObject.Instantiate(levelManagerPrefab)?.GetComponent<LevelManager>() 
 				?? throw new ArgumentException("LevelManager prefab not found!");
 		}
 		void FinalizeLevelManager() {
@@ -116,15 +113,15 @@ public sealed class WorldManager {
 	}
 
 	public void SaveWorld(string world, WorldDump dump) {
-		string dumpPath = GetDumpPath(world);
-		string json = JsonConvert.SerializeObject(dump, LevelManager.globalJsonSettings); 
-
-		File.WriteAllText(dumpPath, json);
+		string dumpPath = GetDumpPath(world, createIfAbsent: saveStrategy is not DoNotSaveWorldStrategy);
+		saveStrategy.Save(dump, dumpPath);
 	}
 
-	private string GetDumpPath(string world) {
+	private string GetDumpPath(string world, bool createIfAbsent) {
 		string worldFolder = Path.Combine(savesRoot, world);
-		Directory.CreateDirectory(GetPersistentPath(worldFolder));
+		if (createIfAbsent) {
+			Directory.CreateDirectory(GetPersistentPath(worldFolder));
+		}
 		string dumpPath = GetPersistentPath(Path.Combine(worldFolder, LevelManager.worldDump));
 		return dumpPath;
 	}

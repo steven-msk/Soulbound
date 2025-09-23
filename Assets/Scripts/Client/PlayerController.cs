@@ -196,9 +196,8 @@ namespace SoulboundBackend.Client {
 			try {
 				pendingAttachUpdates = inventory.Deserialize(properties.GetOrThrow<SerializedInventory>("inventory"));
 				this.stats = properties.GetOrThrow<PlayerStats>("stats");
-			} catch (Exception e) {
+			} catch (Exception) {
 				this.stats = new();
-				logger.LogError(null, e);
 			} finally {
 				stats.UpdateInjectedMappings();
 				stats.MaxHealth.OnModifiersChanged += maxHealth => {
