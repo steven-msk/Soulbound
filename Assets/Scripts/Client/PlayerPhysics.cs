@@ -49,6 +49,8 @@ namespace SoulboundBackend.Client {
 
 		private float immunityTimeSeconds = 0.5f;
 
+		public bool isBootstrapped { get; private set; }
+
 		private float _facing = 1f;
 		public float facing {
 			get => _facing;
@@ -64,7 +66,7 @@ namespace SoulboundBackend.Client {
 
 		public void OnBootstrap(DependencyContainer dependencyContainer) {
 			player = dependencyContainer.Resolve<PlayerController>();
-			inputHandler = dependencyContainer.Resolve<InputHandler>();
+			inputHandler = dependencyContainer.Resolve<InputHandler>(); 
 			rb = player.Rigidbody;
 			animator = player.Animator;
 			collider = this.GetComponent<CapsuleCollider2D>();
@@ -91,6 +93,7 @@ namespace SoulboundBackend.Client {
 				rb.linearVelocity = bounce * contactBouncePower;
 				knockbackStunTimer = knockbackStunDuration * Mathf.Clamp(Mathf.Abs(bounce.y), 0.1f, 1f);
 			}, () => !player.isImmune));
+			isBootstrapped = true;
 		}
 
 		public void OnEarlyBootstrap(DependencyContainer dependencyContainer) {
@@ -100,6 +103,9 @@ namespace SoulboundBackend.Client {
 		// FIXME: inconsistent movement
 
 		private void Update() {
+			if (!isBootstrapped) {
+				return;
+			}
 			if (LevelManager.instance.IsPaused) {
 				return;
 			}
@@ -113,6 +119,9 @@ namespace SoulboundBackend.Client {
 		}
 
 		private void FixedUpdate() {
+			if (!isBootstrapped) {
+				return;
+			}
 			if (knockbackStunTimer > 0) {
 				knockbackStunTimer -= Time.fixedDeltaTime;
 				return;         // knockback immunity will be a thing
@@ -168,7 +177,7 @@ namespace SoulboundBackend.Client {
 			UpdateFlightTimePanel(isFlying, flightTime, player.Stats.GrantedFlightTime);
 		}
 
-		internal void OnSpacePressed() {
+		internal void OnSpacePressed() { 
 			if (jumpsLeft > 0 && knockbackStunTimer <= 0) {
 				shouldJump = true;
 				jumpsLeft--;

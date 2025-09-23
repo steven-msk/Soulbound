@@ -46,6 +46,7 @@ namespace SoulboundBackend.Client.World {
         private PlayerController player;
         public PlayerController Player => player;
 
+        public bool isBootstrapped { get; private set; } = false;
 
         public Level(PlayerController player, LevelGridContext gridContext, int seed, int renderDistance) {
             this.player = player;
@@ -78,6 +79,8 @@ namespace SoulboundBackend.Client.World {
 				    BlockStateChanged += structureTemplate.blockStateChangedCallback;
 			    }
 		    }
+
+            isBootstrapped = true;
 
             InvocationHelper.If(dump != null, 
                 () => entityManager.Boostrap(dump!.Value.serializedEntities));

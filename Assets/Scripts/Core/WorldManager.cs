@@ -63,19 +63,23 @@ public sealed class WorldManager {
 		}
 		void FinalizeLevelManager() {
             if (activeLevelManager == null) {
-                throw new InvalidOperationException("LevelManager instantiation failed.");
+                throw new InvalidOperationException("LevelManager not instantiated.");
             }
 
             activeLevelManager.Init(this, world, instanceFactory,
                 treeBuilder => treeBuilder.BuildTree<BootstrappableParentOfAttribute>(typeof(LevelManager))
-            );
+			);
 
-            Grid grid = GameObject.Find("Grid").GetComponent<Grid>();
-            Tilemap tilemap = grid.GetComponentInChildren<Tilemap>();
+			LevelGridContext gridContext;
+			GameObject grid = GameObject.Find("Grid");
+			if (grid == null) {
+				gridContext = LevelGridContext.FromRuntimePrefabs();
+			} else {
+				Tilemap tilemap = grid.GetComponentInChildren<Tilemap>();
+				gridContext = new LevelGridContext(grid.GetComponent<Grid>(), tilemap);
+			}
 
-            activeLevelManager.BootstrapWorld(dump, seed,
-                new LevelGridContext(grid, tilemap)
-            );
+			activeLevelManager.BootstrapWorld(dump, seed, gridContext);
         }
 
 		if (levelScene == null) {
@@ -106,7 +110,7 @@ public sealed class WorldManager {
 		} else {
 			SceneManager.SetActiveScene(levelScene.Value);
 			activeLevelManager = InstantiateLevelManager();
-			instanceFactory = GameEntryPoint.DefaultInstanceFactory(activeLevelManager);
+			instanceFactory = GameEntryPoint.DefaultInstanceFactory().Invoke(activeLevelManager);
 			FinalizeLevelManager();
 		}
 	}

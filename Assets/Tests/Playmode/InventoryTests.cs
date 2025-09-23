@@ -7,6 +7,7 @@ using SoulboundBackend.Client.UI.Storage;
 using SoulboundBackend.Core;
 using SoulboundBackend.Core.Bootstrap;
 using SoulboundBackend.Core.Resource;
+using SoulboundBackend.Tests;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -25,7 +26,7 @@ public class InventoryTests {
         var levelManager = GameObject.Instantiate(levelManagerPrefab).GetComponent<LevelManager>();
 
         levelManager.Init(null, null,
-			GameEntryPoint.DefaultInstanceFactory(levelManager),
+			GameEntryPoint.DefaultInstanceFactory().Invoke(levelManager),
 			treeBuilder => treeBuilder.BuildTree<BootstrappableChildOfAttribute>(typeof(InventoryController))
 		);
 
@@ -53,4 +54,10 @@ public class InventoryTests {
 		Assert.That(slot.ItemDisplay, Is.EqualTo(display),
 			() => "ItemDisplay did not assign correctly in slot");
 	}
+
+    [SetUp]
+    public void PrepareEnvironment() {
+        StaticResetManager.ResetAll();
+        ResourceGroups.Bootstrap();
+    }
 }

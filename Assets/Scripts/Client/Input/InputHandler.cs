@@ -12,6 +12,8 @@ namespace SoulboundBackend.Client.Input {
 	[BootstrappableChildOf(typeof(PlayerController))]
 	public class InputHandler : MonoBehaviour, IBootstrappable {
 		public PlayerInputActions inputActions { get; private set; }
+		private PlayerController player;
+		public bool isBootstrapped { get; private set; }
 
 		public Vector2 MouseScreenPosition { get; private set; }
 		public Vector2 MouseWorldPosition {
@@ -38,13 +40,13 @@ namespace SoulboundBackend.Client.Input {
 		private static List<InputAction> pausableInputs = new();
 
 		public void OnBootstrap(DependencyContainer dependencyContainer) {
+			player = dependencyContainer.Resolve<PlayerController>();
 			requests.Clear();
 			blockedContexts.Clear();
 			pausableInputs.Clear();
 
 			inputActions = new PlayerInputActions();
 			PlayerActions playerActions = inputActions.Player;
-			PlayerController player = dependencyContainer.Resolve<PlayerController>();
 
 			RegisterInputEvent(playerActions.MousePosition, pausable: false, (action) => {
 				action.performed += actionContext => MouseScreenPosition = actionContext.ReadValue<Vector2>();
@@ -98,9 +100,10 @@ namespace SoulboundBackend.Client.Input {
 			});
 
 			inputActions.Enable();
-		}
+            isBootstrapped = true;
+        }
 
-		public void OnEarlyBootstrap(DependencyContainer dependencyContainer) {
+        public void OnEarlyBootstrap(DependencyContainer dependencyContainer) {
 			dependencyContainer.Register<InputHandler>(this);
 		}
 
@@ -116,8 +119,11 @@ namespace SoulboundBackend.Client.Input {
 		public static void RequestAction(InputActionRequest action) => requests.Add(action);
 
 		private void Update() {
-			InvocationHelper.If(LeftHold, LevelManager.instance.Player.OnLeftHold);
-			InvocationHelper.If(RightHold, LevelManager.instance.Player.OnRightHold);
+			if (!isBootstrapped) {
+				return;
+			}
+			InvocationHelper.If(LeftHold, player.OnLeftHold);
+			InvocationHelper.If(RightHold, player.OnRightHold);
 
 			List<string> unblockedPersistent = new();
 			foreach (var kvp in blockedContexts) {
@@ -149,5 +155,4 @@ namespace SoulboundBackend.Client.Input {
 
 		public static void UnpauseInputs() => pausableInputs.ForEach(inputAction => inputAction.Enable());
 	}
-
 }

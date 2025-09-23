@@ -10,12 +10,12 @@ using Logger = SoulboundBackend.Common.Logging.Logger;
 namespace SoulboundBackend.Core.Resource {
 	public static partial class ResourceGroups {
 		private static readonly Logger logger = Logger.CreateInstance();
-		static Dictionary<Type, string> addressesByGroupType = new(); 
+		static Dictionary<Type, string> addressesByGroupType = new();
 		static Dictionary<string, ResourceGroup> groupsByAddress = new();
 		static bool bootstrapped = false;
 
-		public static void Bootstrap() {
-			if (bootstrapped) {
+		public static void Bootstrap(bool force = false) {
+			if (bootstrapped && !force) {
 				logger.LogInfo(LogModules.resource, "Resource group types already bootstrapped, skipping");
 				return;
 			}

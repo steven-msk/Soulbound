@@ -88,7 +88,7 @@ namespace SoulboundBackend.Core {
 		}
 
 		private void Update() {
-			this.level.Update(Time.deltaTime);
+			this.level?.Update(Time.deltaTime);
 		}
 
 		IEnumerator GameTickLoop() {
@@ -97,7 +97,7 @@ namespace SoulboundBackend.Core {
 				if (!this.IsPaused) {
 					StartTick();
 					// do things
-					level.EntityManager.Tick();
+					level?.EntityManager.Tick();
 					// TODO: implement proper ticking system
 					EndTick();
 				}
@@ -130,14 +130,16 @@ namespace SoulboundBackend.Core {
 		private void OnApplicationQuit() {
 			EventBus<GameEvent>.Clear();
 			EventBus<SystemEvent>.Clear();
-			worldManager.SaveWorld(world, level.Save());
+			if (level != null) {
+				worldManager.SaveWorld(world, level.Save()); 
+			}
 		} 
 	}
 
 	public record LevelGridContext(Grid grid, Tilemap tilemap) {
 		public static LevelGridContext FromRuntimePrefabs() {
 			var gridPrefab = ResourceManager.Get<GameObject, ResourceGroups.Runtime.Prefabs>("Grid");
-			var tilemapPrefab = ResourceManager.Get<GameObject, ResourceGroups.Runtime.Prefabs>("tilemap");
+			var tilemapPrefab = ResourceManager.Get<GameObject, ResourceGroups.Runtime.Prefabs>("Tilemap");
 
 			var gridObj = GameObject.Instantiate(gridPrefab);
 			var tilemapObj = GameObject.Instantiate(tilemapPrefab, gridObj.transform);
