@@ -46,6 +46,7 @@ public class ResourceTests {
 	}
 }
 
+#if UNITY_INCLUDE_TESTS
 public static partial class ResourceGroups {
 	public sealed class DummyGroup : IResourceGroupDefinition<GameObject> {
 		public static readonly DummyGroup instance = new();
@@ -53,4 +54,4 @@ public static partial class ResourceGroups {
 		public string address => "dummy/";
 	}
 }
-
+#endif
