@@ -26,6 +26,7 @@ namespace SoulboundBackend.Core {
 		public static LevelManager instance;
 		public const float tickRate = 0.02f;        // 50 tps
 		private float tickStartTime;
+		public bool isWorldLoaded { get; private set; } = false;
 		public bool IsPaused { get; private set; }
 
 		// POTENTIAL FEATUREIMPL (unlikely, but possible): make Level class NOT a singleton.
@@ -72,23 +73,23 @@ namespace SoulboundBackend.Core {
 
 		public void BootstrapWorld(WorldDump? dump, int seed, LevelGridContext gridContext) {
 			UnityEngine.Random.InitState(seed);
-            this.level = new Level(player, gridContext, seed, renderDistance: 2);
+			this.level = new Level(player, gridContext, seed, renderDistance: 2);
 			this.level.BootstrapWorld(dump);
-		}
+			isWorldLoaded = true;
+        }
 
 		void IBootstrappable.OnBootstrap(DependencyContainer dependencyContainer) {
-		}
+            StartCoroutine(GameTickLoop());
+        }
 
 		public void OnEarlyBootstrap(DependencyContainer dependencyContainer) {
 			dependencyContainer.Register<LevelManager>(this);
 		}
 
-		private void Start() {
-			StartCoroutine(GameTickLoop());
-		}
-
 		private void Update() {
-			this.level?.Update(Time.deltaTime);
+			if (isWorldLoaded) {
+				this.level.Update(Time.deltaTime);
+			}
 		}
 
 		IEnumerator GameTickLoop() {
@@ -97,7 +98,9 @@ namespace SoulboundBackend.Core {
 				if (!this.IsPaused) {
 					StartTick();
 					// do things
-					level?.EntityManager.Tick();
+					if (isWorldLoaded) {
+						level.EntityManager.Tick();
+					}
 					// TODO: implement proper ticking system
 					EndTick();
 				}
@@ -128,10 +131,8 @@ namespace SoulboundBackend.Core {
 		}
 
 		private void OnApplicationQuit() {
-			EventBus<GameEvent>.Clear();
-			EventBus<SystemEvent>.Clear();
-			if (level != null) {
-				worldManager.SaveWorld(world, level.Save()); 
+			if (isWorldLoaded) {
+				worldManager.SaveWorld(world, level.Save());
 			}
 		} 
 	}
@@ -145,10 +146,10 @@ namespace SoulboundBackend.Core {
 			var tilemapObj = GameObject.Instantiate(tilemapPrefab, gridObj.transform);
 			tilemapObj.transform.SetParent(gridObj.transform);
 
-            return new LevelGridContext(
+			return new LevelGridContext(
 				gridObj.GetComponent<Grid>(),
 				tilemapObj.GetComponent<Tilemap>()
-            );
-        }
+			);
+		}
 	}
 }
