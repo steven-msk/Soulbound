@@ -28,6 +28,17 @@ public class WorldTests {
         worldManager.LoadWorld("test1", null);
 		yield return new WaitUntil(() => LevelManager.instance?.Level?.isBootstrapped ?? false);
 		Assert.Pass();
+	[UnityTest]
+	public IEnumerator BlockState_GetsPlacedSuccessfully_WhenWorldJustBootstrapped() {
+		var result = new WorldContextResult();
+		yield return WorldTests.CreateScenelessContext(result);
+			
+		Level level = result.worldManager?.activeLevelManager?.Level
+			?? throw new ArgumentException("Scened world didnt load properly");
+		BlockPos blockPos = new(0, 0);
+
+		level.SetBlock(blockPos, Blocks.air.defaultState);
+		Assert.That(level.BlockAt(blockPos) == Blocks.air);
     }
 
 	[SetUp]
