@@ -108,12 +108,22 @@ namespace SoulboundBackend.Client.World.Chunk {
 			outlineRenderer.HideOutline(this);
 		}
 
-		public void SetBlock(ChunkBlockPos chunkPos, BlockState blockState) => blockStates[chunkPos.x][WorldYToIndex(chunkPos.y)] = blockState;
+		public void SetBlock(ChunkBlockPos chunkPos, BlockState blockState) {
+			blockStates[chunkPos.x][WorldYToIndex(chunkPos.y)] = blockState;
+		}
 
-		public BlockState BlockStateAt(ChunkBlockPos chunkPos) => blockStates[chunkPos.x][WorldYToIndex(chunkPos.y)];
+		public BlockState BlockStateAt(ChunkBlockPos chunkPos) { 
+			return blockStates[chunkPos.x][WorldYToIndex(chunkPos.y)];
+		}
 
 		public sealed class WorldChunkJsonConverter : JsonConverter<WorldChunk> {
-			public override WorldChunk ReadJson(JsonReader reader, Type objectType, WorldChunk existingValue, bool hasExistingValue, JsonSerializer serializer) {
+			public override WorldChunk ReadJson(
+					JsonReader reader,
+					Type objectType, 
+					WorldChunk existingValue, 
+					bool hasExistingValue,
+					JsonSerializer serializer
+				) {
 				if (reader.TokenType == JsonToken.Null) {
 					return null;
 				}

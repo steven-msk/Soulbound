@@ -4,6 +4,7 @@ using SoulboundBackend.Client.UI.Storage;
 using SoulboundBackend.Client.World;
 using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Client.World.Chunk;
+using SoulboundBackend.Common;
 using SoulboundBackend.Core;
 using SoulboundBackend.Core.Bootstrap;
 using SoulboundBackend.Core.Resource;
@@ -27,6 +28,10 @@ public class WorldTests {
 	}
 	internal const string commonSavesRoot = "testSaves";
 
+	internal static string CreateNewWorldID() {
+		return "world " + Guid.NewGuid().ToString();
+    }
+
 	internal static IEnumerator CreateContextWithNoSceneProvided(
 			WorldContextResult result,
 			string? world = null, 
@@ -36,10 +41,11 @@ public class WorldTests {
 			saveStrategy ?? new DoNotSaveWorldStrategy(),
 			() => Application.temporaryCachePath
 		);
-		result.worldManager.LoadWorld(world ?? "world " + Guid.NewGuid().ToString(), null);
+		result.worldManager.LoadWorld(world ?? CreateNewWorldID(), null);
 		yield return new WaitUntil(
 			() => result.worldManager.activeLevelManager?.Level.isBootstrapped ?? false
 		);
+		yield return null;
 	}
 
 	internal static void CreateContextWithSceneProvided(
@@ -52,7 +58,7 @@ public class WorldTests {
 			saveStrategy ?? new DoNotSaveWorldStrategy(),
 			() => Application.temporaryCachePath
 		);
-		worldManager.LoadWorld(world ?? "world " + Guid.NewGuid().ToString(), scene);
+		worldManager.LoadWorld(world ?? CreateNewWorldID(), scene);
 	}
 
 	internal static Scene CreateSavedContext(out WorldManager worldManager, string world) {
@@ -86,7 +92,7 @@ public class WorldTests {
 
 	[UnityTest]
 	public IEnumerator World_SaveAndReload_PersistsBlockChanges() {
-		string world = "savedWorld " + Guid.NewGuid().ToString();
+		string world = CreateNewWorldID();
 
 		Scene scene = CreateSavedContext(out var worldManager, world);
 		yield return null;
@@ -115,8 +121,8 @@ public class WorldTests {
 
 	[UnityTest]
 	public IEnumerator World_HasUniqueSaveFile() {
-		string world1 = "savedWorld " + Guid.NewGuid().ToString();
-		string world2 = "savedWorld " + Guid.NewGuid().ToString();
+		string world1 = CreateNewWorldID();
+		string world2 = CreateNewWorldID();
 
 		Scene scene = CreateSavedContext(out var worldManager, world1);
 		int world1seed = TryGetLevel(worldManager).seed;
@@ -141,6 +147,39 @@ public class WorldTests {
 
 		yield return TestingEnvironment.UnloadSceneAsync(scene);
     }
+
+	[UnityTest]
+	public IEnumerator World_LevelInstanceChanges_WhenSwitchingWorlds() {
+		string world1 = CreateNewWorldID();
+		string world2 = CreateNewWorldID();
+
+		Scene scene = CreateSavedContext(out var worldManager, world1);
+		Level world1instance = TryGetLevel(worldManager);
+		worldManager.SaveWorld(world1, world1instance.Save());
+
+		yield return TestingEnvironment.UnloadSceneAsync(scene);
+
+		scene = CreateSavedContext(out worldManager, world2);
+		Level world2instance = TryGetLevel(worldManager);
+
+		Assert.That(world1instance, Is.Not.EqualTo(world2instance));
+	}
+
+	[UnityTest]
+	public IEnumerator DoNotSaveWorldStrategy_DiscardsSaves() {
+		string world = CreateNewWorldID();
+
+		Scene scene = TestingEnvironment.CreateNewTestScene();
+		CreateContextWithSceneProvided(scene, out var worldManager, world, saveStrategy: new DoNotSaveWorldStrategy());
+		int seed = TryGetLevel(worldManager).seed;
+		worldManager.SaveWorld(world, TryGetLevel(worldManager).Save());
+
+		yield return TestingEnvironment.UnloadSceneAsync(scene);
+
+		var result = new WorldContextResult();
+		yield return CreateContextWithNoSceneProvided(result, world, saveStrategy: new DoNotSaveWorldStrategy());
+		Assert.That(seed, Is.Not.EqualTo(TryGetLevel(result.worldManager).seed));
+	}
 
 	[UnityTest]
 	public IEnumerator BlockState_GetsPlacedSuccessfully_WhenWorldJustBootstrapped() {

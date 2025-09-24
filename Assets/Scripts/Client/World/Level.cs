@@ -159,7 +159,12 @@ namespace SoulboundBackend.Client.World {
             return chunk;
         }
 
-        public bool CheckStructureAvailability(int chunkBlockX, int chunkX, ChunkHeightmapData heightmapData, out StructurePlacement structurePlacement) {
+        public bool CheckStructureAvailability(
+                int chunkBlockX,
+                int chunkX, 
+                ChunkHeightmapData heightmapData,
+                out StructurePlacement structurePlacement
+            ) {
             foreach (var structureID in registeredStructureTemplates.Keys) {
                 StructureTemplate structure = registeredStructureTemplates[structureID];
                 var context = new StructureGenerationContext(chunkBlockX, chunkX, heightmapData, this);
