@@ -26,10 +26,12 @@ public sealed class WorldManager {
 	private readonly string savesRoot;
 	public LevelManager? activeLevelManager { get; private set; }
 	private readonly ISaveStrategy<WorldDump> saveStrategy;
+	private Func<string> dataRegion;
 
-	public WorldManager(string savesRoot, ISaveStrategy<WorldDump> saveStrategy) {
+	public WorldManager(string savesRoot, ISaveStrategy<WorldDump> saveStrategy, Func<string>? dataRegion = null) {
 		this.savesRoot = savesRoot;
 		this.saveStrategy = saveStrategy;
+		this.dataRegion = dataRegion ?? (() => Application.persistentDataPath);
 	}
 
 	public IEnumerable<string> QuerySaves() {
@@ -37,7 +39,7 @@ public sealed class WorldManager {
 			yield break;
 		}
 		foreach (var dir in Directory.GetDirectories(savesRoot)) {
-			if (File.Exists(GetPersistentPath(Path.Combine(dir, LevelManager.worldDump)))) {
+			if (File.Exists(GetRegionedPath(Path.Combine(dir, LevelManager.worldDump)))) {
 				yield return Path.GetFileName(dir);
 			}
 		}
@@ -117,16 +119,18 @@ public sealed class WorldManager {
 		saveStrategy.Save(dump, dumpPath);
 	}
 
-	private string GetDumpPath(string world, bool createIfAbsent) {
+	public string GetDumpPath(string world, bool createIfAbsent) {
 		string worldFolder = Path.Combine(savesRoot, world);
 		if (createIfAbsent) {
-			Directory.CreateDirectory(GetPersistentPath(worldFolder));
+			Directory.CreateDirectory(GetRegionedPath(worldFolder));
 		}
-		string dumpPath = GetPersistentPath(Path.Combine(worldFolder, LevelManager.worldDump));
+		string dumpPath = GetRegionedPath(Path.Combine(worldFolder, LevelManager.worldDump));
 		return dumpPath;
 	}
 
-	private string GetPersistentPath(string path) {
-		return Path.Combine(Application.persistentDataPath, path);
+	public string GetRegionedPath(params string[] paths) {
+		List<string> regioned = new() { dataRegion.Invoke() };
+		regioned.AddRange(paths);
+		return Path.Combine(regioned.ToArray());
 	}
 }

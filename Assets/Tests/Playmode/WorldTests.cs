@@ -2,12 +2,16 @@ using NUnit.Framework;
 using SoulboundBackend.Client.UI.Storage;
 using SoulboundBackend.Client.World;
 using SoulboundBackend.Client.World.BlockSystem;
+using SoulboundBackend.Client.World.Chunk;
 using SoulboundBackend.Core;
 using SoulboundBackend.Core.Bootstrap;
 using SoulboundBackend.Core.Resource;
 using SoulboundBackend.Tests;
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
@@ -25,12 +29,15 @@ public class WorldTests {
 			string world = "test", 
 			ISaveStrategy<WorldDump>? saveStrategy = null
 		) {
-		result.worldManager = new(savesRoot, saveStrategy ?? new DoNotSaveWorldStrategy());
-        result.worldManager.LoadWorld(world, null);
-        yield return new WaitUntil(
+		result.worldManager = new(savesRoot, 
+			saveStrategy ?? new DoNotSaveWorldStrategy(),
+			() => Application.temporaryCachePath
+		);
+		result.worldManager.LoadWorld(world, null);
+		yield return new WaitUntil(
 			() => result.worldManager.activeLevelManager?.Level.isBootstrapped ?? false
 		);
-    }
+	}
 
 	internal static void CreateScenedContext(
 		Scene scene,
@@ -39,7 +46,10 @@ public class WorldTests {
 		string world = "test", 
 		ISaveStrategy<WorldDump>? saveStrategy = null
 		) {
-		worldManager = new(savesRoot, saveStrategy ?? new DoNotSaveWorldStrategy());
+		worldManager = new(savesRoot, 
+			saveStrategy ?? new DoNotSaveWorldStrategy(), 
+			() => Application.temporaryCachePath
+		);
 		worldManager.LoadWorld(world, scene);
 	}
 
@@ -59,7 +69,45 @@ public class WorldTests {
 		var result = new WorldContextResult();
 		yield return WorldTests.CreateScenelessContext(result);
 		Assert.That(result.worldManager != null, () => "Failed to create sceneless world");
-    }
+	}
+
+	[UnityTest]
+	public IEnumerator World_SaveAndReload_PersistsBlockChanges() {
+		var result = new WorldContextResult();
+		string world = "savedWorld";
+		string savesRoot = "worldSaveTest";
+		Scene CreateContext(out WorldManager worldManager) {
+			Scene scene = SceneManager.CreateScene(Guid.NewGuid().ToString());
+			CreateScenedContext(scene, out worldManager, savesRoot, world, new WorldSaveStrategy());
+			return scene;
+		}
+
+		Scene scene = CreateContext(out var worldManager);
+		Level TryGetLevel() => worldManager.activeLevelManager?.Level
+			?? throw new ArgumentException("Scened world didnt load properly");
+		yield return null;
+
+		Level level = TryGetLevel();
+		WorldDump dump = level.Save();
+		ChunkBlockPos pos = new(0, 0, 0);
+
+		pos.chunkX = dump.generatedChunks[0].xpos;
+		Block blockAtPos = dump.generatedChunks[0].BlockStateAt(pos).block;
+		Block target = Blocks.AllBlocks().First(block => blockAtPos != block);
+
+		dump.generatedChunks[0].SetBlock(pos, target.defaultState);
+		worldManager.SaveWorld(world, dump);
+
+		AsyncOperation async = SceneManager.UnloadSceneAsync(scene);
+		yield return new WaitUntil(() => async.isDone);
+		yield return null;
+
+		StaticResetManager.ResetAll();
+		CreateContext(out worldManager);
+
+		level = TryGetLevel();
+		Assert.That(level.BlockAt(pos.ToWorldBlockPos()) == target);
+	}
 
 	[UnityTest]
 	public IEnumerator BlockState_GetsPlacedSuccessfully_WhenWorldJustBootstrapped() {
@@ -76,7 +124,7 @@ public class WorldTests {
 
 	[SetUp]
 	public void PrepareEnvironment() {
-        StaticResetManager.ResetAll();
-        ResourceGroups.Bootstrap();
-    }
+		StaticResetManager.ResetAll();
+		ResourceGroups.Bootstrap();
+	}
 }

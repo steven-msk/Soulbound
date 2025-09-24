@@ -2,6 +2,7 @@
 using SoulboundBackend.Core.Resource;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine.Tilemaps;
 
@@ -17,6 +18,8 @@ namespace SoulboundBackend.Client.World.BlockSystem {
         public static readonly Block stone = InjectID(new GenericBlock("Stone Block", Tile("stone"), Items.stoneBlock));
         public static readonly Block wood = InjectID(new GenericBlock("Wood", Tile("wood"), Items.woodBlock));
         public static readonly Block leaves = InjectID(new GenericBlock("Leaves", Tile("leaves"), Items.leavesBlock, _ => BlockBehaviors.DropIfPlayerBroke()));
+
+        public static List<Block> AllBlocks() => blocksById.Values.ToList();
 
         public static Block ByID(int id) {
             if (blocksById.TryGetValue(id, out Block block)) {
