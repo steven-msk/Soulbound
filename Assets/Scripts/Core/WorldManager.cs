@@ -24,7 +24,7 @@ using CoroutineRunner = SoulboundBackend.Core.CoroutineRunner;
 
 public sealed class WorldManager {
 	private readonly string savesRoot;
-	private LevelManager? activeLevelManager;
+	public LevelManager? activeLevelManager { get; private set; }
 	private readonly ISaveStrategy<WorldDump> saveStrategy;
 
 	public WorldManager(string savesRoot, ISaveStrategy<WorldDump> saveStrategy) {
@@ -55,7 +55,7 @@ public sealed class WorldManager {
 		GameObject? levelManagerPrefab = ResourceManager.Get<GameObject, ResourceGroups.Runtime.Prefabs>("levelManager");
 		BootstrappableInstanceFactory instanceFactory = new();
 		LevelManager InstantiateLevelManager() {
-			return GameObject.Instantiate(levelManagerPrefab)?.GetComponent<LevelManager>() 
+			return GameObject.Instantiate(levelManagerPrefab)?.GetComponent<LevelManager>()
 				?? throw new ArgumentException("LevelManager prefab not found!");
 		}
 		void FinalizeLevelManager() {

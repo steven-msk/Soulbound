@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using SoulboundBackend.Client.UI.Storage;
 using SoulboundBackend.Client.World;
+using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Core;
 using SoulboundBackend.Core.Bootstrap;
 using SoulboundBackend.Core.Resource;
@@ -11,23 +12,55 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 
+#nullable enable
+
 public class WorldTests {
+	internal class WorldContextResult {
+		public WorldManager? worldManager { get; set; }
+	}
+
+	internal static IEnumerator CreateScenelessContext(
+			WorldContextResult result,
+			string savesRoot = "testWorlds",
+			string world = "test", 
+			ISaveStrategy<WorldDump>? saveStrategy = null
+		) {
+		result.worldManager = new(savesRoot, saveStrategy ?? new DoNotSaveWorldStrategy());
+        result.worldManager.LoadWorld(world, null);
+        yield return new WaitUntil(
+			() => result.worldManager.activeLevelManager?.Level.isBootstrapped ?? false
+		);
+    }
+
+	internal static void CreateScenedContext(
+		Scene scene,
+		out WorldManager worldManager,
+		string savesRoot = "testWorlds", 
+		string world = "test", 
+		ISaveStrategy<WorldDump>? saveStrategy = null
+		) {
+		worldManager = new(savesRoot, saveStrategy ?? new DoNotSaveWorldStrategy());
+		worldManager.LoadWorld(world, scene);
+	}
+
 	[Test]
 	public void World_LoadsSuccessfully_WhenSceneProvided() {
 		Scene scene = SceneManager.CreateScene(Guid.NewGuid().ToString());
+		CreateScenedContext(scene, out var worldManager);
 
-		WorldManager worldManager = new("testSaves", new DoNotSaveWorldStrategy());
-		worldManager.LoadWorld("test1", scene);
-
-		Assert.That(LevelManager.instance.Level.isBootstrapped);
+		Assert.That(
+			worldManager.activeLevelManager?.Level.isBootstrapped ?? false,
+			() => "Failed to create scened world"
+		);
 	}
 
 	[UnityTest] 
 	public IEnumerator World_LoadsSuccessfully_WhenNoSceneProvided() {
-        WorldManager worldManager = new("testSaves", new DoNotSaveWorldStrategy());
-        worldManager.LoadWorld("test1", null);
-		yield return new WaitUntil(() => LevelManager.instance?.Level?.isBootstrapped ?? false);
-		Assert.Pass();
+		var result = new WorldContextResult();
+		yield return WorldTests.CreateScenelessContext(result);
+		Assert.That(result.worldManager != null, () => "Failed to create sceneless world");
+    }
+
 	[UnityTest]
 	public IEnumerator BlockState_GetsPlacedSuccessfully_WhenWorldJustBootstrapped() {
 		var result = new WorldContextResult();
@@ -39,7 +72,7 @@ public class WorldTests {
 
 		level.SetBlock(blockPos, Blocks.air.defaultState);
 		Assert.That(level.BlockAt(blockPos) == Blocks.air);
-    }
+	}
 
 	[SetUp]
 	public void PrepareEnvironment() {
