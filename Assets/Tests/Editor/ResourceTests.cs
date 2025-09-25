@@ -39,6 +39,14 @@ public class ResourceTests {
 		Assert.That(loadedPrefab != null, () => "Failed to load prefab");
 	}
 
+	[Test]
+	public void ResourceManager_ReturnsNull_WhenAssetDoesNotExist() {
+		SoulboundBackend.Core.Resource.ResourceGroups.Bootstrap();
+		LogAssert.ignoreFailingMessages = true;
+        GameObject? prefab = ResourceManager.Get<GameObject, SoulboundBackend.Core.Resource.ResourceGroups.Runtime.Prefabs>("unknownPrefab");
+		Assert.That(prefab == null, "Expected null for non-existent asset");
+	}
+
 	[OneTimeTearDown]
 	public void Cleanup() {
 		AssetDatabase.DeleteAsset(dummyGroupPath);
