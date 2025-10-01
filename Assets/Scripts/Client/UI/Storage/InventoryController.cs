@@ -72,7 +72,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 			mainPlayerSlots.AddRange(popupSlots);
 			MainPlayerSlots = mainPlayerSlots.ToArray();
 			hotbar.SetActiveSlot(0);
-		}
+        }
 
 		public void OnEarlyBootstrap(DependencyContainer dependencyContainer) {
 			dependencyContainer.Register<InventoryController>(this);
@@ -91,12 +91,6 @@ namespace SoulboundBackend.Client.UI.Storage {
 				armorSlotsByIndex[i] = armorSlots[i];
 			}
 		}
-
-		//private void Start() {
-		//	if (hotbar[0].IsEmpty) {
-		//		ItemDisplay.Create(Items.statItem_test, Item.DEFAULT_MAX_STACK, hotbar[0]);
-		//	}
-		//}
 
 		public SerializedInventory Serialize() {
 			if (GrabbedContext.value != null) {
@@ -152,7 +146,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 			foreach (var slot in popupSlots) {
 				slot.OnInventoryPopup(opened);
 			}
-		}
+        }
 
 		public void DropHoveredOrActiveItem() {
 			IItemSlot? slot = hoveredSlot ?? hotbar.ActiveSlot ?? null;
