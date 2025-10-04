@@ -63,7 +63,7 @@ namespace WorldTests {
 				out WorldManager worldManager
 			) {
 			World.CreateContextWithSceneProvided(
-				worldScene ?? TestingEnvironment.CreateNewTestScene(),
+				worldScene ?? PlayModeTesting.CreateNewTestScene(),
 				out worldManager
 			);
 		}
@@ -88,7 +88,7 @@ namespace WorldTests {
 		}
 
 		internal static Scene CreateSavedContext(out WorldManager worldManager, string world) {
-			Scene scene = TestingEnvironment.CreateNewTestScene();
+			Scene scene = PlayModeTesting.CreateNewTestScene();
 			CreateContextWithSceneProvided(scene, out worldManager, world, new WorldSaveStrategy());
 			return scene;
 		}
@@ -100,7 +100,7 @@ namespace WorldTests {
 
 		[Test]
 		public void World_LoadsSuccessfully_WhenSceneProvided() {
-			Scene scene = TestingEnvironment.CreateNewTestScene();
+			Scene scene = PlayModeTesting.CreateNewTestScene();
 			CreateContextWithSceneProvided(scene, out var worldManager);
 
 			Assert.That(
@@ -134,7 +134,7 @@ namespace WorldTests {
 			dump.generatedChunks[0].SetBlock(pos, target.defaultState);
 			worldManager.SaveWorld(world, dump);
 
-			yield return TestingEnvironment.UnloadSceneAsync(scene);
+			yield return PlayModeTesting.UnloadSceneAsync(scene);
 
 			StaticResetManager.ResetAll();
 			CreateSavedContext(out worldManager, world);
@@ -163,7 +163,7 @@ namespace WorldTests {
 			scene = CreateSavedContext(out worldManager, world1);
 			Assert.That(world1seed, Is.EqualTo(TryGetLevel(worldManager).seed));
 
-			yield return TestingEnvironment.UnloadSceneAsync(scene);
+			yield return PlayModeTesting.UnloadSceneAsync(scene);
 
 			scene = CreateSavedContext(out worldManager, world2);
 			Assert.That(world2seed, Is.EqualTo(TryGetLevel(worldManager).seed));
@@ -178,7 +178,7 @@ namespace WorldTests {
 			Level world1instance = TryGetLevel(worldManager);
 			worldManager.SaveWorld(world1, world1instance.CreateDump());
 
-			yield return TestingEnvironment.UnloadSceneAsync(scene);
+			yield return PlayModeTesting.UnloadSceneAsync(scene);
 
 			scene = CreateSavedContext(out worldManager, world2);
 			Level world2instance = TryGetLevel(worldManager);
@@ -190,12 +190,12 @@ namespace WorldTests {
 		public IEnumerator DoNotSaveWorldStrategy_DiscardsSaves() {
 			string world = CreateNewWorldID();
 
-			Scene scene = TestingEnvironment.CreateNewTestScene();
+			Scene scene = PlayModeTesting.CreateNewTestScene();
 			CreateContextWithSceneProvided(scene, out var worldManager, world, new DoNotSaveWorldStrategy());
 			int seed = TryGetLevel(worldManager).seed;
 			worldManager.SaveWorld(world, TryGetLevel(worldManager).CreateDump());
 
-			yield return TestingEnvironment.UnloadSceneAsync(scene);
+			yield return PlayModeTesting.UnloadSceneAsync(scene);
 
 			var result = new ContextResult<WorldManager>();
 			yield return CreateContextWithNoSceneProvided(result, world, new DoNotSaveWorldStrategy());
@@ -235,7 +235,7 @@ namespace WorldTests.BlockTests {
 
 			BlockState? targetState = World.TryGetLevel(worldManager).BlockStateAt(targetPos);
 			worldManager.SaveWorld(world, World.TryGetLevel(worldManager).CreateDump());
-			yield return TestingEnvironment.UnloadSceneAsync(scene);
+			yield return PlayModeTesting.UnloadSceneAsync(scene);
 
 			World.CreateSavedContext(out worldManager, world);
 			BlockState? actualState = World.TryGetLevel(worldManager).BlockStateAt(targetPos);

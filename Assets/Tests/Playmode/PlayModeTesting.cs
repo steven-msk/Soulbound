@@ -10,7 +10,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace SoulboundBackend.Tests {
-    internal class TestingEnvironment {
+    internal class PlayModeTesting {
         public static Scene CreateNewTestScene() {
             return SceneManager.CreateScene(Guid.NewGuid().ToString());
         }
