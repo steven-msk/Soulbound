@@ -13,6 +13,14 @@ namespace SoulboundBackend.Core.Bootstrap {
             suppliers[typeof(T)] = () => (T)supplier.Invoke();
         }
 
+        public void Override<T>(Func<T> supplier) where T : IBootstrappable {
+            if (!suppliers.TryGetValue(typeof(T), out var existingSupplier)) {
+                Register<T>(supplier);
+                return;
+            }
+            existingSupplier = () => supplier.Invoke();
+        }
+
         public IBootstrappable Create(Type type) {
             if (suppliers.TryGetValue(type, out var supplier)) {
                 return supplier.Invoke();

@@ -26,7 +26,7 @@ public class InventoryTests {
         var levelManager = GameObject.Instantiate(levelManagerPrefab).GetComponent<LevelManager>();
 
         levelManager.Init(null, null,
-			GameEntryPoint.DefaultInstanceFactory().Invoke(levelManager),
+			BootstrapRecipe.ForPredefinedScene(levelManager),
 			treeBuilder => treeBuilder.BuildTree<BootstrappableChildOfAttribute>(typeof(InventoryController))
 		);
 

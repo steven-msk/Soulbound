@@ -21,34 +21,9 @@ using UnityEngine.SceneManagement;
 public sealed class GameEntryPoint : MonoBehaviour {
 	private LevelManager levelManager;
 
-	public static Func<LevelManager, BootstrappableInstanceFactory> DefaultInstanceFactory() {
-		return levelManager => {
-			BootstrappableInstanceFactory factory = new();
-			var playerInstancePrefab = ResourceManager.Get<GameObject, ResourceGroups.Runtime.Prefabs>("player");
-			var uiManager = (GameObject.FindWithTag("MainCanvas")
-				?? GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.Runtime.Prefabs>("Canvas")))
-				.GetComponent<UIManager>();
-
-			var player = GameObject.Instantiate(playerInstancePrefab).GetComponent<PlayerController>();
-			player.enabled = false;
-			var inventory = uiManager.InstantiateInUILevel(player.Inventory).GetComponent<InventoryController>();
-
-			factory.Register<LevelManager>(() => levelManager);
-			factory.Register<PlayerController>(() => player);
-			factory.Register<InventoryController>(() => inventory);
-			factory.Register<HotbarController>(() => inventory.Hotbar);
-			factory.Register<PlayerPhysics>(() => player.GetComponent<PlayerPhysics>());
-			factory.Register<InputHandler>(() => GameObject.Instantiate(player.InputHandler));
-			factory.Register<ItemUsageHandler>(() => new ItemUsageHandler(player));
-
-			return factory;
-		};
-	}
-
 	public static Func<BootstrapTreeBuilder, IEnumerable<IBootstrappable>> defaultBootstrapTree = treeBuilder => {
 		return treeBuilder.BuildTree<BootstrappableParentOfAttribute>(typeof(LevelManager));
     };
-
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
 	public static void StartWorld() {

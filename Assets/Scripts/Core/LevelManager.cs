@@ -49,12 +49,18 @@ namespace SoulboundBackend.Core {
 			TypeNameHandling = TypeNameHandling.Auto,
 			TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
 			Converters = new List<JsonConverter> { 
-				new Vector2JsonConverter(), new Vector3JsonConverter(), new ColorJsonConverter()
+				new Vector2JsonConverter(),
+				new Vector3JsonConverter(),
+				new ColorJsonConverter()
 			},
 		};
 
-		public void Init(WorldManager worldManager, string world, BootstrappableInstanceFactory instanceFactory,
-				Func<BootstrapTreeBuilder, IEnumerable<IBootstrappable>> treeFunc) {
+		public void Init(
+				WorldManager worldManager,
+				string world, 
+				BootstrappableInstanceFactory instanceFactory,
+				Func<BootstrapTreeBuilder, IEnumerable<IBootstrappable>> treeFunc
+			) {
 			instance = this;
 			this.worldManager = worldManager;
 			this.world = world;
@@ -139,6 +145,12 @@ namespace SoulboundBackend.Core {
 				worldManager.SaveWorld(world, level.CreateDump());
 			}
 		} 
+
+		public static LevelManager CreateInstance() {
+            GameObject? levelManagerPrefab = ResourceManager.Get<GameObject, ResourceGroups.Runtime.Prefabs>("levelManager");
+            return GameObject.Instantiate(levelManagerPrefab)?.GetComponent<LevelManager>()
+                ?? throw new ArgumentException("LevelManager prefab not found!");
+        }
 	}
 
 	public record LevelGridContext(Grid grid, Tilemap tilemap) {

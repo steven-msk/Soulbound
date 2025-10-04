@@ -191,14 +191,14 @@ namespace WorldTests {
 			string world = CreateNewWorldID();
 
 			Scene scene = TestingEnvironment.CreateNewTestScene();
-			CreateContextWithSceneProvided(scene, out var worldManager, world, saveStrategy: new DoNotSaveWorldStrategy());
+			CreateContextWithSceneProvided(scene, out var worldManager, world, new DoNotSaveWorldStrategy());
 			int seed = TryGetLevel(worldManager).seed;
 			worldManager.SaveWorld(world, TryGetLevel(worldManager).CreateDump());
 
 			yield return TestingEnvironment.UnloadSceneAsync(scene);
 
 			var result = new ContextResult<WorldManager>();
-			yield return CreateContextWithNoSceneProvided(result, world, saveStrategy: new DoNotSaveWorldStrategy());
+			yield return CreateContextWithNoSceneProvided(result, world, new DoNotSaveWorldStrategy());
 			Assert.That(seed, Is.Not.EqualTo(TryGetLevel(result.value).seed));
 		}
 

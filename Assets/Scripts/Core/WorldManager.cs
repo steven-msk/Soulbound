@@ -61,12 +61,7 @@ public sealed class WorldManager {
 		}
 		int seed = dump?.seed ?? UnityEngine.Random.Range(int.MinValue, int.MaxValue);
 
-		GameObject? levelManagerPrefab = ResourceManager.Get<GameObject, ResourceGroups.Runtime.Prefabs>("levelManager");
 		BootstrappableInstanceFactory instanceFactory = new();
-		LevelManager InstantiateLevelManager() {
-			return GameObject.Instantiate(levelManagerPrefab)?.GetComponent<LevelManager>()
-				?? throw new ArgumentException("LevelManager prefab not found!");
-		}
 		void FinalizeLevelManager() {
             if (activeLevelManager == null) {
                 throw new InvalidOperationException("LevelManager not instantiated.");
@@ -90,34 +85,20 @@ public sealed class WorldManager {
         }
 
 		if (levelScene == null) {
-			T FindByType<T>() where T : UnityEngine.Object {
-				return GameObject.FindAnyObjectByType<T>()
-					?? throw new ArgumentException($"No object of type {typeof(T)} found in the current scene!");
-			}
-
 			IEnumerator LevelSceneLoader() {
 				AsyncOperation asyncLoad = SceneManager.LoadSceneAsync("WorldScene");
 				yield return new WaitUntil(() => asyncLoad.isDone);
 
-				activeLevelManager = InstantiateLevelManager(); 
-				var playerPrefab = ResourceManager.Get<GameObject, ResourceGroups.Runtime.Prefabs>("player");
-				var player = GameObject.Instantiate(playerPrefab)!.GetComponent<PlayerController>();
-
-				instanceFactory.Register<LevelManager>(() => activeLevelManager);
-				instanceFactory.Register<PlayerController>(() => player);
-				instanceFactory.Register<InventoryController>(FindByType<InventoryController>);
-				instanceFactory.Register<HotbarController>(FindByType<HotbarController>);
-				instanceFactory.Register<PlayerPhysics>(() => player.GetComponent<PlayerPhysics>()); 
-				instanceFactory.Register<InputHandler>(FindByType<InputHandler>);
-				instanceFactory.Register<ItemUsageHandler>(() => new ItemUsageHandler(player));
+				instanceFactory = BootstrapRecipe.ForInstanceCreation(out var activeLevelManager);
+				this.activeLevelManager = activeLevelManager;
 
 				FinalizeLevelManager();
 			}
 			CoroutineRunner.GetInstance().StartCoroutine(LevelSceneLoader());
 		} else {
 			SceneManager.SetActiveScene(levelScene.Value);
-			activeLevelManager = InstantiateLevelManager();
-			instanceFactory = GameEntryPoint.DefaultInstanceFactory().Invoke(activeLevelManager);
+			activeLevelManager = LevelManager.CreateInstance();
+			instanceFactory = BootstrapRecipe.ForPredefinedScene(activeLevelManager);
 			FinalizeLevelManager();
 		}
 		return dump;
