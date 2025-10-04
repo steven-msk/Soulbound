@@ -97,7 +97,7 @@ namespace WorldTests {
 			yield return null;
 
 			Level level = TryGetLevel(worldManager);
-			WorldDump dump = level.Save();
+			WorldDump dump = level.CreateDump();
 			ChunkBlockPos pos = new(0, 0, 0);
 
 			pos.chunkX = dump.generatedChunks[0].xpos;
@@ -107,9 +107,7 @@ namespace WorldTests {
 			dump.generatedChunks[0].SetBlock(pos, target.defaultState);
 			worldManager.SaveWorld(world, dump);
 
-			AsyncOperation async = SceneManager.UnloadSceneAsync(scene);
-			yield return new WaitUntil(() => async.isDone);
-			yield return null;
+			yield return TestingEnvironment.UnloadSceneAsync(scene);
 
 			StaticResetManager.ResetAll();
 			CreateSavedContext(out worldManager, world);
@@ -125,16 +123,15 @@ namespace WorldTests {
 
 			Scene scene = CreateSavedContext(out var worldManager, world1);
 			int world1seed = TryGetLevel(worldManager).seed;
-			worldManager.SaveWorld(world1, TryGetLevel(worldManager).Save());
 
-			yield return TestingEnvironment.UnloadSceneAsync(scene);
+			yield return worldManager.TerminateWorldProcess(scene, world1,
+				() => TryGetLevel(worldManager).CreateDump());
 
 			scene = CreateSavedContext(out worldManager, world2);
 			int world2seed = TryGetLevel(worldManager).seed;
-			worldManager.SaveWorld(world2, TryGetLevel(worldManager).Save());
 
-			yield return TestingEnvironment.UnloadSceneAsync(scene);
-
+			yield return worldManager.TerminateWorldProcess(scene, world2,
+				() => TryGetLevel(worldManager).CreateDump());
 
 			scene = CreateSavedContext(out worldManager, world1);
 			Assert.That(world1seed, Is.EqualTo(TryGetLevel(worldManager).seed));
@@ -143,8 +140,6 @@ namespace WorldTests {
 
 			scene = CreateSavedContext(out worldManager, world2);
 			Assert.That(world2seed, Is.EqualTo(TryGetLevel(worldManager).seed));
-
-			yield return TestingEnvironment.UnloadSceneAsync(scene);
 		}
 
 		[UnityTest]
@@ -154,7 +149,7 @@ namespace WorldTests {
 
 			Scene scene = CreateSavedContext(out var worldManager, world1);
 			Level world1instance = TryGetLevel(worldManager);
-			worldManager.SaveWorld(world1, world1instance.Save());
+			worldManager.SaveWorld(world1, world1instance.CreateDump());
 
 			yield return TestingEnvironment.UnloadSceneAsync(scene);
 
@@ -171,7 +166,7 @@ namespace WorldTests {
 			Scene scene = TestingEnvironment.CreateNewTestScene();
 			CreateContextWithSceneProvided(scene, out var worldManager, world, saveStrategy: new DoNotSaveWorldStrategy());
 			int seed = TryGetLevel(worldManager).seed;
-			worldManager.SaveWorld(world, TryGetLevel(worldManager).Save());
+			worldManager.SaveWorld(world, TryGetLevel(worldManager).CreateDump());
 
 			yield return TestingEnvironment.UnloadSceneAsync(scene);
 
@@ -212,7 +207,7 @@ namespace WorldTests.BlockTests {
 			Scene scene = World.CreateSavedContext(out var worldManager, world);
 
 			BlockState? targetState = World.TryGetLevel(worldManager).BlockStateAt(targetPos);
-			worldManager.SaveWorld(world, World.TryGetLevel(worldManager).Save());
+			worldManager.SaveWorld(world, World.TryGetLevel(worldManager).CreateDump());
 			yield return TestingEnvironment.UnloadSceneAsync(scene);
 
 			World.CreateSavedContext(out worldManager, world);
@@ -242,11 +237,11 @@ namespace WorldTests.BlockTests {
 
 			Level level = World.TryGetLevel(result.value);
 			ChunkBlockPos pos = new(5, 0, 0);
-			pos.chunkX = level.Save().generatedChunks[0].xpos;
+			pos.chunkX = level.CreateDump().generatedChunks[0].xpos;
 
 			level.SetBlock(pos.ToWorldBlockPos(), Blocks.leaves.defaultState);
 
-			var dump = level.Save();
+			var dump = level.CreateDump();
 			var blockInDump = dump.generatedChunks[0].BlockStateAt(pos).block;
 
 			Assert.That(blockInDump == Blocks.leaves);

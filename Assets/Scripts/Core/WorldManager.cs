@@ -15,10 +15,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Unity.Plastic.Newtonsoft.Json;
 using Unity.VisualScripting;
+using UnityEditor.SearchService;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
 using CoroutineRunner = SoulboundBackend.Core.CoroutineRunner;
+using Scene = UnityEngine.SceneManagement.Scene;
 
 #nullable enable
 
@@ -118,6 +120,14 @@ public sealed class WorldManager {
 		string dumpPath = GetDumpPath(world, createIfAbsent: saveStrategy is not DoNotSaveWorldStrategy);
 		saveStrategy.Save(dump, dumpPath);
 	}
+
+	public IEnumerator TerminateWorldProcess(Scene worldScene, string world, Func<WorldDump> dumpSupplier) {
+		this.SaveWorld(world, dumpSupplier.Invoke());
+
+        var async = SceneManager.UnloadSceneAsync(worldScene);
+        yield return new WaitUntil(() => async.isDone);
+        yield return null;
+    }
 
 	public string GetDumpPath(string world, bool createIfAbsent) {
 		string worldFolder = Path.Combine(savesRoot, world);

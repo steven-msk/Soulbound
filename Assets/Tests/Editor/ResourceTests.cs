@@ -1,11 +1,21 @@
-using System;
-using System.Collections;
-using System.IO;
 using NUnit.Framework;
 using SoulboundBackend.Core.Resource;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.TestTools;
+using static ResourceGroups;
+
+public static partial class ResourceGroups {
+    public sealed class DummyGroup : IResourceGroupDefinition<GameObject> {
+        public static readonly DummyGroup instance = new();
+        static DummyGroup() => SoulboundBackend.Core.Resource.ResourceGroups.RegisterGroupDefinition<DummyGroup, GameObject>(instance);
+        public string address => "dummy/";
+    }
+}
 
 #nullable enable
 public class ResourceTests {
@@ -18,8 +28,13 @@ public class ResourceTests {
 	[Test]
 	public void ResourceManager_ReturnsAsset_WhenAssetExistsInRegisteredGroup() {
 		Assert.That(!string.IsNullOrEmpty(AssetDatabase.CreateFolder(registryFolder, dummyGroupFolder)), () => $"Could not create folder {dummyGroupSearch}");
-
-		ResourceGroup group = ScriptableObject.CreateInstance<ResourceGroup>();
+		Assert.That(ResourceGroups.DummyGroup.instance != null);
+		try {
+			SoulboundBackend.Core.Resource.ResourceGroups.GetAddressFromGroupDefinition<DummyGroup>();
+        } catch (KeyNotFoundException) {
+			SoulboundBackend.Core.Resource.ResourceGroups.RegisterGroupDefinition<DummyGroup, GameObject>(DummyGroup.instance);
+		}
+        ResourceGroup group = ScriptableObject.CreateInstance<ResourceGroup>();
 		group.groupAddress = "dummy/";
 		group.searchFolder = dummyGroupSearch;
 		group.assetType = "GameObject";
@@ -37,29 +52,26 @@ public class ResourceTests {
 
 		GameObject? loadedPrefab = ResourceManager.Get<GameObject, ResourceGroups.DummyGroup>("dummyObject");
 		Assert.That(loadedPrefab != null, () => "Failed to load prefab");
-	}
+
+		SoulboundBackend.Core.Resource.ResourceGroups.UnloadGroup(group, typeof(ResourceGroups.DummyGroup));
+    }
 
 	[Test]
 	public void ResourceManager_ReturnsNull_WhenAssetDoesNotExist() {
 		SoulboundBackend.Core.Resource.ResourceGroups.Bootstrap();
 		LogAssert.ignoreFailingMessages = true;
-        GameObject? prefab = ResourceManager.Get<GameObject, SoulboundBackend.Core.Resource.ResourceGroups.Runtime.Prefabs>("unknownPrefab");
+        GameObject? prefab = ResourceManager.Get<GameObject, SoulboundBackend.Core.Resource.ResourceGroups.Runtime.Prefabs>("unexpected prefab");
 		Assert.That(prefab == null, "Expected null for non-existent asset");
+    }
+
+	[SetUp, TearDown]
+	public void Setup() {
+		SoulboundBackend.Core.Resource.ResourceGroups.Clear();
 	}
 
 	[OneTimeTearDown]
-	public void Cleanup() {
-		AssetDatabase.DeleteAsset(dummyGroupPath);
+	public void CleanupDummy() {
+        AssetDatabase.DeleteAsset(dummyGroupPath);
 		AssetDatabase.DeleteAsset(dummyGroupSearch);
 	}
 }
-
-#if UNITY_INCLUDE_TESTS
-public static partial class ResourceGroups {
-	public sealed class DummyGroup : IResourceGroupDefinition<GameObject> {
-		public static readonly DummyGroup instance = new();
-		static DummyGroup() => SoulboundBackend.Core.Resource.ResourceGroups.RegisterGroupDefinition<DummyGroup, GameObject>(instance);
-		public string address => "dummy/";
-	}
-}
-#endif

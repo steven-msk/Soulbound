@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using Logger = SoulboundBackend.Common.Logging.Logger;
@@ -14,8 +15,8 @@ namespace SoulboundBackend.Core.Resource {
 		static Dictionary<string, ResourceGroup> groupsByAddress = new();
 		static bool bootstrapped = false;
 
-		public static void Bootstrap(bool force = false) {
-			if (bootstrapped && !force) {
+		public static void Bootstrap() {
+			if (bootstrapped) {
 				logger.LogInfo(LogModules.resource, "Resource group types already bootstrapped, skipping");
 				return;
 			}
@@ -52,6 +53,16 @@ namespace SoulboundBackend.Core.Resource {
 
 		public static ResourceGroup GetGroupByAddress(string address) {
 			return groupsByAddress[address];
+		}
+
+		public static void UnloadGroup(ResourceGroup group, Type groupType) {
+			groupsByAddress.Remove(group.groupAddress);
+			addressesByGroupType.Remove(groupType);
+		}
+
+		public static void Clear() {
+			groupsByAddress.Clear();
+			bootstrapped = false;
 		}
 
 		public static class Runtime {

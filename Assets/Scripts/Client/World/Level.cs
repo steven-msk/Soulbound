@@ -91,7 +91,7 @@ namespace SoulboundBackend.Client.World {
 		    entityManager.SpawnPlayer(player, dump?.player ?? fallback);
 	    }
 
-        public WorldDump Save() {
+        public WorldDump CreateDump() {
             Dictionary<Guid, SerializedEntity> serializedEntities = entityManager.AllExistingEntities
                 .Where(entity => entity.Value is not PlayerController)
                 .ToDictionary(guid => guid.Key, entity => entity.Value.Serialize());

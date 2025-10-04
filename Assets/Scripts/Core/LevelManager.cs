@@ -129,7 +129,7 @@ namespace SoulboundBackend.Core {
 
 		private void OnApplicationQuit() {
 			if (isWorldLoaded) {
-				worldManager.SaveWorld(world, level.Save());
+				worldManager.SaveWorld(world, level.CreateDump());
 			}
 		} 
 	}
