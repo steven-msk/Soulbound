@@ -47,7 +47,12 @@ public sealed class WorldManager {
 		}
 	}
 
-	public void LoadWorld(string world, Scene? levelScene) {
+	public WorldDump? LoadWorld(
+			string world, 
+			Scene? levelScene, 
+			Func<BootstrapTreeBuilder, IEnumerable<IBootstrappable>> bootstrapTreeFunc,
+			bool initPlayerState
+		) {
 		string dumpPath = GetDumpPath(world, createIfAbsent: false);
 
 		WorldDump? dump = saveStrategy.Load(dumpPath);
@@ -67,9 +72,7 @@ public sealed class WorldManager {
                 throw new InvalidOperationException("LevelManager not instantiated.");
             }
 
-            activeLevelManager.Init(this, world, instanceFactory,
-                treeBuilder => treeBuilder.BuildTree<BootstrappableParentOfAttribute>(typeof(LevelManager))
-			);
+            activeLevelManager.Init(this, world, instanceFactory, bootstrapTreeFunc);
 
 			LevelGridContext gridContext;
 			GameObject grid = GameObject.Find("Grid");
@@ -81,6 +84,9 @@ public sealed class WorldManager {
 			}
 
 			activeLevelManager.BootstrapWorld(dump, seed, gridContext);
+			if (initPlayerState) {
+				activeLevelManager.SpawnPlayer(dump?.player); 
+			}
         }
 
 		if (levelScene == null) {
@@ -114,6 +120,7 @@ public sealed class WorldManager {
 			instanceFactory = GameEntryPoint.DefaultInstanceFactory().Invoke(activeLevelManager);
 			FinalizeLevelManager();
 		}
+		return dump;
 	}
 
 	public void SaveWorld(string world, WorldDump dump) {

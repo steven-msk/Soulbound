@@ -68,7 +68,9 @@ namespace SoulboundBackend.Client.World.Entity {
 			foreach (var entity in allEntities.Values) {
 				entity.EntityUpdate(deltaTime);
 			}
-			this.player.EntityUpdate(deltaTime);
+			if (level.isPlayerSpawned) {
+				this.player.EntityUpdate(deltaTime);
+			}
 		}
 
 		public void OnChunkLoaded(WorldChunk chunk) {

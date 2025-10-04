@@ -34,13 +34,19 @@ namespace WorldTests {
 		internal static IEnumerator CreateContextWithNoSceneProvided(
 				ContextResult<WorldManager> result,
 				string? world = null,
-				ISaveStrategy<WorldDump>? saveStrategy = null
-			) {
+				ISaveStrategy<WorldDump>? saveStrategy = null,
+                Func<BootstrapTreeBuilder, IEnumerable<IBootstrappable>>? bootstrapTree = null
+            ) {
 			result.value = new WorldManager(commonSavesRoot,
 				saveStrategy ?? new DoNotSaveWorldStrategy(),
 				() => Application.temporaryCachePath
 			);
-			result.value.LoadWorld(world ?? CreateNewWorldID(), null);
+			result.value.LoadWorld(
+				world ?? CreateNewWorldID(),
+				levelScene: null,
+				bootstrapTree ?? (treeBuilder => new List<IBootstrappable>()),
+				initPlayerState: false
+			);
 			yield return new WaitUntil(
 				() => result.value.activeLevelManager?.Level.isBootstrapped ?? false
 			);
@@ -66,13 +72,19 @@ namespace WorldTests {
 				Scene scene,
 				out WorldManager worldManager,
 				string? world = null,
-				ISaveStrategy<WorldDump>? saveStrategy = null
-			) {
+				ISaveStrategy<WorldDump>? saveStrategy = null,
+                Func<BootstrapTreeBuilder, IEnumerable<IBootstrappable>>? bootstrapTree = null
+            ) {
 			worldManager = new(commonSavesRoot,
 				saveStrategy ?? new DoNotSaveWorldStrategy(),
 				() => Application.temporaryCachePath
 			);
-			worldManager.LoadWorld(world ?? CreateNewWorldID(), scene);
+			worldManager.LoadWorld(
+				world ?? CreateNewWorldID(), 
+				scene, 
+				bootstrapTree ?? (treeBuilder => new List<IBootstrappable>()),
+				initPlayerState: false
+			);
 		}
 
 		internal static Scene CreateSavedContext(out WorldManager worldManager, string world) {

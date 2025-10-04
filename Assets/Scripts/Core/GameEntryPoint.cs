@@ -45,8 +45,12 @@ public sealed class GameEntryPoint : MonoBehaviour {
 		};
 	}
 
+	public static Func<BootstrapTreeBuilder, IEnumerable<IBootstrappable>> defaultBootstrapTree = treeBuilder => {
+		return treeBuilder.BuildTree<BootstrappableParentOfAttribute>(typeof(LevelManager));
+    };
 
-	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
 	public static void StartWorld() {
 #if UNITY_INCLUDE_TESTS
 		if (Application.isEditor && SceneManager.GetActiveScene().name != "DevScene") {
@@ -54,7 +58,7 @@ public sealed class GameEntryPoint : MonoBehaviour {
 		}
 #endif
 		WorldManager worldManager = new("saves", new WorldSaveStrategy());
-		worldManager.LoadWorld("devWorld", null);
+		var loadedDump = worldManager.LoadWorld("devWorld", null, defaultBootstrapTree, true);
 	}
 
 	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]

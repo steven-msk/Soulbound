@@ -4,6 +4,7 @@ using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.UI;
 using SoulboundBackend.Client.UI.Storage;
 using SoulboundBackend.Client.World;
+using SoulboundBackend.Client.World.Entity;
 using SoulboundBackend.Common;
 using SoulboundBackend.Common.Json;
 using SoulboundBackend.Core.Bootstrap;
@@ -63,7 +64,7 @@ namespace SoulboundBackend.Core {
 			var tree = treeFunc.Invoke(treeBuilder).ToList();
 			
 			DependencyContainer dependencyContainer = bootstrapper.EarlyBootstrap(tree);
-			bootstrapper.Bootstrap(tree, dependencyContainer); 
+			bootstrapper.Bootstrap(tree, dependencyContainer);
 
 			this.player = dependencyContainer.Resolve<PlayerController>();
 		}
@@ -74,6 +75,12 @@ namespace SoulboundBackend.Core {
 			this.level.BootstrapWorld(dump);
 			isWorldLoaded = true;
         }
+
+		public void SpawnPlayer(SerializedEntity? serialized) {
+			if (isWorldLoaded) {
+				this.level.SpawnPlayer(serialized);
+			}
+		}
 
 		void IBootstrappable.OnBootstrap(DependencyContainer dependencyContainer) {
             StartCoroutine(GameTickLoop());

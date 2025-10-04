@@ -45,6 +45,7 @@ namespace SoulboundBackend.Client.World {
 
         private PlayerController player;
         public PlayerController Player => player;
+        public bool isPlayerSpawned => player != null;
 
         public bool isBootstrapped { get; private set; } = false;
 
@@ -84,12 +85,15 @@ namespace SoulboundBackend.Client.World {
 
             InvocationHelper.If(dump != null, 
                 () => entityManager.Boostrap(dump!.Value.serializedEntities));
-            SerializedEntity fallback = new(typeof(PlayerController), 
+	    }
+
+        public void SpawnPlayer(SerializedEntity? serializedPlayer) {
+            SerializedEntity fallback = new(typeof(PlayerController),
                 Guid.NewGuid(), player.prefabDefinitionID,
                 new Vector2(0f, GetSurfaceY(0)), null
             );
-		    entityManager.SpawnPlayer(player, dump?.player ?? fallback);
-	    }
+            entityManager.SpawnPlayer(player, serializedPlayer ?? fallback);
+        }
 
         public WorldDump CreateDump() {
             Dictionary<Guid, SerializedEntity> serializedEntities = entityManager.AllExistingEntities
@@ -99,7 +103,7 @@ namespace SoulboundBackend.Client.World {
 		    WorldDump dump = new(
                 this.seed, 
                 generatedChunks.Values.ToArray(), 
-                player.Serialize(),
+                isPlayerSpawned ? player.Serialize() : default,
                 this.structurePlacements, 
                 serializedEntities
             );
@@ -137,7 +141,9 @@ namespace SoulboundBackend.Client.World {
         }
 
         public void Update(float deltaTime) {
-            this.UpdateChunks(player.position);
+            if (isPlayerSpawned) {
+                this.UpdateChunks(player.position);
+            }
             entityManager.Update(deltaTime);
         }
 
