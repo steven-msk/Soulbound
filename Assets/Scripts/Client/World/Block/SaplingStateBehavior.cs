@@ -2,9 +2,11 @@
 using SoulboundBackend.Client.World.Chunk;
 using SoulboundBackend.Client.World.Structure.Templates;
 using SoulboundBackend.Core;
+using System;
 using System.Collections.Generic;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
+	[Obsolete]
 	public class SaplingStateBehavior : IBlockStateBehavior {
 		public string Description => "Tree.";
 

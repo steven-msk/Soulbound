@@ -1,7 +1,9 @@
 ﻿using SoulboundBackend.Client.ItemSystem;
+using System;
 using System.Collections.Generic;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
+	[Obsolete]
 	public class LeafBlockStateBehavior : IBlockStateBehavior {
 		public string Description => "Drops only on player break source, no neighbor updates (yet)";
 		public List<ItemStack> GetDrops(BlockState blockState, BreakSource source) {
