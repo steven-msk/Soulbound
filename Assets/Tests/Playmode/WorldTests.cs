@@ -47,6 +47,21 @@ namespace WorldTests {
 			yield return null;
 		}
 
+		internal static IEnumerator CreateAnonymousContext() {
+            var result = new ContextResult<WorldManager>();
+            yield return World.CreateContextWithNoSceneProvided(result, World.CreateNewWorldID());
+        }
+
+		internal static void CreateAnonymousContext(
+				Scene? worldScene, 
+				out WorldManager worldManager
+			) {
+			World.CreateContextWithSceneProvided(
+				worldScene ?? TestingEnvironment.CreateNewTestScene(),
+				out worldManager
+			);
+		}
+
 		internal static void CreateContextWithSceneProvided(
 				Scene scene,
 				out WorldManager worldManager,
