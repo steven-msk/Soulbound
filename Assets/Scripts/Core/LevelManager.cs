@@ -77,7 +77,7 @@ namespace SoulboundBackend.Core {
 
 		public void BootstrapWorld(WorldDump? dump, int seed, LevelGridContext gridContext) {
 			UnityEngine.Random.InitState(seed);
-			this.level = new Level(player, gridContext, seed, renderDistance: 2);
+			this.level = new Level(player, gridContext, seed);
 			this.level.BootstrapWorld(dump);
 			isWorldLoaded = true;
         }

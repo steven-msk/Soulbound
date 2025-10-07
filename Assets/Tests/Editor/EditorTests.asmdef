@@ -4,7 +4,8 @@
     "references": [
         "UnityEditor.TestRunner",
         "SoulboundBackend",
-        "UnityEngine.TestRunner"
+        "UnityEngine.TestRunner",
+        "PlaymodeTests"
     ],
     "includePlatforms": [
         "Editor"

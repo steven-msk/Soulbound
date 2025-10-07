@@ -38,7 +38,6 @@ namespace SoulboundBackend.Client.World.Chunk {
 			int startX = x * Level.CHUNK_LENGTH;
 			Dictionary<int, int> surfaceLevels = new();
 			int highestStone = 0;
-			Level level = LevelManager.instance.Level;
 
 			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
 				int worldX = startX + x;

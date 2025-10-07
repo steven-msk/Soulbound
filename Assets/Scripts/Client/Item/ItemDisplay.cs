@@ -4,6 +4,7 @@ using SoulboundBackend.Client.UI.Tooltip;
 using SoulboundBackend.Core;
 using SoulboundBackend.Core.Resource;
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,6 +12,7 @@ using UnityEngine.UI;
 
 namespace SoulboundBackend.Client.ItemSystem {
 	public class ItemDisplay : MonoBehaviour {
+		private PlayerController player;
 		[SerializeField] private bool moveMode;
 		[SerializeField] private Item displayedItem;
 		private ItemStack itemStack;
@@ -44,20 +46,20 @@ namespace SoulboundBackend.Client.ItemSystem {
 			itemStack.AssignDisplay(display);
 			display.tooltipRenderer = new TooltipRenderer(TooltipNodeStylePresets.PresetProvider());
 			display.transform.SetAsLastSibling();
+			display.player = LevelManager.instance.Player;
 			return display;
 		}
 
 		private void Update() {
-			InputHandler inputHandler = LevelManager.instance.Player.InputHandler;
 			if (moveMode) {
-				gameObject.transform.position = inputHandler.MouseScreenPosition;
+				gameObject.transform.position = player.InputHandler.MouseScreenPosition;
 			}
-			activeTooltip?.SetPosition(inputHandler.MouseScreenPosition);
+			activeTooltip?.SetPosition(player.InputHandler.MouseScreenPosition);
 		}
 
 		public void Destroy() {
-			if (ItemStack == LevelManager.instance.Player.MainHandStack) {
-				LevelManager.instance.Player.SetMainHandItem(null);
+			if (ItemStack == player.MainHandStack) {
+				player.SetMainHandItem(null);
 			}
 			DestroyTooltip();
 			GameObject.Destroy(gameObject);
@@ -65,7 +67,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 
 		public void ShowTooltip(Vector2 position) {
 			activeTooltip = itemStack.item.RenderTooltip(position, this.transform);
-			activeTooltip?.SetParent(LevelManager.instance.Player.Inventory.transform, true);
+			activeTooltip?.SetParent(player.Inventory.transform, true);
 		}
 
 		public void OnGrab() {

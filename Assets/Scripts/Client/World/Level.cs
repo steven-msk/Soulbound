@@ -25,6 +25,7 @@ namespace SoulboundBackend.Client.World {
 	    public const int CHUNK_LENGTH = 32;
         public const int WORLD_HEIGHT = 300;
         public const int SURFACE_TO_UNDERGROUND_DELIMITER = WORLD_HEIGHT / 2;
+        public const int RENDER_DISTANCE = 2;
         public static string worldDumpFile => Path.Combine(Application.persistentDataPath, LevelManager.worldDump);
 
 	    public event Action<BlockChangeInfo>? BlockStateChanged;
@@ -38,7 +39,6 @@ namespace SoulboundBackend.Client.World {
         private ChunkOutlineRenderer chunkOutlineRenderer = new();
         private Dictionary<int, List<StructurePlacement>> structurePlacements = new();
         private Dictionary<int, List<(ChunkBlockPos chunkBlockPos, BlockState state)>> pendingUpdates = new();
-        private int renderDistance;
         private LevelGridContext gridContext;
         private EntityManager entityManager;
         public EntityManager EntityManager => entityManager;
@@ -49,10 +49,9 @@ namespace SoulboundBackend.Client.World {
 
         public bool isBootstrapped { get; private set; } = false;
 
-        public Level(PlayerController player, LevelGridContext gridContext, int seed, int renderDistance) {
+        public Level(PlayerController player, LevelGridContext gridContext, int seed) {
             this.player = player;
             this.gridContext = gridContext;
-            this.renderDistance = renderDistance; 
             this.seed = seed;
             this.heightGenerator = new PerlinNoiseGenerator1D(this.seed, WorldChunk.HEIGHT_SPREAD);
             this.entityManager = new EntityManager(this);
@@ -67,7 +66,7 @@ namespace SoulboundBackend.Client.World {
             Dictionary<int, int[][]> chunkIDmap = new();
 
             if (dump == null) {
-			    for (int dx = -renderDistance; dx <= renderDistance; dx++) {
+			    for (int dx = -RENDER_DISTANCE; dx <= RENDER_DISTANCE; dx++) {
 				    this.GenerateNewChunk(dx);
 			    }
 		    } else {
@@ -112,9 +111,9 @@ namespace SoulboundBackend.Client.World {
 
         public void UpdateChunks(Vector2 playerPos) {
             int playerChunkX = ChunkXAt(playerPos);
-            this.UnloadDistantChunks(playerChunkX, renderDistance);
+            this.UnloadDistantChunks(playerChunkX, RENDER_DISTANCE);
 
-            for (int dx = -renderDistance; dx <= renderDistance; dx++) {
+            for (int dx = -RENDER_DISTANCE; dx <= RENDER_DISTANCE; dx++) {
                 int chunkX = playerChunkX + dx;
                 if (!loadedChunks.ContainsKey(chunkX)) {
                     WorldChunk chunk = new(chunkX);
@@ -157,7 +156,7 @@ namespace SoulboundBackend.Client.World {
             generatedChunks[chunkX] = chunk;
 
             for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
-                if (CheckStructureAvailability(cx, chunk.xpos, heightmapData, out var structurePlacement)) {
+                if (TryPlaceStructure(cx, chunk.xpos, heightmapData, out var structurePlacement)) {
                     PlaceStructure(chunkX, structurePlacement);
                 }
             }
@@ -165,7 +164,7 @@ namespace SoulboundBackend.Client.World {
             return chunk;
         }
 
-        public bool CheckStructureAvailability(
+        public bool TryPlaceStructure(
                 int chunkBlockX,
                 int chunkX, 
                 ChunkHeightmapData heightmapData,
@@ -173,7 +172,7 @@ namespace SoulboundBackend.Client.World {
             ) {
             foreach (var structureID in registeredStructureTemplates.Keys) {
                 StructureTemplate structure = registeredStructureTemplates[structureID];
-                var context = new StructureGenerationContext(chunkBlockX, chunkX, heightmapData, this);
+                var context = new StructureGenerationContext(chunkBlockX, 0, chunkX, heightmapData, this);
                 var data = structure.placementFunction.Invoke(context, false);
 
                 if (data != null && structure.validationFunction.Invoke(context, data.Value)) {
@@ -189,7 +188,7 @@ namespace SoulboundBackend.Client.World {
 
         public StructurePlacement ForceGeneratePlacement(ChunkBlockPos chunkBlockPos, StructureTemplate template) {
             WorldChunk? chunk = chunkBlockPos.underlyingChunk;
-            var context = new StructureGenerationContext(chunkBlockPos.x, chunkBlockPos.chunkX, chunk.HeightmapData, this);
+            var context = new StructureGenerationContext(chunkBlockPos.x, chunkBlockPos.y, chunkBlockPos.chunkX, chunk.HeightmapData, this);
             var structureData = template.placementFunction.Invoke(context, true);
 
             return template.FinalizePlacement(template.placementGenerator.Invoke(context, structureData));
@@ -216,10 +215,11 @@ namespace SoulboundBackend.Client.World {
         public bool OverlappingStructures(BlockPos blockPos, out List<StructurePlacement> overlappingStructures) {
             int chunkX = ChunkXAt((Vector2Int)blockPos);
 
-            if (structurePlacements.TryGetValue(chunkX, out var chunkFeatures)) {
+            if (structurePlacements.TryGetValue(chunkX, out var placementsInChunk)) {
                 ChunkBlockPos chunkBlockPos = blockPos.ToChunkBlockPos(chunkX);
-                overlappingStructures = chunkFeatures
-                    .Where(f => f.bounds.Contains((Vector2Int)chunkBlockPos)).ToList();
+                overlappingStructures = placementsInChunk
+                    .Where(f => f.bounds.Contains((Vector2Int)chunkBlockPos))
+                    .ToList();
                 return overlappingStructures.Count > 0;
             }
 
@@ -236,7 +236,7 @@ namespace SoulboundBackend.Client.World {
             foreach (var stateOverride in placement.stateOverrides) {
                 ChunkBlockPos chunkBlockPos = stateOverride.Key;
                 BlockState blockState = stateOverride.Value;
-                WorldChunk? underlyingChunk = ChunkAt(chunkBlockPos.ToWorldBlockPos());
+                WorldChunk? underlyingChunk = chunkBlockPos.underlyingChunk;
 
                 if (underlyingChunk == null) {
                     PendUpdate(chunkBlockPos.chunkX, chunkBlockPos, blockState);
@@ -400,12 +400,14 @@ namespace SoulboundBackend.Client.World {
             return coveredTiles;
         }
 
-        private static void RegisterStructure(StructureTemplate structure) {
-            registeredStructureTemplates.Add(structure.ID, structure);
+        public static void RegisterStructure(StructureTemplate structure) {
+            if (!registeredStructureTemplates.ContainsKey(structure.ID)) {
+                registeredStructureTemplates.Add(structure.ID, structure);
+            }
         }
 
-        static Level() {
-            RegisterStructure(TreeStructure.instance);
+        public static void ClearStructureRegistry() {
+            registeredStructureTemplates.Clear();
         }
     }
 }

@@ -25,8 +25,8 @@ namespace SoulboundBackend.Client.World.Structure.Templates {
 				ChunkBlockPos origin = new ChunkBlockPos(generationContext.chunkBlockX, ypos, generationContext.chunkX);
 
 				int height = Random.Range(minHeight, maxHeight + 1);
-				BoundsInt2D bounds = new(origin.x - crownRadius, origin.y, crownRadius * 2 + 1, height);
-				return new PreliminaryStructureData(bounds, origin, forcePlacement);
+				Vector2Int size = new(crownRadius * 2 + 1, height);
+				return new PreliminaryStructureData(size, origin, forcePlacement);
 			})
 			.ValidationFunction((generationContext, preliminaryData) => {
 				if (preliminaryData.forced) {
@@ -36,7 +36,7 @@ namespace SoulboundBackend.Client.World.Structure.Templates {
 				int worldX = generationContext.level.ToWorldX(preliminaryData.origin.x, generationContext.chunkX);
 				int ypos = generationContext.heightmapData.surfaceLevels[worldX];
 				valid = preliminaryData.origin.y == generationContext.heightmapData.surfaceLevels[worldX];
-				int sizeY = preliminaryData.estimatedBounds.size.y;
+				int sizeY = preliminaryData.size.y;
 				valid = sizeY >= minHeight && sizeY <= maxHeight;
 				return valid;
 			})
@@ -44,7 +44,7 @@ namespace SoulboundBackend.Client.World.Structure.Templates {
 				Dictionary<ChunkBlockPos, BlockState> stateOverrides = new();
 				Level level = generationContext.level;
 				ChunkBlockPos origin = preliminaryData.Value.origin;
-				BoundsInt2D bounds = preliminaryData.Value.estimatedBounds;
+				BoundsInt2D bounds = new((Vector2Int)preliminaryData.Value.origin, preliminaryData.Value.size);
 				ChunkBlockPos trunkPos = new ChunkBlockPos(origin.x, origin.y, generationContext.chunkX);
 				BlockState woodBlock = Blocks.wood.defaultState;
 				BlockState leavesBlock = Blocks.leaves.defaultState;
@@ -73,7 +73,7 @@ namespace SoulboundBackend.Client.World.Structure.Templates {
 						stateOverrides[leafChunkPos] = leavesBlock;
 					}
 				}
-				return new StructurePlacementConstraints(origin, bounds, stateOverrides);
+				return new StructurePlacementConstraints(bounds, stateOverrides);
 			})
 			.BlockStateChangedCallback(blockChangedEvent => {
 				Level level = blockChangedEvent.level;

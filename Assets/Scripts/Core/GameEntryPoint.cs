@@ -4,6 +4,7 @@ using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.UI;
 using SoulboundBackend.Client.UI.Storage;
 using SoulboundBackend.Client.World;
+using SoulboundBackend.Client.World.Structure.Templates;
 using SoulboundBackend.Core;
 using SoulboundBackend.Core.Bootstrap;
 using SoulboundBackend.Core.Resource;
@@ -33,6 +34,7 @@ public sealed class GameEntryPoint : MonoBehaviour {
 		}
 #endif
 		WorldManager worldManager = new("saves", new WorldSaveStrategy());
+		Level.RegisterStructure(TreeStructure.instance);
 		var loadedDump = worldManager.LoadWorld("devWorld", null, defaultBootstrapTree, true);
 	}
 
