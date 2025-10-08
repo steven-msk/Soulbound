@@ -129,7 +129,7 @@ namespace WorldTests {
 
 			pos.chunkX = dump.generatedChunks[0].xpos;
 			Block blockAtPos = dump.generatedChunks[0].BlockStateAt(pos).block;
-			Block target = Blocks.AllBlocks().First(block => blockAtPos != block);
+			Block target = Blocks.wood;
 
 			dump.generatedChunks[0].SetBlock(pos, target.defaultState);
 			worldManager.SaveWorld(world, dump);

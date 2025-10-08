@@ -11,8 +11,6 @@ using UnityEngine.Tilemaps;
 namespace SoulboundBackend.Client.World.BlockSystem {
     public partial class Blocks : IResourceModule {
         // REMINDER: since block state properties are unavailable as of right now, keep in mind that block behavior definitions might change when they have actual purpose
-        private static int idCounter = 0;
-        private static Dictionary<int, Block> blocksById = new();
         private static ConcurrentDictionary<int, Block> cached = new();
 
         public static Block air => Lookup("air", () => new GenericBlock("Air", Tile("air"), null));
@@ -21,8 +19,6 @@ namespace SoulboundBackend.Client.World.BlockSystem {
         public static Block stone => Lookup("stone", () => new GenericBlock("Stone Block", Tile("stone"), Items.stoneBlock));
         public static Block wood => Lookup("wood", () => new GenericBlock("Wood", Tile("wood"), Items.woodBlock));
         public static Block leaves => Lookup("leaves", () => new GenericBlock("Leaves", Tile("leaves"), Items.leavesBlock, _ => BlockBehaviors.DropIfPlayerBroke()));
-
-        public static List<Block> AllBlocks() => blocksById.Values.ToList();
 
         private static TileBase Tile(string name) {
             return IResourceModule.Resource<TileBase, ResourceGroups.Tiles>(name);
