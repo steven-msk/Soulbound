@@ -8,6 +8,7 @@
 UserSettings/
 MemoryCaptures/
 Assets/Plugins/Editor/JetBrains*
+CodeCoverage/
 
 # Visual Studio / Rider
 .vscode/
