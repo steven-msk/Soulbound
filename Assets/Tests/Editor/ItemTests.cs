@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEditor.UIElements;
 
 #if UNITY_INCLUDE_TESTS
 public partial class Items {
@@ -19,12 +20,17 @@ public partial class Items {
 
     internal static TItem Lookup<TItem>(string key, Func<TItem> instanceSupplier) where TItem : Item {
         int hash = key.GetHashCode();
-        return (TItem)cached.GetOrAdd(hash, _ => instanceSupplier.Invoke());
+        
+        return (TItem)cached.GetOrAdd(hash, hashedID => {
+            TItem item = instanceSupplier.Invoke();
+            item.hashedID = hashedID;
+            return item;
+        });
     }
 }
 #endif
 
-public class Items_InstanceTests {
+public class ItemTests {
 
     [OneTimeSetUp]
     public void Setup() {
@@ -63,4 +69,5 @@ public class Items_InstanceTests {
         Assert.That(Items.cached.TryGetValue(hash, out registered));
         Assert.That(registered != null);
     }
+
 }

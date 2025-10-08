@@ -56,7 +56,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 		}
 
 		public override int GetHashCode() {
-			return HashCode.Combine(name, aspect, maxStackSize, IsStackable, tooltipSupplier, nodeStyleProvider, id);
+			return HashCode.Combine(name, aspect, maxStackSize, IsStackable, tooltipSupplier, nodeStyleProvider, hashedID);
 		}
 
 		public virtual void StaticReset() {

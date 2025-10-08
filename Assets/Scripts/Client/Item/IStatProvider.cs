@@ -37,7 +37,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 			}
 
 			public override void WriteJson(JsonWriter writer, IStatProvider? value, JsonSerializer serializer) {
-				serializer.Serialize(writer, (value as Item)?.id);
+				serializer.Serialize(writer, (value as Item)?.hashedID);
 			}
 		}
 	}
