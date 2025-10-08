@@ -1,4 +1,5 @@
 ﻿using SoulboundBackend.Client.World.BlockSystem;
+using SoulboundBackend.Common;
 using SoulboundBackend.Core.Resource;
 using System;
 using System.Collections.Concurrent;
@@ -7,8 +8,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Unity.Plastic.Newtonsoft.Json;
 
 namespace SoulboundBackend.Client.ItemSystem {
-	public partial class Items : IResourceModule {
-		private static Dictionary<int, Item> itemsById = new();
+	public partial class Items {
 		private static ConcurrentDictionary<int, Item> cached = new();
 
 		public static BlockItem grassBlock => Lookup("grassBlock", () => new BlockItem("Grass Block", ItemAspect.Simple("grass_icon", ppu: 16), 210, () => Blocks.grass));
@@ -22,7 +22,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public static StatItem_test statItem_test => Lookup("statItem_test", () => new StatItem_test());
 
 		private static TItem Lookup<TItem>(string key, Func<TItem> instanceSupplier) where TItem : Item {
-			int hash = StableHash(key);
+			int hash = HashHelper.StableHash(key);
 
             return (TItem)cached.GetOrAdd(hash, hashedID => {
                 TItem item = instanceSupplier.Invoke();
@@ -31,25 +31,13 @@ namespace SoulboundBackend.Client.ItemSystem {
             });
         }
 
-		public static int StableHash(string id) {
-			unchecked {
-                const int offset = (int)2166136261;
-                const int prime = 16777619;
-                int hash = offset;
-                foreach (char c in id) {
-                    hash = (hash ^ c) * prime;
-				}
-                return hash;
-            }
-		}
-
 #nullable enable
 
-		public static Item ByID(int id) {
-			if (itemsById.TryGetValue(id, out Item item)) {
+		public static Item ByHashedID(int hashedID) {
+			if (cached.TryGetValue(hashedID, out Item item)) {
 				return item;
 			}
-			throw new KeyNotFoundException($"Item ID {id} not found.");
+			throw new KeyNotFoundException($"Item hashedID {hashedID} not found.");
 		}
 	}
 
@@ -62,7 +50,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public sealed class ItemJsonConverter : JsonConverter<Item> {
 			public override Item ReadJson(JsonReader reader, Type objectType, Item existingValue, bool hasExistingValue, JsonSerializer serializer) {
 				int id = Convert.ToInt32(reader.Value);
-				return Items.ByID(id);
+				return Items.ByHashedID(id);
 			}
 
 			public override void WriteJson(JsonWriter writer, Item value, JsonSerializer serializer) {

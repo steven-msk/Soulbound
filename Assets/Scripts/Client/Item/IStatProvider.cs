@@ -28,7 +28,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 				int id = Convert.ToInt32(reader.Value);
 				IStatProvider? value = null;
 				try {
-					value = (IStatProvider)Items.ByID(id);
+					value = (IStatProvider)Items.ByHashedID(id);
 				} catch (Exception e) {
 					logger.LogError(null, "Could not deserialize IStatProvider type because the item's id doesnt provide such type. {}", e);
 					value = null;

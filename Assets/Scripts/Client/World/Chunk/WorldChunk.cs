@@ -138,7 +138,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 					blockStates[x] = new BlockState[row.Count];
 					for (int y = 0; y < row.Count; y++) {
 						int blockID = row[y]!.Value<int>();
-						Block block = Blocks.ByID(blockID);
+						Block block = Blocks.ByHashedID(blockID);
 						blockStates[x][y] = block.defaultState;
 					}
 				}

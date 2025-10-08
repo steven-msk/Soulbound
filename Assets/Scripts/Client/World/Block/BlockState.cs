@@ -62,11 +62,11 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 				}
 
 				int blockID = Convert.ToInt32(reader.Value);
-				return Blocks.ByID(blockID).defaultState;
+				return Blocks.ByHashedID(blockID).defaultState;
 			}
 
 			public override void WriteJson(JsonWriter writer, BlockState? value, JsonSerializer serializer) {
-				serializer.Serialize(writer, value?.block.id);
+				serializer.Serialize(writer, value?.block.hashedID);
 			}
 		}
 	}
