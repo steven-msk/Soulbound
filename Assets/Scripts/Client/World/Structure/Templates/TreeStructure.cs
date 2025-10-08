@@ -44,7 +44,7 @@ namespace SoulboundBackend.Client.World.Structure.Templates {
 				Dictionary<ChunkBlockPos, BlockState> stateOverrides = new();
 				Level level = generationContext.level;
 				ChunkBlockPos origin = preliminaryData.Value.origin;
-				BoundsInt2D bounds = new((Vector2Int)preliminaryData.Value.origin, preliminaryData.Value.size);
+				BoundsInt2D bounds = new((Vector2Int)origin, (Vector2Int)origin + preliminaryData.Value.size);
 				ChunkBlockPos trunkPos = new ChunkBlockPos(origin.x, origin.y, generationContext.chunkX);
 				BlockState woodBlock = Blocks.wood.defaultState;
 				BlockState leavesBlock = Blocks.leaves.defaultState;

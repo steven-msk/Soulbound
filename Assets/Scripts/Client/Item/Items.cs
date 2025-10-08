@@ -8,7 +8,6 @@ using Unity.Plastic.Newtonsoft.Json;
 
 namespace SoulboundBackend.Client.ItemSystem {
 	public partial class Items : IResourceModule {
-		//private static int idCounter = 0;
 		private static Dictionary<int, Item> itemsById = new();
 		private static ConcurrentDictionary<int, Item> cached = new();
 
@@ -45,12 +44,6 @@ namespace SoulboundBackend.Client.ItemSystem {
 		}
 
 #nullable enable
-
-		//private static TItem InjectID<TItem>(TItem item) where TItem : Item {
-		//	item.hashedID = idCounter++;
-		//	itemsById[item.hashedID] = item;
-		//	return item;
-		//}
 
 		public static Item ByID(int id) {
 			if (itemsById.TryGetValue(id, out Item item)) {
