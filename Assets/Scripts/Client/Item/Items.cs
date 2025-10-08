@@ -1,13 +1,16 @@
 ﻿using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Core.Resource;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using Unity.Plastic.Newtonsoft.Json;
 
 namespace SoulboundBackend.Client.ItemSystem {
 	public partial class Items : IResourceModule {
 		private static int idCounter = 0;
 		private static Dictionary<int, Item> itemsById = new();
+		private static ConcurrentDictionary<int, Item> cached = new();
 
 		public static readonly BlockItem grassBlock = InjectID(new BlockItem("Grass Block", ItemAspect.Simple("grass_icon", ppu: 16), 210, () => Blocks.grass));
 		public static readonly BlockItem stoneBlock = InjectID(new BlockItem("Stone Block", ItemAspect.Simple("stone_icon", ppu: 8), Item.DEFAULT_MAX_STACK, () => Blocks.stone));
@@ -18,6 +21,23 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public static readonly ArmorItem_test armorItem_test = InjectID(new ArmorItem_test());
 		public static readonly ConsumableStatItem_test consumableStatItem_test = InjectID(new ConsumableStatItem_test());
 		public static readonly StatItem_test statItem_test = InjectID(new StatItem_test());
+
+		private static TItem Lookup<TItem>(string key, Func<TItem> instanceSupplier) where TItem : Item {
+			int hash = StableHash(key);
+			return (TItem)cached.GetOrAdd(hash, _ => instanceSupplier.Invoke());
+		}
+
+		public static int StableHash(string id) {
+			unchecked {
+                const int offset = (int)2166136261;
+                const int prime = 16777619;
+                int hash = offset;
+                foreach (char c in id) {
+                    hash = (hash ^ c) * prime;
+				}
+                return hash;
+            }
+		}
 
 #nullable enable
 
