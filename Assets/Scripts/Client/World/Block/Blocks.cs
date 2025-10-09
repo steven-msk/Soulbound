@@ -38,7 +38,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
             if (cached.TryGetValue(hashedID, out Block block)) {
                 return block;
             }
-            throw new KeyNotFoundException($"Block hashedID {hashedID} not found.");
+            throw new KeyNotFoundException($"Block hashedID {hashedID} not found."); 
         }
     }
 
