@@ -205,7 +205,6 @@ namespace WorldTests {
 		[SetUp]
 		public void PrepareEnvironment() {
 			StaticResetManager.ResetAll();
-			ResourceGroups.Bootstrap();
 		}
 	}
 }

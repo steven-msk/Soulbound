@@ -13,12 +13,6 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 public class StructurePlacementTests {
-	[OneTimeSetUp]
-	public void Setup() {
-		SoulboundBackend.Core.Resource.ResourceGroups.Bootstrap();
-		StaticResetManager.ResetAll();
-	}
-
 	[Test]
 	public void Equality_WorksForSameData() {
 		var origin = new ChunkBlockPos(1, 2, 3);

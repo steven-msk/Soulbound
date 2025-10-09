@@ -37,7 +37,6 @@ public class ItemTests {
 
     [OneTimeSetUp]
     public void Setup() {
-        SoulboundBackend.Core.Resource.ResourceGroups.Bootstrap();
         StaticResetManager.ResetAll();
     }
 

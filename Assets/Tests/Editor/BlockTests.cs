@@ -11,12 +11,7 @@ using BlockSystem = SoulboundBackend.Client.World.BlockSystem;
 public class BlockTests {
     [SetUp]
     public void Setup() {
-        _ = typeof(BlockSystem.Blocks).TypeInitializer;
-    }
-
-    [OneTimeSetUp]
-    public void BootstrapResources() {
-        SoulboundBackend.Core.Resource.ResourceGroups.Bootstrap();
+        _ = typeof(BlockSystem.Blocks).TypeInitializer; 
     }
 
     [Test]

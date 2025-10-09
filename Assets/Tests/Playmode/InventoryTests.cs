@@ -58,6 +58,5 @@ public class InventoryTests {
     [SetUp]
     public void PrepareEnvironment() {
         StaticResetManager.ResetAll();
-        ResourceGroups.Bootstrap();
     }
 }

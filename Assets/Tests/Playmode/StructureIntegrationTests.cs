@@ -57,7 +57,6 @@ public class StructureIntegrationTests {
 
 	[OneTimeSetUp]
 	public void OneTimeSetup() {
-		SoulboundBackend.Core.Resource.ResourceGroups.Bootstrap();
 		StaticResetManager.ResetAll();
 	}
 

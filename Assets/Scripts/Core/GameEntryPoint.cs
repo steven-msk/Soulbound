@@ -41,6 +41,6 @@ public sealed class GameEntryPoint : MonoBehaviour {
 	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
 	public static void ResetStaticDomain() {
         StaticResetManager.ResetAll();
-        ResourceGroups.Bootstrap();
+        ResourceManager.PreloadGroups();
     }
 }
