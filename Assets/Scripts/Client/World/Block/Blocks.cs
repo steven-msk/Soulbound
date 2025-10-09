@@ -16,7 +16,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
     public partial class Blocks : IResourceModule {
         // REMINDER: since block state properties are unavailable as of right now, keep in mind that block behavior definitions might change when they have actual purpose
         private static ConcurrentDictionary<int, Block> cached = new();
-        private static ConcurrentDictionary<int, Func<object>> cachedReferences = new();
+        private static ConcurrentDictionary<int, Func<Block>> cachedReferences = new();
 
         [BlockCache(nameof(air))] public static Block air => Lookup(() => new GenericBlock("Air", Tile("air"), null));
         [BlockCache(nameof(grass))] public static Block grass => Lookup(() => new GenericBlock("Grass Block", Tile("grass"), Items.grassBlock));
@@ -56,8 +56,8 @@ namespace SoulboundBackend.Client.World.BlockSystem {
             if (cached.TryGetValue(hashedID, out Block block)) {
                 return block;
             }
-            if (cachedReferences.TryGetValue(hashedID, out Func<object> reference)) {
-                return (Block)reference.Invoke();
+            if (cachedReferences.TryGetValue(hashedID, out Func<Block> reference)) {
+                return reference.Invoke();
             }
             throw new KeyNotFoundException($"Block hashedID {hashedID} not found.");
         }
@@ -68,14 +68,14 @@ namespace SoulboundBackend.Client.World.BlockSystem {
                 throw new NotSupportedException("No getter found for block property: " + property);
             }
 
-            Func<object> accessor = () => getter.Invoke(null, null);
+            Func<Block> accessor = () => (Block)getter.Invoke(null, null);
             int hash = HashHelper.StableHash(blockCache.PropertyName);
             cachedReferences[hash] = accessor;
         }
     }
 
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-    internal class BlockCache : Attribute {
+    public class BlockCache : Attribute {
         public string PropertyName { get; set; }
 
         public BlockCache(string propertyName) {
