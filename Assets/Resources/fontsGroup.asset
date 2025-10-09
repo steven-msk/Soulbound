@@ -15,8 +15,9 @@ MonoBehaviour:
   groupAddress: fonts/
   searchFolder: Assets/Resources/Registry/Fonts
   assetType: TMP_FontAsset
-  resources:
-  - {fileID: 11400000, guid: cbf0dfe6112d8e84c849d454f1474d8f, type: 2}
-  - {fileID: 11400000, guid: 3ddab628e43f7114c804ef2cf0dff34b, type: 2}
-  - {fileID: 11400000, guid: f6426e6fd6941634a8f5292711ce4db8, type: 2}
-  - {fileID: 11400000, guid: 4cffaf4bd4c9c5b49ab2de69200080a0, type: 2}
+  extension: .asset
+  resourceAddresses:
+  - Assets/Resources/Registry/Fonts/JosefinSans-Medium SDF.asset
+  - Assets/Resources/Registry/Fonts/JosefinSans-Regular SDF.asset
+  - Assets/Resources/Registry/Fonts/Urbanist-Bold SDF.asset
+  - Assets/Resources/Registry/Fonts/Urbanist-SemiBold SDF.asset

@@ -1,24 +1,38 @@
-﻿using SoulboundBackend.Client.ItemSystem;
+﻿using Codice.CM.Client.Differences;
+using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core.Resource;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using Unity.Plastic.Newtonsoft.Json;
+using UnityEditor;
 using UnityEngine.Tilemaps;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
     public partial class Blocks : IResourceModule {
         // REMINDER: since block state properties are unavailable as of right now, keep in mind that block behavior definitions might change when they have actual purpose
         private static ConcurrentDictionary<int, Block> cached = new();
+        private static ConcurrentDictionary<int, Func<object>> cachedReferences = new();
 
-        public static Block air => Lookup("air", () => new GenericBlock("Air", Tile("air"), null));
-        public static Block grass => Lookup("grass", () => new GenericBlock("Grass Block", Tile("grass"), Items.grassBlock));
-        public static Block dirt => Lookup("dirt", () => new GenericBlock("Dirt Block", Tile("dirt"), Items.dirtBlock));
-        public static Block stone => Lookup("stone", () => new GenericBlock("Stone Block", Tile("stone"), Items.stoneBlock));
-        public static Block wood => Lookup("wood", () => new GenericBlock("Wood", Tile("wood"), Items.woodBlock));
-        public static Block leaves => Lookup("leaves", () => new GenericBlock("Leaves", Tile("leaves"), Items.leavesBlock, _ => BlockBehaviors.DropIfPlayerBroke()));
+        [BlockCache(nameof(air))] public static Block air => Lookup(() => new GenericBlock("Air", Tile("air"), null));
+        [BlockCache(nameof(grass))] public static Block grass => Lookup(() => new GenericBlock("Grass Block", Tile("grass"), Items.grassBlock));
+        [BlockCache(nameof(dirt))] public static Block dirt => Lookup(() => new GenericBlock("Dirt Block", Tile("dirt"), Items.dirtBlock));
+        [BlockCache(nameof(stone))] public static Block stone => Lookup(() => new GenericBlock("Stone Block", Tile("stone"), Items.stoneBlock));
+        [BlockCache(nameof(wood))] public static Block wood => Lookup(() => new GenericBlock("Wood", Tile("wood"), Items.woodBlock));
+        [BlockCache(nameof(leaves))] public static Block leaves => Lookup(() => new GenericBlock("Leaves", Tile("leaves"), Items.leavesBlock, _ => BlockBehaviors.DropIfPlayerBroke()));
+    
+        static Blocks() {
+            foreach (var property in typeof(Blocks).GetProperties(BindingFlags.Static | BindingFlags.Public)) {
+                var cacheAttribute = property.GetCustomAttribute<BlockCache>();
+                if (cacheAttribute != null) {
+                    RegisterBlockCache(cacheAttribute, property);
+                }
+            }
+        }
 
         private static TileBase Tile(string name) {
             return IResourceModule.Resource<TileBase, ResourceGroups.Tiles>(name);
@@ -34,11 +48,38 @@ namespace SoulboundBackend.Client.World.BlockSystem {
             });
         }
 
+        private static TBlock Lookup<TBlock>(Func<TBlock> instanceSupplier, [CallerMemberName] string propertyName = null) where TBlock : Block {
+            return Lookup<TBlock>(propertyName, instanceSupplier);
+        }
+
         public static Block ByHashedID(int hashedID) {
             if (cached.TryGetValue(hashedID, out Block block)) {
                 return block;
             }
-            throw new KeyNotFoundException($"Block hashedID {hashedID} not found."); 
+            if (cachedReferences.TryGetValue(hashedID, out Func<object> reference)) {
+                return (Block)reference.Invoke();
+            }
+            throw new KeyNotFoundException($"Block hashedID {hashedID} not found.");
+        }
+
+        private static void RegisterBlockCache(BlockCache blockCache, PropertyInfo property) {
+            var getter = property.GetGetMethod();
+            if (getter == null) {
+                throw new NotSupportedException("No getter found for block property: " + property);
+            }
+
+            Func<object> accessor = () => getter.Invoke(null, null);
+            int hash = HashHelper.StableHash(blockCache.PropertyName);
+            cachedReferences[hash] = accessor;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+    internal class BlockCache : Attribute {
+        public string PropertyName { get; set; }
+
+        public BlockCache(string propertyName) {
+            this.PropertyName = propertyName;
         }
     }
 

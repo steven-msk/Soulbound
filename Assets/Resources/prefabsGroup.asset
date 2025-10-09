@@ -15,12 +15,13 @@ MonoBehaviour:
   groupAddress: prefabs/
   searchFolder: Assets/Resources/Registry/Prefabs
   assetType: GameObject
-  resources:
-  - {fileID: 620446807833871700, guid: dd90606c5da2287499c83477a2cd6c1f, type: 3}
-  - {fileID: 5142671602168178108, guid: 73b53856178d60e448dda63bdce09c1c, type: 3}
-  - {fileID: 4487431087504722001, guid: b76a12af57d7e284bb0d42b2df31bf48, type: 3}
-  - {fileID: 8122590342159268706, guid: 83091ff37e0613643b4c9a13662a6824, type: 3}
-  - {fileID: 8347405326156370234, guid: 779797e769489a9449d6f94f635cf0ea, type: 3}
-  - {fileID: 2727150236658770225, guid: dedc175c69fa52f4db514e00ef93386b, type: 3}
-  - {fileID: 3406828767456130031, guid: 4020c73e3815cf64490d111e3762919a, type: 3}
-  - {fileID: 1468142884118006896, guid: 1535861a9572f724fb9bebf03b0ec575, type: 3}
+  extension: .prefab
+  resourceAddresses:
+  - Assets/Resources/Registry/Prefabs/ai test.prefab
+  - Assets/Resources/Registry/Prefabs/armorSlotOverlay.prefab
+  - Assets/Resources/Registry/Prefabs/chunkOutline.prefab
+  - Assets/Resources/Registry/Prefabs/droppedItem.prefab
+  - Assets/Resources/Registry/Prefabs/itemDisplayPrefab.prefab
+  - Assets/Resources/Registry/Prefabs/stackNumberPrefab.prefab
+  - Assets/Resources/Registry/Prefabs/tooltipPanel.prefab
+  - Assets/Resources/Registry/Prefabs/tooltipSection.prefab
