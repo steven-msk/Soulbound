@@ -87,7 +87,7 @@ public class BlockTests {
         foreach (var property in staticProperties) {
             var attribute = property.GetCustomAttribute<BlockSystem.BlockCache>();
             Assert.NotNull(attribute, $"{property.Name} is missing [BlockCache]");
-            int hash = HashHelper.StableHash(attribute.PropertyName);
+            int hash = HashHelper.StableHash(attribute.propertyName);
 
             var block = BlockSystem.Blocks.ByHashedID(hash);
             Assert.NotNull(block, $"{property.Name} not retrievable by hash fallback");

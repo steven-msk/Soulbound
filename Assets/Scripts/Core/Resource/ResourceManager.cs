@@ -29,7 +29,7 @@ namespace SoulboundBackend.Core.Resource {
             ResourceGroup[] groups = Resources.LoadAll<ResourceGroup>("");
             logger.LogInfo(LogModules.resource, "Found {} resource group instances", groups.Length);
             foreach (var group in groups) {
-                groupsByAddress.Add(group.groupAddress, group);
+                groupsByAddress.TryAdd(group.groupAddress, group);
             }
             RegisterDefinitions();
             

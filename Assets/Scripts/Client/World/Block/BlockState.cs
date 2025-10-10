@@ -47,7 +47,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			}
 
 			var newProperties = new Dictionary<string, object>() {
-				[property.name] = value
+				[property.name] = value!
 			};
 
 			return block.GetStateFor(newProperties);

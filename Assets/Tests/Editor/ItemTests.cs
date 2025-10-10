@@ -99,7 +99,7 @@ public class ItemTests {
         foreach (var property in staticProperties) {
             var attribute = property.GetCustomAttribute<ItemSystem.ItemCache>();
             Assert.NotNull(attribute, $"{property.Name} is missing [ItemCache]");
-            int hash = HashHelper.StableHash(attribute.PropertyName);
+            int hash = HashHelper.StableHash(attribute.propertyName);
 
             var item = ItemSystem.Items.ByHashedID(hash);
             Assert.NotNull(item, $"{property.Name} not retreivable by hash fallback");
