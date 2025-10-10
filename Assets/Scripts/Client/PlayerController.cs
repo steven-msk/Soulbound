@@ -72,11 +72,6 @@ namespace SoulboundBackend.Client {
 			playerPhysics = dependencyContainer.Resolve<PlayerPhysics>();
 			itemUsageHandler = dependencyContainer.Resolve<ItemUsageHandler>();
 
-			//inputHandler = GameObject.Instantiate(inputHandler).OnBootstrap(this);
-			//inventory = GameManager.instance.UIManager.InstantiateInUILevel(inventory).GetComponent<InventoryController>().OnBootstrap(this);
-			//playerPhysics = gameObject.GetComponent<PlayerPhysics>().OnBootstrap(this);
-			//itemUsageHandler = new ItemUsageHandler(this);
-
 			//itemUsageHandler.Register<IConsumable>(ItemUseTrigger.RightClick, (consumable, stack) => consumable.Consume(stack));
 			//foreach (ItemUseTrigger trigger in Enum.GetValues(typeof(ItemUseTrigger))) {
 			//	itemUsageHandler.Register<IAttackPerformer>(trigger, (attackPerformer, stack) => {
@@ -84,7 +79,7 @@ namespace SoulboundBackend.Client {
 			//	});
 			//}
 			//itemUsageHandler.Register<IPlaceable>(ItemUseTrigger.LeftHold, (placeable, stack) => {
-			//	Level level = GameManager.instance.Level;
+			//	Level level = LevelManager.instance.Level;
 			//	BlockPos blockPos = level.ToBlockPos(inputHandler.MouseWorldPosition);
 
 			//	if (CanPlaceBlockAt(blockPos)) {

@@ -1,6 +1,7 @@
 ﻿using SoulboundBackend.Client.ItemSystem;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
 
@@ -8,17 +9,15 @@ using UnityEngine;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
 	[JsonConverter(typeof(BlockStateJsonConverter))]
-	public class BlockState {
+	public sealed class BlockState {
 		public Block block { get; private set; }
-
 		// might be replaced with a type-safe data structure in the future
-		public Dictionary<string, object> properties { get; private set; } = new();
-
+		public IReadOnlyDictionary<string, object> properties { get; private set; }
 		public IBlockStateBehavior stateBehavior { get; private set; }
 
 		public BlockState(Block block, Dictionary<string, object>? properties, IBlockStateBehavior stateBehavior) {
 			this.block = block ?? Blocks.air;
-			this.properties = properties ?? new Dictionary<string, object>();
+			this.properties = new ReadOnlyDictionary<string, object>(properties ?? new Dictionary<string, object>());
 			this.stateBehavior = stateBehavior;
 		}
 
@@ -35,6 +34,24 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		}
 
 		public void OnPlace(BlockPos blockPos) => stateBehavior.OnPlace(blockPos, this);
+
+		public T Get<T>(BlockProperty<T> property) => (T)properties[property.name];
+
+		public BlockState With<T>(BlockProperty<T> property, T value) {
+			if (!block.HasProperty(property)) {
+				throw new InvalidOperationException($"Block {block.name} does not have property {property.name}");
+			}
+
+			if (EqualityComparer<T>.Default.Equals(Get(property), value)) {
+				return this;
+			}
+
+			var newProperties = new Dictionary<string, object>() {
+				[property.name] = value
+			};
+
+			return block.GetStateFor(newProperties);
+		}
 
 		public static bool operator ==(BlockState? state1, BlockState? state2) {
 			return state1 is not null && state2 is not null && state1.block == state2.block;

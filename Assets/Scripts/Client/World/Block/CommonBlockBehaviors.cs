@@ -4,7 +4,7 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
-	public static class BlockBehaviors {
+	public static class CommonBlockBehaviors {
 		public delegate Vector2 DropForce();
 		public delegate List<ItemStack> DropsGetter(BlockState blockState, BreakSource breakSource);
 		public delegate void OnNeighborStateChanged(BlockPos selfPos, BlockPos neighborPos, BlockState oldState, BlockState newState);
@@ -14,7 +14,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public static OnNeighborStateChanged NoNeighborUpdate => (_, _, _, _) => { };
 		public static OnPlace NoPlaceAction => (_, _) => { };
 
-		public static IBlockStateBehavior NoBehavior() {
+		public static IBlockStateBehavior NullBehavior() {
 			return FromDelegates(
 				dropForce: () => default,
 				dropsGetter: (blockState, breakSource) => new List<ItemStack>(),
@@ -23,10 +23,11 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			);
 		}
 
-		public static IBlockStateBehavior PassiveBehavior() {
+		public static IBlockStateBehavior Basic() {
 			return FromDelegates(
 				DefaultDropForce,
-				dropsGetter: (blockState, breakSource) => new List<ItemStack>() { new ItemStack(blockState.block.itemReference, 1) },
+				dropsGetter: (blockState, breakSource) => 
+					new List<ItemStack>() { new ItemStack(blockState.block.itemReference, 1) },
 				NoNeighborUpdate,
 				NoPlaceAction
 			);
@@ -47,17 +48,27 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			);
 		}
 
-		public static IBlockStateBehavior FromDelegates(DropForce dropForce, DropsGetter dropsGetter, OnNeighborStateChanged onNeighborStateChanged, OnPlace onPlace) {
+		public static IBlockStateBehavior FromDelegates(
+				DropForce dropForce, 
+				DropsGetter dropsGetter, 
+				OnNeighborStateChanged onNeighborStateChanged,
+				OnPlace onPlace
+			) {
 			return new DelegateStateBehavior(dropForce, dropsGetter, onNeighborStateChanged, onPlace);
 		}
 
-		public class DelegateStateBehavior : IBlockStateBehavior {
+		private class DelegateStateBehavior : IBlockStateBehavior {
 			private DropForce dropForce;
 			private DropsGetter dropsGetter;
 			private OnNeighborStateChanged onNeighborStateChanged;
 			private OnPlace onPlace;
 
-			public DelegateStateBehavior(DropForce dropForce, DropsGetter dropsGetter, OnNeighborStateChanged onNeighborStateChanged, OnPlace onPlace) {
+			public DelegateStateBehavior(
+					DropForce dropForce, 
+					DropsGetter dropsGetter,
+					OnNeighborStateChanged onNeighborStateChanged, 
+					OnPlace onPlace
+				) {
 				this.dropForce = dropForce;
 				this.dropsGetter = dropsGetter;
 				this.onNeighborStateChanged = onNeighborStateChanged;

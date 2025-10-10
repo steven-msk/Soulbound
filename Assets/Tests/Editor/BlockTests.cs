@@ -1,4 +1,6 @@
 ﻿using NUnit.Framework;
+using SoulboundBackend.Client.ItemSystem;
+using SoulboundBackend.Client.World;
 using SoulboundBackend.Common;
 using System;
 using System.Collections.Generic;
@@ -6,7 +8,51 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine.Tilemaps;
 using BlockSystem = SoulboundBackend.Client.World.BlockSystem;
+
+public class DummyBlock : BlockSystem.Block {
+    public override string name => "dummy_block";
+    public override TileBase tileReference => null;
+    public override BlockItem itemReference => null;
+
+    public static readonly BlockSystem.BlockProperty<bool> lit = new("lit");
+
+    public DummyBlock() {
+        RegisterProperties();
+        var defaultProperties = new Dictionary<string, object> { { lit.name, false } };
+        RegisterDefaultState(new BlockSystem.BlockState(this, defaultProperties, new DummyBehavior()));
+    }
+
+    public override void RegisterProperties() {
+        propertyList.Add(lit);
+    }
+
+    protected override IBlockStateBehavior CreateBehaviorFor(Dictionary<string, object> properties) {
+        bool lit = (bool)properties[DummyBlock.lit.name];
+        return lit ? new LitBehavior() : new DummyBehavior();
+    }
+}
+
+public class DummyBehavior : IBlockStateBehavior {
+    private IBlockStateBehavior inner;
+    public bool placed { get; private set; }
+
+    public DummyBehavior() => inner = BlockSystem.CommonBlockBehaviors.Basic();
+
+    public List<ItemStack> GetDrops(BlockSystem.BlockState blockState, BreakSource source) {
+        return inner.GetDrops(blockState, source);
+    }
+
+    public void OnNeighborStateChanged(BlockPos selfPos, BlockPos neighborPos, BlockSystem.BlockState oldState, BlockSystem.BlockState newState) {
+    }
+
+    public void OnPlace(BlockPos blockPos, BlockSystem.BlockState blockState) {
+        placed = true;
+    }
+}
+
+public class LitBehavior : DummyBehavior { }
 
 public class BlockTests {
     [SetUp]
@@ -46,5 +92,84 @@ public class BlockTests {
             var block = BlockSystem.Blocks.ByHashedID(hash);
             Assert.NotNull(block, $"{property.Name} not retrievable by hash fallback");
         }
+    }
+
+    [Test]
+    public void DefaultState_IsRegisteredAndCached() {
+        var block = new DummyBlock();
+        Assert.NotNull(block.defaultState);
+        Assert.AreEqual("dummy_block", block.defaultState.block.name);
+    }
+
+    [Test]
+    public void Block_HasRegisteredProperty() {
+        var block = new DummyBlock();
+        Assert.IsTrue(block.HasProperty(DummyBlock.lit));
+    }
+
+    [Test]
+    public void GetStateFor_CachesIdentical() {
+        var block = new DummyBlock();
+
+        var props = new Dictionary<string, object> { { DummyBlock.lit.name, false } };
+        var state1 = block.GetStateFor(props);
+        var state2 = block.GetStateFor(props);
+
+        Assert.AreSame(state1, state2);
+    }
+
+    [Test]
+    public void WithProperty_CreatesNewBlockState_WhenPropertyValueDiffers() {
+        var block = new DummyBlock();
+        var state1 = block.defaultState;
+        var state2 = state1.With(DummyBlock.lit, true);
+
+        Assert.AreNotSame(state1, state2);
+        Assert.IsInstanceOf<LitBehavior>(state2.stateBehavior);
+    }
+
+    [Test]
+    public void WithProperty_ReturnsSameInstance_WhenValueIsUnchanged() {
+        var block = new DummyBlock();
+        var state1 = block.defaultState;
+        var state2 = state1.With(DummyBlock.lit, false);
+
+        Assert.AreSame(state1, state2);
+    }
+
+    [Test]
+    public void OnPlace_DelegatesToBehavior() {
+        var block = new DummyBlock();
+        var state = block.defaultState;
+        var pos = new BlockPos(0, 0);
+
+        state.OnPlace(pos);
+
+        var stateBehavior = (DummyBehavior)state.stateBehavior;
+        Assert.IsTrue(stateBehavior.placed);
+    }
+
+    [Test]
+    public void BehaviorFactory_ReturnsDifferentBehaviorForDifferentProperties() {
+        var block = new DummyBlock();
+
+        var unlitProps = new Dictionary<string, object> { { DummyBlock.lit.name, false } };
+        var litProps = new Dictionary<string, object> { { DummyBlock.lit.name, true } };
+
+        var unlitState = block.GetStateFor(unlitProps);
+        var litState = block.GetStateFor(litProps);
+
+        Assert.IsInstanceOf<DummyBehavior>(unlitState.stateBehavior);
+        Assert.IsInstanceOf<LitBehavior>(litState.stateBehavior);
+    }
+
+    [Test]
+    public void EqualityOperator_ConsidersBlockReferenceOnly() {
+        var block = new DummyBlock();
+        var s1 = block.defaultState;
+        var s2 = block.GetStateFor(new Dictionary<string, object> { { DummyBlock.lit.name, true } });
+
+        Assert.IsTrue(s1 == s2);
+        Assert.AreEqual(s1.GetHashCode(), s2.GetHashCode());
     }
 }

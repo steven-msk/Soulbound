@@ -23,7 +23,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
         [BlockCache(nameof(dirt))] public static Block dirt => Lookup(() => new GenericBlock("Dirt Block", Tile("dirt"), Items.dirtBlock));
         [BlockCache(nameof(stone))] public static Block stone => Lookup(() => new GenericBlock("Stone Block", Tile("stone"), Items.stoneBlock));
         [BlockCache(nameof(wood))] public static Block wood => Lookup(() => new GenericBlock("Wood", Tile("wood"), Items.woodBlock));
-        [BlockCache(nameof(leaves))] public static Block leaves => Lookup(() => new GenericBlock("Leaves", Tile("leaves"), Items.leavesBlock, _ => BlockBehaviors.DropIfPlayerBroke()));
+        [BlockCache(nameof(leaves))] public static Block leaves => Lookup(() => new GenericBlock("Leaves", Tile("leaves"), Items.leavesBlock, null, _ => CommonBlockBehaviors.DropIfPlayerBroke()));
     
         static Blocks() {
             foreach (var property in typeof(Blocks).GetProperties(BindingFlags.Static | BindingFlags.Public)) {

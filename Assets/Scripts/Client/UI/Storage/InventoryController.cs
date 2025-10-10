@@ -198,6 +198,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 				InventorySlot? emptySlot = GetFirstEmptySlot();
 				if (emptySlot != null) {
 					ItemDisplay.Create(itemStack, emptySlot);
+					itemStack.OnPickedUp();
 					remaining = 0;
 					return true;
 				}
@@ -217,6 +218,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 						remaining -= toAdd;
 						ClampRemaining(ref remaining);
 						if (remaining == 0) {
+							itemStack.OnPickedUp();
 							return true;
 						}
 					}
@@ -232,6 +234,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 					}
 					ClampRemaining(ref remaining);
 					if (remaining == 0) {
+						itemStack.OnPickedUp();
 						return true;
 					}
 				}

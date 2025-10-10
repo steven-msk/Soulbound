@@ -17,6 +17,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 		private GameObject? stackText;
 		public int quantity { get; private set; }
 		public int MaxStackSize => item.maxStackSize;
+		public bool isDropped { get; private set; } = false;
 
 		public ItemStack(Item item, int quantity) {
 			this.item = item;
@@ -68,7 +69,10 @@ namespace SoulboundBackend.Client.ItemSystem {
 				[SpawnDataKey.Of("pickupDelay")] = new SpawnDataValue<float>((playerAction ? 2f : 0f)),
 				[SpawnDataKey.Of("dropForce")] = new SpawnDataValue<Vector2>(dropForce),
 			});
+			isDropped = true;
 		}
+
+		public void OnPickedUp() => isDropped = false;
 
 		public bool IsFull() => quantity >= item.maxStackSize;
 		public bool IsEmpty() => quantity <= 0;

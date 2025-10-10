@@ -10,32 +10,39 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public override string name { get; }
 		public override TileBase tileReference { get; }
 		public override BlockItem? itemReference { get; }
-		public override BlockState defaultState { get; }
-		private Func<Dictionary<string, object>?, IBlockStateBehavior>? behaviorFactory { get; }
+		private Func<Dictionary<string, object>?, IBlockStateBehavior>? behaviorFactory;
+		private Action<GenericBlock>? propertyRegisterer;
 
 		public GenericBlock(string name, TileBase tileReference, BlockItem itemReference)
-			: this(name, tileReference, itemReference, null, _ => BlockBehaviors.PassiveBehavior()) { }
+			: this(name, tileReference, itemReference, null, null, null) { }
 
-		public GenericBlock(string name, TileBase tileReference, BlockItem itemReference, Func<Dictionary<string, object>?, IBlockStateBehavior> behaviorFactory)
-			: this(name, tileReference, itemReference, null, behaviorFactory) { }
-
-		public GenericBlock(string name, TileBase tileReference, BlockItem itemReference, Dictionary<string, object>? defaultProperties = null,
-				Func<Dictionary<string, object>?, IBlockStateBehavior>? behaviorFactory = null) {
+		public GenericBlock(
+				string name,
+				TileBase tileReference,
+				BlockItem itemReference,
+				Dictionary<string, object>? defaultProperties,
+				Func<Dictionary<string, object>?, IBlockStateBehavior>? behaviorFactory = null,
+				Action<GenericBlock>? propertyRegisterer = null
+			) {
 			this.name = name;
 			this.tileReference = tileReference;
-			this.behaviorFactory = behaviorFactory;
-			IBlockStateBehavior defaultBehavior = GetFromNullable(defaultProperties);
-			this.defaultState = new BlockState(this, defaultProperties ?? new Dictionary<string, object>(), defaultBehavior);
 			this.itemReference = itemReference;
+			this.behaviorFactory = behaviorFactory;
+			this.propertyRegisterer = propertyRegisterer;
+
+			this.RegisterProperties();
+			defaultProperties ??= new Dictionary<string, object>();
+			var defaultBehavior = behaviorFactory?.Invoke(defaultProperties)
+				?? CommonBlockBehaviors.Basic();
+			RegisterDefaultState(new BlockState(this, defaultProperties, defaultBehavior));
 		}
 
-		public override BlockState CreateState(Dictionary<string, object>? properties) {
-			IBlockStateBehavior behavior = GetFromNullable(properties);
-			return new BlockState(this, properties, behavior);
-		}
+        protected override IBlockStateBehavior CreateBehaviorFor(Dictionary<string, object> properties) {
+			return behaviorFactory?.Invoke(properties) ?? base.CreateBehaviorFor(properties);
+        }
 
-		private IBlockStateBehavior GetFromNullable(Dictionary<string, object>? properties) {
-			return behaviorFactory?.Invoke(properties ?? new Dictionary<string, object>()) ?? BlockBehaviors.NoBehavior();
-		}
-	}
+        public override void RegisterProperties() {
+			propertyRegisterer?.Invoke(this);
+        }
+    }
 }
