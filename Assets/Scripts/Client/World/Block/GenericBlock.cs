@@ -10,8 +10,9 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public override string name { get; }
 		public override TileBase tileReference { get; }
 		public override BlockItem? itemReference { get; }
-		private Func<Dictionary<string, object>?, IBlockStateBehavior>? behaviorFactory;
-		private Action<GenericBlock>? propertyRegisterer;
+		private readonly Func<Dictionary<string, object>?, IBlockStateBehavior>? behaviorFactory;
+		private readonly Action<GenericBlock>? propertyRegisterer;
+		private readonly Func<Block, BlockState>? defaultStateGetter;
 
 		public GenericBlock(string name, TileBase tileReference, BlockItem itemReference)
 			: this(name, tileReference, itemReference, null, null, null) { }
@@ -20,7 +21,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 				string name,
 				TileBase tileReference,
 				BlockItem itemReference,
-				Dictionary<string, object>? defaultProperties,
+				Func<Block, BlockState>? defaultState = null,
 				Func<Dictionary<string, object>?, IBlockStateBehavior>? behaviorFactory = null,
 				Action<GenericBlock>? propertyRegisterer = null
 			) {
@@ -29,20 +30,27 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			this.itemReference = itemReference;
 			this.behaviorFactory = behaviorFactory;
 			this.propertyRegisterer = propertyRegisterer;
+			this.defaultStateGetter = defaultState;
 
-			this.RegisterProperties();
-			defaultProperties ??= new Dictionary<string, object>();
-			var defaultBehavior = behaviorFactory?.Invoke(defaultProperties)
-				?? CommonBlockBehaviors.Basic();
-			RegisterDefaultState(new BlockState(this, defaultProperties, defaultBehavior));
+			// Clears unwanted basic default state
+			cachedStates.Clear();
+
+			// Registers the actual default state
+			RegisterProperties();
+			RegisterDefaultState(CreateDefaultState());
 		}
 
         protected override IBlockStateBehavior CreateBehaviorFor(Dictionary<string, object> properties) {
 			return behaviorFactory?.Invoke(properties) ?? base.CreateBehaviorFor(properties);
         }
 
-        public override void RegisterProperties() {
-			propertyRegisterer?.Invoke(this);
+        protected override void RegisterProperties() {
+			propertyRegisterer?.Invoke(this);			// null at initialization
+        }
+
+        protected override BlockState CreateDefaultState() {
+			return defaultStateGetter?.Invoke(this)		// null at initialization
+				?? new BlockState(this, null, CommonBlockBehaviors.Basic());
         }
     }
 }

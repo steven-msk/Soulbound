@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.World;
+using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Common;
 using System;
 using System.Collections.Generic;
@@ -18,14 +19,13 @@ public class DummyBlock : BlockSystem.Block {
 
     public static readonly BlockSystem.BlockProperty<bool> lit = new("lit");
 
-    public DummyBlock() {
-        RegisterProperties();
-        var defaultProperties = new Dictionary<string, object> { { lit.name, false } };
-        RegisterDefaultState(new BlockSystem.BlockState(this, defaultProperties, new DummyBehavior()));
+    protected override void RegisterProperties() {
+        propertyList.Add(lit);
     }
 
-    public override void RegisterProperties() {
-        propertyList.Add(lit);
+    protected override BlockState CreateDefaultState() {
+        var defaultProperties = new Dictionary<string, object> { { lit.name, false } };
+        return new BlockSystem.BlockState(this, defaultProperties, new DummyBehavior());
     }
 
     protected override IBlockStateBehavior CreateBehaviorFor(Dictionary<string, object> properties) {

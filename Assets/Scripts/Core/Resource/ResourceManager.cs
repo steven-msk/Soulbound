@@ -59,9 +59,6 @@ namespace SoulboundBackend.Core.Resource {
         public static TAsset? Get<TAsset, TGroup>(string name)
 				where TAsset : UnityEngine.Object
 				where TGroup : IResourceGroupDefinition<TAsset> {
-            if (!definitionsRegistered) {
-                RegisterDefinitions();
-            }
             string address = "";
             ResourceGroup group = null!;
             try {

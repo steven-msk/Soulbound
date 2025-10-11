@@ -12,7 +12,18 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 
 		protected List<object> propertyList = new();
 		public BlockState defaultState { get; private set; }
-		private Dictionary<int, BlockState> cachedStates = new();
+		protected Dictionary<int, BlockState> cachedStates = new();
+
+		protected Block() {
+			RegisterProperties();
+			RegisterDefaultState(CreateDefaultState());
+			InitializePredefinedStates();
+		}
+
+		protected abstract void RegisterProperties();
+		protected abstract BlockState CreateDefaultState();
+		protected virtual void InitializePredefinedStates() {
+		}
 
 		protected void RegisterDefaultState(BlockState state) {
 			defaultState = state;
@@ -33,11 +44,13 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			return propertyList.Contains(property);
 		}
 
+		public BlockState WithProperty<T>(BlockState state, BlockProperty<T> property, T value) {
+			return state.With(property, value);
+		}
+
 		protected virtual IBlockStateBehavior CreateBehaviorFor(Dictionary<string, object> properties) {
 			return defaultState.stateBehavior;
 		}
-
-		public abstract void RegisterProperties();
 
 		private int ComputeHash(object obj) => obj.GetHashCode();
 

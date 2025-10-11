@@ -13,66 +13,70 @@ using UnityEditor;
 using UnityEngine.Tilemaps;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
-    public partial class Blocks : IResourceModule, ICachedRegistry<Block> {
-        // REMINDER: since block state properties are unavailable as of right now, keep in mind that block behavior definitions might change when they have actual purpose
+	public partial class Blocks : IResourceModule, ICachedRegistry<Block> {
+		// REMINDER: since block state properties are unavailable as of right now, keep in mind that block behavior definitions might change when they have actual purpose
 
-        [BlockCache(nameof(air))] public static Block air => Lookup(() => new GenericBlock("Air", Tile("air"), null));
-        [BlockCache(nameof(grass))] public static Block grass => Lookup(() => new GenericBlock("Grass Block", Tile("grass"), Items.grassBlock));
-        [BlockCache(nameof(dirt))] public static Block dirt => Lookup(() => new GenericBlock("Dirt Block", Tile("dirt"), Items.dirtBlock));
-        [BlockCache(nameof(stone))] public static Block stone => Lookup(() => new GenericBlock("Stone Block", Tile("stone"), Items.stoneBlock));
-        [BlockCache(nameof(wood))] public static Block wood => Lookup(() => new GenericBlock("Wood", Tile("wood"), Items.woodBlock));
-        [BlockCache(nameof(leaves))] public static Block leaves => Lookup(() => new GenericBlock("Leaves", Tile("leaves"), Items.leavesBlock, null, _ => CommonBlockBehaviors.DropIfPlayerBroke()));
-    
-        static Blocks() {
-            foreach (var property in typeof(Blocks).GetProperties(BindingFlags.Static | BindingFlags.Public)) {
-                var cacheAttribute = property.GetCustomAttribute<BlockCache>();
-                if (cacheAttribute != null) {
-                    ICachedRegistry<Block>.RegisterCachedReference<BlockCache>(cacheAttribute, property);
-                }
-            }
-        }
+		[BlockCache(nameof(air))] public static Block air => Lookup(() => new GenericBlock("Air", Tile("air"), null));
+		[BlockCache(nameof(grass))] public static Block grass => Lookup(() => new GenericBlock("Grass Block", Tile("grass"), Items.grassBlock));
+		[BlockCache(nameof(dirt))] public static Block dirt => Lookup(() => new GenericBlock("Dirt Block", Tile("dirt"), Items.dirtBlock));
+		[BlockCache(nameof(stone))] public static Block stone => Lookup(() => new GenericBlock("Stone Block", Tile("stone"), Items.stoneBlock));
+		[BlockCache(nameof(wood))] public static Block wood => Lookup(() => new GenericBlock("Wood", Tile("wood"), Items.woodBlock));
+		[BlockCache(nameof(leaves))] public static Block leaves => Lookup(() => 
+			new GenericBlock("Leaves", Tile("leaves"), Items.leavesBlock, block => {
+				return new BlockState(block, null, CommonBlockBehaviors.DropIfPlayerBroke());
+			}
+		));
+	
+		static Blocks() {
+			foreach (var property in typeof(Blocks).GetProperties(BindingFlags.Static | BindingFlags.Public)) {
+				var cacheAttribute = property.GetCustomAttribute<BlockCache>();
+				if (cacheAttribute != null) {
+					ICachedRegistry<Block>.RegisterCachedReference<BlockCache>(cacheAttribute, property);
+				}
+			}
+		}
 
-        private static TBlock Lookup<TBlock>(Func<TBlock> instanceSupplier, [CallerMemberName] string propertyName = null) where TBlock : Block {
-            return (TBlock)ICachedRegistry<Block>.Lookup(propertyName, instanceSupplier);
-        }
+		private static TBlock Lookup<TBlock>(Func<TBlock> instanceSupplier, [CallerMemberName] string propertyName = null) where TBlock : Block {
+			return (TBlock)ICachedRegistry<Block>.Lookup(propertyName, instanceSupplier);
+		}
 
-        private static TileBase Tile(string name) {
-            return IResourceModule.Resource<TileBase, ResourceGroups.Tiles>(name);
-        }
+		private static TileBase Tile(string name) {
+			return IResourceModule.Resource<TileBase, ResourceGroups.Tiles>(name);
+		}
 
-        public static Block ByHashedID(int hashedID) {
-            if (ICachedRegistry<Block>.cached.TryGetValue(hashedID, out Block block)) {
-                return block;
-            }
-            if (ICachedRegistry<Block>.cachedReferences.TryGetValue(hashedID, out Func<Block> reference)) {
-                return reference.Invoke();
-            }
-            throw new KeyNotFoundException($"Block hashedID {hashedID} not found.");
-        }
-    }
+		public static Block ByHashedID(int hashedID) {
+			if (ICachedRegistry<Block>.cached.TryGetValue(hashedID, out Block block)) {
+				return block;
+			}
+			if (ICachedRegistry<Block>.cachedReferences.TryGetValue(hashedID, out Func<Block> reference)) {
+				return reference.Invoke();
+			}
+			throw new KeyNotFoundException($"Block hashedID {hashedID} not found.");
+		}
+	}
 
-    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
-    public class BlockCache : Attribute, ICachedReferenceAttribute {
-        public string propertyName { get; set; }
+	[AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+	public class BlockCache : Attribute, ICachedReferenceAttribute {
+		public string propertyName { get; set; }
 
-        public BlockCache(string propertyName) {
-            this.propertyName = propertyName;
-        }
-    }
+		public BlockCache(string propertyName) {
+			this.propertyName = propertyName;
+		}
+	}
 
-    [JsonConverter(typeof(Block.BlockJsonConverter))]
-    abstract partial class Block : IHashableReference {
-        public int hashedID { get; set; }
+	[JsonConverter(typeof(Block.BlockJsonConverter))]
+	abstract partial class Block : IHashableReference {
+		public int hashedID { get; set; }
 
-	    public sealed class BlockJsonConverter : JsonConverter<Block> {
-		    public override Block ReadJson(JsonReader reader, Type objectType, Block existingValue, bool hasExistingValue, JsonSerializer serializer) {
-                int id = Convert.ToInt32(reader.Value);
-			    return Blocks.ByHashedID(id);
-		    }
+		public sealed class BlockJsonConverter : JsonConverter<Block> {
+			public override Block ReadJson(JsonReader reader, Type objectType, Block existingValue, bool hasExistingValue, JsonSerializer serializer) {
+				int id = Convert.ToInt32(reader.Value);
+				return Blocks.ByHashedID(id);
+			}
 
-		    public override void WriteJson(JsonWriter writer, Block value, JsonSerializer serializer) {
-			    writer.WriteValue(value.hashedID);
-		    }
-	    }
-    }
+			public override void WriteJson(JsonWriter writer, Block value, JsonSerializer serializer) {
+				writer.WriteValue(value.hashedID);
+			}
+		}
+	}
 }
