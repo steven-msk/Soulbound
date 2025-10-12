@@ -14,8 +14,6 @@ using UnityEngine.Tilemaps;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
 	public partial class Blocks : IResourceModule, ICachedRegistry<Block> {
-		// REMINDER: since block state properties are unavailable as of right now, keep in mind that block behavior definitions might change when they have actual purpose
-
 		[BlockCache(nameof(air))] public static Block air => Lookup(() => new GenericBlock("Air", Tile("air"), null));
 		[BlockCache(nameof(grass))] public static Block grass => Lookup(() => new GenericBlock("Grass Block", Tile("grass"), Items.grassBlock));
 		[BlockCache(nameof(dirt))] public static Block dirt => Lookup(() => new GenericBlock("Dirt Block", Tile("dirt"), Items.dirtBlock));

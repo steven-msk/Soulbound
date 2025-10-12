@@ -3,21 +3,25 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Unity.Plastic.Newtonsoft.Json;
+using Unity.Plastic.Newtonsoft.Json.Linq;
+using Unity.VisualScripting.YamlDotNet.Core.Tokens;
+using UnityEditor.Rendering;
 using UnityEngine;
+using Logger = SoulboundBackend.Common.Logging.Logger;
 
 #nullable enable
 
 namespace SoulboundBackend.Client.World.BlockSystem {
 	[JsonConverter(typeof(BlockStateJsonConverter))]
 	public sealed class BlockState {
+		static readonly Logger logger = Logger.CreateInstance();
 		public Block block { get; private set; }
-		// might be replaced with a type-safe data structure in the future
-		public IReadOnlyDictionary<string, object> properties { get; private set; }
+		public BlockStateProperties properties { get; private set; }
 		public IBlockStateBehavior stateBehavior { get; private set; }
 
-		public BlockState(Block block, Dictionary<string, object>? properties, IBlockStateBehavior stateBehavior) {
+		public BlockState(Block block, BlockStateProperties? properties, IBlockStateBehavior stateBehavior) {
 			this.block = block ?? Blocks.air;
-			this.properties = new ReadOnlyDictionary<string, object>(properties ?? new Dictionary<string, object>());
+			this.properties = properties ?? new BlockStateProperties(new Dictionary<string, object>());
 			this.stateBehavior = stateBehavior;
 		}
 
@@ -46,15 +50,17 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 				return this;
 			}
 
-			var newProperties = new Dictionary<string, object>() {
+			var newProperties = new BlockStateProperties(new Dictionary<string, object>() {
 				[property.name] = value!
-			};
+			});
 
 			return block.GetStateFor(newProperties);
 		}
 
 		public static bool operator ==(BlockState? state1, BlockState? state2) {
-			return state1 is not null && state2 is not null && state1.block == state2.block;
+			return state1 is not null && state2 is not null 
+				&& state1.block == state2.block
+				&& state1.properties == state2.properties;
 		}
 
 		public static bool operator !=(BlockState? state1, BlockState? state2) => !(state1! == state2!);
@@ -66,10 +72,40 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			return false;
 		}
 
-		public override int GetHashCode() => block.GetHashCode();
+		public override int GetHashCode() => properties.GetHashCode();
 
 		public override string ToString() {
-			return $"BlockState[{block.name}]";
+			return $"BlockState[{block.name}:{properties}]";
+		}
+
+		public static class Serializer {
+			public static BlockState? Deserialize(JArray dataArray) {
+				if (dataArray.Count < 2) {
+					return null;
+				}
+
+				int blockID = dataArray[0]!.Value<int>();
+				int stateHash = dataArray[1]!.Value<int>();
+
+				Block block = Blocks.ByHashedID(blockID);
+				if (block == null) {
+					return Blocks.air.defaultState;
+				}
+
+				if (block.TryGetStateByHash(stateHash, out var state)) {
+					return state;
+				}
+
+                logger.LogWarning(null, $"Unknown state hash {stateHash} for block '{block.name}'");
+                return block.defaultState;
+            }
+
+			public static JArray Serialize(BlockState state) {
+                int blockID = state.block.hashedID;
+                int stateHash = state.block.ComputeHash(state.properties);
+
+                return new JArray { blockID, stateHash };
+            }
 		}
 
 		public sealed class BlockStateJsonConverter : JsonConverter<BlockState> {
@@ -78,12 +114,17 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 					return null;
 				}
 
-				int blockID = Convert.ToInt32(reader.Value);
-				return Blocks.ByHashedID(blockID).defaultState;
+				var array = JArray.Load(reader);
+				return Serializer.Deserialize(array);
 			}
 
 			public override void WriteJson(JsonWriter writer, BlockState? value, JsonSerializer serializer) {
-				serializer.Serialize(writer, value?.block.hashedID);
+				if (value == null) {
+					writer.WriteNull();
+					return;
+				}
+
+				serializer.Serialize(writer, Serializer.Serialize(value));
 			}
 		}
 	}

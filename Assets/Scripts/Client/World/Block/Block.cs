@@ -1,4 +1,5 @@
 ﻿using SoulboundBackend.Client.ItemSystem;
+using System;
 using System.Collections.Generic;
 using UnityEngine.Tilemaps;
 
@@ -30,7 +31,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			cachedStates[ComputeHash(state)] = state;
 		}
 
-		public BlockState GetStateFor(Dictionary<string, object> properties) {
+		public BlockState GetStateFor(BlockStateProperties properties) {
 			int hash = ComputeHash(properties);
 
 			if (!cachedStates.TryGetValue(hash, out var state)) {
@@ -38,6 +39,10 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 				cachedStates[hash] = state;
 			}
 			return state;
+		}
+
+		public bool TryGetStateByHash(int hash, out BlockState state) {
+			return cachedStates.TryGetValue(hash, out state);
 		}
 
 		public bool HasProperty<T>(BlockProperty<T> property) {
@@ -48,11 +53,11 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			return state.With(property, value);
 		}
 
-		protected virtual IBlockStateBehavior CreateBehaviorFor(Dictionary<string, object> properties) {
+		protected virtual IBlockStateBehavior CreateBehaviorFor(BlockStateProperties properties) {
 			return defaultState.stateBehavior;
 		}
 
-		private int ComputeHash(object obj) => obj.GetHashCode();
+		internal int ComputeHash(object obj) => obj.GetHashCode();
 
 		public override string ToString() {
 			return name;

@@ -1,5 +1,6 @@
 ﻿using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Common;
+using Logger = SoulboundBackend.Common.Logging.Logger;
 using SoulboundBackend.Core;
 using SoulboundBackend.Core.Noise;
 using System;
@@ -17,6 +18,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 		public const float HEIGHT_SPREAD = 0.01f;
 		public const float SURFACE_HEIGHT_RANGE = 50f;
 		public const float UNDERGROUND_HEIGHT_RANGE = 20f;
+		private static readonly Logger logger = Logger.CreateInstance();
 
 		private ChunkHeightmapData heightmapData;
 		public ChunkHeightmapData HeightmapData => heightmapData;
@@ -130,16 +132,16 @@ namespace SoulboundBackend.Client.World.Chunk {
 				JObject obj = JObject.Load(reader);
 				int xpos = obj["xpos"].Value<int>();
 				ChunkHeightmapData heightmap = obj["heightmapData"].ToObject<ChunkHeightmapData>(serializer);
-
 				JArray rows = (JArray)obj["blockStates"];
 				BlockState[][] blockStates = new BlockState[rows.Count][];
+
 				for (int x = 0; x < rows.Count; x++) {
 					JArray row = (JArray)rows[x];
 					blockStates[x] = new BlockState[row.Count];
+
 					for (int y = 0; y < row.Count; y++) {
-						int blockID = row[y]!.Value<int>();
-						Block block = Blocks.ByHashedID(blockID);
-						blockStates[x][y] = block.defaultState;
+						JArray data = JArray.Parse(row[y].ToString());
+						blockStates[x][y] = BlockState.Serializer.Deserialize(data);
 					}
 				}
 

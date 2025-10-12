@@ -10,7 +10,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public override string name { get; }
 		public override TileBase tileReference { get; }
 		public override BlockItem? itemReference { get; }
-		private readonly Func<Dictionary<string, object>?, IBlockStateBehavior>? behaviorFactory;
+		private readonly Func<BlockStateProperties?, IBlockStateBehavior>? behaviorFactory;
 		private readonly Action<GenericBlock>? propertyRegisterer;
 		private readonly Func<Block, BlockState>? defaultStateGetter;
 
@@ -22,7 +22,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 				TileBase tileReference,
 				BlockItem itemReference,
 				Func<Block, BlockState>? defaultState = null,
-				Func<Dictionary<string, object>?, IBlockStateBehavior>? behaviorFactory = null,
+				Func<BlockStateProperties?, IBlockStateBehavior>? behaviorFactory = null,
 				Action<GenericBlock>? propertyRegisterer = null
 			) {
 			this.name = name;
@@ -40,7 +40,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			RegisterDefaultState(CreateDefaultState());
 		}
 
-        protected override IBlockStateBehavior CreateBehaviorFor(Dictionary<string, object> properties) {
+        protected override IBlockStateBehavior CreateBehaviorFor(BlockStateProperties properties) {
 			return behaviorFactory?.Invoke(properties) ?? base.CreateBehaviorFor(properties);
         }
 
