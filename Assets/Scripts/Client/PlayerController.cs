@@ -142,7 +142,7 @@ namespace SoulboundBackend.Client {
                     return;
                 }
 
-				if (targetBlock.breakRequirement?.minBreakPower >= 0) {
+				if (0 >= targetBlock.breakRequirement?.minBreakPower) {
 					level.BreakBlock(blockPos, BreakSource.Player);
 				}
             }

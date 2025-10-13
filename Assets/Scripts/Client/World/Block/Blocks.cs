@@ -15,9 +15,9 @@ using UnityEngine.Tilemaps;
 namespace SoulboundBackend.Client.World.BlockSystem {
 	public partial class Blocks : IResourceModule, ICachedRegistry<Block> {
 		[BlockCache(nameof(air))] public static Block air => Lookup(() => new GenericBlock("Air", Tile("air"), null, null));
-		[BlockCache(nameof(grass))] public static Block grass => Lookup(() => new GenericBlock("Grass Block", Tile("grass"), Items.grassBlock, null));
-		[BlockCache(nameof(dirt))] public static Block dirt => Lookup(() => new GenericBlock("Dirt Block", Tile("dirt"), Items.dirtBlock, null));
-		[BlockCache(nameof(stone))] public static Block stone => Lookup(() => new GenericBlock("Stone Block", Tile("stone"), Items.stoneBlock, null));
+		[BlockCache(nameof(grass))] public static Block grass => Lookup(() => new GenericBlock("Grass Block", Tile("grass"), Items.grassBlock, new BreakRequirement(1)));
+		[BlockCache(nameof(dirt))] public static Block dirt => Lookup(() => new GenericBlock("Dirt Block", Tile("dirt"), Items.dirtBlock, new BreakRequirement(1)));
+		[BlockCache(nameof(stone))] public static Block stone => Lookup(() => new GenericBlock("Stone Block", Tile("stone"), Items.stoneBlock, new BreakRequirement(1)));
 		[BlockCache(nameof(wood))] public static Block wood => Lookup(() => new GenericBlock("Wood", Tile("wood"), Items.woodBlock, new BreakRequirement(0)));
 		[BlockCache(nameof(leaves))] public static Block leaves => Lookup(() => 
 			new GenericBlock("Leaves", Tile("leaves"), Items.leavesBlock, new BreakRequirement(0), block => {
