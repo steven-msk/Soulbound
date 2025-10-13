@@ -21,7 +21,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 				BlockItem itemReference, 
 				BreakRequirement? breakRequirement
 			)
-			: this(name, tileReference, itemReference, null, null, null) { 
+			: this(name, tileReference, itemReference, breakRequirement, null, null, null) { 
 		}
 
 		public GenericBlock(
