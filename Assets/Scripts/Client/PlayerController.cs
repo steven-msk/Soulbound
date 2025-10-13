@@ -1,20 +1,25 @@
+using log4net.Core;
 using SoulboundBackend.Client.Input;
+using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.Stats;
 using SoulboundBackend.Client.UI.Storage;
+using SoulboundBackend.Client.World;
+using SoulboundBackend.Client.World.BlockSystem;
+using SoulboundBackend.Client.World.Chunk;
 using SoulboundBackend.Client.World.Entity;
+using SoulboundBackend.Common;
 using SoulboundBackend.Core;
+using SoulboundBackend.Core.Bootstrap;
 using System;
+using System.Collections.Generic;
 using Unity.VisualScripting;
-using Logger = SoulboundBackend.Common.Logging.Logger;
+using UnityEditor.Build.Content;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using SoulboundBackend.Client.ItemSystem;
-using SoulboundBackend.Client.World.Chunk;
-using SoulboundBackend.Client.World;
-using SoulboundBackend.Common;
-using SoulboundBackend.Client.World.BlockSystem;
-using System.Collections.Generic;
-using SoulboundBackend.Core.Bootstrap;
+using static Unity.VisualScripting.Member;
+using static UnityEditor.PlayerSettings;
+using Level = SoulboundBackend.Client.World.Level;
+using Logger = SoulboundBackend.Common.Logging.Logger;
 
 namespace SoulboundBackend.Client {
 	[BootstrappableParentOf(typeof(InputHandler))]
@@ -126,7 +131,21 @@ namespace SoulboundBackend.Client {
 
 		[InputAction("ItemUse", Priority = 5)]
 		internal void OnLeftHold() {
-			RequestSuppressedMainHandUse(ItemUseTrigger.LeftHold);
+			if (MainHandStack != null) {
+				RequestSuppressedMainHandUse(ItemUseTrigger.LeftHold);
+			} else {
+                Level level = LevelManager.instance.Level;
+                Vector2 worldMousePos = inputHandler.MouseWorldPosition;
+                BlockPos blockPos = level.ToBlockPos(worldMousePos);
+				Block? targetBlock = level.BlockAt(blockPos);
+                if ((targetBlock ?? Blocks.air) == Blocks.air) {
+                    return;
+                }
+
+				if (targetBlock.breakRequirement?.minBreakPower >= 0) {
+					level.BreakBlock(blockPos, BreakSource.Player);
+				}
+            }
 		}
 
 		[InputAction("ItemUse", Priority = 5)]
