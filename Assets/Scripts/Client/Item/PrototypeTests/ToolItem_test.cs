@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 public class ToolItem_test : Item, IBreakingTool {
     public int breakingPower => 1;
+    public ToolType types => ToolType.Pickaxe;
 
     public override string name => "crappy pickaxe";
 

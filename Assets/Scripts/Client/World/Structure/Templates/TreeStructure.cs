@@ -1,4 +1,5 @@
-﻿using SoulboundBackend.Client.World.BlockSystem;
+﻿using Codice.Client.BaseCommands;
+using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Client.World.Chunk;
 using SoulboundBackend.Common;
 using System.Collections.Generic;
@@ -77,8 +78,8 @@ namespace SoulboundBackend.Client.World.Structure.Templates {
 			})
 			.BlockStateChangedCallback(blockChangedEvent => {
 				Level level = blockChangedEvent.level;
-				bool foundStructure = level.StructureAt(blockChangedEvent.pos, out var structure);
-				BlockPos changePos = blockChangedEvent.pos;
+				bool foundStructure = level.StructureAt(blockChangedEvent.blockPos, out var structure);
+				BlockPos changePos = blockChangedEvent.blockPos;
 				BlockState oldState = blockChangedEvent.oldState;
 				bool flag_brokenUnderneath = false;
 				if (!foundStructure) {
@@ -105,7 +106,7 @@ namespace SoulboundBackend.Client.World.Structure.Templates {
 					var toRemove = structure.stateOverrides.Where(stateOverride => stateOverride.Key.y > changePos.y);
 					toRemove.ToList().ForEach(stateOverride => {
 						structure.stateOverrides.Remove(stateOverride.Key);
-						level.BreakBlock(stateOverride.Key.ToWorldBlockPos(), BreakSource.NonPlayer);
+						level.BreakBlock(stateOverride.Key.ToWorldBlockPos(), blockChangedEvent.breakSource.GetValue());
 					});
 				}
 			}).Build();

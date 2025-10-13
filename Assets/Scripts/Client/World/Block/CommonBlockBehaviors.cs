@@ -23,7 +23,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			);
 		}
 
-		public static IBlockStateBehavior Basic() {
+		public static IBlockStateBehavior DropSingle() {
 			return FromDelegates(
 				DefaultDropForce,
 				dropsGetter: (blockState, breakSource) => 
@@ -33,12 +33,12 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			);
 		}
 
-		public static IBlockStateBehavior DropIfPlayerBroke() {
+		public static IBlockStateBehavior DropIfBrokenByPlayer() {
 			return FromDelegates(
 				DefaultDropForce,
 				dropsGetter: (blockState, breakSource) => {
 					List<ItemStack> list = new List<ItemStack>();
-					if (breakSource == BreakSource.Player) {
+					if (breakSource is PlayerToolBreakSource) {
 						list.Add(new ItemStack(blockState.block.itemReference, 1));
 					}
 					return list;

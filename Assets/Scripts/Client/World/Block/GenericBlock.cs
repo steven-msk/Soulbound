@@ -59,7 +59,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 
         protected override BlockState CreateDefaultState() {
 			return defaultStateGetter?.Invoke(this)		// null at initialization
-				?? new BlockState(this, null, CommonBlockBehaviors.Basic());
+				?? new BlockState(this, null, CommonBlockBehaviors.DropSingle());
         }
     }
 }

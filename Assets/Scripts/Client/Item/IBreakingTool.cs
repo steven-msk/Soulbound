@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 namespace SoulboundBackend.Client.ItemSystem {
     public interface IBreakingTool : IItemCapability {
         int breakingPower { get; }
+        ToolType types { get; }
 
         public void TryBreak(BlockPos pos, Level level, BreakSource source) {
             Block targetBlock = level.BlockAt(pos);

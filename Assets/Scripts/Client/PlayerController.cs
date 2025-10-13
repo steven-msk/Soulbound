@@ -88,7 +88,7 @@ namespace SoulboundBackend.Client {
 				BlockPos blockPos = level.ToBlockPos(inputHandler.MouseWorldPosition);
 
 				if (CanPlaceBlockAt(blockPos)) {
-					level.SetBlock(blockPos, placeable.Place(stack, blockPos));
+					level.PlaceBlock(blockPos, placeable.Place(stack, blockPos));
 				}
 			});
 			itemUsageHandler.RegisterCapability<IBreakingTool>(ItemUseTrigger.LeftHold, (tool, stack) => {
@@ -97,7 +97,7 @@ namespace SoulboundBackend.Client {
 				BlockPos blockPos = level.ToBlockPos(worldMousePos);
 
 				if (IsInBlockReach((Vector2)blockPos)) {
-					tool.TryBreak(blockPos, level, BreakSource.Player);
+					tool.TryBreak(blockPos, level, new PlayerToolBreakSource(this, tool));
 				}
 			});
 		}
@@ -134,17 +134,19 @@ namespace SoulboundBackend.Client {
 			if (MainHandStack != null) {
 				RequestSuppressedMainHandUse(ItemUseTrigger.LeftHold);
 			} else {
-                Level level = LevelManager.instance.Level;
-                Vector2 worldMousePos = inputHandler.MouseWorldPosition;
-                BlockPos blockPos = level.ToBlockPos(worldMousePos);
-				Block? targetBlock = level.BlockAt(blockPos);
-                if ((targetBlock ?? Blocks.air) == Blocks.air) {
-                    return;
-                }
+				InputHandler.RequestAction(new("BlockBreak", 5, () => {
+					Level level = LevelManager.instance.Level;
+					Vector2 worldMousePos = inputHandler.MouseWorldPosition;
+					BlockPos blockPos = level.ToBlockPos(worldMousePos);
+					Block? targetBlock = level.BlockAt(blockPos);
+					if ((targetBlock ?? Blocks.air) == Blocks.air) {
+						return;
+					}
 
-				if (0 >= targetBlock.breakRequirement?.minBreakPower) {
-					level.BreakBlock(blockPos, BreakSource.Player);
-				}
+					if (IsInBlockReach(worldMousePos) && 0 >= targetBlock.breakRequirement?.minBreakPower) {
+						level.BreakBlock(blockPos, new PlayerToolBreakSource(this, null));
+					}
+				}, null));
             }
 		}
 
@@ -217,6 +219,7 @@ namespace SoulboundBackend.Client {
 						this.currentHealth = this.maxHealth;
 					}
 				};
+
 				this.maxHealth = stats.MaxHealth.GetProcessedValue();
 				this.currentHealth = maxHealth;         // might cause problems later with OnDeath handling
 														// If the player were to leave while having the death screen active,
