@@ -121,15 +121,15 @@ namespace SoulboundBackend.Client.World {
                     if (!generatedChunks.ContainsKey(chunkX)) {
                         chunk = this.GenerateNewChunk(chunkX);
                         generatedChunks[chunkX] = chunk;
-
-                        if (pendingUpdates.TryGetValue(chunkX, out var stateUpdates)) {
-                            stateUpdates.ForEach(stateUpdate => {
-                                chunk.SetBlock(stateUpdate.chunkBlockPos, stateUpdate.state);
-                            });
-                            pendingUpdates.Remove(chunkX);
-                        }
                     } else {
                         chunk = generatedChunks[chunkX];
+                    }
+
+                    if (pendingUpdates.TryGetValue(chunkX, out var stateUpdates)) {
+                        stateUpdates.ForEach(stateUpdate => {
+                            chunk.SetBlock(stateUpdate.chunkBlockPos, stateUpdate.state);
+                        });
+                        pendingUpdates.Remove(chunkX);
                     }
 
                     loadedChunks[chunkX] = chunk;
