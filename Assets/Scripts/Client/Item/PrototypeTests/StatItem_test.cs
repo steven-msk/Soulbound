@@ -13,7 +13,7 @@ public class StatItem_test : StatItem {
 
 	public override string name => "StatItem_test";
 
-	public override ItemAspect aspect => ItemAspectRegistry.Get(this, ItemAspect.Simple("gem_icon"));
+	public override ItemAspect aspect => ItemAspectRegistry.Get(this, () => ItemAspect.Simple("gem_icon"));
 
 	public override int maxStackSize => Item.CustomMaxStack(128);
 

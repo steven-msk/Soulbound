@@ -13,7 +13,7 @@ public class ConsumableStatItem_test : ConsumableStatItem {
 
 	public override string name => "ConsumableStatItem_test";
 
-	public override ItemAspect aspect => ItemAspectRegistry.Get(this, ItemAspect.Simple("fruit_icon"));
+	public override ItemAspect aspect => ItemAspectRegistry.Get(this, () => ItemAspect.Simple("fruit_icon"));
 
 	public override int maxStackSize => Item.DEFAULT_MAX_STACK;
 
