@@ -10,17 +10,25 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public override string name { get; }
 		public override TileBase tileReference { get; }
 		public override BlockItem? itemReference { get; }
+        public override BreakRequirement? breakRequirement { get; }
 		private readonly Func<BlockStateProperties?, IBlockStateBehavior>? behaviorFactory;
 		private readonly Action<GenericBlock>? propertyRegisterer;
 		private readonly Func<Block, BlockState>? defaultStateGetter;
 
-		public GenericBlock(string name, TileBase tileReference, BlockItem itemReference)
-			: this(name, tileReference, itemReference, null, null, null) { }
+		public GenericBlock(
+				string name, 
+				TileBase tileReference, 
+				BlockItem itemReference, 
+				BreakRequirement? breakRequirement
+			)
+			: this(name, tileReference, itemReference, null, null, null) { 
+		}
 
 		public GenericBlock(
 				string name,
 				TileBase tileReference,
 				BlockItem itemReference,
+				BreakRequirement? breakRequirement,
 				Func<Block, BlockState>? defaultState = null,
 				Func<BlockStateProperties?, IBlockStateBehavior>? behaviorFactory = null,
 				Action<GenericBlock>? propertyRegisterer = null
@@ -28,6 +36,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			this.name = name;
 			this.tileReference = tileReference;
 			this.itemReference = itemReference;
+			this.breakRequirement = breakRequirement;
 			this.behaviorFactory = behaviorFactory;
 			this.propertyRegisterer = propertyRegisterer;
 			this.defaultStateGetter = defaultState;

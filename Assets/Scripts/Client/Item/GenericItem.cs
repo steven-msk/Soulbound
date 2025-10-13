@@ -11,8 +11,13 @@ namespace SoulboundBackend.Client.ItemSystem {
 		protected override Func<Item, TooltipData?> tooltipSupplier { get; }
 		protected override TooltipRenderer.NodeStyleProvider? nodeStyleProvider { get; }
 
-		public GenericItem(string name, ItemAspect aspect, int maxStackSize,
-				Func<Item, TooltipData?> tooltipSupplier, TooltipRenderer.NodeStyleProvider? nodeStyleProvider = null)
+		public GenericItem(
+				string name, 
+				ItemAspect aspect, 
+				int maxStackSize,
+				Func<Item, TooltipData?> tooltipSupplier, 
+				TooltipRenderer.NodeStyleProvider? nodeStyleProvider = null
+			)
 			: base(name, aspect, maxStackSize, tooltipSupplier, nodeStyleProvider) {
 			this.name = name;
 			this.aspect = aspect;

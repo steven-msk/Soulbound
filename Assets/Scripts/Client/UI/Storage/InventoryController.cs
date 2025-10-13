@@ -113,6 +113,9 @@ namespace SoulboundBackend.Client.UI.Storage {
 				.Concat(TryDeserialize("popup", serialized.regions, this.GetSlotByIndex))
 				.Concat(TryDeserialize("armor", serialized.regions, index => armorSlotsByIndex[index]));
 			hotbar.SetActiveSlot(serialized.lastHotbarIndex);
+
+			ItemDisplay.Create(new ItemStack(Items.toolItem_test, 1), this.slots[0]);
+
 			return pendingUpdates.ToList();
 		}
 

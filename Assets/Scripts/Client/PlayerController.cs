@@ -21,7 +21,7 @@ namespace SoulboundBackend.Client {
 	[BootstrappableParentOf(typeof(InventoryController))]
 	[BootstrappableParentOf(typeof(PlayerPhysics))]
 	[BootstrappableParentOf(typeof(ItemUsageHandler))]
-    public class PlayerController : LivingEntity, IBootstrappable {
+	public class PlayerController : LivingEntity, IBootstrappable {
 		private static readonly Logger logger = Logger.CreateInstance();
 		public override Type entityScriptType => typeof(PlayerController);
 		public override string prefabDefinitionID => "johnny";
@@ -72,20 +72,29 @@ namespace SoulboundBackend.Client {
 			playerPhysics = dependencyContainer.Resolve<PlayerPhysics>();
 			itemUsageHandler = dependencyContainer.Resolve<ItemUsageHandler>();
 
-			//itemUsageHandler.Register<IConsumable>(ItemUseTrigger.RightClick, (consumable, stack) => consumable.Consume(stack));
-			//foreach (ItemUseTrigger trigger in Enum.GetValues(typeof(ItemUseTrigger))) {
-			//	itemUsageHandler.Register<IAttackPerformer>(trigger, (attackPerformer, stack) => {
-			//		InvocationHelper.If(CanAttack, () => attackPerformer.PerformAttack(trigger));
-			//	});
-			//}
-			//itemUsageHandler.Register<IPlaceable>(ItemUseTrigger.LeftHold, (placeable, stack) => {
-			//	Level level = LevelManager.instance.Level;
-			//	BlockPos blockPos = level.ToBlockPos(inputHandler.MouseWorldPosition);
+			itemUsageHandler.RegisterCapability<IConsumable>(ItemUseTrigger.RightClick, (consumable, stack) => consumable.Consume(stack));
+			foreach (ItemUseTrigger trigger in Enum.GetValues(typeof(ItemUseTrigger))) {
+				itemUsageHandler.RegisterCapability<IAttackPerformer>(trigger, (attackPerformer, stack) => {
+					InvocationHelper.If(CanAttack, () => attackPerformer.PerformAttack(trigger));
+				});
+			}
+			itemUsageHandler.RegisterCapability<IPlaceable>(ItemUseTrigger.LeftHold, (placeable, stack) => {
+				Level level = LevelManager.instance.Level;
+				BlockPos blockPos = level.ToBlockPos(inputHandler.MouseWorldPosition);
 
-			//	if (CanPlaceBlockAt(blockPos)) {
-			//		level.SetBlock(blockPos, placeable.Place(stack, blockPos));
-			//	}
-			//});
+				if (CanPlaceBlockAt(blockPos)) {
+					level.SetBlock(blockPos, placeable.Place(stack, blockPos));
+				}
+			});
+			itemUsageHandler.RegisterCapability<IBreakingTool>(ItemUseTrigger.LeftHold, (tool, stack) => {
+				Level level = LevelManager.instance.Level;
+				Vector2 worldMousePos = inputHandler.MouseWorldPosition;
+				BlockPos blockPos = level.ToBlockPos(worldMousePos);
+
+				if (IsInBlockReach((Vector2)blockPos)) {
+					tool.TryBreak(blockPos, level, BreakSource.Player);
+				}
+			});
 		}
 
 		public void OnEarlyBootstrap(DependencyContainer dependencyContainer) {
@@ -117,19 +126,7 @@ namespace SoulboundBackend.Client {
 
 		[InputAction("ItemUse", Priority = 5)]
 		internal void OnLeftHold() {
-			if (MainHandStack != null) {
-				RequestSuppressedMainHandUse(ItemUseTrigger.LeftHold);
-			} else {
-				InputHandler.RequestAction(new InputActionRequest("BlockBreak", 5, () => {
-					Level level = LevelManager.instance.Level;
-					Vector2 worldMousePos = inputHandler.MouseWorldPosition;
-					BlockPos blockPos = level.ToBlockPos(worldMousePos);
-
-					if (IsInBlockReach((Vector2)blockPos) && level.BlockAt(blockPos) != Blocks.air) {
-						level.BreakBlock(blockPos, BreakSource.Player);
-					}
-				}, null));
-			}
+			RequestSuppressedMainHandUse(ItemUseTrigger.LeftHold);
 		}
 
 		[InputAction("ItemUse", Priority = 5)]
@@ -140,7 +137,6 @@ namespace SoulboundBackend.Client {
 		private void RequestSuppressedMainHandUse(ItemUseTrigger trigger) {
 			Item? usedItem = MainHandStack?.item;
 			RequestMainHandUse(trigger, null);
-			InputHandler.RequestAction(new("ItemUse", 5, () => itemUsageHandler.HandleInput(trigger, MainHandStack), null));
 			if (usedItem is IPlaceable) {
 				InputHandler.BlockContext("BlockBreak", () => !InputHandler.LeftHold);
 			}

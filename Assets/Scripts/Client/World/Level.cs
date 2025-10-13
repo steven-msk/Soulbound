@@ -291,10 +291,10 @@ namespace SoulboundBackend.Client.World {
         }
 
         // in the future this will also contain the information about how the block was broken
-        public void BreakBlock(BlockPos blockPos, BreakSource provider) {
+        public void BreakBlock(BlockPos blockPos, BreakSource source) {
             BlockState? brokenBlock = BlockStateAt(blockPos);
             SetBlock(blockPos, null);
-            brokenBlock?.DropOnBroken(blockPos, provider);
+            brokenBlock?.DropOnBroken(blockPos, source);
         }
 
         public void PendUpdates(int chunkX, List<(ChunkBlockPos chunkBlockpos, BlockState state)> blockStateUpdates) {

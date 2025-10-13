@@ -10,6 +10,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public abstract string name { get; }
 		public abstract TileBase tileReference { get; }
 		public abstract BlockItem? itemReference { get; }
+		public virtual BreakRequirement? breakRequirement => null;
 
 		protected List<object> propertyList = new();
 		public BlockState defaultState { get; private set; }
