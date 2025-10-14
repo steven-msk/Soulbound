@@ -18,6 +18,7 @@ MonoBehaviour:
   extension: .asset
   resourceAddresses:
   - Assets/Resources/Registry/Sprites/chestplate_overlay.asset
+  - Assets/Resources/Registry/Sprites/crappy_pickaxe.asset
   - Assets/Resources/Registry/Sprites/dirt_icon.asset
   - Assets/Resources/Registry/Sprites/fruit_icon.asset
   - Assets/Resources/Registry/Sprites/gem_icon.asset

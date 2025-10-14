@@ -75,36 +75,42 @@ namespace SoulboundBackend.Client {
 			inputHandler = dependencyContainer.Resolve<InputHandler>();
 			inventory = dependencyContainer.Resolve<InventoryController>();
 			playerPhysics = dependencyContainer.Resolve<PlayerPhysics>();
-			itemUsageHandler = dependencyContainer.Resolve<ItemUsageHandler>();
-
-			itemUsageHandler.RegisterCapability<IConsumable>(ItemUseTrigger.RightClick, (consumable, stack) => consumable.Consume(stack));
-			foreach (ItemUseTrigger trigger in Enum.GetValues(typeof(ItemUseTrigger))) {
-				itemUsageHandler.RegisterCapability<IAttackPerformer>(trigger, (attackPerformer, stack) => {
-					InvocationHelper.If(CanAttack, () => attackPerformer.PerformAttack(trigger));
-				});
-			}
-			itemUsageHandler.RegisterCapability<IPlaceable>(ItemUseTrigger.LeftHold, (placeable, stack) => {
-				Level level = LevelManager.instance.Level;
-				BlockPos blockPos = level.ToBlockPos(inputHandler.MouseWorldPosition);
-
-				if (CanPlaceBlockAt(blockPos)) {
-					level.PlaceBlock(blockPos, placeable.Place(stack, blockPos));
-				}
-			});
-			itemUsageHandler.RegisterCapability<IBreakingTool>(ItemUseTrigger.LeftHold, (tool, stack) => {
-				Level level = LevelManager.instance.Level;
-				Vector2 worldMousePos = inputHandler.MouseWorldPosition;
-				BlockPos blockPos = level.ToBlockPos(worldMousePos);
-
-				if (IsInBlockReach((Vector2)blockPos)) {
-					tool.TryBreak(blockPos, level, new PlayerToolBreakSource(this, tool));
-				}
-			});
+			RegisterItemUsageCandidates(dependencyContainer.Resolve<ItemUsageHandler>());
 		}
-
 		public void OnEarlyBootstrap(DependencyContainer dependencyContainer) {
 			dependencyContainer.Register<PlayerController>(this);
 		}
+
+		private void RegisterItemUsageCandidates(ItemUsageHandler? itemUsageHandler) {
+			if (itemUsageHandler == null) {
+				return;
+			}
+			this.itemUsageHandler = itemUsageHandler;
+
+            itemUsageHandler.RegisterCapability<IConsumable>(ItemUseTrigger.RightClick, (consumable, stack) => consumable.Consume(stack));
+            foreach (ItemUseTrigger trigger in Enum.GetValues(typeof(ItemUseTrigger))) {
+                itemUsageHandler.RegisterCapability<IAttackPerformer>(trigger, (attackPerformer, stack) => {
+                    InvocationHelper.If(CanAttack, () => attackPerformer.PerformAttack(trigger));
+                });
+            }
+            itemUsageHandler.RegisterCapability<IPlaceable>(ItemUseTrigger.LeftHold, (placeable, stack) => {
+                Level level = LevelManager.instance.Level;
+                BlockPos blockPos = level.ToBlockPos(inputHandler.MouseWorldPosition);
+
+                if (CanPlaceBlockAt(blockPos)) {
+                    level.PlaceBlock(blockPos, placeable.Place(stack, blockPos));
+                }
+            });
+            itemUsageHandler.RegisterCapability<IBreakingTool>(ItemUseTrigger.LeftHold, (tool, stack) => {
+                Level level = LevelManager.instance.Level;
+                Vector2 worldMousePos = inputHandler.MouseWorldPosition;
+                BlockPos blockPos = level.ToBlockPos(worldMousePos);
+
+                if (IsInBlockReach((Vector2)blockPos)) {
+                    tool.TryBreak(blockPos, level, new PlayerToolBreakSource(this, tool));
+                }
+            });
+        }
 
 		protected override void Update() {
 			base.Update();
@@ -175,7 +181,10 @@ namespace SoulboundBackend.Client {
 
 		public bool IsInBlockReach(Vector2 worldPos) {
 			float dist = Vector2.Distance(worldPos, this.center);
-			return dist <= MaxBlockReach && !LevelManager.instance.Level.GetTilesCovered(playerPhysics.Collider.bounds).Contains(BlockPos.FromWorld(worldPos));
+			return dist <= MaxBlockReach 
+				&& !LevelManager.instance.Level
+					.GetTilesCovered(playerPhysics.Collider.bounds)
+						.Contains(BlockPos.FromWorld(worldPos));
 		}
 
 		// since this is a lazy player entity addition, not all methods need implementation (for now)
