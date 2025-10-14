@@ -1,10 +1,12 @@
 using NUnit.Framework;
+using SoulboundBackend.Common.Logging;
 using SoulboundBackend.Core.Resource;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -67,30 +69,47 @@ public class ResourceTests {
             ?.SetValue(null, new Dictionary<string, ResourceGroup>());
     }
 
+    [TearDown]
+    public void CleanupDummy() {
+        AssetDatabase.DeleteAsset(dummyGroupPath);
+        AssetDatabase.DeleteAsset(dummyGroupSearch);
+        AssetDatabase.DeleteAsset("Assets/Resources/MockGroup.asset");
+    }
+
+    private ResourceGroup RegisterDummyGroup() {
+        Assert.That(!string.IsNullOrEmpty(AssetDatabase.CreateFolder(registryFolder, dummyGroupFolder)), () => $"Could not create folder {dummyGroupSearch}");
+        Assert.That(ResourceGroups.DummyGroup.instance != null);
+        try {
+            Resources.ResourceManager.GetAddressFromGroupDefinition<DummyGroup>();
+        } catch (KeyNotFoundException) {
+            Resources.ResourceManager.RegisterGroupDefinition<DummyGroup, GameObject>(DummyGroup.instance);
+        }
+        ResourceGroup group = ScriptableObject.CreateInstance<ResourceGroup>();
+        group.groupAddress = "dummy/";
+        group.searchFolder = dummyGroupSearch;
+        group.assetType = "GameObject";
+        AssetDatabase.CreateAsset(group, dummyGroupPath);
+        Assert.That(AssetDatabase.AssetPathExists(dummyGroupPath), () => "Could not create ResourceGroup asset");
+        try {
+            Resources.ResourceManager.RegisterGroupByAddress(group);
+        } catch (ArgumentException) { }
+        return group;
+    }
+
+    private GameObject SaveDummyObject(string name, string path) {
+        GameObject prefab = new GameObject(name);
+        PrefabUtility.SaveAsPrefabAsset(prefab, path);
+        AssetDatabase.Refresh();
+        Assert.That(AssetDatabase.AssetPathExists(path), () => "Could not create prefab asset");
+        return prefab;
+    }
+
     [Test]
 	public void ResourceManager_ReturnsAsset_WhenAssetExistsInRegisteredGroup() {
-		Assert.That(!string.IsNullOrEmpty(AssetDatabase.CreateFolder(registryFolder, dummyGroupFolder)), () => $"Could not create folder {dummyGroupSearch}");
-		Assert.That(ResourceGroups.DummyGroup.instance != null);
-		try {
-			Resources.ResourceManager.GetAddressFromGroupDefinition<DummyGroup>();
-        } catch (KeyNotFoundException) {
-			Resources.ResourceManager.RegisterGroupDefinition<DummyGroup, GameObject>(DummyGroup.instance);
-		}
-        ResourceGroup group = ScriptableObject.CreateInstance<ResourceGroup>();
-		group.groupAddress = "dummy/";
-		group.searchFolder = dummyGroupSearch;
-		group.assetType = "GameObject";
-		AssetDatabase.CreateAsset(group, dummyGroupPath);
-		Assert.That(AssetDatabase.AssetPathExists(dummyGroupPath), () => "Could not create ResourceGroup asset");
-		try {
-			Resources.ResourceManager.RegisterGroupByAddress(group);
-		} catch (ArgumentException) { }
+        ResourceGroup group = RegisterDummyGroup();
 
-		GameObject prefab = new GameObject("dummyObject");
-		PrefabUtility.SaveAsPrefabAsset(prefab, dummyPrefabPath);
-		AssetDatabase.Refresh();
-		Assert.That(AssetDatabase.AssetPathExists(dummyPrefabPath), () => "Could not create prefab asset");
-		group.RefreshGroup();
+        SaveDummyObject("dummyObject", dummyPrefabPath);
+		group.RefreshAddresses();
 
 		GameObject? loadedPrefab = ResourceManager.Get<GameObject, ResourceGroups.DummyGroup>("dummyObject");
 		Assert.That(loadedPrefab != null, () => "Failed to load prefab");
@@ -215,14 +234,7 @@ public class ResourceTests {
         ResourceManager.RegisterGroupDefinition<MockGroupDefinition, Texture2D>(def);
 
         Assert.Throws<NullReferenceException>(() => {
-            ResourceManager.Get<Texture2D, MockGroupDefinition>("missing"); 
+            ResourceManager.Get<Texture2D, MockGroupDefinition>("missing");
         });
     }
-
-    [OneTimeTearDown]
-	public void CleanupDummy() {
-        AssetDatabase.DeleteAsset(dummyGroupPath);
-		AssetDatabase.DeleteAsset(dummyGroupSearch);
-        AssetDatabase.DeleteAsset("Assets/Resources/MockGroup.asset");
-	}
 }

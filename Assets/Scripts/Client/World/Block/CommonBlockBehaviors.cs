@@ -1,4 +1,5 @@
 ﻿using SoulboundBackend.Client.ItemSystem;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -33,15 +34,19 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			);
 		}
 
-		public static IBlockStateBehavior DropIfBrokenByPlayer() {
+		public static IBlockStateBehavior DropSingleIfBrokenByPlayer() {
+			return DropSingleIf((blockState, breakSource) => breakSource is PlayerToolBreakSource);
+		}
+
+		public static IBlockStateBehavior DropSingleIf(Func<BlockState, BreakSource, bool> predicate) {
 			return FromDelegates(
 				DefaultDropForce,
 				dropsGetter: (blockState, breakSource) => {
-					List<ItemStack> list = new List<ItemStack>();
-					if (breakSource is PlayerToolBreakSource) {
-						list.Add(new ItemStack(blockState.block.itemReference, 1));
+					List<ItemStack> drops = new List<ItemStack>();
+					if (predicate.Invoke(blockState, breakSource)) {
+						drops.Add(new ItemStack(blockState.block.itemReference, 1));
 					}
-					return list;
+					return drops;
 				},
 				NoNeighborUpdate,
 				NoPlaceAction

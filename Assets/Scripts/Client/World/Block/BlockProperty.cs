@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
-    public class BlockProperty<T> {
+    public class BlockProperty<T> : IBlockStateProperty {
         public string name { get; }
         public IReadOnlyList<T> allowedValues { get; }
 
@@ -15,5 +15,15 @@ namespace SoulboundBackend.Client.World.BlockSystem {
         }
 
         public override string ToString() => name;
+
+        public override bool Equals(object obj) {
+            return obj is BlockProperty<T> other
+                && other.name == this.name
+                && other.allowedValues.SequenceEqual(this.allowedValues);
+        }
+
+        public override int GetHashCode() {
+            return HashCode.Combine(name, allowedValues);
+        }
     }
 }

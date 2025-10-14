@@ -21,16 +21,16 @@ public class DummyBlock : BlockSystem.Block {
     public static readonly BlockSystem.BlockProperty<bool> lit = new("lit");
 
     protected override void RegisterProperties() {
-        propertyList.Add(lit);
+        propertyMap.Add(lit, false);
     }
 
     protected override BlockState CreateDefaultState() {
-        var defaultProperties = new BlockStateProperties(new Dictionary<string, object> { { lit.name, false } });
+        var defaultProperties = new Dictionary<IBlockStateProperty, object> { { lit, false } };
         return new BlockSystem.BlockState(this, defaultProperties, new DummyBehavior());
     }
 
     protected override IBlockStateBehavior CreateBehaviorFor(BlockStateProperties properties) {
-        bool lit = (bool)properties[DummyBlock.lit.name];
+        bool lit = (bool)properties[DummyBlock.lit];
         return lit ? new LitBehavior() : new DummyBehavior();
     }
 }
@@ -117,7 +117,7 @@ namespace BlockTests {
         public void GetStateFor_CachesIdentical() {
             var block = new DummyBlock();
 
-            var props = new BlockStateProperties(new Dictionary<string, object> { { DummyBlock.lit.name, false } });
+            var props = new BlockStateProperties(new Dictionary<IBlockStateProperty, object> { { DummyBlock.lit, false } });
             var state1 = block.GetStateFor(props);
             var state2 = block.GetStateFor(props);
 
@@ -159,8 +159,8 @@ namespace BlockTests {
         public void BehaviorFactory_ReturnsDifferentBehaviorForDifferentProperties() {
             var block = new DummyBlock();
 
-            var unlitProps = new BlockStateProperties(new Dictionary<string, object> { { DummyBlock.lit.name, false } });
-            var litProps = new BlockStateProperties(new Dictionary<string, object> { { DummyBlock.lit.name, true } });
+            var unlitProps = new BlockStateProperties(new Dictionary<IBlockStateProperty, object> { { DummyBlock.lit, false } });
+            var litProps = new BlockStateProperties(new Dictionary<IBlockStateProperty, object> { { DummyBlock.lit, true } });
 
             var unlitState = block.GetStateFor(unlitProps);
             var litState = block.GetStateFor(litProps);
@@ -173,8 +173,8 @@ namespace BlockTests {
         public void BlockState_EqualityComparer_ConsidersOnlyProperties() {
             var block = new DummyBlock();
             var s1 = block.defaultState;
-            var props1 = new BlockStateProperties(new Dictionary<string, object> { { DummyBlock.lit.name, true } });
-            var props2 = new BlockStateProperties(new Dictionary<string, object> { { DummyBlock.lit.name, true } });
+            var props1 = new BlockStateProperties(new Dictionary<IBlockStateProperty, object> { { DummyBlock.lit, true } });
+            var props2 = new BlockStateProperties(new Dictionary<IBlockStateProperty, object> { { DummyBlock.lit, true } });
             var s2 = block.GetStateFor(props1);
             var s3 = block.GetStateFor(props2);
 

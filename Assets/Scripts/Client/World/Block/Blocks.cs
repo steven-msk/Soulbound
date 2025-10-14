@@ -21,7 +21,12 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		[BlockCache(nameof(wood))] public static Block wood => Lookup(() => new GenericBlock("Wood", Tile("wood"), Items.woodBlock, new BreakRequirement(0, ToolType.None, 10)));
 		[BlockCache(nameof(leaves))] public static Block leaves => Lookup(() => 
 			new GenericBlock("Leaves", Tile("leaves"), Items.leavesBlock, new BreakRequirement(0, ToolType.All, 10), block => {
-				return new BlockState(block, null, CommonBlockBehaviors.DropIfBrokenByPlayer());
+				return new BlockState(block, null,
+					CommonBlockBehaviors.DropSingleIf((blockState, breakSource) =>
+						breakSource is PlayerToolBreakSource && blockState.Get<bool>("persistent")
+				));
+			}, behaviorFactory: null, propertyRegisterer: instance => {
+				instance.RegisterProperty(new BlockProperty<bool>("persistent"), false);
 			}
 		));
 	
@@ -62,19 +67,19 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		}
 	}
 
-	[JsonConverter(typeof(Block.BlockJsonConverter))]
-	abstract partial class Block : IHashableReference {
-		public int hashedID { get; set; }
+    [JsonConverter(typeof(Block.BlockJsonConverter))]
+    abstract partial class Block : IHashableReference {
+        public int hashedID { get; set; }
 
-		public sealed class BlockJsonConverter : JsonConverter<Block> {
-			public override Block ReadJson(JsonReader reader, Type objectType, Block existingValue, bool hasExistingValue, JsonSerializer serializer) {
-				int id = Convert.ToInt32(reader.Value);
-				return Blocks.ByHashedID(id);
-			}
+        public sealed class BlockJsonConverter : JsonConverter<Block> {
+            public override Block ReadJson(JsonReader reader, Type objectType, Block existingValue, bool hasExistingValue, JsonSerializer serializer) {
+                int id = Convert.ToInt32(reader.Value);
+                return Blocks.ByHashedID(id);
+            }
 
-			public override void WriteJson(JsonWriter writer, Block value, JsonSerializer serializer) {
-				writer.WriteValue(value.hashedID);
-			}
-		}
-	}
+            public override void WriteJson(JsonWriter writer, Block value, JsonSerializer serializer) {
+                writer.WriteValue(value.hashedID);
+            }
+        }
+    }
 }

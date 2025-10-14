@@ -38,7 +38,7 @@ namespace SoulboundBackend.Client.World.Structure.Templates {
 				int ypos = generationContext.heightmapData.surfaceLevels[worldX];
 				valid = preliminaryData.origin.y == generationContext.heightmapData.surfaceLevels[worldX];
 				int sizeY = preliminaryData.size.y;
-				valid = sizeY >= minHeight && sizeY <= maxHeight;
+				valid = valid && sizeY >= minHeight && sizeY <= maxHeight;
 				return valid;
 			})
 			.PlacementGenerator((generationContext, preliminaryData) => {
@@ -48,7 +48,7 @@ namespace SoulboundBackend.Client.World.Structure.Templates {
 				BoundsInt2D bounds = new((Vector2Int)origin, (Vector2Int)origin + preliminaryData.Value.size);
 				ChunkBlockPos trunkPos = new ChunkBlockPos(origin.x, origin.y, generationContext.chunkX);
 				BlockState woodBlock = Blocks.wood.defaultState;
-				BlockState leavesBlock = Blocks.leaves.defaultState;
+				BlockState leavesBlock = Blocks.leaves.defaultState.With(new BlockProperty<bool>("persistent"), true);
 
 				for (int ty = 0; ty < bounds.size.y; ty++) {
 					stateOverrides[trunkPos] = woodBlock;
@@ -82,6 +82,7 @@ namespace SoulboundBackend.Client.World.Structure.Templates {
 				BlockPos changePos = blockChangedEvent.blockPos;
 				BlockState oldState = blockChangedEvent.oldState;
 				bool flag_brokenUnderneath = false;
+
 				if (!foundStructure) {
 					BlockPos upNeighbor = changePos.GetAdjacent(Direction.Up);
 					foundStructure = level.StructureAt(upNeighbor, out structure);
@@ -90,6 +91,7 @@ namespace SoulboundBackend.Client.World.Structure.Templates {
 					}
 					flag_brokenUnderneath = true;
 				}
+
 				if (oldState.block == Blocks.leaves && structure.stateOverrides.ContainsKey(ChunkBlockPos.FromBlockPos(changePos))) {
 					if (level.OverlappingStructures(changePos, out var overlapping)) {
 						foreach (StructurePlacement overlappingStructure in overlapping) {
@@ -101,12 +103,15 @@ namespace SoulboundBackend.Client.World.Structure.Templates {
 					}
 					return;
 				}
+
 				if ((oldState.block == Blocks.wood && structure.stateOverrides.ContainsKey(ChunkBlockPos.FromBlockPos(changePos))) || flag_brokenUnderneath) {
 					level.MarkStructureDirty(structure);
 					var toRemove = structure.stateOverrides.Where(stateOverride => stateOverride.Key.y > changePos.y);
+					var treeCollapseSource = new TreeCollapseBreakSource(blockChangedEvent.breakSource.GetValue());
+
 					toRemove.ToList().ForEach(stateOverride => {
 						structure.stateOverrides.Remove(stateOverride.Key);
-						level.BreakBlock(stateOverride.Key.ToWorldBlockPos(), blockChangedEvent.breakSource.GetValue());
+						level.BreakBlock(stateOverride.Key.ToWorldBlockPos(), treeCollapseSource);
 					});
 				}
 			}).Build();

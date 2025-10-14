@@ -8,9 +8,13 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
-	public class BlockStateProperties : ReadOnlyDictionary<string, object> {
-		public BlockStateProperties(IDictionary<string, object> predefined) 
+	public class BlockStateProperties : ReadOnlyDictionary<IBlockStateProperty, object> {
+		public BlockStateProperties(IDictionary<IBlockStateProperty, object> predefined) 
 			: base(predefined) {
+		}
+
+		public bool Contains(IBlockStateProperty property) {
+			return this.ContainsKey(property);
 		}
 
 		public override int GetHashCode() {

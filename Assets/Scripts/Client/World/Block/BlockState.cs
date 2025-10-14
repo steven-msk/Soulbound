@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using Unity.Plastic.Newtonsoft.Json;
 using Unity.Plastic.Newtonsoft.Json.Linq;
 using Unity.VisualScripting.YamlDotNet.Core.Tokens;
@@ -15,14 +16,21 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 	[JsonConverter(typeof(BlockStateJsonConverter))]
 	public sealed class BlockState {
 		static readonly Logger logger = Logger.CreateInstance();
-		public Block block { get; private set; }
-		public BlockStateProperties properties { get; private set; }
-		public IBlockStateBehavior stateBehavior { get; private set; }
+		public Block block { get; }
+		public BlockStateProperties properties { get; }
+		public IBlockStateBehavior stateBehavior { get; }
 
-		public BlockState(Block block, BlockStateProperties? properties, IBlockStateBehavior stateBehavior) {
+		public BlockState(Block block, Dictionary<IBlockStateProperty, object>? properties, IBlockStateBehavior stateBehavior) {
 			this.block = block ?? Blocks.air;
-			this.properties = properties ?? new BlockStateProperties(new Dictionary<string, object>());
 			this.stateBehavior = stateBehavior;
+
+			properties ??= new Dictionary<IBlockStateProperty, object>();
+			var unspecified = block!.propertyDefinitions.Where(p => !properties.ContainsKey(p));
+			foreach (var property in unspecified) {
+				properties.Add(property, block.GetDefaultValueOfProperty(property));
+			}
+
+			this.properties = new BlockStateProperties(properties);
 		}
 
 		public void OnNeighborStateChanged(BlockPos selfPos, BlockPos neighborPos, BlockState oldState, BlockState newState) {
@@ -39,9 +47,18 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 
 		public void OnPlace(BlockPos blockPos) => stateBehavior.OnPlace(blockPos, this);
 
-		public T Get<T>(BlockProperty<T> property) => (T)properties[property.name];
+		public T Get<T>(BlockProperty<T> property) => (T)properties[property];
 
-		public BlockState With<T>(BlockProperty<T> property, T value) {
+		public object Get(IBlockStateProperty property) => properties[property];
+
+		public object Get(string property) {
+			var target = properties.Keys.FirstOrDefault(p => p.name == property);
+			return properties[target] ?? default!;
+		}
+
+        public T Get<T>(string property) => (T)Get(property);
+
+        public BlockState With<T>(BlockProperty<T> property, T value) {
 			if (!block.HasProperty(property)) {
 				throw new InvalidOperationException($"Block {block.name} does not have property {property.name}");
 			}
@@ -50,8 +67,8 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 				return this;
 			}
 
-			var newProperties = new BlockStateProperties(new Dictionary<string, object>() {
-				[property.name] = value!
+			var newProperties = new BlockStateProperties(new Dictionary<IBlockStateProperty, object>() {
+				[property] = value!
 			});
 
 			return block.GetStateFor(newProperties);
@@ -96,16 +113,16 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 					return state;
 				}
 
-                logger.LogWarning(null, $"Unknown state hash {stateHash} for block '{block.name}'");
-                return block.defaultState;
-            }
+				logger.LogWarning(null, $"Unknown state hash {stateHash} for block '{block.name}'");
+				return block.defaultState;
+			}
 
 			public static JArray Serialize(BlockState state) {
-                int blockID = state.block.hashedID;
-                int stateHash = state.block.ComputeHash(state.properties);
+				int blockID = state.block.hashedID;
+				int stateHash = state.block.ComputeHash(state.properties);
 
-                return new JArray { blockID, stateHash };
-            }
+				return new JArray { blockID, stateHash };
+			}
 		}
 
 		public sealed class BlockStateJsonConverter : JsonConverter<BlockState> {
@@ -129,4 +146,3 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		}
 	}
 }
-

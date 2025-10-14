@@ -10,4 +10,8 @@ namespace SoulboundBackend.Client.World.BlockSystem {
     public record PlayerToolBreakSource(PlayerController player, IBreakingTool? tool) : BreakSource {
         public override bool fromPlayer => true;
     }
+
+    public record TreeCollapseBreakSource(BreakSource origin) : BreakSource {
+        public override bool fromPlayer => origin.fromPlayer;
+    }
 }

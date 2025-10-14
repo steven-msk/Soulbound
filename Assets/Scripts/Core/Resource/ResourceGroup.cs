@@ -24,8 +24,8 @@ namespace SoulboundBackend.Core.Resource {
 #nullable enable
 
 #if UNITY_EDITOR
-		[ContextMenu("Refresh Group")]
-		public void RefreshGroup() {
+		[ContextMenu("Refresh Addresses")]
+		public void RefreshAddresses() {
 			var guids = AssetDatabase.FindAssets($"t:{assetType}", new[] { searchFolder });
 
 			resourceAddresses = guids
@@ -61,7 +61,7 @@ namespace SoulboundBackend.Core.Resource {
 			return asset;
 		}
 
-        private void OnValidate() {
+        private void OnEnable() {
 			fileWatcher = new FileSystemWatcher(searchFolder) {
 				IncludeSubdirectories = false,
 				EnableRaisingEvents = true,
@@ -76,7 +76,7 @@ namespace SoulboundBackend.Core.Resource {
                     logger.LogInfo(LogModules.resource,
                         "Issued an automatic refresh for group with address '{}'" +
                         " from source folder '{}'", groupAddress, searchFolder);
-                    RefreshGroup();
+                    RefreshAddresses();
                     justRefreshed = false;
                 };
             };

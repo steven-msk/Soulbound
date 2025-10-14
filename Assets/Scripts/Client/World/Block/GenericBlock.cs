@@ -43,6 +43,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 
 			// Clears unwanted basic default state
 			cachedStates.Clear();
+			propertyDefinitionTerminated = false;
 
 			// Registers the actual default state
 			RegisterProperties();
