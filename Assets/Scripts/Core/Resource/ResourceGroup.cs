@@ -1,12 +1,10 @@
-﻿using System;
+﻿using SoulboundBackend.Common.Logging;
+using System.Collections.Concurrent;
+using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using Object = UnityEngine.Object;
 using Logger = SoulboundBackend.Common.Logging.Logger;
-using SoulboundBackend.Common.Logging;
-using System.Collections.Concurrent;
-using System.IO;
 
 namespace SoulboundBackend.Core.Resource {
 
@@ -17,7 +15,10 @@ namespace SoulboundBackend.Core.Resource {
 		public string searchFolder = "Assets/Resources/";
 		public string assetType = "";
 		private ConcurrentDictionary<string, ResourceEntry> cached = new();
+		private FileSystemWatcher fileWatcher;
+		private bool justRefreshed = false;
 		[SerializeField] private string extension;
+		[SerializeField] private bool issueAutomaticRefreshes = true;
 		[SerializeField] private string[] resourceAddresses;
 
 #nullable enable
@@ -34,6 +35,8 @@ namespace SoulboundBackend.Core.Resource {
 			if (resourceAddresses != null && resourceAddresses.Length > 0) {
 				extension = Path.GetExtension(resourceAddresses[0]);
 			}
+
+			logger.LogInfo(LogModules.resource, "Found {} resources in folder {}", resourceAddresses?.Length ?? 0, searchFolder);
 
             EditorUtility.SetDirty(this);
 		}
@@ -58,9 +61,34 @@ namespace SoulboundBackend.Core.Resource {
 			return asset;
 		}
 
-		static ResourceGroup() {
+        private void OnValidate() {
+			fileWatcher = new FileSystemWatcher(searchFolder) {
+				IncludeSubdirectories = false,
+				EnableRaisingEvents = true,
+			};
+			FileSystemEventHandler delayedRefresh = (sender, e) => {
+                if (!issueAutomaticRefreshes || justRefreshed) {
+                    return;
+                }
+                justRefreshed = true;
+
+                EditorApplication.delayCall += () => {
+                    logger.LogInfo(LogModules.resource,
+                        "Issued an automatic refresh for group with address '{}'" +
+                        " from source folder '{}'", groupAddress, searchFolder);
+                    RefreshGroup();
+                    justRefreshed = false;
+                };
+            };
+
+			fileWatcher.Created += delayedRefresh;
+			fileWatcher.Renamed += (sender, e) => delayedRefresh.Invoke(sender, e);
+			fileWatcher.Deleted += delayedRefresh;
+		}
+
+        static ResourceGroup() {
 			logger.LogInfo(LogModules.resource, "ResourceGroup type loaded");
 		}
-	}
+    }
 }
 

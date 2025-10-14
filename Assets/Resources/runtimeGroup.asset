@@ -16,6 +16,7 @@ MonoBehaviour:
   searchFolder: Assets/Resources/Registry/Runtime
   assetType: GameObject
   extension: .prefab
+  refreshAutomatically: 1
   resourceAddresses:
   - Assets/Resources/Registry/Runtime/Canvas.prefab
   - Assets/Resources/Registry/Runtime/FlightTimePanel.prefab

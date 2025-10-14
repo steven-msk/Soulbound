@@ -16,6 +16,7 @@ MonoBehaviour:
   searchFolder: Assets/Resources/Registry/Tiles
   assetType: TileBase
   extension: .asset
+  refreshAutomatically: 1
   resourceAddresses:
   - Assets/Resources/Registry/Tiles/air.asset
   - Assets/Resources/Registry/Tiles/dirt.asset

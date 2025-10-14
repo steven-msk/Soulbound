@@ -16,6 +16,7 @@ MonoBehaviour:
   searchFolder: Assets/Resources/Registry/Sprites
   assetType: Sprite
   extension: .asset
+  refreshAutomatically: 1
   resourceAddresses:
   - Assets/Resources/Registry/Sprites/chestplate_overlay.asset
   - Assets/Resources/Registry/Sprites/crappy_pickaxe.asset
