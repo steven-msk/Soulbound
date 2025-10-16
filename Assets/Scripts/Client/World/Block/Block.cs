@@ -19,7 +19,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		protected Dictionary<IBlockStateProperty, object> propertyMap = new();
 		public IList<IBlockStateProperty> propertyDefinitions => propertyMap.Keys.AsReadOnlyList();
 		public bool propertyDefinitionTerminated { get; protected set; } = false;
-		public IBlockStateCacheStrategy stateCacheStrategy { get; protected set; } = new StaticBlockStateCacheStrategy();
+		public IBlockStateCacheStrategy stateCacheStrategy { get; protected set; } = new StaticStateCache();
 
 		public BlockState defaultState { get; private set; }
 

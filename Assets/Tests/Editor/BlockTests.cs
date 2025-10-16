@@ -20,7 +20,7 @@ public class DummyBlock : BlockSystem.Block {
 
     public static readonly BlockSystem.BlockProperty<bool> lit = new("lit");
 
-    public DummyBlock() : base(new StaticBlockStateCacheStrategy()) {
+    public DummyBlock() : base(new StaticStateCache()) {
     }
 
     protected override void RegisterProperties() {

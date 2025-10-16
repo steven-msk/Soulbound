@@ -101,8 +101,8 @@ public sealed class WorldManager {
 		saveStrategy.Save(dump, dumpPath);
 		var persistent = ICachedRegistry<Block>.GetCachedRegistry().Values
 			.Select(block => new KeyValuePair<Block, IBlockStateCacheStrategy>(block, block.stateCacheStrategy))
-			.Where(e => e.Value is IPersistentBlockStateCacheStrategy)
-			.Select(e => new KeyValuePair<Block, IPersistentBlockStateCacheStrategy>(e.Key, (IPersistentBlockStateCacheStrategy)e.Value));
+			.Where(e => e.Value is IPersistentStateCache)
+			.Select(e => new KeyValuePair<Block, IPersistentStateCache>(e.Key, (IPersistentStateCache)e.Value));
         foreach (var persistentEntry in persistent) {
 			persistentEntry.Value.Save(persistentEntry.Key);
         }

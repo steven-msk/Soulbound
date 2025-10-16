@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
-    public interface IPersistentBlockStateCacheStrategy : IBlockStateCacheStrategy {
+    public interface IPersistentStateCache : IBlockStateCacheStrategy {
         public void Save(Block block);
     }
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 #nullable enable
 
 namespace SoulboundBackend.Client.World.BlockSystem {
-	public class StaticBlockStateCacheStrategy : IBlockStateCacheStrategy {
+	public class StaticStateCache : IBlockStateCacheStrategy {
 		private BlockState? defaultState;
 
 		public BlockState Get(Block block, BlockStateProperties properties) {

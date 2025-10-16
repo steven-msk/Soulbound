@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Unity.Plastic.Antlr3.Runtime;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
-    public class DeterministicBlockStateCacheStrategy : IPersistentBlockStateCacheStrategy, IBlockStateCacheResettable {
+    public class PredefinedStateCache : IPersistentStateCache, IBlockStateCacheResettable {
         private readonly Dictionary<int, BlockState> cache = new();
 
         public void Initialize(Block block) {

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
-    public class NonDeterministicBlockStateCacheStrategy : IPersistentBlockStateCacheStrategy, IBlockStateCacheResettable {
+    public class FileLinkedStateCache : IPersistentStateCache, IBlockStateCacheResettable {
         private readonly Dictionary<int, BlockState> cache = new(); 
 
         public BlockState Get(Block block, BlockStateProperties properties) {
