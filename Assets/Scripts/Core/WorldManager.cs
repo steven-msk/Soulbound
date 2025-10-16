@@ -1,21 +1,13 @@
-﻿using SoulboundBackend.Client;
-using SoulboundBackend.Client.Input;
-using SoulboundBackend.Client.ItemSystem;
-using SoulboundBackend.Client.UI.Storage;
-using SoulboundBackend.Client.World;
+﻿using SoulboundBackend.Client.World;
+using SoulboundBackend.Client.World.BlockSystem;
+using SoulboundBackend.Common;
 using SoulboundBackend.Core;
 using SoulboundBackend.Core.Bootstrap;
-using SoulboundBackend.Core.Resource;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Unity.Plastic.Newtonsoft.Json;
-using Unity.VisualScripting;
-using UnityEditor.SearchService;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
@@ -107,7 +99,14 @@ public sealed class WorldManager {
 	public void SaveWorld(string world, WorldDump dump) {
 		string dumpPath = GetDumpPath(world, createIfAbsent: saveStrategy is not DoNotSaveWorldStrategy);
 		saveStrategy.Save(dump, dumpPath);
-	}
+		var persistent = ICachedRegistry<Block>.GetCachedRegistry().Values
+			.Select(block => new KeyValuePair<Block, IBlockStateCacheStrategy>(block, block.stateCacheStrategy))
+			.Where(e => e.Value is IPersistentBlockStateCacheStrategy)
+			.Select(e => new KeyValuePair<Block, IPersistentBlockStateCacheStrategy>(e.Key, (IPersistentBlockStateCacheStrategy)e.Value));
+        foreach (var persistentEntry in persistent) {
+			persistentEntry.Value.Save(persistentEntry.Key);
+        }
+    }
 
 	public IEnumerator TerminateWorldProcess(Scene worldScene, string world, Func<WorldDump> dumpSupplier) {
 		this.SaveWorld(world, dumpSupplier.Invoke());

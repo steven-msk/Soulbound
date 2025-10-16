@@ -34,5 +34,13 @@ namespace SoulboundBackend.Common {
             int hash = HashHelper.StableHash(cacheAttribute.propertyName);
             cachedReferences[hash] = accessor;
         }
+
+        public static IDictionary<int, T> GetCachedRegistry() {
+            return cached;
+        }
+
+        public static IDictionary<int, Func<T>> GetCachedReferences() {
+            return cachedReferences;
+        }
     }
 }

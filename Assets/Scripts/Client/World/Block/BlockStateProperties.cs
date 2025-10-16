@@ -1,17 +1,27 @@
 ﻿using NUnit.Framework.Constraints;
 using SoulboundBackend.Common;
+using SoulboundBackend.Common.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Unity.Plastic.Newtonsoft.Json;
+using Unity.VisualScripting;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
+	[JsonConverter(typeof(JsonDictionaryConverter<IBlockStateProperty, object>))]
 	public class BlockStateProperties : ReadOnlyDictionary<IBlockStateProperty, object> {
 		public BlockStateProperties(IDictionary<IBlockStateProperty, object> predefined) 
 			: base(predefined) {
 		}
+
+		public Dictionary<IBlockStateProperty, object> CloneMappings() {
+            Dictionary<IBlockStateProperty, object> cloned = new();
+            cloned.AddRange(this.ToList());
+			return cloned;
+        }
 
 		public bool Contains(IBlockStateProperty property) {
 			return this.ContainsKey(property);

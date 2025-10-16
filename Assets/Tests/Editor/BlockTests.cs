@@ -20,6 +20,9 @@ public class DummyBlock : BlockSystem.Block {
 
     public static readonly BlockSystem.BlockProperty<bool> lit = new("lit");
 
+    public DummyBlock() : base(new StaticBlockStateCacheStrategy()) {
+    }
+
     protected override void RegisterProperties() {
         propertyMap.Add(lit, false);
     }
@@ -29,7 +32,7 @@ public class DummyBlock : BlockSystem.Block {
         return new BlockSystem.BlockState(this, defaultProperties, new DummyBehavior());
     }
 
-    protected override IBlockStateBehavior CreateBehaviorFor(BlockStateProperties properties) {
+    public override IBlockStateBehavior CreateBehaviorFor(BlockStateProperties properties) {
         bool lit = (bool)properties[DummyBlock.lit];
         return lit ? new LitBehavior() : new DummyBehavior();
     }

@@ -14,13 +14,13 @@ using UnityEngine.Tilemaps;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
 	public partial class Blocks : IResourceModule, ICachedRegistry<Block> {
-		[BlockCache(nameof(air))] public static Block air => Lookup(() => new GenericBlock("Air", Tile("air"), null, null));
-		[BlockCache(nameof(grass))] public static Block grass => Lookup(() => new GenericBlock("Grass Block", Tile("grass"), Items.grassBlock, new BreakRequirement(1, ToolType.None, 10)));
-		[BlockCache(nameof(dirt))] public static Block dirt => Lookup(() => new GenericBlock("Dirt Block", Tile("dirt"), Items.dirtBlock, new BreakRequirement(1, ToolType.None, 10)));
-		[BlockCache(nameof(stone))] public static Block stone => Lookup(() => new GenericBlock("Stone Block", Tile("stone"), Items.stoneBlock, new BreakRequirement(1, ToolType.None, 10)));
-		[BlockCache(nameof(wood))] public static Block wood => Lookup(() => new GenericBlock("Wood", Tile("wood"), Items.woodBlock, new BreakRequirement(0, ToolType.None, 10)));
+		[BlockCache(nameof(air))] public static Block air => Lookup(() => new GenericBlock("Air", Tile("air"), null, new StaticBlockStateCacheStrategy(), null));
+		[BlockCache(nameof(grass))] public static Block grass => Lookup(() => new GenericBlock("Grass Block", Tile("grass"), Items.grassBlock, new StaticBlockStateCacheStrategy(), new BreakRequirement(1, ToolType.None, 10)));
+		[BlockCache(nameof(dirt))] public static Block dirt => Lookup(() => new GenericBlock("Dirt Block", Tile("dirt"), Items.dirtBlock, new StaticBlockStateCacheStrategy(), new BreakRequirement(1, ToolType.None, 10)));
+		[BlockCache(nameof(stone))] public static Block stone => Lookup(() => new GenericBlock("Stone Block", Tile("stone"), Items.stoneBlock, new StaticBlockStateCacheStrategy(), new BreakRequirement(1, ToolType.None, 10)));
+		[BlockCache(nameof(wood))] public static Block wood => Lookup(() => new GenericBlock("Wood", Tile("wood"), Items.woodBlock, new StaticBlockStateCacheStrategy(), new BreakRequirement(0, ToolType.None, 10)));
 		[BlockCache(nameof(leaves))] public static Block leaves => Lookup(() => 
-			new GenericBlock("Leaves", Tile("leaves"), Items.leavesBlock, new BreakRequirement(0, ToolType.All, 10), block => {
+			new GenericBlock("Leaves", Tile("leaves"), Items.leavesBlock, new DeterministicBlockStateCacheStrategy(), new BreakRequirement(0, ToolType.All, 10), block => {
 				return new BlockState(block, null,
 					CommonBlockBehaviors.DropSingleIf((blockState, breakSource) =>
 						breakSource is PlayerToolBreakSource && blockState.Get<bool>("persistent")

@@ -19,20 +19,24 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		protected Dictionary<IBlockStateProperty, object> propertyMap = new();
 		public IList<IBlockStateProperty> propertyDefinitions => propertyMap.Keys.AsReadOnlyList();
 		public bool propertyDefinitionTerminated { get; protected set; } = false;
+		public IBlockStateCacheStrategy stateCacheStrategy { get; protected set; } = new StaticBlockStateCacheStrategy();
 
 		public BlockState defaultState { get; private set; }
-		protected Dictionary<int, BlockState> cachedStates = new();
 
-		protected Block() {
+		protected Block(IBlockStateCacheStrategy stateCacheStrategy) {
+			this.stateCacheStrategy = stateCacheStrategy;
+
 			RegisterProperties();
 			propertyDefinitionTerminated = true;
 			RegisterDefaultState(CreateDefaultState());
-			InitializePredefinedStates();
+			stateCacheStrategy.Initialize(this);
 		}
 
 		protected abstract void RegisterProperties();
 		protected abstract BlockState CreateDefaultState();
-		protected virtual void InitializePredefinedStates() {
+		public virtual bool GetPredefinedStates(out IReadOnlyList<BlockState> states) {
+			states = new List<BlockState>();
+			return false;
 		}
 
 		public void RegisterProperty<T>(BlockProperty<T> property, T defaultValue) {
@@ -52,24 +56,16 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 
 		protected void RegisterDefaultState(BlockState state) {
 			defaultState = state;
-			cachedStates[ComputeHash(state)] = state;
+			stateCacheStrategy.RegisterDefault(state);
 		}
 
 		public BlockState GetStateFor(BlockStateProperties properties) {
-			int hash = ComputeHash(properties);
-
-			if (!cachedStates.TryGetValue(hash, out var state)) {
-				Dictionary<IBlockStateProperty, object> cloned = new();
-				cloned.AddRange(properties.ToList());
-
-				state = new BlockState(this, cloned, CreateBehaviorFor(properties));
-				cachedStates[hash] = state;
-			}
-			return state;
+			return stateCacheStrategy.Get(this, properties);
 		}
 
 		public bool TryGetStateByHash(int hash, out BlockState state) {
-			return cachedStates.TryGetValue(hash, out state);
+			state = stateCacheStrategy.Get(this, hash);
+			return state is not null;
 		}
 
 		public bool HasProperty(IBlockStateProperty property) {
@@ -80,7 +76,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			return state.With(property, value);
 		}
 
-		protected virtual IBlockStateBehavior CreateBehaviorFor(BlockStateProperties properties) {
+		public virtual IBlockStateBehavior CreateBehaviorFor(BlockStateProperties properties) {
 			return defaultState.stateBehavior;
 		}
 
