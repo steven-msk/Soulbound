@@ -13,15 +13,18 @@ using Unity.VisualScripting;
 namespace SoulboundBackend.Client.World.BlockSystem {
 	[JsonConverter(typeof(JsonDictionaryConverter<IBlockStateProperty, object>))]
 	public class BlockStateProperties : ReadOnlyDictionary<IBlockStateProperty, object> {
+		public BlockStateProperties() : this(new Dictionary<IBlockStateProperty, object>()) {
+		}
+
 		public BlockStateProperties(IDictionary<IBlockStateProperty, object> predefined) 
 			: base(predefined) {
 		}
 
 		public Dictionary<IBlockStateProperty, object> CloneMappings() {
-            Dictionary<IBlockStateProperty, object> cloned = new();
-            cloned.AddRange(this.ToList());
+			Dictionary<IBlockStateProperty, object> cloned = new();
+			cloned.AddRange(this.ToList());
 			return cloned;
-        }
+		}
 
 		public bool Contains(IBlockStateProperty property) {
 			return this.ContainsKey(property);
@@ -38,9 +41,9 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			return "{" + string.Join(',', entries) + "}";
 		}
 
-        public override bool Equals(object obj) {
+		public override bool Equals(object obj) {
 			return obj is BlockStateProperties other
 				&& other.SequenceEqual(this);
-        }
+		}
 	}
 }

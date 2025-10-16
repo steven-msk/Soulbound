@@ -14,7 +14,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		private readonly Func<BlockStateProperties?, IBlockStateBehavior>? behaviorFactory;
 		private readonly Action<GenericBlock>? propertyRegisterer;
 		private readonly Func<Block, BlockState>? defaultStateGetter;
-		private readonly Func<IReadOnlyList<BlockState>>? stateInitializer;
+		private readonly Func<Block, IReadOnlyList<BlockState>>? stateInitializer;
 		private readonly Func<ItemStack, BlockPos, BlockState>? placeFunction;
 
 		public GenericBlock(
@@ -42,7 +42,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 				Func<Block, BlockState>? defaultState = null,
 				Func<BlockStateProperties?, IBlockStateBehavior>? behaviorFactory = null,
 				Action<GenericBlock>? propertyRegisterer = null,
-				Func<IReadOnlyList<BlockState>>? stateInitializer = null,
+				Func<Block, IReadOnlyList<BlockState>>? stateInitializer = null,
 				Func<ItemStack, BlockPos, BlockState>? placeFunction = null
 			) : base(stateCacheStrategy) {
 			this.name = name;
@@ -81,7 +81,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		}
 
 		public override bool GetPredefinedStates(out IReadOnlyList<BlockState> states) {
-			states = stateInitializer?.Invoke() ?? new List<BlockState>();
+			states = stateInitializer?.Invoke(this) ?? new List<BlockState>();
 			return states.Count > 0;
 		}
 

@@ -14,223 +14,316 @@ using UnityEngine.Tilemaps;
 using BlockSystem = SoulboundBackend.Client.World.BlockSystem;
 
 public class DummyBlock : BlockSystem.Block {
-    public override string name => "dummy_block";
-    public override TileBase tileReference => null;
-    public override BlockItem itemReference => null;
+	public override string name => "dummy_block";
+	public override TileBase tileReference => null;
+	public override BlockItem itemReference => null;
 
-    public static readonly BlockSystem.BlockProperty<bool> lit = new("lit");
+	public static readonly BlockSystem.BlockProperty<bool> lit = new("lit");
 
-    public DummyBlock() : base(new StaticStateCache()) {
-    }
+	public DummyBlock() : base(StateCaching.Predefined()) {
+	}
 
-    protected override void RegisterProperties() {
-        propertyMap.Add(lit, false);
-    }
+	protected override void RegisterProperties() {
+		propertyMap.Add(lit, false);
+	}
 
-    protected override BlockState CreateDefaultState() {
-        var defaultProperties = new Dictionary<IBlockStateProperty, object> { { lit, false } };
-        return new BlockSystem.BlockState(this, defaultProperties, new DummyBehavior());
-    }
+	protected override BlockState CreateDefaultState() {
+		var defaultProperties = new Dictionary<IBlockStateProperty, object> { { lit, false } };
+		return new BlockSystem.BlockState(this, defaultProperties, new DummyBehavior());
+	}
 
-    public override IBlockStateBehavior CreateBehaviorFor(BlockStateProperties properties) {
-        bool lit = (bool)properties[DummyBlock.lit];
-        return lit ? new LitBehavior() : new DummyBehavior();
-    }
+	public override IBlockStateBehavior CreateBehaviorFor(BlockStateProperties properties) {
+		bool lit = (bool)properties[DummyBlock.lit];
+		return lit ? new LitBehavior() : new DummyBehavior();
+	}
 }
 
 public class DummyBehavior : IBlockStateBehavior {
-    private IBlockStateBehavior inner;
-    public bool placed { get; private set; }
+	private IBlockStateBehavior inner;
+	public bool placed { get; private set; }
 
-    public DummyBehavior() => inner = BlockSystem.CommonBlockBehaviors.DropSingle();
+	public DummyBehavior() => inner = BlockSystem.CommonBlockBehaviors.DropSingle();
 
-    public List<ItemStack> GetDrops(BlockSystem.BlockState blockState, BreakSource source) {
-        return inner.GetDrops(blockState, source);
-    }
+	public List<ItemStack> GetDrops(BlockSystem.BlockState blockState, BreakSource source) {
+		return inner.GetDrops(blockState, source);
+	}
 
-    public void OnNeighborStateChanged(BlockPos selfPos, BlockPos neighborPos, BlockSystem.BlockState oldState, BlockSystem.BlockState newState) {
-    }
+	public void OnNeighborStateChanged(BlockPos selfPos, BlockPos neighborPos, BlockSystem.BlockState oldState, BlockSystem.BlockState newState) {
+	}
 
-    public void OnPlace(BlockPos blockPos, BlockSystem.BlockState blockState) {
-        placed = true;
-    }
+	public void OnPlace(BlockPos blockPos, BlockSystem.BlockState blockState) {
+		placed = true;
+	}
 }
 
 public class LitBehavior : DummyBehavior { }
 
 namespace BlockTests {
-    [TestFixture]
-    public class InstanceTests {
-        [SetUp]
-        public void Setup() {
-            _ = typeof(BlockSystem.Blocks).TypeInitializer;
-        }
+	[TestFixture]
+	public class InstanceTests {
+		[SetUp]
+		public void Setup() {
+			_ = typeof(BlockSystem.Blocks).TypeInitializer;
+		}
+
+		[Test]
+		public void Blocks_SameProperty_ReturnsSameInstance() {
+			var block1 = BlockSystem.Blocks.grass;
+			var block2 = BlockSystem.Blocks.grass;
+			Assert.AreSame(block1, block2, "Block cache should return same instance for same property");
+		}
+
+		[Test]
+		public void Blocks_ByHashedID_ReturnsSameInstance() {
+			int hash = HashHelper.StableHash(nameof(BlockSystem.Blocks.grass));
+			var viaProperty = BlockSystem.Blocks.grass;
+			var viaID = BlockSystem.Blocks.ByHashedID(hash);
+			Assert.AreSame(viaProperty, viaID, "Block retrieved by hash should return equal property instance");
+		}
+
+		[Test]
+		public void Blocks_ByHashedID_ThrowsForInvalid() {
+			int fakeHash = HashHelper.StableHash("nonexistent_block");
+			Assert.Throws<KeyNotFoundException>(() => BlockSystem.Blocks.ByHashedID(fakeHash));
+		}
+
+		[Test]
+		public void Blocks_AllProperties_HaveCachedReferences() {
+			var staticProperties = typeof(BlockSystem.Blocks).GetProperties(BindingFlags.Public | BindingFlags.Static);
+			foreach (var property in staticProperties) {
+				var attribute = property.GetCustomAttribute<BlockSystem.BlockCache>();
+				Assert.NotNull(attribute, $"{property.Name} is missing [BlockCache]");
+				int hash = HashHelper.StableHash(attribute.propertyName);
+
+				var block = BlockSystem.Blocks.ByHashedID(hash);
+				Assert.NotNull(block, $"{property.Name} not retrievable by hash fallback");
+			}
+		}
+	}
+
+	[TestFixture]
+	public class StateTests {
+		[Test]
+		public void DefaultState_IsRegisteredAndCached() {
+			var block = new DummyBlock();
+			Assert.NotNull(block.defaultState);
+			Assert.AreEqual("dummy_block", block.defaultState.block.name);
+		}
+
+		[Test]
+		public void Block_HasRegisteredProperty() {
+			var block = new DummyBlock();
+			Assert.IsTrue(block.HasProperty(DummyBlock.lit));
+		}
+
+		[Test]
+		public void GetStateFor_CachesIdentical() {
+			var block = new DummyBlock();
+
+			var props = new BlockStateProperties(new Dictionary<IBlockStateProperty, object> { { DummyBlock.lit, false } });
+			var state1 = block.GetStateFor(props);
+			var state2 = block.GetStateFor(props);
+
+			Assert.AreSame(state1, state2);
+		}
+
+		[Test]
+		public void WithProperty_CreatesNewBlockState_WhenPropertyValueDiffers() {
+			var block = new DummyBlock();
+			var state1 = block.defaultState;
+			var state2 = state1.With(DummyBlock.lit, true);
+
+			Assert.AreNotSame(state1, state2);
+			Assert.IsInstanceOf<LitBehavior>(state2.stateBehavior);
+		}
+
+		[Test]
+		public void WithProperty_ReturnsSameInstance_WhenValueIsUnchanged() {
+			var block = new DummyBlock();
+			var state1 = block.defaultState;
+			var state2 = state1.With(DummyBlock.lit, false);
+
+			Assert.AreSame(state1, state2);
+		}
+
+		[Test]
+		public void OnPlace_DelegatesToBehavior() {
+			var block = new DummyBlock();
+			var state = block.defaultState;
+			var pos = new BlockPos(0, 0);
+
+			state.OnPlace(pos);
+
+			var stateBehavior = (DummyBehavior)state.stateBehavior;
+			Assert.IsTrue(stateBehavior.placed);
+		}
+
+		[Test]
+		public void BehaviorFactory_ReturnsDifferentBehaviorForDifferentProperties() {
+			var block = new DummyBlock();
+
+			var unlitProps = new BlockStateProperties(new Dictionary<IBlockStateProperty, object> { { DummyBlock.lit, false } });
+			var litProps = new BlockStateProperties(new Dictionary<IBlockStateProperty, object> { { DummyBlock.lit, true } });
+
+			var unlitState = block.GetStateFor(unlitProps);
+			var litState = block.GetStateFor(litProps);
+
+			Assert.IsInstanceOf<DummyBehavior>(unlitState.stateBehavior);
+			Assert.IsInstanceOf<LitBehavior>(litState.stateBehavior);
+		}
+
+		[Test]
+		public void BlockState_EqualityComparer_ConsidersOnlyProperties() {
+			var block = new DummyBlock();
+			var s1 = block.defaultState;
+			var props1 = new BlockStateProperties(new Dictionary<IBlockStateProperty, object> { { DummyBlock.lit, true } });
+			var props2 = new BlockStateProperties(new Dictionary<IBlockStateProperty, object> { { DummyBlock.lit, true } });
+			var s2 = block.GetStateFor(props1);
+			var s3 = block.GetStateFor(props2);
+
+			Assert.AreEqual(props1.GetHashCode(), props2.GetHashCode());
+
+			Assert.IsTrue(s2 == s3);
+			Assert.AreEqual(s2.GetHashCode(), s3.GetHashCode());
+
+			Assert.IsTrue(s1 != s2);
+			Assert.AreNotEqual(s1.GetHashCode(), s2.GetHashCode());
+		}
+	}
+
+	[TestFixture]
+	public class SerializationTests {
+		internal partial class Blocks : ICachedRegistry<Block> {
+			[BlockCache(nameof(testBlock))] public static Block testBlock =>
+				ICachedRegistry<Block>.Lookup("testBlock", () => new DummyBlock());
+		}
+
+		[Test]
+		public void Serialize_ShouldReturnValidJArray() {
+			var block = new DummyBlock();
+			var state = block.defaultState.With(DummyBlock.lit, false);
+
+			JArray result = BlockState.Serializer.Serialize(state);
+
+			Assert.That(result[0]!.Value<int>(), Is.EqualTo(block.hashedID));
+			Assert.That(result[1]!.Value<int>(), Is.EqualTo(state.properties.GetHashCode()));
+		}
+
+		[Test]
+		public void Deserialize_ShouldRestoreBlockState() {
+			var block = Blocks.testBlock;
+			var state = block.defaultState.With(DummyBlock.lit, false);
+
+			JArray serialized = new JArray { block.hashedID, state.properties.GetHashCode() };
+			BlockState deserialized = BlockState.Serializer.Deserialize(serialized);
+
+			Assert.IsTrue(deserialized == state);
+			Assert.AreEqual(deserialized.properties, state.properties);
+		}
+
+		[Test]
+		public void Serialize_ThenDeserialize_ShouldPreserveState() {
+			var block = Blocks.testBlock;
+			var original = block.defaultState.With(DummyBlock.lit, false);
+
+			var json = BlockState.Serializer.Serialize(original);
+			var restored = BlockState.Serializer.Deserialize(json);
+
+			Assert.That(restored.block, Is.EqualTo(original.block));
+			Assert.That(restored.properties, Is.EqualTo(original.properties));
+		}
+	}
+}
+
+namespace BlockTests.StateCachingTests {
+	internal class TestBlock : Block {
+		public override string name => "testBlock";
+		public override TileBase tileReference => null;
+		public override BlockItem itemReference => null;
+
+		public TestBlock(IBlockStateCacheStrategy stateCacheStrategy)
+			: base(stateCacheStrategy) {
+		}
+
+		protected override BlockState CreateDefaultState() {
+			return new BlockState(this, null, CommonBlockBehaviors.NullBehavior());
+		}
+
+		public void SetDefaultState(BlockState state) {
+			this.RegisterDefaultState(state);
+		}
+
+		protected override void RegisterProperties() {
+		}
+	}
+
+
+	[TestFixture]
+	public class StaticStateCacheTests {
+		[Test]
+		public void Get_ShouldReturnSameDefaultState_ForAnyProperties() {
+			var cache = StateCaching.Static();
+			var block = new TestBlock(cache);
+
+			var s1 = cache.Get(block, new BlockStateProperties());
+			var s2 = cache.Get(block, new BlockStateProperties());
+
+			Assert.AreSame(block.defaultState, s1);
+			Assert.AreSame(block.defaultState, s2);
+		}
 
         [Test]
-        public void Blocks_SameProperty_ReturnsSameInstance() {
-            var block1 = BlockSystem.Blocks.grass;
-            var block2 = BlockSystem.Blocks.grass;
-            Assert.AreSame(block1, block2, "Block cache should return same instance for same property");
-        }
-
-        [Test]
-        public void Blocks_ByHashedID_ReturnsSameInstance() {
-            int hash = HashHelper.StableHash(nameof(BlockSystem.Blocks.grass));
-            var viaProperty = BlockSystem.Blocks.grass;
-            var viaID = BlockSystem.Blocks.ByHashedID(hash);
-            Assert.AreSame(viaProperty, viaID, "Block retrieved by hash should return equal property instance");
-        }
-
-        [Test]
-        public void Blocks_ByHashedID_ThrowsForInvalid() {
-            int fakeHash = HashHelper.StableHash("nonexistent_block");
-            Assert.Throws<KeyNotFoundException>(() => BlockSystem.Blocks.ByHashedID(fakeHash));
-        }
-
-        [Test]
-        public void Blocks_AllProperties_HaveCachedReferences() {
-            var staticProperties = typeof(BlockSystem.Blocks).GetProperties(BindingFlags.Public | BindingFlags.Static);
-            foreach (var property in staticProperties) {
-                var attribute = property.GetCustomAttribute<BlockSystem.BlockCache>();
-                Assert.NotNull(attribute, $"{property.Name} is missing [BlockCache]");
-                int hash = HashHelper.StableHash(attribute.propertyName);
-
-                var block = BlockSystem.Blocks.ByHashedID(hash);
-                Assert.NotNull(block, $"{property.Name} not retrievable by hash fallback");
-            }
+        public void Get_ShouldThrow_IfDefaultNotRegistered() {
+			var cache = StateCaching.Static();
+			var block = new TestBlock(cache);
+			block.SetDefaultState(null);
+			Assert.Throws<InvalidOperationException>(() => cache.Get(block, 123));
         }
     }
 
-    [TestFixture]
-    public class StateTests {
-        [Test]
-        public void DefaultState_IsRegisteredAndCached() {
-            var block = new DummyBlock();
-            Assert.NotNull(block.defaultState);
-            Assert.AreEqual("dummy_block", block.defaultState.block.name);
-        }
+	[TestFixture]
+	public class FileLinkedStateCacheTests {
+		[Test]
+		public void Get_ShouldLoadFromFile_WhenCacheMiss() {
+			var cache = StateCaching.FileLinked();
+			var block = new TestBlock(cache);
+			block.SetDefaultState(new BlockState(block, null, CommonBlockBehaviors.NullBehavior()));
 
-        [Test]
-        public void Block_HasRegisteredProperty() {
-            var block = new DummyBlock();
-            Assert.IsTrue(block.HasProperty(DummyBlock.lit));
-        }
+			var persistedState = new BlockState(block, null, CommonBlockBehaviors.NullBehavior());
+			StateFileHandler.Save(block, new[] { persistedState });
 
-        [Test]
-        public void GetStateFor_CachesIdentical() {
-            var block = new DummyBlock();
+			var result = cache.Get(block, persistedState.hash);
+			Assert.AreEqual(persistedState.hash, result.hash);
+		}
 
-            var props = new BlockStateProperties(new Dictionary<IBlockStateProperty, object> { { DummyBlock.lit, false } });
-            var state1 = block.GetStateFor(props);
-            var state2 = block.GetStateFor(props);
+		[Test]
+		public void Save_ShouldPersistAllCachedStates() {
+			var cache = StateCaching.FileLinked();
+			var block = new TestBlock(cache);
+			var stateA = new BlockState(block, null, CommonBlockBehaviors.NullBehavior());
+			cache.RegisterDefault(stateA);
+			cache.Save(block);
 
-            Assert.AreSame(state1, state2);
-        }
+			var saved = StateFileHandler.LoadAll(block);
+			Assert.IsTrue(saved.Any(s => s.hash == stateA.hash));
+		}
+	}
 
-        [Test]
-        public void WithProperty_CreatesNewBlockState_WhenPropertyValueDiffers() {
-            var block = new DummyBlock();
-            var state1 = block.defaultState;
-            var state2 = state1.With(DummyBlock.lit, true);
+	[TestFixture]
+	public class PredefinedStateCacheTests {
+		[Test]
+		public void Initialize_ShouldPrepopulateCache_FromBlockPredefeinedStates() {
+			var cache = StateCaching.Predefined();
+			var block = new GenericBlock("testBlock", null, null, cache, null, stateInitializer: block => {
+				return new[] { new BlockState(block, new Dictionary<IBlockStateProperty, object>() {
+						[new BlockProperty<bool>("test")] = true
+					}, CommonBlockBehaviors.NullBehavior()) 
+				};
+			});
 
-            Assert.AreNotSame(state1, state2);
-            Assert.IsInstanceOf<LitBehavior>(state2.stateBehavior);
-        }
-
-        [Test]
-        public void WithProperty_ReturnsSameInstance_WhenValueIsUnchanged() {
-            var block = new DummyBlock();
-            var state1 = block.defaultState;
-            var state2 = state1.With(DummyBlock.lit, false);
-
-            Assert.AreSame(state1, state2);
-        }
-
-        [Test]
-        public void OnPlace_DelegatesToBehavior() {
-            var block = new DummyBlock();
-            var state = block.defaultState;
-            var pos = new BlockPos(0, 0);
-
-            state.OnPlace(pos);
-
-            var stateBehavior = (DummyBehavior)state.stateBehavior;
-            Assert.IsTrue(stateBehavior.placed);
-        }
-
-        [Test]
-        public void BehaviorFactory_ReturnsDifferentBehaviorForDifferentProperties() {
-            var block = new DummyBlock();
-
-            var unlitProps = new BlockStateProperties(new Dictionary<IBlockStateProperty, object> { { DummyBlock.lit, false } });
-            var litProps = new BlockStateProperties(new Dictionary<IBlockStateProperty, object> { { DummyBlock.lit, true } });
-
-            var unlitState = block.GetStateFor(unlitProps);
-            var litState = block.GetStateFor(litProps);
-
-            Assert.IsInstanceOf<DummyBehavior>(unlitState.stateBehavior);
-            Assert.IsInstanceOf<LitBehavior>(litState.stateBehavior);
-        }
-
-        [Test]
-        public void BlockState_EqualityComparer_ConsidersOnlyProperties() {
-            var block = new DummyBlock();
-            var s1 = block.defaultState;
-            var props1 = new BlockStateProperties(new Dictionary<IBlockStateProperty, object> { { DummyBlock.lit, true } });
-            var props2 = new BlockStateProperties(new Dictionary<IBlockStateProperty, object> { { DummyBlock.lit, true } });
-            var s2 = block.GetStateFor(props1);
-            var s3 = block.GetStateFor(props2);
-
-            Assert.AreEqual(props1.GetHashCode(), props2.GetHashCode());
-
-            Assert.IsTrue(s2 == s3);
-            Assert.AreEqual(s2.GetHashCode(), s3.GetHashCode());
-
-            Assert.IsTrue(s1 != s2);
-            Assert.AreNotEqual(s1.GetHashCode(), s2.GetHashCode());
-        }
-    }
-
-    [TestFixture]
-    public class SerializationTests {
-        internal partial class Blocks : ICachedRegistry<Block> {
-            [BlockCache(nameof(testBlock))] public static Block testBlock =>
-                ICachedRegistry<Block>.Lookup("testBlock", () => new DummyBlock());
-        }
-
-        [Test]
-        public void Serialize_ShouldReturnValidJArray() {
-            var block = new DummyBlock();
-            var state = block.defaultState.With(DummyBlock.lit, false);
-
-            JArray result = BlockState.Serializer.Serialize(state);
-
-            Assert.That(result[0]!.Value<int>(), Is.EqualTo(block.hashedID));
-            Assert.That(result[1]!.Value<int>(), Is.EqualTo(state.properties.GetHashCode()));
-        }
-
-        [Test]
-        public void Deserialize_ShouldRestoreBlockState() {
-            var block = Blocks.testBlock;
-            var state = block.defaultState.With(DummyBlock.lit, false);
-
-            JArray serialized = new JArray { block.hashedID, state.properties.GetHashCode() };
-            BlockState deserialized = BlockState.Serializer.Deserialize(serialized);
-
-            Assert.IsTrue(deserialized == state);
-            Assert.AreEqual(deserialized.properties, state.properties);
-        }
-
-        [Test]
-        public void Serialize_ThenDeserialize_ShouldPreserveState() {
-            var block = Blocks.testBlock;
-            var original = block.defaultState.With(DummyBlock.lit, false);
-
-            var json = BlockState.Serializer.Serialize(original);
-            var restored = BlockState.Serializer.Deserialize(json);
-
-            Assert.That(restored.block, Is.EqualTo(original.block));
-            Assert.That(restored.properties, Is.EqualTo(original.properties));
-        }
-    }
+			block.GetPredefinedStates(out var states);
+			var retrieved = cache.Get(block, states[0].hash);
+			Assert.AreEqual(states[0].hash, retrieved.hash);
+		}
+	}
 }

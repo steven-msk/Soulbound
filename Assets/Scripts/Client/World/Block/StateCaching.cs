@@ -10,11 +10,11 @@ namespace SoulboundBackend.Client.World.BlockSystem {
             return new StaticStateCache();
         }
 
-        public static IBlockStateCacheStrategy FileLinked() {
+        public static IPersistentStateCache FileLinked() {
             return new FileLinkedStateCache();
         }
 
-        public static IBlockStateCacheStrategy Predefined() {
+        public static IPersistentStateCache Predefined() {
             return new PredefinedStateCache();
         }
     }
