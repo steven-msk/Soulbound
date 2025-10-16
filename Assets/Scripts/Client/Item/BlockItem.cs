@@ -21,7 +21,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 
 		public virtual BlockState Place(ItemStack itemStack, BlockPos position) {
 			itemStack.Decrement();
-			return referenceBlock.defaultState;
+			return referenceBlock.Place(itemStack, position);
 		}
 
 		public static BlockItem? FromBlock(Block block) => block.itemReference;

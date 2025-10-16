@@ -38,6 +38,9 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			states = new List<BlockState>();
 			return false;
 		}
+		public virtual BlockState Place(ItemStack itemStack, BlockPos blockPos) {
+			return defaultState;
+		}
 
 		public void RegisterProperty<T>(BlockProperty<T> property, T defaultValue) {
 			if (propertyDefinitionTerminated) {

@@ -10,15 +10,16 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public override string name { get; }
 		public override TileBase tileReference { get; }
 		public override BlockItem? itemReference { get; }
-        public override BreakRequirement? breakRequirement { get; }
+		public override BreakRequirement? breakRequirement { get; }
 		private readonly Func<BlockStateProperties?, IBlockStateBehavior>? behaviorFactory;
 		private readonly Action<GenericBlock>? propertyRegisterer;
 		private readonly Func<Block, BlockState>? defaultStateGetter;
 		private readonly Func<IReadOnlyList<BlockState>>? stateInitializer;
+		private readonly Func<ItemStack, BlockPos, BlockState>? placeFunction;
 
 		public GenericBlock(
 				string name, 
-				TileBase tileReference, 
+				TileBase tileReference,
 				BlockItem itemReference, 
 				IBlockStateCacheStrategy stateCacheStrategy,
 				BreakRequirement? breakRequirement
@@ -41,7 +42,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 				Func<Block, BlockState>? defaultState = null,
 				Func<BlockStateProperties?, IBlockStateBehavior>? behaviorFactory = null,
 				Action<GenericBlock>? propertyRegisterer = null,
-				Func<IReadOnlyList<BlockState>>? stateInitializer = null
+				Func<IReadOnlyList<BlockState>>? stateInitializer = null,
 				Func<ItemStack, BlockPos, BlockState>? placeFunction = null
 			) : base(stateCacheStrategy) {
 			this.name = name;
@@ -52,6 +53,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			this.propertyRegisterer = propertyRegisterer;
 			this.defaultStateGetter = defaultState;
 			this.stateInitializer = stateInitializer;
+			this.placeFunction = placeFunction;
 
 			// Clear unwanted basic default state
 			propertyDefinitionTerminated = false;
@@ -67,20 +69,24 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 
 		public override IBlockStateBehavior CreateBehaviorFor(BlockStateProperties properties) {
 			return behaviorFactory?.Invoke(properties) ?? base.CreateBehaviorFor(properties);
-        }
+		}
 
-        protected override void RegisterProperties() {
+		protected override void RegisterProperties() {
 			propertyRegisterer?.Invoke(this);			// null at initialization
-        }
+		}
 
-        protected override BlockState CreateDefaultState() {
+		protected override BlockState CreateDefaultState() {
 			return defaultStateGetter?.Invoke(this)		// null at initialization
 				?? new BlockState(this, null, CommonBlockBehaviors.DropSingle());
-        }
+		}
 
 		public override bool GetPredefinedStates(out IReadOnlyList<BlockState> states) {
 			states = stateInitializer?.Invoke() ?? new List<BlockState>();
 			return states.Count > 0;
 		}
-    }
+
+        public override BlockState Place(ItemStack itemStack, BlockPos blockPos) {
+            return placeFunction?.Invoke(itemStack, blockPos) ?? base.Place(itemStack, blockPos);
+        }
+	}
 }
