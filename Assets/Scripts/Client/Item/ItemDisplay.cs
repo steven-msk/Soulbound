@@ -46,7 +46,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 			itemStack.AssignDisplay(display);
 			display.tooltipRenderer = new TooltipRenderer(TooltipNodeStylePresets.PresetProvider());
 			display.transform.SetAsLastSibling();
-			display.player = LevelManager.instance.Player;
+			display.player = Soulbound.instance.GetActiveLevel()!.Player;
 			return display;
 		}
 

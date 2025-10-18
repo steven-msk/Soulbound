@@ -97,7 +97,9 @@ namespace SoulboundBackend.Client.World.Entity {
 
 #nullable enable
 		public HashSet<Entity> GetEntitiesInChunk(WorldChunk chunk) {
-			var entities = allEntities.Values.Where(entity => ChunkBlockPos.FromWorld(entity.position).underlyingChunk == chunk);
+			var entities = allEntities.Values
+				.Where(entity => ChunkBlockPos.FromWorld(entity.position, level)
+					.UnderlyingChunk(level) == chunk);
 			return System.Linq.Enumerable.ToHashSet(entities);
 		}
 

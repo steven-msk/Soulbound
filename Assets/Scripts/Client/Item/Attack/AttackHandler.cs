@@ -22,7 +22,7 @@ namespace SoulboundBackend.Common.Item.Attack {
 		public GameObject Parent => transform.parent.gameObject;
 
 		public void Init(WeaponItem weapon, AttackHandlerEvents events) {
-			this.player = LevelManager.instance.Player;
+			this.player = Soulbound.instance.GetActiveLevel().Player;
 			this.weapon = weapon;
 			this.events = events;
 			events.PreAttack(Parent);

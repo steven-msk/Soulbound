@@ -5,10 +5,10 @@ using UnityEngine;
 namespace SoulboundBackend.Client {
 	public class CameraMovement : MonoBehaviour {
         void Update() {
-            if (LevelManager.instance?.Player == null) {
+            if (Soulbound.instance?.GetActiveLevel()?.Player == null) {
                 return;
             }
-            Vector3 playerPos = LevelManager.instance.Player.position;
+            Vector3 playerPos = Soulbound.instance.GetActiveLevel().Player.position;
 			gameObject.transform.position = new Vector3(playerPos.x, playerPos.y, transform.position.z);
 		}
 	}

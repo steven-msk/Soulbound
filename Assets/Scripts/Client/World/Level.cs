@@ -185,7 +185,7 @@ namespace SoulboundBackend.Client.World {
 		}
 
 		public StructurePlacement ForceGeneratePlacement(ChunkBlockPos chunkBlockPos, StructureTemplate template) {
-			WorldChunk? chunk = chunkBlockPos.underlyingChunk;
+			WorldChunk? chunk = chunkBlockPos.UnderlyingChunk(this);
 			var context = new StructureGenerationContext(chunkBlockPos.x, chunkBlockPos.y, chunkBlockPos.chunkX, chunk.HeightmapData, this);
 			var structureData = template.placementFunction.Invoke(context, true);
 
@@ -234,7 +234,7 @@ namespace SoulboundBackend.Client.World {
 			foreach (var stateOverride in placement.stateOverrides) {
 				ChunkBlockPos chunkBlockPos = stateOverride.Key;
 				BlockState blockState = stateOverride.Value;
-				WorldChunk? underlyingChunk = chunkBlockPos.underlyingChunk;
+				WorldChunk? underlyingChunk = chunkBlockPos.UnderlyingChunk(this);
 
 				if (underlyingChunk == null) {
 					PendUpdate(chunkBlockPos.chunkX, chunkBlockPos, blockState);

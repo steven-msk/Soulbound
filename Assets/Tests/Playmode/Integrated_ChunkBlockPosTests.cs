@@ -16,7 +16,7 @@ public class Integrated_ChunkBlockPosTests {
         World.CreateAnonymousContext(null, out var worldManager);
 
         var worldPos = new Vector2(18.5f, 6.2f);
-        var chunkPos = ChunkBlockPos.FromWorld(worldPos);
+        var chunkPos = ChunkBlockPos.FromWorld(worldPos, worldManager.activeLevelManager.Level);
 
         Assert.AreEqual(Mathf.FloorToInt(worldPos.y), chunkPos.y);
     }
@@ -27,7 +27,7 @@ public class Integrated_ChunkBlockPosTests {
 
         var pos = new ChunkBlockPos(2, 3, 1);
 
-        var chunk = pos.underlyingChunk;
+        var chunk = pos.UnderlyingChunk(worldManager.activeLevelManager.Level);
 
         Assert.IsNotNull(chunk);
         Assert.AreEqual(1, chunk.xpos);

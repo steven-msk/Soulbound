@@ -58,8 +58,8 @@ namespace SoulboundBackend.Client {
 
 		public float facing => playerPhysics.facing;
 		public Vector2 center => Physics.Collider.bounds.center;
-		public BlockPos blockPos => LevelManager.instance.Level.ToBlockPos(this.position);
-		public ChunkBlockPos chunkBlockPos => blockPos.ToChunkBlockPos(LevelManager.instance.Level.ChunkXAt(position));
+		public BlockPos blockPos => Soulbound.instance.GetActiveLevel()!.ToBlockPos(this.position);
+		public ChunkBlockPos chunkBlockPos => blockPos.ToChunkBlockPos(Soulbound.instance.GetActiveLevel()!.ChunkXAt(position));
 
 		public Vector2 itemDropForce {
 			get {
@@ -94,7 +94,7 @@ namespace SoulboundBackend.Client {
                 });
             }
             itemUsageHandler.RegisterCapability<IPlaceable>(ItemUseTrigger.LeftHold, (placeable, stack) => {
-                Level level = LevelManager.instance.Level;
+                Level level = Soulbound.instance.GetActiveLevel()!;
                 BlockPos blockPos = level.ToBlockPos(inputHandler.MouseWorldPosition);
 
                 if (CanPlaceBlockAt(blockPos)) {
@@ -102,7 +102,7 @@ namespace SoulboundBackend.Client {
                 }
             });
             itemUsageHandler.RegisterCapability<IBreakingTool>(ItemUseTrigger.LeftHold, (tool, stack) => {
-                Level level = LevelManager.instance.Level;
+                Level level = Soulbound.instance.GetActiveLevel()!;
                 Vector2 worldMousePos = inputHandler.MouseWorldPosition;
                 BlockPos blockPos = level.ToBlockPos(worldMousePos);
 
@@ -141,7 +141,7 @@ namespace SoulboundBackend.Client {
 				RequestSuppressedMainHandUse(ItemUseTrigger.LeftHold);
 			} else {
 				InputHandler.RequestAction(new("BlockBreak", 5, () => {
-					Level level = LevelManager.instance.Level;
+					Level level = Soulbound.instance.GetActiveLevel()!;
 					Vector2 worldMousePos = inputHandler.MouseWorldPosition;
 					BlockPos blockPos = level.ToBlockPos(worldMousePos);
 					Block? targetBlock = level.BlockAt(blockPos);
@@ -176,15 +176,15 @@ namespace SoulboundBackend.Client {
 		public bool CanPlaceBlockAt(BlockPos blockPos) {
 			Vector2 worldPos = (Vector2)blockPos;
 			return IsInBlockReach(worldPos)
-				   && LevelManager.instance.Level.BlockAt(blockPos) == Blocks.air;
+				   && Soulbound.instance.GetActiveLevel()!.BlockAt(blockPos) == Blocks.air;
 		}
 
 		public bool IsInBlockReach(Vector2 worldPos) {
+			Level level = Soulbound.instance.GetActiveLevel()!;
 			float dist = Vector2.Distance(worldPos, this.center);
 			return dist <= MaxBlockReach 
-				&& !LevelManager.instance.Level
-					.GetTilesCovered(playerPhysics.Collider.bounds)
-						.Contains(BlockPos.FromWorld(worldPos));
+				&& !level.GetTilesCovered(playerPhysics.Collider.bounds)
+						.Contains(BlockPos.FromWorld(worldPos, level));
 		}
 
 		// since this is a lazy player entity addition, not all methods need implementation (for now)

@@ -9,7 +9,6 @@ namespace SoulboundBackend.Client.World.Chunk {
 		public int x;
 		public int y;
 		public int chunkX;
-		[JsonIgnore] public WorldChunk underlyingChunk => LevelManager.instance.Level.ChunkAt(this.ToWorldBlockPos());
 
 		public ChunkBlockPos(int x, int y, int chunkX) {
 			this.x = x;
@@ -17,13 +16,15 @@ namespace SoulboundBackend.Client.World.Chunk {
 			this.chunkX = chunkX;
 		}
 
-		public static ChunkBlockPos FromBlockPos(BlockPos blockPos) {
+        public WorldChunk UnderlyingChunk(Level level) => level.ChunkAt(this.ToWorldBlockPos());
+
+        public static ChunkBlockPos FromBlockPos(BlockPos blockPos) {
 			int chunkX = Mathf.FloorToInt((float)blockPos.x / Level.CHUNK_LENGTH);
 			int localX = blockPos.x - chunkX * Level.CHUNK_LENGTH;
 			return new ChunkBlockPos(localX, blockPos.y, chunkX);
 		}
 
-		public static ChunkBlockPos FromWorld(Vector2 position) => FromBlockPos(BlockPos.FromWorld(position));
+		public static ChunkBlockPos FromWorld(Vector2 position, Level level) => FromBlockPos(BlockPos.FromWorld(position, level));
 
 		public static bool operator !=(ChunkBlockPos pos1, ChunkBlockPos pos2) => !(pos1 == pos2);
 

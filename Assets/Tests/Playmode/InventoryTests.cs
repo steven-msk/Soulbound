@@ -30,7 +30,7 @@ public class InventoryTests {
 			treeBuilder => treeBuilder.BuildTree<BootstrappableChildOfAttribute>(typeof(InventoryController))
 		);
 
-        return LevelManager.instance.Player.Inventory 
+        return levelManager.Player.Inventory
 			?? throw new ArgumentException("Test environment not initialized properly");
     }
 

@@ -7,9 +7,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+#nullable enable
+
 namespace SoulboundBackend.Core {
     public sealed class Soulbound {
-        public static Soulbound instance { get; private set; }
+        public static Soulbound instance { get; private set; } = null!;
         private readonly GameConfig config;
         private readonly WorldManager worldManager;
 
@@ -21,12 +23,20 @@ namespace SoulboundBackend.Core {
 
         public void Prototype_LoadDevWorld() {
             Level.RegisterStructure(TreeStructure.instance);
-            string world = config.dev.loadDevWorldFromSave ? config.dev.devWorld : null;
+            string world = config.dev.loadDevWorldFromSave ? config.dev.devWorld : null!;
             worldManager.LoadWorld(world, null, GetDefaultBootstrapTree, true);
         }
 
         public IEnumerable<IBootstrappable> GetDefaultBootstrapTree(BootstrapTreeBuilder treeBuilder) {
             return treeBuilder.BuildTree<BootstrappableParentOfAttribute>(typeof(LevelManager));
+        }
+
+        public Level? GetActiveLevel() {
+            return GetActiveLevelManager()?.Level;
+        }
+
+        public LevelManager? GetActiveLevelManager() {
+            return worldManager.activeLevelManager;
         }
     }
 }

@@ -12,7 +12,7 @@ namespace SoulboundBackend.Core {
 
 		public static void ResetAll() {
 			foreach (var resettable in resettables) {
-				resettable.StaticReset();
+				resettable.StaticReset(); 
 			}
 		}
 	}

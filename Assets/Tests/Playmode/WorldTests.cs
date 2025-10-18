@@ -227,7 +227,7 @@ namespace WorldTests.BlockTests {
 
 		[UnityTest]
 		public IEnumerator BlockState_PersistsCorrectly_AfterSaveAndReload() {
-			string world = World.CreateNewWorldID();
+			string world = World.CreateNewWorldID(); 
 			BlockPos targetPos = new(0, 0);
 
 			Scene scene = World.CreateSavedContext(out var worldManager, world);
@@ -281,7 +281,7 @@ namespace WorldTests.BlockTests {
 			Level level = World.TryGetLevel(result.value);
 			BlockPos pos1 = new(0, 0);
 			BlockPos pos2 = new(1, 0);
-
+			
 			level.SetBlock(pos1, Blocks.stone.defaultState);
 			level.SetBlock(pos2, Blocks.dirt.defaultState);
 

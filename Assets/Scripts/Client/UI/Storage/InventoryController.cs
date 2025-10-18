@@ -286,7 +286,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 					}
 				});
 			}, null));
-			InputHandler.BlockContext("ItemUse", () => !LevelManager.instance.Player.InputHandler.LeftHold);
+			InputHandler.BlockContext("ItemUse", () => !Soulbound.instance.GetActiveLevel()!.Player.InputHandler.LeftHold);
 		}
 
 		public void OnPointerUp(IItemSlot slot, PointerEventData eventData) {
@@ -496,7 +496,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 			if (!IsOpened) {
 				return;
 			}
-			PlayerController player = LevelManager.instance.Player;
+			PlayerController player = Soulbound.instance.GetActiveLevel()!.Player;
 			void SetRightClickAvailable(bool enabled) {
 				Action<ItemUseTrigger[]> action = enabled ? player.ItemUsageHandler.Enable : player.ItemUsageHandler.Disable;
 				action.Invoke(new ItemUseTrigger[] { ItemUseTrigger.RightClick, ItemUseTrigger.RightHold });

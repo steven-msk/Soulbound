@@ -106,7 +106,7 @@ namespace SoulboundBackend.Client {
 			if (!isBootstrapped) {
 				return;
 			}
-			if (LevelManager.instance.IsPaused) {
+			if (Soulbound.instance.GetActiveLevelManager()!.IsPaused) {
 				return;
 			}
 			movement.x = inputHandler.HorizontalMovement;

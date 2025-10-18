@@ -17,7 +17,7 @@ public class Integrated_BlockPosTests {
         World.CreateAnonymousContext(null, out var worldManager);
 
         var worldPos = new Vector2(12.3f, 7.7f);
-        var blockPos = BlockPos.FromWorld(worldPos);
+        var blockPos = BlockPos.FromWorld(worldPos, worldManager.activeLevelManager.Level);
 
         Assert.AreEqual(Mathf.FloorToInt(worldPos.x), blockPos.x);
         Assert.AreEqual(Mathf.FloorToInt(worldPos.y), blockPos.y);

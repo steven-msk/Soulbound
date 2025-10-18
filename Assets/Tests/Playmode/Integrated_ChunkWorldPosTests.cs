@@ -30,7 +30,7 @@ public class Integrated_ChunkWorldPosTests {
 
         var pos = new ChunkWorldPos(3.3f, 4.4f, 2);
 
-        var chunk = pos.underlyingChunk;
+        var chunk = pos.UnderlyingChunk(worldManager.activeLevelManager.Level);
 
         Assert.IsNotNull(chunk);
         Assert.AreEqual(2, chunk.xpos);

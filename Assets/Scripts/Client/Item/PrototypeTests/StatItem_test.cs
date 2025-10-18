@@ -48,13 +48,13 @@ public class StatItem_test : StatItem {
 
 	public override SlotHook GetSlotHook() => new SlotHook(
 		onAttached: (itemDisplay, slot) => {
-			PlayerController player = LevelManager.instance.Player;
+			PlayerController player = Soulbound.instance.GetActiveLevel().Player;
 			if (player.Inventory.GetOccupiedSlots(this).Count() >= 1 && !this.hasContext) {
 				contextHandle.OnContextReceived(player.Stats);
 			}
 		},
 		onDetached: (itemDisplay, slot) => {
-			PlayerController player = LevelManager.instance.Player;
+			PlayerController player = Soulbound.instance.GetActiveLevel().Player;
 			if (player.Inventory.GetOccupiedSlots(this).Count() == 0) {
 				contextHandle.OnContextLost(player.Stats);
 			}

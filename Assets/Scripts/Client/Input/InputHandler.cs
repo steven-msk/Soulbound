@@ -19,7 +19,7 @@ namespace SoulboundBackend.Client.Input {
 		public Vector2 MouseWorldPosition {
 			get {
 				Vector3 screenPos = MouseScreenPosition;
-				RectTransform rootTransform = LevelManager.instance.UIManager.GetRootTransform();
+				RectTransform rootTransform = Soulbound.instance.GetActiveLevelManager().UIManager.GetRootTransform();
 				if (RectTransformUtility.ScreenPointToWorldPointInRectangle(rootTransform, MouseScreenPosition, Camera.main, out var worldPoint)) {
 					return worldPoint;
 				}
@@ -96,7 +96,7 @@ namespace SoulboundBackend.Client.Input {
 			});
 
 			RegisterInputEvent(playerActions.PauseGame, pausable: false, (action) => {
-				action.performed += actionContext => LevelManager.instance.TogglePauseGame();
+				action.performed += actionContext => Soulbound.instance.GetActiveLevelManager().TogglePauseGame();
 			});
 
 			inputActions.Enable();
@@ -143,8 +143,8 @@ namespace SoulboundBackend.Client.Input {
 		}
 
 		public Vector2 ScreenPosToLocalPos(Vector2 screenPos) {
-			RectTransform rootTransfom = LevelManager.instance.UIManager.GetRootTransform();
-			if (RectTransformUtility.ScreenPointToLocalPointInRectangle(rootTransfom, screenPos, LevelManager.instance.UIManager.Canvas.worldCamera, out var localPos)) {
+			RectTransform rootTransfom = Soulbound.instance.GetActiveLevelManager().UIManager.GetRootTransform();
+			if (RectTransformUtility.ScreenPointToLocalPointInRectangle(rootTransfom, screenPos, Soulbound.instance.GetActiveLevelManager().UIManager.Canvas.worldCamera, out var localPos)) {
 				return localPos;
 			}
 			UnityEngine.Debug.LogError($"Could not retrieve local point from screen point: ({screenPos.x}, {screenPos.y})");

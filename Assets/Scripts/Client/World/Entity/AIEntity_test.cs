@@ -12,7 +12,7 @@ namespace SoulboundBackend.Client.World.Entity {
 		public override void Spawn(EntitySpawnData spawnData) {
 			base.Spawn(spawnData);
 			IdleState idle = new();
-			PlayerController player = LevelManager.instance.Player;
+			PlayerController player = Soulbound.instance.GetActiveLevel().Player;
 			MoveToPositionState move = new(this, player.position, speed: 5f, isInterruptable: true);
 			aiController = new(this, () => {
 				if (Vector2.Distance(position, player.position) < 10f) {

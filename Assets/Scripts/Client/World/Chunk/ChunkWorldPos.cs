@@ -7,15 +7,15 @@ namespace SoulboundBackend.Client.World.Chunk {
 		public float y;
 		public int chunkX;
 
-		public WorldChunk underlyingChunk => LevelManager.instance.Level.ChunkAt(this.ToWorldBlockPos());
-
 		public ChunkWorldPos(float x, float y, int chunkX) {
 			this.x = x;
 			this.y = y;
 			this.chunkX = chunkX;
 		}
 
-		public static ChunkWorldPos FromBlockPos(BlockPos blockPos) {
+        public WorldChunk UnderlyingChunk(Level level) => level.ChunkAt(this.ToWorldBlockPos(level));
+
+        public static ChunkWorldPos FromBlockPos(BlockPos blockPos) {
 			int chunkX = Mathf.FloorToInt((float)blockPos.x / Level.CHUNK_LENGTH);
 			float localX = blockPos.x - chunkX * Level.CHUNK_LENGTH;
 			return new ChunkWorldPos(localX, blockPos.y, chunkX);
@@ -34,9 +34,9 @@ namespace SoulboundBackend.Client.World.Chunk {
 
 		public override string ToString() => $"cwx:{x}, cwy:{y}, c:{chunkX}";
 
-		public BlockPos ToWorldBlockPos() {
+		public BlockPos ToWorldBlockPos(Level level) {
 			Vector2 pos = new(this.x + this.chunkX * Level.CHUNK_LENGTH, this.y);
-			return BlockPos.FromWorld(pos);
+			return BlockPos.FromWorld(pos, level);
 		}
 
 		public override bool Equals(object obj) {

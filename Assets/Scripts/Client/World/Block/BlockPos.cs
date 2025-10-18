@@ -13,7 +13,7 @@ namespace SoulboundBackend.Client.World {
             this.y = y;
         }
 
-        public static BlockPos FromWorld(Vector2 worldPos) => LevelManager.instance.Level.ToBlockPos(worldPos);
+        public static BlockPos FromWorld(Vector2 worldPos, Level level) => level.ToBlockPos(worldPos);
 
         public override string ToString() => $"bx:{x}, by:{y}";
 

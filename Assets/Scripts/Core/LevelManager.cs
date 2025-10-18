@@ -24,7 +24,6 @@ namespace SoulboundBackend.Core {
 	[BootstrappableParentOf(typeof(PlayerController))]
 	public class LevelManager : MonoBehaviour, IBootstrappable {
 		private static readonly Logger logger = Logger.CreateInstance();
-		public static LevelManager instance;
 		public const float tickRate = 0.02f;        // 50 tps
 		private float tickStartTime;
 		public bool isWorldLoaded { get; private set; } = false;
@@ -61,7 +60,6 @@ namespace SoulboundBackend.Core {
 				BootstrappableInstanceFactory instanceFactory,
 				Func<BootstrapTreeBuilder, IEnumerable<IBootstrappable>> treeFunc
 			) {
-			instance = this;
 			this.worldManager = worldManager;
 			this.world = world;
 
