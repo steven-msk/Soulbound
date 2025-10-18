@@ -15,7 +15,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		private readonly Action<GenericBlock>? propertyRegisterer;
 		private readonly Func<Block, BlockState>? defaultStateGetter;
 		private readonly Func<Block, IReadOnlyList<BlockState>>? stateInitializer;
-		private readonly Func<ItemStack, BlockPos, BlockState>? placeFunction;
+		private readonly Func<Block, ItemStack, BlockPos, BlockState>? placeFunction;
 
 		public GenericBlock(
 				string name, 
@@ -43,7 +43,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 				Func<BlockStateProperties?, IBlockStateBehavior>? behaviorFactory = null,
 				Action<GenericBlock>? propertyRegisterer = null,
 				Func<Block, IReadOnlyList<BlockState>>? stateInitializer = null,
-				Func<ItemStack, BlockPos, BlockState>? placeFunction = null
+				Func<Block, ItemStack, BlockPos, BlockState>? placeFunction = null
 			) : base(stateCacheStrategy) {
 			this.name = name;
 			this.tileReference = tileReference;
@@ -86,7 +86,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		}
 
         public override BlockState Place(ItemStack itemStack, BlockPos blockPos) {
-            return placeFunction?.Invoke(itemStack, blockPos) ?? base.Place(itemStack, blockPos);
+            return placeFunction?.Invoke(this, itemStack, blockPos) ?? base.Place(itemStack, blockPos);
         }
 	}
 }

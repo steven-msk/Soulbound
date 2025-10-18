@@ -80,6 +80,10 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			return block.GetStateFor(newProperties);
 		}
 
+		public BlockState With<T>(string property, T value) {
+			return With(new BlockProperty<T>(property), value);
+		}
+
 		public static bool operator ==(BlockState? state1, BlockState? state2) {
 			return state1 is not null && state2 is not null 
 				&& state1.block == state2.block

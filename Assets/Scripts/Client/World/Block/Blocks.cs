@@ -20,14 +20,23 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		[BlockCache(nameof(stone))] public static Block stone => Lookup(() => new GenericBlock("Stone Block", Tile("stone"), Items.stoneBlock, StateCaching.Static(), new BreakRequirement(1, ToolType.None, 10)));
 		[BlockCache(nameof(wood))] public static Block wood => Lookup(() => new GenericBlock("Wood", Tile("wood"), Items.woodBlock, StateCaching.Static(), new BreakRequirement(0, ToolType.None, 10)));
 		[BlockCache(nameof(leaves))] public static Block leaves => Lookup(() => 
-			new GenericBlock("Leaves", Tile("leaves"), Items.leavesBlock, StateCaching.Predefined(), new BreakRequirement(0, ToolType.All, 10), block => {
-				return new BlockState(block, null,
-					CommonBlockBehaviors.DropSingleIf((blockState, breakSource) =>
-						breakSource is PlayerToolBreakSource && blockState.Get<bool>("persistent")
-				));
-			}, behaviorFactory: null, propertyRegisterer: instance => {
-				instance.RegisterProperty(new BlockProperty<bool>("persistent"), false);
-			}
+			new GenericBlock(
+				"Leaves", 
+				Tile("leaves"), 
+				Items.leavesBlock, 
+				StateCaching.Predefined(), 
+				new BreakRequirement(0, ToolType.All, 10),
+				defaultState: block => {
+					Func<BlockState, BreakSource, bool> dropPredicate = (blockState, breakSource) => 
+						breakSource is PlayerToolBreakSource || blockState.Get<bool>("persistent");
+					return new BlockState(block, null, CommonBlockBehaviors.DropSingleIf(dropPredicate));
+				}, 
+				propertyRegisterer: instance => {
+					instance.RegisterProperty(new BlockProperty<bool>("persistent"), false);
+				}, 
+				placeFunction: (block, itemStack, blockPos) => {
+					return block.defaultState.With("persistent", true);
+				}
 		));
 	
 		static Blocks() {

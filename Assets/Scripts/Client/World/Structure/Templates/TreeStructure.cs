@@ -48,7 +48,7 @@ namespace SoulboundBackend.Client.World.Structure.Templates {
 				BoundsInt2D bounds = new((Vector2Int)origin, (Vector2Int)origin + preliminaryData.Value.size);
 				ChunkBlockPos trunkPos = new ChunkBlockPos(origin.x, origin.y, generationContext.chunkX);
 				BlockState woodBlock = Blocks.wood.defaultState;
-				BlockState leavesBlock = Blocks.leaves.defaultState.With(new BlockProperty<bool>("persistent"), true);
+				BlockState leavesBlock = Blocks.leaves.defaultState;
 
 				for (int ty = 0; ty < bounds.size.y; ty++) {
 					stateOverrides[trunkPos] = woodBlock;

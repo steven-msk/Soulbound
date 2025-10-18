@@ -317,7 +317,7 @@ namespace BlockTests.StateCachingTests {
 			var block = new GenericBlock("testBlock", null, null, cache, null, stateInitializer: block => {
 				return new[] { new BlockState(block, new Dictionary<IBlockStateProperty, object>() {
 						[new BlockProperty<bool>("test")] = true
-					}, CommonBlockBehaviors.NullBehavior()) 
+					}, CommonBlockBehaviors.NullBehavior())
 				};
 			});
 
