@@ -285,6 +285,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74baa989304b2fd4cba63a16ceb41073, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameConfig:
+    file:
+      savesFolder: saves
+    dev:
+      loadDevWorldFromSave: 1
+      devWorld: devWorld
+      devScene: DevScene
 --- !u!4 &2144701901
 Transform:
   m_ObjectHideFlags: 0

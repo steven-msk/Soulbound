@@ -21,26 +21,29 @@ using UnityEngine.SceneManagement;
 
 public sealed class GameEntryPoint : MonoBehaviour {
 	private LevelManager levelManager;
+	[SerializeField] private GameConfig gameConfig;
+	private static GameEntryPoint instance;
 
-	public static Func<BootstrapTreeBuilder, IEnumerable<IBootstrappable>> defaultBootstrapTree = treeBuilder => {
+    private void Awake() => instance = this;
+
+    public static Func<BootstrapTreeBuilder, IEnumerable<IBootstrappable>> defaultBootstrapTree = treeBuilder => {
 		return treeBuilder.BuildTree<BootstrappableParentOfAttribute>(typeof(LevelManager));
-    };
+	};
 
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
 	public static void StartWorld() {
 #if UNITY_INCLUDE_TESTS
-		if (Application.isEditor && SceneManager.GetActiveScene().name != "DevScene") {
+		if (Application.isEditor && SceneManager.GetActiveScene().name != instance.gameConfig.dev.devScene) {
 			return;
 		}
 #endif
-		WorldManager worldManager = new("saves", new WorldSaveStrategy());
-		Level.RegisterStructure(TreeStructure.instance);
-		var loadedDump = worldManager.LoadWorld("devWorld", null, defaultBootstrapTree, true);
+		Soulbound soulbound = new Soulbound(instance.gameConfig);
+		soulbound.Prototype_LoadDevWorld();
 	}
 
 	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
 	public static void ResetStaticDomain() {
-        StaticResetManager.ResetAll();
-        ResourceManager.PreloadGroups();
-    }
+		StaticResetManager.ResetAll();
+		ResourceManager.PreloadGroups();
+	}
 }

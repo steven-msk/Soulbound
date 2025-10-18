@@ -22,7 +22,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 		}
 
 		public static ChunkWorldPos FromWorld(Vector2 position) {
-			int chunkX = LevelManager.instance.Level.ChunkXAt(position);
+			int chunkX = Mathf.FloorToInt(position.x / Level.CHUNK_LENGTH);
 			return new ChunkWorldPos(position.x, position.y, chunkX);
 		}
 
