@@ -75,6 +75,9 @@ namespace SoulboundBackend.Client {
 			inputHandler = dependencyContainer.Resolve<InputHandler>();
 			inventory = dependencyContainer.Resolve<InventoryController>();
 			playerPhysics = dependencyContainer.Resolve<PlayerPhysics>();
+			if (playerPhysics != null) {
+				this.GetComponent<StepClimber>().Init(this);
+			}
 			RegisterItemUsageCandidates(dependencyContainer.Resolve<ItemUsageHandler>());
 		}
 		public void OnEarlyBootstrap(DependencyContainer dependencyContainer) {

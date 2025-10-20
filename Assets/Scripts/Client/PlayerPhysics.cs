@@ -66,7 +66,7 @@ namespace SoulboundBackend.Client {
 
 		public void OnBootstrap(DependencyContainer dependencyContainer) {
 			player = dependencyContainer.Resolve<PlayerController>();
-			inputHandler = dependencyContainer.Resolve<InputHandler>(); 
+			inputHandler = dependencyContainer.Resolve<InputHandler>();
 			rb = player.Rigidbody;
 			animator = player.Animator;
 			collider = this.GetComponent<CapsuleCollider2D>();

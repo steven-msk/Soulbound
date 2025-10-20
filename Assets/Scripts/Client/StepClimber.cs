@@ -1,9 +1,12 @@
 using SoulboundBackend.Core;
+using SoulboundBackend.Core.Bootstrap;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace SoulboundBackend.Client {
+	[RequireComponent(typeof(PlayerController))]
+	[RequireComponent(typeof(Rigidbody2D))]
 	public class StepClimber : MonoBehaviour {
 		[SerializeField] private float maxStepHeight = 1f;
 		[SerializeField] private float stepSearchOvershoot = 0.1f;
@@ -14,13 +17,20 @@ namespace SoulboundBackend.Client {
 		private List<ContactPoint2D> allContactPoints = new();
 		private Vector2 lastVelocity;
 		Coroutine stepCoroutine = null;
+		private bool init = false;
 
-		private void Start() {
-			player = Soulbound.instance?.GetActiveLevel()?.Player;
-			rb = this.GetComponent<Rigidbody2D>();
+		public void Init(PlayerController player) {
+			player = this.GetComponent<PlayerController>();
+			rb = player.GetComponent<Rigidbody2D>();
+			init = true;
 		}
 
 		private void FixedUpdate() {
+			if (!init) {
+				allContactPoints.Clear();
+				return;
+			}
+
 			Vector2 velocity = rb.linearVelocity;
 			ContactPoint2D ground = default(ContactPoint2D);
 
