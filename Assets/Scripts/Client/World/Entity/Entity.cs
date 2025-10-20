@@ -8,22 +8,25 @@ using UnityEngine;
 
 namespace SoulboundBackend.Client.World.Entity {
 	public abstract class Entity : MonoBehaviour, ISerializable<SerializedEntity> {
-		public Guid? id { get; set; } = null;
-		public Vector2 position => transform.position;
+		protected EntityManager entityManager = null;
+		public Guid id { get; private set; }
 		public int currentChunkX { get; private set; }
 		public abstract Type entityScriptType { get; }
 		public abstract string prefabDefinitionID { get; }
+		public Vector2 position => transform.position;
 
-		public abstract void EntityUpdate(float deltaTime);
-
-		protected virtual void Start() {
+		public void InitState(Guid id, EntityManager entityManager) {
+			this.id = id;
+			this.entityManager = entityManager;
 			currentChunkX = ChunkWorldPos.FromWorld(position).chunkX;
 		}
 
-		protected virtual void Update() {
+		public abstract void EntityUpdate(float deltaTime);
+
+		public void ManagerUpdate(EntityManager entityManager) {
 			ChunkWorldPos currentPos = ChunkWorldPos.FromWorld(this.position);
 			if (currentPos.chunkX != currentChunkX) {
-				Soulbound.instance.GetActiveLevel().EntityManager.HandleChunkChange(this, currentChunkX, currentPos.chunkX);
+				entityManager.HandleChunkChange(this, currentChunkX, currentPos.chunkX);
 				currentChunkX = currentPos.chunkX;
 			}
 		}
@@ -34,7 +37,7 @@ namespace SoulboundBackend.Client.World.Entity {
 		}
 
 		public virtual void Despawn() {
-			Soulbound.instance.GetActiveLevel().EntityManager.RemoveEntity(this, destroy: true);
+			entityManager.RemoveEntity(this, destroy: true);
 		}
 
 		public abstract void OnChunkLoaded();
@@ -47,7 +50,10 @@ namespace SoulboundBackend.Client.World.Entity {
 		public abstract void ApplySerializedProperties(SerializedEntityPropertyList properties);
 
 		public SerializedEntity Serialize() {
-			return new(this.entityScriptType, this.id.Value, this.prefabDefinitionID, this.position, this.GetSerializedProperties());
+			if (entityManager == null) {
+				throw new InvalidOperationException("Entity state not initialized");
+			}
+			return new(this.entityScriptType, this.id, this.prefabDefinitionID, this.position, this.GetSerializedProperties());
 		}
 
 		public void Deserialize(SerializedEntity serialized) {

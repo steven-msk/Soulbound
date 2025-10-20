@@ -20,17 +20,21 @@ namespace SoulboundBackend.Client.World.Entity {
 		}
 
 		public void Boostrap(Dictionary<Guid, SerializedEntity> serializedEntities) {
-			foreach (var serializedEntity in serializedEntities.Values) {
+			foreach (var entry in serializedEntities) {
+				SerializedEntity serializedEntity = entry.Value;
+				Guid id = entry.Key;
+
 				GameObject entityPrefab = ResourceManager.Get<GameObject, ResourceGroups.Prefabs>(serializedEntity.prefabDefinitionID);
 				Entity entity = (Entity)GameObject.Instantiate(entityPrefab).GetComponent(serializedEntity.entityScriptType);
+
+				this.AddExistingEntity(entity, id);
 				entity.Deserialize(serializedEntity);
-				this.AddExistingEntity(entity);
 			}
 		}
 
-		public void AddExistingEntity(Entity entity) {
-			entity.id = Guid.NewGuid();
-			allEntities.Add(entity.id.Value, entity);
+		public void AddExistingEntity(Entity entity, Guid? id) {
+			entity.InitState(id ?? Guid.NewGuid(), this);
+			allEntities.Add(entity.id, entity);
 			if (entity is ITickable tickable) {
 				tickables.Add(tickable);
 			}
@@ -38,7 +42,7 @@ namespace SoulboundBackend.Client.World.Entity {
 
 		public void SpawnEntity(Entity entity, EntitySpawnData spawnData) {
 			entity.Spawn(spawnData);
-			this.AddExistingEntity(entity);
+			this.AddExistingEntity(entity, null);
 		}
 
 		public void SpawnPlayer(PlayerController player, SerializedEntity serialized) {
@@ -49,7 +53,7 @@ namespace SoulboundBackend.Client.World.Entity {
 		public void RemoveEntity(Entity entity, bool destroy) => pendingRemovals.Add((entity, destroy));
 
 		public void RemoveEntityImmediately(Entity entity, bool destroy) {
-			allEntities.Remove(entity.id.Value);
+			allEntities.Remove(entity.id);
 			if (entity is ITickable tickable) {
 				tickables.Remove(tickable);
 			}
@@ -67,6 +71,7 @@ namespace SoulboundBackend.Client.World.Entity {
 			pendingRemovals.Clear();
 			foreach (var entity in allEntities.Values) {
 				entity.EntityUpdate(deltaTime);
+				entity.ManagerUpdate(this);
 			}
 			if (level.isPlayerSpawned) {
 				this.player.EntityUpdate(deltaTime);

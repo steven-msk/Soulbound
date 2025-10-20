@@ -112,8 +112,8 @@ namespace SoulboundBackend.Client {
             });
         }
 
-		protected override void Update() {
-			base.Update();
+		public override void EntityUpdate(float deltaTime) {
+			base.EntityUpdate(deltaTime);
 			animator.SetFloat("horizontalSpeed", Mathf.Abs(rb.linearVelocityX));
 		}
 
