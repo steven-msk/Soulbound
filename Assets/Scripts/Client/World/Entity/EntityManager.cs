@@ -5,10 +5,12 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+#nullable enable
+
 namespace SoulboundBackend.Client.World.Entity {
 	public sealed class EntityManager {
 		private readonly Level level;
-		private PlayerController player;
+		private PlayerController player = null!;
 		private Dictionary<Guid, Entity> allEntities = new();
 		private List<ITickable> tickables = new();
 		private List<(Entity entity, bool destroy)> pendingRemovals = new();
@@ -24,8 +26,8 @@ namespace SoulboundBackend.Client.World.Entity {
 				SerializedEntity serializedEntity = entry.Value;
 				Guid id = entry.Key;
 
-				GameObject entityPrefab = ResourceManager.Get<GameObject, ResourceGroups.Prefabs>(serializedEntity.prefabDefinitionID);
-				Entity entity = (Entity)GameObject.Instantiate(entityPrefab).GetComponent(serializedEntity.entityScriptType);
+				GameObject? entityPrefab = ResourceManager.Get<GameObject, ResourceGroups.Prefabs>(serializedEntity.prefabDefinitionID);
+				Entity entity = (Entity)GameObject.Instantiate(entityPrefab)!.GetComponent(serializedEntity.entityScriptType);
 
 				this.AddExistingEntity(entity, id);
 				entity.Deserialize(serializedEntity);
@@ -46,6 +48,7 @@ namespace SoulboundBackend.Client.World.Entity {
 		}
 
 		public void SpawnPlayer(PlayerController player, SerializedEntity serialized) {
+			player.InitState(serialized.id, this);
 			player.Deserialize(serialized);
 			this.player = player;
 		}
@@ -100,7 +103,6 @@ namespace SoulboundBackend.Client.World.Entity {
 			}
 		}
 
-#nullable enable
 		public HashSet<Entity> GetEntitiesInChunk(WorldChunk chunk) {
 			var entities = allEntities.Values
 				.Where(entity => ChunkBlockPos.FromWorld(entity.position, level)
