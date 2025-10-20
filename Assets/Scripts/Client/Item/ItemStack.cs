@@ -13,8 +13,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 	public class ItemStack {
 		private static readonly Logger logger = Logger.CreateInstance();
 		public Item item { get; }
-		private ItemDisplay? display;
-		private GameObject? stackText;
+		private ItemDisplay? display = null;
 		public int quantity { get; private set; }
 		public int MaxStackSize => item.maxStackSize;
 		public bool isDropped { get; private set; } = false;
@@ -24,26 +23,16 @@ namespace SoulboundBackend.Client.ItemSystem {
 			this.quantity = Mathf.Min(quantity, item.maxStackSize);
 		}
 
-		public void UpdateText() {
-			TextMeshProUGUI? stackText = this.stackText?.GetComponent<TextMeshProUGUI>();
-			stackText!.text = quantity.ToString();
-		}
-
 		public GameObject AssignDisplay(ItemDisplay parent) {
-			GameObject? stackText = GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.Prefabs>("stackNumberPrefab"), parent.transform);
+			var prefab = ResourceManager.Get<GameObject, ResourceGroups.Prefabs>("stackNumberPrefab");
+            GameObject? stackText = GameObject.Instantiate(prefab, parent.transform);
 			TextMeshProUGUI? text = stackText!.GetComponent<TextMeshProUGUI>();
 			text.enabled = item.IsStackable;
 			RectTransform rectTransform = stackText!.GetComponent<RectTransform>();
 			if (item.IsStackable) {
 				text!.autoSizeTextContainer = true;
 				text.text = quantity.ToString();
-				InventoryController inventory = Soulbound.instance.GetActiveLevel()!.Player.Inventory;
-				Color textColor = Color.white;
-				InventorySlot hotbarSlot = parent.GetComponentInParent<InventorySlot>();
-				if (!inventory.IsOpened && hotbarSlot != null && inventory.Hotbar.ActiveSlot != hotbarSlot) {
-					textColor = inventory.Hotbar.inactiveSlotNumberColor;
-				}
-				text.color = textColor;
+				text.color = Color.white;
 				rectTransform.pivot = new Vector2(1f, 0f);
 				rectTransform.anchorMax = new Vector2(0.9375f, 0.0625f);
 				rectTransform.anchorMin = rectTransform.anchorMax;
@@ -51,7 +40,6 @@ namespace SoulboundBackend.Client.ItemSystem {
 				text.rectTransform.sizeDelta = text.GetPreferredValues(Mathf.Infinity, Mathf.Infinity);
 				rectTransform.anchoredPosition = new(Mathf.Max(-4, rectTransform.sizeDelta.x - 19.14f), rectTransform.anchoredPosition.y);
 			}
-			this.stackText = stackText;
 			this.display = parent;
 			return stackText;
 		}
@@ -72,7 +60,9 @@ namespace SoulboundBackend.Client.ItemSystem {
 			isDropped = true;
 		}
 
-		public void OnPickedUp() => isDropped = false;
+        public void UpdateText() => display?.UpdateStackText();
+
+        public void OnPickedUp() => isDropped = false;
 
 		public bool IsFull() => quantity >= item.maxStackSize;
 		public bool IsEmpty() => quantity <= 0;
@@ -107,12 +97,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 		}
 
 		private void OnQuantityChanged(int old, int @new) {
-			if (@new <= 0) {
-				display?.Destroy();
-			}
-			if (stackText != null && @new > 0) {
-				UpdateText();
-			}
+			display?.OnStackQuantityChanged(old, @new);
 		}
 
 		// FEATUREIMPL: dropped item stacks converging to avoid lag

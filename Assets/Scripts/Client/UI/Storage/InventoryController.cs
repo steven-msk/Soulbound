@@ -154,7 +154,13 @@ namespace SoulboundBackend.Client.UI.Storage {
 
 		void IItemContainer.OnItemDisplayAdded(ItemDisplay itemDisplay, IItemSlot slot) {
 			itemDisplay.onDestroy += player.OnItemDisplayDestroyed;
+
+			InventorySlot hotbarSlot = itemDisplay.GetComponentInParent<InventorySlot>();
+			if (!this.IsOpened && hotbarSlot != null && Hotbar.ActiveSlot != hotbarSlot) {
+				itemDisplay.stackText.GetComponent<TextMeshProUGUI>().color = Hotbar.inactiveSlotNumberColor;
+			}
 		}
+
 		public void DropHoveredOrActiveItem() {
 			IItemSlot? slot = hoveredSlot ?? hotbar.ActiveSlot ?? null;
 			if (slot == null) {
