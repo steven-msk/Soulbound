@@ -46,11 +46,11 @@ public class InventoryTests {
 	public void CreateItemDisplay_AssignsToFirstEmptySlot_WhenSlotExists() {
 		var inventory = CreateTestEnvironment();
 
-		var slot = inventory.GetFirstEmptySlot();
+		var slot = inventory.GetFirstEmptySlot() as IItemSlot;
 		Assert.IsNotNull(slot, "No empty slot available");
 
 		ItemStack stack = new ItemStack(Items.consumableStatItem_test, 1);
-		ItemDisplay display = ItemDisplay.Create(stack, slot);
+		ItemDisplay display = slot.CreateDisplay(stack);
 		Assert.That(slot.ItemDisplay, Is.EqualTo(display),
 			() => "ItemDisplay did not assign correctly in slot");
 	}

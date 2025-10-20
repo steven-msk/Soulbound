@@ -149,5 +149,9 @@ namespace SoulboundBackend.Client.UI.Storage {
 		public void OnPointerExit(IItemSlot slot, PointerEventData data) {
 			throw new NotImplementedException();
 		}
-	}
+
+        public void OnItemDisplayAdded(ItemDisplay itemDisplay, IItemSlot slot) {
+            throw new NotImplementedException();
+        }
+    }
 }

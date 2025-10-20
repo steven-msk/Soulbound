@@ -7,6 +7,7 @@ using SoulboundBackend.Core.Bootstrap;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
@@ -114,7 +115,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 				.Concat(TryDeserialize("armor", serialized.regions, index => armorSlotsByIndex[index]));
 			hotbar.SetActiveSlot(serialized.lastHotbarIndex);
 
-			ItemDisplay.Create(new ItemStack(Items.toolItem_test, 1), this.slots[0]);
+			//ItemDisplay.Create(new ItemStack(Items.toolItem_test, 1), this.slots[0], this);
 
 			return pendingUpdates.ToList();
 		}
@@ -151,13 +152,16 @@ namespace SoulboundBackend.Client.UI.Storage {
 			}
         }
 
+		void IItemContainer.OnItemDisplayAdded(ItemDisplay itemDisplay, IItemSlot slot) {
+			itemDisplay.onDestroy += player.OnItemDisplayDestroyed;
+		}
 		public void DropHoveredOrActiveItem() {
 			IItemSlot? slot = hoveredSlot ?? hotbar.ActiveSlot ?? null;
 			if (slot == null) {
 				return;
 			}
 			ItemDisplay hoveredDisplay = slot.ItemDisplay;
-			slot.DetachItemDisplay();
+			slot.DetachItemDisplay(this.transform);
 			hoveredDisplay.ItemStack.Drop(player.center, player.itemDropForce, true);
 			hoveredDisplay.Destroy();
 		}
@@ -200,7 +204,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 			if (!itemStack.item.IsStackable) {
 				InventorySlot? emptySlot = GetFirstEmptySlot();
 				if (emptySlot != null) {
-					ItemDisplay.Create(itemStack, emptySlot);
+					(emptySlot as IItemSlot).CreateDisplay(itemStack);
 					itemStack.OnPickedUp();
 					remaining = 0;
 					return true;
@@ -232,7 +236,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 				for (int i = 0; i < availableSlots.Length; i++) {
 					if (!availableSlots[i].HasItem) {
 						int toAdd = Mathf.Min(remaining, itemStack.item.maxStackSize);
-						ItemDisplay.Create(new ItemStack(itemStack.item, toAdd), availableSlots[i]);
+						(availableSlots[i] as IItemSlot).CreateDisplay(new ItemStack(itemStack.item, toAdd));
 						remaining -= toAdd;
 					}
 					ClampRemaining(ref remaining);
@@ -482,7 +486,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 
 		public ItemDisplay CreateGrabbedDisplay(ItemStack itemStack, Func<Transform?>? parentSupplier = null) {
 			ItemDisplay grabbed = ItemDisplay.Create(itemStack, parentSupplier ?? (() => this.transform));
-			grabbed.OnGrab();
+			grabbed.OnGrab(this.transform, true);
 			return grabbed;
 		}
 
@@ -530,7 +534,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 				return;
 			}
 			grabbedItem.value = slot.ItemDisplay;
-			slot.DetachItemDisplay();
+			slot.DetachItemDisplay(this.transform);
 			player.SetMainHandItem(grabbedItem.value.ItemStack);
 		}
 
@@ -551,7 +555,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 			}
 			ItemDisplay previousGrabbed = grabbedItem.value;
 			grabbedItem.value = slot.ItemDisplay;
-			slot.DetachItemDisplay();
+			slot.DetachItemDisplay(this.transform);
 			slot.AttachItemDisplay(previousGrabbed);
 			player.SetMainHandItem(grabbedItem.value.ItemStack);
 		}

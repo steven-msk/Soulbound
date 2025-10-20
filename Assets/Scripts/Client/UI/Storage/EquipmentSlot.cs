@@ -12,8 +12,6 @@ namespace SoulboundBackend.Client.UI.Storage {
 		public ItemStack ItemStack => ItemDisplay?.ItemStack;
 		public abstract bool showTooltip { get; set; }
 
-		public GameObject GameObject => gameObject;
-
 		public abstract void Deserialize(SerializedItemSlot serialized);
 
 		//[InputAction("ItemDrag", Priority = 10, BlocksContexts = new[] { "ItemUse" })]

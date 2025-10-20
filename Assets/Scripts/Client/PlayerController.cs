@@ -173,6 +173,12 @@ namespace SoulboundBackend.Client {
 			InputHandler.RequestAction(new("ItemUse", 5, () => itemUsageHandler.HandleInput(trigger, MainHandStack), callback));
 		}
 
+		public void OnItemDisplayDestroyed(ItemStack stack) {
+			if (stack == MainHandStack) {
+				this.SetMainHandItem(null);
+			}
+		}
+
 		public bool CanPlaceBlockAt(BlockPos blockPos) {
 			Vector2 worldPos = (Vector2)blockPos;
 			return IsInBlockReach(worldPos)

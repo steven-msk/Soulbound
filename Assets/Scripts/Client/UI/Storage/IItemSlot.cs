@@ -10,63 +10,75 @@ using UnityEngine.EventSystems;
 namespace SoulboundBackend.Client.UI.Storage {
 	public interface IItemSlot : IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler, ISerializable<SerializedItemSlot> {
 		public ItemDisplay ItemDisplay { get; }
-		public IItemContainer container { get; }
+		public IItemContainer? container { get; }
 		public int index { get; set; }
-		public bool HasItem => ItemDisplay != null;
-		public bool IsEmpty => ItemDisplay == null;
-		public ItemStack? ItemStack => ItemDisplay?.ItemStack;
-		public Item? ContainedItem => ItemStack?.item;
-		public GameObject GameObject { get; }
+		public Transform transform { get; }
 		public bool showTooltip { get; set; }
 
+		public ItemStack? ItemStack => ItemDisplay?.ItemStack;
+		public Item? ContainedItem => ItemStack?.item;
+
+		public bool HasItem => ItemDisplay != null;
+		public bool IsEmpty => ItemDisplay == null;
+
 		internal void AttachItemDisplay(ItemDisplay itemDisplay, bool suppressHook = false) {
-			itemDisplay.transform.SetParent(GameObject.transform, true);
-			itemDisplay.OnRelease();
-			InvocationHelper.If(!suppressHook, () => OnAttached(itemDisplay));
+			itemDisplay.OnRelease(transform);
+			OnAttached(itemDisplay, suppressHook);
 		}
 
-		private void OnAttached(ItemDisplay itemDisplay) {
+		private void OnAttached(ItemDisplay itemDisplay, bool suppressHook = false) {
+			if (suppressHook) {
+				return;
+			}
 			itemDisplay.DisplayedItem?.GetSlotHook()?.onAttached?.Invoke(itemDisplay, this);
+		}
+
+		private void OnDetached(ItemDisplay itemDisplay, bool suppressHook = false) {
+			if (suppressHook) {
+				return;
+			}
+			itemDisplay.DisplayedItem?.GetSlotHook()?.onDetached?.Invoke(itemDisplay, this);
 		}
 
 		internal void NotifyDeserializedHook() => OnAttached(ItemDisplay);
 
-		internal void DetachItemDisplay(bool suppressHook = false) {
+		internal void DetachItemDisplay(Transform newParent, bool suppressHook = false) {
 			if (ItemDisplay == null) {
 				return;
 			}
 			ItemDisplay detached = this.ItemDisplay;
-			ItemDisplay.OnGrab();
-			ItemDisplay.transform.SetParent(Soulbound.instance.GetActiveLevel()!.Player.Inventory.transform, true);
-			if (!suppressHook) {
-				detached.DisplayedItem?.GetSlotHook()?.onDetached?.Invoke(detached, this);
-			}
+			ItemDisplay.OnGrab(newParent, true);
+			this.OnDetached(detached, suppressHook);
 		}
 
 		SerializedItemSlot ISerializable<SerializedItemSlot>.Serialize() => new(index, ItemStack);
 
 		public void TrySetStack(int quantity, Item fallback) {
-			CreateDisplayIfEmpty(new ItemStack(fallback, quantity));
+			CreateDisplayIfEmpty(new ItemStack(fallback, quantity), out var display);
 			this.ItemStack!.SetQuantity(quantity);
 		}
 
 		public int TryAddStack(int add, Item fallback) {
-			if (!CreateDisplayIfEmpty(new ItemStack(fallback, 0))) {
+			if (!CreateDisplayIfEmpty(new ItemStack(fallback, 0), out var display)) {
 				return this.ItemStack!.Increment(add);
 			}
 			this.ItemStack!.Increment(add);
 			return add;
 		}
 
-		public void CreateDisplay(ItemStack itemStack, bool suppressHook = false) {
-			this.AttachItemDisplay(ItemDisplay.Create(itemStack, () => GameObject.transform), suppressHook);
+		public ItemDisplay CreateDisplay(ItemStack itemStack, bool suppressHook = false) {
+			ItemDisplay display = ItemDisplay.Create(itemStack, () => transform);
+			this.OnAttached(display, suppressHook);
+			container?.OnItemDisplayAdded(display, this);
+			return display;
 		}
 
-		public bool CreateDisplayIfEmpty(ItemStack itemStack) {
+		public bool CreateDisplayIfEmpty(ItemStack itemStack, out ItemDisplay? display) {
 			if (this.ItemStack == null) {
-				CreateDisplay(itemStack);
+				display = CreateDisplay(itemStack);
 				return true;
 			}
+			display = null;
 			return false;
 		}
 
@@ -78,7 +90,9 @@ namespace SoulboundBackend.Client.UI.Storage {
 		}
 		new public virtual void OnPointerEnter(PointerEventData eventData) {
 			container.OnPointerEnter(this, eventData);
-			InvocationHelper.If(showTooltip, () => ItemDisplay?.ShowTooltip(eventData.position));
+			if (showTooltip) {
+				ItemDisplay?.ShowTooltip(eventData.position, container.transform);
+			}
 		}
 
 		new public virtual void OnPointerExit(PointerEventData eventData) {
@@ -100,8 +114,8 @@ namespace SoulboundBackend.Client.UI.Storage {
 	}
 
 	public static class ItemSlotDeserializer {
-		public static void Deserialize(this IItemSlot slot, SerializedItemSlot serialized) {
-			slot.CreateDisplay(serialized.itemStack, suppressHook: true);
+		public static ItemDisplay Deserialize(this IItemSlot slot, SerializedItemSlot serialized) {
+			return slot.CreateDisplay(serialized.itemStack, suppressHook: true);
 		}
 	}
 }
