@@ -33,7 +33,7 @@ public sealed class GameEntryPoint : MonoBehaviour {
 	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
 	public static void StartWorld() {
 #if UNITY_INCLUDE_TESTS
-		if (Application.isEditor && SceneManager.GetActiveScene().name != instance.gameConfig.dev.devScene) {
+		if (Application.isEditor && SceneManager.GetActiveScene().name != instance?.gameConfig.dev.devScene) {
 			return;
 		}
 #endif

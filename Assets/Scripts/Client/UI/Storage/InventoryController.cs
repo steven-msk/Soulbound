@@ -111,13 +111,13 @@ namespace SoulboundBackend.Client.UI.Storage {
 
 		public List<IItemSlot> Deserialize(SerializedInventory serialized) {
 			var pendingUpdates = TryDeserialize("hotbar", serialized.regions, hotbar.GetSlotByIndex)
-				.Concat(TryDeserialize("popup", serialized.regions, this.GetSlotByIndex))
-				.Concat(TryDeserialize("armor", serialized.regions, index => armorSlotsByIndex[index]));
+				?.Concat(TryDeserialize("popup", serialized.regions, this.GetSlotByIndex))
+				?.Concat(TryDeserialize("armor", serialized.regions, index => armorSlotsByIndex[index]));
 			hotbar.SetActiveSlot(serialized.lastHotbarIndex);
 
 			//ItemDisplay.Create(new ItemStack(Items.toolItem_test, 1), this.slots[0], this);
 
-			return pendingUpdates.ToList();
+			return pendingUpdates?.ToList()!;
 		}
 
 		private IItemSlot[] TryDeserialize<TSlot>(string region, Dictionary<string, List<SerializedItemSlot>> regions, Func<int, TSlot> slotSupplier)
@@ -125,7 +125,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 			List<TSlot> pendingAttachUpdates = new();
 
 			if (!regions.TryGetValue(region, out var serializedRegion)) {
-				logger.LogError(null, "Unknown inventory region: {}", region);
+				logger.LogError(null, "Inventory region not found: {}", region);
 				return null!;
 			}
 			foreach (var serializedSlot in serializedRegion) {
@@ -278,7 +278,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 			lastClickedSlot = clickedSlot;
 
 			PointerEventData.InputButton dragButton = eventData.button;
-			InterpretationFunction? interpretationFunction = InterpretClick(clickedSlot, eventData, doubleClick, out bool cancelDrag);
+			InterpretationFunction? interpretationFunction = InterpretClick(clickedSlot, dragButton, doubleClick, out bool cancelDrag);
 			if (interpretationFunction == null) {
 				logger.ThrowException(null, new InvalidOperationException("InterpretClick() returned null!"));
 				return;
@@ -321,19 +321,19 @@ namespace SoulboundBackend.Client.UI.Storage {
 			this.hoveredSlot = null;
 		}
 
-		public InterpretationFunction? InterpretClick(IItemSlot clickedSlot, PointerEventData eventData, bool doubleClick, out bool cancelDrag) {
+		public InterpretationFunction? InterpretClick(IItemSlot clickedSlot, PointerEventData.InputButton button, bool doubleClick, out bool cancelDrag) {
 			bool shift = Keyboard.current.shiftKey.isPressed;
 			bool ctrl = Keyboard.current.ctrlKey.isPressed;
 			bool alt = Keyboard.current.altKey.isPressed;
 
-			if (eventData.button == PointerEventData.InputButton.Left) {
+			if (button == PointerEventData.InputButton.Left) {
 				if (doubleClick && GrabbedContext.value != null) {
 					cancelDrag = false;
-					return (slot, grabbedItem) => CollectAllStacksInGrabbed(grabbedItem.value!.ItemStack.item, grabbedItem);
+					return CollectAllStacksInGrabbed_Impl;
 				}
 				cancelDrag = false;
 				return TransferGrabbed;
-			} else if (eventData.button == PointerEventData.InputButton.Right) {
+			} else if (button == PointerEventData.InputButton.Right) {
 				if (GrabbedContext.value != null && clickedSlot.ContainedItem != null) {
 					if (GrabbedContext.value?.DisplayedItem != clickedSlot.ItemDisplay?.DisplayedItem) {
 						cancelDrag = false;
@@ -353,42 +353,12 @@ namespace SoulboundBackend.Client.UI.Storage {
 
 		public InterpretationFunction? InterpretDrag(DragHandler handler, IItemSlot draggedSlot, RefBox<ItemDisplay> grabbedItem) {
 			if (handler.dragButton == PointerEventData.InputButton.Left) {
-				return (slot, grabbedItem) => {
-					if (handler.DraggedSlots.Contains(slot)
-							|| (slot.HasItem && slot.ContainedItem != handler.origin!.ContainedItem)
-							|| (slot.HasItem && slot.ItemStack!.IsFull())) {
-						return;
-					}
-
-					// Clone to preview distribution
-					List<IItemSlot> preview = new(handler.DraggedSlots) { slot };
-
-					int toSplit = handler.startDragStack;
-					int splitAmount = toSplit / (preview.Count);
-					if (splitAmount <= 0) {
-						return;
-					}
-					// Commit the slot to dragged list
-					handler.AddDraggedSlot(slot);
-					int remainder = toSplit % (handler.DraggedSlots.Count);
-
-					for (int i = 0; i < handler.DraggedSlots.Count; i++) {
-						var draggedSlot = handler.DraggedSlots[i];
-						int amount = splitAmount + (i < remainder ? 1 : 0);
-
-						if (draggedSlot.ItemStack == null) {
-							draggedSlot.CreateDisplay(new ItemStack(handler.origin!.ItemStack!.item, amount));
-						}
-						if (handler.quantitySnapshots.TryGetValue(draggedSlot, out var snapshot) && draggedSlot != handler.origin) {
-							draggedSlot.ItemStack!.SetQuantity(snapshot + amount);
-						} else {
-							draggedSlot.ItemStack!.SetQuantity(amount);
-						}
-					}
-				};
+				return SplitDistributeToDraggedSlot_Impl;
 			} else if (handler.dragButton == PointerEventData.InputButton.Right) {
-				if (draggedSlot.ContainedItem != null && (!grabbedItem.value?.DisplayedItem!.Equals(draggedSlot.ContainedItem) ?? true)) {
-					return DoNothing;
+				if (grabbedItem.value != null && draggedSlot.ContainedItem != null) {
+					if (grabbedItem.value.DisplayedItem != draggedSlot.ContainedItem) {
+						return DoNothing;
+					}
 				}
 				return TransferSingleToSlot;
 			}
@@ -400,7 +370,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 			Dictionary<IItemSlot, int> quantitySnapshots = new();
 			var snapshotSlots = slots.Where(s => s != dragOrigin && s.ContainedItem == dragOrigin.ContainedItem);
 			foreach (var slot in snapshotSlots) {
-				quantitySnapshots[slot] = slot.ItemStack!.quantity;
+				quantitySnapshots[slot] = slot.ItemStack?.quantity ?? 0;
 			}
 			return new DragHandler(dragOrigin, () => slots.ToArray(), this.InterpretDrag, quantitySnapshots, dragButton);
 		}
@@ -443,6 +413,11 @@ namespace SoulboundBackend.Client.UI.Storage {
 				slot.ItemStack.Decrement(transfer);
 				spaceLeft -= transfer;
 			}
+		}
+
+		public void CollectAllStacksInGrabbed_Impl(IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
+			CollectAllStacksInGrabbed(grabbedItem.value?.ItemStack.item
+				?? throw new InvalidOperationException("Grabbed context not available"), grabbedItem);
 		}
 
 		[InterpretationFunctionCandidate]
@@ -488,17 +463,6 @@ namespace SoulboundBackend.Client.UI.Storage {
 			int transfer = Mathf.Min(amount, slot.ItemStack.quantity);
 			slot.ItemStack.Decrement(transfer);
 			grabbedItem.value!.ItemStack.Increment(transfer);
-		}
-
-		public ItemDisplay CreateGrabbedDisplay(ItemStack itemStack, Func<Transform?>? parentSupplier = null) {
-			ItemDisplay grabbed = ItemDisplay.Create(itemStack, parentSupplier ?? (() => this.transform));
-			grabbed.OnGrab(this.transform, true);
-			return grabbed;
-		}
-
-		public void CreateGrabbedDisplay(RefBox<ItemDisplay> grabbedReference, ItemStack itemStack, Func<Transform?>? parentSupplier = null) {
-			ItemDisplay grabbed = CreateGrabbedDisplay(itemStack, parentSupplier);
-			grabbedReference.value = grabbed;
 		}
 
 		[InterpretationFunctionCandidate]
@@ -587,6 +551,61 @@ namespace SoulboundBackend.Client.UI.Storage {
 			slot.ItemStack.Increment(transfer);
 			grabbedItem.value.ItemStack.Decrement(transfer);
 			return DestroyGrabbedIfEmpty(grabbedItem);
+		}
+
+		public void SplitDistributeToDraggedSlot_Impl(IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
+			SplitDistributeToDraggedSlot(this.activeDragHandler
+				?? throw new InvalidOperationException("Drag context does not exist"), slot, grabbedItem);
+		}
+
+		public void SplitDistributeToDraggedSlot(DragHandler handler, IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
+			if (handler.DraggedSlots.Contains(slot)
+					|| (slot.HasItem && slot.ContainedItem != handler.origin!.ContainedItem)
+					|| (slot.HasItem && slot.ItemStack!.IsFull())) {
+				return;
+			}
+
+			// Clone to preview distribution
+			List<IItemSlot> preview = new(handler.DraggedSlots) { slot };
+
+			int toSplit = handler.startDragStack;
+			int splitAmount = toSplit / (preview.Count);
+			if (splitAmount <= 0) {
+				return;
+			}
+			// Commit the slot to dragged list
+			handler.AddDraggedSlot(slot);
+			int remainder = toSplit % (handler.DraggedSlots.Count);
+
+			for (int i = 0; i < handler.DraggedSlots.Count; i++) {
+				var draggedSlot = handler.DraggedSlots[i];
+				int amount = splitAmount + (i < remainder ? 1 : 0);
+
+				if (draggedSlot.ItemStack == null) {
+					draggedSlot.CreateDisplay(new ItemStack(handler.origin!.ItemStack!.item, amount));
+				}
+				if (handler.quantitySnapshots.TryGetValue(draggedSlot, out var snapshot) && draggedSlot != handler.origin) {
+					draggedSlot.ItemStack!.SetQuantity(snapshot + amount);
+				} else {
+					draggedSlot.ItemStack!.SetQuantity(amount);
+				}
+			}
+		}
+
+		public ItemDisplay CreateGrabbedDisplay(ItemStack itemStack, Func<Transform?>? parentSupplier = null) {
+			ItemDisplay grabbed = ItemDisplay.Create(itemStack, parentSupplier ?? (() => this.transform));
+			grabbed.OnGrab(this.transform, true);
+			return grabbed;
+		}
+
+		public void CreateGrabbedDisplay(RefBox<ItemDisplay> grabbedReference, ItemStack itemStack, Func<Transform?>? parentSupplier = null) {
+			ItemDisplay grabbed = CreateGrabbedDisplay(itemStack, parentSupplier);
+			grabbedReference.value = grabbed;
+		}
+
+		public RefBox<ItemDisplay> CreateGrabbedReference(ItemStack itemStack, Func<Transform?>? parentSupplier = null) {
+			RefBox<ItemDisplay> grabbedReference = new(CreateGrabbedDisplay(itemStack, parentSupplier));
+			return grabbedReference;
 		}
 
 		private bool DestroyGrabbedIfEmpty(RefBox<ItemDisplay> grabbedItem) {
