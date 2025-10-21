@@ -31,7 +31,7 @@ namespace SoulboundBackend.Core.Bootstrap {
             factory.Register<InventoryController>(() => inventory);
             factory.Register<HotbarController>(() => inventory.Hotbar);
             factory.Register<PlayerPhysics>(() => player.GetComponent<PlayerPhysics>());
-            factory.Register<InputHandler>(() => GameObject.Instantiate(player.InputHandler));
+            factory.Register<InputHandler>(() => GameObject.Instantiate(player.inputHandler));
             factory.Register<ItemUsageHandler>(() => new ItemUsageHandler(player));
 
             return factory;

@@ -8,6 +8,8 @@ using UnityEngine;
 using SoulboundBackend.Common;
 using UnityEngine.UI;
 using SoulboundBackend.Core.Bootstrap;
+using Zenject;
+using System.Runtime.Serialization;
 
 namespace SoulboundBackend.Client {
 	[BootstrappableChildOf(typeof(PlayerController))]
@@ -64,12 +66,14 @@ namespace SoulboundBackend.Client {
 
 #nullable enable
 
-		public void OnBootstrap(DependencyContainer dependencyContainer) {
-			player = dependencyContainer.Resolve<PlayerController>();
-			inputHandler = dependencyContainer.Resolve<InputHandler>();
-			rb = player.Rigidbody;
-			animator = player.Animator;
-			collider = this.GetComponent<CapsuleCollider2D>();
+		[Inject]
+		public void Construct(PlayerController player, InputHandler inputHandler) {
+			this.player = player;
+			this.inputHandler = inputHandler;
+			this.rb = player.GetComponent<Rigidbody2D>();
+			this.animator = player.GetComponent<Animator>();
+			this.collider = player.GetComponent<CapsuleCollider2D>();
+
 
 			//collisionReactionsByTag.Add("Enemy", ((collision) => {
 			//	Vector2 bounce = (transform.position - (Vector3)collision.GetContact(0).point).normalized;
@@ -96,6 +100,16 @@ namespace SoulboundBackend.Client {
 			isBootstrapped = true;
 		}
 
+		[Obsolete]
+		public void OnBootstrap(DependencyContainer dependencyContainer) {
+			//player = dependencyContainer.Resolve<PlayerController>();
+			//inputHandler = dependencyContainer.Resolve<InputHandler>();
+			//rb = player.Rigidbody;
+			//animator = player.Animator;
+			//collider = this.GetComponent<CapsuleCollider2D>();
+		}
+
+		[Obsolete]
 		public void OnEarlyBootstrap(DependencyContainer dependencyContainer) {
 			dependencyContainer.Register<PlayerPhysics>(this);
 		}

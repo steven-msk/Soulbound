@@ -16,6 +16,7 @@ using Unity.VisualScripting;
 using UnityEditor.Build.Content;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Zenject;
 using static Unity.VisualScripting.Member;
 using static UnityEditor.PlayerSettings;
 using Level = SoulboundBackend.Client.World.Level;
@@ -30,8 +31,7 @@ namespace SoulboundBackend.Client {
 		private static readonly Logger logger = Logger.CreateInstance();
 		public override Type entityScriptType => typeof(PlayerController);
 		public override string prefabDefinitionID => "johnny";
-		[SerializeField] private InputHandler inputHandler;
-		public InputHandler InputHandler => inputHandler;
+		public InputHandler inputHandler { get; private set; }
 
 		[SerializeField] private InventoryController inventory;
 		public InventoryController Inventory => inventory;
@@ -51,6 +51,7 @@ namespace SoulboundBackend.Client {
 
 		private ItemUsageHandler itemUsageHandler;
 		public ItemUsageHandler ItemUsageHandler => itemUsageHandler!;
+
 #nullable enable
 		public ItemStack? MainHandStack { get; private set; }
 
@@ -71,15 +72,26 @@ namespace SoulboundBackend.Client {
 
 		public float MaxBlockReach => 5f;
 
-		public void OnBootstrap(DependencyContainer dependencyContainer) {
-			inputHandler = dependencyContainer.Resolve<InputHandler>();
-			inventory = dependencyContainer.Resolve<InventoryController>();
-			playerPhysics = dependencyContainer.Resolve<PlayerPhysics>();
-			if (playerPhysics != null) {
-				this.GetComponent<StepClimber>().Init(this);
-			}
-			RegisterItemUsageCandidates(dependencyContainer.Resolve<ItemUsageHandler>());
+		[Inject]
+		public void Construct(DiContainer container) {
+			this.inputHandler = container.Resolve<InputHandler>();
+			this.playerPhysics = container.Resolve<PlayerPhysics>();
+			this.inventory = container.Resolve<InventoryController>();
+			RegisterItemUsageCandidates(container.Resolve<ItemUsageHandler>());
 		}
+
+		[Obsolete]
+		public void OnBootstrap(DependencyContainer dependencyContainer) {
+			//inputHandler = dependencyContainer.Resolve<InputHandler>();
+			//inventory = dependencyContainer.Resolve<InventoryController>();
+			//playerPhysics = dependencyContainer.Resolve<PlayerPhysics>();
+			//if (playerPhysics != null) {
+			//	this.GetComponent<StepClimber>().Init(this);
+			//}
+			//RegisterItemUsageCandidates(dependencyContainer.Resolve<ItemUsageHandler>());
+		}
+
+		[Obsolete]
 		public void OnEarlyBootstrap(DependencyContainer dependencyContainer) {
 			dependencyContainer.Register<PlayerController>(this);
 		}
@@ -168,7 +180,7 @@ namespace SoulboundBackend.Client {
 			Item? usedItem = MainHandStack?.item;
 			RequestMainHandUse(trigger, null);
 			if (usedItem is IPlaceable) {
-				InputHandler.BlockContext("BlockBreak", () => !InputHandler.LeftHold);
+				InputHandler.BlockContext("BlockBreak", () => !inputHandler.LeftHold);
 			}
 		}
 

@@ -1,8 +1,11 @@
 using SoulboundBackend.Core;
 using SoulboundBackend.Core.Bootstrap;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using UnityEngine;
+using Zenject;
 
 namespace SoulboundBackend.Client {
 	[RequireComponent(typeof(PlayerController))]
@@ -19,6 +22,14 @@ namespace SoulboundBackend.Client {
 		Coroutine stepCoroutine = null;
 		private bool init = false;
 
+		[Inject]
+		public void Construct(PlayerController player) {
+			this.player = player;
+			this.rb = player.GetComponent<Rigidbody2D>();
+			init = true;
+		}
+
+		[Obsolete]
 		public void Init(PlayerController player) {
 			player = this.GetComponent<PlayerController>();
 			rb = player.GetComponent<Rigidbody2D>();

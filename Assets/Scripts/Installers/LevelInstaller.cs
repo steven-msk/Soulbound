@@ -4,8 +4,10 @@ using UnityEngine;
 using Zenject;
 
 public class LevelInstaller : MonoInstaller {
+	[SerializeField] private PlayerController playerPrefab;
+
 	public override void InstallBindings() {
-		Container.Bind<InventoryController>().AsSingle();
-		Container.Bind<PlayerController>().AsSingle();
+		Container.Bind<PlayerController>().FromComponentInNewPrefab(playerPrefab).AsSingle();
+
 	}
 }

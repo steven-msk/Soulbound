@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 5492268416738884276}
   - component: {fileID: 6417993767097125418}
   - component: {fileID: 1969086936979604891}
+  - component: {fileID: 8276486397069156307}
   m_Layer: 7
   m_Name: player
   m_TagString: Untagged
@@ -155,7 +156,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1f1052fc3ce1104bb8ffca9b92abb12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inputHandler: {fileID: 7349287938222686006, guid: 4572b6f108dc5d94fab0d8c105f8b89f, type: 3}
   inventory: {fileID: 701114529275448436, guid: b8e974e7315dc3b408e80437cd281dee, type: 3}
   rb: {fileID: 2992365726666747388}
   animator: {fileID: 8592448353225578507}
@@ -287,3 +287,17 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1.375, y: 2}
   m_EdgeRadius: 0
+--- !u!114 &8276486397069156307
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8095950580177048670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e142304dd213bb4f8a0200a8ad7283e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inputHandlerPrefab: {fileID: 7349287938222686006, guid: 4572b6f108dc5d94fab0d8c105f8b89f, type: 3}
+  inventoryPrefab: {fileID: 701114529275448436, guid: b8e974e7315dc3b408e80437cd281dee, type: 3}
