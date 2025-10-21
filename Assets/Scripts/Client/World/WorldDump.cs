@@ -3,6 +3,7 @@ using SoulboundBackend.Client.World.Entity;
 using SoulboundBackend.Client.World.Structure;
 using System;
 using System.Collections.Generic;
+using Unity.Plastic.Newtonsoft.Json;
 
 #nullable enable
 
@@ -15,8 +16,14 @@ namespace SoulboundBackend.Client.World {
 		public Dictionary<Guid, SerializedEntity> serializedEntities;
 		public bool nonNulled;
 
-		public WorldDump(int seed, WorldChunk[] generatedChunks, SerializedEntity player, Dictionary<int, List<StructurePlacement>> structurePlacements,
-						 Dictionary<Guid, SerializedEntity> serializedEntities) {
+		[JsonConstructor]
+		public WorldDump(
+				int seed, 
+				WorldChunk[] generatedChunks,
+				SerializedEntity player, 
+				Dictionary<int, List<StructurePlacement>> structurePlacements,
+				Dictionary<Guid, SerializedEntity> serializedEntities
+			) {
 			this.seed = seed;
 			this.generatedChunks = generatedChunks;
 			this.structurePlacements = structurePlacements;

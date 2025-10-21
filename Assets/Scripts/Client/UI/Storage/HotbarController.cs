@@ -8,6 +8,7 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using Zenject;
 
 namespace SoulboundBackend.Client.UI.Storage {
 	[BootstrappableChildOf(typeof(InventoryController))]
@@ -43,11 +44,19 @@ namespace SoulboundBackend.Client.UI.Storage {
 
 #nullable enable
 
+		[Inject]
+		public void Construct(InventoryController inventory) {
+			this.inventory = inventory;
+			this.SetupGrid();
+		}
+
+		[Obsolete]
 		public void OnBootstrap(DependencyContainer dependencyContainer) {
 			inventory = dependencyContainer.Resolve<InventoryController>();
 			this.SetupGrid();
 		}
 
+		[Obsolete]
 		public void OnEarlyBootstrap(DependencyContainer dependencyContainer) {
 			dependencyContainer.Register<HotbarController>(this);
 		}

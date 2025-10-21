@@ -1,4 +1,5 @@
-﻿using SoulboundBackend.Client.World;
+﻿using NUnit.Framework;
+using SoulboundBackend.Client.World;
 using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core;
@@ -8,9 +9,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
+using Zenject;
 using CoroutineRunner = SoulboundBackend.Core.CoroutineRunner;
 using Scene = UnityEngine.SceneManagement.Scene;
 
@@ -26,6 +29,11 @@ public sealed class WorldManager {
 		this.savesRoot = savesRoot;
 		this.saveStrategy = saveStrategy;
 		this.dataRegion = dataRegion ?? (() => Application.persistentDataPath);
+	}
+
+	[Inject]
+	public void InjectLevel(LevelManager instance) {
+		activeLevelManager = instance;
 	}
 
 	public IEnumerable<string> QuerySaves() {
@@ -53,13 +61,17 @@ public sealed class WorldManager {
 		}
 		int seed = dump?.seed ?? UnityEngine.Random.Range(int.MinValue, int.MaxValue);
 
-		BootstrappableInstanceFactory instanceFactory = new();
-		void FinalizeLevelManager() {
-            if (activeLevelManager == null) {
-                throw new InvalidOperationException("LevelManager not instantiated.");
-            }
+		IEnumerator LevelSceneLoader() {
+			AsyncOperation async = SceneManager.LoadSceneAsync("WorldScene");
+			yield return new WaitUntil(() => async.isDone);
 
-            activeLevelManager.Init(this, world, instanceFactory, bootstrapTreeFunc);
+			var sceneContext = UnityEngine.Object.FindFirstObjectByType<SceneContext>();
+			yield return new WaitUntil(() => sceneContext != null && sceneContext.Container != null);
+
+			sceneContext.Container.Inject(this);
+			if (activeLevelManager == null) {
+				throw new InvalidOperationException("Level Manager is not injected");
+			}
 
 			LevelGridContext gridContext;
 			GameObject grid = GameObject.Find("Grid");
@@ -70,30 +82,33 @@ public sealed class WorldManager {
 				gridContext = new LevelGridContext(grid.GetComponent<Grid>(), tilemap);
 			}
 
-			activeLevelManager.BootstrapWorld(dump, seed, gridContext);
+			activeLevelManager.BootstrapWorld(world, dump, seed, gridContext);
 			if (initPlayerState) {
-				activeLevelManager.SpawnPlayer(dump?.player); 
+				activeLevelManager.SpawnPlayer(dump?.player);
 			}
-        }
-
-		if (levelScene == null) {
-			IEnumerator LevelSceneLoader() {
-				AsyncOperation asyncLoad = SceneManager.LoadSceneAsync("WorldScene");
-				yield return new WaitUntil(() => asyncLoad.isDone);
-
-				instanceFactory = BootstrapRecipe.ForInstanceCreation(out var activeLevelManager);
-				this.activeLevelManager = activeLevelManager;
-
-				FinalizeLevelManager();
-			}
-			CoroutineRunner.GetInstance().StartCoroutine(LevelSceneLoader());
-		} else {
-			SceneManager.SetActiveScene(levelScene.Value);
-			activeLevelManager = LevelManager.CreateInstance();
-			instanceFactory = BootstrapRecipe.ForPredefinedScene(activeLevelManager);
-			FinalizeLevelManager();
 		}
+		CoroutineRunner.GetInstance().StartCoroutine(LevelSceneLoader());
+
 		return dump;
+
+		//if (levelScene == null) {
+		//	IEnumerator LevelSceneLoader() {
+		//		AsyncOperation asyncLoad = SceneManager.LoadSceneAsync("WorldScene");
+		//		yield return new WaitUntil(() => asyncLoad.isDone);
+
+		//		instanceFactory = BootstrapRecipe.ForInstanceCreation(out var activeLevelManager);
+		//		this.activeLevelManager = activeLevelManager;
+
+		//		FinalizeLevelManager();
+		//	}
+		//	CoroutineRunner.GetInstance().StartCoroutine(LevelSceneLoader());
+		//} else {
+		//	SceneManager.SetActiveScene(levelScene.Value);
+		//	activeLevelManager = LevelManager.CreateInstance();
+		//	instanceFactory = BootstrapRecipe.ForPredefinedScene(activeLevelManager);
+		//	FinalizeLevelManager();
+		//}
+		//return dump;
 	}
 
 	public void SaveWorld(string world, WorldDump dump) {

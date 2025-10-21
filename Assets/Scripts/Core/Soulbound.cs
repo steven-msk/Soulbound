@@ -13,9 +13,9 @@ namespace SoulboundBackend.Core {
     public sealed class Soulbound {
         public static Soulbound instance { get; private set; } = null!;
         private readonly GameConfig config;
-        private readonly WorldManager worldManager;
+        public readonly WorldManager worldManager;
 
-        public Soulbound(GameConfig config) {
+		public Soulbound(GameConfig config) {
             instance = this;
             this.config = config;
             this.worldManager = new WorldManager(config.file.savesFolder, new WorldSaveStrategy());

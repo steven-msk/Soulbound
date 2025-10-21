@@ -18,6 +18,7 @@ using Unity.Plastic.Newtonsoft.Json;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using Zenject;
 using Logger = SoulboundBackend.Common.Logging.Logger;
 
 namespace SoulboundBackend.Core {
@@ -47,13 +48,20 @@ namespace SoulboundBackend.Core {
 		public static readonly JsonSerializerSettings globalJsonSettings = new() {
 			TypeNameHandling = TypeNameHandling.Auto,
 			TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
-			Converters = new List<JsonConverter> { 
+			Converters = new List<JsonConverter> {
 				new Vector2JsonConverter(),
 				new Vector3JsonConverter(),
 				new ColorJsonConverter()
 			},
 		};
 
+		[Inject]
+		public void Construct(WorldManager worldManager, PlayerController player) {
+			this.worldManager = worldManager;
+			this.player = player;
+		}
+
+		[Obsolete]
 		public void Init(
 				WorldManager worldManager,
 				string world, 
@@ -73,7 +81,8 @@ namespace SoulboundBackend.Core {
 			this.player = dependencyContainer.Resolve<PlayerController>();
 		}
 
-		public void BootstrapWorld(WorldDump? dump, int seed, LevelGridContext gridContext) {
+		public void BootstrapWorld(string world, WorldDump? dump, int seed, LevelGridContext gridContext) {
+			this.world = world;
 			UnityEngine.Random.InitState(seed);
 			this.level = new Level(player, gridContext, seed);
 			this.level.BootstrapWorld(dump);
@@ -86,10 +95,12 @@ namespace SoulboundBackend.Core {
 			}
 		}
 
+		[Obsolete]
 		void IBootstrappable.OnBootstrap(DependencyContainer dependencyContainer) {
             StartCoroutine(GameTickLoop());
         }
 
+		[Obsolete]
 		public void OnEarlyBootstrap(DependencyContainer dependencyContainer) {
 			dependencyContainer.Register<LevelManager>(this);
 		}
