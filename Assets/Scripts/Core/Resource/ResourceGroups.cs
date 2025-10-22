@@ -52,5 +52,12 @@ namespace SoulboundBackend.Core.Resource {
 			public string address => "fonts/";
 			public string scriptableObjectName => "fontsGroup";
         }
+
+		public sealed class ZenjectContexts : IResourceGroupDefinition<GameObject> {
+			public static readonly ZenjectContexts instance = new();
+			public static void Register() => ResourceManager.RegisterGroupDefinition<ZenjectContexts, GameObject>(instance);
+			public string address => "zenjectContexts/";
+			public string scriptableObjectName => "zenjectContextsGroup";
+		}
 	}
 }

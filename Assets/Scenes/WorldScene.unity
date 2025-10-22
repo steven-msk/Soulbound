@@ -241,7 +241,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92566ccabadc01245be7ccbd19a679fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerPrefab: {fileID: 8095950580177048670, guid: e116241861752154f8e50619c5299109, type: 3}
   levelManagerPrefab: {fileID: 4020491691331682824, guid: bc877545e8f940848bf14c741b0fe691, type: 3}
 --- !u!1001 &486148868
 PrefabInstance:

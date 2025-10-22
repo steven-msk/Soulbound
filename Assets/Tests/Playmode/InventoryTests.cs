@@ -20,6 +20,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
+using Zenject;
 
 namespace InventoryTests {
 	[TestFixture]
@@ -27,6 +28,7 @@ namespace InventoryTests {
 		[SetUp]
 		public void PrepareEnvironment() {
 			StaticResetManager.ResetAll();
+			PlayModeTesting.CreateNewSceneAndSetActive();
 		}
 
 		internal InventoryController CreateTestEnvironment(out Scene scene) {
@@ -66,7 +68,9 @@ namespace InventoryTests {
 	public class Initialization : InventoryTest {
 		[Test]
 		public void Inventory_InitializesWithEmptySlots_OnNewSceneLoad() {
-			var inventory = CreateTestEnvironment(out var scene);
+			var sceneContext = new GameObject().AddComponent<SceneContext>();
+			sceneContext.Container.Install<PlayerInstallerWrapper>(new[] { true as object });
+			var inventory = sceneContext.Container.Resolve<InventoryController>();
 
 			var f = inventory.GetFirstEmptySlot();
 			Assert.IsTrue(inventory.GetFirstEmptySlot().ItemStack == null, $"{f.name} is not empty");
@@ -74,7 +78,9 @@ namespace InventoryTests {
 
 		[Test]
 		public void CreateItemDisplay_AssignsToFirstEmptySlot_WhenSlotExists() {
-			var inventory = CreateTestEnvironment(out var scene);
+			var sceneContext = new GameObject().AddComponent<SceneContext>();
+			sceneContext.Container.Install<PlayerInstallerWrapper>(new[] { true as object });
+			var inventory = sceneContext.Container.Resolve<InventoryController>();
 
 			var slot = inventory.GetFirstEmptySlot() as IItemSlot;
 			Assert.IsNotNull(slot, "No empty slot available");
