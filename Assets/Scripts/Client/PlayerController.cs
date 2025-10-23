@@ -23,11 +23,7 @@ using Level = SoulboundBackend.Client.World.Level;
 using Logger = SoulboundBackend.Common.Logging.Logger;
 
 namespace SoulboundBackend.Client {
-	[BootstrappableParentOf(typeof(InputHandler))]
-	[BootstrappableParentOf(typeof(InventoryController))]
-	[BootstrappableParentOf(typeof(PlayerPhysics))]
-	[BootstrappableParentOf(typeof(ItemUsageHandler))]
-	public class PlayerController : LivingEntity, IBootstrappable {
+	public class PlayerController : LivingEntity {
 		private static readonly Logger logger = Logger.CreateInstance();
 		public override Type entityScriptType => typeof(PlayerController);
 		public override string prefabDefinitionID => "johnny";
@@ -81,22 +77,6 @@ namespace SoulboundBackend.Client {
 			this.inventory = container.Resolve<InventoryController>();
 			RegisterItemUsageCandidates(container.Resolve<ItemUsageHandler>());
 			UnityEngine.Debug.Log("player loaded: " + this.GetHashCode());
-		}
-
-		[Obsolete]
-		public void OnBootstrap(DependencyContainer dependencyContainer) {
-			//inputHandler = dependencyContainer.Resolve<InputHandler>();
-			//inventory = dependencyContainer.Resolve<InventoryController>();
-			//playerPhysics = dependencyContainer.Resolve<PlayerPhysics>();
-			//if (playerPhysics != null) {
-			//	this.GetComponent<StepClimber>().Init(this);
-			//}
-			//RegisterItemUsageCandidates(dependencyContainer.Resolve<ItemUsageHandler>());
-		}
-
-		[Obsolete]
-		public void OnEarlyBootstrap(DependencyContainer dependencyContainer) {
-			dependencyContainer.Register<PlayerController>(this);
 		}
 
 		private void RegisterItemUsageCandidates(ItemUsageHandler? itemUsageHandler) {

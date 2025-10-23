@@ -20,9 +20,7 @@ using Logger = SoulboundBackend.Common.Logging.Logger;
 #nullable enable
 
 namespace SoulboundBackend.Client.UI.Storage {
-	[BootstrappableChildOf(typeof(PlayerController))]
-	[BootstrappableParentOf(typeof(HotbarController))]
-    public class InventoryController : MonoBehaviour, IItemContainer2D, IBootstrappable, ISerializable<SerializedInventory, List<IItemSlot>> {
+    public class InventoryController : MonoBehaviour, IItemContainer2D, ISerializable<SerializedInventory, List<IItemSlot>> {
 		public delegate void InterpretationFunction(IItemSlot slot, RefBox<ItemDisplay> grabbedItem);
 		public delegate InterpretationFunction? InterpretationProvider(DragHandler handler, IItemSlot draggedSlot, RefBox<ItemDisplay> grabbedItem);
 
@@ -76,26 +74,6 @@ namespace SoulboundBackend.Client.UI.Storage {
 			MainPlayerSlots = mainPlayerSlots.ToArray();
 			hotbar.SetActiveSlot(0);
 			UnityEngine.Debug.Log("inventory constructed: "+ this.GetHashCode());
-		}
-
-		[Obsolete]
-		public void OnBootstrap(DependencyContainer dependencyContainer) {
-			this.eventHandler = new InventoryEventHandler();
-			player = dependencyContainer.Resolve<PlayerController>();
-			hotbar.OnBootstrap(dependencyContainer);
-			popup.SetActive(false);
-			armorSlots.SetActive(false);
-			this.SetupGrid();
-
-			List<InventorySlot> mainPlayerSlots = hotbar.Slots.ToList();
-			mainPlayerSlots.AddRange(popupSlots);
-			MainPlayerSlots = mainPlayerSlots.ToArray();
-			hotbar.SetActiveSlot(0);
-        }
-
-		[Obsolete]
-		public void OnEarlyBootstrap(DependencyContainer dependencyContainer) {
-			dependencyContainer.Register<InventoryController>(this);
 		}
 
 		public void SetupGrid() {

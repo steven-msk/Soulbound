@@ -21,21 +21,22 @@ using UnityEngine.Tilemaps;
 using Zenject;
 using Logger = SoulboundBackend.Common.Logging.Logger;
 
+#nullable enable
+
 namespace SoulboundBackend.Core {
-	[BootstrappableParentOf(typeof(PlayerController))]
-	public class LevelManager : MonoBehaviour, IBootstrappable {
+	public class LevelManager : MonoBehaviour {
 		private static readonly Logger logger = Logger.CreateInstance();
 		public const float tickRate = 0.02f;        // 50 tps
 		private float tickStartTime;
 		public bool isWorldLoaded { get; private set; } = false;
 		public bool IsPaused { get; private set; }
 
-		private WorldManager worldManager;
-		private string world;
-		private Level level;
+		private WorldManager worldManager = null!;
+		private string world = null!;
+		private Level level = null!;
 		public Level Level => level;
 
-		private PlayerController player;
+		private PlayerController player = null!;
 		public PlayerController Player => player;
 
 		public UIManager UIManager => GameObject.Find("Canvas").GetComponent<UIManager>();
@@ -62,26 +63,6 @@ namespace SoulboundBackend.Core {
 			player.GetComponent<GameObjectContext>().Run();
 		}
 
-		[Obsolete]
-		public void Init(
-				WorldManager worldManager,
-				string world, 
-				BootstrappableInstanceFactory instanceFactory,
-				Func<BootstrapTreeBuilder, IEnumerable<IBootstrappable>> treeFunc
-			) {
-			this.worldManager = worldManager;
-			this.world = world;
-
-			Bootstrapper bootstrapper = new();
-			BootstrapTreeBuilder treeBuilder = new(null, instanceFactory);
-			var tree = treeFunc.Invoke(treeBuilder).ToList();
-			
-			DependencyContainer dependencyContainer = bootstrapper.EarlyBootstrap(tree);
-			bootstrapper.Bootstrap(tree, dependencyContainer);
-
-			this.player = dependencyContainer.Resolve<PlayerController>();
-		}
-
 		public void BootstrapWorld(string world, WorldDump? dump, int seed, LevelGridContext gridContext) {
 			this.world = world;
 			UnityEngine.Random.InitState(seed);
@@ -95,17 +76,6 @@ namespace SoulboundBackend.Core {
 				this.level.SpawnPlayer(serialized);
 			}
 		}
-
-		[Obsolete]
-		void IBootstrappable.OnBootstrap(DependencyContainer dependencyContainer) {
-            StartCoroutine(GameTickLoop());
-        }
-
-		[Obsolete]
-		public void OnEarlyBootstrap(DependencyContainer dependencyContainer) {
-			dependencyContainer.Register<LevelManager>(this);
-		}
-
 		private void Update() {
 			if (isWorldLoaded) {
 				this.level.Update(Time.deltaTime);

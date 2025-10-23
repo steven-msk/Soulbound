@@ -2,14 +2,12 @@
 using SoulboundBackend.Client.World;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core;
-using SoulboundBackend.Core.Bootstrap;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace SoulboundBackend.Client.ItemSystem {
-	[BootstrappableChildOf(typeof(PlayerController))]
-    public sealed class ItemUsageHandler : IBootstrappable {
+    public sealed class ItemUsageHandler {
 		private readonly Dictionary<(Type itemCapability, ItemUseTrigger useTrigger), Action<ItemStack>> handlers = new();
 		private readonly List<ItemUseTrigger> disabledTriggers = new();
 		private readonly PlayerController player;
@@ -48,13 +46,6 @@ namespace SoulboundBackend.Client.ItemSystem {
 		}
 
 		public bool IsDisabled(ItemUseTrigger trigger) => disabledTriggers.Contains((trigger));
-
-        public void OnBootstrap(DependencyContainer dependencyContainer) {
-        }
-
-        public void OnEarlyBootstrap(DependencyContainer dependencyContainer) {
-			dependencyContainer.Register<ItemUsageHandler>(this);
-        }
     }
 }
 

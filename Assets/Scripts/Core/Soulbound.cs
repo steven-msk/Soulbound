@@ -37,10 +37,6 @@ namespace SoulboundBackend.Core {
 			);
 		}
 
-		public IEnumerable<IBootstrappable> GetDefaultBootstrapTree(BootstrapTreeBuilder treeBuilder) {
-			return treeBuilder.BuildTree<BootstrappableParentOfAttribute>(typeof(LevelManager));
-		}
-
 		public Level? GetActiveLevel() {
 			return GetActiveLevelManager()?.Level;
 		}

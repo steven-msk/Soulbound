@@ -11,17 +11,18 @@ using SoulboundBackend.Core.Bootstrap;
 using Zenject;
 using System.Runtime.Serialization;
 
+#nullable enable
+
 namespace SoulboundBackend.Client {
-	[BootstrappableChildOf(typeof(PlayerController))]
-	public class PlayerPhysics : MonoBehaviour, IBootstrappable {
+	public class PlayerPhysics : MonoBehaviour {
 		private static readonly Logger logger = Logger.CreateInstance();
 		private readonly Dictionary<string, (Action<Collision2D> action, Func<bool> validator)> collisionReactionsByTag = new();
 		private readonly Dictionary<int, (Action<Collider2D> action, Func<bool> validator)> triggerReactionsByLayer = new();
-		private PlayerController player;
-		private InputHandler inputHandler;
-		private Rigidbody2D rb;
-		private Animator animator;
-		new private CapsuleCollider2D collider;
+		private PlayerController player = null!;
+		private InputHandler inputHandler = null!;
+		private Rigidbody2D rb = null!;
+		private Animator animator = null!;
+		new private CapsuleCollider2D collider = null!;
 		public CapsuleCollider2D Collider => collider;
 
 		public float movementSpeedPower = 30f;
@@ -64,8 +65,6 @@ namespace SoulboundBackend.Client {
 			}
 		}
 
-#nullable enable
-
 		[Inject]
 		public void Construct(PlayerController player, InputHandler inputHandler) {
 			this.player = player;
@@ -99,20 +98,6 @@ namespace SoulboundBackend.Client {
 			}, () => !player.isImmune));
 			isBootstrapped = true;
 			UnityEngine.Debug.Log("player physics constructed");
-		}
-
-		[Obsolete]
-		public void OnBootstrap(DependencyContainer dependencyContainer) {
-			//player = dependencyContainer.Resolve<PlayerController>();
-			//inputHandler = dependencyContainer.Resolve<InputHandler>();
-			//rb = player.Rigidbody;
-			//animator = player.Animator;
-			//collider = this.GetComponent<CapsuleCollider2D>();
-		}
-
-		[Obsolete]
-		public void OnEarlyBootstrap(DependencyContainer dependencyContainer) {
-			dependencyContainer.Register<PlayerPhysics>(this);
 		}
 
 		// FIXME: inconsistent movement

@@ -10,8 +10,7 @@ using Zenject;
 using static PlayerInputActions;
 
 namespace SoulboundBackend.Client.Input {
-	[BootstrappableChildOf(typeof(PlayerController))]
-	public class InputHandler : MonoBehaviour, IBootstrappable {
+	public class InputHandler : MonoBehaviour {
 		public PlayerInputActions inputActions { get; private set; }
 		private PlayerController player;
 		public bool isBootstrapped { get; private set; }
@@ -103,16 +102,6 @@ namespace SoulboundBackend.Client.Input {
 
 			inputActions.Enable();
 			isBootstrapped = true;
-		}
-
-		[Obsolete]
-		public void OnBootstrap(DependencyContainer dependencyContainer) {
-			//player = dependencyContainer.Resolve<PlayerController>();
-        }
-
-		[Obsolete]
-        public void OnEarlyBootstrap(DependencyContainer dependencyContainer) {
-			dependencyContainer.Register<InputHandler>(this);
 		}
 
 		private static void RegisterInputEvent(InputAction inputAction, bool pausable, Action<InputAction> callbackBinding) {

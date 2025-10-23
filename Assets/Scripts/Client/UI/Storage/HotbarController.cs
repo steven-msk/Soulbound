@@ -10,9 +10,10 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using Zenject;
 
+#nullable enable
+
 namespace SoulboundBackend.Client.UI.Storage {
-	[BootstrappableChildOf(typeof(InventoryController))]
-	public class HotbarController : MonoBehaviour, IItemContainer, IBootstrappable {
+	public class HotbarController : MonoBehaviour, IItemContainer {
 		[Header("Active Slots")]
 		public Color activeSlotColor;
 		public Color activeSlotNumberColor;
@@ -32,35 +33,21 @@ namespace SoulboundBackend.Client.UI.Storage {
 		public InventorySlot ActiveSlot => active.hotbarSlot;
 		public int ActiveKey => active.key;
 
-		private InventoryController inventory;
+		private InventoryController inventory = null!;
 		public static int length => 9;
 
-		private InventorySlot[] slots;
+		private InventorySlot[] slots = null!;
 		public InventorySlot[] Slots => slots;
 		IReadOnlyList<IItemSlot> IItemContainer.slots => slots;
 
 		public InventorySlot this[int index] => slots[index];
 		private static Dictionary<int, InventorySlot> slotsByIndex = new();
 
-#nullable enable
-
 		[Inject]
 		public void Construct(InventoryController inventory) {
 			this.inventory = inventory;
 			this.SetupGrid();
 		}
-
-		[Obsolete]
-		public void OnBootstrap(DependencyContainer dependencyContainer) {
-			inventory = dependencyContainer.Resolve<InventoryController>();
-			this.SetupGrid();
-		}
-
-		[Obsolete]
-		public void OnEarlyBootstrap(DependencyContainer dependencyContainer) {
-			dependencyContainer.Register<HotbarController>(this);
-		}
-
 		public void SetupGrid() {
 			slots = gameObject.GetComponentsInChildren<InventorySlot>();
 			for (int i = 0; i < length; i++) {

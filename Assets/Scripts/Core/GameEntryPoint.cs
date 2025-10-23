@@ -26,10 +26,6 @@ public sealed class GameEntryPoint : MonoBehaviour {
 
     private void Awake() => instance = this;
 
-    public static Func<BootstrapTreeBuilder, IEnumerable<IBootstrappable>> defaultBootstrapTree = treeBuilder => {
-		return treeBuilder.BuildTree<BootstrappableParentOfAttribute>(typeof(LevelManager));
-	};
-
 	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
 	public static void StartWorld() {
 #if UNITY_INCLUDE_TESTS
