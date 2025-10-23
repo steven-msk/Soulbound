@@ -31,6 +31,11 @@ Expect:
 - Custom input/event context management system
 - Modular components for UI, entity control, and world interaction
 
+---
+
+## External libraries used (not maintained by Unity)
+- Zenject 9.2.0
+
 ## Notes
 
 - Branching strategy may be used later - currently all changes live in `prototype` branch until probject stabilization.
