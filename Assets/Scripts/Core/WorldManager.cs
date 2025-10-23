@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
@@ -51,7 +52,7 @@ public sealed class WorldManager {
 			string world, 
 			bool initPlayerState,
 			Func<SceneContext> sceneContextSupplier,
-			Func<Scene> sceneSupplier
+			Action sceneLoader
 		) {
 		string dumpPath = GetDumpPath(world, createIfAbsent: false);
 
@@ -62,11 +63,11 @@ public sealed class WorldManager {
 		int seed = dump?.seed ?? UnityEngine.Random.Range(int.MinValue, int.MaxValue);
 
 		IEnumerator LevelSceneLoader() {
-			var scene = sceneSupplier.Invoke();
-			SceneManager.SetActiveScene(scene);
+			sceneLoader.Invoke();
+			yield return null;
 
 			var sceneContext = sceneContextSupplier.Invoke();
-			yield return new WaitUntil(() => sceneContext != null && sceneContext.Container != null);
+			yield return new WaitUntil(() => sceneContext.HasInstalled && sceneContext.HasResolved);
 
 			sceneContext.Container.Inject(this);
 			if (activeLevelManager == null) {

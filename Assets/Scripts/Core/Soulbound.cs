@@ -33,7 +33,7 @@ namespace SoulboundBackend.Core {
 				: $"altw_{Guid.NewGuid()}";
 			worldManager.LoadWorld(world, true,
 				() => UnityEngine.Object.FindFirstObjectByType<SceneContext>(),
-				() => SceneManager.GetSceneByName("WorldScene")
+				() => SceneManager.LoadScene("WorldScene")
 			);
 		}
 

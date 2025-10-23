@@ -60,7 +60,7 @@ namespace WorldTests {
 					sceneContext.Run();
 					return sceneContext;
 				},
-				PlayModeTesting.CreateNewTestScene
+				() => PlayModeTesting.CreateNewSceneAndSetActive()
 			);
 			yield return new WaitUntil(
 				() => worldBox.value.activeLevelManager?.Level.isWorldLoaded ?? false
@@ -105,7 +105,7 @@ namespace WorldTests {
 					sceneContext.Run();
 					return sceneContext;
 				},
-				() => scene
+				() => SceneManager.SetActiveScene(scene)
 			);
 			yield return new WaitUntil(
 				() => worldBox.value.activeLevelManager?.Level.isWorldLoaded ?? false
