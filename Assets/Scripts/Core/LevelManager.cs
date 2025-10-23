@@ -124,6 +124,7 @@ namespace SoulboundBackend.Core {
 			if (isWorldLoaded) {
 				worldManager.SaveWorld(world, level.CreateDump());
 			}
+			Soulbound.instance?.OnApplicationQuit();
 		} 
 
 		public static LevelManager CreateInstance() {

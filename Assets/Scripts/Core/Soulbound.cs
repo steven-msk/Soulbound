@@ -1,4 +1,5 @@
-﻿using SoulboundBackend.Client.World;
+﻿using SoulboundBackend.Client.Settings;
+using SoulboundBackend.Client.World;
 using SoulboundBackend.Client.World.Structure.Templates;
 using SoulboundBackend.Core.Bootstrap;
 using System;
@@ -16,10 +17,12 @@ namespace SoulboundBackend.Core {
 		public static Soulbound instance { get; private set; } = null!;
 		private readonly GameConfig config;
 		public readonly WorldManager worldManager;
+		public readonly Settings settings;
 
 		public Soulbound(GameConfig config) {
 			instance = this;
 			this.config = config;
+			this.settings = new Settings();
 			ISaveStrategy<WorldDump> saveStrategy = config.dev.loadDevWorldFromSave
 				? new WorldSaveStrategy()
 				: new DoNotSaveWorldStrategy();
@@ -35,6 +38,10 @@ namespace SoulboundBackend.Core {
 				() => UnityEngine.Object.FindFirstObjectByType<SceneContext>(),
 				() => SceneManager.LoadScene("WorldScene")
 			);
+		}
+
+		public void OnApplicationQuit() {
+			settings.Save();
 		}
 
 		public Level? GetActiveLevel() {
