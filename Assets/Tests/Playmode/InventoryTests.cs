@@ -20,29 +20,19 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
+using Zenject;
 
 namespace InventoryTests {
 	[TestFixture]
 	public abstract class InventoryTest {
-		[SetUp]
-		public void PrepareEnvironment() {
-			StaticResetManager.ResetAll();
-		}
-
 		internal InventoryController CreateTestEnvironment(out Scene scene) {
-			scene = SceneManager.CreateScene(Guid.NewGuid().ToString());
-			SceneManager.SetActiveScene(scene);
+			scene = PlayModeTesting.CreateNewSceneAndSetActive();
+			var prefab = ResourceManager.GetRuntimePrefab("sceneContext");
+			var sceneContext = GameObject.Instantiate(prefab).GetComponent<SceneContext>();
 
-			GameObject levelManagerPrefab = ResourceManager.Get<GameObject, ResourceGroups.Runtime.Prefabs>("levelManager");
-			var levelManager = GameObject.Instantiate(levelManagerPrefab).GetComponent<LevelManager>();
-
-			levelManager.Init(null, null,
-				BootstrapRecipe.ForPredefinedScene(levelManager),
-				treeBuilder => treeBuilder.BuildTree<BootstrappableChildOfAttribute>(typeof(InventoryController))
-			);
-
-			return levelManager.Player.Inventory
-				?? throw new ArgumentException("Test environment not initialized properly");
+			sceneContext.AddNormalInstaller(new PlayerInstallerWrapper(true));
+			sceneContext.Install();
+			return sceneContext.Container.Resolve<InventoryController>();
 		}
 
 		internal Item CreateTestItem(int maxStack = 64) {
@@ -107,7 +97,6 @@ namespace InventoryTests {
 
 		[UnityTest]
 		public IEnumerator Serialize_And_Deserialize_PreservesItemStacks() {
-			LogAssert.ignoreFailingMessages = true;
 			Item item = CreateTestItem();
 			var inventory = CreateTestEnvironment(out var scene);
 			var slot = inventory.GetFirstEmptySlot() as IItemSlot;

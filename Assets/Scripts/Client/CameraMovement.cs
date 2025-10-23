@@ -1,5 +1,4 @@
 using SoulboundBackend.Core;
-using SoulboundBackend.Core.Bootstrap;
 using UnityEngine;
 
 namespace SoulboundBackend.Client {

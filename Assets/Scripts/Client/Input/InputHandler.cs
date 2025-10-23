@@ -6,11 +6,11 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Zenject;
 using static PlayerInputActions;
 
 namespace SoulboundBackend.Client.Input {
-	[BootstrappableChildOf(typeof(PlayerController))]
-	public class InputHandler : MonoBehaviour, IBootstrappable {
+	public class InputHandler : MonoBehaviour {
 		public PlayerInputActions inputActions { get; private set; }
 		private PlayerController player;
 		public bool isBootstrapped { get; private set; }
@@ -39,14 +39,15 @@ namespace SoulboundBackend.Client.Input {
 		private static Dictionary<string, Func<bool>> blockedContexts = new();
 		private static List<InputAction> pausableInputs = new();
 
-		public void OnBootstrap(DependencyContainer dependencyContainer) {
-			player = dependencyContainer.Resolve<PlayerController>();
+		[Inject]
+		public void Construct(PlayerController player) {
+			this.player = player;
+			inputActions = new PlayerInputActions();
+			PlayerActions playerActions = inputActions.Player;
+
 			requests.Clear();
 			blockedContexts.Clear();
 			pausableInputs.Clear();
-
-			inputActions = new PlayerInputActions();
-			PlayerActions playerActions = inputActions.Player;
 
 			RegisterInputEvent(playerActions.MousePosition, pausable: false, (action) => {
 				action.performed += actionContext => MouseScreenPosition = actionContext.ReadValue<Vector2>();
@@ -100,11 +101,7 @@ namespace SoulboundBackend.Client.Input {
 			});
 
 			inputActions.Enable();
-            isBootstrapped = true;
-        }
-
-        public void OnEarlyBootstrap(DependencyContainer dependencyContainer) {
-			dependencyContainer.Register<InputHandler>(this);
+			isBootstrapped = true;
 		}
 
 		private static void RegisterInputEvent(InputAction inputAction, bool pausable, Action<InputAction> callbackBinding) {

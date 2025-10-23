@@ -119,5 +119,9 @@ namespace SoulboundBackend.Core.Resource {
             addressesByGroupType.Clear();
             definitionsRegistered = false;
         }
+
+        public static GameObject? GetRuntimePrefab(string name) {
+            return Get<GameObject, ResourceGroups.Runtime.Prefabs>(name);
+        }
     }
 }

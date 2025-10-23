@@ -8,18 +8,21 @@ using UnityEngine;
 using SoulboundBackend.Common;
 using UnityEngine.UI;
 using SoulboundBackend.Core.Bootstrap;
+using Zenject;
+using System.Runtime.Serialization;
+
+#nullable enable
 
 namespace SoulboundBackend.Client {
-	[BootstrappableChildOf(typeof(PlayerController))]
-	public class PlayerPhysics : MonoBehaviour, IBootstrappable {
+	public class PlayerPhysics : MonoBehaviour {
 		private static readonly Logger logger = Logger.CreateInstance();
 		private readonly Dictionary<string, (Action<Collision2D> action, Func<bool> validator)> collisionReactionsByTag = new();
 		private readonly Dictionary<int, (Action<Collider2D> action, Func<bool> validator)> triggerReactionsByLayer = new();
-		private PlayerController player;
-		private InputHandler inputHandler;
-		private Rigidbody2D rb;
-		private Animator animator;
-		new private CapsuleCollider2D collider;
+		private PlayerController player = null!;
+		private InputHandler inputHandler = null!;
+		private Rigidbody2D rb = null!;
+		private Animator animator = null!;
+		new private CapsuleCollider2D collider = null!;
 		public CapsuleCollider2D Collider => collider;
 
 		public float movementSpeedPower = 30f;
@@ -62,14 +65,14 @@ namespace SoulboundBackend.Client {
 			}
 		}
 
-#nullable enable
+		[Inject]
+		public void Construct(PlayerController player, InputHandler inputHandler) {
+			this.player = player;
+			this.inputHandler = inputHandler;
+			this.rb = player.GetComponent<Rigidbody2D>();
+			this.animator = player.GetComponent<Animator>();
+			this.collider = player.GetComponent<CapsuleCollider2D>();
 
-		public void OnBootstrap(DependencyContainer dependencyContainer) {
-			player = dependencyContainer.Resolve<PlayerController>();
-			inputHandler = dependencyContainer.Resolve<InputHandler>();
-			rb = player.Rigidbody;
-			animator = player.Animator;
-			collider = this.GetComponent<CapsuleCollider2D>();
 
 			//collisionReactionsByTag.Add("Enemy", ((collision) => {
 			//	Vector2 bounce = (transform.position - (Vector3)collision.GetContact(0).point).normalized;
@@ -94,19 +97,13 @@ namespace SoulboundBackend.Client {
 				knockbackStunTimer = knockbackStunDuration * Mathf.Clamp(Mathf.Abs(bounce.y), 0.1f, 1f);
 			}, () => !player.isImmune));
 			isBootstrapped = true;
-		}
-
-		public void OnEarlyBootstrap(DependencyContainer dependencyContainer) {
-			dependencyContainer.Register<PlayerPhysics>(this);
+			UnityEngine.Debug.Log("player physics constructed");
 		}
 
 		// FIXME: inconsistent movement
 
 		private void Update() {
-			if (!isBootstrapped) {
-				return;
-			}
-			if (Soulbound.instance.GetActiveLevelManager()!.IsPaused) {
+			if (!player?.isSpawned ?? true) {
 				return;
 			}
 			movement.x = inputHandler.HorizontalMovement;
@@ -119,7 +116,7 @@ namespace SoulboundBackend.Client {
 		}
 
 		private void FixedUpdate() {
-			if (!isBootstrapped) {
+			if (!player?.isSpawned ?? true) {
 				return;
 			}
 			if (knockbackStunTimer > 0) {
@@ -189,6 +186,9 @@ namespace SoulboundBackend.Client {
 		}
 
 		private void OnCollisionStay2D(Collision2D collision) {
+			if (!player?.isSpawned ?? true) {
+				return;
+			}
 			var collisionResponse = collisionReactionsByTag.GetValueOrDefault(collision.gameObject.tag, (collision => {
 				logger.LogWarning(null, "Unknown collision callback tag: {}", collision.gameObject.tag);
 			}, null));
@@ -196,6 +196,9 @@ namespace SoulboundBackend.Client {
 		}
 
 		private void OnTriggerStay2D(Collider2D collision) {
+			if (!player?.isSpawned ?? true) {
+				return;
+			}
 			var triggerResponse = triggerReactionsByLayer.GetValueOrDefault(collision.gameObject.layer, (collision => {
 				logger.LogWarning(null, "Unknown trigger callback layer: {}", LayerMask.LayerToName(collision.gameObject.layer));
 			}, null));

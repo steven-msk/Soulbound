@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using SoulboundBackend.Client.World;
 using SoulboundBackend.Client.World.Chunk;
+using SoulboundBackend.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -90,4 +91,26 @@ public class ChunkBlockPosTests {
         Assert.AreEqual(staticValue, instanceValue);
         Assert.AreEqual(pos.y - WorldChunk.maxY, instanceValue);
     }
+
+	[Test]
+	public void FromWorld_DelegatesToBlockPos() {
+		Level level = new Level(null, LevelGridContext.FromRuntimePrefabs(), 0);
+
+		var worldPos = new Vector2(18.5f, 6.2f);
+		var chunkPos = ChunkBlockPos.FromWorld(worldPos, level);
+
+		Assert.AreEqual(Mathf.FloorToInt(worldPos.y), chunkPos.y);
+	}
+
+	[Test]
+	public void UnderlyingChunk_ReturnsExpectedChunk() {
+		Level level = new Level(null, LevelGridContext.FromRuntimePrefabs(), 0);
+        level.BootstrapWorld(null);
+
+        var pos = new ChunkBlockPos(2, 3, 1);
+		var chunk = pos.UnderlyingChunk(level);
+
+		Assert.IsNotNull(chunk);
+		Assert.AreEqual(1, chunk.xpos);
+	}
 }

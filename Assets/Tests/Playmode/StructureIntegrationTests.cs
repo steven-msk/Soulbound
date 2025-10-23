@@ -7,12 +7,14 @@ using SoulboundBackend.Common;
 using SoulboundBackend.Core;
 using SoulboundBackend.Tests;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.TestTools;
 using WorldTests;
 
 #nullable enable
@@ -55,22 +57,18 @@ public class StructureIntegrationTests {
 		return stateOverrides;
 	}
 
-	[OneTimeSetUp]
-	public void OneTimeSetup() {
-		StaticResetManager.ResetAll();
-	}
-
 	[SetUp, TearDown]
 	public void StructureCleanup() {
 		Level.ClearStructureRegistry();
 	}
 
-	[Test]
-	public void StructureAt_ReturnsTrue_WhenStructureIsPlacedAndPersistent() {
+	[UnityTest]
+	public IEnumerator StructureAt_ReturnsTrue_WhenStructureIsPlacedAndPersistent() {
 		var template = CreateBoxTemplate(5, 5, "testStructure", Blocks.stone.defaultState, null);
+		var worldBox = new ContextBox<WorldManager>();
 
-		World.CreateAnonymousContext(null, out var worldManager);
-		Level level = World.TryGetLevel(worldManager);
+		yield return World.CreateAnonymousContext(null, worldBox);
+		Level level = World.TryGetLevel(worldBox);
 
 		ChunkBlockPos pos = new(0, 0, 0);
 
@@ -81,13 +79,14 @@ public class StructureIntegrationTests {
 		Assert.That(level.StructureAt(targetPos, out var placement));
 	}
 
-	[Test]
-	public void OverlappingStructures_ReturnsTwo_WhenStructuresPlacedOverlapping() {
+	[UnityTest]
+	public IEnumerator OverlappingStructures_ReturnsTwo_WhenStructuresPlacedOverlapping() {
 		var template1 = CreateBoxTemplate(5, 5, "box1", Blocks.stone.defaultState, null);
 		var template2 = CreateBoxTemplate(5, 5, "box2", Blocks.stone.defaultState, null);
+		var worldBox = new ContextBox<WorldManager>();
 
-		World.CreateAnonymousContext(null, out var worldManager);
-		Level level = World.TryGetLevel(worldManager);
+		yield return World.CreateAnonymousContext(null, worldBox);
+		Level level = World.TryGetLevel(worldBox);
 
 		ChunkBlockPos structurePos1 = new(0, 0, 0);
 		ChunkBlockPos structurePos2 = new(1, 1, 0);
@@ -107,18 +106,19 @@ public class StructureIntegrationTests {
 			() => "Overlapping equality failed");
 	}
 
-	[Test]
-	public void PlacedStructure_OverridesBlockStates() {
+	[UnityTest]
+	public IEnumerator PlacedStructure_OverridesBlockStates() {
 		var template = CreateBoxTemplate(10, 10, "box", Blocks.wood.defaultState, null);
 		var pos = new ChunkBlockPos(1, -10, 0);
+		var worldBox = new ContextBox<WorldManager>();
 
-        World.CreateAnonymousContext(null, out var worldManager);
-        Level level = World.TryGetLevel(worldManager);
+		yield return World.CreateAnonymousContext(null, worldBox);
+		Level level = World.TryGetLevel(worldBox);
 
 		Level.RegisterStructure(template);
 		level.ForcePlaceStructure(pos, template);
 
-		for (int x = 1; x < 9; x++) { 
+		for (int x = 1; x < 9; x++) {
 			for (int y = -0; y < 0; y++) {
 				BlockPos targetPos = new(x, y);
 				Assert.That(level.StructureAt(targetPos, out var placement),
@@ -126,5 +126,5 @@ public class StructureIntegrationTests {
 				Assert.That(level.BlockStateAt(targetPos), Is.EqualTo(Blocks.wood.defaultState));
 			}
 		}
-    }
+	}
 }

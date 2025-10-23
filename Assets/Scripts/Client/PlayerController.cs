@@ -16,22 +16,18 @@ using Unity.VisualScripting;
 using UnityEditor.Build.Content;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Zenject;
 using static Unity.VisualScripting.Member;
 using static UnityEditor.PlayerSettings;
 using Level = SoulboundBackend.Client.World.Level;
 using Logger = SoulboundBackend.Common.Logging.Logger;
 
 namespace SoulboundBackend.Client {
-	[BootstrappableParentOf(typeof(InputHandler))]
-	[BootstrappableParentOf(typeof(InventoryController))]
-	[BootstrappableParentOf(typeof(PlayerPhysics))]
-	[BootstrappableParentOf(typeof(ItemUsageHandler))]
-	public class PlayerController : LivingEntity, IBootstrappable {
+	public class PlayerController : LivingEntity {
 		private static readonly Logger logger = Logger.CreateInstance();
 		public override Type entityScriptType => typeof(PlayerController);
 		public override string prefabDefinitionID => "johnny";
-		[SerializeField] private InputHandler inputHandler;
-		public InputHandler InputHandler => inputHandler;
+		public InputHandler inputHandler { get; private set; }
 
 		[SerializeField] private InventoryController inventory;
 		public InventoryController Inventory => inventory;
@@ -48,9 +44,12 @@ namespace SoulboundBackend.Client {
 		[SerializeField] private Animator animator;
 		public Animator Animator => animator;
 
+		public bool isSpawned { get; private set; }
+
 
 		private ItemUsageHandler itemUsageHandler;
 		public ItemUsageHandler ItemUsageHandler => itemUsageHandler!;
+
 #nullable enable
 		public ItemStack? MainHandStack { get; private set; }
 
@@ -71,17 +70,13 @@ namespace SoulboundBackend.Client {
 
 		public float MaxBlockReach => 5f;
 
-		public void OnBootstrap(DependencyContainer dependencyContainer) {
-			inputHandler = dependencyContainer.Resolve<InputHandler>();
-			inventory = dependencyContainer.Resolve<InventoryController>();
-			playerPhysics = dependencyContainer.Resolve<PlayerPhysics>();
-			if (playerPhysics != null) {
-				this.GetComponent<StepClimber>().Init(this);
-			}
-			RegisterItemUsageCandidates(dependencyContainer.Resolve<ItemUsageHandler>());
-		}
-		public void OnEarlyBootstrap(DependencyContainer dependencyContainer) {
-			dependencyContainer.Register<PlayerController>(this);
+		[Inject]
+		public void Construct(DiContainer container) {
+			this.inputHandler = container.Resolve<InputHandler>();
+			this.playerPhysics = container.Resolve<PlayerPhysics>();
+			this.inventory = container.Resolve<InventoryController>();
+			RegisterItemUsageCandidates(container.Resolve<ItemUsageHandler>());
+			UnityEngine.Debug.Log("player loaded: " + this.GetHashCode());
 		}
 
 		private void RegisterItemUsageCandidates(ItemUsageHandler? itemUsageHandler) {
@@ -168,7 +163,7 @@ namespace SoulboundBackend.Client {
 			Item? usedItem = MainHandStack?.item;
 			RequestMainHandUse(trigger, null);
 			if (usedItem is IPlaceable) {
-				InputHandler.BlockContext("BlockBreak", () => !InputHandler.LeftHold);
+				InputHandler.BlockContext("BlockBreak", () => !inputHandler.LeftHold);
 			}
 		}
 
@@ -202,6 +197,7 @@ namespace SoulboundBackend.Client {
 		public override void Spawn(EntitySpawnData spawnData) {
 			base.Spawn(spawnData);
 			logger.LogInfo(null, "Player spawned at {}", spawnData.Get<Vector2>("position"));
+			this.isSpawned = true;
 		}
 
 		public override void OnChunkLoaded() {

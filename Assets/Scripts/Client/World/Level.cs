@@ -43,9 +43,9 @@ namespace SoulboundBackend.Client.World {
 
 		private PlayerController player;
 		public PlayerController Player => player;
-		public bool isPlayerSpawned => player != null;
+		public bool isPlayerSpawned => player.isSpawned;
 
-		public bool isBootstrapped { get; private set; } = false;
+		public bool isWorldLoaded { get; private set; } = false;
 
 		public Level(PlayerController player, LevelGridContext gridContext, int seed) {
 			this.player = player;
@@ -78,18 +78,28 @@ namespace SoulboundBackend.Client.World {
 				}
 			}
 
-			isBootstrapped = true;
+			Vector2 spawnPoint = dump != null
+				? dump.Value.player.lastPosition
+				: GetWorldSpawnPoint();
+			this.UpdateChunks(spawnPoint);
 
-			InvocationHelper.If(dump != null, 
-				() => entityManager.Boostrap(dump!.Value.serializedEntities));
+			isWorldLoaded = true;
+
+			if (dump != null) {
+				entityManager.Boostrap(dump!.Value.serializedEntities);
+			}
 		}
 
 		public void SpawnPlayer(SerializedEntity? serializedPlayer) {
 			SerializedEntity fallback = new(typeof(PlayerController),
 				Guid.NewGuid(), player.prefabDefinitionID,
-				new Vector2(0f, GetSurfaceY(0)), null
+				GetWorldSpawnPoint(), null
 			);
 			entityManager.SpawnPlayer(player, serializedPlayer ?? fallback);
+		}
+
+		public Vector2 GetWorldSpawnPoint() {
+			return new Vector2(0f, GetSurfaceY(0));
 		}
 
 		public WorldDump CreateDump() {

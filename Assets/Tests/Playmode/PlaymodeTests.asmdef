@@ -3,7 +3,8 @@
     "rootNamespace": "",
     "references": [
         "UnityEngine.TestRunner",
-        "SoulboundBackend"
+        "SoulboundBackend",
+        "Zenject"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

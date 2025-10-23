@@ -14,14 +14,13 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using Zenject;
 using Logger = SoulboundBackend.Common.Logging.Logger;
 
 #nullable enable
 
 namespace SoulboundBackend.Client.UI.Storage {
-	[BootstrappableChildOf(typeof(PlayerController))]
-	[BootstrappableParentOf(typeof(HotbarController))]
-    public class InventoryController : MonoBehaviour, IItemContainer2D, IBootstrappable, ISerializable<SerializedInventory, List<IItemSlot>> {
+    public class InventoryController : MonoBehaviour, IItemContainer2D, ISerializable<SerializedInventory, List<IItemSlot>> {
 		public delegate void InterpretationFunction(IItemSlot slot, RefBox<ItemDisplay> grabbedItem);
 		public delegate InterpretationFunction? InterpretationProvider(DragHandler handler, IItemSlot draggedSlot, RefBox<ItemDisplay> grabbedItem);
 
@@ -61,22 +60,20 @@ namespace SoulboundBackend.Client.UI.Storage {
 		private DragHandler? activeDragHandler;
 		private IItemSlot? hoveredSlot;
 
-		public void OnBootstrap(DependencyContainer dependencyContainer) {
+		[Inject]
+		public void Construct(DiContainer container) {
 			this.eventHandler = new InventoryEventHandler();
-			player = dependencyContainer.Resolve<PlayerController>();
-			hotbar.OnBootstrap(dependencyContainer);
-			popup.SetActive(false);
-			armorSlots.SetActive(false);
+			player = container.Resolve<PlayerController>();
+
+			hotbar.SetupGrid();
 			this.SetupGrid();
+			armorSlots.SetActive(false);
 
 			List<InventorySlot> mainPlayerSlots = hotbar.Slots.ToList();
 			mainPlayerSlots.AddRange(popupSlots);
 			MainPlayerSlots = mainPlayerSlots.ToArray();
 			hotbar.SetActiveSlot(0);
-        }
-
-		public void OnEarlyBootstrap(DependencyContainer dependencyContainer) {
-			dependencyContainer.Register<InventoryController>(this);
+			UnityEngine.Debug.Log("inventory constructed: "+ this.GetHashCode());
 		}
 
 		public void SetupGrid() {
@@ -296,7 +293,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 					}
 				});
 			}, null));
-			InputHandler.BlockContext("ItemUse", () => !Soulbound.instance.GetActiveLevel()!.Player.InputHandler.LeftHold);
+			InputHandler.BlockContext("ItemUse", () => !Soulbound.instance.GetActiveLevel()!.Player.inputHandler.LeftHold);
 		}
 
 		public void OnPointerUp(IItemSlot slot, PointerEventData eventData) {
