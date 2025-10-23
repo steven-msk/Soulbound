@@ -45,7 +45,7 @@ namespace SoulboundBackend.Client.World {
 		public PlayerController Player => player;
 		public bool isPlayerSpawned => player.isSpawned;
 
-		public bool isBootstrapped { get; private set; } = false;
+		public bool isWorldLoaded { get; private set; } = false;
 
 		public Level(PlayerController player, LevelGridContext gridContext, int seed) {
 			this.player = player;
@@ -83,10 +83,11 @@ namespace SoulboundBackend.Client.World {
 				: GetWorldSpawnPoint();
 			this.UpdateChunks(spawnPoint);
 
-			isBootstrapped = true;
+			isWorldLoaded = true;
 
-			InvocationHelper.If(dump != null, 
-				() => entityManager.Boostrap(dump!.Value.serializedEntities));
+			if (dump != null) {
+				entityManager.Boostrap(dump!.Value.serializedEntities);
+			}
 		}
 
 		public void SpawnPlayer(SerializedEntity? serializedPlayer) {

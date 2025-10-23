@@ -6,42 +6,47 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine.SceneManagement;
+using Zenject;
 
 #nullable enable
 
 namespace SoulboundBackend.Core {
-    public sealed class Soulbound {
-        public static Soulbound instance { get; private set; } = null!;
-        private readonly GameConfig config;
-        public readonly WorldManager worldManager;
+	public sealed class Soulbound {
+		public static Soulbound instance { get; private set; } = null!;
+		private readonly GameConfig config;
+		public readonly WorldManager worldManager;
 
 		public Soulbound(GameConfig config) {
-            instance = this;
-            this.config = config;
-            ISaveStrategy<WorldDump> saveStrategy = config.dev.loadDevWorldFromSave
-                ? new WorldSaveStrategy()
-                : new DoNotSaveWorldStrategy();
-            this.worldManager = new WorldManager(config.file.savesFolder, saveStrategy);
-        }
+			instance = this;
+			this.config = config;
+			ISaveStrategy<WorldDump> saveStrategy = config.dev.loadDevWorldFromSave
+				? new WorldSaveStrategy()
+				: new DoNotSaveWorldStrategy();
+			this.worldManager = new WorldManager(config.file.savesFolder, saveStrategy);
+		}
 
-        public void Prototype_LoadDevWorld() {
-            Level.RegisterStructure(TreeStructure.instance);
-            string world = config.dev.loadDevWorldFromSave
-                ? config.dev.devWorld
-                : $"altw_{Guid.NewGuid()}";
-            worldManager.LoadWorld(world, null, GetDefaultBootstrapTree, true);
-        }
+		public void Prototype_LoadDevWorld() {
+			Level.RegisterStructure(TreeStructure.instance);
+			string world = config.dev.loadDevWorldFromSave
+				? config.dev.devWorld
+				: $"altw_{Guid.NewGuid()}";
+			worldManager.LoadWorld(world, true,
+				() => UnityEngine.Object.FindFirstObjectByType<SceneContext>(),
+				() => SceneManager.GetSceneByName("WorldScene")
+			);
+		}
 
-        public IEnumerable<IBootstrappable> GetDefaultBootstrapTree(BootstrapTreeBuilder treeBuilder) {
-            return treeBuilder.BuildTree<BootstrappableParentOfAttribute>(typeof(LevelManager));
-        }
+		public IEnumerable<IBootstrappable> GetDefaultBootstrapTree(BootstrapTreeBuilder treeBuilder) {
+			return treeBuilder.BuildTree<BootstrappableParentOfAttribute>(typeof(LevelManager));
+		}
 
-        public Level? GetActiveLevel() {
-            return GetActiveLevelManager()?.Level;
-        }
+		public Level? GetActiveLevel() {
+			return GetActiveLevelManager()?.Level;
+		}
 
-        public LevelManager? GetActiveLevelManager() {
-            return worldManager.activeLevelManager;
-        }
-    }
+		public LevelManager? GetActiveLevelManager() {
+			return worldManager.activeLevelManager;
+		}
+	}
 }

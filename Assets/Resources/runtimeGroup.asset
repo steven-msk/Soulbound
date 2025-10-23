@@ -25,4 +25,5 @@ MonoBehaviour:
   - Assets/Resources/Registry/Runtime/inventory.prefab
   - Assets/Resources/Registry/Runtime/levelManager.prefab
   - Assets/Resources/Registry/Runtime/player.prefab
+  - Assets/Resources/Registry/Runtime/sceneContext.prefab
   - Assets/Resources/Registry/Runtime/Tilemap.prefab

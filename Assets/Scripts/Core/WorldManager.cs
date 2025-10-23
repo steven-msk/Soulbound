@@ -49,9 +49,9 @@ public sealed class WorldManager {
 
 	public WorldDump? LoadWorld(
 			string world, 
-			Scene? levelScene, 
-			Func<BootstrapTreeBuilder, IEnumerable<IBootstrappable>> bootstrapTreeFunc,
-			bool initPlayerState
+			bool initPlayerState,
+			Func<SceneContext> sceneContextSupplier,
+			Func<Scene> sceneSupplier
 		) {
 		string dumpPath = GetDumpPath(world, createIfAbsent: false);
 
@@ -62,10 +62,10 @@ public sealed class WorldManager {
 		int seed = dump?.seed ?? UnityEngine.Random.Range(int.MinValue, int.MaxValue);
 
 		IEnumerator LevelSceneLoader() {
-			AsyncOperation async = SceneManager.LoadSceneAsync("WorldScene");
-			yield return new WaitUntil(() => async.isDone);
+			var scene = sceneSupplier.Invoke();
+			SceneManager.SetActiveScene(scene);
 
-			var sceneContext = UnityEngine.Object.FindFirstObjectByType<SceneContext>();
+			var sceneContext = sceneContextSupplier.Invoke();
 			yield return new WaitUntil(() => sceneContext != null && sceneContext.Container != null);
 
 			sceneContext.Container.Inject(this);
@@ -90,25 +90,6 @@ public sealed class WorldManager {
 		CoroutineRunner.GetInstance().StartCoroutine(LevelSceneLoader());
 
 		return dump;
-
-		//if (levelScene == null) {
-		//	IEnumerator LevelSceneLoader() {
-		//		AsyncOperation asyncLoad = SceneManager.LoadSceneAsync("WorldScene");
-		//		yield return new WaitUntil(() => asyncLoad.isDone);
-
-		//		instanceFactory = BootstrapRecipe.ForInstanceCreation(out var activeLevelManager);
-		//		this.activeLevelManager = activeLevelManager;
-
-		//		FinalizeLevelManager();
-		//	}
-		//	CoroutineRunner.GetInstance().StartCoroutine(LevelSceneLoader());
-		//} else {
-		//	SceneManager.SetActiveScene(levelScene.Value);
-		//	activeLevelManager = LevelManager.CreateInstance();
-		//	instanceFactory = BootstrapRecipe.ForPredefinedScene(activeLevelManager);
-		//	FinalizeLevelManager();
-		//}
-		//return dump;
 	}
 
 	public void SaveWorld(string world, WorldDump dump) {

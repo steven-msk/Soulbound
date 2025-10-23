@@ -24,7 +24,6 @@ namespace SoulboundBackend.Tests {
         public static IEnumerator UnloadSceneAsync(Scene scene) {
             var async = SceneManager.UnloadSceneAsync(scene);
             yield return new WaitUntil(() => async.isDone);
-            yield return null;
         }
     }
 }

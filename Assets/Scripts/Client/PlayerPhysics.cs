@@ -98,6 +98,7 @@ namespace SoulboundBackend.Client {
 				knockbackStunTimer = knockbackStunDuration * Mathf.Clamp(Mathf.Abs(bounce.y), 0.1f, 1f);
 			}, () => !player.isImmune));
 			isBootstrapped = true;
+			UnityEngine.Debug.Log("player physics constructed");
 		}
 
 		[Obsolete]
@@ -117,7 +118,7 @@ namespace SoulboundBackend.Client {
 		// FIXME: inconsistent movement
 
 		private void Update() {
-			if (!player.isSpawned) {
+			if (!player?.isSpawned ?? true) {
 				return;
 			}
 			movement.x = inputHandler.HorizontalMovement;
@@ -130,7 +131,7 @@ namespace SoulboundBackend.Client {
 		}
 
 		private void FixedUpdate() {
-			if (!player.isSpawned) {
+			if (!player?.isSpawned ?? true) {
 				return;
 			}
 			if (knockbackStunTimer > 0) {
@@ -200,7 +201,7 @@ namespace SoulboundBackend.Client {
 		}
 
 		private void OnCollisionStay2D(Collision2D collision) {
-			if (!player.isSpawned) {
+			if (!player?.isSpawned ?? true) {
 				return;
 			}
 			var collisionResponse = collisionReactionsByTag.GetValueOrDefault(collision.gameObject.tag, (collision => {
@@ -210,7 +211,7 @@ namespace SoulboundBackend.Client {
 		}
 
 		private void OnTriggerStay2D(Collider2D collision) {
-			if (!player.isSpawned) {
+			if (!player?.isSpawned ?? true) {
 				return;
 			}
 			var triggerResponse = triggerReactionsByLayer.GetValueOrDefault(collision.gameObject.layer, (collision => {
