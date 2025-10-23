@@ -8,8 +8,9 @@ using Zenject;
 
 namespace SoulboundBackend.Core.Bootstrap {
 	public class PlayerInstaller : MonoInstaller {
+		[SerializeField] private bool instantiatePlayer = false;
 		public override void InstallBindings() {
-			new PlayerInstallerWrapper(false).InstallBindings(Container);
+			new PlayerInstallerWrapper(instantiatePlayer).InstallBindings(Container);
 		}
 	}
 
@@ -18,6 +19,7 @@ namespace SoulboundBackend.Core.Bootstrap {
 
 		public PlayerInstallerWrapper(bool instantiatePlayer) {
 			this.instantiatePlayer = instantiatePlayer;
+			Debug.Log("player installer wrapper created");
 		}
 
 		public override void InstallBindings(DiContainer container) {
@@ -36,6 +38,7 @@ namespace SoulboundBackend.Core.Bootstrap {
 			container.Bind<InventoryController>().FromComponentInNewPrefab(inventoryPrefab).AsSingle();
 			container.Bind<HotbarController>().FromComponentInChildren().AsSingle();
 			container.Bind<StepClimber>().FromComponentOnRoot().AsSingle();
+			Debug.Log("player installer has installed bindings");
 		}
 	}
 }

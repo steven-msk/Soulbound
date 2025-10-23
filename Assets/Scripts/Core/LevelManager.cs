@@ -59,6 +59,7 @@ namespace SoulboundBackend.Core {
 		public void Construct(WorldManager worldManager, PlayerController player) {
 			this.worldManager = worldManager;
 			this.player = player;
+			player.GetComponent<GameObjectContext>().Run();
 		}
 
 		[Obsolete]

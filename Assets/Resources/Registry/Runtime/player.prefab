@@ -304,7 +304,7 @@ MonoBehaviour:
   _monoInstallers:
   - {fileID: 8276486397069156307}
   _installerPrefabs: []
-  _autoRun: 1
+  _autoRun: 0
   _kernel: {fileID: 0}
 --- !u!114 &8276486397069156307
 MonoBehaviour:
@@ -318,5 +318,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e142304dd213bb4f8a0200a8ad7283e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inputHandlerPrefab: {fileID: 243267408137811895, guid: 4572b6f108dc5d94fab0d8c105f8b89f, type: 3}
-  inventoryPrefab: {fileID: 6758222006781929819, guid: b8e974e7315dc3b408e80437cd281dee, type: 3}
+  instantiatePlayer: 0

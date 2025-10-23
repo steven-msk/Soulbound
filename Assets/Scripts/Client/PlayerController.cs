@@ -48,6 +48,8 @@ namespace SoulboundBackend.Client {
 		[SerializeField] private Animator animator;
 		public Animator Animator => animator;
 
+		public bool isSpawned { get; private set; }
+
 
 		private ItemUsageHandler itemUsageHandler;
 		public ItemUsageHandler ItemUsageHandler => itemUsageHandler!;
@@ -78,6 +80,7 @@ namespace SoulboundBackend.Client {
 			this.playerPhysics = container.Resolve<PlayerPhysics>();
 			this.inventory = container.Resolve<InventoryController>();
 			RegisterItemUsageCandidates(container.Resolve<ItemUsageHandler>());
+			UnityEngine.Debug.Log("player loaded: " + this.GetHashCode());
 		}
 
 		[Obsolete]
@@ -214,6 +217,7 @@ namespace SoulboundBackend.Client {
 		public override void Spawn(EntitySpawnData spawnData) {
 			base.Spawn(spawnData);
 			logger.LogInfo(null, "Player spawned at {}", spawnData.Get<Vector2>("position"));
+			this.isSpawned = true;
 		}
 
 		public override void OnChunkLoaded() {

@@ -117,10 +117,7 @@ namespace SoulboundBackend.Client {
 		// FIXME: inconsistent movement
 
 		private void Update() {
-			if (!isBootstrapped) {
-				return;
-			}
-			if (Soulbound.instance.GetActiveLevelManager()!.IsPaused) {
+			if (!player.isSpawned) {
 				return;
 			}
 			movement.x = inputHandler.HorizontalMovement;
@@ -133,7 +130,7 @@ namespace SoulboundBackend.Client {
 		}
 
 		private void FixedUpdate() {
-			if (!isBootstrapped) {
+			if (!player.isSpawned) {
 				return;
 			}
 			if (knockbackStunTimer > 0) {
@@ -203,6 +200,9 @@ namespace SoulboundBackend.Client {
 		}
 
 		private void OnCollisionStay2D(Collision2D collision) {
+			if (!player.isSpawned) {
+				return;
+			}
 			var collisionResponse = collisionReactionsByTag.GetValueOrDefault(collision.gameObject.tag, (collision => {
 				logger.LogWarning(null, "Unknown collision callback tag: {}", collision.gameObject.tag);
 			}, null));
@@ -210,6 +210,9 @@ namespace SoulboundBackend.Client {
 		}
 
 		private void OnTriggerStay2D(Collider2D collision) {
+			if (!player.isSpawned) {
+				return;
+			}
 			var triggerResponse = triggerReactionsByLayer.GetValueOrDefault(collision.gameObject.layer, (collision => {
 				logger.LogWarning(null, "Unknown trigger callback layer: {}", LayerMask.LayerToName(collision.gameObject.layer));
 			}, null));

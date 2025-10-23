@@ -43,7 +43,7 @@ namespace SoulboundBackend.Client.World {
 
 		private PlayerController player;
 		public PlayerController Player => player;
-		public bool isPlayerSpawned => player != null;
+		public bool isPlayerSpawned => player.isSpawned;
 
 		public bool isBootstrapped { get; private set; } = false;
 

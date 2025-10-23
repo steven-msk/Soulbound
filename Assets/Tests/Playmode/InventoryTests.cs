@@ -68,8 +68,15 @@ namespace InventoryTests {
 	public class Initialization : InventoryTest {
 		[Test]
 		public void Inventory_InitializesWithEmptySlots_OnNewSceneLoad() {
-			var sceneContext = new GameObject().AddComponent<SceneContext>();
-			sceneContext.Container.Install<PlayerInstallerWrapper>(new[] { true as object });
+			//var sceneContext = new GameObject().AddComponent<SceneContext>();
+			//var installer = new PlayerInstallerWrapper(true);
+			//installer.InstallBindings(sceneContext.Container);
+			//sceneContext.Container.Inject(installer);
+			//var inventory = sceneContext.Container.Resolve<InventoryController>();
+
+			var sceneContext = GameObject.Instantiate(Resources.Load<GameObject>("sceneContext")).GetComponent<SceneContext>();
+			sceneContext.AddNormalInstaller(new PlayerInstallerWrapper(true));
+			sceneContext.Install();
 			var inventory = sceneContext.Container.Resolve<InventoryController>();
 
 			var f = inventory.GetFirstEmptySlot();

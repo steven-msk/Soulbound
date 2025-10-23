@@ -18,12 +18,17 @@ namespace SoulboundBackend.Core {
 		public Soulbound(GameConfig config) {
             instance = this;
             this.config = config;
-            this.worldManager = new WorldManager(config.file.savesFolder, new WorldSaveStrategy());
+            ISaveStrategy<WorldDump> saveStrategy = config.dev.loadDevWorldFromSave
+                ? new WorldSaveStrategy()
+                : new DoNotSaveWorldStrategy();
+            this.worldManager = new WorldManager(config.file.savesFolder, saveStrategy);
         }
 
         public void Prototype_LoadDevWorld() {
             Level.RegisterStructure(TreeStructure.instance);
-            string world = config.dev.loadDevWorldFromSave ? config.dev.devWorld : null!;
+            string world = config.dev.loadDevWorldFromSave
+                ? config.dev.devWorld
+                : $"altw_{Guid.NewGuid()}";
             worldManager.LoadWorld(world, null, GetDefaultBootstrapTree, true);
         }
 
