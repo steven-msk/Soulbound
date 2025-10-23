@@ -25,26 +25,12 @@ using Zenject;
 namespace InventoryTests {
 	[TestFixture]
 	public abstract class InventoryTest {
-		[SetUp]
-		public void PrepareEnvironment() {
-			StaticResetManager.ResetAll();
-			PlayModeTesting.CreateNewSceneAndSetActive();
-		}
-
 		internal InventoryController CreateTestEnvironment(out Scene scene) {
-			scene = SceneManager.CreateScene(Guid.NewGuid().ToString());
-			SceneManager.SetActiveScene(scene);
-
-			GameObject levelManagerPrefab = ResourceManager.Get<GameObject, ResourceGroups.Runtime.Prefabs>("levelManager");
-			var levelManager = GameObject.Instantiate(levelManagerPrefab).GetComponent<LevelManager>();
-
-			levelManager.Init(null, null,
-				BootstrapRecipe.ForPredefinedScene(levelManager),
-				treeBuilder => treeBuilder.BuildTree<BootstrappableChildOfAttribute>(typeof(InventoryController))
-			);
-
-			return levelManager.Player.Inventory
-				?? throw new ArgumentException("Test environment not initialized properly");
+			scene = PlayModeTesting.CreateNewSceneAndSetActive();
+			var sceneContext = GameObject.Instantiate(Resources.Load<GameObject>("sceneContext")).GetComponent<SceneContext>();
+			sceneContext.AddNormalInstaller(new PlayerInstallerWrapper(true));
+			sceneContext.Install();
+			return sceneContext.Container.Resolve<InventoryController>();
 		}
 
 		internal Item CreateTestItem(int maxStack = 64) {
@@ -68,16 +54,7 @@ namespace InventoryTests {
 	public class Initialization : InventoryTest {
 		[Test]
 		public void Inventory_InitializesWithEmptySlots_OnNewSceneLoad() {
-			//var sceneContext = new GameObject().AddComponent<SceneContext>();
-			//var installer = new PlayerInstallerWrapper(true);
-			//installer.InstallBindings(sceneContext.Container);
-			//sceneContext.Container.Inject(installer);
-			//var inventory = sceneContext.Container.Resolve<InventoryController>();
-
-			var sceneContext = GameObject.Instantiate(Resources.Load<GameObject>("sceneContext")).GetComponent<SceneContext>();
-			sceneContext.AddNormalInstaller(new PlayerInstallerWrapper(true));
-			sceneContext.Install();
-			var inventory = sceneContext.Container.Resolve<InventoryController>();
+			var inventory = CreateTestEnvironment(out var scene);
 
 			var f = inventory.GetFirstEmptySlot();
 			Assert.IsTrue(inventory.GetFirstEmptySlot().ItemStack == null, $"{f.name} is not empty");
@@ -85,9 +62,7 @@ namespace InventoryTests {
 
 		[Test]
 		public void CreateItemDisplay_AssignsToFirstEmptySlot_WhenSlotExists() {
-			var sceneContext = new GameObject().AddComponent<SceneContext>();
-			sceneContext.Container.Install<PlayerInstallerWrapper>(new[] { true as object });
-			var inventory = sceneContext.Container.Resolve<InventoryController>();
+			var inventory = CreateTestEnvironment(out var scene);
 
 			var slot = inventory.GetFirstEmptySlot() as IItemSlot;
 			Assert.IsNotNull(slot, "No empty slot available");
@@ -120,7 +95,6 @@ namespace InventoryTests {
 
 		[UnityTest]
 		public IEnumerator Serialize_And_Deserialize_PreservesItemStacks() {
-			LogAssert.ignoreFailingMessages = true;
 			Item item = CreateTestItem();
 			var inventory = CreateTestEnvironment(out var scene);
 			var slot = inventory.GetFirstEmptySlot() as IItemSlot;
