@@ -1,4 +1,5 @@
-﻿using SoulboundBackend.Core;
+﻿using SoulboundBackend.Common.Logging;
+using SoulboundBackend.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.Settings {
 	public abstract class SettingEntry {
+		protected static readonly Logger logger = Logger.CreateInstance();
 		public readonly string id;
 		public abstract object boxedDefaultValue { get; }
 		public abstract object boxedValue { get; }
@@ -41,6 +43,8 @@ namespace SoulboundBackend.Client.Settings {
 				if (broadcastChange) {
 					valueChanged?.Invoke(oldValue, this.value);
 				}
+			} else {
+				logger.LogWarning(null, "Attempted to set invalid value {} to setting {}", value!, id);
 			}
 		}
 	}
@@ -63,7 +67,7 @@ namespace SoulboundBackend.Client.Settings {
 
 	public abstract record NumericValueSet<T>(T minInclusive, T maxInclusive) : ValueSet<T> where T : struct, IComparable<T> {
 		public override bool IsValid(T value) {
-			return value.CompareTo(minInclusive) >= 0 && value.CompareTo(maxInclusive) >= 0;
+			return value.CompareTo(minInclusive) >= 0 && value.CompareTo(maxInclusive) <= 0;
 		}
 
 		public override string Encode(T value) => value.ToString();
