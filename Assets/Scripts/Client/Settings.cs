@@ -10,15 +10,9 @@ namespace SoulboundBackend.Client.Settings {
 	public sealed class Settings {
 		private static readonly Logger logger = Logger.CreateInstance();
 		public const string settingsFile = "settings.txt";
-		private static readonly List<SettingEntry> injected = new();
-		public static readonly SettingEntry<int> masterVolume = InjectEntry(new SettingEntry<int>("master_volume", 100, new IntRange(0, 100)));
+		public static readonly SettingEntry<int> masterVolume = new("master_volume", 100, new IntRange(0, 100));
 
 		public Settings() => LoadEntries();
-
-		private static SettingEntry<T> InjectEntry<T>(SettingEntry<T> entry) {
-			injected.Add(entry);
-			return entry;
-		}
 
 		private void LoadEntries() {
 			try {
