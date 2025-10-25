@@ -1,4 +1,5 @@
 using log4net.Core;
+using SoulboundBackend.Client.Combat;
 using SoulboundBackend.Client.Input;
 using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.Stats;
@@ -123,7 +124,24 @@ namespace SoulboundBackend.Client {
 		}
 
 		[InputAction("ItemUse", Priority = 5)]
-		internal void OnLeftClick() => RequestSuppressedMainHandUse(ItemUseTrigger.LeftClick);
+		internal void OnLeftClick() {
+			AttackSource attackSource = new AttackSource.Builder(1, 10)
+				.OnAttackStart(() => logger.LogInfo(null, "attack started"))
+				.OnAttackEnd(() => logger.LogInfo(null, "attack ended"))
+				.OnAttackAnimationStart(() => logger.LogInfo(null, "attack animation started"))
+				.OnAttackAnimationEnd(() => logger.LogInfo(null, "attack animation ended"))
+				.OnHit(collider => logger.LogInfo(null, "attack hit: " + collider))
+				.OnHitboxSpawned(hitbox => logger.LogInfo(null, "spawned hitbox: " + hitbox))
+				.OnHitboxDespawned(() => logger.LogInfo(null, "despawned hitbox"))
+				.GetInstance();
+			AttackEventDispatcher eventDispatcher = this.GetComponent<AttackEventDispatcher>();
+			AttackHandler attackHandler = new AttackHandler(attackSource, eventDispatcher);
+
+			animator.Play("johnny_attack");
+			logger.LogInfo(null, "triggered attack animation");
+			attackHandler.StartAttack();
+			//RequestSuppressedMainHandUse(ItemUseTrigger.LeftClick); 
+		}
 
 		[InputAction("ItemUse", Priority = 5)]
 		internal void OnRightClick() {

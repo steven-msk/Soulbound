@@ -12,7 +12,7 @@ namespace SoulboundBackend.Client.World.Entity {
 		public Guid id { get; private set; }
 		public int currentChunkX { get; private set; }
 		public abstract Type entityScriptType { get; }
-		public abstract string prefabDefinitionID { get; }
+		[Obsolete] public abstract string prefabDefinitionID { get; }
 		public Vector2 position => transform.position;
 
 		public void InitState(Guid id, EntityManager entityManager) {
