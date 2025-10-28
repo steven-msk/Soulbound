@@ -9,11 +9,11 @@ namespace SoulboundBackend.Client.Combat {
 	public sealed class OneTimeHitRecognizer : IHitRecognizer {
 		private bool hasHit = false;
 
-		public void OnHitFrame(Collider2D other) {
+		public void OnHitFrame(Hurtbox other) {
 			hasHit = true;
 		}
 
-		public bool ShouldRegisterHit(Collider2D other) {
+		public bool ShouldRegisterHit(Hurtbox other) {
 			return !hasHit;
 		}
 	}

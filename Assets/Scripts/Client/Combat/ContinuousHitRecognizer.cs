@@ -7,10 +7,10 @@ using UnityEngine;
 
 namespace SoulboundBackend.Client.Combat {
 	public class ContinuousHitRecognizer : IHitRecognizer {
-		public void OnHitFrame(Collider2D other) {
+		public void OnHitFrame(Hurtbox other) {
 		}
 
-		public bool ShouldRegisterHit(Collider2D other) {
+		public bool ShouldRegisterHit(Hurtbox other) {
 			return true;
 		}
 	}

@@ -1,13 +1,16 @@
 ﻿using SoulboundBackend.Common;
+using SoulboundBackend.Common.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using Logger = SoulboundBackend.Common.Logging.Logger;
 
 namespace SoulboundBackend.Client.Combat {
 	public class AttackHandler {
+		private static readonly Logger logger = Logger.CreateInstance();
 		private readonly AttackSource source;
 		private readonly AttackEventDispatcher eventDispatcher;
 		private readonly IHitRecognizer hitRecognizer;
@@ -67,11 +70,16 @@ namespace SoulboundBackend.Client.Combat {
 		}
 
 		private void OnHitFrame(Collider2D other) {
-			if (hitRecognizer.ShouldRegisterHit(other)) {
-				source.onHitRegistered?.Invoke(other);
+			if (other.TryGetComponent<Hurtbox>(out var hurtbox)) {
+				if (hitRecognizer.ShouldRegisterHit(hurtbox)) {
+					hurtbox.NotifyHit(source);
+					source.onHitRegistered?.Invoke(other);
+				}
+				hitRecognizer.OnHitFrame(hurtbox);
+				source.onHitFrame(other);
+			} else {
+				logger.LogError(null, "Could not find Hurtbox on hitbox collider: {}", other.gameObject);
 			}
-			hitRecognizer.OnHitFrame(other);
-			source.onHitFrame(other);
 		}
 
 		public void OnAttackAnimationEnd() {
