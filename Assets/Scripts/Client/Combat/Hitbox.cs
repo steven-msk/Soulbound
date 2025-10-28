@@ -13,11 +13,18 @@ namespace SoulboundBackend.Client.Combat {
 		[SerializeField] private new Collider2D collider;
 		private AttackEventDispatcher owner;
 
+#if UNITY_EDITOR
+		private bool flag_invalidState = false;
+
 		private void OnValidate() {
-			if (!collider?.isTrigger ?? false) {
+			if (!collider?.isTrigger ?? false && !flag_invalidState) {
 				logger.LogError(null, "Hitbox collider is not set to trigger collider on {}", gameObject.name);
+				flag_invalidState = true;
+			} else {
+				flag_invalidState = false;
 			}
 		}
+#endif
 
 		public void Activate(AttackEventDispatcher owner) {
 			this.owner = owner;
@@ -31,6 +38,7 @@ namespace SoulboundBackend.Client.Combat {
 
 		private void OnTriggerEnter2D(Collider2D other) {
 			owner?.OnHitboxEnter(other);
+			owner?.OnHitFrame(other);
 		}
 
 		private void OnTriggerStay2D(Collider2D other) {

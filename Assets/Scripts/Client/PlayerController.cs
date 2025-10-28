@@ -125,21 +125,23 @@ namespace SoulboundBackend.Client {
 
 		[InputAction("ItemUse", Priority = 5)]
 		internal void OnLeftClick() {
-			AttackSource attackSource = new AttackSource.Builder(1, 10)
+			AttackSource attackSource = new AttackSource.Builder(1, 10, () => GetComponent<Hitbox>())
 				.OnAttackStart(() => logger.LogInfo(null, "attack started"))
 				.OnAttackEnd(() => logger.LogInfo(null, "attack ended"))
 				.OnAttackAnimationStart(() => logger.LogInfo(null, "attack animation started"))
 				.OnAttackAnimationEnd(() => logger.LogInfo(null, "attack animation ended"))
-				.OnHit(collider => logger.LogInfo(null, "attack hit: " + collider))
+				.OnHitRegistered(collider => logger.LogInfo(null, "<color=red>hit registered</color>: " + collider))
+				.OnHitFrame(collider => logger.LogInfo(null, "hit frame registered: " + collider))
 				.OnHitboxSpawned(hitbox => logger.LogInfo(null, "spawned hitbox: " + hitbox))
 				.OnHitboxDespawned(() => logger.LogInfo(null, "despawned hitbox"))
+				.OnHitboxEnter(collider => logger.LogInfo(null, "entered hitbox: "+ collider))
+				.OnHitboxExit(collider => logger.LogInfo(null, "exited hitbox: "+ collider))
 				.GetInstance();
 			AttackEventDispatcher eventDispatcher = this.GetComponent<AttackEventDispatcher>();
-			AttackHandler attackHandler = new AttackHandler(attackSource, eventDispatcher);
+			AttackHandler attackHandler = new AttackHandler(attackSource, eventDispatcher, new OneTimeHitRecognizer());
 
 			animator.Play("johnny_attack");
 			logger.LogInfo(null, "triggered attack animation");
-			attackHandler.StartAttack();
 			//RequestSuppressedMainHandUse(ItemUseTrigger.LeftClick); 
 		}
 
