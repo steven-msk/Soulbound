@@ -38,6 +38,9 @@ namespace SoulboundBackend.Client.Combat {
 		}
 
 		public void EndAttack() {
+			isHandlingAttack = false;
+			InvocationHelper.If(isHitboxActive, DespawnHitbox);
+
 			eventDispatcher.onAttackStart -= StartAttack;
 			eventDispatcher.onAttackEnd -= EndAttack;
 			eventDispatcher.onAttackAnimationStart -= source.onAttackAnimationStart;
@@ -48,7 +51,6 @@ namespace SoulboundBackend.Client.Combat {
 			eventDispatcher.onHitboxExit -= source.onHitboxExit;
 			eventDispatcher.onHitFrame -= OnHitFrame;
 
-			InvocationHelper.If(isHitboxActive, DespawnHitbox);
 			source.onAttackEnd?.Invoke();
 		}
 

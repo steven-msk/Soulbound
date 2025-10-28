@@ -14,6 +14,7 @@ using SoulboundBackend.Core.Bootstrap;
 using System;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor.Build;
 using UnityEditor.Build.Content;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -86,30 +87,30 @@ namespace SoulboundBackend.Client {
 			}
 			this.itemUsageHandler = itemUsageHandler;
 
-            itemUsageHandler.RegisterCapability<IConsumable>(ItemUseTrigger.RightClick, (consumable, stack) => consumable.Consume(stack));
-            foreach (ItemUseTrigger trigger in Enum.GetValues(typeof(ItemUseTrigger))) {
-                itemUsageHandler.RegisterCapability<IAttackPerformer>(trigger, (attackPerformer, stack) => {
-                    InvocationHelper.If(CanAttack, () => attackPerformer.PerformAttack(trigger));
-                });
-            }
-            itemUsageHandler.RegisterCapability<IPlaceable>(ItemUseTrigger.LeftHold, (placeable, stack) => {
-                Level level = Soulbound.instance.GetActiveLevel()!;
-                BlockPos blockPos = level.ToBlockPos(inputHandler.MouseWorldPosition);
+			itemUsageHandler.RegisterCapability<IConsumable>(ItemUseTrigger.RightClick, (consumable, stack) => consumable.Consume(stack));
+			foreach (ItemUseTrigger trigger in Enum.GetValues(typeof(ItemUseTrigger))) {
+				itemUsageHandler.RegisterCapability<IAttackPerformer>(trigger, (attackPerformer, stack) => {
+					InvocationHelper.If(CanAttack, () => attackPerformer.PerformAttack(trigger));
+				});
+			}
+			itemUsageHandler.RegisterCapability<IPlaceable>(ItemUseTrigger.LeftHold, (placeable, stack) => {
+				Level level = Soulbound.instance.GetActiveLevel()!;
+				BlockPos blockPos = level.ToBlockPos(inputHandler.MouseWorldPosition);
 
-                if (CanPlaceBlockAt(blockPos)) {
-                    level.PlaceBlock(blockPos, placeable.Place(stack, blockPos));
-                }
-            });
-            itemUsageHandler.RegisterCapability<IBreakingTool>(ItemUseTrigger.LeftHold, (tool, stack) => {
-                Level level = Soulbound.instance.GetActiveLevel()!;
-                Vector2 worldMousePos = inputHandler.MouseWorldPosition;
-                BlockPos blockPos = level.ToBlockPos(worldMousePos);
+				if (CanPlaceBlockAt(blockPos)) {
+					level.PlaceBlock(blockPos, placeable.Place(stack, blockPos));
+				}
+			});
+			itemUsageHandler.RegisterCapability<IBreakingTool>(ItemUseTrigger.LeftHold, (tool, stack) => {
+				Level level = Soulbound.instance.GetActiveLevel()!;
+				Vector2 worldMousePos = inputHandler.MouseWorldPosition;
+				BlockPos blockPos = level.ToBlockPos(worldMousePos);
 
-                if (IsInBlockReach((Vector2)blockPos)) {
-                    tool.TryBreak(blockPos, level, new PlayerToolBreakSource(this, tool));
-                }
-            });
-        }
+				if (IsInBlockReach((Vector2)blockPos)) {
+					tool.TryBreak(blockPos, level, new PlayerToolBreakSource(this, tool));
+				}
+			});
+		}
 
 		public override void EntityUpdate(float deltaTime) {
 			base.EntityUpdate(deltaTime);
@@ -123,31 +124,34 @@ namespace SoulboundBackend.Client {
 			MainHandStack = itemStack;
 		}
 
+		private AttackHandler attackHandler = null!;
+		private AttackSource attackSource = null!;
+
 		[InputAction("ItemUse", Priority = 5)]
 		internal void OnLeftClick() {
-			AttackSource attackSource = new AttackSource.Builder(1, 10, () => GetComponent<Hitbox>())
-				.OnAttackStart(() => logger.LogInfo(null, "attack started"))
-				.OnAttackEnd(() => logger.LogInfo(null, "attack ended"))
-				.OnAttackAnimationStart(() => logger.LogInfo(null, "attack animation started"))
-				.OnAttackAnimationEnd(() => logger.LogInfo(null, "attack animation ended"))
-				.OnHitRegistered(collider => logger.LogInfo(null, "<color=red>hit registered</color>: " + collider))
-				.OnHitFrame(collider => logger.LogInfo(null, "hit frame registered: " + collider))
-				.OnHitboxSpawned(hitbox => logger.LogInfo(null, "spawned hitbox: " + hitbox))
-				.OnHitboxDespawned(() => logger.LogInfo(null, "despawned hitbox"))
-				.OnHitboxEnter(collider => logger.LogInfo(null, "entered hitbox: "+ collider))
-				.OnHitboxExit(collider => logger.LogInfo(null, "exited hitbox: "+ collider))
-				.GetInstance();
-			AttackEventDispatcher eventDispatcher = this.GetComponent<AttackEventDispatcher>();
-			AttackHandler attackHandler = new AttackHandler(attackSource, eventDispatcher, new OneTimeHitRecognizer());
+			if (attackSource == null) {
+				attackSource = new AttackSource.Builder(1, 10, GetComponent<Hitbox>)
+					.OnAttackStart(() => logger.LogInfo(null, "attack started"))
+					.OnAttackEnd(() => {
+						logger.LogInfo(null, "attack ended");
+						attackHandler = null!;
+					})
+					.OnAttackAnimationStart(() => logger.LogInfo(null, "attack animation started"))
+					.OnAttackAnimationEnd(() => logger.LogInfo(null, "attack animation ended"))
+					.OnHitRegistered(collider => logger.LogInfo(null, "<color=red>hit registered</color>: " + collider))
+					.OnHitFrame(collider => logger.LogInfo(null, "hit frame registered: " + collider))
+					.OnHitboxSpawned(hitbox => logger.LogInfo(null, "spawned hitbox: " + hitbox))
+					.OnHitboxDespawned(() => logger.LogInfo(null, "despawned hitbox"))
+					.OnHitboxEnter(collider => logger.LogInfo(null, "entered hitbox: " + collider))
+					.OnHitboxExit(collider => logger.LogInfo(null, "exited hitbox: " + collider))
+					.GetInstance();
+			}
 
-			animator.Play("johnny_attack");
-			logger.LogInfo(null, "triggered attack animation");
-			//RequestSuppressedMainHandUse(ItemUseTrigger.LeftClick); 
+			RequestSuppressedMainHandUse(ItemUseTrigger.LeftClick);
 		}
 
 		[InputAction("ItemUse", Priority = 5)]
 		internal void OnRightClick() {
-			UnityEngine.Debug.Log("right click");
 			RequestMainHandUse(ItemUseTrigger.RightClick, null);
 		}
 
@@ -171,7 +175,15 @@ namespace SoulboundBackend.Client {
 						level.BreakBlock(blockPos, new PlayerToolBreakSource(this, null));
 					}
 				}, null));
-            }
+
+				InputHandler.RequestAction(new("PlayerAttack", 6, () => {
+					if (attackHandler == null) {
+						attackHandler = new AttackHandler(attackSource, this.GetComponent<AttackEventDispatcher>(), new OneTimeHitRecognizer());
+						logger.LogInfo(null, "executing attack");
+						animator.SetTrigger("attack");
+					}
+				}, null));
+			}
 		}
 
 		[InputAction("ItemUse", Priority = 5)]
