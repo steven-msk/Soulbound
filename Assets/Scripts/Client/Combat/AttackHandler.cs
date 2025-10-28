@@ -17,13 +17,17 @@ namespace SoulboundBackend.Client.Combat {
 		private Hitbox hitbox;
 		private AttackAnimationHandler animationHandler;
 
-		public AttackHandler(AttackSource source, AttackEventDispatcher eventDispatcher, IHitRecognizer hitRecognizer,
-				bool shouldEndOnAnimationEnds = true) {
+		public AttackHandler(
+				AttackSource source,
+				AttackEventDispatcher eventDispatcher, 
+				IHitRecognizer hitRecognizer,
+				bool shouldEndWhenAnimationEnds
+			) {
 			this.source = source;
 			this.eventDispatcher = eventDispatcher;
 			this.hitbox = source.hitboxSupplier.Invoke();
 			this.hitRecognizer = hitRecognizer;
-			this.shouldEndWhenAnimationEnds = shouldEndOnAnimationEnds;
+			this.shouldEndWhenAnimationEnds = shouldEndWhenAnimationEnds;
 		}
 
 		public void StartAttack(AttackAnimationHandler animationHandler) {
