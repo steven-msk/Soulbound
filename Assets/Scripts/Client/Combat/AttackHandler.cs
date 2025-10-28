@@ -11,47 +11,43 @@ namespace SoulboundBackend.Client.Combat {
 		private readonly AttackSource source;
 		private readonly AttackEventDispatcher eventDispatcher;
 		private readonly IHitRecognizer hitRecognizer;
+		private readonly bool shouldEndWhenAnimationEnds;
 		public bool isHandlingAttack { get; private set; }
 		private bool isHitboxActive = false;
 		private Hitbox hitbox;
+		private AttackAnimationHandler animationHandler;
 
-		public AttackHandler(AttackSource source, AttackEventDispatcher eventDispatcher, IHitRecognizer hitRecognizer) {
+		public AttackHandler(AttackSource source, AttackEventDispatcher eventDispatcher, IHitRecognizer hitRecognizer,
+				bool shouldEndOnAnimationEnds = true) {
 			this.source = source;
 			this.eventDispatcher = eventDispatcher;
 			this.hitbox = source.hitboxSupplier.Invoke();
 			this.hitRecognizer = hitRecognizer;
-
-			eventDispatcher.onAttackStart += StartAttack;
-			eventDispatcher.onAttackEnd += EndAttack;
-			eventDispatcher.onAttackAnimationStart += source.onAttackAnimationStart;
-			eventDispatcher.onAttackAnimationEnd += source.onAttackAnimationEnd;
-			eventDispatcher.onSpawnHitbox += SpawnHitbox;
-			eventDispatcher.onDespawnHitbox += DespawnHitbox;
-			eventDispatcher.onHitboxEnter += source.onHitboxEnter;
-			eventDispatcher.onHitboxExit += source.onHitboxExit;
-			eventDispatcher.onHitFrame += OnHitFrame;
+			this.shouldEndWhenAnimationEnds = shouldEndOnAnimationEnds;
 		}
 
-		public void StartAttack() {
+		public void StartAttack(AttackAnimationHandler animationHandler) {
+			this.animationHandler = animationHandler;
 			isHandlingAttack = true;
-			source.onAttackStart?.Invoke();
+
+			animationHandler.BindEvents(source.onAttackAnimationStart, source.onAttackAnimationEnd, SpawnHitbox, DespawnHitbox);
+			eventDispatcher.onAttackStart += source.onAttackStart;
+			eventDispatcher.onAttackEnd += source.onAttackEnd;
+			eventDispatcher.onHitFrame += OnHitFrame;
+
+			eventDispatcher.OnAttackStart();
+			animationHandler.StartAnimation(this);
 		}
 
 		public void EndAttack() {
-			isHandlingAttack = false;
+			eventDispatcher.OnAttackEnd();
 			InvocationHelper.If(isHitboxActive, DespawnHitbox);
+			isHandlingAttack = false;
 
-			eventDispatcher.onAttackStart -= StartAttack;
-			eventDispatcher.onAttackEnd -= EndAttack;
-			eventDispatcher.onAttackAnimationStart -= source.onAttackAnimationStart;
-			eventDispatcher.onAttackAnimationEnd -= source.onAttackAnimationEnd;
-			eventDispatcher.onSpawnHitbox -= SpawnHitbox;
-			eventDispatcher.onDespawnHitbox -= DespawnHitbox;
-			eventDispatcher.onHitboxEnter -= source.onHitboxEnter;
-			eventDispatcher.onHitboxExit -= source.onHitboxExit;
+			animationHandler.UnbindEvents();
+			eventDispatcher.onAttackStart -= source.onAttackStart;
+			eventDispatcher.onAttackEnd -= source.onAttackEnd;
 			eventDispatcher.onHitFrame -= OnHitFrame;
-
-			source.onAttackEnd?.Invoke();
 		}
 
 		private void SpawnHitbox() {
@@ -72,6 +68,10 @@ namespace SoulboundBackend.Client.Combat {
 			}
 			hitRecognizer.OnHitFrame(other);
 			source.onHitFrame(other);
+		}
+
+		public void OnAttackAnimationEnd() {
+			InvocationHelper.If(shouldEndWhenAnimationEnds, EndAttack);
 		}
 	}
 }

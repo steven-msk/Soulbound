@@ -1,4 +1,5 @@
 using log4net.Core;
+using NUnit.Framework.Internal;
 using SoulboundBackend.Client.Combat;
 using SoulboundBackend.Client.Input;
 using SoulboundBackend.Client.ItemSystem;
@@ -178,9 +179,11 @@ namespace SoulboundBackend.Client {
 
 				InputHandler.RequestAction(new("PlayerAttack", 6, () => {
 					if (attackHandler == null) {
-						attackHandler = new AttackHandler(attackSource, this.GetComponent<AttackEventDispatcher>(), new OneTimeHitRecognizer());
+						var eventDispatcher = GetComponent<AttackEventDispatcher>();
+						var animationHandler = new AttackAnimationHandler(() => animator.SetTrigger("attack"), eventDispatcher);
+						attackHandler = new AttackHandler(attackSource, eventDispatcher, new OneTimeHitRecognizer());
 						logger.LogInfo(null, "executing attack");
-						animator.SetTrigger("attack");
+						attackHandler.StartAttack(animationHandler);
 					}
 				}, null));
 			}
