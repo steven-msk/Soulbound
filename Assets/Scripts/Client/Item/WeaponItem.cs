@@ -1,12 +1,15 @@
-using SoulboundBackend.Client.ItemSystem.Attack;
-using SoulboundBackend.Common.Item.Attack;
+using SoulboundBackend.Client.Combat;
 using UnityEngine;
 
 namespace SoulboundBackend.Client.ItemSystem {
-	public abstract class WeaponItem : StatItem, IAttackPerformer {
+	public abstract class WeaponItem : StatItem, IAttackSourceProvider {
 		public override bool applyInstantStatsOnHoverOrSelect => true;
 		public abstract GameObject attackPrefab { get; protected set; }
-		public abstract WeaponAttackBehavior attackBehavior { get; protected set; }
+
+		public abstract bool GetAttackSource(ItemUseTrigger trigger, out AttackSource source);
+
+		//public abstract WeaponAttackBehavior attackBehavior { get; protected set; }
+
 
 		// FEATUREIMPL (WIP): weapon attacks (NOT TESTED)
 		// Each armor and weapon item can be inscriptioned with +4 soul slots. This means that the
@@ -20,19 +23,5 @@ namespace SoulboundBackend.Client.ItemSystem {
 		// simple; they should leave the role of the real combat (including detailed effects) to rituals
 		// e.g. a quick slash, horizontal slice, stab, double slash, spinning attack (AoE), parry.
 		// Most weapon attacks will consist in slashing, slicing, or swinging.
-
-
-		public void PerformAttack(ItemUseTrigger trigger) {
-			if (!attackBehavior.RecognizedTriggers.Contains(trigger)) {
-				return;
-			}
-			GameObject attackObject = GameObject.Instantiate(attackPrefab);
-			if (attackObject.GetComponentInChildren<AttackHandler>() == null) {
-				throw new AttackHandlerNotFoundException(this, attackObject);
-			}
-			AttackHandler attackHandler = attackObject.GetComponentInChildren<AttackHandler>();
-			attackHandler.Init(this, attackBehavior.GenerateEvents());
-			attackHandler.HandleAttack(attackBehavior.AttackProcedureSupplier.Invoke(trigger));
-		}
 	}
 }

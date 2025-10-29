@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class ConsumableStatItem_test : ConsumableStatItem {
+public sealed class ConsumableStatItem_test : ConsumableStatItem {
 	public override IConsumable.ConsumeAction consumeAction => null;
 
 	public override string name => "ConsumableStatItem_test";

@@ -22,6 +22,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 		[ItemCache(nameof(consumableStatItem_test))] public static ConsumableStatItem_test consumableStatItem_test => Lookup(() => new ConsumableStatItem_test());
 		[ItemCache(nameof(statItem_test))] public static StatItem_test statItem_test => Lookup(() => new StatItem_test());
 		[ItemCache(nameof(toolItem_test))] public static ToolItem_test toolItem_test => Lookup(() => new ToolItem_test());
+		[ItemCache(nameof(weaponItem_test))] public static WeaponItem_test weaponItem_test => Lookup(() => new WeaponItem_test());
 
 		static Items() {
             foreach (var property in typeof(Items).GetProperties(BindingFlags.Static | BindingFlags.Public)) {

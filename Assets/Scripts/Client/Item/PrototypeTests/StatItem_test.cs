@@ -8,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class StatItem_test : StatItem {
+public sealed class StatItem_test : StatItem {
 	public override bool applyInstantStatsOnHoverOrSelect => false;
 
 	public override string name => "StatItem_test";

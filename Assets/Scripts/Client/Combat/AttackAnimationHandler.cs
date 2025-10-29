@@ -15,8 +15,8 @@ namespace SoulboundBackend.Client.Combat {
 		private AttackHandler attackHandler = null!;
 		private AnimationEvent? onAnimationStart;
 		private AnimationEvent? onAnimationEnd;
-		private AnimationEvent spawnHitbox = null!;
-		private AnimationEvent despawnHitbox = null!;
+		private AnimationEvent enrollBehaviorContext = null!;
+		private AnimationEvent endBehaviorContext = null!;
 
 		public AttackAnimationHandler(Action animationTrigger, AttackEventDispatcher eventDispatcher) {
 			this.animationTrigger = animationTrigger;
@@ -26,36 +26,31 @@ namespace SoulboundBackend.Client.Combat {
 		public void BindEvents(
 				AnimationEvent? onAnimationStart,
 				AnimationEvent? onAnimationEnd,
-				AnimationEvent spawnHitbox, 
-				AnimationEvent despawnHitbox
+				AnimationEvent enrollBehaviorContext, 
+				AnimationEvent endBehaviorContext
 			) {
 			this.onAnimationStart = onAnimationStart;
 			this.onAnimationEnd = onAnimationEnd;
-			this.spawnHitbox = spawnHitbox;
-			this.despawnHitbox = despawnHitbox;
+			this.enrollBehaviorContext = enrollBehaviorContext;
+			this.endBehaviorContext = endBehaviorContext;
 
 			eventDispatcher.onAttackAnimationStart += onAnimationStart;
-			eventDispatcher.onAttackAnimationEnd += OnAttackAnimationEnd;
-			eventDispatcher.onSpawnHitbox += spawnHitbox;
-			eventDispatcher.onDespawnHitbox += despawnHitbox;
+			eventDispatcher.onAttackAnimationEnd += onAnimationEnd;
+			eventDispatcher.enrollBehaviorContext += this.enrollBehaviorContext;
+			eventDispatcher.endBehaviorContext += this.endBehaviorContext;
 		}
 
 		public void UnbindEvents() {
 			eventDispatcher.onAttackAnimationStart -= onAnimationStart;
-			eventDispatcher.onAttackAnimationEnd -= OnAttackAnimationEnd;
-			eventDispatcher.onSpawnHitbox -= spawnHitbox;
-			eventDispatcher.onDespawnHitbox -= despawnHitbox;
+			eventDispatcher.onAttackAnimationEnd -= onAnimationEnd;
+			eventDispatcher.enrollBehaviorContext -= enrollBehaviorContext;
+			eventDispatcher.endBehaviorContext -= endBehaviorContext;
 		}
 
 		public void StartAnimation(AttackHandler handler) {
 			this.attackHandler = handler;
 			animationTrigger.Invoke();
 			eventDispatcher.OnAttackAnimationStart();
-		}
-
-		private void OnAttackAnimationEnd() {
-			onAnimationEnd?.Invoke();
-			attackHandler?.OnAttackAnimationEnd();
 		}
 	}
 }

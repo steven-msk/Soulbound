@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-public class ToolItem_test : Item, IBreakingTool {
+public sealed class ToolItem_test : Item, IBreakingTool {
     public int breakingPower => 1;
     public ToolType types => ToolType.Pickaxe;
 

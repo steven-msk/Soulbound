@@ -29,16 +29,11 @@ namespace SoulboundBackend.Client.ItemSystem {
 		}
 
 		public Tooltip? RenderTooltip(Vector2 position, Transform parent) {
-			try {
-				TooltipData tooltipData = tooltipSupplier.Invoke(this) ?? Tooltip.Plain(this.name);
-				TooltipRenderer renderer = new(nodeStyleProvider ?? TooltipNodeStylePresets.PresetProvider());
-				Tooltip tooltip = new Tooltip(renderer, tooltipData);
-				tooltip.Show(position, parent);
-				return tooltip;
-			} catch (Exception e) {
-				logger.ThrowException(null, e, "Unexpected exception thrown while rendering tooltip");
-				return null;
-			}
+			TooltipData tooltipData = tooltipSupplier?.Invoke(this) ?? Tooltip.Plain(this.name);
+			TooltipRenderer renderer = new(nodeStyleProvider ?? TooltipNodeStylePresets.PresetProvider());
+			Tooltip tooltip = new Tooltip(renderer, tooltipData);
+			tooltip.Show(position, parent);
+			return tooltip;
 		}
 
 		public static int CustomMaxStack(int maxStack) => maxStack;

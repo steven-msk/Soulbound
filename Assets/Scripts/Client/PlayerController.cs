@@ -26,7 +26,7 @@ using Level = SoulboundBackend.Client.World.Level;
 using Logger = SoulboundBackend.Common.Logging.Logger;
 
 namespace SoulboundBackend.Client {
-	public class PlayerController : LivingEntity {
+	public class PlayerController : LivingEntity, IAttackPerformer {
 		private static readonly Logger logger = Logger.CreateInstance();
 		public override Type entityScriptType => typeof(PlayerController);
 		public override string prefabDefinitionID => "johnny";
@@ -83,21 +83,57 @@ namespace SoulboundBackend.Client {
 			RegisterItemUsageCandidates(container.Resolve<ItemUsageHandler>());
 			UnityEngine.Debug.Log("player loaded: " + this.GetHashCode());
 
-			attackSource = new AttackSource.Builder(1, 10, GetComponent<Hitbox>)
-				.OnAttackStart(() => logger.LogInfo(null, "attack started"))
-				.OnAttackEnd(() => {
-					logger.LogInfo(null, "attack ended");
-					attackHandler = null!;
-				})
-				.OnAttackAnimationStart(() => logger.LogInfo(null, "attack animation started"))
-				.OnAttackAnimationEnd(() => logger.LogInfo(null, "attack animation ended"))
-				.OnHitRegistered(collider => logger.LogInfo(null, "<color=red>hit registered</color>: " + collider))
-				.OnHitFrame(collider => logger.LogInfo(null, "hit frame registered: " + collider))
-				.OnHitboxSpawned(hitbox => logger.LogInfo(null, "spawned hitbox: " + hitbox))
-				.OnHitboxDespawned(() => logger.LogInfo(null, "despawned hitbox"))
-				.OnHitboxEnter(collider => logger.LogInfo(null, "entered hitbox: " + collider))
-				.OnHitboxExit(collider => logger.LogInfo(null, "exited hitbox: " + collider))
-				.GetInstance();
+			attackSource = new AttackSource(1, 10, new AttackBehavior());
+		}
+
+		class AttackBehavior : IAttackBehavior {
+			private AttackHandler attackHandler = null!;
+			private IHitRecognizer hitRecognizer = null!;
+
+			public void End() {
+				logger.LogInfo(null, "attack behavior context ended");
+			}
+
+			public void Enroll(AttackHandler handler) {
+				this.attackHandler = handler;
+				this.hitRecognizer = new OneTimeHitRecognizer();
+				logger.LogInfo(null, "attack behavior context enrolled");
+			}
+
+			void IAttackBehavior.OnAttackAnimationStart() {
+				logger.LogInfo(null, "attack animation started");
+			}
+
+			void IAttackBehavior.OnAttackAnimationEnd() {
+				logger.LogInfo(null, "attack animation ended");
+				attackHandler.EndAttack();
+			}
+
+			void IAttackBehavior.OnAttackStart() {
+				logger.LogInfo(null, "attack started");
+			}
+
+			void IAttackBehavior.OnAttackEnd() {
+				logger.LogInfo(null, "attack ended");
+			}
+
+			void IAttackBehavior.OnHitFrame(Collider2D collider) {
+				logger.LogInfo(null, "hit frame registered: " + collider);
+			}
+
+			void IAttackBehavior.OnHitboxEnter(Collider2D collider) {
+				logger.LogInfo(null, "entered hitbox: " + collider);
+			}
+
+			void IAttackBehavior.OnHitbotExit(Collider2D collider) {
+				logger.LogInfo(null, "exited hitbox: " + collider);
+			}
+
+			void IAttackBehavior.OnHitRegistered(Collider2D collider) {
+				logger.LogInfo(null, "<color=red>hit registered</color>: " + collider);
+			}
+
+			public IHitRecognizer GetHitRecognizer() => hitRecognizer;
 		}
 
 		private void RegisterItemUsageCandidates(ItemUsageHandler? itemUsageHandler) {
@@ -108,8 +144,11 @@ namespace SoulboundBackend.Client {
 
 			itemUsageHandler.RegisterCapability<IConsumable>(ItemUseTrigger.RightClick, (consumable, stack) => consumable.Consume(stack));
 			foreach (ItemUseTrigger trigger in Enum.GetValues(typeof(ItemUseTrigger))) {
-				itemUsageHandler.RegisterCapability<IAttackPerformer>(trigger, (attackPerformer, stack) => {
-					InvocationHelper.If(CanAttack, () => attackPerformer.PerformAttack(trigger));
+				itemUsageHandler.RegisterCapability<IAttackSourceProvider>(trigger, (sourceProvider, stack) => {
+					if (sourceProvider.GetAttackSource(trigger, out var attackSource)) {
+						UnityEngine.Debug.Log("using attack item: "+ trigger);
+						TryAttack(attackSource);
+					}
 				});
 			}
 			itemUsageHandler.RegisterCapability<IPlaceable>(ItemUseTrigger.LeftHold, (placeable, stack) => {
@@ -129,6 +168,18 @@ namespace SoulboundBackend.Client {
 					tool.TryBreak(blockPos, level, new PlayerToolBreakSource(this, tool));
 				}
 			});
+		}
+
+		public void TryAttack(AttackSource source) {
+			var eventDispatcher = GetComponent<AttackEventDispatcher>();
+			var animationHandler = new AttackAnimationHandler(() => animator.SetTrigger("attack"), eventDispatcher);
+			if (attackHandler == null) {
+				attackHandler = new AttackHandler(source, eventDispatcher);
+			} else if (attackHandler.isHandlingAttack) {
+				return;
+			}
+			logger.LogInfo(null, "executing attack");
+			attackHandler.StartAttack(animationHandler);
 		}
 
 		public override void EntityUpdate(float deltaTime) {
@@ -162,29 +213,19 @@ namespace SoulboundBackend.Client {
 			} else {
 				Vector2 worldMousePos = inputHandler.MouseWorldPosition;
 
-				if (IsInBlockReach(worldMousePos)) {
+				if (CanBreakBlockAt((BlockPos)worldMousePos)) {
 					InputHandler.RequestAction(new("BlockBreak", 5, () => {
 						Level level = Soulbound.instance.GetActiveLevel()!;
 						BlockPos blockPos = level.ToBlockPos(worldMousePos);
 						Block? targetBlock = level.BlockAt(blockPos);
-						if ((targetBlock ?? Blocks.air) == Blocks.air) {
-							return;
-						}
 
 						if (0 >= targetBlock.breakRequirement?.minBreakPower) {
 							level.BreakBlock(blockPos, new PlayerToolBreakSource(this, null));
 						}
 					}, null));
+					InputHandler.BlockContext("PlayerAttack", () => !inputHandler.LeftHold);
 				} else {
-					InputHandler.RequestAction(new("PlayerAttack", 5, () => {
-						if (attackHandler == null) {
-							var eventDispatcher = GetComponent<AttackEventDispatcher>();
-							var animationHandler = new AttackAnimationHandler(() => animator.SetTrigger("attack"), eventDispatcher);
-							attackHandler = new AttackHandler(attackSource, eventDispatcher, new OneTimeHitRecognizer(), true);
-							logger.LogInfo(null, "executing attack");
-							attackHandler.StartAttack(animationHandler);
-						}
-					}, null));
+					InputHandler.RequestAction(new("PlayerAttack", 5, () => TryAttack(attackSource), null));
 				}
 			}
 		}
@@ -215,7 +256,15 @@ namespace SoulboundBackend.Client {
 		public bool CanPlaceBlockAt(BlockPos blockPos) {
 			Vector2 worldPos = (Vector2)blockPos;
 			return IsInBlockReach(worldPos)
-				   && Soulbound.instance.GetActiveLevel()!.BlockAt(blockPos) == Blocks.air;
+				   && Soulbound.instance.GetActiveLevel()!
+						.BlockAt(blockPos) == Blocks.air;
+		}
+
+		public bool CanBreakBlockAt(BlockPos blockPos) {
+			Vector2 worldPos = (Vector2)blockPos;
+			return IsInBlockReach(worldPos)
+				   && Soulbound.instance.GetActiveLevel()!
+						.BlockAt(blockPos) != Blocks.air;
 		}
 
 		public bool IsInBlockReach(Vector2 worldPos) {

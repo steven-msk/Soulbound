@@ -1,24 +1,32 @@
-﻿using SoulboundBackend.Client.ItemSystem;
-using SoulboundBackend.Client.ItemSystem.Attack;
-using SoulboundBackend.Client.Stats;
+﻿using SoulboundBackend.Client.Combat;
+using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.UI.Tooltip;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using UnityEngine;
 
-public class WeaponItem_test : WeaponItem {
-	public override GameObject attackPrefab { get => throw new NotImplementedException(); protected set => throw new NotImplementedException(); }
-	public override WeaponAttackBehavior attackBehavior { get => throw new NotImplementedException(); protected set => throw new NotImplementedException(); }
+public sealed class WeaponItem_test : Item, IAttackSourceProvider {
+	public override string name => "weaponItem_test";
 
-	public override string name => throw new NotImplementedException();
+	public override ItemAspect aspect => ItemAspectRegistry.Get(this, () => ItemAspect.Simple("fruit_icon"));
 
-	public override ItemAspect aspect => throw new NotImplementedException();
+	public override int maxStackSize => 1;
 
-	public override int maxStackSize => throw new NotImplementedException();
+	protected override Func<Item, TooltipData> tooltipSupplier => null;
 
-	public override IEnumerable<StatMapping> statMappings => throw new NotImplementedException();
+	protected override TooltipRenderer.NodeStyleProvider nodeStyleProvider => null;
 
-	protected override Func<Item, TooltipData> tooltipSupplier => throw new NotImplementedException();
-
-	protected override TooltipRenderer.NodeStyleProvider nodeStyleProvider => throw new NotImplementedException();
+	public bool GetAttackSource(ItemUseTrigger trigger, out AttackSource source) {
+		if (trigger == ItemUseTrigger.LeftClick) {
+			//GameObject.Instantiate(Resources.Load<GameObject>("weaponItem_test_hitbox")).GetComponent<Hitbox>()
+			source = new(10, 1, default);
+			return true;
+		}
+		source = default;
+		return false;
+	}
 }

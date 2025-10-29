@@ -18,19 +18,19 @@ namespace SoulboundBackend.Client.Combat {
 		public event Action<Collider2D>? onHitFrame;
 		public event Action<Collider2D>? onHitboxEnter;
 		public event Action<Collider2D>? onHitboxExit;
-		public event AnimationEvent? onSpawnHitbox;
-		public event AnimationEvent? onDespawnHitbox;
+		public event AnimationEvent enrollBehaviorContext = null!;
+		public event AnimationEvent endBehaviorContext = null!;
 
 		public void OnAttackStart() {
 			onAttackStart?.Invoke();
 		}
 
-		public void SpawnHitbox() {
-			onSpawnHitbox?.Invoke();
+		public void EnrollBehaviorContext() {
+			enrollBehaviorContext.Invoke();
 		}
 
-		public void DespawnHitbox() {
-			onDespawnHitbox?.Invoke();
+		public void EndBehaviorContext() {
+			endBehaviorContext.Invoke();
 		}
 
 		public void OnHitFrame(Collider2D other) {
