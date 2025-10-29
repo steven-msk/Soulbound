@@ -65,9 +65,9 @@ namespace SoulboundBackend.Client.UI.Storage {
 			this.eventHandler = new InventoryEventHandler();
 			player = container.Resolve<PlayerController>();
 
-			hotbar.SetupGrid();
+			hotbar.Construct(this);
 			this.SetupGrid();
-			armorSlots.SetActive(false);
+			this.PreInitState();
 
 			List<InventorySlot> mainPlayerSlots = hotbar.Slots.ToList();
 			mainPlayerSlots.AddRange(popupSlots);
@@ -112,7 +112,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 				?.Concat(TryDeserialize("armor", serialized.regions, index => armorSlotsByIndex[index]));
 			hotbar.SetActiveSlot(serialized.lastHotbarIndex);
 
-			//ItemDisplay.Create(new ItemStack(Items.toolItem_test, 1), this.slots[0], this);
+			this.slots[0].CreateDisplay(new ItemStack(Items.weaponItem_test, 1));
 
 			return pendingUpdates?.ToList()!;
 		}
@@ -133,6 +133,11 @@ namespace SoulboundBackend.Client.UI.Storage {
 				}
 			}
 			return pendingAttachUpdates.ToArray();
+		}
+
+		private void PreInitState() {
+			armorSlots.SetActive(opened);
+			popup.SetActive(opened);
 		}
 
 		public void ToggleInventory() {

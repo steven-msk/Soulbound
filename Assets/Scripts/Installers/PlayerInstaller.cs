@@ -5,6 +5,7 @@ using SoulboundBackend.Client.UI.Storage;
 using SoulboundBackend.Core.Resource;
 using UnityEngine;
 using Zenject;
+using System;
 
 namespace SoulboundBackend.Core.Bootstrap {
 	public class PlayerInstaller : MonoInstaller {
@@ -35,8 +36,10 @@ namespace SoulboundBackend.Core.Bootstrap {
 			container.Bind<InputHandler>().FromComponentInNewPrefab(inputHandlerPrefab.gameObject).AsSingle();
 			container.Bind<PlayerPhysics>().FromComponentOnRoot().AsSingle();
 			container.Bind<ItemUsageHandler>().AsSingle();
-			container.Bind<InventoryController>().FromComponentInNewPrefab(inventoryPrefab).AsSingle();
-			container.Bind<HotbarController>().FromComponentInChildren().AsSingle();
+			container.Bind<InventoryController>()
+				.FromComponentInNewPrefab(inventoryPrefab)
+				.UnderTransform(GameObject.FindFirstObjectByType<Canvas>().transform)
+				.AsSingle();
 			container.Bind<StepClimber>().FromComponentOnRoot().AsSingle();
 			Debug.Log("player installer has installed bindings");
 		}

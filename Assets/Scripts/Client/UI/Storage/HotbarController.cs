@@ -43,10 +43,10 @@ namespace SoulboundBackend.Client.UI.Storage {
 		public InventorySlot this[int index] => slots[index];
 		private static Dictionary<int, InventorySlot> slotsByIndex = new();
 
-		[Inject]
 		public void Construct(InventoryController inventory) {
 			this.inventory = inventory;
 			this.SetupGrid();
+			UnityEngine.Debug.Log("hotbar loaded");
 		}
 		public void SetupGrid() {
 			slots = gameObject.GetComponentsInChildren<InventorySlot>();
