@@ -90,46 +90,46 @@ namespace SoulboundBackend.Client {
 			private AttackHandler attackHandler = null!;
 			private IHitRecognizer hitRecognizer = null!;
 
-			public void End() {
+			public void End(AttackContext context) {
 				logger.LogInfo(null, "attack behavior context ended");
 			}
 
-			public void Enroll(AttackHandler handler) {
+			public void Enroll(AttackContext context, AttackHandler handler, AttackEventDispatcher eventDispatcher) {
 				this.attackHandler = handler;
 				this.hitRecognizer = new OneTimeHitRecognizer();
 				logger.LogInfo(null, "attack behavior context enrolled");
 			}
 
-			void IAttackBehavior.OnAttackAnimationStart() {
+			void IAttackBehavior.OnAttackAnimationStart(AttackContext context) {
 				logger.LogInfo(null, "attack animation started");
 			}
 
-			void IAttackBehavior.OnAttackAnimationEnd() {
+			void IAttackBehavior.OnAttackAnimationEnd(AttackContext context) {
 				logger.LogInfo(null, "attack animation ended");
 				attackHandler.EndAttack();
 			}
 
-			void IAttackBehavior.OnAttackStart() {
+			void IAttackBehavior.OnAttackStart(AttackContext context) {
 				logger.LogInfo(null, "attack started");
 			}
 
-			void IAttackBehavior.OnAttackEnd() {
+			void IAttackBehavior.OnAttackEnd(AttackContext context) {
 				logger.LogInfo(null, "attack ended");
 			}
 
-			void IAttackBehavior.OnHitFrame(Collider2D collider) {
+			void IAttackBehavior.OnHitFrame(AttackContext context, Collider2D collider) {
 				logger.LogInfo(null, "hit frame registered: " + collider);
 			}
 
-			void IAttackBehavior.OnHitboxEnter(Collider2D collider) {
+			void IAttackBehavior.OnHitboxEnter(AttackContext context, Collider2D collider) {
 				logger.LogInfo(null, "entered hitbox: " + collider);
 			}
 
-			void IAttackBehavior.OnHitbotExit(Collider2D collider) {
+			void IAttackBehavior.OnHitbotExit(AttackContext context, Collider2D collider) {
 				logger.LogInfo(null, "exited hitbox: " + collider);
 			}
 
-			void IAttackBehavior.OnHitRegistered(Collider2D collider) {
+			void IAttackBehavior.OnHitRegistered(AttackContext context, Collider2D collider) {
 				logger.LogInfo(null, "<color=red>hit registered</color>: " + collider);
 			}
 
@@ -173,13 +173,15 @@ namespace SoulboundBackend.Client {
 		public void TryAttack(AttackSource source) {
 			var eventDispatcher = GetComponent<AttackEventDispatcher>();
 			var animationHandler = new AttackAnimationHandler(() => animator.SetTrigger("attack"), eventDispatcher);
-			if (attackHandler == null) {
-				attackHandler = new AttackHandler(source, eventDispatcher);
-			} else if (attackHandler.isHandlingAttack) {
+			if (attackHandler?.isHandlingAttack ?? false) {
 				return;
 			}
-			logger.LogInfo(null, "executing attack");
-			attackHandler.StartAttack(animationHandler);
+			attackHandler = new AttackHandler(source, eventDispatcher);
+			var attackContext = new AttackContext(this, source) {
+				metadata = 12
+			};
+			logger.LogInfo(null, "executing attack: " + attackContext.metadata);
+			attackHandler.StartAttack(attackContext, animationHandler);
 		}
 
 		public override void EntityUpdate(float deltaTime) {

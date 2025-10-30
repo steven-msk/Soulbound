@@ -14,6 +14,7 @@ namespace SoulboundBackend.Client.Combat {
 		private readonly AttackSource source;
 		private readonly AttackEventDispatcher eventDispatcher;
 		public bool isHandlingAttack { get; private set; }
+		private AttackContext context;
 		private AttackAnimationHandler animationHandler;
 
 		public AttackHandler(AttackSource source, AttackEventDispatcher eventDispatcher) {
@@ -21,21 +22,22 @@ namespace SoulboundBackend.Client.Combat {
 			this.eventDispatcher = eventDispatcher;
 		}
 
-		public void StartAttack(AttackAnimationHandler animationHandler) {
+		public void StartAttack(AttackContext context, AttackAnimationHandler animationHandler) {
 			if (isHandlingAttack) {
-				throw new InvalidOperationException("Attempted to start attack while an ongoing one is handled");
+				throw new InvalidOperationException("Attempted to start attack when another has already begun");
 			}
+			this.context = context;
 			this.animationHandler = animationHandler;
 			isHandlingAttack = true;
 
 			animationHandler.BindEvents(
-				source.behavior.OnAttackAnimationStart,
-				source.behavior.OnAttackAnimationEnd, 
+				InjectContext_OnAttackAnimationStart,
+				InjectContext_OnAttackAnimationEnd,
 				EnrollBehaviorContext, 
 				EndBehaviorContext
 			);
-			eventDispatcher.onAttackStart += source.behavior.OnAttackStart;
-			eventDispatcher.onAttackEnd += source.behavior.OnAttackEnd;
+			eventDispatcher.onAttackStart += InjectContext_OnAttackStart;
+			eventDispatcher.onAttackEnd += InjectContext_OnAttackEnd;
 			eventDispatcher.onHitFrame += OnHitFrame;
 
 			eventDispatcher.OnAttackStart();
@@ -47,12 +49,11 @@ namespace SoulboundBackend.Client.Combat {
 				throw new InvalidOperationException("Attempted to end attack when it hasnt even started yet");
 			}
 			eventDispatcher.OnAttackEnd();
-			//InvocationHelper.If(isHitboxActive, DespawnHitbox);
 			isHandlingAttack = false;
 
 			animationHandler.UnbindEvents();
-			eventDispatcher.onAttackStart -= source.behavior.OnAttackStart;
-			eventDispatcher.onAttackEnd -= source.behavior.OnAttackEnd;
+			eventDispatcher.onAttackStart -= InjectContext_OnAttackStart;
+			eventDispatcher.onAttackEnd -= InjectContext_OnAttackEnd;
 			eventDispatcher.onHitFrame -= OnHitFrame;
 		}
 
@@ -61,14 +62,14 @@ namespace SoulboundBackend.Client.Combat {
 			if (!isHandlingAttack) {
 				throw new InvalidOperationException("EnrollBehaviorContext called on a non-handled attack");
 			}
-			source.behavior.Enroll(this);
+			source.behavior.Enroll(context, this, eventDispatcher);
 		}
 
 		private void EndBehaviorContext() {
 			if (!isHandlingAttack) {
 				throw new InvalidOperationException("EndBehaviorContext called on a non-handled attack");
 			}
-			source.behavior.End();
+			source.behavior.End(this.context);
 		}
 
 		private void OnHitFrame(Collider2D other) {
@@ -77,13 +78,29 @@ namespace SoulboundBackend.Client.Combat {
 
 				if (hitRecognizer.ShouldRegisterHit(hurtbox)) {
 					hurtbox.NotifyHit(source);
-					source.behavior.OnHitRegistered(other);
+					source.behavior.OnHitRegistered(this.context, other);
 				}
 				hitRecognizer.OnHitFrame(hurtbox);
-				source.behavior.OnHitFrame(other);
+				source.behavior.OnHitFrame(this.context, other);
 			} else {
 				logger.LogError(null, "Could not find Hurtbox on hitbox collider: {}", other.gameObject);
 			}
+		}
+
+		private void InjectContext_OnAttackAnimationStart() {
+			source.behavior.OnAttackAnimationStart(this.context);
+		}
+
+		private void InjectContext_OnAttackAnimationEnd() {
+			source.behavior.OnAttackAnimationEnd(this.context);
+		}
+
+		private void InjectContext_OnAttackStart() {
+			source.behavior.OnAttackStart(this.context);
+		}
+
+		private void InjectContext_OnAttackEnd() {
+			source.behavior.OnAttackEnd(this.context);
 		}
 	}
 }
