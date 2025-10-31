@@ -1,4 +1,5 @@
-﻿using SoulboundBackend.Common;
+﻿using SoulboundBackend.Client.World.Entity;
+using SoulboundBackend.Common;
 using SoulboundBackend.Common.Logging;
 using System;
 using System.Collections.Generic;
@@ -12,22 +13,33 @@ namespace SoulboundBackend.Client.Combat {
 	public class AttackHandler {
 		private static readonly Logger logger = Logger.CreateInstance();
 		private readonly AttackSource source;
-		private readonly AttackEventDispatcher eventDispatcher;
 		public bool isHandlingAttack { get; private set; }
 		private AttackContext context;
+		private AttackEventDispatcher eventDispatcher;
 		private AttackAnimationHandler animationHandler;
 
-		public AttackHandler(AttackSource source, AttackEventDispatcher eventDispatcher) {
-			this.source = source;
-			this.eventDispatcher = eventDispatcher;
+		public AttackHandler(AttackSource source) => this.source = source;
+		
+		public void StartAttack(Entity performer, object metadata) {
+			AssertNotHandling();
+			var context = new AttackContext(performer, source) {
+				metadata = metadata
+			};
+			var animatorChannel = source.animatorChannelSupplier.Invoke(context);
+			Animator animator = animatorChannel.animator;
+			AttackEventDispatcher eventDispatcher = animatorChannel.eventDispatcher;
+			var animationHandler = new AttackAnimationHandler(eventDispatcher, animator, source.initialAnimationTrigger);
+
+			this.StartAttack(context, animationHandler, eventDispatcher);
 		}
 
-		public void StartAttack(AttackContext context, AttackAnimationHandler animationHandler) {
-			if (isHandlingAttack) {
-				throw new InvalidOperationException("Attempted to start attack when another has already begun");
-			}
+		public void StartAttack(AttackContext context, AttackAnimationHandler animationHandler, AttackEventDispatcher eventDispatcher) {
+			AssertNotHandling();
 			this.context = context;
 			this.animationHandler = animationHandler;
+			this.eventDispatcher = eventDispatcher;
+			context.animationHandler ??= animationHandler;
+			context.eventDispatcher ??= eventDispatcher;
 			isHandlingAttack = true;
 
 			animationHandler.BindEvents(
@@ -59,6 +71,8 @@ namespace SoulboundBackend.Client.Combat {
 			eventDispatcher.onHitboxEnter -= InjectContext_OnHitboxEnter;
 			eventDispatcher.onHitboxExit -= InjectContext_OnHitboxExit;
 			eventDispatcher.onHitFrame -= OnHitFrame;
+
+			context.DestroyAllTemp();
 		}
 
 
@@ -66,7 +80,7 @@ namespace SoulboundBackend.Client.Combat {
 			if (!isHandlingAttack) {
 				throw new InvalidOperationException("EnrollBehaviorContext called on a non-handled attack");
 			}
-			source.behavior.Enroll(context, this, eventDispatcher);
+			source.behavior.Enroll(context, this);
 		}
 
 		private void EndBehaviorContext() {
@@ -113,6 +127,12 @@ namespace SoulboundBackend.Client.Combat {
 
 		private void InjectContext_OnHitboxExit(Collider2D collider) {
 			source.behavior.OnHitbotExit(this.context, collider);
+		}
+
+		private void AssertNotHandling() {
+			if (isHandlingAttack) {
+				throw new InvalidOperationException("Attempted to start attack when another has already begun");
+			}
 		}
 	}
 }

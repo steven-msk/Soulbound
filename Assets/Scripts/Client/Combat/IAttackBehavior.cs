@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace SoulboundBackend.Client.Combat {
 	public interface IAttackBehavior {
-		void Enroll(AttackContext context, AttackHandler handler, AttackEventDispatcher eventDispatcher);
+		void Enroll(AttackContext context, AttackHandler handler);
 		void End(AttackContext context);
 
 		IHitRecognizer GetHitRecognizer();

@@ -83,7 +83,16 @@ namespace SoulboundBackend.Client {
 			RegisterItemUsageCandidates(container.Resolve<ItemUsageHandler>());
 			UnityEngine.Debug.Log("player loaded: " + this.GetHashCode());
 
-			attackSource = new AttackSource(1, 10, new AttackBehavior());
+			attackSource = new AttackSource(1, 10, new AttackBehavior(),
+				context => {
+					var eventDispatcher = GetComponent<AttackEventDispatcher>();
+					context.eventDispatcher = eventDispatcher;
+					return AttackAnimatorChannel.FromDelegates(
+						GetComponent<Animator>, 
+						() => eventDispatcher
+					);
+				},
+				animator => animator.SetTrigger("attack"));
 		}
 
 		class AttackBehavior : IAttackBehavior {
@@ -94,7 +103,7 @@ namespace SoulboundBackend.Client {
 				logger.LogInfo(null, "attack behavior context ended");
 			}
 
-			public void Enroll(AttackContext context, AttackHandler handler, AttackEventDispatcher eventDispatcher) {
+			public void Enroll(AttackContext context, AttackHandler handler) {
 				this.attackHandler = handler;
 				this.hitRecognizer = new OneTimeHitRecognizer();
 				logger.LogInfo(null, "attack behavior context enrolled");
@@ -115,6 +124,7 @@ namespace SoulboundBackend.Client {
 
 			void IAttackBehavior.OnAttackEnd(AttackContext context) {
 				logger.LogInfo(null, "attack ended");
+				context.animationHandler.animatorReference.Play("johnny_jump");
 			}
 
 			void IAttackBehavior.OnHitFrame(AttackContext context, Collider2D collider) {
@@ -171,17 +181,12 @@ namespace SoulboundBackend.Client {
 		}
 
 		public void TryAttack(AttackSource source) {
-			var eventDispatcher = GetComponent<AttackEventDispatcher>();
-			var animationHandler = new AttackAnimationHandler(() => animator.SetTrigger("attack"), eventDispatcher);
 			if (attackHandler?.isHandlingAttack ?? false) {
 				return;
 			}
-			attackHandler = new AttackHandler(source, eventDispatcher);
-			var attackContext = new AttackContext(this, source) {
-				metadata = 12
-			};
-			logger.LogInfo(null, "executing attack: " + attackContext.metadata);
-			attackHandler.StartAttack(attackContext, animationHandler);
+			attackHandler = new AttackHandler(source);
+			logger.LogInfo(null, "executing attack");
+			attackHandler.StartAttack(this, null);
 		}
 
 		public override void EntityUpdate(float deltaTime) {

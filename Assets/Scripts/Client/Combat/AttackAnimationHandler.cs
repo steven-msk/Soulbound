@@ -10,17 +10,23 @@ using static Unity.VisualScripting.Member;
 
 namespace SoulboundBackend.Client.Combat {
 	public sealed class AttackAnimationHandler {
-		private readonly Action animationTrigger;
+		private readonly Action<Animator> initialAnimationTrigger;
 		private readonly AttackEventDispatcher eventDispatcher;
+		public readonly Animator animatorReference;
 		private AttackHandler attackHandler = null!;
 		private AnimationEvent? onAnimationStart;
 		private AnimationEvent? onAnimationEnd;
 		private AnimationEvent enrollBehaviorContext = null!;
 		private AnimationEvent endBehaviorContext = null!;
 
-		public AttackAnimationHandler(Action animationTrigger, AttackEventDispatcher eventDispatcher) {
-			this.animationTrigger = animationTrigger;
+		public AttackAnimationHandler(
+				AttackEventDispatcher eventDispatcher,
+				Animator animatorReference,
+				Action<Animator> initialAnimationTrigger
+			) {
+			this.initialAnimationTrigger = initialAnimationTrigger;
 			this.eventDispatcher = eventDispatcher;
+			this.animatorReference = animatorReference;
 		}
 
 		public void BindEvents(
@@ -49,7 +55,7 @@ namespace SoulboundBackend.Client.Combat {
 
 		public void StartAnimation(AttackHandler handler) {
 			this.attackHandler = handler;
-			animationTrigger.Invoke();
+			initialAnimationTrigger.Invoke(animatorReference);
 			eventDispatcher.OnAttackAnimationStart();
 		}
 	}

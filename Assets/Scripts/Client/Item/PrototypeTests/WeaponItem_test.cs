@@ -22,8 +22,19 @@ public sealed class WeaponItem_test : Item, IAttackSourceProvider {
 
 	public bool GetAttackSource(ItemUseTrigger trigger, out AttackSource source) {
 		if (trigger == ItemUseTrigger.LeftClick) {
-			//GameObject.Instantiate(Resources.Load<GameObject>("weaponItem_test_hitbox")).GetComponent<Hitbox>()
-			source = new(10, 1, new TestBehavior());
+			var animationPrefab = Resources.Load<GameObject>("weaponItem_test_hitbox");
+			source = new AttackSource(10, 1, new TestBehavior(), context => {
+				var parentObj = new GameObject("parent animation object");
+				parentObj.transform.SetParent(context.performer.transform);
+				parentObj.transform.position = new Vector2(1f * context.performer.facing, 1f) + context.performer.position;
+
+				var obj = GameObject.Instantiate(animationPrefab, parentObj.transform, true);
+				context.AddTemp(parentObj);
+				return AttackAnimatorChannel.FromDelegates(
+					obj.GetComponent<Animator>,
+					obj.GetComponent<AttackEventDispatcher>
+				);
+			}, animator => animator.Play("attack"));
 			return true;
 		}
 		source = default;
@@ -37,19 +48,20 @@ public sealed class WeaponItem_test : Item, IAttackSourceProvider {
 
 		public void End(AttackContext context) {
 			UnityEngine.Debug.Log("test behavior ended");
-			hitbox.Deactivate();
-			GameObject.Destroy(hitbox.gameObject);
+			context.animationHandler.animatorReference.gameObject.GetComponent<Hitbox>().Deactivate();
+			//hitbox.Deactivate();
+			//GameObject.Destroy(hitbox.gameObject);
 		}
 
-		public void Enroll(AttackContext context, AttackHandler handler, AttackEventDispatcher eventDispatcher) {
+		public void Enroll(AttackContext context, AttackHandler handler) {
 			hitRecognizer = new OneTimeHitRecognizer();
 			this.attackHandler = handler;
 			UnityEngine.Debug.Log("test behavior enrolled");
-			hitbox = GameObject.Instantiate(Resources.Load<GameObject>("weaponItem_test_hitbox"), context.performer.transform, true)
-				.GetComponent<Hitbox>();
-			hitbox.gameObject.SetActive(true);
-			hitbox.transform.position = new Vector2(context.performer.facing * 1f, 1f) + context.performer.position;
-			hitbox.Activate(eventDispatcher);
+			context.animationHandler.animatorReference.gameObject.GetComponent<Hitbox>().Activate(context.eventDispatcher);
+			//hitbox = GameObject.Instantiate(Resources.Load<GameObject>("weaponItem_test_hitbox"), context.performer.transform, true)
+			//	.GetComponent<Hitbox>();
+			//hitbox.transform.position = new Vector2(context.performer.facing * 1f, 1f) + context.performer.position;
+			//hitbox.Activate(context.eventDispatcher);
 		}
 
 		public IHitRecognizer GetHitRecognizer() {
