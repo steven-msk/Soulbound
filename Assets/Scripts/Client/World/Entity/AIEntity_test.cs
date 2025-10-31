@@ -7,6 +7,12 @@ namespace SoulboundBackend.Client.World.Entity {
 	public sealed class AIEntity_test : Entity, ITickable {
 		public override Type entityScriptType => typeof(AIEntity_test);
 		public override string prefabDefinitionID => "ai test";
+
+		public override float facing { 
+			get => this.GetFacingFromXScaleSign();
+			set => this.SetFacingUsingXScaleSign(value);
+		}
+
 		private AIController aiController;
 
 		public override void Spawn(EntitySpawnData spawnData) {

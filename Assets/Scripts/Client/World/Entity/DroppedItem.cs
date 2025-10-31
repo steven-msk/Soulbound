@@ -13,6 +13,8 @@ namespace SoulboundBackend.Client.World.Entity {
 		public override Type entityScriptType => typeof(DroppedItem);
 		public override string prefabDefinitionID => "droppedItem";
 		public ItemStack ItemStack { get; private set; }
+		public override float facing { get => 1f; set => _ = value; }
+
 		private float despawnTimer;
 		private bool isFrozen;
 

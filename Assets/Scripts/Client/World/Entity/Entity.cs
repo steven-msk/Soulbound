@@ -12,6 +12,7 @@ namespace SoulboundBackend.Client.World.Entity {
 		public Guid id { get; private set; }
 		public int currentChunkX { get; private set; }
 		public abstract Type entityScriptType { get; }
+		public abstract float facing { get; set; }
 		[Obsolete] public abstract string prefabDefinitionID { get; }
 		public Vector2 position => transform.position;
 
@@ -76,7 +77,7 @@ namespace SoulboundBackend.Client.World.Entity {
 		}
 	}
 
-	public static class EnityBounds {
+	public static class EntityFieldRetriever {
 		public static Bounds GetBoundsOrFallback(this Entity entity, Vector2 fallbackSize) {
 			Collider2D collider = entity.GetComponent<Collider2D>();
 			if (collider != null) {
@@ -87,6 +88,18 @@ namespace SoulboundBackend.Client.World.Entity {
 
 		public static Bounds GetColliderBounds(this Entity entity) {
 			return entity.GetComponent<Collider2D>().bounds;
+		}
+
+		public static float GetFacingFromXScaleSign(this Entity entity) {
+			return Mathf.Sign(entity.transform.localScale.x);
+		}
+
+		public static void SetFacingUsingXScaleSign(this Entity entity, float facing) {
+			facing = Mathf.Sign(facing);
+			Vector3 scale = entity.transform.localScale;
+			scale.x = facing;
+			entity.transform.localScale = scale;
+			entity.facing = facing;
 		}
 	}
 }

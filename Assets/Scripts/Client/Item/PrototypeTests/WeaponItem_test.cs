@@ -48,7 +48,7 @@ public sealed class WeaponItem_test : Item, IAttackSourceProvider {
 			hitbox = GameObject.Instantiate(Resources.Load<GameObject>("weaponItem_test_hitbox"), context.performer.transform, true)
 				.GetComponent<Hitbox>();
 			hitbox.gameObject.SetActive(true);
-			hitbox.transform.position = new Vector2(1f, 1f) + context.performer.position;
+			hitbox.transform.position = new Vector2(context.performer.facing * 1f, 1f) + context.performer.position;
 			hitbox.Activate(eventDispatcher);
 		}
 

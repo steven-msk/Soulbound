@@ -12,6 +12,8 @@ namespace SoulboundBackend.Client.World.Entity {
 
 		[Obsolete] public override string prefabDefinitionID => null;
 
+		public override float facing { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
 		public override void ApplySerializedProperties(SerializedEntityPropertyList properties) {
 		}
 

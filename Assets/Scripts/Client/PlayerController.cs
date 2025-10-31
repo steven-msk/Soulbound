@@ -60,7 +60,7 @@ namespace SoulboundBackend.Client {
 
 		public bool CanAttack { get; set; } = true;
 
-		public float facing => playerPhysics.facing;
+		public override float facing { get => playerPhysics.facing; set => playerPhysics.facing = value; }
 		public Vector2 center => Physics.Collider.bounds.center;
 		public BlockPos blockPos => Soulbound.instance.GetActiveLevel()!.ToBlockPos(this.position);
 		public ChunkBlockPos chunkBlockPos => blockPos.ToChunkBlockPos(Soulbound.instance.GetActiveLevel()!.ChunkXAt(position));
