@@ -25,6 +25,11 @@ namespace SoulboundBackend.Client.Combat {
 			}
 		}
 #endif
+		private void Update() {
+			if (owner != null) {
+				UnityEngine.Debug.Log("active: "+ collider.enabled);
+			}
+		}
 
 		public void Activate(AttackEventDispatcher owner) {
 			this.owner = owner;

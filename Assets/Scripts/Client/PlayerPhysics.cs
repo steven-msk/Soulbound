@@ -89,14 +89,14 @@ namespace SoulboundBackend.Client {
 				rb.linearDamping = 0f;
 			}, IsOnGround));
 
-			triggerReactionsByLayer.Add(LayerMask.NameToLayer("Hitbox"), (collision => {
-				player.TakeDamage(1);
-				player.GrantImmunity(immunityTimeSeconds);
-				Vector2 bounce = (transform.position - collision.transform.position).normalized;
-				rb.linearVelocity = bounce * contactBouncePower;
-				knockbackStunTimer = knockbackStunDuration * Mathf.Clamp(Mathf.Abs(bounce.y), 0.1f, 1f);
-			}, () => !player.isImmune));
-			isBootstrapped = true;
+			//triggerReactionsByLayer.Add(LayerMask.NameToLayer("Hitbox"), (collision => {
+			//	player.TakeDamage(1);
+			//	player.GrantImmunity(immunityTimeSeconds);
+			//	Vector2 bounce = (transform.position - collision.transform.position).normalized;
+			//	rb.linearVelocity = bounce * contactBouncePower;
+			//	knockbackStunTimer = knockbackStunDuration * Mathf.Clamp(Mathf.Abs(bounce.y), 0.1f, 1f);
+			//}, () => !player.isImmune));
+			//isBootstrapped = true;
 			UnityEngine.Debug.Log("player physics constructed");
 		}
 
@@ -195,15 +195,15 @@ namespace SoulboundBackend.Client {
 			collisionResponse.action.InvokeIf(collision, collisionResponse.validator ?? (() => true));
 		}
 
-		private void OnTriggerStay2D(Collider2D collision) {
-			if (!player?.isSpawned ?? true) {
-				return;
-			}
-			var triggerResponse = triggerReactionsByLayer.GetValueOrDefault(collision.gameObject.layer, (collision => {
-				logger.LogWarning(null, "Unknown trigger callback layer: {}", LayerMask.LayerToName(collision.gameObject.layer));
-			}, null));
-			triggerResponse.action.InvokeIf(collision, triggerResponse.validator ?? (() => true));
-		}
+		//private void OnTriggerStay2D(Collider2D collision) {
+		//	if (!player?.isSpawned ?? true) {
+		//		return;
+		//	}
+		//	var triggerResponse = triggerReactionsByLayer.GetValueOrDefault(collision.gameObject.layer, (collision => {
+		//		logger.LogWarning(null, "Unknown trigger callback layer: {}", LayerMask.LayerToName(collision.gameObject.layer));
+		//	}, null));
+		//	triggerResponse.action.InvokeIf(collision, triggerResponse.validator ?? (() => true));
+		//}
 
 		public bool IsOnGround() {
 			Vector2 origin = (Vector2)transform.position + collider.offset + Vector2.down * (collider.size.y * 0.5f);

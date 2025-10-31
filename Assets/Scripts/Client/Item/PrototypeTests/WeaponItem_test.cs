@@ -47,7 +47,8 @@ public sealed class WeaponItem_test : Item, IAttackSourceProvider {
 			UnityEngine.Debug.Log("test behavior enrolled");
 			hitbox = GameObject.Instantiate(Resources.Load<GameObject>("weaponItem_test_hitbox"), context.performer.transform, true)
 				.GetComponent<Hitbox>();
-			hitbox.transform.position = context.performer.position;
+			hitbox.gameObject.SetActive(true);
+			hitbox.transform.position = new Vector2(1f, 1f) + context.performer.position;
 			hitbox.Activate(eventDispatcher);
 		}
 
@@ -57,6 +58,10 @@ public sealed class WeaponItem_test : Item, IAttackSourceProvider {
 
 		void IAttackBehavior.OnAttackAnimationEnd(AttackContext context) {
 			attackHandler.EndAttack();
+		}
+
+		void IAttackBehavior.OnHitboxEnter(AttackContext context, Collider2D collider) {
+			UnityEngine.Debug.Log("hitbox entered");
 		}
 	}
 }

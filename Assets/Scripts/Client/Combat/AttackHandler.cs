@@ -38,6 +38,8 @@ namespace SoulboundBackend.Client.Combat {
 			);
 			eventDispatcher.onAttackStart += InjectContext_OnAttackStart;
 			eventDispatcher.onAttackEnd += InjectContext_OnAttackEnd;
+			eventDispatcher.onHitboxEnter += InjectContext_OnHitboxEnter;
+			eventDispatcher.onHitboxExit += InjectContext_OnHitboxExit;
 			eventDispatcher.onHitFrame += OnHitFrame;
 
 			eventDispatcher.OnAttackStart();
@@ -54,6 +56,8 @@ namespace SoulboundBackend.Client.Combat {
 			animationHandler.UnbindEvents();
 			eventDispatcher.onAttackStart -= InjectContext_OnAttackStart;
 			eventDispatcher.onAttackEnd -= InjectContext_OnAttackEnd;
+			eventDispatcher.onHitboxEnter -= InjectContext_OnHitboxEnter;
+			eventDispatcher.onHitboxExit -= InjectContext_OnHitboxExit;
 			eventDispatcher.onHitFrame -= OnHitFrame;
 		}
 
@@ -101,6 +105,14 @@ namespace SoulboundBackend.Client.Combat {
 
 		private void InjectContext_OnAttackEnd() {
 			source.behavior.OnAttackEnd(this.context);
+		}
+
+		private void InjectContext_OnHitboxEnter(Collider2D collider) {
+			source.behavior.OnHitboxEnter(this.context, collider);
+		}
+
+		private void InjectContext_OnHitboxExit(Collider2D collider) {
+			source.behavior.OnHitbotExit(this.context, collider);
 		}
 	}
 }

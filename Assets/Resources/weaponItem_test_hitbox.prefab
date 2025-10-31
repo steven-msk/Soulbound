@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1745129434304316669}
   - component: {fileID: 2375633529242123914}
   - component: {fileID: 1541472514263546152}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: weaponItem_test_hitbox
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40,7 +40,7 @@ BoxCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1731999832789114393}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Density: 1
   m_Material: {fileID: 0}

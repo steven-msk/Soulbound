@@ -25,6 +25,7 @@ namespace SoulboundBackend.Client.Combat {
 
 		public void NotifyHit(AttackSource source) {
 			UnityEngine.Debug.Log("hurtbox hit: "+ source.baseDamage);
+			this.GetComponentInParent<Rigidbody2D>().AddForce(new Vector2(100f, 100f));
 		}
 	}
 }
