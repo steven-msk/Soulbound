@@ -90,19 +90,26 @@ namespace SoulboundBackend.Client.Combat {
 			source.behavior.End(this.context);
 		}
 
-		private void OnHitFrame(Collider2D other) {
-			if (other.TryGetComponent<Hurtbox>(out var hurtbox)) {
+		private void OnHitFrame(Hitbox hitbox, Collider2D collider) {
+			if (collider.TryGetComponent<Hurtbox>(out var hurtbox)) {
 				IHitRecognizer hitRecognizer = source.behavior.GetHitRecognizer();
 
 				if (hitRecognizer.ShouldRegisterHit(hurtbox)) {
 					hurtbox.NotifyHit(source);
-					source.behavior.OnHitRegistered(this.context, other);
+					source.behavior.OnHitRegistered(this.context, hitbox, collider);
 				}
 				hitRecognizer.OnHitFrame(hurtbox);
-				source.behavior.OnHitFrame(this.context, other);
-			} else {
-				logger.LogError(null, "Could not find Hurtbox on hitbox collider: {}", other.gameObject);
+				source.behavior.OnHitFrame(this.context, hitbox, collider);
+				return;
 			}
+			
+			if (collider.TryGetComponent<TilemapCollisionDetector>(out var tilemapCollisionDetector)) {
+				UnityEngine.Debug.Log("hitting tilemap");
+				tilemapCollisionDetector.NotifyHit(hitbox, collider);
+				return;
+			}
+
+			logger.LogError(null, "Could not find Hurtbox on hitbox collider: {}", collider.gameObject);
 		}
 
 		private void InjectContext_OnAttackAnimationStart() {
@@ -121,12 +128,12 @@ namespace SoulboundBackend.Client.Combat {
 			source.behavior.OnAttackEnd(this.context);
 		}
 
-		private void InjectContext_OnHitboxEnter(Collider2D collider) {
-			source.behavior.OnHitboxEnter(this.context, collider);
+		private void InjectContext_OnHitboxEnter(Hitbox hitbox, Collider2D collider) {
+			source.behavior.OnHitboxEnter(this.context, hitbox, collider);
 		}
 
-		private void InjectContext_OnHitboxExit(Collider2D collider) {
-			source.behavior.OnHitbotExit(this.context, collider);
+		private void InjectContext_OnHitboxExit(Hitbox hitbox, Collider2D collider) {
+			source.behavior.OnHitbotExit(this.context, hitbox, collider);
 		}
 
 		private void AssertNotHandling() {

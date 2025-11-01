@@ -13,6 +13,11 @@ namespace SoulboundBackend.Client.Combat {
 		public void Enroll(AttackContext context, AttackHandler handler) {
 			this.attackHandler = handler;
 			this.hitRecognizer = new OneTimeHitRecognizer();
+			context.performer.GetComponent<Hitbox>().Activate(context.eventDispatcher);
+		}
+
+		public void End(AttackContext context) {
+			context.performer.GetComponent<Hitbox>().Deactivate();
 		}
 
 		void IAttackBehavior.OnAttackAnimationEnd(AttackContext context) {
@@ -20,8 +25,5 @@ namespace SoulboundBackend.Client.Combat {
 		}
 
 		public IHitRecognizer GetHitRecognizer() => hitRecognizer;
-
-		public void End(AttackContext context) {
-		}
 	}
 }

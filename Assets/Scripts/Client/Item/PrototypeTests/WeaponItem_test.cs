@@ -72,7 +72,7 @@ public sealed class WeaponItem_test : Item, IAttackSourceProvider {
 			attackHandler.EndAttack();
 		}
 
-		void IAttackBehavior.OnHitboxEnter(AttackContext context, Collider2D collider) {
+		void IAttackBehavior.OnHitboxEnter(AttackContext context, Hitbox hitbox, Collider2D collider) {
 			UnityEngine.Debug.Log("hitbox entered");
 		}
 	}

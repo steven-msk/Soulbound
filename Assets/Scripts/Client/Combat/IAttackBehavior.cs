@@ -16,9 +16,9 @@ namespace SoulboundBackend.Client.Combat {
 		virtual void OnAttackEnd(AttackContext context) { }
 		virtual void OnAttackAnimationStart(AttackContext context) { }
 		virtual void OnAttackAnimationEnd(AttackContext context) { }
-		virtual void OnHitRegistered(AttackContext context, Collider2D collider) { }
-		virtual void OnHitFrame(AttackContext context, Collider2D collider) { }
-		virtual void OnHitboxEnter(AttackContext context, Collider2D collider) { }
-		virtual void OnHitbotExit(AttackContext context, Collider2D collider) { }
+		virtual void OnHitRegistered(AttackContext context, Hitbox hitbox, Collider2D collider) { }
+		virtual void OnHitFrame(AttackContext context, Hitbox hitbox, Collider2D collider) { }
+		virtual void OnHitboxEnter(AttackContext context, Hitbox hitbox, Collider2D collider) { }
+		virtual void OnHitbotExit(AttackContext context, Hitbox hitbox, Collider2D collider) { }
 	}
 }

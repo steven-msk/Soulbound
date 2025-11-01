@@ -21,8 +21,8 @@ MonoBehaviour:
   - Assets/Resources/Registry/Runtime/Canvas.prefab
   - Assets/Resources/Registry/Runtime/FlightTimePanel.prefab
   - Assets/Resources/Registry/Runtime/Grid.prefab
-  - Assets/Resources/Registry/Runtime/inputHandler.prefab
-  - Assets/Resources/Registry/Runtime/inventory.prefab
+  - Assets/Resources/Registry/Runtime/InputHandler.prefab
+  - Assets/Resources/Registry/Runtime/Inventory.prefab
   - Assets/Resources/Registry/Runtime/levelManager.prefab
   - Assets/Resources/Registry/Runtime/player.prefab
   - Assets/Resources/Registry/Runtime/sceneContext.prefab

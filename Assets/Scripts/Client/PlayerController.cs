@@ -19,6 +19,7 @@ using UnityEditor.Build;
 using UnityEditor.Build.Content;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Tilemaps;
 using Zenject;
 using static Unity.VisualScripting.Member;
 using static UnityEditor.PlayerSettings;

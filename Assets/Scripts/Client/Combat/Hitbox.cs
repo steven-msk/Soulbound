@@ -25,11 +25,6 @@ namespace SoulboundBackend.Client.Combat {
 			}
 		}
 #endif
-		private void Update() {
-			if (owner != null) {
-				UnityEngine.Debug.Log("active: "+ collider.enabled);
-			}
-		}
 
 		public void Activate(AttackEventDispatcher owner) {
 			this.owner = owner;
@@ -42,16 +37,18 @@ namespace SoulboundBackend.Client.Combat {
 		}
 
 		private void OnTriggerEnter2D(Collider2D other) {
-			owner?.OnHitboxEnter(other);
-			owner?.OnHitFrame(other);
+			owner?.OnHitboxEnter(this, other);
+			owner?.OnHitFrame(this, other);
 		}
 
 		private void OnTriggerStay2D(Collider2D other) {
-			owner?.OnHitFrame(other);
+			owner?.OnHitFrame(this, other);
 		}
 
 		private void OnTriggerExit2D(Collider2D other) {
-			owner?.OnHitboxExit(other);
+			owner?.OnHitboxExit(this, other);
 		}
+
+		public Collider2D GetCollider() => collider;
 	}
 }

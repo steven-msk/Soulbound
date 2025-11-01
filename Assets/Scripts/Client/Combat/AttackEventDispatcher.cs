@@ -15,9 +15,9 @@ namespace SoulboundBackend.Client.Combat {
 		public event Action? onAttackEnd;
 		public event AnimationEvent? onAttackAnimationStart;
 		public event AnimationEvent? onAttackAnimationEnd;
-		public event Action<Collider2D>? onHitFrame;
-		public event Action<Collider2D>? onHitboxEnter;
-		public event Action<Collider2D>? onHitboxExit;
+		public event Action<Hitbox, Collider2D>? onHitFrame;
+		public event Action<Hitbox, Collider2D>? onHitboxEnter;
+		public event Action<Hitbox, Collider2D>? onHitboxExit;
 		public event AnimationEvent enrollBehaviorContext = null!;
 		public event AnimationEvent endBehaviorContext = null!;
 
@@ -33,16 +33,16 @@ namespace SoulboundBackend.Client.Combat {
 			endBehaviorContext.Invoke();
 		}
 
-		public void OnHitFrame(Collider2D other) {
-			onHitFrame?.Invoke(other);
+		public void OnHitFrame(Hitbox hitbox, Collider2D other) {
+			onHitFrame?.Invoke(hitbox, other);
 		}
 
-		public void OnHitboxEnter(Collider2D other) {
-			onHitboxEnter?.Invoke(other);
+		public void OnHitboxEnter(Hitbox hitbox, Collider2D other) {
+			onHitboxEnter?.Invoke(hitbox, other);
 		}
 
-		public void OnHitboxExit(Collider2D other) {
-			onHitboxExit?.Invoke(other);
+		public void OnHitboxExit(Hitbox hitbox, Collider2D other) {
+			onHitboxExit?.Invoke(hitbox, other);
 		}
 
 		public void OnAttackAnimationStart() {
