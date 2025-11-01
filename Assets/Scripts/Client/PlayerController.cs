@@ -83,67 +83,16 @@ namespace SoulboundBackend.Client {
 			RegisterItemUsageCandidates(container.Resolve<ItemUsageHandler>());
 			UnityEngine.Debug.Log("player loaded: " + this.GetHashCode());
 
-			attackSource = new AttackSource(1, 10, new AttackBehavior(),
+			attackSource = new AttackSource(1, 10, new PlayerMainHandAttack(),
 				context => {
 					var eventDispatcher = GetComponent<AttackEventDispatcher>();
 					context.eventDispatcher = eventDispatcher;
 					return AttackAnimatorChannel.FromDelegates(
-						GetComponent<Animator>, 
+						GetComponent<Animator>,
 						() => eventDispatcher
 					);
 				},
 				animator => animator.SetTrigger("attack"));
-		}
-
-		class AttackBehavior : IAttackBehavior {
-			private AttackHandler attackHandler = null!;
-			private IHitRecognizer hitRecognizer = null!;
-
-			public void End(AttackContext context) {
-				logger.LogInfo(null, "attack behavior context ended");
-			}
-
-			public void Enroll(AttackContext context, AttackHandler handler) {
-				this.attackHandler = handler;
-				this.hitRecognizer = new OneTimeHitRecognizer();
-				logger.LogInfo(null, "attack behavior context enrolled");
-			}
-
-			void IAttackBehavior.OnAttackAnimationStart(AttackContext context) {
-				logger.LogInfo(null, "attack animation started");
-			}
-
-			void IAttackBehavior.OnAttackAnimationEnd(AttackContext context) {
-				logger.LogInfo(null, "attack animation ended");
-				attackHandler.EndAttack();
-			}
-
-			void IAttackBehavior.OnAttackStart(AttackContext context) {
-				logger.LogInfo(null, "attack started");
-			}
-
-			void IAttackBehavior.OnAttackEnd(AttackContext context) {
-				logger.LogInfo(null, "attack ended");
-				context.animationHandler.animatorReference.Play("johnny_jump");
-			}
-
-			void IAttackBehavior.OnHitFrame(AttackContext context, Collider2D collider) {
-				logger.LogInfo(null, "hit frame registered: " + collider);
-			}
-
-			void IAttackBehavior.OnHitboxEnter(AttackContext context, Collider2D collider) {
-				logger.LogInfo(null, "entered hitbox: " + collider);
-			}
-
-			void IAttackBehavior.OnHitbotExit(AttackContext context, Collider2D collider) {
-				logger.LogInfo(null, "exited hitbox: " + collider);
-			}
-
-			void IAttackBehavior.OnHitRegistered(AttackContext context, Collider2D collider) {
-				logger.LogInfo(null, "<color=red>hit registered</color>: " + collider);
-			}
-
-			public IHitRecognizer GetHitRecognizer() => hitRecognizer;
 		}
 
 		private void RegisterItemUsageCandidates(ItemUsageHandler? itemUsageHandler) {
