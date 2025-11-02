@@ -13,14 +13,18 @@ namespace SoulboundBackend.Client.Combat {
 	[RequireComponent(typeof(Tilemap))]
 	public sealed class TilemapCollisionDetector : MonoBehaviour {
 		[SerializeField] private GameObject blockHitEffectPrefab;
+		private AttackContext previousContext;
 
-		public void NotifyHit(Hitbox hitbox, Collider2D collider) {
-			Vector2 estimatedPos = hitbox.GetCollider().ClosestPoint(collider.transform.position);
+		public void NotifyHit(AttackContext context, Hitbox hitbox, Collider2D collider) {
+			if (previousContext == context) {
+				return;
+			}
+			this.previousContext = context;
+			var colliderDistance = Physics2D.Distance(hitbox.GetCollider(), collider);
+			Vector2 estimatedPos = colliderDistance.pointB;
+			
 			GameObject hitEffect = GameObject.Instantiate(blockHitEffectPrefab, estimatedPos, Quaternion.identity);
-
-			BlockPos blockPos = (BlockPos)estimatedPos;
-			Block blockHit = Soulbound.instance.GetActiveLevel().BlockAt(blockPos);
-			hitEffect.GetComponent<BlockHitEffect>().Initialize(blockHit, blockPos, this.GetComponent<Tilemap>());
+			hitEffect.GetComponent<BlockHitEffect>().Initialize(this.GetComponent<Tilemap>());
 		}
 	}
 }

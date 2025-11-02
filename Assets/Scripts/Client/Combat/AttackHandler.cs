@@ -102,10 +102,11 @@ namespace SoulboundBackend.Client.Combat {
 				source.behavior.OnHitFrame(this.context, hitbox, collider);
 				return;
 			}
+
+			UnityEngine.Debug.Log(collider);
 			
 			if (collider.TryGetComponent<TilemapCollisionDetector>(out var tilemapCollisionDetector)) {
-				UnityEngine.Debug.Log("hitting tilemap");
-				tilemapCollisionDetector.NotifyHit(hitbox, collider);
+				tilemapCollisionDetector.NotifyHit(this.context, hitbox, collider);
 				return;
 			}
 
