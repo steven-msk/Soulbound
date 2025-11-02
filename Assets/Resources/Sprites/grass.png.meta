@@ -535,7 +535,7 @@ TextureImporter:
         width: 8
         height: 8
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -544,6 +544,72 @@ TextureImporter:
       bones: []
       spriteID: bbc7647879ab0f24794d0236c4fe3faa
       internalID: 135184031
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: grass_tree_root_left
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 38
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8a832eed4bb9df14493ca6012ccdd8a1
+      internalID: -2123417990
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: grass_tree_root_right
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 30
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 431be038395a5844892b906eb7991c26
+      internalID: 556839756
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: grass_tree_root_under
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 22
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 31d729548596561469ec9dfff5bd85f4
+      internalID: 2081070382
       vertices: []
       indices: 
       edges: []
@@ -581,6 +647,9 @@ TextureImporter:
       grass_t_right: -613633490
       grass_t_up: 960029329
       grass_top: 562522146
+      grass_tree_root_left: -2123417990
+      grass_tree_root_right: 556839756
+      grass_tree_root_under: 2081070382
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

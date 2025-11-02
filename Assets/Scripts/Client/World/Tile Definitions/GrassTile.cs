@@ -7,6 +7,7 @@ namespace SoulboundBackend.Client.World.TileDefinitions {
 		public class Neighbor : RuleTile.TilingRule.Neighbor {
 			public const int IsAir = 3;
 			public const int ThisOrDirt = 4;
+			public const int IsWood = 5;
 		}
 
 		// FIXME: visual grass tile bug
@@ -20,6 +21,7 @@ namespace SoulboundBackend.Client.World.TileDefinitions {
 				Neighbor.NotThis => other != this,
 				Neighbor.IsAir => other == null || other == Tiles.air,
 				Neighbor.ThisOrDirt => other != null && (other == this || other == Tiles.dirt),
+				Neighbor.IsWood => other != null && other == Tiles.wood,
 				_ => base.RuleMatch(neighbor, other)
 			};
 		}
