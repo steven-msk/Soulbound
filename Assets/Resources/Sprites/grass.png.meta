@@ -504,6 +504,50 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: grass_inner_corner_nw
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 54
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 83adca9de8b76974d9cfb94b95490539
+      internalID: -1029195202
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: grass_inner_corner_ne
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 46
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bbc7647879ab0f24794d0236c4fe3faa
+      internalID: 135184031
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -524,6 +568,8 @@ TextureImporter:
       grass_down: -1588001788
       grass_full: -761508718
       grass_icon: -1683944374
+      grass_inner_corner_ne: 135184031
+      grass_inner_corner_nw: -1029195202
       grass_left: -217465913
       grass_ne_corner_outer: 242841898
       grass_nw_corner_outer: -638828550

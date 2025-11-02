@@ -54,9 +54,9 @@ namespace SoulboundBackend.Client.World.Chunk {
 					BlockState blockState = default(BlockState);
 					if (y > groundHeight) {
 						blockState = Blocks.air.defaultState;
-					} else if (y == groundHeight) {
+					} else if (y == groundHeight || y == groundHeight - 1) {
 						blockState = Blocks.grass.defaultState;
-					} else if (y < groundHeight && y >= undergroundHeight) {
+					} else if (y < groundHeight - 1 && y >= undergroundHeight) {
 						blockState = Blocks.dirt.defaultState;
 					} else {
 						blockState = Blocks.stone.defaultState;

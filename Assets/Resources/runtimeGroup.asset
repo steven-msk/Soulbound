@@ -19,6 +19,7 @@ MonoBehaviour:
   issueAutomaticRefreshes: 1
   resourceAddresses:
   - Assets/Resources/Registry/Runtime/Canvas.prefab
+  - Assets/Resources/Registry/Runtime/debugVisuals.prefab
   - Assets/Resources/Registry/Runtime/FlightTimePanel.prefab
   - Assets/Resources/Registry/Runtime/Grid.prefab
   - Assets/Resources/Registry/Runtime/InputHandler.prefab
