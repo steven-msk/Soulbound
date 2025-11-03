@@ -1135,6 +1135,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f06da6e8d0e39494093ad8c840b11884, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hitEffectPrefab: {fileID: 4237063343407780013, guid: b6cd3b84e09533a4bac580bcec724555, type: 3}
   collider: {fileID: 2012656665}
 --- !u!1001 &3196589557816541718
 PrefabInstance:
