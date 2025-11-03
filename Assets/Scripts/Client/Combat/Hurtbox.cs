@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace SoulboundBackend.Client.Combat {
 	public sealed class Hurtbox : MonoBehaviour {
+		[SerializeField] private ParticleSystem hitEffectPrefab;
 #if UNITY_EDITOR
 		[SerializeField] private new Collider2D collider;
 
@@ -25,7 +26,14 @@ namespace SoulboundBackend.Client.Combat {
 
 		public void NotifyHit(AttackSource source) {
 			UnityEngine.Debug.Log("hurtbox hit: "+ source.baseDamage);
-			this.GetComponentInParent<Rigidbody2D>().AddForce(new Vector2(100f, 100f));
+			this.GetComponentInParent<Rigidbody2D>().AddForce(new Vector2(10f, 10f) * source.knockbackForce);
+
+			for (int i = 0; i < source.baseDamage; i++) {
+				var ps = GameObject.Instantiate(hitEffectPrefab.gameObject).GetComponent<ParticleSystem>();
+				ps.transform.position = transform.position + new Vector3(0f, 1f);
+				ps.Play();
+				Destroy(ps.gameObject, ps.main.duration + 0.1f);
+			}
 		}
 	}
 }

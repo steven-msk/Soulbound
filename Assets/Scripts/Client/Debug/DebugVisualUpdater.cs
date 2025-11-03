@@ -4,7 +4,7 @@ using UnityEngine;
 namespace SoulboundBackend.Client.Debug {
 
     [RequireComponent(typeof(TextMeshProUGUI))]
-    public class DebugVisualUpdater : MonoBehaviour {
+    public abstract class DebugVisualUpdater : MonoBehaviour {
         protected TextMeshProUGUI textComponent;
         public TextMeshProUGUI TextComponent => textComponent;
 

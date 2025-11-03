@@ -508,9 +508,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5289442052255062108, guid: b54940d46e298384382541cf7ed92bda, type: 3}
       insertIndex: -1
       addedObject: {fileID: 486148875}
-    - targetCorrespondingSourceObject: {fileID: 5289442052255062108, guid: b54940d46e298384382541cf7ed92bda, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 486148881}
   m_SourcePrefab: {fileID: 100100000, guid: b54940d46e298384382541cf7ed92bda, type: 3}
 --- !u!4 &486148869 stripped
 Transform:
@@ -530,18 +527,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blockHitEffectPrefab: {fileID: 580499420322896727, guid: 13bd427b029dcaa4cbd789c8d21c4966, type: 3}
---- !u!114 &486148881
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 99917140}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1e067876a43b24f4aad1c4a216d9cc15, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -906,7 +891,7 @@ BoxCollider2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2

@@ -84,7 +84,7 @@ namespace SoulboundBackend.Client {
 			RegisterItemUsageCandidates(container.Resolve<ItemUsageHandler>());
 			UnityEngine.Debug.Log("player loaded: " + this.GetHashCode());
 
-			attackSource = new AttackSource(1, 10, new PlayerMainHandAttack(),
+			attackSource = new AttackSource(2, 10, new PlayerMainHandAttack(),
 				context => {
 					var eventDispatcher = GetComponent<AttackEventDispatcher>();
 					context.eventDispatcher = eventDispatcher;
