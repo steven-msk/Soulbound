@@ -93,7 +93,8 @@ namespace SoulboundBackend.Client {
 						() => eventDispatcher
 					);
 				},
-				animator => animator.SetTrigger("attack"));
+				animator => animator.SetTrigger("attack")
+			);
 		}
 
 		private void RegisterItemUsageCandidates(ItemUsageHandler? itemUsageHandler) {

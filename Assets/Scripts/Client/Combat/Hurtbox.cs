@@ -27,6 +27,7 @@ namespace SoulboundBackend.Client.Combat {
 		public void NotifyHit(AttackSource source) {
 			UnityEngine.Debug.Log("hurtbox hit: "+ source.baseDamage);
 			this.GetComponentInParent<Rigidbody2D>().AddForce(new Vector2(10f, 10f) * source.knockbackForce);
+			GetComponentInParent<HitFlashEffect>().TriggerFlash();
 
 			for (int i = 0; i < source.baseDamage; i++) {
 				var ps = GameObject.Instantiate(hitEffectPrefab.gameObject).GetComponent<ParticleSystem>();
