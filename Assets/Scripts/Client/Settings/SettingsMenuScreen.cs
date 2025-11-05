@@ -12,8 +12,9 @@ namespace SoulboundBackend.Client.UI {
 	public class SettingsMenuScreen : MenuScreen {
 		public override void OnShow() {
 			base.OnShow();
-			var entryGroup = GetComponent<SettingEntryGroup>();
+			var entryGroup = GetComponentInChildren<SettingEntryGroup>();
 			entryGroup.AddEntry(GlobalSettings.floatSetting);
+			entryGroup.AddEntry(GlobalSettings.floatSetting_2);
 		}
 	}
 }

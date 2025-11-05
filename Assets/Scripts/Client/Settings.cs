@@ -12,7 +12,8 @@ namespace SoulboundBackend.Client.Settings {
 		public const string settingsFile = "settings.txt";
 		public static readonly SettingEntry<int> masterVolume = new("master_volume", 100, new IntRange(0, 100));
 
-		public static readonly SettingEntry<float> floatSetting = new("float_setting", 10f, new FloatRange(0f, 50f), (old, @new) => UnityEngine.Debug.Log("changed value: "+ @new));
+		public static readonly SettingEntry<float> floatSetting = new("float_setting", 10f, new FloatRange(0f, 50f));
+		public static readonly SettingEntry<float> floatSetting_2 = new("float_setting_2", 100f, new FloatRange(50f, 1000f));
 
 		public Settings() => LoadEntries();
 
