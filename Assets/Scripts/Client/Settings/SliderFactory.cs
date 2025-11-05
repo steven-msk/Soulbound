@@ -20,6 +20,8 @@ namespace SoulboundBackend.Client.UI {
 			background.transform.SetParent(sliderObject.transform, false);
 			RectTransform bgRect = background.GetComponent<RectTransform>();
 			SetStretchedCustomAnchor(bgRect);
+			bgRect.offsetMin = new Vector2(0f, 0f);
+			bgRect.offsetMax = new Vector2(0f, 0f);
 			Image bgImage = background.GetComponent<Image>();
 			bgImage.color = new Color(1f, 1f, 1f, 0.25f);
 
@@ -62,7 +64,6 @@ namespace SoulboundBackend.Client.UI {
 			slider.direction = Slider.Direction.LeftToRight;
 			slider.minValue = 0f;
 			slider.maxValue = 1f;
-			slider.value = 0.5f;
 
 			return slider;
 		}

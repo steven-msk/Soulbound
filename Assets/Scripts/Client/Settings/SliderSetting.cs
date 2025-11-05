@@ -16,6 +16,7 @@ namespace SoulboundBackend.Client.Settings {
 		public override void Bind(SettingEntry<float> settingEntry, ValueSet<float> valueSet) {
 			this.settingEntry = settingEntry;
 			this.valueSet = valueSet;
+			_slider.value = settingEntry.value;
 			_slider.onValueChanged.AddListener(OnValueChanged);
 		}
 

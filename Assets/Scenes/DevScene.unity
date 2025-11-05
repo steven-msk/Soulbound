@@ -583,8 +583,9 @@ MonoBehaviour:
         m_MethodName: ShowMenuScreen
         m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 1929719539}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_ObjectArgument: {fileID: 1929719542}
+          m_ObjectArgumentAssemblyTypeName: SoulboundBackend.Client.UI.MenuScreen,
+            SoulboundBackend
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -1110,19 +1111,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1922785081}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 366415231}
-        m_TargetAssemblyTypeName: SoulboundBackend.Client.UI.UIManager, SoulboundBackend
-        m_MethodName: ShowMenuScreen
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 11400000, guid: 1947125fa587de649849d17026a6cb62, type: 2}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!222 &1922785080
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1431,6 +1420,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2099192031}
+  - component: {fileID: 2099192032}
   m_Layer: 5
   m_Name: GamePausedMenu
   m_TagString: Untagged
@@ -1459,6 +1449,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &2099192032
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2099192030}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 183057945d711e1468a0dbc6b9ffde77, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2144701899
 GameObject:
   m_ObjectHideFlags: 0

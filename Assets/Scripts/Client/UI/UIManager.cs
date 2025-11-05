@@ -10,7 +10,7 @@ namespace SoulboundBackend.Client.UI {
 		public bool enableScaleFix = true;
 		public static readonly Vector2 referenceResolution = new(960, 540);
 		public static readonly float maxScale = 4.0f;
-		public GameObject? activeMenuScreen { get; private set; }
+		public MenuScreen? activeMenuScreen { get; private set; }
 
 		public Canvas Canvas => this.GetComponent<Canvas>();
 
@@ -31,14 +31,14 @@ namespace SoulboundBackend.Client.UI {
 			}
 		}
 
-		public void ShowMenuScreen(GameObject menuScreen) {
-			activeMenuScreen?.SetActive(false);
+		public void ShowMenuScreen(MenuScreen? menuScreen) {
+			activeMenuScreen?.OnHide();
 			activeMenuScreen = menuScreen;
-			menuScreen.SetActive(true);
+			activeMenuScreen?.OnShow();
 		}
 
 		private void OnEnable() {
-			activeMenuScreen = GameObject.Find("GamePausedMenu");
+			activeMenuScreen = GameObject.Find("GamePausedMenu").GetComponent<MenuScreen>();
 		}
 
 		public Object InstantiateInUILevel(Object original) {
