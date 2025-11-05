@@ -1,5 +1,4 @@
-﻿using Codice.CM.Client.Differences;
-using SoulboundBackend.Client.ItemSystem;
+﻿using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core.Resource;
 using System;

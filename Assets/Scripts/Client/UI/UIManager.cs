@@ -1,11 +1,16 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
+using Object = UnityEngine.Object;
+
+#nullable enable
 
 namespace SoulboundBackend.Client.UI {
 	public class UIManager : MonoBehaviour {
 		public bool enableScaleFix = true;
 		public static readonly Vector2 referenceResolution = new(960, 540);
 		public static readonly float maxScale = 4.0f;
+		public GameObject? activeMenuScreen { get; private set; }
 
 		public Canvas Canvas => this.GetComponent<Canvas>();
 
@@ -24,6 +29,16 @@ namespace SoulboundBackend.Client.UI {
 				float scale = Mathf.Max(1, Mathf.Min(scaleX, scaleY));
 				canvasScaler.scaleFactor = Mathf.Min(scale, maxScale);
 			}
+		}
+
+		public void ShowMenuScreen(GameObject menuScreen) {
+			activeMenuScreen?.SetActive(false);
+			activeMenuScreen = menuScreen;
+			menuScreen.SetActive(true);
+		}
+
+		private void OnEnable() {
+			activeMenuScreen = GameObject.Find("GamePausedMenu");
 		}
 
 		public Object InstantiateInUILevel(Object original) {

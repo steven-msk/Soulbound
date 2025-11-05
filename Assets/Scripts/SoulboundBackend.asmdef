@@ -19,8 +19,14 @@
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Unity.Plastic.Newtonsoft.Json.dll",
+        "log4netPlastic.dll",
+        "nunit.framework.dll",
+        "Unity.VisualScripting.YamlDotNet.dll",
+        "Zenject-usage.dll"
+    ],
     "autoReferenced": true,
     "defineConstraints": [],
     "versionDefines": [],

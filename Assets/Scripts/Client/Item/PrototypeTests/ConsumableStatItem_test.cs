@@ -1,5 +1,4 @@
-﻿using GluonGui.WorkspaceWindow.Views.WorkspaceExplorer.Explorer;
-using SoulboundBackend.Client.ItemSystem;
+﻿using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.Stats;
 using SoulboundBackend.Client.UI.Tooltip;
 using SoulboundBackend.Common;
