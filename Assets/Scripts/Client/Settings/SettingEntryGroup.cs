@@ -11,10 +11,10 @@ namespace SoulboundBackend.Client.Settings {
 	public class SettingEntryGroup : MonoBehaviour {
 		public void AddEntry<T>(SettingEntry<T> entry) {
 			SettingVisual<T> visual = entry.valueSet.GetVisual(transform);
-			visual.Show(entry, entry.valueSet);
+			visual.Show(entry);
 		}
 
-		public void AddEntry(SettingEntry entry) {
+		public void AddEntry(AbstractSettingEntry entry) {
 			const BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 			Type entryType = typeof(SettingEntry<>).MakeGenericType(entry.valueType);
 
@@ -25,7 +25,7 @@ namespace SoulboundBackend.Client.Settings {
 			object visual = getVisualMethod.Invoke(valueSet, new object[] { transform });
 
 			MethodInfo bindMethod = visual.GetType().GetMethod("Bind", bindingFlags);
-			bindMethod.Invoke(visual, new object[] { entry, valueSet });
+			bindMethod.Invoke(visual, new object[] { entry });
 		}
 	}
 }

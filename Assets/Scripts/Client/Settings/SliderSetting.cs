@@ -12,13 +12,14 @@ namespace SoulboundBackend.Client.Settings {
 		[SerializeField] private Slider _slider;
 		public Slider slider { get => _slider; set => _slider = value; }
 		[SerializeField] private TooltipTrigger _tooltipTrigger;
-		public TooltipTrigger tooltipTrigger { get => _tooltipTrigger; set => SetTooltipTrigger(value); }
+		public TooltipTrigger tooltipTrigger { 
+			get => _tooltipTrigger; 
+			set => SetTooltipTrigger(value);
+		}
 		private SettingEntry<float> settingEntry;
-		private ValueSet<float> valueSet;
 
-		public override void Show(SettingEntry<float> settingEntry, ValueSet<float> valueSet) {
+		public override void Show(SettingEntry<float> settingEntry) {
 			this.settingEntry = settingEntry;
-			this.valueSet = valueSet;
 
 			_slider.value = settingEntry.value;
 			_slider.onValueChanged.AddListener(OnValueChanged);

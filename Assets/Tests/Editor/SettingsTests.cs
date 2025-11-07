@@ -56,7 +56,7 @@ public class SettingsTests {
 
 	[Test]
 	public void SettingEntry_RejectsInvalidValues() {
-		var entry = new SettingEntry<int>("testEntry", 50, new IntRange(0, 100), null);
+		var entry = new SettingEntry<int>("", "testEntry", 50, new IntRange(0, 100), null);
 
 		LogAssert.Expect(LogType.Warning, "[SettingEntry]: Attempted to set invalid value 120 to setting testEntry");
 		entry.SetValue(120);
@@ -66,7 +66,7 @@ public class SettingsTests {
 
 	[Test]
 	public void SettingEntry_TriggersValueChangedEvent() {
-		var entry = new SettingEntry<int>("test", 50, new IntRange(0, 100), null);
+		var entry = new SettingEntry<int>("", "test", 50, new IntRange(0, 100), null);
 		bool triggered = false;
 
 		entry.valueChanged += (oldVal, newVal) => {
@@ -82,7 +82,7 @@ public class SettingsTests {
 
 	[Test]
 	public void SettingWriter_WritesAndReader_ReadsCorrectly() {
-		var entry = new SettingEntry<int>("testEntry", 80, new IntRange(0, 100), null);
+		var entry = new SettingEntry<int>("", "testEntry", 80, new IntRange(0, 100), null);
 
 		using (var writer = new StreamWriter(tempPath)) {
 			var processor = new SettingWriter(writer);
@@ -100,7 +100,7 @@ public class SettingsTests {
 
 	[Test]
 	public void FileValue_GetsOverriden_WhenChangingValue() {
-		var entry = new SettingEntry<int>("testEntry", 50, new IntRange(0, 100), null);
+		var entry = new SettingEntry<int>("", "testEntry", 50, new IntRange(0, 100), null);
 
 		void WriteValue() {
 			using (var writer = new StreamWriter(tempPath)) {

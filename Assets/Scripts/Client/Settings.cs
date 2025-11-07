@@ -11,10 +11,10 @@ namespace SoulboundBackend.Client.Settings {
 	public sealed class Settings {
 		private static readonly Logger logger = Logger.CreateInstance();
 		public const string settingsFile = "settings.txt";
-		public static readonly SettingEntry<int> masterVolume = new("master_volume", 100, new IntRange(0, 100), Tooltip.NoTooltip);
+		public static readonly SettingEntry<int> masterVolume = new("Master Volume", "master_volume", 100, new IntRange(0, 100), Tooltip.NoTooltip);
 
-		public static readonly SettingEntry<float> floatSetting = new("float_setting", 10f, new FloatRange(0f, 50f), Tooltip.NoTooltip);
-		public static readonly SettingEntry<float> floatSetting_2 = new("float_setting_2", 100f, new FloatRange(50f, 1000f), Tooltip.NoTooltip);
+		public static readonly SettingEntry<float> floatSetting = new("Float Setting", "float_setting", 10f, new FloatRange(0f, 50f), Tooltip.NoTooltip);
+		public static readonly SettingEntry<float> floatSetting_2 = new("Float Setting 2", "float_setting_2", 100f, new FloatRange(50f, 1000f), Tooltip.NoTooltip);
 
 		public Settings() => LoadEntries();
 
