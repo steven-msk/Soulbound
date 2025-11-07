@@ -20,7 +20,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public abstract int maxStackSize { get; }
 		public bool IsStackable => maxStackSize > 1;
 		protected abstract Func<Item, TooltipData?> tooltipSupplier { get; }
-		protected abstract TooltipRenderer.NodeStyleProvider? nodeStyleProvider { get; }
+		protected abstract TooltipRenderer.NodeStyleFactory? nodeStyleProvider { get; }
 
 		public virtual SlotHook? GetSlotHook() => null;
 

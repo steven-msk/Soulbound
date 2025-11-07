@@ -20,7 +20,7 @@ public sealed class ConsumableStatItem_test : ConsumableStatItem {
 
 	protected override Func<Item, TooltipData> tooltipSupplier { get; }
 
-	protected override TooltipRenderer.NodeStyleProvider nodeStyleProvider => null;
+	protected override TooltipRenderer.NodeStyleFactory nodeStyleProvider => null;
 
 	public override IConsumptionRestriction restriction { get; }
 

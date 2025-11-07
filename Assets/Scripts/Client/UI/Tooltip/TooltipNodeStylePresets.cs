@@ -16,7 +16,7 @@ namespace SoulboundBackend.Client.UI.Tooltip {
 			},
 		};
 
-		public static TooltipRenderer.NodeStyleProvider PresetProvider() {
+		public static TooltipRenderer.NodeStyleFactory PresetProvider() {
 			return GetPreset;
 		}
 

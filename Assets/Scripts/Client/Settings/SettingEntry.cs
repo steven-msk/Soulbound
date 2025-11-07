@@ -1,4 +1,5 @@
 ﻿using SoulboundBackend.Client.UI;
+using SoulboundBackend.Client.UI.Tooltip;
 using SoulboundBackend.Common.Logging;
 using SoulboundBackend.Core;
 using System;
@@ -17,12 +18,14 @@ namespace SoulboundBackend.Client.Settings {
 	public abstract class SettingEntry {
 		protected static readonly Logger logger = Logger.CreateInstance();
 		public readonly string id;
+		public readonly Func<Tooltip> tooltipSupplier;
 		public abstract object boxedDefaultValue { get; }
 		public abstract object boxedValue { get; }
 		public abstract Type valueType { get; }
 
-		protected SettingEntry(string id) {
+		protected SettingEntry(string id, Func<Tooltip> tooltipSupplier) {
 			this.id = id;
+			this.tooltipSupplier = tooltipSupplier;
 		}
 	}
 
@@ -36,15 +39,15 @@ namespace SoulboundBackend.Client.Settings {
 		public override object boxedValue => value!;
 		public override Type valueType => typeof(T);
 
-		public SettingEntry(string id, T defaultValue, ValueSet<T> valueSet)
-			: base(id) {
+		public SettingEntry(string id, T defaultValue, ValueSet<T> valueSet, Func<Tooltip> tooltipSupplier)
+			: base(id, tooltipSupplier) {
 			this.defaultValue = defaultValue;
 			this.valueSet = valueSet;
 			this.value = defaultValue;
 		}
 
-		public SettingEntry(string id, T defaultValue, ValueSet<T> valueSet, Action<T, T> valueChanged)
-			: this(id, defaultValue, valueSet) {
+		public SettingEntry(string id, T defaultValue, ValueSet<T> valueSet, Func<Tooltip> tooltipSupplier, Action<T, T> valueChanged)
+			: this(id, defaultValue, valueSet, tooltipSupplier) {
 			this.valueChanged += valueChanged;
 		}
 
@@ -125,8 +128,9 @@ namespace SoulboundBackend.Client.Settings {
 			slider.minValue = minInclusive;
 			slider.maxValue = maxInclusive;
 
-			SliderSetting sliderSetting = slider.gameObject.AddComponent<SliderSetting>();
+			SliderSetting sliderSetting = slider.AddComponent<SliderSetting>();
 			sliderSetting.slider = slider;
+			sliderSetting.tooltipTrigger = slider.AddComponent<TooltipTrigger>();
 			return sliderSetting;
 		}
 	}

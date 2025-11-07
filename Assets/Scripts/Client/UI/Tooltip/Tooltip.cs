@@ -1,6 +1,7 @@
 using SoulboundBackend.Common;
 using System;
 using UnityEngine;
+using UnityEngine.Assertions.Must;
 using Logger = SoulboundBackend.Common.Logging.Logger;
 
 #nullable enable
@@ -12,7 +13,7 @@ namespace SoulboundBackend.Client.UI.Tooltip {
 		// PLANNED: tooltip tiling and clamping at screen limits
 		public static float MaxWidth => 850f;
 		// POTENTIAL FEATUREIMPL: legendary tooltips
-		public TooltipData data { get; private set; }
+		public TooltipData? data { get; private set; }
 		private TooltipRenderer renderer;
 		private GameObject? panel;
 
@@ -23,32 +24,40 @@ namespace SoulboundBackend.Client.UI.Tooltip {
 			this.renderer = renderer;
 		}
 
-		public static TooltipData Plain(string text) => new TooltipData.Builder().AddNode(TooltipNode.None, text).Finish();
-
 		public void Show(Vector2 position, Transform parent) {
+			if (data == null) {
+				return;
+			}
 			panel = renderer.Render(data, position, parent);
 			panel.SetActive(true);
 		}
 
 		public void Hide() {
-			InvocationHelper.If(panel != null, () => GameObject.Destroy(panel));
+			if (panel != null) {
+				GameObject.Destroy(panel);
+			}
 		}
 
 		public void SetParent(Transform parent, bool worldPositionStays = false) {
+			if (data == null) {
+				return;
+			}
 			this.panel.NullOrElse((panel) => {
-				panel.transform.SetParent(parent, worldPositionStays);
 			}, () => logger.LogWarning(null, "Discarded attempt to set parent to null tooltip panel"));
 		}
 
 		public void SetPosition(Vector2 screenPosition) {
+			if (data == null) {
+				return;
+			}
 			this.panel.NullOrElse((panel) => {
 				panel.transform.position = screenPosition;
 			}, () => logger.LogWarning(null, "Discarded attempt to set position to null tooltip panel"));
 		}
 
-		private void WarnIfNullPanel(Action<GameObject> panelAction, string warnMessage) {
-			this.panel.NullOrElse(panelAction, () => logger.LogWarning(null, warnMessage));
-		}
+		public static TooltipData Plain(string text) => new TooltipData.Builder().AddNode(TooltipNode.None, text).Finish();
+
+		public static Tooltip NoTooltip() => new(null!, null!);
 
 		//public virtual void Update(ItemStack itemStack) {
 		//	if (tooltipPanel != null) {

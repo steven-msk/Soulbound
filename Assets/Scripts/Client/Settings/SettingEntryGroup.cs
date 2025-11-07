@@ -11,7 +11,7 @@ namespace SoulboundBackend.Client.Settings {
 	public class SettingEntryGroup : MonoBehaviour {
 		public void AddEntry<T>(SettingEntry<T> entry) {
 			SettingVisual<T> visual = entry.valueSet.GetVisual(transform);
-			visual.Bind(entry, entry.valueSet);
+			visual.Show(entry, entry.valueSet);
 		}
 
 		public void AddEntry(SettingEntry entry) {

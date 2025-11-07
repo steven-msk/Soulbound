@@ -10,7 +10,7 @@ using UnityEngine.UI;
 namespace SoulboundBackend.Client.UI {
 	public static class SliderFactory {
 		public static Slider CreateSlider(Transform parent) {
-			GameObject sliderObject = new("Slider", typeof(RectTransform), typeof(Slider), typeof(SliderSetting));
+			GameObject sliderObject = new("Slider", typeof(RectTransform), typeof(Slider));
 			sliderObject.transform.SetParent(parent, false);
 
 			RectTransform rootRect = sliderObject.GetComponent<RectTransform>();

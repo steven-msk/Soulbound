@@ -21,7 +21,7 @@ public sealed class StatItem_test : StatItem {
 
 	protected override Func<Item, TooltipData> tooltipSupplier { get; }
 
-	protected override TooltipRenderer.NodeStyleProvider nodeStyleProvider => null;
+	protected override TooltipRenderer.NodeStyleFactory nodeStyleProvider => null;
 
 	public StatItem_test() : base() {
 		StatMappingBuilder mappingBuilder = new StatMappingBuilder()

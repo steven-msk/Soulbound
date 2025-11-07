@@ -9,14 +9,14 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public override ItemAspect aspect { get; }
 		public override int maxStackSize { get; } = Item.DEFAULT_MAX_STACK;
 		protected override Func<Item, TooltipData?> tooltipSupplier { get; }
-		protected override TooltipRenderer.NodeStyleProvider? nodeStyleProvider { get; }
+		protected override TooltipRenderer.NodeStyleFactory? nodeStyleProvider { get; }
 
 		public ConstructableItemDefinition(
 				string name,
 				ItemAspect aspect, 
 				int maxStackSize,
 				Func<Item, TooltipData?> tooltipSupplier, 
-				TooltipRenderer.NodeStyleProvider? nodeStyleProvider = null
+				TooltipRenderer.NodeStyleFactory? nodeStyleProvider = null
 			) {
 			this.name = name;
 			this.aspect = aspect;

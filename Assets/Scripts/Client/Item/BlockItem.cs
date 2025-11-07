@@ -11,7 +11,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public Block referenceBlock => blockGetter() ?? throw new InvalidOperationException("Block reference is not yet initialized.");
 
 		public BlockItem(string name, ItemAspect aspect, int maxStackSize, Func<Block> blockGetter,
-				Func<Item, TooltipData?> tooltipSupplier, TooltipRenderer.NodeStyleProvider? nodeStyleProvider = null)
+				Func<Item, TooltipData?> tooltipSupplier, TooltipRenderer.NodeStyleFactory? nodeStyleProvider = null)
 			: base(name, aspect, maxStackSize, tooltipSupplier, nodeStyleProvider) {
 			this.blockGetter = blockGetter;
 		}

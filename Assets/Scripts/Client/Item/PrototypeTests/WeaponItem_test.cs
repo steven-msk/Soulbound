@@ -18,7 +18,7 @@ public sealed class WeaponItem_test : Item, IAttackSourceProvider {
 
 	protected override Func<Item, TooltipData> tooltipSupplier => null;
 
-	protected override TooltipRenderer.NodeStyleProvider nodeStyleProvider => null;
+	protected override TooltipRenderer.NodeStyleFactory nodeStyleProvider => null;
 
 	public bool GetAttackSource(ItemUseTrigger trigger, out AttackSource source) {
 		if (trigger == ItemUseTrigger.LeftClick) {

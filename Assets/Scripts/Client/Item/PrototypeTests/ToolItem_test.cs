@@ -20,5 +20,5 @@ public sealed class ToolItem_test : Item, IBreakingTool {
 
     protected override Func<Item, TooltipData?> tooltipSupplier => item => new TooltipData.Builder().AddNode(TooltipNode.Title, item.name).Finish();
 
-    protected override TooltipRenderer.NodeStyleProvider? nodeStyleProvider => null;
+    protected override TooltipRenderer.NodeStyleFactory? nodeStyleProvider => null;
 }

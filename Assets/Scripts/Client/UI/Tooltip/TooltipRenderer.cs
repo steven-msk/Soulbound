@@ -7,13 +7,13 @@ using Logger = SoulboundBackend.Common.Logging.Logger;
 
 namespace SoulboundBackend.Client.UI.Tooltip {
 	public class TooltipRenderer {
-		public delegate TooltipNodeStyle NodeStyleProvider(TooltipNode node);
+		public delegate TooltipNodeStyle NodeStyleFactory(TooltipNode node);
 
 		private static readonly Logger logger = Logger.CreateInstance();
-		public NodeStyleProvider styleProvider;
+		public NodeStyleFactory styleFactory;
 
-		public TooltipRenderer(NodeStyleProvider styleProvider) {
-			this.styleProvider = styleProvider;
+		public TooltipRenderer(NodeStyleFactory styleProvider) {
+			this.styleFactory = styleProvider;
 		}
 
 		public GameObject Render(TooltipData data, Vector2 position, Transform parent) {
@@ -30,7 +30,7 @@ namespace SoulboundBackend.Client.UI.Tooltip {
 				TextMeshProUGUI node = nodeObj.GetComponent<TextMeshProUGUI>();
 
 				node.text = dataNode.text;
-				TooltipNodeStyle nodeStyle = styleProvider.Invoke(dataNode.node);
+				TooltipNodeStyle nodeStyle = styleFactory.Invoke(dataNode.node);
 				nodeStyle.Apply(node);
 			}
 			data.layout.Apply(panel.GetComponent<VerticalLayoutGroup>());
