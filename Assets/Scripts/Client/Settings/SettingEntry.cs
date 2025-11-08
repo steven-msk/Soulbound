@@ -18,7 +18,7 @@ using Logger = SoulboundBackend.Common.Logging.Logger;
 namespace SoulboundBackend.Client.Settings {
 	public abstract class AbstractSettingEntry {
 		protected static readonly Logger logger = Logger.CreateInstance();
-		public readonly string name;
+		public readonly string displayName;
 		public readonly string id;
 		public readonly Func<Tooltip> tooltipSupplier;
 		public abstract object boxedDefaultValue { get; }
@@ -26,9 +26,13 @@ namespace SoulboundBackend.Client.Settings {
 		public abstract Type valueType { get; }
 
 		protected AbstractSettingEntry(string name, string id, Func<Tooltip> tooltipSupplier) {
-			this.name = name;
+			this.displayName = name;
 			this.id = id;
 			this.tooltipSupplier = tooltipSupplier;
+		}
+
+		public override string ToString() {
+			return $"{displayName}={boxedValue}";
 		}
 	}
 
@@ -42,15 +46,15 @@ namespace SoulboundBackend.Client.Settings {
 		public override object boxedValue => value!;
 		public override Type valueType => typeof(T);
 
-		public SettingEntry(string name, string id, T defaultValue, ValueSet<T> valueSet, Func<Tooltip> tooltipSupplier)
-			: base(name, id, tooltipSupplier) {
+		public SettingEntry(string displayName, string id, T defaultValue, ValueSet<T> valueSet, Func<Tooltip> tooltipSupplier)
+			: base(displayName, id, tooltipSupplier) {
 			this.defaultValue = defaultValue;
 			this.valueSet = valueSet;
 			this.value = defaultValue;
 		}
 
-		public SettingEntry(string name, string id, T defaultValue, ValueSet<T> valueSet, Func<Tooltip> tooltipSupplier, Action<T, T> valueChanged)
-			: this(name, id, defaultValue, valueSet, tooltipSupplier) {
+		public SettingEntry(string displayName, string id, T defaultValue, ValueSet<T> valueSet, Func<Tooltip> tooltipSupplier, Action<T, T> valueChanged)
+			: this(displayName, id, defaultValue, valueSet, tooltipSupplier) {
 			this.valueChanged += valueChanged;
 		}
 
@@ -127,35 +131,13 @@ namespace SoulboundBackend.Client.Settings {
 		public override float Decode(string value) => float.Parse(value);
 
 		public override SettingVisual<float> GetVisual(Transform parent) {
-			const float spacing = 8f;
-			const ContentSizeFitter.FitMode fitMode = ContentSizeFitter.FitMode.PreferredSize;
-
-			GameObject settingContainer = new("Setting Container", typeof(RectTransform), typeof(HorizontalLayoutGroup), typeof(ContentSizeFitter));
-			settingContainer.transform.SetParent(parent, false);
-			var layout = settingContainer.GetComponent<HorizontalLayoutGroup>();
-			layout.spacing = spacing;
-			layout.childControlWidth = layout.childControlHeight = false;
-			layout.childForceExpandWidth = layout.childForceExpandHeight = false;
-			layout.childScaleWidth = layout.childScaleHeight = true;
-			layout.childAlignment = TextAnchor.MiddleLeft;
-			var sizeFitter = settingContainer.GetComponent<ContentSizeFitter>();
-			sizeFitter.horizontalFit = sizeFitter.verticalFit = fitMode;
-
-			GameObject nameObject = new("Name", typeof(RectTransform), typeof(TextMeshProUGUI));
-			nameObject.transform.SetParent(settingContainer.transform, false);
-			TextMeshProUGUI name = nameObject.GetComponent<TextMeshProUGUI>();
-			name.alignment = TextAlignmentOptions.MidlineRight;
-			name.autoSizeTextContainer = true;
-			name.SetText("setting_name:");
-
 			Slider slider = SliderFactory.CreateSlider(parent);
-			slider.transform.SetParent(settingContainer.transform, false);
 			slider.minValue = minInclusive;
 			slider.maxValue = maxInclusive;
 
-			SliderSetting sliderSetting = settingContainer.AddComponent<SliderSetting>();
+			SliderSetting sliderSetting = slider.gameObject.AddComponent<SliderSetting>();
 			sliderSetting.slider = slider;
-			sliderSetting.tooltipTrigger = settingContainer.AddComponent<TooltipTrigger>();
+			sliderSetting.tooltipTrigger = parent.AddComponent<TooltipTrigger>();
 			return sliderSetting;
 		}
 	}

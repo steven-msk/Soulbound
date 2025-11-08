@@ -14,7 +14,7 @@ namespace SoulboundBackend.Client.UI {
 			base.OnShow();
 			var entryGroup = GetComponentInChildren<SettingEntryGroup>();
 			entryGroup.AddEntry(GlobalSettings.floatSetting);
-			entryGroup.AddEntry(GlobalSettings.floatSetting_2);
+			entryGroup.AddEntry((AbstractSettingEntry)GlobalSettings.floatSetting_2);
 		}
 	}
 }

@@ -9,12 +9,17 @@ using System.Reflection;
 
 namespace SoulboundBackend.Client.Settings {
 	public class SettingEntryGroup : MonoBehaviour {
-		public void AddEntry<T>(SettingEntry<T> entry) {
+		public SettingContainerBuilder AddEntry<T>(SettingEntry<T> entry) {
+			SettingContainerBuilder containerBuilder = new(this, entry);
+			GameObject container = containerBuilder.ConstructContainer();
+
 			SettingVisual<T> visual = entry.valueSet.GetVisual(transform);
+			visual.transform.SetParent(container.transform, false);
 			visual.Show(entry);
+			return containerBuilder;
 		}
 
-		public void AddEntry(AbstractSettingEntry entry) {
+		public SettingContainerBuilder AddEntry(AbstractSettingEntry entry) {
 			const BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 			Type entryType = typeof(SettingEntry<>).MakeGenericType(entry.valueType);
 
@@ -24,8 +29,14 @@ namespace SoulboundBackend.Client.Settings {
 			MethodInfo getVisualMethod = valueSet.GetType().GetMethod("GetVisual", bindingFlags);
 			object visual = getVisualMethod.Invoke(valueSet, new object[] { transform });
 
-			MethodInfo bindMethod = visual.GetType().GetMethod("Bind", bindingFlags);
+			SettingContainerBuilder containerBuilder = new(this, entry);
+			GameObject container = containerBuilder.ConstructContainer();
+			(visual as Component).transform.SetParent(container.transform);
+
+			MethodInfo bindMethod = visual.GetType().GetMethod("Show", bindingFlags);
 			bindMethod.Invoke(visual, new object[] { entry });
+
+			return containerBuilder;
 		}
 	}
 }
