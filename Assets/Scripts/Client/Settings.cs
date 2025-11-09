@@ -42,6 +42,8 @@ namespace SoulboundBackend.Client.Settings {
 
 		public void ProcessSettings(ISettingProcessor processor) {
 			masterVolume.SetValue(processor.Process(masterVolume));
+			floatSetting.SetValue(processor.Process(floatSetting));
+			floatSetting_2.SetValue(processor.Process(floatSetting_2));
 		}
 
 		public string GetSavePath() {
