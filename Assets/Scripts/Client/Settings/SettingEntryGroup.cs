@@ -9,9 +9,12 @@ using System.Reflection;
 
 namespace SoulboundBackend.Client.Settings {
 	public class SettingEntryGroup : MonoBehaviour {
+		private List<GameObject> toDestroy = new();
+
 		public SettingContainerBuilder AddEntry<T>(SettingEntry<T> entry) {
 			SettingContainerBuilder containerBuilder = new(this, entry);
 			GameObject container = containerBuilder.ConstructContainer();
+			toDestroy.Add(container);
 
 			SettingVisual<T> visual = entry.valueSet.GetVisual(transform);
 			visual.transform.SetParent(container.transform, false);
@@ -32,11 +35,21 @@ namespace SoulboundBackend.Client.Settings {
 			SettingContainerBuilder containerBuilder = new(this, entry);
 			GameObject container = containerBuilder.ConstructContainer();
 			(visual as Component).transform.SetParent(container.transform);
+			toDestroy.Add(container);
 
 			MethodInfo bindMethod = visual.GetType().GetMethod("Show", bindingFlags);
 			bindMethod.Invoke(visual, new object[] { entry });
 
 			return containerBuilder;
+		}
+
+		private void OnDisable() => DestroyVisuals();
+
+		public void DestroyVisuals() {
+			foreach (var obj in toDestroy) {
+				GameObject.Destroy(obj);
+			}
+			toDestroy.Clear();
 		}
 	}
 }

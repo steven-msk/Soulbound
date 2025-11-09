@@ -29,7 +29,7 @@ namespace SoulboundBackend.Core {
 		public const float tickRate = 0.02f;        // 50 tps
 		private float tickStartTime;
 		public bool isWorldLoaded { get; private set; } = false;
-		public bool IsPaused { get; private set; }
+		public bool paused { get; private set; }
 
 		private WorldManager worldManager = null!;
 		private string world = null!;
@@ -58,6 +58,7 @@ namespace SoulboundBackend.Core {
 
 		[Inject]
 		public void Construct(WorldManager worldManager, PlayerController player) {
+			GameObject.Instantiate(ResourceManager.GetRuntimePrefab("Canvas"))!.name = "Canvas";
 			this.worldManager = worldManager;
 			this.player = player;
 			player.GetComponent<GameObjectContext>().Run();
@@ -85,7 +86,7 @@ namespace SoulboundBackend.Core {
 		IEnumerator GameTickLoop() {
 			WaitForSecondsRealtime tickDelay = new(tickRate);
 			while (Application.isPlaying) {
-				if (!this.IsPaused) {
+				if (!this.paused) {
 					StartTick();
 					// do things
 					if (isWorldLoaded) {
@@ -110,14 +111,11 @@ namespace SoulboundBackend.Core {
 		}
 
 		public void TogglePauseGame() {
-			this.IsPaused = !this.IsPaused;
-			Time.timeScale = this.IsPaused ? 0f : 1f;
-			AudioListener.pause = this.IsPaused;		// FEATUREIMPL: sound effects and music
-			InvocationHelper.IfElse(this.IsPaused, 
-				InputHandler.PauseInputs, 
-				InputHandler.UnpauseInputs
-			);
-		
+			this.paused = !this.paused;
+			Time.timeScale = this.paused ? 0f : 1f;
+			AudioListener.pause = this.paused;        // FEATUREIMPL: sound effects and music
+			InputHandler.PauseInputs(this.paused);
+			UIManager.SetScreen(paused ? new GamePausedScreen().GetScreen() : null);
 		}
 
 		private void OnApplicationQuit() {

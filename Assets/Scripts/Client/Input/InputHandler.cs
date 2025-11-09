@@ -53,12 +53,12 @@ namespace SoulboundBackend.Client.Input {
 				action.performed += actionContext => MouseScreenPosition = actionContext.ReadValue<Vector2>();
 			});
 
-			RegisterInputEvent(playerActions.LeftClick, pausable: false, (action) => {
+			RegisterInputEvent(playerActions.LeftClick, pausable: true, (action) => {
 				action.performed += actionContext => player.OnLeftClick();
 				action.performed += actionContext => LeftHold = true;
 				action.canceled += actionContext => LeftHold = false;
 			});
-			RegisterInputEvent(playerActions.RightClick, pausable: false, (action) => {
+			RegisterInputEvent(playerActions.RightClick, pausable: true, (action) => {
 				action.performed += actionContext => player.OnRightClick();
 				action.performed += actionContext => RightHold = true;
 				action.canceled += actionContext => RightHold = false;
@@ -141,15 +141,18 @@ namespace SoulboundBackend.Client.Input {
 
 		public Vector2 ScreenPosToLocalPos(Vector2 screenPos) {
 			RectTransform rootTransfom = Soulbound.instance.GetActiveLevelManager().UIManager.GetRootTransform();
-			if (RectTransformUtility.ScreenPointToLocalPointInRectangle(rootTransfom, screenPos, Soulbound.instance.GetActiveLevelManager().UIManager.Canvas.worldCamera, out var localPos)) {
+			if (RectTransformUtility.ScreenPointToLocalPointInRectangle(rootTransfom, screenPos, Soulbound.instance.GetActiveLevelManager().UIManager.rootCanvas.worldCamera, out var localPos)) {
 				return localPos;
 			}
 			UnityEngine.Debug.LogError($"Could not retrieve local point from screen point: ({screenPos.x}, {screenPos.y})");
 			return new(-1f, -1f);
 		}
 
-		public static void PauseInputs() => pausableInputs.ForEach(inputAction => inputAction.Disable());
-
-		public static void UnpauseInputs() => pausableInputs.ForEach(inputAction => inputAction.Enable());
+		public static void PauseInputs(bool pause) {
+			Action<InputAction> action = pause
+				? inputAction => inputAction.Disable()
+				: inputAction => inputAction.Enable();
+			pausableInputs.ForEach(action);
+		}
 	}
 }
