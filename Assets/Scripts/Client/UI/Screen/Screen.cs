@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace SoulboundBackend.Client.UI {
+namespace SoulboundBackend.Client.UI.Screens {
 	public class Screen : MonoBehaviour {
 		public ChildReferenceMap childMap { get; } = new();
 

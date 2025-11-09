@@ -2,6 +2,7 @@ using SoulboundBackend.Client;
 using SoulboundBackend.Client.Input;
 using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.UI;
+using SoulboundBackend.Client.UI.Screens;
 using SoulboundBackend.Client.UI.Storage;
 using SoulboundBackend.Client.World;
 using SoulboundBackend.Client.World.Entity;
@@ -110,12 +111,14 @@ namespace SoulboundBackend.Core {
 			}
 		}
 
-		public void TogglePauseGame() {
-			this.paused = !this.paused;
-			Time.timeScale = this.paused ? 0f : 1f;
-			AudioListener.pause = this.paused;        // FEATUREIMPL: sound effects and music
-			InputHandler.PauseInputs(this.paused);
-			UIManager.SetScreen(paused ? new GamePausedScreen().GetScreen() : null);
+		public void OnEscPressed() {
+			if (UIManager.OnEscPressed()) {
+				this.paused = !this.paused;
+				Time.timeScale = this.paused ? 0f : 1f;
+				AudioListener.pause = this.paused;        // FEATUREIMPL: sound effects and music
+				InputHandler.PauseInputs(this.paused);
+				UIManager.SetScreen(paused ? new GamePausedScreen().GetScreen() : null, ScreenSetMethod.Stack);
+			}
 		}
 
 		private void OnApplicationQuit() {

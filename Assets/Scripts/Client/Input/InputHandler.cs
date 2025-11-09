@@ -96,8 +96,8 @@ namespace SoulboundBackend.Client.Input {
 				action.performed += actionContext => player.Inventory.DropHoveredOrActiveItem();
 			});
 
-			RegisterInputEvent(playerActions.PauseGame, pausable: false, (action) => {
-				action.performed += actionContext => Soulbound.instance.GetActiveLevelManager().TogglePauseGame();
+			RegisterInputEvent(playerActions.Esc, pausable: false, (action) => {
+				action.performed += actionContext => Soulbound.instance.GetActiveLevelManager().OnEscPressed();
 			});
 
 			inputActions.Enable();

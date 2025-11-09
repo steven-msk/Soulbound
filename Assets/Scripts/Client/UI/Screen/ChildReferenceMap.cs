@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
 
-namespace SoulboundBackend.Client.UI {
+namespace SoulboundBackend.Client.UI.Screens {
 	public sealed class ChildReferenceMap {
 		private Dictionary<string, GameObject> childReferences = new();
 

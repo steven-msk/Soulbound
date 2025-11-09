@@ -12,6 +12,12 @@ namespace SoulboundBackend.Common {
 			}
 		}
 
+		public static void IfNotNull<T>(this T? actionTarget, Action<T> action) {
+			if (actionTarget != null) {
+				action(actionTarget);
+			}
+		}
+
 		public static void InvokeIf(this Action? action, Func<bool>? predicate) {
 			if (predicate?.Invoke() ?? true) {
 				action?.Invoke();

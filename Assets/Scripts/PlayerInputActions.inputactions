@@ -87,7 +87,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "PauseGame",
+                    "name": "Esc",
                     "type": "Button",
                     "id": "32eac010-4470-4e64-9a81-8093495920d4",
                     "expectedControlType": "",
@@ -368,7 +368,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "PauseGame",
+                    "action": "Esc",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

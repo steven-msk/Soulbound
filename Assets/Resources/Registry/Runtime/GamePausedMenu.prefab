@@ -512,7 +512,7 @@ GameObject:
   - component: {fileID: 2026655180437792030}
   - component: {fileID: 9016895143630755988}
   - component: {fileID: 784368556018151766}
-  - component: {fileID: 670214731747783507}
+  - component: {fileID: 105772750192504053}
   m_Layer: 5
   m_Name: SettingsButton
   m_TagString: Untagged
@@ -684,7 +684,7 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &670214731747783507
+--- !u!114 &105772750192504053
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -693,7 +693,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4800067681414987713}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6270da58b104c9244b82580c02689035, type: 3}
+  m_Script: {fileID: 11500000, guid: be43fc58846e87c4d8c0ff3c32346f3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   referenceOverride: 
@@ -706,7 +706,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4751097122036113821}
-  - component: {fileID: 4011089857007520464}
+  - component: {fileID: 727625334092739776}
   m_Layer: 5
   m_Name: GamePausedMenu
   m_TagString: Untagged
@@ -735,7 +735,7 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &4011089857007520464
+--- !u!114 &727625334092739776
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -744,7 +744,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5400785653598467579}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 183057945d711e1468a0dbc6b9ffde77, type: 3}
+  m_Script: {fileID: 11500000, guid: e4d89b57a57e2f14ea780203d9ad63fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &7186155935183770616

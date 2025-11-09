@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SoulboundBackend.Client.UI {
+namespace SoulboundBackend.Client.UI.Screens {
 	public sealed class GamePausedScreen : IScreenBuilder {
 		private readonly Canvas canvas;
 		private readonly UIManager uiManager;
@@ -20,7 +20,6 @@ namespace SoulboundBackend.Client.UI {
 		public Screen GetScreen() {
 			GameObject screenObject = GameObject.Instantiate(ResourceManager.GetRuntimePrefab("GamePausedMenu"), canvas.transform);
 			Screen screen = screenObject.GetComponent<Screen>();
-			screenObject.AddComponent<DestroyOnHide>();
 			screen.BroadcastMessage("OnRegisterChildrenReferences", SendMessageOptions.DontRequireReceiver);
 
 			Button settingsButton = screen.childMap.GetChild("SettingsButton").GetComponent<Button>();
