@@ -14,7 +14,7 @@ namespace SoulboundBackend.Client.UI {
 			sliderObject.transform.SetParent(parent, false);
 
 			RectTransform rootRect = sliderObject.GetComponent<RectTransform>();
-			rootRect.sizeDelta = new Vector2(160f, 20f);
+			rootRect.sizeDelta = new Vector2(80f, 10f);
 
 			GameObject background = new("Background", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
 			background.transform.SetParent(sliderObject.transform, false);
@@ -46,14 +46,14 @@ namespace SoulboundBackend.Client.UI {
 			RectTransform handleAreaRect = handleArea.GetComponent<RectTransform>();
 			handleAreaRect.anchorMin = new Vector2(0f, 0f);
 			handleAreaRect.anchorMax = new Vector2(1f, 1f);
-			handleAreaRect.offsetMin = new Vector2(10f, 0f);
-			handleAreaRect.offsetMax = new Vector2(-10f, 0f);
+			handleAreaRect.offsetMin = new Vector2(5f, 0f);
+			handleAreaRect.offsetMax = new Vector2(-5f, 0f);
 
 			GameObject handle = new("Handle", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
 			handle.transform.SetParent(handleArea.transform, false);
 			RectTransform handleRect = handle.GetComponent<RectTransform>();
 			SetStretchedLeftAnchor(handleRect);
-			handleRect.sizeDelta = new Vector2(20f, 20f);
+			handleRect.sizeDelta = new Vector2(10f, 10f);
 			Image handleImage = handle.GetComponent<Image>();
 			handleImage.color = Color.white;
 

@@ -12,7 +12,6 @@ namespace SoulboundBackend.Client.UI {
 		public static readonly float maxScale = 4.0f;
 		public Screen? activeScreen { get; private set; }
 		public ChildReferenceMap screenChildMap { get; } = new();
-		[SerializeField] private Screen gamePausedScreen;
 
 		public Canvas rootCanvas => this.GetComponent<Canvas>();
 

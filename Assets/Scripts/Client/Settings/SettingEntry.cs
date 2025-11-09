@@ -137,7 +137,6 @@ namespace SoulboundBackend.Client.Settings {
 
 			SliderSetting sliderSetting = slider.gameObject.AddComponent<SliderSetting>();
 			sliderSetting.slider = slider;
-			sliderSetting.tooltipTrigger = parent.AddComponent<TooltipTrigger>();
 			return sliderSetting;
 		}
 	}

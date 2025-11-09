@@ -10,6 +10,5 @@ namespace SoulboundBackend.Client.Settings {
 	public abstract class SettingVisual<T> : MonoBehaviour {
 		public abstract void Show(SettingEntry<T> settingEntry);
 		public abstract void OnValueChanged(T newValue);
-		protected abstract void SetTooltipTrigger(TooltipTrigger trigger);
 	}
 }

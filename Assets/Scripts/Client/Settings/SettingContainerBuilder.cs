@@ -41,6 +41,7 @@ namespace SoulboundBackend.Client.Settings {
 			this.nameObject = new("Name", typeof(RectTransform), typeof(TextMeshProUGUI));
 			nameObject.transform.SetParent(container.transform, false);
 			TextMeshProUGUI name = nameObject.GetComponent<TextMeshProUGUI>();
+			name.fontSize = 15f;
 			name.alignment = TextAlignmentOptions.MidlineRight;
 			name.autoSizeTextContainer = true;
 			name.SetText($"{entry.displayName}:");

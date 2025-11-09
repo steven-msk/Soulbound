@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using System.Reflection;
+using SoulboundBackend.Client.UI.Tooltip;
 
 namespace SoulboundBackend.Client.Settings {
 	public class SettingEntryGroup : MonoBehaviour {
@@ -19,6 +20,10 @@ namespace SoulboundBackend.Client.Settings {
 			SettingVisual<T> visual = entry.valueSet.GetVisual(transform);
 			visual.transform.SetParent(container.transform, false);
 			visual.Show(entry);
+
+			TooltipTrigger tooltipTrigger = container.AddComponent<TooltipTrigger>();
+			tooltipTrigger.Init(entry.tooltipSupplier());
+
 			return containerBuilder;
 		}
 
@@ -39,6 +44,9 @@ namespace SoulboundBackend.Client.Settings {
 
 			MethodInfo bindMethod = visual.GetType().GetMethod("Show", bindingFlags);
 			bindMethod.Invoke(visual, new object[] { entry });
+
+			TooltipTrigger tooltipTrigger = container.AddComponent<TooltipTrigger>();
+			tooltipTrigger.Init(entry.tooltipSupplier());
 
 			return containerBuilder;
 		}
