@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SoulboundBackend.Client.UI.Screens {
-	public class Screen : MonoBehaviour {
+	public class Screen : MonoBehaviour, IDisposable {
 		public ChildReferenceMap childMap { get; } = new();
 
 		public virtual void OnShow() {
@@ -20,6 +20,10 @@ namespace SoulboundBackend.Client.UI.Screens {
 		public void RegisterChildReference(ChildReference reference) {
 			UnityEngine.Debug.Log($"caught child ref: {reference.accessor} @ {name}");
 			childMap.RegisterChildReference(reference);
+		}
+
+		public virtual void Dispose() {
+			Destroy(gameObject);
 		}
 	}
 }

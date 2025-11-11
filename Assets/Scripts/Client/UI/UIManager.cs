@@ -70,6 +70,7 @@ namespace SoulboundBackend.Client.UI {
 		public bool OnEscPressed() {
 			if (screenStack.TryPop(out var activeScreen)) {
 				activeScreen.OnHide();
+				activeScreen.Dispose();
 			}
 
 			if (screenStack.TryPeek(out var previousScreen)) {

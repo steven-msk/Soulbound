@@ -19,6 +19,9 @@ namespace SoulboundBackend.Client.UI.Screens {
 			entryGroup.AddEntry((AbstractSettingEntry)GlobalSettings.floatSetting_2);
 		}
 
+		public override void Dispose() {
+		}
+
 		//public override void OnHide() {
 		//	base.OnHide();
 		//	entryGroup.DestroyVisuals();
