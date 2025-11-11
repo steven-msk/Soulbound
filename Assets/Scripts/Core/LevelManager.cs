@@ -59,7 +59,7 @@ namespace SoulboundBackend.Core {
 
 		[Inject]
 		public void Construct(WorldManager worldManager, PlayerController player) {
-			GameObject.Instantiate(ResourceManager.GetRuntimePrefab("Canvas"))!.name = "Canvas";
+			//GameObject.Instantiate(ResourceManager.GetRuntimePrefab("Canvas"))!.name = "Canvas";
 			this.worldManager = worldManager;
 			this.player = player;
 			player.GetComponent<GameObjectContext>().Run();

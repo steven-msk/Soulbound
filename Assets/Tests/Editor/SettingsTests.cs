@@ -58,7 +58,7 @@ public class SettingsTests {
 	public void SettingEntry_RejectsInvalidValues() {
 		var entry = new SettingEntry<int>("", "testEntry", 50, new IntRange(0, 100), null);
 
-		LogAssert.Expect(LogType.Warning, "[SettingEntry]: Attempted to set invalid value 120 to setting testEntry");
+		LogAssert.Expect(LogType.Warning, "[AbstractSettingEntry]: Attempted to set invalid value '120' to setting 'testEntry'");
 		entry.SetValue(120);
 
 		Assert.That(entry.boxedValue, Is.EqualTo(50));

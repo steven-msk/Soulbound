@@ -40,7 +40,6 @@ namespace SoulboundBackend.Core.Bootstrap {
 				.FromComponentInNewPrefab(inventoryPrefab)
 				.UnderTransform(GameObject.FindFirstObjectByType<Canvas>().transform)
 				.AsSingle();
-			container.Bind<StepClimber>().FromComponentOnRoot().AsSingle();
 			Debug.Log("player installer has installed bindings");
 		}
 	}
