@@ -1,4 +1,5 @@
-﻿using SoulboundBackend.Core.Resource;
+﻿using SoulboundBackend.Core;
+using SoulboundBackend.Core.Resource;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,10 @@ namespace SoulboundBackend.Client.UI.Screens {
 			Button settingsButton = screen.childMap.GetChild("SettingsButton").GetComponent<Button>();
 			settingsButton.onClick.RemoveAllListeners();
 			settingsButton.onClick.AddListener(() => uiManager.SetScreen<SettingsScreen>());
+
+			Button resumeButton = screen.childMap.GetChild("ResumeButton").GetComponent<Button>();
+			resumeButton.onClick.RemoveAllListeners();
+			resumeButton.onClick.AddListener(() => Soulbound.instance.GetActiveLevelManager().TogglePause());
 
 			return screen;
 		}
