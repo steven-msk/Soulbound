@@ -1,4 +1,5 @@
-﻿using SoulboundBackend.Core;
+﻿using SoulboundBackend.Common;
+using SoulboundBackend.Core;
 using SoulboundBackend.Core.Resource;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace SoulboundBackend.Client.UI.Screens {
+	[PROTOTYPICAL]
 	public sealed class GamePausedScreen : IScreenBuilder {
 		private readonly Canvas canvas;
 		private readonly UIManager uiManager;

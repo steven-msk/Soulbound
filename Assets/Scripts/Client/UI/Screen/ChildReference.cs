@@ -13,7 +13,6 @@ namespace SoulboundBackend.Client.UI.Screens {
 				: referenceOverride;
 
 		public void OnRegisterChildrenReferences() {
-			UnityEngine.Debug.Log($"registering child ref: {accessor}");
 			SendMessageUpwards(
 				"RegisterChildReference", this,
 				SendMessageOptions.DontRequireReceiver

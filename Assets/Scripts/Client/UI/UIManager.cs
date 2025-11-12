@@ -80,9 +80,7 @@ namespace SoulboundBackend.Client.UI {
 		}
 
 		public void RegisterChildReference(ChildReference reference) {
-			UnityEngine.Debug.Log($"caught child ref: {reference.accessor} @ {this}");
 			if (reference.TryGetComponent<Screen>(out var _)) {
-				UnityEngine.Debug.Log($"registering screen child: {reference.accessor}");
 				screenChildMap.RegisterChildReference(reference);
 			}
 		}
