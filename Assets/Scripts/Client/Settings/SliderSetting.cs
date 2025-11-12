@@ -1,4 +1,5 @@
 ﻿using SoulboundBackend.Client.UI.Tooltip;
+using SoulboundBackend.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace SoulboundBackend.Client.Settings {
+	[PROTOTYPICAL]
 	public class SliderSetting : SettingVisual<float> {
 		[SerializeField] private Slider _slider;
 		public Slider slider { get => _slider; set => _slider = value; }

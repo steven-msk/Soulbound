@@ -7,8 +7,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using SoulboundBackend.Common;
 
 namespace SoulboundBackend.Client.UI.Screens {
+	[PROTOTYPICAL]
 	public class SettingsScreen : Screen {
 		private SettingEntryGroup entryGroup;
 

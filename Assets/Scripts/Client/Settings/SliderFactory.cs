@@ -1,4 +1,5 @@
 ﻿using SoulboundBackend.Client.Settings;
+using SoulboundBackend.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace SoulboundBackend.Client.UI {
+	[PROTOTYPICAL]
 	public static class SliderFactory {
 		public static Slider CreateSlider(Transform parent) {
 			GameObject sliderObject = new("Slider", typeof(RectTransform), typeof(Slider));

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SoulboundBackend.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,7 @@ using UnityEngine.UI;
 using static UnityEngine.UI.ContentSizeFitter;
 
 namespace SoulboundBackend.Client.Settings {
+	[PROTOTYPICAL]
 	public class SettingContainerBuilder {
 		public const float DEFAULT_HORIZONTAL_SPACING = 8f;
 		public const ContentSizeFitter.FitMode DEFAULT_FIT_MODE = FitMode.PreferredSize;

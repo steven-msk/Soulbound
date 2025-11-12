@@ -7,8 +7,10 @@ using System.Threading.Tasks;
 using UnityEngine;
 using System.Reflection;
 using SoulboundBackend.Client.UI.Tooltip;
+using SoulboundBackend.Common;
 
 namespace SoulboundBackend.Client.Settings {
+	[PROTOTYPICAL]
 	public class SettingEntryGroup : MonoBehaviour {
 		private List<GameObject> toDestroy = new();
 

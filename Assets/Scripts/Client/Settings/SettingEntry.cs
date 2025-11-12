@@ -1,5 +1,6 @@
 ﻿using SoulboundBackend.Client.UI;
 using SoulboundBackend.Client.UI.Tooltip;
+using SoulboundBackend.Common;
 using SoulboundBackend.Common.Logging;
 using SoulboundBackend.Core;
 using System;
@@ -130,6 +131,7 @@ namespace SoulboundBackend.Client.Settings {
 
 		public override float Decode(string value) => float.Parse(value);
 
+		[PROTOTYPICAL]
 		public override SettingVisual<float> GetVisual(Transform parent) {
 			Slider slider = SliderFactory.CreateSlider(parent);
 			slider.minValue = minInclusive;
