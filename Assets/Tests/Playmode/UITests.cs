@@ -17,7 +17,7 @@ namespace UITests {
 			var obj = new GameObject("TestObj");
 			var childRef = obj.AddComponent<ChildReference>();
 
-			Assert.AreEqual("TestObj", childRef.accessor);
+			Assert.AreEqual("TestObj", childRef.accessor); 
 
 			GameObject.DestroyImmediate(obj);
 		}

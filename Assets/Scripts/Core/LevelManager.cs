@@ -42,10 +42,6 @@ namespace SoulboundBackend.Core {
 
 		public UIManager UIManager => GameObject.Find("Canvas").GetComponent<UIManager>();
 
-		// FEATUREIMPL: settings menu
-		// FEATUREIMPL: pause menu
-		// Pause menu -> Settings menu
-
 		public const string worldDump = "worldDump.json";
 		public static readonly JsonSerializerSettings globalJsonSettings = new() {
 			TypeNameHandling = TypeNameHandling.Auto,

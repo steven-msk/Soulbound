@@ -10,11 +10,6 @@ namespace SoulboundBackend.Client.World.TileDefinitions {
 			public const int IsWood = 5;
 		}
 
-		// FIXME: visual grass tile bug
-		// Sometimes the tiles dont update properly and a grass tile sets itself to the wrong state
-		// This can be fixed manually by updating the position with a tile brush,
-		// but this is not maintainable and works only in editor
-
 		public override bool RuleMatch(int neighbor, TileBase other) {
 			return neighbor switch {
 				Neighbor.This => other == this,
