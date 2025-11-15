@@ -1,4 +1,4 @@
-﻿namespace SoulboundBackend.Client.World.Entity.SpawnData {
+﻿namespace SoulboundBackend.Client.World.EntitySystem.SpawnData {
 	public abstract class SpawnDataValue {
 		public abstract object GetValue();
 		public abstract void SetValue(object value);

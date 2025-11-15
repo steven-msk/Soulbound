@@ -1,4 +1,4 @@
-﻿namespace SoulboundBackend.Client.World.Entity {
+﻿namespace SoulboundBackend.Client.World.EntitySystem {
 	public interface ITickable {
 		void Tick();
 	}

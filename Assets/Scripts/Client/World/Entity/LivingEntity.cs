@@ -3,7 +3,7 @@ using UnityEngine;
 
 #nullable enable
 
-namespace SoulboundBackend.Client.World.Entity {
+namespace SoulboundBackend.Client.World.EntitySystem {
 	public abstract class LivingEntity : Entity {
 		protected float maxHealth;
 		protected float currentHealth;

@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Client.World.Entity;
+﻿using SoulboundBackend.Client.World.EntitySystem;
 using System;
 using System.Collections.Generic;
 using System.Linq;

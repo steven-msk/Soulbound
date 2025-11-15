@@ -1,7 +1,7 @@
-﻿using SoulboundBackend.Client.World.Entity.SpawnData;
+﻿using SoulboundBackend.Client.World.EntitySystem.SpawnData;
 using System;
 
-namespace SoulboundBackend.Client.World.Entity {
+namespace SoulboundBackend.Client.World.EntitySystem {
 	public class SerializedEntityProperty<T> : AbstractSerializedEntityProperty {
 		public string key;
 		public T value;

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SoulboundBackend.Client.World.Entity {
+namespace SoulboundBackend.Client.World.EntitySystem {
 	public struct SerializedEntity {
 		public Type entityScriptType;
 		public Guid id;

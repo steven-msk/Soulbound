@@ -1,6 +1,6 @@
 ﻿using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Client.World.Chunk;
-using SoulboundBackend.Client.World.Entity;
+using SoulboundBackend.Client.World.EntitySystem;
 using SoulboundBackend.Client.World.Structure;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core;
@@ -38,16 +38,13 @@ namespace SoulboundBackend.Client.World {
 		private Dictionary<int, List<StructurePlacement>> structurePlacements = new();
 		private Dictionary<int, List<(ChunkBlockPos chunkBlockPos, BlockState state)>> pendingUpdates = new();
 		private LevelGridContext gridContext;
-		[Obsolete] private EntityManager entityManager;
-		[Obsolete] public EntityManager EntityManager => entityManager;
-
+		private LevelManager? levelManager;
 		public bool isWorldLoaded { get; private set; } = false;
 
 		public Level(LevelGridContext gridContext, int seed) {
 			this.gridContext = gridContext;
 			this.seed = seed;
 			this.heightGenerator = new PerlinNoiseGenerator1D(this.seed, WorldChunk.HEIGHT_SPREAD);
-			this.entityManager = new EntityManager(this);
 		}
 
 		// PLANNED REWORK: world rendering system
@@ -55,7 +52,8 @@ namespace SoulboundBackend.Client.World {
 		// achieve any level of performance. This project is still in prototype phase, so making any
 		// optimization isnt really worth it and might be a waste of time in most cases.
 
-		public void BootstrapWorld(WorldDump? dump) {
+		public void BootstrapWorld(WorldDump? dump, LevelManager levelManager) {
+			this.levelManager = levelManager;
 			Dictionary<int, int[][]> chunkIDmap = new();
 
 			if (dump == null) {
@@ -85,19 +83,10 @@ namespace SoulboundBackend.Client.World {
 			return new Vector2(0f, GetSurfaceY(0));
 		}
 
-		public WorldDump CreateDump() {
-			Dictionary<Guid, SerializedEntity> serializedEntities = entityManager.AllExistingEntities
-				.Where(entity => entity.Value is not PlayerController)
-				.ToDictionary(guid => guid.Key, entity => entity.Value.Serialize());
-
-			WorldDump dump = new(
-				this.seed, 
-				generatedChunks.Values.ToArray(), 
-				/* isPlayerSpawned ? player.Serialize() : default */default,
-				this.structurePlacements, 
-				serializedEntities
-			);
-			return dump;
+		public void CreateDump(out int seed, out WorldChunk[] generatedChunks, out Dictionary<int, List<StructurePlacement>> structurePlacements) {
+			seed = this.seed;
+			generatedChunks = this.generatedChunks.Values.ToArray();
+			structurePlacements = this.structurePlacements;
 		}
 
 		public void UpdateChunks(Vector2 playerPos) {
@@ -125,13 +114,21 @@ namespace SoulboundBackend.Client.World {
 
 					loadedChunks[chunkX] = chunk;
 					chunk.Render(gridContext.tilemap, chunkOutlineRenderer);
-					entityManager.OnChunkLoaded(chunk);
+					levelManager.OnChunkLoaded(chunk);
 				}
 			}
 		}
 
 		public void Update(Vector2 playerPos, float deltaTime) {
 			UpdateChunks(playerPos);
+		}
+
+		public void SpawnEntity(Entity entity, EntitySpawnData spawnData) {
+			levelManager.SpawnEntity(entity, spawnData);
+		}
+
+		public void RemoveEntityImmediately(Entity entity, bool destroy) {
+			levelManager.RemoveEntityImmediately(entity, destroy);
 		}
 
 		//public void Update(float deltaTime) {
@@ -331,7 +328,7 @@ namespace SoulboundBackend.Client.World {
 			foreach (WorldChunk chunk in toRemove) {
 				loadedChunks.Remove(chunk.xpos);
 				chunk.Unload(gridContext.tilemap, chunkOutlineRenderer);
-				entityManager.OnChunkUnloaded(chunk);
+				levelManager.OnChunkUnloaded(chunk);
 			}
 		}
 

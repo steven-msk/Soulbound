@@ -1,9 +1,9 @@
-﻿using SoulboundBackend.Client.World.Entity.SpawnData;
+﻿using SoulboundBackend.Client.World.EntitySystem.SpawnData;
 using System.Collections.Generic;
 using UnityEngine;
 using Logger = SoulboundBackend.Common.Logging.Logger;
 
-namespace SoulboundBackend.Client.World.Entity {
+namespace SoulboundBackend.Client.World.EntitySystem {
 	public class EntitySpawnData : Dictionary<SpawnDataKey, SpawnDataValue> {
 		private static readonly Logger logger = Logger.CreateInstance();
 

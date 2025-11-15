@@ -1,4 +1,4 @@
-﻿namespace SoulboundBackend.Client.World.Entity.AI {
+﻿namespace SoulboundBackend.Client.World.EntitySystem.AI {
 	public sealed class MutableStateProperty<TType> {
 		public TType value { get; private set; }
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace SoulboundBackend.Client.World.Entity.AI {
+namespace SoulboundBackend.Client.World.EntitySystem.AI {
 	public class MoveToPositionState : IMutableAIState<MoveToPositionState> {
 		public MutableStateProperty<Vector2> target { get; }
 		private Entity entity;

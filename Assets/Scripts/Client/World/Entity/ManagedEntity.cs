@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace SoulboundBackend.Client.World.Entity {
+namespace SoulboundBackend.Client.World.EntitySystem {
 	[RequireComponent(typeof(Collider2D))]
 	public sealed class ManagedEntity : Entity {
 		public override Type entityScriptType => typeof(ManagedEntity);

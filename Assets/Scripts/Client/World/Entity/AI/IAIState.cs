@@ -1,4 +1,4 @@
-﻿namespace SoulboundBackend.Client.World.Entity.AI {
+﻿namespace SoulboundBackend.Client.World.EntitySystem.AI {
 	public interface IAIState {
 		public abstract bool isInterruptable { get; }
 		public abstract bool isFinished { get; }

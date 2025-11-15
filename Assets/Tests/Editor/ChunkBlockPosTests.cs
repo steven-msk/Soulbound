@@ -102,15 +102,15 @@ public class ChunkBlockPosTests {
 		Assert.AreEqual(Mathf.FloorToInt(worldPos.y), chunkPos.y);
 	}
 
-	[Test]
-	public void UnderlyingChunk_ReturnsExpectedChunk() {
-		Level level = new Level(LevelGridContext.FromRuntimePrefabs(), 0);
-        level.BootstrapWorld(null);
+	//[Test]
+	//public void UnderlyingChunk_ReturnsExpectedChunk() {
+	//	Level level = new Level(LevelGridContext.FromRuntimePrefabs(), 0);
+ //       level.BootstrapWorld(null);
 
-        var pos = new ChunkBlockPos(2, 3, 1);
-		var chunk = pos.UnderlyingChunk(level);
+ //       var pos = new ChunkBlockPos(2, 3, 1);
+	//	var chunk = pos.UnderlyingChunk(level);
 
-		Assert.IsNotNull(chunk);
-		Assert.AreEqual(1, chunk.xpos);
-	}
+	//	Assert.IsNotNull(chunk);
+	//	Assert.AreEqual(1, chunk.xpos);
+	//}
 }

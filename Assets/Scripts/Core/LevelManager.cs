@@ -5,7 +5,8 @@ using SoulboundBackend.Client.UI;
 using SoulboundBackend.Client.UI.Screens;
 using SoulboundBackend.Client.UI.Storage;
 using SoulboundBackend.Client.World;
-using SoulboundBackend.Client.World.Entity;
+using SoulboundBackend.Client.World.Chunk;
+using SoulboundBackend.Client.World.EntitySystem;
 using SoulboundBackend.Common;
 using SoulboundBackend.Common.Json;
 using SoulboundBackend.Core.Bootstrap;
@@ -66,7 +67,7 @@ namespace SoulboundBackend.Core {
 			this.level = new Level(gridContext, seed);
 			this.entityManager = new EntityManager(level);
 
-			level.BootstrapWorld(dump);
+			level.BootstrapWorld(dump, this);
 			entityManager.Boostrap(dump?.serializedEntities ?? new());
 			isWorldLoaded = true;
 
@@ -119,6 +120,22 @@ namespace SoulboundBackend.Core {
 			}
 		}
 
+		public void OnChunkLoaded(WorldChunk chunk) {
+			entityManager.OnChunkLoaded(chunk);
+		}
+
+		public void OnChunkUnloaded(WorldChunk chunk) {
+			entityManager.OnChunkUnloaded(chunk);
+		}
+
+		public void SpawnEntity(Entity entity, EntitySpawnData spawnData) {
+			entityManager.SpawnEntity(entity, spawnData);
+		}
+
+		public void RemoveEntityImmediately(Entity entity, bool destroy) {
+			entityManager.RemoveEntityImmediately(entity, destroy);
+		}
+ 
 		public void OnEscPressed() {
 			if (UIManager.OnEscPressed()) {
 				TogglePause();
@@ -135,7 +152,15 @@ namespace SoulboundBackend.Core {
 
 		private void OnApplicationQuit() {
 			if (isWorldLoaded) {
-				worldManager.SaveWorld(world, level.CreateDump());
+				level.CreateDump(out var seed, out var generatedChunks, out var structurePlacements);
+				WorldDump dump = new(
+					seed,
+					generatedChunks, 
+					player?.Serialize() ?? default, 
+					structurePlacements, 
+					entityManager.Serialize()
+				);
+				worldManager.SaveWorld(world, dump);
 			}
 			Soulbound.instance?.OnApplicationQuit();
 		} 

@@ -626,7 +626,7 @@ MonoBehaviour:
     file:
       savesFolder: saves
     dev:
-      loadDevWorldFromSave: 0
+      loadDevWorldFromSave: 1
       devWorld: devWorld
       devScene: DevScene
 --- !u!4 &2144701901

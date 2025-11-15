@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Client.World.Entity;
+﻿using SoulboundBackend.Client.World.EntitySystem;
 using SoulboundBackend.Core.Resource;
 using System;
 using UnityEngine;

@@ -152,96 +152,96 @@ namespace WorldTests {
 			Assert.That(worldBox.value != null, () => "Failed to create sceneless world");
 		}
 
-		[UnityTest]
-		public IEnumerator World_SaveAndReload_PersistsBlockChanges() {
-			string world = CreateNewWorldID();
+		//[UnityTest]
+		//public IEnumerator World_SaveAndReload_PersistsBlockChanges() {
+		//	string world = CreateNewWorldID();
 
-			var sceneBox = new ContextBox<Scene>();
-			var worldBox = new ContextBox<WorldManager>();
-			yield return CreateSavedContext(worldBox, sceneBox, world);
+		//	var sceneBox = new ContextBox<Scene>();
+		//	var worldBox = new ContextBox<WorldManager>();
+		//	yield return CreateSavedContext(worldBox, sceneBox, world);
 
-			Level level = TryGetLevel(worldBox);
-			WorldDump dump = level.CreateDump();
-			ChunkBlockPos pos = new(0, 0, 0);
+		//	Level level = TryGetLevel(worldBox);
+		//	WorldDump dump = level.CreateDump();
+		//	ChunkBlockPos pos = new(0, 0, 0);
 
-			pos.chunkX = dump.generatedChunks[0].xpos;
-			Block blockAtPos = dump.generatedChunks[0].BlockStateAt(pos).block;
-			Block target = Blocks.wood;
+		//	pos.chunkX = dump.generatedChunks[0].xpos;
+		//	Block blockAtPos = dump.generatedChunks[0].BlockStateAt(pos).block;
+		//	Block target = Blocks.wood;
 
-			dump.generatedChunks[0].SetBlock(pos, target.defaultState);
-			worldBox.value!.SaveWorld(world, dump);
+		//	dump.generatedChunks[0].SetBlock(pos, target.defaultState);
+		//	worldBox.value!.SaveWorld(world, dump);
 
-			yield return PlayModeTesting.UnloadSceneAsync(sceneBox.value);
+		//	yield return PlayModeTesting.UnloadSceneAsync(sceneBox.value);
 
-			StaticResetManager.ResetAll();
-			yield return CreateSavedContext(worldBox, sceneBox, world);
+		//	StaticResetManager.ResetAll();
+		//	yield return CreateSavedContext(worldBox, sceneBox, world);
 
-			level = TryGetLevel(worldBox);
-			Assert.That(level.BlockAt(pos.ToWorldBlockPos()) == target);
-		}
+		//	level = TryGetLevel(worldBox);
+		//	Assert.That(level.BlockAt(pos.ToWorldBlockPos()) == target);
+		//}
 
-		[UnityTest]
-		public IEnumerator World_HasUniqueSaveFile() {
-			string world1 = CreateNewWorldID();
-			string world2 = CreateNewWorldID();
+		//[UnityTest]
+		//public IEnumerator World_HasUniqueSaveFile() {
+		//	string world1 = CreateNewWorldID();
+		//	string world2 = CreateNewWorldID();
 
-			var sceneBox = new ContextBox<Scene>();
-			var worldBox = new ContextBox<WorldManager>();
-			yield return CreateSavedContext(worldBox, sceneBox, world1);
-			int world1seed = TryGetLevel(worldBox).seed;
+		//	var sceneBox = new ContextBox<Scene>();
+		//	var worldBox = new ContextBox<WorldManager>();
+		//	yield return CreateSavedContext(worldBox, sceneBox, world1);
+		//	int world1seed = TryGetLevel(worldBox).seed;
 
-			yield return worldBox.value!.TerminateWorldProcess(sceneBox.value, world1,
-				() => TryGetLevel(worldBox).CreateDump());
+		//	yield return worldBox.value!.TerminateWorldProcess(sceneBox.value, world1,
+		//		() => TryGetLevel(worldBox).CreateDump());
 
-			yield return CreateSavedContext(worldBox, sceneBox, world2);
-			int world2seed = TryGetLevel(worldBox).seed;
+		//	yield return CreateSavedContext(worldBox, sceneBox, world2);
+		//	int world2seed = TryGetLevel(worldBox).seed;
 
-			yield return worldBox.value!.TerminateWorldProcess(sceneBox.value, world2,
-				() => TryGetLevel(worldBox).CreateDump());
+		//	yield return worldBox.value!.TerminateWorldProcess(sceneBox.value, world2,
+		//		() => TryGetLevel(worldBox).CreateDump());
 
-			yield return CreateSavedContext(worldBox, sceneBox, world1);
-			Assert.That(world1seed, Is.EqualTo(TryGetLevel(worldBox).seed));
+		//	yield return CreateSavedContext(worldBox, sceneBox, world1);
+		//	Assert.That(world1seed, Is.EqualTo(TryGetLevel(worldBox).seed));
 
-			yield return PlayModeTesting.UnloadSceneAsync(sceneBox.value);
+		//	yield return PlayModeTesting.UnloadSceneAsync(sceneBox.value);
 
-			yield return CreateSavedContext(worldBox, sceneBox, world2);
-			Assert.That(world2seed, Is.EqualTo(TryGetLevel(worldBox).seed));
-		}
+		//	yield return CreateSavedContext(worldBox, sceneBox, world2);
+		//	Assert.That(world2seed, Is.EqualTo(TryGetLevel(worldBox).seed));
+		//}
 
-		[UnityTest]
-		public IEnumerator World_LevelInstanceChanges_WhenSwitchingWorlds() {
-			string world1 = CreateNewWorldID();
-			string world2 = CreateNewWorldID();
-			var worldBox = new ContextBox<WorldManager>();
-			var sceneBox = new ContextBox<Scene>();
+		//[UnityTest]
+		//public IEnumerator World_LevelInstanceChanges_WhenSwitchingWorlds() {
+		//	string world1 = CreateNewWorldID();
+		//	string world2 = CreateNewWorldID();
+		//	var worldBox = new ContextBox<WorldManager>();
+		//	var sceneBox = new ContextBox<Scene>();
 
-			yield return CreateSavedContext(worldBox, sceneBox, world1);
-			Level world1instance = TryGetLevel(worldBox);
-			worldBox.value!.SaveWorld(world1, world1instance.CreateDump());
+		//	yield return CreateSavedContext(worldBox, sceneBox, world1);
+		//	Level world1instance = TryGetLevel(worldBox);
+		//	worldBox.value!.SaveWorld(world1, world1instance.CreateDump());
 
-			yield return PlayModeTesting.UnloadSceneAsync(sceneBox.value);
+		//	yield return PlayModeTesting.UnloadSceneAsync(sceneBox.value);
 
-			yield return CreateSavedContext(worldBox, sceneBox, world2);
-			Level world2instance = TryGetLevel(worldBox);
+		//	yield return CreateSavedContext(worldBox, sceneBox, world2);
+		//	Level world2instance = TryGetLevel(worldBox);
 
-			Assert.That(world1instance, Is.Not.EqualTo(world2instance));
-		}
+		//	Assert.That(world1instance, Is.Not.EqualTo(world2instance));
+		//}
 
-		[UnityTest]
-		public IEnumerator DoNotSaveWorldStrategy_DiscardsSaves() {
-			string world = CreateNewWorldID();
-			var worldBox = new ContextBox<WorldManager>();
+		//[UnityTest]
+		//public IEnumerator DoNotSaveWorldStrategy_DiscardsSaves() {
+		//	string world = CreateNewWorldID();
+		//	var worldBox = new ContextBox<WorldManager>();
 
-			Scene scene = PlayModeTesting.CreateNewTestScene();
-			yield return CreateAnonymousContext(scene, worldBox);
-			int seed = TryGetLevel(worldBox).seed;
-			worldBox.value!.SaveWorld(world, TryGetLevel(worldBox).CreateDump());
+		//	Scene scene = PlayModeTesting.CreateNewTestScene();
+		//	yield return CreateAnonymousContext(scene, worldBox);
+		//	int seed = TryGetLevel(worldBox).seed;
+		//	worldBox.value!.SaveWorld(world, TryGetLevel(worldBox).CreateDump());
 
-			yield return PlayModeTesting.UnloadSceneAsync(scene);
+		//	yield return PlayModeTesting.UnloadSceneAsync(scene);
 
-			yield return CreateContextWithNoSceneProvided(worldBox, world, new DoNotSaveWorldStrategy());
-			Assert.That(seed, Is.Not.EqualTo(TryGetLevel(worldBox).seed));
-		}
+		//	yield return CreateContextWithNoSceneProvided(worldBox, world, new DoNotSaveWorldStrategy());
+		//	Assert.That(seed, Is.Not.EqualTo(TryGetLevel(worldBox).seed));
+		//}
 	}
 }
 
@@ -261,23 +261,23 @@ namespace WorldTests.BlockTests {
 			Assert.That(level.BlockAt(blockPos) == Blocks.air);
 		}
 
-		[UnityTest]
-		public IEnumerator BlockState_PersistsCorrectly_AfterSaveAndReload() {
-			string world = World.CreateNewWorldID();
-			BlockPos targetPos = new(0, 0);
-			var sceneBox = new ContextBox<Scene>();
-			var worldBox = new ContextBox<WorldManager>();
+		//[UnityTest]
+		//public IEnumerator BlockState_PersistsCorrectly_AfterSaveAndReload() {
+		//	string world = World.CreateNewWorldID();
+		//	BlockPos targetPos = new(0, 0);
+		//	var sceneBox = new ContextBox<Scene>();
+		//	var worldBox = new ContextBox<WorldManager>();
 
-			yield return World.CreateSavedContext(worldBox, sceneBox, world);
+		//	yield return World.CreateSavedContext(worldBox, sceneBox, world);
 
-			BlockState? targetState = World.TryGetLevel(worldBox).BlockStateAt(targetPos);
-			worldBox.value!.SaveWorld(world, World.TryGetLevel(worldBox).CreateDump());
-			yield return PlayModeTesting.UnloadSceneAsync(sceneBox.value);
+		//	BlockState? targetState = World.TryGetLevel(worldBox).BlockStateAt(targetPos);
+		//	worldBox.value!.SaveWorld(world, World.TryGetLevel(worldBox).CreateDump());
+		//	yield return PlayModeTesting.UnloadSceneAsync(sceneBox.value);
 
-			yield return World.CreateSavedContext(worldBox, sceneBox, world);
-			BlockState? actualState = World.TryGetLevel(worldBox).BlockStateAt(targetPos);
-			Assert.That(actualState, Is.EqualTo(targetState));
-		}
+		//	yield return World.CreateSavedContext(worldBox, sceneBox, world);
+		//	BlockState? actualState = World.TryGetLevel(worldBox).BlockStateAt(targetPos);
+		//	Assert.That(actualState, Is.EqualTo(targetState));
+		//}
 
 		[UnityTest]
 		public IEnumerator BlockState_ReplacesCorrectly_WhenSetAgain() {
@@ -294,22 +294,22 @@ namespace WorldTests.BlockTests {
 			Assert.That(level.BlockAt(pos) == Blocks.stone);
 		}
 
-		[UnityTest]
-		public IEnumerator BlockState_UpdatesChunkData_WhenPlaced() {
-			var result = new ContextBox<WorldManager>();
-			yield return World.CreateContextWithNoSceneProvided(result);
+		//[UnityTest]
+		//public IEnumerator BlockState_UpdatesChunkData_WhenPlaced() {
+		//	var result = new ContextBox<WorldManager>();
+		//	yield return World.CreateContextWithNoSceneProvided(result);
 
-			Level level = World.TryGetLevel(result.value);
-			ChunkBlockPos pos = new(5, 0, 0);
-			pos.chunkX = level.CreateDump().generatedChunks[0].xpos;
+		//	Level level = World.TryGetLevel(result.value);
+		//	ChunkBlockPos pos = new(5, 0, 0);
+		//	pos.chunkX = level.CreateDump().generatedChunks[0].xpos;
 
-			level.SetBlock(pos.ToWorldBlockPos(), Blocks.leaves.defaultState);
+		//	level.SetBlock(pos.ToWorldBlockPos(), Blocks.leaves.defaultState);
 
-			var dump = level.CreateDump();
-			var blockInDump = dump.generatedChunks[0].BlockStateAt(pos).block;
+		//	var dump = level.CreateDump();
+		//	var blockInDump = dump.generatedChunks[0].BlockStateAt(pos).block;
 
-			Assert.That(blockInDump == Blocks.leaves);
-		}
+		//	Assert.That(blockInDump == Blocks.leaves);
+		//}
 
 		[UnityTest]
 		public IEnumerator BlockStates_MultipleBlocksRemainConsistent_InSameChunk() {

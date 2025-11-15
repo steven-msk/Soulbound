@@ -1,6 +1,6 @@
-﻿using SoulboundBackend.Client.World.Entity.SpawnData;
+﻿using SoulboundBackend.Client.World.EntitySystem.SpawnData;
 
-namespace SoulboundBackend.Client.World.Entity {
+namespace SoulboundBackend.Client.World.EntitySystem {
 	public abstract class AbstractSerializedEntityProperty {
 		public abstract object GetValueAsObject();
 		public abstract void SetValueFromObject(object value);

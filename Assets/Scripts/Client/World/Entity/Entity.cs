@@ -1,12 +1,12 @@
 ﻿using SoulboundBackend.Client.World.Chunk;
-using SoulboundBackend.Client.World.Entity.SpawnData;
+using SoulboundBackend.Client.World.EntitySystem.SpawnData;
 using SoulboundBackend.Core;
 using System;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
-namespace SoulboundBackend.Client.World.Entity {
+namespace SoulboundBackend.Client.World.EntitySystem {
 	public abstract class Entity : MonoBehaviour, ISerializable<SerializedEntity> {
 		protected EntityManager entityManager = null;
 		public Guid id { get; private set; }

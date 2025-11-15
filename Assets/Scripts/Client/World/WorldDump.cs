@@ -1,5 +1,5 @@
 ﻿using SoulboundBackend.Client.World.Chunk;
-using SoulboundBackend.Client.World.Entity;
+using SoulboundBackend.Client.World.EntitySystem;
 using SoulboundBackend.Client.World.Structure;
 using System;
 using System.Collections.Generic;

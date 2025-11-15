@@ -7,7 +7,7 @@ using UnityEngine;
 
 #nullable enable
 
-namespace SoulboundBackend.Client.World.Entity {
+namespace SoulboundBackend.Client.World.EntitySystem {
 	public sealed class EntityManager {
 		private readonly Level level;
 		private PlayerController player = null!;
@@ -77,9 +77,6 @@ namespace SoulboundBackend.Client.World.Entity {
 				entity.ManagerUpdate(this);
 			}
 			player?.EntityUpdate(deltaTime);
-			//if (level.isPlayerSpawned) {
-			//	this.player.EntityUpdate(deltaTime);
-			//}
 		}
 
 		public void OnChunkLoaded(WorldChunk chunk) {
@@ -102,6 +99,10 @@ namespace SoulboundBackend.Client.World.Entity {
 			} else if (!oldLoaded && newLoaded) {
 				entity.OnChunkLoaded();
 			}
+		}
+
+		public Dictionary<Guid, SerializedEntity> Serialize() {
+			return allEntities.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Serialize());
 		}
 
 		public HashSet<Entity> GetEntitiesInChunk(WorldChunk chunk) {

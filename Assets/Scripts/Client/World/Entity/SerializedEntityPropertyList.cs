@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SoulboundBackend.Client.World.Entity {
+namespace SoulboundBackend.Client.World.EntitySystem {
 	public sealed class SerializedEntityPropertyList : List<AbstractSerializedEntityProperty> {
 		public SerializedEntityPropertyList() : base() {
 		}

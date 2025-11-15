@@ -1,4 +1,4 @@
-﻿namespace SoulboundBackend.Client.World.Entity.SpawnData {
+﻿namespace SoulboundBackend.Client.World.EntitySystem.SpawnData {
 	public class SpawnDataKey {
 		public string name { get; }
 

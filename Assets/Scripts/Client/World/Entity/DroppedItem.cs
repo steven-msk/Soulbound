@@ -5,7 +5,7 @@ using System;
 using UnityEngine;
 using Logger = SoulboundBackend.Common.Logging.Logger;
 
-namespace SoulboundBackend.Client.World.Entity {
+namespace SoulboundBackend.Client.World.EntitySystem {
 	public class DroppedItem : Entity {
 		private static readonly Logger logger = Logger.CreateInstance();
 		public const float defaultLifespanSeconds = 120f;           // TODO: decide on a dropped item lifespan duration
@@ -86,7 +86,7 @@ namespace SoulboundBackend.Client.World.Entity {
 			if (pickupTimer <= 0 && !flag_pickupLocked) {
 				if (Soulbound.instance.GetPlayerInstance().Inventory.PickUpItem(ItemStack, out int remaining)) {
 					flag_pickupLocked = true;
-					Soulbound.instance.GetActiveLevel().EntityManager.RemoveEntityImmediately(this, destroy: true);
+					Soulbound.instance.GetActiveLevel().RemoveEntityImmediately(this, destroy: true);
 				} else {
 					ItemStack.SetQuantity(remaining);
 				}

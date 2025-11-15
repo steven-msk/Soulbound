@@ -1,6 +1,6 @@
 using SoulboundBackend.Client.UI.Storage;
-using SoulboundBackend.Client.World.Entity;
-using SoulboundBackend.Client.World.Entity.SpawnData;
+using SoulboundBackend.Client.World.EntitySystem;
+using SoulboundBackend.Client.World.EntitySystem.SpawnData;
 using SoulboundBackend.Core;
 using SoulboundBackend.Core.Resource;
 using TMPro;
@@ -52,7 +52,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 			}
 			GameObject droppedItem = worldPrefab!;
 			DroppedItem pickup = droppedItem.GetComponent<DroppedItem>() ?? droppedItem.AddComponent<DroppedItem>();
-			Soulbound.instance.GetActiveLevel()!.EntityManager.SpawnEntity(pickup, new EntitySpawnData(pos) {
+			Soulbound.instance.GetActiveLevel().SpawnEntity(pickup, new EntitySpawnData(pos) {
 				[SpawnDataKey.Of("itemStack")] = new SpawnDataValue<ItemStack>(this),
 				[SpawnDataKey.Of("pickupDelay")] = new SpawnDataValue<float>((playerAction ? 2f : 0f)),
 				[SpawnDataKey.Of("dropForce")] = new SpawnDataValue<Vector2>(dropForce),

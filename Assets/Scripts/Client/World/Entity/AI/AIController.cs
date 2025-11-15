@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SoulboundBackend.Client.World.Entity.AI {
+namespace SoulboundBackend.Client.World.EntitySystem.AI {
 	public class AIController : ITickable {
 		public delegate IAIState StateResolver();
 

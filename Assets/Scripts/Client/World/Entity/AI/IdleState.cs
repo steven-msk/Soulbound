@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SoulboundBackend.Client.World.Entity.AI {
+namespace SoulboundBackend.Client.World.EntitySystem.AI {
 	public class IdleState : IAIState {
 		public bool isInterruptable => true;
 		public bool isFinished => false;
