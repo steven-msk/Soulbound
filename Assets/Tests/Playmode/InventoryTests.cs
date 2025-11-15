@@ -28,10 +28,11 @@ namespace InventoryTests {
 		internal InventoryController CreateTestEnvironment(out Scene scene) {
 			scene = PlayModeTesting.CreateNewSceneAndSetActive();
 			var prefab = ResourceManager.GetRuntimePrefab("sceneContext");
-			GameObject.Instantiate(ResourceManager.GetRuntimePrefab("Canvas"));
+			var canvas = GameObject.Instantiate(ResourceManager.GetRuntimePrefab("Canvas")).GetComponent<Canvas>();
+			canvas.name = "Canvas";
 			var sceneContext = GameObject.Instantiate(prefab).GetComponent<SceneContext>();
 
-			sceneContext.AddNormalInstaller(new PlayerInstallerWrapper(true));
+			sceneContext.AddNormalInstaller(new PlayerInstallerWrapper(true, canvas));
 			sceneContext.Install();
 			return sceneContext.Container.Resolve<InventoryController>();
 		}

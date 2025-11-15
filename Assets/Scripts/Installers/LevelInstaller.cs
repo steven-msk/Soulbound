@@ -6,16 +6,19 @@ using Zenject;
 namespace SoulboundBackend.Core.Bootstrap {
 	public class LevelInstaller : AbstractInstaller {
 		public readonly WorldManager worldManager;
+		public readonly Canvas canvas;
 
-		public LevelInstaller(WorldManager worldManager) {
+		public LevelInstaller(WorldManager worldManager, Canvas canvas) {
 			this.worldManager = worldManager;
+			this.canvas = canvas;
 		}
 
 		public override void InstallBindings(DiContainer container) {
 			var levelManagerPrefab = ResourceManager.GetRuntimePrefab("levelManager");
 
-			container.Bind<WorldManager>().FromInstance(worldManager).AsSingle();
+			container.BindInstance<WorldManager>(worldManager).AsSingle();
 			container.Bind<LevelManager>().FromComponentInNewPrefab(levelManagerPrefab).AsSingle().NonLazy();
+			container.BindInstance<Canvas>(canvas).AsSingle();
 		}
 	}
 }

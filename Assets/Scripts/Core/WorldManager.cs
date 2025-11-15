@@ -95,6 +95,10 @@ public sealed class WorldManager {
 		return dump;
 	}
 
+	public void SaveWorld(string world, LevelManager levelManager) {
+		this.SaveWorld(world, levelManager.CreateDump());
+	}
+
 	public void SaveWorld(string world, WorldDump dump) {
 		string dumpPath = GetDumpPath(world, createIfAbsent: saveStrategy is not DoNotSaveWorldStrategy);
 		saveStrategy.Save(dump, dumpPath);

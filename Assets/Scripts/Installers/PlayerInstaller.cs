@@ -11,15 +11,17 @@ namespace SoulboundBackend.Core.Bootstrap {
 	public class PlayerInstaller : MonoInstaller {
 		[SerializeField] private bool instantiatePlayer = false;
 		public override void InstallBindings() {
-			new PlayerInstallerWrapper(instantiatePlayer).InstallBindings(Container);
+			new PlayerInstallerWrapper(instantiatePlayer, GameObject.Find("Canvas").GetComponent<Canvas>()).InstallBindings(Container);
 		}
 	}
 
 	public class PlayerInstallerWrapper : AbstractInstaller {
 		private bool instantiatePlayer;
+		private Canvas canvas;
 
-		public PlayerInstallerWrapper(bool instantiatePlayer) {
+		public PlayerInstallerWrapper(bool instantiatePlayer, Canvas canvas) {
 			this.instantiatePlayer = instantiatePlayer;
+			this.canvas = canvas;
 			Debug.Log("player installer wrapper created");
 		}
 
@@ -36,10 +38,7 @@ namespace SoulboundBackend.Core.Bootstrap {
 			container.Bind<InputHandler>().FromComponentInNewPrefab(inputHandlerPrefab.gameObject).AsSingle();
 			container.Bind<PlayerPhysics>().FromComponentOnRoot().AsSingle();
 			container.Bind<ItemUsageHandler>().AsSingle();
-			container.Bind<InventoryController>()
-				.FromComponentInNewPrefab(inventoryPrefab)
-				.UnderTransform(GameObject.FindFirstObjectByType<Canvas>().transform)
-				.AsSingle();
+			container.Bind<InventoryController>().FromComponentInNewPrefab(inventoryPrefab).UnderTransform(canvas.transform).AsSingle();
 			Debug.Log("player installer has installed bindings");
 		}
 	}

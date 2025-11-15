@@ -29,12 +29,12 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 				GameObject? entityPrefab = ResourceManager.Get<GameObject, ResourceGroups.Prefabs>(serializedEntity.prefabDefinitionID);
 				Entity entity = (Entity)GameObject.Instantiate(entityPrefab)!.GetComponent(serializedEntity.entityScriptType);
 
-				this.AddExistingEntity(entity, id);
+				this.AddEntity(entity, id);
 				entity.Deserialize(serializedEntity);
 			}
 		}
 
-		public void AddExistingEntity(Entity entity, Guid? id) {
+		public void AddEntity(Entity entity, Guid? id) {
 			entity.InitState(id ?? Guid.NewGuid(), this);
 			allEntities.Add(entity.id, entity);
 			if (entity is ITickable tickable) {
@@ -44,7 +44,7 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 
 		public void SpawnEntity(Entity entity, EntitySpawnData spawnData) {
 			entity.Spawn(spawnData);
-			this.AddExistingEntity(entity, null);
+			this.AddEntity(entity, null);
 		}
 
 		public void SpawnPlayer(PlayerController player, SerializedEntity serialized) {

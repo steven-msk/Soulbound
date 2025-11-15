@@ -56,7 +56,6 @@ namespace SoulboundBackend.Core {
 
 		[Inject]
 		public void Construct(DiContainer container) {
-			//GameObject.Instantiate(ResourceManager.GetRuntimePrefab("Canvas"))!.name = "Canvas";
 			this.container = container;
 			this.worldManager = container.Resolve<WorldManager>();
 		}
@@ -150,17 +149,20 @@ namespace SoulboundBackend.Core {
 			UIManager.SetScreen(paused ? new GamePausedScreen().GetScreen() : null, ScreenSetMethod.Stack);
 		}
 
+		public WorldDump CreateDump() {
+			level.CreateDump(out var seed, out var generatedChunks, out var structurePlacements);
+			return new WorldDump(
+				seed,
+				generatedChunks,
+				player?.Serialize() ?? default,
+				structurePlacements,
+				entityManager.Serialize()
+			);
+		}
+
 		private void OnApplicationQuit() {
 			if (isWorldLoaded) {
-				level.CreateDump(out var seed, out var generatedChunks, out var structurePlacements);
-				WorldDump dump = new(
-					seed,
-					generatedChunks, 
-					player?.Serialize() ?? default, 
-					structurePlacements, 
-					entityManager.Serialize()
-				);
-				worldManager.SaveWorld(world, dump);
+				worldManager.SaveWorld(world, CreateDump());
 			}
 			Soulbound.instance?.OnApplicationQuit();
 		} 
