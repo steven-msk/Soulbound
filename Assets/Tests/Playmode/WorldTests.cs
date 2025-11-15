@@ -56,14 +56,14 @@ namespace WorldTests {
 					var prefab = ResourceManager.GetRuntimePrefab("sceneContext");
 					var sceneContext = GameObject.Instantiate(prefab)!.GetComponent<SceneContext>();
 
-					sceneContext.AddNormalInstaller(new LevelInstallerWrapper(() => worldBox.value));
+					sceneContext.AddNormalInstaller(new LevelInstaller(worldBox.value));
 					sceneContext.Run();
 					return sceneContext;
 				},
 				() => PlayModeTesting.CreateNewSceneAndSetActive()
 			);
 			yield return new WaitUntil(
-				() => worldBox.value.activeLevelManager?.Level.isWorldLoaded ?? false
+				() => worldBox.value.activeLevelManager?.level.isWorldLoaded ?? false
 			);
 		}
 
@@ -99,7 +99,7 @@ namespace WorldTests {
 					if (sceneContext == null) {
 						var prefab = ResourceManager.GetRuntimePrefab("sceneContext");
 						sceneContext = GameObject.Instantiate(prefab)!.GetComponent<SceneContext>();
-						sceneContext.AddNormalInstaller(new LevelInstallerWrapper(() => worldBox.value));
+						sceneContext.AddNormalInstaller(new LevelInstaller(worldBox.value));
 					}
 
 					sceneContext.Run();
@@ -108,7 +108,7 @@ namespace WorldTests {
 				() => SceneManager.SetActiveScene(scene)
 			);
 			yield return new WaitUntil(
-				() => worldBox.value.activeLevelManager?.Level.isWorldLoaded ?? false
+				() => worldBox.value.activeLevelManager?.level.isWorldLoaded ?? false
 			);
 		}
 
@@ -125,7 +125,7 @@ namespace WorldTests {
 		}
 
 		internal static Level TryGetLevel(WorldManager? worldManager) {
-			return worldManager?.activeLevelManager?.Level
+			return worldManager?.activeLevelManager?.level
 				?? throw new ArgumentException("Level reference wasnt loaded");
 		}
 
@@ -140,7 +140,7 @@ namespace WorldTests {
 			yield return CreateContextWithSceneProvided(scene, worldBox);
 
 			Assert.That(
-				worldBox.value?.activeLevelManager?.Level.isWorldLoaded ?? false,
+				worldBox.value?.activeLevelManager?.level.isWorldLoaded ?? false,
 				() => "Failed to create world with provided scene"
 			);
 		}
@@ -253,7 +253,7 @@ namespace WorldTests.BlockTests {
 			var result = new ContextBox<WorldManager>();
 			yield return World.CreateContextWithNoSceneProvided(result);
 
-			Level level = result.value?.activeLevelManager?.Level
+			Level level = result.value?.activeLevelManager?.level
 				?? throw new ArgumentException("Scened world didnt load properly");
 			BlockPos blockPos = new(0, 0);
 

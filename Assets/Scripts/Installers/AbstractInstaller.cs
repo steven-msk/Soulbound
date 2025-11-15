@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 using Zenject;
 
 namespace SoulboundBackend.Core.Bootstrap {
-	public abstract class AbstractInstallerWrapper : Installer {
+	public abstract class AbstractInstaller : Installer {
 		public abstract void InstallBindings(DiContainer container);
 
 		public override void InstallBindings() => InstallBindings(Container);
 	}
 
-	public abstract class AbstractInstallerWrapper<T> : Installer<AbstractInstallerWrapper<T>> {
+	public abstract class AbstractInstaller<T> : Installer<AbstractInstaller<T>> {
 		public abstract void InstallBindinds(DiContainer container);
 		public override void InstallBindings() => InstallBindinds(Container);
 	}

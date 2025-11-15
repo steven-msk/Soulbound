@@ -14,8 +14,9 @@ namespace SoulboundBackend.Client.Debug {
 		[SerializeField] private VectorCoordinateVisual velocity;
 
 		private void Update() {
-			this.level = Soulbound.instance?.GetActiveLevel();
-			this.player = level?.Player;
+			var levelManager = Soulbound.instance?.GetActiveLevelManager();
+			this.level = levelManager.level;
+			this.player = levelManager.player;
 			if (level == null || player == null) {
 				return;
 			}

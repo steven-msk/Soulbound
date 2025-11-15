@@ -94,7 +94,7 @@ public class ChunkBlockPosTests {
 
 	[Test]
 	public void FromWorld_DelegatesToBlockPos() {
-		Level level = new Level(null, LevelGridContext.FromRuntimePrefabs(), 0);
+		Level level = new Level(LevelGridContext.FromRuntimePrefabs(), 0);
 
 		var worldPos = new Vector2(18.5f, 6.2f);
 		var chunkPos = ChunkBlockPos.FromWorld(worldPos, level);
@@ -104,7 +104,7 @@ public class ChunkBlockPosTests {
 
 	[Test]
 	public void UnderlyingChunk_ReturnsExpectedChunk() {
-		Level level = new Level(null, LevelGridContext.FromRuntimePrefabs(), 0);
+		Level level = new Level(LevelGridContext.FromRuntimePrefabs(), 0);
         level.BootstrapWorld(null);
 
         var pos = new ChunkBlockPos(2, 3, 1);

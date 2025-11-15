@@ -74,7 +74,7 @@ public class ChunkWorldPosTests {
 
 	[Test]
 	public void UnderlyingChunk_ReturnsExpectedChunk() {
-		Level level = new Level(null, LevelGridContext.FromRuntimePrefabs(), 0);
+		Level level = new Level(LevelGridContext.FromRuntimePrefabs(), 0);
 		level.BootstrapWorld(null);
 
 		var pos = new ChunkWorldPos(3.3f, 4.4f, 2);

@@ -1,9 +1,11 @@
 ﻿using NUnit.Framework;
+using SoulboundBackend.Client;
 using SoulboundBackend.Client.World;
 using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core;
 using SoulboundBackend.Core.Bootstrap;
+using SoulboundBackend.Core.Resource;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -73,6 +75,9 @@ public sealed class WorldManager {
 			if (activeLevelManager == null) {
 				throw new InvalidOperationException("Level Manager is not injected");
 			}
+			activeLevelManager.onLevelLoaded += level => {
+				activeLevelManager.SpawnPlayer(dump?.player);
+			};
 
 			LevelGridContext gridContext;
 			GameObject grid = GameObject.Find("Grid");
@@ -84,9 +89,6 @@ public sealed class WorldManager {
 			}
 
 			activeLevelManager.BootstrapWorld(world, dump, seed, gridContext);
-			if (initPlayerState) {
-				activeLevelManager.SpawnPlayer(dump?.player);
-			}
 		}
 		CoroutineRunner.GetInstance().StartCoroutine(LevelSceneLoader());
 

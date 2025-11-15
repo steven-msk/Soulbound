@@ -84,7 +84,7 @@ namespace SoulboundBackend.Client.World.Entity {
 
 		private void OnTriggerStay2D(Collider2D collision) {
 			if (pickupTimer <= 0 && !flag_pickupLocked) {
-				if (Soulbound.instance.GetActiveLevel().Player.Inventory.PickUpItem(ItemStack, out int remaining)) {
+				if (Soulbound.instance.GetPlayerInstance().Inventory.PickUpItem(ItemStack, out int remaining)) {
 					flag_pickupLocked = true;
 					Soulbound.instance.GetActiveLevel().EntityManager.RemoveEntityImmediately(this, destroy: true);
 				} else {

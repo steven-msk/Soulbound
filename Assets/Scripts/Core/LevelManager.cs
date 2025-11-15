@@ -27,18 +27,18 @@ using Logger = SoulboundBackend.Common.Logging.Logger;
 namespace SoulboundBackend.Core {
 	public class LevelManager : MonoBehaviour {
 		private static readonly Logger logger = Logger.CreateInstance();
+		public event Action<Level>? onLevelLoaded;
 		public const float tickRate = 0.02f;        // 50 tps
 		private float tickStartTime;
 		public bool isWorldLoaded { get; private set; } = false;
 		public bool paused { get; private set; }
 
+		private DiContainer container = null!;
 		private WorldManager worldManager = null!;
+		private EntityManager entityManager = null!;
 		private string world = null!;
-		private Level level = null!;
-		public Level Level => level;
-
-		private PlayerController player = null!;
-		public PlayerController Player => player;
+		public Level? level { get; private set; }
+		public PlayerController? player { get; private set; }
 
 		public UIManager UIManager => GameObject.Find("Canvas").GetComponent<UIManager>();
 
@@ -54,29 +54,43 @@ namespace SoulboundBackend.Core {
 		};
 
 		[Inject]
-		public void Construct(WorldManager worldManager, PlayerController player) {
+		public void Construct(DiContainer container) {
 			//GameObject.Instantiate(ResourceManager.GetRuntimePrefab("Canvas"))!.name = "Canvas";
-			this.worldManager = worldManager;
-			this.player = player;
-			player.GetComponent<GameObjectContext>().Run();
+			this.container = container;
+			this.worldManager = container.Resolve<WorldManager>();
 		}
 
 		public void BootstrapWorld(string world, WorldDump? dump, int seed, LevelGridContext gridContext) {
-			this.world = world;
 			UnityEngine.Random.InitState(seed);
-			this.level = new Level(player, gridContext, seed);
-			this.level.BootstrapWorld(dump);
+			this.world = world;
+			this.level = new Level(gridContext, seed);
+			this.entityManager = new EntityManager(level);
+
+			level.BootstrapWorld(dump);
+			entityManager.Boostrap(dump?.serializedEntities ?? new());
 			isWorldLoaded = true;
+
+			container.BindInstance<Level>(level).AsSingle();
+			container.BindInstance<EntityManager>(entityManager).AsSingle();
+			onLevelLoaded?.Invoke(level);
         }
 
 		public void SpawnPlayer(SerializedEntity? serialized) {
-			if (isWorldLoaded) {
-				this.level.SpawnPlayer(serialized);
-			}
+			GameObject playerPrefab = ResourceManager.GetRuntimePrefab("player");
+			this.player = container.InstantiatePrefabForComponent<PlayerController>(playerPrefab);
+			container.BindInstance<PlayerController>(player).AsSingle();
+			player.GetComponent<GameObjectContext>().Run();
+
+			SerializedEntity fallback = new(typeof(PlayerController),
+				Guid.NewGuid(), player.prefabDefinitionID,
+				level.GetWorldSpawnPoint(), null
+			);
+			entityManager.SpawnPlayer(player, serialized ?? fallback);
 		}
+
 		private void Update() {
-			if (isWorldLoaded) {
-				this.level.Update(Time.deltaTime);
+			if (player?.isSpawned ?? false) {
+				level.Update(player.position, Time.deltaTime);
 			}
 		}
 
@@ -86,9 +100,7 @@ namespace SoulboundBackend.Core {
 				if (!this.paused) {
 					StartTick();
 					// do things
-					if (isWorldLoaded) {
-						level.EntityManager.Tick();
-					}
+					entityManager.Tick();
 					// TODO: implement proper ticking system
 					EndTick();
 				}

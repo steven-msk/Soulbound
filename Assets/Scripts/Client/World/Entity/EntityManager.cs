@@ -76,9 +76,10 @@ namespace SoulboundBackend.Client.World.Entity {
 				entity.EntityUpdate(deltaTime);
 				entity.ManagerUpdate(this);
 			}
-			if (level.isPlayerSpawned) {
-				this.player.EntityUpdate(deltaTime);
-			}
+			player?.EntityUpdate(deltaTime);
+			//if (level.isPlayerSpawned) {
+			//	this.player.EntityUpdate(deltaTime);
+			//}
 		}
 
 		public void OnChunkLoaded(WorldChunk chunk) {

@@ -38,17 +38,12 @@ namespace SoulboundBackend.Client.World {
 		private Dictionary<int, List<StructurePlacement>> structurePlacements = new();
 		private Dictionary<int, List<(ChunkBlockPos chunkBlockPos, BlockState state)>> pendingUpdates = new();
 		private LevelGridContext gridContext;
-		private EntityManager entityManager;
-		public EntityManager EntityManager => entityManager;
-
-		private PlayerController player;
-		public PlayerController Player => player;
-		public bool isPlayerSpawned => player.isSpawned;
+		[Obsolete] private EntityManager entityManager;
+		[Obsolete] public EntityManager EntityManager => entityManager;
 
 		public bool isWorldLoaded { get; private set; } = false;
 
-		public Level(PlayerController player, LevelGridContext gridContext, int seed) {
-			this.player = player;
+		public Level(LevelGridContext gridContext, int seed) {
 			this.gridContext = gridContext;
 			this.seed = seed;
 			this.heightGenerator = new PerlinNoiseGenerator1D(this.seed, WorldChunk.HEIGHT_SPREAD);
@@ -84,18 +79,6 @@ namespace SoulboundBackend.Client.World {
 			this.UpdateChunks(spawnPoint);
 
 			isWorldLoaded = true;
-
-			if (dump != null) {
-				entityManager.Boostrap(dump!.Value.serializedEntities);
-			}
-		}
-
-		public void SpawnPlayer(SerializedEntity? serializedPlayer) {
-			SerializedEntity fallback = new(typeof(PlayerController),
-				Guid.NewGuid(), player.prefabDefinitionID,
-				GetWorldSpawnPoint(), null
-			);
-			entityManager.SpawnPlayer(player, serializedPlayer ?? fallback);
 		}
 
 		public Vector2 GetWorldSpawnPoint() {
@@ -110,7 +93,7 @@ namespace SoulboundBackend.Client.World {
 			WorldDump dump = new(
 				this.seed, 
 				generatedChunks.Values.ToArray(), 
-				isPlayerSpawned ? player.Serialize() : default,
+				/* isPlayerSpawned ? player.Serialize() : default */default,
 				this.structurePlacements, 
 				serializedEntities
 			);
@@ -147,12 +130,16 @@ namespace SoulboundBackend.Client.World {
 			}
 		}
 
-		public void Update(float deltaTime) {
-			if (isPlayerSpawned) {
-				this.UpdateChunks(player.position);
-			}
-			entityManager.Update(deltaTime);
+		public void Update(Vector2 playerPos, float deltaTime) {
+			UpdateChunks(playerPos);
 		}
+
+		//public void Update(float deltaTime) {
+		//	if (isPlayerSpawned) {
+		//		this.UpdateChunks(player.position);
+		//	}
+		//	entityManager.Update(deltaTime);
+		//}
 
 		public bool IsChunkLoaded(WorldChunk chunk) => loadedChunks.ContainsValue(chunk);
 
@@ -279,11 +266,11 @@ namespace SoulboundBackend.Client.World {
 			});
 		}
 
-        public void SetBlock(ChunkBlockPos chunkBlockPos, BlockState? blockState) {
-            SetBlock(chunkBlockPos.ToWorldBlockPos(), blockState);
-        }
+		public void SetBlock(ChunkBlockPos chunkBlockPos, BlockState? blockState) {
+			SetBlock(chunkBlockPos.ToWorldBlockPos(), blockState);
+		}
 
-        public void PlaceBlock(BlockPos blockPos, BlockState newState) {
+		public void PlaceBlock(BlockPos blockPos, BlockState newState) {
 			BlockState? oldState = BlockStateAt(blockPos);
 			SetBlock(blockPos, newState);
 			BroadcastBlockEvent(new BlockChangeInfo(

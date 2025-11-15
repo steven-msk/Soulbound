@@ -132,7 +132,7 @@ public class BlockPosTests {
 
 	[Test]
 	public void FromWorld_UsesLevelConversion() {
-		Level level = new Level(null, LevelGridContext.FromRuntimePrefabs(), 0);
+		Level level = new Level(LevelGridContext.FromRuntimePrefabs(), 0);
 
 		var worldPos = new Vector2(12.3f, 7.7f);
 		var blockPos = BlockPos.FromWorld(worldPos, level);

@@ -1,6 +1,8 @@
-﻿using SoulboundBackend.Client.Settings;
+﻿using SoulboundBackend.Client;
+using SoulboundBackend.Client.Settings;
 using SoulboundBackend.Client.World;
 using SoulboundBackend.Client.World.Structure.Templates;
+using SoulboundBackend.Common;
 using SoulboundBackend.Core.Bootstrap;
 using System;
 using System.Collections.Generic;
@@ -45,11 +47,16 @@ namespace SoulboundBackend.Core {
 		}
 
 		public Level? GetActiveLevel() {
-			return GetActiveLevelManager()?.Level;
+			return GetActiveLevelManager()?.level;
 		}
 
 		public LevelManager? GetActiveLevelManager() {
 			return worldManager.activeLevelManager;
+		}
+
+		[PROTOTYPICAL]
+		public PlayerController? GetPlayerInstance() {
+			return worldManager.activeLevelManager?.player;
 		}
 	}
 }

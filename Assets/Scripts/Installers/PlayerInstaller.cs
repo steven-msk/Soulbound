@@ -15,7 +15,7 @@ namespace SoulboundBackend.Core.Bootstrap {
 		}
 	}
 
-	public class PlayerInstallerWrapper : AbstractInstallerWrapper {
+	public class PlayerInstallerWrapper : AbstractInstaller {
 		private bool instantiatePlayer;
 
 		public PlayerInstallerWrapper(bool instantiatePlayer) {
