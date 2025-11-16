@@ -55,7 +55,6 @@ namespace WorldTests {
 				() => {
 					var prefab = ResourceManager.GetRuntimePrefab("sceneContext");
 					var canvas = GameObject.Instantiate(ResourceManager.GetRuntimePrefab("Canvas")).GetComponent<Canvas>();
-					canvas.name = "Canvas";
 					var sceneContext = GameObject.Instantiate(prefab)!.GetComponent<SceneContext>();
 
 					sceneContext.AddNormalInstaller(new LevelInstaller(worldBox.value, canvas));
@@ -102,7 +101,6 @@ namespace WorldTests {
 						var prefab = ResourceManager.GetRuntimePrefab("sceneContext");
 						sceneContext = GameObject.Instantiate(prefab)!.GetComponent<SceneContext>();
 						var canvas = GameObject.Instantiate(ResourceManager.GetRuntimePrefab("Canvas")).GetComponent<Canvas>();
-						canvas.name = "Canvas";
 						sceneContext.AddNormalInstaller(new LevelInstaller(worldBox.value, canvas));
 					}
 

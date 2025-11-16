@@ -8,18 +8,11 @@ using Zenject;
 using System;
 
 namespace SoulboundBackend.Core.Bootstrap {
-	public class PlayerInstaller : MonoInstaller {
-		[SerializeField] private bool instantiatePlayer = false;
-		public override void InstallBindings() {
-			new PlayerInstallerWrapper(instantiatePlayer, GameObject.Find("Canvas").GetComponent<Canvas>()).InstallBindings(Container);
-		}
-	}
-
-	public class PlayerInstallerWrapper : AbstractInstaller {
+	public class PlayerInstaller : AbstractInstaller {
 		private bool instantiatePlayer;
 		private Canvas canvas;
 
-		public PlayerInstallerWrapper(bool instantiatePlayer, Canvas canvas) {
+		public PlayerInstaller(bool instantiatePlayer, Canvas canvas) {
 			this.instantiatePlayer = instantiatePlayer;
 			this.canvas = canvas;
 			Debug.Log("player installer wrapper created");

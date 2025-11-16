@@ -37,6 +37,7 @@ namespace SoulboundBackend.Core {
 		private DiContainer container = null!;
 		private WorldManager worldManager = null!;
 		private EntityManager entityManager = null!;
+		private Canvas worldCanvas = null!;
 		private string world = null!;
 		public Level? level { get; private set; }
 		public PlayerController? player { get; private set; }
@@ -58,6 +59,7 @@ namespace SoulboundBackend.Core {
 		public void Construct(DiContainer container) {
 			this.container = container;
 			this.worldManager = container.Resolve<WorldManager>();
+			this.worldCanvas = container.Resolve<Canvas>();
 		}
 
 		public void BootstrapWorld(string world, WorldDump? dump, int seed, LevelGridContext gridContext) {
@@ -79,7 +81,9 @@ namespace SoulboundBackend.Core {
 			GameObject playerPrefab = ResourceManager.GetRuntimePrefab("player");
 			this.player = container.InstantiatePrefabForComponent<PlayerController>(playerPrefab);
 			container.BindInstance<PlayerController>(player).AsSingle();
-			player.GetComponent<GameObjectContext>().Run();
+			var playerContext = player.GetComponent<GameObjectContext>();
+			playerContext.AddNormalInstaller(new PlayerInstaller(false, worldCanvas));
+			playerContext.Run();
 
 			SerializedEntity fallback = new(typeof(PlayerController),
 				Guid.NewGuid(), player.prefabDefinitionID,
