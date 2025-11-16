@@ -19,6 +19,7 @@ using System.Linq;
 using Unity.Plastic.Newtonsoft.Json;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
 using Zenject;
 using static PlayerInputActions;
@@ -40,6 +41,7 @@ namespace SoulboundBackend.Core {
 		private EntityManager entityManager = null!;
 		private Canvas worldCanvas = null!;
 		private InputHandler inputHandler = null!;
+		private PlayerInputActions inputMappings = null!;
 		private string world = null!;
 		public Level? level { get; private set; }
 		public PlayerController? player { get; private set; }
@@ -62,12 +64,14 @@ namespace SoulboundBackend.Core {
 			this.container = container;
 			this.worldManager = container.Resolve<WorldManager>();
 			this.worldCanvas = container.Resolve<Canvas>();
-			this.inputHandler = new InputHandler();
-			var playerActions = new PlayerInputActions().Player;
-			inputHandler.RegisterInputEvent(playerActions.Esc, pausable: false, action => {
+
+			this.inputMappings = new PlayerInputActions();
+			this.inputHandler = new InputHandler(inputMappings.asset);
+
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player", "Esc"), pausable: false, action => {
 				action.performed += _ => OnEscPressed();
 			});
-			playerActions.Enable();
+			inputMappings.Enable();
 		}
 
 		public void BootstrapWorld(string world, WorldDump? dump, int seed, LevelGridContext gridContext) {
@@ -148,7 +152,7 @@ namespace SoulboundBackend.Core {
 			entityManager.RemoveEntityImmediately(entity, destroy);
 		}
  
-		public void OnEscPressed() {
+		private void OnEscPressed() {
 			if (UIManager.OnEscPressed()) {
 				TogglePause();
 			}

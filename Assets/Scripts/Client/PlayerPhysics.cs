@@ -71,19 +71,13 @@ namespace SoulboundBackend.Client {
 		private Vector2 mouseScreenPos;
 
 		[Inject]
-		public void Construct(PlayerController player, InputHandler inputHandler) {
-			this.player = player;
-			this.inputHandler = inputHandler;
+		public void Construct(DiContainer container) {
+			this.player = container.Resolve<PlayerController>();
+			this.inputHandler = container.Resolve<InputHandler>();
 			this.rb = player.GetComponent<Rigidbody2D>();
 			this.animator = player.GetComponent<Animator>();
 			this.collider = player.GetComponent<CapsuleCollider2D>();
-			var playerActions = new PlayerInputActions().Player;
 
-			//collisionReactionsByTag.Add("Enemy", ((collision) => {
-			//	Vector2 bounce = (transform.position - (Vector3)collision.GetContact(0).point).normalized;
-			//	rb.linearVelocity = bounce * contactBouncePower;
-			//	knockbackStunTimer = knockbackStunDuration;
-			//}, null));
 			collisionReactionsByTag.Add("Ground", ((collision) => {
 				animator.SetBool("jumping", false);
 				animator.SetBool("flying", false);
@@ -94,34 +88,24 @@ namespace SoulboundBackend.Client {
 				rb.linearDamping = 0f;
 			}, IsOnGround));
 
-			//triggerReactionsByLayer.Add(LayerMask.NameToLayer("Hitbox"), (collision => {
-			//	player.TakeDamage(1);
-			//	player.GrantImmunity(immunityTimeSeconds);
-			//	Vector2 bounce = (transform.position - collision.transform.position).normalized;
-			//	rb.linearVelocity = bounce * contactBouncePower;
-			//	knockbackStunTimer = knockbackStunDuration * Mathf.Clamp(Mathf.Abs(bounce.y), 0.1f, 1f);
-			//}, () => !player.isImmune));
-			//isBootstrapped = true;
-
-			inputHandler.RegisterInputEvent(playerActions.Move, pausable: true, (action) => {
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player", "Move"), pausable: true, (action) => {
 				action.performed += actionContext => movement.x = actionContext.ReadValue<Vector2>().x;
 				action.canceled += _ => movement.x = 0;
 			});
-			inputHandler.RegisterInputEvent(playerActions.LeftClick, pausable: true, (action) => {
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player", "LeftClick"), pausable: true, (action) => {
 				action.performed += _ => leftHold = true;
 				action.canceled += _ => leftHold = false;
 			});
-			inputHandler.RegisterInputEvent(playerActions.RightClick, pausable: true, (action) => {
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player", "RightClick"), pausable: true, (action) => {
 				action.performed += _ => rightHold = true;
 				action.canceled += _ => rightHold = false;
 			});
-			inputHandler.RegisterInputEvent(playerActions.MousePosition, pausable: false, (action) => {
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player","MousePosition"), pausable: false, (action) => {
 				action.performed += actionContext => mouseScreenPos = actionContext.ReadValue<Vector2>();
 			});
-			inputHandler.RegisterInputEvent(playerActions.Jump, pausable: true, (action) => {
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player", "Jump"), pausable: true, (action) => {
 				action.performed += _ => OnSpacePressed();
 			});
-			playerActions.Enable();
 		}
 
 		// FIXME: inconsistent movement

@@ -6,6 +6,7 @@ using SoulboundBackend.Core.Resource;
 using UnityEngine;
 using Zenject;
 using System;
+using static PlayerInputActions;
 
 namespace SoulboundBackend.Core.Bootstrap {
 	public class PlayerInstaller : InstallerAdapter {

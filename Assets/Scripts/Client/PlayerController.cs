@@ -97,7 +97,6 @@ namespace SoulboundBackend.Client {
 		[Inject]
 		public void Construct(DiContainer container) {
 			this.inputHandler = container.Resolve<InputHandler>();
-			var playerActions = new PlayerInputActions().Player;
 			this.playerPhysics = container.Resolve<PlayerPhysics>();
 			this.inventory = container.Resolve<InventoryController>();
 			this.level = container.Resolve<Level>();
@@ -116,20 +115,19 @@ namespace SoulboundBackend.Client {
 				animator => animator.SetTrigger("attack")
 			);
 
-			inputHandler.RegisterInputEvent(playerActions.LeftClick, pausable: true, (action) => {
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player", "LeftClick"), pausable: true, (action) => {
 				action.performed += _ => OnLeftClick();
 				action.performed += _ => leftHold = true;
 				action.canceled += _ => leftHold = false;
 			});
-			inputHandler.RegisterInputEvent(playerActions.RightClick, pausable: true, (action) => {
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player", "RightClick"), pausable: true, (action) => {
 				action.performed += _ => OnRightClick();
 				action.performed += _ => rightHold = true;
 				action.canceled += _ => rightHold = false;
 			});
-			inputHandler.RegisterInputEvent(playerActions.MousePosition, pausable: false, (action) => {
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player", "MousePosition"), pausable: false, (action) => {
 				action.performed += actionContext => mouseScreenPos = actionContext.ReadValue<Vector2>();
 			});
-			playerActions.Enable();
 		}
 
 		private void RegisterItemUsageCandidates(ItemUsageHandler? itemUsageHandler) {

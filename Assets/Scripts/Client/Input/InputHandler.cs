@@ -14,6 +14,16 @@ namespace SoulboundBackend.Client.Input {
 		private List<InputActionRequest> requests = new();
 		private Dictionary<string, Func<bool>> blockedContexts = new();
 		private List<InputAction> pausableInputs = new();
+		private readonly InputActionAsset asset;
+
+		public InputHandler(InputActionAsset asset) {
+			this.asset = asset;
+		}
+
+		public InputAction GetAction(string mappingId, string actionId) {
+			var actionMap = asset.FindActionMap(mappingId);
+			return actionMap.FindAction(actionId);
+		}
 
 		public void RegisterInputEvent(InputAction inputAction, bool pausable, Action<InputAction> callbackBinding) {
 			if (pausable) {

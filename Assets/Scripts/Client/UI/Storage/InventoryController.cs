@@ -15,6 +15,8 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using Zenject;
+using static PlayerInputActions;
+using static UnityEngine.InputSystem.DefaultInputActions;
 using Logger = SoulboundBackend.Common.Logging.Logger;
 
 #nullable enable
@@ -66,7 +68,6 @@ namespace SoulboundBackend.Client.UI.Storage {
 			this.eventHandler = new InventoryEventHandler();
 			this.player = container.Resolve<PlayerController>();
 			this.inputHandler = container.Resolve<InputHandler>();
-			var playerActions = new PlayerInputActions().Player;
 
 			hotbar.Construct(this);
 			this.SetupGrid();
@@ -77,25 +78,24 @@ namespace SoulboundBackend.Client.UI.Storage {
 			MainPlayerSlots = mainPlayerSlots.ToArray();
 			hotbar.SetActiveSlot(0);
 
-			inputHandler.RegisterInputEvent(playerActions.ChangeHotbarSlot, pausable: true, (action) => {
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player", "Change Hotbar Slot"), pausable: true, (action) => {
 				action.performed += actionContext => {
 					int keySlot = int.Parse(actionContext.control.name);
 					Hotbar.SetActiveSlot(keySlot - 1);
 				};
 			});
-			inputHandler.RegisterInputEvent(playerActions.ScrollHotbarSlot, pausable: true, action => {
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player", "Scroll Hotbar Slot"), pausable: true, action => {
 				action.performed += actionContext => {
 					float scrollDelta = actionContext.ReadValue<float>();
 					Hotbar.OnHotbarScroll(scrollDelta);
 				};
 			});
-			inputHandler.RegisterInputEvent(playerActions.DropItem, pausable: true, (action) => {
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player", "Drop Item"), pausable: true, (action) => {
 				action.performed += _ => DropHoveredOrActiveItem();
 			});
-			inputHandler.RegisterInputEvent(playerActions.ToggleInventory, pausable: true, (action) => {
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player", "Toggle Inventory"), pausable: true, (action) => {
 				action.performed += _ => ToggleInventory();
 			});
-			playerActions.Enable();
 		}
 
 		public void SetupGrid() {

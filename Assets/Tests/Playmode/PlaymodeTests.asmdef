@@ -4,7 +4,8 @@
     "references": [
         "UnityEngine.TestRunner",
         "SoulboundBackend",
-        "Zenject"
+        "Zenject",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
