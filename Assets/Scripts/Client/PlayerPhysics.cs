@@ -97,7 +97,6 @@ namespace SoulboundBackend.Client {
 			//	knockbackStunTimer = knockbackStunDuration * Mathf.Clamp(Mathf.Abs(bounce.y), 0.1f, 1f);
 			//}, () => !player.isImmune));
 			//isBootstrapped = true;
-			UnityEngine.Debug.Log("player physics constructed");
 		}
 
 		// FIXME: inconsistent movement
@@ -107,6 +106,7 @@ namespace SoulboundBackend.Client {
 				return;
 			}
 			movement.x = inputHandler.HorizontalMovement;
+			animator.SetFloat("horizontalSpeed", Mathf.Abs(movement.x));
 			if (movement.x != 0) {
 				this.facing = Mathf.Sign(movement.x);
 			}
@@ -194,17 +194,6 @@ namespace SoulboundBackend.Client {
 			}, null));
 			collisionResponse.action.InvokeIf(collision, collisionResponse.validator ?? (() => true));
 		}
-
-		//private void OnTriggerStay2D(Collider2D collision) {
-		//	if (!player?.isSpawned ?? true) {
-		//		return;
-		//	}
-		//	var triggerResponse = triggerReactionsByLayer.GetValueOrDefault(collision.gameObject.layer, (collision => {
-		//		logger.LogWarning(null, "Unknown trigger callback layer: {}", LayerMask.LayerToName(collision.gameObject.layer));
-		//	}, null));
-		//	triggerResponse.action.InvokeIf(collision, triggerResponse.validator ?? (() => true));
-		//}
-
 		public bool IsOnGround() {
 			Vector2 origin = (Vector2)transform.position + collider.offset + Vector2.down * (collider.size.y * 0.5f);
 			float offsetX = collider.size.x * 0.5f;

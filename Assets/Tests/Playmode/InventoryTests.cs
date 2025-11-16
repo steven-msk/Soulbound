@@ -30,8 +30,9 @@ namespace InventoryTests {
 			var prefab = ResourceManager.GetRuntimePrefab("sceneContext");
 			var canvas = GameObject.Instantiate(ResourceManager.GetRuntimePrefab("Canvas")).GetComponent<Canvas>();
 			var sceneContext = GameObject.Instantiate(prefab).GetComponent<SceneContext>();
+			var player = GameObject.Instantiate(ResourceManager.GetRuntimePrefab("player")).GetComponent<PlayerController>();
 
-			sceneContext.AddNormalInstaller(new PlayerInstaller(true, canvas));
+			sceneContext.AddNormalInstaller(new PlayerInstaller(player, canvas));
 			sceneContext.Install();
 			return sceneContext.Container.Resolve<InventoryController>();
 		}

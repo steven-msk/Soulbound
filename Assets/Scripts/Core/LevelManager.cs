@@ -82,7 +82,7 @@ namespace SoulboundBackend.Core {
 			this.player = container.InstantiatePrefabForComponent<PlayerController>(playerPrefab);
 			container.BindInstance<PlayerController>(player).AsSingle();
 			var playerContext = player.GetComponent<GameObjectContext>();
-			playerContext.AddNormalInstaller(new PlayerInstaller(false, worldCanvas));
+			playerContext.AddNormalInstaller(new PlayerInstaller(player, worldCanvas));
 			playerContext.Run();
 
 			SerializedEntity fallback = new(typeof(PlayerController),

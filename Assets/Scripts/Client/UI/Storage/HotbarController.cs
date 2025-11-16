@@ -46,7 +46,6 @@ namespace SoulboundBackend.Client.UI.Storage {
 		public void Construct(InventoryController inventory) {
 			this.inventory = inventory;
 			this.SetupGrid();
-			UnityEngine.Debug.Log("hotbar loaded");
 		}
 		public void SetupGrid() {
 			slots = gameObject.GetComponentsInChildren<InventorySlot>();

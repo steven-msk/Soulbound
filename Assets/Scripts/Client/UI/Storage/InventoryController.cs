@@ -73,7 +73,6 @@ namespace SoulboundBackend.Client.UI.Storage {
 			mainPlayerSlots.AddRange(popupSlots);
 			MainPlayerSlots = mainPlayerSlots.ToArray();
 			hotbar.SetActiveSlot(0);
-			UnityEngine.Debug.Log("inventory constructed: "+ this.GetHashCode());
 		}
 
 		public void SetupGrid() {

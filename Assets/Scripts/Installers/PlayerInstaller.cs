@@ -8,31 +8,24 @@ using Zenject;
 using System;
 
 namespace SoulboundBackend.Core.Bootstrap {
-	public class PlayerInstaller : AbstractInstaller {
-		private bool instantiatePlayer;
+	public class PlayerInstaller : InstallerAdapter {
+		private PlayerController playerInstance;
 		private Canvas canvas;
 
-		public PlayerInstaller(bool instantiatePlayer, Canvas canvas) {
-			this.instantiatePlayer = instantiatePlayer;
+		public PlayerInstaller(PlayerController playerInstance, Canvas canvas) {
+			this.playerInstance = playerInstance;
 			this.canvas = canvas;
-			Debug.Log("player installer wrapper created");
 		}
 
 		public override void InstallBindings(DiContainer container) {
 			GameObject inputHandlerPrefab = ResourceManager.GetRuntimePrefab("inputHandler");
 			GameObject inventoryPrefab = ResourceManager.GetRuntimePrefab("inventory");
 
-			if (instantiatePlayer) {
-				GameObject playerPrefab = ResourceManager.GetRuntimePrefab("player");
-				container.Bind<PlayerController>().FromComponentInNewPrefab(playerPrefab).AsSingle();
-			} else {
-				container.Bind<PlayerController>().FromComponentInHierarchy().AsSingle();
-			}
+			container.BindInstance<PlayerController>(playerInstance).AsSingle();
 			container.Bind<InputHandler>().FromComponentInNewPrefab(inputHandlerPrefab.gameObject).AsSingle();
 			container.Bind<PlayerPhysics>().FromComponentOnRoot().AsSingle();
 			container.Bind<ItemUsageHandler>().AsSingle();
 			container.Bind<InventoryController>().FromComponentInNewPrefab(inventoryPrefab).UnderTransform(canvas.transform).AsSingle();
-			Debug.Log("player installer has installed bindings");
 		}
 	}
 }

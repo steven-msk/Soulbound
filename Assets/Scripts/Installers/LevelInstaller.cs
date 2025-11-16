@@ -4,7 +4,7 @@ using UnityEngine;
 using Zenject;
 
 namespace SoulboundBackend.Core.Bootstrap {
-	public class LevelInstaller : AbstractInstaller {
+	public class LevelInstaller : InstallerAdapter {
 		public readonly WorldManager worldManager;
 		public readonly Canvas canvas;
 
