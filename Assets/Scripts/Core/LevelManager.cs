@@ -38,6 +38,7 @@ namespace SoulboundBackend.Core {
 		private WorldManager worldManager = null!;
 		private EntityManager entityManager = null!;
 		private Canvas worldCanvas = null!;
+		private InputHandler inputHandler = null!;
 		private string world = null!;
 		public Level? level { get; private set; }
 		public PlayerController? player { get; private set; }
@@ -60,6 +61,7 @@ namespace SoulboundBackend.Core {
 			this.container = container;
 			this.worldManager = container.Resolve<WorldManager>();
 			this.worldCanvas = container.Resolve<Canvas>();
+			this.inputHandler = new InputHandler();
 		}
 
 		public void BootstrapWorld(string world, WorldDump? dump, int seed, LevelGridContext gridContext) {
@@ -82,7 +84,7 @@ namespace SoulboundBackend.Core {
 			this.player = container.InstantiatePrefabForComponent<PlayerController>(playerPrefab);
 			container.BindInstance<PlayerController>(player).AsSingle();
 			var playerContext = player.GetComponent<GameObjectContext>();
-			playerContext.AddNormalInstaller(new PlayerInstaller(player, worldCanvas));
+			playerContext.AddNormalInstaller(new PlayerInstaller(player, worldCanvas, inputHandler));
 			playerContext.Run();
 
 			SerializedEntity fallback = new(typeof(PlayerController),
@@ -149,7 +151,7 @@ namespace SoulboundBackend.Core {
 			this.paused = !this.paused;
 			Time.timeScale = this.paused ? 0f : 1f;
 			AudioListener.pause = this.paused;        // FEATUREIMPL: sound effects and music
-			InputHandler.PauseInputs(this.paused);
+			inputHandler.PauseInputs(this.paused);
 			UIManager.SetScreen(paused ? new GamePausedScreen().GetScreen() : null, ScreenSetMethod.Stack);
 		}
 

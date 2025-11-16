@@ -1,12 +1,14 @@
  using SoulboundBackend.Client;
+using SoulboundBackend.Client.Input;
 using SoulboundBackend.Core.Resource;
+using System;
 using UnityEngine;
 using Zenject;
 
 namespace SoulboundBackend.Core.Bootstrap {
 	public class LevelInstaller : InstallerAdapter {
-		public readonly WorldManager worldManager;
-		public readonly Canvas canvas;
+		private WorldManager worldManager;
+		private Canvas canvas;
 
 		public LevelInstaller(WorldManager worldManager, Canvas canvas) {
 			this.worldManager = worldManager;

@@ -88,7 +88,7 @@ namespace SoulboundBackend.Common {
 
 		public static void If(bool condition, Action action) {
 			if (condition) {
-				action.Invoke();
+				action();
 			}
 		}
 

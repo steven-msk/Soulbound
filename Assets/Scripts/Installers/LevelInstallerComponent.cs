@@ -1,3 +1,4 @@
+using SoulboundBackend.Client.Input;
 using SoulboundBackend.Client.UI.Storage;
 using SoulboundBackend.Core;
 using System;

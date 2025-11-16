@@ -51,7 +51,8 @@ namespace SoulboundBackend.Client.UI.Storage {
 		IItemSlot IItemContainer2D.this[int row, int column] => this[row, column];
 		public IReadOnlyList<IItemSlot> slots => popupSlots.Flatten();
 
-		private PlayerController player;
+		private PlayerController player = null!;
+		private InputHandler inputHandler = null!;
 		public InventoryEventHandler eventHandler { get; private set; }
 
 		private float doubleClickThreshold = 0.15f;
@@ -63,7 +64,8 @@ namespace SoulboundBackend.Client.UI.Storage {
 		[Inject]
 		public void Construct(DiContainer container) {
 			this.eventHandler = new InventoryEventHandler();
-			player = container.Resolve<PlayerController>();
+			this.player = container.Resolve<PlayerController>();
+			this.inputHandler = container.Resolve<InputHandler>();
 
 			hotbar.Construct(this);
 			this.SetupGrid();
@@ -285,7 +287,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 				return;
 			}
 
-			InputHandler.RequestAction(new("ItemSlotAction", 10, () => {
+			inputHandler.RequestAction(new("ItemSlotAction", 10, () => {
 				if (!clickedSlot.Handshake(GrabbedContext.value, SlotInteractionMode.Click)) {
 					return;
 				}
@@ -297,7 +299,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 					}
 				});
 			}, null));
-			InputHandler.BlockContext("ItemUse", () => !Soulbound.instance.GetPlayerInstance().inputHandler.LeftHold);
+			inputHandler.BlockContext("ItemUse", () => !Soulbound.instance.GetPlayerInstance().inputHandler.LeftHold);
 		}
 
 		public void OnPointerUp(IItemSlot slot, PointerEventData eventData) {

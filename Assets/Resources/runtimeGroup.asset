@@ -23,7 +23,6 @@ MonoBehaviour:
   - Assets/Resources/Registry/Runtime/FlightTimePanel.prefab
   - Assets/Resources/Registry/Runtime/GamePausedMenu.prefab
   - Assets/Resources/Registry/Runtime/Grid.prefab
-  - Assets/Resources/Registry/Runtime/InputHandler.prefab
   - Assets/Resources/Registry/Runtime/Inventory.prefab
   - Assets/Resources/Registry/Runtime/levelManager.prefab
   - Assets/Resources/Registry/Runtime/player.prefab

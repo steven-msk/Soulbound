@@ -78,7 +78,7 @@ namespace SoulboundBackend.Client {
 
 		[Inject]
 		public void Construct(DiContainer container) {
-			this.inputHandler = container.Resolve<InputHandler>();
+			//this.inputHandler = container.Resolve<InputHandler>();
 			this.playerPhysics = container.Resolve<PlayerPhysics>();
 			this.inventory = container.Resolve<InventoryController>();
 			RegisterItemUsageCandidates(container.Resolve<ItemUsageHandler>());
@@ -172,7 +172,7 @@ namespace SoulboundBackend.Client {
 				Vector2 worldMousePos = inputHandler.MouseWorldPosition;
 
 				if (CanBreakBlockAt((BlockPos)worldMousePos)) {
-					InputHandler.RequestAction(new("BlockBreak", 5, () => {
+					inputHandler.RequestAction(new("BlockBreak", 5, () => {
 						Level level = Soulbound.instance.GetActiveLevel()!;
 						BlockPos blockPos = level.ToBlockPos(worldMousePos);
 						Block? targetBlock = level.BlockAt(blockPos);
@@ -181,9 +181,9 @@ namespace SoulboundBackend.Client {
 							level.BreakBlock(blockPos, new PlayerToolBreakSource(this, null));
 						}
 					}, null));
-					InputHandler.BlockContext("PlayerAttack", () => !inputHandler.LeftHold);
+					inputHandler.BlockContext("PlayerAttack", () => !inputHandler.LeftHold);
 				} else {
-					InputHandler.RequestAction(new("PlayerAttack", 5, () => TryAttack(attackSource), null));
+					inputHandler.RequestAction(new("PlayerAttack", 5, () => TryAttack(attackSource), null));
 				}
 			}
 		}
@@ -197,12 +197,12 @@ namespace SoulboundBackend.Client {
 			Item? usedItem = MainHandStack?.item;
 			RequestMainHandUse(trigger, null);
 			if (usedItem is IPlaceable) {
-				InputHandler.BlockContext("BlockBreak", () => !inputHandler.LeftHold);
+				inputHandler.BlockContext("BlockBreak", () => !inputHandler.LeftHold);
 			}
 		}
 
 		private void RequestMainHandUse(ItemUseTrigger trigger, Action? callback) {
-			InputHandler.RequestAction(new("ItemUse", 5, () => itemUsageHandler.HandleInput(trigger, MainHandStack), callback));
+			inputHandler.RequestAction(new("ItemUse", 5, () => itemUsageHandler.HandleInput(trigger, MainHandStack), callback));
 		}
 
 		public void OnItemDisplayDestroyed(ItemStack stack) {

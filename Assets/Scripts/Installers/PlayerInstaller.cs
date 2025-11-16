@@ -9,23 +9,25 @@ using System;
 
 namespace SoulboundBackend.Core.Bootstrap {
 	public class PlayerInstaller : InstallerAdapter {
-		private PlayerController playerInstance;
-		private Canvas canvas;
+		private readonly PlayerController playerInstance;
+		private readonly Canvas canvas;
+		private readonly InputHandler inputHandler;
 
-		public PlayerInstaller(PlayerController playerInstance, Canvas canvas) {
+		public PlayerInstaller(PlayerController playerInstance, Canvas canvas, InputHandler inputHandler) {
 			this.playerInstance = playerInstance;
 			this.canvas = canvas;
+			this.inputHandler = inputHandler;
 		}
 
 		public override void InstallBindings(DiContainer container) {
-			GameObject inputHandlerPrefab = ResourceManager.GetRuntimePrefab("inputHandler");
 			GameObject inventoryPrefab = ResourceManager.GetRuntimePrefab("inventory");
 
+			container.BindInterfacesAndSelfTo<InputHandler>().FromInstance(inputHandler).AsSingle();
 			container.BindInstance<PlayerController>(playerInstance).AsSingle();
-			container.Bind<InputHandler>().FromComponentInNewPrefab(inputHandlerPrefab.gameObject).AsSingle();
 			container.Bind<PlayerPhysics>().FromComponentOn(playerInstance.gameObject).AsSingle();
 			container.Bind<ItemUsageHandler>().AsSingle();
 			container.Bind<InventoryController>().FromComponentInNewPrefab(inventoryPrefab).UnderTransform(canvas.transform).AsSingle();
+
 		}
 	}
 }
