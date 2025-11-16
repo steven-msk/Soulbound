@@ -10,6 +10,7 @@ using UnityEngine.UI;
 using SoulboundBackend.Core.Bootstrap;
 using Zenject;
 using System.Runtime.Serialization;
+using static PlayerInputActions;
 
 #nullable enable
 
@@ -65,6 +66,10 @@ namespace SoulboundBackend.Client {
 			}
 		}
 
+		private bool leftHold;
+		private bool rightHold;
+		private Vector2 mouseScreenPos;
+
 		[Inject]
 		public void Construct(PlayerController player, InputHandler inputHandler) {
 			this.player = player;
@@ -72,7 +77,7 @@ namespace SoulboundBackend.Client {
 			this.rb = player.GetComponent<Rigidbody2D>();
 			this.animator = player.GetComponent<Animator>();
 			this.collider = player.GetComponent<CapsuleCollider2D>();
-
+			var playerActions = new PlayerInputActions().Player;
 
 			//collisionReactionsByTag.Add("Enemy", ((collision) => {
 			//	Vector2 bounce = (transform.position - (Vector3)collision.GetContact(0).point).normalized;
@@ -97,6 +102,30 @@ namespace SoulboundBackend.Client {
 			//	knockbackStunTimer = knockbackStunDuration * Mathf.Clamp(Mathf.Abs(bounce.y), 0.1f, 1f);
 			//}, () => !player.isImmune));
 			//isBootstrapped = true;
+
+			inputHandler.RegisterInputEvent(playerActions.Move, pausable: true, (action) => {
+				action.performed += actionContext => movement.x = actionContext.ReadValue<Vector2>().x;
+				action.canceled += _ => movement.x = 0;
+			});
+			inputHandler.RegisterInputEvent(playerActions.LeftClick, pausable: true, (action) => {
+				action.performed += _ => leftHold = true;
+				action.canceled += _ => leftHold = false;
+			});
+			inputHandler.RegisterInputEvent(playerActions.RightClick, pausable: true, (action) => {
+				action.performed += _ => rightHold = true;
+				action.canceled += _ => rightHold = false;
+			});
+			inputHandler.RegisterInputEvent(playerActions.MousePosition, pausable: false, (action) => {
+				action.performed += actionContext => mouseScreenPos = actionContext.ReadValue<Vector2>();
+			});
+			inputHandler.RegisterInputEvent(playerActions.Jump, pausable: true, (action) => {
+				action.performed += _ => OnSpacePressed();
+			});
+
+			inputHandler.RegisterInputEvent(playerActions.LeftClick, pausable: true, action => {
+				action.performed += _ => logger.LogInfo(null, "left click from physics");
+			});
+			playerActions.Enable();
 		}
 
 		// FIXME: inconsistent movement
@@ -105,13 +134,12 @@ namespace SoulboundBackend.Client {
 			if (!player?.isSpawned ?? true) {
 				return;
 			}
-			movement.x = inputHandler.HorizontalMovement;
 			animator.SetFloat("horizontalSpeed", Mathf.Abs(movement.x));
 			if (movement.x != 0) {
 				this.facing = Mathf.Sign(movement.x);
 			}
-			if (inputHandler.RightHold || inputHandler.LeftHold) {
-				this.facing = Mathf.Sign(inputHandler.MouseScreenPosition.x - Screen.width / 2);
+			if (rightHold || leftHold) {
+				this.facing = Mathf.Sign(mouseScreenPos.x - Screen.width / 2);
 			}
 		}
 
@@ -153,7 +181,7 @@ namespace SoulboundBackend.Client {
 				jumpToFlightTimer -= Time.fixedDeltaTime;
 				return;         // flight switch will occur once jump timer is finished
 			}
-			if (inputHandler.PressingSpace && jumpsLeft == 0 && !shouldJump && flightTime > 0 && jumpToFlightTimer <= 0) {
+			if (jumpsLeft == 0 && !shouldJump && flightTime > 0 && jumpToFlightTimer <= 0) {
 				float scaledFlightAcceleration = flightMovementPower * player.Stats.VerticalFlightAcceleration;
 				rb.linearVelocityY += scaledFlightAcceleration * Time.fixedDeltaTime;
 				if (rb.linearVelocityY > scaledFlightAcceleration) {
@@ -165,7 +193,7 @@ namespace SoulboundBackend.Client {
 				rb.linearDamping = 1;
 				flightTime -= Time.fixedDeltaTime * flightTimeReductionMultiplier;
 				flightTime = Mathf.Clamp(flightTime, 0, player.Stats.GrantedFlightTime);
-			} else if (flightTime == 0 && inputHandler.PressingSpace && player.Stats.GrantedFlightTime > 0) {
+			} else if (flightTime == 0 && player.Stats.GrantedFlightTime > 0) {
 				if (rb.linearVelocityY <= -rb.gravityScale) {
 					float scaledSlowFallVelocity = Time.fixedDeltaTime * slowFallTimeReductionMultiplier;
 					rb.linearVelocityY = Mathf.Lerp(rb.linearVelocityY, -scaledSlowFallVelocity, scaledSlowFallVelocity);
@@ -207,7 +235,7 @@ namespace SoulboundBackend.Client {
 		}
 
 		public void UpdateFlightTimePanel(bool isFlying, float flightTime, float grantedFlightTime) {
-			flightTimePanel.SetActive(isFlying && inputHandler.PressingSpace);
+			flightTimePanel.SetActive(isFlying);
 			if (flightTimePanel.activeSelf) {
 				RectMask2D? timeMask = flightTimePanel.GetComponentInChildren(typeof(RectMask2D), true) as RectMask2D;
 				timeMask!.padding = new Vector4(maskWidth * (1 - flightTime / grantedFlightTime), 0, 0, 0);

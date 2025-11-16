@@ -21,6 +21,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using Zenject;
+using static PlayerInputActions;
 using Logger = SoulboundBackend.Common.Logging.Logger;
 
 #nullable enable
@@ -62,6 +63,11 @@ namespace SoulboundBackend.Core {
 			this.worldManager = container.Resolve<WorldManager>();
 			this.worldCanvas = container.Resolve<Canvas>();
 			this.inputHandler = new InputHandler();
+			var playerActions = new PlayerInputActions().Player;
+			inputHandler.RegisterInputEvent(playerActions.Esc, pausable: false, action => {
+				action.performed += _ => OnEscPressed();
+			});
+			playerActions.Enable();
 		}
 
 		public void BootstrapWorld(string world, WorldDump? dump, int seed, LevelGridContext gridContext) {

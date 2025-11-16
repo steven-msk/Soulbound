@@ -1,4 +1,3 @@
-using log4net.Core;
 using NUnit.Framework.Internal;
 using SoulboundBackend.Client.Combat;
 using SoulboundBackend.Client.Input;
@@ -21,6 +20,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
 using Zenject;
+using static PlayerInputActions;
 using static Unity.VisualScripting.Member;
 using static UnityEditor.PlayerSettings;
 using Level = SoulboundBackend.Client.World.Level;
@@ -78,11 +78,11 @@ namespace SoulboundBackend.Client {
 
 		[Inject]
 		public void Construct(DiContainer container) {
-			//this.inputHandler = container.Resolve<InputHandler>();
+			this.inputHandler = container.Resolve<InputHandler>();
+			var playerActions = new PlayerInputActions().Player;
 			this.playerPhysics = container.Resolve<PlayerPhysics>();
 			this.inventory = container.Resolve<InventoryController>();
 			RegisterItemUsageCandidates(container.Resolve<ItemUsageHandler>());
-			UnityEngine.Debug.Log("player loaded: " + this.GetHashCode());
 
 			attackSource = new AttackSource(2, 10, new PlayerMainHandAttack(),
 				context => {
@@ -95,6 +95,28 @@ namespace SoulboundBackend.Client {
 				},
 				animator => animator.SetTrigger("attack")
 			);
+
+			inputHandler.RegisterInputEvent(playerActions.LeftClick, pausable: true, (action) => {
+				action.performed += _ => OnLeftClick();
+				action.performed += _ => OnLeftHold();
+			});
+			inputHandler.RegisterInputEvent(playerActions.RightClick, pausable: true, (action) => {
+				action.performed += _ => OnRightClick();
+				action.performed += _ => OnRightHold();
+			});
+			inputHandler.RegisterInputEvent(playerActions.ChangeHotbarSlot, pausable: true, (action) => {
+				action.performed += actionContext => {
+					int keySlot = int.Parse(actionContext.control.name);
+					Inventory.Hotbar.SetActiveSlot(keySlot - 1);
+				};
+			});
+			inputHandler.RegisterInputEvent(playerActions.ToggleInventory, pausable: true, (action) => {
+				action.performed += _ => Inventory.ToggleInventory();
+			});
+			inputHandler.RegisterInputEvent(playerActions.DropItem, pausable: true, (action) => {
+				action.performed += _ => Inventory.DropHoveredOrActiveItem();
+			});
+			playerActions.Enable();
 		}
 
 		private void RegisterItemUsageCandidates(ItemUsageHandler? itemUsageHandler) {
@@ -114,7 +136,7 @@ namespace SoulboundBackend.Client {
 			}
 			itemUsageHandler.RegisterCapability<IPlaceable>(ItemUseTrigger.LeftHold, (placeable, stack) => {
 				Level level = Soulbound.instance.GetActiveLevel()!;
-				BlockPos blockPos = level.ToBlockPos(inputHandler.MouseWorldPosition);
+				//BlockPos blockPos = level.ToBlockPos(inputHandler.MouseWorldPosition);
 
 				if (CanPlaceBlockAt(blockPos)) {
 					level.PlaceBlock(blockPos, placeable.Place(stack, blockPos));
@@ -122,8 +144,9 @@ namespace SoulboundBackend.Client {
 			});
 			itemUsageHandler.RegisterCapability<IBreakingTool>(ItemUseTrigger.LeftHold, (tool, stack) => {
 				Level level = Soulbound.instance.GetActiveLevel()!;
-				Vector2 worldMousePos = inputHandler.MouseWorldPosition;
-				BlockPos blockPos = level.ToBlockPos(worldMousePos);
+				//Vector2 worldMousePos = inputHandler.MouseWorldPosition;
+				//BlockPos blockPos = level.ToBlockPos(worldMousePos);
+				BlockPos pos = default;
 
 				if (IsInBlockReach((Vector2)blockPos)) {
 					tool.TryBreak(blockPos, level, new PlayerToolBreakSource(this, tool));
@@ -154,6 +177,7 @@ namespace SoulboundBackend.Client {
 
 		[InputAction("ItemUse", Priority = 5)]
 		internal void OnLeftClick() {
+			logger.LogInfo(null, "left click from player");
 			RequestSuppressedMainHandUse(ItemUseTrigger.LeftClick);
 		}
 
@@ -169,7 +193,8 @@ namespace SoulboundBackend.Client {
 			if (MainHandStack != null) {
 				RequestSuppressedMainHandUse(ItemUseTrigger.LeftHold);
 			} else {
-				Vector2 worldMousePos = inputHandler.MouseWorldPosition;
+				//Vector2 worldMousePos = inputHandler.MouseWorldPosition;
+				Vector2 worldMousePos = default;
 
 				if (CanBreakBlockAt((BlockPos)worldMousePos)) {
 					inputHandler.RequestAction(new("BlockBreak", 5, () => {
@@ -181,7 +206,7 @@ namespace SoulboundBackend.Client {
 							level.BreakBlock(blockPos, new PlayerToolBreakSource(this, null));
 						}
 					}, null));
-					inputHandler.BlockContext("PlayerAttack", () => !inputHandler.LeftHold);
+					//inputHandler.BlockContext("PlayerAttack", () => !inputHandler.LeftHold);
 				} else {
 					inputHandler.RequestAction(new("PlayerAttack", 5, () => TryAttack(attackSource), null));
 				}
@@ -197,7 +222,7 @@ namespace SoulboundBackend.Client {
 			Item? usedItem = MainHandStack?.item;
 			RequestMainHandUse(trigger, null);
 			if (usedItem is IPlaceable) {
-				inputHandler.BlockContext("BlockBreak", () => !inputHandler.LeftHold);
+				//inputHandler.BlockContext("BlockBreak", () => !inputHandler.LeftHold);
 			}
 		}
 

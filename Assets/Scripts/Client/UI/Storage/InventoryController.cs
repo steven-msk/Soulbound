@@ -299,7 +299,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 					}
 				});
 			}, null));
-			inputHandler.BlockContext("ItemUse", () => !Soulbound.instance.GetPlayerInstance().inputHandler.LeftHold);
+			//inputHandler.BlockContext("ItemUse", () => !Soulbound.instance.GetPlayerInstance().inputHandler.LeftHold);
 		}
 
 		public void OnPointerUp(IItemSlot slot, PointerEventData eventData) {
