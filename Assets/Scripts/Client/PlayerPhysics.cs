@@ -88,22 +88,22 @@ namespace SoulboundBackend.Client {
 				rb.linearDamping = 0f;
 			}, IsOnGround));
 
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player", "Move"), pausable: true, (action) => {
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/Move"), pausable: true, (action) => {
 				action.performed += actionContext => movement.x = actionContext.ReadValue<Vector2>().x;
 				action.canceled += _ => movement.x = 0;
 			});
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player", "LeftClick"), pausable: true, (action) => {
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/LeftClick"), pausable: true, (action) => {
 				action.performed += _ => leftHold = true;
 				action.canceled += _ => leftHold = false;
 			});
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player", "RightClick"), pausable: true, (action) => {
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/RightClick"), pausable: true, (action) => {
 				action.performed += _ => rightHold = true;
 				action.canceled += _ => rightHold = false;
 			});
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player","MousePosition"), pausable: false, (action) => {
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/MousePosition"), pausable: false, (action) => {
 				action.performed += actionContext => mouseScreenPos = actionContext.ReadValue<Vector2>();
 			});
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player", "Jump"), pausable: true, (action) => {
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/Jump"), pausable: true, (action) => {
 				action.performed += _ => OnSpacePressed();
 			});
 		}

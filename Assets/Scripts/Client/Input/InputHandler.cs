@@ -20,6 +20,15 @@ namespace SoulboundBackend.Client.Input {
 			this.asset = asset;
 		}
 
+		public InputAction GetAction(string compressedId) {
+			string[] parts = compressedId.Split('/');
+			if (parts.Length < 2) {
+				throw new ArgumentException($"Invalid compressedId action format: {compressedId}");
+			}
+
+			return GetAction(parts[0], parts[1]);
+		}
+
 		public InputAction GetAction(string mappingId, string actionId) {
 			var actionMap = asset.FindActionMap(mappingId);
 			return actionMap.FindAction(actionId);
@@ -48,7 +57,7 @@ namespace SoulboundBackend.Client.Input {
 
 		void ILateTickable.LateTick() {
 			var availableRequests = requests.Where(action => !blockedContexts.ContainsKey(action.Context));
-			InputActionRequest highestPriorityRequest = availableRequests.OrderByDescending(intent => intent.Priority).FirstOrDefault();
+			InputActionRequest highestPriorityRequest = availableRequests.OrderByDescending(r => r.Priority).FirstOrDefault();
 			highestPriorityRequest?.Callback.Invoke();
 			highestPriorityRequest?.Action.Invoke();
 			requests.Clear();

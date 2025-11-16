@@ -68,7 +68,7 @@ namespace SoulboundBackend.Core {
 			this.inputMappings = new PlayerInputActions();
 			this.inputHandler = new InputHandler(inputMappings.asset);
 
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player", "Esc"), pausable: false, action => {
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/Esc"), pausable: false, action => {
 				action.performed += _ => OnEscPressed();
 			});
 			inputMappings.Enable();
