@@ -23,7 +23,7 @@ namespace SoulboundBackend.Core.Bootstrap {
 
 			container.BindInstance<PlayerController>(playerInstance).AsSingle();
 			container.Bind<InputHandler>().FromComponentInNewPrefab(inputHandlerPrefab.gameObject).AsSingle();
-			container.Bind<PlayerPhysics>().FromComponentOnRoot().AsSingle();
+			container.Bind<PlayerPhysics>().FromComponentOn(playerInstance.gameObject).AsSingle();
 			container.Bind<ItemUsageHandler>().AsSingle();
 			container.Bind<InventoryController>().FromComponentInNewPrefab(inventoryPrefab).UnderTransform(canvas.transform).AsSingle();
 		}
