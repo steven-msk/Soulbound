@@ -104,6 +104,7 @@ namespace SoulboundBackend.Core {
 			if (player?.isSpawned ?? false) {
 				level.Update(player.position, Time.deltaTime);
 			}
+			entityManager?.Update(Time.deltaTime);
 		}
 
 		IEnumerator GameTickLoop() {

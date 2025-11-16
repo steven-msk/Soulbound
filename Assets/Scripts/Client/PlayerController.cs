@@ -3,6 +3,7 @@ using SoulboundBackend.Client.Combat;
 using SoulboundBackend.Client.Input;
 using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.Stats;
+using SoulboundBackend.Client.UI;
 using SoulboundBackend.Client.UI.Storage;
 using SoulboundBackend.Client.World;
 using SoulboundBackend.Client.World.BlockSystem;
@@ -76,12 +77,31 @@ namespace SoulboundBackend.Client {
 
 		public float MaxBlockReach => 5f;
 
+		private Level level;
+		private Vector2 mouseScreenPos;
+		private Canvas canvas;
+		private Vector2 mouseWorldPos {
+			get {
+				Vector3 screenPos = mouseScreenPos;
+				RectTransform rootTransform = canvas.GetComponent<UIManager>().GetRootTransform();
+				if (RectTransformUtility.ScreenPointToWorldPointInRectangle(rootTransform, screenPos, Camera.main, out var worldPoint)) {
+					return worldPoint;
+				}
+				screenPos.z = -Camera.main.transform.position.z;
+				return Camera.main.ScreenToWorldPoint(screenPos);
+			}
+		}
+		private bool leftHold;
+		private bool rightHold;
+
 		[Inject]
 		public void Construct(DiContainer container) {
 			this.inputHandler = container.Resolve<InputHandler>();
 			var playerActions = new PlayerInputActions().Player;
 			this.playerPhysics = container.Resolve<PlayerPhysics>();
 			this.inventory = container.Resolve<InventoryController>();
+			this.level = container.Resolve<Level>();
+			this.canvas = container.Resolve<Canvas>();
 			RegisterItemUsageCandidates(container.Resolve<ItemUsageHandler>());
 
 			attackSource = new AttackSource(2, 10, new PlayerMainHandAttack(),
@@ -98,23 +118,16 @@ namespace SoulboundBackend.Client {
 
 			inputHandler.RegisterInputEvent(playerActions.LeftClick, pausable: true, (action) => {
 				action.performed += _ => OnLeftClick();
-				action.performed += _ => OnLeftHold();
+				action.performed += _ => leftHold = true;
+				action.canceled += _ => leftHold = false;
 			});
 			inputHandler.RegisterInputEvent(playerActions.RightClick, pausable: true, (action) => {
 				action.performed += _ => OnRightClick();
-				action.performed += _ => OnRightHold();
+				action.performed += _ => rightHold = true;
+				action.canceled += _ => rightHold = false;
 			});
-			inputHandler.RegisterInputEvent(playerActions.ChangeHotbarSlot, pausable: true, (action) => {
-				action.performed += actionContext => {
-					int keySlot = int.Parse(actionContext.control.name);
-					Inventory.Hotbar.SetActiveSlot(keySlot - 1);
-				};
-			});
-			inputHandler.RegisterInputEvent(playerActions.ToggleInventory, pausable: true, (action) => {
-				action.performed += _ => Inventory.ToggleInventory();
-			});
-			inputHandler.RegisterInputEvent(playerActions.DropItem, pausable: true, (action) => {
-				action.performed += _ => Inventory.DropHoveredOrActiveItem();
+			inputHandler.RegisterInputEvent(playerActions.MousePosition, pausable: false, (action) => {
+				action.performed += actionContext => mouseScreenPos = actionContext.ReadValue<Vector2>();
 			});
 			playerActions.Enable();
 		}
@@ -135,18 +148,14 @@ namespace SoulboundBackend.Client {
 				});
 			}
 			itemUsageHandler.RegisterCapability<IPlaceable>(ItemUseTrigger.LeftHold, (placeable, stack) => {
-				Level level = Soulbound.instance.GetActiveLevel()!;
-				//BlockPos blockPos = level.ToBlockPos(inputHandler.MouseWorldPosition);
+				BlockPos blockPos = level.ToBlockPos(mouseWorldPos);
 
 				if (CanPlaceBlockAt(blockPos)) {
 					level.PlaceBlock(blockPos, placeable.Place(stack, blockPos));
 				}
 			});
 			itemUsageHandler.RegisterCapability<IBreakingTool>(ItemUseTrigger.LeftHold, (tool, stack) => {
-				Level level = Soulbound.instance.GetActiveLevel()!;
-				//Vector2 worldMousePos = inputHandler.MouseWorldPosition;
-				//BlockPos blockPos = level.ToBlockPos(worldMousePos);
-				BlockPos pos = default;
+				BlockPos blockPos = level.ToBlockPos(mouseWorldPos);
 
 				if (IsInBlockReach((Vector2)blockPos)) {
 					tool.TryBreak(blockPos, level, new PlayerToolBreakSource(this, tool));
@@ -165,7 +174,8 @@ namespace SoulboundBackend.Client {
 
 		public override void EntityUpdate(float deltaTime) {
 			base.EntityUpdate(deltaTime);
-			animator.SetFloat("horizontalSpeed", Mathf.Abs(rb.linearVelocityX));
+			InvocationHelper.If(leftHold, OnLeftHold);
+			InvocationHelper.If(rightHold, OnRightHold);
 		}
 
 		public void SetMainHandItem(ItemStack? itemStack) {
@@ -177,7 +187,6 @@ namespace SoulboundBackend.Client {
 
 		[InputAction("ItemUse", Priority = 5)]
 		internal void OnLeftClick() {
-			logger.LogInfo(null, "left click from player");
 			RequestSuppressedMainHandUse(ItemUseTrigger.LeftClick);
 		}
 
@@ -193,20 +202,17 @@ namespace SoulboundBackend.Client {
 			if (MainHandStack != null) {
 				RequestSuppressedMainHandUse(ItemUseTrigger.LeftHold);
 			} else {
-				//Vector2 worldMousePos = inputHandler.MouseWorldPosition;
-				Vector2 worldMousePos = default;
-
-				if (CanBreakBlockAt((BlockPos)worldMousePos)) {
+				if (CanBreakBlockAt((BlockPos)mouseWorldPos)) {
 					inputHandler.RequestAction(new("BlockBreak", 5, () => {
 						Level level = Soulbound.instance.GetActiveLevel()!;
-						BlockPos blockPos = level.ToBlockPos(worldMousePos);
+						BlockPos blockPos = level.ToBlockPos(mouseWorldPos);
 						Block? targetBlock = level.BlockAt(blockPos);
 
 						if (0 >= targetBlock.breakRequirement?.minBreakPower) {
 							level.BreakBlock(blockPos, new PlayerToolBreakSource(this, null));
 						}
 					}, null));
-					//inputHandler.BlockContext("PlayerAttack", () => !inputHandler.LeftHold);
+					inputHandler.BlockContext("PlayerAttack", () => !leftHold);
 				} else {
 					inputHandler.RequestAction(new("PlayerAttack", 5, () => TryAttack(attackSource), null));
 				}
@@ -222,7 +228,7 @@ namespace SoulboundBackend.Client {
 			Item? usedItem = MainHandStack?.item;
 			RequestMainHandUse(trigger, null);
 			if (usedItem is IPlaceable) {
-				//inputHandler.BlockContext("BlockBreak", () => !inputHandler.LeftHold);
+				inputHandler.BlockContext("BlockBreak", () => !leftHold);
 			}
 		}
 

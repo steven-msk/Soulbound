@@ -121,10 +121,6 @@ namespace SoulboundBackend.Client {
 			inputHandler.RegisterInputEvent(playerActions.Jump, pausable: true, (action) => {
 				action.performed += _ => OnSpacePressed();
 			});
-
-			inputHandler.RegisterInputEvent(playerActions.LeftClick, pausable: true, action => {
-				action.performed += _ => logger.LogInfo(null, "left click from physics");
-			});
 			playerActions.Enable();
 		}
 

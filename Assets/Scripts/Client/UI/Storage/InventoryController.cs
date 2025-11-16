@@ -20,7 +20,7 @@ using Logger = SoulboundBackend.Common.Logging.Logger;
 #nullable enable
 
 namespace SoulboundBackend.Client.UI.Storage {
-    public class InventoryController : MonoBehaviour, IItemContainer2D, ISerializable<SerializedInventory, List<IItemSlot>> {
+	public class InventoryController : MonoBehaviour, IItemContainer2D, ISerializable<SerializedInventory, List<IItemSlot>> {
 		public delegate void InterpretationFunction(IItemSlot slot, RefBox<ItemDisplay> grabbedItem);
 		public delegate InterpretationFunction? InterpretationProvider(DragHandler handler, IItemSlot draggedSlot, RefBox<ItemDisplay> grabbedItem);
 
@@ -66,6 +66,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 			this.eventHandler = new InventoryEventHandler();
 			this.player = container.Resolve<PlayerController>();
 			this.inputHandler = container.Resolve<InputHandler>();
+			var playerActions = new PlayerInputActions().Player;
 
 			hotbar.Construct(this);
 			this.SetupGrid();
@@ -75,6 +76,26 @@ namespace SoulboundBackend.Client.UI.Storage {
 			mainPlayerSlots.AddRange(popupSlots);
 			MainPlayerSlots = mainPlayerSlots.ToArray();
 			hotbar.SetActiveSlot(0);
+
+			inputHandler.RegisterInputEvent(playerActions.ChangeHotbarSlot, pausable: true, (action) => {
+				action.performed += actionContext => {
+					int keySlot = int.Parse(actionContext.control.name);
+					Hotbar.SetActiveSlot(keySlot - 1);
+				};
+			});
+			inputHandler.RegisterInputEvent(playerActions.ScrollHotbarSlot, pausable: true, action => {
+				action.performed += actionContext => {
+					float scrollDelta = actionContext.ReadValue<float>();
+					Hotbar.OnHotbarScroll(scrollDelta);
+				};
+			});
+			inputHandler.RegisterInputEvent(playerActions.DropItem, pausable: true, (action) => {
+				action.performed += _ => DropHoveredOrActiveItem();
+			});
+			inputHandler.RegisterInputEvent(playerActions.ToggleInventory, pausable: true, (action) => {
+				action.performed += _ => ToggleInventory();
+			});
+			playerActions.Enable();
 		}
 
 		public void SetupGrid() {
@@ -141,7 +162,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 			popup.SetActive(opened);
 		}
 
-		public void ToggleInventory() {
+		private void ToggleInventory() {
 			opened = !opened;
 			popup.SetActive(opened);
 			armorSlots.SetActive(opened);
@@ -153,7 +174,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 			foreach (var slot in popupSlots) {
 				slot.OnInventoryPopup(opened);
 			}
-        }
+		}
 
 		void IItemContainer.OnItemDisplayAdded(ItemDisplay itemDisplay, IItemSlot slot) {
 			itemDisplay.onDestroy += player.OnItemDisplayDestroyed;
@@ -164,7 +185,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 			}
 		}
 
-		public void DropHoveredOrActiveItem() {
+		private void DropHoveredOrActiveItem() {
 			IItemSlot? slot = hoveredSlot ?? hotbar.ActiveSlot ?? null;
 			if (slot == null) {
 				return;

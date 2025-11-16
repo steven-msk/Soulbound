@@ -44,15 +44,6 @@ namespace SoulboundBackend.Client.Input {
 			requests.Clear();
 		}
 
-		public Vector2 ScreenPosToLocalPos(Vector2 screenPos) {
-			RectTransform rootTransfom = Soulbound.instance.GetActiveLevelManager().UIManager.GetRootTransform();
-			if (RectTransformUtility.ScreenPointToLocalPointInRectangle(rootTransfom, screenPos, Soulbound.instance.GetActiveLevelManager().UIManager.rootCanvas.worldCamera, out var localPos)) {
-				return localPos;
-			}
-			UnityEngine.Debug.LogError($"Could not retrieve local point from screen point: ({screenPos.x}, {screenPos.y})");
-			return new(-1f, -1f);
-		}
-
 		public void PauseInputs(bool pause) {
 			Action<InputAction> action = pause
 				? inputAction => inputAction.Disable()
