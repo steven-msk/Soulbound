@@ -18,7 +18,8 @@
     "precompiledReferences": [
         "nunit.framework.dll",
         "Unity.Plastic.Newtonsoft.Json.dll",
-        "NSubstitute.dll"
+        "NSubstitute.dll",
+        "Zenject-usage.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [

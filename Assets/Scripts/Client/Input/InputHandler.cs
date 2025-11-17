@@ -41,7 +41,13 @@ namespace SoulboundBackend.Client.Input {
 			callbackBinding.Invoke(inputAction);
 		}
 
-		public void BlockContext(string context, Func<bool> unblockPredicate) => blockedContexts[context] = unblockPredicate;
+		public void BlockContext(string context, Func<bool> unblockPredicate) {
+			blockedContexts[context] = unblockPredicate;
+		}
+		
+		public bool IsContextBlocked(string context) {
+			return blockedContexts.ContainsKey(context);
+		}
 
 		public void RequestAction(InputActionRequest action) => requests.Add(action);
 
