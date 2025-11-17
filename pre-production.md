@@ -381,10 +381,11 @@ Status: ⚙️ Prototype (JSON, human-readable, but slow and memory inefficient)
 
 ## Recommended Production Order (Top to bottom)
 Based on the dependency graph, this could be an optimal order:
-1. State initialization
-2. Dependency injection
-3. Internal timing system
-4. Input system
+[EDIT]: For convenience during late prototyping, categories have been marked accordingly to ease development: `*` means started but not finished, `<-` signifies focus point, `>|` means completed, `>>>` means progressively developed (see [notes](#notes))
+1. State initialization >>>
+2. Dependency injection >>>
+3. Internal timing system >>>
+4. Input system *
 5. Serialization (foundation only)
 6. Stat system
 7. Entity system
@@ -399,8 +400,20 @@ Based on the dependency graph, this could be an optimal order:
 16. Lighting
 17. Audio
 
+#### Notes
+
+`State Initialization` and `Dependency Injection` are self-deterministic systems. In practice, they do not form two independent layers of abstraction; their responsibilities blend into eachother. Their behavior is based on establishing a complete and coherent object graph before any logic executes.
+Because their responsibilities overlap, they cannot be meaningfully separated into more isolated abstractions. The most accurate level of abstraction for both is the "lifecycle unit", a self-contained intialization domain that declares what it requires, what it provides, and how it bootstraps itself.
+This means that `State Initialization` and `Dependency Injection` are not isolated modules being "worked on" inidividually. Instead, they are an evolving backbone of the project. Their development progresses naturally as new lifecycle units are introduced. Each improvement in either system automatically reinforces the other, depending on the role they play.  
+
+`Internal Timing` works similarly to whats stated above, but in the runtime domain. Like DI/State init, it is self-deterministic: each unit declares its context, subscribes to events, and gains/loses contexts in a predictable, controlled manner.
+The central abstraction for this is the `ContextHandle`, which is a runtime lifecycle hook for any effect or behavior. Each context may differ in how it is activated, but the mechanism for managing activation and deactivation remains the same.
+Because every context can define its own runtime behavior, `Internal Timing` cannot be fully generalized into a universal framework. Instead, it evolves alongside new lifecycle units. 
+This system is also marked with a special focus point the same as DI/State init.
+
+
 ## Final Note
 
 By December 2025-early January 2026 the project will (hopefully) be considered in a production-ready state.
 Starting from this point and until further notice, **all systems are considered mutable and subject to redesign, or complete overhaul if necessary**, for a production-ready foundation.  
-The project is now considered to be in a late-production state.
+The project is now considered to be in a late-prototype state.

@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace SoulboundBackend.Core {
+	[Obsolete]
 	public static class StaticResetManager {
 		private static readonly List<IStaticResettable> resettables = new();
 

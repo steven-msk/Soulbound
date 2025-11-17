@@ -1,4 +1,5 @@
 ﻿using SoulboundBackend.Client.Stats;
+using SoulboundBackend.Common;
 using SoulboundBackend.Common.Logging;
 using System;
 using System.Collections.Generic;

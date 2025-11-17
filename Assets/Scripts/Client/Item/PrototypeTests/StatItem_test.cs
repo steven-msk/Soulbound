@@ -23,7 +23,7 @@ public sealed class StatItem_test : StatItem {
 
 	protected override TooltipRenderer.NodeStyleFactory nodeStyleProvider => null;
 
-	public StatItem_test() : base() {
+	public StatItem_test() {
 		StatMappingBuilder mappingBuilder = new StatMappingBuilder()
 			.SetStats(() => new DynamicMap<AbstractSerializableStat>() {
 				["physicalDamage"] = new SerializableStat<int>(StatDefinition.PhysicalDamage, 10, StatApplicationType.Percentage, showAsBonus: true)
