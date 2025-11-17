@@ -6,7 +6,8 @@
         "SoulboundBackend",
         "UnityEngine.TestRunner",
         "PlaymodeTests",
-        "Zenject"
+        "Zenject",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [
         "Editor"
@@ -16,7 +17,8 @@
     "overrideReferences": true,
     "precompiledReferences": [
         "nunit.framework.dll",
-        "Unity.Plastic.Newtonsoft.Json.dll"
+        "Unity.Plastic.Newtonsoft.Json.dll",
+        "NSubstitute.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [
