@@ -36,6 +36,9 @@ namespace SoulboundBackend.Core {
 			string world = config.dev.loadDevWorldFromSave
 				? config.dev.devWorld
 				: $"altw_{Guid.NewGuid()}";
+			worldManager.onWorldLoaded += (levelManager, dump) => {
+				levelManager.SpawnPlayer(dump?.player);
+			};
 			worldManager.LoadWorld(world, true,
 				() => UnityEngine.Object.FindFirstObjectByType<SceneContext>(),
 				() => SceneManager.LoadScene("WorldScene")

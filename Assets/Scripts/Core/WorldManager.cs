@@ -23,6 +23,7 @@ using Scene = UnityEngine.SceneManagement.Scene;
 #nullable enable
 
 public sealed class WorldManager {
+	public event Action<LevelManager, WorldDump?>? onWorldLoaded;
 	private readonly string savesRoot;
 	public LevelManager? activeLevelManager { get; private set; }
 	private readonly ISaveStrategy<WorldDump> saveStrategy;
@@ -75,9 +76,6 @@ public sealed class WorldManager {
 			if (activeLevelManager == null) {
 				throw new InvalidOperationException("Level Manager is not injected");
 			}
-			activeLevelManager.onLevelLoaded += level => {
-				activeLevelManager.SpawnPlayer(dump?.player);
-			};
 
 			LevelGridContext gridContext;
 			GameObject grid = GameObject.Find("Grid");
@@ -89,6 +87,8 @@ public sealed class WorldManager {
 			}
 
 			activeLevelManager.BootstrapWorld(world, dump, seed, gridContext);
+			onWorldLoaded?.Invoke(activeLevelManager, dump);
+			
 		}
 		CoroutineRunner.GetInstance().StartCoroutine(LevelSceneLoader());
 
