@@ -19,6 +19,7 @@ using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public sealed class GameEntryPoint : MonoBehaviour {
 	private LevelManager levelManager;
@@ -36,7 +37,9 @@ public sealed class GameEntryPoint : MonoBehaviour {
 		}
 #endif
 		Soulbound soulbound = new Soulbound(instance.gameConfig);
-		soulbound.Prototype_LoadDevWorld();
+		var childContainer = GameObject.Find("Canvas").GetComponent<ChildReferenceContainer>();
+		var enterWorldButton = childContainer.GetChildComponent<Button>("WorldEnter");
+		enterWorldButton.onClick.AddListener(soulbound.Prototype_LoadDevWorld);
 	}
 
 	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]

@@ -25,11 +25,11 @@ namespace SoulboundBackend.Client.UI.Screens {
 			Screen screen = screenObject.GetComponent<Screen>();
 			screen.BroadcastMessage("OnRegisterChildrenReferences", SendMessageOptions.DontRequireReceiver);
 
-			Button settingsButton = screen.childMap.GetChild("SettingsButton").GetComponent<Button>();
+			Button settingsButton = screen.GetChild("SettingsButton").GetComponent<Button>();
 			settingsButton.onClick.RemoveAllListeners();
 			settingsButton.onClick.AddListener(() => uiManager.SetScreen<SettingsScreen>());
 
-			Button resumeButton = screen.childMap.GetChild("ResumeButton").GetComponent<Button>();
+			Button resumeButton = screen.GetChild("ResumeButton").GetComponent<Button>();
 			resumeButton.onClick.RemoveAllListeners();
 			resumeButton.onClick.AddListener(() => Soulbound.instance.GetActiveLevelManager().TogglePause());
 

@@ -75,7 +75,7 @@ namespace UITests {
 			var childRef = child.AddComponent<ChildReference>();
 
 			parent.BroadcastMessage("OnRegisterChildrenReferences", SendMessageOptions.DontRequireReceiver);
-			Assert.AreEqual(child, screen.childMap.GetChild("TestChild"));
+			Assert.AreEqual(child, screen.GetChild("TestChild"));
 
 			GameObject.DestroyImmediate(parent);
 		}

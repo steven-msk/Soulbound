@@ -14,8 +14,15 @@ namespace SoulboundBackend.Client.UI.Screens {
 			childReferences[reference.accessor] = reference.gameObject;
 		}
 
+		public bool TryGetChild(string accessor, out GameObject child) {
+			return childReferences.TryGetValue(accessor, out child);
+		}
+
 		public GameObject GetChild(string accessor) {
-			return childReferences[accessor];
+			if (!TryGetChild(accessor, out var child)) {
+				throw new ArgumentException($"No child found with accessor: {accessor}");
+			}
+			return child;
 		}
 	}
 }
