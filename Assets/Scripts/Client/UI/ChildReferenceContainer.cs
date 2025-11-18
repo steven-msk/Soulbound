@@ -7,12 +7,23 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SoulboundBackend.Client.UI {
+	[DisallowMultipleComponent]
 	public class ChildReferenceContainer : MonoBehaviour {
-		private ChildReferenceMap childMap = new();
+		protected ChildReferenceMap childMap = new();
 
-		// Received message
-		public void RegisterChildReference(ChildReference reference) {
+		public virtual void RegisterChildReference(ChildReference reference) {
+			UnityEngine.Debug.Log("register child: " + reference.gameObject.name);
 			childMap.RegisterChildReference(reference);
+		}
+
+		public void BroadcastRegisterMessage() {
+			BroadcastMessage("OnRegisterChildrenReferences", SendMessageOptions.DontRequireReceiver);
+		}
+
+		public void BruteForceRegisterAllChildren() {
+			foreach (var childReference in GetComponentsInChildren<ChildReference>(true)) {
+				childReference.OnRegisterChildrenReferences();
+			}
 		}
 
 		public GameObject GetChild(string accessor) {

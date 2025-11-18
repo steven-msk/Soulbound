@@ -14,7 +14,7 @@ using Screen = SoulboundBackend.Client.UI.Screens.Screen;
 #nullable enable
 
 namespace SoulboundBackend.Client.UI {
-	public class UIManager : MonoBehaviour {
+	public class UIManager : ChildReferenceContainer {
 		public bool enableScaleFix = true;
 		public static readonly Vector2 referenceResolution = new(960, 540);
 		public static readonly float maxScale = 4.0f;
@@ -25,10 +25,6 @@ namespace SoulboundBackend.Client.UI {
 		public Canvas rootCanvas => this.GetComponent<Canvas>();
 
 		private CanvasScaler canvasScaler;
-
-		private void Awake() {
-			BroadcastMessage("OnRegisterChildrenReferences", SendMessageOptions.DontRequireReceiver);
-		}
 
 		private void Start() {
 			canvasScaler = GetComponent<CanvasScaler>();
@@ -79,7 +75,8 @@ namespace SoulboundBackend.Client.UI {
 			return screenStack.IsEmpty();
 		}
 
-		public void RegisterChildReference(ChildReference reference) {
+		public override void RegisterChildReference(ChildReference reference) {
+			UnityEngine.Debug.Log("register child in ui manager: " + reference.gameObject.name);
 			if (reference.TryGetComponent<Screen>(out var _)) {
 				screenChildMap.RegisterChildReference(reference);
 			}

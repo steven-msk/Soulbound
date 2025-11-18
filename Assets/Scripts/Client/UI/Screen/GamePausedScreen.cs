@@ -31,7 +31,7 @@ namespace SoulboundBackend.Client.UI.Screens {
 
 			Button resumeButton = screen.GetChild("ResumeButton").GetComponent<Button>();
 			resumeButton.onClick.RemoveAllListeners();
-			resumeButton.onClick.AddListener(() => Soulbound.instance.GetActiveLevelManager().TogglePause());
+			resumeButton.onClick.AddListener(Soulbound.instance.GetActiveLevelManager().TogglePause);
 
 			return screen;
 		}

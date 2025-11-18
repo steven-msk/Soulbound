@@ -20,5 +20,9 @@ namespace SoulboundBackend.Client.UI.Screens {
 		public virtual void Dispose() {
 			Destroy(gameObject);
 		}
+		public new void RegisterChildReference(ChildReference reference) {
+			UnityEngine.Debug.Log("register child in screen: " + reference.gameObject.name);
+			childMap.RegisterChildReference(reference);
+		}
 	}
 }
