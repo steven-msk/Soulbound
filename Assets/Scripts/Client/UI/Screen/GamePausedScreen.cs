@@ -2,11 +2,13 @@
 using SoulboundBackend.Core;
 using SoulboundBackend.Core.Resource;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace SoulboundBackend.Client.UI.Screens {
@@ -33,7 +35,23 @@ namespace SoulboundBackend.Client.UI.Screens {
 			resumeButton.onClick.RemoveAllListeners();
 			resumeButton.onClick.AddListener(Soulbound.instance.GetActiveLevelManager().TogglePause);
 
+			Button quitButton = screen.GetChild("QuitWorld").GetComponent<Button>();
+			quitButton.onClick.RemoveAllListeners();
+			quitButton.onClick.AddListener(() => CoroutineRunner.GetInstance().StartCoroutine(QuitWorld()));
+
 			return screen;
+		}
+
+		private IEnumerator QuitWorld() {
+			LevelManager levelManager = Soulbound.instance.GetActiveLevelManager();
+			WorldManager worldManager = Soulbound.instance.worldManager;
+
+			worldManager.SaveWorld(levelManager.world, levelManager);
+			var async = SceneManager.LoadSceneAsync("DevScene");
+			yield return new WaitUntil(() => async.isDone);
+
+			var uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
+			uiManager.SetScreen(new MainMenuScreen());
 		}
 	}
 }

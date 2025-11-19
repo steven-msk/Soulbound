@@ -25,7 +25,7 @@ using Scene = UnityEngine.SceneManagement.Scene;
 public sealed class WorldManager {
 	public event Action<LevelManager, WorldDump?>? onWorldLoaded;
 	private readonly string savesRoot;
-	public LevelManager? activeLevelManager { get; private set; }
+	[Inject] public LevelManager? activeLevelManager { get; private set; }
 	private readonly ISaveStrategy<WorldDump> saveStrategy;
 	private Func<string> dataRegion;
 
@@ -33,11 +33,6 @@ public sealed class WorldManager {
 		this.savesRoot = savesRoot;
 		this.saveStrategy = saveStrategy;
 		this.dataRegion = dataRegion ?? (() => Application.persistentDataPath);
-	}
-
-	[Inject]
-	public void InjectLevel(LevelManager instance) {
-		activeLevelManager = instance;
 	}
 
 	public IEnumerable<string> QuerySaves() {

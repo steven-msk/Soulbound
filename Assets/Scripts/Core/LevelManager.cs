@@ -42,7 +42,7 @@ namespace SoulboundBackend.Core {
 		private Canvas worldCanvas = null!;
 		private InputHandler inputHandler = null!;
 		private PlayerInputActions inputMappings = null!;
-		private string world = null!;
+		public string world { get; private set; } = null!;
 		public Level? level { get; private set; }
 		public PlayerController? player { get; private set; }
 
