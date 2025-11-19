@@ -33,8 +33,8 @@ namespace SoulboundBackend.Core {
 		public event Action<Level>? onLevelLoaded;
 		public const float tickRate = 0.02f;        // 50 tps
 		private float tickStartTime;
-		public bool isWorldLoaded { get; private set; } = false;
 		public bool paused { get; private set; }
+		private bool sessionRunning;
 
 		private DiContainer container = null!;
 		private WorldManager worldManager = null!;
@@ -82,14 +82,15 @@ namespace SoulboundBackend.Core {
 
 			level.BootstrapWorld(dump, this);
 			entityManager.Boostrap(dump?.serializedEntities ?? new());
-			isWorldLoaded = true;
+			sessionRunning = true;
 
 			container.BindInstance<Level>(level).AsSingle();
 			container.BindInstance<EntityManager>(entityManager).AsSingle();
 			onLevelLoaded?.Invoke(level);
-        }
+		}
 
 		public void SpawnPlayer(SerializedEntity? serialized) {
+			UnityEngine.Debug.Log("player spawn");
 			GameObject playerPrefab = ResourceManager.GetRuntimePrefab("player");
 			this.player = container.InstantiatePrefabForComponent<PlayerController>(playerPrefab);
 			container.BindInstance<PlayerController>(player).AsSingle();
@@ -113,7 +114,7 @@ namespace SoulboundBackend.Core {
 
 		IEnumerator GameTickLoop() {
 			WaitForSecondsRealtime tickDelay = new(tickRate);
-			while (Application.isPlaying) {
+			while (sessionRunning) {
 				if (!this.paused) {
 					StartTick();
 					// do things
@@ -123,6 +124,11 @@ namespace SoulboundBackend.Core {
 				}
 				yield return tickDelay;
 			}
+		}
+
+		public void StopSession() {
+			sessionRunning = false;
+			container.FlushBindings();
 		}
 
 		private void StartTick() {
@@ -178,17 +184,17 @@ namespace SoulboundBackend.Core {
 		}
 
 		private void OnApplicationQuit() {
-			if (isWorldLoaded) {
+			if (sessionRunning) {
 				worldManager.SaveWorld(world, CreateDump());
 			}
 			Soulbound.instance?.OnApplicationQuit();
 		} 
 
 		public static LevelManager CreateInstance() {
-            GameObject? levelManagerPrefab = ResourceManager.Get<GameObject, ResourceGroups.Runtime.Prefabs>("levelManager");
-            return GameObject.Instantiate(levelManagerPrefab)?.GetComponent<LevelManager>()
-                ?? throw new ArgumentException("LevelManager prefab not found!");
-        }
+			GameObject? levelManagerPrefab = ResourceManager.Get<GameObject, ResourceGroups.Runtime.Prefabs>("levelManager");
+			return GameObject.Instantiate(levelManagerPrefab)?.GetComponent<LevelManager>()
+				?? throw new ArgumentException("LevelManager prefab not found!");
+		}
 	}
 
 	public record LevelGridContext(Grid grid, Tilemap tilemap) {

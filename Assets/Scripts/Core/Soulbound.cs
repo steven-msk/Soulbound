@@ -5,11 +5,13 @@ using SoulboundBackend.Client.World;
 using SoulboundBackend.Client.World.Structure.Templates;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core.Bootstrap;
+using SoulboundBackend.Core.Resource;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using Zenject;
 
@@ -30,6 +32,9 @@ namespace SoulboundBackend.Core {
 				? new WorldSaveStrategy()
 				: new DoNotSaveWorldStrategy();
 			this.worldManager = new WorldManager(config.file.savesFolder, saveStrategy);
+			worldManager.onWorldLoaded += (levelManager, dump) => {
+				levelManager.SpawnPlayer(dump?.player);
+			};
 		}
 
 		public void Prototype_LoadDevWorld() {
@@ -37,11 +42,14 @@ namespace SoulboundBackend.Core {
 			string world = config.dev.loadDevWorldFromSave
 				? config.dev.devWorld
 				: $"altw_{Guid.NewGuid()}";
-			worldManager.onWorldLoaded += (levelManager, dump) => {
-				levelManager.SpawnPlayer(dump?.player);
-			};
 			worldManager.LoadWorld(world, true,
-				() => UnityEngine.Object.FindFirstObjectByType<SceneContext>(),
+				() => {
+					var contextPrefab = ResourceManager.GetRuntimePrefab("sceneContext");
+					SceneContext context = GameObject.Instantiate(contextPrefab).GetComponent<SceneContext>();
+					context.AddNormalInstaller(new LevelInstaller(worldManager, GameObject.Find("Canvas").GetComponent<Canvas>()));
+					context.Run();
+					return context;
+				},
 				() => SceneManager.LoadScene("WorldScene")
 			);
 		}

@@ -47,6 +47,7 @@ namespace SoulboundBackend.Client.UI.Screens {
 			WorldManager worldManager = Soulbound.instance.worldManager;
 
 			worldManager.SaveWorld(levelManager.world, levelManager);
+			levelManager.StopSession();
 			var async = SceneManager.LoadSceneAsync("DevScene");
 			yield return new WaitUntil(() => async.isDone);
 
