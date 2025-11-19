@@ -38,7 +38,7 @@ namespace SoulboundBackend.Client.World {
 		private Dictionary<int, List<StructurePlacement>> structurePlacements = new();
 		private Dictionary<int, List<(ChunkBlockPos chunkBlockPos, BlockState state)>> pendingUpdates = new();
 		private LevelGridContext gridContext;
-		private LevelManager? levelManager;
+		private LevelManager levelManager = null!;
 		public bool isWorldLoaded { get; private set; } = false;
 
 		public Level(LevelGridContext gridContext, int seed) {
@@ -83,18 +83,18 @@ namespace SoulboundBackend.Client.World {
 			return new Vector2(0f, GetSurfaceY(0));
 		}
 
-		public void CreateDump(out int seed, out WorldChunk[] generatedChunks, out Dictionary<int, List<StructurePlacement>> structurePlacements) {
+		public void Dump(out int seed, out WorldChunk[] generatedChunks, out Dictionary<int, List<StructurePlacement>> structurePlacements) {
 			seed = this.seed;
 			generatedChunks = this.generatedChunks.Values.ToArray();
 			structurePlacements = this.structurePlacements;
 		}
 
-		public void UpdateChunks(Vector2 playerPos) {
-			int playerChunkX = ChunkXAt(playerPos);
-			this.UnloadDistantChunks(playerChunkX, RENDER_DISTANCE);
+		public void UpdateChunks(Vector2 pivot) {
+			int pivotChunkX = ChunkXAt(pivot);
+			this.UnloadDistantChunks(pivotChunkX, RENDER_DISTANCE);
 
 			for (int dx = -RENDER_DISTANCE; dx <= RENDER_DISTANCE; dx++) {
-				int chunkX = playerChunkX + dx;
+				int chunkX = pivotChunkX + dx;
 				if (!loadedChunks.ContainsKey(chunkX)) {
 					WorldChunk chunk = new(chunkX);
 
@@ -119,10 +119,6 @@ namespace SoulboundBackend.Client.World {
 			}
 		}
 
-		public void Update(Vector2 playerPos, float deltaTime) {
-			UpdateChunks(playerPos);
-		}
-
 		public void SpawnEntity(Entity entity, EntitySpawnData spawnData) {
 			levelManager.SpawnEntity(entity, spawnData);
 		}
@@ -130,13 +126,6 @@ namespace SoulboundBackend.Client.World {
 		public void RemoveEntityImmediately(Entity entity, bool destroy) {
 			levelManager.RemoveEntityImmediately(entity, destroy);
 		}
-
-		//public void Update(float deltaTime) {
-		//	if (isPlayerSpawned) {
-		//		this.UpdateChunks(player.position);
-		//	}
-		//	entityManager.Update(deltaTime);
-		//}
 
 		public bool IsChunkLoaded(WorldChunk chunk) => loadedChunks.ContainsValue(chunk);
 

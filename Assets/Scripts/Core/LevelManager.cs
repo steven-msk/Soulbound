@@ -90,7 +90,6 @@ namespace SoulboundBackend.Core {
 		}
 
 		public void SpawnPlayer(SerializedEntity? serialized) {
-			UnityEngine.Debug.Log("player spawn");
 			GameObject playerPrefab = ResourceManager.GetRuntimePrefab("player");
 			this.player = container.InstantiatePrefabForComponent<PlayerController>(playerPrefab);
 			container.BindInstance<PlayerController>(player).AsSingle();
@@ -107,7 +106,7 @@ namespace SoulboundBackend.Core {
 
 		private void Update() {
 			if (player?.isSpawned ?? false) {
-				level.Update(player.position, Time.deltaTime);
+				level.UpdateChunks(player.position);
 			}
 			entityManager?.Update(Time.deltaTime);
 		}
@@ -128,6 +127,7 @@ namespace SoulboundBackend.Core {
 
 		public void StopSession() {
 			sessionRunning = false;
+			inputMappings.Disable();
 			container.FlushBindings();
 		}
 
@@ -168,11 +168,11 @@ namespace SoulboundBackend.Core {
 			this.paused = !this.paused;
 			Time.timeScale = this.paused ? 0f : 1f;
 			inputHandler.PauseInputs(this.paused);
-			UIManager.SetScreen(paused ? new GamePausedScreen().GetScreen() : null, ScreenSetMethod.Stack);
+			UIManager.SetScreen(paused ? new GamePausedScreen().GetScreen() : null);
 		}
 
 		public WorldDump CreateDump() {
-			level.CreateDump(out var seed, out var generatedChunks, out var structurePlacements);
+			level.Dump(out var seed, out var generatedChunks, out var structurePlacements);
 			return new WorldDump(
 				seed,
 				generatedChunks,
@@ -185,6 +185,7 @@ namespace SoulboundBackend.Core {
 		private void OnApplicationQuit() {
 			if (sessionRunning) {
 				worldManager.SaveWorld(world, CreateDump());
+				StopSession();
 			}
 			Soulbound.instance?.OnApplicationQuit();
 		} 

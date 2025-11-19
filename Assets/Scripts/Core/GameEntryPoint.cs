@@ -25,6 +25,7 @@ public sealed class GameEntryPoint : MonoBehaviour {
 	private LevelManager levelManager;
 	[SerializeField] private GameConfig gameConfig;
 	private static GameEntryPoint instance;
+	private static Soulbound soulbound;
 
     private void Awake() => instance = this;
 
@@ -36,7 +37,7 @@ public sealed class GameEntryPoint : MonoBehaviour {
 			return;
 		}
 #endif
-		Soulbound soulbound = new Soulbound(instance.gameConfig);
+		soulbound = new Soulbound(instance.gameConfig);
 		var uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
 		uiManager.SetScreen(new MainMenuScreen());
 	}
@@ -45,5 +46,9 @@ public sealed class GameEntryPoint : MonoBehaviour {
 	public static void ResetStaticDomain() {
 		StaticResetManager.ResetAll();
 		ResourceManager.PreloadGroups();
+	}
+
+	private void OnApplicationQuit() {
+		soulbound.OnApplicationQuit();
 	}
 }
