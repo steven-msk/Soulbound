@@ -48,7 +48,6 @@ public sealed class WorldManager {
 
 	public WorldDump? LoadWorld(
 			string world, 
-			bool initPlayerState,
 			Func<SceneContext> sceneContextSupplier,
 			Action sceneLoader
 		) {

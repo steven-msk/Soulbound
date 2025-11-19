@@ -7,8 +7,10 @@ using Zenject;
 
 namespace SoulboundBackend.Core.Bootstrap {
 	public class LevelInstallerComponent : MonoInstaller {
+		[SerializeField] private Canvas worldCanvas;
+
 		public override void InstallBindings() {
-			new LevelInstaller(Soulbound.instance.worldManager, GameObject.Find("Canvas").GetComponent<Canvas>()).InstallBindings(Container);
+			new LevelInstaller(Soulbound.instance.worldManager, worldCanvas).InstallBindings(Container);
 		}
 	}
 }

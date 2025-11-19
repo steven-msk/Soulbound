@@ -50,6 +50,7 @@ namespace SoulboundBackend.Client.UI.Screens {
 			levelManager.StopSession();
 			var async = SceneManager.LoadSceneAsync("DevScene");
 			yield return new WaitUntil(() => async.isDone);
+			Time.timeScale = 1f;
 
 			var uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
 			uiManager.SetScreen(new MainMenuScreen());

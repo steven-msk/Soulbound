@@ -167,7 +167,6 @@ namespace SoulboundBackend.Core {
 		public void TogglePause() {
 			this.paused = !this.paused;
 			Time.timeScale = this.paused ? 0f : 1f;
-			AudioListener.pause = this.paused;        // FEATUREIMPL: sound effects and music
 			inputHandler.PauseInputs(this.paused);
 			UIManager.SetScreen(paused ? new GamePausedScreen().GetScreen() : null, ScreenSetMethod.Stack);
 		}

@@ -42,14 +42,8 @@ namespace SoulboundBackend.Core {
 			string world = config.dev.loadDevWorldFromSave
 				? config.dev.devWorld
 				: $"altw_{Guid.NewGuid()}";
-			worldManager.LoadWorld(world, true,
-				() => {
-					var contextPrefab = ResourceManager.GetRuntimePrefab("sceneContext");
-					SceneContext context = GameObject.Instantiate(contextPrefab).GetComponent<SceneContext>();
-					context.AddNormalInstaller(new LevelInstaller(worldManager, GameObject.Find("Canvas").GetComponent<Canvas>()));
-					context.Run();
-					return context;
-				},
+			worldManager.LoadWorld(world,
+				GameObject.FindFirstObjectByType<SceneContext>,
 				() => SceneManager.LoadScene("WorldScene")
 			);
 		}

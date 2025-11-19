@@ -52,7 +52,6 @@ namespace WorldTests {
 			);
 			worldBox.value.LoadWorld(
 				world ?? CreateNewWorldID(),
-				initPlayerState: false,
 				() => {
 					var prefab = ResourceManager.GetRuntimePrefab("sceneContext");
 					var canvas = GameObject.Instantiate(ResourceManager.GetRuntimePrefab("Canvas")).GetComponent<Canvas>();
@@ -92,7 +91,6 @@ namespace WorldTests {
 
 			worldBox.value.LoadWorld(
 				world ?? CreateNewWorldID(),
-				initPlayerState: false,
 				() => {
 					var sceneContext = scene.GetRootGameObjects()
 						.SelectMany(o => o.GetComponentsInChildren<SceneContext>(true))
