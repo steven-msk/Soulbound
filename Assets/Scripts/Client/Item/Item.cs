@@ -11,7 +11,7 @@ using SoulboundBackend.Core;
 #nullable enable
 
 namespace SoulboundBackend.Client.ItemSystem {
-	public abstract partial class Item : IStaticResettable {
+	public abstract partial class Item {
 		private static readonly Logger logger = Logger.CreateInstance();
 		public const int DEFAULT_MAX_STACK = 256;
 
@@ -52,9 +52,6 @@ namespace SoulboundBackend.Client.ItemSystem {
 
 		public override int GetHashCode() {
 			return HashCode.Combine(name, aspect, maxStackSize, IsStackable, tooltipSupplier, nodeStyleProvider, hashedID);
-		}
-
-		public virtual void StaticReset() {
 		}
 	}
 

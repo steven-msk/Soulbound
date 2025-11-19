@@ -143,7 +143,7 @@ namespace WorldTests {
 		}
 
 		[UnityTest]
-		public IEnumerator World_LoadsSuccessfully_WhenSceneProvided() {
+		public IEnumerator TestRelevant_World_LoadsSuccessfully_WhenSceneProvided() {
 			Scene scene = PlayModeTesting.CreateNewTestScene();
 			var worldBox = new ContextBox<WorldManager>();
 			yield return CreateContextWithSceneProvided(scene, worldBox);
@@ -155,7 +155,7 @@ namespace WorldTests {
 		}
 
 		[UnityTest]
-		public IEnumerator World_LoadsSuccessfully_WhenNoSceneProvided() {
+		public IEnumerator TestRelevant_World_LoadsSuccessfully_WhenNoSceneProvided() {
 			var worldBox = new ContextBox<WorldManager>();
 			yield return World.CreateContextWithNoSceneProvided(worldBox);
 			Assert.That(worldBox.value != null, () => "Failed to create sceneless world");
@@ -181,7 +181,6 @@ namespace WorldTests {
 
 			yield return PlayModeTesting.UnloadSceneAsync(sceneBox.value);
 
-			StaticResetManager.ResetAll();
 			yield return CreateSavedContext(worldBox, sceneBox, world);
 
 			Level level = TryGetLevel(worldBox);

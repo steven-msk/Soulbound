@@ -68,8 +68,8 @@ namespace SoulboundBackend.Core {
 			this.inputMappings = new PlayerInputActions();
 			this.inputHandler = new InputHandler(inputMappings.asset);
 
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/Esc"), pausable: false, action => {
-				action.performed += _ => OnEscPressed();
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/Esc"), pausable: false, binding => {
+				binding.Performed(_ => OnEscPressed());
 			});
 			inputMappings.Enable();
 		}
@@ -127,7 +127,8 @@ namespace SoulboundBackend.Core {
 
 		public void StopSession() {
 			sessionRunning = false;
-			inputMappings.Disable();
+			inputHandler.FlushCallbacks();
+			inputMappings.Dispose();
 			container.FlushBindings();
 		}
 

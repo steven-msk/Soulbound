@@ -24,5 +24,11 @@ namespace SoulboundBackend.Client.UI.Screens {
 			}
 			return child;
 		}
+
+		public T GetChildComponent<T>(string accessor) {
+			return GetChild(accessor).GetComponent<T>();
+		}
+
+		public int Size() => childReferences.Count();
 	}
 }

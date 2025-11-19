@@ -14,9 +14,5 @@ namespace SoulboundBackend.Client.ItemSystem {
 
 		public ContextHandle<IStatReceiver> contextHandle { get; } = new();
 		protected bool hasContext => contextHandle.hasContext;
-
-		protected StatItem() => StaticResetManager.Register(this);
-
-		public override void StaticReset() => contextHandle.hasContext = false;
 	}
 }

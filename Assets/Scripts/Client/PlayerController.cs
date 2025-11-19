@@ -115,18 +115,18 @@ namespace SoulboundBackend.Client {
 				animator => animator.SetTrigger("attack")
 			);
 
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/LeftClick"), pausable: true, (action) => {
-				action.performed += _ => OnLeftClick();
-				action.performed += _ => leftHold = true;
-				action.canceled += _ => leftHold = false;
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/LeftClick"), pausable: true, binding => {
+				binding.Performed(_ => OnLeftClick());
+				binding.Performed(_ => leftHold = true);
+				binding.Canceled(_ => leftHold = false);
 			});
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/RightClick"), pausable: true, (action) => {
-				action.performed += _ => OnRightClick();
-				action.performed += _ => rightHold = true;
-				action.canceled += _ => rightHold = false;
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/RightClick"), pausable: true, binding => {
+				binding.Performed(_ => OnRightClick());
+				binding.Performed(_ => rightHold = true);
+				binding.Performed(_ => rightHold = true);
 			});
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/MousePosition"), pausable: false, (action) => {
-				action.performed += actionContext => mouseScreenPos = actionContext.ReadValue<Vector2>();
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/MousePosition"), pausable: false, binding => {
+				binding.Performed(context => mouseScreenPos = context.ReadValue<Vector2>());
 			});
 		}
 

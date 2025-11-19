@@ -35,11 +35,6 @@ public partial class Items {
 
 public class ItemTests {
 
-    [OneTimeSetUp]
-    public void Setup() {
-        StaticResetManager.ResetAll();
-    }
-
     [SetUp]
     public void ItemCleanup() => Items.cached.Clear();
     

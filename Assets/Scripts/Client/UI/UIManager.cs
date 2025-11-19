@@ -76,7 +76,7 @@ namespace SoulboundBackend.Client.UI {
 		}
 
 		public override void RegisterChildReference(ChildReference reference) {
-			UnityEngine.Debug.Log("register child in ui manager: " + reference.gameObject.name);
+			UnityEngine.Debug.Log("register child in ui manager: " + reference.gameObject.name); 
 			if (reference.TryGetComponent<Screen>(out var _)) {
 				screenChildMap.RegisterChildReference(reference);
 			}

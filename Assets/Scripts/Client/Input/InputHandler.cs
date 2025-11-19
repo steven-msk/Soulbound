@@ -11,10 +11,12 @@ using static PlayerInputActions;
 
 namespace SoulboundBackend.Client.Input {
 	public class InputHandler : ITickable, ILateTickable {
-		private List<InputActionRequest> requests = new();
-		private Dictionary<string, Func<bool>> blockedContexts = new();
-		private List<InputAction> pausableInputs = new();
+		private readonly List<InputActionRequest> requests = new();
+		private readonly Dictionary<string, Func<bool>> blockedContexts = new();
+		private readonly Dictionary<InputAction, List<Action<InputAction.CallbackContext>>> registeredDelegates = new();
+		private readonly List<InputAction> pausableInputs = new();
 		private readonly InputActionAsset asset;
+		private InputAction currentlyRegistering;
 
 		public InputHandler(InputActionAsset asset) {
 			this.asset = asset;
@@ -34,11 +36,17 @@ namespace SoulboundBackend.Client.Input {
 			return actionMap.FindAction(actionId);
 		}
 
-		public void RegisterInputEvent(InputAction inputAction, bool pausable, Action<InputAction> callbackBinding) {
+		public void RegisterInputEvent(InputAction inputAction, bool pausable, Action<InputBindingBuilder> callbackBinder) {
 			if (pausable) {
 				pausableInputs.Add(inputAction);
 			}
-			callbackBinding.Invoke(inputAction);
+			InputBindingBuilder bindingBuilder = new(inputAction);
+			callbackBinder.Invoke(bindingBuilder);
+
+			var mapping = bindingBuilder.GetMapping();
+			if (registeredDelegates.TryAdd(mapping.Key, mapping.Value)) {
+				registeredDelegates[mapping.Key].AddRange(mapping.Value);
+			}
 		}
 
 		public void BlockContext(string context, Func<bool> unblockPredicate) {
@@ -75,5 +83,19 @@ namespace SoulboundBackend.Client.Input {
 				: inputAction => inputAction.Enable();
 			pausableInputs.ForEach(action);
 		}
+
+		public void FlushCallbacks() {
+			foreach (var kvp in registeredDelegates) {
+				var inputAction = kvp.Key;
+				var callbacks = kvp.Value;
+
+				foreach (var callback in callbacks) {
+					inputAction.performed -= callback;
+					inputAction.canceled -= callback;
+					inputAction.started -= callback;
+				}
+			}
+		}
+
 	}
 }

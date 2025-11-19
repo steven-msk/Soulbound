@@ -10,6 +10,7 @@ using System.Linq;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEditor;
+using UnityEditor.Timeline.Actions;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -78,23 +79,23 @@ namespace SoulboundBackend.Client.UI.Storage {
 			MainPlayerSlots = mainPlayerSlots.ToArray();
 			hotbar.SetActiveSlot(0);
 
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/Change Hotbar Slot"), pausable: true, (action) => {
-				action.performed += actionContext => {
-					int keySlot = int.Parse(actionContext.control.name);
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/Change Hotbar Slot"), pausable: true, binding => {
+				binding.Performed(context => {
+					int keySlot = int.Parse(context.control.name);
 					Hotbar.SetActiveSlot(keySlot - 1);
-				};
+				});
 			});
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/Scroll Hotbar Slot"), pausable: true, action => {
-				action.performed += actionContext => {
-					float scrollDelta = actionContext.ReadValue<float>();
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/Scroll Hotbar Slot"), pausable: true, binding => {
+				binding.Performed(context => {
+					float scrollDelta = context.ReadValue<float>();
 					Hotbar.OnHotbarScroll(scrollDelta);
-				};
+				});
 			});
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/Drop Item"), pausable: true, (action) => {
-				action.performed += _ => DropHoveredOrActiveItem();
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/Drop Item"), pausable: true, binding => {
+				binding.Performed(_ => DropHoveredOrActiveItem());
 			});
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/Toggle Inventory"), pausable: true, (action) => {
-				action.performed += _ => ToggleInventory();
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/Toggle Inventory"), pausable: true, binding => {
+				binding.Performed(_ => ToggleInventory());
 			});
 		}
 

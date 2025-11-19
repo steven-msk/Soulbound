@@ -44,7 +44,6 @@ public sealed class Main : MonoBehaviour {
 
 	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
 	public static void ResetStaticDomain() {
-		StaticResetManager.ResetAll();
 		ResourceManager.PreloadGroups();
 	}
 
