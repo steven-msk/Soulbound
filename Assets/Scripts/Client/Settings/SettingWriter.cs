@@ -39,7 +39,7 @@ namespace SoulboundBackend.Client.Settings {
 		}
 
 		public string FormatValue<T>(SettingEntry<T> entry) {
-			return $"{entry.id}={entry.value}";
+			return $"{entry.id}={entry.valueSet.Encode(entry.value)}";
 		}
 	}
 }

@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine.InputSystem;
 
 namespace SoulboundBackend.Client.Settings {
 	public sealed class Settings {
@@ -15,6 +16,8 @@ namespace SoulboundBackend.Client.Settings {
 
 		public static readonly SettingEntry<float> floatSetting = new("Float Setting", "float_setting", 10f, new FloatRange(0f, 50f), Tooltip.NoTooltip);
 		public static readonly SettingEntry<float> floatSetting_2 = new("Float Setting 2", "float_setting_2", 100f, new FloatRange(50f, 1000f), Tooltip.NoTooltip);
+
+		public static readonly KeyMapping keyMapping = new("keyMapping", "test", Key.G, Tooltip.NoTooltip);
 
 		public Settings() => LoadEntries();
 
@@ -44,6 +47,7 @@ namespace SoulboundBackend.Client.Settings {
 			masterVolume.SetValue(processor.Process(masterVolume));
 			floatSetting.SetValue(processor.Process(floatSetting));
 			floatSetting_2.SetValue(processor.Process(floatSetting_2));
+			keyMapping.SetValue(processor.Process(keyMapping));
 		}
 
 		public string GetSavePath() {

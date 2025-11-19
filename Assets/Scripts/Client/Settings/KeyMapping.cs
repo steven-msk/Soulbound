@@ -1,0 +1,58 @@
+﻿using SoulboundBackend.Client.UI.Tooltip;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
+
+namespace SoulboundBackend.Client.Settings {
+	public class KeyMapping : SettingEntry<KeyControl> {
+		public KeyMapping(string displayName, string id, Key defaultKey, Func<Tooltip> tooltipSupplier) 
+			: base(displayName, $"keyMapping.{id}", Keyboard.current[defaultKey], new KeyboardValueSet(), tooltipSupplier) {
+		}
+
+		public KeyMapping(string displayName, string id, Key defaultKey, Func<Tooltip> tooltipSupplier, Action<KeyControl, KeyControl> valueChanged) 
+			: base(displayName, $"keyMapping.{id}", Keyboard.current[defaultKey], new KeyboardValueSet(), tooltipSupplier, valueChanged) {
+		}
+
+		public void ApplyBinding(InputAction inputAction) {
+			inputAction.ApplyBindingOverride(0, value.path);
+		}
+
+		public void SetKey(Key key, bool broadcastChange = true) {
+			this.SetValue(Keyboard.current[key], broadcastChange);
+		}
+	}
+
+	public record KeyboardValueSet : ValueSet<KeyControl> {
+		public override KeyControl Decode(string value) {
+			if (string.IsNullOrEmpty(value) || Keyboard.current == null) {
+				return null;
+			}
+
+			if (Enum.TryParse<Key>(value, out var key)) {
+				return Keyboard.current[key];
+			}
+			return null;
+		}
+
+		public override string Encode(KeyControl value) {
+			return value?.keyCode.ToString() ?? string.Empty;
+		}
+
+		public override SettingVisual<KeyControl> GetVisual(Transform parent) {
+			throw new NotImplementedException();
+		}
+
+		public override bool IsValid(KeyControl value) {
+			if (value == null || Keyboard.current == null) {
+				return false;
+			}
+
+			return Keyboard.current.allKeys.Contains(value);
+		}
+	}
+}
