@@ -381,24 +381,24 @@ Status: ⚙️ Prototype (JSON, human-readable, but slow and memory inefficient)
 
 ## Recommended Production Order (Top to bottom)
 Based on the dependency graph, this could be an optimal order:
-[EDIT]: For convenience during late prototyping, categories have been marked accordingly to ease development: `*` means started but not finished, `<-` signifies focus point, `>|` means completed, `>>>` means progressively developed (see [notes](#notes))
-1. State initialization >>>
-2. Dependency injection >>>
-3. Internal timing system >>>
-4. Input system *
-5. Serialization (foundation only)
-6. Stat system
-7. Entity system
-8. Block system
-9. Chunk generation
-10. World rendering
-11. Physics system (global additions)
-12. UI Core layer & navigation system
-13. Tooltips
-14. Settings
-15. Debug visuals
-16. Lighting
-17. Audio
+[EDIT]: For convenience during late prototyping, categories have been marked accordingly to ease development: `*` means started but not finished, `<-` marks a focus point, `>|` means ready for production, `>>>` means progressively developed (see [notes](#notes))
+1. [State Initialization](#1-state-initialization) >>> 
+2. [Dependency injection](#2-dependency-injection-di) >>>
+3. [Internal timing system](#3-internal-timing--event-communication) >>>
+4. [Input system](#4-input-system) <-
+5. [Serialization](#17-serialization) (foundation only)
+6. [Stat system](#5-stat-system)
+7. [Entity system](#6-entity-system)
+8. [Block system](#8-block-system)
+9. [Chunk generation](#9-chunk-generation)
+10. [World rendering](#10-world-rendering)
+11. [Physics system](#7-physics-system) (universal overhaul)
+12. [UI Core layer & navigation system](#13-ui-systems-overall)
+13. [Tooltips](#14-tooltips)
+14. [Settings](#16-settings-ui)
+15. [Debug visuals](#15-debug-visuals)
+16. [Lighting](#11-lighting-system)
+17. [Audio](#12-audio-system)
 
 #### Notes
 

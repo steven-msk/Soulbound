@@ -13,7 +13,7 @@ namespace SoulboundBackend.Client.Input {
 	public class InputHandler : ITickable, ILateTickable {
 		private readonly List<InputActionRequest> requests = new();
 		private readonly Dictionary<string, Func<bool>> blockedContexts = new();
-		private readonly Dictionary<InputAction, List<Action<InputAction.CallbackContext>>> registeredDelegates = new();
+		private readonly Dictionary<InputAction, List<Action<InputAction.CallbackContext>>> registeredCallbacks = new();
 		private readonly List<InputAction> pausableInputs = new();
 		private readonly InputActionAsset asset;
 		private InputAction currentlyRegistering;
@@ -44,8 +44,8 @@ namespace SoulboundBackend.Client.Input {
 			callbackBinder.Invoke(bindingBuilder);
 
 			var mapping = bindingBuilder.GetMapping();
-			if (registeredDelegates.TryAdd(mapping.Key, mapping.Value)) {
-				registeredDelegates[mapping.Key].AddRange(mapping.Value);
+			if (!registeredCallbacks.TryAdd(mapping.Key, mapping.Value)) {
+				registeredCallbacks[mapping.Key].AddRange(mapping.Value);
 			}
 		}
 
@@ -85,7 +85,7 @@ namespace SoulboundBackend.Client.Input {
 		}
 
 		public void FlushCallbacks() {
-			foreach (var kvp in registeredDelegates) {
+			foreach (var kvp in registeredCallbacks) {
 				var inputAction = kvp.Key;
 				var callbacks = kvp.Value;
 

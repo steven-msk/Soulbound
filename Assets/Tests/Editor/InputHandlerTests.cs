@@ -9,6 +9,9 @@ using SoulboundBackend.Client.Input;
 using UnityEngine;
 using Zenject;
 using UnityEditor;
+using UnityEngine.InputSystem.LowLevel;
+using System.Security.Permissions;
+using UnityEngine.InputSystem.Controls;
 
 public class InputHandlerTests {
 	private void CreateHandler(out InputHandler handler, out InputActionAsset asset) {
