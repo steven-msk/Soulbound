@@ -210,7 +210,7 @@ GameObject:
   - component: {fileID: 1559442995}
   - component: {fileID: 1559442996}
   m_Layer: 5
-  m_Name: MainMenu
+  m_Name: TitleScreen
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -610,7 +610,7 @@ GameObject:
   - component: {fileID: 2144701901}
   - component: {fileID: 2144701900}
   m_Layer: 0
-  m_Name: EntryPoint
+  m_Name: Main
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

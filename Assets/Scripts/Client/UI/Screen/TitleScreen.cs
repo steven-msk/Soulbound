@@ -10,15 +10,15 @@ using UnityEngine.UI;
 using Screen = SoulboundBackend.Client.UI.Screens.Screen;
 
 namespace SoulboundBackend.Client.UI {
-	public class MainMenuScreen : IScreenBuilder {
+	public class TitleScreen : IScreenBuilder {
 		private readonly UIManager uiManager;
 
-		public MainMenuScreen() {
+		public TitleScreen() {
 			this.uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
 		}
 
 		public Screen GetScreen() {
-			Screen screen = uiManager.screenChildMap.GetChild("MainMenu").GetComponent<Screen>();
+			Screen screen = uiManager.screenChildMap.GetChild("TitleScreen").GetComponent<Screen>();
 
 			var enterButton = screen.GetChildComponent<Button>("WorldEnter");
 			enterButton.onClick.RemoveAllListeners();

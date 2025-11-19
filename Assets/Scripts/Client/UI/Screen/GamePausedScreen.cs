@@ -53,7 +53,7 @@ namespace SoulboundBackend.Client.UI.Screens {
 			Time.timeScale = 1f;
 
 			var uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
-			uiManager.SetScreen(new MainMenuScreen());
+			uiManager.SetScreen(new TitleScreen());
 		}
 	}
 }

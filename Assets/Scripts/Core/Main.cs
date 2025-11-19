@@ -21,10 +21,10 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public sealed class GameEntryPoint : MonoBehaviour {
+public sealed class Main : MonoBehaviour {
 	private LevelManager levelManager;
 	[SerializeField] private GameConfig gameConfig;
-	private static GameEntryPoint instance;
+	private static Main instance;
 	private static Soulbound soulbound;
 
     private void Awake() => instance = this;
@@ -39,7 +39,7 @@ public sealed class GameEntryPoint : MonoBehaviour {
 #endif
 		soulbound = new Soulbound(instance.gameConfig);
 		var uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
-		uiManager.SetScreen(new MainMenuScreen());
+		uiManager.SetScreen(new TitleScreen());
 	}
 
 	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
