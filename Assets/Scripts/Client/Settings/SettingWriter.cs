@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.Settings {
 	public sealed class SettingWriter : ISettingProcessor {
-		private readonly StreamWriter writer;
+		private readonly TextWriter writer;
 
-		public SettingWriter(StreamWriter writer) {
+		public SettingWriter(TextWriter writer) {
 			this.writer = writer;
 		}
 
@@ -41,5 +41,7 @@ namespace SoulboundBackend.Client.Settings {
 		public string FormatValue<T>(SettingEntry<T> entry) {
 			return $"{entry.id}={entry.valueSet.Encode(entry.value)}";
 		}
+
+		public void Flush() => writer.Flush();
 	}
 }

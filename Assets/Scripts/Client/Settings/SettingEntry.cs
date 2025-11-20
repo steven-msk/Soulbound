@@ -61,6 +61,9 @@ namespace SoulboundBackend.Client.Settings {
 
 		public void SetValue(T value, bool broadcastChange = true) {
 			var oldValue = this.value;
+			if (value?.Equals(this.value) ?? true) {
+				return;
+			}
 			if (valueSet.IsValid(value)) {
 				this.value = value;
 				if (broadcastChange) {
@@ -89,6 +92,20 @@ namespace SoulboundBackend.Client.Settings {
 		}
 
 		public override SettingVisual<T> GetVisual(Transform parent) {
+			throw new NotImplementedException();
+		}
+	}
+
+	public record StringValueSet(string[] acceptedValues) : ValueSet<string> {
+		public override string Decode(string value) => value;
+
+		public override string Encode(string? value) => value ?? string.Empty;
+
+		public override bool IsValid(string value) {
+			return acceptedValues.Contains(value);
+		}
+
+		public override SettingVisual<string> GetVisual(Transform parent) {
 			throw new NotImplementedException();
 		}
 	}

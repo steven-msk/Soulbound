@@ -12,7 +12,7 @@ using UnityEngine.InputSystem.Controls;
 
 namespace SoulboundBackend.Client.Settings {
 	public class KeyMapping : SettingEntry<KeyControl> {
-		public event Action<InputAction, InputAction>? onAppliedActionChanged;
+		public event Action<InputAction?, InputAction>? onAppliedActionChanged;
 		private InputAction appliedAction = null!;
 
 		public KeyMapping(string displayName, string id, Key defaultKey, Func<Tooltip> tooltipSupplier) 
@@ -36,7 +36,9 @@ namespace SoulboundBackend.Client.Settings {
 				var oldAction = appliedAction;
 
 				appliedAction = action;
-				RevokeBinding(oldAction);
+				if (oldAction != null) {
+					RevokeBinding(oldAction);
+				}
 				ApplyBinding(appliedAction);
 
 				onAppliedActionChanged?.Invoke(oldAction, action);
