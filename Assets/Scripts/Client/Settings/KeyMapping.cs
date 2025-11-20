@@ -1,4 +1,5 @@
 ﻿using SoulboundBackend.Client.UI.Tooltip;
+using SoulboundBackend.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,14 +32,14 @@ namespace SoulboundBackend.Client.Settings {
 			inputAction.RemoveBindingOverride(0);
 		}
 
+		// this is actually wrong
+		// a key mapping changes the binding of an action, not depending on the action itself
 		public void SetAction(InputAction? action) {
 			if (action != null && appliedAction != action) {
 				var oldAction = appliedAction;
 
 				appliedAction = action;
-				if (oldAction != null) {
-					RevokeBinding(oldAction);
-				}
+				oldAction.IfNotNull(RevokeBinding);
 				ApplyBinding(appliedAction);
 
 				onAppliedActionChanged?.Invoke(oldAction, action);

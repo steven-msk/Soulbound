@@ -395,7 +395,7 @@ Based on the dependency graph, this could be an optimal order:
 11. [Physics system](#7-physics-system) (universal overhaul)
 12. [UI Core layer & navigation system](#13-ui-systems-overall)
 13. [Tooltips](#14-tooltips)
-14. [Settings](#16-settings-ui)
+14. [Settings](#16-settings-ui) *
 15. [Debug visuals](#15-debug-visuals)
 16. [Lighting](#11-lighting-system)
 17. [Audio](#12-audio-system)
