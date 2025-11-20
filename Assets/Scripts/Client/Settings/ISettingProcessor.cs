@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+#nullable enable
+
 namespace SoulboundBackend.Client.Settings {
 	public interface ISettingProcessor {
 		int Process(SettingEntry<int> entry);

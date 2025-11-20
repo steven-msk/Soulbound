@@ -8,8 +8,13 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 
+#nullable enable
+
 namespace SoulboundBackend.Client.Settings {
 	public class KeyMapping : SettingEntry<KeyControl> {
+		public event Action<InputAction, InputAction>? onAppliedActionChanged;
+		private InputAction appliedAction = null!;
+
 		public KeyMapping(string displayName, string id, Key defaultKey, Func<Tooltip> tooltipSupplier) 
 			: base(displayName, $"keyMapping.{id}", Keyboard.current[defaultKey], new KeyboardValueSet(), tooltipSupplier) {
 		}
@@ -18,8 +23,24 @@ namespace SoulboundBackend.Client.Settings {
 			: base(displayName, $"keyMapping.{id}", Keyboard.current[defaultKey], new KeyboardValueSet(), tooltipSupplier, valueChanged) {
 		}
 
-		public void ApplyBinding(InputAction inputAction) {
+		protected virtual void ApplyBinding(InputAction inputAction) {
 			inputAction.ApplyBindingOverride(0, value.path);
+		}
+
+		protected virtual void RevokeBinding(InputAction inputAction) {
+			inputAction.RemoveBindingOverride(0);
+		}
+
+		public void SetAction(InputAction? action) {
+			if (action != null && appliedAction != action) {
+				var oldAction = appliedAction;
+
+				appliedAction = action;
+				RevokeBinding(oldAction);
+				ApplyBinding(appliedAction);
+
+				onAppliedActionChanged?.Invoke(oldAction, action);
+			}
 		}
 
 		public void SetKey(Key key, bool broadcastChange = true) {
@@ -30,16 +51,16 @@ namespace SoulboundBackend.Client.Settings {
 	public record KeyboardValueSet : ValueSet<KeyControl> {
 		public override KeyControl Decode(string value) {
 			if (string.IsNullOrEmpty(value) || Keyboard.current == null) {
-				return null;
+				return null!;
 			}
 
 			if (Enum.TryParse<Key>(value, out var key)) {
 				return Keyboard.current[key];
 			}
-			return null;
+			return null!;
 		}
 
-		public override string Encode(KeyControl value) {
+		public override string Encode(KeyControl? value) {
 			return value?.keyCode.ToString() ?? string.Empty;
 		}
 
