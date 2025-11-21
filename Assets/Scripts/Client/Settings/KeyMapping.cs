@@ -32,18 +32,17 @@ namespace SoulboundBackend.Client.Settings {
 			inputAction.RemoveBindingOverride(0);
 		}
 
-		// this is actually wrong
-		// a key mapping changes the binding of an action, not depending on the action itself
 		public void SetAction(InputAction? action) {
-			if (action != null && appliedAction != action) {
+			if (action == null) {
+				return;
+			}
+			if (appliedAction != action) {
 				var oldAction = appliedAction;
-
-				appliedAction = action;
 				oldAction.IfNotNull(RevokeBinding);
-				ApplyBinding(appliedAction);
-
+				appliedAction = action;
 				onAppliedActionChanged?.Invoke(oldAction, action);
 			}
+			ApplyBinding(appliedAction);
 		}
 
 		public void SetKey(Key key, bool broadcastChange = true) {
