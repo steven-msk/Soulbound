@@ -10,10 +10,10 @@ using UnityEngine.InputSystem;
 
 namespace SoulboundBackend.Client.Settings {
 	public sealed class KeybindMappings {
-		public static readonly KeyMapping keyMapping = new("Key Mapping Test", "keyMappingTest", Key.Home, Tooltip.NoTooltip);
+		public static readonly KeyMapping jump = new("Jump", "jump", Key.Space, Tooltip.NoTooltip);
 
 		public void ProcessMappings(IKeyMappingProcessor processor) {
-			keyMapping.SetValue(processor.Process(keyMapping));
+			jump.SetValue(processor.Process(jump));
 		}
 
 		public void ProcessBindings(Dictionary<KeyMapping, InputAction> bindings) {
@@ -24,7 +24,7 @@ namespace SoulboundBackend.Client.Settings {
 				return null;
 			}
 
-			keyMapping.SetAction(GetAction(keyMapping));
+			jump.SetAction(GetAction(jump));
 		}
 	}
 }

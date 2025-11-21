@@ -1,5 +1,6 @@
 using SoulboundBackend.Client;
 using SoulboundBackend.Client.Input;
+using SoulboundBackend.Client.Settings;
 using SoulboundBackend.Client.UI;
 using SoulboundBackend.Client.UI.Screens;
 using SoulboundBackend.Client.World;
@@ -13,6 +14,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
 using Zenject;
 using Logger = SoulboundBackend.Common.Logging.Logger;
@@ -59,6 +61,10 @@ namespace SoulboundBackend.Core {
 
 			this.inputMappings = new PlayerInputActions();
 			this.inputHandler = new InputHandler(inputMappings.asset);
+
+			Settings.keybindMappings.ProcessBindings(new Dictionary<KeyMapping, InputAction>() {
+				[KeybindMappings.jump] = inputHandler.GetAction("Player/Jump")
+			});
 
 			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/Esc"), pausable: false, binding => {
 				binding.Performed(_ => OnEscPressed());

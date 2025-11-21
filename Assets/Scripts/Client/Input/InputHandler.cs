@@ -27,7 +27,6 @@ namespace SoulboundBackend.Client.Input {
 			if (parts.Length < 2) {
 				throw new ArgumentException($"Invalid compressedId action format: {compressedId}");
 			}
-
 			return GetAction(parts[0], parts[1]);
 		}
 
