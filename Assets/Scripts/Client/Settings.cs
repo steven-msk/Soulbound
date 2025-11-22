@@ -38,9 +38,8 @@ namespace SoulboundBackend.Client.SettingSystem {
 
 		public void Save() {
 			string savePath = GetSavePath();
-			FileStream fileStream = File.Open(savePath, FileMode.OpenOrCreate, FileAccess.Write);
 
-			using (StreamWriter writer = new StreamWriter(fileStream)) {
+			using (StreamWriter writer = new StreamWriter(savePath, append: false)) {
 				var settingWriter = new SettingWriter(writer);
 
 				ProcessSettings(settingWriter);
