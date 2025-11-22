@@ -21,13 +21,13 @@ namespace SoulboundBackend.Client.SettingSystem {
 		private bool isRebinding;
 
 		public override void Build() {
-			_text.text = this.settingEntry.value.keyCode.ToString();
+			_text.text = GetBindingText(settingEntry.value);
 		}
 
 		private void Update() => PollKeyboard();
 
 		public void UpdateRebinding(KeyControl? keyControl) {
-			_text.text = keyControl?.keyCode.ToString() ?? "null";
+			_text.text = GetBindingText(keyControl);
 		}
 
 		public void BeginRebinding() {
@@ -58,10 +58,14 @@ namespace SoulboundBackend.Client.SettingSystem {
 		}
 
 		private KeyControl? HandleKeyPress(KeyControl keyControl) {
-			if (keyControl.keyCode == Key.Escape) {
+			if (keyControl.keyCode == Key.X) {
 				return null;
 			}
 			return keyControl;
 		}
+
+		public string GetBindingText(KeyControl? keyControl) {
+			return keyControl?.keyCode.ToString() ?? "Not Bound";
+		} 
 	}
 }
