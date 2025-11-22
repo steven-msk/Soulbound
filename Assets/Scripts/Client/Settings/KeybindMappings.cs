@@ -5,12 +5,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 
 #nullable enable
 
 namespace SoulboundBackend.Client.SettingSystem {
 	public sealed class KeybindMappings {
 		public static readonly KeyMapping jump = new("Jump", "jump", Key.Space, Tooltip.NoTooltip);
+
+		public KeybindMappings() {
+			InputSystem.EnableDevice(Keyboard.current);
+		}
 
 		public void ProcessMappings(IKeyMappingProcessor processor) {
 			jump.SetValue(processor.Process(jump));

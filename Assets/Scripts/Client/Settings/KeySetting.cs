@@ -7,16 +7,61 @@ using System.Text;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
+
+#nullable enable
 
 namespace SoulboundBackend.Client.SettingSystem {
 	[PROTOTYPICAL]
 	public class KeySetting : SettingVisual<KeyControl> {
 		[SerializeField] private TextMeshProUGUI _text;
 		public TextMeshProUGUI text { get => _text; set => _text = value; }
+		public KeyMapping mapping => (KeyMapping)this.settingEntry;
+		private bool isRebinding;
 
 		public override void Build() {
 			_text.text = this.settingEntry.value.keyCode.ToString();
+		}
+
+		private void Update() => PollKeyboard();
+
+		public void UpdateRebinding(KeyControl? keyControl) {
+			_text.text = keyControl?.keyCode.ToString() ?? "null";
+		}
+
+		public void BeginRebinding() {
+			this.isRebinding = true;
+			UnityEngine.Debug.Log("beginning rebinding");
+		}
+
+		private void PollKeyboard() {
+			if (!isRebinding) {
+				return;
+			}
+
+			foreach (var keyControl in Keyboard.current.allKeys) {
+				if (keyControl.wasPressedThisFrame) {
+					var appliedControl = HandleKeyPress(keyControl);
+
+					mapping.SetValue(appliedControl);
+					UpdateRebinding(appliedControl);
+
+					this.EndRebinding();
+					return;
+				}
+			}
+		}
+
+		private void EndRebinding() {
+			this.isRebinding = false;
+		}
+
+		private KeyControl? HandleKeyPress(KeyControl keyControl) {
+			if (keyControl.keyCode == Key.Escape) {
+				return null;
+			}
+			return keyControl;
 		}
 	}
 }

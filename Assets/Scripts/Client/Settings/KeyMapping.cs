@@ -6,9 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
+using UnityEngine.UI;
 
 #nullable enable
 
@@ -26,7 +28,8 @@ namespace SoulboundBackend.Client.SettingSystem {
 		}
 
 		protected virtual void ApplyBinding(InputAction inputAction) {
-			inputAction.ApplyBindingOverride(0, value.path);
+			inputAction.ApplyBindingOverride(0, value?.path ?? "");
+			logger.LogInfo(null, "applying binding: " + value ?? "null");
 		}
 
 		protected virtual void RevokeBinding(InputAction inputAction) {
@@ -49,11 +52,24 @@ namespace SoulboundBackend.Client.SettingSystem {
 		public void SetKey(Key key, bool broadcastChange = true) {
 			this.SetValue(Keyboard.current[key], broadcastChange);
 		}
+
+		public override void SetValue(KeyControl? value, bool broadcastChange = true) {
+			var oldValue = this.value;
+			if (valueSet.IsValid(value!)) {
+				this.value = value!;
+				if (broadcastChange) {
+					base.InvokeValueChanged(oldValue, this.value!);
+				}
+				SetAction(this.appliedAction);
+			} else {
+				logger.LogError(null, "Attempted to set invalid key to mapping '{}': '{}'", id, value!.keyCode);
+			}
+		}
 	}
 
 	public record KeyboardValueSet : ValueSet<KeyControl> {
 		public override KeyControl Decode(string value) {
-			if (string.IsNullOrEmpty(value) || Keyboard.current == null) {
+			if (value == "null" || Keyboard.current == null) {
 				return null!;
 			}
 
@@ -64,7 +80,7 @@ namespace SoulboundBackend.Client.SettingSystem {
 		}
 
 		public override string Encode(KeyControl? value) {
-			return value?.keyCode.ToString() ?? string.Empty;
+			return value?.keyCode.ToString() ?? "null";
 		}
 
 		public override SettingVisual<KeyControl> GetVisual(Transform parent) {
@@ -77,15 +93,19 @@ namespace SoulboundBackend.Client.SettingSystem {
 
 			var keySetting = obj.AddComponent<KeySetting>();
 			keySetting.text = text;
+
+			var rebindingButton = obj.AddComponent<Button>();
+			rebindingButton.onClick.AddListener(keySetting.BeginRebinding);
+
 			return keySetting;
 		}
 
-		public override bool IsValid(KeyControl value) {
-			if (value == null || Keyboard.current == null) {
+		public override bool IsValid(KeyControl? value) {
+			if (Keyboard.current == null) {
 				return false;
 			}
 
-			return Keyboard.current.allKeys.Contains(value);
+			return Keyboard.current.allKeys.Contains(value) || value == null;
 		}
 	}
 }

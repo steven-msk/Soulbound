@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem.Controls;
 using UnityEngine.UI;
 using Logger = SoulboundBackend.Common.Logging.Logger;
 
@@ -41,7 +42,7 @@ namespace SoulboundBackend.Client.SettingSystem {
 		public readonly T defaultValue;
 		public readonly ValueSet<T> valueSet;
 		public event Action<T, T>? valueChanged;
-		public T value { get; private set; }
+		public virtual T value { get; protected set; }
 
 		public override object boxedDefaultValue => defaultValue!;
 		public override object boxedValue => value!;
@@ -59,7 +60,7 @@ namespace SoulboundBackend.Client.SettingSystem {
 			this.valueChanged += valueChanged;
 		}
 
-		public void SetValue(T value, bool broadcastChange = true) {
+		public virtual void SetValue(T value, bool broadcastChange = true) {
 			var oldValue = this.value;
 			if (value?.Equals(this.value) ?? true) {
 				return;
@@ -72,6 +73,10 @@ namespace SoulboundBackend.Client.SettingSystem {
 			} else {
 				logger.LogWarning(null, "Attempted to set invalid value '{}' to setting '{}'", value!, id);
 			}
+		}
+
+		protected void InvokeValueChanged(T oldValue, T newValue) {
+			valueChanged?.Invoke(oldValue, newValue);
 		}
 	}
 
