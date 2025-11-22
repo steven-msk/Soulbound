@@ -58,7 +58,9 @@ namespace SoulboundBackend.Client.SettingSystem {
 		}
 
 		private KeyControl? HandleKeyPress(KeyControl keyControl) {
-			if (keyControl.keyCode == Key.X) {
+			// TODO: swap to ESC unbinding the key
+			// DELETE is just a placeholder because ESC is used to navigate screens
+			if (keyControl.keyCode == Key.Delete) {
 				return null;
 			}
 			return keyControl;

@@ -88,8 +88,9 @@ namespace SoulboundBackend.Client.SettingSystem {
 			obj.transform.SetParent(parent, false);
 
 			var text = obj.AddComponent<TextMeshProUGUI>();
-			text.autoSizeTextContainer = true;
 			text.fontSize = 10;
+			text.autoSizeTextContainer = true;
+			text.textWrappingMode = TextWrappingModes.NoWrap;
 
 			var keySetting = obj.AddComponent<KeySetting>();
 			keySetting.text = text;
