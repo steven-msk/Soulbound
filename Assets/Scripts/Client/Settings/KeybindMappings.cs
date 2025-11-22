@@ -8,7 +8,7 @@ using UnityEngine.InputSystem;
 
 #nullable enable
 
-namespace SoulboundBackend.Client.Settings {
+namespace SoulboundBackend.Client.SettingSystem {
 	public sealed class KeybindMappings {
 		public static readonly KeyMapping jump = new("Jump", "jump", Key.Space, Tooltip.NoTooltip);
 

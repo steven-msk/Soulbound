@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-namespace SoulboundBackend.Client.Settings {
+namespace SoulboundBackend.Client.SettingSystem {
 	public sealed class SettingReader : ISettingProcessor {
 		private readonly Dictionary<string, string> mappings = new();
 

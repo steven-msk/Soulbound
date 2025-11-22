@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SoulboundBackend.Client.Settings {
+namespace SoulboundBackend.Client.SettingSystem {
 	public sealed class SettingWriter : ISettingProcessor {
 		private readonly TextWriter writer;
 

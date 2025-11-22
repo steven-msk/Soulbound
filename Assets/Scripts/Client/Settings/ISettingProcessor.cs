@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-namespace SoulboundBackend.Client.Settings {
+namespace SoulboundBackend.Client.SettingSystem {
 	public interface ISettingProcessor {
 		int Process(SettingEntry<int> entry);
 		double Process(SettingEntry<double> entry);

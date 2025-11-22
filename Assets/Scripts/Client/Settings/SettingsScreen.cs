@@ -1,5 +1,4 @@
-﻿using SoulboundBackend.Client.Settings;
-using GlobalSettings = SoulboundBackend.Client.Settings.Settings;
+﻿using SoulboundBackend.Client.SettingSystem;
 using SoulboundBackend.Client.UI;
 using System;
 using System.Collections.Generic;
@@ -17,11 +16,13 @@ namespace SoulboundBackend.Client.UI.Screens {
 		public override void OnShow() {
 			base.OnShow();
 			entryGroup = GetComponentInChildren<SettingEntryGroup>();
-			entryGroup.AddEntry(GlobalSettings.floatSetting);
-			entryGroup.AddEntry((AbstractSettingEntry)GlobalSettings.floatSetting_2);
+			entryGroup.AddEntry(Settings.floatSetting);
+			entryGroup.AddEntry(Settings.floatSetting_2);
+			entryGroup.AddEntry(KeybindMappings.jump);
 		}
 
 		public override void Dispose() {
+			// intended overriding, do not delete
 		}
 
 		//public override void OnHide() {

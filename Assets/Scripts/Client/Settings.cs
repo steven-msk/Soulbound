@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine.InputSystem;
 
-namespace SoulboundBackend.Client.Settings {
+namespace SoulboundBackend.Client.SettingSystem {
 	public sealed class Settings {
 		private static readonly Logger logger = Logger.CreateInstance();
 		public const string settingsFile = "settings.txt";

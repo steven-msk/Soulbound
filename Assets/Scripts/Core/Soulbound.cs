@@ -1,5 +1,5 @@
 ﻿using SoulboundBackend.Client;
-using SoulboundBackend.Client.Settings;
+using SoulboundBackend.Client.SettingSystem;
 using SoulboundBackend.Client.UI;
 using SoulboundBackend.Client.World;
 using SoulboundBackend.Client.World.Structure.Templates;

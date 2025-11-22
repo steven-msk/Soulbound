@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UnityEditor.Rendering;
 using UnityEngine.InputSystem.Controls;
 
-namespace SoulboundBackend.Client.Settings {
+namespace SoulboundBackend.Client.SettingSystem {
 	public sealed class KeyMappingWriter : IKeyMappingProcessor {
 		private readonly SettingWriter writer;
 

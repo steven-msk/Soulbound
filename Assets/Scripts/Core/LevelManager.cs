@@ -1,6 +1,6 @@
 using SoulboundBackend.Client;
 using SoulboundBackend.Client.Input;
-using SoulboundBackend.Client.Settings;
+using SoulboundBackend.Client.SettingSystem;
 using SoulboundBackend.Client.UI;
 using SoulboundBackend.Client.UI.Screens;
 using SoulboundBackend.Client.World;

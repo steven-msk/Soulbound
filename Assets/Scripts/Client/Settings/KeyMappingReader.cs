@@ -8,7 +8,7 @@ using UnityEngine.InputSystem.Controls;
 
 #nullable enable
 
-namespace SoulboundBackend.Client.Settings {
+namespace SoulboundBackend.Client.SettingSystem {
 	public sealed class KeyMappingReader : IKeyMappingProcessor {
 		private readonly SettingReader reader;
 

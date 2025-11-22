@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Client.Settings;
+﻿using SoulboundBackend.Client.SettingSystem;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,7 @@ using System.Reflection;
 using SoulboundBackend.Client.UI.Tooltip;
 using SoulboundBackend.Common;
 
-namespace SoulboundBackend.Client.Settings {
+namespace SoulboundBackend.Client.SettingSystem {
 	[PROTOTYPICAL]
 	public class SettingEntryGroup : MonoBehaviour {
 		private List<GameObject> toDestroy = new();

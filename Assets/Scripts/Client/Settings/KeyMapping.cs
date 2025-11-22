@@ -5,13 +5,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 
 #nullable enable
 
-namespace SoulboundBackend.Client.Settings {
+namespace SoulboundBackend.Client.SettingSystem {
 	public class KeyMapping : SettingEntry<KeyControl> {
 		public event Action<InputAction?, InputAction>? onAppliedActionChanged;
 		private InputAction appliedAction = null!;
@@ -67,7 +68,16 @@ namespace SoulboundBackend.Client.Settings {
 		}
 
 		public override SettingVisual<KeyControl> GetVisual(Transform parent) {
-			throw new NotImplementedException();
+			var obj = new GameObject("KeyField", typeof(RectTransform));
+			obj.transform.SetParent(parent, false);
+
+			var text = obj.AddComponent<TextMeshProUGUI>();
+			text.autoSizeTextContainer = true;
+			text.fontSize = 10;
+
+			var keySetting = obj.AddComponent<KeySetting>();
+			keySetting.text = text;
+			return keySetting;
 		}
 
 		public override bool IsValid(KeyControl value) {

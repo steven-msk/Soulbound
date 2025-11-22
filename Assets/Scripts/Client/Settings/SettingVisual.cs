@@ -7,10 +7,20 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace SoulboundBackend.Client.Settings {
+namespace SoulboundBackend.Client.SettingSystem {
 	[PROTOTYPICAL]
 	public abstract class SettingVisual<T> : MonoBehaviour {
-		public abstract void Show(SettingEntry<T> settingEntry);
-		public abstract void OnValueChanged(T newValue);
+		protected SettingEntry<T> settingEntry;
+
+		public abstract void Build();
+
+		public virtual void Show(SettingEntry<T> settingEntry) {
+			this.settingEntry = settingEntry;
+			this.Build();
+		}
+
+		public virtual void OnValueChanged(T newValue) {
+			settingEntry.SetValue(newValue);
+		}
 	}
 }

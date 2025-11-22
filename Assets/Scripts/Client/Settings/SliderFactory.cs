@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Client.Settings;
+﻿using SoulboundBackend.Client.SettingSystem;
 using SoulboundBackend.Common;
 using System;
 using System.Collections.Generic;

@@ -9,7 +9,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using static UnityEngine.UI.ContentSizeFitter;
 
-namespace SoulboundBackend.Client.Settings {
+namespace SoulboundBackend.Client.SettingSystem {
 	[PROTOTYPICAL]
 	public class SettingContainerBuilder {
 		public const float DEFAULT_HORIZONTAL_SPACING = 8f;

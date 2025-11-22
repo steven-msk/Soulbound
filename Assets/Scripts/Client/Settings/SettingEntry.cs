@@ -16,7 +16,7 @@ using Logger = SoulboundBackend.Common.Logging.Logger;
 
 #nullable enable
 
-namespace SoulboundBackend.Client.Settings {
+namespace SoulboundBackend.Client.SettingSystem {
 	public abstract class AbstractSettingEntry {
 		protected static readonly Logger logger = Logger.CreateInstance();
 		public readonly string displayName;
