@@ -17,7 +17,7 @@ using UnityEngine.UI;
 namespace SoulboundBackend.Client.SettingSystem {
 	public class KeyMapping : SettingEntry<KeyControl> {
 		public event Action<InputAction?, InputAction>? onAppliedActionChanged;
-		private InputAction appliedAction = null!;
+		private InputAction? appliedAction;
 
 		public KeyMapping(string displayName, string id, Key defaultKey, Func<Tooltip> tooltipSupplier) 
 			: base(displayName, $"keyMapping.{id}", Keyboard.current[defaultKey], new KeyboardValueSet(), tooltipSupplier) {
@@ -51,6 +51,10 @@ namespace SoulboundBackend.Client.SettingSystem {
 
 		public void SetKey(Key key, bool broadcastChange = true) {
 			this.SetValue(Keyboard.current[key], broadcastChange);
+		}
+
+		public Key GetKey() {
+			return value?.keyCode ?? Key.None;
 		}
 
 		public override void SetValue(KeyControl? value, bool broadcastChange = true) {

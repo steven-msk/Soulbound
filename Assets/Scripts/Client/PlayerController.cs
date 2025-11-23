@@ -115,17 +115,17 @@ namespace SoulboundBackend.Client {
 				animator => animator.SetTrigger("attack")
 			);
 
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/LeftClick"), pausable: true, binding => {
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("LeftClick"), pausable: true, binding => {
 				binding.Performed(_ => OnLeftClick());
 				binding.Performed(_ => leftHold = true);
 				binding.Canceled(_ => leftHold = false);
 			});
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/RightClick"), pausable: true, binding => {
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("RightClick"), pausable: true, binding => {
 				binding.Performed(_ => OnRightClick());
 				binding.Performed(_ => rightHold = true);
 				binding.Performed(_ => rightHold = true);
 			});
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/MousePosition"), pausable: false, binding => {
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("MousePosition"), pausable: false, binding => {
 				binding.Performed(context => mouseScreenPos = context.ReadValue<Vector2>());
 			});
 		}

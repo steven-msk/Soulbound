@@ -15,24 +15,19 @@ namespace SoulboundBackend.Client.Input {
 		private readonly Dictionary<string, Func<bool>> blockedContexts = new();
 		private readonly Dictionary<InputAction, List<Action<InputAction.CallbackContext>>> registeredCallbacks = new();
 		private readonly List<InputAction> pausableInputs = new();
-		private readonly InputActionAsset asset;
+		private readonly InputActionMap actionMap;
 		private InputAction currentlyRegistering;
 
-		public InputHandler(InputActionAsset asset) {
-			this.asset = asset;
+		public InputHandler(InputActionAsset asset, string actionMapId) {
+			this.actionMap = asset.FindActionMap(actionMapId);
 		}
 
-		public InputAction GetAction(string compressedId) {
-			string[] parts = compressedId.Split('/');
-			if (parts.Length < 2) {
-				throw new ArgumentException($"Invalid compressedId action format: {compressedId}");
-			}
-			return GetAction(parts[0], parts[1]);
+		public InputHandler(InputActionMap actionMap) {
+			this.actionMap = actionMap;
 		}
 
-		public InputAction GetAction(string mappingId, string actionId) {
-			var actionMap = asset.FindActionMap(mappingId);
-			return actionMap.FindAction(actionId);
+		public InputAction GetAction(string actionId) {
+			return actionMap.FindAction(actionId, true);
 		}
 
 		public void RegisterInputEvent(InputAction inputAction, bool pausable, Action<InputBindingBuilder> callbackBinder) {

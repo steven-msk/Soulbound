@@ -32,7 +32,7 @@ namespace SoulboundBackend.Client.SettingSystem {
 
 		public void BeginRebinding() {
 			this.isRebinding = true;
-			UnityEngine.Debug.Log("beginning rebinding");
+			Settings.keybindMappings.BeginRebindContext(this);
 		}
 
 		private void PollKeyboard() {
@@ -55,12 +55,11 @@ namespace SoulboundBackend.Client.SettingSystem {
 
 		private void EndRebinding() {
 			this.isRebinding = false;
+			Settings.keybindMappings.EndRebindContext(this);
 		}
 
 		private KeyControl? HandleKeyPress(KeyControl keyControl) {
-			// TODO: swap to ESC unbinding the key
-			// DELETE is just a placeholder because ESC is used to navigate screens
-			if (keyControl.keyCode == Key.Delete) {
+			if (keyControl.keyCode == KeybindMappings.backtrackScreen.GetKey()) {
 				return null;
 			}
 			return keyControl;

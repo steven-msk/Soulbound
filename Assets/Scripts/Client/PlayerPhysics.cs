@@ -88,22 +88,22 @@ namespace SoulboundBackend.Client {
 				rb.linearDamping = 0f;
 			}, IsOnGround));
 
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/Move"), pausable: true, binding => {
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Move"), pausable: true, binding => {
 				binding.Performed(context => movement.x = context.ReadValue<Vector2>().x);
 				binding.Canceled(context => movement.x = 0f);
 			});
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/LeftClick"), pausable: true, binding => {
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("LeftClick"), pausable: true, binding => {
 				binding.Performed(_ => leftHold = true);
 				binding.Performed(_ => leftHold = false);
 			});
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/RightClick"), pausable: true, binding => {
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("RightClick"), pausable: true, binding => {
 				binding.Performed(_ => rightHold = true);
 				binding.Canceled(_ => rightHold = false);
 			});
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/MousePosition"), pausable: false, (action) => {
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("MousePosition"), pausable: false, (action) => {
 				action.Performed(context => mouseScreenPos = context.ReadValue<Vector2>());
 			});
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/Jump"), pausable: true, (action) => {
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Jump"), pausable: true, (action) => {
 				action.Performed(_ => OnSpacePressed());
 			});
 		}

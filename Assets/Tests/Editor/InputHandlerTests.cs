@@ -14,11 +14,6 @@ using System.Security.Permissions;
 using UnityEngine.InputSystem.Controls;
 
 public class InputHandlerTests {
-	private void CreateHandler(out InputHandler handler, out InputActionAsset asset) {
-		asset = ScriptableObject.CreateInstance<InputActionAsset>();
-		handler = new InputHandler(asset);
-	}
-
 	private void CreateMapping(out InputActionAsset asset, out InputActionMap map, string actionMapID) {
 		asset = ScriptableObject.CreateInstance<InputActionAsset>();
 		map = asset.AddActionMap(actionMapID);
@@ -28,45 +23,20 @@ public class InputHandlerTests {
 		CreateMapping(out asset, out map, actionMapId);
 		action = map.AddAction(actionId);
 	}
+	private void CreateMapping(out InputHandler handler, out InputActionAsset asset, out InputActionMap actionMap, string actionMapId = "ActionMap") {
+		asset = ScriptableObject.CreateInstance<InputActionAsset>();
+		actionMap = asset.AddActionMap(actionMapId);
+		handler = new InputHandler(actionMap);
+	}
 
 	private void CreateMapping(out InputHandler handler, out InputActionAsset asset, out InputActionMap map, out InputAction action, string actionMapID, string actionID) {
 		CreateMapping(out asset, out map, out action, actionMapID, actionID);
-		handler = new InputHandler(asset);
-	}
-
-	[Test]
-	public void GetAction_WithCompressedID_ReturnsCorrectAction() {
-		CreateMapping(out var asset, out var map, out var action, "Player", "Jump");
-		var inputHandler = new InputHandler(asset);
-
-		var result = inputHandler.GetAction("Player/Jump");
-		Assert.AreEqual(action, result);
-	}
-
-	[Test]
-	public void GetAction_WithCompressedID_ReturnsDifferentAction_ForDifferentBindings() {
-		CreateMapping(out var asset, out var map, "Player");
-		var action1 = map.AddAction("Action1");
-		var action2 = map.AddAction("Action2");
-		var inputHandler = new InputHandler(asset);
-		Assert.That(action1, Is.Not.EqualTo(action2));
-
-		var result1 = inputHandler.GetAction("Player/Action1");
-		var result2 = inputHandler.GetAction("Player/Action2");
-		Assert.That(result1, Is.Not.EqualTo(result2));
-		Assert.That(result1, Is.EqualTo(action1));
-		Assert.That(result2, Is.EqualTo(action2));
-	}
-
-	[Test]
-	public void GetAction_Throws_ForInvalidCompressedId() {
-		CreateHandler(out var handler, out var _);
-		Assert.Throws<ArgumentException>(() => handler.GetAction("Invalid"));
+		handler = new InputHandler(map);
 	}
 
 	[Test]
 	public void LateTick_ExecutesRequest() {
-		CreateHandler(out var handler, out var _);
+		CreateMapping(out var handler, out var _, out var _);
 		bool invoked = false;
 
 		handler.RequestAction(new InputActionRequest(
@@ -83,7 +53,7 @@ public class InputHandlerTests {
 
 	[Test]
 	public void LateTick_Executes_HighestPriorityRequest() {
-		CreateHandler(out var handler, out var _);
+		CreateMapping(out var handler, out var _, out var _);
 		bool lowCalled = false;
 		bool highCalled = false;
 
@@ -110,7 +80,7 @@ public class InputHandlerTests {
 	[Test]
 	public void LateTick_IgnoresBlockedRequests() {
 		bool executed = false;
-		CreateHandler(out var handler, out var _);
+		CreateMapping(out var handler, out var _, out var _);
 
 		handler.BlockContext("ActionContext", () => false);
 
@@ -128,7 +98,7 @@ public class InputHandlerTests {
 
 	[Test]
 	public void Tick_RemovesBlockedContext_IfPredicateTrue() {
-		CreateHandler(out var handler, out var _);
+		CreateMapping(out var handler, out var _, out var _);
 		handler.BlockContext("ActionContext", () => true);
 
 		((ITickable)handler).Tick();
@@ -138,7 +108,7 @@ public class InputHandlerTests {
 
 	[Test]
 	public void Tick_DoesntRemoveBlockedContext_IfPredicateFalse() {
-		CreateHandler(out var handler, out var _);
+		CreateMapping(out var handler, out var _, out var _);
 		handler.BlockContext("ActionContext", () => false);
 
 		((ITickable)handler).Tick();

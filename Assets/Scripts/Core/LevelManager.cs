@@ -59,14 +59,16 @@ namespace SoulboundBackend.Core {
 			this.worldManager = container.Resolve<WorldManager>();
 			this.worldCanvas = container.Resolve<Canvas>();
 
-			this.inputMappings = new PlayerInputActions();
-			this.inputHandler = new InputHandler(inputMappings.asset);
+			inputMappings = Soulbound.instance.playerInputActions;
+			InputActionMap playerActionMap = inputMappings.asset.FindActionMap("Player");
+			this.inputHandler = new InputHandler(playerActionMap);
 
+			Settings.keybindMappings.AddRebindTargetMap(playerActionMap);
 			Settings.keybindMappings.ProcessBindings(new Dictionary<KeyMapping, InputAction>() {
-				[KeybindMappings.jump] = inputHandler.GetAction("Player/Jump")
+				[KeybindMappings.jump] = inputHandler.GetAction("Jump")
 			});
 
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/Esc"), pausable: false, binding => {
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Esc"), pausable: false, binding => {
 				binding.Performed(_ => OnEscPressed());
 			});
 			inputMappings.Enable();

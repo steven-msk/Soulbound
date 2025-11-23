@@ -23,11 +23,13 @@ namespace SoulboundBackend.Core {
 		private readonly GameConfig config;
 		public readonly WorldManager worldManager;
 		public readonly Settings settings;
+		public readonly PlayerInputActions playerInputActions;
 
 		public Soulbound(GameConfig config) {
 			instance = this;
 			this.config = config;
 			this.settings = new Settings();
+			this.playerInputActions = new PlayerInputActions();
 			ISaveStrategy<WorldDump> saveStrategy = config.dev.loadDevWorldFromSave
 				? new WorldSaveStrategy()
 				: new DoNotSaveWorldStrategy();

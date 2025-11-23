@@ -376,12 +376,12 @@ fmtsi.value={fileValue}
 		}
 
 		[Test]
-		public void KeyboardValueSet_Encode_ReturnsEmptyString_ForNull() {
+		public void KeyboardValueSet_Encode_ReturnsNull_ForNull() {
 			var valueSet = new KeyboardValueSet();
 
 			string encoded = valueSet.Encode(null);
 
-			Assert.AreEqual(string.Empty, encoded);
+			Assert.AreEqual("null", encoded);
 		}
 
 		[Test]
@@ -422,10 +422,10 @@ fmtsi.value={fileValue}
 		}
 
 		[Test]
-		public void KeyboardValueSet_IsValid_ReturnsFalseForNull() {
+		public void KeyboardValueSet_IsValid_ReturnsTrueForNull() {
 			var valueSet = new KeyboardValueSet();
 
-			Assert.IsFalse(valueSet.IsValid(null));
+			Assert.IsTrue(valueSet.IsValid(null));
 		}
 
 		[Test]

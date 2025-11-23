@@ -79,22 +79,22 @@ namespace SoulboundBackend.Client.UI.Storage {
 			MainPlayerSlots = mainPlayerSlots.ToArray();
 			hotbar.SetActiveSlot(0);
 
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/Change Hotbar Slot"), pausable: true, binding => {
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Change Hotbar Slot"), pausable: true, binding => {
 				binding.Performed(context => {
 					int keySlot = int.Parse(context.control.name);
 					Hotbar.SetActiveSlot(keySlot - 1);
 				});
 			});
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/Scroll Hotbar Slot"), pausable: true, binding => {
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Scroll Hotbar Slot"), pausable: true, binding => {
 				binding.Performed(context => {
 					float scrollDelta = context.ReadValue<float>();
 					Hotbar.OnHotbarScroll(scrollDelta);
 				});
 			});
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/Drop Item"), pausable: true, binding => {
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Drop Item"), pausable: true, binding => {
 				binding.Performed(_ => DropHoveredOrActiveItem());
 			});
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("Player/Toggle Inventory"), pausable: true, binding => {
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Toggle Inventory"), pausable: true, binding => {
 				binding.Performed(_ => ToggleInventory());
 			});
 		}
