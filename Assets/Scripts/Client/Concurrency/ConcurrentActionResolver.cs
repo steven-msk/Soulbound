@@ -19,13 +19,23 @@ namespace SoulboundBackend.Client.Concurrency {
 		}
 
 		void ILateTickable.LateTick() {
-			var valid = requests.Where(r => r.conditions.All(condition => condition())).ToList();
-			ExecuteHighestPriority(valid);
+			var conditionsPassed = SolveConditions(this.requests);
+			ExecuteByPriority(conditionsPassed);
+			requests.Clear();
 		}
 
-		public void ExecuteHighestPriority(IEnumerable<ActionRequest> requests) {
-			ActionRequest highestPriorityRequest = requests.OrderByDescending(r => r.priority).FirstOrDefault();
-			highestPriorityRequest?.action.Invoke();
+		public void ExecuteByPriority(IEnumerable<ActionRequest> requests) {
+			var ordered = requests.OrderByDescending(r => r.priority).ToList();
+
+			ActionRequest highestPriorityRequest = ordered.FirstOrDefault();
+			highestPriorityRequest.action?.Invoke();
+			ordered.Remove(highestPriorityRequest);
+
+			foreach (var request in ordered) {
+				if (request.priorityType == PriorityType.NonExclusive) {
+					request.action.Invoke();
+				}
+			}
 		}
 
 		public IEnumerable<ActionRequest> SolveConditions(IEnumerable<ActionRequest> requests) {

@@ -14,6 +14,7 @@ namespace ActionConcurrencyTests {
 	//Request.Create().Execute(() => { }).WithPriority(2);
 	//Request.Create().Execute(() => { }).OnCondition(() => true).WithPriority(5);
 	//Request.Create().Execute(() => { }).OnCondition(() => true).And(() => false).WithPriority(1);
+	//Request.Create().Execute(() => { }).OnCondition(() => true).And(() => false).WithPriority(0).NonExclusive();
 
 	[TestFixture]
 	public class ActionBinderTests {
@@ -75,6 +76,51 @@ namespace ActionConcurrencyTests {
 			Assert.Throws<ArgumentNullException>(() => {
 				Request.Create().Execute(() => { }).OnCondition(() => true).And(null);
 			});
+		}
+	}
+
+	[TestFixture]
+	public class PriorityBinderTests {
+		[Test]
+		public void PriorityBinder_WithPriority_SetsPriority() {
+			var binder = Request.Create().Execute(() => { }).WithPriority(100);
+			var request = binder.GetAction();
+
+			Assert.That(request.priority, Is.EqualTo(100));
+		}
+
+		[Test]
+		public void PriorityBinder_WithPriority_ReturnsPriorityTypeBinder() {
+			var binder = Request.Create().Execute(() => { }).WithPriority(1);
+			Assert.That(binder is PriorityTypeBinder);
+		}
+	}
+
+	[TestFixture]
+	public class PriorityTypeTests {
+		[Test]
+		public void PriorityTypeBinder_Exclusive_SetsPriorityTypeExclusive() {
+			var binder = Request.Create().Execute(() => { }).Exclusive();
+			var request = binder.GetAction();
+
+			Assert.That(request.priorityType == PriorityType.Exclusive);
+		}
+
+		[Test]
+		public void PriorityTypeBinder_DefaultsToExclusive() {
+			var binder = Request.Create().Execute(() => { });
+			var request = binder.GetAction();
+
+			Assert.That(request.priorityType == PriorityType.Exclusive);
+		}
+
+		[Test]
+		public void PriorityTypeBinder_ExclusiveAndNonExclusive_ReturnAbstractBinder() {
+			var exclusiveBinder = Request.Create().Execute(() => { }).Exclusive();
+			var nonExclusiveBinder = Request.Create().Execute(() => { }).NonExclusive();
+
+			Assert.That(exclusiveBinder is AbstractActionRequestBinder);
+			Assert.That(nonExclusiveBinder is AbstractActionRequestBinder);
 		}
 	}
 }

@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.Concurrency {
 	public class ConditionChainBinder : PriorityBinder {
-		public ConditionChainBinder(ActionRequestData actionRequestData) : base(actionRequestData) {
+		public ConditionChainBinder(ActionRequestData actionRequestData) 
+			: base(actionRequestData) {
 		}
 
 		public ConditionChainBinder And(Func<bool> condition) {
