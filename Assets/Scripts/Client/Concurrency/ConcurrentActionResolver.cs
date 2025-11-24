@@ -11,7 +11,7 @@ namespace SoulboundBackend.Client.Concurrency {
 		private readonly List<ActionRequest> requests = new();
 
 		public void Submit(AbstractActionRequestBinder binder) {
-			requests.Add(binder.GetAction());
+			requests.Add(binder.GetRequest());
 		}
 
 		public void Submit(ActionRequest request) {

@@ -12,7 +12,7 @@ namespace SoulboundBackend.Client.Concurrency {
 			this.actionRequestData = actionRequestData;
 		}
 
-		public ActionRequest GetAction() {
+		public ActionRequest GetRequest() {
 			return new ActionRequest(actionRequestData);
 		}
 	}
