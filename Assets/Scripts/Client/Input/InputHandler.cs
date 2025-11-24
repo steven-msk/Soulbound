@@ -29,14 +29,14 @@ namespace SoulboundBackend.Client.Input {
 			return actionMap.FindAction(actionId, true);
 		}
 
-		public void RegisterInputEvent(InputAction inputAction, bool pausable, Action<InputBindingBuilder> callbackBinder) {
+		public void RegisterInputEvent(InputAction inputAction, bool pausable, Action<InputCallbackBuilder> callbackBinder) {
 			if (pausable) {
 				pausableInputs.Add(inputAction);
 			}
-			InputBindingBuilder bindingBuilder = new(inputAction);
-			callbackBinder.Invoke(bindingBuilder);
+			InputCallbackBuilder callbackBuilder = new(inputAction);
+			callbackBinder.Invoke(callbackBuilder);
 
-			var mapping = bindingBuilder.GetMapping();
+			var mapping = callbackBuilder.GetCallbacks();
 			if (!registeredCallbacks.TryAdd(mapping.Key, mapping.Value)) {
 				registeredCallbacks[mapping.Key].AddRange(mapping.Value);
 			}

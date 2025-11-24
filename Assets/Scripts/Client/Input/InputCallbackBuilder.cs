@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine.InputSystem;
 
 namespace SoulboundBackend.Client.Input {
-	public class InputBindingBuilder {
+	public class InputCallbackBuilder {
 		private readonly List<Action<InputAction.CallbackContext>> subscribedDelegates = new();
 		private readonly InputAction action;
 
-		public InputBindingBuilder(InputAction action) {
+		public InputCallbackBuilder(InputAction action) {
 			this.action = action;
 		}
 
@@ -26,7 +26,7 @@ namespace SoulboundBackend.Client.Input {
 			subscribedDelegates.Add(callback);
 		}
 
-		public KeyValuePair<InputAction, List<Action<InputAction.CallbackContext>>> GetMapping() {
+		public KeyValuePair<InputAction, List<Action<InputAction.CallbackContext>>> GetCallbacks() {
 			return new(action, subscribedDelegates);
 		}
 	}

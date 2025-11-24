@@ -1,5 +1,6 @@
 using NUnit.Framework.Internal;
 using SoulboundBackend.Client.Combat;
+using SoulboundBackend.Client.Concurrency;
 using SoulboundBackend.Client.Input;
 using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.Stats;
