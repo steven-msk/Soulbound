@@ -34,6 +34,7 @@ This document summarizes the current state of Soulbound towards the end of the p
 | **Internal Timing Communications** | ⚠️ Unstable | Sub-systems, like the Hitbox-Hurtbox relationship, require a better foundation and need to integrate well with events in production (like the upcoming world event system). |
 | **Serialization** | ⚙️ Prototype | Most of the data is saved as json, which is memory-heavy and time consuming, at the cost of human readability and maintainability. Will be replaced with a more obfuscated approach later in production. |
 | **UI Management** | ⚠️ Stable, but Prototypical | Many of he current features need further improvement and/or refactor. | 
+| **Action Request System** | ⚙️ Prototype | Current implementation lives in InputHandler, and is not respecting separation of concerns. Multiple organization related problems are raised alongside. |
 
 ---
 
@@ -379,13 +380,25 @@ Status: ⚙️ Prototype (JSON, human-readable, but slow and memory inefficient)
 
 > Will be replaced with a more compact production-readt binary or hybrid approach.
 
+## 18. Action Request System
+Status: ⚙️ Prototype (implemented poorly, not respecting separation of concerns)
+- Resolves event concurrency under specific contexts
+
+#### Dependencies
+- DI
+- State initialization
+
+#### Reverse Dependencies
+- Internal timing system
+- Any action systems that happen concurrently
+
 ## Recommended Production Order (Top to bottom)
 Based on the dependency graph, this could be an optimal order:
 [EDIT]: For convenience during late prototyping, categories have been marked accordingly to ease development: `*` means started but not finished, `<-` marks a focus point, `>|` means ready for production, `>>>` means progressively developed (see [notes](#notes))
-1. [State Initialization](#1-state-initialization) >>> 
+1. [State Initialization](#1-state-initialization) >>>
 2. [Dependency injection](#2-dependency-injection-di) >>>
 3. [Internal timing system](#3-internal-timing--event-communication) >>>
-4. [Input system](#4-input-system) <-
+4. [Input system](#4-input-system) **>|**
 5. [Serialization](#17-serialization) (foundation only)
 6. [Stat system](#5-stat-system)
 7. [Entity system](#6-entity-system)
@@ -399,6 +412,7 @@ Based on the dependency graph, this could be an optimal order:
 15. [Debug visuals](#15-debug-visuals)
 16. [Lighting](#11-lighting-system)
 17. [Audio](#12-audio-system)
+18. [Action Request System](#18-action-request-system) **<-**
 
 #### Notes
 

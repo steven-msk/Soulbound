@@ -7,7 +7,6 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Zenject;
-using static PlayerInputActions;
 
 namespace SoulboundBackend.Client.Input {
 	public class InputHandler : ITickable, ILateTickable {
