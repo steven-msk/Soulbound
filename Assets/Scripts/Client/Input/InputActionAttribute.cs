@@ -1,6 +1,7 @@
 ﻿using System;
 
 namespace SoulboundBackend.Client.Input {
+	[Obsolete]
 	[AttributeUsage(AttributeTargets.Method | AttributeTargets.Constructor, AllowMultiple = false)]
 	public class InputActionAttribute : System.Attribute {
 		public string Context { get; }

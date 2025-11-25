@@ -10,7 +10,7 @@ using Unity.VisualScripting;
 using Zenject;
 
 namespace SoulboundBackend.Client.Concurrency {
-	public class ConcurrentActionResolver : ILateTickable {
+	public class ConcurrentActionResolver : ITickable, ILateTickable {
 		private static readonly Logger logger = Logger.CreateInstance();
 		private readonly List<ActionRequest> requests = new();
 		private readonly Dictionary<ActionToken, Func<bool>> suppressions = new();
@@ -30,6 +30,18 @@ namespace SoulboundBackend.Client.Concurrency {
 			this.requests.Clear();
 		}
 
+		void ITickable.Tick() {
+			var unsuppressed = new List<ActionToken>();
+
+			foreach (var (token, unsuppressCondition) in suppressions) {
+				if (unsuppressCondition.Invoke()) {
+					unsuppressed.Add(token);
+				}
+			}
+
+			unsuppressed.ForEach(token => suppressions.Remove(token));
+		}
+
 		public void ExecuteByPriority(IEnumerable<ActionRequest> requests) {
 			var ordered = requests.OrderByDescending(r => r.priority).ToList();
 
@@ -45,12 +57,17 @@ namespace SoulboundBackend.Client.Concurrency {
 			foreach (var request in ordered) {
 				if (request.priorityType == PriorityType.NonExclusive) {
 					Execute(request);
+					ProcessSuppressions(ordered);
 				}
 			}
 		}
 
 		public void Execute(ActionRequest request) {
-			this.suppressions.AddRange(request.suppressions ?? new Dictionary<ActionToken, Func<bool>>());
+			if (request.suppressions != null) {
+				foreach (var (token, unsuppressCondition) in request.suppressions) {
+					this.suppressions.TryAdd(token, unsuppressCondition);
+				}
+			}
 
 			if (request.action == null) {
 				logger.LogWarning(null, "Caught null concurrent action executable");

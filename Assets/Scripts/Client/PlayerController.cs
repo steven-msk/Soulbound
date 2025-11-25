@@ -189,79 +189,63 @@ namespace SoulboundBackend.Client {
 
 		[InputAction("ItemUse", Priority = 5)]
 		internal void OnLeftClick() {
-			RequestSuppressedMainHandUse(ItemUseTrigger.LeftClick);
+			RequestMainHandItemUse(ItemUseTrigger.LeftClick);
 		}
 
 		[InputAction("ItemUse", Priority = 5)]
 		internal void OnRightClick() {
-			RequestMainHandUse(ItemUseTrigger.RightClick, null);
+			RequestMainHandItemUse(ItemUseTrigger.RightClick);
 		}
 
 		// POTENTIAL FEATUREIMPL: add Reach int stat
 
 		[InputAction("ItemUse", Priority = 5)]
 		internal void OnLeftHold() {
-			actionResolver.Submit(Request.New().Execute(() => {
-				itemUsageHandler.HandleInput(ItemUseTrigger.LeftHold, MainHandStack);
-				logger.LogInfo(null, "handled input");
-			}).OnCondition(() => MainHandStack != null));
+			RequestMainHandItemUse(ItemUseTrigger.LeftHold);
 
-			actionResolver.Submit(Request.New().Execute(() => {
-				logger.LogInfo(null, "handled empty main hand");
-			}).OnCondition(() => MainHandStack == null).WithPriority(-1).NonExclusive());
+			actionResolver.Submit(Request.New()
+				.UnderToken(PlayerActionTokens.BlockBreak)
+				.Execute(() => {
+					Level level = Soulbound.instance.GetActiveLevel()!;
+					BlockPos blockPos = level.ToBlockPos(mouseWorldPos);
+					Block? targetBlock = level.BlockAt(blockPos);
 
-			actionResolver.Submit(Request.New().Execute(() => {
-				Level level = Soulbound.instance.GetActiveLevel()!;
-				BlockPos blockPos = level.ToBlockPos(mouseWorldPos);
-				Block? targetBlock = level.BlockAt(blockPos);
+					if (0 >= targetBlock.breakRequirement?.minBreakPower) {
+						level.BreakBlock(blockPos, new PlayerToolBreakSource(this, null));
+					}
+				})
+				.OnCondition(() => CanBreakBlockAt((BlockPos)mouseWorldPos))
+				.Suppress(PlayerActionTokens.Attack, () => !leftHold)
+			);
 
-				if (0 >= targetBlock.breakRequirement?.minBreakPower) {
-					level.BreakBlock(blockPos, new PlayerToolBreakSource(this, null));
-				}
-			}).OnCondition(() => CanBreakBlockAt((BlockPos)mouseWorldPos)));
-
-			actionResolver.Submit(Request.New().Execute(() => {
-				TryAttack(attackSource);
-			}).OnCondition(() => !CanBreakBlockAt((BlockPos)mouseWorldPos)));
-
-			//if (MainHandStack != null) {
-			//	RequestSuppressedMainHandUse(ItemUseTrigger.LeftHold);
-			//} else {
-			//	if (CanBreakBlockAt((BlockPos)mouseWorldPos)) {
-			//		inputHandler.RequestAction(new("BlockBreak", 5, () => {
-			//			Level level = Soulbound.instance.GetActiveLevel()!;
-			//			BlockPos blockPos = level.ToBlockPos(mouseWorldPos);
-			//			Block? targetBlock = level.BlockAt(blockPos);
-
-			//			if (0 >= targetBlock.breakRequirement?.minBreakPower) {
-			//				level.BreakBlock(blockPos, new PlayerToolBreakSource(this, null));
-			//			}
-			//		}, null));
-			//		inputHandler.BlockContext("PlayerAttack", () => !leftHold);
-			//	} else {
-			//		inputHandler.RequestAction(new("PlayerAttack", 5, () => TryAttack(attackSource), null));
-			//	}
-			//}
+			actionResolver.Submit(Request.New()
+				.UnderToken(PlayerActionTokens.Attack)
+				.Execute(() => TryAttack(attackSource))
+				.Suppress(PlayerActionTokens.BlockBreak, () => !leftHold)
+			);
 		}
 
 		[Obsolete]
-		private void LateUpdate() => ((ILateTickable)actionResolver).LateTick();
+		private void LateUpdate() {
+			((Zenject.ITickable)actionResolver).Tick();
+			((ILateTickable)actionResolver).LateTick();
+		}
 
 		[InputAction("ItemUse", Priority = 5)]
 		internal void OnRightHold() {
-			RequestMainHandUse(ItemUseTrigger.RightHold, null);
+			RequestMainHandItemUse(ItemUseTrigger.RightHold);
 		}
 
-		private void RequestSuppressedMainHandUse(ItemUseTrigger trigger) {
-			Item? usedItem = MainHandStack?.item;
-			RequestMainHandUse(trigger, null);
-			if (usedItem is IPlaceable) {
-				inputHandler.BlockContext("BlockBreak", () => !leftHold);
-			}
-		}
-
-		private void RequestMainHandUse(ItemUseTrigger trigger, Action? callback) {
-			inputHandler.RequestAction(new("ItemUse", 5, () => itemUsageHandler.HandleInput(trigger, MainHandStack), callback));
+		private void RequestMainHandItemUse(ItemUseTrigger trigger) {
+			actionResolver.Submit(Request.New()
+				.UnderToken(PlayerActionTokens.ItemUse)
+				.Execute(() => {
+					itemUsageHandler.HandleInput(trigger, MainHandStack);
+				})
+				.OnCondition(() => MainHandStack != null)
+				.Suppress(PlayerActionTokens.BlockBreak, () => !leftHold)
+				.Suppress(PlayerActionTokens.Attack, () => !leftHold)
+			);
 		}
 
 		public void OnItemDisplayDestroyed(ItemStack stack) {
