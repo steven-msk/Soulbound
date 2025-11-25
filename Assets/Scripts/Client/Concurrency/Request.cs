@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.Concurrency {
 	public static class Request {
-		public static ActionBinder Create() => new ActionBinder();
-		public static ConditionBinder Execute(Action action) => new ActionBinder().Execute(action);
+		public static ActionBinder New() => new ActionBinder();
+		public static ConditionBinder New(Action action) => new ActionBinder().Execute(action);
 	}
 }

@@ -42,16 +42,20 @@ namespace SoulboundBackend.Client.Input {
 			}
 		}
 
+		[Obsolete]
 		public void BlockContext(string context, Func<bool> unblockPredicate) {
 			blockedContexts[context] = unblockPredicate;
 		}
-		
+
+		[Obsolete]
 		public bool IsContextBlocked(string context) {
 			return blockedContexts.ContainsKey(context);
 		}
 
+		[Obsolete]
 		public void RequestAction(InputActionRequest action) => requests.Add(action);
 
+		[Obsolete]
 		void ITickable.Tick() {
 			List<string> unblockedPersistent = new();
 			foreach (var kvp in blockedContexts) {
@@ -62,6 +66,7 @@ namespace SoulboundBackend.Client.Input {
 			unblockedPersistent.ForEach(context => blockedContexts.Remove(context));
 		}
 
+		[Obsolete]
 		void ILateTickable.LateTick() {
 			var availableRequests = requests.Where(action => !blockedContexts.ContainsKey(action.Context));
 			InputActionRequest highestPriorityRequest = availableRequests.OrderByDescending(r => r.Priority).FirstOrDefault();
