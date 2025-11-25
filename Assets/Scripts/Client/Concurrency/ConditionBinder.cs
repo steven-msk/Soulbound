@@ -10,7 +10,7 @@ namespace SoulboundBackend.Client.Concurrency {
 			: base(actionRequestData) {
 		}
 
-		public ConditionChainBinder If(Func<bool> condition) {
+		public ConditionChainBinder OnCondition(Func<bool> condition) {
 			if (condition == null) {
 				throw new ArgumentNullException("Condition cannot be null");
 			}

@@ -10,5 +10,7 @@ namespace SoulboundBackend.Client.Concurrency {
 		public readonly List<Func<bool>> conditions = new();
 		public int priority = 0;
 		public PriorityType priorityType = PriorityType.Exclusive;
+		public Dictionary<ActionToken, Func<bool>> suppressions = new();
+		public ActionToken token;
 	}
 }

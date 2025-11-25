@@ -201,16 +201,16 @@ namespace SoulboundBackend.Client {
 
 		[InputAction("ItemUse", Priority = 5)]
 		internal void OnLeftHold() {
-			actionResolver.Submit(Request.New(() => {
+			actionResolver.Submit(Request.New().Execute(() => {
 				itemUsageHandler.HandleInput(ItemUseTrigger.LeftHold, MainHandStack);
 				logger.LogInfo(null, "handled input");
-			}).If(() => MainHandStack != null));
+			}).OnCondition(() => MainHandStack != null));
 
-			actionResolver.Submit(Request.New(() => {
+			actionResolver.Submit(Request.New().Execute(() => {
 				logger.LogInfo(null, "handled empty main hand");
-			}).If(() => MainHandStack == null).WithPriority(-1).NonExclusive());
+			}).OnCondition(() => MainHandStack == null).WithPriority(-1).NonExclusive());
 
-			actionResolver.Submit(Request.New(() => {
+			actionResolver.Submit(Request.New().Execute(() => {
 				Level level = Soulbound.instance.GetActiveLevel()!;
 				BlockPos blockPos = level.ToBlockPos(mouseWorldPos);
 				Block? targetBlock = level.BlockAt(blockPos);
@@ -218,24 +218,24 @@ namespace SoulboundBackend.Client {
 				if (0 >= targetBlock.breakRequirement?.minBreakPower) {
 					level.BreakBlock(blockPos, new PlayerToolBreakSource(this, null));
 				}
-			}).If(() => CanBreakBlockAt((BlockPos)mouseWorldPos)));
+			}).OnCondition(() => CanBreakBlockAt((BlockPos)mouseWorldPos)));
 
-			actionResolver.Submit(Request.New(() => {
+			actionResolver.Submit(Request.New().Execute(() => {
 				TryAttack(attackSource);
-			}).If(() => !CanBreakBlockAt((BlockPos)mouseWorldPos)));
+			}).OnCondition(() => !CanBreakBlockAt((BlockPos)mouseWorldPos)));
 
 			//if (MainHandStack != null) {
 			//	RequestSuppressedMainHandUse(ItemUseTrigger.LeftHold);
 			//} else {
 			//	if (CanBreakBlockAt((BlockPos)mouseWorldPos)) {
 			//		inputHandler.RequestAction(new("BlockBreak", 5, () => {
-						//Level level = Soulbound.instance.GetActiveLevel()!;
-						//BlockPos blockPos = level.ToBlockPos(mouseWorldPos);
-						//Block? targetBlock = level.BlockAt(blockPos);
+			//			Level level = Soulbound.instance.GetActiveLevel()!;
+			//			BlockPos blockPos = level.ToBlockPos(mouseWorldPos);
+			//			Block? targetBlock = level.BlockAt(blockPos);
 
-						//if (0 >= targetBlock.breakRequirement?.minBreakPower) {
-						//	level.BreakBlock(blockPos, new PlayerToolBreakSource(this, null));
-						//}
+			//			if (0 >= targetBlock.breakRequirement?.minBreakPower) {
+			//				level.BreakBlock(blockPos, new PlayerToolBreakSource(this, null));
+			//			}
 			//		}, null));
 			//		inputHandler.BlockContext("PlayerAttack", () => !leftHold);
 			//	} else {
