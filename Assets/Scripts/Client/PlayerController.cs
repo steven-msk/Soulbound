@@ -104,8 +104,7 @@ namespace SoulboundBackend.Client {
 			this.level = container.Resolve<Level>();
 			this.canvas = container.Resolve<Canvas>();
 			RegisterItemUsageCandidates(container.Resolve<ItemUsageHandler>());
-
-			actionResolver = new ConcurrentActionResolver();
+			this.actionResolver = container.Resolve<ConcurrentActionResolver>();
 
 			attackSource = new AttackSource(2, 10, new PlayerMainHandAttack(),
 				context => {
@@ -187,20 +186,17 @@ namespace SoulboundBackend.Client {
 			MainHandStack = itemStack;
 		}
 
-		[InputAction("ItemUse", Priority = 5)]
-		internal void OnLeftClick() {
+		private void OnLeftClick() {
 			RequestMainHandItemUse(ItemUseTrigger.LeftClick);
 		}
 
-		[InputAction("ItemUse", Priority = 5)]
-		internal void OnRightClick() {
+		private void OnRightClick() {
 			RequestMainHandItemUse(ItemUseTrigger.RightClick);
 		}
 
 		// POTENTIAL FEATUREIMPL: add Reach int stat
 
-		[InputAction("ItemUse", Priority = 5)]
-		internal void OnLeftHold() {
+		private void OnLeftHold() {
 			RequestMainHandItemUse(ItemUseTrigger.LeftHold);
 
 			actionResolver.Submit(Request.New()
@@ -225,14 +221,7 @@ namespace SoulboundBackend.Client {
 			);
 		}
 
-		[Obsolete]
-		private void LateUpdate() {
-			((Zenject.ITickable)actionResolver).Tick();
-			((ILateTickable)actionResolver).LateTick();
-		}
-
-		[InputAction("ItemUse", Priority = 5)]
-		internal void OnRightHold() {
+		private void OnRightHold() {
 			RequestMainHandItemUse(ItemUseTrigger.RightHold);
 		}
 

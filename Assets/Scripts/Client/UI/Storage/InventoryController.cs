@@ -1,4 +1,5 @@
-﻿using SoulboundBackend.Client.Input;
+﻿using SoulboundBackend.Client.Concurrency;
+using SoulboundBackend.Client.Input;
 using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Common;
 using SoulboundBackend.Common.UI.Storage;
@@ -55,7 +56,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 		public IReadOnlyList<IItemSlot> slots => popupSlots.Flatten();
 
 		private PlayerController player = null!;
-		private InputHandler inputHandler = null!;
+		private ConcurrentActionResolver actionResolver = null!;
 		public InventoryEventHandler eventHandler { get; private set; }
 
 		private float doubleClickThreshold = 0.15f;
@@ -63,12 +64,14 @@ namespace SoulboundBackend.Client.UI.Storage {
 		private IItemSlot? lastClickedSlot;
 		private DragHandler? activeDragHandler;
 		private IItemSlot? hoveredSlot;
+		private bool leftHold;
 
 		[Inject]
 		public void Construct(DiContainer container) {
 			this.eventHandler = new InventoryEventHandler();
 			this.player = container.Resolve<PlayerController>();
-			this.inputHandler = container.Resolve<InputHandler>();
+			this.actionResolver = container.Resolve<ConcurrentActionResolver>();
+			var inputHandler = container.Resolve<InputHandler>();
 
 			hotbar.Construct(this);
 			this.SetupGrid();
@@ -96,6 +99,10 @@ namespace SoulboundBackend.Client.UI.Storage {
 			});
 			inputHandler.RegisterInputEvent(inputHandler.GetAction("Toggle Inventory"), pausable: true, binding => {
 				binding.Performed(_ => ToggleInventory());
+			});
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("LeftClick"), pausable: true, binding => {
+				binding.Performed(_ => leftHold = true);
+				binding.Canceled(_ => leftHold = false);
 			});
 		}
 
@@ -309,19 +316,22 @@ namespace SoulboundBackend.Client.UI.Storage {
 				return;
 			}
 
-			inputHandler.RequestAction(new("ItemSlotAction", 10, () => {
-				if (!clickedSlot.Handshake(GrabbedContext.value, SlotInteractionMode.Click)) {
-					return;
-				}
-				ExecuteOnGrabbedReference(clickedSlot, (slot, grabbedReference) => {
-					interpretationFunction.Invoke(slot!, grabbedReference);
-					hotbar.OnItemTransfer(slot!, grabbedReference);
-					if (GrabbedContext.value != null && !doubleClick && !cancelDrag) {
-						activeDragHandler = this.StartDrag(slot!, dragButton);
-					}
-				});
-			}, null));
-			//inputHandler.BlockContext("ItemUse", () => !Soulbound.instance.GetPlayerInstance().inputHandler.LeftHold);
+			actionResolver.Submit(Request.New()
+				.UnderToken(PlayerActionTokens.SlotClick)
+				.Execute(() => {
+					ExecuteOnGrabbedReference(clickedSlot, (slot, grabbedReference) => {
+						interpretationFunction.Invoke(slot!, grabbedReference);
+						hotbar.OnItemTransfer(slot!, grabbedReference);
+						if (GrabbedContext.value != null && !doubleClick && !cancelDrag) {
+							activeDragHandler = this.StartDrag(slot!, dragButton);
+						}
+					});
+				})
+				.OnCondition(() => clickedSlot.Handshake(GrabbedContext.value, SlotInteractionMode.Click))
+				.WithPriority(PlayerActionTokens.SlotClick.effectivePriority)
+				.Suppress(PlayerActionTokens.ItemUse, () => !leftHold)
+				.Suppress(PlayerActionTokens.Attack,() => !leftHold)
+			);
 		}
 
 		public void OnPointerUp(IItemSlot slot, PointerEventData eventData) {

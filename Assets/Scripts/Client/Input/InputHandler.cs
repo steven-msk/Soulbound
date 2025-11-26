@@ -9,7 +9,7 @@ using UnityEngine.InputSystem;
 using Zenject;
 
 namespace SoulboundBackend.Client.Input {
-	public class InputHandler : ITickable, ILateTickable {
+	public class InputHandler {
 		private readonly List<InputActionRequest> requests = new();
 		private readonly Dictionary<string, Func<bool>> blockedContexts = new();
 		private readonly Dictionary<InputAction, List<Action<InputAction.CallbackContext>>> registeredCallbacks = new();
@@ -40,39 +40,6 @@ namespace SoulboundBackend.Client.Input {
 			if (!registeredCallbacks.TryAdd(mapping.Key, mapping.Value)) {
 				registeredCallbacks[mapping.Key].AddRange(mapping.Value);
 			}
-		}
-
-		[Obsolete]
-		public void BlockContext(string context, Func<bool> unblockPredicate) {
-			blockedContexts[context] = unblockPredicate;
-		}
-
-		[Obsolete]
-		public bool IsContextBlocked(string context) {
-			return blockedContexts.ContainsKey(context);
-		}
-
-		[Obsolete]
-		public void RequestAction(InputActionRequest action) => requests.Add(action);
-
-		[Obsolete]
-		void ITickable.Tick() {
-			List<string> unblockedPersistent = new();
-			foreach (var kvp in blockedContexts) {
-				if (kvp.Value.Invoke()) {
-					unblockedPersistent.Add(kvp.Key);
-				}
-			}
-			unblockedPersistent.ForEach(context => blockedContexts.Remove(context));
-		}
-
-		[Obsolete]
-		void ILateTickable.LateTick() {
-			var availableRequests = requests.Where(action => !blockedContexts.ContainsKey(action.Context));
-			InputActionRequest highestPriorityRequest = availableRequests.OrderByDescending(r => r.Priority).FirstOrDefault();
-			highestPriorityRequest?.Callback.Invoke();
-			highestPriorityRequest?.Action.Invoke();
-			requests.Clear();
 		}
 
 		public void PauseInputs(bool pause) {

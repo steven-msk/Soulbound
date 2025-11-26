@@ -164,13 +164,26 @@ namespace ActionConcurrencyTests {
 			notSuppressed = actionResolver.ProcessSuppressions(new[] { request1, request2 });
 			Assert.That(notSuppressed.SequenceEqual(new[] { request1, request2 }));
 		}
+
+		[Test]
+		public void LateTick_ExecutesRequest() {
+			bool executed = false;
+			var request = Request.New().Execute(() => executed = true);
+
+			var actionResolver = new ConcurrentActionResolver();
+			actionResolver.Submit(request);
+
+			((ILateTickable)actionResolver).LateTick();
+
+			Assert.IsTrue(executed);
+		}
 	}
 
 	//Request.New().Execute.Execute(() => { }).WithPriority(2);
 	//Request.New().Execute.Execute(() => { }).OnCondition(() => true).WithPriority(5);
 	//Request.New().Execute.Execute(() => { }).OnCondition(() => true).And(() => false).WithPriority(1);
 	//Request.New().Execute.Execute(() => { }).OnCondition(() => true).And(() => false).WithPriority(0).NonExclusive();
-	//Request.New().Execute.UnderToken(new()).Execute(() => { });
+	//Request.New().Execute.UnderToken(token).Execute(() => { });
 	//Request.New().Execute.Execute(() => { });
 	//Request.New().Execute(() => { }).NonExclusive().Suppress(token, () => false)
 

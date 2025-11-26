@@ -7,6 +7,7 @@ using UnityEngine;
 using Zenject;
 using System;
 using static PlayerInputActions;
+using SoulboundBackend.Client.Concurrency;
 
 namespace SoulboundBackend.Core.Bootstrap {
 	public class PlayerInstaller : InstallerAdapter {
@@ -23,7 +24,8 @@ namespace SoulboundBackend.Core.Bootstrap {
 		public override void InstallBindings(DiContainer container) {
 			GameObject inventoryPrefab = ResourceManager.GetRuntimePrefab("inventory");
 
-			container.BindInterfacesAndSelfTo<InputHandler>().FromInstance(inputHandler).AsSingle();
+			container.BindInterfacesAndSelfTo<ConcurrentActionResolver>().AsSingle();
+			container.BindInstance<InputHandler>(inputHandler).AsSingle();
 			container.BindInstance<PlayerController>(playerInstance).AsSingle();
 			container.Bind<PlayerPhysics>().FromComponentOn(playerInstance.gameObject).AsSingle();
 			container.Bind<ItemUsageHandler>().AsSingle();
