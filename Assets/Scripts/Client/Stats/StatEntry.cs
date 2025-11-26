@@ -28,7 +28,7 @@ namespace SoulboundBackend.Client.Stats {
 				IEnumerable<SerializableStat<TValue>> casted = modifiers.SelectMany(m => m.Value.Cast<SerializableStat<TValue>>());
 				return this.definitionReference.processor.ProcessFinalValue(baseValue, casted);
 			} catch (InvalidCastException e) {
-				logger.LogError(null, e);
+				logger.LogError(e);
 				return default(TValue);
 			}
 		}

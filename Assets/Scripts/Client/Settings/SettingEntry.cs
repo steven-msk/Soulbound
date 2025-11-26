@@ -71,7 +71,7 @@ namespace SoulboundBackend.Client.SettingSystem {
 					valueChanged?.Invoke(oldValue, this.value);
 				}
 			} else {
-				logger.LogWarning(null, "Attempted to set invalid value '{}' to setting '{}'", value!, id);
+				logger.LogWarning("Attempted to set invalid value '{}' to setting '{}'", value!, id);
 			}
 		}
 

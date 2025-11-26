@@ -33,7 +33,6 @@ namespace SoulboundBackend.Client {
 		private static readonly Logger logger = Logger.CreateInstance();
 		public override Type entityScriptType => typeof(PlayerController);
 		public override string prefabDefinitionID => "johnny";
-		public InputHandler inputHandler { get; private set; }
 
 		[SerializeField] private InventoryController inventory;
 		public InventoryController Inventory => inventory;
@@ -41,14 +40,12 @@ namespace SoulboundBackend.Client {
 		[SerializeField] private PlayerStats stats;
 		public PlayerStats Stats => stats;
 
-		private PlayerPhysics playerPhysics;
-		public PlayerPhysics Physics => playerPhysics;
 
 		[Header("Internal")]
 		[SerializeField] private Rigidbody2D rb;
-		public Rigidbody2D Rigidbody => rb;
 		[SerializeField] private Animator animator;
-		public Animator Animator => animator;
+		private InputHandler inputHandler;
+		private PlayerPhysics playerPhysics;
 		private AttackHandler attackHandler = null!;
 		private AttackSource attackSource = null!;
 
@@ -64,7 +61,7 @@ namespace SoulboundBackend.Client {
 		public bool CanAttack { get; set; } = true;
 
 		public override float facing { get => playerPhysics.facing; set => playerPhysics.facing = value; }
-		public Vector2 center => Physics.Collider.bounds.center;
+		public Vector2 center => playerPhysics.Collider.bounds.center;
 		public BlockPos blockPos => Soulbound.instance.GetActiveLevel()!.ToBlockPos(this.position);
 		public ChunkBlockPos chunkBlockPos => blockPos.ToChunkBlockPos(Soulbound.instance.GetActiveLevel()!.ChunkXAt(position));
 
@@ -169,7 +166,7 @@ namespace SoulboundBackend.Client {
 				return;
 			}
 			attackHandler = new AttackHandler(source);
-			logger.LogInfo(null, "executing attack");
+			logger.LogInfo("executing attack");
 			attackHandler.StartAttack(this, null);
 		}
 
@@ -270,7 +267,7 @@ namespace SoulboundBackend.Client {
 
 		public override void Spawn(EntitySpawnData spawnData) {
 			base.Spawn(spawnData);
-			logger.LogInfo(null, "Player spawned at {}", spawnData.Get<Vector2>("position"));
+			logger.LogInfo("Player spawned at {}", spawnData.Get<Vector2>("position"));
 			this.isSpawned = true;
 		}
 
@@ -283,11 +280,11 @@ namespace SoulboundBackend.Client {
 		public override Bounds GetBounds() => this.GetColliderBounds();
 
 		public override void OnDeath() {
-			logger.LogInfo(null, "Player died");
+			logger.LogInfo("Player died");
 		}
 
 		public override void OnDamageTaken(float damage) {
-			logger.LogInfo(null, "Player has taken {} damage", damage);
+			logger.LogInfo("Player has taken {} damage", damage);
 		}
 
 		public override void ApplySerializedProperties(SerializedEntityPropertyList properties) {

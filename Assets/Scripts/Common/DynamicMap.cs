@@ -25,7 +25,7 @@ namespace SoulboundBackend.Common {
 				if (property.GetValue(other) is T value) {
 					this[property.Name] = value;
 				} else {
-					logger.LogError(null, new InvalidOperationException($"Property '{property.Name}' is not of type {typeof(T).Name}"));
+					logger.LogError(new InvalidOperationException($"Property '{property.Name}' is not of type {typeof(T).Name}"));
 				}
 			}
 		}

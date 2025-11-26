@@ -11,6 +11,10 @@
 This document summarizes the current state of Soulbound towards the end of the prototype phase and serves as a reference point or a recalibration moment before entering pre-production / complete production.
 **All commits following this document contain systems subject to major changes, reworks, and redesign as part of moving toward a production-ready state.**
 
+# Warning
+<b>There is an ongoing issue where Zenject fails to compile after copying a Unity project from a ZIP file, even when all files and meta files appear to be present.</b>
+The exact cause of this behavior is currently unknown, and there is no reliable fix for now. Avoid transferring Unity projects via ZIP when using Zenject. Use proper folder copy or version control instead.
+
 ---
 
 ## Prototype Systems & Current Status
@@ -399,20 +403,20 @@ Based on the dependency graph, this could be an optimal order:
 2. [Dependency injection](#2-dependency-injection-di) >>>
 3. [Internal timing system](#3-internal-timing--event-communication) >>>
 4. [Input system](#4-input-system) **>|**
-5. [Serialization](#17-serialization) (foundation only)
-6. [Stat system](#5-stat-system)
-7. [Entity system](#6-entity-system)
-8. [Block system](#8-block-system)
-9. [Chunk generation](#9-chunk-generation)
-10. [World rendering](#10-world-rendering)
-11. [Physics system](#7-physics-system) (universal overhaul)
-12. [UI Core layer & navigation system](#13-ui-systems-overall)
-13. [Tooltips](#14-tooltips)
-14. [Settings](#16-settings-ui) *
-15. [Debug visuals](#15-debug-visuals)
-16. [Lighting](#11-lighting-system)
-17. [Audio](#12-audio-system)
-18. [Action Request System](#18-action-request-system) **<-**
+5. [Action Request System](#18-action-request-system) **>|**
+6. [Serialization](#17-serialization) (foundation only)
+7. [Stat system](#5-stat-system)
+8. [Entity system](#6-entity-system)
+9. [Block system](#8-block-system)
+10. [Chunk generation](#9-chunk-generation)
+11. [World rendering](#10-world-rendering)
+12. [Physics system](#7-physics-system) (universal overhaul)
+13. [UI Core layer & navigation system](#13-ui-systems-overall)
+14. [Tooltips](#14-tooltips)
+15. [Settings](#16-settings-ui) *
+16. [Debug visuals](#15-debug-visuals)
+17. [Lighting](#11-lighting-system)
+18. [Audio](#12-audio-system)
 
 #### Notes
 

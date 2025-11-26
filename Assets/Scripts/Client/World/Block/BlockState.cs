@@ -197,7 +197,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 					return state;
 				}
 
-				logger.LogWarning(null, $"Unknown state hash {stateHash} for block '{block.name}'");
+				logger.LogWarning($"Unknown state hash {stateHash} for block '{block.name}'");
 				return block.defaultState;
 			}
 

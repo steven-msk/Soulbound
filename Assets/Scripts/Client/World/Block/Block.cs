@@ -44,7 +44,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 
 		public void RegisterProperty<T>(BlockProperty<T> property, T defaultValue) {
 			if (propertyDefinitionTerminated) {
-				logger.LogWarning(null, "Cancelled block property registration '{}' due to definition context termination", property.name);
+				logger.LogWarning("Cancelled block property registration '{}' due to definition context termination", property.name);
 				return;
 			}
 			propertyMap.Add(property, defaultValue!);

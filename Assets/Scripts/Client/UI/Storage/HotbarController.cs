@@ -105,7 +105,6 @@ namespace SoulboundBackend.Client.UI.Storage {
 		}
 
 		public void OnInventoryPopup() {
-			InventoryController inventory = Soulbound.instance.GetPlayerInstance().Inventory;
 			Color slotColor = inventory.IsOpened ? activeSlotColor : inactiveSlotColor;
 			Color slotNumberColor = inventory.IsOpened ? activeSlotNumberColor : inactiveSlotNumberColor;
 			Color itemStackColor = inventory.IsOpened ? activeItemStackColor : inactiveItemStackColor;

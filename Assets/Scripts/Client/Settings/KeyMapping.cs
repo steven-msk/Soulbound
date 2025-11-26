@@ -29,7 +29,7 @@ namespace SoulboundBackend.Client.SettingSystem {
 
 		protected virtual void ApplyBinding(InputAction inputAction) {
 			inputAction.ApplyBindingOverride(0, value?.path ?? "");
-			logger.LogInfo(null, "applying binding: " + value ?? "null");
+			logger.LogInfo("applying binding: " + value ?? "null");
 		}
 
 		protected virtual void RevokeBinding(InputAction inputAction) {

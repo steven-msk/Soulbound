@@ -198,7 +198,7 @@ namespace SoulboundBackend.Client {
 				return;
 			}
 			var collisionResponse = collisionReactionsByTag.GetValueOrDefault(collision.gameObject.tag, (collision => {
-				logger.LogWarning(null, "Unknown collision callback tag: {}", collision.gameObject.tag);
+				logger.LogWarning("Unknown collision callback tag: {}", collision.gameObject.tag);
 			}, null));
 			collisionResponse.action.InvokeIf(collision, collisionResponse.validator ?? (() => true));
 		}

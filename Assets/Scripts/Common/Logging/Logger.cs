@@ -36,24 +36,42 @@ namespace SoulboundBackend.Common.Logging {
 			this.LogMessage(module, UnityEngine.Debug.Log, message.ToString());
 		}
 
+		public void LogInfo(object message) => this.LogInfo(module: null, message);
+
 		public void LogInfo(LogModule? module, string compoundMessage, params object[] args) {
 			this.LogMessage(module, UnityEngine.Debug.Log, FormatPlaceholders(compoundMessage, compoundPlaceholder, args));
+		}
+
+		public void LogInfo(string compoundMessage, params object[] args) {
+			this.LogInfo(null, compoundMessage, args);
 		}
 
 		public void LogWarning(LogModule? module, object message) {
 			this.LogMessage(module, UnityEngine.Debug.LogWarning, message.ToString());
 		}
 
+		public void LogWarning(object message) => this.LogWarning(module: null, message);
+
 		public void LogWarning(LogModule? module, string compoundMessage, params object[] args) {
 			this.LogMessage(module, UnityEngine.Debug.LogWarning, FormatPlaceholders(compoundMessage, compoundPlaceholder, args));
+		}
+
+		public void LogWarning(string compoundMessage, params object[] args) {
+			this.LogWarning(null, compoundMessage, args);
 		}
 
 		public void LogError(LogModule? module, object message) {
 			this.LogMessage(module, UnityEngine.Debug.LogError, message.ToString());
 		}
 
+		public void LogError(object message) => this.LogError(module: null, message);
+
 		public void LogError(LogModule? module, string compoundMessage, params object[] args) {
 			this.LogMessage(module, UnityEngine.Debug.LogError, FormatPlaceholders(compoundMessage, compoundPlaceholder, args));
+		}
+
+		public void LogError(string compoundMessage, params object[] args) {
+			this.LogError(null, compoundMessage, args);
 		}
 
 		public void ThrowException(LogModule? module, Exception exception, string? comment = null) {

@@ -24,7 +24,7 @@ namespace SoulboundBackend.Client.Stats {
 			this.persistent = persistent;
 
 			if (applicationType == StatApplicationType.Percentage && typeof(TValue) == typeof(int)) {
-				logger.LogWarning(null, "Unsupported stat application type 'percentage' for stat value type 'int'. Overriding with flat application type");
+				logger.LogWarning("Unsupported stat application type 'percentage' for stat value type 'int'. Overriding with flat application type");
 				this.applicationType = StatApplicationType.Flat;
 			}
 		}

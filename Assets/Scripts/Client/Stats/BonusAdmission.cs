@@ -25,7 +25,7 @@ namespace SoulboundBackend.Client.Stats {
 				Add = new BonusAdmission<TValue>(value => Convert.ToSingle(value) > 0f ? "+" : "");
 				AddAndSubtract = Add;
 			} else {
-				logger.LogWarning(null, "Unexpected BonusAdmission type {}", typeof(TValue));
+				logger.LogWarning("Unexpected BonusAdmission type {}", typeof(TValue));
 				Add = None;
 				AddAndSubtract = None;
 			}

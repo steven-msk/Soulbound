@@ -70,7 +70,7 @@ namespace SoulboundBackend.Client.Concurrency {
 			}
 
 			if (request.action == null) {
-				logger.LogWarning(null, "Caught null concurrent action executable");
+				logger.LogWarning("Caught null concurrent action executable");
 			}
 			request.action?.Invoke();
 		}

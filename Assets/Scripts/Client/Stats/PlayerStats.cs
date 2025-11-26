@@ -53,7 +53,7 @@ namespace SoulboundBackend.Client.Stats {
 					statEntry.Add(stat, receiver);
 					UnityEngine.Debug.Log("added stat: " + stat.GetHashCode() + ": " + stat);
 				} else {
-					logger.LogError(null, new ArgumentException($"Could not apply stat to player receiver: unknown player stat definition {stat.GetStatDefinition()}"));
+					logger.LogError(new ArgumentException($"Could not apply stat to player receiver: unknown player stat definition {stat.GetStatDefinition()}"));
 				}
 			}
 		}
@@ -64,7 +64,7 @@ namespace SoulboundBackend.Client.Stats {
 					statEntry.Remove(stat, receiver);
 					UnityEngine.Debug.Log("removed stat: " + stat.GetHashCode() + ": " + stat);
 				} else {
-					logger.LogError(null, new ArgumentException($"Could not revoke stat to player receiver: unknown player stat definition {stat.GetStatDefinition()}"));
+					logger.LogError(new ArgumentException($"Could not revoke stat to player receiver: unknown player stat definition {stat.GetStatDefinition()}"));
 				}
 			}
 		}

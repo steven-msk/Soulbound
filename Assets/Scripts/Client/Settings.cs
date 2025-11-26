@@ -32,7 +32,7 @@ namespace SoulboundBackend.Client.SettingSystem {
 					keybindMappings.ProcessMappings(new KeyMappingReader(settingReader));
 				};
 			} catch (FileNotFoundException) {
-				logger.LogWarning(null, "No settings file found. Initiating with default values");
+				logger.LogWarning("No settings file found. Initiating with default values");
 			}		
 		}
 

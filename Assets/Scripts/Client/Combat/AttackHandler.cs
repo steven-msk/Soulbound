@@ -110,7 +110,7 @@ namespace SoulboundBackend.Client.Combat {
 				return;
 			}
 
-			logger.LogError(null, "Could not find Hurtbox on hitbox collider: {}", collider.gameObject);
+			logger.LogError("Could not find Hurtbox on hitbox collider: {}", collider.gameObject);
 		}
 
 		private void InjectContext_OnAttackAnimationStart() {

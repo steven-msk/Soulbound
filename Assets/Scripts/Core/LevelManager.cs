@@ -139,7 +139,7 @@ namespace SoulboundBackend.Core {
 		private void EndTick() {
 			float elapsed = Time.realtimeSinceStartup - tickStartTime;
 			if (elapsed > tickRate) {
-				logger.LogWarning(null, $"Tick lag detected! Tick took {elapsed * 1000f:F1} ms");
+				logger.LogWarning($"Tick lag detected! Tick took {elapsed * 1000f:F1} ms");
 			}
 		}
 

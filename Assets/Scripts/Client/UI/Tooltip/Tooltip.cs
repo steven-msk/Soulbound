@@ -43,7 +43,7 @@ namespace SoulboundBackend.Client.UI.Tooltip {
 				return;
 			}
 			this.panel.NullOrElse((panel) => {
-			}, () => logger.LogWarning(null, "Discarded attempt to set parent to null tooltip panel"));
+			}, () => logger.LogWarning("Discarded attempt to set parent to null tooltip panel"));
 		}
 
 		public void SetPosition(Vector2 screenPosition) {
@@ -52,7 +52,7 @@ namespace SoulboundBackend.Client.UI.Tooltip {
 			}
 			this.panel.NullOrElse((panel) => {
 				panel.transform.position = screenPosition;
-			}, () => logger.LogWarning(null, "Discarded attempt to set position to null tooltip panel"));
+			}, () => logger.LogWarning("Discarded attempt to set position to null tooltip panel"));
 		}
 
 		public static TooltipData Plain(string text) => new TooltipData.Builder().AddNode(TooltipNode.None, text).Finish();
