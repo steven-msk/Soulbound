@@ -121,7 +121,7 @@ namespace WorldTests {
 			sceneBox.value = PlayModeTesting.CreateNewTestScene();
 			yield return CreateContextWithSceneProvided(
 				sceneBox.value, worldBox, world, 
-				new WorldSaveStrategy()
+				new WorldSaveStrategy("saves", Application.temporaryCachePath)
 			);
 		}
 

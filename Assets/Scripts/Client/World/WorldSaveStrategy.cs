@@ -11,7 +11,17 @@ using Unity.Plastic.Newtonsoft.Json;
 
 namespace SoulboundBackend.Client.World {
     public class WorldSaveStrategy : ISaveStrategy<WorldDump> {
-        public WorldDump Load(string path) {
+        private readonly string root;
+        private readonly string dataRegion;
+
+        public WorldSaveStrategy(string root, string dataRegion) {
+            this.root = root;
+            this.dataRegion = dataRegion;
+        }
+
+        public WorldDump Load(string name) {
+            string path = GetDumpPath(name);
+
             if (File.Exists(path)) {
                 return JsonConvert.DeserializeObject<WorldDump>(
                     File.ReadAllText(path),
@@ -21,9 +31,23 @@ namespace SoulboundBackend.Client.World {
             return default;
         }
 
-        public void Save(WorldDump obj, string path) {
+        public void Save(WorldDump obj, string name) {
             string json = JsonConvert.SerializeObject(obj, LevelManager.globalJsonSettings);
-            File.WriteAllText(path, json);
+            File.WriteAllText(GetDumpPath(name), json);
         }
-    }
+
+		public string GetDumpPath(string world) {
+			string worldFolder = Path.Combine(root, world);
+			Directory.CreateDirectory(GetRegionedPath(worldFolder));
+
+			string dumpPath = GetRegionedPath(Path.Combine(worldFolder, LevelManager.worldDump));
+			return dumpPath;
+		}
+
+		public string GetRegionedPath(params string[] paths) {
+			List<string> regioned = new() { dataRegion };
+			regioned.AddRange(paths);
+			return Path.Combine(regioned.ToArray());
+		}
+	}
 }

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SoulboundBackend.Core {
     public interface ISaveStrategy<T> {
-        T? Load(string path);
-        void Save(T obj, string path);
+        T? Load(string arg);
+        void Save(T obj, string arg);
     }
 }

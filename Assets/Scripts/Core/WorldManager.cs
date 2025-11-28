@@ -35,25 +35,23 @@ public sealed class WorldManager {
 		this.dataRegion = dataRegion ?? (() => Application.persistentDataPath);
 	}
 
-	public IEnumerable<string> QuerySaves() {
-		if (!Directory.Exists(savesRoot)) {
-			yield break;
-		}
-		foreach (var dir in Directory.GetDirectories(savesRoot)) {
-			if (File.Exists(GetRegionedPath(Path.Combine(dir, LevelManager.worldDump)))) {
-				yield return Path.GetFileName(dir);
-			}
-		}
-	}
+	//public IEnumerable<string> QuerySaves() {
+	//	if (!Directory.Exists(savesRoot)) {
+	//		yield break;
+	//	}
+	//	foreach (var dir in Directory.GetDirectories(savesRoot)) {
+	//		if (File.Exists(GetRegionedPath(Path.Combine(dir, LevelManager.worldDump)))) {
+	//			yield return Path.GetFileName(dir);
+	//		}
+	//	}
+	//}
 
 	public WorldDump? LoadWorld(
 			string world, 
 			Func<SceneContext> sceneContextSupplier,
 			Action sceneLoader
 		) {
-		string dumpPath = GetDumpPath(world, createIfAbsent: false);
-
-		WorldDump? dump = saveStrategy.Load(dumpPath);
+		WorldDump? dump = saveStrategy.Load(world);
 		if (!dump?.nonNulled ?? true) {
 			dump = null;
 		}
@@ -94,37 +92,23 @@ public sealed class WorldManager {
 	}
 
 	public void SaveWorld(string world, WorldDump dump) {
-		string dumpPath = GetDumpPath(world, createIfAbsent: saveStrategy is not DoNotSaveWorldStrategy);
-		saveStrategy.Save(dump, dumpPath);
+		saveStrategy.Save(dump, world);
+
 		var persistent = ICachedRegistry<Block>.GetCachedRegistry().Values
 			.Select(block => new KeyValuePair<Block, IBlockStateCacheStrategy>(block, block.stateCacheStrategy))
 			.Where(e => e.Value is IPersistentStateCache)
 			.Select(e => new KeyValuePair<Block, IPersistentStateCache>(e.Key, (IPersistentStateCache)e.Value));
-        foreach (var persistentEntry in persistent) {
+
+		foreach (var persistentEntry in persistent) {
 			persistentEntry.Value.Save(persistentEntry.Key);
-        }
-    }
+		}
+	}
 
 	public IEnumerator TerminateWorldProcess(Scene worldScene, string world, Func<WorldDump> dumpSupplier) {
 		this.SaveWorld(world, dumpSupplier.Invoke());
 
-        var async = SceneManager.UnloadSceneAsync(worldScene);
-        yield return new WaitUntil(() => async.isDone);
-        yield return null;
-    }
-
-	public string GetDumpPath(string world, bool createIfAbsent) {
-		string worldFolder = Path.Combine(savesRoot, world);
-		if (createIfAbsent) {
-			Directory.CreateDirectory(GetRegionedPath(worldFolder));
-		}
-		string dumpPath = GetRegionedPath(Path.Combine(worldFolder, LevelManager.worldDump));
-		return dumpPath;
-	}
-
-	public string GetRegionedPath(params string[] paths) {
-		List<string> regioned = new() { dataRegion.Invoke() };
-		regioned.AddRange(paths);
-		return Path.Combine(regioned.ToArray());
+		var async = SceneManager.UnloadSceneAsync(worldScene);
+		yield return new WaitUntil(() => async.isDone);
+		yield return null;
 	}
 }
