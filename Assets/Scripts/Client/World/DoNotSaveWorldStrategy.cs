@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+#nullable enable
+
 #if UNITY_INCLUDE_TESTS
 namespace SoulboundBackend.Client.World {
     public class DoNotSaveWorldStrategy : IWorldSaveStrategy {
@@ -12,8 +14,15 @@ namespace SoulboundBackend.Client.World {
             return null;
         }
 
-        public void Save(WorldDump obj, string world) {
+		public byte[]? LoadRaw(string world) {
+			return null;
+		}
+
+		public void Save(WorldDump obj, string world) {
         }
-    }
+
+		public void SaveRaw(byte[] data, string world) {
+		}
+	}
 }
 #endif

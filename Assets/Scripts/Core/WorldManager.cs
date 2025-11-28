@@ -24,15 +24,11 @@ using Scene = UnityEngine.SceneManagement.Scene;
 
 public sealed class WorldManager {
 	public event Action<LevelManager, WorldDump?>? onWorldLoaded;
-	private readonly string savesRoot;
 	[Inject] public LevelManager? activeLevelManager { get; private set; }
-	private readonly IWorldSaveStrategy saveStrategy;
-	private Func<string> dataRegion;
+	private readonly WorldSerializationService serializationService;
 
-	public WorldManager(string savesRoot, IWorldSaveStrategy saveStrategy, Func<string>? dataRegion = null) {
-		this.savesRoot = savesRoot;
-		this.saveStrategy = saveStrategy;
-		this.dataRegion = dataRegion ?? (() => Application.persistentDataPath);
+	public WorldManager(WorldSerializationService serializationService) {
+		this.serializationService = serializationService;
 	}
 
 	//public IEnumerable<string> QuerySaves() {
@@ -51,7 +47,7 @@ public sealed class WorldManager {
 			Func<SceneContext> sceneContextSupplier,
 			Action sceneLoader
 		) {
-		WorldDump? dump = saveStrategy.Load(world);
+		WorldDump? dump = serializationService.Load(world);
 		if (!dump?.nonNulled ?? true) {
 			dump = null;
 		}
@@ -92,7 +88,7 @@ public sealed class WorldManager {
 	}
 
 	public void SaveWorld(string world, WorldDump dump) {
-		saveStrategy.Save(dump, world);
+		serializationService.Save(dump, world);
 
 		var persistent = ICachedRegistry<Block>.GetCachedRegistry().Values
 			.Select(block => new KeyValuePair<Block, IBlockStateCacheStrategy>(block, block.stateCacheStrategy))

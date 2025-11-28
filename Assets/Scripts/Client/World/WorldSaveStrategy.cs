@@ -36,6 +36,19 @@ namespace SoulboundBackend.Client.World {
             File.WriteAllText(GetDumpPath(name), json);
         }
 
+		public byte[]? LoadRaw(string world) {
+            string path = GetDumpPath(world);
+            if (!File.Exists(path)) {
+                return null;
+            }
+
+            return File.ReadAllBytes(path);
+		}
+
+		public void SaveRaw(byte[] data, string world) {
+            File.WriteAllBytes(GetDumpPath(world), data);
+		}
+
 		public string GetDumpPath(string world) {
 			string worldFolder = Path.Combine(root, world);
 			Directory.CreateDirectory(GetDataPath(worldFolder));

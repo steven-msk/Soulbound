@@ -4,13 +4,16 @@ using SoulboundBackend.Client.UI;
 using SoulboundBackend.Client.World;
 using SoulboundBackend.Client.World.Structure.Templates;
 using SoulboundBackend.Common;
+using SoulboundBackend.Common.Json;
 using SoulboundBackend.Core.Bootstrap;
 using SoulboundBackend.Core.Resource;
+using SoulboundBackend.Core.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Zenject;
@@ -24,6 +27,15 @@ namespace SoulboundBackend.Core {
 		public readonly WorldManager worldManager;
 		public readonly Settings settings;
 		public readonly PlayerInputActions playerInputActions;
+		public static readonly JsonSerializerSettings globalJsonSettings = new() {
+			TypeNameHandling = TypeNameHandling.Auto,
+			TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
+			Converters = new List<JsonConverter> {
+				new Vector2JsonConverter(),
+				new Vector3JsonConverter(),
+				new ColorJsonConverter()
+			},
+		};
 
 		public Soulbound(GameConfig config) {
 			instance = this;
@@ -33,7 +45,9 @@ namespace SoulboundBackend.Core {
 			IWorldSaveStrategy saveStrategy = config.dev.loadDevWorldFromSave
 				? new WorldSaveStrategy(config.file.savesFolder, Application.persistentDataPath)
 				: new DoNotSaveWorldStrategy();
-			this.worldManager = new WorldManager(config.file.savesFolder, saveStrategy);
+			ISerializer<WorldDump> worldSerializer = new JsonSerializer<WorldDump>(globalJsonSettings);
+			SerializationPipeline<WorldDump> worldSerializationPipeline = new(worldSerializer);
+			this.worldManager = new WorldManager(new WorldSerializationService(saveStrategy, worldSerializationPipeline));
 			worldManager.onWorldLoaded += (levelManager, dump) => {
 				levelManager.SpawnPlayer(dump?.player);
 			};

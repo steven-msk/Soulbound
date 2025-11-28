@@ -9,6 +9,7 @@ using SoulboundBackend.Common;
 using SoulboundBackend.Core;
 using SoulboundBackend.Core.Bootstrap;
 using SoulboundBackend.Core.Resource;
+using SoulboundBackend.Core.Serialization;
 using SoulboundBackend.Tests;
 using System;
 using System.Collections;
@@ -34,10 +35,13 @@ namespace WorldTests {
 		}
 
 		private static WorldManager CreateManagerInstance(IWorldSaveStrategy? saveStrategy) {
+			ISerializer<WorldDump> worldSerializer = new JsonSerializer<WorldDump>(Soulbound.globalJsonSettings);
+			SerializationPipeline<WorldDump> worldSerializationPipeline = new(worldSerializer);
 			return new WorldManager(
-				commonSavesRoot,
-				saveStrategy ?? new DoNotSaveWorldStrategy(),
-				() => Application.temporaryCachePath
+				new WorldSerializationService(
+					saveStrategy ?? new DoNotSaveWorldStrategy(),
+					worldSerializationPipeline
+				)
 			);
 		}
 
@@ -46,10 +50,7 @@ namespace WorldTests {
 				string? world = null,
 				IWorldSaveStrategy? saveStrategy = null
 			) {
-			worldBox.value = new WorldManager(commonSavesRoot,
-				saveStrategy ?? new DoNotSaveWorldStrategy(),
-				() => Application.temporaryCachePath
-			);
+			worldBox.value = CreateManagerInstance(new DoNotSaveWorldStrategy());
 			worldBox.value.LoadWorld(
 				world ?? World.CreateNewWorldID(),
 				() => {

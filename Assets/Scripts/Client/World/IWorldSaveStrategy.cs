@@ -11,5 +11,8 @@ namespace SoulboundBackend.Core {
     public interface IWorldSaveStrategy {
         WorldDump? Load(string world);
         void Save(WorldDump obj, string world);
+
+        byte[]? LoadRaw(string world);
+        void SaveRaw(byte[] data, string world);
     }
 }
