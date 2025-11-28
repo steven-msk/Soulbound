@@ -12,11 +12,11 @@ using Unity.Plastic.Newtonsoft.Json;
 namespace SoulboundBackend.Client.World {
     public class WorldSaveStrategy : IWorldSaveStrategy {
         private readonly string root;
-        private readonly string dataRegion;
+        private readonly string dataPath;
 
-        public WorldSaveStrategy(string root, string dataRegion) {
+        public WorldSaveStrategy(string root, string dataPath) {
             this.root = root;
-            this.dataRegion = dataRegion;
+            this.dataPath = dataPath;
         }
 
         public WorldDump? Load(string name) {
@@ -38,16 +38,16 @@ namespace SoulboundBackend.Client.World {
 
 		public string GetDumpPath(string world) {
 			string worldFolder = Path.Combine(root, world);
-			Directory.CreateDirectory(GetRegionedPath(worldFolder));
+			Directory.CreateDirectory(GetDataPath(worldFolder));
 
-			string dumpPath = GetRegionedPath(Path.Combine(worldFolder, LevelManager.worldDump));
+			string dumpPath = GetDataPath(worldFolder, LevelManager.worldDump);
 			return dumpPath;
 		}
 
-		public string GetRegionedPath(params string[] paths) {
-			List<string> regioned = new() { dataRegion };
-			regioned.AddRange(paths);
-			return Path.Combine(regioned.ToArray());
+		public string GetDataPath(params string[] paths) {
+			List<string> path = new() { dataPath };
+			path.AddRange(paths);
+			return Path.Combine(path.ToArray());
 		}
 	}
 }

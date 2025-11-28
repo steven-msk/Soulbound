@@ -51,7 +51,7 @@ namespace WorldTests {
 				() => Application.temporaryCachePath
 			);
 			worldBox.value.LoadWorld(
-				world ?? CreateNewWorldID(),
+				world ?? World.CreateNewWorldID(),
 				() => {
 					var prefab = ResourceManager.GetRuntimePrefab("sceneContext");
 					var canvas = GameObject.Instantiate(ResourceManager.GetRuntimePrefab("Canvas")).GetComponent<Canvas>();
@@ -76,7 +76,7 @@ namespace WorldTests {
 				Scene? worldScene,
 				ContextBox<WorldManager> worldBox
 			) {
-			yield return CreateContextWithSceneProvided(
+			yield return World.CreateContextWithSceneProvided(
 				worldScene ?? PlayModeTesting.CreateNewTestScene(), worldBox
 			);
 		}
@@ -87,10 +87,10 @@ namespace WorldTests {
 				string? world = null,
 				IWorldSaveStrategy? saveStrategy = null
 			) {
-			worldBox.value = CreateManagerInstance(saveStrategy);
+			worldBox.value = World.CreateManagerInstance(saveStrategy);
 
 			worldBox.value.LoadWorld(
-				world ?? CreateNewWorldID(),
+				world ?? World.CreateNewWorldID(),
 				() => {
 					var sceneContext = scene.GetRootGameObjects()
 						.SelectMany(o => o.GetComponentsInChildren<SceneContext>(true))
@@ -119,14 +119,14 @@ namespace WorldTests {
 				string world
 			) {
 			sceneBox.value = PlayModeTesting.CreateNewTestScene();
-			yield return CreateContextWithSceneProvided(
+			yield return World.CreateContextWithSceneProvided(
 				sceneBox.value, worldBox, world, 
 				new WorldSaveStrategy("saves", Application.temporaryCachePath)
 			);
 		}
 
 		internal static Level TryGetLevel(WorldManager? worldManager) {
-			return TryGetManager(worldManager)?.level!;
+			return World.TryGetManager(worldManager)?.level!;
 		}
 
 		internal static LevelManager TryGetManager(WorldManager? worldManager) {
@@ -135,18 +135,18 @@ namespace WorldTests {
 		}
 
 		internal static Level TryGetLevel(ContextBox<WorldManager> worldBox) {
-			return TryGetLevel(worldBox.value);
+			return World.TryGetLevel(worldBox.value);
 		}
 
 		internal static LevelManager TryGetManager(ContextBox<WorldManager> worldBox) {
-			return TryGetManager(worldBox.value);
+			return World.TryGetManager(worldBox.value);
 		}
 
 		[UnityTest]
 		public IEnumerator TestRelevant_World_LoadsSuccessfully_WhenSceneProvided() {
 			Scene scene = PlayModeTesting.CreateNewTestScene();
 			var worldBox = new ContextBox<WorldManager>();
-			yield return CreateContextWithSceneProvided(scene, worldBox);
+			yield return World.CreateContextWithSceneProvided(scene, worldBox);
 
 			Assert.That(
 				worldBox.value?.activeLevelManager?.level.isWorldLoaded ?? false,
@@ -160,16 +160,19 @@ namespace WorldTests {
 			yield return World.CreateContextWithNoSceneProvided(worldBox);
 			Assert.That(worldBox.value != null, () => "Failed to create sceneless world");
 		}
+	}
 
+	[TestFixture]
+	public class Serialization {
 		[UnityTest]
 		public IEnumerator World_SaveAndReload_PersistsBlockChanges() {
-			string world = CreateNewWorldID();
+			string world = World.CreateNewWorldID();
 
 			var sceneBox = new ContextBox<Scene>();
 			var worldBox = new ContextBox<WorldManager>();
-			yield return CreateSavedContext(worldBox, sceneBox, world);
+			yield return World.CreateSavedContext(worldBox, sceneBox, world);
 
-			WorldDump dump = TryGetManager(worldBox).CreateDump();
+			WorldDump dump = World.TryGetManager(worldBox).CreateDump();
 			ChunkBlockPos pos = new(0, 0, 0);
 
 			pos.chunkX = dump.generatedChunks[0].xpos;
@@ -181,73 +184,73 @@ namespace WorldTests {
 
 			yield return PlayModeTesting.UnloadSceneAsync(sceneBox.value);
 
-			yield return CreateSavedContext(worldBox, sceneBox, world);
+			yield return World.CreateSavedContext(worldBox, sceneBox, world);
 
-			Level level = TryGetLevel(worldBox);
+			Level level = World.TryGetLevel(worldBox);
 			Assert.That(level.BlockAt(pos.ToWorldBlockPos()) == target);
 		}
 
 		[UnityTest]
 		public IEnumerator World_HasUniqueSaveFile() {
-			string world1 = CreateNewWorldID();
-			string world2 = CreateNewWorldID();
+			string world1 = World.CreateNewWorldID();
+			string world2 = World.CreateNewWorldID();
 
 			var sceneBox = new ContextBox<Scene>();
 			var worldBox = new ContextBox<WorldManager>();
-			yield return CreateSavedContext(worldBox, sceneBox, world1);
-			int world1seed = TryGetLevel(worldBox).seed;
+			yield return World.CreateSavedContext(worldBox, sceneBox, world1);
+			int world1seed = World.TryGetLevel(worldBox).seed;
 
 			yield return worldBox.value!.TerminateWorldProcess(sceneBox.value, world1,
-				() => TryGetManager(worldBox).CreateDump());
+				() => World.TryGetManager(worldBox).CreateDump());
 
-			yield return CreateSavedContext(worldBox, sceneBox, world2);
-			int world2seed = TryGetLevel(worldBox).seed;
+			yield return World.CreateSavedContext(worldBox, sceneBox, world2);
+			int world2seed = World.TryGetLevel(worldBox).seed;
 
 			yield return worldBox.value!.TerminateWorldProcess(sceneBox.value, world2,
-				() => TryGetManager(worldBox).CreateDump());
+				() => World.TryGetManager(worldBox).CreateDump());
 
-			yield return CreateSavedContext(worldBox, sceneBox, world1);
-			Assert.That(world1seed, Is.EqualTo(TryGetLevel(worldBox).seed));
+			yield return World.CreateSavedContext(worldBox, sceneBox, world1);
+			Assert.That(world1seed, Is.EqualTo(World.TryGetLevel(worldBox).seed));
 
 			yield return PlayModeTesting.UnloadSceneAsync(sceneBox.value);
 
-			yield return CreateSavedContext(worldBox, sceneBox, world2);
-			Assert.That(world2seed, Is.EqualTo(TryGetLevel(worldBox).seed));
+			yield return World.CreateSavedContext(worldBox, sceneBox, world2);
+			Assert.That(world2seed, Is.EqualTo(World.TryGetLevel(worldBox).seed));
 		}
 
 		[UnityTest]
 		public IEnumerator World_LevelInstanceChanges_WhenSwitchingWorlds() {
-			string world1 = CreateNewWorldID();
-			string world2 = CreateNewWorldID();
+			string world1 = World.CreateNewWorldID();
+			string world2 = World.CreateNewWorldID();
 			var worldBox = new ContextBox<WorldManager>();
 			var sceneBox = new ContextBox<Scene>();
 
-			yield return CreateSavedContext(worldBox, sceneBox, world1);
-			Level world1instance = TryGetLevel(worldBox);
-			worldBox.value!.SaveWorld(world1, TryGetManager(worldBox));
+			yield return World.CreateSavedContext(worldBox, sceneBox, world1);
+			Level world1instance = World.TryGetLevel(worldBox);
+			worldBox.value!.SaveWorld(world1, World.TryGetManager(worldBox));
 
 			yield return PlayModeTesting.UnloadSceneAsync(sceneBox.value);
 
-			yield return CreateSavedContext(worldBox, sceneBox, world2);
-			Level world2instance = TryGetLevel(worldBox);
+			yield return World.CreateSavedContext(worldBox, sceneBox, world2);
+			Level world2instance = World.TryGetLevel(worldBox);
 
 			Assert.That(world1instance, Is.Not.EqualTo(world2instance));
 		}
 
 		[UnityTest]
 		public IEnumerator DoNotSaveWorldStrategy_DiscardsSaves() {
-			string world = CreateNewWorldID();
+			string world = World.CreateNewWorldID();
 			var worldBox = new ContextBox<WorldManager>();
 
 			Scene scene = PlayModeTesting.CreateNewTestScene();
-			yield return CreateAnonymousContext(scene, worldBox);
-			int seed = TryGetLevel(worldBox).seed;
-			worldBox.value!.SaveWorld(world, TryGetManager(worldBox));
+			yield return World.CreateAnonymousContext(scene, worldBox);
+			int seed = World.TryGetLevel(worldBox).seed;
+			worldBox.value!.SaveWorld(world, World.TryGetManager(worldBox));
 
 			yield return PlayModeTesting.UnloadSceneAsync(scene);
 
-			yield return CreateContextWithNoSceneProvided(worldBox, world, new DoNotSaveWorldStrategy());
-			Assert.That(seed, Is.Not.EqualTo(TryGetLevel(worldBox).seed));
+			yield return World.CreateContextWithNoSceneProvided(worldBox, world, new DoNotSaveWorldStrategy());
+			Assert.That(seed, Is.Not.EqualTo(World.TryGetLevel(worldBox).seed));
 		}
 	}
 }
