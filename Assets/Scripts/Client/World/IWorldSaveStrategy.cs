@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 #nullable enable
 
 namespace SoulboundBackend.Core {
-    public interface ISaveStrategy<T> {
-        T? Load(string arg);
-        void Save(T obj, string arg);
+    public interface IWorldSaveStrategy {
+        WorldDump? Load(string world);
+        void Save(WorldDump obj, string world);
     }
 }

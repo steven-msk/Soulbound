@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 #if UNITY_INCLUDE_TESTS
 namespace SoulboundBackend.Client.World {
-    public class DoNotSaveWorldStrategy : ISaveStrategy<WorldDump> {
-        public WorldDump Load(string path) {
-            return default;
+    public class DoNotSaveWorldStrategy : IWorldSaveStrategy {
+        public WorldDump? Load(string world) {
+            return null;
         }
 
-        public void Save(WorldDump obj, string path) {
+        public void Save(WorldDump obj, string world) {
         }
     }
 }

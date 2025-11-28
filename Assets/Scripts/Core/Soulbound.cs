@@ -30,7 +30,7 @@ namespace SoulboundBackend.Core {
 			this.config = config;
 			this.settings = new Settings();
 			this.playerInputActions = new PlayerInputActions();
-			ISaveStrategy<WorldDump> saveStrategy = config.dev.loadDevWorldFromSave
+			IWorldSaveStrategy saveStrategy = config.dev.loadDevWorldFromSave
 				? new WorldSaveStrategy(config.file.savesFolder, Application.persistentDataPath)
 				: new DoNotSaveWorldStrategy();
 			this.worldManager = new WorldManager(config.file.savesFolder, saveStrategy);

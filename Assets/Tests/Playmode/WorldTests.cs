@@ -33,7 +33,7 @@ namespace WorldTests {
 			return "world_" + Guid.NewGuid().ToString();
 		}
 
-		private static WorldManager CreateManagerInstance(ISaveStrategy<WorldDump>? saveStrategy) {
+		private static WorldManager CreateManagerInstance(IWorldSaveStrategy? saveStrategy) {
 			return new WorldManager(
 				commonSavesRoot,
 				saveStrategy ?? new DoNotSaveWorldStrategy(),
@@ -44,7 +44,7 @@ namespace WorldTests {
 		internal static IEnumerator CreateContextWithNoSceneProvided(
 				ContextBox<WorldManager> worldBox,
 				string? world = null,
-				ISaveStrategy<WorldDump>? saveStrategy = null
+				IWorldSaveStrategy? saveStrategy = null
 			) {
 			worldBox.value = new WorldManager(commonSavesRoot,
 				saveStrategy ?? new DoNotSaveWorldStrategy(),
@@ -85,7 +85,7 @@ namespace WorldTests {
 				Scene scene,
 				ContextBox<WorldManager> worldBox,
 				string? world = null,
-				ISaveStrategy<WorldDump>? saveStrategy = null
+				IWorldSaveStrategy? saveStrategy = null
 			) {
 			worldBox.value = CreateManagerInstance(saveStrategy);
 

@@ -26,10 +26,10 @@ public sealed class WorldManager {
 	public event Action<LevelManager, WorldDump?>? onWorldLoaded;
 	private readonly string savesRoot;
 	[Inject] public LevelManager? activeLevelManager { get; private set; }
-	private readonly ISaveStrategy<WorldDump> saveStrategy;
+	private readonly IWorldSaveStrategy saveStrategy;
 	private Func<string> dataRegion;
 
-	public WorldManager(string savesRoot, ISaveStrategy<WorldDump> saveStrategy, Func<string>? dataRegion = null) {
+	public WorldManager(string savesRoot, IWorldSaveStrategy saveStrategy, Func<string>? dataRegion = null) {
 		this.savesRoot = savesRoot;
 		this.saveStrategy = saveStrategy;
 		this.dataRegion = dataRegion ?? (() => Application.persistentDataPath);

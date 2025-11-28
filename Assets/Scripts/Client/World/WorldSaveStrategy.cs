@@ -10,7 +10,7 @@ using Unity.Plastic.Newtonsoft.Json;
 #nullable enable
 
 namespace SoulboundBackend.Client.World {
-    public class WorldSaveStrategy : ISaveStrategy<WorldDump> {
+    public class WorldSaveStrategy : IWorldSaveStrategy {
         private readonly string root;
         private readonly string dataRegion;
 
@@ -19,7 +19,7 @@ namespace SoulboundBackend.Client.World {
             this.dataRegion = dataRegion;
         }
 
-        public WorldDump Load(string name) {
+        public WorldDump? Load(string name) {
             string path = GetDumpPath(name);
 
             if (File.Exists(path)) {
