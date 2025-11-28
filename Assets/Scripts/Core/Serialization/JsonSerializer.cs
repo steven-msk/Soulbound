@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Unity.Plastic.Newtonsoft.Json;
 
 namespace SoulboundBackend.Core.Serialization {
-	public sealed class JsonSerializer<T> : ISerializer<T> {
+	public class JsonSerializer<T> : ISerializer<T> {
 		private JsonSerializerSettings serializerSettings;
 
 		public JsonSerializer(JsonSerializerSettings serializerSettings) {

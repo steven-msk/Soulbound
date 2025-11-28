@@ -403,7 +403,7 @@ Based on the dependency graph, this could be an optimal order:
 [EDIT]: For convenience during late prototyping, categories have been marked accordingly to ease development: `*` means started but not finished, `<-` marks a focus point, `>|` means ready for production, `>>>` means progressively developed (see [notes](#notes))
 1. [Input system](#4-input-system) **>|**
 2. [Action Request System](#18-action-request-system) **>|**
-3. [Serialization](#17-serialization) (foundation only)
+3. [Serialization](#17-serialization) (foundation only) * *delayed until all WorldDump fields are stable*
 4. [Stat system](#5-stat-system)
 5. [Entity system](#6-entity-system)
 6. [Block system](#8-block-system)

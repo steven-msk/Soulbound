@@ -9,9 +9,10 @@ using Unity.Plastic.Newtonsoft.Json;
 using Unity.Plastic.Newtonsoft.Json.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using System.IO;
 
 namespace SoulboundBackend.Client.World.Chunk {
-	[JsonConverter(typeof(WorldChunkJsonConverter))]
+	[JsonConverter(typeof(WorldChunk.Serializer))]
 	public class WorldChunk {
 		public static readonly int minY = -Level.WORLD_HEIGHT / 2;
 		public static readonly int maxY = Level.WORLD_HEIGHT / 2;
@@ -117,7 +118,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 			return blockStates[chunkPos.x][WorldYToIndex(chunkPos.y)];
 		}
 
-		public sealed class WorldChunkJsonConverter : JsonConverter<WorldChunk> {
+		public sealed class Serializer : JsonConverter<WorldChunk> {
 			public override WorldChunk ReadJson(
 					JsonReader reader,
 					Type objectType, 
@@ -175,6 +176,14 @@ namespace SoulboundBackend.Client.World.Chunk {
 				writer.WriteEndArray();
 
 				writer.WriteEndObject();
+			}
+
+			public static void WriteBinary(BinaryWriter writer, WorldChunk chunk) {
+				throw new NotImplementedException();
+			}
+
+			public static WorldChunk ReadBinary(BinaryReader reader) {
+				throw new NotImplementedException();
 			}
 		}
 	}
