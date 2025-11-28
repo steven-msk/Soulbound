@@ -59,7 +59,7 @@ namespace SoulboundBackend.Core {
 			this.worldManager = container.Resolve<WorldManager>();
 			this.worldCanvas = container.Resolve<Canvas>();
 
-			inputMappings = Soulbound.instance.playerInputActions;
+			inputMappings = container.Resolve<PlayerInputActions>();
 			InputActionMap playerActionMap = inputMappings.asset.FindActionMap("Player");
 			this.inputHandler = new InputHandler(playerActionMap);
 

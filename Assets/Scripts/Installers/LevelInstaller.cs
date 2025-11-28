@@ -18,6 +18,7 @@ namespace SoulboundBackend.Core.Bootstrap {
 		public override void InstallBindings(DiContainer container) {
 			var levelManagerPrefab = ResourceManager.GetRuntimePrefab("levelManager");
 
+			container.BindInstance<PlayerInputActions>(Soulbound.instance?.playerInputActions ?? new PlayerInputActions()).AsSingle().NonLazy();
 			container.BindInstance<WorldManager>(worldManager).AsSingle();
 			container.Bind<LevelManager>().FromComponentInNewPrefab(levelManagerPrefab).AsSingle().NonLazy();
 			container.BindInstance<Canvas>(canvas).AsSingle();
