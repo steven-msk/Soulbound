@@ -82,6 +82,8 @@ The exact cause of this behavior is currently unknown, and there is no reliable 
 
 ## System Dependency Map
 
+- Jump to [Recommended Production Order](#recommended-production-order-top-to-bottom)
+
 Below is each system with:
 - General status summary
 - Direct dependencies (systems it *needs* to function)
@@ -399,26 +401,27 @@ Status: ⚙️ Prototype (implemented poorly, not respecting separation of conce
 ## Recommended Production Order (Top to bottom)
 Based on the dependency graph, this could be an optimal order:
 [EDIT]: For convenience during late prototyping, categories have been marked accordingly to ease development: `*` means started but not finished, `<-` marks a focus point, `>|` means ready for production, `>>>` means progressively developed (see [notes](#notes))
+1. [Input system](#4-input-system) **>|**
+2. [Action Request System](#18-action-request-system) **>|**
+3. [Serialization](#17-serialization) (foundation only)
+4. [Stat system](#5-stat-system)
+5. [Entity system](#6-entity-system)
+6. [Block system](#8-block-system)
+7. [Chunk generation](#9-chunk-generation)
+11. [World rendering](#10-world-rendering)
+8. [Physics system](#7-physics-system) (universal overhaul)
+9. [UI Core layer & navigation system](#13-ui-systems-overall)
+10. [Tooltips](#14-tooltips)
+11. [Settings](#16-settings-ui) *
+12. [Debug visuals](#15-debug-visuals)
+13. [Lighting](#11-lighting-system)
+14. [Audio](#12-audio-system)
+
+##### Exceptions from this list
+
 1. [State Initialization](#1-state-initialization) >>>
 2. [Dependency injection](#2-dependency-injection-di) >>>
 3. [Internal timing system](#3-internal-timing--event-communication) >>>
-4. [Input system](#4-input-system) **>|**
-5. [Action Request System](#18-action-request-system) **>|**
-6. [Serialization](#17-serialization) (foundation only)
-7. [Stat system](#5-stat-system)
-8. [Entity system](#6-entity-system)
-9. [Block system](#8-block-system)
-10. [Chunk generation](#9-chunk-generation)
-11. [World rendering](#10-world-rendering)
-12. [Physics system](#7-physics-system) (universal overhaul)
-13. [UI Core layer & navigation system](#13-ui-systems-overall)
-14. [Tooltips](#14-tooltips)
-15. [Settings](#16-settings-ui) *
-16. [Debug visuals](#15-debug-visuals)
-17. [Lighting](#11-lighting-system)
-18. [Audio](#12-audio-system)
-
-#### Notes
 
 `State Initialization` and `Dependency Injection` are self-deterministic systems. In practice, they do not form two independent layers of abstraction; their responsibilities blend into eachother. Their behavior is based on establishing a complete and coherent object graph before any logic executes.
 Because their responsibilities overlap, they cannot be meaningfully separated into more isolated abstractions. The most accurate level of abstraction for both is the "lifecycle unit", a self-contained intialization domain that declares what it requires, what it provides, and how it bootstraps itself.
