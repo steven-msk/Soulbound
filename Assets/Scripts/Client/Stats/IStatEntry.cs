@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 
 namespace SoulboundBackend.Client.Stats {
-	public interface IStatEntryImpl {
+	public interface IStatEntry {
 		void Add(AbstractSerializableStat serializableStat, IStatProvider provider);
 
 		void AddRange(params (AbstractSerializableStat stat, IStatProvider provider)[] modifiers);

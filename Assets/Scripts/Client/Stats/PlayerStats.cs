@@ -14,9 +14,8 @@ namespace SoulboundBackend.Client.Stats {
 		private static readonly LogModule playerStats = new LogModule("PLAYER STATS", "#00FFFF");
 
 		[JsonProperty]
-		[JsonConverter(typeof(JsonDictionaryConverter<IStatDefinitionImpl, IStatEntryImpl>))]
-		private static Dictionary<IStatDefinitionImpl, IStatEntryImpl> injected = new();
-
+		[JsonConverter(typeof(JsonDictionaryConverter<IStatDefinition, IStatEntry>))]
+		private static Dictionary<IStatDefinition, IStatEntry> injected = new();
 
 		// REMINDER: current stat default values are subject to change
 		[JsonIgnore] public StatEntry<int> MaxHealth { get; private set; } = InjectStatEntry<int>(new(200, StatDefinition.MaxHealth));
@@ -43,7 +42,7 @@ namespace SoulboundBackend.Client.Stats {
 		public int GrantedFlightTime { get; set; } = 0;
 
 		internal static StatEntry<TValue> InjectStatEntry<TValue>(StatEntry<TValue> statEntry) where TValue : struct, IComparable<TValue> {
-			injected[statEntry.definitionReference] = statEntry;
+			injected[statEntry.definition] = statEntry;
 			return statEntry;
 		}
 

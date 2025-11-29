@@ -33,9 +33,9 @@ namespace SoulboundBackend.Client.Stats {
 
 		public override object GetBoxedValue() => value;
 
-		public override string GetFormattedExpression() => (statDefinition as IStatDefinitionImpl).GetFormattedExpression(value, showAsBonus);
+		public override string GetFormattedExpression() => (statDefinition as IStatDefinition).GetFormattedExpression(value, showAsBonus);
 
-		public override IStatDefinitionImpl GetStatDefinition() => statDefinition;
+		public override IStatDefinition GetStatDefinition() => statDefinition;
 
 		public override string GetInfo() {
 			return $"SerializableStat[type: {typeof(TValue)}, statDefinition: {statDefinition}, " +

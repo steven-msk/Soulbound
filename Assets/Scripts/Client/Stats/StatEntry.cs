@@ -4,29 +4,39 @@ using SoulboundBackend.Common.Json;
 using SoulboundBackend.Common.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Unity.Plastic.Newtonsoft.Json;
 
+#nullable enable
+
 namespace SoulboundBackend.Client.Stats {
-	public class StatEntry<TValue> : IStatEntryImpl where TValue : struct, IComparable<TValue> {
+	public class StatEntry<TValue> : IStatEntry where TValue : struct, IComparable<TValue> {
 		private static readonly Logger logger = Logger.CreateInstance();
 		[JsonProperty]
 		[JsonConverter(typeof(ModifierDictionaryConverter))]
 		private Dictionary<IStatProvider, List<AbstractSerializableStat>> modifiers = new();
-		public event Action<StatEntry<TValue>> OnModifiersChanged;
+		public event Action<StatEntry<TValue>>? OnModifiersChanged;
 		public TValue baseValue { get; protected set; }
-		public StatDefinition<TValue> definitionReference { get; protected set; }
+		public StatDefinition<TValue> definition { get; protected set; }
+		private IStatProcessor<TValue>? _processor;
+		public IStatProcessor<TValue> processor => _processor ?? definition.defaultProcessor;
 		private bool flag_blockUpdate = false;
 
-		public StatEntry(TValue baseValue, StatDefinition<TValue> definitionReference) {
+		public StatEntry(TValue baseValue, StatDefinition<TValue> definition, IStatProcessor<TValue> processor) 
+			: this(baseValue, definition) {
+			this._processor = processor;
+		}
+
+		public StatEntry(TValue baseValue, StatDefinition<TValue> definition) {
 			this.baseValue = baseValue;
-			this.definitionReference = definitionReference;
+			this.definition = definition;
 		}
 
 		public TValue GetProcessedValue() {
 			try {
 				IEnumerable<SerializableStat<TValue>> casted = modifiers.SelectMany(m => m.Value.Cast<SerializableStat<TValue>>());
-				return this.definitionReference.processor.ProcessFinalValue(baseValue, casted);
+				return this.processor.ProcessFinalValue(baseValue, casted);
 			} catch (InvalidCastException e) {
 				logger.LogError(e);
 				return default(TValue);
@@ -86,7 +96,7 @@ namespace SoulboundBackend.Client.Stats {
 			}
 
 			StatDefinition<TValue> definition = (StatDefinition<TValue>)serializableStat.GetStatDefinition();
-			if (definition != this.definitionReference) {
+			if (definition != this.definition) {
 				logger.ThrowException(null, new ArgumentException($"{failedApplication} Mismatched stat definition references for serializable stat {serializableStat} and stat entry {this}"));
 				return false;
 			}
@@ -103,7 +113,7 @@ namespace SoulboundBackend.Client.Stats {
 			if (string.IsNullOrEmpty(modifiers)) {
 				modifiers = "null";
 			}
-			return $"StatEntry[type: {typeof(TValue)}, baseValue: {baseValue}, definitionReference: {definitionReference}, modifiers: {modifiers}]";
+			return $"StatEntry[type: {typeof(TValue)}, baseValue: {baseValue}, definitionReference: {definition}, modifiers: {modifiers}]";
 		}
 
 	}

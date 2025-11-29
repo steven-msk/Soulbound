@@ -2,12 +2,12 @@
 
 namespace SoulboundBackend.Client.Stats {
 	public abstract class AbstractSerializableStat {
-		public abstract IStatDefinitionImpl GetStatDefinition();
+		public abstract IStatDefinition GetStatDefinition();
 		public abstract StatApplicationType GetApplicationType();
 		public abstract object GetBoxedValue();
 		public abstract string GetFormattedExpression();
 		public abstract bool showAsBonus { get; }
-		public abstract bool persistent { get; set; }
+		[Obsolete] public abstract bool persistent { get; set; }
 
 		public override string ToString() => GetFormattedExpression();
 

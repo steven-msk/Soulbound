@@ -3,14 +3,14 @@
 #nullable enable
 
 namespace SoulboundBackend.Client.Stats {
-	public partial class StatDefinition<TValue> : IStatDefinitionImpl where TValue : struct, IComparable<TValue> {
+	public partial class StatDefinition<TValue> : IStatDefinition where TValue : struct, IComparable<TValue> {
 		public string baseName { get; }
 		public Func<TValue, string, string> displayNameFormat { get; }
 		public Func<TValue, string> valueFormat { get; }
 		public BonusAdmission<TValue> bonusValueAdmission { get; }
 		public Func<TValue, string>? valueColorSupplier { get; }
 		public SupportedApplicationType supportedApplications { get; }
-		public IStatProcessor<TValue> processor { get; }
+		public IStatProcessor<TValue> defaultProcessor { get; }
 		public string? id { get; set; }
 		public Type valueType => typeof(TValue);
 
@@ -23,12 +23,12 @@ namespace SoulboundBackend.Client.Stats {
 			this.bonusValueAdmission = bonusValueAdmission;
 			this.valueColorSupplier = valueColorSupplier;
 			this.supportedApplications = supportedApplications;
-			this.processor = processor;
+			this.defaultProcessor = processor;
 		}
 
-		string IStatDefinitionImpl.GetFormattedName(object value) => displayNameFormat.Invoke((TValue)value, baseName);
+		string IStatDefinition.GetFormattedName(object value) => displayNameFormat.Invoke((TValue)value, baseName);
 
-		string IStatDefinitionImpl.GetFormattedValue(object value, bool applyAsBonus) {
+		string IStatDefinition.GetFormattedValue(object value, bool applyAsBonus) {
 			string formattedValue = valueFormat.Invoke((TValue)value);
 			if (applyAsBonus && valueColorSupplier != null) {
 				formattedValue = string.Concat(bonusValueAdmission.GetPrefix((TValue)value), formattedValue);
@@ -48,7 +48,7 @@ namespace SoulboundBackend.Client.Stats {
 		}
 
 		public override bool Equals(object obj) {
-			return obj is IStatDefinitionImpl other && other.id == this.id;
+			return obj is IStatDefinition other && other.id == this.id;
 		}
 
 		public static bool operator ==(StatDefinition<TValue> first, StatDefinition<TValue> second) {
@@ -69,6 +69,8 @@ namespace SoulboundBackend.Client.Stats {
 			SupportedApplicationType.Flat,
 			StatProcessors.Flat<int>()
 		));
+		// +/- => +/-X
+
 		public static readonly StatDefinition<int> MaxMana = InjectID("maxMana", new StatDefinition<int>("Max Mana",
 			StatDisplayFormatter.PlainNameFormat<int>("#6BCBFF"),
 			StatDisplayFormatter.PlainValueFormat<int>(),
@@ -77,6 +79,8 @@ namespace SoulboundBackend.Client.Stats {
 			SupportedApplicationType.Flat,
 			StatProcessors.Flat<int>()
 		));
+		// +/- => +/-X
+
 		public static readonly StatDefinition<int> Defense = InjectID("defense", new StatDefinition<int>("Defense",
 			StatDisplayFormatter.PlainNameFormat<int>("#CCDDEE"),
 			StatDisplayFormatter.PlainValueFormat<int>(),
@@ -85,6 +89,8 @@ namespace SoulboundBackend.Client.Stats {
 			SupportedApplicationType.Flat,
 			StatProcessors.Flat<int>()
 		));
+		// +/- => +/-X
+
 		public static readonly StatDefinition<int> SoulSlots = InjectID("soulSlot", new StatDefinition<int>("Soul Slot",
 			StatDisplayFormatter.PluralAdaptedNameFormat<int>("#C86BFF"),
 			StatDisplayFormatter.PlainValueFormat<int>(),
@@ -93,6 +99,8 @@ namespace SoulboundBackend.Client.Stats {
 			SupportedApplicationType.Flat,
 			StatProcessors.Flat<int>()
 		));
+		// +/- => +/-X
+
 		public static readonly StatDefinition<float> MovementSpeed = InjectID("movementSpeed", new StatDefinition<float>("Movement Speed",
 			StatDisplayFormatter.PlainNameFormat<float>("#6BFFB6"),
 			StatDisplayFormatter.PercentageValueFormat(),
@@ -101,6 +109,14 @@ namespace SoulboundBackend.Client.Stats {
 			SupportedApplicationType.Percentage,
 			StatProcessors.Percentage()
 		));
+		// +/-% => +/-X%
+
+		// +/-X%
+		// x1.5 == +150%
+		// percentage display preferred over multiplied display
+		// due to negative incompatibility with multiplied:
+		// -x1.5 or x-1.5 == -150%
+
 		public static readonly StatDefinition<int> JumpHeight = InjectID("jumpHeight", new StatDefinition<int>("Jump Height",
 			StatDisplayFormatter.PlainNameFormat<int>("#67E8F9"),
 			StatDisplayFormatter.PlainValueFormat<int>(),
@@ -207,9 +223,9 @@ namespace SoulboundBackend.Client.Stats {
 		));
 
 		protected static StatDefinition<TInnerValue> InjectID<TInnerValue>(string id, StatDefinition<TInnerValue> definition)
-			where TInnerValue : struct, IComparable<TInnerValue> {
+				where TInnerValue : struct, IComparable<TInnerValue> {
 			definition.id = id;
-			IStatDefinitionImpl.Register(id, definition);
+			IStatDefinition.Register(id, definition);
 			return definition;
 		}
 	}
