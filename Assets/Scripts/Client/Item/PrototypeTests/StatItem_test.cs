@@ -26,7 +26,7 @@ public sealed class StatItem_test : StatItem {
 	public StatItem_test() {
 		StatMappingBuilder mappingBuilder = new StatMappingBuilder()
 			.SetStats(() => new DynamicMap<AbstractSerializableStat>() {
-				["physicalDamage"] = new SerializableStat<int>(StatDefinition.PhysicalDamage, 10, StatApplicationType.Percentage, showAsBonus: true)
+				["physicalDamage"] = new ValueModifier<int>(StatDefinition.PhysicalDamage, 10, StatApplicationType.Percentage, showAsBonus: true)
 			})
 			.WithTooltipNodes(stats => new List<TooltipNodeData>() {
 				new TooltipNodeData(TooltipNode.Stats, $"While in inventory, gain {stats["physicalDamage"]}.")

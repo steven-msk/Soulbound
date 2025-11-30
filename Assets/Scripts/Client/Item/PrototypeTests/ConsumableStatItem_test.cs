@@ -27,7 +27,7 @@ public sealed class ConsumableStatItem_test : ConsumableStatItem {
 	public ConsumableStatItem_test() {
 		StatMappingBuilder mappingBuilder = new StatMappingBuilder()
 			.SetStats(() => new DynamicMap<AbstractSerializableStat>() {
-				["luck"] = new SerializableStat<float>(StatDefinition.Luck, 0.1f, StatApplicationType.Percentage)
+				["luck"] = new ValueModifier<float>(StatDefinition.Luck, 0.1f, StatApplicationType.Percentage)
 			})
 			.WithTooltipNodes(stats => new List<TooltipNodeData>() {
 				new TooltipNodeData(TooltipNode.Stats, $"Grants {stats["luck"]} for 3s.")

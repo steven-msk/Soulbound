@@ -13,10 +13,10 @@ namespace SoulboundBackend.Client.Stats {
 				this.productResolver = productResolver;
 			}
 
-			public TValue ProcessFinalValue(TValue baseValue, IEnumerable<SerializableStat<TValue>> modifiers) {
+			public TValue ProcessFinalValue(TValue baseValue, IEnumerable<ValueModifier<TValue>> modifiers) {
 				var flatModifiers = modifiers.Where(m => m.applicationType == StatApplicationType.Flat);
 				var percentageModifiers = modifiers.Where(m => m.applicationType == StatApplicationType.Percentage)
-					.Cast<SerializableStat<float>>();       // Safe cast because percentage stats are always floats
+					.Cast<ValueModifier<float>>();       // Safe cast because percentage stats are always floats
 				TValue flatAddition = StatProcessors.Add(baseValue, flatModifiers.Select(m => m.value), adder);
 				float percentageAddition = 1 + percentageModifiers.Sum(m => m.value);
 				return productResolver.Invoke(flatAddition, percentageAddition);
@@ -30,13 +30,13 @@ namespace SoulboundBackend.Client.Stats {
 				this.adder = adder;
 			}
 
-			public TValue ProcessFinalValue(TValue baseValue, IEnumerable<SerializableStat<TValue>> modifiers) {
+			public TValue ProcessFinalValue(TValue baseValue, IEnumerable<ValueModifier<TValue>> modifiers) {
 				return StatProcessors.Add(baseValue, modifiers.Select(m => m.value), adder);
 			}
 		}
 
 		private sealed class PercentageStatProcessor : IStatProcessor<float> {
-			public float ProcessFinalValue(float baseValue, IEnumerable<SerializableStat<float>> modifiers) {
+			public float ProcessFinalValue(float baseValue, IEnumerable<ValueModifier<float>> modifiers) {
 				return baseValue * (1 + modifiers.Sum(m => m.value));
 			}
 		}

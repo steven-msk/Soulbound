@@ -5,17 +5,17 @@ namespace SoulboundBackend.Client.Stats {
 		public abstract IStatDefinition GetStatDefinition();
 		public abstract StatApplicationType GetApplicationType();
 		public abstract object GetBoxedValue();
-		public abstract string GetFormattedExpression();
+		//public abstract string GetFormattedExpression();
 		public abstract bool showAsBonus { get; }
 		[Obsolete] public abstract bool persistent { get; set; }
 
-		public override string ToString() => GetFormattedExpression();
+		//public override string ToString() => GetFormattedExpression();
 
-		public abstract string GetInfo();
+		public abstract override string ToString();
 
-		public override int GetHashCode() {
-			return HashCode.Combine(this.GetFormattedExpression(), persistent);
-		}
+		//public override int GetHashCode() {
+		//	return HashCode.Combine(this.GetFormattedExpression(), persistent);
+		//}
 
 		public override bool Equals(object other) {
 			return other is AbstractSerializableStat stat && stat.GetHashCode() == this.GetHashCode();

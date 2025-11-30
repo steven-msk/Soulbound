@@ -35,7 +35,7 @@ namespace SoulboundBackend.Client.Stats {
 
 		public TValue GetProcessedValue() {
 			try {
-				IEnumerable<SerializableStat<TValue>> casted = modifiers.SelectMany(m => m.Value.Cast<SerializableStat<TValue>>());
+				IEnumerable<ValueModifier<TValue>> casted = modifiers.SelectMany(m => m.Value.Cast<ValueModifier<TValue>>());
 				return this.processor.ProcessFinalValue(baseValue, casted);
 			} catch (InvalidCastException e) {
 				logger.LogError(e);
@@ -48,7 +48,7 @@ namespace SoulboundBackend.Client.Stats {
 				if (!modifiers.ContainsKey(provider)) {
 					modifiers.Add(provider, new List<AbstractSerializableStat>());
 				}
-				modifiers[provider].Add(serializableStat as SerializableStat<TValue>);
+				modifiers[provider].Add(serializableStat as ValueModifier<TValue>);
 			}
 			InvocationHelper.If(!flag_blockUpdate, () => OnModifiersChanged?.Invoke(this));
 		}
@@ -62,7 +62,7 @@ namespace SoulboundBackend.Client.Stats {
 
 		public void Remove(AbstractSerializableStat serializableStat, IStatProvider provider) {
 			if (Validate(serializableStat, provider) && modifiers.TryGetValue(provider, out var stats)) {
-				stats.Remove(serializableStat as SerializableStat<TValue>);
+				stats.Remove(serializableStat as ValueModifier<TValue>);
 				if (stats.Count == 0) {
 					modifiers.Remove(provider);
 				}
