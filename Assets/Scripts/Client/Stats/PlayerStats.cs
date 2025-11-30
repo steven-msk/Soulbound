@@ -46,10 +46,11 @@ namespace SoulboundBackend.Client.Stats {
 			return statEntry;
 		}
 
+		[Obsolete]
 		public void ApplyStats(IEnumerable<AbstractValueModifier> stats, IStatProvider receiver) {
 			foreach (var stat in stats) {
 				if (injected.TryGetValue(stat.statDefinition, out var statEntry)) {
-					statEntry.Add(stat, receiver);
+					//statEntry.Add(stat, receiver);
 					UnityEngine.Debug.Log("added stat: " + stat.GetHashCode() + ": " + stat);
 				} else {
 					logger.LogError(new ArgumentException($"Could not apply stat to player receiver: unknown player stat definition {stat.statDefinition}"));
@@ -57,10 +58,11 @@ namespace SoulboundBackend.Client.Stats {
 			}
 		}
 
+		[Obsolete]
 		public void RevokeStats(IEnumerable<AbstractValueModifier> stats, IStatProvider receiver) {
 			foreach (var stat in stats) {
 				if (injected.TryGetValue(stat.statDefinition, out var statEntry)) {
-					statEntry.Remove(stat, receiver);
+					//statEntry.Remove(stat, receiver);
 					UnityEngine.Debug.Log("removed stat: " + stat.GetHashCode() + ": " + stat);
 				} else {
 					logger.LogError(new ArgumentException($"Could not revoke stat to player receiver: unknown player stat definition {stat.statDefinition}"));

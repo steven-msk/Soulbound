@@ -1,6 +1,10 @@
 ﻿using System;
 
+#nullable enable
+
 namespace SoulboundBackend.Client.Stats {
+	public sealed record ModificationToken(object? tag = null);
+
 	public abstract class AbstractValueModifier {
 		public readonly IStatDefinition statDefinition;
 		public readonly StatApplicationType applicationType;
@@ -8,10 +12,11 @@ namespace SoulboundBackend.Client.Stats {
 
 		public AbstractValueModifier(IStatDefinition statDefinition, StatApplicationType applicationType) {
 			this.statDefinition = statDefinition;
-			this.applicationType = applicationType;
 		}
 
 		public abstract object GetBoxedValue();
+
+		public abstract void Apply(IStatEntry entry, ModificationToken modificationToken);
 
 		public abstract override string ToString();
 		public abstract override int GetHashCode();

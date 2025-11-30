@@ -27,6 +27,14 @@ namespace SoulboundBackend.Client.Stats {
 
 		public override object GetBoxedValue() => value;
 
+		public override void Apply(IStatEntry entry, ModificationToken modificationToken) {
+			Apply((StatEntry<TValue>)entry, modificationToken);
+		}
+
+		public void Apply(StatEntry<TValue> entry, ModificationToken modificationToken) {
+			throw new NotImplementedException();
+		}
+
 		public override string ToString() {
 			return $"ValueModifier[type: {typeof(TValue)}, " +
 				   $"statDefinition: {statDefinition}, " +
