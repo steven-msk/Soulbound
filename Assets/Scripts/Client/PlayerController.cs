@@ -316,7 +316,7 @@ namespace SoulboundBackend.Client {
 
 		public override SerializedEntityPropertyList GetSerializedProperties() {
 			return base.GetSerializedProperties()
-				.Add("stats", this.stats)
+				//.Add("stats", this.stats)
 				.Add("inventory", inventory.Serialize());
 		}
 	}

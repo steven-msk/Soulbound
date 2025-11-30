@@ -7,7 +7,7 @@ using Unity.Plastic.Newtonsoft.Json;
 namespace SoulboundBackend.Client.Stats {
 	public class ValueModifier<TValue> : AbstractValueModifier where TValue : struct, IComparable<TValue> {
 		private static readonly Logger logger = Logger.CreateInstance();
-		public TValue value { get; set; }
+		public readonly TValue value;
 		public override bool keepSign { get; }
 
 		public ValueModifier(
@@ -28,9 +28,11 @@ namespace SoulboundBackend.Client.Stats {
 		public override object GetBoxedValue() => value;
 
 		public override string ToString() {
-			return $"SerializableStat[type: {typeof(TValue)}, statDefinition: {statDefinition}, " +
-				$"value: {value}, applicationType: {applicationType}," +
-				$" showAsBonus: {keepSign}]";
+			return $"ValueModifier[type: {typeof(TValue)}, " +
+				   $"statDefinition: {statDefinition}, " +
+				   $"value: {value}, " +
+				   $"applicationType: {applicationType}, " +
+				   $"keepSign: {keepSign}]";
 		}
 
 		public override object Clone() {

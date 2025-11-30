@@ -46,21 +46,21 @@ namespace SoulboundBackend.Client.Stats {
 			return $"StatDefinition<{typeof(TValue)}>[type: {valueType}, baseName: {baseName}]";
 		}
 
-		public override int GetHashCode() {
-			return this.id!.GetHashCode();
-		}
+		//public override int GetHashCode() {
+		//	return this.id!.GetHashCode();
+		//}
 
-		public override bool Equals(object obj) {
-			return obj is IStatDefinition other && other.id == this.id;
-		}
+		//public override bool Equals(object obj) {
+		//	return obj is IStatDefinition other && other.id == this.id;
+		//}
 
-		public static bool operator ==(StatDefinition<TValue> first, StatDefinition<TValue> second) {
-			return first.id == second.id;
-		}
+		//public static bool operator ==(StatDefinition<TValue> first, StatDefinition<TValue> second) {
+		//	return first.id == second.id;
+		//}
 
-		public static bool operator !=(StatDefinition<TValue> first, StatDefinition<TValue> second) {
-			return !(first == second);
-		}
+		//public static bool operator !=(StatDefinition<TValue> first, StatDefinition<TValue> second) {
+		//	return !(first == second);
+		//}
 	}
 
 	public partial class StatDefinition {
