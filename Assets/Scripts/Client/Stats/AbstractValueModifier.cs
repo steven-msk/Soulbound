@@ -3,9 +3,7 @@
 #nullable enable
 
 namespace SoulboundBackend.Client.Stats {
-	public sealed record ModificationToken(object? tag = null);
-
-	public abstract class AbstractValueModifier {
+	public abstract class AbstractValueModifier : IStatEntryModifier {
 		public readonly IStatDefinition statDefinition;
 		public readonly StatApplicationType applicationType;
 		public abstract bool keepSign { get; }
@@ -17,6 +15,7 @@ namespace SoulboundBackend.Client.Stats {
 		public abstract object GetBoxedValue();
 
 		public abstract void Apply(IStatEntry entry, ModificationToken modificationToken);
+		public abstract void Remove(IStatEntry entry, ModificationToken modificationToken);
 
 		public abstract override string ToString();
 		public abstract override int GetHashCode();

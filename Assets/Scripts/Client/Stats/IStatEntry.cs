@@ -19,8 +19,12 @@ namespace SoulboundBackend.Client.Stats {
 		//[Obsolete]
 		//void SetModifiers(List<(AbstractValueModifier stat, IStatProvider provider)> modifiers);
 
-		object GetBoxedValue();
+		object CalculateBoxedValue();
 		Type valueType { get; }
+
+		void AcceptModifier(IStatEntryModifier modifier, ModificationToken modificationToken);
+		void RemoveModifier(IStatEntryModifier modifier, ModificationToken modificationToken);
+		void RemoveModifiers(ModificationToken modificationToken);
 
 		//[Obsolete]
 		//List<(AbstractValueModifier, IStatProvider)> GetBoxedModifiers();

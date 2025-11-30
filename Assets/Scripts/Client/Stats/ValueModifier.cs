@@ -5,7 +5,8 @@ using Unity.Plastic.Newtonsoft.Json;
 #nullable enable
 
 namespace SoulboundBackend.Client.Stats {
-	public class ValueModifier<TValue> : AbstractValueModifier where TValue : struct, IComparable<TValue> {
+	public class ValueModifier<TValue> : AbstractValueModifier, IStatEntryModifier<TValue> 
+			where TValue : struct, IComparable<TValue> {
 		private static readonly Logger logger = Logger.CreateInstance();
 		public readonly TValue value;
 		public override bool keepSign { get; }
@@ -25,15 +26,23 @@ namespace SoulboundBackend.Client.Stats {
 			}
 		}
 
-		public override object GetBoxedValue() => value;
-
-		public override void Apply(IStatEntry entry, ModificationToken modificationToken) {
-			Apply((StatEntry<TValue>)entry, modificationToken);
-		}
-
 		public void Apply(StatEntry<TValue> entry, ModificationToken modificationToken) {
 			throw new NotImplementedException();
 		}
+
+		public void Remove(StatEntry<TValue> entry, ModificationToken modificationToken) {
+			throw new NotImplementedException();
+		}
+
+		public override void Apply(IStatEntry entry, ModificationToken modificationToken) {
+			((IStatEntryModifier<TValue>)this).Apply(entry, modificationToken);
+		}
+
+		public override void Remove(IStatEntry entry, ModificationToken modificationToken) {
+			((IStatEntryModifier<TValue>)this).Remove(entry, modificationToken);
+		}
+
+		public override object GetBoxedValue() => value;
 
 		public override string ToString() {
 			return $"ValueModifier[type: {typeof(TValue)}, " +

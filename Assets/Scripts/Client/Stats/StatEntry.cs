@@ -13,7 +13,7 @@ using Unity.Plastic.Newtonsoft.Json;
 namespace SoulboundBackend.Client.Stats {
 	public class StatEntry<TValue> : IStatEntry where TValue : struct, IComparable<TValue> {
 		private static readonly Logger logger = Logger.CreateInstance();
-		private Dictionary<ModificationToken, List<AbstractValueModifier>> modifiers = new();
+		private Dictionary<ModificationToken, List<IStatEntryModifier<TValue>>> modifiers = new();
 		[Obsolete]
 		public event Action<StatEntry<TValue>>? OnModifiersChanged;
 		public TValue baseValue { get; protected set; }
@@ -34,6 +34,7 @@ namespace SoulboundBackend.Client.Stats {
 			this.definition = definition;
 		}
 
+		[Obsolete]
 		public TValue GetProcessedValue() {
 			try {
 				IEnumerable<ValueModifier<TValue>> casted = modifiers.SelectMany(m => m.Value.Cast<ValueModifier<TValue>>());
@@ -42,6 +43,27 @@ namespace SoulboundBackend.Client.Stats {
 				logger.LogError(e);
 				return default(TValue);
 			}
+		}
+
+		public void AcceptModifier(IStatEntryModifier modifier, ModificationToken modificationToken) {
+			modifier.Apply(this, modificationToken);
+		}
+
+		public void RemoveModifier(IStatEntryModifier modifier, ModificationToken modificationToken) {
+			modifier.Remove(this, modificationToken);
+		}
+
+		public void RemoveModifiers(ModificationToken modificationToken) {
+			foreach (var modifier in modifiers[modificationToken]) {
+				modifier.Remove(this, modificationToken);
+			}
+		}
+
+		public void AddModifier(IStatEntryModifier<TValue> modifier, ModificationToken modificationToken) {
+			if (!modifiers.TryGetValue(modificationToken, out var list)) {
+				modifiers[modificationToken] = list = new();
+			}
+			list.Add(modifier);
 		}
 
 		//[Obsolete]
@@ -88,7 +110,7 @@ namespace SoulboundBackend.Client.Stats {
 		//	this.AddRange(modifiers.ToArray());
 		//}
 
-		public object GetBoxedValue() => this.GetProcessedValue();
+		public object CalculateBoxedValue() => this.GetProcessedValue();
 
 		public override string ToString() {
 			string modifiers = this.modifiers.ToString();
