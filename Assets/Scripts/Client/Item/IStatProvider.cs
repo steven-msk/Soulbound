@@ -16,7 +16,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 			return statMappings.SelectMany(sm => sm.activators).Distinct().ToHashSet();
 		}
 
-		public IEnumerable<AbstractSerializableStat> GetStats() {
+		public IEnumerable<AbstractValueModifier> GetStats() {
 			return statMappings.Select(sm => sm.stat);
 		}
 

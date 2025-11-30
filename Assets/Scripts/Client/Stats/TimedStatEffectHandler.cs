@@ -11,7 +11,7 @@ namespace SoulboundBackend.Client.Stats {
 		private bool resetOnEnable;
 		private (Coroutine coroutine, IStatReceiver receiver)? active;
 
-		public TimedStatEffectHandler(IStatProvider provider, IEnumerable<AbstractSerializableStat> usedStats, float durationSeconds, bool resetOnEnable)
+		public TimedStatEffectHandler(IStatProvider provider, IEnumerable<AbstractValueModifier> usedStats, float durationSeconds, bool resetOnEnable)
 			: base(usedStats) {
 			this.provider = provider;
 			this.durationSeconds = durationSeconds;

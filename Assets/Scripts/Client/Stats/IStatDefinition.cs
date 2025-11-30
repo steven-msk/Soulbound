@@ -5,7 +5,6 @@ using Unity.Plastic.Newtonsoft.Json;
 #nullable enable
 
 namespace SoulboundBackend.Client.Stats {
-
 	//[JsonConverter(typeof(IStatDefinition.StatDefinitionJsonConverter))]
 	public interface IStatDefinition {
 		string baseName { get; }

@@ -5,15 +5,15 @@ using System.Linq;
 namespace SoulboundBackend.Client.Stats {
 
 	public interface IStatEffectHandler {
-		public IEnumerable<AbstractSerializableStat> SuppliedStats();
+		public IEnumerable<AbstractValueModifier> SuppliedStats();
 		public void Enable(IStatReceiver receiver);
 		public void Disable(IStatReceiver receiver);
 
-		public static IEnumerable<AbstractSerializableStat> SupplyStats(params AbstractSerializableStat[] stats) {
+		public static IEnumerable<AbstractValueModifier> SupplyStats(params AbstractValueModifier[] stats) {
 			return StatSupplier.Of(stats);
 		}
 
-		public static IStatEffectHandler Static(IStatProvider provider, params AbstractSerializableStat[] stats) {
+		public static IStatEffectHandler Static(IStatProvider provider, params AbstractValueModifier[] stats) {
 			return new DelegatedStatEffectHandler(
 				receiver => receiver.ApplyStats(stats, provider),
 				receiver => receiver.RevokeStats(stats, provider), 
@@ -21,28 +21,28 @@ namespace SoulboundBackend.Client.Stats {
 			);
 		}
 
-		public static IStatEffectHandler Timed(float durationSeconds, bool resetOnEnable, IStatProvider provider, params AbstractSerializableStat[] stats) {
+		public static IStatEffectHandler Timed(float durationSeconds, bool resetOnEnable, IStatProvider provider, params AbstractValueModifier[] stats) {
 			return new TimedStatEffectHandler(provider, stats, durationSeconds, resetOnEnable);
 		}
 
 		public class StatSupplier {
-			public List<AbstractSerializableStat> stats { get; private set; } = new();
+			public List<AbstractValueModifier> stats { get; private set; } = new();
 
-			public static List<AbstractSerializableStat> Of(params AbstractSerializableStat[] stats) {
+			public static List<AbstractValueModifier> Of(params AbstractValueModifier[] stats) {
 				return stats.ToList();
 			}
 
-			public StatSupplier Add(params AbstractSerializableStat[] stats) {
+			public StatSupplier Add(params AbstractValueModifier[] stats) {
 				this.stats.AddRange(stats);
 				return this;
 			}
 
-			public StatSupplier Set(params AbstractSerializableStat[] stats) {
+			public StatSupplier Set(params AbstractValueModifier[] stats) {
 				this.stats = stats.ToList();
 				return this;
 			}
 
-			public List<AbstractSerializableStat> Finish() {
+			public List<AbstractValueModifier> Finish() {
 				return stats;
 			}
 		}

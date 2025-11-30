@@ -6,26 +6,26 @@ using System.Linq;
 
 namespace SoulboundBackend.Client.Stats {
 	public sealed class StatMappingBuilder {
-		public DynamicMap<AbstractSerializableStat> dynamicStats { get; private set; } = new();
+		public DynamicMap<AbstractValueModifier> dynamicStats { get; private set; } = new();
 		public DynamicMap<IStatEffectHandler> dynamicEffectHandlers { get; private set; } = new();
 		public List<StatActivator> activators { get; private set; } = new();
 		public List<TooltipNodeData> tooltipNodes { get; private set; } = new();
 
-		public StatMappingBuilder(Func<DynamicMap<AbstractSerializableStat>> dynamicStatSupplier = null) {
-			dynamicStats = dynamicStatSupplier?.Invoke() ?? new DynamicMap<AbstractSerializableStat>();
+		public StatMappingBuilder(Func<DynamicMap<AbstractValueModifier>> dynamicStatSupplier = null) {
+			dynamicStats = dynamicStatSupplier?.Invoke() ?? new DynamicMap<AbstractValueModifier>();
 		}
 
-		public StatMappingBuilder AddStats(Func<DynamicMap<AbstractSerializableStat>> dynamicStatSupplier) {
+		public StatMappingBuilder AddStats(Func<DynamicMap<AbstractValueModifier>> dynamicStatSupplier) {
 			dynamicStats.AddRange(dynamicStatSupplier.Invoke());
 			return this;
 		}
 
-		public StatMappingBuilder SetStats(Func<DynamicMap<AbstractSerializableStat>> dynamicStatSupplier) {
+		public StatMappingBuilder SetStats(Func<DynamicMap<AbstractValueModifier>> dynamicStatSupplier) {
 			dynamicStats.AddRange(dynamicStatSupplier.Invoke());
 			return this;
 		}
 
-		public StatMappingBuilder BindEffectHandlers(Func<DynamicMap<AbstractSerializableStat>, DynamicMap<IStatEffectHandler>> effectHandlerBinder) {
+		public StatMappingBuilder BindEffectHandlers(Func<DynamicMap<AbstractValueModifier>, DynamicMap<IStatEffectHandler>> effectHandlerBinder) {
 			dynamicEffectHandlers.AddRange(effectHandlerBinder.Invoke(dynamicStats));
 			return this;
 		}
@@ -40,13 +40,13 @@ namespace SoulboundBackend.Client.Stats {
 			return this;
 		}
 
-		public StatMappingBuilder WithTooltipNodes(Func<DynamicMap<AbstractSerializableStat>, IEnumerable<TooltipNodeData>> nodesSupplier) {
+		public StatMappingBuilder WithTooltipNodes(Func<DynamicMap<AbstractValueModifier>, IEnumerable<TooltipNodeData>> nodesSupplier) {
 			this.tooltipNodes.AddRange(nodesSupplier.Invoke(dynamicStats));
 			return this;
 		}
 
 		public List<StatMapping> ResolveMappings() {
-			Dictionary<StatActivator, IEnumerable<AbstractSerializableStat>> statsByActivator = new();
+			Dictionary<StatActivator, IEnumerable<AbstractValueModifier>> statsByActivator = new();
 			foreach (var activator in activators) {
 				statsByActivator[activator] = activator.effectHandlers.SelectMany(s => s.SuppliedStats());
 			}

@@ -15,7 +15,7 @@ namespace SoulboundBackend.Client.Stats {
 		private static readonly Logger logger = Logger.CreateInstance();
 		[JsonProperty]
 		[JsonConverter(typeof(ModifierDictionaryConverter))]
-		private Dictionary<IStatProvider, List<AbstractSerializableStat>> modifiers = new();
+		private Dictionary<IStatProvider, List<AbstractValueModifier>> modifiers = new();
 		public event Action<StatEntry<TValue>>? OnModifiersChanged;
 		public TValue baseValue { get; protected set; }
 		public StatDefinition<TValue> definition { get; protected set; }
@@ -43,24 +43,24 @@ namespace SoulboundBackend.Client.Stats {
 			}
 		}
 
-		public void Add(AbstractSerializableStat serializableStat, IStatProvider provider) {
+		public void Add(AbstractValueModifier serializableStat, IStatProvider provider) {
 			if (Validate(serializableStat, provider)) {
 				if (!modifiers.ContainsKey(provider)) {
-					modifiers.Add(provider, new List<AbstractSerializableStat>());
+					modifiers.Add(provider, new List<AbstractValueModifier>());
 				}
 				modifiers[provider].Add(serializableStat as ValueModifier<TValue>);
 			}
 			InvocationHelper.If(!flag_blockUpdate, () => OnModifiersChanged?.Invoke(this));
 		}
 
-		public void AddRange(params (AbstractSerializableStat stat, IStatProvider provider)[] modifiers) {
+		public void AddRange(params (AbstractValueModifier stat, IStatProvider provider)[] modifiers) {
 			flag_blockUpdate = true;
 			modifiers.ToList().ForEach(modifier => this.Add(modifier.stat, modifier.provider));
 			OnModifiersChanged?.Invoke(this);
 			flag_blockUpdate = false;
 		}
 
-		public void Remove(AbstractSerializableStat serializableStat, IStatProvider provider) {
+		public void Remove(AbstractValueModifier serializableStat, IStatProvider provider) {
 			if (Validate(serializableStat, provider) && modifiers.TryGetValue(provider, out var stats)) {
 				stats.Remove(serializableStat as ValueModifier<TValue>);
 				if (stats.Count == 0) {
@@ -70,38 +70,38 @@ namespace SoulboundBackend.Client.Stats {
 			InvocationHelper.If(!flag_blockUpdate, () => OnModifiersChanged?.Invoke(this));
 		}
 
-		public void RemoveRange(params (AbstractSerializableStat stat, IStatProvider provider)[] modifiers) {
+		public void RemoveRange(params (AbstractValueModifier stat, IStatProvider provider)[] modifiers) {
 			flag_blockUpdate = true;
 			modifiers.ToList().ForEach(modifier => this.Remove(modifier.stat, modifier.provider));
 			OnModifiersChanged?.Invoke(this);
 			flag_blockUpdate = false;
 		}
 
-		public void SetModifiers(List<(AbstractSerializableStat stat, IStatProvider provider)> modifiers) {
+		public void SetModifiers(List<(AbstractValueModifier stat, IStatProvider provider)> modifiers) {
 			this.modifiers.Clear();
 			this.AddRange(modifiers.ToArray());
 		}
 
 		public object GetBoxedValue() => this.GetProcessedValue();
 
-		public List<(AbstractSerializableStat, IStatProvider)> GetBoxedModifiers() {
-			return modifiers.Cast<(AbstractSerializableStat, IStatProvider)>().ToList();
+		public List<(AbstractValueModifier, IStatProvider)> GetBoxedModifiers() {
+			return modifiers.Cast<(AbstractValueModifier, IStatProvider)>().ToList();
 		}
 
-		private bool Validate(AbstractSerializableStat serializableStat, IStatProvider provider) {
+		private bool Validate(AbstractValueModifier serializableStat, IStatProvider provider) {
 			string failedApplication = "Failed to apply serializedStat:";
 			if (provider == null) {
 				logger.ThrowException(null, new ArgumentException($"{failedApplication} Null IStatProvider provider called on serializable stat {serializableStat}"));
 				return false;
 			}
 
-			StatDefinition<TValue> definition = (StatDefinition<TValue>)serializableStat.GetStatDefinition();
+			StatDefinition<TValue> definition = (StatDefinition<TValue>)serializableStat.statDefinition;
 			if (definition != this.definition) {
 				logger.ThrowException(null, new ArgumentException($"{failedApplication} Mismatched stat definition references for serializable stat {serializableStat} and stat entry {this}"));
 				return false;
 			}
-			if (!definition.supportedApplications.Supports(serializableStat.GetApplicationType())) {
-				logger.ThrowException(null, new ArgumentException($"{failedApplication} Unsupported application type {serializableStat.GetApplicationType()} for stat definition {definition}"));
+			if (!definition.supportedApplications.Supports(serializableStat.applicationType)) {
+				logger.ThrowException(null, new ArgumentException($"{failedApplication} Unsupported application type {serializableStat.applicationType} for stat definition {definition}"));
 				return false;
 			}
 
@@ -118,20 +118,21 @@ namespace SoulboundBackend.Client.Stats {
 
 	}
 
-	sealed class ModifierDictionaryConverter : JsonDictionaryConverter<IStatProvider, List<AbstractSerializableStat>> {
-		public override void WriteJson(JsonWriter writer, Dictionary<IStatProvider, List<AbstractSerializableStat>> value, JsonSerializer serializer) {
+	sealed class ModifierDictionaryConverter : JsonDictionaryConverter<IStatProvider, List<AbstractValueModifier>> {
+		public override void WriteJson(JsonWriter writer, Dictionary<IStatProvider, List<AbstractValueModifier>> value, JsonSerializer serializer) {
 			writer.WriteStartArray();
 			foreach (var kvp in value) {
-				var persistentStats = kvp.Value.Where(stat => stat.persistent).ToList();
-				if (persistentStats.Count == 0) {
-					continue;
-				}
+				//var persistentStats = kvp.Value.Where(stat => stat.persistent).ToList();
+				//if (persistentStats.Count == 0) {
+				//	continue;
+				//}
 
 				writer.WriteStartObject();
 				writer.WritePropertyName("key");
 				serializer.Serialize(writer, kvp.Key, typeof(IStatProvider));
 				writer.WritePropertyName("value");
-				serializer.Serialize(writer, persistentStats, typeof(List<AbstractSerializableStat>));
+				serializer.Serialize(writer, kvp.Value, typeof(List<AbstractValueModifier>));
+				//serializer.Serialize(writer, persistentStats, typeof(List<AbstractValueModifier>));
 				writer.WriteEndObject();
 			}
 			writer.WriteEndArray();

@@ -6,8 +6,8 @@ using System.Collections.Generic;
 namespace SoulboundBackend.Client.Stats {
 	public interface IStatReceiver {
 
-		public void ApplyStats(IEnumerable<AbstractSerializableStat> stats, IStatProvider provider);
+		public void ApplyStats(IEnumerable<AbstractValueModifier> stats, IStatProvider provider);
 
-		public void RevokeStats(IEnumerable<AbstractSerializableStat> stats, IStatProvider provider);
+		public void RevokeStats(IEnumerable<AbstractValueModifier> stats, IStatProvider provider);
 	}
 }

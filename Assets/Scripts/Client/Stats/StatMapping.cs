@@ -3,10 +3,10 @@ using System.Linq;
 
 namespace SoulboundBackend.Client.Stats {
 	public sealed class StatMapping {
-		public AbstractSerializableStat stat { get; }
+		public AbstractValueModifier stat { get; }
 		public IReadOnlyList<StatActivator> activators { get; }
 
-		public StatMapping(AbstractSerializableStat stat, IEnumerable<StatActivator> activators) {
+		public StatMapping(AbstractValueModifier stat, IEnumerable<StatActivator> activators) {
 			this.stat = stat;
 			this.activators = activators.ToList();
 		}
