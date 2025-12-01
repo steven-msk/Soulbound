@@ -7,6 +7,6 @@ using UnityEngine.UIElements;
 
 namespace SoulboundBackend.Client.Stats {
 	public interface IModificationProcedure<TValue> where TValue : struct, IComparable<TValue> {
-		TValue Apply(TValue currentValue, TValue modifierValue, StatEntry<TValue> entry);
+		TValue Apply(TValue currentValue, IStatEntryModifier<TValue> modifier, StatEntry<TValue> entry);
 	}
 }

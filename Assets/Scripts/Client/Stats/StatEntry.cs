@@ -18,30 +18,25 @@ namespace SoulboundBackend.Client.Stats {
 		private Dictionary<IStatEntryModifier<TValue>, IModificationProcedure<TValue>> modificationProcedues = new();
 		public TValue baseValue { get; protected set; }
 		public StatDefinition<TValue> definition { get; protected set; }
-		private IStatProcessor<TValue>? _processor;
-		public IStatProcessor<TValue> processor => _processor ?? definition.defaultProcessor;
+		private readonly IStatProcessor<TValue> processor;
 		Type IStatEntry.valueType => typeof(TValue);
 
-		public StatEntry(StatDefinition<TValue> definition, TValue baseValue, IStatProcessor<TValue> processor) 
-			: this(definition, baseValue) {
-			this._processor = processor;
-		}
-
-		public StatEntry(StatDefinition<TValue> definition, TValue baseValue) {
+		public StatEntry(StatDefinition<TValue> definition, TValue baseValue, IStatProcessor<TValue> processor) {
 			this.baseValue = baseValue;
 			this.definition = definition;
+			this.processor = processor;
 		}
 
-		[Obsolete]
-		public TValue GetProcessedValue() {
-			try {
-				IEnumerable<IStatEntryModifier<TValue>> modifiers = this.modifiers.SelectMany(m => m.Value);
-				return this.processor.ProcessFinalValue(baseValue, modifiers, modificationProcedues);
-			} catch (InvalidCastException e) {
-				logger.LogError(e);
-				return default(TValue);
-			}
+		public StatEntry(StatDefinition<TValue> definition, TValue baseValue) 
+			: this(definition, baseValue, new StatProcessor<TValue>()) {
 		}
+
+		public TValue GetProcessedValue() {
+			IEnumerable<IStatEntryModifier<TValue>> modifiers = this.modifiers.SelectMany(m => m.Value);
+			return this.processor.ProcessFinalValue(baseValue, this, modifiers, modificationProcedues);
+		}
+
+		object IStatEntry.CalculateBoxedValue() => GetProcessedValue();
 
 		public void AcceptModifier(IStatEntryModifier modifier, ModificationToken modificationToken) {
 			modifier.Apply(this, modificationToken);
@@ -75,8 +70,6 @@ namespace SoulboundBackend.Client.Stats {
 			modificationProcedues.Remove(modifier);
 		}
 
-		public object CalculateBoxedValue() => this.GetProcessedValue();
-
 		public override string ToString() {
 			string modifiers = this.modifiers.ToString();
 			if (string.IsNullOrEmpty(modifiers)) {
@@ -84,7 +77,6 @@ namespace SoulboundBackend.Client.Stats {
 			}
 			return $"StatEntry[type: {typeof(TValue)}, baseValue: {baseValue}, definitionReference: {definition}, modifiers: {modifiers}]";
 		}
-
 	}
 
 	[Obsolete]

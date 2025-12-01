@@ -7,14 +7,12 @@ namespace SoulboundBackend.Client.Stats {
 		public string baseName { get; }
 
 		public SupportedApplicationType supportedApplications { get; }
-		public IStatProcessor<TValue> defaultProcessor { get; }
 		public string? id { get; set; }
 		public Type valueType => typeof(TValue);
 
-		public StatDefinition(string baseName, SupportedApplicationType supportedApplications, IStatProcessor<TValue> defaultProcessor) {
+		public StatDefinition(string baseName, SupportedApplicationType supportedApplications) {
 			this.baseName = baseName;
 			this.supportedApplications = supportedApplications;
-			this.defaultProcessor = defaultProcessor;
 		}
 
 		public override string ToString() {
@@ -28,7 +26,7 @@ namespace SoulboundBackend.Client.Stats {
 			//StatDisplayFormatter.PlainValueFormat<int>(),
 			//StatDisplayFormatter.ColorPositiveNegative<int>(),
 			//BonusAdmission<int>.AddAndSubtract,
-			SupportedApplicationType.FlatOnly, null
+			SupportedApplicationType.FlatOnly
 			//StatProcessors.Flat<int>()
 		));
 		// +/- => +/-X
@@ -38,7 +36,7 @@ namespace SoulboundBackend.Client.Stats {
 			//StatDisplayFormatter.PlainValueFormat<int>(),
 			//StatDisplayFormatter.ColorPositiveNegative<int>(),
 			//BonusAdmission<int>.AddAndSubtract,
-			SupportedApplicationType.FlatOnly, null
+			SupportedApplicationType.FlatOnly
 			//StatProcessors.Flat<int>()
 		));
 		// +/- => +/-X
@@ -48,7 +46,7 @@ namespace SoulboundBackend.Client.Stats {
 			//StatDisplayFormatter.PlainValueFormat<int>(),
 			//StatDisplayFormatter.ColorPositiveNegative<int>(),
 			//BonusAdmission<int>.AddAndSubtract,
-			SupportedApplicationType.FlatOnly, null
+			SupportedApplicationType.FlatOnly
 			//StatProcessors.Flat<int>()
 		));
 		// +/- => +/-X
@@ -58,7 +56,7 @@ namespace SoulboundBackend.Client.Stats {
 			//StatDisplayFormatter.PlainValueFormat<int>(),
 			//StatDisplayFormatter.ColorPositiveNegative<int>(),
 			//BonusAdmission<int>.AddAndSubtract,
-			SupportedApplicationType.FlatOnly, null
+			SupportedApplicationType.FlatOnly
 			//StatProcessors.Flat<int>()
 		));
 		// +/- => +/-X
@@ -68,7 +66,7 @@ namespace SoulboundBackend.Client.Stats {
 			//StatDisplayFormatter.PercentageValueFormat(),
 			//StatDisplayFormatter.ColorPositiveNegative<float>(),
 			//BonusAdmission<float>.AddAndSubtract,
-			SupportedApplicationType.PercentageOnly, null
+			SupportedApplicationType.PercentageOnly
 			//StatProcessors.Percentage()
 		));
 		// +/-% => +/-X%
@@ -84,7 +82,7 @@ namespace SoulboundBackend.Client.Stats {
 			//StatDisplayFormatter.PlainValueFormat<int>(),
 			//StatDisplayFormatter.ColorPositiveNegative<int>(),
 			//BonusAdmission<int>.Add,
-			SupportedApplicationType.FlatOnly, null
+			SupportedApplicationType.FlatOnly
 			//StatProcessors.Flat<int>()
 		));
 		public static readonly StatDefinition<int> MaxJumps = InjectID("maxJump", new StatDefinition<int>("Max Jump",
@@ -92,7 +90,7 @@ namespace SoulboundBackend.Client.Stats {
 			//StatDisplayFormatter.PlainValueFormat<int>(),
 			//StatDisplayFormatter.ColorPositiveNegative<int>(),
 			//BonusAdmission<int>.Add,
-			SupportedApplicationType.FlatOnly, null
+			SupportedApplicationType.FlatOnly
 			//StatProcessors.Flat<int>()
 		));
 		public static readonly StatDefinition<float> DashVelocity = InjectID("dashVelocity", new StatDefinition<float>("Dash Velocity",
@@ -100,7 +98,7 @@ namespace SoulboundBackend.Client.Stats {
 			//StatDisplayFormatter.PercentageValueFormat(),
 			//StatDisplayFormatter.ColorPositiveNegative<float>(),
 			//BonusAdmission<float>.AddAndSubtract,
-			SupportedApplicationType.PercentageOnly, null
+			SupportedApplicationType.PercentageOnly
 			//StatProcessors.Percentage()
 		));
 		public static readonly StatDefinition<float> DashCooldown = InjectID("dashCooldown", new StatDefinition<float>("Dash Cooldown",
@@ -108,7 +106,7 @@ namespace SoulboundBackend.Client.Stats {
 			//value => $"-{StatDisplayFormatter.PercentageValueFormat()(value)}",
 			//StatDisplayFormatter.ColorPositiveNegative<float>(),
 			//BonusAdmission<float>.Subtract,
-			SupportedApplicationType.PercentageOnly, null
+			SupportedApplicationType.PercentageOnly
 			//StatProcessors.Percentage()
 		));
 		public static readonly StatDefinition<float> HealthRegen = InjectID("healthRegen", new StatDefinition<float>("Health Regen",
@@ -116,7 +114,7 @@ namespace SoulboundBackend.Client.Stats {
 			//StatDisplayFormatter.PlainValueFormat<float>(),
 			//StatDisplayFormatter.ColorPositiveNegative<float>(),
 			//BonusAdmission<float>.AddAndSubtract,
-			SupportedApplicationType.FlatAndPercentage, null
+			SupportedApplicationType.FlatAndPercentage
 			//StatProcessors.Multiplicative<float>()
 		));
 		public static readonly StatDefinition<float> ManaRegen = InjectID("manaRegen", new StatDefinition<float>("Mana Regen",
@@ -124,7 +122,7 @@ namespace SoulboundBackend.Client.Stats {
 			//StatDisplayFormatter.PlainValueFormat<float>(),
 			//StatDisplayFormatter.ColorPositiveNegative<float>(),
 			//BonusAdmission<float>.AddAndSubtract,
-			SupportedApplicationType.FlatAndPercentage, null
+			SupportedApplicationType.FlatAndPercentage
 			//StatProcessors.Multiplicative<float>()
 		));
 		public static readonly StatDefinition<int> PhysicalDamage = InjectID("physicalDamage", new StatDefinition<int>("Physical Damage",
@@ -132,7 +130,7 @@ namespace SoulboundBackend.Client.Stats {
 			//StatDisplayFormatter.PlainValueFormat<int>(),
 			//StatDisplayFormatter.ColorPositiveNegative<int>(),
 			//BonusAdmission<int>.AddAndSubtract,
-			SupportedApplicationType.FlatAndPercentage, null
+			SupportedApplicationType.FlatAndPercentage
 			//StatProcessors.Multiplicative<int>()
 		));
 		public static readonly StatDefinition<int> RitualDamage = InjectID("ritualDamage", new StatDefinition<int>("Ritual Damage",
@@ -140,7 +138,7 @@ namespace SoulboundBackend.Client.Stats {
 			//StatDisplayFormatter.PlainValueFormat<int>(),
 			//StatDisplayFormatter.ColorPositiveNegative<int>(),
 			//BonusAdmission<int>.AddAndSubtract,
-			SupportedApplicationType.FlatAndPercentage, null
+			SupportedApplicationType.FlatAndPercentage
 			//StatProcessors.Multiplicative<int>()
 		));
 		public static readonly StatDefinition<float> AttackSpeed = InjectID("attackSpeed", new StatDefinition<float>("Attack Speed",
@@ -148,7 +146,7 @@ namespace SoulboundBackend.Client.Stats {
 			//StatDisplayFormatter.PercentageValueFormat(),
 			//StatDisplayFormatter.ColorPositiveNegative<float>(),
 			//BonusAdmission<float>.AddAndSubtract,
-			SupportedApplicationType.PercentageOnly, null
+			SupportedApplicationType.PercentageOnly
 			//StatProcessors.Percentage()
 		));
 		public static readonly StatDefinition<float> CritChance = InjectID("critChance", new StatDefinition<float>("Crit Chance",
@@ -156,7 +154,7 @@ namespace SoulboundBackend.Client.Stats {
 			//StatDisplayFormatter.PercentageValueFormat(),
 			//StatDisplayFormatter.ColorPositiveNegative<float>(),
 			//BonusAdmission<float>.None,
-			SupportedApplicationType.PercentageOnly, null
+			SupportedApplicationType.PercentageOnly
 			//StatProcessors.Percentage()
 		));
 		public static readonly StatDefinition<float> CritMultiplier = InjectID("critMultiplier", new StatDefinition<float>("Crit Multiplier",
@@ -164,7 +162,7 @@ namespace SoulboundBackend.Client.Stats {
 			//value => $"x{StatDisplayFormatter.PlainValueFormat<float>()(value)}",
 			//StatDisplayFormatter.ColorPositiveNegative<float>(),
 			//BonusAdmission<float>.None,
-			SupportedApplicationType.FlatOnly, null
+			SupportedApplicationType.FlatOnly
 			//StatProcessors.Flat<float>()
 		));
 		public static readonly StatDefinition<float> Luck = InjectID("luck", new StatDefinition<float>("Luck",
@@ -172,7 +170,7 @@ namespace SoulboundBackend.Client.Stats {
 			//StatDisplayFormatter.PercentageValueFormat(),
 			//StatDisplayFormatter.ColorPositiveNegative<float>(),
 			//BonusAdmission<float>.AddAndSubtract,
-			SupportedApplicationType.PercentageOnly, null
+			SupportedApplicationType.PercentageOnly
 			//StatProcessors.Percentage()
 		));
 		public static readonly StatDefinition<float> LootBonus = InjectID("lootBonus", new StatDefinition<float>("Loot Bonus",
@@ -180,7 +178,7 @@ namespace SoulboundBackend.Client.Stats {
 			//StatDisplayFormatter.PercentageValueFormat(),
 			//StatDisplayFormatter.ColorPositiveNegative<float>(),
 			//BonusAdmission<float>.AddAndSubtract,
-			SupportedApplicationType.PercentageOnly, null
+			SupportedApplicationType.PercentageOnly
 			//StatProcessors.Percentage()
 		));
 

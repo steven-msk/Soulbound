@@ -63,29 +63,36 @@ namespace SoulboundBackend.Client.Stats {
 
 				return Expression.Lambda<Func<TValue, TValue, TValue>>(body, paramA, paramB).Compile();
 			}
+
+			protected TValue GetValue(Func<TValue, TValue, TValue> lambda, TValue currentValue, IStatEntryModifier<TValue> modifier) {
+				if (modifier is not ValueModifier<TValue> typed) {
+					throw new ArgumentException($"Mistyped math procedure modifier, expected ValueModifier<TValue> but is {modifier.GetType()}");
+				}
+				return lambda(currentValue, typed.value);
+			}
 		}
 
 		public class Add : MathProcedure, IModificationProcedure<TValue> {
-			public TValue Apply(TValue currentValue, TValue modifierValue, StatEntry<TValue> entry) {
-				return base.GetDelegate(Expression.Add)(currentValue, modifierValue);
+			public TValue Apply(TValue currentValue, IStatEntryModifier<TValue> modifier, StatEntry<TValue> entry) {
+				return base.GetValue(base.GetDelegate(Expression.Add), currentValue, modifier);
 			}
 		}
 
 		public class Subtract : MathProcedure, IModificationProcedure<TValue> {
-			public TValue Apply(TValue currentValue, TValue modifierValue, StatEntry<TValue> entry) {
-				return base.GetDelegate(Expression.Subtract)(currentValue, modifierValue);
+			public TValue Apply(TValue currentValue, IStatEntryModifier<TValue> modifier, StatEntry<TValue> entry) {
+				return base.GetValue(base.GetDelegate(Expression.Subtract), currentValue, modifier);
 			}
 		}
 
 		public class Multiply : MathProcedure, IModificationProcedure<TValue> {
-			public TValue Apply(TValue currentValue, TValue modifierValue, StatEntry<TValue> entry) {
-				return base.GetDelegate(Expression.Multiply)(currentValue, modifierValue);
+			public TValue Apply(TValue currentValue, IStatEntryModifier<TValue> modifier, StatEntry<TValue> entry) {
+				return base.GetValue(base.GetDelegate(Expression.Multiply), currentValue, modifier);
 			}
 		}
 
 		public class Divide : MathProcedure, IModificationProcedure<TValue> {
-			public TValue Apply(TValue currentValue, TValue modifierValue, StatEntry<TValue> entry) {
-				return base.GetDelegate(Expression.Divide)(currentValue, modifierValue);
+			public TValue Apply(TValue currentValue, IStatEntryModifier<TValue> modifier, StatEntry<TValue> entry) {
+				return base.GetValue(base.GetDelegate(Expression.Divide), currentValue, modifier);
 			}
 		}
 	}

@@ -101,7 +101,7 @@ namespace StatSystemTests {
 		[Test]
 		public void ApplyModifier_AddsValue() {
 			IgnoreFailingMessages();
-			var definition = new StatDefinition<int>("def", SupportedApplicationType.FlatOnly, null);
+			var definition = new StatDefinition<int>("def", SupportedApplicationType.FlatOnly);
 			var entry = new TestEntry<int>(definition, 100);
 			var token = new ModificationToken();
 
@@ -115,7 +115,7 @@ namespace StatSystemTests {
 		[Test]
 		public void RemoveModifier_RestoresOriginalValue() {
 			IgnoreFailingMessages();
-			var definition = new StatDefinition<int>("def", SupportedApplicationType.FlatOnly, null);
+			var definition = new StatDefinition<int>("def", SupportedApplicationType.FlatOnly);
 			var entry = new TestEntry<int>(definition, 100);
 			var token = new ModificationToken();
 
@@ -130,7 +130,7 @@ namespace StatSystemTests {
 		[Test]
 		public void MultipleTokensStack() {
 			IgnoreFailingMessages();
-			var definition = new StatDefinition<int>("def", SupportedApplicationType.FlatOnly, null);
+			var definition = new StatDefinition<int>("def", SupportedApplicationType.FlatOnly);
 			var entry = new TestEntry<int>(definition, 100);
 
 			var tokenA = new ModificationToken();
@@ -148,7 +148,7 @@ namespace StatSystemTests {
 		[Test]
 		public void RemoveModifiers_RemovesOnlyMatchingToken() {
 			IgnoreFailingMessages();
-			var def = new StatDefinition<int>("Health", SupportedApplicationType.FlatOnly, null);
+			var def = new StatDefinition<int>("Health", SupportedApplicationType.FlatOnly);
 			var entry = new TestEntry<int>(def, 100);
 
 			var tokenA = new ModificationToken("A");
@@ -168,8 +168,8 @@ namespace StatSystemTests {
 		[Test]
 		public void ModifierDoesNotApplyToWrongType() {
 			IgnoreFailingMessages();
-			var defInt = new StatDefinition<int>("Health", SupportedApplicationType.FlatOnly, null);
-			var defFloat = new StatDefinition<float>("Speed", SupportedApplicationType.FlatOnly, null);
+			var defInt = new StatDefinition<int>("Health", SupportedApplicationType.FlatOnly);
+			var defFloat = new StatDefinition<float>("Speed", SupportedApplicationType.FlatOnly);
 
 			var entryInt = new TestEntry<int>(defInt, 100);
 
@@ -187,7 +187,7 @@ namespace StatSystemTests {
 	public class ModificationContextTests {
 		[Test]
 		public void ValueModification_IsValid_ReturnsTrueAccordingly() {
-			var def = new StatDefinition<int>("def", SupportedApplicationType.PercentageOnly, null);
+			var def = new StatDefinition<int>("def", SupportedApplicationType.PercentageOnly);
 			var entry = new StatEntry<int>(def, 10);
 
 			var mod = new ValueModifier<int>(5, true, StatApplicationType.Flat);
@@ -195,7 +195,7 @@ namespace StatSystemTests {
 
 			Assert.IsFalse(context.IsValid());
 
-			var def2 = new StatDefinition<float>("def2", SupportedApplicationType.FlatOnly, null);
+			var def2 = new StatDefinition<float>("def2", SupportedApplicationType.FlatOnly);
 			var entry2 = new StatEntry<float>(def2, 0.1f);
 
 			var mod2 = new ValueModifier<float>(0.9f, true, StatApplicationType.Percentage);
@@ -203,7 +203,7 @@ namespace StatSystemTests {
 
 			Assert.IsFalse(context2.IsValid());
 
-			var def3 = new StatDefinition<float>("def3", SupportedApplicationType.FlatAndPercentage, null);
+			var def3 = new StatDefinition<float>("def3", SupportedApplicationType.FlatAndPercentage);
 			var entry3 = new StatEntry<float>(def3, 0f);
 
 			var mod3 = new ValueModifier<float>(0.1f, true, StatApplicationType.Percentage);
@@ -220,50 +220,59 @@ namespace StatSystemTests {
 	public class ValueModifierProceduresTests {
 		[Test]
 		public void ValueModifier_Add_AddsValuesCorrectly() {
-			var def = new StatDefinition<int>("def", SupportedApplicationType.FlatOnly, null);
+			var def = new StatDefinition<int>("def", SupportedApplicationType.FlatOnly);
 			var entry = new StatEntry<int>(def, 1);
 
+			var mod = new ValueModifier<int>(1, true, StatApplicationType.Flat);
 			var procedure = new ValueModifier<int>.Add();
-			int a = 1, b = 1;
-			int result = procedure.Apply(a, b, entry);
+			int a = 1;
+			int result = procedure.Apply(a, mod, entry);
 
 			Assert.AreEqual(2, result);
 		}
 
 		[Test]
 		public void ValueModifier_Subtract_SubtractsValuesCorrectly() {
-			var def = new StatDefinition<int>("def", SupportedApplicationType.FlatOnly, null);
+			var def = new StatDefinition<int>("def", SupportedApplicationType.FlatOnly);
 			var entry = new StatEntry<int>(def, 1);
 
+			var mod = new ValueModifier<int>(75, true, StatApplicationType.Flat);
 			var procedure = new ValueModifier<int>.Subtract();
-			int a = 100, b = 75;
-			int result = procedure.Apply(a, b, entry);
+			int a = 100;
+			int result = procedure.Apply(a, mod, entry);
 
 			Assert.AreEqual(25, result);
 		}
 
 		[Test]
 		public void ValueModifier_Multiply_MultipliesValuesCorrectly() {
-			var def = new StatDefinition<float>("def", SupportedApplicationType.FlatOnly, null);
+			var def = new StatDefinition<float>("def", SupportedApplicationType.FlatOnly);
 			var entry = new StatEntry<float>(def, 1f);
 
+			var mod = new ValueModifier<float>(2f, true, StatApplicationType.Flat);
 			var procedure = new ValueModifier<float>.Multiply();
-			float a = 1.5f, b = 2f;
-			float result = procedure.Apply(a, b, entry);
+			float a = 1.5f;
+			float result = procedure.Apply(a, mod, entry);
 
 			Assert.AreEqual(3f, result);
 		}
 
 		[Test]
 		public void ValueModifier_Divide_DividesValuesCorrectly() {
-			var def = new StatDefinition<float>("def", SupportedApplicationType.FlatOnly, null);
+			var def = new StatDefinition<float>("def", SupportedApplicationType.FlatOnly);
 			var entry = new StatEntry<float>(def, 1f);
 
+			var mod = new ValueModifier<float>(2f, true, StatApplicationType.Flat);
 			var procedure = new ValueModifier<float>.Divide();
-			float a = 3f, b = 2f;
-			float result = procedure.Apply(a, b, entry);
+			float a = 3f;
+			float result = procedure.Apply(a, mod, entry);
 
 			Assert.AreEqual(1.5f, result);
 		}
+	}
+
+	[TestFixture]
+	public class ProcessorTests { 
+		
 	}
 }
