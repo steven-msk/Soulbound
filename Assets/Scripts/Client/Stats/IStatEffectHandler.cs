@@ -1,9 +1,10 @@
 ﻿using SoulboundBackend.Client.ItemSystem;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace SoulboundBackend.Client.Stats {
-
+	[Obsolete]
 	public interface IStatEffectHandler {
 		public IEnumerable<AbstractValueModifier> SuppliedStats();
 		public void Enable(IStatReceiver receiver);

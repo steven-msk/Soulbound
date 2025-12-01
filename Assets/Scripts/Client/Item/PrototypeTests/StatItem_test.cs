@@ -17,33 +17,34 @@ public sealed class StatItem_test : StatItem {
 
 	public override int maxStackSize => Item.CustomMaxStack(128);
 
-	public override IEnumerable<StatMapping> statMappings { get; }
-
 	protected override Func<Item, TooltipData> tooltipSupplier { get; }
 
 	protected override TooltipRenderer.NodeStyleFactory nodeStyleProvider => null;
 
+	private readonly ModificationToken _token = new();
+	public override ModificationToken token => _token;
+
 	public StatItem_test() {
-		StatMappingBuilder mappingBuilder = new StatMappingBuilder()
-			.SetStats(() => new DynamicMap<AbstractValueModifier>() {
-				["physicalDamage"] = new ValueModifier<int>(10, true, StatApplicationType.Percentage)
-			})
-			.WithTooltipNodes(stats => new List<TooltipNodeData>() {
-				new TooltipNodeData(TooltipNode.Stats, $"While in inventory, gain {stats["physicalDamage"]}.")
-			})
-			.BindEffectHandlers(stats => new DynamicMap<IStatEffectHandler>() {
-				["physicalDamageHandler"] = IStatEffectHandler.Static(this, stats["physicalDamage"])
-			})
-			.BindActivator(handlers => new StatActivator(
-				activationBinder: callback => contextHandle.onContextReceived += callback,
-				deactivationBinder: callback => contextHandle.onContextLost += callback,
-				handlers["physicalDamageHandler"]
-			));
-		this.statMappings = mappingBuilder.ResolveMappings();
-		this.tooltipSupplier = item => new TooltipData.Builder()
-			.AddNode(TooltipNode.Title, this.name)
-			.AddNodes(mappingBuilder.ResolveTooltipNodes())
-			.Finish();
+		//StatMappingBuilder mappingBuilder = new StatMappingBuilder()
+		//	.SetStats(() => new DynamicMap<AbstractValueModifier>() {
+		//		["physicalDamage"] = new ValueModifier<int>(10, true, StatApplicationType.Percentage)
+		//	})
+		//	.WithTooltipNodes(stats => new List<TooltipNodeData>() {
+		//		new TooltipNodeData(TooltipNode.Stats, $"While in inventory, gain {stats["physicalDamage"]}.")
+		//	})
+		//	.BindEffectHandlers(stats => new DynamicMap<IStatEffectHandler>() {
+		//		["physicalDamageHandler"] = IStatEffectHandler.Static(this, stats["physicalDamage"])
+		//	})
+		//	.BindActivator(handlers => new StatActivator(
+		//		activationBinder: callback => contextHandle.onContextReceived += callback,
+		//		deactivationBinder: callback => contextHandle.onContextLost += callback,
+		//		handlers["physicalDamageHandler"]
+		//	));
+		//this.statMappings = mappingBuilder.ResolveMappings();
+		//this.tooltipSupplier = item => new TooltipData.Builder()
+		//	.AddNode(TooltipNode.Title, this.name)
+		//	.AddNodes(mappingBuilder.ResolveTooltipNodes())
+		//	.Finish();
 	}
 
 	public override SlotHook GetSlotHook() => new SlotHook(
@@ -60,4 +61,8 @@ public sealed class StatItem_test : StatItem {
 			}
 		}
 	);
+
+	public override IEnumerable<StatModificationPackage> GetPackages() {
+		throw new NotImplementedException();
+	}
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 
 namespace SoulboundBackend.Client.Stats {
+	[Obsolete]
 	public sealed class DelegatedStatEffectHandler : IStatEffectHandler {
 		private IEnumerable<AbstractValueModifier> suppliedStats;
 		private Action<IStatReceiver> enableAction;

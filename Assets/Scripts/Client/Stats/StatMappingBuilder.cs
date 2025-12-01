@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace SoulboundBackend.Client.Stats {
+	[Obsolete]
 	public sealed class StatMappingBuilder {
 		public DynamicMap<AbstractValueModifier> dynamicStats { get; private set; } = new();
 		public DynamicMap<IStatEffectHandler> dynamicEffectHandlers { get; private set; } = new();

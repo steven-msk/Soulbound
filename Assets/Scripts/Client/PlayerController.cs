@@ -29,7 +29,7 @@ using Level = SoulboundBackend.Client.World.Level;
 using Logger = SoulboundBackend.Common.Logging.Logger;
 
 namespace SoulboundBackend.Client {
-	public class PlayerController : LivingEntity, IAttackPerformer {
+	public class PlayerController : LivingEntity, IAttackPerformer, IItemConsumer {
 		private static readonly Logger logger = Logger.CreateInstance();
 		public override Type entityScriptType => typeof(PlayerController);
 		public override string prefabDefinitionID => "johnny";
@@ -39,7 +39,7 @@ namespace SoulboundBackend.Client {
 
 		[SerializeField] private PlayerStats stats;
 		public PlayerStats Stats => stats;
-
+		IStatModificationHost IItemConsumer.statModificationHost => stats;
 
 		[Header("Internal")]
 		[SerializeField] private Rigidbody2D rb;
@@ -136,7 +136,7 @@ namespace SoulboundBackend.Client {
 			}
 			this.itemUsageHandler = itemUsageHandler;
 
-			itemUsageHandler.RegisterCapability<IConsumable>(ItemUseTrigger.RightClick, (consumable, stack) => consumable.Consume(stack));
+			itemUsageHandler.RegisterCapability<IConsumable>(ItemUseTrigger.RightClick, (consumable, stack) => consumable.StartConsume(this, stack));
 			foreach (ItemUseTrigger trigger in Enum.GetValues(typeof(ItemUseTrigger))) {
 				itemUsageHandler.RegisterCapability<IAttackSourceProvider>(trigger, (sourceProvider, stack) => {
 					if (sourceProvider.GetAttackSource(trigger, out var attackSource)) {
@@ -296,7 +296,7 @@ namespace SoulboundBackend.Client {
 			} catch (Exception) {
 				this.stats = new();
 			} finally {
-				stats.UpdateInjectedMappings();
+				//stats.UpdateInjectedMappings();
 				//stats.MaxHealth.OnModifiersChanged += maxHealth => {
 				//	bool wasFullHealth = this.currentHealth == this.maxHealth;
 				//	this.maxHealth = maxHealth.GetProcessedValue();

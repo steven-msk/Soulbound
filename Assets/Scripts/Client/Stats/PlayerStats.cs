@@ -69,33 +69,13 @@ namespace SoulboundBackend.Client.Stats {
 
 		public IReadOnlyDictionary<IStatDefinition, IStatEntry> GetEntries() => entries;
 
-		[Obsolete]
-		public void UpdateInjectedMappings() {
-			//this.MaxHealth = (StatEntry<int>)injected[StatDefinition.MaxHealth];
-			//this.MaxMana = (StatEntry<int>)injected[StatDefinition.MaxMana];
-			//this.Defense = (StatEntry<int>)injected[StatDefinition.Defense];
-			//this.SoulSlots = (StatEntry<int>)injected[StatDefinition.SoulSlots];
-			//this.MovementSpeed = (StatEntry<float>)injected[StatDefinition.MovementSpeed];
-			//this.JumpHeight = (StatEntry<int>)injected[StatDefinition.JumpHeight];
-			//this.DashVelocity = (StatEntry<float>)injected[StatDefinition.DashVelocity];
-			//this.DashCooldown = (StatEntry<float>)injected[StatDefinition.DashCooldown];
-			//this.HealthRegen = (StatEntry<float>)injected[StatDefinition.HealthRegen];
-			//this.ManaRegen = (StatEntry<float>)injected[StatDefinition.ManaRegen];
-			//this.RawPhysicalDamage = (StatEntry<int>)injected[StatDefinition.PhysicalDamage];
-			//this.RawRitualDamage = (StatEntry<int>)injected[StatDefinition.RitualDamage];
-			//this.AttackSpeed = (StatEntry<float>)injected[StatDefinition.AttackSpeed];
-			//this.CritChance = (StatEntry<float>)injected[StatDefinition.CritChance];
-			//this.CritMultiplier = (StatEntry<float>)injected[StatDefinition.CritMultiplier];
-			//this.Luck = (StatEntry<float>)injected[StatDefinition.Luck];
-			//this.LootBonus = (StatEntry<float>)injected[StatDefinition.LootBonus];
-		}
-
 		public void ApplyModifiers(IStatModificationSource source) {
 			foreach (var package in source.GetPackages()) {
 				if (!entries.TryGetValue(package.definition, out var entry)) {
 					continue;
 				}
 				foreach (var modifier in package.modifiers) {
+					UnityEngine.Debug.Log("adding modifier: " + package.definition + $" [{modifier.GetHashCode()}]");
 					entry.AcceptModifier(modifier, source.token);
 				}
 			}

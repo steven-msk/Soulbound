@@ -2,6 +2,7 @@
 using System;
 
 namespace SoulboundBackend.Client.Stats {
+	[Obsolete]
 	public class StatValuePrefix<TValue> {
 		private static readonly Logger logger = Logger.CreateInstance();
 		public static StatValuePrefix<TValue> None = new(_ => "");

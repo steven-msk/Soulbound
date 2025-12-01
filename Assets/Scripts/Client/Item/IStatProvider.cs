@@ -8,6 +8,7 @@ using Unity.Plastic.Newtonsoft.Json;
 
 namespace SoulboundBackend.Client.ItemSystem {
 	[JsonConverter(typeof(StatProviderConverter))]
+	[Obsolete]
 	public interface IStatProvider : IItemCapability {
 		public IEnumerable<StatMapping> statMappings { get; }
 		public ContextHandle<IStatReceiver> contextHandle { get; }

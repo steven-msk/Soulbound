@@ -4,6 +4,7 @@ using System.Linq;
 
 #nullable enable
 namespace SoulboundBackend.Client.Stats {
+	[Obsolete]
 	public class StatActivator {
 		public IEnumerable<IStatEffectHandler> effectHandlers { get; private set; }
 

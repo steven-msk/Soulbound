@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 namespace SoulboundBackend.Client.Stats {
+	[Obsolete]
 	public abstract class NonPersistentStatEffectHandler : IStatEffectHandler {
 		protected IEnumerable<AbstractValueModifier> usedStats;
 

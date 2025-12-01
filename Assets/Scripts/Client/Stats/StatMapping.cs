@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace SoulboundBackend.Client.Stats {
+	[Obsolete]
 	public sealed class StatMapping {
 		public AbstractValueModifier stat { get; }
 		public IReadOnlyList<StatActivator> activators { get; }

@@ -1,10 +1,12 @@
 ﻿using SoulboundBackend.Client.ItemSystem;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
 namespace SoulboundBackend.Client.Stats {
+	[Obsolete]
 	public class TimedStatEffectHandler : NonPersistentStatEffectHandler {
 		private IStatProvider provider;
 		private float durationSeconds;

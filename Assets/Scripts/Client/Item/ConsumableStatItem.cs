@@ -7,18 +7,12 @@ using System.Collections.Generic;
 
 namespace SoulboundBackend.Client.ItemSystem {
 	public abstract class ConsumableStatItem : StatItem, IConsumable {
-		public event Action<IStatReceiver>? onConsumed;
 		public override bool applyInstantStatsOnHoverOrSelect => false;
-		public abstract IConsumable.ConsumeAction consumeAction { get; }
 		public virtual int consumeAmount { get; } = 1;
-		public abstract IConsumptionRestriction restriction { get; }
 
-		public virtual ConsumptionResult Consume(ItemStack itemStack) {
-			ConsumptionResult result = Consumables.DefaultConsume(this, itemStack);
-			if (result.mode == ConsumeMode.Allow) {
-				//onConsumed?.Invoke(Soulbound.instance.GetPlayerInstance().Stats);
-			}
-			return result;
+		public virtual ConsumptionResult Consume(IItemConsumer consumer, ItemStack itemStack) {
+			consumer.statModificationHost?.ApplyModifiers(this);
+			return ConsumptionResult.Success(itemStack);
 		}
 	}
 }
