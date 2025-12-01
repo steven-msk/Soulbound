@@ -1,5 +1,6 @@
 ﻿using SoulboundBackend.Common.Logging;
 using System;
+using System.Linq.Expressions;
 using Unity.Plastic.Newtonsoft.Json;
 
 #nullable enable
@@ -25,7 +26,7 @@ namespace SoulboundBackend.Client.Stats {
 			var context = new ValueModificationContext<TValue>(this, entry);
 
 			if (context.IsValid()) {
-				entry.CommitModifier(this, modificationToken);
+				entry.CommitModifier(this, modificationToken, new Add());
 			}
 		}
 
@@ -52,6 +53,40 @@ namespace SoulboundBackend.Client.Stats {
 
 		public override int GetHashCode() {
 			return HashCode.Combine(value, keepSign, applicationType);
+		}
+
+		public abstract class MathProcedure {
+			protected Func<TValue, TValue, TValue> GetDelegate(Func<Expression, Expression, BinaryExpression> expression) {
+				var paramA = Expression.Parameter(typeof(TValue), "a");
+				var paramB = Expression.Parameter(typeof(TValue), "b");
+				var body = expression(paramA, paramB);
+
+				return Expression.Lambda<Func<TValue, TValue, TValue>>(body, paramA, paramB).Compile();
+			}
+		}
+
+		public class Add : MathProcedure, IModificationProcedure<TValue> {
+			public TValue Apply(TValue currentValue, TValue modifierValue, StatEntry<TValue> entry) {
+				return base.GetDelegate(Expression.Add)(currentValue, modifierValue);
+			}
+		}
+
+		public class Subtract : MathProcedure, IModificationProcedure<TValue> {
+			public TValue Apply(TValue currentValue, TValue modifierValue, StatEntry<TValue> entry) {
+				return base.GetDelegate(Expression.Subtract)(currentValue, modifierValue);
+			}
+		}
+
+		public class Multiply : MathProcedure, IModificationProcedure<TValue> {
+			public TValue Apply(TValue currentValue, TValue modifierValue, StatEntry<TValue> entry) {
+				return base.GetDelegate(Expression.Multiply)(currentValue, modifierValue);
+			}
+		}
+
+		public class Divide : MathProcedure, IModificationProcedure<TValue> {
+			public TValue Apply(TValue currentValue, TValue modifierValue, StatEntry<TValue> entry) {
+				return base.GetDelegate(Expression.Divide)(currentValue, modifierValue);
+			}
 		}
 	}
 }

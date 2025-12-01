@@ -15,6 +15,7 @@ namespace SoulboundBackend.Client.Stats {
 	public class StatEntry<TValue> : IStatEntry where TValue : struct, IComparable<TValue> {
 		private static readonly Logger logger = Logger.CreateInstance();
 		private Dictionary<ModificationToken, List<IStatEntryModifier<TValue>>> modifiers = new();
+		private Dictionary<IStatEntryModifier<TValue>, IModificationProcedure<TValue>> modificationProcedues = new();
 		public TValue baseValue { get; protected set; }
 		public StatDefinition<TValue> definition { get; protected set; }
 		private IStatProcessor<TValue>? _processor;
@@ -34,8 +35,8 @@ namespace SoulboundBackend.Client.Stats {
 		[Obsolete]
 		public TValue GetProcessedValue() {
 			try {
-				IEnumerable<ValueModifier<TValue>> casted = modifiers.SelectMany(m => m.Value.Cast<ValueModifier<TValue>>());
-				return this.processor.ProcessFinalValue(baseValue, casted);
+				IEnumerable<IStatEntryModifier<TValue>> modifiers = this.modifiers.SelectMany(m => m.Value);
+				return this.processor.ProcessFinalValue(baseValue, modifiers, modificationProcedues);
 			} catch (InvalidCastException e) {
 				logger.LogError(e);
 				return default(TValue);
@@ -56,11 +57,12 @@ namespace SoulboundBackend.Client.Stats {
 			}
 		}
 
-		public void CommitModifier(IStatEntryModifier<TValue> modifier, ModificationToken modificationToken) {
+		public void CommitModifier(IStatEntryModifier<TValue> modifier, ModificationToken modificationToken, IModificationProcedure<TValue> procedure) {
 			if (!modifiers.TryGetValue(modificationToken, out var list)) {
 				modifiers[modificationToken] = list = new();
 			}
 			list.Add(modifier);
+			modificationProcedues.Add(modifier, procedure);
 		}
 
 		public void UncommitModifier(IStatEntryModifier<TValue> modifier, ModificationToken modificationToken) {
@@ -70,6 +72,7 @@ namespace SoulboundBackend.Client.Stats {
 			if (list.IsEmpty()) {
 				modifiers.Remove(modificationToken);
 			}
+			modificationProcedues.Remove(modifier);
 		}
 
 		public object CalculateBoxedValue() => this.GetProcessedValue();

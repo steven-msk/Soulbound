@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine.Assertions;
 using UnityEngine.TestTools;
+using Zenject;
 using Assert = NUnit.Framework.Assert;
 
 namespace StatSystemTests {
@@ -212,6 +213,57 @@ namespace StatSystemTests {
 
 			Assert.IsTrue(context3.IsValid());
 			Assert.IsTrue(context4.IsValid());
+		}
+	}
+
+	[TestFixture]
+	public class ValueModifierProceduresTests {
+		[Test]
+		public void ValueModifier_Add_AddsValuesCorrectly() {
+			var def = new StatDefinition<int>("def", SupportedApplicationType.FlatOnly, null);
+			var entry = new StatEntry<int>(def, 1);
+
+			var procedure = new ValueModifier<int>.Add();
+			int a = 1, b = 1;
+			int result = procedure.Apply(a, b, entry);
+
+			Assert.AreEqual(2, result);
+		}
+
+		[Test]
+		public void ValueModifier_Subtract_SubtractsValuesCorrectly() {
+			var def = new StatDefinition<int>("def", SupportedApplicationType.FlatOnly, null);
+			var entry = new StatEntry<int>(def, 1);
+
+			var procedure = new ValueModifier<int>.Subtract();
+			int a = 100, b = 75;
+			int result = procedure.Apply(a, b, entry);
+
+			Assert.AreEqual(25, result);
+		}
+
+		[Test]
+		public void ValueModifier_Multiply_MultipliesValuesCorrectly() {
+			var def = new StatDefinition<float>("def", SupportedApplicationType.FlatOnly, null);
+			var entry = new StatEntry<float>(def, 1f);
+
+			var procedure = new ValueModifier<float>.Multiply();
+			float a = 1.5f, b = 2f;
+			float result = procedure.Apply(a, b, entry);
+
+			Assert.AreEqual(3f, result);
+		}
+
+		[Test]
+		public void ValueModifier_Divide_DividesValuesCorrectly() {
+			var def = new StatDefinition<float>("def", SupportedApplicationType.FlatOnly, null);
+			var entry = new StatEntry<float>(def, 1f);
+
+			var procedure = new ValueModifier<float>.Divide();
+			float a = 3f, b = 2f;
+			float result = procedure.Apply(a, b, entry);
+
+			Assert.AreEqual(1.5f, result);
 		}
 	}
 }

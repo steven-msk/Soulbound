@@ -28,8 +28,8 @@ namespace SoulboundBackend.Client.Stats {
 			//StatDisplayFormatter.PlainValueFormat<int>(),
 			//StatDisplayFormatter.ColorPositiveNegative<int>(),
 			//BonusAdmission<int>.AddAndSubtract,
-			SupportedApplicationType.FlatOnly,
-			StatProcessors.Flat<int>()
+			SupportedApplicationType.FlatOnly, null
+			//StatProcessors.Flat<int>()
 		));
 		// +/- => +/-X
 
@@ -38,8 +38,8 @@ namespace SoulboundBackend.Client.Stats {
 			//StatDisplayFormatter.PlainValueFormat<int>(),
 			//StatDisplayFormatter.ColorPositiveNegative<int>(),
 			//BonusAdmission<int>.AddAndSubtract,
-			SupportedApplicationType.FlatOnly,
-			StatProcessors.Flat<int>()
+			SupportedApplicationType.FlatOnly, null
+			//StatProcessors.Flat<int>()
 		));
 		// +/- => +/-X
 
@@ -48,8 +48,8 @@ namespace SoulboundBackend.Client.Stats {
 			//StatDisplayFormatter.PlainValueFormat<int>(),
 			//StatDisplayFormatter.ColorPositiveNegative<int>(),
 			//BonusAdmission<int>.AddAndSubtract,
-			SupportedApplicationType.FlatOnly,
-			StatProcessors.Flat<int>()
+			SupportedApplicationType.FlatOnly, null
+			//StatProcessors.Flat<int>()
 		));
 		// +/- => +/-X
 
@@ -58,8 +58,8 @@ namespace SoulboundBackend.Client.Stats {
 			//StatDisplayFormatter.PlainValueFormat<int>(),
 			//StatDisplayFormatter.ColorPositiveNegative<int>(),
 			//BonusAdmission<int>.AddAndSubtract,
-			SupportedApplicationType.FlatOnly,
-			StatProcessors.Flat<int>()
+			SupportedApplicationType.FlatOnly, null
+			//StatProcessors.Flat<int>()
 		));
 		// +/- => +/-X
 
@@ -68,8 +68,8 @@ namespace SoulboundBackend.Client.Stats {
 			//StatDisplayFormatter.PercentageValueFormat(),
 			//StatDisplayFormatter.ColorPositiveNegative<float>(),
 			//BonusAdmission<float>.AddAndSubtract,
-			SupportedApplicationType.PercentageOnly,
-			StatProcessors.Percentage()
+			SupportedApplicationType.PercentageOnly, null
+			//StatProcessors.Percentage()
 		));
 		// +/-% => +/-X%
 
@@ -84,104 +84,104 @@ namespace SoulboundBackend.Client.Stats {
 			//StatDisplayFormatter.PlainValueFormat<int>(),
 			//StatDisplayFormatter.ColorPositiveNegative<int>(),
 			//BonusAdmission<int>.Add,
-			SupportedApplicationType.FlatOnly,
-			StatProcessors.Flat<int>()
+			SupportedApplicationType.FlatOnly, null
+			//StatProcessors.Flat<int>()
 		));
 		public static readonly StatDefinition<int> MaxJumps = InjectID("maxJump", new StatDefinition<int>("Max Jump",
 			//StatDisplayFormatter.PluralAdaptedNameFormat<int>("#67E8F9"),
 			//StatDisplayFormatter.PlainValueFormat<int>(),
 			//StatDisplayFormatter.ColorPositiveNegative<int>(),
 			//BonusAdmission<int>.Add,
-			SupportedApplicationType.FlatOnly,
-			StatProcessors.Flat<int>()
+			SupportedApplicationType.FlatOnly, null
+			//StatProcessors.Flat<int>()
 		));
 		public static readonly StatDefinition<float> DashVelocity = InjectID("dashVelocity", new StatDefinition<float>("Dash Velocity",
 			//StatDisplayFormatter.PlainNameFormat<float>("#5EEAD4"),
 			//StatDisplayFormatter.PercentageValueFormat(),
 			//StatDisplayFormatter.ColorPositiveNegative<float>(),
 			//BonusAdmission<float>.AddAndSubtract,
-			SupportedApplicationType.PercentageOnly,
-			StatProcessors.Percentage()
+			SupportedApplicationType.PercentageOnly, null
+			//StatProcessors.Percentage()
 		));
 		public static readonly StatDefinition<float> DashCooldown = InjectID("dashCooldown", new StatDefinition<float>("Dash Cooldown",
 			//StatDisplayFormatter.PlainNameFormat<float>("#4BFFE0"),
 			//value => $"-{StatDisplayFormatter.PercentageValueFormat()(value)}",
 			//StatDisplayFormatter.ColorPositiveNegative<float>(),
 			//BonusAdmission<float>.Subtract,
-			SupportedApplicationType.PercentageOnly,
-			StatProcessors.Percentage()
+			SupportedApplicationType.PercentageOnly, null
+			//StatProcessors.Percentage()
 		));
 		public static readonly StatDefinition<float> HealthRegen = InjectID("healthRegen", new StatDefinition<float>("Health Regen",
 			//StatDisplayFormatter.PlainNameFormat<float>("#ff9771"),
 			//StatDisplayFormatter.PlainValueFormat<float>(),
 			//StatDisplayFormatter.ColorPositiveNegative<float>(),
 			//BonusAdmission<float>.AddAndSubtract,
-			SupportedApplicationType.FlatAndPercentage,
-			StatProcessors.Multiplicative<float>()
+			SupportedApplicationType.FlatAndPercentage, null
+			//StatProcessors.Multiplicative<float>()
 		));
 		public static readonly StatDefinition<float> ManaRegen = InjectID("manaRegen", new StatDefinition<float>("Mana Regen",
 			//StatDisplayFormatter.PlainNameFormat<float>("#71C9FF"),
 			//StatDisplayFormatter.PlainValueFormat<float>(),
 			//StatDisplayFormatter.ColorPositiveNegative<float>(),
 			//BonusAdmission<float>.AddAndSubtract,
-			SupportedApplicationType.FlatAndPercentage,
-			StatProcessors.Multiplicative<float>()
+			SupportedApplicationType.FlatAndPercentage, null
+			//StatProcessors.Multiplicative<float>()
 		));
 		public static readonly StatDefinition<int> PhysicalDamage = InjectID("physicalDamage", new StatDefinition<int>("Physical Damage",
 			//StatDisplayFormatter.PlainNameFormat<int>("#FFB347"),
 			//StatDisplayFormatter.PlainValueFormat<int>(),
 			//StatDisplayFormatter.ColorPositiveNegative<int>(),
 			//BonusAdmission<int>.AddAndSubtract,
-			SupportedApplicationType.FlatAndPercentage,
-			StatProcessors.Multiplicative<int>()
+			SupportedApplicationType.FlatAndPercentage, null
+			//StatProcessors.Multiplicative<int>()
 		));
 		public static readonly StatDefinition<int> RitualDamage = InjectID("ritualDamage", new StatDefinition<int>("Ritual Damage",
 			//StatDisplayFormatter.PlainNameFormat<int>("#DA6BFF"),
 			//StatDisplayFormatter.PlainValueFormat<int>(),
 			//StatDisplayFormatter.ColorPositiveNegative<int>(),
 			//BonusAdmission<int>.AddAndSubtract,
-			SupportedApplicationType.FlatAndPercentage,
-			StatProcessors.Multiplicative<int>()
+			SupportedApplicationType.FlatAndPercentage, null
+			//StatProcessors.Multiplicative<int>()
 		));
 		public static readonly StatDefinition<float> AttackSpeed = InjectID("attackSpeed", new StatDefinition<float>("Attack Speed",
 			//StatDisplayFormatter.PlainNameFormat<float>("#FFE066"),
 			//StatDisplayFormatter.PercentageValueFormat(),
 			//StatDisplayFormatter.ColorPositiveNegative<float>(),
 			//BonusAdmission<float>.AddAndSubtract,
-			SupportedApplicationType.PercentageOnly,
-			StatProcessors.Percentage()
+			SupportedApplicationType.PercentageOnly, null
+			//StatProcessors.Percentage()
 		));
 		public static readonly StatDefinition<float> CritChance = InjectID("critChance", new StatDefinition<float>("Crit Chance",
 			//StatDisplayFormatter.PlainNameFormat<float>("#F4C430"),
 			//StatDisplayFormatter.PercentageValueFormat(),
 			//StatDisplayFormatter.ColorPositiveNegative<float>(),
 			//BonusAdmission<float>.None,
-			SupportedApplicationType.PercentageOnly,
-			StatProcessors.Percentage()
+			SupportedApplicationType.PercentageOnly, null
+			//StatProcessors.Percentage()
 		));
 		public static readonly StatDefinition<float> CritMultiplier = InjectID("critMultiplier", new StatDefinition<float>("Crit Multiplier",
 			//StatDisplayFormatter.PlainNameFormat<float>("#FFBF00"),
 			//value => $"x{StatDisplayFormatter.PlainValueFormat<float>()(value)}",
 			//StatDisplayFormatter.ColorPositiveNegative<float>(),
 			//BonusAdmission<float>.None,
-			SupportedApplicationType.FlatOnly,
-			StatProcessors.Flat<float>()
+			SupportedApplicationType.FlatOnly, null
+			//StatProcessors.Flat<float>()
 		));
 		public static readonly StatDefinition<float> Luck = InjectID("luck", new StatDefinition<float>("Luck",
 			//StatDisplayFormatter.PlainNameFormat<float>("#77DD77"),
 			//StatDisplayFormatter.PercentageValueFormat(),
 			//StatDisplayFormatter.ColorPositiveNegative<float>(),
 			//BonusAdmission<float>.AddAndSubtract,
-			SupportedApplicationType.PercentageOnly,
-			StatProcessors.Percentage()
+			SupportedApplicationType.PercentageOnly, null
+			//StatProcessors.Percentage()
 		));
 		public static readonly StatDefinition<float> LootBonus = InjectID("lootBonus", new StatDefinition<float>("Loot Bonus",
 			//StatDisplayFormatter.PlainNameFormat<float>("#C2FF6B"),
 			//StatDisplayFormatter.PercentageValueFormat(),
 			//StatDisplayFormatter.ColorPositiveNegative<float>(),
 			//BonusAdmission<float>.AddAndSubtract,
-			SupportedApplicationType.PercentageOnly,
-			StatProcessors.Percentage()
+			SupportedApplicationType.PercentageOnly, null
+			//StatProcessors.Percentage()
 		));
 
 		protected static StatDefinition<TInnerValue> InjectID<TInnerValue>(string id, StatDefinition<TInnerValue> definition)
