@@ -16,8 +16,10 @@ namespace SoulboundBackend.Client.Stats {
 		private static readonly Logger logger = Logger.CreateInstance();
 		private Dictionary<ModificationToken, List<IStatEntryModifier<TValue>>> modifiers = new();
 		private Dictionary<IStatEntryModifier<TValue>, IModificationProcedure<TValue>> modificationProcedues = new();
-		public TValue baseValue { get; protected set; }
-		public StatDefinition<TValue> definition { get; protected set; }
+		public TValue baseValue { get; private set; }
+		public StatDefinition<TValue> definition { get; private set; }
+		IStatDefinition IStatEntry.definition => definition;
+
 		private readonly IStatProcessor<TValue> processor;
 		Type IStatEntry.valueType => typeof(TValue);
 

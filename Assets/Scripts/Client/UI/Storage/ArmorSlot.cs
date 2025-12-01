@@ -24,14 +24,14 @@ namespace SoulboundBackend.Client.UI.Storage {
 
 			if (grabbedItem?.DisplayedItem is ArmorItem armor && armor.armorType == this.AcceptedType) {
 				if (this.HasItem) {
-					this.CastDisplayed()!.OnUnequipped(playerStats);
+					//this.CastDisplayed()!.OnUnequipped(playerStats);
 				}
-				armor.OnEquip(playerStats);
+				//armor.OnEquip(playerStats);
 				overlay.SetActive(false);
 				return true;
 			}
 			if (grabbedItem == null && this.HasItem) {
-				this.CastDisplayed()?.OnUnequipped(playerStats);
+				//this.CastDisplayed()?.OnUnequipped(playerStats);
 				overlay.SetActive(true);
 				return true;
 			}

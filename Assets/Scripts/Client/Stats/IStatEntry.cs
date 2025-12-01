@@ -6,6 +6,7 @@ namespace SoulboundBackend.Client.Stats {
 	public interface IStatEntry {
 		object CalculateBoxedValue();
 		Type valueType { get; }
+		IStatDefinition definition { get; }
 
 		void AcceptModifier(IStatEntryModifier modifier, ModificationToken modificationToken);
 		void RemoveModifier(IStatEntryModifier modifier, ModificationToken modificationToken);

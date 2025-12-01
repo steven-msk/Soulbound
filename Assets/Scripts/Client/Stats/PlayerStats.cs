@@ -9,105 +9,106 @@ using UnityEngine;
 using Logger = SoulboundBackend.Common.Logging.Logger;
 
 namespace SoulboundBackend.Client.Stats {
-	public sealed class PlayerStats : IStatReceiver {
+	public sealed class PlayerStats : IStatOwner, IStatModificationHost {
 		private static readonly Logger logger = Logger.CreateInstance();
 		private static readonly LogModule playerStats = new LogModule("PLAYER STATS", "#00FFFF");
 
-		[JsonProperty]
-		[JsonConverter(typeof(JsonDictionaryConverter<IStatDefinition, IStatEntry>))]
-		private static Dictionary<IStatDefinition, IStatEntry> injected = new();
+		private readonly Dictionary<IStatDefinition, IStatEntry> entries = new();
 
 		// REMINDER: current stat default values are subject to change
-		[JsonIgnore] public StatEntry<int> MaxHealth { get; private set; } = InjectStatEntry<int>(new(StatDefinition.MaxHealth, 100));
-		[JsonIgnore] public StatEntry<int> MaxMana { get; private set; } = InjectStatEntry<int>(new(StatDefinition.MaxMana, 50));
-		[JsonIgnore] public StatEntry<int> Defense { get; private set; } = InjectStatEntry<int>(new(StatDefinition.Defense, 0));
-		[JsonIgnore] public StatEntry<int> SoulSlots { get; private set; } = InjectStatEntry<int>(new(StatDefinition.SoulSlots, 2));
-		[JsonIgnore] public StatEntry<float> MovementSpeed { get; private set; } = InjectStatEntry<float>(new(StatDefinition.MovementSpeed, 8f));
-		[JsonIgnore] public StatEntry<int> JumpHeight { get; private set; } = InjectStatEntry<int>(new(StatDefinition.JumpHeight, 1));
-		public int MaxJumps { get; set; } = 1;
-		[JsonIgnore] public StatEntry<float> DashVelocity { get; private set; } = InjectStatEntry<float>(new(StatDefinition.DashVelocity, 1f));
-		[JsonIgnore] public StatEntry<float> DashCooldown { get; private set; } = InjectStatEntry<float>(new(StatDefinition.DashCooldown, 2f));
-		[JsonIgnore] public StatEntry<float> HealthRegen { get; private set; } = InjectStatEntry<float>(new(StatDefinition.HealthRegen, 1.5f));
-		[JsonIgnore] public StatEntry<float> ManaRegen { get; private set; } = InjectStatEntry<float>(new(StatDefinition.ManaRegen, 2f));
-		[JsonIgnore] public StatEntry<int> RawPhysicalDamage { get; private set; } = InjectStatEntry<int>(new(StatDefinition.PhysicalDamage, 10));
-		[JsonIgnore] public StatEntry<int> RawRitualDamage { get; private set; } = InjectStatEntry<int>(new(StatDefinition.RitualDamage, 10));
-		[JsonIgnore] public StatEntry<float> AttackSpeed { get; private set; } = InjectStatEntry<float>(new(StatDefinition.AttackSpeed, 1f));
-		[JsonIgnore] public StatEntry<float> CritChance { get; private set; } = InjectStatEntry<float>(new(StatDefinition.CritChance, 0.05f));
-		[JsonIgnore] public StatEntry<float> CritMultiplier { get; private set; } = InjectStatEntry<float>(new(StatDefinition.CritMultiplier, 1.5f));
-		[JsonIgnore] public StatEntry<float> Luck { get; private set; } = InjectStatEntry<float>(new(StatDefinition.Luck, 0f));
-		[JsonIgnore] public StatEntry<float> LootBonus { get; private set; } = InjectStatEntry<float>(new(StatDefinition.LootBonus, 0f));
-		public float HorizontalAcceleration { get; set; } = 1f;
-		public float HorizontalFlightAcceleration { get; set; } = 3f;
-		public float VerticalFlightAcceleration { get; set; } = 2f;
-		public int GrantedFlightTime { get; set; } = 0;
+		public StatEntry<int> maxHealth = new(Stats.maxHealth, 100);
+		public StatEntry<int> maxMana = new(Stats.maxMana, 50);
+		public StatEntry<int> defense = new(Stats.defense, 0);
+		public StatEntry<int> soulSlots = new(Stats.soulSlots, 2);
+		public StatEntry<float> movementSpeed = new(Stats.movementSpeed, 8f);
+		public StatEntry<int> jumpHeight = new(Stats.jumpHeight, 1);
+		public StatEntry<float> dashVelocity = new(Stats.dashVelocity, 1f);
+		public StatEntry<float> dashCooldown = new(Stats.dashCooldown, 2f);
+		public StatEntry<float> healthRegen = new(Stats.healthRegen, 1.5f);
+		public StatEntry<float> manaRegen = new(Stats.manaRegen, 2f);
+		public StatEntry<int> rawPhysicalDamage = new(Stats.physicalDamage, 10);
+		public StatEntry<int> rawRitualDamage = new(Stats.ritualDamage, 10);
+		public StatEntry<float> attackSpeed = new(Stats.attackSpeed, 1f);
+		public StatEntry<float> critChance = new(Stats.critChance, 0.05f);
+		public StatEntry<float> critMultiplier = new(Stats.critMultiplier, 1.5f);
+		public StatEntry<float> luck = new(Stats.luck, 0f);
+		public StatEntry<float> lootBonus = new(Stats.lootBonus, 0f);
+		public int maxJumps = 1;
+		public float horizontalAcceleration = 1f;
+		public float horizontalFlightAcceleration = 3f;
+		public float verticalFlightAcceleration = 2f;
+		public int grantedFlightTime = 0;
 
-		internal static StatEntry<TValue> InjectStatEntry<TValue>(StatEntry<TValue> statEntry) where TValue : struct, IComparable<TValue> {
-			injected[statEntry.definition] = statEntry;
-			return statEntry;
+		public PlayerStats() {
+			RegisterEntry(maxHealth);
+			RegisterEntry(maxMana);
+			RegisterEntry(defense);
+			RegisterEntry(soulSlots);
+			RegisterEntry(movementSpeed);
+			RegisterEntry(jumpHeight);
+			RegisterEntry(dashVelocity);
+			RegisterEntry(dashCooldown);
+			RegisterEntry(healthRegen);
+			RegisterEntry(manaRegen);
+			RegisterEntry(rawPhysicalDamage);
+			RegisterEntry(rawRitualDamage);
+			RegisterEntry(attackSpeed);
+			RegisterEntry(critChance);
+			RegisterEntry(critMultiplier);
+			RegisterEntry(luck);
+			RegisterEntry(lootBonus);
 		}
+
+		private void RegisterEntry(IStatEntry entry) {
+			entries[entry.definition] = entry;
+		}
+
+		public bool TryGetEntry(IStatDefinition definition, out IStatEntry entry) {
+			return entries.TryGetValue(definition, out entry);
+		}
+
+		public IReadOnlyDictionary<IStatDefinition, IStatEntry> GetEntries() => entries;
 
 		[Obsolete]
-		public void ApplyStats(IEnumerable<AbstractValueModifier> stats, IStatProvider receiver) {
-			foreach (var stat in stats) {
-				//if (injected.TryGetValue(stat.statDefinition, out var statEntry)) {
-				//	statEntry.Add(stat, receiver);
-				//	UnityEngine.Debug.Log("added stat: " + stat.GetHashCode() + ": " + stat);
-				//} else {
-				//	logger.LogError(new ArgumentException($"Could not apply stat to player receiver: unknown player stat definition {stat.statDefinition}"));
-				//}
-			}
-		}
-
-		[Obsolete]
-		public void RevokeStats(IEnumerable<AbstractValueModifier> stats, IStatProvider receiver) {
-			foreach (var stat in stats) {
-				//if (injected.TryGetValue(stat.statDefinition, out var statEntry)) {
-				//	statEntry.Remove(stat, receiver);
-				//	UnityEngine.Debug.Log("removed stat: " + stat.GetHashCode() + ": " + stat);
-				//} else {
-				//	logger.LogError(new ArgumentException($"Could not revoke stat to player receiver: unknown player stat definition {stat.statDefinition}"));
-				//}
-			}
-		}
-
 		public void UpdateInjectedMappings() {
-			this.MaxHealth = (StatEntry<int>)injected[StatDefinition.MaxHealth];
-			this.MaxMana = (StatEntry<int>)injected[StatDefinition.MaxMana];
-			this.Defense = (StatEntry<int>)injected[StatDefinition.Defense];
-			this.SoulSlots = (StatEntry<int>)injected[StatDefinition.SoulSlots];
-			this.MovementSpeed = (StatEntry<float>)injected[StatDefinition.MovementSpeed];
-			this.JumpHeight = (StatEntry<int>)injected[StatDefinition.JumpHeight];
-			this.DashVelocity = (StatEntry<float>)injected[StatDefinition.DashVelocity];
-			this.DashCooldown = (StatEntry<float>)injected[StatDefinition.DashCooldown];
-			this.HealthRegen = (StatEntry<float>)injected[StatDefinition.HealthRegen];
-			this.ManaRegen = (StatEntry<float>)injected[StatDefinition.ManaRegen];
-			this.RawPhysicalDamage = (StatEntry<int>)injected[StatDefinition.PhysicalDamage];
-			this.RawRitualDamage = (StatEntry<int>)injected[StatDefinition.RitualDamage];
-			this.AttackSpeed = (StatEntry<float>)injected[StatDefinition.AttackSpeed];
-			this.CritChance = (StatEntry<float>)injected[StatDefinition.CritChance];
-			this.CritMultiplier = (StatEntry<float>)injected[StatDefinition.CritMultiplier];
-			this.Luck = (StatEntry<float>)injected[StatDefinition.Luck];
-			this.LootBonus = (StatEntry<float>)injected[StatDefinition.LootBonus];
+			//this.MaxHealth = (StatEntry<int>)injected[StatDefinition.MaxHealth];
+			//this.MaxMana = (StatEntry<int>)injected[StatDefinition.MaxMana];
+			//this.Defense = (StatEntry<int>)injected[StatDefinition.Defense];
+			//this.SoulSlots = (StatEntry<int>)injected[StatDefinition.SoulSlots];
+			//this.MovementSpeed = (StatEntry<float>)injected[StatDefinition.MovementSpeed];
+			//this.JumpHeight = (StatEntry<int>)injected[StatDefinition.JumpHeight];
+			//this.DashVelocity = (StatEntry<float>)injected[StatDefinition.DashVelocity];
+			//this.DashCooldown = (StatEntry<float>)injected[StatDefinition.DashCooldown];
+			//this.HealthRegen = (StatEntry<float>)injected[StatDefinition.HealthRegen];
+			//this.ManaRegen = (StatEntry<float>)injected[StatDefinition.ManaRegen];
+			//this.RawPhysicalDamage = (StatEntry<int>)injected[StatDefinition.PhysicalDamage];
+			//this.RawRitualDamage = (StatEntry<int>)injected[StatDefinition.RitualDamage];
+			//this.AttackSpeed = (StatEntry<float>)injected[StatDefinition.AttackSpeed];
+			//this.CritChance = (StatEntry<float>)injected[StatDefinition.CritChance];
+			//this.CritMultiplier = (StatEntry<float>)injected[StatDefinition.CritMultiplier];
+			//this.Luck = (StatEntry<float>)injected[StatDefinition.Luck];
+			//this.LootBonus = (StatEntry<float>)injected[StatDefinition.LootBonus];
 		}
 
-		//private float healthRegenAccumulator = 0;
-		//private float manaRegenAccumulator = 0;
+		public void ApplyModifiers(IStatModificationSource source) {
+			foreach (var package in source.GetPackages()) {
+				if (!entries.TryGetValue(package.definition, out var entry)) {
+					continue;
+				}
+				foreach (var modifier in package.modifiers) {
+					entry.AcceptModifier(modifier, source.token);
+				}
+			}
+		}
 
+		public void RemoveModifiers(IStatModificationSource source) {
+			foreach (var package in source.GetPackages()) {
+				if (!entries.TryGetValue(package.definition, out var entry)) {
+					continue;
+				}
+				entry.RemoveModifiers(source.token);
+			}
+		}
 
-		//public void UpdateRegenStats() {
-		//	healthRegenAccumulator += healthRegen * Time.deltaTime;
-		//	if (healthRegenAccumulator >= 1f) {
-		//		int regenAmount = Mathf.FloorToInt(healthRegenAccumulator);
-		//		Health += regenAmount;
-		//		healthRegenAccumulator -= regenAmount;
-		//	}
-
-		//	manaRegenAccumulator += manaRegen * Time.deltaTime;
-		//	if (manaRegenAccumulator >= 1f) {
-		//		int regenAmount = Mathf.FloorToInt(manaRegenAccumulator);
-		//		Mana += regenAmount;
-		//		manaRegenAccumulator -= regenAmount;
-		//	}
-		//}
 	}
 }

@@ -50,13 +50,13 @@ public sealed class StatItem_test : StatItem {
 		onAttached: (itemDisplay, slot) => {
 			PlayerController player = Soulbound.instance.GetPlayerInstance();
 			if (player.Inventory.GetOccupiedSlots(this).Count() >= 1 && !this.hasContext) {
-				contextHandle.OnContextReceived(player.Stats);
+				//contextHandle.OnContextReceived(player.Stats);
 			}
 		},
 		onDetached: (itemDisplay, slot) => {
 			PlayerController player = Soulbound.instance.GetPlayerInstance();
 			if (player.Inventory.GetOccupiedSlots(this).Count() == 0) {
-				contextHandle.OnContextLost(player.Stats);
+				//contextHandle.OnContextLost(player.Stats);
 			}
 		}
 	);

@@ -20,172 +20,28 @@ namespace SoulboundBackend.Client.Stats {
 		}
 	}
 
-	public partial class StatDefinition {
-		public static readonly StatDefinition<int> MaxHealth = InjectID("maxHealth", new StatDefinition<int>("Max Health",
-			//StatDisplayFormatter.PlainNameFormat<int>("#FF6B6B"),
-			//StatDisplayFormatter.PlainValueFormat<int>(),
-			//StatDisplayFormatter.ColorPositiveNegative<int>(),
-			//BonusAdmission<int>.AddAndSubtract,
-			SupportedApplicationType.FlatOnly
-			//StatProcessors.Flat<int>()
-		));
-		// +/- => +/-X
+	public partial class Stats {
+		public static readonly StatDefinition<int> maxHealth = InjectID("maxHealth", new StatDefinition<int>("Max Health", SupportedApplicationType.FlatOnly));
+		public static readonly StatDefinition<int> maxMana = InjectID("maxMana", new StatDefinition<int>("Max Mana", SupportedApplicationType.FlatOnly));
+		public static readonly StatDefinition<int> defense = InjectID("defense", new StatDefinition<int>("Defense", SupportedApplicationType.FlatOnly));
+		public static readonly StatDefinition<int> soulSlots = InjectID("soulSlot", new StatDefinition<int>("Soul Slot", SupportedApplicationType.FlatOnly));
+		public static readonly StatDefinition<float> movementSpeed = InjectID("movementSpeed", new StatDefinition<float>("Movement Speed", SupportedApplicationType.PercentageOnly));
+		public static readonly StatDefinition<int> jumpHeight = InjectID("jumpHeight", new StatDefinition<int>("Jump Height", SupportedApplicationType.FlatOnly));
+		public static readonly StatDefinition<int> maxJumps = InjectID("maxJump", new StatDefinition<int>("Max Jump", SupportedApplicationType.FlatOnly));
+		public static readonly StatDefinition<float> dashVelocity = InjectID("dashVelocity", new StatDefinition<float>("Dash Velocity", SupportedApplicationType.PercentageOnly));
+		public static readonly StatDefinition<float> dashCooldown = InjectID("dashCooldown", new StatDefinition<float>("Dash Cooldown",	SupportedApplicationType.PercentageOnly));
+		public static readonly StatDefinition<float> healthRegen = InjectID("healthRegen", new StatDefinition<float>("Health Regen", SupportedApplicationType.FlatAndPercentage));
+		public static readonly StatDefinition<float> manaRegen = InjectID("manaRegen", new StatDefinition<float>("Mana Regen", SupportedApplicationType.FlatAndPercentage));
+		public static readonly StatDefinition<int> physicalDamage = InjectID("physicalDamage", new StatDefinition<int>("Physical Damage", SupportedApplicationType.FlatAndPercentage));
+		public static readonly StatDefinition<int> ritualDamage = InjectID("ritualDamage", new StatDefinition<int>("Ritual Damage",	SupportedApplicationType.FlatAndPercentage));
+		public static readonly StatDefinition<float> attackSpeed = InjectID("attackSpeed", new StatDefinition<float>("Attack Speed", SupportedApplicationType.PercentageOnly		));
+		public static readonly StatDefinition<float> critChance = InjectID("critChance", new StatDefinition<float>("Crit Chance", SupportedApplicationType.PercentageOnly));
+		public static readonly StatDefinition<float> critMultiplier = InjectID("critMultiplier", new StatDefinition<float>("Crit Multiplier", SupportedApplicationType.FlatOnly));
+		public static readonly StatDefinition<float> luck = InjectID("luck", new StatDefinition<float>("Luck", SupportedApplicationType.PercentageOnly));
+		public static readonly StatDefinition<float> lootBonus = InjectID("lootBonus", new StatDefinition<float>("Loot Bonus", SupportedApplicationType.PercentageOnly));
 
-		public static readonly StatDefinition<int> MaxMana = InjectID("maxMana", new StatDefinition<int>("Max Mana",
-			//StatDisplayFormatter.PlainNameFormat<int>("#6BCBFF"),
-			//StatDisplayFormatter.PlainValueFormat<int>(),
-			//StatDisplayFormatter.ColorPositiveNegative<int>(),
-			//BonusAdmission<int>.AddAndSubtract,
-			SupportedApplicationType.FlatOnly
-			//StatProcessors.Flat<int>()
-		));
-		// +/- => +/-X
-
-		public static readonly StatDefinition<int> Defense = InjectID("defense", new StatDefinition<int>("Defense",
-			//StatDisplayFormatter.PlainNameFormat<int>("#CCDDEE"),
-			//StatDisplayFormatter.PlainValueFormat<int>(),
-			//StatDisplayFormatter.ColorPositiveNegative<int>(),
-			//BonusAdmission<int>.AddAndSubtract,
-			SupportedApplicationType.FlatOnly
-			//StatProcessors.Flat<int>()
-		));
-		// +/- => +/-X
-
-		public static readonly StatDefinition<int> SoulSlots = InjectID("soulSlot", new StatDefinition<int>("Soul Slot",
-			//StatDisplayFormatter.PluralAdaptedNameFormat<int>("#C86BFF"),
-			//StatDisplayFormatter.PlainValueFormat<int>(),
-			//StatDisplayFormatter.ColorPositiveNegative<int>(),
-			//BonusAdmission<int>.AddAndSubtract,
-			SupportedApplicationType.FlatOnly
-			//StatProcessors.Flat<int>()
-		));
-		// +/- => +/-X
-
-		public static readonly StatDefinition<float> MovementSpeed = InjectID("movementSpeed", new StatDefinition<float>("Movement Speed",
-			//StatDisplayFormatter.PlainNameFormat<float>("#6BFFB6"),
-			//StatDisplayFormatter.PercentageValueFormat(),
-			//StatDisplayFormatter.ColorPositiveNegative<float>(),
-			//BonusAdmission<float>.AddAndSubtract,
-			SupportedApplicationType.PercentageOnly
-			//StatProcessors.Percentage()
-		));
-		// +/-% => +/-X%
-
-		// +/-X%
-		// x1.5 == +150%
-		// percentage display preferred over multiplied display
-		// due to negative incompatibility with multiplied:
-		// -x1.5 or x-1.5 == -150%
-
-		public static readonly StatDefinition<int> JumpHeight = InjectID("jumpHeight", new StatDefinition<int>("Jump Height",
-			//StatDisplayFormatter.PlainNameFormat<int>("#67E8F9"),
-			//StatDisplayFormatter.PlainValueFormat<int>(),
-			//StatDisplayFormatter.ColorPositiveNegative<int>(),
-			//BonusAdmission<int>.Add,
-			SupportedApplicationType.FlatOnly
-			//StatProcessors.Flat<int>()
-		));
-		public static readonly StatDefinition<int> MaxJumps = InjectID("maxJump", new StatDefinition<int>("Max Jump",
-			//StatDisplayFormatter.PluralAdaptedNameFormat<int>("#67E8F9"),
-			//StatDisplayFormatter.PlainValueFormat<int>(),
-			//StatDisplayFormatter.ColorPositiveNegative<int>(),
-			//BonusAdmission<int>.Add,
-			SupportedApplicationType.FlatOnly
-			//StatProcessors.Flat<int>()
-		));
-		public static readonly StatDefinition<float> DashVelocity = InjectID("dashVelocity", new StatDefinition<float>("Dash Velocity",
-			//StatDisplayFormatter.PlainNameFormat<float>("#5EEAD4"),
-			//StatDisplayFormatter.PercentageValueFormat(),
-			//StatDisplayFormatter.ColorPositiveNegative<float>(),
-			//BonusAdmission<float>.AddAndSubtract,
-			SupportedApplicationType.PercentageOnly
-			//StatProcessors.Percentage()
-		));
-		public static readonly StatDefinition<float> DashCooldown = InjectID("dashCooldown", new StatDefinition<float>("Dash Cooldown",
-			//StatDisplayFormatter.PlainNameFormat<float>("#4BFFE0"),
-			//value => $"-{StatDisplayFormatter.PercentageValueFormat()(value)}",
-			//StatDisplayFormatter.ColorPositiveNegative<float>(),
-			//BonusAdmission<float>.Subtract,
-			SupportedApplicationType.PercentageOnly
-			//StatProcessors.Percentage()
-		));
-		public static readonly StatDefinition<float> HealthRegen = InjectID("healthRegen", new StatDefinition<float>("Health Regen",
-			//StatDisplayFormatter.PlainNameFormat<float>("#ff9771"),
-			//StatDisplayFormatter.PlainValueFormat<float>(),
-			//StatDisplayFormatter.ColorPositiveNegative<float>(),
-			//BonusAdmission<float>.AddAndSubtract,
-			SupportedApplicationType.FlatAndPercentage
-			//StatProcessors.Multiplicative<float>()
-		));
-		public static readonly StatDefinition<float> ManaRegen = InjectID("manaRegen", new StatDefinition<float>("Mana Regen",
-			//StatDisplayFormatter.PlainNameFormat<float>("#71C9FF"),
-			//StatDisplayFormatter.PlainValueFormat<float>(),
-			//StatDisplayFormatter.ColorPositiveNegative<float>(),
-			//BonusAdmission<float>.AddAndSubtract,
-			SupportedApplicationType.FlatAndPercentage
-			//StatProcessors.Multiplicative<float>()
-		));
-		public static readonly StatDefinition<int> PhysicalDamage = InjectID("physicalDamage", new StatDefinition<int>("Physical Damage",
-			//StatDisplayFormatter.PlainNameFormat<int>("#FFB347"),
-			//StatDisplayFormatter.PlainValueFormat<int>(),
-			//StatDisplayFormatter.ColorPositiveNegative<int>(),
-			//BonusAdmission<int>.AddAndSubtract,
-			SupportedApplicationType.FlatAndPercentage
-			//StatProcessors.Multiplicative<int>()
-		));
-		public static readonly StatDefinition<int> RitualDamage = InjectID("ritualDamage", new StatDefinition<int>("Ritual Damage",
-			//StatDisplayFormatter.PlainNameFormat<int>("#DA6BFF"),
-			//StatDisplayFormatter.PlainValueFormat<int>(),
-			//StatDisplayFormatter.ColorPositiveNegative<int>(),
-			//BonusAdmission<int>.AddAndSubtract,
-			SupportedApplicationType.FlatAndPercentage
-			//StatProcessors.Multiplicative<int>()
-		));
-		public static readonly StatDefinition<float> AttackSpeed = InjectID("attackSpeed", new StatDefinition<float>("Attack Speed",
-			//StatDisplayFormatter.PlainNameFormat<float>("#FFE066"),
-			//StatDisplayFormatter.PercentageValueFormat(),
-			//StatDisplayFormatter.ColorPositiveNegative<float>(),
-			//BonusAdmission<float>.AddAndSubtract,
-			SupportedApplicationType.PercentageOnly
-			//StatProcessors.Percentage()
-		));
-		public static readonly StatDefinition<float> CritChance = InjectID("critChance", new StatDefinition<float>("Crit Chance",
-			//StatDisplayFormatter.PlainNameFormat<float>("#F4C430"),
-			//StatDisplayFormatter.PercentageValueFormat(),
-			//StatDisplayFormatter.ColorPositiveNegative<float>(),
-			//BonusAdmission<float>.None,
-			SupportedApplicationType.PercentageOnly
-			//StatProcessors.Percentage()
-		));
-		public static readonly StatDefinition<float> CritMultiplier = InjectID("critMultiplier", new StatDefinition<float>("Crit Multiplier",
-			//StatDisplayFormatter.PlainNameFormat<float>("#FFBF00"),
-			//value => $"x{StatDisplayFormatter.PlainValueFormat<float>()(value)}",
-			//StatDisplayFormatter.ColorPositiveNegative<float>(),
-			//BonusAdmission<float>.None,
-			SupportedApplicationType.FlatOnly
-			//StatProcessors.Flat<float>()
-		));
-		public static readonly StatDefinition<float> Luck = InjectID("luck", new StatDefinition<float>("Luck",
-			//StatDisplayFormatter.PlainNameFormat<float>("#77DD77"),
-			//StatDisplayFormatter.PercentageValueFormat(),
-			//StatDisplayFormatter.ColorPositiveNegative<float>(),
-			//BonusAdmission<float>.AddAndSubtract,
-			SupportedApplicationType.PercentageOnly
-			//StatProcessors.Percentage()
-		));
-		public static readonly StatDefinition<float> LootBonus = InjectID("lootBonus", new StatDefinition<float>("Loot Bonus",
-			//StatDisplayFormatter.PlainNameFormat<float>("#C2FF6B"),
-			//StatDisplayFormatter.PercentageValueFormat(),
-			//StatDisplayFormatter.ColorPositiveNegative<float>(),
-			//BonusAdmission<float>.AddAndSubtract,
-			SupportedApplicationType.PercentageOnly
-			//StatProcessors.Percentage()
-		));
-
-		protected static StatDefinition<TInnerValue> InjectID<TInnerValue>(string id, StatDefinition<TInnerValue> definition)
-				where TInnerValue : struct, IComparable<TInnerValue> {
-			//definition.id = id;
-			//IStatDefinition.Register(id, definition);
+		protected static StatDefinition<T> InjectID<T>(string id, StatDefinition<T> definition) where T : struct, IComparable<T> {
+			definition.id = id;
 			return definition;
 		}
 	}

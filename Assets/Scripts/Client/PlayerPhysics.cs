@@ -82,8 +82,8 @@ namespace SoulboundBackend.Client {
 				animator.SetBool("jumping", false);
 				animator.SetBool("flying", false);
 				animator.SetBool("onGround", true);
-				flightTime = player.Stats.GrantedFlightTime;
-				jumpsLeft = player.Stats.MaxJumps;
+				flightTime = player.Stats.grantedFlightTime;
+				jumpsLeft = player.Stats.maxJumps;
 				isFlying = false;
 				rb.linearDamping = 0f;
 			}, IsOnGround));
@@ -134,13 +134,13 @@ namespace SoulboundBackend.Client {
 
 			if (movement.x != 0) {
 				if (!isFlying) {
-					rb.linearVelocityX += player.Stats.HorizontalAcceleration * movementSpeedPower * Time.fixedDeltaTime * movement.x;
-					float speedLimit = player.Stats.MovementSpeed.GetProcessedValue();
+					rb.linearVelocityX += player.Stats.horizontalAcceleration * movementSpeedPower * Time.fixedDeltaTime * movement.x;
+					float speedLimit = player.Stats.movementSpeed.GetProcessedValue();
 					if (Mathf.Abs(rb.linearVelocityX) > speedLimit) {
 						rb.linearVelocityX = Mathf.Sign(rb.linearVelocityX) * speedLimit;
 					}
 				} else {
-					float scaledFlightAcceleration = flightMovementPower * player.Stats.HorizontalFlightAcceleration;
+					float scaledFlightAcceleration = flightMovementPower * player.Stats.horizontalFlightAcceleration;
 					rb.linearVelocityX += scaledFlightAcceleration * Time.fixedDeltaTime * movement.x;
 					if (rb.linearVelocityX > scaledFlightAcceleration) {
 						rb.linearVelocityX = scaledFlightAcceleration;
@@ -151,7 +151,7 @@ namespace SoulboundBackend.Client {
 				rb.linearVelocityX = Mathf.Lerp(rb.linearVelocityX, 0, deceleration * Time.fixedDeltaTime);
 			}
 			if (shouldJump) {
-				rb.AddForceY(player.Stats.JumpHeight.GetProcessedValue() * jumpHeightPower, ForceMode2D.Impulse);
+				rb.AddForceY(player.Stats.jumpHeight.GetProcessedValue() * jumpHeightPower, ForceMode2D.Impulse);
 				shouldJump = false;
 				animator.SetBool("onGround", false);
 				rb.linearDamping = 1f;
@@ -162,7 +162,7 @@ namespace SoulboundBackend.Client {
 				return;         // flight switch will occur once jump timer is finished
 			}
 			if (jumpsLeft == 0 && !shouldJump && flightTime > 0 && jumpToFlightTimer <= 0) {
-				float scaledFlightAcceleration = flightMovementPower * player.Stats.VerticalFlightAcceleration;
+				float scaledFlightAcceleration = flightMovementPower * player.Stats.verticalFlightAcceleration;
 				rb.linearVelocityY += scaledFlightAcceleration * Time.fixedDeltaTime;
 				if (rb.linearVelocityY > scaledFlightAcceleration) {
 					rb.linearVelocityY = scaledFlightAcceleration;
@@ -172,14 +172,14 @@ namespace SoulboundBackend.Client {
 				animator.SetBool("jumping", false);
 				rb.linearDamping = 1;
 				flightTime -= Time.fixedDeltaTime * flightTimeReductionMultiplier;
-				flightTime = Mathf.Clamp(flightTime, 0, player.Stats.GrantedFlightTime);
-			} else if (flightTime == 0 && player.Stats.GrantedFlightTime > 0) {
+				flightTime = Mathf.Clamp(flightTime, 0, player.Stats.grantedFlightTime);
+			} else if (flightTime == 0 && player.Stats.grantedFlightTime > 0) {
 				if (rb.linearVelocityY <= -rb.gravityScale) {
 					float scaledSlowFallVelocity = Time.fixedDeltaTime * slowFallTimeReductionMultiplier;
 					rb.linearVelocityY = Mathf.Lerp(rb.linearVelocityY, -scaledSlowFallVelocity, scaledSlowFallVelocity);
 				}
 			}
-			UpdateFlightTimePanel(isFlying, flightTime, player.Stats.GrantedFlightTime);
+			UpdateFlightTimePanel(isFlying, flightTime, player.Stats.grantedFlightTime);
 		}
 
 		internal void OnSpacePressed() { 

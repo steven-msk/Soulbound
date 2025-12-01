@@ -11,8 +11,6 @@ using System.Threading.Tasks;
 using UnityEngine.Assertions;
 using UnityEngine.TestTools;
 using Zenject;
-using static UnityEditor.Search.SearchColumn;
-using static UnityEngine.EventSystems.EventTrigger;
 using Assert = NUnit.Framework.Assert;
 
 namespace StatSystemTests {
@@ -23,8 +21,6 @@ namespace StatSystemTests {
 
 			public TestEntry(StatDefinition<TValue> definition, TValue baseValue)
 				: base(definition, baseValue) {
-				this.definition = definition;
-				this.baseValue = baseValue;
 			}
 
 			public Type valueType => typeof(TValue);

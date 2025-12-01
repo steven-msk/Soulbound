@@ -305,7 +305,7 @@ namespace SoulboundBackend.Client {
 				//	}
 				//};
 
-				this.maxHealth = stats.MaxHealth.GetProcessedValue();
+				this.maxHealth = stats.maxHealth.GetProcessedValue();
 				this.currentHealth = maxHealth;         // might cause problems later with OnDeath handling
 														// If the player were to leave while having the death screen active,
 														// Upon rejoining it would reset their health to max, completely overriding the death state.
