@@ -26,20 +26,12 @@ namespace SoulboundBackend.Client.Stats {
 			}
 		}
 
-		public void Apply(StatEntry<TValue> entry, ModificationToken modificationToken) {
+		public virtual void Apply(StatEntry<TValue> entry, ModificationToken modificationToken) {
 			throw new NotImplementedException();
 		}
 
-		public void Remove(StatEntry<TValue> entry, ModificationToken modificationToken) {
+		public virtual void Remove(StatEntry<TValue> entry, ModificationToken modificationToken) {
 			throw new NotImplementedException();
-		}
-
-		public override void Apply(IStatEntry entry, ModificationToken modificationToken) {
-			((IStatEntryModifier<TValue>)this).Apply(entry, modificationToken);
-		}
-
-		public override void Remove(IStatEntry entry, ModificationToken modificationToken) {
-			((IStatEntryModifier<TValue>)this).Remove(entry, modificationToken);
 		}
 
 		public override object GetBoxedValue() => value;

@@ -4,36 +4,11 @@ using System.Collections.Generic;
 
 namespace SoulboundBackend.Client.Stats {
 	public interface IStatEntry {
-		//[Obsolete]
-		//void Add(AbstractValueModifier serializableStat, IStatProvider provider);
-
-		//[Obsolete]
-		//void AddRange(params (AbstractValueModifier stat, IStatProvider provider)[] modifiers);
-
-		//[Obsolete]
-		//void Remove(AbstractValueModifier serializableStat, IStatProvider provider);
-
-		//[Obsolete]
-		//void RemoveRange(params (AbstractValueModifier stat, IStatProvider provider)[] modifiers);
-
-		//[Obsolete]
-		//void SetModifiers(List<(AbstractValueModifier stat, IStatProvider provider)> modifiers);
-
 		object CalculateBoxedValue();
 		Type valueType { get; }
 
 		void AcceptModifier(IStatEntryModifier modifier, ModificationToken modificationToken);
 		void RemoveModifier(IStatEntryModifier modifier, ModificationToken modificationToken);
 		void RemoveModifiers(ModificationToken modificationToken);
-
-		//[Obsolete]
-		//List<(AbstractValueModifier, IStatProvider)> GetBoxedModifiers();
-
-		[Obsolete]
-		internal class UnsupportedSerializableStatTypeException : NullReferenceException {
-			public UnsupportedSerializableStatTypeException(object value, Type expectedType)
-				: base($"Unsupported stat value type {value.GetType()} for entry of type {expectedType}") {
-			}
-		}
 	}
 }

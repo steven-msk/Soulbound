@@ -1,4 +1,5 @@
-﻿using SoulboundBackend.Client.ItemSystem;
+﻿using ModestTree;
+using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Common;
 using SoulboundBackend.Common.Json;
 using SoulboundBackend.Common.Logging;
@@ -24,12 +25,12 @@ namespace SoulboundBackend.Client.Stats {
 		[Obsolete]
 		private bool flag_blockUpdate = false;
 
-		public StatEntry(TValue baseValue, StatDefinition<TValue> definition, IStatProcessor<TValue> processor) 
-			: this(baseValue, definition) {
+		public StatEntry(StatDefinition<TValue> definition, TValue baseValue, IStatProcessor<TValue> processor) 
+			: this(definition, baseValue) {
 			this._processor = processor;
 		}
 
-		public StatEntry(TValue baseValue, StatDefinition<TValue> definition) {
+		public StatEntry(StatDefinition<TValue> definition, TValue baseValue) {
 			this.baseValue = baseValue;
 			this.definition = definition;
 		}
@@ -59,56 +60,21 @@ namespace SoulboundBackend.Client.Stats {
 			}
 		}
 
-		public void AddModifier(IStatEntryModifier<TValue> modifier, ModificationToken modificationToken) {
+		public void CommitModifier(IStatEntryModifier<TValue> modifier, ModificationToken modificationToken) {
 			if (!modifiers.TryGetValue(modificationToken, out var list)) {
 				modifiers[modificationToken] = list = new();
 			}
 			list.Add(modifier);
 		}
 
-		//[Obsolete]
-		//public void Add(AbstractValueModifier serializableStat, IStatProvider provider) {
-		//	if (Validate(serializableStat, provider)) {
-		//		if (!modifiers.ContainsKey(provider)) {
-		//			modifiers.Add(provider, new List<AbstractValueModifier>());
-		//		}
-		//		modifiers[provider].Add(serializableStat as ValueModifier<TValue>);
-		//	}
-		//	InvocationHelper.If(!flag_blockUpdate, () => OnModifiersChanged?.Invoke(this));
-		//}
-
-		//[Obsolete]
-		//public void AddRange(params (AbstractValueModifier stat, IStatProvider provider)[] modifiers) {
-		//	flag_blockUpdate = true;
-		//	modifiers.ToList().ForEach(modifier => this.Add(modifier.stat, modifier.provider));
-		//	OnModifiersChanged?.Invoke(this);
-		//	flag_blockUpdate = false;
-		//}
-
-		//[Obsolete]
-		//public void Remove(AbstractValueModifier serializableStat, IStatProvider provider) {
-		//	if (Validate(serializableStat, provider) && modifiers.TryGetValue(provider, out var stats)) {
-		//		stats.Remove(serializableStat as ValueModifier<TValue>);
-		//		if (stats.Count == 0) {
-		//			modifiers.Remove(provider);
-		//		}
-		//	}
-		//	InvocationHelper.If(!flag_blockUpdate, () => OnModifiersChanged?.Invoke(this));
-		//}
-
-		//[Obsolete]
-		//public void RemoveRange(params (AbstractValueModifier stat, IStatProvider provider)[] modifiers) {
-		//	flag_blockUpdate = true;
-		//	modifiers.ToList().ForEach(modifier => this.Remove(modifier.stat, modifier.provider));
-		//	OnModifiersChanged?.Invoke(this);
-		//	flag_blockUpdate = false;
-		//}
-
-		//[Obsolete]
-		//public void SetModifiers(List<(AbstractValueModifier stat, IStatProvider provider)> modifiers) {
-		//	this.modifiers.Clear();
-		//	this.AddRange(modifiers.ToArray());
-		//}
+		public void UncommitModifier(IStatEntryModifier<TValue> modifier, ModificationToken modificationToken) {
+			if (modifiers.TryGetValue(modificationToken, out var list)) {
+				list.Remove(modifier);
+			}
+			if (list.IsEmpty()) {
+				modifiers.Remove(modificationToken);
+			}
+		}
 
 		public object CalculateBoxedValue() => this.GetProcessedValue();
 

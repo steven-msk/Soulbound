@@ -11,56 +11,15 @@ namespace SoulboundBackend.Client.Stats {
 		public string? id { get; set; }
 		public Type valueType => typeof(TValue);
 
-		internal StatDefinition(string baseName, SupportedApplicationType supportedApplications, IStatProcessor<TValue> defaultProcessor) {
+		public StatDefinition(string baseName, SupportedApplicationType supportedApplications, IStatProcessor<TValue> defaultProcessor) {
 			this.baseName = baseName;
 			this.supportedApplications = supportedApplications;
 			this.defaultProcessor = defaultProcessor;
 		}
 
-		//internal StatDefinition(string baseName, Func<TValue, string, string> displayNameFormat, Func<TValue, string> valueFormat,
-		//				Func<TValue, string>? valueColorSupplier, BonusAdmission<TValue> bonusValueAdmission,
-		//				SupportedApplicationType supportedApplications, IStatProcessor<TValue> processor) {
-		//	this.displayNameFormat = displayNameFormat;
-		//	this.baseName = baseName;
-		//	this.valueFormat = valueFormat;
-		//	this.bonusValueAdmission = bonusValueAdmission;
-		//	this.valueColorSupplier = valueColorSupplier;
-		//	this.supportedApplications = supportedApplications;
-		//	this.defaultProcessor = processor;
-		//}
-
-		//string IStatDefinition.GetFormattedName(object value) => displayNameFormat.Invoke((TValue)value, baseName);
-
-		//string IStatDefinition.GetFormattedValue(object value, bool applyAsBonus) {
-		//	string formattedValue = valueFormat.Invoke((TValue)value);
-		//	if (applyAsBonus && valueColorSupplier != null) {
-		//		formattedValue = string.Concat(bonusValueAdmission.GetPrefix((TValue)value), formattedValue);
-		//		formattedValue = $"<color={valueColorSupplier((TValue)value)}>{formattedValue}</color>";
-		//	} else {
-		//		formattedValue = displayNameFormat.Invoke((TValue)value, formattedValue).Replace("s", "");                      // hard-coded, not optimal
-		//	}
-		//	return formattedValue;
-		//}
-
 		public override string ToString() {
 			return $"StatDefinition<{typeof(TValue)}>[type: {valueType}, baseName: {baseName}]";
 		}
-
-		//public override int GetHashCode() {
-		//	return this.id!.GetHashCode();
-		//}
-
-		//public override bool Equals(object obj) {
-		//	return obj is IStatDefinition other && other.id == this.id;
-		//}
-
-		//public static bool operator ==(StatDefinition<TValue> first, StatDefinition<TValue> second) {
-		//	return first.id == second.id;
-		//}
-
-		//public static bool operator !=(StatDefinition<TValue> first, StatDefinition<TValue> second) {
-		//	return !(first == second);
-		//}
 	}
 
 	public partial class StatDefinition {

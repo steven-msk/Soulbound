@@ -12,27 +12,6 @@ namespace SoulboundBackend.Client.Stats {
 		SupportedApplicationType supportedApplications { get; }
 		string? id { get; set; }
 
-		//string GetFormattedName(object value);
-
-		//string GetFormattedValue(object value, bool applyAsBonus);
-
-		//static Dictionary<string, IStatDefinition> definitionsById = new();
-
-		//static IStatDefinition ByID(string id) {
-		//	if (definitionsById.TryGetValue(id, out IStatDefinition definition)) {
-		//		return definition;
-		//	}
-		//	throw new ArgumentException($"No stat definition found for id {id}");
-		//}
-
-		//internal static void Register(string id, IStatDefinition definition) {
-		//	definitionsById[id] = definition;
-		//}
-
-		//virtual string GetFormattedExpression(object value, bool applyAsBonus = false) {
-		//	return $"{this.GetFormattedValue(value, applyAsBonus)} {this.GetFormattedName(value)}";
-		//}
-
 		public bool SupportsApplication(StatApplicationType applicationType) {
 			return supportedApplications.HasFlag(applicationType);
 		}

@@ -3,19 +3,17 @@
 #nullable enable
 
 namespace SoulboundBackend.Client.Stats {
-	public abstract class AbstractValueModifier : IStatEntryModifier {
+	public abstract class AbstractValueModifier {
 		public readonly IStatDefinition statDefinition;
 		public readonly StatApplicationType applicationType;
 		public abstract bool keepSign { get; }
 
 		public AbstractValueModifier(IStatDefinition statDefinition, StatApplicationType applicationType) {
 			this.statDefinition = statDefinition;
+			this.applicationType = applicationType;
 		}
 
 		public abstract object GetBoxedValue();
-
-		public abstract void Apply(IStatEntry entry, ModificationToken modificationToken);
-		public abstract void Remove(IStatEntry entry, ModificationToken modificationToken);
 
 		public abstract override string ToString();
 		public abstract override int GetHashCode();
