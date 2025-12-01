@@ -51,10 +51,6 @@ namespace SoulboundBackend.Client.Stats {
 			);
 		}
 
-		public override int GetHashCode() {
-			return HashCode.Combine(value, keepSign, applicationType);
-		}
-
 		public abstract class MathProcedure {
 			protected Func<TValue, TValue, TValue> GetDelegate(Func<Expression, Expression, BinaryExpression> expression) {
 				var paramA = Expression.Parameter(typeof(TValue), "a");

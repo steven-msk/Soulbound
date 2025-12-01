@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 using UnityEngine.Assertions;
 using UnityEngine.TestTools;
 using Zenject;
+using static UnityEditor.Search.SearchColumn;
+using static UnityEngine.EventSystems.EventTrigger;
 using Assert = NUnit.Framework.Assert;
 
 namespace StatSystemTests {
@@ -254,7 +256,7 @@ namespace StatSystemTests {
 			float a = 1.5f;
 			float result = procedure.Apply(a, mod, entry);
 
-			Assert.AreEqual(3f, result);
+			Assert.AreEqual(3f, result, 0.0001f);
 		}
 
 		[Test]
@@ -267,12 +269,169 @@ namespace StatSystemTests {
 			float a = 3f;
 			float result = procedure.Apply(a, mod, entry);
 
-			Assert.AreEqual(1.5f, result);
+			Assert.AreEqual(1.5f, result, 0.0001f);
 		}
 	}
 
 	[TestFixture]
-	public class ProcessorTests { 
-		
+	public class ProcessorTests {
+		[Test]
+		public void Apply_AddModifier_UpdatesFinalValue() {
+			var def = new StatDefinition<int>("def", SupportedApplicationType.FlatOnly);
+			var entry = new StatEntry<int>(def, 10);
+			var mod = new ValueModifier<int>(5, true);
+			var token = new ModificationToken();
+			entry.CommitModifier(mod, token, new ValueModifier<int>.Add());
+
+			int finalValue = entry.GetProcessedValue();
+
+			Assert.AreEqual(15, finalValue);
+		}
+
+		[Test]
+		public void Apply_SubtractModifier_UpdatesFinalValue() {
+			var def = new StatDefinition<int>("def", SupportedApplicationType.FlatOnly);
+			var entry = new StatEntry<int>(def, 10);
+			var mod = new ValueModifier<int>(3, true);
+			var token = new ModificationToken();
+			entry.CommitModifier(mod, token, new ValueModifier<int>.Subtract());
+
+			int finalValue = entry.GetProcessedValue();
+
+			Assert.AreEqual(7, finalValue);
+		}
+
+		[Test]
+		public void Apply_MultiplyModifier_UpdatesFinalValue() {
+			var def = new StatDefinition<int>("def", SupportedApplicationType.FlatOnly);
+			var entry = new StatEntry<int>(def, 10);
+			var mod = new ValueModifier<int>(2, true);
+			var token = new ModificationToken();
+			entry.CommitModifier(mod, token, new ValueModifier<int>.Multiply());
+
+			int finalValue = entry.GetProcessedValue();
+
+			Assert.AreEqual(20, finalValue);
+		}
+
+		[Test]
+		public void Apply_DivideModifier_UpdatesFinalValue() {
+			var def = new StatDefinition<int>("def", SupportedApplicationType.FlatOnly);
+			var entry = new StatEntry<int>(def, 10);
+			var mod = new ValueModifier<int>(2, true);
+			var token = new ModificationToken();
+			entry.CommitModifier(mod, token, new ValueModifier<int>.Divide());
+
+			int finalValue = entry.GetProcessedValue();
+
+			Assert.AreEqual(5, finalValue);
+		}
+
+		[Test]
+		public void Apply_MultipleModifiers_CalculatesCorrectly() {
+			var def = new StatDefinition<int>("def", SupportedApplicationType.FlatOnly);
+			var entry = new StatEntry<int>(def, 10);
+			var token = new ModificationToken();
+
+			entry.CommitModifier(new ValueModifier<int>(5, true), token, new ValueModifier<int>.Add());		  // 10 + 5 = 15
+			entry.CommitModifier(new ValueModifier<int>(10, true), token, new ValueModifier<int>.Subtract()); // 15 - 10 = 5 
+			entry.CommitModifier(new ValueModifier<int>(6, true), token, new ValueModifier<int>.Multiply());  // 5 * 6 = 30
+			entry.CommitModifier(new ValueModifier<int>(2, true), token, new ValueModifier<int>.Divide());	  // 30 / 2 = 15
+
+			int finalValue = entry.GetProcessedValue();
+
+			Assert.AreEqual(15, finalValue);
+		}
+
+		[Test]
+		public void Remove_RemovesModificationValue() {
+			var def = new StatDefinition<int>("def", SupportedApplicationType.FlatOnly);
+			var entry = new StatEntry<int>(def, 10);
+			var token = new ModificationToken();
+
+			var mod = new ValueModifier<int>(5, true);
+			entry.CommitModifier(mod, token, new ValueModifier<int>.Add());
+			Assert.AreEqual(15, entry.GetProcessedValue());
+
+			entry.UncommitModifier(mod, token);
+			Assert.AreEqual(10, entry.GetProcessedValue());
+		}
+
+		[Test]
+		public void Apply_AddModifier_UpdatesFinalValue_Float() {
+			var def = new StatDefinition<float>("def", SupportedApplicationType.FlatOnly);
+			var entry = new StatEntry<float>(def, 0f);
+			var mod = new ValueModifier<float>(10.3f, true);
+			var token = new ModificationToken();
+			entry.CommitModifier(mod, token, new ValueModifier<float>.Add());
+
+			float finalValue = entry.GetProcessedValue();
+
+			Assert.AreEqual(10.3f, finalValue);
+		}
+
+		[Test]
+		public void Apply_SubtractModifier_UpdatesFinalValue_Float() {
+			var def = new StatDefinition<float>("def", SupportedApplicationType.FlatOnly);
+			var entry = new StatEntry<float>(def, 100f);
+			var mod = new ValueModifier<float>(49.9f, true);
+			var token = new ModificationToken();
+			entry.CommitModifier(mod, token, new ValueModifier<float>.Subtract());
+
+			float finalValue = entry.GetProcessedValue();
+
+			Assert.AreEqual(50.1f, finalValue, 0.0001f);
+		}
+
+		[Test]
+		public void Apply_MultiplyModifier_UpdatesFinalValue_Float() {
+			var def = new StatDefinition<float>("def", SupportedApplicationType.FlatOnly);
+			var entry = new StatEntry<float>(def, 1.5f);
+			var mod = new ValueModifier<float>(4f, true);
+			var token = new ModificationToken();
+			entry.CommitModifier(mod, token, new ValueModifier<float>.Multiply());
+
+			float finalValue = entry.GetProcessedValue();
+
+			Assert.AreEqual(6f, finalValue, 0.0001f);
+		}
+
+		[Test]
+		public void Apply_DivideModifier_UpdatesFinalValue_Float() {
+			var def = new StatDefinition<float>("def", SupportedApplicationType.FlatOnly);
+			var entry = new StatEntry<float>(def, 5f);
+			var mod = new ValueModifier<float>(2f, true);
+			var token = new ModificationToken();
+			entry.CommitModifier(mod, token, new ValueModifier<float>.Divide());
+
+			float finalValue = entry.GetProcessedValue();
+
+			Assert.AreEqual(2.5f, finalValue, 0.0001f);
+		}
+
+		[Test]
+		public void Apply_SubtractModifier_NegativeFloat() {
+			var def = new StatDefinition<float>("def", SupportedApplicationType.FlatOnly);
+			var entry = new StatEntry<float>(def, 10f);
+			var mod = new ValueModifier<float>(-3.5f, true);
+			var token = new ModificationToken();
+			entry.CommitModifier(mod, token, new ValueModifier<float>.Subtract());
+			Assert.AreEqual(13.5f, entry.GetProcessedValue(), 0.0001f); // 10 - (-3.5) = 13.5
+		}
+
+		[Test]
+		public void Apply_ModifiersWithZero_Int() {
+			var def = new StatDefinition<int>("def", SupportedApplicationType.FlatOnly);
+			var entry = new StatEntry<int>(def, 10);
+			var token = new ModificationToken();
+
+			var addZero = new ValueModifier<int>(0, true);
+			entry.CommitModifier(addZero, token, new ValueModifier<int>.Add());
+			Assert.AreEqual(10, entry.GetProcessedValue());
+
+			var multZero = new ValueModifier<int>(0, false);
+			entry.CommitModifier(multZero, token, new ValueModifier<int>.Multiply());
+			Assert.AreEqual(0, entry.GetProcessedValue());
+		}
 	}
 }
