@@ -26,8 +26,8 @@ public sealed class ArmorItem_test : ArmorItem {
 		public ArmorItem_test() {
 			StatMappingBuilder mappingBuilder = new StatMappingBuilder()
 				.SetStats(() => new DynamicMap<AbstractValueModifier>() {
-					["maxHealth"] = new ValueModifier<int>(StatDefinition.MaxHealth, 1, keepSign: true),
-					["defense"] = new ValueModifier<int>(StatDefinition.Defense, 10, keepSign: true)
+					["maxHealth"] = new ValueModifier<int>(1, true),
+					["defense"] = new ValueModifier<int>(10, true)
 				})
 				.WithTooltipNodes((stats) => new List<TooltipNodeData>() {
 					new TooltipNodeData(TooltipNode.Stats, stats["defense"].ToString()),

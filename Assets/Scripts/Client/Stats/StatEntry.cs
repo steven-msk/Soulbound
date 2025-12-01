@@ -15,15 +15,11 @@ namespace SoulboundBackend.Client.Stats {
 	public class StatEntry<TValue> : IStatEntry where TValue : struct, IComparable<TValue> {
 		private static readonly Logger logger = Logger.CreateInstance();
 		private Dictionary<ModificationToken, List<IStatEntryModifier<TValue>>> modifiers = new();
-		[Obsolete]
-		public event Action<StatEntry<TValue>>? OnModifiersChanged;
 		public TValue baseValue { get; protected set; }
 		public StatDefinition<TValue> definition { get; protected set; }
 		private IStatProcessor<TValue>? _processor;
 		public IStatProcessor<TValue> processor => _processor ?? definition.defaultProcessor;
 		Type IStatEntry.valueType => typeof(TValue);
-		[Obsolete]
-		private bool flag_blockUpdate = false;
 
 		public StatEntry(StatDefinition<TValue> definition, TValue baseValue, IStatProcessor<TValue> processor) 
 			: this(definition, baseValue) {

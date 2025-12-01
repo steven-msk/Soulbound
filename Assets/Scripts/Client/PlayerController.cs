@@ -297,13 +297,13 @@ namespace SoulboundBackend.Client {
 				this.stats = new();
 			} finally {
 				stats.UpdateInjectedMappings();
-				stats.MaxHealth.OnModifiersChanged += maxHealth => {
-					bool wasFullHealth = this.currentHealth == this.maxHealth;
-					this.maxHealth = maxHealth.GetProcessedValue();
-					if (wasFullHealth) {
-						this.currentHealth = this.maxHealth;
-					}
-				};
+				//stats.MaxHealth.OnModifiersChanged += maxHealth => {
+				//	bool wasFullHealth = this.currentHealth == this.maxHealth;
+				//	this.maxHealth = maxHealth.GetProcessedValue();
+				//	if (wasFullHealth) {
+				//		this.currentHealth = this.maxHealth;
+				//	}
+				//};
 
 				this.maxHealth = stats.MaxHealth.GetProcessedValue();
 				this.currentHealth = maxHealth;         // might cause problems later with OnDeath handling

@@ -4,12 +4,10 @@
 
 namespace SoulboundBackend.Client.Stats {
 	public abstract class AbstractValueModifier {
-		public readonly IStatDefinition statDefinition;
 		public readonly StatApplicationType applicationType;
 		public abstract bool keepSign { get; }
 
-		public AbstractValueModifier(IStatDefinition statDefinition, StatApplicationType applicationType) {
-			this.statDefinition = statDefinition;
+		public AbstractValueModifier(StatApplicationType applicationType) {
 			this.applicationType = applicationType;
 		}
 

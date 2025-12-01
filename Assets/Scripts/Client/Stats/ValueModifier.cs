@@ -12,33 +12,31 @@ namespace SoulboundBackend.Client.Stats {
 		public override bool keepSign { get; }
 
 		public ValueModifier(
-			StatDefinition<TValue> statDefinition,
 			TValue value,
 			bool keepSign,
 			StatApplicationType applicationType = StatApplicationType.Flat
 		) 
-			: base(statDefinition, applicationType) {
+			: base(applicationType) {
 			this.value = value;
 			this.keepSign = keepSign;
-
-			if (applicationType == StatApplicationType.Percentage && typeof(TValue) == typeof(int)) {
-				logger.LogWarning("Unsupported stat application type 'percentage' for stat value type 'int'.");
-			}
 		}
 
 		public virtual void Apply(StatEntry<TValue> entry, ModificationToken modificationToken) {
-			throw new NotImplementedException();
+			var context = new ValueModificationContext<TValue>(this, entry);
+
+			if (context.IsValid()) {
+				entry.CommitModifier(this, modificationToken);
+			}
 		}
 
 		public virtual void Remove(StatEntry<TValue> entry, ModificationToken modificationToken) {
-			throw new NotImplementedException();
+			entry.UncommitModifier(this, modificationToken);
 		}
 
 		public override object GetBoxedValue() => value;
 
 		public override string ToString() {
 			return $"ValueModifier[type: {typeof(TValue)}, " +
-				   $"statDefinition: {statDefinition}, " +
 				   $"value: {value}, " +
 				   $"applicationType: {applicationType}, " +
 				   $"keepSign: {keepSign}]";
@@ -46,7 +44,6 @@ namespace SoulboundBackend.Client.Stats {
 
 		public override object Clone() {
 			return new ValueModifier<TValue>(
-				(StatDefinition<TValue>)this.statDefinition,
 				this.value, 
 				this.keepSign,
 				this.applicationType
@@ -54,7 +51,7 @@ namespace SoulboundBackend.Client.Stats {
 		}
 
 		public override int GetHashCode() {
-			return HashCode.Combine(statDefinition, value, keepSign, applicationType);
+			return HashCode.Combine(value, keepSign, applicationType);
 		}
 	}
 }
