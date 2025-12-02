@@ -22,7 +22,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 			}
 			PlayerStats playerStats = Soulbound.instance.GetPlayerInstance().Stats;
 
-			if (grabbedItem?.DisplayedItem is ArmorItem armor && armor.armorType == this.AcceptedType) {
+			if (grabbedItem?.item is ArmorItem armor && armor.armorType == this.AcceptedType) {
 				if (this.HasItem) {
 					//this.CastDisplayed()!.OnUnequipped(playerStats);
 				}
@@ -38,7 +38,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 			return false;
 		}
 
-		private ArmorItem? CastDisplayed() => this.ItemStack?.item as ArmorItem;
+		private ArmorItem? CastDisplayed() => this.stack?.item as ArmorItem;
 
 		public override void Deserialize(SerializedItemSlot serialized) {
 			ItemSlotDeserializer.Deserialize(this, serialized);

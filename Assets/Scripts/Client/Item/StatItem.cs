@@ -8,12 +8,8 @@ using System.Collections.Generic;
 
 namespace SoulboundBackend.Client.ItemSystem {
 	public abstract class StatItem : Item, IStatModificationSource {
-		public abstract bool applyInstantStatsOnHoverOrSelect { get; }
-		public abstract ModificationToken token { get; }
+		private readonly ModificationToken _token = new();
+		public virtual ModificationToken token => _token;
 		public abstract IEnumerable<StatModificationPackage> GetPackages();
-		[Obsolete]
-		public ContextHandle<IStatReceiver> contextHandle { get; } = new();
-		[Obsolete]
-		protected bool hasContext => contextHandle.hasContext;
 	}
 }

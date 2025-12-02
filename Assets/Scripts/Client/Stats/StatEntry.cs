@@ -49,8 +49,12 @@ namespace SoulboundBackend.Client.Stats {
 		}
 
 		public void RemoveModifiers(ModificationToken modificationToken) {
-			foreach (var modifier in modifiers[modificationToken]) {
-				modifier.Remove(this, modificationToken);
+			if (this.modifiers.TryGetValue(modificationToken, out var modifiers)) {
+				var clone = new List<IStatEntryModifier<TValue>>(modifiers);
+
+				foreach (var modifier in clone) {
+					modifier.Remove(this, modificationToken);
+				}
 			}
 		}
 

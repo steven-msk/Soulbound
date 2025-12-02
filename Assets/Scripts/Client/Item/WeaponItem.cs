@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace SoulboundBackend.Client.ItemSystem {
 	public abstract class WeaponItem : StatItem, IAttackSourceProvider {
-		public override bool applyInstantStatsOnHoverOrSelect => true;
 		public abstract GameObject attackPrefab { get; protected set; }
 
 		public abstract bool GetAttackSource(ItemUseTrigger trigger, out AttackSource source);

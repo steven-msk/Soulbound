@@ -1,6 +1,7 @@
 ﻿using SoulboundBackend.Client.Concurrency;
 using SoulboundBackend.Client.Input;
 using SoulboundBackend.Client.ItemSystem;
+using SoulboundBackend.Client.Stats;
 using SoulboundBackend.Common;
 using SoulboundBackend.Common.UI.Storage;
 using SoulboundBackend.Core;
@@ -24,7 +25,7 @@ using Logger = SoulboundBackend.Common.Logging.Logger;
 #nullable enable
 
 namespace SoulboundBackend.Client.UI.Storage {
-	public class InventoryController : MonoBehaviour, IItemContainer2D, ISerializable<SerializedInventory, List<IItemSlot>> {
+	public class InventoryController : MonoBehaviour, IItemContainer2D, ISerializable<SerializedInventory>, IStatContextProvider {
 		public delegate void InterpretationFunction(IItemSlot slot, RefBox<ItemDisplay> grabbedItem);
 		public delegate InterpretationFunction? InterpretationProvider(DragHandler handler, IItemSlot draggedSlot, RefBox<ItemDisplay> grabbedItem);
 
@@ -57,7 +58,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 
 		private PlayerController player = null!;
 		private ConcurrentActionResolver actionResolver = null!;
-		public InventoryEventHandler eventHandler { get; private set; }
+		IStatModificationHost IStatContextProvider.statModificationHost => player.Stats;
 
 		private float doubleClickThreshold = 0.15f;
 		private float lastClickTime;
@@ -68,7 +69,6 @@ namespace SoulboundBackend.Client.UI.Storage {
 
 		[Inject]
 		public void Construct(DiContainer container) {
-			this.eventHandler = new InventoryEventHandler();
 			this.player = container.Resolve<PlayerController>();
 			this.actionResolver = container.Resolve<ConcurrentActionResolver>();
 			var inputHandler = container.Resolve<InputHandler>();
@@ -136,15 +136,15 @@ namespace SoulboundBackend.Client.UI.Storage {
 			});
 		}
 
-		public List<IItemSlot> Deserialize(SerializedInventory serialized) {
+		public void Deserialize(SerializedInventory serialized) {
 			var pendingUpdates = TryDeserialize("hotbar", serialized.regions, hotbar.GetSlotByIndex)
 				?.Concat(TryDeserialize("popup", serialized.regions, this.GetSlotByIndex))
 				?.Concat(TryDeserialize("armor", serialized.regions, index => armorSlotsByIndex[index]));
 			hotbar.SetActiveSlot(serialized.lastHotbarIndex);
 
-			this.slots[0].CreateDisplay(new ItemStack(Items.consumableStatItem_test, 1));
+			this.slots[0].CreateDisplay(new ItemStack(Items.statItem_test, 1));
 
-			return pendingUpdates?.ToList()!;
+			pendingUpdates?.ToList().ForEach(s => s.item?.OnAttachedInSlot(s));
 		}
 
 		private IItemSlot[] TryDeserialize<TSlot>(string region, Dictionary<string, List<SerializedItemSlot>> regions, Func<int, TSlot> slotSupplier)
@@ -198,18 +198,18 @@ namespace SoulboundBackend.Client.UI.Storage {
 			if (slot == null) {
 				return;
 			}
-			ItemDisplay hoveredDisplay = slot.ItemDisplay;
+			ItemDisplay hoveredDisplay = slot.itemDisplay;
 			slot.DetachItemDisplay(this.transform);
-			hoveredDisplay.ItemStack.Drop(player.center, player.itemDropForce, true);
+			hoveredDisplay.stack.Drop(player.center, player.itemDropForce, true);
 			hoveredDisplay.Destroy();
 		}
 
 		// POTENTIAL: OnDrop callback in Item
 
 		public void DropGrabbedItem() {
-			GrabbedContext.value?.ItemStack.Drop(player.center, player.itemDropForce, true);
+			GrabbedContext.value?.stack.Drop(player.center, player.itemDropForce, true);
 			GrabbedContext.value?.Destroy();
-			if (GrabbedContext.value?.ItemStack == player.MainHandStack) {
+			if (GrabbedContext.value?.stack == player.MainHandStack) {
 				player.SetMainHandItem(null!);
 			}
 			GrabbedContext.Set(null, null);
@@ -219,11 +219,11 @@ namespace SoulboundBackend.Client.UI.Storage {
 			if (GrabbedContext.value == null) {
 				return;
 			}
-			if (PickUpItem(GrabbedContext.value.ItemStack, out int remaining)) {
+			if (PickUpItem(GrabbedContext.value.stack, out int remaining)) {
 				GrabbedContext.value.Destroy();
 				GrabbedContext.Set(null, null);
 			} else {
-				GrabbedContext.value.ItemStack.SetQuantity(remaining);
+				GrabbedContext.value.stack.SetQuantity(remaining);
 				DropGrabbedItem();
 			}
 		}
@@ -255,7 +255,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 
 				// Search for stack with the same item
 				foreach (var stackSlot in GetOccupiedSlots(itemStack.item) ?? new List<IItemSlot>().ToArray()) {
-					ItemStack? stackInSlot = stackSlot.ItemStack;
+					ItemStack? stackInSlot = stackSlot.stack;
 					if (stackInSlot!.quantity < itemStack.item.maxStackSize) {
 						int availableSpace = itemStack.item.maxStackSize - stackInSlot.quantity;
 						int toAdd = Math.Min(remaining, availableSpace);
@@ -291,13 +291,13 @@ namespace SoulboundBackend.Client.UI.Storage {
 
 		public InventorySlot[]? GetOccupiedSlots() => MainPlayerSlots.Where(slot => slot.HasItem)?.ToArray();
 
-		public InventorySlot[]? GetOccupiedSlots(Item item) => GetOccupiedSlots().Where(slot => slot.ItemStack.item.Equals(item))?.ToArray();
+		public InventorySlot[]? GetOccupiedSlots(Item item) => GetOccupiedSlots().Where(slot => slot.stack.item.Equals(item))?.ToArray();
 
 		public InventorySlot[]? GetEmptySlots() => MainPlayerSlots.Where(slot => !slot.HasItem)?.ToArray();
 
 		public void EquipHotbarItem(InventorySlot slot) {
-			ItemDisplay? itemDisplay = slot.ItemDisplay;
-			player.SetMainHandItem(itemDisplay?.ItemStack!);
+			ItemDisplay? itemDisplay = slot.itemDisplay;
+			player.SetMainHandItem(itemDisplay?.stack!);
 		}
 
 		public InventorySlot GetSlotByIndex(int index) => popupSlotsByIndex[index];
@@ -369,8 +369,8 @@ namespace SoulboundBackend.Client.UI.Storage {
 				cancelDrag = false;
 				return TransferGrabbed;
 			} else if (button == PointerEventData.InputButton.Right) {
-				if (GrabbedContext.value != null && clickedSlot.ContainedItem != null) {
-					if (GrabbedContext.value?.DisplayedItem != clickedSlot.ItemDisplay?.DisplayedItem) {
+				if (GrabbedContext.value != null && clickedSlot.item != null) {
+					if (GrabbedContext.value?.item != clickedSlot.itemDisplay?.item) {
 						cancelDrag = false;
 						return DoNothing;
 					}
@@ -390,8 +390,8 @@ namespace SoulboundBackend.Client.UI.Storage {
 			if (handler.dragButton == PointerEventData.InputButton.Left) {
 				return SplitDistributeToDraggedSlot_Impl;
 			} else if (handler.dragButton == PointerEventData.InputButton.Right) {
-				if (grabbedItem.value != null && draggedSlot.ContainedItem != null) {
-					if (grabbedItem.value.DisplayedItem != draggedSlot.ContainedItem) {
+				if (grabbedItem.value != null && draggedSlot.item != null) {
+					if (grabbedItem.value.item != draggedSlot.item) {
 						return DoNothing;
 					}
 				}
@@ -403,9 +403,9 @@ namespace SoulboundBackend.Client.UI.Storage {
 
 		public DragHandler StartDrag(IItemSlot dragOrigin, PointerEventData.InputButton dragButton) {
 			Dictionary<IItemSlot, int> quantitySnapshots = new();
-			var snapshotSlots = slots.Where(s => s != dragOrigin && s.ContainedItem == dragOrigin.ContainedItem);
+			var snapshotSlots = slots.Where(s => s != dragOrigin && s.item == dragOrigin.item);
 			foreach (var slot in snapshotSlots) {
-				quantitySnapshots[slot] = slot.ItemStack?.quantity ?? 0;
+				quantitySnapshots[slot] = slot.stack?.quantity ?? 0;
 			}
 			return new DragHandler(dragOrigin, () => slots.ToArray(), this.InterpretDrag, quantitySnapshots, dragButton);
 		}
@@ -428,43 +428,43 @@ namespace SoulboundBackend.Client.UI.Storage {
 
 		[InterpretationFunctionCandidate]
 		public void CollectAllStacksInGrabbed(Item item, RefBox<ItemDisplay> grabbedItem) {
-			if (grabbedItem.value == null || grabbedItem.value.ItemStack.IsFull()) {
+			if (grabbedItem.value == null || grabbedItem.value.stack.IsFull()) {
 				return;
 			}
 
-			var slots = GetOccupiedSlots(item)?.OrderBy(slot => slot.ItemStack.quantity).ToList();
+			var slots = GetOccupiedSlots(item)?.OrderBy(slot => slot.stack.quantity).ToList();
 			if (slots == null || slots.Count == 0) {
 				return;
 			}
 
-			ItemStack grabbedStack = grabbedItem.value.ItemStack;
+			ItemStack grabbedStack = grabbedItem.value.stack;
 			int spaceLeft = item.maxStackSize - grabbedStack.quantity;
 			foreach (var slot in slots) {
 				if (spaceLeft <= 0) {
 					break;
 				}
 
-				int transfer = grabbedStack.Increment(slot.ItemStack.quantity);
-				slot.ItemStack.Decrement(transfer);
+				int transfer = grabbedStack.Increment(slot.stack.quantity);
+				slot.stack.Decrement(transfer);
 				spaceLeft -= transfer;
 			}
 		}
 
 		public void CollectAllStacksInGrabbed_Impl(IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
-			CollectAllStacksInGrabbed(grabbedItem.value?.ItemStack.item
+			CollectAllStacksInGrabbed(grabbedItem.value?.stack.item
 				?? throw new InvalidOperationException("Grabbed context not available"), grabbedItem);
 		}
 
 		[InterpretationFunctionCandidate]
 		public void HalveStackFromSlot(IItemSlot clickedSlot, RefBox<ItemDisplay> grabbedItem) {
-			if (clickedSlot.ItemStack == null || grabbedItem.value != null) {
+			if (clickedSlot.stack == null || grabbedItem.value != null) {
 				return;
 			}
-			int half = clickedSlot.ItemStack.quantity / 2;
-			int remainder = clickedSlot.ItemStack.quantity % 2;
+			int half = clickedSlot.stack.quantity / 2;
+			int remainder = clickedSlot.stack.quantity % 2;
 			int transfer = half + remainder;
-			clickedSlot.ItemStack.Decrement(transfer);
-			CreateGrabbedDisplay(grabbedItem, new ItemStack(clickedSlot.ItemStack.item, transfer));
+			clickedSlot.stack.Decrement(transfer);
+			CreateGrabbedDisplay(grabbedItem, new ItemStack(clickedSlot.stack.item, transfer));
 		}
 
 		[InterpretationFunctionCandidate]
@@ -472,16 +472,16 @@ namespace SoulboundBackend.Client.UI.Storage {
 			if (grabbedItem.value == null) {
 				return;
 			}
-			int added = slot.TryAddStack(1, grabbedItem.value.ItemStack.item);
+			int added = slot.TryAddStack(1, grabbedItem.value.stack.item);
 			if (added > 0) {
-				grabbedItem.value.ItemStack.Decrement(added);
+				grabbedItem.value.stack.Decrement(added);
 				DestroyGrabbedIfEmpty(grabbedItem);
 			}
 		}
 
 		[InterpretationFunctionCandidate]
 		public void TransferSingleToGrabbed(IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
-			if (slot.ItemStack == null) {
+			if (slot.stack == null) {
 				return;
 			}
 			this.AddToGrabbed(slot, grabbedItem, 1);
@@ -489,15 +489,15 @@ namespace SoulboundBackend.Client.UI.Storage {
 
 		[InterpretationFunctionCandidate]
 		public void AddToGrabbed(IItemSlot slot, RefBox<ItemDisplay> grabbedItem, int amount) {
-			if (slot.ItemStack == null) {
+			if (slot.stack == null) {
 				return;
 			}
 			if (grabbedItem.value == null) {
-				CreateGrabbedDisplay(grabbedItem, new ItemStack(slot.ItemStack.item, 0));
+				CreateGrabbedDisplay(grabbedItem, new ItemStack(slot.stack.item, 0));
 			}
-			int transfer = Mathf.Min(amount, slot.ItemStack.quantity);
-			slot.ItemStack.Decrement(transfer);
-			grabbedItem.value!.ItemStack.Increment(transfer);
+			int transfer = Mathf.Min(amount, slot.stack.quantity);
+			slot.stack.Decrement(transfer);
+			grabbedItem.value!.stack.Increment(transfer);
 		}
 
 		[InterpretationFunctionCandidate]
@@ -512,21 +512,21 @@ namespace SoulboundBackend.Client.UI.Storage {
 			}
 
 			// Grab if slot has item, grabbed is empty
-			if (grabbedItem.value == null && slot.ItemStack != null) {
+			if (grabbedItem.value == null && slot.stack != null) {
 				SetRightClickAvailable(false);
 				this.GrabItemFromSlot(slot, grabbedItem);
 				return;
 			}
 
 			// Release if slot is empty, grabbed has item
-			if (grabbedItem.value != null && slot.ItemStack == null) {
+			if (grabbedItem.value != null && slot.stack == null) {
 				SetRightClickAvailable(true);
 				this.ReleaseItemInSlot(slot, grabbedItem);
 				return;
 			}
 
 			// Swap if different items or max quantity exists in either stack
-			if (slot.ContainedItem != grabbedItem.value!.ItemStack.item || grabbedItem.value.ItemStack.IsFull() || slot.ItemStack!.IsFull()) {
+			if (slot.item != grabbedItem.value!.stack.item || grabbedItem.value.stack.IsFull() || slot.stack!.IsFull()) {
 				this.SwapItems(slot, grabbedItem);
 			} else {    // Merge in slot for compatible stacks
 				SetRightClickAvailable(MergeInSlot(slot, grabbedItem));
@@ -538,9 +538,9 @@ namespace SoulboundBackend.Client.UI.Storage {
 			if (slot.IsEmpty || grabbedItem.value != null) {
 				return;
 			}
-			grabbedItem.value = slot.ItemDisplay;
+			grabbedItem.value = slot.itemDisplay;
 			slot.DetachItemDisplay(this.transform);
-			player.SetMainHandItem(grabbedItem.value.ItemStack);
+			player.SetMainHandItem(grabbedItem.value.stack);
 		}
 
 		[InterpretationFunctionCandidate]
@@ -549,7 +549,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 				return;
 			}
 			(slot as IItemSlot).AttachItemDisplay(grabbedItem.value);
-			player.SetMainHandItem(Hotbar.ActiveSlot.ItemStack);
+			player.SetMainHandItem(Hotbar.ActiveSlot.stack);
 			grabbedItem.value = null;
 		}
 
@@ -559,10 +559,10 @@ namespace SoulboundBackend.Client.UI.Storage {
 				return;
 			}
 			ItemDisplay previousGrabbed = grabbedItem.value;
-			grabbedItem.value = slot.ItemDisplay;
+			grabbedItem.value = slot.itemDisplay;
 			slot.DetachItemDisplay(this.transform);
 			slot.AttachItemDisplay(previousGrabbed);
-			player.SetMainHandItem(grabbedItem.value.ItemStack);
+			player.SetMainHandItem(grabbedItem.value.stack);
 		}
 
 		[InterpretationFunctionCandidate("Attempts to merge the grabbed stack into the clicked slot. Returns true if fully merged")]
@@ -574,17 +574,17 @@ namespace SoulboundBackend.Client.UI.Storage {
 				this.ReleaseItemInSlot(slot, grabbedItem);
 				return true;
 			}
-			if (slot.ItemStack!.item != grabbedItem.value.ItemStack.item) {
+			if (slot.stack!.item != grabbedItem.value.stack.item) {
 				return false;
 			}
 
-			int space = slot.ItemStack!.item.maxStackSize - slot.ItemStack.quantity;
+			int space = slot.stack!.item.maxStackSize - slot.stack.quantity;
 			if (space < 0) {
 				return false;
 			}
-			int transfer = Math.Min(space, grabbedItem.value.ItemStack.quantity);
-			slot.ItemStack.Increment(transfer);
-			grabbedItem.value.ItemStack.Decrement(transfer);
+			int transfer = Math.Min(space, grabbedItem.value.stack.quantity);
+			slot.stack.Increment(transfer);
+			grabbedItem.value.stack.Decrement(transfer);
 			return DestroyGrabbedIfEmpty(grabbedItem);
 		}
 
@@ -595,8 +595,8 @@ namespace SoulboundBackend.Client.UI.Storage {
 
 		public void SplitDistributeToDraggedSlot(DragHandler handler, IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
 			if (handler.DraggedSlots.Contains(slot)
-					|| (slot.HasItem && slot.ContainedItem != handler.origin!.ContainedItem)
-					|| (slot.HasItem && slot.ItemStack!.IsFull())) {
+					|| (slot.HasItem && slot.item != handler.origin!.item)
+					|| (slot.HasItem && slot.stack!.IsFull())) {
 				return;
 			}
 
@@ -616,13 +616,13 @@ namespace SoulboundBackend.Client.UI.Storage {
 				var draggedSlot = handler.DraggedSlots[i];
 				int amount = splitAmount + (i < remainder ? 1 : 0);
 
-				if (draggedSlot.ItemStack == null) {
-					draggedSlot.CreateDisplay(new ItemStack(handler.origin!.ItemStack!.item, amount));
+				if (draggedSlot.stack == null) {
+					draggedSlot.CreateDisplay(new ItemStack(handler.origin!.stack!.item, amount));
 				}
 				if (handler.quantitySnapshots.TryGetValue(draggedSlot, out var snapshot) && draggedSlot != handler.origin) {
-					draggedSlot.ItemStack!.SetQuantity(snapshot + amount);
+					draggedSlot.stack!.SetQuantity(snapshot + amount);
 				} else {
-					draggedSlot.ItemStack!.SetQuantity(amount);
+					draggedSlot.stack!.SetQuantity(amount);
 				}
 			}
 		}
@@ -647,7 +647,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 			if (grabbedItem.value == null) {
 				return false;
 			}
-			if (grabbedItem.value.ItemStack.IsEmpty()) {
+			if (grabbedItem.value.stack.IsEmpty()) {
 				grabbedItem.value.Destroy();
 				grabbedItem.value = null;
 				return true;

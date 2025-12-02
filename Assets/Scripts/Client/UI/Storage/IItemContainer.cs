@@ -17,5 +17,15 @@ namespace SoulboundBackend.Client.UI.Storage {
 		void OnPointerExit(IItemSlot slot, PointerEventData data);
 
 		void OnItemDisplayAdded(ItemDisplay itemDisplay, IItemSlot slot);
+
+		public virtual bool ContainsItem(Item item) {
+			foreach (var slot in slots) {
+				if (slot.HasItem && slot.item == item) {
+					return true;
+				}
+			}
+			return false;
+		}
+
 	}
 }

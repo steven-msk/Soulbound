@@ -7,7 +7,6 @@ using System.Collections.Generic;
 
 namespace SoulboundBackend.Client.ItemSystem {
 	public abstract class ConsumableStatItem : StatItem, IConsumable {
-		public override bool applyInstantStatsOnHoverOrSelect => false;
 		public virtual int consumeAmount { get; } = 1;
 
 		public virtual ConsumptionResult Consume(IItemConsumer consumer, ItemStack itemStack) {

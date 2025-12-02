@@ -24,7 +24,7 @@ namespace SoulboundBackend.Common.UI.Storage {
 			this.slots = slotsSupplier.Invoke();
 			this.origin = origin;
 			this.interpretationProvider = interpretationProvider;
-			this.startDragStack = origin.ItemStack?.quantity ?? 0;
+			this.startDragStack = origin.stack?.quantity ?? 0;
 			this.draggedSlots = new List<IItemSlot>() { origin };
 			this.quantitySnapshots = quantitySnapshots;
 			this.dragButton = dragButton;

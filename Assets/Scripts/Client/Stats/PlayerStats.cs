@@ -78,6 +78,7 @@ namespace SoulboundBackend.Client.Stats {
 					UnityEngine.Debug.Log("adding modifier: " + package.definition + $" [{modifier.GetHashCode()}]");
 					entry.AcceptModifier(modifier, source.token);
 				}
+				UnityEngine.Debug.Log("entry value: " + entry.CalculateBoxedValue());
 			}
 		}
 
@@ -86,7 +87,11 @@ namespace SoulboundBackend.Client.Stats {
 				if (!entries.TryGetValue(package.definition, out var entry)) {
 					continue;
 				}
+				foreach (var modifier in package.modifiers) {
+					UnityEngine.Debug.Log("removing modifier: " + package.definition + $" [{modifier.GetHashCode()}]");
+				}
 				entry.RemoveModifiers(source.token);
+				UnityEngine.Debug.Log("entry value: " + entry.CalculateBoxedValue());
 			}
 		}
 

@@ -18,7 +18,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 		[SerializeField] private Item displayedItem;
 		public GameObject stackText { get; private set; } = null!;
 		private ItemStack itemStack = null!;
-		public ItemStack ItemStack {
+		public ItemStack stack {
 			get => itemStack;
 			set {
 				itemStack = value;
@@ -26,7 +26,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 				displayedItem = itemStack.item;
 			}
 		}
-		public Item? DisplayedItem => ItemStack?.item;
+		public Item? item => stack?.item;
 		public Tooltip? activeTooltip { get; private set; } = null;
 
 		public static ItemDisplay Create(ItemStack itemStack, Func<Transform?> parentSupplier) {
@@ -35,7 +35,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 			ItemDisplay? display = obj?.GetComponent<ItemDisplay>();
 			UnityEngine.Debug.Assert(display != null, $"ItemDisplay component not found in item display prefab");
 
-			display!.ItemStack = itemStack;
+			display!.stack = itemStack;
 			display.stackText = itemStack.AssignDisplay(display);
 			display.transform.SetAsLastSibling();
 			return display;

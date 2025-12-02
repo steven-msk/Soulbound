@@ -73,7 +73,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 				ApplySelectionChanges(active.hotbarSlot, activeSlotColor, activeSlotNumberColor, activeItemStackColor, activeSlotOffset, activeSlotScale);
 			}
 
-			activeItemText.text = slots[slotKey].ItemStack?.item.name ?? "";
+			activeItemText.text = slots[slotKey].stack?.item.name ?? "";
 			inventory.EquipHotbarItem(slots[slotKey]);
 		}
 
@@ -99,8 +99,8 @@ namespace SoulboundBackend.Client.UI.Storage {
 				hotbarSlot.GetComponent<TextMeshProUGUI>().color = slotNumberColor;
 				break;
 			}
-			if (!slot.IsEmpty && slot.ItemStack.item.IsStackable) {
-				slot.ItemDisplay.gameObject.GetComponentInChildren<TextMeshProUGUI>().color = itemStackColor;
+			if (!slot.IsEmpty && slot.stack.item.IsStackable) {
+				slot.itemDisplay.gameObject.GetComponentInChildren<TextMeshProUGUI>().color = itemStackColor;
 			}
 		}
 
@@ -115,12 +115,12 @@ namespace SoulboundBackend.Client.UI.Storage {
 		}
 
 		public void OnItemTransfer(IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
-			activeItemText.text = active.hotbarSlot.ItemStack?.item.name ?? "";
+			activeItemText.text = active.hotbarSlot.stack?.item.name ?? "";
 			if (slot == (IItemSlot)active.hotbarSlot) {
 				if (slot.IsEmpty && grabbedItem.value != null) {
 					grabbedItem.value.transform.localScale = Vector3.one;
 				} else if (slot.HasItem && grabbedItem.value == null) {
-					slot.ItemDisplay.transform.localScale = Vector3.one;
+					slot.itemDisplay.transform.localScale = Vector3.one;
 				}
 			}
 		}
@@ -147,5 +147,5 @@ namespace SoulboundBackend.Client.UI.Storage {
         public void OnItemDisplayAdded(ItemDisplay itemDisplay, IItemSlot slot) {
             throw new NotImplementedException();
         }
-    }
+	}
 }

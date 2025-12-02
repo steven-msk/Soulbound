@@ -39,7 +39,7 @@ namespace SoulboundBackend.Client {
 
 		[SerializeField] private PlayerStats stats;
 		public PlayerStats Stats => stats;
-		IStatModificationHost IItemConsumer.statModificationHost => stats;
+		IStatModificationHost IStatContextProvider.statModificationHost => stats;
 
 		[Header("Internal")]
 		[SerializeField] private Rigidbody2D rb;
@@ -89,6 +89,7 @@ namespace SoulboundBackend.Client {
 				return Camera.main.ScreenToWorldPoint(screenPos);
 			}
 		}
+
 		private bool leftHold;
 		private bool rightHold;
 		private ConcurrentActionResolver actionResolver = null!;
@@ -289,29 +290,22 @@ namespace SoulboundBackend.Client {
 
 		public override void ApplySerializedProperties(SerializedEntityPropertyList properties) {
 			base.ApplySerializedProperties(properties);
-			List<IItemSlot>? pendingAttachUpdates = null;
-			try {
-				pendingAttachUpdates = inventory.Deserialize(properties.GetOrThrow<SerializedInventory>("inventory"));
-				this.stats = properties.GetOrThrow<PlayerStats>("stats");
-			} catch (Exception) {
-				this.stats = new();
-			} finally {
-				//stats.UpdateInjectedMappings();
-				//stats.MaxHealth.OnModifiersChanged += maxHealth => {
-				//	bool wasFullHealth = this.currentHealth == this.maxHealth;
-				//	this.maxHealth = maxHealth.GetProcessedValue();
-				//	if (wasFullHealth) {
-				//		this.currentHealth = this.maxHealth;
-				//	}
-				//};
+			this.stats = new();
+			inventory.Deserialize(properties.GetOrThrow<SerializedInventory>("inventory"));
+			//stats.UpdateInjectedMappings();
+			//stats.MaxHealth.OnModifiersChanged += maxHealth => {
+			//	bool wasFullHealth = this.currentHealth == this.maxHealth;
+			//	this.maxHealth = maxHealth.GetProcessedValue();
+			//	if (wasFullHealth) {
+			//		this.currentHealth = this.maxHealth;
+			//	}
+			//};
 
-				this.maxHealth = stats.maxHealth.GetProcessedValue();
-				this.currentHealth = maxHealth;         // might cause problems later with OnDeath handling
-														// If the player were to leave while having the death screen active,
-														// Upon rejoining it would reset their health to max, completely overriding the death state.
-														// Death screen implementation should be prioritized when deserializing.
-				pendingAttachUpdates?.ForEach(s => s.NotifyDeserializedHook());
-			}
+			this.maxHealth = stats.maxHealth.GetProcessedValue();
+			this.currentHealth = maxHealth;         // might cause problems later with OnDeath handling
+													// If the player were to leave while having the death screen active,
+													// Upon rejoining it would reset their health to max, completely overriding the death state.
+													// Death screen implementation should be prioritized when deserializing.
 		}
 
 		public override SerializedEntityPropertyList GetSerializedProperties() {

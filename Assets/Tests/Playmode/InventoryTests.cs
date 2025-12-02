@@ -62,7 +62,7 @@ namespace InventoryTests {
 			var inventory = CreateTestEnvironment(out var scene);
 
 			var f = inventory.GetFirstEmptySlot();
-			Assert.IsTrue(inventory.GetFirstEmptySlot().ItemStack == null, $"{f.name} is not empty");
+			Assert.IsTrue(inventory.GetFirstEmptySlot().stack == null, $"{f.name} is not empty");
 		}
 
 		[Test]
@@ -74,7 +74,7 @@ namespace InventoryTests {
 
 			ItemStack stack = new ItemStack(Items.consumableStatItem_test, 1);
 			ItemDisplay display = slot.CreateDisplay(stack);
-			Assert.That(slot.ItemDisplay, Is.EqualTo(display),
+			Assert.That(slot.itemDisplay, Is.EqualTo(display),
 				() => "ItemDisplay did not assign correctly in slot");
 		}
 	}
@@ -114,7 +114,7 @@ namespace InventoryTests {
 			inventory.Deserialize(serialized);
 
 			var occupiedSlot = inventory.GetOccupiedSlots(item).First();
-			Assert.That(occupiedSlot.ItemStack, Is.EqualTo(stack));
+			Assert.That(occupiedSlot.stack, Is.EqualTo(stack));
 			Assert.That(occupiedSlot.index, Is.EqualTo(slot.index));
 		}
 	}
@@ -133,7 +133,7 @@ namespace InventoryTests.Logic {
 
 			Assert.That(pickedUp, Is.True);
 			Assert.That(remaining, Is.EqualTo(0));
-			Assert.That(inventory.GetOccupiedSlots(item).First().ItemStack.quantity == stack.quantity);
+			Assert.That(inventory.GetOccupiedSlots(item).First().stack.quantity == stack.quantity);
 		}
 
 		[Test]
@@ -168,8 +168,8 @@ namespace InventoryTests.Logic {
 			PickUp(fullStack);
 
 			var occupiedSlots = inventory.GetOccupiedSlots(item).ToList();
-			Assert.That(occupiedSlots[0].ItemStack.quantity, Is.EqualTo(fullStack.quantity));
-			Assert.That(occupiedSlots[1].ItemStack.quantity, Is.EqualTo(patialStack.quantity));
+			Assert.That(occupiedSlots[0].stack.quantity, Is.EqualTo(fullStack.quantity));
+			Assert.That(occupiedSlots[1].stack.quantity, Is.EqualTo(patialStack.quantity));
 		}
 
 		[Test]
@@ -186,7 +186,7 @@ namespace InventoryTests.Logic {
 
 			var occupiedSlots = inventory.GetOccupiedSlots(item).ToList();
 			Assert.That(occupiedSlots.Count, Is.EqualTo(2));
-			Assert.That(occupiedSlots.All(slot => slot.ItemStack.IsFull() && slot.ItemStack.quantity == 1));
+			Assert.That(occupiedSlots.All(slot => slot.stack.IsFull() && slot.stack.quantity == 1));
 		}
 	}
 
@@ -210,10 +210,10 @@ namespace InventoryTests.Logic {
 			bool merged = inventory.MergeInSlot(slot2, grabbedReference);
 
 			Assert.That(merged, Is.False);
-			Assert.That(slot1.ItemStack.quantity, Is.EqualTo(64));
-			Assert.That(slot2.ItemStack.quantity, Is.EqualTo(item.maxStackSize));
+			Assert.That(slot1.stack.quantity, Is.EqualTo(64));
+			Assert.That(slot2.stack.quantity, Is.EqualTo(item.maxStackSize));
 			Assert.That(grabbedReference.value, Is.Not.Null);
-			Assert.That(grabbedReference.value.ItemStack.quantity, Is.EqualTo(16));
+			Assert.That(grabbedReference.value.stack.quantity, Is.EqualTo(16));
 		}
 
 		[Test]
@@ -227,7 +227,7 @@ namespace InventoryTests.Logic {
 
 			Assert.That(merged, Is.True);
 			Assert.That(grabbedReference.value, Is.Null);
-			Assert.That(inventory.GetOccupiedSlots(item).First().ItemStack.quantity, Is.EqualTo(30));
+			Assert.That(inventory.GetOccupiedSlots(item).First().stack.quantity, Is.EqualTo(30));
 		}
 
 		[Test]
@@ -243,7 +243,7 @@ namespace InventoryTests.Logic {
 
 			Assert.That(merged, Is.True);
 			Assert.That(grabbedReference.value, Is.Null);
-			Assert.That(slot.ItemStack.quantity, Is.EqualTo(item.maxStackSize));
+			Assert.That(slot.stack.quantity, Is.EqualTo(item.maxStackSize));
 		}
 
 		[Test]
@@ -259,7 +259,7 @@ namespace InventoryTests.Logic {
 
 			Assert.That(merged, Is.False);
 			Assert.That(grabbedReference.value, Is.Not.Null);
-			Assert.That(grabbedReference.value.ItemStack.quantity, Is.EqualTo(10));
+			Assert.That(grabbedReference.value.stack.quantity, Is.EqualTo(10));
 		}
 
 		[Test]
@@ -277,7 +277,7 @@ namespace InventoryTests.Logic {
 
 			Assert.That(merged, Is.False);
 			Assert.That(grabbedReference.value, Is.Not.Null);
-			Assert.That(grabbedReference.value.ItemStack == grabbedStack);
+			Assert.That(grabbedReference.value.stack == grabbedStack);
 		}
 	}
 }

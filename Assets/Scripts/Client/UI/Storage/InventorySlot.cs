@@ -7,12 +7,13 @@ using UnityEngine;
 namespace SoulboundBackend.Client.UI.Storage {
 	public class InventorySlot : MonoBehaviour, IItemSlot {
 		public IItemContainer container => gameObject.GetComponentInParent<InventoryController>(true);
-		public ItemDisplay? ItemDisplay => gameObject.GetComponentInChildren<ItemDisplay>();
+		public ItemDisplay? itemDisplay => gameObject.GetComponentInChildren<ItemDisplay>();
 		public int index { get; set; }
-		public bool HasItem => ItemDisplay != null;
-		public bool IsEmpty => ItemDisplay == null;
+		public bool HasItem => itemDisplay != null;
+		public bool IsEmpty => itemDisplay == null;
 
-		public ItemStack? ItemStack => ItemDisplay?.ItemStack;
+		public ItemStack? stack => itemDisplay?.stack;
+		public Item? item => stack?.item;
 		public bool showTooltip { get; set; } = true;
 
 		public void Deserialize(SerializedItemSlot serialized) {
@@ -21,7 +22,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 
 		public void OnInventoryPopup(bool opened) {
 			if (!opened && this.HasItem) {
-				ItemDisplay!.DestroyTooltip();
+				itemDisplay!.DestroyTooltip();
 			}
 		}
 	}

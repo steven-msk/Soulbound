@@ -5,8 +5,8 @@ using SoulboundBackend.Client.UI.Tooltip;
 using System.Resources;
 using SoulboundBackend.Core.Resource;
 using ResourceManager = SoulboundBackend.Core.Resource.ResourceManager;
-using SoulboundBackend.Client.UI.Storage;
 using SoulboundBackend.Core;
+using SoulboundBackend.Client.UI.Storage;
 
 #nullable enable
 
@@ -22,18 +22,18 @@ namespace SoulboundBackend.Client.ItemSystem {
 		protected abstract Func<Item, TooltipData?> tooltipSupplier { get; }
 		protected abstract TooltipRenderer.NodeStyleFactory? nodeStyleProvider { get; }
 
-		public virtual SlotHook? GetSlotHook() => null;
-
-		public static GameObject InstantiateDefaultWorldPrefab() {
-			return GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.Prefabs>("droppedItem"))!;
-		}
-
 		public Tooltip? RenderTooltip(Vector2 position, Transform parent) {
 			TooltipData tooltipData = tooltipSupplier?.Invoke(this) ?? Tooltip.Plain(this.name);
 			TooltipRenderer renderer = new(nodeStyleProvider ?? TooltipNodeStylePresets.PresetProvider());
 			Tooltip tooltip = new Tooltip(renderer, tooltipData);
 			tooltip.Show(position, parent);
 			return tooltip;
+		}
+
+		public virtual void OnAttachedInSlot(IItemSlot slot) {
+		}
+
+		public virtual void OnDetachedFromSlot(IItemSlot slot) {
 		}
 
 		public static int CustomMaxStack(int maxStack) => maxStack;
@@ -54,6 +54,4 @@ namespace SoulboundBackend.Client.ItemSystem {
 			return HashCode.Combine(name, aspect, maxStackSize, IsStackable, tooltipSupplier, nodeStyleProvider, hashedID);
 		}
 	}
-
-	public record SlotHook(Action<ItemDisplay, IItemSlot>? onAttached, Action<ItemDisplay, IItemSlot>? onDetached);
 }

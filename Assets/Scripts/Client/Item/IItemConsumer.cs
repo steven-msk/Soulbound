@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 #nullable enable
 
 namespace SoulboundBackend.Client.ItemSystem {
-	public interface IItemConsumer {
-		IStatModificationHost? statModificationHost { get; }
+	public interface IItemConsumer : IStatContextProvider {
+		abstract IStatModificationHost? IStatContextProvider.statModificationHost { get; }
 	}
 }

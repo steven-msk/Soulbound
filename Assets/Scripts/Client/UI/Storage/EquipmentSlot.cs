@@ -5,11 +5,11 @@ using UnityEngine;
 namespace SoulboundBackend.Client.UI.Storage {
 	public abstract class EquipmentSlot : MonoBehaviour, IItemSlot {
 		public abstract IItemContainer container { get; }
-		public ItemDisplay ItemDisplay => gameObject.GetComponentInChildren<ItemDisplay>();
+		public ItemDisplay itemDisplay => gameObject.GetComponentInChildren<ItemDisplay>();
 		public abstract int index { get; set; }
-		public bool HasItem => ItemDisplay != null;
-		public bool IsEmpty => ItemDisplay == null;
-		public ItemStack ItemStack => ItemDisplay?.ItemStack;
+		public bool HasItem => itemDisplay != null;
+		public bool IsEmpty => itemDisplay == null;
+		public ItemStack stack => itemDisplay?.stack;
 		public abstract bool showTooltip { get; set; }
 
 		public abstract void Deserialize(SerializedItemSlot serialized);

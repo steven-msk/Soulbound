@@ -18,32 +18,6 @@ public sealed class ConsumableStatItem_test : ConsumableStatItem {
 
 	protected override TooltipRenderer.NodeStyleFactory nodeStyleProvider => null;
 
-	private readonly ModificationToken _token = new();
-	public override ModificationToken token => _token;
-
-	public ConsumableStatItem_test() {
-		//StatMappingBuilder mappingBuilder = new StatMappingBuilder()
-		//	.SetStats(() => new DynamicMap<AbstractValueModifier>() {
-		//		["luck"] = new ValueModifier<float>(0.1f, true, StatApplicationType.Percentage)
-		//	})
-		//	.WithTooltipNodes(stats => new List<TooltipNodeData>() {
-		//		new TooltipNodeData(TooltipNode.Stats, $"Grants {stats["luck"]} for 3s.")
-		//	})
-		//	.BindEffectHandlers(stats => new DynamicMap<IStatEffectHandler>() {
-		//		["luckHandler"] = IStatEffectHandler.Timed(3f, resetOnEnable: true, this, stats["luck"])
-		//	})
-		//	.BindActivator(handlers => new StatActivator(
-		//		activationBinder: callback => onConsumed += callback,
-		//		deactivationBinder: null,
-		//		handlers["luckHandler"]
-		//	));
-		//this.statMappings = mappingBuilder.ResolveMappings();
-		//this.tooltipSupplier = item => new TooltipData.Builder()
-		//	.AddNode(TooltipNode.Title, this.name)
-		//	.AddNodes(mappingBuilder.ResolveTooltipNodes())
-		//	.Finish();
-	}
-
 	public override IEnumerable<StatModificationPackage> GetPackages() {
 		yield return new(Stats.maxHealth, new[] { new ValueModifier<int>(1, true) });
 	}

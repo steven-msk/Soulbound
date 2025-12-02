@@ -9,7 +9,6 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public event Action<IStatReceiver>? onEquipped;
 		public event Action<IStatReceiver>? onUnequipped;
 		public abstract ArmorType armorType { get; }
-		public override bool applyInstantStatsOnHoverOrSelect => false;
 
 		public void OnEquip(IStatReceiver receiver) {
 			onEquipped?.Invoke(receiver);
