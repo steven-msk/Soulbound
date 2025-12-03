@@ -17,14 +17,12 @@ namespace SoulboundBackend.Client.ItemSystem {
 
 		public abstract string name { get; }
 		public abstract ItemAspect aspect { get; }
-		public abstract int maxStackSize { get; }
+		public virtual int maxStackSize { get; } = DEFAULT_MAX_STACK;
 		public bool IsStackable => maxStackSize > 1;
-		protected abstract Func<Item, TooltipData?> tooltipSupplier { get; }
-		protected abstract TooltipRenderer.NodeStyleFactory? nodeStyleProvider { get; }
 
-		public Tooltip? RenderTooltip(Vector2 position, Transform parent) {
-			TooltipData tooltipData = tooltipSupplier?.Invoke(this) ?? Tooltip.Plain(this.name);
-			TooltipRenderer renderer = new(nodeStyleProvider ?? TooltipNodeStylePresets.PresetProvider());
+		public virtual Tooltip? RenderTooltip(Vector2 position, Transform parent) {
+			TooltipData tooltipData = Tooltip.Plain(this.name);
+			TooltipRenderer renderer = new(TooltipNodeStylePresets.PresetProvider());
 			Tooltip tooltip = new Tooltip(renderer, tooltipData);
 			tooltip.Show(position, parent);
 			return tooltip;
@@ -51,7 +49,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 		}
 
 		public override int GetHashCode() {
-			return HashCode.Combine(name, aspect, maxStackSize, IsStackable, tooltipSupplier, nodeStyleProvider, hashedID);
+			return HashCode.Combine(name, aspect, maxStackSize, IsStackable, hashedID);
 		}
 	}
 }

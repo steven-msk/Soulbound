@@ -14,20 +14,20 @@ using UnityEngine.UI;
 namespace SoulboundBackend.Client.ItemSystem {
 	public class ItemDisplay : MonoBehaviour {
 		public event Action<ItemStack>? onDestroy;
-		[SerializeField] private bool moveMode;
-		[SerializeField] private Item displayedItem;
 		public GameObject stackText { get; private set; } = null!;
 		private ItemStack itemStack = null!;
 		public ItemStack stack {
 			get => itemStack;
 			set {
 				itemStack = value;
+
+				// prototypical - will be implemented correctly when visuals system is improved
 				gameObject.GetComponent<Image>().sprite = itemStack.item.aspect.icon.sprite;
-				displayedItem = itemStack.item;
 			}
 		}
 		public Item? item => stack?.item;
 		public Tooltip? activeTooltip { get; private set; } = null;
+		public bool isGrabbed { get; private set; }
 
 		public static ItemDisplay Create(ItemStack itemStack, Func<Transform?> parentSupplier) {
 			var prefab = ResourceManager.Get<GameObject, ResourceGroups.Prefabs>("itemDisplayPrefab");
@@ -43,7 +43,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 
 		private void Update() {
 			Vector2 mousePos = UnityEngine.Input.mousePosition;
-			if (moveMode) {
+			if (isGrabbed) {
 				gameObject.transform.position = mousePos;
 			}
 			activeTooltip?.SetPosition(mousePos);
@@ -61,14 +61,14 @@ namespace SoulboundBackend.Client.ItemSystem {
 		}
 
 		public void OnGrab(Transform? grabParent, bool keepWorldSpace = false) {
-			moveMode = true;
+			isGrabbed = true;
 			transform.SetParent(grabParent, keepWorldSpace);
 			gameObject.GetComponent<Image>().raycastTarget = false;
 			DestroyTooltip();
 		}
 
 		public void OnRelease(Transform? releaseParent, bool keepWorldSpace = false) {
-			moveMode = false;
+			isGrabbed = false;
 			transform.SetParent(releaseParent, keepWorldSpace);
 			gameObject.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
 			gameObject.GetComponent<Image>().raycastTarget = true;

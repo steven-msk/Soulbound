@@ -17,10 +17,6 @@ public sealed class ArmorItem_test : ArmorItem {
 
 	public override int maxStackSize => 1;
 
-	protected override Func<Item, TooltipData> tooltipSupplier { get; }
-
-	protected override TooltipRenderer.NodeStyleFactory? nodeStyleProvider => null;
-
 	private readonly ModificationToken _token = new();
 	public override ModificationToken token => _token;
 

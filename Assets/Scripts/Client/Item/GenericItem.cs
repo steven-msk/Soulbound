@@ -8,21 +8,16 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public override string name { get; }
 		public override ItemAspect aspect { get; }
 		public override int maxStackSize { get; }
-		protected override Func<Item, TooltipData?> tooltipSupplier { get; }
-		protected override TooltipRenderer.NodeStyleFactory? nodeStyleProvider { get; }
 
 		public GenericItem(
 				string name, 
 				ItemAspect aspect, 
-				int maxStackSize,
-				Func<Item, TooltipData?> tooltipSupplier, 
-				TooltipRenderer.NodeStyleFactory? nodeStyleProvider = null
+				int maxStackSize
 			)
-			: base(name, aspect, maxStackSize, tooltipSupplier, nodeStyleProvider) {
+			: base(name, aspect, maxStackSize) {
 			this.name = name;
 			this.aspect = aspect;
 			this.maxStackSize = maxStackSize;
-			this.tooltipSupplier = tooltipSupplier;
 		}
 	}
 }

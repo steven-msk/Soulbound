@@ -21,12 +21,12 @@ namespace SoulboundBackend.Client.UI.Storage {
 		public bool HasItem => itemDisplay != null;
 		public bool IsEmpty => itemDisplay == null;
 
-		internal void AttachItemDisplay(ItemDisplay itemDisplay) {
+		public void AttachItemDisplay(ItemDisplay itemDisplay) {
 			itemDisplay.OnRelease(transform);
 			item!.OnAttachedInSlot(this);
 		}
 
-		internal void DetachItemDisplay(Transform newParent) {
+		public void DetachItemDisplay(Transform newParent) {
 			if (itemDisplay == null) {
 				return;
 			}

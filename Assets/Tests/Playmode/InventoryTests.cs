@@ -39,7 +39,7 @@ namespace InventoryTests {
 		}
 
 		internal Item CreateTestItem(int maxStack = 64) {
-			return new GenericItem("testItem", new ItemAspect(new ItemIcon(null, 100), () => null), maxStack, null);
+			return new GenericItem("testItem", new ItemAspect(new ItemIcon(null, 100), () => null), maxStack);
 		}
 
 		internal ItemDisplay SetGrabbedContext(ItemStack stack, InventoryController inventory) {

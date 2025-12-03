@@ -14,10 +14,6 @@ public sealed class ConsumableStatItem_test : ConsumableStatItem {
 
 	public override int maxStackSize => Item.DEFAULT_MAX_STACK;
 
-	protected override Func<Item, TooltipData> tooltipSupplier { get; }
-
-	protected override TooltipRenderer.NodeStyleFactory nodeStyleProvider => null;
-
 	public override IEnumerable<StatModificationPackage> GetPackages() {
 		yield return new(Stats.maxHealth, new[] { new ValueModifier<int>(1, true) });
 	}

@@ -5,7 +5,8 @@
         "UnityEngine.TestRunner",
         "SoulboundBackend",
         "Zenject",
-        "Unity.InputSystem"
+        "Unity.InputSystem",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -18,7 +18,7 @@ public sealed class ToolItem_test : Item, IBreakingTool {
 
     public override int maxStackSize => 1;
 
-    protected override Func<Item, TooltipData?> tooltipSupplier => item => new TooltipData.Builder().AddNode(TooltipNode.Title, item.name).Finish();
+    //protected override Func<Item, TooltipData?> tooltipSupplier => item => new TooltipData.Builder().AddNode(TooltipNode.Title, item.name).Finish();
 
-    protected override TooltipRenderer.NodeStyleFactory? nodeStyleProvider => null;
+    //protected override TooltipRenderer.NodeStyleFactory? nodeStyleProvider => null;
 }

@@ -16,10 +16,6 @@ public sealed class StatItem_test : StatItem {
 
 	public override int maxStackSize => Item.CustomMaxStack(128);
 
-	protected override Func<Item, TooltipData> tooltipSupplier { get; }
-
-	protected override TooltipRenderer.NodeStyleFactory nodeStyleProvider => null;
-
 	private readonly ModificationToken _token = new();
 	public override ModificationToken token => _token;
 	private bool appliedStats = false;

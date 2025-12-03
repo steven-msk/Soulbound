@@ -14,8 +14,8 @@ namespace SoulboundBackend.Client.UI.Tooltip {
 		public static float MaxWidth => 850f;
 		// POTENTIAL FEATUREIMPL: legendary tooltips
 		public TooltipData? data { get; private set; }
-		private TooltipRenderer renderer;
-		private GameObject? panel;
+		protected TooltipRenderer renderer;
+		protected GameObject? panel;
 
 		public bool IsDisplaying => panel != null;
 
@@ -24,7 +24,7 @@ namespace SoulboundBackend.Client.UI.Tooltip {
 			this.renderer = renderer;
 		}
 
-		public void Show(Vector2 position, Transform parent) {
+		public virtual void Show(Vector2 position, Transform parent) {
 			if (data == null) {
 				return;
 			}
@@ -32,7 +32,7 @@ namespace SoulboundBackend.Client.UI.Tooltip {
 			panel.SetActive(true);
 		}
 
-		public void Hide() {
+		public virtual void Hide() {
 			if (panel != null) {
 				GameObject.Destroy(panel);
 			}
