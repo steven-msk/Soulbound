@@ -10,7 +10,7 @@ using UnityEngine.EventSystems;
 namespace SoulboundBackend.Client.UI.Storage {
 	public interface IItemSlot : IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler, ISerializable<SerializedItemSlot> {
 		public ItemDisplay itemDisplay { get; }
-		public IItemContainer? container { get; }
+		public IItemContainer container { get; }
 		public int index { get; set; }
 		public Transform transform { get; }
 		public bool showTooltip { get; set; }
@@ -53,13 +53,13 @@ namespace SoulboundBackend.Client.UI.Storage {
 		public ItemDisplay CreateDisplay(ItemStack itemStack) {
 			ItemDisplay display = ItemDisplay.Create(itemStack, () => transform);
 			itemStack.item.OnAttachedInSlot(this);
-			container?.OnItemDisplayAdded(display, this);
+			container.OnItemDisplayAdded(display, this);
 			return display;
 		}
 
 		internal void InternalDeserialize(SerializedItemSlot slot) {
 			ItemDisplay display = ItemDisplay.Create(slot.itemStack, () => transform);
-			container?.OnItemDisplayAdded(display, this);
+			container.OnItemDisplayAdded(display, this);
 		}
 
 		public bool CreateDisplayIfEmpty(ItemStack itemStack, out ItemDisplay? display) {
@@ -67,7 +67,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 				display = CreateDisplay(itemStack);
 				return true;
 			}
-			display = null;
+			display = itemDisplay;
 			return false;
 		}
 

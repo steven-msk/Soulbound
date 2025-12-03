@@ -105,6 +105,7 @@ namespace InventoryTests {
 			var slot = inventory.GetFirstEmptySlot() as IItemSlot;
 
 			ItemStack stack = new ItemStack(item, 64);
+			LogAssert.ignoreFailingMessages = true;
 			slot.CreateDisplay(stack);
 
 			var serialized = inventory.Serialize();

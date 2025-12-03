@@ -404,7 +404,7 @@ Based on the dependency graph, this could be an optimal order:
 1. [Input system](#4-input-system) **>|**
 2. [Action Request System](#18-action-request-system) **>|**
 3. [Serialization](#17-serialization) (foundation only) * *delayed until all WorldDump fields are stable*
-4. [Stat system](#5-stat-system)
+4. [Stat system](#5-stat-system) * *some features might be missing, but most systems are working*
 5. [Entity system](#6-entity-system)
 6. [Block system](#8-block-system)
 7. [Chunk generation](#9-chunk-generation)
