@@ -1,9 +1,11 @@
 ﻿using SoulboundBackend.Client.World.EntitySystem.AI;
+using SoulboundBackend.Common;
 using SoulboundBackend.Core;
 using System;
 using UnityEngine;
 
 namespace SoulboundBackend.Client.World.EntitySystem {
+	[PROTOTYPICAL]
 	public sealed class AIEntity_test : Entity, ITickable {
 		public override Type entityScriptType => typeof(AIEntity_test);
 		public override string prefabDefinitionID => "ai test";

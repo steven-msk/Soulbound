@@ -405,7 +405,7 @@ Based on the dependency graph, this could be an optimal order:
 2. [Action Request System](#18-action-request-system) **>|**
 3. [Serialization](#17-serialization) (foundation only) * *delayed until all WorldDump fields are stable*
 4. [Stat system](#5-stat-system) * *some features might be missing, but most systems are working*
-5. [Entity system](#6-entity-system)
+5. [Entity system](#6-entity-system) <-
 6. [Block system](#8-block-system)
 7. [Chunk generation](#9-chunk-generation)
 11. [World rendering](#10-world-rendering)
@@ -417,7 +417,7 @@ Based on the dependency graph, this could be an optimal order:
 13. [Lighting](#11-lighting-system)
 14. [Audio](#12-audio-system)
 
-##### Exceptions from this list
+##### Exceptions
 
 1. [State Initialization](#1-state-initialization) >>>
 2. [Dependency injection](#2-dependency-injection-di) >>>
