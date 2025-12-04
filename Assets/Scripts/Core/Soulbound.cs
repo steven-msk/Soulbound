@@ -68,10 +68,12 @@ namespace SoulboundBackend.Core {
 			settings.Save();
 		}
 
+		[PROTOTYPICAL]
 		public Level? GetActiveLevel() {
 			return GetActiveLevelManager()?.level;
 		}
 
+		[PROTOTYPICAL]
 		public LevelManager? GetActiveLevelManager() {
 			return worldManager.activeLevelManager;
 		}

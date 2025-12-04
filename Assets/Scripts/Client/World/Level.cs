@@ -119,13 +119,13 @@ namespace SoulboundBackend.Client.World {
 			}
 		}
 
-		public void SpawnEntity(Entity entity, EntitySpawnData spawnData) {
-			levelManager.SpawnEntity(entity, spawnData);
-		}
+		//public void SpawnEntity(Entity entity, EntitySpawnData spawnData) {
+		//	levelManager.SpawnEntity(entity, spawnData);
+		//}
 
-		public void RemoveEntityImmediately(Entity entity, bool destroy) {
-			levelManager.RemoveEntityImmediately(entity, destroy);
-		}
+		//public void RemoveEntityImmediately(Entity entity, bool destroy) {
+		//	levelManager.RemoveEntityImmediately(entity, destroy);
+		//}
 
 		public bool IsChunkLoaded(WorldChunk chunk) => loadedChunks.ContainsValue(chunk);
 
@@ -361,6 +361,13 @@ namespace SoulboundBackend.Client.World {
 		public BlockPos ToBlockPos(Vector2 worldPos) {
 			Vector2Int intPos = (Vector2Int)gridContext.grid.WorldToCell(worldPos);
 			return new BlockPos(intPos.x, intPos.y);
+		}
+
+		public WorldChunk? ToChunk(int chunkX) {
+			if (generatedChunks.TryGetValue(chunkX, out var chunk)) {
+				return chunk;
+			}
+			return null;
 		}
 
 		public ChunkBlockPos ToChunkPos(Vector2 worldPos) {

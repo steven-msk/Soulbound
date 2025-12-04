@@ -10,6 +10,7 @@ using SoulboundBackend.Client.World;
 using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Client.World.Chunk;
 using SoulboundBackend.Client.World.EntitySystem;
+using SoulboundBackend.Client.World.EntitySystem.SpawnData;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core;
 using SoulboundBackend.Core.Bootstrap;
@@ -29,9 +30,9 @@ using Level = SoulboundBackend.Client.World.Level;
 using Logger = SoulboundBackend.Common.Logging.Logger;
 
 namespace SoulboundBackend.Client {
-	public class PlayerController : LivingEntity, IAttackPerformer, IItemConsumer {
+	public class PlayerController : Entity, IAttackPerformer, IItemConsumer, IUpdatable {
 		private static readonly Logger logger = Logger.CreateInstance();
-		public override Type entityScriptType => typeof(PlayerController);
+		public override Type scriptType => typeof(PlayerController);
 		public override string prefabDefinitionID => "johnny";
 
 		[SerializeField] private InventoryController inventory;
@@ -60,7 +61,6 @@ namespace SoulboundBackend.Client {
 
 		public bool CanAttack { get; set; } = true;
 
-		public override float facing { get => playerPhysics.facing; set => playerPhysics.facing = value; }
 		public Vector2 center => playerPhysics.Collider.bounds.center;
 		public BlockPos blockPos => Soulbound.instance.GetActiveLevel()!.ToBlockPos(this.position);
 		public ChunkBlockPos chunkBlockPos => blockPos.ToChunkBlockPos(Soulbound.instance.GetActiveLevel()!.ChunkXAt(position));
@@ -68,7 +68,7 @@ namespace SoulboundBackend.Client {
 		public Vector2 itemDropForce {
 			get {
 				Vector2 force = new Vector2(3f, 4f);
-				force.x *= facing;
+				force.x *= facing.direction.x;
 				return force;
 			}
 		}
@@ -89,6 +89,8 @@ namespace SoulboundBackend.Client {
 				return Camera.main.ScreenToWorldPoint(screenPos);
 			}
 		}
+
+		public override Facing facing => new(playerPhysics.facing);
 
 		private bool leftHold;
 		private bool rightHold;
@@ -171,8 +173,7 @@ namespace SoulboundBackend.Client {
 			attackHandler.StartAttack(this, null);
 		}
 
-		public override void EntityUpdate(float deltaTime) {
-			base.EntityUpdate(deltaTime);
+		void IUpdatable.FrameUpdate(float deltaTime) {
 			InvocationHelper.If(leftHold, OnLeftHold);
 			InvocationHelper.If(rightHold, OnRightHold);
 		}
@@ -263,56 +264,68 @@ namespace SoulboundBackend.Client {
 						.Contains(BlockPos.FromWorld(worldPos, level));
 		}
 
-		// since this is a lazy player entity addition, not all methods need implementation (for now)
-		// TODO: properly implement player entity methods
+		public override void ApplySpawnData<TData>(TData spawnData) {
+			var playerSpawnData = spawnData as PlayerSpawnData;
+			if (playerSpawnData == null) {
+				throw new ArgumentException($"Invalid player spawn data type: {typeof(TData)}");
+			}
 
-		public override void Spawn(EntitySpawnData spawnData) {
-			base.Spawn(spawnData);
-			logger.LogInfo("Player spawned at {}", spawnData.Get<Vector2>("position"));
+			this.transform.position = playerSpawnData.position;
+			this.stats = new();
 			this.isSpawned = true;
 		}
 
-		public override void OnChunkLoaded() {
-		}
+		// since this is a lazy player entity addition, not all methods need implementation (for now)
+		// TODO: properly implement player entity methods
 
-		public override void OnChunkUnloaded() {
-		}
+		//public override void Spawn(EntitySpawnData spawnData) {
+		//	base.Spawn(spawnData);
+		//	logger.LogInfo("Player spawned at {}", spawnData.Get<Vector2>("position"));
+		//	this.isSpawned = true;
+		//}
 
-		public override Bounds GetBounds() => this.GetColliderBounds();
+		//public override void OnChunkLoaded() {
+		//}
 
-		public override void OnDeath() {
-			logger.LogInfo("Player died");
-		}
+		//public override void OnChunkUnloaded() {
+		//}
 
-		public override void OnDamageTaken(float damage) {
-			logger.LogInfo("Player has taken {} damage", damage);
-		}
+		//public override Bounds GetBounds() => this.GetColliderBounds();
 
-		public override void ApplySerializedProperties(SerializedEntityPropertyList properties) {
-			base.ApplySerializedProperties(properties);
-			this.stats = new();
-			inventory.Deserialize(properties.GetOrThrow<SerializedInventory>("inventory"));
-			//stats.UpdateInjectedMappings();
-			//stats.MaxHealth.OnModifiersChanged += maxHealth => {
-			//	bool wasFullHealth = this.currentHealth == this.maxHealth;
-			//	this.maxHealth = maxHealth.GetProcessedValue();
-			//	if (wasFullHealth) {
-			//		this.currentHealth = this.maxHealth;
-			//	}
-			//};
+		//public override void OnDeath() {
+		//	logger.LogInfo("Player died");
+		//}
 
-			this.maxHealth = stats.maxHealth.GetProcessedValue();
-			this.currentHealth = maxHealth;         // might cause problems later with OnDeath handling
-													// If the player were to leave while having the death screen active,
-													// Upon rejoining it would reset their health to max, completely overriding the death state.
-													// Death screen implementation should be prioritized when deserializing.
-		}
+		//public override void OnDamageTaken(float damage) {
+		//	logger.LogInfo("Player has taken {} damage", damage);
+		//}
 
-		public override SerializedEntityPropertyList GetSerializedProperties() {
-			return base.GetSerializedProperties()
-				//.Add("stats", this.stats)
-				.Add("inventory", inventory.Serialize());
-		}
+		//public override void ApplySerializedProperties(ComponentSerializer properties) {
+		//	base.ApplySerializedProperties(properties);
+		//	this.stats = new();
+		//	inventory.Deserialize(properties.GetOrThrow<SerializedInventory>("inventory"));
+		//	//stats.UpdateInjectedMappings();
+		//	//stats.MaxHealth.OnModifiersChanged += maxHealth => {
+		//	//	bool wasFullHealth = this.currentHealth == this.maxHealth;
+		//	//	this.maxHealth = maxHealth.GetProcessedValue();
+		//	//	if (wasFullHealth) {
+		//	//		this.currentHealth = this.maxHealth;
+		//	//	}
+		//	//};
+
+		//	this.maxHealth = stats.maxHealth.GetProcessedValue();
+		//	this.currentHealth = maxHealth;         // might cause problems later with OnDeath handling
+		//											// If the player were to leave while having the death screen active,
+		//											// Upon rejoining it would reset their health to max, completely overriding the death state.
+		//											// Death screen implementation should be prioritized when deserializing.
+		//}
+
+		//public override ComponentSerializer GetSerializedProperties() {
+		//	return base.GetSerializedProperties()
+		//		//.Add("stats", this.stats)
+		//		.Add("inventory", inventory.Serialize());
+		//}
+
 	}
 
 }

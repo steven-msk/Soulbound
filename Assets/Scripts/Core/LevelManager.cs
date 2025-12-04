@@ -32,7 +32,7 @@ namespace SoulboundBackend.Core {
 
 		private DiContainer container = null!;
 		private WorldManager worldManager = null!;
-		private EntityManager entityManager = null!;
+		public EntityManager entityManager { get; private set; } = null!;
 		private Canvas worldCanvas = null!;
 		private InputHandler inputHandler = null!;
 		private PlayerInputActions inputMappings = null!;
@@ -78,7 +78,7 @@ namespace SoulboundBackend.Core {
 			UnityEngine.Random.InitState(seed);
 			this.world = world;
 			this.level = new Level(gridContext, seed);
-			this.entityManager = new EntityManager(level);
+			this.entityManager = new EntityManager(level, new GameObject("Updater").AddComponent<UpdateManager>());
 
 			level.BootstrapWorld(dump, this);
 			entityManager.Boostrap(dump?.serializedEntities ?? new());
@@ -101,7 +101,9 @@ namespace SoulboundBackend.Core {
 				Guid.NewGuid(), player.prefabDefinitionID,
 				level.GetWorldSpawnPoint(), null
 			);
-			entityManager.SpawnPlayer(player, serialized ?? fallback);
+			entityManager.Spawn(player, new PlayerSpawnData() {
+				position = level.GetWorldSpawnPoint()
+			});
 		}
 
 		private void Update() {
@@ -143,20 +145,24 @@ namespace SoulboundBackend.Core {
 			}
 		}
 
+		[Obsolete]
 		public void OnChunkLoaded(WorldChunk chunk) {
-			entityManager.OnChunkLoaded(chunk);
+			//entityManager.OnChunkLoaded(chunk);
 		}
 
+		[Obsolete]
 		public void OnChunkUnloaded(WorldChunk chunk) {
-			entityManager.OnChunkUnloaded(chunk);
+			//entityManager.OnChunkUnloaded(chunk);
 		}
 
+		[Obsolete]
 		public void SpawnEntity(Entity entity, EntitySpawnData spawnData) {
-			entityManager.SpawnEntity(entity, spawnData);
+			//entityManager.Spawn(entity, spawnData);
 		}
 
+		[Obsolete]
 		public void RemoveEntityImmediately(Entity entity, bool destroy) {
-			entityManager.RemoveEntityImmediately(entity, destroy);
+			//entityManager.RemoveEntityImmediately(entity, destroy);
 		}
  
 		private void OnEscPressed() {
@@ -178,8 +184,8 @@ namespace SoulboundBackend.Core {
 				seed,
 				generatedChunks,
 				player?.Serialize() ?? default,
-				structurePlacements,
-				entityManager.Serialize()
+				structurePlacements, null
+				//entityManager.Serialize()
 			);
 		}
 

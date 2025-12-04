@@ -1,26 +1,37 @@
 ﻿using SoulboundBackend.Client.World.Chunk;
+using SoulboundBackend.Client.World.EntitySystem.SpawnData;
+using SoulboundBackend.Core;
 using SoulboundBackend.Core.Resource;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 #nullable enable
 
 namespace SoulboundBackend.Client.World.EntitySystem {
 	public sealed class EntityManager {
+		private readonly UpdateManager updater;
 		private readonly Level level;
-		private PlayerController player = null!;
-		private Dictionary<Guid, Entity> allEntities = new();
-		private List<ITickable> tickables = new();
-		private List<(Entity entity, bool destroy)> pendingRemovals = new();
+		private readonly List<IEntitySubsystem> subsystems = new();
+		private readonly TickManager tickManager;
+		private readonly EntityChunkTracker chunkTracker;
+		private readonly Dictionary<Guid, Entity> all = new();
 
-		public Dictionary<Guid, Entity> AllExistingEntities => allEntities;
-
-		public EntityManager(Level level) {
+		public EntityManager(Level level, UpdateManager updater) {
 			this.level = level;
+			this.updater = updater;
+
+			this.tickManager = new TickManager();
+			this.chunkTracker = new EntityChunkTracker(level);
+
+			subsystems.Add(tickManager);
+			subsystems.Add(chunkTracker);
+			subsystems.Add(updater);
 		}
 
+		[Obsolete]
 		public void Boostrap(Dictionary<Guid, SerializedEntity> serializedEntities) {
 			foreach (var entry in serializedEntities) {
 				SerializedEntity serializedEntity = entry.Value;
@@ -34,89 +45,68 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 			}
 		}
 
-		public void AddEntity(Entity entity, Guid? id) {
-			entity.InitState(id ?? Guid.NewGuid(), this);
-			allEntities.Add(entity.id, entity);
-			if (entity is ITickable tickable) {
-				tickables.Add(tickable);
+		public void AddEntity(Entity entity, Guid? id = null) {
+			Guid assigned = id ?? Guid.NewGuid();
+			entity.InitState(assigned, this);
+			all.Add(assigned, entity);
+
+			foreach (var subsystem in subsystems) {
+				subsystem.AddEntity(entity);
 			}
 		}
 
-		public void SpawnEntity(Entity entity, EntitySpawnData spawnData) {
-			entity.Spawn(spawnData);
-			this.AddEntity(entity, null);
+		public void Spawn<T>(Entity entity, T spawnData) where T : ISpawnData {
+			Guid id = Guid.NewGuid();
+			this.AddEntity(entity, id);
+			entity.InitState(id, this);
+			entity.ApplySpawnData(spawnData);
 		}
 
-		public void SpawnPlayer(PlayerController player, SerializedEntity serialized) {
-			player.InitState(serialized.id, this);
-			player.Deserialize(serialized);
-			this.player = player;
+		public void Spawn<T>(GameObject prefab, T spawnData) where T : ISpawnData {
+			var obj = GameObject.Instantiate(prefab);
+			this.Spawn<T>(obj.GetComponent<Entity>(), spawnData);
 		}
 
-		public void RemoveEntity(Entity entity, bool destroy) => pendingRemovals.Add((entity, destroy));
-
-		public void RemoveEntityImmediately(Entity entity, bool destroy) {
-			allEntities.Remove(entity.id);
-			if (entity is ITickable tickable) {
-				tickables.Remove(tickable);
+		public T SpawnSerialized<T>(SerializedEntity serializedEntity, ISpawnData spawnData) where T : Entity {
+			GameObject prefab = ResourceManager.Get<GameObject, ResourceGroups.Prefabs>(
+				serializedEntity.prefabDefinitionID
+			)!;
+			if (prefab == null) {
+				throw new ArgumentException($"Entity prefab '{serializedEntity.prefabDefinitionID}' not found");
 			}
-			if (destroy) {
-				GameObject.Destroy(entity.gameObject);
+
+			GameObject obj = GameObject.Instantiate(prefab);
+			T? entity = obj.GetComponent(typeof(T)) as T;
+			if (entity == null) {
+				GameObject.Destroy(obj);
+				throw new MissingComponentException($"No entity component found on prefab {serializedEntity.prefabDefinitionID}");
 			}
+
+			entity.InitState(serializedEntity.id, this);
+			entity.Deserialize(serializedEntity);
+			entity.ApplySpawnData(spawnData);
+			foreach (var subsystem in subsystems) {
+				subsystem.AddEntity(entity);
+			}
+			all.Add(entity.id, entity);
+
+			return entity;
+		}
+		public void RemoveEntity(Entity entity) {
+			foreach (var subsystem in subsystems) {
+				subsystem.RemoveEntity(entity);
+			}
+
+			all.Remove(entity.id);
+			GameObject.Destroy(entity.gameObject);
 		}
 
-		public void Tick() {
-			tickables.ForEach(tickingEntity => tickingEntity.Tick());
-		}
+		public void Tick() => tickManager.Tick();
 
 		public void Update(float deltaTime) {
-			pendingRemovals.ForEach(entry => RemoveEntityImmediately(entry.entity, entry.destroy));
-			pendingRemovals.Clear();
-			foreach (var entity in allEntities.Values) {
-				entity.EntityUpdate(deltaTime);
-				entity.ManagerUpdate(this);
+			foreach (var entity in all.Values) {
+				chunkTracker.UpdateEntityChunk(entity);
 			}
-			player?.EntityUpdate(deltaTime);
-		}
-
-		public void OnChunkLoaded(WorldChunk chunk) {
-			foreach (var entity in GetEntitiesInChunk(chunk)) {
-				entity.OnChunkLoaded();
-			}
-		}
-
-		public void OnChunkUnloaded(WorldChunk chunk) {
-			foreach (var entity in GetEntitiesInChunk(chunk)) {
-				entity.OnChunkUnloaded();
-			}
-		}
-
-		public void HandleChunkChange(Entity entity, int oldChunkX, int newChunkX) {
-			bool newLoaded = level.IsChunkLoaded(newChunkX);
-			bool oldLoaded = level.IsChunkLoaded(oldChunkX);
-			if (oldLoaded && !newLoaded) {
-				entity.OnChunkUnloaded();
-			} else if (!oldLoaded && newLoaded) {
-				entity.OnChunkLoaded();
-			}
-		}
-
-		public Dictionary<Guid, SerializedEntity> Serialize() {
-			return allEntities.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Serialize());
-		}
-
-		public HashSet<Entity> GetEntitiesInChunk(WorldChunk chunk) {
-			var entities = allEntities.Values
-				.Where(entity => ChunkBlockPos.FromWorld(entity.position, level)
-					.UnderlyingChunk(level) == chunk);
-			return System.Linq.Enumerable.ToHashSet(entities);
-		}
-
-		public Entity? GetEntityById(Guid id) {
-			if (allEntities.TryGetValue(id, out var entity)) {
-				return entity;
-			}
-			return null;
 		}
 	}
 }

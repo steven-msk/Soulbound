@@ -52,10 +52,11 @@ namespace SoulboundBackend.Client.ItemSystem {
 			}
 			GameObject droppedItem = worldPrefab!;
 			DroppedItem pickup = droppedItem.GetComponent<DroppedItem>() ?? droppedItem.AddComponent<DroppedItem>();
-			Soulbound.instance.GetActiveLevel().SpawnEntity(pickup, new EntitySpawnData(pos) {
-				[SpawnDataKey.Of("itemStack")] = new SpawnDataValue<ItemStack>(this),
-				[SpawnDataKey.Of("pickupDelay")] = new SpawnDataValue<float>((playerAction ? 2f : 0f)),
-				[SpawnDataKey.Of("dropForce")] = new SpawnDataValue<Vector2>(dropForce),
+			Soulbound.instance.GetActiveLevelManager().entityManager.Spawn(pickup, new DroppedItem.SpawnData() {
+				 position = pos,
+				 itemStack = this,
+				 dropForce = dropForce,
+				 pickupDelay = playerAction ? 2f : 0f
 			});
 			isDropped = true;
 		}

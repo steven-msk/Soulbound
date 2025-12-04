@@ -22,7 +22,7 @@ public sealed class WeaponItem_test : Item, IAttackSourceProvider {
 			source = new AttackSource(10, 1, new TestBehavior(), context => {
 				var parentObj = new GameObject("parent animation object");
 				parentObj.transform.SetParent(context.performer.transform);
-				parentObj.transform.position = new Vector2(1f * context.performer.facing, 1f) + context.performer.position;
+				parentObj.transform.position = new Vector2(1f * context.performer.facing.x, 1f) + context.performer.position;
 
 				var obj = GameObject.Instantiate(animationPrefab, parentObj.transform, true);
 				context.AddTemp(parentObj);

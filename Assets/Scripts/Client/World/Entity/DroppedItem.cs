@@ -1,4 +1,6 @@
 using SoulboundBackend.Client.ItemSystem;
+using SoulboundBackend.Client.World.Chunk;
+using SoulboundBackend.Client.World.EntitySystem.SpawnData;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core;
 using System;
@@ -6,14 +8,14 @@ using UnityEngine;
 using Logger = SoulboundBackend.Common.Logging.Logger;
 
 namespace SoulboundBackend.Client.World.EntitySystem {
-	public class DroppedItem : Entity {
+	public class DroppedItem : Entity, IUpdatable, IChunkListener {
 		private static readonly Logger logger = Logger.CreateInstance();
 		public const float defaultLifespanSeconds = 120f;           // TODO: decide on a dropped item lifespan duration
 
-		public override Type entityScriptType => typeof(DroppedItem);
+		public override Type scriptType => typeof(DroppedItem);
 		public override string prefabDefinitionID => "droppedItem";
-		public ItemStack ItemStack { get; private set; }
-		public override float facing { get => 1f; set => _ = value; }
+		public ItemStack itemStack { get; private set; }
+		public override Facing facing => Facing.Left;
 
 		private float despawnTimer;
 		private bool isFrozen;
@@ -22,21 +24,28 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 		private float pickupTimer;
 		private bool flag_pickupLocked = false;
 
-		[EntitySpawnPropertyCandidates("itemStack", "pickupDelay", "dropForce")]
-		public override void Spawn(EntitySpawnData spawnData) {
-			base.Spawn(spawnData);
-			this.ItemStack = spawnData.Get<ItemStack>("itemStack");
-			this.pickupDelay = spawnData.Get<float>("pickupDelay");
-			this.ApplyIcon(ItemStack.item.aspect.icon);
+		public override void ApplySpawnData<TData>(TData spawnData) {
+			var typed = spawnData as DroppedItem.SpawnData;
+			if (typed == null) {
+				return;
+			}
 
-			Vector2 dropForce = spawnData.Get<Vector2>("dropForce", Vector2.zero);
+			this.transform.position = typed.position;
+			this.itemStack = typed.itemStack;
+			this.pickupDelay = typed.pickupDelay;
+			this.ApplyIcon(itemStack.item.aspect.icon);
+
+			Vector2 dropForce = typed.dropForce;
 			float xForce = UnityEngine.Random.Range(1f, 1.5f);
 			float yForce = UnityEngine.Random.Range(1f, 1.5f);
-			Vector2 force = new Vector2(spawnData.Contains("dropForce") ? xForce : 0f, yForce) * dropForce;
+			Vector2 force = new Vector2(xForce, yForce) * dropForce;
 			GetComponent<Rigidbody2D>().AddForce(force, ForceMode2D.Impulse);
-			OnEnable();
+
+			pickupTimer = pickupDelay;
+			despawnTimer = defaultLifespanSeconds;
 		}
 
+		[PROTOTYPICAL]
 		public void ApplyIcon(ItemIcon icon) {
 			SpriteRenderer spriteRenderer = ComponentUtility.GetOrAddComponent<SpriteRenderer>(gameObject);
 			spriteRenderer.sprite = icon.sprite;
@@ -55,65 +64,66 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 			PolygonCollider2D groundCollider = gameObject.AddComponent<PolygonCollider2D>();
 			groundCollider.autoTiling = true;
 			groundCollider.excludeLayers = ~LayerMask.GetMask("Ground");
-
 		}
 
-		public override SerializedEntityPropertyList GetSerializedProperties() {
-			return new SerializedEntityPropertyList()
-				.Add("itemStack", this.ItemStack)
-				.Add("pickupDelay", this.pickupDelay)
-				.Add("pickupTimer", this.pickupTimer)
-				.Add("despawnTimer", this.despawnTimer)
-				.Add("isFrozen", this.isFrozen)
-				.Add("flag_pickupLocked", this.flag_pickupLocked);
-		}
+		//public override ComponentSerializer GetSerializedProperties() {
+		//	return new ComponentSerializer()
+		//		.Add("itemStack", this.ItemStack)
+		//		.Add("pickupDelay", this.pickupDelay)
+		//		.Add("pickupTimer", this.pickupTimer)
+		//		.Add("despawnTimer", this.despawnTimer)
+		//		.Add("isFrozen", this.isFrozen)
+		//		.Add("flag_pickupLocked", this.flag_pickupLocked);
+		//}
 
-		public override void ApplySerializedProperties(SerializedEntityPropertyList properties) {
-			this.ItemStack = properties.Get<ItemStack>("itemStack");
-			this.pickupDelay = properties.Get<float>("pickupDelay");
-			this.pickupTimer = properties.Get<float>("pickupTimer");
-			this.despawnTimer = properties.Get<float>("despawnTimer");
-			this.isFrozen = properties.Get<bool>("isFrozen");
-			this.flag_pickupLocked = properties.Get<bool>("flag_pickupLocked");
-		}
-
-		private void OnEnable() {
-			pickupTimer = pickupDelay;
-			despawnTimer = defaultLifespanSeconds;
-		}
+		//public override void ApplySerializedProperties(ComponentSerializer properties) {
+		//	this.ItemStack = properties.Get<ItemStack>("itemStack");
+		//	this.pickupDelay = properties.Get<float>("pickupDelay");
+		//	this.pickupTimer = properties.Get<float>("pickupTimer");
+		//	this.despawnTimer = properties.Get<float>("despawnTimer");
+		//	this.isFrozen = properties.Get<bool>("isFrozen");
+		//	this.flag_pickupLocked = properties.Get<bool>("flag_pickupLocked");
+		//}
 
 		private void OnTriggerStay2D(Collider2D collision) {
 			if (pickupTimer <= 0 && !flag_pickupLocked) {
-				if (Soulbound.instance.GetPlayerInstance().Inventory.PickUpItem(ItemStack, out int remaining)) {
+				if (Soulbound.instance.GetPlayerInstance().Inventory.PickUpItem(itemStack, out int remaining)) {
 					flag_pickupLocked = true;
-					Soulbound.instance.GetActiveLevel().RemoveEntityImmediately(this, destroy: true);
+					manager.RemoveEntity(this);
 				} else {
-					ItemStack.SetQuantity(remaining);
+					itemStack.SetQuantity(remaining);
 				}
 			}
 		}
 
-		public override void EntityUpdate(float deltaTime) {
+		public void FrameUpdate(float deltaTime) {
 			if (isFrozen) {
 				return;
 			}
 			pickupTimer -= deltaTime;
 			despawnTimer -= deltaTime;
 			if (despawnTimer <= 0) {
-				this.Despawn();
+				manager.RemoveEntity(this);
 			}
 		}
 
-		public override void OnChunkLoaded() {
+		public void OnChunkLoaded(WorldChunk chunk) {
+			UnityEngine.Debug.Log("chunk load");
 			gameObject.SetActive(true);
 			isFrozen = false;
 		}
 
-		public override void OnChunkUnloaded() {
+		public void OnChunkUnloaded(WorldChunk chunk) {
+			UnityEngine.Debug.Log("chunk unload");
 			gameObject.SetActive(false);
 			isFrozen = true;
 		}
 
-		public override Bounds GetBounds() => this.GetColliderBounds();
+		public sealed class SpawnData : ISpawnData {
+			public Vector2 position { get; init; }
+			public Vector2 dropForce { get; init; }
+			public ItemStack itemStack { get; init; }
+			public float pickupDelay { get; init; }
+		}
 	}
 }
