@@ -5,6 +5,7 @@ using Unity.Plastic.Newtonsoft.Json;
 using Unity.Plastic.Newtonsoft.Json.Linq;
 
 namespace SoulboundBackend.Client.World.EntitySystem {
+	[Obsolete]
 	public sealed class ComponentSerializer {
 		private readonly Dictionary<string, object> data = new();
 		public Dictionary<string, object> raw => data;

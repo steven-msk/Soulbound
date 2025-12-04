@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.World.EntitySystem {
 	public interface IChunkListener {
-		void OnChunkLoaded(WorldChunk chunk);
-		void OnChunkUnloaded(WorldChunk chunk);
+		void OnEnteredChunk(WorldChunk chunk);
+		void OnLeftChunk(WorldChunk chunk);
 	}
 }

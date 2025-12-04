@@ -13,14 +13,12 @@ using UnityEngine;
 namespace SoulboundBackend.Client.World.EntitySystem {
 	public sealed class EntityManager {
 		private readonly UpdateManager updater;
-		private readonly Level level;
 		private readonly List<IEntitySubsystem> subsystems = new();
 		private readonly TickManager tickManager;
 		private readonly EntityChunkTracker chunkTracker;
 		private readonly Dictionary<Guid, Entity> all = new();
 
 		public EntityManager(Level level, UpdateManager updater) {
-			this.level = level;
 			this.updater = updater;
 
 			this.tickManager = new TickManager();
@@ -58,7 +56,6 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 		public void Spawn<T>(Entity entity, T spawnData) where T : ISpawnData {
 			Guid id = Guid.NewGuid();
 			this.AddEntity(entity, id);
-			entity.InitState(id, this);
 			entity.ApplySpawnData(spawnData);
 		}
 

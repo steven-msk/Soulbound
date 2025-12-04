@@ -107,13 +107,13 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 			}
 		}
 
-		public void OnChunkLoaded(WorldChunk chunk) {
+		public void OnEnteredChunk(WorldChunk chunk) {
 			UnityEngine.Debug.Log("chunk load");
 			gameObject.SetActive(true);
 			isFrozen = false;
 		}
 
-		public void OnChunkUnloaded(WorldChunk chunk) {
+		public void OnLeftChunk(WorldChunk chunk) {
 			UnityEngine.Debug.Log("chunk unload");
 			gameObject.SetActive(false);
 			isFrozen = true;
