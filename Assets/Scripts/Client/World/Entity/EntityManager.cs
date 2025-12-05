@@ -11,7 +11,7 @@ using UnityEngine;
 #nullable enable
 
 namespace SoulboundBackend.Client.World.EntitySystem {
-	public sealed class EntityManager {
+	public sealed class EntityManager : ISerializable<Dictionary<Guid, SerializedEntity>> {
 		private readonly UpdateManager updater;
 		private readonly List<IEntitySubsystem> subsystems = new();
 		private readonly TickManager tickManager;
@@ -29,18 +29,24 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 			subsystems.Add(updater);
 		}
 
-		[Obsolete]
-		public void Boostrap(Dictionary<Guid, SerializedEntity> serializedEntities) {
+		public void Deserialize(Dictionary<Guid, SerializedEntity> serializedEntities) {
 			foreach (var entry in serializedEntities) {
 				SerializedEntity serializedEntity = entry.Value;
 				Guid id = entry.Key;
 
-				GameObject? entityPrefab = ResourceManager.Get<GameObject, ResourceGroups.Prefabs>(serializedEntity.prefabDefinitionID);
+				GameObject? entityPrefab = ResourceManager.GetRuntimePrefab(serializedEntity.prefabDefinitionID);
+				if (entityPrefab == null) {
+					entityPrefab = ResourceManager.Get<GameObject, ResourceGroups.Prefabs>(serializedEntity.prefabDefinitionID);
+				}
 				Entity entity = (Entity)GameObject.Instantiate(entityPrefab)!.GetComponent(serializedEntity.entityScriptType);
 
 				this.AddEntity(entity, id);
 				entity.Deserialize(serializedEntity);
 			}
+		}
+
+		public Dictionary<Guid, SerializedEntity> Serialize() {
+			return all.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Serialize());
 		}
 
 		public void AddEntity(Entity entity, Guid? id = null) {
@@ -89,6 +95,7 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 
 			return entity;
 		}
+
 		public void RemoveEntity(Entity entity) {
 			foreach (var subsystem in subsystems) {
 				subsystem.RemoveEntity(entity);
@@ -104,6 +111,10 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 			foreach (var entity in all.Values) {
 				chunkTracker.UpdateEntityChunk(entity);
 			}
+		}
+
+		public bool GetEntityByID(Guid id, out Entity entity) {
+			return all.TryGetValue(id, out entity);
 		}
 	}
 }

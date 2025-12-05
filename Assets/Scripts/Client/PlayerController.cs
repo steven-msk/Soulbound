@@ -33,7 +33,7 @@ namespace SoulboundBackend.Client {
 	public class PlayerController : Entity, IAttackPerformer, IItemConsumer, IUpdatable {
 		private static readonly Logger logger = Logger.CreateInstance();
 		public override Type scriptType => typeof(PlayerController);
-		public override string prefabDefinitionID => "johnny";
+		public override string prefabDefinitionID => "player";
 
 		[SerializeField] private InventoryController inventory;
 		public InventoryController Inventory => inventory;

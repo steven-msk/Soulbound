@@ -81,7 +81,7 @@ namespace SoulboundBackend.Core {
 			this.entityManager = new EntityManager(level, new GameObject("Updater").AddComponent<UpdateManager>());
 
 			level.BootstrapWorld(dump, this);
-			entityManager.Boostrap(dump?.serializedEntities ?? new());
+			entityManager.Deserialize(dump?.serializedEntities ?? new());
 			sessionRunning = true;
 
 			container.BindInstance<Level>(level).AsSingle();
@@ -90,19 +90,19 @@ namespace SoulboundBackend.Core {
 		}
 
 		public void SpawnPlayer(SerializedEntity? serialized) {
-			GameObject playerPrefab = ResourceManager.GetRuntimePrefab("player");
-			this.player = container.InstantiatePrefabForComponent<PlayerController>(playerPrefab);
-			container.BindInstance<PlayerController>(player).AsSingle();
-			var playerContext = player.GetComponent<GameObjectContext>();
-			playerContext.AddNormalInstaller(new PlayerInstaller(player, worldCanvas, inputHandler));
+			if (entityManager.GetEntityByID(serialized.GetValueOrDefault().id, out var playerEntity)) {
+				entityManager.RemoveEntity(playerEntity);
+			}
+			this.player = container.InstantiatePrefabForComponent<PlayerController>(
+				ResourceManager.GetRuntimePrefab("player")
+			);
+			container.BindInstance<PlayerController>(this.player).AsSingle();
+			var playerContext = this.player.GetComponent<GameObjectContext>();
+			playerContext.AddNormalInstaller(new PlayerInstaller(this.player, worldCanvas, inputHandler));
 			playerContext.Run();
 
-			SerializedEntity fallback = new(typeof(PlayerController),
-				Guid.NewGuid(), player.prefabDefinitionID,
-				level.GetWorldSpawnPoint(), null
-			);
-			entityManager.Spawn(player, new PlayerSpawnData() {
-				position = level.GetWorldSpawnPoint()
+			entityManager.Spawn(this.player, new PlayerSpawnData() {
+				position = serialized?.lastPosition ?? level.GetWorldSpawnPoint()
 			});
 		}
 
@@ -184,8 +184,8 @@ namespace SoulboundBackend.Core {
 				seed,
 				generatedChunks,
 				player?.Serialize() ?? default,
-				structurePlacements, null
-				//entityManager.Serialize()
+				structurePlacements,
+				entityManager.Serialize()
 			);
 		}
 
