@@ -101,7 +101,7 @@ namespace SoulboundBackend.Core {
 			playerContext.AddNormalInstaller(new PlayerInstaller(this.player, worldCanvas, inputHandler));
 			playerContext.Run();
 
-			entityManager.Spawn(this.player, new PlayerSpawnData() {
+			entityManager.Spawn<PlayerController, PlayerSpawnData>(this.player, new PlayerSpawnData() {
 				position = serialized?.lastPosition ?? level.GetWorldSpawnPoint()
 			});
 		}
@@ -198,7 +198,7 @@ namespace SoulboundBackend.Core {
 		} 
 
 		public static LevelManager CreateInstance() {
-			GameObject? levelManagerPrefab = ResourceManager.Get<GameObject, ResourceGroups.Runtime.Prefabs>("levelManager");
+			GameObject? levelManagerPrefab = ResourceManager.GetRuntimePrefab("levelManager");
 			return GameObject.Instantiate(levelManagerPrefab)?.GetComponent<LevelManager>()
 				?? throw new ArgumentException("LevelManager prefab not found!");
 		}
@@ -206,8 +206,8 @@ namespace SoulboundBackend.Core {
 
 	public record LevelGridContext(Grid grid, Tilemap tilemap) {
 		public static LevelGridContext FromRuntimePrefabs() {
-			var gridPrefab = ResourceManager.Get<GameObject, ResourceGroups.Runtime.Prefabs>("Grid");
-			var tilemapPrefab = ResourceManager.Get<GameObject, ResourceGroups.Runtime.Prefabs>("Tilemap");
+			var gridPrefab = ResourceManager.GetRuntimePrefab("Grid");
+			var tilemapPrefab = ResourceManager.GetRuntimePrefab("Tilemap");
 
 			var gridObj = GameObject.Instantiate(gridPrefab);
 			var tilemapObj = GameObject.Instantiate(tilemapPrefab, gridObj.transform);

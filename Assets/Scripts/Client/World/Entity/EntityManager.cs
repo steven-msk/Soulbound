@@ -59,42 +59,55 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 			}
 		}
 
-		public void Spawn<T>(Entity entity, T spawnData) where T : ISpawnData {
+		public void Spawn(Entity entity) {
 			Guid id = Guid.NewGuid();
 			this.AddEntity(entity, id);
-			entity.ApplySpawnData(spawnData);
 		}
 
-		public void Spawn<T>(GameObject prefab, T spawnData) where T : ISpawnData {
+		public void Spawn(GameObject prefab) {
 			var obj = GameObject.Instantiate(prefab);
-			this.Spawn<T>(obj.GetComponent<Entity>(), spawnData);
+			this.Spawn(obj.GetComponent<Entity>());
 		}
 
-		public T SpawnSerialized<T>(SerializedEntity serializedEntity, ISpawnData spawnData) where T : Entity {
-			GameObject prefab = ResourceManager.Get<GameObject, ResourceGroups.Prefabs>(
-				serializedEntity.prefabDefinitionID
-			)!;
-			if (prefab == null) {
-				throw new ArgumentException($"Entity prefab '{serializedEntity.prefabDefinitionID}' not found");
-			}
-
-			GameObject obj = GameObject.Instantiate(prefab);
-			T? entity = obj.GetComponent(typeof(T)) as T;
-			if (entity == null) {
-				GameObject.Destroy(obj);
-				throw new MissingComponentException($"No entity component found on prefab {serializedEntity.prefabDefinitionID}");
-			}
-
-			entity.InitState(serializedEntity.id, this);
-			entity.Deserialize(serializedEntity);
+		public void Spawn<TEntity, TData>(TEntity entity, TData spawnData)
+				where TEntity : Entity, IEntitySpawnable<TData> 
+				where TData : ISpawnData {
+			this.Spawn(entity);
 			entity.ApplySpawnData(spawnData);
-			foreach (var subsystem in subsystems) {
-				subsystem.AddEntity(entity);
-			}
-			all.Add(entity.id, entity);
-
-			return entity;
 		}
+
+		public void Spawn<TEntity, TData>(GameObject prefab, TData spawnData)
+				where TEntity : Entity, IEntitySpawnable<TData>
+				where TData : ISpawnData {
+			var obj = GameObject.Instantiate(prefab);
+			this.Spawn(obj.GetComponent<TEntity>(), spawnData);
+		}
+
+		//public T SpawnSerialized<T>(SerializedEntity serializedEntity, ISpawnData spawnData) where T : Entity {
+		//	GameObject prefab = ResourceManager.Get<GameObject, ResourceGroups.Prefabs>(
+		//		serializedEntity.prefabDefinitionID
+		//	)!;
+		//	if (prefab == null) {
+		//		throw new ArgumentException($"Entity prefab '{serializedEntity.prefabDefinitionID}' not found");
+		//	}
+
+		//	GameObject obj = GameObject.Instantiate(prefab);
+		//	T? entity = obj.GetComponent(typeof(T)) as T;
+		//	if (entity == null) {
+		//		GameObject.Destroy(obj);
+		//		throw new MissingComponentException($"No entity component found on prefab {serializedEntity.prefabDefinitionID}");
+		//	}
+
+		//	entity.InitState(serializedEntity.id, this);
+		//	entity.Deserialize(serializedEntity);
+		//	entity.ApplySpawnData(spawnData);
+		//	foreach (var subsystem in subsystems) {
+		//		subsystem.AddEntity(entity);
+		//	}
+		//	all.Add(entity.id, entity);
+
+		//	return entity;
+		//}
 
 		public void RemoveEntity(Entity entity) {
 			foreach (var subsystem in subsystems) {

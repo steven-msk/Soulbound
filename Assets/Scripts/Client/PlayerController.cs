@@ -30,7 +30,7 @@ using Level = SoulboundBackend.Client.World.Level;
 using Logger = SoulboundBackend.Common.Logging.Logger;
 
 namespace SoulboundBackend.Client {
-	public class PlayerController : Entity, IAttackPerformer, IItemConsumer, IUpdatable {
+	public class PlayerController : Entity, IAttackPerformer, IItemConsumer, IUpdatable, IEntitySpawnable<PlayerSpawnData> {
 		private static readonly Logger logger = Logger.CreateInstance();
 		public override Type scriptType => typeof(PlayerController);
 		public override string prefabDefinitionID => "player";
@@ -264,16 +264,12 @@ namespace SoulboundBackend.Client {
 						.Contains(BlockPos.FromWorld(worldPos, level));
 		}
 
-		public override void ApplySpawnData<TData>(TData spawnData) {
-			var playerSpawnData = spawnData as PlayerSpawnData;
-			if (playerSpawnData == null) {
-				throw new ArgumentException($"Invalid player spawn data type: {typeof(TData)}");
-			}
-
-			this.transform.position = playerSpawnData.position;
+		void IEntitySpawnable<PlayerSpawnData>.ApplySpawnData(PlayerSpawnData spawnData) {
+			this.transform.position = spawnData.position;
 			this.stats = new();
 			this.isSpawned = true;
 		}
+
 
 		// since this is a lazy player entity addition, not all methods need implementation (for now)
 		// TODO: properly implement player entity methods

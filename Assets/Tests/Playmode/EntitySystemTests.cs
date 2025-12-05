@@ -18,7 +18,7 @@ using UnityEngine.TestTools;
 using WorldTests;
 using Assert = NUnit.Framework.Assert;
 
-public class MockEntity : Entity, ITickable, IChunkListener {
+public class MockEntity : Entity, ITickable, IChunkListener, IEntitySpawnable<MockSpawnData> {
 	public override Type scriptType => typeof(MockEntity);
 	public override string prefabDefinitionID => "mock_entity";
 	public override Facing facing => new Facing(1f);
@@ -27,9 +27,8 @@ public class MockEntity : Entity, ITickable, IChunkListener {
 	public int loadedCount = 0;
 	public int unloadedCount = 0;
 
-	public override void ApplySpawnData<TData>(TData spawnData) {
-		if (spawnData is MockSpawnData sd)
-			transform.position = sd.position;
+	void IEntitySpawnable<MockSpawnData>.ApplySpawnData(MockSpawnData spawnData) {
+		this.transform.position = spawnData.position;
 	}
 
 	public void Tick() => tickCount++;

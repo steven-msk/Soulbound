@@ -8,7 +8,7 @@ using UnityEngine;
 using Logger = SoulboundBackend.Common.Logging.Logger;
 
 namespace SoulboundBackend.Client.World.EntitySystem {
-	public class DroppedItem : Entity, IUpdatable, IChunkListener {
+	public class DroppedItem : Entity, IUpdatable, IChunkListener, IEntitySpawnable<DroppedItem.SpawnData> {
 		private static readonly Logger logger = Logger.CreateInstance();
 		public const float defaultLifespanSeconds = 120f;           // TODO: decide on a dropped item lifespan duration
 
@@ -24,18 +24,13 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 		private float pickupTimer;
 		private bool flag_pickupLocked = false;
 
-		public override void ApplySpawnData<TData>(TData spawnData) {
-			var typed = spawnData as DroppedItem.SpawnData;
-			if (typed == null) {
-				return;
-			}
-
-			this.transform.position = typed.position;
-			this.itemStack = typed.itemStack;
-			this.pickupDelay = typed.pickupDelay;
+		void IEntitySpawnable<SpawnData>.ApplySpawnData(SpawnData spawnData) {
+			this.transform.position = spawnData.position;
+			this.itemStack = spawnData.itemStack;
+			this.pickupDelay = spawnData.pickupDelay;
 			this.ApplyIcon(itemStack.item.aspect.icon);
 
-			Vector2 dropForce = typed.dropForce;
+			Vector2 dropForce = spawnData.dropForce;
 			float xForce = UnityEngine.Random.Range(1f, 1.5f);
 			float yForce = UnityEngine.Random.Range(1f, 1.5f);
 			Vector2 force = new Vector2(xForce, yForce) * dropForce;
@@ -46,7 +41,7 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 		}
 
 		[PROTOTYPICAL]
-		public void ApplyIcon(ItemIcon icon) {
+		private void ApplyIcon(ItemIcon icon) {
 			SpriteRenderer spriteRenderer = ComponentUtility.GetOrAddComponent<SpriteRenderer>(gameObject);
 			spriteRenderer.sprite = icon.sprite;
 
@@ -65,6 +60,7 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 			groundCollider.autoTiling = true;
 			groundCollider.excludeLayers = ~LayerMask.GetMask("Ground");
 		}
+
 
 		//public override ComponentSerializer GetSerializedProperties() {
 		//	return new ComponentSerializer()
