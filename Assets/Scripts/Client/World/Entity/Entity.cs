@@ -23,11 +23,20 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 		public abstract void ApplySpawnData<TData>(TData spawnData) where TData : ISpawnData;
 
 		public SerializedEntity Serialize() {
-			throw new NotImplementedException();
+			var properties = new SerializedEntityPropertyList();
+			foreach (var component in GetComponents<ISerializableComponent>()) {
+				component.Save(properties);
+			}
+			return new SerializedEntity(scriptType, id, prefabDefinitionID, position, properties);
 		}
 
 		public void Deserialize(SerializedEntity serialized) {
-			throw new NotImplementedException();
+			this.id = serialized.id;
+			this.transform.position = serialized.lastPosition;
+			var properties = SerializedEntityPropertyList.From(serialized.properties);
+			foreach (var component in GetComponents<ISerializableComponent>()) {
+				component.Read(properties);
+			}
 		}
 
 

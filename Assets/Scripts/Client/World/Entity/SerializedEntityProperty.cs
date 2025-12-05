@@ -2,7 +2,6 @@
 using System;
 
 namespace SoulboundBackend.Client.World.EntitySystem {
-	[Obsolete]
 	public class SerializedEntityProperty<T> : AbstractSerializedEntityProperty {
 		public string key;
 		public T value;

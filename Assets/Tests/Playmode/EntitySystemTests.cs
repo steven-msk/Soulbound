@@ -16,7 +16,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.TestTools;
 using WorldTests;
-using Assert = UnityEngine.Assertions.Assert;
+using Assert = NUnit.Framework.Assert;
 
 public class MockEntity : Entity, ITickable, IChunkListener {
 	public override Type scriptType => typeof(MockEntity);
@@ -77,7 +77,7 @@ public class EntitySystemTests {
 
 		manager.Spawn(entity, spawnData);
 
-		Assert.AreEqual<Vector2>(new Vector2(10, 5), entity.transform.position);
+		Assert.AreEqual(new Vector2(10, 5), entity.transform.position);
 		Assert.AreNotEqual(Guid.Empty, entity.id);
 	}
 
@@ -126,4 +126,106 @@ public class EntitySystemTests {
 		manager.RemoveEntity(entity);
 	}
 
+}
+
+[TestFixture]
+public class EntityComponentSerializationTests {
+	private class TestSerializableComponent : ISerializableComponent {
+		public int health;
+		public string name;
+
+		public void Save(SerializedEntityPropertyList props) {
+			props.Set("health", health);
+			props.Set("name", name);
+		}
+
+		public void Read(SerializedEntityPropertyList props) {
+			health = props.Get("health", 0);
+			name = props.Get("name", "");
+		}
+	}
+
+	[Test]
+	public void Save_WritesComponentFields() {
+		var component = new TestSerializableComponent {
+			health = 40,
+			name = "component"
+		};
+
+		var list = new SerializedEntityPropertyList();
+		component.Save(list);
+
+		Assert.IsTrue(list.ContainsKey("health"));
+		Assert.IsTrue(list.ContainsKey("name"));
+
+		Assert.AreEqual(40, list.Get<int>("health"));
+		Assert.AreEqual("component", list.Get<string>("name"));
+	}
+
+	[Test]
+	public void Set_OverwritesExistingProperty() {
+		const string key = "key";
+		var list = new SerializedEntityPropertyList();
+		list.Add(key, 10);
+
+		list.Set(key, 99);
+
+		Assert.AreEqual(99, list.Get<int>(key));
+	}
+
+	[Test]
+	public void Get_ReturnsDefault_WhenKeyMissing() {
+		var list = new SerializedEntityPropertyList();
+
+		int value = list.Get("key", 123);
+
+		Assert.AreEqual(123, value);
+	}
+
+	[Test]
+	public void MixedTypes_ArePreservedCorrectly() {
+		var list = new SerializedEntityPropertyList();
+		list.Add("intValue", 10);
+		list.Add("floatValue", 5.5f);
+		list.Add("stringValue", "key");
+		list.Add("vectorValue", new Vector2(2, 3));
+
+		Assert.AreEqual(10, list.Get<int>("intValue"));
+		Assert.AreEqual(5.5f, list.Get<float>("floatValue"));
+		Assert.AreEqual("key", list.Get<string>("stringValue"));
+
+		Vector2 vec = list.Get<Vector2>("vectorValue");
+		Assert.AreEqual(new Vector2(2, 3), vec);
+	}
+
+	[Test]
+	public void PropertyList_CanRoundTripThroughSerializedEntityProperty() {
+		var list = new SerializedEntityPropertyList
+		{
+			new SerializedEntityProperty<int>("hp", 88),
+			new SerializedEntityProperty<string>("tag", "orc")
+		};
+
+		var rebuilt = SerializedEntityPropertyList.From(list);
+
+		Assert.AreEqual(88, rebuilt.Get<int>("hp"));
+		Assert.AreEqual("orc", rebuilt.Get<string>("tag"));
+	}
+
+	[Test]
+	public void ComponentSerialization_RoundTrip_Works() {
+		var component = new TestSerializableComponent {
+			health = 20,
+			name = "name"
+		};
+
+		var list = new SerializedEntityPropertyList();
+		component.Save(list);
+
+		var loaded = new TestSerializableComponent();
+		loaded.Read(list);
+
+		Assert.AreEqual(20, loaded.health);
+		Assert.AreEqual("name", loaded.name);
+	}
 }
