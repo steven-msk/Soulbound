@@ -137,6 +137,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 		}
 
 		public void Deserialize(SerializedInventory serialized) {
+			UnityEngine.Debug.Log("inventory deserialize");
 			var pendingUpdates = TryDeserialize("hotbar", serialized.regions, hotbar.GetSlotByIndex)
 				?.Concat(TryDeserialize("popup", serialized.regions, this.GetSlotByIndex))
 				?.Concat(TryDeserialize("armor", serialized.regions, index => armorSlotsByIndex[index]));

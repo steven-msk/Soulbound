@@ -101,6 +101,9 @@ namespace SoulboundBackend.Core {
 			playerContext.AddNormalInstaller(new PlayerInstaller(this.player, worldCanvas, inputHandler));
 			playerContext.Run();
 
+			if (serialized.HasValue) {
+				this.player.Deserialize(serialized.Value);
+			}
 			entityManager.Spawn<PlayerController, PlayerSpawnData>(this.player, new PlayerSpawnData() {
 				position = serialized?.lastPosition ?? level.GetWorldSpawnPoint()
 			});
@@ -180,12 +183,16 @@ namespace SoulboundBackend.Core {
 
 		public WorldDump CreateDump() {
 			level.Dump(out var seed, out var generatedChunks, out var structurePlacements);
+			var serializedPlayer = player?.Serialize() ?? default;
+			var serializedEntities = entityManager.Serialize();
+			serializedEntities.Remove(serializedPlayer.id);
+
 			return new WorldDump(
 				seed,
 				generatedChunks,
-				player?.Serialize() ?? default,
+				serializedPlayer,
 				structurePlacements,
-				entityManager.Serialize()
+				serializedEntities
 			);
 		}
 

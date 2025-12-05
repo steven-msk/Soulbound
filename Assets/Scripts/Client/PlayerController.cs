@@ -270,6 +270,23 @@ namespace SoulboundBackend.Client {
 			this.isSpawned = true;
 		}
 
+		public override void Deserialize(SerializedEntity serialized) {
+			base.Deserialize(serialized);
+			this.stats = new();
+			var properties = SerializedEntityPropertyList.From(serialized.properties);
+			inventory.Deserialize(properties.GetOrThrow<SerializedInventory>("inventory"));
+		}
+
+		public override SerializedEntity Serialize() {
+			var serialized = base.Serialize();
+
+			var properties = SerializedEntityPropertyList.From(serialized.properties);
+			properties.Set("inventory", inventory.Serialize());
+
+			serialized.properties = properties;
+			return serialized;
+		}
+
 
 		// since this is a lazy player entity addition, not all methods need implementation (for now)
 		// TODO: properly implement player entity methods
