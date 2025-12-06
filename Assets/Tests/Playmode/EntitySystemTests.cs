@@ -23,6 +23,8 @@ public class MockEntity : Entity, ITickable, IChunkListener, IEntitySpawnable<Mo
 	public override string prefabDefinitionID => "mock_entity";
 	public override Facing facing => new Facing(1f);
 
+	public override EntityDescriptor descriptor => throw new NotImplementedException();
+
 	public int tickCount = 0;
 	public int loadedCount = 0;
 	public int unloadedCount = 0;

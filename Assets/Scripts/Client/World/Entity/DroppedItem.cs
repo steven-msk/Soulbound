@@ -11,7 +11,7 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 	public class DroppedItem : Entity, IUpdatable, IChunkListener, IEntitySpawnable<DroppedItem.SpawnData> {
 		private static readonly Logger logger = Logger.CreateInstance();
 		public const float defaultLifespanSeconds = 120f;           // TODO: decide on a dropped item lifespan duration
-
+		public override EntityDescriptor descriptor => EntityDescriptorRegistry.ByType<DroppedItem>();
 		public override Type scriptType => typeof(DroppedItem);
 		public override string prefabDefinitionID => "droppedItem";
 		public ItemStack itemStack { get; private set; }

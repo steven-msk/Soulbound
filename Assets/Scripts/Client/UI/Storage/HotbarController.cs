@@ -49,7 +49,6 @@ namespace SoulboundBackend.Client.UI.Storage {
 		}
 
 		public void SetupGrid() {
-			UnityEngine.Debug.Log("grip setup");
 			slots = gameObject.GetComponentsInChildren<InventorySlot>();
 			for (int i = 0; i < length; i++) {
 				slots[i].index = i;
@@ -59,7 +58,6 @@ namespace SoulboundBackend.Client.UI.Storage {
 
 		public void SetActiveSlot(int slotKey) {
 			UnityEngine.Debug.Assert(slotKey >= 0 && slotKey < length, $"Unexpected hotbar slotKey {slotKey}");
-			UnityEngine.Debug.Log("setting slot");
 			InventorySlot hotbarSlot = this[slotKey];
 			if (active.hotbarSlot == null) {
 				active = (hotbarSlot, slotKey);

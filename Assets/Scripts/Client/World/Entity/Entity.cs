@@ -8,6 +8,7 @@ using UnityEngine;
 
 namespace SoulboundBackend.Client.World.EntitySystem {
 	public abstract class Entity : MonoBehaviour, ISerializable<SerializedEntity> {
+		public abstract EntityDescriptor descriptor { get; }
 		public EntityManager manager { get; private set; }
 		public abstract Type scriptType { get; }
 		public Guid id { get; private set; }

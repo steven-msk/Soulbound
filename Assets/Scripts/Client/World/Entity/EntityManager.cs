@@ -34,11 +34,8 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 				SerializedEntity serializedEntity = entry.Value;
 				Guid id = entry.Key;
 
-				GameObject? entityPrefab = ResourceManager.GetRuntimePrefab(serializedEntity.prefabDefinitionID);
-				if (entityPrefab == null) {
-					entityPrefab = ResourceManager.Get<GameObject, ResourceGroups.Prefabs>(serializedEntity.prefabDefinitionID);
-				}
-				Entity entity = (Entity)GameObject.Instantiate(entityPrefab)!.GetComponent(serializedEntity.entityScriptType);
+				var descriptor = EntityDescriptorRegistry.ByID(serializedEntity.descriptorID);
+				Entity entity = descriptor.CreateInstance();
 
 				this.AddEntity(entity, id);
 				entity.Deserialize(serializedEntity);
