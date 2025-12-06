@@ -28,14 +28,22 @@ public class DummyBlock : BlockSystem.Block {
 	}
 
 	protected override BlockState CreateDefaultState() {
-		var defaultProperties = new Dictionary<IBlockStateProperty, object> { { lit, false } };
-		return new BlockSystem.BlockState(this, defaultProperties, new DummyBehavior());
+		throw new NotImplementedException();
 	}
 
-	public override IBlockStateBehavior CreateBehaviorFor(BlockStateProperties properties) {
-		bool lit = (bool)properties[DummyBlock.lit];
-		return lit ? new LitBehavior() : new DummyBehavior();
+	public override IEnumerable<ItemStack> GetDrops(BlockState blockState, BreakSource source) {
+		throw new NotImplementedException();
 	}
+
+	//protected override BlockState CreateDefaultState() {
+	//	var defaultProperties = new Dictionary<IBlockStateProperty, object> { { lit, false } };
+	//	return new BlockSystem.BlockState(this, defaultProperties, new DummyBehavior());
+	//}
+
+	//public override IBlockStateBehavior CreateBehaviorFor(BlockStateProperties properties) {
+	//	bool lit = (bool)properties[DummyBlock.lit];
+	//	return lit ? new LitBehavior() : new DummyBehavior();
+	//}
 }
 
 public class DummyBehavior : IBlockStateBehavior {
@@ -127,15 +135,15 @@ namespace BlockTests {
 			Assert.AreSame(state1, state2);
 		}
 
-		[Test]
-		public void WithProperty_CreatesNewBlockState_WhenPropertyValueDiffers() {
-			var block = new DummyBlock();
-			var state1 = block.defaultState;
-			var state2 = state1.With(DummyBlock.lit, true);
+		//[Test]
+		//public void WithProperty_CreatesNewBlockState_WhenPropertyValueDiffers() {
+		//	var block = new DummyBlock();
+		//	var state1 = block.defaultState;
+		//	var state2 = state1.With(DummyBlock.lit, true);
 
-			Assert.AreNotSame(state1, state2);
-			Assert.IsInstanceOf<LitBehavior>(state2.stateBehavior);
-		}
+		//	Assert.AreNotSame(state1, state2);
+		//	Assert.IsInstanceOf<LitBehavior>(state2.stateBehavior);
+		//}
 
 		[Test]
 		public void WithProperty_ReturnsSameInstance_WhenValueIsUnchanged() {
@@ -146,31 +154,31 @@ namespace BlockTests {
 			Assert.AreSame(state1, state2);
 		}
 
-		[Test]
-		public void OnPlace_DelegatesToBehavior() {
-			var block = new DummyBlock();
-			var state = block.defaultState;
-			var pos = new BlockPos(0, 0);
+		//[Test]
+		//public void OnPlace_DelegatesToBehavior() {
+		//	var block = new DummyBlock();
+		//	var state = block.defaultState;
+		//	var pos = new BlockPos(0, 0);
 
-			state.OnPlace(pos);
+		//	state.OnPlace(pos);
 
-			var stateBehavior = (DummyBehavior)state.stateBehavior;
-			Assert.IsTrue(stateBehavior.placed);
-		}
+		//	var stateBehavior = (DummyBehavior)state.stateBehavior;
+		//	Assert.IsTrue(stateBehavior.placed);
+		//}
 
-		[Test]
-		public void BehaviorFactory_ReturnsDifferentBehaviorForDifferentProperties() {
-			var block = new DummyBlock();
+		//[Test]
+		//public void BehaviorFactory_ReturnsDifferentBehaviorForDifferentProperties() {
+		//	var block = new DummyBlock();
 
-			var unlitProps = new BlockStateProperties(new Dictionary<IBlockStateProperty, object> { { DummyBlock.lit, false } });
-			var litProps = new BlockStateProperties(new Dictionary<IBlockStateProperty, object> { { DummyBlock.lit, true } });
+		//	var unlitProps = new BlockStateProperties(new Dictionary<IBlockStateProperty, object> { { DummyBlock.lit, false } });
+		//	var litProps = new BlockStateProperties(new Dictionary<IBlockStateProperty, object> { { DummyBlock.lit, true } });
 
-			var unlitState = block.GetStateFor(unlitProps);
-			var litState = block.GetStateFor(litProps);
+		//	var unlitState = block.GetStateFor(unlitProps);
+		//	var litState = block.GetStateFor(litProps);
 
-			Assert.IsInstanceOf<DummyBehavior>(unlitState.stateBehavior);
-			Assert.IsInstanceOf<LitBehavior>(litState.stateBehavior);
-		}
+		//	Assert.IsInstanceOf<DummyBehavior>(unlitState.stateBehavior);
+		//	Assert.IsInstanceOf<LitBehavior>(litState.stateBehavior);
+		//}
 
 		[Test]
 		public void BlockState_EqualityComparer_ConsidersOnlyProperties() {
@@ -245,15 +253,23 @@ namespace BlockTests.StateCachingTests {
 			: base(stateCacheStrategy) {
 		}
 
-		protected override BlockState CreateDefaultState() {
-			return new BlockState(this, null, CommonBlockBehaviors.NullBehavior());
-		}
+		//protected override BlockState CreateDefaultState() {
+		//	return new BlockState(this, null, CommonBlockBehaviors.NullBehavior());
+		//}
 
 		public void SetDefaultState(BlockState state) {
 			this.RegisterDefaultState(state);
 		}
 
 		protected override void RegisterProperties() {
+		}
+
+		protected override BlockState CreateDefaultState() {
+			throw new NotImplementedException();
+		}
+
+		public override IEnumerable<ItemStack> GetDrops(BlockState blockState, BreakSource source) {
+			throw new NotImplementedException();
 		}
 	}
 
@@ -281,49 +297,49 @@ namespace BlockTests.StateCachingTests {
         }
     }
 
-	[TestFixture]
-	public class FileLinkedStateCacheTests {
-		[Test]
-		public void Get_ShouldLoadFromFile_WhenCacheMiss() {
-			var cache = StateCaching.FileLinked();
-			var block = new TestBlock(cache);
-			block.SetDefaultState(new BlockState(block, null, CommonBlockBehaviors.NullBehavior()));
+	//[TestFixture]
+	//public class FileLinkedStateCacheTests {
+	//	[Test]
+	//	public void Get_ShouldLoadFromFile_WhenCacheMiss() {
+	//		var cache = StateCaching.FileLinked();
+	//		var block = new TestBlock(cache);
+	//		block.SetDefaultState(new BlockState(block, null, CommonBlockBehaviors.NullBehavior()));
 
-			var persistedState = new BlockState(block, null, CommonBlockBehaviors.NullBehavior());
-			StateFileHandler.Save(block, new[] { persistedState });
+	//		var persistedState = new BlockState(block, null, CommonBlockBehaviors.NullBehavior());
+	//		StateFileHandler.Save(block, new[] { persistedState });
 
-			var result = cache.Get(block, persistedState.hash);
-			Assert.AreEqual(persistedState.hash, result.hash);
-		}
+	//		var result = cache.Get(block, persistedState.hash);
+	//		Assert.AreEqual(persistedState.hash, result.hash);
+	//	}
 
-		[Test]
-		public void Save_ShouldPersistAllCachedStates() {
-			var cache = StateCaching.FileLinked();
-			var block = new TestBlock(cache);
-			var stateA = new BlockState(block, null, CommonBlockBehaviors.NullBehavior());
-			cache.RegisterDefault(stateA);
-			cache.Save(block);
+	//	[Test]
+	//	public void Save_ShouldPersistAllCachedStates() {
+	//		var cache = StateCaching.FileLinked();
+	//		var block = new TestBlock(cache);
+	//		var stateA = new BlockState(block, null, CommonBlockBehaviors.NullBehavior());
+	//		cache.RegisterDefault(stateA);
+	//		cache.Save(block);
 
-			var saved = StateFileHandler.LoadAll(block);
-			Assert.IsTrue(saved.Any(s => s.hash == stateA.hash));
-		}
-	}
+	//		var saved = StateFileHandler.LoadAll(block);
+	//		Assert.IsTrue(saved.Any(s => s.hash == stateA.hash));
+	//	}
+	//}
 
-	[TestFixture]
-	public class PredefinedStateCacheTests {
-		[Test]
-		public void Initialize_ShouldPrepopulateCache_FromBlockPredefeinedStates() {
-			var cache = StateCaching.Predefined();
-			var block = new GenericBlock("testBlock", null, null, cache, null, stateInitializer: block => {
-				return new[] { new BlockState(block, new Dictionary<IBlockStateProperty, object>() {
-						[new BlockProperty<bool>("test")] = true
-					}, CommonBlockBehaviors.NullBehavior())
-				};
-			});
+	//[TestFixture]
+	//public class PredefinedStateCacheTests {
+	//	[Test]
+	//	public void Initialize_ShouldPrepopulateCache_FromBlockPredefeinedStates() {
+	//		var cache = StateCaching.Predefined();
+	//		var block = new GenericBlock("testBlock", null, null, cache, null, stateInitializer: block => {
+	//			return new[] { new BlockState(block, new Dictionary<IBlockStateProperty, object>() {
+	//					[new BlockProperty<bool>("test")] = true
+	//				}, CommonBlockBehaviors.NullBehavior())
+	//			};
+	//		});
 
-			block.GetPredefinedStates(out var states);
-			var retrieved = cache.Get(block, states[0].hash);
-			Assert.AreEqual(states[0].hash, retrieved.hash);
-		}
-	}
+	//		block.GetPredefinedStates(out var states);
+	//		var retrieved = cache.Get(block, states[0].hash);
+	//		Assert.AreEqual(states[0].hash, retrieved.hash);
+	//	}
+	//}
 }

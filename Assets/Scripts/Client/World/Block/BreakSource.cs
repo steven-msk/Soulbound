@@ -1,4 +1,5 @@
 ﻿using SoulboundBackend.Client.ItemSystem;
+using SoulboundBackend.Common;
 
 #nullable enable
 
@@ -11,6 +12,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
         public override bool fromPlayer => true;
     }
 
+    [PROTOTYPICAL]
     public record TreeCollapseBreakSource(BreakSource origin) : BreakSource {
         public override bool fromPlayer => origin.fromPlayer;
     }

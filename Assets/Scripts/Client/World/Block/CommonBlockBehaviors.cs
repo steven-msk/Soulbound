@@ -5,6 +5,7 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
+	[Obsolete]
 	public static class CommonBlockBehaviors {
 		public delegate Vector2 DropForce();
 		public delegate List<ItemStack> DropsGetter(BlockState blockState, BreakSource breakSource);

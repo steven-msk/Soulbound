@@ -19,12 +19,11 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		static readonly Logger logger = Logger.CreateInstance();
 		public Block block { get; }
 		public BlockStateProperties properties { get; }
-		public IBlockStateBehavior stateBehavior { get; }
+
 		public int hash => this.GetHashCode();
 
-		public BlockState(Block block, Dictionary<IBlockStateProperty, object>? properties, IBlockStateBehavior stateBehavior) {
+		public BlockState(Block block, Dictionary<IBlockStateProperty, object>? properties) {
 			this.block = block ?? Blocks.air;
-			this.stateBehavior = stateBehavior;
 
 			properties ??= new Dictionary<IBlockStateProperty, object>();
 			var unspecified = block!.propertyDefinitions.Where(p => !properties.ContainsKey(p));
@@ -36,22 +35,32 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		}
 
 		public static BlockState From(Block block, BlockStateProperties properties) {
-			return new(block, properties.CloneMappings(), block.CreateBehaviorFor(properties));
+			return new(block, properties.CloneMappings());
 		}
 
 		public void OnNeighborStateChanged(BlockPos selfPos, BlockPos neighborPos, BlockState oldState, BlockState newState) {
-			stateBehavior.OnNeighborStateChanged(selfPos, neighborPos, oldState, newState);
+			block.OnNeighborStateChanged(selfPos, neighborPos, oldState, newState);
+			//stateBehavior.OnNeighborStateChanged(selfPos, neighborPos, oldState, newState);
 		}
 
 		public void DropOnBroken(BlockPos pos, BreakSource source) {
-			if (block != Blocks.air) {
-				List<ItemStack> itemsDropped = stateBehavior.GetDrops(this, source);
-				Vector2 dropForce = stateBehavior.dropForce;
-				itemsDropped.ForEach(itemStack => itemStack.Drop(pos.CenterAligned(), dropForce));
+			Vector2 dropForce = new(UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(2.5f, 3f));
+			var drops = block.GetDrops(this, source);
+
+			foreach (var stack in drops) {
+				stack.Drop(pos.CenterAligned(), dropForce);
 			}
+			//if (block != Blocks.air) {
+			//	List<ItemStack> itemsDropped = stateBehavior.GetDrops(this, source);
+			//	Vector2 dropForce = stateBehavior.dropForce;
+			//	itemsDropped.ForEach(itemStack => itemStack.Drop(pos.CenterAligned(), dropForce));
+			//}
 		}
 
-		public void OnPlace(BlockPos blockPos) => stateBehavior.OnPlace(blockPos, this);
+		[Obsolete]
+		public void OnPlace(BlockPos blockPos) {
+			//=> stateBehavior.OnPlace(blockPos, this);
+		}
 
 		public T Get<T>(BlockProperty<T> property) => (T)properties[property];
 

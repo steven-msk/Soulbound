@@ -67,9 +67,9 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			stateCacheStrategy.Initialize(this);
 		}
 
-		public override IBlockStateBehavior CreateBehaviorFor(BlockStateProperties properties) {
-			return behaviorFactory?.Invoke(properties) ?? base.CreateBehaviorFor(properties);
-		}
+		//public override IBlockStateBehavior CreateBehaviorFor(BlockStateProperties properties) {
+		//	return behaviorFactory?.Invoke(properties) ?? base.CreateBehaviorFor(properties);
+		//}
 
 		protected override void RegisterProperties() {
 			propertyRegisterer?.Invoke(this);			// null at initialization
@@ -77,7 +77,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 
 		protected override BlockState CreateDefaultState() {
 			return defaultStateGetter?.Invoke(this)		// null at initialization
-				?? new BlockState(this, null, CommonBlockBehaviors.DropSingle());
+				?? new BlockState(this, null);
 		}
 
 		public override bool GetPredefinedStates(out IReadOnlyList<BlockState> states) {
@@ -88,5 +88,9 @@ namespace SoulboundBackend.Client.World.BlockSystem {
         public override BlockState Place(ItemStack itemStack, BlockPos blockPos) {
             return placeFunction?.Invoke(this, itemStack, blockPos) ?? base.Place(itemStack, blockPos);
         }
+
+		public override IEnumerable<ItemStack> GetDrops(BlockState blockState, BreakSource source) {
+			throw new NotImplementedException();
+		}
 	}
 }

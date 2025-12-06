@@ -1,10 +1,12 @@
 ﻿using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.World.BlockSystem;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace SoulboundBackend.Client.World {
+	[Obsolete]
 	public interface IBlockStateBehavior {
 		// all of these method implementations are subject to change in the future
 

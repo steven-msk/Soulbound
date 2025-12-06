@@ -38,9 +38,13 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			states = new List<BlockState>();
 			return false;
 		}
+
 		public virtual BlockState Place(ItemStack itemStack, BlockPos blockPos) {
 			return defaultState;
 		}
+		public virtual void OnNeighborStateChanged(BlockPos selfPos, BlockPos neighborPos, BlockState oldState, BlockState newState) {
+		}
+		public abstract IEnumerable<ItemStack> GetDrops(BlockState blockState, BreakSource source);
 
 		public void RegisterProperty<T>(BlockProperty<T> property, T defaultValue) {
 			if (propertyDefinitionTerminated) {
@@ -75,13 +79,15 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			return propertyMap.ContainsKey(property);
 		}
 
+		[Obsolete]
 		public BlockState WithProperty<T>(BlockState state, BlockProperty<T> property, T value) {
 			return state.With(property, value);
 		}
 
-		public virtual IBlockStateBehavior CreateBehaviorFor(BlockStateProperties properties) {
-			return defaultState.stateBehavior;
-		}
+		//[Obsolete]
+		//public virtual IBlockStateBehavior CreateBehaviorFor(BlockStateProperties properties) {
+		//	return defaultState.stateBehavior;
+		//}
 
 		internal int ComputeHash(object obj) => obj.GetHashCode();
 
