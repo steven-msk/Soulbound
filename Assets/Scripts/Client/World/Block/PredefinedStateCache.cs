@@ -23,7 +23,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
         public BlockState Get(Block block, BlockStateProperties properties) {
             int hash = properties.GetHashCode();
             if (!cache.TryGetValue(hash, out var state)) {
-                state = BlockState.From(block, properties);
+                //state = BlockState.From(block, properties);
                 cache[hash] = state;
             }
             return state;

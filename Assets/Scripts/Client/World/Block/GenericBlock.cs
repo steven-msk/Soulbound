@@ -6,6 +6,7 @@ using UnityEngine.Tilemaps;
 #nullable enable
 
 namespace SoulboundBackend.Client.World.BlockSystem {
+	[Obsolete]
 	public class GenericBlock : Block {
 		public override string name { get; }
 		public override TileBase tileReference { get; }
@@ -62,8 +63,8 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			}
 
 			// Register the actual default state
-			RegisterProperties();
-			RegisterDefaultState(CreateDefaultState());
+			//RegisterProperties();
+			//RegisterDefaultState(CreateDefaultState());
 			stateCacheStrategy.Initialize(this);
 		}
 
@@ -71,14 +72,14 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		//	return behaviorFactory?.Invoke(properties) ?? base.CreateBehaviorFor(properties);
 		//}
 
-		protected override void RegisterProperties() {
-			propertyRegisterer?.Invoke(this);			// null at initialization
-		}
+		//protected override void RegisterProperties() {
+		//	propertyRegisterer?.Invoke(this);			// null at initialization
+		//}
 
-		protected override BlockState CreateDefaultState() {
-			return defaultStateGetter?.Invoke(this)		// null at initialization
-				?? new BlockState(this, null);
-		}
+		//protected override BlockState CreateDefaultState() {
+		//	return defaultStateGetter?.Invoke(this)		// null at initialization
+		//		?? new BlockState(this, null);
+		//}
 
 		public override bool GetPredefinedStates(out IReadOnlyList<BlockState> states) {
 			states = stateInitializer?.Invoke(this) ?? new List<BlockState>();
@@ -90,6 +91,14 @@ namespace SoulboundBackend.Client.World.BlockSystem {
         }
 
 		public override IEnumerable<ItemStack> GetDrops(BlockState blockState, BreakSource source) {
+			throw new NotImplementedException();
+		}
+
+		protected override void RegisterProperties(BlockPropertyPool pool) {
+			throw new NotImplementedException();
+		}
+
+		protected override BlockState CreateDefaultState(BlockPropertyPool propertyPool) {
 			throw new NotImplementedException();
 		}
 	}

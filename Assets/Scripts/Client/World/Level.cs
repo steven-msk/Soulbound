@@ -270,9 +270,6 @@ namespace SoulboundBackend.Client.World {
 		}
 
 		public void BroadcastBlockEvent(BlockChangeInfo changeInfo, Action<BlockState?, BlockState?>? followUp = null) {
-			if (changeInfo.eventType == BlockEventType.Placed) {
-				changeInfo.newState?.OnPlace(changeInfo.blockPos);
-			}
 			followUp?.Invoke(changeInfo.oldState, changeInfo.newState);
 			BlockStateChanged?.Invoke(changeInfo);
 		}

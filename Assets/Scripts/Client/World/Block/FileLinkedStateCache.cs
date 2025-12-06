@@ -16,7 +16,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 
             state = StateFileHandler.LoadSingle(block, hash);
             if (state is null) {
-                state = BlockState.From(block, properties);
+                //state = BlockState.From(block, properties);
             }
 
             cache[hash] = state;

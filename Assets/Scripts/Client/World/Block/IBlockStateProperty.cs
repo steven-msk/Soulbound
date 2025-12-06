@@ -11,6 +11,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
     [JsonConverter(typeof(BlockPropertyJsonConverter))]
     public interface IBlockStateProperty {
         string name { get; }
+        Type valueType { get; }
     }
 
     class BlockPropertyJsonConverter : JsonConverter<IBlockStateProperty> {

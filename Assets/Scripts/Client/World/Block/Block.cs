@@ -16,24 +16,28 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public abstract BlockItem? itemReference { get; }
 		public virtual BreakRequirement? breakRequirement => null;
 
+		[Obsolete]
 		protected Dictionary<IBlockStateProperty, object> propertyMap = new();
+		[Obsolete]
 		public IList<IBlockStateProperty> propertyDefinitions => propertyMap.Keys.AsReadOnlyList();
+		[Obsolete]
 		public bool propertyDefinitionTerminated { get; protected set; } = false;
 		public IBlockStateCacheStrategy stateCacheStrategy { get; protected set; } = new StaticStateCache();
+		private readonly BlockPropertyPool propertyPool = new();
 
 		public BlockState defaultState { get; private set; }
 
 		protected Block(IBlockStateCacheStrategy stateCacheStrategy) {
 			this.stateCacheStrategy = stateCacheStrategy;
 
-			RegisterProperties();
+			RegisterProperties(propertyPool);
 			propertyDefinitionTerminated = true;
-			RegisterDefaultState(CreateDefaultState());
+			RegisterDefaultState(CreateDefaultState(propertyPool));
 			stateCacheStrategy.Initialize(this);
 		}
 
-		protected abstract void RegisterProperties();
-		protected abstract BlockState CreateDefaultState();
+		protected abstract void RegisterProperties(BlockPropertyPool pool);
+		protected abstract BlockState CreateDefaultState(BlockPropertyPool propertyPool);
 		public virtual bool GetPredefinedStates(out IReadOnlyList<BlockState> states) {
 			states = new List<BlockState>();
 			return false;
@@ -76,7 +80,8 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		}
 
 		public bool HasProperty(IBlockStateProperty property) {
-			return propertyMap.ContainsKey(property);
+			return propertyPool.Has(property.name);
+			//return propertyMap.ContainsKey(property);
 		}
 
 		[Obsolete]

@@ -11,6 +11,7 @@ using Unity.Plastic.Newtonsoft.Json;
 using Unity.VisualScripting;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
+	[Obsolete]
 	[JsonConverter(typeof(JsonDictionaryConverter<IBlockStateProperty, object>))]
 	public class BlockStateProperties : ReadOnlyDictionary<IBlockStateProperty, object> {
 		public BlockStateProperties() : this(new Dictionary<IBlockStateProperty, object>()) {

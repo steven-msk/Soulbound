@@ -18,24 +18,13 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 	public sealed class BlockState {
 		static readonly Logger logger = Logger.CreateInstance();
 		public Block block { get; }
-		public BlockStateProperties properties { get; }
+		private readonly BlockPropertyEntries properties;
 
 		public int hash => this.GetHashCode();
 
-		public BlockState(Block block, Dictionary<IBlockStateProperty, object>? properties) {
+		public BlockState(Block block, BlockPropertyEntries properties) {
 			this.block = block ?? Blocks.air;
-
-			properties ??= new Dictionary<IBlockStateProperty, object>();
-			var unspecified = block!.propertyDefinitions.Where(p => !properties.ContainsKey(p));
-			foreach (var property in unspecified) {
-				properties.Add(property, block.GetDefaultValueOfProperty(property));
-			}
-
-			this.properties = new BlockStateProperties(properties);
-		}
-
-		public static BlockState From(Block block, BlockStateProperties properties) {
-			return new(block, properties.CloneMappings());
+			this.properties = properties;
 		}
 
 		public void OnNeighborStateChanged(BlockPos selfPos, BlockPos neighborPos, BlockState oldState, BlockState newState) {
@@ -50,30 +39,11 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			foreach (var stack in drops) {
 				stack.Drop(pos.CenterAligned(), dropForce);
 			}
-			//if (block != Blocks.air) {
-			//	List<ItemStack> itemsDropped = stateBehavior.GetDrops(this, source);
-			//	Vector2 dropForce = stateBehavior.dropForce;
-			//	itemsDropped.ForEach(itemStack => itemStack.Drop(pos.CenterAligned(), dropForce));
-			//}
 		}
 
-		[Obsolete]
-		public void OnPlace(BlockPos blockPos) {
-			//=> stateBehavior.OnPlace(blockPos, this);
-		}
+		public T Get<T>(BlockProperty<T> property) => properties.Get<T>(property);
 
-		public T Get<T>(BlockProperty<T> property) => (T)properties[property];
-
-		public object Get(IBlockStateProperty property) => properties[property];
-
-		public object Get(string property) {
-			var target = properties.Keys.FirstOrDefault(p => p.name == property);
-			return properties[target] ?? default!;
-		}
-
-        public T Get<T>(string property) => (T)Get(property);
-
-        public BlockState With<T>(BlockProperty<T> property, T value) {
+		public BlockState With<T>(BlockProperty<T> property, T value) {
 			if (!block.HasProperty(property)) {
 				throw new InvalidOperationException($"Block {block.name} does not have property {property.name}");
 			}
@@ -81,53 +51,38 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			if (EqualityComparer<T>.Default.Equals(Get(property), value)) {
 				return this;
 			}
-
-			var newProperties = new BlockStateProperties(new Dictionary<IBlockStateProperty, object>() {
-				[property] = value!
-			});
-
-			return block.GetStateFor(newProperties);
+			return new BlockState(block, properties.With(property, value));
 		}
-
-		public BlockState With<T>(string property, T value) {
-			return With(new BlockProperty<T>(property), value);
-		}
-
-		public static bool operator ==(BlockState? state1, BlockState? state2) {
-			return state1 is not null && state2 is not null 
-				&& state1.block == state2.block
-				&& state1.properties == state2.properties;
-		}
-
-		public static bool operator !=(BlockState? state1, BlockState? state2) => !(state1! == state2!);
 
 		public override bool Equals(object obj) {
-			if (obj is BlockState other) {
-				return this == other;
-			}
-			return false;
+			return obj is BlockState other
+				&& other.block == this.block
+				&& other.properties == this.properties;
 		}
 
-		public override int GetHashCode() => properties.GetHashCode();
-
-		public override string ToString() {
-			return $"BlockState[{block.name}:{properties}]";
+		public override int GetHashCode() {
+			return HashCode.Combine(block, properties);
 		}
+
 
 		[JsonConverter(typeof(PersistencyInfo.PersistencyJsonConverter))]
 		public record PersistencyInfo(BlockStateProperties properties) {
 			public int hash => properties.GetHashCode();
 
+			[Obsolete]
 			public BlockState ToBlockState(Block block) {
-				return BlockState.From(block, properties);
+				//return BlockState.From(block, properties);
+				return default;
 			}
 
+			[Obsolete]
 			public static PersistencyInfo From(BlockState state) {
-				return new PersistencyInfo(state.properties);
+				//return new PersistencyInfo(state.properties_obsolete);
+				return default;
 			}
 
-            public class PersistencyJsonConverter : JsonConverter<PersistencyInfo> {
-                public override PersistencyInfo? ReadJson(JsonReader reader, Type objectType, PersistencyInfo? existingValue, bool hasExistingValue, JsonSerializer serializer) {
+			public class PersistencyJsonConverter : JsonConverter<PersistencyInfo> {
+				public override PersistencyInfo? ReadJson(JsonReader reader, Type objectType, PersistencyInfo? existingValue, bool hasExistingValue, JsonSerializer serializer) {
 					if (reader.TokenType == JsonToken.Null) {
 						return null;
 					}
@@ -157,17 +112,17 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 							object? primitiveValue = valueToken.ToObject<object>(serializer);
 							Type valueType = primitiveValue?.GetType() ?? typeof(object);
 
-                            Type propertyType = typeof(BlockProperty<>).MakeGenericType(valueType);
-                            IBlockStateProperty property = (IBlockStateProperty)Activator.CreateInstance(propertyType, kvp.Key);
+							Type propertyType = typeof(BlockProperty<>).MakeGenericType(valueType);
+							IBlockStateProperty property = (IBlockStateProperty)Activator.CreateInstance(propertyType, kvp.Key);
 
 							properties[property] = primitiveValue!; 
-                        }
+						}
 					}
 
 					return new PersistencyInfo(new BlockStateProperties(properties));
-                }
+				}
 
-                public override void WriteJson(JsonWriter writer, PersistencyInfo? value, JsonSerializer serializer) {
+				public override void WriteJson(JsonWriter writer, PersistencyInfo? value, JsonSerializer serializer) {
 					if (value == null) {
 						writer.WriteNull();
 						return;
@@ -181,14 +136,16 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 					foreach (var kvp in value.properties) {
 						writer.WritePropertyName(kvp.Key.name);
 						serializer.Serialize(writer, kvp.Value);
-                    }
+					}
 					writer.WriteEndObject();
 					writer.WriteEndObject();
-                }
-            }
-        }
+				}
+			}
+		}
 
+		[Obsolete]
 		public static class Serializer {
+			[Obsolete]
 			public static BlockState? Deserialize(JArray dataArray) {
 				if (dataArray.Count < 2) {
 					return null;
@@ -210,11 +167,13 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 				return block.defaultState;
 			}
 
+			[Obsolete]
 			public static JArray Serialize(BlockState state) {
 				int blockID = state.block.hashedID;
-				int stateHash = state.block.ComputeHash(state.properties);
+				//int stateHash = state.block.ComputeHash(state.properties_obsolete);
 
-				return new JArray { blockID, stateHash };
+				//return new JArray { blockID, stateHash };
+				return new();
 			}
 		}
 
