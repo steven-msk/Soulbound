@@ -54,7 +54,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			string path = GetFilePath(block);
 
 			var serialized = JsonConvert.SerializeObject(
-				states.Select(BlockState.PersistencyInfo.From).ToList(), 
+				states.Select(BlockState.CreatePersistencyInfo).ToList(), 
 				LevelManager.globalJsonSettings
 			);
 

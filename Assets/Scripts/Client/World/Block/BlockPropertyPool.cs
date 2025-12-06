@@ -18,7 +18,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public bool Has(string property) {
 			return pool.ContainsKey(property);
 		}
-		
+
 		public BlockProperty<T> Get<T>(string property) {
 			return (BlockProperty<T>)pool[property];
 		}
@@ -31,5 +31,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public override int GetHashCode() {
 			return pool.GetHashCode();
 		}
+
+		public BlockPropertyEntries CreateEntries() => new(this);
 	}
 }

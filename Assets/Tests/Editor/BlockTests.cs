@@ -58,7 +58,7 @@ public class DummyBehavior : IBlockStateBehavior {
 	private IBlockStateBehavior inner;
 	public bool placed { get; private set; }
 
-	public DummyBehavior() => inner = BlockSystem.CommonBlockBehaviors.DropSingle();
+	//public DummyBehavior() => inner = BlockSystem.CommonBlockBehaviors.DropSingle();
 
 	public List<ItemStack> GetDrops(BlockSystem.BlockState blockState, BreakSource source) {
 		return inner.GetDrops(blockState, source);

@@ -16,12 +16,6 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public abstract BlockItem? itemReference { get; }
 		public virtual BreakRequirement? breakRequirement => null;
 
-		[Obsolete]
-		protected Dictionary<IBlockStateProperty, object> propertyMap = new();
-		[Obsolete]
-		public IList<IBlockStateProperty> propertyDefinitions => propertyMap.Keys.AsReadOnlyList();
-		[Obsolete]
-		public bool propertyDefinitionTerminated { get; protected set; } = false;
 		public IBlockStateCacheStrategy stateCacheStrategy { get; protected set; } = new StaticStateCache();
 		private readonly BlockPropertyPool propertyPool = new();
 
@@ -31,7 +25,6 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			this.stateCacheStrategy = stateCacheStrategy;
 
 			RegisterProperties(propertyPool);
-			propertyDefinitionTerminated = true;
 			RegisterDefaultState(CreateDefaultState(propertyPool));
 			stateCacheStrategy.Initialize(this);
 		}
@@ -49,21 +42,6 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public virtual void OnNeighborStateChanged(BlockPos selfPos, BlockPos neighborPos, BlockState oldState, BlockState newState) {
 		}
 		public abstract IEnumerable<ItemStack> GetDrops(BlockState blockState, BreakSource source);
-
-		public void RegisterProperty<T>(BlockProperty<T> property, T defaultValue) {
-			if (propertyDefinitionTerminated) {
-				logger.LogWarning("Cancelled block property registration '{}' due to definition context termination", property.name);
-				return;
-			}
-			propertyMap.Add(property, defaultValue!);
-		}
-
-		public object GetDefaultValueOfProperty(IBlockStateProperty property) {
-			if (!this.HasProperty(property)) {
-				return null!;
-			}
-			return propertyMap[property];
-		}
 
 		protected void RegisterDefaultState(BlockState state) {
 			defaultState = state;

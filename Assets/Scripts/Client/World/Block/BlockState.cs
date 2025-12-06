@@ -19,7 +19,6 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		static readonly Logger logger = Logger.CreateInstance();
 		public Block block { get; }
 		private readonly BlockPropertyEntries properties;
-
 		public int hash => this.GetHashCode();
 
 		public BlockState(Block block, BlockPropertyEntries properties) {
@@ -29,7 +28,6 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 
 		public void OnNeighborStateChanged(BlockPos selfPos, BlockPos neighborPos, BlockState oldState, BlockState newState) {
 			block.OnNeighborStateChanged(selfPos, neighborPos, oldState, newState);
-			//stateBehavior.OnNeighborStateChanged(selfPos, neighborPos, oldState, newState);
 		}
 
 		public void DropOnBroken(BlockPos pos, BreakSource source) {
@@ -64,23 +62,20 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			return HashCode.Combine(block, properties);
 		}
 
+		public static PersistencyInfo CreatePersistencyInfo(BlockState state) {
+			return new(state.properties);
+		}
 
+		[Obsolete]
 		[JsonConverter(typeof(PersistencyInfo.PersistencyJsonConverter))]
-		public record PersistencyInfo(BlockStateProperties properties) {
+		public record PersistencyInfo(BlockPropertyEntries properties) {
 			public int hash => properties.GetHashCode();
 
-			[Obsolete]
 			public BlockState ToBlockState(Block block) {
-				//return BlockState.From(block, properties);
-				return default;
+				return new BlockState(block, properties);
 			}
 
 			[Obsolete]
-			public static PersistencyInfo From(BlockState state) {
-				//return new PersistencyInfo(state.properties_obsolete);
-				return default;
-			}
-
 			public class PersistencyJsonConverter : JsonConverter<PersistencyInfo> {
 				public override PersistencyInfo? ReadJson(JsonReader reader, Type objectType, PersistencyInfo? existingValue, bool hasExistingValue, JsonSerializer serializer) {
 					if (reader.TokenType == JsonToken.Null) {
@@ -119,7 +114,8 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 						}
 					}
 
-					return new PersistencyInfo(new BlockStateProperties(properties));
+					//return new PersistencyInfo(new BlockStateProperties(properties));
+					return default;
 				}
 
 				public override void WriteJson(JsonWriter writer, PersistencyInfo? value, JsonSerializer serializer) {
@@ -133,10 +129,10 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 					serializer.Serialize(writer, value.hash);
 					writer.WritePropertyName("properties");
 					writer.WriteStartObject();
-					foreach (var kvp in value.properties) {
-						writer.WritePropertyName(kvp.Key.name);
-						serializer.Serialize(writer, kvp.Value);
-					}
+					//foreach (var kvp in value.properties) {
+					//	writer.WritePropertyName(kvp.Key.name);
+					//	serializer.Serialize(writer, kvp.Value);
+					//}
 					writer.WriteEndObject();
 					writer.WriteEndObject();
 				}

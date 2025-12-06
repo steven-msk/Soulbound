@@ -10,6 +10,8 @@ using static Unity.Collections.AllocatorManager;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
 	public class LeafBlock : Block {
+		public BlockProperty<bool> persistent;
+
 		public LeafBlock() : base(StateCaching.Predefined()) {
 		}
 
@@ -21,31 +23,19 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 
 		public override BreakRequirement breakRequirement => new BreakRequirement(0, ToolType.All, 10);
 
-		//protected override BlockState CreateDefaultState() {
-		//	Func<BlockState, BreakSource, bool> dropPredicate = (blockState, breakSource) => {
-		//		return breakSource is PlayerToolBreakSource || blockState.Get<bool>("persistent");
-		//	};
-		//	return new BlockState(this, null);
-		//}
-
-		//protected override void RegisterProperties() {
-		//	RegisterProperty(new BlockProperty<bool>("persistent"), false);
-		//}
-
-		//public override BlockState Place(ItemStack itemStack, BlockPos blockPos) {
-		//	return defaultState.With_obsolete("persistent", true);
-		//}
-
 		public override IEnumerable<ItemStack> GetDrops(BlockState blockState, BreakSource source) {
-			throw new NotImplementedException();
+			if (blockState.Get(persistent)) {
+				yield break;
+			}
+			yield return new(itemReference, 1);
 		}
 
 		protected override BlockState CreateDefaultState(BlockPropertyPool propertyPool) {
-			throw new NotImplementedException();
+			return new(this, propertyPool.CreateEntries().With(persistent, true));
 		}
 
 		protected override void RegisterProperties(BlockPropertyPool pool) {
-			throw new NotImplementedException();
+			persistent = pool.Register<bool>("persistent");
 		}
 	}
 }
