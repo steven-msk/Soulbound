@@ -4,6 +4,7 @@ using SoulboundBackend.Client.World.EntitySystem.SpawnData;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core;
 using System;
+using UnityEditor.Profiling;
 using UnityEngine;
 using Logger = SoulboundBackend.Common.Logging.Logger;
 
@@ -13,7 +14,6 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 		public const float defaultLifespanSeconds = 120f;           // TODO: decide on a dropped item lifespan duration
 		public override EntityDescriptor descriptor => EntityDescriptorRegistry.ByType<DroppedItem>();
 		public override Type scriptType => typeof(DroppedItem);
-		public override string prefabDefinitionID => "droppedItem";
 		public ItemStack itemStack { get; private set; }
 		public override Facing facing => Facing.Left;
 
@@ -61,25 +61,26 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 			groundCollider.excludeLayers = ~LayerMask.GetMask("Ground");
 		}
 
+		public override SerializedEntity Serialize() {
+			var serialized = base.Serialize();
 
-		//public override ComponentSerializer GetSerializedProperties() {
-		//	return new ComponentSerializer()
-		//		.Add("itemStack", this.ItemStack)
-		//		.Add("pickupDelay", this.pickupDelay)
-		//		.Add("pickupTimer", this.pickupTimer)
-		//		.Add("despawnTimer", this.despawnTimer)
-		//		.Add("isFrozen", this.isFrozen)
-		//		.Add("flag_pickupLocked", this.flag_pickupLocked);
-		//}
+			var properties = SerializedEntityPropertyList.From(serialized.properties);
+			properties.Set(nameof(despawnTimer), despawnTimer);
+			properties.Set(nameof(itemStack), itemStack);
+			properties.Set(nameof(isFrozen), isFrozen);
+			serialized.properties = properties;
 
-		//public override void ApplySerializedProperties(ComponentSerializer properties) {
-		//	this.ItemStack = properties.Get<ItemStack>("itemStack");
-		//	this.pickupDelay = properties.Get<float>("pickupDelay");
-		//	this.pickupTimer = properties.Get<float>("pickupTimer");
-		//	this.despawnTimer = properties.Get<float>("despawnTimer");
-		//	this.isFrozen = properties.Get<bool>("isFrozen");
-		//	this.flag_pickupLocked = properties.Get<bool>("flag_pickupLocked");
-		//}
+			return serialized;
+		}
+
+		public override void Deserialize(SerializedEntity serialized) {
+			base.Deserialize(serialized);
+			var properties = SerializedEntityPropertyList.From(serialized.properties);
+			this.despawnTimer = properties.Get<float>(nameof(despawnTimer));
+			this.itemStack = properties.Get<ItemStack>(nameof(itemStack));
+			this.ApplyIcon(itemStack.item.aspect.icon);
+			this.isFrozen = properties.Get<bool>(nameof(isFrozen));
+		}
 
 		private void OnTriggerStay2D(Collider2D collision) {
 			if (pickupTimer <= 0 && !flag_pickupLocked) {

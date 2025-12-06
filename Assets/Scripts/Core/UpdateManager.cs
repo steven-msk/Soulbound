@@ -24,7 +24,8 @@ namespace SoulboundBackend.Core {
 
 		private void Update() {
 			var deltaTime = Time.deltaTime;
-			foreach (var updatable in updatables) {
+			var clone = new List<IUpdatable>(updatables);
+			foreach (var updatable in clone) {
 				updatable.FrameUpdate(deltaTime);
 			}
 		}

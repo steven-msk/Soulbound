@@ -12,8 +12,8 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 		public EntityManager manager { get; private set; }
 		public abstract Type scriptType { get; }
 		public Guid id { get; private set; }
-		public abstract string prefabDefinitionID { get; }
 		public Vector2 position { get => transform.position; set => transform.position = value; }
+		public bool isDeserialized { get; protected set; }
 		protected const float minSignificantFacingAngleDeg = 10f;
 		public virtual Facing facing {
 			get {
@@ -39,7 +39,7 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 			foreach (var component in GetComponents<ISerializableComponent>()) {
 				component.Save(properties);
 			}
-			return new SerializedEntity(scriptType, id, prefabDefinitionID, position, properties);
+			return new SerializedEntity(scriptType, id, descriptor.ID, position, properties);
 		}
 
 		public virtual void Deserialize(SerializedEntity serialized) {
@@ -49,6 +49,7 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 			foreach (var component in GetComponents<ISerializableComponent>()) {
 				component.Read(properties);
 			}
+			this.isDeserialized = true;
 		}
 
 		protected static float NormalizeAngle(float angle) {

@@ -20,7 +20,6 @@ using Assert = NUnit.Framework.Assert;
 
 public class MockEntity : Entity, ITickable, IChunkListener, IEntitySpawnable<MockSpawnData> {
 	public override Type scriptType => typeof(MockEntity);
-	public override string prefabDefinitionID => "mock_entity";
 	public override Facing facing => new Facing(1f);
 
 	public override EntityDescriptor descriptor => throw new NotImplementedException();

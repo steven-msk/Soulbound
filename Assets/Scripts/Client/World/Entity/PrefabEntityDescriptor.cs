@@ -14,6 +14,7 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 		public PrefabEntityDescriptor(string id, string name, string prefabId, Func<string, GameObject> resourceSelector)
 			: base(id, name) {
 			this.prefabId = prefabId;
+			this.resourceSelector = resourceSelector;
 		}
 
 		public PrefabEntityDescriptor(string id, string name, string prefabId)

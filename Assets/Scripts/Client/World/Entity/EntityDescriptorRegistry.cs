@@ -16,7 +16,7 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 			typeof(PlayerController)
 		);
 		private static readonly EntityDescriptor droppedItem = Register(
-			new PrefabEntityDescriptor("entity.droppedItem", nameof(DroppedItem), "droppedIem"),
+			new PrefabEntityDescriptor("entity.droppedItem", nameof(DroppedItem), "droppedItem"),
 			typeof(DroppedItem)
 		);
 		
