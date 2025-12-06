@@ -19,7 +19,7 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 			int cx = ChunkWorldPos.FromWorld(entity.position).chunkX;
 			entitiesByChunk[entity] = cx;
 
-			if (level.IsChunkLoaded(cx) && !entity.isDeserialized) {
+			if (level.IsChunkLoaded(cx)) {
 				(entity as IChunkListener)?.OnEnteredChunk(level.ToChunk(cx));
 			}
 		}

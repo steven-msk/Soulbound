@@ -158,16 +158,6 @@ namespace SoulboundBackend.Core {
 			//entityManager.OnChunkUnloaded(chunk);
 		}
 
-		[Obsolete]
-		public void SpawnEntity(Entity entity, EntitySpawnData spawnData) {
-			//entityManager.Spawn(entity, spawnData);
-		}
-
-		[Obsolete]
-		public void RemoveEntityImmediately(Entity entity, bool destroy) {
-			//entityManager.RemoveEntityImmediately(entity, destroy);
-		}
- 
 		private void OnEscPressed() {
 			if (UIManager.OnEscPressed()) {
 				TogglePause();

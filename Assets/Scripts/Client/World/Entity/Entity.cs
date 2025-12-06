@@ -13,7 +13,6 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 		public abstract Type scriptType { get; }
 		public Guid id { get; private set; }
 		public Vector2 position { get => transform.position; set => transform.position = value; }
-		public bool isDeserialized { get; protected set; }
 		protected const float minSignificantFacingAngleDeg = 10f;
 		public virtual Facing facing {
 			get {
@@ -49,7 +48,6 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 			foreach (var component in GetComponents<ISerializableComponent>()) {
 				component.Read(properties);
 			}
-			this.isDeserialized = true;
 		}
 
 		protected static float NormalizeAngle(float angle) {

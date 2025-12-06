@@ -23,6 +23,5 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 			}
 		}
 
-		public override SpawnDataValue ToSpawnDataValue() => new SpawnDataValue<T>(value);
 	}
 }

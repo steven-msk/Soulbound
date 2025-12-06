@@ -52,9 +52,7 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 			entity.InitState(assigned, this);
 			all.Add(assigned, entity);
 
-			foreach (var subsystem in subsystems) {
-				subsystem.AddEntity(entity);
-			}
+			AddToSubsystems(entity);
 		}
 
 		public void Spawn(Entity entity) {
@@ -62,16 +60,18 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 			this.AddEntity(entity, id);
 		}
 
-		public void Spawn(EntityDescriptor descriptor) {
+		public Entity Spawn(EntityDescriptor descriptor) {
 			var entity = descriptor.CreateInstance();
 			this.Spawn(entity);
+			return entity;
 		}
 
-		public void Spawn<TEntity, TData>(EntityDescriptor descriptor, TData spawnData)
+		public Entity Spawn<TEntity, TData>(EntityDescriptor descriptor, TData spawnData)
 				where TEntity : Entity, IEntitySpawnable<TData>
 				where TData : ISpawnData {
 			TEntity entity = (TEntity)descriptor.CreateInstance();
 			this.Spawn(entity, spawnData);
+			return entity;
 		}
 
 		public void Spawn<TEntity, TData>(TEntity entity, TData spawnData)
@@ -87,11 +87,9 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 
 			entity.InitState(serializedEntity.id, this);
 			entity.Deserialize(serializedEntity);
-			foreach (var subsystem in subsystems) {
-				subsystem.AddEntity(entity);
-			}
-			all.Add(entity.id, entity);
+			AddToSubsystems(entity);
 
+			all.Add(entity.id, entity);
 			return (T)entity;
 		}
 
@@ -100,13 +98,11 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 				where TData : ISpawnData {
 			var descriptor = EntityDescriptorRegistry.ByID(serializedEntity.descriptorID);
 			var entity = (TEntity)descriptor.CreateInstance();
-			entity.ApplySpawnData(spawnData);
 
 			entity.InitState(serializedEntity.id, this);
 			entity.Deserialize(serializedEntity);
-			foreach (var subsystem in subsystems) {
-				subsystem.AddEntity(entity);
-			}
+			entity.ApplySpawnData(spawnData);
+			AddToSubsystems(entity);
 
 			all.Add(entity.id, entity);
 			return entity;
@@ -131,6 +127,16 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 
 		public bool GetEntityByID(Guid id, out Entity entity) {
 			return all.TryGetValue(id, out entity);
+		}
+
+		private void AddToSubsystems(Entity entity) {
+			foreach (var subsystem in subsystems) {
+				subsystem.AddEntity(entity);
+			}
+		}
+
+		public void AddSubsystem(IEntitySubsystem subsystem) {
+			this.subsystems.Add(subsystem);
 		}
 	}
 }
