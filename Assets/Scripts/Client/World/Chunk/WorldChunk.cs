@@ -21,7 +21,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 		public const float SURFACE_HEIGHT_RANGE = 50f;
 		public const float UNDERGROUND_HEIGHT_RANGE = 20f;
 
-		private readonly BlockState[][] blockStates = new BlockState[Level.CHUNK_LENGTH][];
+		private readonly int[][] stateHashes = new int[Level.CHUNK_LENGTH][];
 		private readonly TileEntity[][] tileEntities = new TileEntity[Level.CHUNK_LENGTH][];
 		private readonly TileEntityTickManager tickManager = new();
 		private ChunkHeightmapData heightmapData;
@@ -32,8 +32,8 @@ namespace SoulboundBackend.Client.World.Chunk {
 		public WorldChunk(int cx) { 
 			this.cx = cx;
 			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
-				blockStates[x] = new BlockState[Level.WORLD_HEIGHT];
 				tileEntities[x] = new TileEntity[Level.WORLD_HEIGHT];
+				stateHashes[x] = new int[Level.WORLD_HEIGHT];
 			}
 		}
 
@@ -65,7 +65,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 					} else {
 						blockState = Blocks.stone.defaultState;
 					}
-					blockStates[x][yIndex] = blockState;
+					stateHashes[x][yIndex] = blockState.stateHash;
 				}
 			}
 
@@ -84,10 +84,11 @@ namespace SoulboundBackend.Client.World.Chunk {
 			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
 				for (int y = minY; y < maxY; y++) {
 					int yIndex = WorldYToIndex(y);
-					BlockState blockState = blockStates[x][yIndex];
+					int stateHash = stateHashes[x][yIndex];
 
-					if (blockState != null) {
-						tilemap.SetTile(new Vector3Int(xStart + x, y), blockState.block.tileReference);
+					if (stateHash != 0) {
+						BlockState state = BlockStateRegistry.Get(stateHash);
+						tilemap.SetTile(new Vector3Int(xStart + x, y), state.block.tileReference);
 					} else {
 						UnityEngine.Debug.LogError($"Attempted to render ungenerated terrain! {new ChunkBlockPos(x, y, this.cx).ToString()}");
 					}
@@ -124,7 +125,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 			var yIndex = WorldYToIndex(chunkPos.y);
 			Block block = blockState.block;
 
-			blockStates[xIndex][yIndex] = blockState;
+			stateHashes[xIndex][yIndex] = blockState.stateHash;
 			if (block.hasTileEntity) {
 				TileEntity tileEntity = block.GetTileEntity(this, chunkPos.ToBlockPos());
 				
@@ -137,16 +138,20 @@ namespace SoulboundBackend.Client.World.Chunk {
 			}
 		}
 
-		public BlockState BlockStateAt(ChunkBlockPos chunkPos) { 
-			return blockStates[chunkPos.x][WorldYToIndex(chunkPos.y)];
+		public BlockState BlockStateAt(ChunkBlockPos chunkPos) {
+			int stateHash = stateHashes[chunkPos.x][WorldYToIndex(chunkPos.y)];
+			if (BlockStateRegistry.TryGet(stateHash, out var state)) {
+				return state;
+			}
+			return Blocks.air.defaultState;
 		}
 
-		private void ParseDeserialized(BlockState[][] states) {
+		private void ParseDeserialized(int[][] stateHashes) {
 			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
 				for (int y = minY; y < maxY; y++) {
 					int yIndex = WorldYToIndex(y);
 
-					blockStates[x][yIndex] = states[x][yIndex];
+					this.stateHashes[x][yIndex] = stateHashes[x][yIndex];
 				}
 			}
 		}
@@ -168,23 +173,22 @@ namespace SoulboundBackend.Client.World.Chunk {
 				int xpos = obj["xpos"].Value<int>();
 				ChunkHeightmapData heightmap = obj["heightmapData"].ToObject<ChunkHeightmapData>(serializer);
 				JArray rows = (JArray)obj["blockStates"];
-				BlockState[][] blockStates = new BlockState[rows.Count][];
+				int[][] stateHashes = new int[rows.Count][];
 
 				for (int x = 0; x < rows.Count; x++) {
 					JArray row = (JArray)rows[x];
-					blockStates[x] = new BlockState[row.Count];
+					stateHashes[x] = new int[row.Count];
 
 					for (int y = 0; y < row.Count; y++) {
 						int hash = row[y].Value<int>();
-
-						blockStates[x][y] = BlockState.Serializer.ToState(hash);
+						stateHashes[x][y] = hash;
 					}
 				}
 
 				WorldChunk chunk = new(xpos) {
 					heightmapData = heightmap,
 				};
-				chunk.ParseDeserialized(blockStates);
+				chunk.ParseDeserialized(stateHashes);
 				return chunk;
 			}
 
@@ -202,10 +206,10 @@ namespace SoulboundBackend.Client.World.Chunk {
 
 				writer.WritePropertyName("blockStates");
 				writer.WriteStartArray();
-				foreach (var row in value.blockStates) {
+				foreach (var row in value.stateHashes) {
 					writer.WriteStartArray();
-					foreach (var blockState in row) {
-						serializer.Serialize(writer, blockState);
+					foreach (var stateHash in row) {
+						writer.WriteValue(stateHash);
 					}
 					writer.WriteEndArray();
 				}

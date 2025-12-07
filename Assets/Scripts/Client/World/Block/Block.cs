@@ -13,7 +13,7 @@ using UnityEngine.Tilemaps;
 namespace SoulboundBackend.Client.World.BlockSystem {
 	public abstract partial class Block {
 		private static readonly Logger logger = Logger.CreateInstance();
-		public string id { get; private set; }
+		public string id { get; private set; } = null!;
 		public abstract string name { get; init; }
 		public abstract TileBase tileReference { get; init; }
 		public abstract BlockItem? itemReference { get; init; }
@@ -22,7 +22,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		private Dictionary<int, BlockState> statesByHash = new();
 		private readonly BlockPropertyPool propertyPool = new();
 
-		public BlockState defaultState { get; private set; }
+		public BlockState defaultState { get; private set; } = null!;
 		public virtual bool hasTileEntity { get; protected set; } = false;
 
 		protected Block(string id) => this.ConstructNonGeneric(id);
@@ -47,7 +47,6 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 
 			stateRegisterer.Register(defaultState);
 			statesByHash = stateRegisterer.PostAll();
-
 		}
 
 		protected abstract void RegisterProperties(BlockPropertyPool pool);
@@ -75,10 +74,11 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 
 		public override string ToString() {
 			return $"Block[" +
-				$"name:{name}, " +
-				$"tileReference:{tileReference}, " +
-				$"itemReference:{itemReference}, " +
-				$"propertyPool:{propertyPool}]";
+				$"name:'{name}', " +
+				$"tileReference:'{tileReference}', " +
+				$"itemReference:'{itemReference}', " +
+				$"propertyPool:[{propertyPool}]]";
+
 		}
 	}
 }

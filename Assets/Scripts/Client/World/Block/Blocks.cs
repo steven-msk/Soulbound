@@ -28,6 +28,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public static readonly Block wood = new GenericBlock("wood", "Wood", Tile("wood"), Items.woodBlock, new BreakRequirement(0, ToolType.None, 10));
 		public static readonly Block leaves = new LeafBlock();
 
+		[Obsolete]
 		static Blocks() {
 			foreach (var property in typeof(Blocks).GetProperties(BindingFlags.Static | BindingFlags.Public)) {
 				var cacheAttribute = property.GetCustomAttribute<BlockCache>();
@@ -37,13 +38,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			}
 		}
 
-		private static Block Register(string id, Block block) {
-			int hashed = HashHelper.StableHash(id);
-			block.hashedID = hashed;
-			blocksByHashedId[hashed] = block;
-			return block;
-		}
-
+		[Obsolete]
 		private static TBlock Lookup<TBlock>(Func<TBlock> instanceSupplier, [CallerMemberName] string propertyName = null) where TBlock : Block {
 			return (TBlock)ICachedRegistry<Block>.Lookup(propertyName, instanceSupplier);
 		}
@@ -52,6 +47,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			return IResourceModule.Resource<TileBase, ResourceGroups.Tiles>(name);
 		}
 
+		[Obsolete]
 		public static Block ByHashedID(int hashedID) {
 			//if (ICachedRegistry<Block>.cached.TryGetValue(hashedID, out Block block)) {
 			//	return block;
