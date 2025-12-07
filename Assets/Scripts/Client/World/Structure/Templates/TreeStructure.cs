@@ -110,7 +110,7 @@ namespace SoulboundBackend.Client.World.Structure.Templates {
 
 					toRemove.ToList().ForEach(stateOverride => {
 						structure.stateOverrides.Remove(stateOverride.Key);
-						level.BreakBlock(stateOverride.Key.ToWorldBlockPos(), treeCollapseSource);
+						level.BreakBlock(stateOverride.Key.ToBlockPos(), treeCollapseSource);
 					});
 				}
 			}).Build();

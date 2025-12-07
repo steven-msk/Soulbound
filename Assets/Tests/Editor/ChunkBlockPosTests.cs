@@ -60,7 +60,7 @@ public class ChunkBlockPosTests {
         const int CHUNK_LENGTH = Level.CHUNK_LENGTH;
         var pos = new ChunkBlockPos(5, 10, 2);
 
-        var worldBlock = pos.ToWorldBlockPos();
+        var worldBlock = pos.ToBlockPos();
 
         Assert.AreEqual(5 + 2 * CHUNK_LENGTH, worldBlock.x);
         Assert.AreEqual(10, worldBlock.y);

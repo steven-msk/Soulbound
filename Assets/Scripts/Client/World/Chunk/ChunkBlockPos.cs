@@ -16,7 +16,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 			this.chunkX = chunkX;
 		}
 
-        public WorldChunk UnderlyingChunk(Level level) => level.ChunkAt(this.ToWorldBlockPos());
+        public WorldChunk UnderlyingChunk(Level level) => level.ChunkAt(this.ToBlockPos());
 
         public static ChunkBlockPos FromBlockPos(BlockPos blockPos) {
 			int chunkX = Mathf.FloorToInt((float)blockPos.x / Level.CHUNK_LENGTH);
@@ -36,7 +36,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 
 		public override string ToString() => $"cx:{x}, cy:{y}, c:{chunkX}";
 
-		public BlockPos ToWorldBlockPos() => new BlockPos(this.x + this.chunkX * Level.CHUNK_LENGTH, this.y);
+		public BlockPos ToBlockPos() => new BlockPos(this.x + this.chunkX * Level.CHUNK_LENGTH, this.y);
 
 		public int WorldYToIndex() => WorldYToIndex(this.y);
 

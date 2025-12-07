@@ -12,7 +12,10 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 	public class LeafBlock : Block {
 		public BlockProperty<bool> persistent;
 
-		public override string name => "Leaves";
+		public LeafBlock() : base("leaves") {
+		}
+
+		public override string name { get; } = "Leaves";
 
 		public override TileBase tileReference => ResourceManager.Get<TileBase, ResourceGroups.Tiles>("leaves");
 

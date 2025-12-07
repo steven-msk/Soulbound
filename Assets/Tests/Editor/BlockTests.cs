@@ -14,11 +14,14 @@ using UnityEngine.Tilemaps;
 using BlockSystem = SoulboundBackend.Client.World.BlockSystem;
 
 public class DummyBlock : BlockSystem.Block {
-	public override string name => "dummy_block";
+	public override string name { get; } = "dummy_block";
 	public override TileBase tileReference => null;
 	public override BlockItem itemReference => null;
 
 	public static readonly BlockSystem.BlockProperty<bool> lit = new("lit");
+
+	public DummyBlock() : base("dummy_block") {
+	}
 
 	//protected override void RegisterProperties() {
 	//	propertyMap.Add(lit, false);
@@ -250,7 +253,10 @@ namespace BlockTests {
 
 namespace BlockTests.StateCachingTests {
 	internal class TestBlock : Block {
-		public override string name => "testBlock";
+		public TestBlock() : base("testBlock") {
+		}
+
+		public override string name { get; } = "testBlock";
 		public override TileBase tileReference => null;
 		public override BlockItem itemReference => null;
 

@@ -37,7 +37,7 @@ namespace SoulboundBackend.Core {
 		private InputHandler inputHandler = null!;
 		private PlayerInputActions inputMappings = null!;
 		public string world { get; private set; } = null!;
-		public Level? level { get; private set; }
+		public Level level { get; private set; } = null!;
 		public PlayerController? player { get; private set; }
 
 		public UIManager UIManager => GameObject.Find("Canvas").GetComponent<UIManager>();
@@ -87,6 +87,7 @@ namespace SoulboundBackend.Core {
 			container.BindInstance<Level>(level).AsSingle();
 			container.BindInstance<EntityManager>(entityManager).AsSingle();
 			onLevelLoaded?.Invoke(level);
+			StartCoroutine(GameTickLoop());
 		}
 
 		public void SpawnPlayer(SerializedEntity? serialized) {
@@ -110,9 +111,7 @@ namespace SoulboundBackend.Core {
 		}
 
 		private void Update() {
-			if (player?.isSpawned ?? false) {
-				level.UpdateChunks(player.position);
-			}
+			level?.UpdateChunks(player?.position ?? new Vector2(0f, 0f));
 			entityManager?.Update(Time.deltaTime);
 		}
 
@@ -123,6 +122,7 @@ namespace SoulboundBackend.Core {
 					StartTick();
 					// do things
 					entityManager.Tick();
+					level.Tick();
 					// TODO: implement proper ticking system
 					EndTick();
 				}

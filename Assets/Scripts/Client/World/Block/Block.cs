@@ -1,5 +1,6 @@
 ﻿using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.World.Chunk;
+using SoulboundBackend.Common;
 using SoulboundBackend.Common.Logging;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,9 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public BlockState defaultState { get; private set; }
 		public virtual bool hasTileEntity { get; protected set; } = false;
 
-		protected Block() {
+		protected Block(string id) {
+			this.hashedID = HashHelper.StableHash(id);
+
 			RegisterProperties(propertyPool);
 			defaultState = CreateDefaultState(propertyPool);
 

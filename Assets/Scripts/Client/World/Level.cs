@@ -17,7 +17,7 @@ using Logger = SoulboundBackend.Common.Logging.Logger;
 #nullable enable
 
 namespace SoulboundBackend.Client.World {
-	public class Level {
+	public sealed class Level : ITickable {
 		private static readonly Logger logger = Logger.CreateInstance();
 		public static readonly LogModule level = new LogModule("LEVEL", "#4682B4");
 		public const int CHUNK_LENGTH = 32;
@@ -77,6 +77,12 @@ namespace SoulboundBackend.Client.World {
 			this.UpdateChunks(spawnPoint);
 
 			isWorldLoaded = true;
+		}
+
+		public void Tick() {
+			foreach (var chunk in loadedChunks.Values) {
+				chunk.Tick();
+			}
 		}
 
 		public Vector2 GetWorldSpawnPoint() {
@@ -253,7 +259,7 @@ namespace SoulboundBackend.Client.World {
 		}
 
 		public void SetBlock(ChunkBlockPos chunkBlockPos, BlockState? blockState) {
-			SetBlock(chunkBlockPos.ToWorldBlockPos(), blockState);
+			SetBlock(chunkBlockPos.ToBlockPos(), blockState);
 		}
 
 		public void PlaceBlock(BlockPos blockPos, BlockState newState) {

@@ -33,6 +33,7 @@ namespace SoulboundBackend.Common {
             Func<T> accessor = () => (T)getter.Invoke(null, null);
             int hash = HashHelper.StableHash(cacheAttribute.propertyName);
             cachedReferences[hash] = accessor;
+            cached[hash] = accessor.Invoke();
         }
 
         public static IDictionary<int, T> GetCachedRegistry() {

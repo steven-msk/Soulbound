@@ -9,7 +9,11 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		static readonly Dictionary<int, BlockState> stateByHash = new();
 
 		public static int Register(BlockState state) {
-			int hash = state.hash;
+			int hash = state.stateHash;
+			UnityEngine.Debug.Log("registering hash " + hash  + " block " + state.block);
+			if (stateByHash.ContainsKey(hash)) {
+				return hash;
+			}
 			stateByHash[hash] = state;
 			return hash;
 		}

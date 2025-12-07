@@ -15,7 +15,7 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 
 		public void RemoveEntity(Entity entity) {
 			if (entity is ITickable tickable) {
-				tickables.Remove(tickable);
+				this.RemoveTickable(tickable);
 			}
 		}
 	}

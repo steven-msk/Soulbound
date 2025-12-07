@@ -8,6 +8,9 @@ using UnityEngine.Tilemaps;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
 	public sealed class AirBlock : Block {
+		public AirBlock() : base("air") {
+		}
+
 		public override string name => "Air";
 		public override TileBase tileReference => null;
 		public override BlockItem itemReference => null;

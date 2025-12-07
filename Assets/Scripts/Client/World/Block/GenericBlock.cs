@@ -6,6 +6,7 @@ using UnityEngine.Tilemaps;
 #nullable enable
 
 namespace SoulboundBackend.Client.World.BlockSystem {
+	[Obsolete]
 	public class GenericBlock : Block {
 		public override string name { get; }
 		public override TileBase tileReference { get; }
@@ -13,12 +14,13 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public override BreakRequirement? breakRequirement { get; }
 
 		public GenericBlock(
+				string id,
 				string name,
 				TileBase tileReference,
 				BlockItem itemReference,
 				BreakRequirement? breakRequirement
 			) 
-			: base() {
+			: base(id) {
 			this.name = name;
 			this.tileReference = tileReference;
 			this.itemReference = itemReference;
@@ -33,7 +35,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		}
 
 		protected override BlockState CreateDefaultState(BlockPropertyPool propertyPool) {
-			return new BlockState(this, propertyPool.CreateEntries());
+			return new(this, propertyPool.CreateEntries());
 		}
 	}
 }

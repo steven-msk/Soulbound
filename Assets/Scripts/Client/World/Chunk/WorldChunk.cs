@@ -13,32 +13,35 @@ using System.IO;
 
 namespace SoulboundBackend.Client.World.Chunk {
 	[JsonConverter(typeof(WorldChunk.Serializer))]
-	public class WorldChunk {
+	public class WorldChunk : ITickable {
+		private static readonly Logger logger = Logger.CreateInstance();
 		public static readonly int minY = -Level.WORLD_HEIGHT / 2;
 		public static readonly int maxY = Level.WORLD_HEIGHT / 2;
 		public const float HEIGHT_SPREAD = 0.01f;
 		public const float SURFACE_HEIGHT_RANGE = 50f;
 		public const float UNDERGROUND_HEIGHT_RANGE = 20f;
-		private static readonly Logger logger = Logger.CreateInstance();
 
+		private readonly BlockState[][] blockStates = new BlockState[Level.CHUNK_LENGTH][];
+		private readonly TileEntity[][] tileEntities = new TileEntity[Level.CHUNK_LENGTH][];
+		private readonly TileEntityTickManager tickManager = new();
 		private ChunkHeightmapData heightmapData;
 		public ChunkHeightmapData HeightmapData => heightmapData;
+		private int cx;
+		public int xpos => cx;
 
-		private int x;
-		public int xpos => x;
-
-		private BlockState[][] blockStates = new BlockState[Level.CHUNK_LENGTH][];
-
-		public WorldChunk(int x) { 
-			this.x = x;
-			for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
-				blockStates[cx] = new BlockState[Level.WORLD_HEIGHT];
+		public WorldChunk(int cx) { 
+			this.cx = cx;
+			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
+				blockStates[x] = new BlockState[Level.WORLD_HEIGHT];
+				tileEntities[x] = new TileEntity[Level.WORLD_HEIGHT];
 			}
 		}
 
+		public void Tick() => tickManager.Tick();
+
 		// PLANNED REFACTOR: chunk generation logic - required when introducing biomes
 		public ChunkHeightmapData GenerateHeightmap(INoiseGenerator1D heightGenerator) {
-			int startX = x * Level.CHUNK_LENGTH;
+			int startX = cx * Level.CHUNK_LENGTH;
 			Dictionary<int, int> surfaceLevels = new();
 			int highestStone = 0;
 
@@ -76,22 +79,28 @@ namespace SoulboundBackend.Client.World.Chunk {
 		int IndexToWorldY(int yIndex) => yIndex + minY;
 
 		public void Render(Tilemap tilemap, ChunkOutlineRenderer outlineRenderer) {
-			int xStart = x * Level.CHUNK_LENGTH;
+			int xStart = cx * Level.CHUNK_LENGTH;
+
 			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
 				for (int y = minY; y < maxY; y++) {
 					int yIndex = WorldYToIndex(y);
 					BlockState blockState = blockStates[x][yIndex];
-					InvocationHelper.IfElse(blockState != null,
-						() => tilemap.SetTile(new Vector3Int(xStart + x, y), blockState.block.tileReference),
-						() => UnityEngine.Debug.LogError($"Attempted to render ungenerated terrain! {new ChunkBlockPos(x, y, this.x).ToString()}"));
+
+					if (blockState != null) {
+						tilemap.SetTile(new Vector3Int(xStart + x, y), blockState.block.tileReference);
+					} else {
+						UnityEngine.Debug.LogError($"Attempted to render ungenerated terrain! {new ChunkBlockPos(x, y, this.cx).ToString()}");
+					}
 				}
 			}
+
 			this.RefreshTiles(tilemap);
 			outlineRenderer.ShowOutline(this);
 		}
 
 		public void RefreshTiles(Tilemap tilemap) {
-			int xStart = x * Level.CHUNK_LENGTH;
+			int xStart = cx * Level.CHUNK_LENGTH;
+
 			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
 				for (int y = minY; y < maxY; y++) {
 					int yIndex = WorldYToIndex(y);
@@ -101,7 +110,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 		}
 
 		public void Unload(Tilemap tilemap, ChunkOutlineRenderer outlineRenderer) {
-			int xStart = x * Level.CHUNK_LENGTH;
+			int xStart = cx * Level.CHUNK_LENGTH;
 			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
 				for (int y = minY; y < maxY; y++) {
 					tilemap.SetTile(new Vector3Int(xStart + x, y, 0), null);
@@ -111,15 +120,39 @@ namespace SoulboundBackend.Client.World.Chunk {
 		}
 
 		public void SetBlock(ChunkBlockPos chunkPos, BlockState blockState) {
-			blockStates[chunkPos.x][WorldYToIndex(chunkPos.y)] = blockState;
+			var xIndex = chunkPos.x;
+			var yIndex = WorldYToIndex(chunkPos.y);
+			Block block = blockState.block;
+
+			blockStates[xIndex][yIndex] = blockState;
+			if (block.hasTileEntity) {
+				TileEntity tileEntity = block.GetTileEntity(this, chunkPos.ToBlockPos());
+				
+				if (tileEntities[xIndex][yIndex] != null) {
+					tickManager.RemoveTileEntity(tileEntity);
+				}
+				
+				tileEntities[xIndex][yIndex] = tileEntity;
+				tickManager.AddTileEntity(tileEntity);
+			}
 		}
 
 		public BlockState BlockStateAt(ChunkBlockPos chunkPos) { 
 			return blockStates[chunkPos.x][WorldYToIndex(chunkPos.y)];
 		}
 
+		private void ParseDeserialized(BlockState[][] states) {
+			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
+				for (int y = minY; y < maxY; y++) {
+					int yIndex = WorldYToIndex(y);
+
+					blockStates[x][yIndex] = states[x][yIndex];
+				}
+			}
+		}
+
+
 		public sealed class Serializer : JsonConverter<WorldChunk> {
-			[Obsolete]
 			public override WorldChunk ReadJson(
 					JsonReader reader,
 					Type objectType, 
@@ -142,15 +175,17 @@ namespace SoulboundBackend.Client.World.Chunk {
 					blockStates[x] = new BlockState[row.Count];
 
 					for (int y = 0; y < row.Count; y++) {
-						JArray data = JArray.Parse(row[y].ToString());
-						//blockStates[x][y] = BlockState.Serializer.Deserialize(data);
+						int hash = row[y].Value<int>();
+
+						blockStates[x][y] = BlockState.Serializer.ToState(hash);
 					}
 				}
 
-				return new WorldChunk(xpos) {
+				WorldChunk chunk = new(xpos) {
 					heightmapData = heightmap,
-					blockStates = blockStates
 				};
+				chunk.ParseDeserialized(blockStates);
+				return chunk;
 			}
 
 			public override void WriteJson(JsonWriter writer, WorldChunk value, JsonSerializer serializer) {

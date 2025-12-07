@@ -188,7 +188,7 @@ namespace WorldTests {
 			yield return World.CreateSavedContext(worldBox, sceneBox, world);
 
 			Level level = World.TryGetLevel(worldBox);
-			Assert.That(level.BlockAt(pos.ToWorldBlockPos()) == target);
+			Assert.That(level.BlockAt(pos.ToBlockPos()) == target);
 		}
 
 		[UnityTest]
@@ -314,7 +314,7 @@ namespace WorldTests.BlockTests {
 			ChunkBlockPos pos = new(5, 0, 0);
 			pos.chunkX = levelManager.CreateDump().generatedChunks[0].xpos;
 
-			levelManager.level.SetBlock(pos.ToWorldBlockPos(), Blocks.leaves.defaultState);
+			levelManager.level.SetBlock(pos.ToBlockPos(), Blocks.leaves.defaultState);
 
 			var dump = levelManager.CreateDump();
 			var blockInDump = dump.generatedChunks[0].BlockStateAt(pos).block;
