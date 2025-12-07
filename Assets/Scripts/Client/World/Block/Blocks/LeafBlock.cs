@@ -12,16 +12,11 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 	public class LeafBlock : Block {
 		public BlockProperty<bool> persistent;
 
-		public LeafBlock() : base("leaves") {
-		}
-
-		public override string name { get; } = "Leaves";
-
-		public override TileBase tileReference => ResourceManager.Get<TileBase, ResourceGroups.Tiles>("leaves");
-
-		public override BlockItem itemReference => Items.leavesBlock;
-
-		public override BreakRequirement breakRequirement => new BreakRequirement(0, ToolType.All, 10);
+		public LeafBlock() : base("leaves") { }
+		public override string name { get; init; } = "Leaves";
+		public override TileBase tileReference { get; init; } = ResourceManager.Get<TileBase, ResourceGroups.Tiles>("leaves");
+		public override BlockItem itemReference { get; init; } = Items.leavesBlock;
+		public override BreakRequirement breakRequirement { get; init; } = new BreakRequirement(0, ToolType.All, 10);
 
 		public override IEnumerable<ItemStack> GetDrops(BlockState blockState, BreakSource source) {
 			if (blockState.Get(persistent)) {

@@ -13,10 +13,11 @@ using UnityEngine.Tilemaps;
 namespace SoulboundBackend.Client.World.BlockSystem {
 	public abstract partial class Block {
 		private static readonly Logger logger = Logger.CreateInstance();
-		public abstract string name { get; }
-		public abstract TileBase tileReference { get; }
-		public abstract BlockItem? itemReference { get; }
-		public virtual BreakRequirement? breakRequirement => null;
+		public string id { get; private set; }
+		public abstract string name { get; init; }
+		public abstract TileBase tileReference { get; init; }
+		public abstract BlockItem? itemReference { get; init; }
+		public virtual BreakRequirement? breakRequirement { get; init; } = null;
 
 		private Dictionary<int, BlockState> statesByHash = new();
 		private readonly BlockPropertyPool propertyPool = new();
@@ -24,7 +25,18 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public BlockState defaultState { get; private set; }
 		public virtual bool hasTileEntity { get; protected set; } = false;
 
-		protected Block(string id) {
+		protected Block(string id) => this.ConstructNonGeneric(id);
+
+		protected Block(string id, string name, TileBase tileReference, BlockItem itemReference, BreakRequirement? breakRequirement) {
+			this.name = name;
+			this.tileReference = tileReference;
+			this.itemReference = itemReference;
+			this.breakRequirement = breakRequirement;
+			this.ConstructNonGeneric(id);
+		}
+
+		private void ConstructNonGeneric(string id) {
+			this.id = id;
 			this.hashedID = HashHelper.StableHash(id);
 
 			RegisterProperties(propertyPool);
@@ -35,6 +47,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 
 			stateRegisterer.Register(defaultState);
 			statesByHash = stateRegisterer.PostAll();
+
 		}
 
 		protected abstract void RegisterProperties(BlockPropertyPool pool);

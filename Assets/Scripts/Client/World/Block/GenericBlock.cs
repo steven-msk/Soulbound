@@ -6,12 +6,11 @@ using UnityEngine.Tilemaps;
 #nullable enable
 
 namespace SoulboundBackend.Client.World.BlockSystem {
-	[Obsolete]
 	public class GenericBlock : Block {
-		public override string name { get; }
-		public override TileBase tileReference { get; }
-		public override BlockItem itemReference { get; }
-		public override BreakRequirement? breakRequirement { get; }
+		public override string name { get; init; }
+		public override TileBase tileReference { get; init; }
+		public override BlockItem itemReference { get; init; }
+		public override BreakRequirement? breakRequirement { get; init; }
 
 		public GenericBlock(
 				string id,
@@ -19,12 +18,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 				TileBase tileReference,
 				BlockItem itemReference,
 				BreakRequirement? breakRequirement
-			) 
-			: base(id) {
-			this.name = name;
-			this.tileReference = tileReference;
-			this.itemReference = itemReference;
-			this.breakRequirement = breakRequirement;
+			) : base(id, name, tileReference, itemReference, breakRequirement) {
 		}
 
 		public override IEnumerable<ItemStack> GetDrops(BlockState blockState, BreakSource source) {

@@ -95,7 +95,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 				if (BlockStateRegistry.TryGet(hash, out var state)) {
 					return state;
 				}
-				//logger.LogError("Unknown state hash: {}", hash);
+				logger.LogError("Unknown state hash: {}", hash);
 				return fallback;
 			}
 		}

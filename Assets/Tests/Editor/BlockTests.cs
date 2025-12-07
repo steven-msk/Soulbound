@@ -14,9 +14,9 @@ using UnityEngine.Tilemaps;
 using BlockSystem = SoulboundBackend.Client.World.BlockSystem;
 
 public class DummyBlock : BlockSystem.Block {
-	public override string name { get; } = "dummy_block";
-	public override TileBase tileReference => null;
-	public override BlockItem itemReference => null;
+	public override string name { get; init; } = "dummy_block";
+	public override TileBase tileReference { get; init; } = null;
+	public override BlockItem itemReference { get; init; } = null;
 
 	public static readonly BlockSystem.BlockProperty<bool> lit = new("lit");
 
@@ -256,9 +256,9 @@ namespace BlockTests.StateCachingTests {
 		public TestBlock() : base("testBlock") {
 		}
 
-		public override string name { get; } = "testBlock";
-		public override TileBase tileReference => null;
-		public override BlockItem itemReference => null;
+		public override string name { get; init; } = "testBlock";
+		public override TileBase tileReference { get; init; } = null;
+		public override BlockItem itemReference { get; init; } = null;
 
 		//protected override BlockState CreateDefaultState() {
 		//	return new BlockState(this, null, CommonBlockBehaviors.NullBehavior());
