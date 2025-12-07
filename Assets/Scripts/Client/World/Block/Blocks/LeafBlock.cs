@@ -12,9 +12,6 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 	public class LeafBlock : Block {
 		public BlockProperty<bool> persistent;
 
-		public LeafBlock() : base(StateCaching.Predefined()) {
-		}
-
 		public override string name => "Leaves";
 
 		public override TileBase tileReference => ResourceManager.Get<TileBase, ResourceGroups.Tiles>("leaves");

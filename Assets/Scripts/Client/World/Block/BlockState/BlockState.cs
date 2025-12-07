@@ -54,12 +54,17 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 
 		public override bool Equals(object obj) {
 			return obj is BlockState other
-				&& other.block == this.block
-				&& other.properties == this.properties;
+				&& other.hash == this.hash;
 		}
 
 		public override int GetHashCode() {
-			return HashCode.Combine(block, properties);
+			return StateHasher.ComputeHash(block, properties);
+		}
+
+		public override string ToString() {
+			return $"BlockState[" +
+				$"block:{block.name}, " +
+				$"properties:{properties}]";
 		}
 
 		public static PersistencyInfo CreatePersistencyInfo(BlockState state) {

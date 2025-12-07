@@ -20,9 +20,6 @@ public class DummyBlock : BlockSystem.Block {
 
 	public static readonly BlockSystem.BlockProperty<bool> lit = new("lit");
 
-	public DummyBlock() : base(StateCaching.Predefined()) {
-	}
-
 	//protected override void RegisterProperties() {
 	//	propertyMap.Add(lit, false);
 	//}
@@ -132,16 +129,16 @@ namespace BlockTests {
 			Assert.IsTrue(block.HasProperty(DummyBlock.lit));
 		}
 
-		[Test]
-		public void GetStateFor_CachesIdentical() {
-			var block = new DummyBlock();
+		//[Test]
+		//public void GetStateFor_CachesIdentical() {
+		//	var block = new DummyBlock();
 
-			var props = new BlockStateProperties(new Dictionary<IBlockStateProperty, object> { { DummyBlock.lit, false } });
-			var state1 = block.GetStateFor(props);
-			var state2 = block.GetStateFor(props);
+		//	var props = new BlockStateProperties(new Dictionary<IBlockStateProperty, object> { { DummyBlock.lit, false } });
+		//	var state1 = block.GetStateFor(props);
+		//	var state2 = block.GetStateFor(props);
 
-			Assert.AreSame(state1, state2);
-		}
+		//	Assert.AreSame(state1, state2);
+		//}
 
 		//[Test]
 		//public void WithProperty_CreatesNewBlockState_WhenPropertyValueDiffers() {
@@ -188,23 +185,23 @@ namespace BlockTests {
 		//	Assert.IsInstanceOf<LitBehavior>(litState.stateBehavior);
 		//}
 
-		[Test]
-		public void BlockState_EqualityComparer_ConsidersOnlyProperties() {
-			var block = new DummyBlock();
-			var s1 = block.defaultState;
-			var props1 = new BlockStateProperties(new Dictionary<IBlockStateProperty, object> { { DummyBlock.lit, true } });
-			var props2 = new BlockStateProperties(new Dictionary<IBlockStateProperty, object> { { DummyBlock.lit, true } });
-			var s2 = block.GetStateFor(props1);
-			var s3 = block.GetStateFor(props2);
+		//[Test]
+		//public void BlockState_EqualityComparer_ConsidersOnlyProperties() {
+		//	var block = new DummyBlock();
+		//	var s1 = block.defaultState;
+		//	var props1 = new BlockStateProperties(new Dictionary<IBlockStateProperty, object> { { DummyBlock.lit, true } });
+		//	var props2 = new BlockStateProperties(new Dictionary<IBlockStateProperty, object> { { DummyBlock.lit, true } });
+		//	var s2 = block.GetStateFor(props1);
+		//	var s3 = block.GetStateFor(props2);
 
-			Assert.AreEqual(props1.GetHashCode(), props2.GetHashCode());
+		//	Assert.AreEqual(props1.GetHashCode(), props2.GetHashCode());
 
-			Assert.IsTrue(s2 == s3);
-			Assert.AreEqual(s2.GetHashCode(), s3.GetHashCode());
+		//	Assert.IsTrue(s2 == s3);
+		//	Assert.AreEqual(s2.GetHashCode(), s3.GetHashCode());
 
-			Assert.IsTrue(s1 != s2);
-			Assert.AreNotEqual(s1.GetHashCode(), s2.GetHashCode());
-		}
+		//	Assert.IsTrue(s1 != s2);
+		//	Assert.AreNotEqual(s1.GetHashCode(), s2.GetHashCode());
+		//}
 	}
 
 	[TestFixture]
@@ -257,10 +254,6 @@ namespace BlockTests.StateCachingTests {
 		public override TileBase tileReference => null;
 		public override BlockItem itemReference => null;
 
-		public TestBlock(IBlockStateCacheStrategy stateCacheStrategy)
-			: base(stateCacheStrategy) {
-		}
-
 		//protected override BlockState CreateDefaultState() {
 		//	return new BlockState(this, null, CommonBlockBehaviors.NullBehavior());
 		//}
@@ -295,7 +288,7 @@ namespace BlockTests.StateCachingTests {
 		[Test]
 		public void Get_ShouldReturnSameDefaultState_ForAnyProperties() {
 			var cache = StateCaching.Static();
-			var block = new TestBlock(cache);
+			var block = new TestBlock();
 
 			var s1 = cache.Get(block, new BlockStateProperties());
 			var s2 = cache.Get(block, new BlockStateProperties());
@@ -307,7 +300,7 @@ namespace BlockTests.StateCachingTests {
         [Test]
         public void Get_ShouldThrow_IfDefaultNotRegistered() {
 			var cache = StateCaching.Static();
-			var block = new TestBlock(cache);
+			var block = new TestBlock();
 			block.SetDefaultState(null);
 			Assert.Throws<InvalidOperationException>(() => cache.Get(block, 123));
         }

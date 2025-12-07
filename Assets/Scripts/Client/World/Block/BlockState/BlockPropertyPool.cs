@@ -33,5 +33,9 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		}
 
 		public BlockPropertyEntries CreateEntries() => new(this);
+
+		public override string ToString() {
+			return string.Join(',', pool.Keys);
+		}
 	}
 }

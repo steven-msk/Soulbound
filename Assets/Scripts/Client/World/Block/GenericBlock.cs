@@ -17,7 +17,8 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 				TileBase tileReference,
 				BlockItem itemReference,
 				BreakRequirement? breakRequirement
-			) : base(StateCaching.Static()) {
+			) 
+			: base() {
 			this.name = name;
 			this.tileReference = tileReference;
 			this.itemReference = itemReference;

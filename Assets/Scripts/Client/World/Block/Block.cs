@@ -16,24 +16,30 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public abstract BlockItem? itemReference { get; }
 		public virtual BreakRequirement? breakRequirement => null;
 
-		public IBlockStateCacheStrategy stateCacheStrategy { get; protected set; } = new StaticStateCache();
+		private Dictionary<int, BlockState> statesByHash = new();
 		private readonly BlockPropertyPool propertyPool = new();
 
 		public BlockState defaultState { get; private set; }
 
-		protected Block(IBlockStateCacheStrategy stateCacheStrategy) {
-			this.stateCacheStrategy = stateCacheStrategy;
-
+		protected Block() {
 			RegisterProperties(propertyPool);
-			RegisterDefaultState(CreateDefaultState(propertyPool));
-			stateCacheStrategy.Initialize(this);
+			defaultState = CreateDefaultState(propertyPool);
+
+			var stateRegisterer = new BlockStateRegisterer(this);
+			CreateStates(stateRegisterer);
+
+			stateRegisterer.Register(defaultState);
+			statesByHash = stateRegisterer.PostAll();
 		}
 
 		protected abstract void RegisterProperties(BlockPropertyPool pool);
 		protected abstract BlockState CreateDefaultState(BlockPropertyPool propertyPool);
+		[Obsolete]
 		public virtual bool GetPredefinedStates(out IReadOnlyList<BlockState> states) {
 			states = new List<BlockState>();
 			return false;
+		}
+		public virtual void CreateStates(BlockStateRegisterer registerer) {
 		}
 
 		public virtual BlockState Place(ItemStack itemStack, BlockPos blockPos) {
@@ -43,39 +49,30 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		}
 		public abstract IEnumerable<ItemStack> GetDrops(BlockState blockState, BreakSource source);
 
+		[Obsolete]
 		protected void RegisterDefaultState(BlockState state) {
-			defaultState = state;
-			stateCacheStrategy.RegisterDefault(state);
+			//defaultState = state;
+			//stateCacheStrategy.RegisterDefault(state);
 		}
 
-		public BlockState GetStateFor(BlockStateProperties properties) {
-			return stateCacheStrategy.Get(this, properties);
-		}
-
+		[Obsolete]
 		public bool TryGetStateByHash(int hash, out BlockState state) {
-			state = stateCacheStrategy.Get(this, hash);
-			return state is not null;
+			//state = stateCacheStrategy.Get(this, hash);
+			//return state is not null;
+			state = null;
+			return false;
 		}
 
 		public bool HasProperty(IBlockStateProperty property) {
 			return propertyPool.Has(property.name);
-			//return propertyMap.ContainsKey(property);
 		}
-
-		[Obsolete]
-		public BlockState WithProperty<T>(BlockState state, BlockProperty<T> property, T value) {
-			return state.With(property, value);
-		}
-
-		//[Obsolete]
-		//public virtual IBlockStateBehavior CreateBehaviorFor(BlockStateProperties properties) {
-		//	return defaultState.stateBehavior;
-		//}
-
-		internal int ComputeHash(object obj) => obj.GetHashCode();
 
 		public override string ToString() {
-			return name;
+			return $"Block[" +
+				$"name:{name}, " +
+				$"tileReference:{tileReference}, " +
+				$"itemReference:{itemReference}, " +
+				$"propertyPool:{propertyPool}]";
 		}
 	}
 }

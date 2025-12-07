@@ -90,14 +90,14 @@ public sealed class WorldManager {
 	public void SaveWorld(string world, WorldDump dump) {
 		serializationService.Save(dump, world);
 
-		var persistent = ICachedRegistry<Block>.GetCachedRegistry().Values
-			.Select(block => new KeyValuePair<Block, IBlockStateCacheStrategy>(block, block.stateCacheStrategy))
-			.Where(e => e.Value is IPersistentStateCache)
-			.Select(e => new KeyValuePair<Block, IPersistentStateCache>(e.Key, (IPersistentStateCache)e.Value));
+		//var persistent = ICachedRegistry<Block>.GetCachedRegistry().Values
+		//	.Select(block => new KeyValuePair<Block, IBlockStateCacheStrategy>(block, block.stateCacheStrategy))
+		//	.Where(e => e.Value is IPersistentStateCache)
+		//	.Select(e => new KeyValuePair<Block, IPersistentStateCache>(e.Key, (IPersistentStateCache)e.Value));
 
-		foreach (var persistentEntry in persistent) {
-			persistentEntry.Value.Save(persistentEntry.Key);
-		}
+		//foreach (var persistentEntry in persistent) {
+		//	persistentEntry.Value.Save(persistentEntry.Key);
+		//}
 	}
 
 	public IEnumerator TerminateWorldProcess(Scene worldScene, string world, Func<WorldDump> dumpSupplier) {

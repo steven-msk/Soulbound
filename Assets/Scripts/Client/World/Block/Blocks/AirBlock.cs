@@ -12,9 +12,6 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public override TileBase tileReference => null;
 		public override BlockItem itemReference => null;
 
-		public AirBlock() : base(StateCaching.Static()) {
-		}
-
 		public override IEnumerable<ItemStack> GetDrops(BlockState blockState, BreakSource source) {
 			yield break;
 		}

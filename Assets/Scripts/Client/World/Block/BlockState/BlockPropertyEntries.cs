@@ -36,8 +36,18 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 				&& other.entries.SequenceEqual(this.entries);
 		}
 
+		public override string ToString() {
+			return string.Join(',', entries.Select(kvp => $"{kvp.Key}={kvp.Value}"));
+		}
+
 		public override int GetHashCode() {
 			return HashCode.Combine(entries, pool);
+		}
+
+		public IDictionary<string, object> GetSorted() {
+			return entries
+				.OrderBy(kvp => kvp.Key.name)
+				.ToDictionary(kvp => kvp.Key.name, kvp => kvp.Value);
 		}
 	}
 }
