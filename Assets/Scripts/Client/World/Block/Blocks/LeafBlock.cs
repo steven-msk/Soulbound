@@ -19,10 +19,10 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public override BreakRequirement breakRequirement { get; init; } = new BreakRequirement(0, ToolType.All, 10);
 
 		public override IEnumerable<ItemStack> GetDrops(BlockState blockState, BreakSource source) {
-			if (blockState.Get(persistent)) {
+			if (source is not PlayerToolBreakSource) {
 				yield break;
 			}
-			yield return new(itemReference, 1);
+			yield return new(Items.leavesBlock, 1);
 		}
 
 		protected override BlockState CreateDefaultState(BlockPropertyPool propertyPool) {

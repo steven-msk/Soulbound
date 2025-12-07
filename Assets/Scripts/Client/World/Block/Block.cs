@@ -43,7 +43,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			defaultState = CreateDefaultState(propertyPool);
 
 			var stateRegisterer = new BlockStateRegisterer(this);
-			CreateStates(stateRegisterer);
+			CreateStates(stateRegisterer, propertyPool.CreateEntries());
 
 			stateRegisterer.Register(defaultState);
 			statesByHash = stateRegisterer.PostAll();
@@ -51,7 +51,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 
 		protected abstract void RegisterProperties(BlockPropertyPool pool);
 		protected abstract BlockState CreateDefaultState(BlockPropertyPool propertyPool);
-		public virtual void CreateStates(BlockStateRegisterer registerer) {
+		public virtual void CreateStates(BlockStateRegisterer registerer, BlockPropertyEntries properties) {
 		}
 		public virtual TileEntity GetTileEntity(WorldChunk chunk, BlockPos blockPos) {
 			return null!;
@@ -68,6 +68,10 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			return statesByHash.TryGetValue(hash, out state);
 		}
 
+		public IEnumerable<BlockState> GetPossibleStates() {
+			return statesByHash.Values.AsEnumerable();
+		}
+
 		public bool HasProperty(IBlockStateProperty property) {
 			return propertyPool.Has(property.name);
 		}
@@ -78,7 +82,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 				$"tileReference:'{tileReference}', " +
 				$"itemReference:'{itemReference}', " +
 				$"propertyPool:[{propertyPool}]]";
-
 		}
+
 	}
 }

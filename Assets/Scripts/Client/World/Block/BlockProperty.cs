@@ -9,7 +9,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public string name { get; }
 		Type IBlockStateProperty.valueType => typeof(T);
 
-		public BlockProperty(string name) {
+		internal BlockProperty(string name) {
 			this.name = name;
 		}
 
