@@ -1,4 +1,5 @@
 ﻿using SoulboundBackend.Client.ItemSystem;
+using SoulboundBackend.Client.World.Chunk;
 using SoulboundBackend.Common.Logging;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		private readonly BlockPropertyPool propertyPool = new();
 
 		public BlockState defaultState { get; private set; }
+		public virtual bool hasTileEntity { get; protected set; } = false;
 
 		protected Block() {
 			RegisterProperties(propertyPool);
@@ -34,12 +36,10 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 
 		protected abstract void RegisterProperties(BlockPropertyPool pool);
 		protected abstract BlockState CreateDefaultState(BlockPropertyPool propertyPool);
-		[Obsolete]
-		public virtual bool GetPredefinedStates(out IReadOnlyList<BlockState> states) {
-			states = new List<BlockState>();
-			return false;
-		}
 		public virtual void CreateStates(BlockStateRegisterer registerer) {
+		}
+		public virtual TileEntity GetTileEntity(WorldChunk chunk, BlockPos blockPos) {
+			return null!;
 		}
 
 		public virtual BlockState Place(ItemStack itemStack, BlockPos blockPos) {
@@ -49,18 +49,8 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		}
 		public abstract IEnumerable<ItemStack> GetDrops(BlockState blockState, BreakSource source);
 
-		[Obsolete]
-		protected void RegisterDefaultState(BlockState state) {
-			//defaultState = state;
-			//stateCacheStrategy.RegisterDefault(state);
-		}
-
-		[Obsolete]
-		public bool TryGetStateByHash(int hash, out BlockState state) {
-			//state = stateCacheStrategy.Get(this, hash);
-			//return state is not null;
-			state = null;
-			return false;
+		public bool TryGetState(int hash, out BlockState state) {
+			return statesByHash.TryGetValue(hash, out state);
 		}
 
 		public bool HasProperty(IBlockStateProperty property) {

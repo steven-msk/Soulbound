@@ -119,6 +119,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 		}
 
 		public sealed class Serializer : JsonConverter<WorldChunk> {
+			[Obsolete]
 			public override WorldChunk ReadJson(
 					JsonReader reader,
 					Type objectType, 
@@ -142,7 +143,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 
 					for (int y = 0; y < row.Count; y++) {
 						JArray data = JArray.Parse(row[y].ToString());
-						blockStates[x][y] = BlockState.Serializer.Deserialize(data);
+						//blockStates[x][y] = BlockState.Serializer.Deserialize(data);
 					}
 				}
 

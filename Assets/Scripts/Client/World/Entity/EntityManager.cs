@@ -15,14 +15,14 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 	public sealed class EntityManager : ISerializable<Dictionary<Guid, SerializedEntity>> {
 		private readonly UpdateManager updater;
 		private readonly List<IEntitySubsystem> subsystems = new();
-		private readonly TickManager tickManager;
+		private readonly EntityTickManager tickManager;
 		private readonly EntityChunkTracker chunkTracker;
 		private readonly Dictionary<Guid, Entity> all = new();
 
 		public EntityManager(Level level, UpdateManager updater) {
 			this.updater = updater;
 
-			this.tickManager = new TickManager();
+			this.tickManager = new EntityTickManager();
 			this.chunkTracker = new EntityChunkTracker(level);
 
 			subsystems.Add(tickManager);

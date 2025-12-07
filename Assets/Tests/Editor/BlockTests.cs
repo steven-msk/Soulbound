@@ -51,25 +51,25 @@ public class DummyBlock : BlockSystem.Block {
 	//}
 }
 
-public class DummyBehavior : IBlockStateBehavior {
-	private IBlockStateBehavior inner;
-	public bool placed { get; private set; }
+//public class DummyBehavior : IBlockStateBehavior {
+//	private IBlockStateBehavior inner;
+//	public bool placed { get; private set; }
 
-	//public DummyBehavior() => inner = BlockSystem.CommonBlockBehaviors.DropSingle();
+//	//public DummyBehavior() => inner = BlockSystem.CommonBlockBehaviors.DropSingle();
 
-	public List<ItemStack> GetDrops(BlockSystem.BlockState blockState, BreakSource source) {
-		return inner.GetDrops(blockState, source);
-	}
+//	public List<ItemStack> GetDrops(BlockSystem.BlockState blockState, BreakSource source) {
+//		return inner.GetDrops(blockState, source);
+//	}
 
-	public void OnNeighborStateChanged(BlockPos selfPos, BlockPos neighborPos, BlockSystem.BlockState oldState, BlockSystem.BlockState newState) {
-	}
+//	public void OnNeighborStateChanged(BlockPos selfPos, BlockPos neighborPos, BlockSystem.BlockState oldState, BlockSystem.BlockState newState) {
+//	}
 
-	public void OnPlace(BlockPos blockPos, BlockSystem.BlockState blockState) {
-		placed = true;
-	}
-}
+//	public void OnPlace(BlockPos blockPos, BlockSystem.BlockState blockState) {
+//		placed = true;
+//	}
+//}
 
-public class LitBehavior : DummyBehavior { }
+//public class LitBehavior : DummyBehavior { }
 
 namespace BlockTests {
 	[TestFixture]
@@ -211,16 +211,16 @@ namespace BlockTests {
 				ICachedRegistry<Block>.Lookup("testBlock", () => new DummyBlock());
 		}
 
-		[Test]
-		public void Serialize_ShouldReturnValidJArray() {
-			var block = new DummyBlock();
-			var state = block.defaultState.With(DummyBlock.lit, false);
+		//[Test]
+		//public void Serialize_ShouldReturnValidJArray() {
+		//	var block = new DummyBlock();
+		//	var state = block.defaultState.With(DummyBlock.lit, false);
 
-			JArray result = BlockState.Serializer.Serialize(state);
+		//	JArray result = BlockState.Serializer.Serialize(state);
 
-			Assert.That(result[0]!.Value<int>(), Is.EqualTo(block.hashedID));
-			//Assert.That(result[1]!.Value<int>(), Is.EqualTo(state.properties_obsolete.GetHashCode()));
-		}
+		//	Assert.That(result[0]!.Value<int>(), Is.EqualTo(block.hashedID));
+		//	//Assert.That(result[1]!.Value<int>(), Is.EqualTo(state.properties_obsolete.GetHashCode()));
+		//}
 
 		//[Test]
 		//public void Deserialize_ShouldRestoreBlockState() {
@@ -258,9 +258,9 @@ namespace BlockTests.StateCachingTests {
 		//	return new BlockState(this, null, CommonBlockBehaviors.NullBehavior());
 		//}
 
-		public void SetDefaultState(BlockState state) {
-			this.RegisterDefaultState(state);
-		}
+		//public void SetDefaultState(BlockState state) {
+		//	this.RegisterDefaultState(state);
+		//}
 
 		//protected override void RegisterProperties() {
 		//}
@@ -283,28 +283,28 @@ namespace BlockTests.StateCachingTests {
 	}
 
 
-	[TestFixture]
-	public class StaticStateCacheTests {
-		[Test]
-		public void Get_ShouldReturnSameDefaultState_ForAnyProperties() {
-			var cache = StateCaching.Static();
-			var block = new TestBlock();
+	//[TestFixture]
+	//public class StaticStateCacheTests {
+	//	[Test]
+	//	public void Get_ShouldReturnSameDefaultState_ForAnyProperties() {
+	//		var cache = StateCaching.Static();
+	//		var block = new TestBlock();
 
-			var s1 = cache.Get(block, new BlockStateProperties());
-			var s2 = cache.Get(block, new BlockStateProperties());
+	//		var s1 = cache.Get(block, new BlockStateProperties());
+	//		var s2 = cache.Get(block, new BlockStateProperties());
 
-			Assert.AreSame(block.defaultState, s1);
-			Assert.AreSame(block.defaultState, s2);
-		}
+	//		Assert.AreSame(block.defaultState, s1);
+	//		Assert.AreSame(block.defaultState, s2);
+	//	}
 
-        [Test]
-        public void Get_ShouldThrow_IfDefaultNotRegistered() {
-			var cache = StateCaching.Static();
-			var block = new TestBlock();
-			block.SetDefaultState(null);
-			Assert.Throws<InvalidOperationException>(() => cache.Get(block, 123));
-        }
-    }
+ //       [Test]
+ //       public void Get_ShouldThrow_IfDefaultNotRegistered() {
+	//		var cache = StateCaching.Static();
+	//		var block = new TestBlock();
+	//		block.SetDefaultState(null);
+	//		Assert.Throws<InvalidOperationException>(() => cache.Get(block, 123));
+ //       }
+ //   }
 
 	//[TestFixture]
 	//public class FileLinkedStateCacheTests {

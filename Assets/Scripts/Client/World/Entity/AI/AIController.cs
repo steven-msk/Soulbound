@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using SoulboundBackend.Core;
+using System.Collections.Generic;
 
 namespace SoulboundBackend.Client.World.EntitySystem.AI {
 	public class AIController : ITickable {

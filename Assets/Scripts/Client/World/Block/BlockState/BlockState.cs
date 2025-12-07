@@ -14,7 +14,7 @@ using Logger = SoulboundBackend.Common.Logging.Logger;
 #nullable enable
 
 namespace SoulboundBackend.Client.World.BlockSystem {
-	[JsonConverter(typeof(BlockStateJsonConverter))]
+	//[JsonConverter(typeof(BlockStateJsonConverter))]
 	public sealed class BlockState {
 		static readonly Logger logger = Logger.CreateInstance();
 		public Block block { get; }
@@ -67,135 +67,131 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 				$"properties:{properties}]";
 		}
 
-		public static PersistencyInfo CreatePersistencyInfo(BlockState state) {
-			return new(state.properties);
-		}
+		//	[Obsolete]
+		//	[JsonConverter(typeof(PersistencyInfo.PersistencyJsonConverter))]
+		//	public record PersistencyInfo(BlockPropertyEntries properties) {
+		//		public int hash => properties.GetHashCode();
 
-		[Obsolete]
-		[JsonConverter(typeof(PersistencyInfo.PersistencyJsonConverter))]
-		public record PersistencyInfo(BlockPropertyEntries properties) {
-			public int hash => properties.GetHashCode();
+		//		public BlockState ToBlockState(Block block) {
+		//			return new BlockState(block, properties);
+		//		}
 
-			public BlockState ToBlockState(Block block) {
-				return new BlockState(block, properties);
-			}
+		//		[Obsolete]
+		//		public class PersistencyJsonConverter : JsonConverter<PersistencyInfo> {
+		//			public override PersistencyInfo? ReadJson(JsonReader reader, Type objectType, PersistencyInfo? existingValue, bool hasExistingValue, JsonSerializer serializer) {
+		//				if (reader.TokenType == JsonToken.Null) {
+		//					return null;
+		//				}
+		//				JObject obj = JObject.Load(reader);
+		//				var propertiesToken = obj["properties"] as JObject
+		//					?? throw new JsonSerializationException("Missing 'properties' field in PersistencyInfo JSON.");
+		//				var properties = new Dictionary<IBlockStateProperty, object>();
 
-			[Obsolete]
-			public class PersistencyJsonConverter : JsonConverter<PersistencyInfo> {
-				public override PersistencyInfo? ReadJson(JsonReader reader, Type objectType, PersistencyInfo? existingValue, bool hasExistingValue, JsonSerializer serializer) {
-					if (reader.TokenType == JsonToken.Null) {
-						return null;
-					}
-					JObject obj = JObject.Load(reader);
-					var propertiesToken = obj["properties"] as JObject
-						?? throw new JsonSerializationException("Missing 'properties' field in PersistencyInfo JSON.");
-					var properties = new Dictionary<IBlockStateProperty, object>();
+		//				foreach (var kvp in propertiesToken) {
+		//					JToken valueToken = kvp.Value!;
+		//					if (valueToken == null) {
+		//						continue;
+		//					}
 
-					foreach (var kvp in propertiesToken) {
-						JToken valueToken = kvp.Value!;
-						if (valueToken == null) {
-							continue;
-						}
+		//					if (valueToken.Type == JTokenType.Object
+		//							&& valueToken["value"] != null
+		//							&& valueToken["type"] != null) {
+		//						string typeName = valueToken["type"]!.Value<string>()!;
+		//						Type valueType = Type.GetType(typeName)!;
+		//						object value = valueToken["value"]!.ToObject(valueType, serializer)!;
 
-						if (valueToken.Type == JTokenType.Object
-								&& valueToken["value"] != null
-								&& valueToken["type"] != null) {
-							string typeName = valueToken["type"]!.Value<string>()!;
-							Type valueType = Type.GetType(typeName)!;
-							object value = valueToken["value"]!.ToObject(valueType, serializer)!;
+		//						Type propertyType = typeof(BlockProperty<>).MakeGenericType(valueType);
+		//						IBlockStateProperty property = (IBlockStateProperty)Activator.CreateInstance(propertyType, kvp.Key);
 
-							Type propertyType = typeof(BlockProperty<>).MakeGenericType(valueType);
-							IBlockStateProperty property = (IBlockStateProperty)Activator.CreateInstance(propertyType, kvp.Key);
+		//						properties[property] = value;
+		//					} else {
+		//						object? primitiveValue = valueToken.ToObject<object>(serializer);
+		//						Type valueType = primitiveValue?.GetType() ?? typeof(object);
 
-							properties[property] = value;
-						} else {
-							object? primitiveValue = valueToken.ToObject<object>(serializer);
-							Type valueType = primitiveValue?.GetType() ?? typeof(object);
+		//						Type propertyType = typeof(BlockProperty<>).MakeGenericType(valueType);
+		//						IBlockStateProperty property = (IBlockStateProperty)Activator.CreateInstance(propertyType, kvp.Key);
 
-							Type propertyType = typeof(BlockProperty<>).MakeGenericType(valueType);
-							IBlockStateProperty property = (IBlockStateProperty)Activator.CreateInstance(propertyType, kvp.Key);
+		//						properties[property] = primitiveValue!; 
+		//					}
+		//				}
 
-							properties[property] = primitiveValue!; 
-						}
-					}
+		//				//return new PersistencyInfo(new BlockStateProperties(properties));
+		//				return default;
+		//			}
 
-					//return new PersistencyInfo(new BlockStateProperties(properties));
-					return default;
-				}
+		//			public override void WriteJson(JsonWriter writer, PersistencyInfo? value, JsonSerializer serializer) {
+		//				if (value == null) {
+		//					writer.WriteNull();
+		//					return;
+		//				}
 
-				public override void WriteJson(JsonWriter writer, PersistencyInfo? value, JsonSerializer serializer) {
-					if (value == null) {
-						writer.WriteNull();
-						return;
-					}
+		//				writer.WriteStartObject();
+		//				writer.WritePropertyName("hash");
+		//				serializer.Serialize(writer, value.hash);
+		//				writer.WritePropertyName("properties");
+		//				writer.WriteStartObject();
+		//				//foreach (var kvp in value.properties) {
+		//				//	writer.WritePropertyName(kvp.Key.name);
+		//				//	serializer.Serialize(writer, kvp.Value);
+		//				//}
+		//				writer.WriteEndObject();
+		//				writer.WriteEndObject();
+		//			}
+		//		}
+		//	}
 
-					writer.WriteStartObject();
-					writer.WritePropertyName("hash");
-					serializer.Serialize(writer, value.hash);
-					writer.WritePropertyName("properties");
-					writer.WriteStartObject();
-					//foreach (var kvp in value.properties) {
-					//	writer.WritePropertyName(kvp.Key.name);
-					//	serializer.Serialize(writer, kvp.Value);
-					//}
-					writer.WriteEndObject();
-					writer.WriteEndObject();
-				}
-			}
-		}
+		//	[Obsolete]
+		//	public static class Serializer {
+		//		[Obsolete]
+		//		public static BlockState? Deserialize(JArray dataArray) {
+		//			if (dataArray.Count < 2) {
+		//				return null;
+		//			}
 
-		[Obsolete]
-		public static class Serializer {
-			[Obsolete]
-			public static BlockState? Deserialize(JArray dataArray) {
-				if (dataArray.Count < 2) {
-					return null;
-				}
+		//			int blockID = dataArray[0]!.Value<int>();
+		//			int stateHash = dataArray[1]!.Value<int>();
 
-				int blockID = dataArray[0]!.Value<int>();
-				int stateHash = dataArray[1]!.Value<int>();
+		//			Block block = Blocks.ByHashedID(blockID);
+		//			if (block == null) {
+		//				return Blocks.air.defaultState;
+		//			}
 
-				Block block = Blocks.ByHashedID(blockID);
-				if (block == null) {
-					return Blocks.air.defaultState;
-				}
+		//			if (block.TryGetState(stateHash, out var state)) {
+		//				return state;
+		//			}
 
-				if (block.TryGetStateByHash(stateHash, out var state)) {
-					return state;
-				}
+		//			logger.LogWarning($"Unknown state hash {stateHash} for block '{block.name}'");
+		//			return block.defaultState;
+		//		}
 
-				logger.LogWarning($"Unknown state hash {stateHash} for block '{block.name}'");
-				return block.defaultState;
-			}
+		//		[Obsolete]
+		//		public static JArray Serialize(BlockState state) {
+		//			int blockID = state.block.hashedID;
+		//			//int stateHash = state.block.ComputeHash(state.properties_obsolete);
 
-			[Obsolete]
-			public static JArray Serialize(BlockState state) {
-				int blockID = state.block.hashedID;
-				//int stateHash = state.block.ComputeHash(state.properties_obsolete);
+		//			//return new JArray { blockID, stateHash };
+		//			return new();
+		//		}
+		//	}
 
-				//return new JArray { blockID, stateHash };
-				return new();
-			}
-		}
+		//	public sealed class BlockStateJsonConverter : JsonConverter<BlockState> {
+		//		public override BlockState? ReadJson(JsonReader reader, Type objectType, BlockState? existingValue, bool hasExistingValue, JsonSerializer serializer) {
+		//			if (reader.TokenType == JsonToken.Null) {
+		//				return null;
+		//			}
 
-		public sealed class BlockStateJsonConverter : JsonConverter<BlockState> {
-			public override BlockState? ReadJson(JsonReader reader, Type objectType, BlockState? existingValue, bool hasExistingValue, JsonSerializer serializer) {
-				if (reader.TokenType == JsonToken.Null) {
-					return null;
-				}
+		//			var array = JArray.Load(reader);
+		//			return Serializer.Deserialize(array);
+		//		}
 
-				var array = JArray.Load(reader);
-				return Serializer.Deserialize(array);
-			}
+		//		public override void WriteJson(JsonWriter writer, BlockState? value, JsonSerializer serializer) {
+		//			if (value == null) {
+		//				writer.WriteNull();
+		//				return;
+		//			}
 
-			public override void WriteJson(JsonWriter writer, BlockState? value, JsonSerializer serializer) {
-				if (value == null) {
-					writer.WriteNull();
-					return;
-				}
-
-				serializer.Serialize(writer, Serializer.Serialize(value));
-			}
-		}
+		//			serializer.Serialize(writer, Serializer.Serialize(value));
+		//		}
+		//	}
 	}
 }
