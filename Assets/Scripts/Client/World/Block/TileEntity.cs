@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Unity.Plastic.Newtonsoft.Json;
 using Unity.Plastic.Newtonsoft.Json.Linq;
+using UnityEngine.Tilemaps;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
 	public abstract class TileEntity {
@@ -28,5 +29,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		protected void Set<T>(string key, T value) {
 			data[key] = value;
 		}
+
+		public virtual void Render(BlockState blockState, Tilemap tilemap) { }
 	}
 }

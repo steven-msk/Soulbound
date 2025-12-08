@@ -88,7 +88,9 @@ namespace SoulboundBackend.Client.World.Chunk {
 
 					if (stateHash != 0) {
 						BlockState state = BlockStateRegistry.Get(stateHash);
-						tilemap.SetTile(new Vector3Int(xStart + x, y), state.block.tileReference);
+						BlockPos pos = new(xStart + x, y);
+
+						state.block.Render(state, tileEntities[x][yIndex], pos, tilemap);
 					} else {
 						UnityEngine.Debug.LogError($"Attempted to render ungenerated terrain! {new ChunkBlockPos(x, y, this.cx).ToString()}");
 					}

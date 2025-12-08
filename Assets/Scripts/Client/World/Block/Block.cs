@@ -6,7 +6,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
+using UnityEngine;
 using UnityEngine.Tilemaps;
+using Logger = SoulboundBackend.Common.Logging.Logger;
 
 #nullable enable
 
@@ -63,6 +65,11 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public virtual void OnNeighborStateChanged(BlockPos selfPos, BlockPos neighborPos, BlockState oldState, BlockState newState) {
 		}
 		public abstract IEnumerable<ItemStack> GetDrops(BlockState blockState, BreakSource source);
+
+		public virtual void Render(BlockState state, TileEntity? tileEntity, BlockPos pos, Tilemap tilemap) {
+			tilemap.SetTile((Vector3Int)pos, tileReference);
+			tileEntity?.Render(state, tilemap);
+		}
 
 		public bool TryGetState(int hash, out BlockState state) {
 			return statesByHash.TryGetValue(hash, out state);

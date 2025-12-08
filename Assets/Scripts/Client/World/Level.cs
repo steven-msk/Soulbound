@@ -101,6 +101,7 @@ namespace SoulboundBackend.Client.World {
 
 			for (int dx = -RENDER_DISTANCE; dx <= RENDER_DISTANCE; dx++) {
 				int chunkX = pivotChunkX + dx;
+
 				if (!loadedChunks.ContainsKey(chunkX)) {
 					WorldChunk chunk = new(chunkX);
 
@@ -124,14 +125,6 @@ namespace SoulboundBackend.Client.World {
 				}
 			}
 		}
-
-		//public void SpawnEntity(Entity entity, EntitySpawnData spawnData) {
-		//	levelManager.SpawnEntity(entity, spawnData);
-		//}
-
-		//public void RemoveEntityImmediately(Entity entity, bool destroy) {
-		//	levelManager.RemoveEntityImmediately(entity, destroy);
-		//}
 
 		public bool IsChunkLoaded(WorldChunk chunk) => loadedChunks.ContainsValue(chunk);
 
@@ -308,11 +301,11 @@ namespace SoulboundBackend.Client.World {
 			pendingUpdates[chunkX].Add((chunkBlockPos, blockState));
 		}
 
-		public void UnloadDistantChunks(int playerChunkX, int viewDistance) {
+		public void UnloadDistantChunks(int pivotChunkX, int viewDistance) {
 			List<WorldChunk> toRemove = new();
 
 			foreach (int chunkX in loadedChunks.Keys) {
-				if (Mathf.Abs(chunkX - playerChunkX) > viewDistance) {
+				if (Mathf.Abs(chunkX - pivotChunkX) > viewDistance) {
 					toRemove.Add(loadedChunks[chunkX]);
 				}
 			}

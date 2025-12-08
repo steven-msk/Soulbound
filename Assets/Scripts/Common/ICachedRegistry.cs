@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace SoulboundBackend.Common {
-    public interface ICachedRegistry<T> where T : class, IHashableReference {
+    public interface ICachedRegistry<T> where T : IHashableReference {
         protected static ConcurrentDictionary<int, T> cached = new();
         protected static ConcurrentDictionary<int, Func<T>> cachedReferences = new();
 
@@ -34,14 +34,6 @@ namespace SoulboundBackend.Common {
             int hash = HashHelper.StableHash(cacheAttribute.propertyName);
             cachedReferences[hash] = accessor;
             cached[hash] = accessor.Invoke();
-        }
-
-        public static IDictionary<int, T> GetCachedRegistry() {
-            return cached;
-        }
-
-        public static IDictionary<int, Func<T>> GetCachedReferences() {
-            return cachedReferences;
         }
     }
 }

@@ -95,7 +95,7 @@ namespace BlockTests {
 			Assert.That(BlockStateRegistry.Get(block.defaultState.stateHash), Is.EqualTo(block.defaultState));
 		}
 
-		// the following tests use obsolete features and have been commented out
+		// the following tests use obsolete features and have been commented out for this reason
 
 		//[Test]
 		//public void Blocks_SameProperty_ReturnsSameInstance() {
