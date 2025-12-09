@@ -406,8 +406,8 @@ Based on the dependency graph, this could be an optimal order:
 3. [Serialization](#17-serialization) (foundation only) * *delayed until all WorldDump fields are stable*
 4. [Stat system](#5-stat-system) * *some features might be missing, but most systems are working*
 5. [Entity system](#6-entity-system) >| *components wil be handled during productions*
-6. [Block system](#8-block-system) <-
-7. [Chunk generation](#9-chunk-generation)
+6. [Block system](#8-block-system) >| *TileEntity serialization and lifetime aspects TBD when working on the level system*
+7. [Chunk generation](#9-chunk-generation) <-
 11. [World rendering](#10-world-rendering)
 8. [Physics system](#7-physics-system) (universal overhaul)
 9. [UI Core layer & navigation system](#13-ui-systems-overall)
