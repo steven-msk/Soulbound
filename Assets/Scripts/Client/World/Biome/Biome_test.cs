@@ -16,7 +16,9 @@ namespace Assets.Scripts.Client.World.Biome {
 		}
 
 		public IDensityGenerator CreateDensityGenerator(int colX) {
-			return new SimpleHeightmapColumnGenerator(this, platformHeight, new PerlinNoise(0.01f, 100f));
+			const int seed = 94839204;
+
+			return new SimpleHeightmapColumnGenerator(this, platformHeight, new PerlinNoise(seed, 0.01f, 100f));
 		}
 
 		public BlockState ResolveBlock(float density, int x, int y) {
