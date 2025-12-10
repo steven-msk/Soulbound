@@ -10,6 +10,7 @@ using Unity.Plastic.Newtonsoft.Json.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using System.IO;
+using SoulboundBackend.Client.World.Generation;
 
 namespace SoulboundBackend.Client.World.Chunk {
 	[JsonConverter(typeof(WorldChunk.Serializer))]
@@ -29,8 +30,11 @@ namespace SoulboundBackend.Client.World.Chunk {
 		private int cx;
 		public int xpos => cx;
 
+		private readonly IBiome[] biomeColumns;
+
 		public WorldChunk(int cx) { 
 			this.cx = cx;
+
 			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
 				tileEntities[x] = new TileEntity[Level.WORLD_HEIGHT];
 				stateHashes[x] = new int[Level.WORLD_HEIGHT];
@@ -41,6 +45,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 
 		// PLANNED REFACTOR: chunk generation logic - required when introducing biomes
 		public ChunkHeightmapData GenerateHeightmap(INoiseGenerator1D heightGenerator) {
+
 			int startX = cx * Level.CHUNK_LENGTH;
 			Dictionary<int, int> surfaceLevels = new();
 			int highestStone = 0;
@@ -69,9 +74,22 @@ namespace SoulboundBackend.Client.World.Chunk {
 				}
 			}
 
+
+
 			ChunkHeightmapData generationData = new ChunkHeightmapData(surfaceLevels, highestStone);
 			this.heightmapData = generationData;
 			return generationData;
+		}
+
+		public void GenerateByBiomeCols_PROTOTYPICAL(IBiome[] biomeColumns) {
+			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
+				var columnGenerator = biomeColumns[x].CreateColumnGenerator(x);
+
+				for (int y = 0; y < Level.WORLD_HEIGHT; y++) {
+					var state = columnGenerator.ResolveBlock(x, y);
+					stateHashes[x][y] = state.stateHash;
+				}
+			}
 		}
 
 		int WorldYToIndex(int worldY) => worldY - minY;

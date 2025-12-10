@@ -16,7 +16,7 @@ namespace SoulboundBackend.Client.World.Generation {
 		}
 
 		public float SampleDensity(int x, int y) {
-			return height - y;
+			return y - height;
 		}
 
 		public BlockState ResolveBlock(int x, int y) {

@@ -1,6 +1,8 @@
-﻿using SoulboundBackend.Client.World.BlockSystem;
+﻿using Assets.Scripts.Client.World.Biome;
+using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Client.World.Chunk;
 using SoulboundBackend.Client.World.EntitySystem;
+using SoulboundBackend.Client.World.Generation;
 using SoulboundBackend.Client.World.Structure;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core;
@@ -103,7 +105,7 @@ namespace SoulboundBackend.Client.World {
 				int chunkX = pivotChunkX + dx;
 
 				if (!loadedChunks.ContainsKey(chunkX)) {
-					WorldChunk chunk = new(chunkX);
+					WorldChunk chunk;
 
 					if (!generatedChunks.ContainsKey(chunkX)) {
 						chunk = this.GenerateNewChunk(chunkX);
@@ -131,8 +133,15 @@ namespace SoulboundBackend.Client.World {
 		public bool IsChunkLoaded(int chunkX) => loadedChunks.ContainsKey(chunkX);
 
 		private WorldChunk GenerateNewChunk(int chunkX) {
+			var biome = new Biome_test(50);
+			IBiome[] biomeColumns = new IBiome[Level.CHUNK_LENGTH];
+			for (int i = 0; i < biomeColumns.Length; i++) {
+				biomeColumns[i] = biome;
+			}
+
 			WorldChunk chunk = new(chunkX);
 			ChunkHeightmapData heightmapData = chunk.GenerateHeightmap(this.heightGenerator);
+			chunk.GenerateByBiomeCols_PROTOTYPICAL(biomeColumns);
 			generatedChunks[chunkX] = chunk;
 
 			for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
