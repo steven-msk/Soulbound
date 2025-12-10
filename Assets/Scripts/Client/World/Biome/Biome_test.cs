@@ -16,11 +16,17 @@ namespace Assets.Scripts.Client.World.Biome {
 		}
 
 		public IColumnGenerator CreateColumnGenerator(int colX) {
-			return new SimpleHeightmapColumnGenerator(this, colX >= Level.CHUNK_LENGTH / 3 ? platformHeight + colX : platformHeight);
+			return new SimpleHeightmapColumnGenerator(this, platformHeight);
 		}
 
-		public BlockState ResolveBlock(float colDensity, int x, int y) {
-			return colDensity < 0 ? Blocks.stone.defaultState : Blocks.air.defaultState;
+		public BlockState ResolveBlock(float density, int x, int y) {
+			if (density <= 0)
+				return Blocks.air.defaultState;
+			if (density < 4)
+				return Blocks.grass.defaultState;
+			if (density < 1)
+				return Blocks.dirt.defaultState;
+			return Blocks.stone.defaultState;
 		}
 	}
 }

@@ -141,7 +141,10 @@ namespace SoulboundBackend.Client.World {
 
 			WorldChunk chunk = new(chunkX);
 			ChunkHeightmapData heightmapData = chunk.GenerateHeightmap(this.heightGenerator);
+
+			// overrides all states set in GenerateHeightmap
 			chunk.GenerateByBiomeCols_PROTOTYPICAL(biomeColumns);
+
 			generatedChunks[chunkX] = chunk;
 
 			for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
