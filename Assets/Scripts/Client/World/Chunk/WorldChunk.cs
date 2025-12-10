@@ -83,10 +83,10 @@ namespace SoulboundBackend.Client.World.Chunk {
 
 		public void GenerateByBiomeCols_PROTOTYPICAL(IBiome[] biomeColumns) {
 			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
-				var columnGenerator = biomeColumns[x].CreateColumnGenerator(x);
+				var columnGenerator = biomeColumns[x].CreateDensityGenerator(x);
 
 				for (int y = 0; y < Level.WORLD_HEIGHT; y++) {
-					var state = columnGenerator.ResolveBlock(x, y);
+					var state = columnGenerator.ResolveBlock(x + cx * Level.CHUNK_LENGTH, y);
 					stateHashes[x][y] = state.stateHash;
 				}
 			}

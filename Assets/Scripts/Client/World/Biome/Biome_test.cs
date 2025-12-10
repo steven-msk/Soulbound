@@ -15,8 +15,8 @@ namespace Assets.Scripts.Client.World.Biome {
 			this.platformHeight = platformHeight;
 		}
 
-		public IColumnGenerator CreateColumnGenerator(int colX) {
-			return new SimpleHeightmapColumnGenerator(this, platformHeight);
+		public IDensityGenerator CreateDensityGenerator(int colX) {
+			return new SimpleHeightmapColumnGenerator(this, platformHeight, new PerlinNoise(0.01f, 100f));
 		}
 
 		public BlockState ResolveBlock(float density, int x, int y) {
