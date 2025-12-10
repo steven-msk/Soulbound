@@ -398,6 +398,10 @@ Status: ⚙️ Prototype (implemented poorly, not respecting separation of conce
 - Internal timing system
 - Any action systems that happen concurrently
 
+#### 19. Level system
+Status: ⚙️ Prototype (currently very limiting)
+- General aspects of the level (contexts, events, block, entity management, serialization)
+
 ## Recommended Production Order (Top to bottom)
 Based on the dependency graph, this could be an optimal order:
 [EDIT]: For convenience during late prototyping, categories have been marked accordingly to ease development: `*` means started but not finished, `<-` marks a focus point, `>|` means ready for production, `>>>` means progressively developed (see [notes](#notes))
@@ -409,13 +413,14 @@ Based on the dependency graph, this could be an optimal order:
 6. [Block system](#8-block-system) >| *TileEntity serialization and lifetime aspects TBD when working on the level system*
 7. [Chunk generation](#9-chunk-generation) <-
 11. [World rendering](#10-world-rendering)
-8. [Physics system](#7-physics-system) (universal overhaul)
-9. [UI Core layer & navigation system](#13-ui-systems-overall)
-10. [Tooltips](#14-tooltips)
-11. [Settings](#16-settings-ui) *
-12. [Debug visuals](#15-debug-visuals)
-13. [Lighting](#11-lighting-system)
-14. [Audio](#12-audio-system)
+12. [Level system](#19-level-system)
+13. [Physics system](#7-physics-system) (universal overhaul)
+14. [UI Core layer & navigation system](#13-ui-systems-overall)
+15. [Tooltips](#14-tooltips)
+16. [Settings](#16-settings-ui) *
+17. [Debug visuals](#15-debug-visuals)
+18. [Lighting](#11-lighting-system)
+19. [Audio](#12-audio-system)
 
 ##### Exceptions
 
