@@ -8,7 +8,7 @@ using TreeEditor;
 using UnityEngine;
 
 namespace SoulboundBackend.Client.World.Generation {
-	public class PerlinNoise : IDensityModulation {
+	public class PerlinNoise : INoise {
 		private Perlin noise;
 		private readonly float frequencyX;
 		private readonly float frequencyY;
@@ -36,15 +36,20 @@ namespace SoulboundBackend.Client.World.Generation {
 			this.offsetY = random.Next(-100000, 100000);
 		}
 
-		public float Apply(float density, int x, int y) {
-			float noise = this.noise.Noise(x * frequencyX + offsetX, y * frequencyY + offsetY);
-			return density + noise * amplitude;
+		public float Sample(float arg) {
+			return noise.Noise(arg * frequencyX + offsetX) * amplitude;
 		}
 
-		public float Noise(float arg) => noise.Noise(arg);
+		public float Sample(float x, float y) { 
+			return noise.Noise(x * frequencyX + offsetX, y * frequencyY + offsetY) * amplitude;
+		}
 
-		public float Noise(float x, float y) => noise.Noise(x, y);
+		public float Sample(float x, float y, float z) { 
+			return noise.Noise(x * frequencyX + offsetX, y * frequencyY + offsetY, z) * amplitude; 
+		}
 
-		public float Noise(float x, float y, float z) => noise.Noise(x, y, z);
+		public float Sample1D(float x) {
+			return Mathf.PerlinNoise1D(x * frequencyX + offsetX) * amplitude;
+		}
 	}
 }

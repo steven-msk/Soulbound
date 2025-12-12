@@ -133,7 +133,7 @@ namespace SoulboundBackend.Client.World {
 		public bool IsChunkLoaded(int chunkX) => loadedChunks.ContainsKey(chunkX);
 
 		private WorldChunk GenerateNewChunk(int chunkX) {
-			var biome = new Biome_test(50);
+			var biome = new Biome_test(seed, 150);
 			IBiome[] biomeColumns = new IBiome[Level.CHUNK_LENGTH];
 			for (int i = 0; i < biomeColumns.Length; i++) {
 				biomeColumns[i] = biome;

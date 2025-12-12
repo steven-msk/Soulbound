@@ -5,7 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.World.Generation {
-	public interface IDensityModulation {
-		float Apply(float density, int x, int y);
+	public interface INoise {
+		float Sample(float arg);
+		float Sample(float x, float y);
+		float Sample(float x, float y, float z);
 	}
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.World.Generation {
 	public interface IBiome {
-		IDensityGenerator CreateDensityGenerator(int colX);
+		float GetDensity(int x, int y);
 		BlockState ResolveBlock(float colDensity, int x, int y);
 	}
 }
