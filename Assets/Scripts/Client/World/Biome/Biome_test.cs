@@ -16,13 +16,15 @@ namespace Assets.Scripts.Client.World.Biome {
 		private readonly PerlinNoise largeNoise;
 		private readonly PerlinNoise mediumNoise;
 		private readonly PerlinNoise detailNoise;
+		private readonly PerlinNoise caveNoise;
 
 		public Biome_test(int seed, int platformHeight) {
 			this.platformHeight = platformHeight;
 			this.largeNoise = new PerlinNoise(seed, frequency: 0.008f, amplitude: 90f);
-			this.mediumNoise = new PerlinNoise(seed, frequency: 0.003f, amplitude: 65f); 
+			this.mediumNoise = new PerlinNoise(seed, frequency: 0.003f, amplitude: 65f);
 			this.detailNoise = new PerlinNoise(seed, frequency: 0.12f, amplitude: 5f);
 			this.heightmap = new Heightmap(platformHeight);
+			this.caveNoise = new PerlinNoise(seed, frequency: 0.015f, amplitude: 1f);
 		}
 
 		public float GetDensity(int x, int y) {
@@ -30,7 +32,19 @@ namespace Assets.Scripts.Client.World.Biome {
 			float mn = mediumNoise.Sample1D(x) * 2f - 1f;
 			float dn = detailNoise.Sample1D(x) * 2f - 1f;
 			float height = ln + mn + dn - platformHeight;
-			return height - y;
+			float density = height - y;
+
+			//if (density >= 5) {
+			//	float cave = caveNoise.Sample2D(x, y);
+
+			//	const float caveThreshold = 0.01f;
+			//	if (cave > caveThreshold) {
+			//		float carvePower = (cave - caveThreshold) * 12f;
+			//		density -= carvePower;
+			//	}
+			//}
+
+			return density;
 		}
 
 		public BlockState ResolveBlock(float density, int x, int y) {

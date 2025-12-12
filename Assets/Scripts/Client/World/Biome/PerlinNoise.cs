@@ -9,6 +9,8 @@ using UnityEngine;
 
 namespace SoulboundBackend.Client.World.Generation {
 	public class PerlinNoise : INoise {
+
+		[Obsolete]
 		private Perlin noise;
 		private readonly float frequencyX;
 		private readonly float frequencyY;
@@ -37,19 +39,19 @@ namespace SoulboundBackend.Client.World.Generation {
 		}
 
 		public float Sample(float arg) {
+			return Mathf.PerlinNoise1D(arg * frequencyX + offsetX) * amplitude;
 			return noise.Noise(arg * frequencyX + offsetX) * amplitude;
 		}
 
-		public float Sample(float x, float y) { 
+		public float Sample2D(float x, float y) { 
+			return Mathf.PerlinNoise(x * frequencyX + offsetX, y * frequencyY + offsetY) * amplitude;
 			return noise.Noise(x * frequencyX + offsetX, y * frequencyY + offsetY) * amplitude;
 		}
 
-		public float Sample(float x, float y, float z) { 
+		public float Sample3D(float x, float y, float z) { 
 			return noise.Noise(x * frequencyX + offsetX, y * frequencyY + offsetY, z) * amplitude; 
 		}
 
-		public float Sample1D(float x) {
-			return Mathf.PerlinNoise1D(x * frequencyX + offsetX) * amplitude;
-		}
+		public float Sample1D(float x) => Sample(x);
 	}
 }
