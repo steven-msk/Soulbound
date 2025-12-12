@@ -9,9 +9,7 @@ using UnityEngine;
 
 namespace SoulboundBackend.Client.World.Generation {
 	public class PerlinNoise : INoise {
-
-		[Obsolete]
-		private Perlin noise;
+		private readonly FastNoiseLite noise;
 		private readonly float frequencyX;
 		private readonly float frequencyY;
 		private readonly float offsetX;
@@ -30,28 +28,24 @@ namespace SoulboundBackend.Client.World.Generation {
 		}
 
 		private PerlinNoise(int seed) {
-			this.noise = new Perlin();
-			this.noise.SetSeed(seed);
+			this.noise = new FastNoiseLite(seed);
+			this.noise.SetNoiseType(FastNoiseLite.NoiseType.Perlin);
 
 			System.Random random = new System.Random(seed);
 			this.offsetX = random.Next(-100000, 100000);
 			this.offsetY = random.Next(-100000, 100000);
 		}
 
-		public float Sample(float arg) {
-			return Mathf.PerlinNoise1D(arg * frequencyX + offsetX) * amplitude;
-			return noise.Noise(arg * frequencyX + offsetX) * amplitude;
+		public float Sample1D(float x) {
+			return noise.GetNoise(x * frequencyX + offsetX, 0f) * amplitude;
 		}
 
-		public float Sample2D(float x, float y) { 
-			return Mathf.PerlinNoise(x * frequencyX + offsetX, y * frequencyY + offsetY) * amplitude;
-			return noise.Noise(x * frequencyX + offsetX, y * frequencyY + offsetY) * amplitude;
+		public float Sample2D(float x, float y) {
+			return noise.GetNoise(x * frequencyX + offsetX, y * frequencyY + offsetY) * amplitude;
 		}
 
-		public float Sample3D(float x, float y, float z) { 
-			return noise.Noise(x * frequencyX + offsetX, y * frequencyY + offsetY, z) * amplitude; 
+		public float Sample3D(float x, float y, float z) {
+			return noise.GetNoise(x * frequencyX + offsetX, y * frequencyY + offsetY, z) * amplitude;
 		}
-
-		public float Sample1D(float x) => Sample(x);
 	}
 }

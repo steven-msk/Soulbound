@@ -20,18 +20,18 @@ namespace Assets.Scripts.Client.World.Biome {
 
 		public Biome_test(int seed, int platformHeight) {
 			this.platformHeight = platformHeight;
-			this.largeNoise = new PerlinNoise(seed, frequency: 0.008f, amplitude: 90f);
-			this.mediumNoise = new PerlinNoise(seed, frequency: 0.003f, amplitude: 65f);
+			this.largeNoise = new PerlinNoise(seed, frequency: 1f, amplitude: 60f);
+			this.mediumNoise = new PerlinNoise(seed, frequency: 0.7f, amplitude: 40f);
 			this.detailNoise = new PerlinNoise(seed, frequency: 0.12f, amplitude: 5f);
 			this.heightmap = new Heightmap(platformHeight);
 			this.caveNoise = new PerlinNoise(seed, frequency: 0.015f, amplitude: 1f);
 		}
 
 		public float GetDensity(int x, int y) {
-			float ln = largeNoise.Sample1D(x) * 2f - 1f;
-			float mn = mediumNoise.Sample1D(x) * 2f - 1f;
-			float dn = detailNoise.Sample1D(x) * 2f - 1f;
-			float height = ln + mn + dn - platformHeight;
+			float ln = largeNoise.Sample1D(x);
+			float mn = mediumNoise.Sample1D(x);
+			float dn = detailNoise.Sample1D(x);
+			float height = platformHeight + ln + mn + dn;
 			float density = height - y;
 
 			//if (density >= 5) {
