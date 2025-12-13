@@ -16,8 +16,8 @@ namespace SoulboundBackend.Client.World.Chunk {
 	[JsonConverter(typeof(WorldChunk.Serializer))]
 	public class WorldChunk : ITickable {
 		private static readonly Logger logger = Logger.CreateInstance();
-		public static readonly int minY = -Level.WORLD_HEIGHT / 2;
-		public static readonly int maxY = Level.WORLD_HEIGHT / 2;
+		public const int minY = -Level.WORLD_HEIGHT / 2;
+		public const int maxY = Level.WORLD_HEIGHT / 2;
 		public const float HEIGHT_SPREAD = 0.01f;
 		public const float SURFACE_HEIGHT_RANGE = 50f;
 		public const float UNDERGROUND_HEIGHT_RANGE = 20f;
