@@ -34,6 +34,7 @@ namespace SoulboundBackend.Client.World.Generation {
 			System.Random random = new System.Random(seed);
 			this.offsetX = random.Next(-100000, 100000);
 			this.offsetY = random.Next(-100000, 100000);
+			UnityEngine.Debug.Log(offsetX + ", " + offsetY);
 		}
 
 		public float Sample1D(float x) {

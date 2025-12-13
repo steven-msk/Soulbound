@@ -24,31 +24,28 @@ namespace Assets.Scripts.Client.World.Biome {
 			this.mediumNoise = new PerlinNoise(seed, frequency: 0.7f, amplitude: 40f);
 			this.detailNoise = new PerlinNoise(seed, frequency: 0.12f, amplitude: 5f);
 			this.heightmap = new Heightmap(platformHeight);
-			this.caveNoise = new PerlinNoise(seed, frequency: 0.015f, amplitude: 1f);
+			this.caveNoise = new PerlinNoise(seed + 1200, frequency: 0.5f, amplitude: 5f);
 		}
 
 		public float GetDensity(int x, int y) {
-			float ln = largeNoise.Sample1D(x);
-			float mn = mediumNoise.Sample1D(x);
-			float dn = detailNoise.Sample1D(x);
+			const float maxSolidDepth = 10f;
+			float ln = Mathf.Abs(largeNoise.Sample1D(x));
+			float mn = Mathf.Abs(mediumNoise.Sample1D(x));
+			float dn = Mathf.Abs(detailNoise.Sample1D(x));
 			float height = platformHeight + ln + mn + dn;
-			float density = height - y;
-
-			//if (density >= 5) {
-			//	float cave = caveNoise.Sample2D(x, y);
-
-			//	const float caveThreshold = 0.01f;
-			//	if (cave > caveThreshold) {
-			//		float carvePower = (cave - caveThreshold) * 12f;
-			//		density -= carvePower;
-			//	}
-			//}
-
+			float depth = height - y;
+			float normalizedDepth = Mathf.Clamp01(depth / maxSolidDepth);
+			float density = normalizedDepth * maxSolidDepth;
 			return density;
 		}
 
+		private bool IsCave(int x, int y) {
+			float n = Mathf.Abs(caveNoise.Sample2D(x, y));
+			return n > 0.65f;
+		}
+
 		public BlockState ResolveBlock(float density, int x, int y) {
-			if (density <= 0)
+			if (density <= 0 || IsCave(x, y))
 				return Blocks.air.defaultState;
 			if (density < 4)
 				return Blocks.grass.defaultState;
