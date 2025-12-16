@@ -15,7 +15,11 @@ namespace Assets.Scripts.Client.World.Biome {
 		const float surfaceFalloff = 15f;
 		const float bottomFalloff = 10f;
 		const float caveThreshold = 0.98f;
-		const float tunnelThreshold = 0.95f;
+		const float smallTunnelThreshold = 0.92f;
+		const float largeTunnelThreshold = 0.91f;
+		const float verticalTunnelCompression = 0.2f;
+		const float tunnelKillMin = 0.2f;
+		const float tunnelKillMax = 0.7f;
 
 		private readonly int platformHeight;
 		private readonly int seed;
@@ -23,9 +27,10 @@ namespace Assets.Scripts.Client.World.Biome {
 		private readonly PerlinNoise largeNoise;
 		private readonly PerlinNoise mediumNoise;
 		private readonly PerlinNoise detailNoise;
-		private readonly PerlinNoise caveNoise;
+		private readonly PerlinNoise smallCaveNoise;
+		private readonly PerlinNoise largeCaveNoise;
+		private readonly PerlinNoise tunnelKillNoise;
 		private readonly DomainWarp warp;
-		private readonly DomainWarp largeWarp;
 
 		public Biome_test(int seed, int platformHeight) {
 			this.platformHeight = platformHeight;
@@ -33,8 +38,10 @@ namespace Assets.Scripts.Client.World.Biome {
 			this.mediumNoise = new PerlinNoise(seed, frequency: 0.7f, amplitude: 40f);
 			this.detailNoise = new PerlinNoise(seed, frequency: 0.12f, amplitude: 5f);
 			this.heightmap = new Heightmap(platformHeight);
-			this.caveNoise = new PerlinNoise(seed, frequency: 0.5f, amplitude: 1f);
-			this.warp = new DomainWarp(seed, frequency: 0.125f);
+			this.smallCaveNoise = new PerlinNoise(seed, frequency: 0.7f, amplitude: 1f);
+			this.largeCaveNoise = new PerlinNoise(seed, frequency: 0.15f, amplitude: 2.4f);
+			this.tunnelKillNoise = new PerlinNoise(seed, frequency: 0.05f, 1f);
+			this.warp = new DomainWarp(seed, frequency: 0.5f);   
 		}
 
 		public float GetDepth(int x, int y) {
@@ -45,17 +52,28 @@ namespace Assets.Scripts.Client.World.Biome {
 		}
 
 		private bool IsCave(int x, int y) {
-			float n = Mathf.Abs(caveNoise.Sample2D(x, y));
-			return n * GetVerticalMask(x, y) > caveThreshold;
+			float n = Mathf.Abs(smallCaveNoise.Sample2D(x, y));
+			float mask = Mathf.Pow(GetVerticalMask(x, y), 4f);
+
+			float thresholdFactor = Mathf.InverseLerp(WorldChunk.minY, SurfaceHeightAtX(x) - surfaceFalloff, y);
+			thresholdFactor = FastExp(1f - Mathf.Clamp01(thresholdFactor), 20);
+
+			return n * mask > 1f - thresholdFactor;
 		}
 
 		private bool IsTunnel(int x, int y) {
-			float wx = x, wy = y;
-			warp.Warp2D(ref wx, ref wy);
-			float n = 1f - Mathf.Abs(caveNoise.Sample2D(x + wx, y + wy));
+			float wx = x, wy = y, zSlice = seed;
+			float verticalMask = GetVerticalMask(x, y);
 
-			float verticalMask = GetVerticalMask(x, y) * GetPeakBias(x, y);
-			return n * verticalMask > tunnelThreshold;
+			warp.Warp3D(ref wx, ref wy, ref zSlice);
+			float n = 1f - Mathf.Abs(smallCaveNoise.Sample2D(wx, wy / verticalTunnelCompression));
+			n *= verticalMask;
+
+			//warp.Warp2D(ref wx, ref wy);
+			//float n1 = 1f - Mathf.Abs(largeCaveNoise.Sample2D(wx * 0.35f, wy));
+			//n1 *= verticalMask * GetSurfaceMask(x, y, surfaceFalloff * 15f);
+
+			return n > smallTunnelThreshold;
 		}
 
 		private float GetPeakBias(int x, int y) {
@@ -74,9 +92,9 @@ namespace Assets.Scripts.Client.World.Biome {
 			return platformHeight + ln + mn + dn;
 		}
 
-		private float GetSurfaceMask(int x, int y) {
+		private float GetSurfaceMask(int x, int y, float falloff) {
 			float surfaceY = SurfaceHeightAtX(x);
-			float t = Mathf.InverseLerp(surfaceY - surfaceFalloff, surfaceY, y);
+			float t = Mathf.InverseLerp(surfaceY - falloff, surfaceY, y);
 			return 1f - Mathf.Clamp01(Mathf.SmoothStep(0f, 1f, t));
 		}
 
@@ -86,7 +104,7 @@ namespace Assets.Scripts.Client.World.Biome {
 		}
 
 		private float GetVerticalMask(int x, int y) {
-			return GetSurfaceMask(x, y) * GetBottomMask(y);
+			return GetSurfaceMask(x, y, surfaceFalloff) * GetBottomMask(y);
 		}
 
 		public BlockState ResolveBlock(float depth, int x, int y) {
@@ -97,6 +115,22 @@ namespace Assets.Scripts.Client.World.Biome {
 			if (depth < 1)
 				return Blocks.dirt.defaultState;
 			return Blocks.stone.defaultState;
+		}
+
+		public void PlaceFeatures(WorldChunk chunk) {
+			
+		}
+
+		private static float FastExp(float b, int n) {
+			float p = 1f;
+			while (n > 0) {
+				if (n % 2 == 1) {
+					p *= b;
+				}
+				b *= b;
+				n /= 2;
+			}
+			return p;
 		}
 	}
 }

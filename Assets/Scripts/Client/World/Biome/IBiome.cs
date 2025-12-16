@@ -1,4 +1,5 @@
 ﻿using SoulboundBackend.Client.World.BlockSystem;
+using SoulboundBackend.Client.World.Chunk;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,5 +10,6 @@ namespace SoulboundBackend.Client.World.Generation {
 	public interface IBiome {
 		float GetDepth(int x, int y);
 		BlockState ResolveBlock(float depth, int x, int y);
+		void PlaceFeatures(WorldChunk chunk);
 	}
 }

@@ -12,6 +12,7 @@ namespace SoulboundBackend.Client.World.Generation {
 			this.warp = new FastNoiseLite(seed);
 			warp.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
 			warp.SetDomainWarpType(FastNoiseLite.DomainWarpType.OpenSimplex2);
+			warp.SetFractalType(FastNoiseLite.FractalType.DomainWarpIndependent);
 			warp.SetDomainWarpAmp(strength);
 			warp.SetFrequency(frequency);
 		}

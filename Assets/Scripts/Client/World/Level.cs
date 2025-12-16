@@ -23,9 +23,9 @@ namespace SoulboundBackend.Client.World {
 		private static readonly Logger logger = Logger.CreateInstance();
 		public static readonly LogModule level = new LogModule("LEVEL", "#4682B4");
 		public const int CHUNK_LENGTH = 32;
-		public const int WORLD_HEIGHT = 300;
+		public const int WORLD_HEIGHT = 1024;
 		public const int SURFACE_TO_UNDERGROUND_DELIMITER = WORLD_HEIGHT / 2;
-		public const int RENDER_DISTANCE = 2;
+		public const int RENDER_DISTANCE = 8;
 		public static string worldDumpFile => Path.Combine(Application.persistentDataPath, LevelManager.worldDump);
 
 		public event Action<BlockChangeInfo>? BlockStateChanged;
@@ -143,15 +143,14 @@ namespace SoulboundBackend.Client.World {
 			ChunkHeightmapData heightmapData = chunk.GenerateHeightmap(this.heightGenerator);
 
 			// overrides all states set in GenerateHeightmap
-			chunk.GenerateByBiomeCols_PROTOTYPICAL(biomeColumns);
-
+			chunk.GenerateTerrain(biomeColumns);
 			generatedChunks[chunkX] = chunk;
 
-			for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
-				if (TryPlaceStructure(cx, chunk.xpos, heightmapData, out var structurePlacement)) {
-					PlaceStructure(chunkX, structurePlacement);
-				}
-			}
+			//for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
+			//	if (TryPlaceStructure(cx, chunk.xpos, heightmapData, out var structurePlacement)) {
+			//		PlaceStructure(chunkX, structurePlacement);
+			//	}
+			//}
 
 			return chunk;
 		}

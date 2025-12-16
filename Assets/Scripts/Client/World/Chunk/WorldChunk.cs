@@ -81,7 +81,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 			return generationData;
 		}
 
-		public void GenerateByBiomeCols_PROTOTYPICAL(IBiome[] biomeColumns) {
+		public void GenerateTerrain(IBiome[] biomeColumns) {
 			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
 				for (int y = minY; y < maxY; y++) {
 					int blockX = x + cx * Level.CHUNK_LENGTH;
@@ -89,6 +89,12 @@ namespace SoulboundBackend.Client.World.Chunk {
 					var state = biomeColumns[x].ResolveBlock(depth, blockX, y);
 					stateHashes[x][WorldYToIndex(y)] = state.stateHash;
 				}
+			}
+		}
+
+		public void PlaceFeatures(IBiome[] biomeColumns) {
+			foreach (var biome in biomeColumns) {
+				biome.PlaceFeatures(this);
 			}
 		}
 
