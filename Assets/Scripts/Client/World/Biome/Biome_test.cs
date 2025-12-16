@@ -15,11 +15,9 @@ namespace Assets.Scripts.Client.World.Biome {
 		const float surfaceFalloff = 15f;
 		const float bottomFalloff = 10f;
 		const float caveThreshold = 0.98f;
-		const float smallTunnelThreshold = 0.92f;
-		const float largeTunnelThreshold = 0.91f;
+		const float tunnelThreshold = 0.92f;
+		const float tunneKillThreshold = tunnelThreshold + 0.03f;
 		const float verticalTunnelCompression = 0.2f;
-		const float tunnelKillMin = 0.2f;
-		const float tunnelKillMax = 0.7f;
 
 		private readonly int platformHeight;
 		private readonly int seed;
@@ -28,7 +26,6 @@ namespace Assets.Scripts.Client.World.Biome {
 		private readonly PerlinNoise mediumNoise;
 		private readonly PerlinNoise detailNoise;
 		private readonly PerlinNoise smallCaveNoise;
-		private readonly PerlinNoise largeCaveNoise;
 		private readonly PerlinNoise tunnelKillNoise;
 		private readonly DomainWarp warp;
 
@@ -38,10 +35,9 @@ namespace Assets.Scripts.Client.World.Biome {
 			this.mediumNoise = new PerlinNoise(2, seed, frequency: 0.7f, amplitude: 40f);
 			this.detailNoise = new PerlinNoise(3, seed, frequency: 0.12f, amplitude: 5f);
 			this.heightmap = new Heightmap(platformHeight);
-			this.smallCaveNoise = new PerlinNoise(4, seed, frequency: 0.7f, amplitude: 1f);
-			this.largeCaveNoise = new PerlinNoise(5, seed, frequency: 0.15f, amplitude: 2.4f);
-			this.tunnelKillNoise = new PerlinNoise(6, seed, frequency: 0.05f, 1f);
-			this.warp = new DomainWarp(seed, frequency: 0.5f);   
+			this.smallCaveNoise = new PerlinNoise(4, seed, frequency: 0.3f, amplitude: 1f);
+			this.tunnelKillNoise = new PerlinNoise(5, seed, frequency: 0.25f, amplitude: 1.76f);
+			this.warp = new DomainWarp(seed, frequency: 0.15f);   
 		}
 
 		public float GetDepth(int x, int y) {
@@ -69,11 +65,13 @@ namespace Assets.Scripts.Client.World.Biome {
 			float n = 1f - Mathf.Abs(smallCaveNoise.Sample2D(wx, wy / verticalTunnelCompression));
 			n *= verticalMask;
 
-			//warp.Warp2D(ref wx, ref wy);
-			//float n1 = 1f - Mathf.Abs(largeCaveNoise.Sample2D(wx * 0.35f, wy));
-			//n1 *= verticalMask * GetSurfaceMask(x, y, surfaceFalloff * 15f);
+			return n > tunnelThreshold && !TunnelKill(x, y);
+		}
 
-			return n > smallTunnelThreshold;
+		private bool TunnelKill(int x, int y) {
+			float k = Mathf.Abs(tunnelKillNoise.Sample2D(x, y / verticalTunnelCompression));
+			float killMask = Mathf.Lerp(tunnelThreshold, 1f, k * k);
+			return killMask > tunneKillThreshold;
 		}
 
 		private float GetPeakBias(int x, int y) {
