@@ -144,6 +144,7 @@ namespace SoulboundBackend.Client.World {
 
 			// overrides all states set in GenerateHeightmap
 			chunk.GenerateTerrain(biomeColumns);
+			chunk.PlaceFeatures(biomeColumns, this);
 			generatedChunks[chunkX] = chunk;
 
 			//for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {

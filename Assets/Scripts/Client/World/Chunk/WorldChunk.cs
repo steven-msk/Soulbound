@@ -1,16 +1,17 @@
 ﻿using SoulboundBackend.Client.World.BlockSystem;
+using SoulboundBackend.Client.World.Generation;
 using SoulboundBackend.Common;
-using Logger = SoulboundBackend.Common.Logging.Logger;
 using SoulboundBackend.Core;
 using SoulboundBackend.Core.Noise;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Unity.Plastic.Newtonsoft.Json;
 using Unity.Plastic.Newtonsoft.Json.Linq;
 using UnityEngine;
+using UnityEngine.LightTransport;
 using UnityEngine.Tilemaps;
-using System.IO;
-using SoulboundBackend.Client.World.Generation;
+using Logger = SoulboundBackend.Common.Logging.Logger;
 
 namespace SoulboundBackend.Client.World.Chunk {
 	[JsonConverter(typeof(WorldChunk.Serializer))]
@@ -92,15 +93,19 @@ namespace SoulboundBackend.Client.World.Chunk {
 			}
 		}
 
-		public void PlaceFeatures(IBiome[] biomeColumns) {
+		public void PlaceFeatures(IBiome[] biomeColumns, Level level) {
 			foreach (var biome in biomeColumns) {
-				biome.PlaceFeatures(this);
+				biome.PlaceFeatures(this, level);
 			}
 		}
 
-		int WorldYToIndex(int worldY) => worldY - minY;
+		public int WorldYToIndex(int worldY) => worldY - minY;
 
-		int IndexToWorldY(int yIndex) => yIndex + minY;
+		public int IndexToWorldY(int yIndex) => yIndex + minY;
+
+		public int WorldXToChunkX(int x) => x - xpos * Level.CHUNK_LENGTH;
+
+		public int ChunkXToWorldX(int cx) => cx + xpos * Level.CHUNK_LENGTH;
 
 		public void Render(Tilemap tilemap, ChunkOutlineRenderer outlineRenderer) {
 			int xStart = cx * Level.CHUNK_LENGTH;

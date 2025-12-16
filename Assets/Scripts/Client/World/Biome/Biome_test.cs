@@ -34,18 +34,18 @@ namespace Assets.Scripts.Client.World.Biome {
 
 		public Biome_test(int seed, int platformHeight) {
 			this.platformHeight = platformHeight;
-			this.largeNoise = new PerlinNoise(seed, frequency: 1f, amplitude: 60f);
-			this.mediumNoise = new PerlinNoise(seed, frequency: 0.7f, amplitude: 40f);
-			this.detailNoise = new PerlinNoise(seed, frequency: 0.12f, amplitude: 5f);
+			this.largeNoise = new PerlinNoise(1, seed, frequency: 1f, amplitude: 60f);
+			this.mediumNoise = new PerlinNoise(2, seed, frequency: 0.7f, amplitude: 40f);
+			this.detailNoise = new PerlinNoise(3, seed, frequency: 0.12f, amplitude: 5f);
 			this.heightmap = new Heightmap(platformHeight);
-			this.smallCaveNoise = new PerlinNoise(seed, frequency: 0.7f, amplitude: 1f);
-			this.largeCaveNoise = new PerlinNoise(seed, frequency: 0.15f, amplitude: 2.4f);
-			this.tunnelKillNoise = new PerlinNoise(seed, frequency: 0.05f, 1f);
+			this.smallCaveNoise = new PerlinNoise(4, seed, frequency: 0.7f, amplitude: 1f);
+			this.largeCaveNoise = new PerlinNoise(5, seed, frequency: 0.15f, amplitude: 2.4f);
+			this.tunnelKillNoise = new PerlinNoise(6, seed, frequency: 0.05f, 1f);
 			this.warp = new DomainWarp(seed, frequency: 0.5f);   
 		}
 
 		public float GetDepth(int x, int y) {
-			float height = SurfaceHeightAtX(x);
+			float height = SurfaceDepthAtX(x);
 			float depth = height - y;
 			float normalized = Mathf.Clamp01(depth / maxSolidDepth);
 			return normalized * maxSolidDepth;
@@ -55,7 +55,7 @@ namespace Assets.Scripts.Client.World.Biome {
 			float n = Mathf.Abs(smallCaveNoise.Sample2D(x, y));
 			float mask = Mathf.Pow(GetVerticalMask(x, y), 4f);
 
-			float thresholdFactor = Mathf.InverseLerp(WorldChunk.minY, SurfaceHeightAtX(x) - surfaceFalloff, y);
+			float thresholdFactor = Mathf.InverseLerp(WorldChunk.minY, SurfaceDepthAtX(x) - surfaceFalloff, y);
 			thresholdFactor = FastExp(1f - Mathf.Clamp01(thresholdFactor), 20);
 
 			return n * mask > 1f - thresholdFactor;
@@ -78,22 +78,26 @@ namespace Assets.Scripts.Client.World.Biome {
 
 		private float GetPeakBias(int x, int y) {
 			float verticalMask = GetVerticalMask(x, y);
-			float relativeDepth = SurfaceHeightAtX(x) - y;
+			float relativeDepth = SurfaceDepthAtX(x) - y;
 			const float minCarveDepth = 0.6f * maxSolidDepth;
 			const float maxCarveDepth = 0.98f * maxSolidDepth;
 			float depthFactor = Mathf.InverseLerp(minCarveDepth, maxCarveDepth, relativeDepth);
 			return Mathf.Clamp01(depthFactor);
 		}
 
-		private float SurfaceHeightAtX(int x) {
+		private float SurfaceDepthAtX(int x) {
 			float ln = Mathf.Abs(largeNoise.Sample1D(x));
 			float mn = Mathf.Abs(mediumNoise.Sample1D(x));
 			float dn = Mathf.Abs(detailNoise.Sample1D(x));
 			return platformHeight + ln + mn + dn;
 		}
 
+		private int SurfaceHeightAtX(int x) {
+			return Mathf.FloorToInt(SurfaceDepthAtX(x));
+		}
+
 		private float GetSurfaceMask(int x, int y, float falloff) {
-			float surfaceY = SurfaceHeightAtX(x);
+			float surfaceY = SurfaceDepthAtX(x);
 			float t = Mathf.InverseLerp(surfaceY - falloff, surfaceY, y);
 			return 1f - Mathf.Clamp01(Mathf.SmoothStep(0f, 1f, t));
 		}
@@ -117,8 +121,14 @@ namespace Assets.Scripts.Client.World.Biome {
 			return Blocks.stone.defaultState;
 		}
 
-		public void PlaceFeatures(WorldChunk chunk) {
-			
+		public void PlaceFeatures(WorldChunk chunk, Level level) {
+			for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
+				int x = chunk.ChunkXToWorldX(cx);
+				int y = SurfaceHeightAtX(x) + 1;
+
+				ChunkBlockPos pos = new(cx, y, chunk.xpos);
+				chunk.SetBlock(pos, Blocks.leaves.defaultState);
+			}
 		}
 
 		private static float FastExp(float b, int n) {

@@ -10,6 +10,6 @@ namespace SoulboundBackend.Client.World.Generation {
 	public interface IBiome {
 		float GetDepth(int x, int y);
 		BlockState ResolveBlock(float depth, int x, int y);
-		void PlaceFeatures(WorldChunk chunk);
+		void PlaceFeatures(WorldChunk chunk, Level level);
 	}
 }
