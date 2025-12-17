@@ -94,8 +94,8 @@ namespace SoulboundBackend.Client.World.Chunk {
 		}
 
 		public void PlaceFeatures(IBiome[] biomeColumns, Level level) {
-			foreach (var biome in biomeColumns) {
-				biome.PlaceFeatures(this, level);
+			for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
+				biomeColumns[cx].TryPlaceFeature(cx, this, level);
 			}
 		}
 

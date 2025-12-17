@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace Assets.Scripts.Client.World.Biome {
@@ -28,6 +29,7 @@ namespace Assets.Scripts.Client.World.Biome {
 		private readonly PerlinNoise caveNoise;
 		private readonly PerlinNoise tunnelKillNoise;
 		private readonly DomainWarp warp;
+		private readonly PerlinNoise treeNoise;
 
 		public Biome_test(int seed, int platformHeight) {
 			this.platformHeight = platformHeight;
@@ -37,7 +39,8 @@ namespace Assets.Scripts.Client.World.Biome {
 			this.heightmap = new Heightmap(platformHeight);
 			this.caveNoise = new PerlinNoise(4, seed, frequency: 0.5f, amplitude: 1.5f);
 			this.tunnelKillNoise = new PerlinNoise(5, seed, frequency: 0.25f, amplitude: 1.76f);
-			this.warp = new DomainWarp(seed, frequency: 0.15f);   
+			this.warp = new DomainWarp(seed, frequency: 0.15f);
+			this.treeNoise = new PerlinNoise(6, seed, frequency: 0.02f, amplitude: 1.5f);
 		}
 
 		public float GetDepth(int x, int y) {
@@ -119,26 +122,59 @@ namespace Assets.Scripts.Client.World.Biome {
 			return Blocks.stone.defaultState;
 		}
 
-		public void PlaceFeatures(WorldChunk chunk, Level level) {
-			for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
-				int x = chunk.ChunkXToWorldX(cx);
-				int y = SurfaceHeightAtX(x) + 1;
+		void PlaceTree(int originX, int originY, WorldChunk chunk) {
+			const int crownRadius = 2;
+			const int trunkHeightMin = 5;
+			const int trunkHeightMax = 20;
 
-				ChunkBlockPos pos = new(cx, y, chunk.xpos);
-				chunk.SetBlock(pos, Blocks.leaves.defaultState);
+			int chunkX = chunk.WorldXToChunkX(originX), ypos = originY;
+			ChunkBlockPos trunkPos = new(chunkX, ypos, chunk.xpos);
+			int height = UnityEngine.Random.Range(trunkHeightMin, trunkHeightMax + 1);
+
+			for (int y = 0; y < height; y++) {
+				chunk.SetBlock(trunkPos, Blocks.wood.defaultState);
+				trunkPos.y++;
 			}
-		}
 
-		private static float FastExp(float b, int n) {
-			float p = 1f;
-			while (n > 0) {
-				if (n % 2 == 1) {
-					p *= b;
+			Dictionary<int, List<int>> rowToXs = new();
+			float angularStep = 1f;
+			for (float angle = 0; angle < 360f; angle += angularStep) {
+				float rad = angle * Mathf.Deg2Rad;
+				int x = Mathf.RoundToInt(trunkPos.x + crownRadius * Mathf.Cos(rad));
+				int y = Mathf.RoundToInt(trunkPos.y + crownRadius * Mathf.Sin(rad));
+				if (x < 0 || x >= Level.CHUNK_LENGTH) {
+					continue;
 				}
-				b *= b;
-				n /= 2;
+
+				if (!rowToXs.ContainsKey(y)) {
+					rowToXs[y] = new List<int>();
+				}
+				rowToXs[y].Add(x);
 			}
-			return p;
+
+			foreach (var kvp in rowToXs) {
+				int y = kvp.Key;
+				List<int> xs = kvp.Value;
+				for (int x = xs.Min(); x <= xs.Max(); x++) {
+					ChunkBlockPos cpos = new(x, y, chunk.xpos);
+					chunk.SetBlock(cpos, Blocks.leaves.defaultState);
+				}
+			}
+
 		}
+
+		public void TryPlaceFeature(int cx, WorldChunk chunk, Level level) {
+			const float treeSpan = 5f;
+			const float treeRegionThreshold = 0.3f;
+
+			int xpos = chunk.ChunkXToWorldX(cx);
+			int ypos = SurfaceHeightAtX(xpos) + 1;
+			float n = Mathf.Abs(treeNoise.Sample1D(xpos));
+
+			if (n > treeRegionThreshold && UnityEngine.Random.value < 1f / treeSpan) {
+				PlaceTree(xpos, ypos, chunk);
+			}
+		}
+
 	}
 }
