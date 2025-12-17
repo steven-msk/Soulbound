@@ -14,7 +14,7 @@ namespace Assets.Scripts.Client.World.Biome {
 		const float maxSolidDepth = 10f;
 		const float surfaceFalloff = 15f;
 		const float bottomFalloff = 10f;
-		const float caveThreshold = 0.98f;
+		const float caveThreshold = 0.7f;
 		const float tunnelThreshold = 0.92f;
 		const float tunneKillThreshold = tunnelThreshold + 0.03f;
 		const float verticalTunnelCompression = 0.2f;
@@ -25,7 +25,7 @@ namespace Assets.Scripts.Client.World.Biome {
 		private readonly PerlinNoise largeNoise;
 		private readonly PerlinNoise mediumNoise;
 		private readonly PerlinNoise detailNoise;
-		private readonly PerlinNoise smallCaveNoise;
+		private readonly PerlinNoise caveNoise;
 		private readonly PerlinNoise tunnelKillNoise;
 		private readonly DomainWarp warp;
 
@@ -35,7 +35,7 @@ namespace Assets.Scripts.Client.World.Biome {
 			this.mediumNoise = new PerlinNoise(2, seed, frequency: 0.7f, amplitude: 40f);
 			this.detailNoise = new PerlinNoise(3, seed, frequency: 0.12f, amplitude: 5f);
 			this.heightmap = new Heightmap(platformHeight);
-			this.smallCaveNoise = new PerlinNoise(4, seed, frequency: 0.3f, amplitude: 1f);
+			this.caveNoise = new PerlinNoise(4, seed, frequency: 0.5f, amplitude: 1.5f);
 			this.tunnelKillNoise = new PerlinNoise(5, seed, frequency: 0.25f, amplitude: 1.76f);
 			this.warp = new DomainWarp(seed, frequency: 0.15f);   
 		}
@@ -48,13 +48,13 @@ namespace Assets.Scripts.Client.World.Biome {
 		}
 
 		private bool IsCave(int x, int y) {
-			float n = Mathf.Abs(smallCaveNoise.Sample2D(x, y));
-			float mask = Mathf.Pow(GetVerticalMask(x, y), 4f);
+			float n = Mathf.Abs(caveNoise.Sample2D(x, y));
+			float mask = GetVerticalMask(x, y);
 
-			float thresholdFactor = Mathf.InverseLerp(WorldChunk.minY, SurfaceDepthAtX(x) - surfaceFalloff, y);
-			thresholdFactor = FastExp(1f - Mathf.Clamp01(thresholdFactor), 20);
+			float f = Mathf.InverseLerp(WorldChunk.minY, WorldChunk.maxY, y);
+			float depthFactor = 1f - Mathf.Clamp01(Mathf.SmoothStep(0f, 1f, f));
 
-			return n * mask > 1f - thresholdFactor;
+			return n * mask > caveThreshold / depthFactor;
 		}
 
 		private bool IsTunnel(int x, int y) {
@@ -62,7 +62,7 @@ namespace Assets.Scripts.Client.World.Biome {
 			float verticalMask = GetVerticalMask(x, y);
 
 			warp.Warp3D(ref wx, ref wy, ref zSlice);
-			float n = 1f - Mathf.Abs(smallCaveNoise.Sample2D(wx, wy / verticalTunnelCompression));
+			float n = 1f - Mathf.Abs(caveNoise.Sample2D(wx, wy / verticalTunnelCompression));
 			n *= verticalMask;
 
 			return n > tunnelThreshold && !TunnelKill(x, y);
