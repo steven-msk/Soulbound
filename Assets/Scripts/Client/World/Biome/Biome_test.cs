@@ -125,7 +125,7 @@ namespace Assets.Scripts.Client.World.Biome {
 			return Blocks.stone.defaultState;
 		}
 
-		void PlaceTree(int originX, int originY, WorldChunk chunk) {
+		void PlaceTree(int originX, int originY, WorldChunk chunk, Level level) {
 			const int crownRadius = 2;
 			const int trunkHeightMin = 5;
 			const int trunkHeightMax = 20;
@@ -145,9 +145,6 @@ namespace Assets.Scripts.Client.World.Biome {
 				float rad = angle * Mathf.Deg2Rad;
 				int x = Mathf.RoundToInt(trunkPos.x + crownRadius * Mathf.Cos(rad));
 				int y = Mathf.RoundToInt(trunkPos.y + crownRadius * Mathf.Sin(rad));
-				if (x < 0 || x >= Level.CHUNK_LENGTH) {
-					continue;
-				}
 
 				if (!rowToXs.ContainsKey(y)) {
 					rowToXs[y] = new List<int>();
@@ -159,8 +156,9 @@ namespace Assets.Scripts.Client.World.Biome {
 				int y = kvp.Key;
 				List<int> xs = kvp.Value;
 				for (int x = xs.Min(); x <= xs.Max(); x++) {
-					ChunkBlockPos cpos = new(x, y, chunk.xpos);
-					chunk.SetBlock(cpos, Blocks.leaves.defaultState);
+					int cx = level.ChunkXFromRelativeBlock(x, chunk.xpos);
+					ChunkBlockPos pos = new(level.NormalizeChunkX(x), y, cx);
+					level.SetBlockOrPend(pos, Blocks.leaves.defaultState);
 				}
 			}
 
@@ -185,7 +183,7 @@ namespace Assets.Scripts.Client.World.Biome {
 
 			float spawnChance = Mathf.Lerp(0.05f, 0.25f, density);
 			if(UnityEngine.Random.value < spawnChance) {
-				PlaceTree(xpos, ypos, chunk);
+				PlaceTree(xpos, ypos, chunk, level);
 				lastTreeX = xpos;
 			}
 		}

@@ -38,7 +38,7 @@ namespace SoulboundBackend.Client.World {
 		private Dictionary<int, WorldChunk> generatedChunks = new(); 
 		private ChunkOutlineRenderer chunkOutlineRenderer = new();
 		private Dictionary<int, List<StructurePlacement>> structurePlacements = new();
-		private Dictionary<int, List<(ChunkBlockPos chunkBlockPos, BlockState state)>> pendingUpdates = new();
+		private Dictionary<int, List<(ChunkBlockPos pos, BlockState? state)>> pendingUpdates = new();
 		private LevelGridContext gridContext;
 		private LevelManager levelManager = null!;
 		public bool isWorldLoaded { get; private set; } = false;
@@ -116,7 +116,7 @@ namespace SoulboundBackend.Client.World {
 
 					if (pendingUpdates.TryGetValue(chunkX, out var stateUpdates)) {
 						stateUpdates.ForEach(stateUpdate => {
-							chunk.SetBlock(stateUpdate.chunkBlockPos, stateUpdate.state);
+							chunk.SetBlock(stateUpdate.pos, stateUpdate.state);
 						});
 						pendingUpdates.Remove(chunkX);
 					}
@@ -231,7 +231,7 @@ namespace SoulboundBackend.Client.World {
 				WorldChunk? underlyingChunk = chunkBlockPos.UnderlyingChunk(this);
 
 				if (underlyingChunk == null) {
-					PendUpdate(chunkBlockPos.chunkX, chunkBlockPos, blockState);
+					PendBlock(chunkBlockPos.chunkX, chunkBlockPos, blockState);
 				} else if (loadedChunks.ContainsKey(chunkBlockPos.chunkX) && underlyingChunk != null) {
 					SetBlock(chunkBlockPos, blockState);
 				} else {
@@ -267,6 +267,15 @@ namespace SoulboundBackend.Client.World {
 			SetBlock(chunkBlockPos.ToBlockPos(), blockState);
 		}
 
+		public void SetBlockOrPend(ChunkBlockPos chunkBlockPos, BlockState? blockState) {
+			int chunkX = chunkBlockPos.chunkX;
+			if (generatedChunks.ContainsKey(chunkX)) {
+				SetBlock(chunkBlockPos, blockState);
+			} else {
+				PendBlock(chunkX, chunkBlockPos, blockState);
+			}
+		}
+
 		public void PlaceBlock(BlockPos blockPos, BlockState newState) {
 			BlockState? oldState = BlockStateAt(blockPos);
 			SetBlock(blockPos, newState);
@@ -298,7 +307,7 @@ namespace SoulboundBackend.Client.World {
 			), (oldState, newState) => oldState?.DropOnBroken(blockPos, source));
 		}
 
-		public void PendUpdates(int chunkX, List<(ChunkBlockPos chunkBlockpos, BlockState state)> blockStateUpdates) {
+		public void PendBlocks(int chunkX, List<(ChunkBlockPos chunkBlockpos, BlockState? state)> blockStateUpdates) {
 			if (pendingUpdates.TryGetValue(chunkX, out var existingUpdates)) {
 				existingUpdates.AddRange(blockStateUpdates);
 			} else {
@@ -306,9 +315,9 @@ namespace SoulboundBackend.Client.World {
 			}
 		}
 
-		public void PendUpdate(int chunkX, ChunkBlockPos chunkBlockPos, BlockState blockState) {
+		public void PendBlock(int chunkX, ChunkBlockPos chunkBlockPos, BlockState? blockState) {
 			if (!pendingUpdates.ContainsKey(chunkX)) {
-				pendingUpdates[chunkX] = new List<(ChunkBlockPos, BlockState)>();
+				pendingUpdates[chunkX] = new List<(ChunkBlockPos, BlockState?)>();
 			}
 			pendingUpdates[chunkX].Add((chunkBlockPos, blockState));
 		}
@@ -336,8 +345,8 @@ namespace SoulboundBackend.Client.World {
 				return chunk.BlockStateAt(blockPos.ToChunkBlockPos(chunk.xpos));
 			}
 
-			InvocationHelper.If(logFlag,
-				() => logger.LogError(level, $"Cannot retrieve block state at {blockPos.ToString()} because its not generated"));
+			//InvocationHelper.If(logFlag,
+			//	() => logger.LogError(level, $"Cannot retrieve block state at {blockPos.ToString()} because its not generated"));
 			return null;
 		}
 
@@ -347,7 +356,7 @@ namespace SoulboundBackend.Client.World {
 				return blockState.block;
 			}
 
-			logger.LogError(level, $"Cannot retrieve block at {blockPos.ToString()} because its not generated");
+			//logger.LogError(level, $"Cannot retrieve block at {blockPos.ToString()} because its not generated");
 			return null;
 		}
 
@@ -387,6 +396,15 @@ namespace SoulboundBackend.Client.World {
 
 		public int ToChunkX(int worldX) => worldX - ChunkXAt(worldX) * CHUNK_LENGTH;
 
+		public int NormalizeChunkX(int x) {
+			return (x % CHUNK_LENGTH + CHUNK_LENGTH) % CHUNK_LENGTH;
+		}
+
+		public int ChunkXFromRelativeBlock(int chunkBlockX, int chunkX) {
+			int worldX = ToWorldX(chunkBlockX, chunkX);
+			return FloorDiv(worldX, CHUNK_LENGTH);
+		}
+
 		public int GetSurfaceY(BlockPos blockPos) => GetSurfaceY(blockPos.x);
 
 		public int GetSurfaceY(int xpos) => this.ChunkAt(xpos)?.HeightmapData.surfaceLevels[xpos] ?? 0;
@@ -416,6 +434,16 @@ namespace SoulboundBackend.Client.World {
 
 		public static void ClearStructureRegistry() {
 			registeredStructureTemplates.Clear();
+		}
+
+		static int FloorDiv(int a, int b) {
+			int q = a / b;
+			int r = a % b;
+
+			if (r != 0 && ((r < 0) != (b < 0))) {
+				q--;
+			}
+			return q;
 		}
 	}
 }
