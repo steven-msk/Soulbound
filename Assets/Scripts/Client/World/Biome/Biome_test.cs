@@ -29,7 +29,9 @@ namespace Assets.Scripts.Client.World.Biome {
 		private readonly PerlinNoise caveNoise;
 		private readonly PerlinNoise tunnelKillNoise;
 		private readonly DomainWarp warp;
-		private readonly PerlinNoise treeNoise;
+		private readonly PerlinNoise forestNoise;
+		private readonly PerlinNoise forestDensityNoise;
+		int lastTreeX = int.MinValue >> 1;
 
 		public Biome_test(int seed, int platformHeight) {
 			this.platformHeight = platformHeight;
@@ -40,7 +42,8 @@ namespace Assets.Scripts.Client.World.Biome {
 			this.caveNoise = new PerlinNoise(4, seed, frequency: 0.5f, amplitude: 1.5f);
 			this.tunnelKillNoise = new PerlinNoise(5, seed, frequency: 0.25f, amplitude: 1.76f);
 			this.warp = new DomainWarp(seed, frequency: 0.15f);
-			this.treeNoise = new PerlinNoise(6, seed, frequency: 0.02f, amplitude: 1.5f);
+			this.forestNoise = new PerlinNoise(6, seed, frequency: 3f, amplitude: 10f);
+			this.forestDensityNoise = new PerlinNoise(7, seed, frequency: 5f, amplitude: 4f);
 		}
 
 		public float GetDepth(int x, int y) {
@@ -164,15 +167,26 @@ namespace Assets.Scripts.Client.World.Biome {
 		}
 
 		public void TryPlaceFeature(int cx, WorldChunk chunk, Level level) {
-			const float treeSpan = 5f;
-			const float treeRegionThreshold = 0.3f;
-
+			const float forestThreshold = 0.45f;
+			const float minTreeSpacing = 3;
 			int xpos = chunk.ChunkXToWorldX(cx);
 			int ypos = SurfaceHeightAtX(xpos) + 1;
-			float n = Mathf.Abs(treeNoise.Sample1D(xpos));
 
-			if (n > treeRegionThreshold && UnityEngine.Random.value < 1f / treeSpan) {
+			float forest = Mathf.Abs(forestNoise.Sample1D(xpos));
+			float forestMask = Mathf.InverseLerp(forestThreshold, 1f, forest);
+			if (forest < forestThreshold) {
+				return;
+			}
+			float density = Mathf.Abs(forestDensityNoise.Sample1D(xpos));
+			float distance = Mathf.Abs(xpos - lastTreeX);
+			if (distance < minTreeSpacing) {
+				return;
+			}
+
+			float spawnChance = Mathf.Lerp(0.05f, 0.25f, density);
+			if(UnityEngine.Random.value < spawnChance) {
 				PlaceTree(xpos, ypos, chunk);
+				lastTreeX = xpos;
 			}
 		}
 
