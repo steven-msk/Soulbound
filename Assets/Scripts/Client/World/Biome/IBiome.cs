@@ -8,8 +8,9 @@ using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.World.Generation {
 	public interface IBiome {
-		float GetDepth(int x, int y);
-		BlockState ResolveBlock(float depth, int x, int y);
+		float GetDepth(BlockPos pos);
+		float GetDensity(BlockPos pos);
+		BlockState ResolveBlock(float depth, BlockPos pos);
 		void TryPlaceFeature(int cx, WorldChunk chunk, Level level);
 	}
 }

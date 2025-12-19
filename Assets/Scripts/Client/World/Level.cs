@@ -43,10 +43,16 @@ namespace SoulboundBackend.Client.World {
 		private LevelManager levelManager = null!;
 		public bool isWorldLoaded { get; private set; } = false;
 
+		private readonly BiomeMap biomeMap;
+
 		public Level(LevelGridContext gridContext, int seed) {
 			this.gridContext = gridContext;
 			this.seed = seed;
 			this.heightGenerator = new PerlinNoiseGenerator1D(this.seed, WorldChunk.HEIGHT_SPREAD);
+
+			var biome1 = new Biome_test(seed);
+			var biome2 = new Biome_test2(seed);
+			this.biomeMap = new BiomeMap(new IBiome[] { biome1, biome2 });
 		}
 
 		// PLANNED REWORK: world rendering system
@@ -131,20 +137,17 @@ namespace SoulboundBackend.Client.World {
 		public bool IsChunkLoaded(WorldChunk chunk) => loadedChunks.ContainsValue(chunk);
 
 		public bool IsChunkLoaded(int chunkX) => loadedChunks.ContainsKey(chunkX);
-
+		
 		private WorldChunk GenerateNewChunk(int chunkX) {
-			var biome = new Biome_test(seed, 0);
-			IBiome[] biomeColumns = new IBiome[Level.CHUNK_LENGTH];
-			for (int i = 0; i < biomeColumns.Length; i++) {
-				biomeColumns[i] = biome;
-			}
-
 			WorldChunk chunk = new(chunkX);
 			ChunkHeightmapData heightmapData = chunk.GenerateHeightmap(this.heightGenerator);
 
 			// overrides all states set in GenerateHeightmap
-			chunk.GenerateTerrain(biomeColumns);
-			chunk.PlaceFeatures(biomeColumns, this);
+			chunk.GenerateTerrain(biomeMap);
+
+			// deprecated
+			chunk.PlaceFeatures(biomeMap, this);
+
 			generatedChunks[chunkX] = chunk;
 
 			//for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {

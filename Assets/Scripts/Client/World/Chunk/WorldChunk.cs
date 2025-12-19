@@ -31,8 +31,6 @@ namespace SoulboundBackend.Client.World.Chunk {
 		private int cx;
 		public int xpos => cx;
 
-		private readonly IBiome[] biomeColumns;
-
 		public WorldChunk(int cx) { 
 			this.cx = cx;
 
@@ -82,20 +80,26 @@ namespace SoulboundBackend.Client.World.Chunk {
 			return generationData;
 		}
 
-		public void GenerateTerrain(IBiome[] biomeColumns) {
+		public void GenerateTerrain(BiomeMap biomeMap) {
 			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
 				for (int y = minY; y < maxY; y++) {
-					int blockX = x + cx * Level.CHUNK_LENGTH;
-					float depth = biomeColumns[x].GetDepth(blockX, y);
-					var state = biomeColumns[x].ResolveBlock(depth, blockX, y);
+					int blockX = ChunkXToWorldX(x);
+					var pos = new BlockPos(blockX, y);
+					var biome = biomeMap.ResolveBiome(pos);
+
+					float depth = biome.GetDepth(pos);
+					var state = biome.ResolveBlock(depth, pos);
 					stateHashes[x][WorldYToIndex(y)] = state.stateHash;
 				}
 			}
 		}
 
-		public void PlaceFeatures(IBiome[] biomeColumns, Level level) {
+		public void PlaceFeatures(BiomeMap biomeMap, Level level) {
 			for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
-				biomeColumns[cx].TryPlaceFeature(cx, this, level);
+
+				//deprecated
+				var biome = biomeMap.ResolveBiome(new BlockPos(ChunkXToWorldX(cx), 0));
+				biome.TryPlaceFeature(cx, this, level);
 			}
 		}
 

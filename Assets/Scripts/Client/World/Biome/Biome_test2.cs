@@ -7,19 +7,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Unity.Mathematics;
 using UnityEngine;
 
 namespace Assets.Scripts.Client.World.Biome {
-	public class Biome_test : IBiome {
+	public class Biome_test2 : IBiome {
 		const float maxSolidDepth = 10f;
 		const float surfaceFalloff = 15f;
 		const float bottomFalloff = 10f;
-		const float caveThreshold = 0.7f;
-		const float tunnelThreshold = 0.92f;
+		const float caveThreshold = 0.9f;
+		const float tunnelThreshold = 0.95f;
 		const float tunneKillThreshold = tunnelThreshold + 0.03f;
-		const float verticalTunnelCompression = 0.2f;
-		const int platformHeight = 0;
+		const float verticalTunnelCompression = 1f;
+		const int platformHeight = -50;
 
 		private readonly int seed;
 		private readonly Heightmap heightmap;
@@ -34,7 +33,7 @@ namespace Assets.Scripts.Client.World.Biome {
 		private readonly PerlinNoise densityNoise;
 		int lastTreeX = int.MinValue >> 1;
 
-		public Biome_test(int seed) {
+		public Biome_test2(int seed) {
 			this.largeNoise = new PerlinNoise(1, seed, frequency: 1f, amplitude: 60f);
 			this.mediumNoise = new PerlinNoise(2, seed, frequency: 0.7f, amplitude: 40f);
 			this.detailNoise = new PerlinNoise(3, seed, frequency: 0.12f, amplitude: 5f);
@@ -44,13 +43,14 @@ namespace Assets.Scripts.Client.World.Biome {
 			this.warp = new DomainWarp(seed, frequency: 0.15f);
 			this.forestNoise = new PerlinNoise(6, seed, frequency: 3f, amplitude: 10f);
 			this.forestDensityNoise = new PerlinNoise(7, seed, frequency: 5f, amplitude: 4f);
-			this.densityNoise = new PerlinNoise(8, seed, frequency: 0.05f, amplitude: 1f);
+			this.densityNoise = new PerlinNoise(8, seed, frequency: 0.06f, amplitude: 1f);
 		}
 
 		float IBiome.GetDensity(BlockPos pos) {
-			const float threshold = 2f;
+			const float threshold = 1f;
 			float n = Mathf.Max(0f, densityNoise.Sample1D(pos.x));
 			n = Mathf.Pow(n, 6f);
+			//n = Mathf.Max(0f, n - threshold);
 			return n;
 		}
 
@@ -124,76 +124,10 @@ namespace Assets.Scripts.Client.World.Biome {
 		}
 
 		public BlockState ResolveBlock(float depth, BlockPos pos) {
-			if (depth <= 0 || IsCave(pos.x, pos.y) || IsTunnel(pos.x, pos.y))
-				return Blocks.air.defaultState;
-			if (depth < 4)
-				return Blocks.grass.defaultState;
-			if (depth < 1)
-				return Blocks.dirt.defaultState;
-			return Blocks.stone.defaultState;
-		}
-
-		void PlaceTree(int originX, int originY, WorldChunk chunk, Level level) {
-			const int crownRadius = 2;
-			const int trunkHeightMin = 5;
-			const int trunkHeightMax = 20;
-
-			int chunkX = chunk.WorldXToChunkX(originX), ypos = originY;
-			ChunkBlockPos trunkPos = new(chunkX, ypos, chunk.xpos);
-			int height = UnityEngine.Random.Range(trunkHeightMin, trunkHeightMax + 1);
-
-			for (int y = 0; y < height; y++) {
-				chunk.SetBlock(trunkPos, Blocks.wood.defaultState);
-				trunkPos.y++;
-			}
-
-			Dictionary<int, List<int>> rowToXs = new();
-			float angularStep = 1f;
-			for (float angle = 0; angle < 360f; angle += angularStep) {
-				float rad = angle * Mathf.Deg2Rad;
-				int x = Mathf.RoundToInt(trunkPos.x + crownRadius * Mathf.Cos(rad));
-				int y = Mathf.RoundToInt(trunkPos.y + crownRadius * Mathf.Sin(rad));
-
-				if (!rowToXs.ContainsKey(y)) {
-					rowToXs[y] = new List<int>();
-				}
-				rowToXs[y].Add(x);
-			}
-
-			foreach (var kvp in rowToXs) {
-				int y = kvp.Key;
-				List<int> xs = kvp.Value;
-				for (int x = xs.Min(); x <= xs.Max(); x++) {
-					int cx = level.ChunkXFromRelativeBlock(x, chunk.xpos);
-					ChunkBlockPos pos = new(level.NormalizeChunkX(x), y, cx);
-					level.SetBlockOrPend(pos, Blocks.leaves.defaultState);
-				}
-			}
-
+			return Blocks.dirt.defaultState;
 		}
 
 		public void TryPlaceFeature(int cx, WorldChunk chunk, Level level) {
-			const float forestThreshold = 0.45f;
-			const float minTreeSpacing = 3;
-			int xpos = chunk.ChunkXToWorldX(cx);
-			int ypos = SurfaceHeightAtX(xpos) + 1;
-
-			float forest = Mathf.Abs(forestNoise.Sample1D(xpos));
-			float forestMask = Mathf.InverseLerp(forestThreshold, 1f, forest);
-			if (forest < forestThreshold) {
-				return;
-			}
-			float density = Mathf.Abs(forestDensityNoise.Sample1D(xpos));
-			float distance = Mathf.Abs(xpos - lastTreeX);
-			if (distance < minTreeSpacing) {
-				return;
-			}
-
-			float spawnChance = Mathf.Lerp(0.05f, 0.25f, density);
-			if(UnityEngine.Random.value < spawnChance) {
-				PlaceTree(xpos, ypos, chunk, level);
-				lastTreeX = xpos;
-			}
 		}
 	}
 }
