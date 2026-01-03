@@ -55,7 +55,7 @@ namespace SoulboundBackend.Client.World {
 			var biome1 = new Biome_test(seed);
 			var biome2 = new Biome_test2(seed);
 			this.biomeMap = new BiomeMap(new IBiome[] { biome1, biome2 });
-			this.heightmap = new Heightmap(TERRAIN_PLANE_Y);
+			this.heightmap = new Heightmap(seed, TERRAIN_PLANE_Y);
 		}
 
 		// PLANNED REWORK: world rendering system

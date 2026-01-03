@@ -82,19 +82,19 @@ namespace SoulboundBackend.Client.World.Chunk {
 
 		public void GenerateTerrain(BiomeMap biomeMap, Heightmap heightmap) {
 			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
-				//int blockX = ChunkXToWorldX(x);
+				int blockX = ChunkXToWorldX(x);
+				float height = heightmap.SampleHeight(blockX);
 				//var biome = biomeMap.ResolveBiome(blockX);
 
-				for (int y = minY; y < maxY; y++) {
+				for (int y = 0; y < Level.WORLD_HEIGHT; y++) {
 					//var pos = new BlockPos(blockX, y);
 
 					//float depth = biome.GetDepth(pos);
 					//var state = biome.ResolveBlock(depth, pos);
 					//stateHashes[x][WorldYToIndex(y)] = state.stateHash;
-					stateHashes[x][WorldYToIndex(y)] = (y < heightmap.ypos
-						? Blocks.stone.defaultState
-						: Blocks.air.defaultState)
-						.stateHash;
+					stateHashes[x][y] = y < height
+						? Blocks.stone.defaultState.stateHash
+						: Blocks.air.defaultState.stateHash;
 				}
 			}
 		}

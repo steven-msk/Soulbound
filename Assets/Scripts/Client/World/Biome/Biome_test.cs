@@ -38,7 +38,6 @@ namespace Assets.Scripts.Client.World.Biome {
 			this.largeNoise = new PerlinNoise(1, seed, frequency: 1f, amplitude: 60f);
 			this.mediumNoise = new PerlinNoise(2, seed, frequency: 0.7f, amplitude: 40f);
 			this.detailNoise = new PerlinNoise(3, seed, frequency: 0.12f, amplitude: 5f);
-			this.heightmap = new Heightmap(platformHeight);
 			this.caveNoise = new PerlinNoise(4, seed, frequency: 0.5f, amplitude: 1.5f);
 			this.tunnelKillNoise = new PerlinNoise(5, seed, frequency: 0.25f, amplitude: 1.76f);
 			this.warp = new DomainWarp(seed, frequency: 0.15f);

@@ -10,12 +10,25 @@ using System.Threading.Tasks;
 #nullable enable
 
 namespace SoulboundBackend.Client.World.Generation {
-	public class Heightmap {
-		public int ypos { get; private set; }
-		public int height => WorldChunk.maxY - ypos;
+	public sealed class Heightmap {
+		const float HEIGHT_OFFSET_AMPLIFIER = 5f;
 
-		public Heightmap(int ypos) {
-			this.ypos = ypos;
+		public int planeY { get; private set; }
+		public int planeHeight => WorldChunk.maxY - planeY;
+		private PerlinNoise continentalNoise;
+
+		public Heightmap(int seed, int planeY) {
+			this.planeY = planeY;
+
+			this.continentalNoise = new PerlinNoise(0, seed, frequency: 0.001f, amplitude: 80f);
+		}
+
+		public float SamplePlaneHeightOffset(int blockX) {
+			return continentalNoise.Sample1D(blockX);
+		}
+
+		public float SampleHeight(int blockX) {
+			return planeHeight + SamplePlaneHeightOffset(blockX);
 		}
 	}
 }
