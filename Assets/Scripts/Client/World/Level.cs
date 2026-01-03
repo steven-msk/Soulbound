@@ -26,6 +26,7 @@ namespace SoulboundBackend.Client.World {
 		public const int WORLD_HEIGHT = 1024;
 		public const int SURFACE_TO_UNDERGROUND_DELIMITER = WORLD_HEIGHT / 2;
 		public const int RENDER_DISTANCE = 8;
+		public const int TERRAIN_PLANE_Y = 0;
 		public static string worldDumpFile => Path.Combine(Application.persistentDataPath, LevelManager.worldDump);
 
 		public event Action<BlockChangeInfo>? BlockStateChanged;
@@ -44,6 +45,7 @@ namespace SoulboundBackend.Client.World {
 		public bool isWorldLoaded { get; private set; } = false;
 
 		private readonly BiomeMap biomeMap;
+		private readonly Heightmap heightmap;
 
 		public Level(LevelGridContext gridContext, int seed) {
 			this.gridContext = gridContext;
@@ -53,6 +55,7 @@ namespace SoulboundBackend.Client.World {
 			var biome1 = new Biome_test(seed);
 			var biome2 = new Biome_test2(seed);
 			this.biomeMap = new BiomeMap(new IBiome[] { biome1, biome2 });
+			this.heightmap = new Heightmap(TERRAIN_PLANE_Y);
 		}
 
 		// PLANNED REWORK: world rendering system
@@ -143,7 +146,7 @@ namespace SoulboundBackend.Client.World {
 			ChunkHeightmapData heightmapData = chunk.GenerateHeightmap(this.heightGenerator);
 
 			// overrides all states set in GenerateHeightmap
-			chunk.GenerateTerrain(biomeMap);
+			chunk.GenerateTerrain(biomeMap, heightmap);
 
 			// deprecated
 			chunk.PlaceFeatures(biomeMap, this);

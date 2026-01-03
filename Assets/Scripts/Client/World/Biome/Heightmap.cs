@@ -1,5 +1,6 @@
 ﻿using Assets.Scripts.Client.World.Biome;
 using SoulboundBackend.Client.World.BlockSystem;
+using SoulboundBackend.Client.World.Chunk;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,14 +11,11 @@ using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.World.Generation {
 	public class Heightmap {
-		private readonly int height;
+		public int ypos { get; private set; }
+		public int height => WorldChunk.maxY - ypos;
 
-		public Heightmap(int height) {
-			this.height = height;
-		}
-
-		public float Sample(int x, int y) {
-			return height - y;
+		public Heightmap(int ypos) {
+			this.ypos = ypos;
 		}
 	}
 }
