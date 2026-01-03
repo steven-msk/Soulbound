@@ -82,10 +82,11 @@ namespace SoulboundBackend.Client.World.Chunk {
 
 		public void GenerateTerrain(BiomeMap biomeMap) {
 			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
+				int blockX = ChunkXToWorldX(x);
+				var biome = biomeMap.ResolveBiome(blockX);
+
 				for (int y = minY; y < maxY; y++) {
-					int blockX = ChunkXToWorldX(x);
 					var pos = new BlockPos(blockX, y);
-					var biome = biomeMap.ResolveBiome(pos);
 
 					float depth = biome.GetDepth(pos);
 					var state = biome.ResolveBlock(depth, pos);
@@ -98,7 +99,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 			for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
 
 				//deprecated
-				var biome = biomeMap.ResolveBiome(new BlockPos(ChunkXToWorldX(cx), 0));
+				var biome = biomeMap.ResolveBiome(ChunkXToWorldX(cx));
 				biome.TryPlaceFeature(cx, this, level);
 			}
 		}

@@ -13,12 +13,12 @@ namespace SoulboundBackend.Client.World.Generation {
 			this.biomes = biomes;
 		}
 
-		public IBiome ResolveBiome(BlockPos blockPos) {
+		public IBiome ResolveBiome(int blockX) {
 			IBiome targetBiome = null;
 			float maxDensity = float.MinValue;
 
 			foreach (var biome in biomes) {
-				float density = biome.GetDensity(blockPos);
+				float density = biome.GetDensity(blockX);
 				if (density > maxDensity) {
 					maxDensity = density;
 					targetBiome = biome;

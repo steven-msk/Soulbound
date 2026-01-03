@@ -9,8 +9,9 @@ using System.Threading.Tasks;
 namespace SoulboundBackend.Client.World.Generation {
 	public interface IBiome {
 		float GetDepth(BlockPos pos);
-		float GetDensity(BlockPos pos);
+		float GetDensity(int blockX);
 		BlockState ResolveBlock(float depth, BlockPos pos);
-		void TryPlaceFeature(int cx, WorldChunk chunk, Level level);
+		void TryPlaceFeature(int cx, WorldChunk chunk, Level level) {
+		}
 	}
 }

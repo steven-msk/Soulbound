@@ -47,9 +47,8 @@ namespace Assets.Scripts.Client.World.Biome {
 			this.densityNoise = new PerlinNoise(8, seed, frequency: 0.05f, amplitude: 1f);
 		}
 
-		float IBiome.GetDensity(BlockPos pos) {
-			const float threshold = 2f;
-			float n = Mathf.Max(0f, densityNoise.Sample1D(pos.x));
+		float IBiome.GetDensity(int blockX) {
+			float n = Mathf.Abs(densityNoise.Sample1D(blockX));
 			n = Mathf.Pow(n, 6f);
 			return n;
 		}
@@ -172,7 +171,7 @@ namespace Assets.Scripts.Client.World.Biome {
 
 		}
 
-		public void TryPlaceFeature(int cx, WorldChunk chunk, Level level) {
+		void IBiome.TryPlaceFeature(int cx, WorldChunk chunk, Level level) {
 			const float forestThreshold = 0.45f;
 			const float minTreeSpacing = 3;
 			int xpos = chunk.ChunkXToWorldX(cx);
