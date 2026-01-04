@@ -30,9 +30,10 @@ namespace SoulboundBackend.Client.World.Generation {
 
 			var primary = weights[0];
 			BiomeWeight? secondary = weights.Count > 1 ? weights[1] : null;
-			float t = secondary != null
-				? Mathf.Clamp01(secondary.Value.value / primary.value)
-				: 0f;
+
+			var w1 = primary.value;
+			var w2 = secondary.GetValueOrDefault().value;
+			float t = secondary != null ? w2 / (w1 + w2) : 0f;
 
 			var a = primary.biome.SampleTerrain(blockX);
 			if (secondary == null || t < 0.001f) {

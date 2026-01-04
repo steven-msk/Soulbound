@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace SoulboundBackend.Client.World.Generation {
 	public sealed class BiomeMap {
-		const float blendSharpness = 12f;
+		const float blendSharpness = 3f;
 
 		private readonly IEnumerable<IBiome> biomes;
 
@@ -48,8 +48,8 @@ namespace SoulboundBackend.Client.World.Generation {
 			}
 
 			foreach (var (biome, density) in densities) {
-				float weight = density - maxDensity;
-				weight = Mathf.Exp(weight * blendSharpness);
+				float weight = density / maxDensity;
+				weight = Mathf.Pow(weight, blendSharpness);
 
 				UnityEngine.Debug.Log($"weight {weight} @ bx={blockX}, biome {biome}");
 				yield return new BiomeWeight(biome, weight);

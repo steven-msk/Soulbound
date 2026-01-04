@@ -199,9 +199,9 @@ namespace Assets.Scripts.Client.World.Biome {
 				//heightOffset = 30f,
 				//amplitude = 0.35f,
 				//erosion = 0.85f
-				heightOffset = 0f,
-				amplitude = 1f,
-				erosion = 1f
+				heightOffset = 30 + SurfaceDepthAtX(blockX),
+				amplitude = 0.35f,
+				erosion = 0.85f
 			};
 		}
 	}
