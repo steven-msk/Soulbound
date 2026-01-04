@@ -52,6 +52,7 @@ namespace Assets.Scripts.Client.World.Biome {
 			return n;
 		}
 
+		[Obsolete]
 		float IBiome.GetDepth(BlockPos pos) {
 			float height = SurfaceDepthAtX(pos.x);
 			float depth = height - pos.y;
@@ -59,6 +60,7 @@ namespace Assets.Scripts.Client.World.Biome {
 			return normalized * maxSolidDepth;
 		}
 
+		[Obsolete]
 		private bool IsCave(int x, int y) {
 			float n = Mathf.Abs(caveNoise.Sample2D(x, y));
 			float mask = GetVerticalMask(x, y);
@@ -69,6 +71,7 @@ namespace Assets.Scripts.Client.World.Biome {
 			return n * mask > caveThreshold / depthFactor;
 		}
 
+		[Obsolete]
 		private bool IsTunnel(int x, int y) {
 			float wx = x, wy = y, zSlice = seed;
 			float verticalMask = GetVerticalMask(x, y);
@@ -80,12 +83,14 @@ namespace Assets.Scripts.Client.World.Biome {
 			return n > tunnelThreshold && !TunnelKill(x, y);
 		}
 
+		[Obsolete]
 		private bool TunnelKill(int x, int y) {
 			float k = Mathf.Abs(tunnelKillNoise.Sample2D(x, y / verticalTunnelCompression));
 			float killMask = Mathf.Lerp(tunnelThreshold, 1f, k * k);
 			return killMask > tunneKillThreshold;
 		}
 
+		[Obsolete]
 		private float GetPeakBias(int x, int y) {
 			float verticalMask = GetVerticalMask(x, y);
 			float relativeDepth = SurfaceDepthAtX(x) - y;
@@ -95,6 +100,7 @@ namespace Assets.Scripts.Client.World.Biome {
 			return Mathf.Clamp01(depthFactor);
 		}
 
+		[Obsolete]
 		private float SurfaceDepthAtX(int x) {
 			float ln = Mathf.Abs(largeNoise.Sample1D(x));
 			float mn = Mathf.Abs(mediumNoise.Sample1D(x));
@@ -102,33 +108,33 @@ namespace Assets.Scripts.Client.World.Biome {
 			return ln + mn + dn;
 		}
 
+		[Obsolete]
 		private int SurfaceHeightAtX(int x) {
 			return Mathf.FloorToInt(SurfaceDepthAtX(x));
 		}
 
+		[Obsolete]
 		private float GetSurfaceMask(int x, int y, float falloff) {
 			float surfaceY = SurfaceDepthAtX(x);
 			float t = Mathf.InverseLerp(surfaceY - falloff, surfaceY, y);
 			return 1f - Mathf.Clamp01(Mathf.SmoothStep(0f, 1f, t));
 		}
 
+		[Obsolete]
 		private float GetBottomMask(int y) {
 			float t = Mathf.InverseLerp(WorldChunk.minY, WorldChunk.minY + bottomFalloff, y);
 			return Mathf.Clamp01(Mathf.SmoothStep(0f, 1f, t));
 		}
 
+		[Obsolete]
 		private float GetVerticalMask(int x, int y) {
 			return GetSurfaceMask(x, y, surfaceFalloff) * GetBottomMask(y);
 		}
 
-		public BlockState ResolveBlock(float depth, BlockPos pos) {
-			if (depth <= 0 || IsCave(pos.x, pos.y) || IsTunnel(pos.x, pos.y))
+		BlockState IBiome.ResolveBlock(BlockContext ctx) {
+			if (ctx.AboveSurface())
 				return Blocks.air.defaultState;
-			if (depth < 4)
-				return Blocks.grass.defaultState;
-			if (depth < 1)
-				return Blocks.dirt.defaultState;
-			return Blocks.stone.defaultState;
+			return Blocks.dirt.defaultState;
 		}
 
 		void PlaceTree(int originX, int originY, WorldChunk chunk, Level level) {
@@ -170,6 +176,7 @@ namespace Assets.Scripts.Client.World.Biome {
 
 		}
 
+		[Obsolete]
 		void IBiome.TryPlaceFeature(int cx, WorldChunk chunk, Level level) {
 			const float forestThreshold = 0.45f;
 			const float minTreeSpacing = 3;
@@ -196,9 +203,6 @@ namespace Assets.Scripts.Client.World.Biome {
 
 		TerrainModulation IBiome.SampleTerrain(int blockX) {
 			return new() {
-				//heightOffset = 30f,
-				//amplitude = 0.35f,
-				//erosion = 0.85f
 				heightOffset = 30 + SurfaceDepthAtX(blockX),
 				amplitude = 0.35f,
 				erosion = 0.85f

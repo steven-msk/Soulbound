@@ -149,7 +149,7 @@ namespace SoulboundBackend.Client.World {
 			chunk.GenerateTerrain(biomeMap, heightmap);
 
 			// deprecated
-			chunk.PlaceFeatures(biomeMap, this);
+			//chunk.PlaceFeatures(biomeMap, this);
 
 			generatedChunks[chunkX] = chunk;
 

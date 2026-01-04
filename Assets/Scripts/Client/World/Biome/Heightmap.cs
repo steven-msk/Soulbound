@@ -19,17 +19,17 @@ namespace SoulboundBackend.Client.World.Generation {
 			this.planeY = planeY;
 		}
 
-		public float SampleHeight(int blockX, BiomeMap biomeMap) {
+		public float SampleHeight(int blockX, IEnumerable<BiomeWeight> weights) {
 			float baseHeight = planeHeight;
-			var weights = biomeMap.ResolveWeights(blockX)
+			List<BiomeWeight> orderedWeights = weights
 				.OrderByDescending(w => w.value)
 				.ToList();
-			if (weights.Count == 0) {
+			if (orderedWeights.Count == 0) {
 				return planeHeight;
 			}
 
-			var primary = weights[0];
-			BiomeWeight? secondary = weights.Count > 1 ? weights[1] : null;
+			var primary = orderedWeights[0];
+			BiomeWeight? secondary = orderedWeights.Count > 1 ? orderedWeights[1] : null;
 
 			var w1 = primary.value;
 			var w2 = secondary.GetValueOrDefault().value;
@@ -55,6 +55,14 @@ namespace SoulboundBackend.Client.World.Generation {
 			float variation = (planeHeight * (m.amplitude - 1f));
 			variation *= m.erosion;
 			return baseHeight + variation;
+		}
+
+		public float ToHeightValue(float yCoord) {
+			return WorldChunk.maxY - yCoord;
+		}
+
+		public float ToYCoord(float heightValue) {
+			return WorldChunk.minY + heightValue;
 		}
 	}
 }

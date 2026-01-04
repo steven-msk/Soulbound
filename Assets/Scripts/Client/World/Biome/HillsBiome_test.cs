@@ -51,13 +51,9 @@ namespace Assets.Scripts.Client.World.Biome {
 			return ln + mn + dn;
 		}
 
-		public BlockState ResolveBlock(float depth, BlockPos pos) {
-			if (depth <= 0)
+		BlockState IBiome.ResolveBlock(BlockContext ctx) {
+			if (ctx.AboveSurface())
 				return Blocks.air.defaultState;
-			if (depth < 5) 
-				return Blocks.dirt.defaultState;
-			if (depth < 2)
-				return Blocks.grass.defaultState;
 			return Blocks.stone.defaultState;
 		}
 

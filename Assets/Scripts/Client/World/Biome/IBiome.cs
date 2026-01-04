@@ -12,7 +12,7 @@ namespace SoulboundBackend.Client.World.Generation {
 		float GetDepth(BlockPos pos);
 		float GetDensity(int blockX);
 		TerrainModulation SampleTerrain(int blockX);
-		BlockState ResolveBlock(float depth, BlockPos pos);
+		BlockState ResolveBlock(BlockContext ctx);
 		void TryPlaceFeature(int cx, WorldChunk chunk, Level level) {
 		}
 	}

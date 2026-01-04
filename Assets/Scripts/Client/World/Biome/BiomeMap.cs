@@ -16,6 +16,7 @@ namespace SoulboundBackend.Client.World.Generation {
 			this.biomes = biomes;
 		}
 
+		[Obsolete]
 		public IBiome ResolveBiome(int blockX) {
 			IBiome targetBiome = null;
 			float maxDensity = float.MinValue;

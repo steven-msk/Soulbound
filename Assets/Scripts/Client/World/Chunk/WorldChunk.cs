@@ -6,6 +6,7 @@ using SoulboundBackend.Core.Noise;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Unity.Plastic.Newtonsoft.Json;
 using Unity.Plastic.Newtonsoft.Json.Linq;
 using UnityEngine;
@@ -84,18 +85,17 @@ namespace SoulboundBackend.Client.World.Chunk {
 			UnityEngine.Debug.Log("generating chunk " + cx);
 			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
 				int blockX = ChunkXToWorldX(x);
-				float height = heightmap.SampleHeight(blockX, biomeMap);
-				//var biome = biomeMap.ResolveBiome(blockX);
+				var weights = biomeMap.ResolveWeights(blockX);
+				float height = heightmap.SampleHeight(blockX, weights);
+
+				IBiome biome = weights.First(w => w.value == 1f).biome;
 
 				for (int y = 0; y < Level.WORLD_HEIGHT; y++) {
-					//var pos = new BlockPos(blockX, y);
-
-					//float depth = biome.GetDepth(pos);
-					//var state = biome.ResolveBlock(depth, pos);
-					//stateHashes[x][WorldYToIndex(y)] = state.stateHash;
-					stateHashes[x][y] = y < height
-						? Blocks.stone.defaultState.stateHash
-						: Blocks.air.defaultState.stateHash;
+					BlockContext ctx = new BlockContext {
+						pos = new BlockPos(blockX, IndexToWorldY(y)),
+						surfaceY = heightmap.ToYCoord(height)
+					};
+					stateHashes[x][y] = biome.ResolveBlock(ctx).stateHash;
 				}
 			}
 		}
