@@ -81,9 +81,10 @@ namespace SoulboundBackend.Client.World.Chunk {
 		}
 
 		public void GenerateTerrain(BiomeMap biomeMap, Heightmap heightmap) {
+			UnityEngine.Debug.Log("generating chunk " + cx);
 			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
 				int blockX = ChunkXToWorldX(x);
-				float height = heightmap.SampleHeight(blockX);
+				float height = heightmap.SampleHeight(blockX, biomeMap);
 				//var biome = biomeMap.ResolveBiome(blockX);
 
 				for (int y = 0; y < Level.WORLD_HEIGHT; y++) {

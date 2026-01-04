@@ -51,7 +51,7 @@ public sealed class WorldManager {
 		if (!dump?.nonNulled ?? true) {
 			dump = null;
 		}
-		int seed = dump?.seed ?? UnityEngine.Random.Range(int.MinValue, int.MaxValue);
+		int seed = dump?.seed ?? 12345;
 
 		IEnumerator LevelSceneLoader() {
 			sceneLoader.Invoke();

@@ -52,10 +52,10 @@ namespace SoulboundBackend.Client.World {
 			this.seed = seed;
 			this.heightGenerator = new PerlinNoiseGenerator1D(this.seed, WorldChunk.HEIGHT_SPREAD);
 
-			var biome1 = new Biome_test(seed);
-			var biome2 = new Biome_test2(seed);
+			var biome1 = new PlainsBiome_test(seed);
+			var biome2 = new HillsBiome_test(seed);
 			this.biomeMap = new BiomeMap(new IBiome[] { biome1, biome2 });
-			this.heightmap = new Heightmap(seed, TERRAIN_PLANE_Y);
+			this.heightmap = new Heightmap(TERRAIN_PLANE_Y);
 		}
 
 		// PLANNED REWORK: world rendering system

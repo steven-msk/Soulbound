@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Assets.Scripts.Client.World.Biome {
-	public class Biome_test2 : IBiome {
+	public class HillsBiome_test : IBiome {
 		const float maxSolidDepth = 10f;
 		const int platformHeight = 0;
 
@@ -23,7 +23,7 @@ namespace Assets.Scripts.Client.World.Biome {
 		private readonly PerlinNoise densityNoise;
 		int lastTreeX = int.MinValue >> 1;
 
-		public Biome_test2(int seed) {
+		public HillsBiome_test(int seed) {
 			this.largeNoise = new PerlinNoise(1, seed, frequency: 0.5f, amplitude: 100f);
 			this.mediumNoise = new PerlinNoise(2, seed, frequency: 1.4f, amplitude: 40f);
 			this.detailNoise = new PerlinNoise(3, seed, frequency: 0.06f, amplitude: 10f);
@@ -33,7 +33,7 @@ namespace Assets.Scripts.Client.World.Biome {
 
 		float IBiome.GetDensity(int blockX) {
 			float n = Mathf.Abs(densityNoise.Sample1D(blockX));
-			n = Mathf.Pow(n, 6f);
+			n = Mathf.Pow(n, 1.5f);
 			return n;
 		}
 
@@ -41,14 +41,14 @@ namespace Assets.Scripts.Client.World.Biome {
 			float height = SurfaceDepthAtX(pos.x);
 			float depth = height - pos.y;
 			float normalized = Mathf.Clamp01(depth / maxSolidDepth);
-			return normalized * maxSolidDepth;
+			return normalized;
 		}
 
 		private float SurfaceDepthAtX(int x) {
 			float ln = Mathf.Abs(largeNoise.Sample1D(x));
 			float mn = Mathf.Abs(mediumNoise.Sample1D(x));
 			float dn = Mathf.Abs(detailNoise.Sample1D(x));
-			return platformHeight + ln + mn + dn;
+			return ln + mn + dn;
 		}
 
 		public BlockState ResolveBlock(float depth, BlockPos pos) {
@@ -59,6 +59,14 @@ namespace Assets.Scripts.Client.World.Biome {
 			if (depth < 2)
 				return Blocks.grass.defaultState;
 			return Blocks.stone.defaultState;
+		}
+
+		TerrainModulation IBiome.SampleTerrain(int blockX) {
+			return new() {
+				heightOffset = 40f + SurfaceDepthAtX(blockX),
+				amplitude = 0.7f,
+				erosion = 0.5f
+			};
 		}
 	}
 }
