@@ -9,10 +9,12 @@ using System.IO;
 using System.Linq;
 using Unity.Plastic.Newtonsoft.Json;
 using Unity.Plastic.Newtonsoft.Json.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.LightTransport;
 using UnityEngine.Tilemaps;
 using Logger = SoulboundBackend.Common.Logging.Logger;
+using TerrainData = SoulboundBackend.Client.World.Generation.TerrainData;
 
 namespace SoulboundBackend.Client.World.Chunk {
 	[JsonConverter(typeof(WorldChunk.Serializer))]
@@ -81,31 +83,66 @@ namespace SoulboundBackend.Client.World.Chunk {
 			return generationData;
 		}
 
-		public void GenerateTerrain(BiomeMap biomeMap, Heightmap heightmap) {
-			UnityEngine.Debug.Log("generating chunk " + cx);
+		public TerrainData GenerateTerrain(BiomeMap biomeMap, Heightmap heightmap) {
+			Dictionary<int, int> surfacePoints = new();
+			Dictionary<int, IEnumerable<BiomeWeight>> biomeWeights = new();
+
 			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
 				int blockX = ChunkXToWorldX(x);
 				var weights = biomeMap.ResolveWeights(blockX);
 				float height = heightmap.SampleHeight(blockX, weights);
 
 				IBiome biome = weights.First(w => w.value == 1f).biome;
+				biomeWeights[blockX] = weights;
 
 				for (int y = 0; y < Level.WORLD_HEIGHT; y++) {
 					BlockContext ctx = new BlockContext {
 						pos = new BlockPos(blockX, IndexToWorldY(y)),
 						surfaceY = heightmap.ToYCoord(height)
 					};
+
+					surfacePoints[blockX] = Mathf.FloorToInt(ctx.surfaceY);
 					stateHashes[x][y] = biome.ResolveBlock(ctx).stateHash;
 				}
 			}
+
+			return new TerrainData {
+				chunk = this,
+				surfacePoints = surfacePoints,
+				biomeWeights = biomeWeights
+			};
 		}
 
-		public void PlaceFeatures(BiomeMap biomeMap, Level level) {
-			for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
+		public void PostProcessTerrain(TerrainData data, Level level) {
+			Dictionary<IBiome, List<BiomeInterval>> biomeIntervals = new();
 
-				//deprecated
-				var biome = biomeMap.ResolveBiome(ChunkXToWorldX(cx));
-				biome.TryPlaceFeature(cx, this, level);
+			for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
+				int blockX = ChunkXToWorldX(cx);
+				var weights = data.biomeWeights[blockX];
+				var primary = weights.First(w => w.value == 1f);
+				
+				if (!biomeIntervals.TryGetValue(primary.biome, out var list)) {
+					list = new List<BiomeInterval>();
+					biomeIntervals[primary.biome] = list;
+					list.Add(new BiomeInterval { 
+						startXInclusive = blockX, 
+						endXExclusive = blockX + 1
+					});
+				} else {
+					var last = list.Last();
+					if  (last.endXExclusive == blockX) {
+						last.endXExclusive = blockX + 1;
+					} else {
+						list.Add(new BiomeInterval {
+							startXInclusive = blockX,
+							endXExclusive = blockX + 1
+						});
+					}
+				}
+			}
+
+			foreach (var (biome, intervals) in biomeIntervals) {
+				biome.PostProcessTerrain(data, this, level, intervals);
 			}
 		}
 

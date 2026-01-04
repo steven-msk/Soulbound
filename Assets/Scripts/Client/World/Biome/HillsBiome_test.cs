@@ -54,6 +54,10 @@ namespace Assets.Scripts.Client.World.Biome {
 		BlockState IBiome.ResolveBlock(BlockContext ctx) {
 			if (ctx.AboveSurface())
 				return Blocks.air.defaultState;
+			if (ctx.distanceToSurface < 2)
+				return Blocks.grass.defaultState;
+			if (ctx.distanceToSurface < 5)
+				return Blocks.dirt.defaultState;
 			return Blocks.stone.defaultState;
 		}
 

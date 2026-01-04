@@ -15,6 +15,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using Application = UnityEngine.Application;
 using Logger = SoulboundBackend.Common.Logging.Logger;
+using TerrainData = SoulboundBackend.Client.World.Generation.TerrainData;
 
 #nullable enable
 
@@ -146,7 +147,8 @@ namespace SoulboundBackend.Client.World {
 			ChunkHeightmapData heightmapData = chunk.GenerateHeightmap(this.heightGenerator);
 
 			// overrides all states set in GenerateHeightmap
-			chunk.GenerateTerrain(biomeMap, heightmap);
+			TerrainData terrainData = chunk.GenerateTerrain(biomeMap, heightmap);
+			chunk.PostProcessTerrain(terrainData, this);
 
 			// deprecated
 			//chunk.PlaceFeatures(biomeMap, this);

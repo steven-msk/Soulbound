@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Unity.Mathematics;
 using UnityEngine;
+using TerrainData = SoulboundBackend.Client.World.Generation.TerrainData;
 
 namespace Assets.Scripts.Client.World.Biome {
 	public class PlainsBiome_test : IBiome {
@@ -100,7 +101,6 @@ namespace Assets.Scripts.Client.World.Biome {
 			return Mathf.Clamp01(depthFactor);
 		}
 
-		[Obsolete]
 		private float SurfaceDepthAtX(int x) {
 			float ln = Mathf.Abs(largeNoise.Sample1D(x));
 			float mn = Mathf.Abs(mediumNoise.Sample1D(x));
@@ -176,28 +176,29 @@ namespace Assets.Scripts.Client.World.Biome {
 
 		}
 
-		[Obsolete]
-		void IBiome.TryPlaceFeature(int cx, WorldChunk chunk, Level level) {
+		void IBiome.PostProcessTerrain(TerrainData data, WorldChunk chunk, Level level, IEnumerable<BiomeInterval> intervals) {
 			const float forestThreshold = 0.45f;
 			const float minTreeSpacing = 3;
-			int xpos = chunk.ChunkXToWorldX(cx);
-			int ypos = SurfaceHeightAtX(xpos) + 1;
 
-			float forest = Mathf.Abs(forestNoise.Sample1D(xpos));
-			float forestMask = Mathf.InverseLerp(forestThreshold, 1f, forest);
-			if (forest < forestThreshold) {
-				return;
-			}
-			float density = Mathf.Abs(forestDensityNoise.Sample1D(xpos));
-			float distance = Mathf.Abs(xpos - lastTreeX);
-			if (distance < minTreeSpacing) {
-				return;
-			}
+			foreach (var interval in intervals) {
+				for (int x = interval.startXInclusive; x < interval.endXExclusive; x++) {
+					float forest = Mathf.Abs(forestNoise.Sample1D(x));
+					if (forest < forestThreshold) {
+						continue;
+					}
 
-			float spawnChance = Mathf.Lerp(0.05f, 0.25f, density);
-			if(UnityEngine.Random.value < spawnChance) {
-				PlaceTree(xpos, ypos, chunk, level);
-				lastTreeX = xpos;
+					float density = Mathf.Abs(forestDensityNoise.Sample1D(x));
+					float distance = Mathf.Abs(x - lastTreeX);
+					if (distance < minTreeSpacing) {
+						continue;
+					}
+
+					float spawnChance = Mathf.Lerp(0.05f, 0.25f, density);
+					if (UnityEngine.Random.value < spawnChance) {
+						PlaceTree(x, data.surfacePoints[x], chunk, level);
+						lastTreeX = x;
+					}
+				}
 			}
 		}
 
