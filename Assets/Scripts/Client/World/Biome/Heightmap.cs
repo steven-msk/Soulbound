@@ -19,18 +19,7 @@ namespace SoulboundBackend.Client.World.Generation {
 			this.planeY = planeY;
 		}
 
-		public float SampleHeight(int blockX, IEnumerable<BiomeWeight> weights) {
-			float baseHeight = planeHeight;
-			List<BiomeWeight> orderedWeights = weights
-				.OrderByDescending(w => w.value)
-				.ToList();
-			if (orderedWeights.Count == 0) {
-				return planeHeight;
-			}
-
-			var primary = orderedWeights[0];
-			BiomeWeight? secondary = orderedWeights.Count > 1 ? orderedWeights[1] : null;
-
+		public float SampleHeight(int blockX, BiomeWeight primary, BiomeWeight? secondary) {
 			var w1 = primary.value;
 			var w2 = secondary.GetValueOrDefault().value;
 			float t = secondary != null ? w2 / (w1 + w2) : 0f;

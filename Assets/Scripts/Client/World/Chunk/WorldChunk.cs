@@ -85,13 +85,11 @@ namespace SoulboundBackend.Client.World.Chunk {
 			return generationData;
 		}
 
-		public void Generate(BiomeMap biomeMap, Heightmap heightmap, out TerrainData terrainData) {
+		public void Generate(BiomeMap biomeMap, Heightmap heightmap, Cavemap cavemap, out TerrainData terrainData) {
 			Dictionary<int, int> surfacePoints = new();
 			Dictionary<int, IEnumerable<BiomeWeight>> biomeWeights = new();
 			float[][] caveDensities = new float[Level.CHUNK_LENGTH][];
 			BitArray[] caveMask = new BitArray[Level.CHUNK_LENGTH];
-
-			CaveField caveField = new();
 
 			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
 				caveDensities[x] = new float[Level.WORLD_HEIGHT];
@@ -99,15 +97,15 @@ namespace SoulboundBackend.Client.World.Chunk {
 
 				int blockX = ChunkXToWorldX(x);
 				var weights = biomeMap.ResolveWeights(blockX);
-				float height = heightmap.SampleHeight(blockX, weights);
-
-				IBiome biome = weights.First(w => w.value == 1f).biome;
+				biomeMap.ResolvePrimaryBiomes(weights, out var primary, out var secondary);
+				float height = heightmap.SampleHeight(blockX, primary, secondary);
+				IBiome biome = primary.biome;
 				biomeWeights[blockX] = weights;
 
 				for (int y = 0; y < Level.WORLD_HEIGHT; y++) {
 					BlockPos blockPos = new(blockX, IndexToWorldY(y));
-					float caveDensity = caveField.SampleDensity(blockPos, weights);
-					bool isCave = caveField.IsCave(caveDensity);
+					float caveDensity = cavemap.SampleDensity(blockX, blockPos.y, primary, secondary);
+					bool isCave = cavemap.IsCave(caveDensity);
 
 					BlockContext ctx = new BlockContext {
 						pos = new BlockPos(blockX, IndexToWorldY(y)),
@@ -128,7 +126,6 @@ namespace SoulboundBackend.Client.World.Chunk {
 				surfacePoints = surfacePoints,
 				biomeWeights = biomeWeights,
 				caveDensities = caveDensities,
-
 			};
 		}
 

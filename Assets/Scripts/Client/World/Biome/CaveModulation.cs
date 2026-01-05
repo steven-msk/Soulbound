@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.World.Generation {
 	public struct CaveModulation {
-		public float density;
-		public float scale;
-		public float verticalBias;
-		public float thresholdBias;
+		public float frequency;
+		public float amplitude;
+		public float threshold;
 	}
 }

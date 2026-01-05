@@ -125,10 +125,18 @@ namespace Assets.Scripts.Client.World.Biome {
 		}
 
 		TerrainModulation IBiome.SampleTerrain(int blockX) {
-			return new() {
+			return new TerrainModulation {
 				heightOffset = 40f + HeightNoise(blockX),
 				amplitude = 0.52f,
 				erosion = 0.5f
+			};
+		}
+
+		CaveModulation IBiome.SampleCave(int blockX, int blockY) {
+			return new CaveModulation {
+				frequency = 5f,
+				amplitude = 0.7f,
+				threshold = 0.4f
 			};
 		}
 	}

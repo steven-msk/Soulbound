@@ -47,6 +47,7 @@ namespace SoulboundBackend.Client.World {
 
 		private readonly BiomeMap biomeMap;
 		private readonly Heightmap heightmap;
+		private readonly Cavemap cavemap;
 
 		public Level(LevelGridContext gridContext, int seed) {
 			this.gridContext = gridContext;
@@ -57,6 +58,7 @@ namespace SoulboundBackend.Client.World {
 			var biome2 = new HillsBiome_test(seed);
 			this.biomeMap = new BiomeMap(new IBiome[] { biome1, biome2 });
 			this.heightmap = new Heightmap(TERRAIN_PLANE_Y);
+			this.cavemap = new Cavemap(seed);
 		}
 
 		// PLANNED REWORK: world rendering system
@@ -147,7 +149,7 @@ namespace SoulboundBackend.Client.World {
 			ChunkHeightmapData heightmapData = chunk.GenerateHeightmap(this.heightGenerator);
 
 			// overrides all states set in GenerateHeightmap
-			chunk.Generate(biomeMap, heightmap, out var terrainData);
+			chunk.Generate(biomeMap, heightmap, cavemap, out var terrainData);
 			chunk.PostProcessTerrain(terrainData, this);
 
 			// deprecated

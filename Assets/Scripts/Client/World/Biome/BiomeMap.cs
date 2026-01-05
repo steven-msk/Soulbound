@@ -56,5 +56,18 @@ namespace SoulboundBackend.Client.World.Generation {
 				yield return new BiomeWeight(biome, weight);
 			}
 		}
+
+		public void ResolvePrimaryBiomes(IEnumerable<BiomeWeight> weights, out BiomeWeight primary, out BiomeWeight? secondary) {
+			List<BiomeWeight> orderedWeights = weights
+				.OrderByDescending(w => w.value)
+				.ToList();
+			if (orderedWeights.Count == 0) {
+				primary = default;
+				secondary = null;
+			}
+
+			primary = orderedWeights[0];
+			secondary = orderedWeights.Count > 1 ? orderedWeights[1] : null;
+		}
 	}
 }
