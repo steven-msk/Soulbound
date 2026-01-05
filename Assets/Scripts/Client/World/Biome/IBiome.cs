@@ -16,5 +16,9 @@ namespace SoulboundBackend.Client.World.Generation {
 		BlockState ResolveBlock(BlockContext ctx);
 		void PostProcessTerrain(TerrainData data, WorldChunk chunk, Level level, IEnumerable<BiomeInterval> intervals) {
 		}
+
+		BlockState ResolveCaveBlock(BlockPos pos, float density) {
+			return Blocks.air.defaultState;
+		}
 	}
 }

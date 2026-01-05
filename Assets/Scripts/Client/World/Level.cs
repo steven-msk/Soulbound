@@ -147,7 +147,7 @@ namespace SoulboundBackend.Client.World {
 			ChunkHeightmapData heightmapData = chunk.GenerateHeightmap(this.heightGenerator);
 
 			// overrides all states set in GenerateHeightmap
-			TerrainData terrainData = chunk.GenerateTerrain(biomeMap, heightmap);
+			chunk.Generate(biomeMap, heightmap, out var terrainData);
 			chunk.PostProcessTerrain(terrainData, this);
 
 			// deprecated

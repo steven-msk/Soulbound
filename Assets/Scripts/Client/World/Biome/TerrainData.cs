@@ -1,5 +1,6 @@
 ﻿using SoulboundBackend.Client.World.Chunk;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,5 +11,7 @@ namespace SoulboundBackend.Client.World.Generation {
 		public WorldChunk chunk;
 		public Dictionary<int, int> surfacePoints;
 		public Dictionary<int, IEnumerable<BiomeWeight>> biomeWeights;
+		public float[][] caveDensities;
+		public BitArray[] caveMask;
 	}
 }

@@ -10,6 +10,9 @@ namespace SoulboundBackend.Client.World.Generation {
 		public float surfaceY;
 		public float distanceToSurface => surfaceY - pos.y;
 
+		public float caveDensity;
+		public bool isCave;
+
 		public bool AboveSurface() {
 			return pos.y > surfaceY;
 		}
