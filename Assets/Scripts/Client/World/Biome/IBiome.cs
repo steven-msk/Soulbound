@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 namespace SoulboundBackend.Client.World.Generation {
 
 	public interface IBiome {
-		float GetDepth(BlockPos pos);
 		float GetDensity(int blockX);
 		TerrainModulation SampleTerrain(int blockX);
 

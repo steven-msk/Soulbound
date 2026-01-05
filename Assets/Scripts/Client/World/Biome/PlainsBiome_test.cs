@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine;
 using TerrainData = SoulboundBackend.Client.World.Generation.TerrainData;
 
@@ -23,27 +24,23 @@ namespace Assets.Scripts.Client.World.Biome {
 		const int platformHeight = 0;
 
 		private readonly int seed;
-		private readonly Heightmap heightmap;
 		private readonly PerlinNoise largeNoise;
 		private readonly PerlinNoise mediumNoise;
 		private readonly PerlinNoise detailNoise;
-		private readonly PerlinNoise caveNoise;
-		private readonly PerlinNoise tunnelKillNoise;
+		[Obsolete] private readonly PerlinNoise caveNoise;
+		[Obsolete] private readonly PerlinNoise tunnelKillNoise;
 		private readonly DomainWarp warp;
-		private readonly PerlinNoise forestNoise;
-		private readonly PerlinNoise forestDensityNoise;
 		private readonly PerlinNoise densityNoise;
 		int lastTreeX = int.MinValue >> 1;
 
 		public PlainsBiome_test(int seed) {
-			this.largeNoise = new PerlinNoise(1, seed, frequency: 1f, amplitude: 60f);
-			this.mediumNoise = new PerlinNoise(2, seed, frequency: 0.7f, amplitude: 40f);
-			this.detailNoise = new PerlinNoise(3, seed, frequency: 0.12f, amplitude: 5f);
+			this.largeNoise = new PerlinNoise(1, seed, frequency: 0.3f, amplitude: 30f);
+			this.mediumNoise = new PerlinNoise(2, seed, frequency: 0.1f, amplitude: 20f);
+			this.detailNoise = new PerlinNoise(3, seed, frequency: 0.02f, amplitude: 5f);
+
 			this.caveNoise = new PerlinNoise(4, seed, frequency: 0.5f, amplitude: 1.5f);
 			this.tunnelKillNoise = new PerlinNoise(5, seed, frequency: 0.25f, amplitude: 1.76f);
 			this.warp = new DomainWarp(seed, frequency: 0.15f);
-			this.forestNoise = new PerlinNoise(6, seed, frequency: 3f, amplitude: 10f);
-			this.forestDensityNoise = new PerlinNoise(7, seed, frequency: 5f, amplitude: 4f);
 			this.densityNoise = new PerlinNoise(8, seed, frequency: 0.05f, amplitude: 1f);
 		}
 
@@ -53,18 +50,9 @@ namespace Assets.Scripts.Client.World.Biome {
 			return n;
 		}
 
-		[Obsolete]
-		float IBiome.GetDepth(BlockPos pos) {
-			float height = SurfaceDepthAtX(pos.x);
-			float depth = height - pos.y;
-			float normalized = Mathf.Clamp01(depth / maxSolidDepth);
-			return normalized * maxSolidDepth;
-		}
-
-		[Obsolete]
-		private bool IsCave(int x, int y) {
+		private bool IsCave(int x, int y, BlockContext ctx) {
 			float n = Mathf.Abs(caveNoise.Sample2D(x, y));
-			float mask = GetVerticalMask(x, y);
+			float mask = GetVerticalMask(x, y, ctx);
 
 			float f = Mathf.InverseLerp(WorldChunk.minY, WorldChunk.maxY, y);
 			float depthFactor = 1f - Mathf.Clamp01(Mathf.SmoothStep(0f, 1f, f));
@@ -72,10 +60,9 @@ namespace Assets.Scripts.Client.World.Biome {
 			return n * mask > caveThreshold / depthFactor;
 		}
 
-		[Obsolete]
-		private bool IsTunnel(int x, int y) {
+		private bool IsTunnel(int x, int y, BlockContext ctx) {
 			float wx = x, wy = y, zSlice = seed;
-			float verticalMask = GetVerticalMask(x, y);
+			float verticalMask = GetVerticalMask(x, y, ctx);
 
 			warp.Warp3D(ref wx, ref wy, ref zSlice);
 			float n = 1f - Mathf.Abs(caveNoise.Sample2D(wx, wy / verticalTunnelCompression));
@@ -84,51 +71,31 @@ namespace Assets.Scripts.Client.World.Biome {
 			return n > tunnelThreshold && !TunnelKill(x, y);
 		}
 
-		[Obsolete]
 		private bool TunnelKill(int x, int y) {
 			float k = Mathf.Abs(tunnelKillNoise.Sample2D(x, y / verticalTunnelCompression));
 			float killMask = Mathf.Lerp(tunnelThreshold, 1f, k * k);
 			return killMask > tunneKillThreshold;
 		}
 
-		[Obsolete]
-		private float GetPeakBias(int x, int y) {
-			float verticalMask = GetVerticalMask(x, y);
-			float relativeDepth = SurfaceDepthAtX(x) - y;
-			const float minCarveDepth = 0.6f * maxSolidDepth;
-			const float maxCarveDepth = 0.98f * maxSolidDepth;
-			float depthFactor = Mathf.InverseLerp(minCarveDepth, maxCarveDepth, relativeDepth);
-			return Mathf.Clamp01(depthFactor);
-		}
-
-		private float SurfaceDepthAtX(int x) {
+		private float HeightNoise(int x) {
 			float ln = Mathf.Abs(largeNoise.Sample1D(x));
 			float mn = Mathf.Abs(mediumNoise.Sample1D(x));
 			float dn = Mathf.Abs(detailNoise.Sample1D(x));
 			return ln + mn + dn;
 		}
 
-		[Obsolete]
-		private int SurfaceHeightAtX(int x) {
-			return Mathf.FloorToInt(SurfaceDepthAtX(x));
-		}
-
-		[Obsolete]
-		private float GetSurfaceMask(int x, int y, float falloff) {
-			float surfaceY = SurfaceDepthAtX(x);
-			float t = Mathf.InverseLerp(surfaceY - falloff, surfaceY, y);
+		private float GetSurfaceMask(int x, int y, float falloff, BlockContext ctx) {
+			float t = Mathf.InverseLerp(ctx.surfaceY - falloff, ctx.surfaceY, y);
 			return 1f - Mathf.Clamp01(Mathf.SmoothStep(0f, 1f, t));
 		}
 
-		[Obsolete]
 		private float GetBottomMask(int y) {
 			float t = Mathf.InverseLerp(WorldChunk.minY, WorldChunk.minY + bottomFalloff, y);
 			return Mathf.Clamp01(Mathf.SmoothStep(0f, 1f, t));
 		}
 
-		[Obsolete]
-		private float GetVerticalMask(int x, int y) {
-			return GetSurfaceMask(x, y, surfaceFalloff) * GetBottomMask(y);
+		private float GetVerticalMask(int x, int y, BlockContext ctx) {
+			return GetSurfaceMask(x, y, surfaceFalloff, ctx) * GetBottomMask(y);
 		}
 
 		BlockState IBiome.ResolveBlock(BlockContext ctx) {
@@ -137,74 +104,9 @@ namespace Assets.Scripts.Client.World.Biome {
 			return Blocks.dirt.defaultState;
 		}
 
-		void PlaceTree(int originX, int originY, WorldChunk chunk, Level level) {
-			const int crownRadius = 2;
-			const int trunkHeightMin = 5;
-			const int trunkHeightMax = 20;
-
-			int chunkX = chunk.WorldXToChunkX(originX), ypos = originY;
-			ChunkBlockPos trunkPos = new(chunkX, ypos, chunk.xpos);
-			int height = UnityEngine.Random.Range(trunkHeightMin, trunkHeightMax + 1);
-
-			for (int y = 0; y < height; y++) {
-				chunk.SetBlock(trunkPos, Blocks.wood.defaultState);
-				trunkPos.y++;
-			}
-
-			Dictionary<int, List<int>> rowToXs = new();
-			float angularStep = 1f;
-			for (float angle = 0; angle < 360f; angle += angularStep) {
-				float rad = angle * Mathf.Deg2Rad;
-				int x = Mathf.RoundToInt(trunkPos.x + crownRadius * Mathf.Cos(rad));
-				int y = Mathf.RoundToInt(trunkPos.y + crownRadius * Mathf.Sin(rad));
-
-				if (!rowToXs.ContainsKey(y)) {
-					rowToXs[y] = new List<int>();
-				}
-				rowToXs[y].Add(x);
-			}
-
-			foreach (var kvp in rowToXs) {
-				int y = kvp.Key;
-				List<int> xs = kvp.Value;
-				for (int x = xs.Min(); x <= xs.Max(); x++) {
-					int cx = level.ChunkXFromRelativeBlock(x, chunk.xpos);
-					ChunkBlockPos pos = new(level.NormalizeChunkX(x), y, cx);
-					level.SetBlockOrPend(pos, Blocks.leaves.defaultState);
-				}
-			}
-
-		}
-
-		void IBiome.PostProcessTerrain(TerrainData data, WorldChunk chunk, Level level, IEnumerable<BiomeInterval> intervals) {
-			const float forestThreshold = 0.45f;
-			const float minTreeSpacing = 3;
-
-			foreach (var interval in intervals) {
-				for (int x = interval.startXInclusive; x < interval.endXExclusive; x++) {
-					float forest = Mathf.Abs(forestNoise.Sample1D(x));
-					if (forest < forestThreshold) {
-						continue;
-					}
-
-					float density = Mathf.Abs(forestDensityNoise.Sample1D(x));
-					float distance = Mathf.Abs(x - lastTreeX);
-					if (distance < minTreeSpacing) {
-						continue;
-					}
-
-					float spawnChance = Mathf.Lerp(0.05f, 0.25f, density);
-					if (UnityEngine.Random.value < spawnChance) {
-						PlaceTree(x, data.surfacePoints[x], chunk, level);
-						lastTreeX = x;
-					}
-				}
-			}
-		}
-
 		TerrainModulation IBiome.SampleTerrain(int blockX) {
 			return new() {
-				heightOffset = 30 + SurfaceDepthAtX(blockX),
+				heightOffset = 30 + HeightNoise(blockX),
 				amplitude = 0.35f,
 				erosion = 0.85f
 			};
