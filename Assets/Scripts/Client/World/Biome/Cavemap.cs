@@ -17,38 +17,37 @@ namespace SoulboundBackend.Client.World.Generation {
 		}
 
 		public float SampleDensity(int blockX, int blockY, BiomeWeight primary, BiomeWeight? secondary) {
-			CaveModulation modulation = BlendModulations(blockX, blockY, primary, secondary);
-			float noise = ApplyModulation(blockX, blockY, modulation);
-			return 1f - noise - modulation.fill;
+			CaveModulation m1 = primary.biome.SampleCave(blockX, blockY);
+			CaveModulation? m2 = secondary?.biome.SampleCave(blockX, blockY);
+
+			float d1 = ApplyModulation(blockX, blockY, m1);
+			float d2 = m2 != null ? ApplyModulation(blockX, blockY, m2.Value) : d1;
+
+			return BlendDensities(d1, d2, primary, secondary);
 		}
 
-		CaveModulation BlendModulations(int blockX, int blockY, BiomeWeight primary, BiomeWeight? secondary) {
+		float BlendDensities(float d1, float d2, BiomeWeight primary, BiomeWeight? secondary) {
 			var w1 = primary.value;
 			var w2 = secondary.GetValueOrDefault().value;
 			float t = secondary != null ? w2 / (w1 + w2) : 0f;
 
-			var a = primary.biome.SampleCave(blockX, blockY);
 			if (secondary == null || t < 0.001f) {
-				return a;
+				return d1;
 			}
-			var b = secondary.Value.biome.SampleCave(blockX, blockY);
 
-			return new CaveModulation {
-				frequency = Mathf.Lerp(a.frequency, b.frequency, t),
-				edgeSharpness = Mathf.Lerp(a.edgeSharpness, b.edgeSharpness, t),
-				fill = Mathf.Lerp(a.fill, b.fill, t),
-			};
+			return Mathf.Lerp(d1, d2, t);
 		}
 
 		public float ApplyModulation(int blockX, int blockY, CaveModulation modulation) {
-			return caveNoise.Sample2D(
+			return 1f - caveNoise.Sample2D(
 				blockX * modulation.frequency,
 				blockY * modulation.frequency
-			) * modulation.edgeSharpness;
+			) * modulation.edgeSharpness - modulation.fill;
 		}
  
 		public bool IsCave(float density) {
 			return density <= 0f;
 		}
+
 	}
 }
