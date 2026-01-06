@@ -99,6 +99,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 				var weights = biomeMap.ResolveWeights(blockX);
 				biomeMap.ResolvePrimaryBiomes(weights, out var primary, out var secondary);
 				float height = heightmap.SampleHeight(blockX, primary, secondary);
+
 				IBiome biome = primary.biome;
 				biomeWeights[blockX] = weights;
 

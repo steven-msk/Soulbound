@@ -19,7 +19,7 @@ namespace SoulboundBackend.Client.World.Generation {
 		public float SampleDensity(int blockX, int blockY, BiomeWeight primary, BiomeWeight? secondary) {
 			CaveModulation modulation = BlendModulations(blockX, blockY, primary, secondary);
 			float noise = ApplyModulation(blockX, blockY, modulation);
-			return 1f - Mathf.Abs(noise) - modulation.threshold;
+			return 1f - noise - modulation.fill;
 		}
 
 		CaveModulation BlendModulations(int blockX, int blockY, BiomeWeight primary, BiomeWeight? secondary) {
@@ -35,8 +35,8 @@ namespace SoulboundBackend.Client.World.Generation {
 
 			return new CaveModulation {
 				frequency = Mathf.Lerp(a.frequency, b.frequency, t),
-				amplitude = Mathf.Lerp(a.amplitude, b.amplitude, t),
-				threshold = Mathf.Lerp(a.threshold, b.threshold, t),
+				edgeSharpness = Mathf.Lerp(a.edgeSharpness, b.edgeSharpness, t),
+				fill = Mathf.Lerp(a.fill, b.fill, t),
 			};
 		}
 
@@ -44,7 +44,7 @@ namespace SoulboundBackend.Client.World.Generation {
 			return caveNoise.Sample2D(
 				blockX * modulation.frequency,
 				blockY * modulation.frequency
-			) * modulation.amplitude;
+			) * modulation.edgeSharpness;
 		}
  
 		public bool IsCave(float density) {

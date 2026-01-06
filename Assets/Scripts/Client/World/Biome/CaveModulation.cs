@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace SoulboundBackend.Client.World.Generation {
 	public struct CaveModulation {
 		public float frequency;
-		public float amplitude;
-		public float threshold;
+		public float edgeSharpness;
+		public float fill;
 	}
 }

@@ -134,9 +134,9 @@ namespace Assets.Scripts.Client.World.Biome {
 
 		CaveModulation IBiome.SampleCave(int blockX, int blockY) {
 			return new CaveModulation {
-				frequency = 5f,
-				amplitude = 0.7f,
-				threshold = 0.4f
+				frequency = 0.5f,
+				edgeSharpness = 1f,
+				fill = 1f
 			};
 		}
 	}

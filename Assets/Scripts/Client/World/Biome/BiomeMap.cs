@@ -52,7 +52,6 @@ namespace SoulboundBackend.Client.World.Generation {
 				float weight = density / maxDensity;
 				weight = Mathf.Pow(weight, blendSharpness);
 
-				UnityEngine.Debug.Log($"weight {weight} @ bx={blockX}, biome {biome}");
 				yield return new BiomeWeight(biome, weight);
 			}
 		}
