@@ -29,7 +29,7 @@ namespace Assets.Scripts.Client.World.Biome {
 		public HillsBiome_test(int seed) {
 			this.largeNoise = new PerlinNoise(1, seed, frequency: 0.5f, amplitude: 100f);
 			this.mediumNoise = new PerlinNoise(2, seed, frequency: 1.4f, amplitude: 40f);
-			this.detailNoise = new PerlinNoise(3, seed, frequency: 0.06f, amplitude: 10f); 
+			this.detailNoise = new PerlinNoise(3, seed, frequency: 0.06f, amplitude: 10f);
 			this.warp = new DomainWarp(seed, frequency: 0.15f);
 			this.densityNoise = new PerlinNoise(8, seed, frequency: 0.06f, amplitude: 1f);
 			this.forestNoise = new PerlinNoise(6, seed, frequency: 3f, amplitude: 10f);
@@ -136,7 +136,8 @@ namespace Assets.Scripts.Client.World.Biome {
 			return new CaveModulation {
 				frequency = 3f,
 				edgeSharpness = 1f,
-				fill = 1f
+				fill = 1f,
+				surfaceFalloff = 60f
 			};
 		}
 	}

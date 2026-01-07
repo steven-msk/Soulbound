@@ -116,7 +116,8 @@ namespace Assets.Scripts.Client.World.Biome {
 			return new CaveModulation {
 				frequency = 1f,
 				edgeSharpness = 1.5f,
-				fill = 0.5f
+				fill = 0.5f,
+				surfaceFalloff = 30f
 			};
 		}
 	}

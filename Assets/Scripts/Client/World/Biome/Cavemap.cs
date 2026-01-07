@@ -16,26 +16,18 @@ namespace SoulboundBackend.Client.World.Generation {
 			this.caveNoise = new PerlinNoise(0, seed, frequency: 1f, amplitude: 1f);
 		}
 
-		public float SampleDensity(int blockX, int blockY, BiomeWeight primary, BiomeWeight? secondary) {
+		public float SampleDensity(int blockX, int blockY, float surfaceY, BiomeWeight primary, BiomeWeight? secondary) {
 			CaveModulation m1 = primary.biome.SampleCave(blockX, blockY);
 			CaveModulation? m2 = secondary?.biome.SampleCave(blockX, blockY);
+			float blendFactor = GetBlendFactor(primary, secondary);
 
 			float d1 = ApplyModulation(blockX, blockY, m1);
 			float d2 = m2 != null ? ApplyModulation(blockX, blockY, m2.Value) : d1;
+			float blended = Mathf.Lerp(d1, d2, blendFactor);
 
-			return BlendDensities(d1, d2, primary, secondary);
-		}
-
-		float BlendDensities(float d1, float d2, BiomeWeight primary, BiomeWeight? secondary) {
-			var w1 = primary.value;
-			var w2 = secondary.GetValueOrDefault().value;
-			float t = secondary != null ? w2 / (w1 + w2) : 0f;
-
-			if (secondary == null || t < 0.001f) {
-				return d1;
-			}
-
-			return Mathf.Lerp(d1, d2, t);
+			const float solidBias = 1f;
+			float surfaceMask = GetSurfaceMask(blockY, surfaceY, m1, m2, blendFactor);
+			return Mathf.Lerp(blended, solidBias, surfaceMask);
 		}
 
 		public float ApplyModulation(int blockX, int blockY, CaveModulation modulation) {
@@ -44,10 +36,29 @@ namespace SoulboundBackend.Client.World.Generation {
 				blockY * modulation.frequency
 			) * modulation.edgeSharpness - modulation.fill;
 		}
+
+		public float GetSurfaceMask(int blockY, float surfaceY, CaveModulation m1, CaveModulation? m2, float blendFactor) {
+			float s1 = m1.surfaceFalloff;
+			float s2 = m2?.surfaceFalloff ?? s1;
+			float surfaceFalloff = Mathf.Lerp(s1, s2, blendFactor);
+
+			float t = Mathf.InverseLerp(surfaceY - surfaceFalloff, surfaceY, blockY);
+			return 1f - Mathf.SmoothStep(1f, 0f, t);
+		}
  
 		public bool IsCave(float density) {
 			return density <= 0f;
 		}
 
+		private float GetBlendFactor(float a, float b) {
+			return b / (a + b);
+		}
+
+		private float GetBlendFactor(BiomeWeight primary, BiomeWeight? secondary) {
+			float w1 = primary.value;
+			float w2 = secondary?.value ?? 0f;
+
+			return GetBlendFactor(w1, w2);
+		}
 	}
 }

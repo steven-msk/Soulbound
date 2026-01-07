@@ -13,5 +13,9 @@ namespace SoulboundBackend.Client.World.Generation {
 		public Dictionary<int, IEnumerable<BiomeWeight>> biomeWeights;
 		public float[][] caveDensities;
 		public BitArray[] caveMask;
+
+		public bool IsCave(int chunkX, int yIndex) {
+			return caveMask[chunkX][yIndex];
+		}
 	}
 }
