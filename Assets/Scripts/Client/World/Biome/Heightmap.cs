@@ -25,7 +25,7 @@ namespace SoulboundBackend.Client.World.Generation {
 			float t = secondary != null ? w2 / (w1 + w2) : 0f;
 
 			var a = primary.biome.SampleTerrain(blockX);
-			if (secondary == null || t < 0.001f) {
+			if (secondary == null) {
 				return ApplyModulation(a);
 			}
 			var b = secondary.Value.biome.SampleTerrain(blockX);

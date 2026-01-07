@@ -140,5 +140,11 @@ namespace Assets.Scripts.Client.World.Biome {
 				surfaceFalloff = 60f
 			};
 		}
+
+		BlockState IBiome.ResolveCaveBlock(BlockPos pos, float density) {
+			if (Mathf.Abs(density) <= 0.05f)
+				return Blocks.dirt.defaultState;
+			return Blocks.air.defaultState;
+		}
 	}
 }
