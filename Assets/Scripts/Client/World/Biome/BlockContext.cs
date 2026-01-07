@@ -8,8 +8,8 @@ using UnityEngine;
 namespace SoulboundBackend.Client.World.Generation {
 	public struct BlockContext {
 		public BlockPos pos;
-		public float surfaceY;
-		public float distanceToSurface => surfaceY - pos.y;
+		public int surfaceY;
+		public int distanceToSurface => surfaceY - pos.y;
 
 		public float caveDensity;
 		public bool isCave;

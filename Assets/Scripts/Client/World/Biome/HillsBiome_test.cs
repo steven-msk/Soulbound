@@ -19,7 +19,6 @@ namespace Assets.Scripts.Client.World.Biome {
 		private readonly Heightmap heightmap;
 		private readonly PerlinNoise largeNoise;
 		private readonly PerlinNoise mediumNoise;
-		private readonly PerlinNoise detailNoise;
 		private readonly DomainWarp warp;
 		private readonly PerlinNoise densityNoise;
 		private readonly PerlinNoise forestNoise;
@@ -29,7 +28,6 @@ namespace Assets.Scripts.Client.World.Biome {
 		public HillsBiome_test(int seed) {
 			this.largeNoise = new PerlinNoise(1, seed, frequency: 0.5f, amplitude: 100f);
 			this.mediumNoise = new PerlinNoise(2, seed, frequency: 1.4f, amplitude: 40f);
-			this.detailNoise = new PerlinNoise(3, seed, frequency: 0.06f, amplitude: 10f);
 			this.warp = new DomainWarp(seed, frequency: 0.15f);
 			this.densityNoise = new PerlinNoise(8, seed, frequency: 0.06f, amplitude: 1f);
 			this.forestNoise = new PerlinNoise(6, seed, frequency: 3f, amplitude: 10f);
@@ -45,8 +43,7 @@ namespace Assets.Scripts.Client.World.Biome {
 		private float HeightNoise(int x) {
 			float ln = Mathf.Abs(largeNoise.Sample1D(x));
 			float mn = Mathf.Abs(mediumNoise.Sample1D(x));
-			float dn = Mathf.Abs(detailNoise.Sample1D(x));
-			return ln + mn + dn;
+			return ln + mn;
 		}
 
 		BlockState IBiome.ResolveBlock(BlockContext ctx) {
@@ -117,7 +114,7 @@ namespace Assets.Scripts.Client.World.Biome {
 
 					float spawnChance = Mathf.Lerp(0.05f, 0.25f, density);
 					if (UnityEngine.Random.value < spawnChance) {
-						PlaceTree(x, data.surfacePoints[x], chunk, level);
+						PlaceTree(x, data.surfacePoints[x] + 1, chunk, level);
 						lastTreeX = x;
 					}
 				}

@@ -26,7 +26,6 @@ namespace Assets.Scripts.Client.World.Biome {
 		private readonly int seed;
 		private readonly PerlinNoise largeNoise;
 		private readonly PerlinNoise mediumNoise;
-		private readonly PerlinNoise detailNoise;
 		[Obsolete] private readonly PerlinNoise caveNoise;
 		[Obsolete] private readonly PerlinNoise tunnelKillNoise;
 		private readonly DomainWarp warp;
@@ -36,7 +35,6 @@ namespace Assets.Scripts.Client.World.Biome {
 		public PlainsBiome_test(int seed) {
 			this.largeNoise = new PerlinNoise(1, seed, frequency: 0.3f, amplitude: 30f);
 			this.mediumNoise = new PerlinNoise(2, seed, frequency: 0.1f, amplitude: 20f);
-			this.detailNoise = new PerlinNoise(3, seed, frequency: 0.02f, amplitude: 5f);
 
 			this.caveNoise = new PerlinNoise(4, seed, frequency: 0.5f, amplitude: 1.5f);
 			this.tunnelKillNoise = new PerlinNoise(5, seed, frequency: 0.25f, amplitude: 1.76f);
@@ -80,8 +78,7 @@ namespace Assets.Scripts.Client.World.Biome {
 		private float HeightNoise(int x) {
 			float ln = Mathf.Abs(largeNoise.Sample1D(x));
 			float mn = Mathf.Abs(mediumNoise.Sample1D(x));
-			float dn = Mathf.Abs(detailNoise.Sample1D(x));
-			return ln + mn + dn;
+			return ln + mn;
 		}
 
 		private float GetSurfaceMask(int x, int y, float falloff, BlockContext ctx) {

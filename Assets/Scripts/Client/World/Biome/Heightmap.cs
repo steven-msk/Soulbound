@@ -46,11 +46,11 @@ namespace SoulboundBackend.Client.World.Generation {
 			return baseHeight + variation;
 		}
 
-		public float ToHeightValue(float yCoord) {
+		public int ToHeightValue(int yCoord) {
 			return WorldChunk.maxY - yCoord;
 		}
 
-		public float ToYCoord(float heightValue) {
+		public int ToYCoord(int heightValue) {
 			return WorldChunk.minY + heightValue;
 		}
 	}
