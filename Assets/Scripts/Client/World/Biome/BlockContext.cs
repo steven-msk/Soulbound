@@ -9,10 +9,11 @@ namespace SoulboundBackend.Client.World.Generation {
 	public struct BlockContext {
 		public BlockPos pos;
 		public int surfaceY;
-		public int distanceToSurface => surfaceY - pos.y;
-
 		public float caveDensity;
 		public bool isCave;
+
+		public int distanceToSurface => Mathf.Abs(surfaceY - pos.y);
+		public int signedDistanceToSurface => surfaceY - pos.y;
 
 		public bool AboveSurface() {
 			return pos.y > surfaceY;

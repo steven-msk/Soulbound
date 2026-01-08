@@ -104,7 +104,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 				int height = Mathf.FloorToInt(heightmap.SampleHeight(blockX, primary, secondary));
 				float surfaceY = heightmap.ToYCoord(height);
 
-				IBiome biome = primary.biome;
+				BlockResolver blockResolver = new(biomeMap, primary, secondary);
 				terrainData.biomeWeights[blockX] = weights;
 
 				for (int y = 0; y < Level.WORLD_HEIGHT; y++) {
@@ -119,14 +119,12 @@ namespace SoulboundBackend.Client.World.Chunk {
 						isCave = isCave,
 					};
 
-
 					terrainData.caveDensities[x][y] = caveDensity;
 					terrainData.caveMask[x][y] = isCave;
 					terrainData.surfacePoints[blockX] = ctx.surfaceY;
 
-					stateHashes[x][y] = !isCave
-						? biome.ResolveBlock(ctx).stateHash
-						: biome.ResolveCaveBlock(blockPos, caveDensity).stateHash;
+					BlockState block = blockResolver.ResolveBlock(ctx);
+					stateHashes[x][y] = block.stateHash;
 				}
 			}
 		}
