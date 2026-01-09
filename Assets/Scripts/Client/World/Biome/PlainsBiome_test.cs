@@ -56,7 +56,8 @@ namespace Assets.Scripts.Client.World.Biome {
 				frequency = 1f,
 				edgeSharpness = 1.5f,
 				fill = 0.5f,
-				surfaceFalloff = 30f
+				surfaceFalloff = 30f,
+				bottomFalloff = 10f
 			};
 		}
 	}

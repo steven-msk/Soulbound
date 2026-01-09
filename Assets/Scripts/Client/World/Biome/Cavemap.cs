@@ -1,10 +1,13 @@
 ﻿using Assets.Scripts.Client.World.Biome;
 using JetBrains.Annotations;
+using SoulboundBackend.Client.World.Chunk;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
+using UnityEditor.ShaderGraph.Legacy;
 using UnityEngine;
 
 namespace SoulboundBackend.Client.World.Generation {
@@ -25,9 +28,15 @@ namespace SoulboundBackend.Client.World.Generation {
 			float d2 = m2 != null ? ApplyModulation(blockX, blockY, m2.Value) : d1;
 			float blended = Mathf.Lerp(d1, d2, blendFactor);
 
+			float s1 = m1.surfaceFalloff;
+			float? s2 = m2 != null ? m2.Value.surfaceFalloff : null;
+
+			float b1 = m1.bottomFalloff;
+			float? b2 = m2 != null ? m2.Value.bottomFalloff : null;
+
 			const float solidBias = 1f;
-			float surfaceMask = GetSurfaceMask(blockY, surfaceY, m1, m2, blendFactor);
-			return Mathf.Lerp(blended, solidBias, surfaceMask);
+			float verticalMask = GetVerticalMask(blockY, surfaceY, s1, s2, b1, b2, blendFactor);
+			return Mathf.Lerp(blended, solidBias, verticalMask);
 		}
 
 		public float ApplyModulation(int blockX, int blockY, CaveModulation modulation) {
@@ -37,15 +46,25 @@ namespace SoulboundBackend.Client.World.Generation {
 			) * modulation.edgeSharpness - modulation.fill;
 		}
 
-		public float GetSurfaceMask(int blockY, float surfaceY, CaveModulation m1, CaveModulation? m2, float blendFactor) {
-			float s1 = m1.surfaceFalloff;
-			float s2 = m2?.surfaceFalloff ?? s1;
-			float surfaceFalloff = Mathf.Lerp(s1, s2, blendFactor);
+		public float GetSurfaceMask(int blockY, float surfaceY, float s1, float? s2, float blendFactor) {
+			float surfaceFalloff = Mathf.Lerp(s1, s2 ?? s1, blendFactor);
 
 			float t = Mathf.InverseLerp(surfaceY - surfaceFalloff, surfaceY, blockY);
 			return 1f - Mathf.SmoothStep(1f, 0f, t);
 		}
- 
+
+		private float GetBottomMask(int blockY, float b1, float? b2, float blendFactor) {
+			float bottomFalloff = Mathf.Lerp(b1, b2 ?? b1, blendFactor);
+			
+			float t = Mathf.InverseLerp(WorldChunk.minY, WorldChunk.minY + bottomFalloff, blockY);
+			return Mathf.SmoothStep(1f, 0f, t);
+		}
+
+		private float GetVerticalMask(int blockY, float surfaceY, float s1, float? s2, float b1, float? b2, float blendFactor) {
+			return GetSurfaceMask(blockY, surfaceY, s1, s2, blendFactor)
+				 + GetBottomMask(blockY, b1, b2, blendFactor);
+		}
+
 		public bool IsCave(float density) {
 			return density <= 0f;
 		}

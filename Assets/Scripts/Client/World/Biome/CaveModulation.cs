@@ -10,5 +10,6 @@ namespace SoulboundBackend.Client.World.Generation {
 		public float edgeSharpness;
 		public float fill;
 		public float surfaceFalloff;
+		public float bottomFalloff;
 	}
 }
