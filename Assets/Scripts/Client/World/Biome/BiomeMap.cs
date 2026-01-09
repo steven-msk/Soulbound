@@ -8,28 +8,12 @@ using UnityEngine;
 
 namespace SoulboundBackend.Client.World.Generation {
 	public sealed class BiomeMap {
-		const float blendSharpness = 1.5f;
+		const float blendSharpness = 3f;
 
 		private readonly IEnumerable<IBiome> biomes;
 
 		public BiomeMap(IEnumerable<IBiome> biomes) {
 			this.biomes = biomes;
-		}
-
-		[Obsolete]
-		public IBiome ResolveBiome(int blockX) {
-			IBiome targetBiome = null;
-			float maxDensity = float.MinValue;
-
-			foreach (var biome in biomes) {
-				float density = biome.GetDensity(blockX);
-				if (density > maxDensity) {
-					maxDensity = density;
-					targetBiome = biome;
-				}
-			}
-
-			return targetBiome;
 		}
 
 		public IEnumerable<BiomeWeight> ResolveWeights(int blockX) {
@@ -50,7 +34,7 @@ namespace SoulboundBackend.Client.World.Generation {
 
 			foreach (var (biome, density) in densities) {
 				float weight = density / maxDensity;
-				weight = Mathf.SmoothStep(0f, 1f, weight);
+				//weight = Mathf.SmoothStep(0f, 1f, weight);
 				weight = Mathf.Pow(weight, blendSharpness);
 
 				yield return new BiomeWeight(biome, weight);
@@ -61,7 +45,7 @@ namespace SoulboundBackend.Client.World.Generation {
 			List<BiomeWeight> orderedWeights = weights
 				.OrderByDescending(w => w.value)
 				.ToList();
-			if (orderedWeights.Count == 0) {
+			if (weights.Count() == 0) {
 				primary = default;
 				secondary = null;
 			}

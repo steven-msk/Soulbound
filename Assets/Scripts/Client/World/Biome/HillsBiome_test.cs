@@ -30,7 +30,7 @@ namespace Assets.Scripts.Client.World.Biome {
 		}
 
 		float IBiome.GetDensity(int blockX) {
-			float n = densityNoise.Sample1D(blockX) * 0.5f + 0.5f;
+			float n = Mathf.Abs(densityNoise.Sample1D(blockX));
 			n = Mathf.Pow(n, 1.5f);
 			return n;
 		}
@@ -127,8 +127,11 @@ namespace Assets.Scripts.Client.World.Biome {
 		CaveModulation IBiome.SampleCave(int blockX, int blockY) {
 			return new CaveModulation {
 				frequency = 3f,
-				edgeSharpness = 1f,
-				fill = 1f,
+				sharpness = 2f,
+				fill = 0.6f,
+				lacunarity = 0.5f,
+				octaves = 3,
+				persistence = 0.1f,
 				surfaceFalloff = 60f,
 				bottomFalloff = 20f
 			};

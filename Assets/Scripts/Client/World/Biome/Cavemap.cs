@@ -39,11 +39,17 @@ namespace SoulboundBackend.Client.World.Generation {
 			return Mathf.Lerp(blended, solidBias, verticalMask);
 		}
 
-		public float ApplyModulation(int blockX, int blockY, CaveModulation modulation) {
-			return 1f - caveNoise.Sample2D(
-				blockX * modulation.frequency,
-				blockY * modulation.frequency
-			) * modulation.edgeSharpness - modulation.fill;
+		public float ApplyModulation(int blockX, int blockY, CaveModulation m) {
+			float f = 0f;
+			float amplitude = m.sharpness;
+			float frequency = m.frequency;
+
+			for (int i = 0; i < m.octaves; i++) {
+				f += amplitude * caveNoise.Sample2D(blockX * frequency, blockY * frequency);
+				frequency *= m.lacunarity;
+				amplitude *= m.persistence;
+			}
+			return 1f - f - m.fill;
 		}
 
 		public float GetSurfaceMask(int blockY, float surfaceY, float s1, float? s2, float blendFactor) {
