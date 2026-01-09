@@ -12,14 +12,10 @@ using TerrainData = SoulboundBackend.Client.World.Generation.TerrainData;
 
 namespace Assets.Scripts.Client.World.Biome {
 	public class HillsBiome_test : IBiome {
-		const float maxSolidDepth = 10f;
-		const int platformHeight = 0;
-
 		private readonly int seed;
 		private readonly Heightmap heightmap;
 		private readonly PerlinNoise largeNoise;
 		private readonly PerlinNoise mediumNoise;
-		private readonly DomainWarp warp;
 		private readonly PerlinNoise densityNoise;
 		private readonly PerlinNoise forestNoise;
 		private readonly PerlinNoise forestDensityNoise;
@@ -28,14 +24,13 @@ namespace Assets.Scripts.Client.World.Biome {
 		public HillsBiome_test(int seed) {
 			this.largeNoise = new PerlinNoise(1, seed, frequency: 0.5f, amplitude: 100f);
 			this.mediumNoise = new PerlinNoise(2, seed, frequency: 1.4f, amplitude: 40f);
-			this.warp = new DomainWarp(seed, frequency: 0.15f);
 			this.densityNoise = new PerlinNoise(8, seed, frequency: 0.06f, amplitude: 1f);
 			this.forestNoise = new PerlinNoise(6, seed, frequency: 3f, amplitude: 10f);
 			this.forestDensityNoise = new PerlinNoise(7, seed, frequency: 5f, amplitude: 4f);
 		}
 
 		float IBiome.GetDensity(int blockX) {
-			float n = Mathf.Abs(densityNoise.Sample1D(blockX));
+			float n = densityNoise.Sample1D(blockX) * 0.5f + 0.5f;
 			n = Mathf.Pow(n, 1.5f);
 			return n;
 		}

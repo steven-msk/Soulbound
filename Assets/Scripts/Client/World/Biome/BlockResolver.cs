@@ -37,15 +37,20 @@ namespace SoulboundBackend.Client.World.Generation {
 		}
 
 		private BlockState ApplyBorderBlend(BlockPos pos, Func<IBiome, BlockState> stateFunction) {
-			if (secondary == null) {
-				return stateFunction(primary.biome);
-			}
-			float w2 = secondary.Value.value;
-			float v = Mathf.Pow(w2 - UnityEngine.Random.value, 5f);
-			if (v < 0.1f) {
-				return stateFunction(primary.biome);
-			}
-			return stateFunction(secondary.Value.biome);
+			return stateFunction(primary.biome);
+
+			// previous implementation had severe flaws
+			// reverted to primary biome selection for now
+
+			//if (secondary == null) {
+			//	return stateFunction(primary.biome);
+			//}
+			//float w2 = Mathf.Pow(secondary.Value.value, 5f);
+			//float v = Mathf.Pow(w2 - UnityEngine.Random.value, 5f);
+			//if (v < 0.05f) {
+			//	return stateFunction(primary.biome);
+			//}
+			//return stateFunction(secondary.Value.biome);
 		}
 	}
 }
