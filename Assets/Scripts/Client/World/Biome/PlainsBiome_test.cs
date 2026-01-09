@@ -15,25 +15,30 @@ using TerrainData = SoulboundBackend.Client.World.Generation.TerrainData;
 namespace Assets.Scripts.Client.World.Biome {
 	public class PlainsBiome_test : IBiome {
 		private readonly int seed;
-		private readonly PerlinNoise largeNoise;
-		private readonly PerlinNoise mediumNoise;
-		private readonly PerlinNoise densityNoise;
+		private readonly NoiseSampler largeNoise;
+		private readonly NoiseSampler mediumNoise;
+		private readonly NoiseSampler densityNoise;
 
 		public PlainsBiome_test(int seed) {
-			this.largeNoise = new PerlinNoise(1, seed, frequency: 0.3f, amplitude: 30f);
-			this.mediumNoise = new PerlinNoise(2, seed, frequency: 0.1f, amplitude: 20f);
-			this.densityNoise = new PerlinNoise(8, seed, frequency: 0.05f, amplitude: 1f);
+			largeNoise = new NoiseSampler(1, seed, new(FastNoiseLite.NoiseType.Perlin, 0.007f));
+			mediumNoise = new NoiseSampler(2, seed, new(FastNoiseLite.NoiseType.Perlin, 0.01f));
+			densityNoise = new NoiseSampler(8, seed, new(FastNoiseLite.NoiseType.OpenSimplex2, 0.001f));
 		}
 
 		float IBiome.GetDensity(int blockX) {
-			float n = Mathf.Abs(densityNoise.Sample1D(blockX));
+			float n = densityNoise.Sample1D(blockX);
+			n = (n + 1f) * 0.5f;
+			n = Mathf.SmoothStep(0f, 1f, n);
 			n = Mathf.Pow(n, 1.5f);
 			return n;
 		}
 
 		private float HeightNoise(int x) {
-			float ln = Mathf.Abs(largeNoise.Sample1D(x));
-			float mn = Mathf.Abs(mediumNoise.Sample1D(x));
+			const float largeAmp = 30f;
+			const float mediumAmp = 20f;
+
+			float ln = (largeNoise.Sample1D(x) + 1f) * 0.5f * largeAmp;
+			float mn = (mediumNoise.Sample1D(x) + 1f) * 0.5f * mediumAmp;
 			return ln + mn;
 		}
 
@@ -53,7 +58,7 @@ namespace Assets.Scripts.Client.World.Biome {
 
 		CaveModulation IBiome.SampleCave(int blockX, int blockY) {
 			return new CaveModulation {
-				frequency = 2f,
+				frequency = 0.02f,
 				sharpness = 1.5f,
 				fill = 1f,
 				octaves = 1,

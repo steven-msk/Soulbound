@@ -13,10 +13,10 @@ using UnityEngine;
 namespace SoulboundBackend.Client.World.Generation {
 	public sealed class Cavemap {
 		private readonly int seed;
-		private readonly PerlinNoise caveNoise;
+		private readonly NoiseSampler caveNoise;
 		
 		public Cavemap(int seed) {
-			this.caveNoise = new PerlinNoise(0, seed, frequency: 1f, amplitude: 1f);
+			this.caveNoise = new NoiseSampler(0, seed, new NoiseSettings(FastNoiseLite.NoiseType.OpenSimplex2, 1.0f));
 		}
 
 		public float SampleDensity(int blockX, int blockY, float surfaceY, BiomeWeight primary, BiomeWeight? secondary) {

@@ -14,30 +14,35 @@ namespace Assets.Scripts.Client.World.Biome {
 	public class HillsBiome_test : IBiome {
 		private readonly int seed;
 		private readonly Heightmap heightmap;
-		private readonly PerlinNoise largeNoise;
-		private readonly PerlinNoise mediumNoise;
-		private readonly PerlinNoise densityNoise;
-		private readonly PerlinNoise forestNoise;
-		private readonly PerlinNoise forestDensityNoise;
+		private readonly NoiseSampler largeNoise;
+		private readonly NoiseSampler mediumNoise;
+		private readonly NoiseSampler densityNoise;
+		private readonly NoiseSampler forestNoise;
+		private readonly NoiseSampler forestDensityNoise;
 		int lastTreeX = int.MinValue >> 1;
 
 		public HillsBiome_test(int seed) {
-			this.largeNoise = new PerlinNoise(1, seed, frequency: 0.5f, amplitude: 100f);
-			this.mediumNoise = new PerlinNoise(2, seed, frequency: 1.4f, amplitude: 40f);
-			this.densityNoise = new PerlinNoise(8, seed, frequency: 0.06f, amplitude: 1f);
-			this.forestNoise = new PerlinNoise(6, seed, frequency: 3f, amplitude: 10f);
-			this.forestDensityNoise = new PerlinNoise(7, seed, frequency: 5f, amplitude: 4f);
+			largeNoise = new NoiseSampler(1, seed, new(FastNoiseLite.NoiseType.Perlin, 0.01f));
+			mediumNoise = new NoiseSampler(2, seed, new(FastNoiseLite.NoiseType.Perlin, 0.02f));
+			densityNoise = new NoiseSampler(8, seed, new(FastNoiseLite.NoiseType.OpenSimplex2S, 0.0012f));
+			forestNoise = new NoiseSampler(6, seed, new(FastNoiseLite.NoiseType.Value, 0.03f));
+			forestDensityNoise = new NoiseSampler(7, seed, new(FastNoiseLite.NoiseType.Value, 0.05f));
 		}
 
 		float IBiome.GetDensity(int blockX) {
-			float n = Mathf.Abs(densityNoise.Sample1D(blockX));
+			float n = densityNoise.Sample1D(blockX);
+			n = (n + 1f) * 0.5f;
+			n = Mathf.SmoothStep(0f, 1f, n);
 			n = Mathf.Pow(n, 1.5f);
 			return n;
 		}
 
 		private float HeightNoise(int x) {
-			float ln = Mathf.Abs(largeNoise.Sample1D(x));
-			float mn = Mathf.Abs(mediumNoise.Sample1D(x));
+			const float largeAmp = 100f;
+			const float mediumAmp = 40f;
+
+			float ln = (largeNoise.Sample1D(x) + 1f) * 0.5f * largeAmp;
+			float mn = (mediumNoise.Sample1D(x) + 1f) * 0.5f * mediumAmp;
 			return ln + mn;
 		}
 
@@ -91,23 +96,27 @@ namespace Assets.Scripts.Client.World.Biome {
 		}
 
 		void IBiome.PostProcessTerrain(TerrainData data, WorldChunk chunk, Level level, IEnumerable<BiomeInterval> intervals) {
-			const float forestThreshold = 0.45f;
+			const float chanceMin = 0.05f;
+			const float chanceMax = 0.25f;
+			const float threshold = 0.45f;
 			const float minTreeSpacing = 3;
+			const float forestAmp = 10f;
+			const float densityAmp = 4f;
 
 			foreach (var interval in intervals) {
 				for (int x = interval.startXInclusive; x < interval.endXExclusive; x++) {
-					float forest = Mathf.Abs(forestNoise.Sample1D(x));
-					if (forest < forestThreshold) {
+					float forest = Mathf.Abs(forestNoise.Sample1D(x) * forestAmp);
+					if (forest < threshold) {
 						continue;
 					}
 
-					float density = Mathf.Abs(forestDensityNoise.Sample1D(x));
+					float density = Mathf.Abs(forestDensityNoise.Sample1D(x) * densityAmp);
 					float distance = Mathf.Abs(x - lastTreeX);
 					if (distance < minTreeSpacing) {
 						continue;
 					}
 
-					float spawnChance = Mathf.Lerp(0.05f, 0.25f, density);
+					float spawnChance = Mathf.Lerp(chanceMin, chanceMax, density);
 					if (UnityEngine.Random.value < spawnChance) {
 						PlaceTree(x, data.surfacePoints[x] + 1, chunk, level);
 						lastTreeX = x;
@@ -126,7 +135,7 @@ namespace Assets.Scripts.Client.World.Biome {
 
 		CaveModulation IBiome.SampleCave(int blockX, int blockY) {
 			return new CaveModulation {
-				frequency = 3f,
+				frequency = 0.03f,
 				sharpness = 2f,
 				fill = 0.6f,
 				lacunarity = 0.5f,

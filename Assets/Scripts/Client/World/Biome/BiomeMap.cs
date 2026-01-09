@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace SoulboundBackend.Client.World.Generation {
 	public sealed class BiomeMap {
-		const float blendSharpness = 3f;
+		const float blendSharpness = 2f;
 
 		private readonly IEnumerable<IBiome> biomes;
 
@@ -21,7 +21,7 @@ namespace SoulboundBackend.Client.World.Generation {
 			float maxDensity = 0f;
 
 			foreach (var biome in biomes) {
-				float density = biome.GetDensity(blockX);
+				float density = Mathf.Abs(biome.GetDensity(blockX));
 				maxDensity = Mathf.Max(maxDensity, density);
 
 				if (density > 0) {
@@ -34,7 +34,7 @@ namespace SoulboundBackend.Client.World.Generation {
 
 			foreach (var (biome, density) in densities) {
 				float weight = density / maxDensity;
-				//weight = Mathf.SmoothStep(0f, 1f, weight);
+				weight = Mathf.SmoothStep(0f, 1f, weight);
 				weight = Mathf.Pow(weight, blendSharpness);
 
 				yield return new BiomeWeight(biome, weight);
