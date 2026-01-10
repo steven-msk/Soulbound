@@ -58,14 +58,16 @@ namespace Assets.Scripts.Client.World.Biome {
 
 		CaveModulation IBiome.SampleCave(int blockX, int blockY) {
 			return new CaveModulation {
-				frequency = 0.02f,
+				frequency = 0.008f,
 				sharpness = 1.5f,
-				fill = 1f,
-				octaves = 1,
-				persistence = 1f,
-				lacunarity = 1f,
+				fill = 0.35f,
+				octaves = 3,
+				lacunarity = 2f,
+				persistence = 0.45f,
 				surfaceFalloff = 30f,
-				bottomFalloff = 10f
+				bottomFalloff = 10f,
+				warpFrequency = 0.004f,
+				warpAmp = 5f
 			};
 		}
 	}

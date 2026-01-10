@@ -8,13 +8,9 @@ namespace SoulboundBackend.Client.World.Generation {
 	public class DomainWarp {
 		private readonly FastNoiseLite warp;
 
-		public DomainWarp(int seed, float frequency, float strength = 1.0f) {
-			this.warp = new FastNoiseLite(seed);
-			warp.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
-			warp.SetDomainWarpType(FastNoiseLite.DomainWarpType.OpenSimplex2);
-			warp.SetFractalType(FastNoiseLite.FractalType.DomainWarpIndependent);
-			warp.SetDomainWarpAmp(strength);
-			warp.SetFrequency(frequency);
+		public DomainWarp(int seed, NoiseSettings settings) {
+			warp = new FastNoiseLite(seed);
+			settings.ApplyTo(warp);
 		}
 		
 		public void Warp1D(ref float x) {
@@ -28,6 +24,14 @@ namespace SoulboundBackend.Client.World.Generation {
 
 		public void Warp3D(ref float x, ref float y, ref float z) {
 			warp.DomainWarp(ref x, ref y, ref z);
+		}
+
+		public void SetAmp(float amp) {
+			warp.SetDomainWarpAmp(amp);
+		}
+
+		public void SetFrequency(float frequency) {
+			warp.SetFrequency(frequency);
 		}
 	}
 }

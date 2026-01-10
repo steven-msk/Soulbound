@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.World.Generation {
 	public record NoiseSettings {
-		public FastNoiseLite.NoiseType noiseType = FastNoiseLite.NoiseType.Value;
+		public FastNoiseLite.NoiseType noiseType = FastNoiseLite.NoiseType.OpenSimplex2;
 		public FastNoiseLite.DomainWarpType domainWarpType = FastNoiseLite.DomainWarpType.OpenSimplex2;
 		public FastNoiseLite.FractalType fractalType = FastNoiseLite.FractalType.None;
 		public FastNoiseLite.RotationType3D rotationType3D = FastNoiseLite.RotationType3D.None;
@@ -26,6 +26,23 @@ namespace SoulboundBackend.Client.World.Generation {
 		public NoiseSettings(FastNoiseLite.NoiseType noiseType, float frequency) {
 			this.noiseType = noiseType;
 			this.frequency = frequency;
+		}
+
+		public void ApplyTo(FastNoiseLite noise) {
+			noise.SetNoiseType(noiseType);
+			noise.SetDomainWarpType(domainWarpType);
+			noise.SetFractalType(fractalType);
+			noise.SetRotationType3D(rotationType3D);
+			noise.SetCellularDistanceFunction(cellularDistanceFunction);
+			noise.SetCellularReturnType(cellularReturnType);
+			noise.SetFrequency(frequency);
+			noise.SetDomainWarpAmp(domainWarpAmp);
+			noise.SetFractalGain(fractalGain);
+			noise.SetFractalLacunarity(fractalLacunarity);
+			noise.SetFractalOctaves(fractalOctaves);
+			noise.SetFractalPingPongStrength(fractalPingPingStrength);
+			noise.SetFractalWeightedStrength(fractalWeightedStrength);
+			noise.SetCellularJitter(cellularJitter);
 		}
 	}
 }

@@ -14,9 +14,16 @@ namespace SoulboundBackend.Client.World.Generation {
 	public sealed class Cavemap {
 		private readonly int seed;
 		private readonly NoiseSampler caveNoise;
+		private readonly DomainWarp warp;
 		
 		public Cavemap(int seed) {
-			this.caveNoise = new NoiseSampler(0, seed, new NoiseSettings(FastNoiseLite.NoiseType.OpenSimplex2, 1.0f));
+			caveNoise = new NoiseSampler(0, seed, new NoiseSettings(FastNoiseLite.NoiseType.OpenSimplex2, 1.0f));
+			warp = new(seed, new NoiseSettings() {
+				noiseType = FastNoiseLite.NoiseType.OpenSimplex2,
+				domainWarpType = FastNoiseLite.DomainWarpType.OpenSimplex2,
+				frequency = 1.0f,
+				domainWarpAmp = 0.0f
+			});
 		}
 
 		public float SampleDensity(int blockX, int blockY, float surfaceY, BiomeWeight primary, BiomeWeight? secondary) {
@@ -40,16 +47,28 @@ namespace SoulboundBackend.Client.World.Generation {
 		}
 
 		public float ApplyModulation(int blockX, int blockY, CaveModulation m) {
+			float x = blockX;
+			float y = blockY;
+			warp.SetFrequency(m.warpFrequency);
+			warp.SetAmp(m.warpAmp);
+			warp.Warp2D(ref x, ref y);
+
 			float f = 0f;
+			float maxAmp = 0f;
 			float amplitude = m.sharpness;
 			float frequency = m.frequency;
 
 			for (int i = 0; i < m.octaves; i++) {
-				f += amplitude * caveNoise.Sample2D(blockX * frequency, blockY * frequency);
+				float n = caveNoise.Sample2D(x * frequency, y * frequency);
+				f += amplitude * (1f - Mathf.Abs(n));
+
 				frequency *= m.lacunarity;
+				maxAmp += amplitude;
 				amplitude *= m.persistence;
 			}
-			return 1f - f - m.fill;
+
+			f /= maxAmp;
+			return f - m.fill;
 		}
 
 		public float GetSurfaceMask(int blockY, float surfaceY, float s1, float? s2, float blendFactor) {

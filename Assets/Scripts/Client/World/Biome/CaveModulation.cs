@@ -14,5 +14,7 @@ namespace SoulboundBackend.Client.World.Generation {
 		public int octaves;
 		public float surfaceFalloff;
 		public float bottomFalloff;
+		public float warpFrequency;
+		public float warpAmp;
 	}
 }

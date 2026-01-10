@@ -12,20 +12,7 @@ namespace SoulboundBackend.Client.World.Generation {
 
 		public NoiseSampler(int channel, int seed, NoiseSettings settings) {
 			this.noise = new FastNoiseLite(seed);
-			noise.SetNoiseType(settings.noiseType);
-			noise.SetDomainWarpType(settings.domainWarpType);
-			noise.SetFractalType(settings.fractalType);
-			noise.SetRotationType3D(settings.rotationType3D);
-			noise.SetCellularDistanceFunction(settings.cellularDistanceFunction);
-			noise.SetCellularReturnType(settings.cellularReturnType);
-			noise.SetFrequency(settings.frequency);
-			noise.SetDomainWarpAmp(settings.domainWarpAmp);
-			noise.SetFractalGain(settings.fractalGain);
-			noise.SetFractalLacunarity(settings.fractalLacunarity);
-			noise.SetFractalOctaves(settings.fractalOctaves);
-			noise.SetFractalPingPongStrength(settings.fractalPingPingStrength);
-			noise.SetFractalWeightedStrength(settings.fractalWeightedStrength);
-			noise.SetCellularJitter(settings.cellularJitter);
+			settings.ApplyTo(noise);
 
 			float offsetX = OffsetAxis(seed, channel, 0);
 			float offsetY = OffsetAxis(seed, channel, 1);
