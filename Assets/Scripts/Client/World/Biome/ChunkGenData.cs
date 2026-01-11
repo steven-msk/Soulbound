@@ -8,10 +8,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.World.Generation {
-	public struct TerrainData {
+	public struct ChunkGenData {
 		public WorldChunk chunk;
 		public BlockGenContext[][] genContexts;
-		public Dictionary<int, int> surfacePoints;
+		public int[] surfacePoints;
 		public IEnumerable<BiomeWeight>[] biomeWeights;
 		public ChunkBiomePartition biomePartition;
 		public float[][] caveDensities;

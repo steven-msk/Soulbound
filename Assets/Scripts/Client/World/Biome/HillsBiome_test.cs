@@ -2,13 +2,9 @@
 using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Client.World.Chunk;
 using SoulboundBackend.Client.World.Generation;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using TerrainData = SoulboundBackend.Client.World.Generation.TerrainData;
 
 namespace Assets.Scripts.Client.World.Biome {
 	public class HillsBiome_test : IBiome {
@@ -95,7 +91,7 @@ namespace Assets.Scripts.Client.World.Biome {
 
 		}
 
-		void IBiome.PostProcessTerrain(TerrainData data, WorldChunk chunk, Level level, IEnumerable<BiomeInterval> intervals) {
+		void IBiome.PostProcessTerrain(ChunkGenData genData, WorldChunk chunk, Level level, int partitionStartX, int partitionLimitX) {
 			const float chanceMin = 0.05f;
 			const float chanceMax = 0.25f;
 			const float threshold = 0.45f;
@@ -103,24 +99,22 @@ namespace Assets.Scripts.Client.World.Biome {
 			const float forestAmp = 10f;
 			const float densityAmp = 4f;
 
-			foreach (var interval in intervals) {
-				for (int x = interval.startXInclusive; x < interval.endXExclusive; x++) {
-					float forest = Mathf.Abs(forestNoise.Sample1D(x) * forestAmp);
-					if (forest < threshold) {
-						continue;
-					}
+			for (int x = partitionStartX; x <= partitionLimitX; x++) {
+				float forest = Mathf.Abs(forestNoise.Sample1D(x) * forestAmp);
+				if (forest < threshold) {
+					continue;
+				}
 
-					float density = Mathf.Abs(forestDensityNoise.Sample1D(x) * densityAmp);
-					float distance = Mathf.Abs(x - lastTreeX);
-					if (distance < minTreeSpacing) {
-						continue;
-					}
+				float density = Mathf.Abs(forestDensityNoise.Sample1D(x) * densityAmp);
+				float distance = Mathf.Abs(x - lastTreeX);
+				if (distance < minTreeSpacing) {
+					continue;
+				}
 
-					float spawnChance = Mathf.Lerp(chanceMin, chanceMax, density);
-					if (UnityEngine.Random.value < spawnChance) {
-						PlaceTree(x, data.surfacePoints[x] + 1, chunk, level);
-						lastTreeX = x;
-					}
+				float spawnChance = Mathf.Lerp(chanceMin, chanceMax, density);
+				if (UnityEngine.Random.value < spawnChance) {
+					PlaceTree(x, genData.surfacePoints[chunk.WorldXToChunkX(x)] + 1, chunk, level);
+					lastTreeX = x;
 				}
 			}
 		}

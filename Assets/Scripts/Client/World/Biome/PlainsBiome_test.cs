@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
-using TerrainData = SoulboundBackend.Client.World.Generation.TerrainData;
 
 namespace Assets.Scripts.Client.World.Biome {
 	public class PlainsBiome_test : IBiome {

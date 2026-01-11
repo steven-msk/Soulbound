@@ -35,25 +35,6 @@ namespace SoulboundBackend.Client.World.Generation {
 			return primary.ResolveCaveBlock(pos, caveDensity);
 		}
 
-		//public BlockState ApplyBorderBlend(BlockPos pos, Func<IBiome, BlockState> stateFunction) {
-		//	//return stateFunction(primary.biome);
-
-		//	// previous implementation had severe flaws
-		//	// reverted to primary biome selection for now
-
-		//	if (secondary == null) {
-		//		return stateFunction(primary.biome);
-		//	}
-
-		//	float w2 = secondary.Value.value;
-		//	float t = Mathf.InverseLerp(0.8f, 1f, w2);
-
-		//	if (t > 0f && t < 1f) {
-		//		return stateFunction(secondary.Value.biome);
-		//	}
-		//	return stateFunction(primary.biome);
-		//}
-
 		public BlockState BlendBiomeBorder(BlockGenContext ctx, int leftX, int rightX, int splitX) {
 			float t = Mathf.InverseLerp(leftX, rightX, ctx.pos.x);
 			t = t * t + UnityEngine.Random.value;

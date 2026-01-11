@@ -15,7 +15,6 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using Application = UnityEngine.Application;
 using Logger = SoulboundBackend.Common.Logging.Logger;
-using TerrainData = SoulboundBackend.Client.World.Generation.TerrainData;
 
 #nullable enable
 

@@ -17,7 +17,6 @@ using UnityEngine.Assertions.Must;
 using UnityEngine.LightTransport;
 using UnityEngine.Tilemaps;
 using Logger = SoulboundBackend.Common.Logging.Logger;
-using TerrainData = SoulboundBackend.Client.World.Generation.TerrainData;
 
 #nullable enable
 
@@ -88,11 +87,11 @@ namespace SoulboundBackend.Client.World.Chunk {
 			return generationData;
 		}
 
-		public void Generate(BiomeMap biomeMap, Heightmap heightmap, Cavemap cavemap, out TerrainData terrainData) {
-			terrainData = new TerrainData {
+		public void Generate(BiomeMap biomeMap, Heightmap heightmap, Cavemap cavemap, out ChunkGenData genData) {
+			genData = new ChunkGenData {
 				chunk = this,
 				genContexts = new BlockGenContext[Level.CHUNK_LENGTH][],
-				surfacePoints = new Dictionary<int, int>(),
+				surfacePoints = new int[Level.CHUNK_LENGTH],
 				biomeWeights = new IEnumerable<BiomeWeight>[Level.CHUNK_LENGTH],
 				biomePartition = new ChunkBiomePartition(),
 				caveDensities = new float[Level.CHUNK_LENGTH][],
@@ -100,17 +99,17 @@ namespace SoulboundBackend.Client.World.Chunk {
 			};
 
 			for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
-				terrainData.caveDensities[cx] = new float[Level.WORLD_HEIGHT];
-				terrainData.caveMask[cx] = new BitArray(Level.WORLD_HEIGHT);
-				terrainData.genContexts[cx] = new BlockGenContext[Level.WORLD_HEIGHT];
+				genData.caveDensities[cx] = new float[Level.WORLD_HEIGHT];
+				genData.caveMask[cx] = new BitArray(Level.WORLD_HEIGHT);
+				genData.genContexts[cx] = new BlockGenContext[Level.WORLD_HEIGHT];
 				int x = ChunkXToWorldX(cx);
 
 				var weights = biomeMap.ResolveWeights(x);
 				biomeMap.ResolvePrimaryBiomes(weights, out var primary, out var secondary);
-				terrainData.biomeWeights[cx] = weights;
+				genData.biomeWeights[cx] = weights;
 
-				var partition = ProcessBiomePartition(x, primary.biome, terrainData.biomePartition);
-				terrainData.biomePartition = partition;
+				var partition = ProcessBiomePartition(x, primary.biome, genData.biomePartition);
+				genData.biomePartition = partition;
 
 				int height = Mathf.FloorToInt(heightmap.SampleHeight(x, primary, secondary));
 				float surfaceY = heightmap.ToYCoord(height);
@@ -123,16 +122,16 @@ namespace SoulboundBackend.Client.World.Chunk {
 					bool isCave = cavemap.IsCave(caveDensity);
 
 					var ctx = new BlockGenContext {
-						pos = new BlockPos(x, IndexToWorldY(y)),
+						pos = blockPos,
 						surfaceY = heightmap.ToYCoord(height),
 						caveDensity = caveDensity,
 						isCave = isCave,
 					};
 
-					terrainData.genContexts[cx][y] = ctx;
-					terrainData.caveDensities[cx][y] = caveDensity;
-					terrainData.caveMask[cx][y] = isCave;
-					terrainData.surfacePoints[x] = ctx.surfaceY;
+					genData.genContexts[cx][y] = ctx;
+					genData.caveDensities[cx][y] = caveDensity;
+					genData.caveMask[cx][y] = isCave;
+					genData.surfacePoints[cx] = ctx.surfaceY;
 
 					BlockState blockState = blockResolver.ResolveBlock(ctx);
 					SetBlock(cx, y, blockState);
@@ -140,7 +139,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 			}
 
 			const int blendRange = 10;
-			BlendBiomeBorders(terrainData.biomePartition, blendRange, terrainData.genContexts);
+			BlendBiomeBorders(genData.biomePartition, blendRange, genData.genContexts);
 		}
 
 		ChunkBiomePartition ProcessBiomePartition(int x, IBiome primary, ChunkBiomePartition partition) {
@@ -178,10 +177,24 @@ namespace SoulboundBackend.Client.World.Chunk {
 			}
 		}
 
-		public void PostProcessTerrain(TerrainData data, Level level) {
-			//foreach (var (biome, intervals) in data.biomeIntervals) {
-			//	biome.PostProcessTerrain(data, this, level, intervals);
-			//}
+		public void PostProcessTerrain(ChunkGenData genData, Level level) {
+			IBiome primary = genData.biomePartition.primary;
+			IBiome? secondary = genData.biomePartition.secondary;
+
+			int splitX = genData.biomePartition.splitX;
+			int chunkEndX = ChunkXToWorldX(Level.CHUNK_LENGTH - 1);
+			int chunkStartX = ChunkXToWorldX(0);
+
+			int partitionStartX = chunkStartX;
+			int partitionLimitX = secondary == null ? chunkEndX : splitX;
+			primary.PostProcessTerrain(genData, this, level, partitionStartX, partitionLimitX);
+
+			if (secondary != null) {
+				partitionStartX = splitX + 1;
+				partitionLimitX = chunkEndX;
+
+				secondary?.PostProcessTerrain(genData, this, level, partitionStartX, partitionLimitX);
+			}
 		}
 
 		public static int WorldYToIndex(int worldY) => worldY - minY;
