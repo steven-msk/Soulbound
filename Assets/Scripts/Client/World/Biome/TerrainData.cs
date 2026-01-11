@@ -1,4 +1,5 @@
-﻿using SoulboundBackend.Client.World.Chunk;
+﻿using Assets.Scripts.Client.World.Biome;
+using SoulboundBackend.Client.World.Chunk;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,8 +10,10 @@ using System.Threading.Tasks;
 namespace SoulboundBackend.Client.World.Generation {
 	public struct TerrainData {
 		public WorldChunk chunk;
+		public BlockGenContext[][] genContexts;
 		public Dictionary<int, int> surfacePoints;
-		public Dictionary<int, IEnumerable<BiomeWeight>> biomeWeights;
+		public IEnumerable<BiomeWeight>[] biomeWeights;
+		public ChunkBiomePartition biomePartition;
 		public float[][] caveDensities;
 		public BitArray[] caveMask;
 

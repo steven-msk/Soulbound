@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
+using UnityEditor.ShaderGraph.Internal;
 using UnityEditor.ShaderGraph.Legacy;
 using UnityEngine;
 
@@ -95,7 +96,9 @@ namespace SoulboundBackend.Client.World.Generation {
 		}
 
 		private float GetBlendFactor(float a, float b) {
-			return b / (a + b);
+			float t = b / (a + b);
+			return Mathf.SmoothStep(0f, 1f, t);
+			//return b / (a + b);
 		}
 
 		private float GetBlendFactor(BiomeWeight primary, BiomeWeight? secondary) {

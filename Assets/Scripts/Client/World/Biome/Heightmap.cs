@@ -22,21 +22,19 @@ namespace SoulboundBackend.Client.World.Generation {
 		public float SampleHeight(int blockX, BiomeWeight primary, BiomeWeight? secondary) {
 			var w1 = primary.value;
 			var w2 = secondary.GetValueOrDefault().value;
-			float t = secondary != null ? w2 / (w1 + w2) : 0f;
+			float t = GetBlendFactor(w1, secondary != null ? w2 : 0f);
 
-			var a = primary.biome.SampleTerrain(blockX);
+			var m1 = primary.biome.SampleTerrain(blockX);
 			if (secondary == null) {
-				return ApplyModulation(a);
+				return ApplyModulation(m1);
 			}
-			var b = secondary.Value.biome.SampleTerrain(blockX);
+			var m2 = secondary.Value.biome.SampleTerrain(blockX);
 
-			var blended = new TerrainModulation {
-				heightOffset = Mathf.Lerp(a.heightOffset, b.heightOffset, t),
-				amplitude = Mathf.Lerp(a.amplitude, b.amplitude, t),
-				erosion = Mathf.Lerp(a.erosion, b.erosion, t)
-			};
+			var h1 = ApplyModulation(m1);
+			var h2 = ApplyModulation(m2);
+			var blended = Mathf.Lerp(h1, h2, t);
 
-			return ApplyModulation(blended);
+			return blended;
 		}
 
 		public float ApplyModulation(TerrainModulation m) {
@@ -45,6 +43,13 @@ namespace SoulboundBackend.Client.World.Generation {
 			variation *= m.erosion;
 			return baseHeight + variation;
 		}
+
+		private float GetBlendFactor(float a, float b) {
+			float t = b / (a + b);
+			return Mathf.SmoothStep(0f, 1f, t);
+			//return b / (a + b);
+		}
+
 
 		public int ToHeightValue(int yCoord) {
 			return WorldChunk.maxY - yCoord;

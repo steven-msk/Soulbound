@@ -14,7 +14,7 @@ namespace SoulboundBackend.Client.World.Generation {
 		TerrainModulation SampleTerrain(int blockX);
 		CaveModulation SampleCave(int blockX, int blockY);
 
-		BlockState ResolveBlock(BlockContext ctx);
+		BlockState ResolveBlock(BlockGenContext ctx);
 		void PostProcessTerrain(TerrainData data, WorldChunk chunk, Level level, IEnumerable<BiomeInterval> intervals) {
 		}
 

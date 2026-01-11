@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SoulboundBackend.Client.World.Generation {
-	public struct BlockContext {
+	public struct BlockGenContext {
 		public BlockPos pos;
 		public int surfaceY;
 		public float caveDensity;

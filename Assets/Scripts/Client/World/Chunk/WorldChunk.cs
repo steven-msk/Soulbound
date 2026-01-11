@@ -1,4 +1,5 @@
-﻿using SoulboundBackend.Client.World.BlockSystem;
+﻿using Assets.Scripts.Client.World.Biome;
+using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Client.World.Generation;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core;
@@ -12,10 +13,13 @@ using Unity.Plastic.Newtonsoft.Json;
 using Unity.Plastic.Newtonsoft.Json.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Assertions.Must;
 using UnityEngine.LightTransport;
 using UnityEngine.Tilemaps;
 using Logger = SoulboundBackend.Common.Logging.Logger;
 using TerrainData = SoulboundBackend.Client.World.Generation.TerrainData;
+
+#nullable enable
 
 namespace SoulboundBackend.Client.World.Chunk {
 	[JsonConverter(typeof(WorldChunk.Serializer))]
@@ -79,7 +83,6 @@ namespace SoulboundBackend.Client.World.Chunk {
 			}
 
 
-
 			ChunkHeightmapData generationData = new ChunkHeightmapData(surfaceLevels, highestStone);
 			this.heightmapData = generationData;
 			return generationData;
@@ -88,78 +91,97 @@ namespace SoulboundBackend.Client.World.Chunk {
 		public void Generate(BiomeMap biomeMap, Heightmap heightmap, Cavemap cavemap, out TerrainData terrainData) {
 			terrainData = new TerrainData {
 				chunk = this,
+				genContexts = new BlockGenContext[Level.CHUNK_LENGTH][],
 				surfacePoints = new Dictionary<int, int>(),
-				biomeWeights = new Dictionary<int, IEnumerable<BiomeWeight>>(),
+				biomeWeights = new IEnumerable<BiomeWeight>[Level.CHUNK_LENGTH],
+				biomePartition = new ChunkBiomePartition(),
 				caveDensities = new float[Level.CHUNK_LENGTH][],
 				caveMask = new BitArray[Level.CHUNK_LENGTH]
 			};
 
-			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
-				terrainData.caveDensities[x] = new float[Level.WORLD_HEIGHT];
-				terrainData.caveMask[x] = new BitArray(Level.WORLD_HEIGHT);
+			for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
+				terrainData.caveDensities[cx] = new float[Level.WORLD_HEIGHT];
+				terrainData.caveMask[cx] = new BitArray(Level.WORLD_HEIGHT);
+				terrainData.genContexts[cx] = new BlockGenContext[Level.WORLD_HEIGHT];
+				int x = ChunkXToWorldX(cx);
 
-				int blockX = ChunkXToWorldX(x);
-				var weights = biomeMap.ResolveWeights(blockX);
+				var weights = biomeMap.ResolveWeights(x);
 				biomeMap.ResolvePrimaryBiomes(weights, out var primary, out var secondary);
-				int height = Mathf.FloorToInt(heightmap.SampleHeight(blockX, primary, secondary));
+				terrainData.biomeWeights[cx] = weights;
+
+				var partition = ProcessBiomePartition(x, primary.biome, terrainData.biomePartition);
+				terrainData.biomePartition = partition;
+
+				int height = Mathf.FloorToInt(heightmap.SampleHeight(x, primary, secondary));
 				float surfaceY = heightmap.ToYCoord(height);
 
-				BlockResolver blockResolver = new(biomeMap, primary, secondary);
-				terrainData.biomeWeights[blockX] = weights;
+				BlockResolver blockResolver = new(primary.biome, secondary?.biome);
 
 				for (int y = 0; y < Level.WORLD_HEIGHT; y++) {
-					BlockPos blockPos = new(blockX, IndexToWorldY(y));
-					float caveDensity = cavemap.SampleDensity(blockX, blockPos.y, surfaceY, primary, secondary);
+					BlockPos blockPos = new(x, IndexToWorldY(y));
+					float caveDensity = cavemap.SampleDensity(x, blockPos.y, surfaceY, primary, secondary);
 					bool isCave = cavemap.IsCave(caveDensity);
 
-					BlockContext ctx = new BlockContext {
-						pos = new BlockPos(blockX, IndexToWorldY(y)),
+					var ctx = new BlockGenContext {
+						pos = new BlockPos(x, IndexToWorldY(y)),
 						surfaceY = heightmap.ToYCoord(height),
 						caveDensity = caveDensity,
 						isCave = isCave,
 					};
 
-					terrainData.caveDensities[x][y] = caveDensity;
-					terrainData.caveMask[x][y] = isCave;
-					terrainData.surfacePoints[blockX] = ctx.surfaceY;
+					terrainData.genContexts[cx][y] = ctx;
+					terrainData.caveDensities[cx][y] = caveDensity;
+					terrainData.caveMask[cx][y] = isCave;
+					terrainData.surfacePoints[x] = ctx.surfaceY;
 
-					BlockState block = blockResolver.ResolveBlock(ctx);
-					stateHashes[x][y] = block.stateHash;
+					BlockState blockState = blockResolver.ResolveBlock(ctx);
+					SetBlock(cx, y, blockState);
+				}
+			}
+
+			const int blendRange = 10;
+			BlendBiomeBorders(terrainData.biomePartition, blendRange, terrainData.genContexts);
+		}
+
+		ChunkBiomePartition ProcessBiomePartition(int x, IBiome primary, ChunkBiomePartition partition) {
+			if (partition.primary == null) {
+				partition.primary = primary;
+			}
+			
+			if (partition.primary != primary && partition.secondary == null) {
+				partition.secondary = primary;
+				partition.splitX = x;
+			}
+			return partition;
+		}
+
+		void BlendBiomeBorders(ChunkBiomePartition partition, int blendRange, BlockGenContext[][] genContexts) {
+			if (!partition.hasBorder) {
+				return;
+			}
+
+			int leftX = partition.splitX - (blendRange / 2);
+			int rightX = partition.splitX + (blendRange / 2);
+			BlockResolver blockResolver = new(partition.primary, partition.secondary);
+
+			for (int x = leftX; x <= rightX; x++) {
+				int cx = WorldXToChunkX(x);
+
+				for (int y = 0; y < Level.WORLD_HEIGHT; y++) {
+					try {
+						BlockGenContext ctx = genContexts[cx][y];
+						var blockState = blockResolver.BlendBiomeBorder(ctx, leftX, rightX, partition.splitX);
+						SetBlock(cx, y, blockState);
+					} catch (IndexOutOfRangeException) {
+					}
 				}
 			}
 		}
 
 		public void PostProcessTerrain(TerrainData data, Level level) {
-			Dictionary<IBiome, List<BiomeInterval>> biomeIntervals = new();
-
-			for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
-				int blockX = ChunkXToWorldX(cx);
-				var weights = data.biomeWeights[blockX];
-				var primary = weights.First(w => w.value == 1f);
-				
-				if (!biomeIntervals.TryGetValue(primary.biome, out var list)) {
-					list = new List<BiomeInterval>();
-					biomeIntervals[primary.biome] = list;
-					list.Add(new BiomeInterval { 
-						startXInclusive = blockX, 
-						endXExclusive = blockX + 1
-					});
-				} else {
-					var last = list.Last();
-					if  (last.endXExclusive == blockX) {
-						last.endXExclusive = blockX + 1;
-					} else {
-						list.Add(new BiomeInterval {
-							startXInclusive = blockX,
-							endXExclusive = blockX + 1
-						});
-					}
-				}
-			}
-
-			foreach (var (biome, intervals) in biomeIntervals) {
-				biome.PostProcessTerrain(data, this, level, intervals);
-			}
+			//foreach (var (biome, intervals) in data.biomeIntervals) {
+			//	biome.PostProcessTerrain(data, this, level, intervals);
+			//}
 		}
 
 		public static int WorldYToIndex(int worldY) => worldY - minY;
@@ -215,19 +237,22 @@ namespace SoulboundBackend.Client.World.Chunk {
 		}
 
 		public void SetBlock(ChunkBlockPos chunkPos, BlockState blockState) {
-			var xIndex = chunkPos.x;
-			var yIndex = WorldYToIndex(chunkPos.y);
-			Block block = blockState.block;
+			this.SetBlock(chunkPos.x, WorldYToIndex(chunkPos.y), blockState);
+		}
 
-			stateHashes[xIndex][yIndex] = blockState.stateHash;
+		private void SetBlock(int cx, int yIndex, BlockState blockState) {
+			Block block = blockState.block;
+			stateHashes[cx][yIndex] = blockState.stateHash;
+
 			if (block.hasTileEntity) {
-				TileEntity tileEntity = block.GetTileEntity(this, chunkPos.ToBlockPos());
+				BlockPos blockPos = new(ChunkXToWorldX(cx), IndexToWorldY(yIndex));
+				TileEntity tileEntity = block.GetTileEntity(this, blockPos);
 				
-				if (tileEntities[xIndex][yIndex] != null) {
+				if (tileEntities[cx][yIndex] != null) {
 					tickManager.RemoveTileEntity(tileEntity);
 				}
 				
-				tileEntities[xIndex][yIndex] = tileEntity;
+				tileEntities[cx][yIndex] = tileEntity;
 				tickManager.AddTileEntity(tileEntity);
 			}
 		}

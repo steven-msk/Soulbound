@@ -1,4 +1,5 @@
-﻿using SoulboundBackend.Client.World.Chunk;
+﻿using Assets.Scripts.Client.World.Biome;
+using SoulboundBackend.Client.World.Chunk;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,8 +9,7 @@ using UnityEngine;
 
 namespace SoulboundBackend.Client.World.Generation {
 	public sealed class BiomeMap {
-		const float blendSharpness = 2f;
-
+		const float blendSharpness = 3f;
 		private readonly IEnumerable<IBiome> biomes;
 
 		public BiomeMap(IEnumerable<IBiome> biomes) {
@@ -34,7 +34,6 @@ namespace SoulboundBackend.Client.World.Generation {
 
 			foreach (var (biome, density) in densities) {
 				float weight = density / maxDensity;
-				weight = Mathf.SmoothStep(0f, 1f, weight);
 				weight = Mathf.Pow(weight, blendSharpness);
 
 				yield return new BiomeWeight(biome, weight);
@@ -42,16 +41,18 @@ namespace SoulboundBackend.Client.World.Generation {
 		}
 
 		public void ResolvePrimaryBiomes(IEnumerable<BiomeWeight> weights, out BiomeWeight primary, out BiomeWeight? secondary) {
-			List<BiomeWeight> orderedWeights = weights
+			List<BiomeWeight> ordered = weights
 				.OrderByDescending(w => w.value)
 				.ToList();
 			if (weights.Count() == 0) {
 				primary = default;
 				secondary = null;
+				return;
 			}
 
-			primary = orderedWeights[0];
-			secondary = orderedWeights.Count > 1 ? orderedWeights[1] : null;
+			primary = ordered[0];
+			secondary = ordered.Count > 1 ? ordered[1] : null;
 		}
+
 	}
 }

@@ -24,7 +24,7 @@ namespace Assets.Scripts.Client.World.Biome {
 		public HillsBiome_test(int seed) {
 			largeNoise = new NoiseSampler(1, seed, new(FastNoiseLite.NoiseType.Perlin, 0.01f));
 			mediumNoise = new NoiseSampler(2, seed, new(FastNoiseLite.NoiseType.Perlin, 0.02f));
-			densityNoise = new NoiseSampler(8, seed, new(FastNoiseLite.NoiseType.OpenSimplex2S, 0.0012f));
+			densityNoise = new NoiseSampler(8, seed, new(FastNoiseLite.NoiseType.OpenSimplex2, 0.0012f));
 			forestNoise = new NoiseSampler(6, seed, new(FastNoiseLite.NoiseType.Value, 0.03f));
 			forestDensityNoise = new NoiseSampler(7, seed, new(FastNoiseLite.NoiseType.Value, 0.05f));
 		}
@@ -46,7 +46,7 @@ namespace Assets.Scripts.Client.World.Biome {
 			return ln + mn;
 		}
 
-		BlockState IBiome.ResolveBlock(BlockContext ctx) {
+		BlockState IBiome.ResolveBlock(BlockGenContext ctx) {
 			if (ctx.AboveSurface())
 				return Blocks.air.defaultState;
 			if (ctx.distanceToSurface < 2)

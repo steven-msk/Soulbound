@@ -42,7 +42,7 @@ namespace Assets.Scripts.Client.World.Biome {
 			return ln + mn;
 		}
 
-		BlockState IBiome.ResolveBlock(BlockContext ctx) {
+		BlockState IBiome.ResolveBlock(BlockGenContext ctx) {
 			if (ctx.AboveSurface())
 				return Blocks.air.defaultState;
 			return Blocks.dirt.defaultState;
