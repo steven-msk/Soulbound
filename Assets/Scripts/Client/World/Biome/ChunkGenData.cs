@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+#nullable enable
+
 namespace SoulboundBackend.Client.World.Generation {
 	public struct ChunkGenData {
 		public WorldChunk chunk;
@@ -16,9 +18,5 @@ namespace SoulboundBackend.Client.World.Generation {
 		public ChunkBiomePartition biomePartition;
 		public float[][] caveDensities;
 		public BitArray[] caveMask;
-
-		public bool IsCave(int chunkX, int yIndex) {
-			return caveMask[chunkX][yIndex];
-		}
 	}
 }

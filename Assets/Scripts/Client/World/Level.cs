@@ -8,6 +8,7 @@ using SoulboundBackend.Common;
 using SoulboundBackend.Core;
 using SoulboundBackend.Core.Noise;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -19,27 +20,32 @@ using Logger = SoulboundBackend.Common.Logging.Logger;
 #nullable enable
 
 namespace SoulboundBackend.Client.World {
+	public delegate void OnChunkGenerated(ChunkGenData genData);
+
 	public sealed class Level : ITickable {
 		private static readonly Logger logger = Logger.CreateInstance();
 		public static readonly LogModule level = new LogModule("LEVEL", "#4682B4");
 		public const int CHUNK_LENGTH = 32;
 		public const int WORLD_HEIGHT = 1024;
-		public const int SURFACE_TO_UNDERGROUND_DELIMITER = WORLD_HEIGHT / 2;
+		[Obsolete] public const int SURFACE_TO_UNDERGROUND_DELIMITER = WORLD_HEIGHT / 2;
 		public const int RENDER_DISTANCE = 8;
 		public const int TERRAIN_PLANE_Y = 0;
-		public static string worldDumpFile => Path.Combine(Application.persistentDataPath, LevelManager.worldDump);
+		const int biomeBlendRange = 10;
+		[Obsolete] public static string worldDumpFile => Path.Combine(Application.persistentDataPath, LevelManager.worldDump);
 
 		public event Action<BlockChangeInfo>? BlockStateChanged;
 		// POTENTIAL: post world events to the ticking system
 
 		public readonly int seed;
-		static Dictionary<string, StructureTemplate> registeredStructureTemplates = new();
-		private readonly PerlinNoiseGenerator1D heightGenerator;
+		[Obsolete] static Dictionary<string, StructureTemplate> registeredStructureTemplates = new();
+		[Obsolete] private readonly PerlinNoiseGenerator1D heightGenerator;
 		private Dictionary<int, WorldChunk> loadedChunks = new();
 		private Dictionary<int, WorldChunk> generatedChunks = new(); 
 		private ChunkOutlineRenderer chunkOutlineRenderer = new();
-		private Dictionary<int, List<StructurePlacement>> structurePlacements = new();
-		private Dictionary<int, List<(ChunkBlockPos pos, BlockState? state)>> pendingUpdates = new();
+		[Obsolete] private Dictionary<int, List<StructurePlacement>> structurePlacements = new();
+		[Obsolete] private Dictionary<int, List<(ChunkBlockPos pos, BlockState? state)>> pendingUpdates = new();
+		[Obsolete] private readonly ConcurrentDictionary<int, List<OnChunkGenerated>> deferredGenerations = new();
+		private readonly Dictionary<int, ChunkGenData> chunkGenData = new();
 		private LevelGridContext gridContext;
 		private LevelManager levelManager = null!;
 		public bool isWorldLoaded { get; private set; } = false;
@@ -138,33 +144,85 @@ namespace SoulboundBackend.Client.World {
 				}
 			}
 		}
-
-		public bool IsChunkLoaded(WorldChunk chunk) => loadedChunks.ContainsValue(chunk);
-
-		public bool IsChunkLoaded(int chunkX) => loadedChunks.ContainsKey(chunkX);
+		
+		// currently world generation uses WorldChunk as the logic executor
+		// when in reality it shouldnt at all
+		// the target design will use world "macroing"
+		// start with small artifacts, then expand and apply the same rules
+		// eventually, after enough steps, the result would be the world itself
+		// its only a matter of how these steps are defined as
+		// since this is a far too complex feature, it will be delayed 
+		// until further notice on world generation
+		// for now all implementations regarding this are obsolete
 		
 		private WorldChunk GenerateNewChunk(int chunkX) {
 			WorldChunk chunk = new(chunkX);
+			generatedChunks[chunkX] = chunk;
 			ChunkHeightmapData heightmapData = chunk.GenerateHeightmap(this.heightGenerator);
 
-			// overrides all states set in GenerateHeightmap
-			chunk.Generate(biomeMap, heightmap, cavemap, out var terrainData);
-			chunk.PostProcessTerrain(terrainData, this);
+			chunk.Generate(biomeMap, heightmap, cavemap, out ChunkGenData genData);
+			chunkGenData[chunkX] = genData;
 
-			// deprecated
-			//chunk.PlaceFeatures(biomeMap, this);
+			BlendBiomeBorder(genData.biomePartition);
 
-			generatedChunks[chunkX] = chunk;
-
-			//for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
-			//	if (TryPlaceStructure(cx, chunk.xpos, heightmapData, out var structurePlacement)) {
-			//		PlaceStructure(chunkX, structurePlacement);
-			//	}
-			//}
+			HandleOnChunkGenerated(chunkX);
+			chunk.PostProcess(genData, this);
 
 			return chunk;
 		}
 
+
+		[Obsolete]
+		void BlendBiomeBorder(ChunkBiomePartition partition) {
+			if (!partition.hasBorder) {
+				return;
+			}
+
+			int leftX = partition.splitX - (biomeBlendRange / 2);
+			int rightX = partition.splitX + (biomeBlendRange / 2) - 1;
+			BlockResolver blockResolver = new(partition.primary, partition.secondary);
+
+			for (int x = leftX; x <= rightX; x++) {
+				int cx = ToChunkX(x);
+				int chunkX = ChunkXAt(x);
+				int localCx = cx;
+
+				OnChunkGenerated onChunkGenerated = genData => {
+					for (int y = 0; y < WORLD_HEIGHT; y++) {
+						BlockGenContext ctx = genData.genContexts[localCx][y];
+						var blockState = blockResolver.BlendBiomeBorder(ctx, leftX, rightX);
+						genData.chunk.SetBlock(localCx, y, blockState);
+					}
+				};
+
+				if (IsChunkGenerated(chunkX)) {
+					onChunkGenerated(chunkGenData[chunkX]);
+				} else {
+					PostOnChunkGenerated(chunkX, onChunkGenerated);
+				}
+			}
+		}
+
+		[Obsolete]
+		public void PostOnChunkGenerated(int chunkX, OnChunkGenerated onChunkGenerated) {
+			if (!deferredGenerations.TryGetValue(chunkX, out var list)) {
+				deferredGenerations[chunkX] = new List<OnChunkGenerated>();
+			}
+			list.Add(onChunkGenerated);
+		}
+
+		[Obsolete]
+		private void HandleOnChunkGenerated(int chunkX) {
+			if (deferredGenerations.Remove(chunkX, out var list)) {
+				var genData = chunkGenData[chunkX];
+
+				foreach (var onChunkGenerated in list) {
+					onChunkGenerated(genData);
+				}
+			}
+		}
+
+		[Obsolete]
 		public bool TryPlaceStructure(
 				int chunkBlockX,
 				int chunkX, 
@@ -187,6 +245,7 @@ namespace SoulboundBackend.Client.World {
 			return false;
 		}
 
+		[Obsolete]
 		public StructurePlacement ForceGeneratePlacement(ChunkBlockPos chunkBlockPos, StructureTemplate template) {
 			WorldChunk? chunk = chunkBlockPos.UnderlyingChunk(this);
 			var context = new StructureGenerationContext(chunkBlockPos.x, chunkBlockPos.y, chunkBlockPos.chunkX, chunk.HeightmapData, this);
@@ -195,11 +254,13 @@ namespace SoulboundBackend.Client.World {
 			return template.FinalizePlacement(template.placementGenerator.Invoke(context, structureData));
 		}
 
+		[Obsolete]
 		public void ForcePlaceStructure(ChunkBlockPos chunkBlockPos, StructureTemplate template) {
 			StructurePlacement placement = ForceGeneratePlacement(chunkBlockPos, template);
 			PlaceStructure(chunkBlockPos.chunkX, placement);
 		}
 
+		[Obsolete]
 		public bool StructureAt(BlockPos blockPos, out StructurePlacement structure) {
 			int chunkX = ChunkXAt((Vector2Int)blockPos);
 			if (structurePlacements.TryGetValue(chunkX, out var chunkFeatures)) {
@@ -213,6 +274,8 @@ namespace SoulboundBackend.Client.World {
 			return false;
 		}
 
+
+		[Obsolete]
 		public bool OverlappingStructures(BlockPos blockPos, out List<StructurePlacement> overlappingStructures) {
 			int chunkX = ChunkXAt((Vector2Int)blockPos);
 
@@ -228,6 +291,7 @@ namespace SoulboundBackend.Client.World {
 			return false;
 		}
 
+		[Obsolete]
 		public void PlaceStructure(int chunkX, StructurePlacement placement) {
 			if (!structurePlacements.ContainsKey(chunkX)) {
 				structurePlacements.Add(chunkX, new List<StructurePlacement>());
@@ -240,7 +304,7 @@ namespace SoulboundBackend.Client.World {
 				WorldChunk? underlyingChunk = chunkBlockPos.UnderlyingChunk(this);
 
 				if (underlyingChunk == null) {
-					PendBlock(chunkBlockPos.chunkX, chunkBlockPos, blockState);
+					PendBlock(chunkBlockPos, blockState);
 				} else if (loadedChunks.ContainsKey(chunkBlockPos.chunkX) && underlyingChunk != null) {
 					SetBlock(chunkBlockPos, blockState);
 				} else {
@@ -249,6 +313,8 @@ namespace SoulboundBackend.Client.World {
 			}
 		}
 
+
+		[Obsolete]
 		public void MarkStructureDirty(StructurePlacement placement) { 
 			structurePlacements[placement.origin.chunkX].Remove(placement);
 		}
@@ -278,10 +344,11 @@ namespace SoulboundBackend.Client.World {
 
 		public void SetBlockOrPend(ChunkBlockPos chunkBlockPos, BlockState? blockState) {
 			int chunkX = chunkBlockPos.chunkX;
+
 			if (generatedChunks.ContainsKey(chunkX)) {
 				SetBlock(chunkBlockPos, blockState);
 			} else {
-				PendBlock(chunkX, chunkBlockPos, blockState);
+				PendBlock(chunkBlockPos, blockState);
 			}
 		}
 
@@ -316,6 +383,7 @@ namespace SoulboundBackend.Client.World {
 			), (oldState, newState) => oldState?.DropOnBroken(blockPos, source));
 		}
 
+		[Obsolete]
 		public void PendBlocks(int chunkX, List<(ChunkBlockPos chunkBlockpos, BlockState? state)> blockStateUpdates) {
 			if (pendingUpdates.TryGetValue(chunkX, out var existingUpdates)) {
 				existingUpdates.AddRange(blockStateUpdates);
@@ -324,7 +392,10 @@ namespace SoulboundBackend.Client.World {
 			}
 		}
 
-		public void PendBlock(int chunkX, ChunkBlockPos chunkBlockPos, BlockState? blockState) {
+		[Obsolete]
+		public void PendBlock(ChunkBlockPos chunkBlockPos, BlockState? blockState) {
+			int chunkX = chunkBlockPos.chunkX;
+
 			if (!pendingUpdates.ContainsKey(chunkX)) {
 				pendingUpdates[chunkX] = new List<(ChunkBlockPos, BlockState?)>();
 			}
@@ -421,6 +492,12 @@ namespace SoulboundBackend.Client.World {
 		public bool IsInWorldBounds(Vector2 pos) => pos.y >= WorldChunk.minY && pos.y <= WorldChunk.maxY;
 
 		public bool IsInWorldBounds(BlockPos blockPos) => IsInWorldBounds((Vector2)blockPos);
+
+		public bool IsChunkLoaded(WorldChunk chunk) => loadedChunks.ContainsValue(chunk);
+
+		public bool IsChunkLoaded(int chunkX) => loadedChunks.ContainsKey(chunkX);
+
+		public bool IsChunkGenerated(int chunkX) => generatedChunks.ContainsKey(chunkX);
 
 		public List<BlockPos> GetTilesCovered(Bounds bounds) {
 			List<BlockPos> coveredTiles = new();

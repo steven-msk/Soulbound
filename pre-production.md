@@ -411,7 +411,7 @@ Based on the dependency graph, this could be an optimal order:
 4. [Stat system](#5-stat-system) * *some features might be missing, but most systems are working*
 5. [Entity system](#6-entity-system) >| *components wil be handled during productions*
 6. [Block system](#8-block-system) >| *TileEntity serialization and lifetime aspects TBD when working on the level system*
-7. [Chunk generation](#9-chunk-generation) <-
+7. [Chunk generation](#9-chunk-generation)* <- *World generation is delayed until further notice*
 11. [World rendering](#10-world-rendering)
 12. [Level system](#19-level-system)
 13. [Physics system](#7-physics-system) (universal overhaul)

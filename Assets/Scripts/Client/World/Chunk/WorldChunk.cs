@@ -33,8 +33,8 @@ namespace SoulboundBackend.Client.World.Chunk {
 		private readonly int[][] stateHashes = new int[Level.CHUNK_LENGTH][];
 		private readonly TileEntity[][] tileEntities = new TileEntity[Level.CHUNK_LENGTH][];
 		private readonly TileEntityTickManager tickManager = new();
-		private ChunkHeightmapData heightmapData;
-		public ChunkHeightmapData HeightmapData => heightmapData;
+		[Obsolete] private ChunkHeightmapData heightmapData;
+		[Obsolete] public ChunkHeightmapData HeightmapData => heightmapData;
 		private int cx;
 		public int xpos => cx;
 
@@ -87,6 +87,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 			return generationData;
 		}
 
+		[Obsolete]
 		public void Generate(BiomeMap biomeMap, Heightmap heightmap, Cavemap cavemap, out ChunkGenData genData) {
 			genData = new ChunkGenData {
 				chunk = this,
@@ -138,10 +139,11 @@ namespace SoulboundBackend.Client.World.Chunk {
 				}
 			}
 
-			const int blendRange = 10;
-			BlendBiomeBorders(genData.biomePartition, blendRange, genData.genContexts);
+			//const int blendRange = 10;
+			//BlendBiomeBorders(genData.biomePartition, blendRange, genData.genContexts);
 		}
 
+		[Obsolete]
 		ChunkBiomePartition ProcessBiomePartition(int x, IBiome primary, ChunkBiomePartition partition) {
 			if (partition.primary == null) {
 				partition.primary = primary;
@@ -154,6 +156,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 			return partition;
 		}
 
+		[Obsolete]
 		void BlendBiomeBorders(ChunkBiomePartition partition, int blendRange, BlockGenContext[][] genContexts) {
 			if (!partition.hasBorder) {
 				return;
@@ -169,7 +172,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 				for (int y = 0; y < Level.WORLD_HEIGHT; y++) {
 					try {
 						BlockGenContext ctx = genContexts[cx][y];
-						var blockState = blockResolver.BlendBiomeBorder(ctx, leftX, rightX, partition.splitX);
+						var blockState = blockResolver.BlendBiomeBorder(ctx, leftX, rightX);
 						SetBlock(cx, y, blockState);
 					} catch (IndexOutOfRangeException) {
 					}
@@ -177,23 +180,24 @@ namespace SoulboundBackend.Client.World.Chunk {
 			}
 		}
 
-		public void PostProcessTerrain(ChunkGenData genData, Level level) {
+		[Obsolete]
+		public void PostProcess(ChunkGenData genData, Level level) {
 			IBiome primary = genData.biomePartition.primary;
 			IBiome? secondary = genData.biomePartition.secondary;
 
 			int splitX = genData.biomePartition.splitX;
-			int chunkEndX = ChunkXToWorldX(Level.CHUNK_LENGTH - 1);
 			int chunkStartX = ChunkXToWorldX(0);
+			int chunkEndX = ChunkXToWorldX(Level.CHUNK_LENGTH - 1);
 
 			int partitionStartX = chunkStartX;
 			int partitionLimitX = secondary == null ? chunkEndX : splitX;
-			primary.PostProcessTerrain(genData, this, level, partitionStartX, partitionLimitX);
+			primary.PostProcess(genData, this, level, partitionStartX, partitionLimitX);
 
 			if (secondary != null) {
 				partitionStartX = splitX + 1;
 				partitionLimitX = chunkEndX;
 
-				secondary?.PostProcessTerrain(genData, this, level, partitionStartX, partitionLimitX);
+				secondary?.PostProcess(genData, this, level, partitionStartX, partitionLimitX);
 			}
 		}
 
@@ -253,7 +257,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 			this.SetBlock(chunkPos.x, WorldYToIndex(chunkPos.y), blockState);
 		}
 
-		private void SetBlock(int cx, int yIndex, BlockState blockState) {
+		public void SetBlock(int cx, int yIndex, BlockState blockState) {
 			Block block = blockState.block;
 			stateHashes[cx][yIndex] = blockState.stateHash;
 

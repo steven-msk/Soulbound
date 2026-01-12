@@ -91,7 +91,7 @@ namespace Assets.Scripts.Client.World.Biome {
 
 		}
 
-		void IBiome.PostProcessTerrain(ChunkGenData genData, WorldChunk chunk, Level level, int partitionStartX, int partitionLimitX) {
+		void IBiome.PostProcess(ChunkGenData genData, WorldChunk chunk, Level level, int partitionStartX, int partitionLimitX) {
 			const float chanceMin = 0.05f;
 			const float chanceMax = 0.25f;
 			const float threshold = 0.45f;

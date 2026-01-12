@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace SoulboundBackend.Client.World.Chunk {
+	[Obsolete]
 	public struct ChunkHeightmapData {
 		/// <summary>
 		/// worldX -> surface level mapping

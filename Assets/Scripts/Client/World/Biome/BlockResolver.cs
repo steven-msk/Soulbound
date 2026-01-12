@@ -35,7 +35,7 @@ namespace SoulboundBackend.Client.World.Generation {
 			return primary.ResolveCaveBlock(pos, caveDensity);
 		}
 
-		public BlockState BlendBiomeBorder(BlockGenContext ctx, int leftX, int rightX, int splitX) {
+		public BlockState BlendBiomeBorder(BlockGenContext ctx, int leftX, int rightX) {
 			float t = Mathf.InverseLerp(leftX, rightX, ctx.pos.x);
 			t = t * t + UnityEngine.Random.value;
 
@@ -44,5 +44,7 @@ namespace SoulboundBackend.Client.World.Generation {
 			}
 			return secondary.ResolveBlock(ctx);
 		}
+
+
 	}
 }
