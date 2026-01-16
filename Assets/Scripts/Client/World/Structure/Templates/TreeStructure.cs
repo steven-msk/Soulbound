@@ -1,12 +1,14 @@
 ﻿using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Client.World.Chunk;
 using SoulboundBackend.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace SoulboundBackend.Client.World.Structure.Templates {
+	[Obsolete]
 	public static class TreeStructure {
 		public const int minHeight = 5;
 		public const int maxHeight = 20;
@@ -21,7 +23,8 @@ namespace SoulboundBackend.Client.World.Structure.Templates {
 					return null;
 				}
 				int worldX = generationContext.level.ToWorldX(generationContext.chunkBlockX, generationContext.chunkX);
-				int ypos = generationContext.heightmapData.surfaceLevels[worldX];
+				//int ypos = generationContext.heightmapData.surfaceLevels[worldX];
+				int ypos = 0;
 				ChunkBlockPos origin = new ChunkBlockPos(generationContext.chunkBlockX, ypos, generationContext.chunkX);
 
 				int height = Random.Range(minHeight, maxHeight + 1);
@@ -34,8 +37,9 @@ namespace SoulboundBackend.Client.World.Structure.Templates {
 				}
 				bool valid = true;
 				int worldX = generationContext.level.ToWorldX(preliminaryData.origin.x, generationContext.chunkX);
-				int ypos = generationContext.heightmapData.surfaceLevels[worldX];
-				valid = preliminaryData.origin.y == generationContext.heightmapData.surfaceLevels[worldX];
+				//int ypos = generationContext.heightmapData.surfaceLevels[worldX];
+				int ypos = 0;
+				//valid = preliminaryData.origin.y == generationContext.heightmapData.surfaceLevels[worldX];
 				int sizeY = preliminaryData.size.y;
 				valid = valid && sizeY >= minHeight && sizeY <= maxHeight;
 				return valid;

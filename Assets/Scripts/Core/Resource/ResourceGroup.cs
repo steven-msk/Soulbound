@@ -29,16 +29,16 @@ namespace SoulboundBackend.Core.Resource {
 			var guids = AssetDatabase.FindAssets($"t:{assetType}", new[] { searchFolder });
 
 			resourceAddresses = guids
-                .Select(g => AssetDatabase.GUIDToAssetPath(g))
-                .Where(path => Path.GetDirectoryName(path).Replace("\\", "/") == searchFolder)
-                .ToArray();
+				.Select(g => AssetDatabase.GUIDToAssetPath(g))
+				.Where(path => Path.GetDirectoryName(path).Replace("\\", "/") == searchFolder)
+				.ToArray();
 			if (resourceAddresses != null && resourceAddresses.Length > 0) {
 				extension = Path.GetExtension(resourceAddresses[0]);
 			}
 
 			logger.LogInfo(LogModules.resource, "Found {} resources in folder {}", resourceAddresses?.Length ?? 0, searchFolder);
 
-            EditorUtility.SetDirty(this);
+			EditorUtility.SetDirty(this);
 		}
 #endif
 
@@ -61,34 +61,36 @@ namespace SoulboundBackend.Core.Resource {
 			return asset;
 		}
 
-        private void OnEnable() {
+		private void OnEnable() {
 			fileWatcher = new FileSystemWatcher(searchFolder) {
 				IncludeSubdirectories = false,
 				EnableRaisingEvents = true,
 			};
 			FileSystemEventHandler delayedRefresh = (sender, e) => {
-                if (!issueAutomaticRefreshes || justRefreshed) {
-                    return;
-                }
-                justRefreshed = true;
+				if (!issueAutomaticRefreshes || justRefreshed) {
+					return;
+				}
+				justRefreshed = true;
 
-                EditorApplication.delayCall += () => {
-                    logger.LogInfo(LogModules.resource,
-                        "Issued an automatic refresh for group with address '{}'" +
-                        " from source folder '{}'", groupAddress, searchFolder);
-                    RefreshAddresses();
-                    justRefreshed = false;
-                };
-            };
+				EditorApplication.delayCall += () => {
+					logger.LogInfo(LogModules.resource,
+						"Issued an automatic refresh for group with address '{}'" +
+						" from source folder '{}'", groupAddress, searchFolder);
+#if UNITY_EDITOR
+					RefreshAddresses();
+#endif
+					justRefreshed = false;
+				};
+			};
 
 			fileWatcher.Created += delayedRefresh;
 			fileWatcher.Renamed += (sender, e) => delayedRefresh.Invoke(sender, e);
 			fileWatcher.Deleted += delayedRefresh;
 		}
 
-        static ResourceGroup() {
+		static ResourceGroup() {
 			logger.LogInfo(LogModules.resource, "ResourceGroup type loaded");
 		}
-    }
+	}
 }
 

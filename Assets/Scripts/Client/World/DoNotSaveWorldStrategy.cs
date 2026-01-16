@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-#if UNITY_INCLUDE_TESTS
 namespace SoulboundBackend.Client.World {
     public class DoNotSaveWorldStrategy : IWorldSaveStrategy {
         public WorldDump? Load(string world) {
@@ -25,4 +24,3 @@ namespace SoulboundBackend.Client.World {
 		}
 	}
 }
-#endif

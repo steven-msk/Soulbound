@@ -105,7 +105,7 @@ namespace SoulboundBackend.Client.World {
 		}
 
 		public Vector2 GetWorldSpawnPoint() {
-			return new Vector2(0f, GetSurfaceY(0));
+			return new Vector2(0f, GetSurfaceAirY(0));
 		}
 
 		public void Dump(out int seed, out WorldChunk[] generatedChunks, out Dictionary<int, List<StructurePlacement>> structurePlacements) {
@@ -158,7 +158,6 @@ namespace SoulboundBackend.Client.World {
 		private WorldChunk GenerateNewChunk(int chunkX) {
 			WorldChunk chunk = new(chunkX);
 			generatedChunks[chunkX] = chunk;
-			ChunkHeightmapData heightmapData = chunk.GenerateHeightmap(this.heightGenerator);
 
 			chunk.Generate(biomeMap, heightmap, cavemap, out ChunkGenData genData);
 			chunkGenData[chunkX] = genData;
@@ -226,12 +225,11 @@ namespace SoulboundBackend.Client.World {
 		public bool TryPlaceStructure(
 				int chunkBlockX,
 				int chunkX, 
-				ChunkHeightmapData heightmapData,
 				out StructurePlacement structurePlacement
 			) {
 			foreach (var structureID in registeredStructureTemplates.Keys) {
 				StructureTemplate structure = registeredStructureTemplates[structureID];
-				var context = new StructureGenerationContext(chunkBlockX, 0, chunkX, heightmapData, this);
+				var context = new StructureGenerationContext(chunkBlockX, 0, chunkX, this);
 				var data = structure.placementFunction.Invoke(context, false);
 
 				if (data != null && structure.validationFunction.Invoke(context, data.Value)) {
@@ -248,7 +246,7 @@ namespace SoulboundBackend.Client.World {
 		[Obsolete]
 		public StructurePlacement ForceGeneratePlacement(ChunkBlockPos chunkBlockPos, StructureTemplate template) {
 			WorldChunk? chunk = chunkBlockPos.UnderlyingChunk(this);
-			var context = new StructureGenerationContext(chunkBlockPos.x, chunkBlockPos.y, chunkBlockPos.chunkX, chunk.HeightmapData, this);
+			var context = new StructureGenerationContext(chunkBlockPos.x, chunkBlockPos.y, chunkBlockPos.chunkX, this);
 			var structureData = template.placementFunction.Invoke(context, true);
 
 			return template.FinalizePlacement(template.placementGenerator.Invoke(context, structureData));
@@ -485,13 +483,13 @@ namespace SoulboundBackend.Client.World {
 			return FloorDiv(worldX, CHUNK_LENGTH);
 		}
 
-		public int GetSurfaceY(BlockPos blockPos) => GetSurfaceY(blockPos.x);
+		public int GetSurfaceY(int xpos) {
+			int chunkX = ChunkXAt(xpos);
+			int cx = ToChunkX(xpos);
+			return chunkGenData[chunkX].surfacePoints[cx];
+		}
 
-		public int GetSurfaceY(int xpos) => this.ChunkAt(xpos)?.HeightmapData.surfaceLevels[xpos] ?? 0;
-
-		public bool IsInWorldBounds(Vector2 pos) => pos.y >= WorldChunk.minY && pos.y <= WorldChunk.maxY;
-
-		public bool IsInWorldBounds(BlockPos blockPos) => IsInWorldBounds((Vector2)blockPos);
+		public int GetSurfaceAirY(int xpos) => GetSurfaceY(xpos) + 1;
 
 		public bool IsChunkLoaded(WorldChunk chunk) => loadedChunks.ContainsValue(chunk);
 

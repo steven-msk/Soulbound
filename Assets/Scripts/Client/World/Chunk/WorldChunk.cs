@@ -33,8 +33,6 @@ namespace SoulboundBackend.Client.World.Chunk {
 		private readonly int[][] stateHashes = new int[Level.CHUNK_LENGTH][];
 		private readonly TileEntity[][] tileEntities = new TileEntity[Level.CHUNK_LENGTH][];
 		private readonly TileEntityTickManager tickManager = new();
-		[Obsolete] private ChunkHeightmapData heightmapData;
-		[Obsolete] public ChunkHeightmapData HeightmapData => heightmapData;
 		private int cx;
 		public int xpos => cx;
 
@@ -48,44 +46,6 @@ namespace SoulboundBackend.Client.World.Chunk {
 		}
 
 		public void Tick() => tickManager.Tick();
-
-		// PLANNED REFACTOR: chunk generation logic - required when introducing biomes
-		[Obsolete]
-		public ChunkHeightmapData GenerateHeightmap(INoiseGenerator1D heightGenerator) {
-
-			int startX = cx * Level.CHUNK_LENGTH;
-			Dictionary<int, int> surfaceLevels = new();
-			int highestStone = 0;
-
-			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
-				int worldX = startX + x;
-				float heightNoise = heightGenerator.GenerateNoise1D(worldX);
-				int groundHeight = Mathf.FloorToInt(heightNoise * SURFACE_HEIGHT_RANGE);
-				int undergroundHeight = Mathf.FloorToInt(heightNoise * UNDERGROUND_HEIGHT_RANGE);
-				surfaceLevels.Add(worldX, groundHeight + 1);
-
-				highestStone = Mathf.Max(highestStone, undergroundHeight);
-				for (int y = minY; y < maxY; y++) {
-					int yIndex = WorldYToIndex(y);
-					BlockState blockState = default(BlockState);
-					if (y > groundHeight) {
-						blockState = Blocks.air.defaultState;
-					} else if (y == groundHeight || y == groundHeight - 1) {
-						blockState = Blocks.grass.defaultState;
-					} else if (y < groundHeight - 1 && y >= undergroundHeight) {
-						blockState = Blocks.dirt.defaultState;
-					} else {
-						blockState = Blocks.stone.defaultState;
-					}
-					stateHashes[x][yIndex] = blockState.stateHash;
-				}
-			}
-
-
-			ChunkHeightmapData generationData = new ChunkHeightmapData(surfaceLevels, highestStone);
-			this.heightmapData = generationData;
-			return generationData;
-		}
 
 		[Obsolete]
 		public void Generate(BiomeMap biomeMap, Heightmap heightmap, Cavemap cavemap, out ChunkGenData genData) {
@@ -307,7 +267,6 @@ namespace SoulboundBackend.Client.World.Chunk {
 
 				JObject obj = JObject.Load(reader);
 				int xpos = obj["xpos"].Value<int>();
-				ChunkHeightmapData heightmap = obj["heightmapData"].ToObject<ChunkHeightmapData>(serializer);
 				JArray rows = (JArray)obj["blockStates"];
 				int[][] stateHashes = new int[rows.Count][];
 
@@ -321,9 +280,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 					}
 				}
 
-				WorldChunk chunk = new(xpos) {
-					heightmapData = heightmap,
-				};
+				WorldChunk chunk = new(xpos);
 				chunk.ParseDeserialized(stateHashes);
 				return chunk;
 			}
@@ -336,9 +293,6 @@ namespace SoulboundBackend.Client.World.Chunk {
 				writer.WriteStartObject();
 				writer.WritePropertyName("xpos");
 				serializer.Serialize(writer, value.xpos);
-
-				writer.WritePropertyName("heightmapData");
-				serializer.Serialize(writer, value.HeightmapData);
 
 				writer.WritePropertyName("blockStates");
 				writer.WriteStartArray();
