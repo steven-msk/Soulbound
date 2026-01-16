@@ -22,29 +22,30 @@ namespace SoulboundBackend.Client.World.Generation {
 		}
 
 		public BlockState ResolveBlock(BlockGenContext ctx) {
+			return ResolveBlock(ctx, primary);
+		}
+
+		private BlockState ResolveBlock(BlockGenContext ctx, IBiome biome) {
 			return ctx.isCave
-				? ResolveCaveBlock(ctx.pos, ctx.caveDensity)
-				: ResolveTerrainBlock(ctx);
+				? ResolveCaveBlock(ctx.pos, ctx.caveDensity, biome)
+				: ResolveTerrainBlock(ctx, biome);
 		}
 
-		private BlockState ResolveTerrainBlock(BlockGenContext ctx) {
-			return primary.ResolveBlock(ctx);
+		private BlockState ResolveTerrainBlock(BlockGenContext ctx, IBiome biome) {
+			return biome.ResolveBlock(ctx);
 		}
 
-		private BlockState ResolveCaveBlock(BlockPos pos, float caveDensity) {
-			return primary.ResolveCaveBlock(pos, caveDensity);
+		private BlockState ResolveCaveBlock(BlockPos pos, float caveDensity, IBiome biome) {
+			return biome.ResolveCaveBlock(pos, caveDensity);
 		}
 
 		public BlockState BlendBiomeBorder(BlockGenContext ctx, int leftX, int rightX) {
 			float t = Mathf.InverseLerp(leftX, rightX, ctx.pos.x);
-			t = t * t + UnityEngine.Random.value;
+			t = Mathf.Pow(t, 1.7f) + UnityEngine.Random.value;
 
-			if (t > 0f && t < 1f) {
-				return primary!.ResolveBlock(ctx);
-			}
-			return secondary.ResolveBlock(ctx);
+			return t > 0f && t < 1f
+				? ResolveBlock(ctx, primary)
+				: ResolveBlock(ctx, secondary);
 		}
-
-
 	}
 }
