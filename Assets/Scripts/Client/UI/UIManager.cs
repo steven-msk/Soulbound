@@ -8,12 +8,14 @@ using Unity.VisualScripting.YamlDotNet.Core;
 using UnityEditor.Graphs;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 using Object = UnityEngine.Object;
 using Screen = SoulboundBackend.Client.UI.Screens.Screen;
 
 #nullable enable
 
 namespace SoulboundBackend.Client.UI {
+	[RequireComponent(typeof(Canvas))]
 	public class UIManager : ChildReferenceContainer {
 		public bool enableScaleFix = true;
 		public static readonly Vector2 referenceResolution = new(960, 540);
@@ -21,10 +23,12 @@ namespace SoulboundBackend.Client.UI {
 		public Screen? activeScreen { get; private set; }
 		public ChildReferenceMap screenChildMap { get; } = new();
 		private Stack<Screen> screenStack = new();
-
-		public Canvas rootCanvas => this.GetComponent<Canvas>();
-
 		private CanvasScaler canvasScaler;
+
+		[Inject] 
+		public void Construct(DiContainer container) {
+			GetComponent<Canvas>().worldCamera = container.Resolve<Camera>();
+		}
 
 		private void Start() {
 			canvasScaler = GetComponent<CanvasScaler>();

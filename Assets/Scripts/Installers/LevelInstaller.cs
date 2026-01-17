@@ -1,5 +1,6 @@
  using SoulboundBackend.Client;
 using SoulboundBackend.Client.Input;
+using SoulboundBackend.Client.UI;
 using SoulboundBackend.Core.Resource;
 using System;
 using UnityEngine;
@@ -22,6 +23,8 @@ namespace SoulboundBackend.Core.Bootstrap {
 			container.BindInstance<WorldManager>(worldManager).AsSingle();
 			container.Bind<LevelManager>().FromComponentInNewPrefab(levelManagerPrefab).AsSingle().NonLazy();
 			container.BindInstance<Canvas>(canvas).AsSingle();
+			container.BindInstance<Camera>(Camera.main).AsSingle();
+			container.Bind<UIManager>().FromComponentOn(canvas.gameObject).AsSingle();
 		}
 	}
 }
