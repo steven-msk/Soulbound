@@ -31,7 +31,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 		public const float UNDERGROUND_HEIGHT_RANGE = 20f;
 
 		private readonly int[][] stateHashes = new int[Level.CHUNK_LENGTH][];
-		private readonly TileEntity[][] tileEntities = new TileEntity[Level.CHUNK_LENGTH][];
+		private readonly TileEntity?[][] tileEntities = new TileEntity[Level.CHUNK_LENGTH][];
 		private readonly TileEntityTickManager tickManager = new();
 		private int cx;
 		public int xpos => cx;
@@ -40,7 +40,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 			this.cx = cx;
 
 			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
-				tileEntities[x] = new TileEntity[Level.WORLD_HEIGHT];
+				tileEntities[x] = new TileEntity?[Level.WORLD_HEIGHT];
 				stateHashes[x] = new int[Level.WORLD_HEIGHT];
 			}
 		}
@@ -99,8 +99,6 @@ namespace SoulboundBackend.Client.World.Chunk {
 				}
 			}
 
-			//const int blendRange = 10;
-			//BlendBiomeBorders(genData.biomePartition, blendRange, genData.genContexts);
 		}
 
 		[Obsolete]
@@ -114,30 +112,6 @@ namespace SoulboundBackend.Client.World.Chunk {
 				partition.splitX = x;
 			}
 			return partition;
-		}
-
-		[Obsolete]
-		void BlendBiomeBorders(ChunkBiomePartition partition, int blendRange, BlockGenContext[][] genContexts) {
-			if (!partition.hasBorder) {
-				return;
-			}
-
-			int leftX = partition.splitX - (blendRange / 2);
-			int rightX = partition.splitX + (blendRange / 2);
-			BlockResolver blockResolver = new(partition.primary, partition.secondary);
-
-			for (int x = leftX; x <= rightX; x++) {
-				int cx = WorldXToChunkX(x);
-
-				for (int y = 0; y < Level.WORLD_HEIGHT; y++) {
-					try {
-						BlockGenContext ctx = genContexts[cx][y];
-						var blockState = blockResolver.BlendBiomeBorder(ctx, leftX, rightX);
-						SetBlock(cx, y, blockState);
-					} catch (IndexOutOfRangeException) {
-					}
-				}
-			}
 		}
 
 		[Obsolete]
@@ -223,7 +197,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 
 			if (block.hasTileEntity) {
 				BlockPos blockPos = new(ChunkXToWorldX(cx), IndexToWorldY(yIndex));
-				TileEntity tileEntity = block.GetTileEntity(this, blockPos);
+				TileEntity? tileEntity = block.GetTileEntity(this, blockPos);
 				
 				if (tileEntities[cx][yIndex] != null) {
 					tickManager.RemoveTileEntity(tileEntity);
@@ -234,12 +208,15 @@ namespace SoulboundBackend.Client.World.Chunk {
 			}
 		}
 
-		public BlockState BlockStateAt(ChunkBlockPos chunkPos) {
+		public BlockState? BlockStateAt(ChunkBlockPos chunkPos) {
 			int stateHash = stateHashes[chunkPos.x][WorldYToIndex(chunkPos.y)];
-			if (BlockStateRegistry.TryGet(stateHash, out var state)) {
-				return state;
-			}
-			return Blocks.air.defaultState;
+			return BlockStateRegistry.TryGet(stateHash, out var state)
+				? state
+				: null;
+		}
+
+		public TileEntity? TileEntityAt(ChunkBlockPos chunkPos) {
+			return tileEntities[chunkPos.x][WorldYToIndex(chunkPos.y)];
 		}
 
 		private void ParseDeserialized(int[][] stateHashes) {

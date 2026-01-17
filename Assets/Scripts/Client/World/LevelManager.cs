@@ -12,6 +12,7 @@ using SoulboundBackend.Core.Resource;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -27,11 +28,13 @@ namespace SoulboundBackend.Core {
 		public event Action<Level>? onLevelLoaded;
 		public const float tickRate = 0.02f;        // 50 tps
 		private float tickStartTime;
+		private float frameStartTime;
 		public bool paused { get; private set; }
 		private bool sessionRunning;
 
 		private DiContainer container = null!;
 		private WorldManager worldManager = null!;
+		private WorldRenderer worldRenderer = null!;
 		public EntityManager entityManager { get; private set; } = null!;
 		private Canvas worldCanvas = null!;
 		private InputHandler inputHandler = null!;
@@ -79,6 +82,7 @@ namespace SoulboundBackend.Core {
 			this.world = world;
 			this.level = new Level(gridContext, seed);
 			this.entityManager = new EntityManager(level, new GameObject("Updater").AddComponent<UpdateManager>());
+			this.worldRenderer = new WorldRenderer(new RectInt(-32, -19, 65, 39), level, gridContext.tilemap);
 
 			level.BootstrapWorld(dump, this);
 			entityManager.Deserialize(dump?.serializedEntities ?? new());
@@ -86,8 +90,10 @@ namespace SoulboundBackend.Core {
 
 			container.BindInstance<Level>(level).AsSingle();
 			container.BindInstance<EntityManager>(entityManager).AsSingle();
-			onLevelLoaded?.Invoke(level);
+
+			StartCoroutine(GameFrameLoop());
 			StartCoroutine(GameTickLoop());
+			onLevelLoaded?.Invoke(level);
 		}
 
 		public void SpawnPlayer(SerializedEntity? serialized) {
@@ -113,6 +119,29 @@ namespace SoulboundBackend.Core {
 		private void Update() {
 			level?.UpdateChunks(player?.position ?? new Vector2(0f, 0f));
 			entityManager?.Update(Time.deltaTime);
+		}
+
+		IEnumerator GameFrameLoop() {
+			WaitForEndOfFrame endOfFrame = new();
+			while (sessionRunning) {
+				if (!this.paused) {
+					StartFrame();
+
+					worldRenderer.Render(player?.position ?? level.GetWorldSpawnPoint());
+
+					yield return endOfFrame;
+
+					EndFrame();
+				}
+			}
+		}
+
+		private void StartFrame() {
+			frameStartTime = Time.realtimeSinceStartup;
+		}
+
+		private void EndFrame() {
+			float fps = 1f / (Time.realtimeSinceStartup - frameStartTime);
 		}
 
 		IEnumerator GameTickLoop() {

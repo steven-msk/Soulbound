@@ -55,8 +55,8 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		protected abstract BlockState CreateDefaultState(BlockPropertyPool propertyPool);
 		public virtual void CreateStates(BlockStateRegisterer registerer, BlockPropertyEntries properties) {
 		}
-		public virtual TileEntity GetTileEntity(WorldChunk chunk, BlockPos blockPos) {
-			return null!;
+		public virtual TileEntity? GetTileEntity(WorldChunk chunk, BlockPos blockPos) {
+			return null;
 		}
 
 		public virtual BlockState Place(ItemStack itemStack, BlockPos blockPos) {

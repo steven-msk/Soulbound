@@ -54,7 +54,6 @@ namespace SoulboundBackend.Core {
 		}
 
 		public void Prototype_LoadDevWorld() {
-			Level.RegisterStructure(TreeStructure.instance);
 			string world = config.dev.loadDevWorldFromSave
 				? config.dev.devWorld
 				: $"altw_{Guid.NewGuid()}";

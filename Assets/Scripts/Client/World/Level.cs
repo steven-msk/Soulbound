@@ -139,7 +139,7 @@ namespace SoulboundBackend.Client.World {
 					}
 
 					loadedChunks[chunkX] = chunk;
-					chunk.Render(gridContext.tilemap, chunkOutlineRenderer);
+					//chunk.Render(gridContext.tilemap, chunkOutlineRenderer);
 					levelManager.OnChunkLoaded(chunk);
 				}
 			}
@@ -416,26 +416,19 @@ namespace SoulboundBackend.Client.World {
 			}
 		}
 
-		public BlockState? BlockStateAt(BlockPos blockPos, bool logFlag = true) {
+		public BlockState? BlockStateAt(BlockPos blockPos) {
 			WorldChunk? chunk = ChunkAt(blockPos);
+			return chunk?.BlockStateAt(blockPos.ToChunkBlockPos(chunk.xpos));
+		}
 
-			if (chunk != null) {
-				return chunk.BlockStateAt(blockPos.ToChunkBlockPos(chunk.xpos));
-			}
-
-			//InvocationHelper.If(logFlag,
-			//	() => logger.LogError(level, $"Cannot retrieve block state at {blockPos.ToString()} because its not generated"));
-			return null;
+		public TileEntity? TileEntityAt(BlockPos blockPos) {
+			WorldChunk? chunk = ChunkAt(blockPos);
+			return chunk?.TileEntityAt(blockPos.ToChunkBlockPos(chunk.xpos));
 		}
 
 		public Block? BlockAt(BlockPos blockPos) {
-			BlockState? blockState = BlockStateAt(blockPos, logFlag: false);
-			if (blockState != null) {
-				return blockState.block;
-			}
-
-			//logger.LogError(level, $"Cannot retrieve block at {blockPos.ToString()} because its not generated");
-			return null;
+			BlockState? blockState = BlockStateAt(blockPos);
+			return blockState?.block;
 		}
 
 		public BlockState? GetAdjacentBlockState(BlockPos startPos, Direction direction) {
