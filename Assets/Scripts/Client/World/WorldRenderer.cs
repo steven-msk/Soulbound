@@ -38,7 +38,7 @@ namespace SoulboundBackend.Client.World {
 			pos = currentView.allPositionsWithin;
 			while (pos.MoveNext()) {
 				BlockPos blockPos = new(pos.Current.x, pos.Current.y);
-				if (!level.IsInBounds(blockPos)) {
+				if (!level.IsInBounds(blockPos) || lastView.Contains(pos.Current)) {
 					continue;
 				}
 

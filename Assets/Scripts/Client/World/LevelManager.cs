@@ -82,7 +82,10 @@ namespace SoulboundBackend.Core {
 			this.world = world;
 			this.level = new Level(gridContext, seed);
 			this.entityManager = new EntityManager(level, new GameObject("Updater").AddComponent<UpdateManager>());
-			this.worldRenderer = new WorldRenderer(new RectInt(-32, -19, 65, 39), level, gridContext.tilemap);
+
+			RectInt renderRect = new(-128, -76, 256, 156);      // simulation distance
+			//RectInt renderRect = new(-32, -19, 65, 39);		// default view distance
+			this.worldRenderer = new WorldRenderer(renderRect, level, gridContext.tilemap);
 
 			level.BootstrapWorld(dump, this);
 			entityManager.Deserialize(dump?.serializedEntities ?? new());
