@@ -143,47 +143,11 @@ namespace SoulboundBackend.Client.World.Chunk {
 
 		public int ChunkXToWorldX(int cx) => cx + xpos * Level.CHUNK_LENGTH;
 
-		public void Render(Tilemap tilemap, ChunkOutlineRenderer outlineRenderer) {
-			int xStart = cx * Level.CHUNK_LENGTH;
-
-			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
-				for (int y = minY; y < maxY; y++) {
-					int yIndex = WorldYToIndex(y);
-					int stateHash = stateHashes[x][yIndex];
-
-					if (stateHash != 0) {
-						BlockState state = BlockStateRegistry.Get(stateHash);
-						BlockPos pos = new(xStart + x, y);
-
-						state.block.Render(state, tileEntities[x][yIndex], pos, tilemap);
-					} else {
-						UnityEngine.Debug.LogError($"Attempted to render ungenerated terrain! {new ChunkBlockPos(x, y, this.cx).ToString()}");
-					}
-				}
-			}
-
-			this.RefreshTiles(tilemap);
+		public void OnLoad(ChunkOutlineRenderer outlineRenderer) {
 			outlineRenderer.ShowOutline(this);
 		}
 
-		public void RefreshTiles(Tilemap tilemap) {
-			int xStart = cx * Level.CHUNK_LENGTH;
-
-			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
-				for (int y = minY; y < maxY; y++) {
-					int yIndex = WorldYToIndex(y);
-					tilemap.RefreshTile(new Vector3Int(xStart + x, y, 0));
-				}
-			}
-		}
-
-		public void Unload(Tilemap tilemap, ChunkOutlineRenderer outlineRenderer) {
-			int xStart = cx * Level.CHUNK_LENGTH;
-			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
-				for (int y = minY; y < maxY; y++) {
-					tilemap.SetTile(new Vector3Int(xStart + x, y, 0), null);
-				}
-			}
+		public void OnUnload(ChunkOutlineRenderer outlineRenderer) {
 			outlineRenderer.HideOutline(this);
 		}
 

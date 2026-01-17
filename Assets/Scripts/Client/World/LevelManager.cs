@@ -181,16 +181,6 @@ namespace SoulboundBackend.Core {
 			}
 		}
 
-		[Obsolete]
-		public void OnChunkLoaded(WorldChunk chunk) {
-			//entityManager.OnChunkLoaded(chunk);
-		}
-
-		[Obsolete]
-		public void OnChunkUnloaded(WorldChunk chunk) {
-			//entityManager.OnChunkUnloaded(chunk);
-		}
-
 		public void RenderRequest(BlockPos blockPos, BlockState? blockState) {
 			worldRenderer.RenderBlock(blockPos, blockState);
 		}

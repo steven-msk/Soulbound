@@ -27,18 +27,15 @@ namespace SoulboundBackend.Client.World {
 		public static readonly LogModule level = new LogModule("LEVEL", "#4682B4");
 		public const int CHUNK_LENGTH = 32;
 		public const int WORLD_HEIGHT = 1024;
-		[Obsolete] public const int SURFACE_TO_UNDERGROUND_DELIMITER = WORLD_HEIGHT / 2;
 		public const int RENDER_DISTANCE = 8;
 		public const int TERRAIN_PLANE_Y = 0;
 		const int biomeBlendRange = 10;
-		[Obsolete] public static string worldDumpFile => Path.Combine(Application.persistentDataPath, LevelManager.worldDump);
 
 		public event Action<BlockChangeInfo>? BlockStateChanged;
 		// POTENTIAL: post world events to the ticking system
 
 		public readonly int seed;
 		[Obsolete] static Dictionary<string, StructureTemplate> registeredStructureTemplates = new();
-		[Obsolete] private readonly PerlinNoiseGenerator1D heightGenerator;
 		private Dictionary<int, WorldChunk> loadedChunks = new();
 		private Dictionary<int, WorldChunk> generatedChunks = new(); 
 		private ChunkOutlineRenderer chunkOutlineRenderer = new();
@@ -57,7 +54,6 @@ namespace SoulboundBackend.Client.World {
 		public Level(LevelGridContext gridContext, int seed) {
 			this.gridContext = gridContext;
 			this.seed = seed;
-			this.heightGenerator = new PerlinNoiseGenerator1D(this.seed, WorldChunk.HEIGHT_SPREAD);
 
 			var biome1 = new PlainsBiome_test(seed);
 			var biome2 = new HillsBiome_test(seed);
@@ -139,8 +135,7 @@ namespace SoulboundBackend.Client.World {
 					}
 
 					loadedChunks[chunkX] = chunk;
-					//chunk.Render(gridContext.tilemap, chunkOutlineRenderer);
-					levelManager.OnChunkLoaded(chunk);
+					chunk.OnLoad(chunkOutlineRenderer);
 				}
 			}
 		}
@@ -409,8 +404,7 @@ namespace SoulboundBackend.Client.World {
 
 			foreach (WorldChunk chunk in toRemove) {
 				loadedChunks.Remove(chunk.xpos);
-				chunk.Unload(gridContext.tilemap, chunkOutlineRenderer);
-				levelManager.OnChunkUnloaded(chunk);
+				chunk.OnUnload(chunkOutlineRenderer);
 			}
 		}
 
