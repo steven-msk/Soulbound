@@ -122,7 +122,7 @@ public class BlockPosTests {
 		var blockPos = new BlockPos(20, 15);
 		int chunkX = 1;
 
-		var chunkPos = blockPos.ToChunkBlockPos(chunkX);
+		var chunkPos = blockPos.ToChunk();
 
 		int expectedLocalX = blockPos.x - chunkX * Level.CHUNK_LENGTH;
 		Assert.AreEqual(expectedLocalX, chunkPos.x);

@@ -17,7 +17,7 @@ namespace SoulboundBackend.Client.World {
 			this.tilemap = tilemap;
 		}
 
-		public void Render(Vector2 pivot) {
+		public void RenderView(Vector2 pivot) {
 			Vector2Int currentPivot = Vector2Int.FloorToInt(pivot);
 			if (this.lastPivot == currentPivot) {
 				return;
@@ -38,7 +38,7 @@ namespace SoulboundBackend.Client.World {
 			pos = currentView.allPositionsWithin;
 			while (pos.MoveNext()) {
 				BlockPos blockPos = new(pos.Current.x, pos.Current.y);
-				if (!level.IsInBounds(blockPos) || lastView.Contains(pos.Current)) {
+				if (!Level.IsInBounds(blockPos) || lastView.Contains(pos.Current)) {
 					continue;
 				}
 
@@ -50,6 +50,12 @@ namespace SoulboundBackend.Client.World {
 
 		}
 
+		public void RenderBlock(BlockPos blockPos, BlockState? blockState) {
+			if (IsInRenderView(blockPos)) {
+				blockState?.block.Render(blockState, level.TileEntityAt(blockPos), blockPos, tilemap);
+			}
+		}
+
 		private RectInt ToRect(Vector2Int pivot) {
 			return new(
 				Mathf.FloorToInt(pivot.x) + relativeRect.x,
@@ -57,6 +63,10 @@ namespace SoulboundBackend.Client.World {
 				relativeRect.width,
 				relativeRect.height
 			);
+		}
+
+		public bool IsInRenderView(BlockPos blockPos) {
+			return ToRect(lastPivot).Contains((Vector2Int)blockPos);
 		}
 	}
 }

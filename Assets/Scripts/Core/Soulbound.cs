@@ -2,7 +2,6 @@
 using SoulboundBackend.Client.SettingSystem;
 using SoulboundBackend.Client.UI;
 using SoulboundBackend.Client.World;
-using SoulboundBackend.Client.World.Structure.Templates;
 using SoulboundBackend.Common;
 using SoulboundBackend.Common.Json;
 using SoulboundBackend.Core.Bootstrap;

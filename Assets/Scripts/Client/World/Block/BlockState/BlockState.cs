@@ -26,7 +26,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			this.properties = properties;
 		}
 
-		public void OnNeighborStateChanged(BlockPos selfPos, BlockPos neighborPos, BlockState oldState, BlockState newState) {
+		public void OnNeighborStateChanged(BlockPos selfPos, BlockPos neighborPos, BlockState? oldState, BlockState? newState) {
 			block.OnNeighborStateChanged(selfPos, neighborPos, oldState, newState);
 		}
 

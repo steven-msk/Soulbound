@@ -62,7 +62,6 @@ namespace SoulboundBackend.Client {
 
 		public Vector2 center => playerPhysics.Collider.bounds.center;
 		public BlockPos blockPos => Soulbound.instance.GetActiveLevel()!.ToBlockPos(this.position);
-		public ChunkBlockPos chunkBlockPos => blockPos.ToChunkBlockPos(Soulbound.instance.GetActiveLevel()!.ChunkXAt(position));
 
 		public Vector2 itemDropForce {
 			get {

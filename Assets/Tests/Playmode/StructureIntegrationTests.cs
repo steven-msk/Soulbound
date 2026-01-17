@@ -51,7 +51,7 @@ public class StructureIntegrationTests {
 		Dictionary<ChunkBlockPos, BlockState> stateOverrides = new();
 		for (int x = context.chunkBlockX; x < data.size.x + context.chunkBlockX; x++) {
 			for (int y = context.chunkBlockY; y < data.size.y + context.chunkBlockY; y++) {
-				stateOverrides[new BlockPos(x, y).ToChunkBlockPos(context.chunkX)] = state;
+				stateOverrides[new BlockPos(x, y).ToChunk()] = state;
 			}
 		}
 		return stateOverrides;

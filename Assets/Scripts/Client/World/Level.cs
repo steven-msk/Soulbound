@@ -262,7 +262,7 @@ namespace SoulboundBackend.Client.World {
 		public bool StructureAt(BlockPos blockPos, out StructurePlacement structure) {
 			int chunkX = ChunkXAt((Vector2Int)blockPos);
 			if (structurePlacements.TryGetValue(chunkX, out var chunkFeatures)) {
-				ChunkBlockPos chunkBlockPos = blockPos.ToChunkBlockPos(chunkX);
+				ChunkBlockPos chunkBlockPos = blockPos.ToChunk();
 				structure = chunkFeatures
 					.FirstOrDefault(f => f.bounds.Contains((Vector2Int)chunkBlockPos));
 				return structure?.PersistentExistence() ?? false;
@@ -278,7 +278,7 @@ namespace SoulboundBackend.Client.World {
 			int chunkX = ChunkXAt((Vector2Int)blockPos);
 
 			if (structurePlacements.TryGetValue(chunkX, out var placementsInChunk)) {
-				ChunkBlockPos chunkBlockPos = blockPos.ToChunkBlockPos(chunkX);
+				ChunkBlockPos chunkBlockPos = blockPos.ToChunk();
 				overlappingStructures = placementsInChunk
 					.Where(f => f.bounds.Contains((Vector2Int)chunkBlockPos))
 					.ToList();
@@ -319,19 +319,17 @@ namespace SoulboundBackend.Client.World {
 
 		public void SetBlock(BlockPos blockPos, BlockState? blockState) {
 			WorldChunk? chunk = this.ChunkAt(blockPos);
-			BlockState air = Blocks.air.defaultState;
-			BlockState oldState = chunk?.BlockStateAt(blockPos.ToChunkBlockPos(chunk.xpos)) ?? air;
-			BlockState newState = blockState ?? air;
-			TileBase referencedTile = newState.block.tileReference;
-			if (oldState == newState) {
+			blockState ??= Blocks.air.defaultState;
+			BlockState? oldState = chunk?.BlockStateAt(blockPos.ToChunk()) ?? null;
+			if (oldState == blockState) {
 				return;
 			}
 
-			chunk?.SetBlock(blockPos.ToChunkBlockPos(chunk.xpos), newState);
-			gridContext.tilemap.SetTile((Vector3Int)blockPos, referencedTile);
+			chunk?.SetBlock(blockPos.ToChunk(), blockState);
+			levelManager.RenderRequest(blockPos, blockState);
 			blockPos.ForEachAdjacent((direction, neighborPos) => {
 				BlockState? neighborBlockState = BlockStateAt(neighborPos);
-				neighborBlockState?.OnNeighborStateChanged(neighborPos, blockPos, oldState, newState);
+				neighborBlockState?.OnNeighborStateChanged(neighborPos, blockPos, oldState, blockState);
 				gridContext.tilemap.RefreshTile((Vector3Int)neighborPos);
 			});
 		}
@@ -418,12 +416,12 @@ namespace SoulboundBackend.Client.World {
 
 		public BlockState? BlockStateAt(BlockPos blockPos) {
 			WorldChunk? chunk = ChunkAt(blockPos);
-			return chunk?.BlockStateAt(blockPos.ToChunkBlockPos(chunk.xpos));
+			return chunk?.BlockStateAt(blockPos.ToChunk());
 		}
 
 		public TileEntity? TileEntityAt(BlockPos blockPos) {
 			WorldChunk? chunk = ChunkAt(blockPos);
-			return chunk?.TileEntityAt(blockPos.ToChunkBlockPos(chunk.xpos));
+			return chunk?.TileEntityAt(blockPos.ToChunk());
 		}
 
 		public Block? BlockAt(BlockPos blockPos) {
@@ -436,12 +434,12 @@ namespace SoulboundBackend.Client.World {
 			return BlockStateAt(adjacentPos);
 		}
 
-		public int ChunkXAt(Vector2 worldPos) => Mathf.FloorToInt(worldPos.x / CHUNK_LENGTH);
+		public static int ChunkXAt(Vector2 worldPos) => Mathf.FloorToInt(worldPos.x / CHUNK_LENGTH);
 
-		public int ChunkXAt(float x) => Mathf.FloorToInt(x / CHUNK_LENGTH);
+		public static int ChunkXAt(float x) => Mathf.FloorToInt(x / CHUNK_LENGTH);
 
 		public WorldChunk? ChunkAt(BlockPos blockPos) { 
-			return generatedChunks!.GetValueOrDefault(this.ChunkXAt((Vector2)blockPos), null);
+			return generatedChunks!.GetValueOrDefault(ChunkXAt((Vector2)blockPos), null);
 		}
 
 		public WorldChunk? ChunkAt(int xpos) => ChunkAt(new BlockPos(xpos, 0));
@@ -463,20 +461,20 @@ namespace SoulboundBackend.Client.World {
 			return ChunkBlockPos.FromBlockPos(blockPos);
 		}
 
-		public int ToWorldX(int chunkBlockX, int chunkX) => chunkBlockX + chunkX * CHUNK_LENGTH;
+		public static int ToWorldX(int chunkBlockX, int chunkX) => chunkBlockX + chunkX * CHUNK_LENGTH;
 
-		public int ToChunkX(int worldX) => worldX - ChunkXAt(worldX) * CHUNK_LENGTH;
+		public static int ToChunkX(int worldX) => worldX - ChunkXAt(worldX) * CHUNK_LENGTH;
 
-		public int NormalizeChunkX(int x) {
+		public static int NormalizeChunkX(int x) {
 			return (x % CHUNK_LENGTH + CHUNK_LENGTH) % CHUNK_LENGTH;
 		}
 
-		public int ChunkXFromRelativeBlock(int chunkBlockX, int chunkX) {
+		public static int ChunkXFromRelativeBlock(int chunkBlockX, int chunkX) {
 			int worldX = ToWorldX(chunkBlockX, chunkX);
 			return FloorDiv(worldX, CHUNK_LENGTH);
 		}
 
-		public bool IsInBounds(BlockPos pos) {
+		public static bool IsInBounds(BlockPos pos) {
 			return pos.y < WORLD_HEIGHT && pos.y >= WorldChunk.minY;
 		}
 

@@ -4,6 +4,7 @@ using SoulboundBackend.Client.SettingSystem;
 using SoulboundBackend.Client.UI;
 using SoulboundBackend.Client.UI.Screens;
 using SoulboundBackend.Client.World;
+using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Client.World.Chunk;
 using SoulboundBackend.Client.World.EntitySystem;
 using SoulboundBackend.Common.Json;
@@ -130,7 +131,7 @@ namespace SoulboundBackend.Core {
 				if (!this.paused) {
 					StartFrame();
 
-					worldRenderer.Render(player?.position ?? level.GetWorldSpawnPoint());
+					worldRenderer.RenderView(player?.position ?? level.GetWorldSpawnPoint());
 
 					yield return endOfFrame;
 
@@ -188,6 +189,10 @@ namespace SoulboundBackend.Core {
 		[Obsolete]
 		public void OnChunkUnloaded(WorldChunk chunk) {
 			//entityManager.OnChunkUnloaded(chunk);
+		}
+
+		public void RenderRequest(BlockPos blockPos, BlockState? blockState) {
+			worldRenderer.RenderBlock(blockPos, blockState);
 		}
 
 		private void OnEscPressed() {

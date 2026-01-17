@@ -17,9 +17,10 @@ namespace SoulboundBackend.Client.World {
 
         public override string ToString() => $"bx:{x}, by:{y}";
 
-        public ChunkBlockPos ToChunkBlockPos(int chunkX) {
-            int chunkBlockX = Mathf.FloorToInt(this.x - (chunkX * Level.CHUNK_LENGTH));
-            return new ChunkBlockPos(chunkBlockX, this.y, chunkX);
+        public ChunkBlockPos ToChunk() {
+            int cx = Level.ToChunkX(this.x);
+            int chunkX = Level.ChunkXAt(cx);
+            return new ChunkBlockPos(cx, this.y, cx);
         }
 
         public static bool operator !=(BlockPos pos1, BlockPos pos2) => !(pos1 == pos2);

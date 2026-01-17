@@ -62,7 +62,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public virtual BlockState Place(ItemStack itemStack, BlockPos blockPos) {
 			return defaultState;
 		}
-		public virtual void OnNeighborStateChanged(BlockPos selfPos, BlockPos neighborPos, BlockState oldState, BlockState newState) {
+		public virtual void OnNeighborStateChanged(BlockPos selfPos, BlockPos neighborPos, BlockState? oldState, BlockState? newState) {
 		}
 		public abstract IEnumerable<ItemStack> GetDrops(BlockState blockState, BreakSource source);
 
