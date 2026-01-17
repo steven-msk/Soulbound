@@ -38,6 +38,10 @@ namespace SoulboundBackend.Client.World {
 			pos = currentView.allPositionsWithin;
 			while (pos.MoveNext()) {
 				BlockPos blockPos = new(pos.Current.x, pos.Current.y);
+				if (!level.IsInBounds(blockPos)) {
+					continue;
+				}
+
 				BlockState? blockState = level.BlockStateAt(blockPos);
 				TileEntity? tileEntity = level.TileEntityAt(blockPos);
 

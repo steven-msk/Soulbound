@@ -476,6 +476,10 @@ namespace SoulboundBackend.Client.World {
 			return FloorDiv(worldX, CHUNK_LENGTH);
 		}
 
+		public bool IsInBounds(BlockPos pos) {
+			return pos.y < WORLD_HEIGHT && pos.y >= WorldChunk.minY;
+		}
+
 		public int GetSurfaceY(int xpos) {
 			int chunkX = ChunkXAt(xpos);
 			int cx = ToChunkX(xpos);
