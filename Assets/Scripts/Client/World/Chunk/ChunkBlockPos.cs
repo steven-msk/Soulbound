@@ -20,8 +20,8 @@ namespace SoulboundBackend.Client.World.Chunk {
         public WorldChunk UnderlyingChunk(Level level) => level.ChunkAt(this.ToBlock());
 
         public static ChunkBlockPos FromBlockPos(BlockPos blockPos) {
-			int chunkX = Mathf.FloorToInt((float)blockPos.x / Level.CHUNK_LENGTH);
-			int localX = blockPos.x - chunkX * Level.CHUNK_LENGTH;
+			int chunkX = Level.ChunkXAt(blockPos.x);
+			int localX = Level.ToChunkX(blockPos.x);
 			return new ChunkBlockPos(localX, blockPos.y, chunkX);
 		}
 

@@ -20,7 +20,7 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 			entitiesByChunk[entity] = cx;
 
 			if (level.IsChunkLoaded(cx)) {
-				(entity as IChunkListener)?.OnEnteredChunk(level.ToChunk(cx));
+				(entity as IChunkListener)?.OnEnteredChunk(level.GetChunk(cx));
 			}
 		}
 
@@ -43,8 +43,8 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 				return;
 			}
 
-			listener.OnLeftChunk(level.ToChunk(currentCx));
-			listener.OnEnteredChunk(level.ToChunk(nextCx));
+			listener.OnLeftChunk(level.GetChunk(currentCx));
+			listener.OnEnteredChunk(level.GetChunk(nextCx));
 		}
 	}
 }

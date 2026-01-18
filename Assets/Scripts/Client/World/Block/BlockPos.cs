@@ -19,7 +19,7 @@ namespace SoulboundBackend.Client.World {
         public override string ToString() => $"bx:{x}, by:{y}";
 
         public ChunkBlockPos ToChunk() {
-            int cx = Level.ToChunkX(this.x);
+            int cx = Level.ToChunkX(x);
             int chunkX = Level.ChunkXAt(x);
             return new ChunkBlockPos(cx, this.y, chunkX);
         }

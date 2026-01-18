@@ -124,9 +124,10 @@ public class BlockPosTests {
 
 		var chunkPos = blockPos.ToChunk();
 
-		int expectedLocalX = blockPos.x - chunkX * Level.CHUNK_LENGTH;
+        int expectedLocalX = blockPos.x - chunkX * Level.CHUNK_LENGTH;
 		Assert.AreEqual(expectedLocalX, chunkPos.x);
 		Assert.AreEqual(blockPos.y, chunkPos.y);
-		Assert.AreEqual(chunkX, chunkPos.chunkX);
+        Assert.AreEqual(chunkX, chunkPos.chunkX);
+        Assert.AreEqual(chunkX, Level.ChunkXAt(blockPos.x));
 	}
 }

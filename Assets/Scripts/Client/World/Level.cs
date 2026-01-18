@@ -428,44 +428,29 @@ namespace SoulboundBackend.Client.World {
 			return BlockStateAt(adjacentPos);
 		}
 
-		public static int ChunkXAt(Vector2 worldPos) => Mathf.FloorToInt(worldPos.x / CHUNK_LENGTH);
-
+		public static int ChunkXAt(Vector2 worldPos) => ChunkXAt(worldPos.x);
+		public static int ChunkXAt(int x) => ChunkXAt((float)x);
 		public static int ChunkXAt(float x) => Mathf.FloorToInt(x / CHUNK_LENGTH);
 
-		public WorldChunk? ChunkAt(BlockPos blockPos) { 
-			return generatedChunks!.GetValueOrDefault(ChunkXAt((Vector2)blockPos), null);
-		}
+		public static int ToWorldX(int cx, int chunkX) => cx + chunkX * CHUNK_LENGTH;
+		public static int ToChunkX(int x) => x - ChunkXAt(x) * CHUNK_LENGTH;
 
 		public WorldChunk? ChunkAt(int xpos) => ChunkAt(new BlockPos(xpos, 0));
+		public WorldChunk? ChunkAt(BlockPos blockPos) { 
+			return generatedChunks!.GetValueOrDefault(ChunkXAt(blockPos.x), null);
+		}
 
+		[Obsolete]
 		public BlockPos ToBlockPos(Vector2 worldPos) {
 			Vector2Int intPos = (Vector2Int)gridContext.grid.WorldToCell(worldPos);
 			return new BlockPos(intPos.x, intPos.y);
 		}
 
-		public WorldChunk? ToChunk(int chunkX) {
+		public WorldChunk? GetChunk(int chunkX) {
 			if (generatedChunks.TryGetValue(chunkX, out var chunk)) {
 				return chunk;
 			}
 			return null;
-		}
-
-		public ChunkBlockPos ToChunkPos(Vector2 worldPos) {
-			BlockPos blockPos = ToBlockPos(worldPos);
-			return ChunkBlockPos.FromBlockPos(blockPos);
-		}
-
-		public static int ToWorldX(int chunkBlockX, int chunkX) => chunkBlockX + chunkX * CHUNK_LENGTH;
-
-		public static int ToChunkX(int worldX) => worldX - ChunkXAt(worldX) * CHUNK_LENGTH;
-
-		public static int NormalizeChunkX(int x) {
-			return (x % CHUNK_LENGTH + CHUNK_LENGTH) % CHUNK_LENGTH;
-		}
-
-		public static int ChunkXFromRelativeBlock(int chunkBlockX, int chunkX) {
-			int worldX = ToWorldX(chunkBlockX, chunkX);
-			return FloorDiv(worldX, CHUNK_LENGTH);
 		}
 
 		public static bool IsInBounds(BlockPos pos) {

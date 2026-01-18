@@ -83,8 +83,7 @@ namespace Assets.Scripts.Client.World.Biome {
 				int y = kvp.Key;
 				List<int> xs = kvp.Value;
 				for (int x = xs.Min(); x <= xs.Max(); x++) {
-					int cx = Level.ChunkXFromRelativeBlock(x, chunk.xpos);
-					ChunkBlockPos pos = new(Level.NormalizeChunkX(x), y, cx);
+					ChunkBlockPos pos = new(Level.ToChunkX(x), y, Level.ChunkXAt(x));
 					level.SetBlockOrPend(pos, Blocks.leaves.defaultState);
 				}
 			}
