@@ -412,8 +412,8 @@ Based on the dependency graph, this could be an optimal order:
 5. [Entity system](#6-entity-system) >| *components wil be handled during productions*
 6. [Block system](#8-block-system) >| *TileEntity serialization and lifetime aspects TBD when working on the level system*
 7. [Chunk generation](#9-chunk-generation)* >| *Proper world generation is delayed until further notice*
-11. [World rendering](#10-world-rendering) <-
-12. [Level system](#19-level-system)
+11. [World rendering](#10-world-rendering) >| *Some performance issues still persist, but will be tackled during prod*
+12. [Level system](#19-level-system) <-
 13. [Physics system](#7-physics-system) (universal overhaul)
 14. [UI Core layer & navigation system](#13-ui-systems-overall)
 15. [Tooltips](#14-tooltips)

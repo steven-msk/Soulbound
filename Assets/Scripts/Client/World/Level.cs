@@ -330,7 +330,7 @@ namespace SoulboundBackend.Client.World {
 		}
 
 		public void SetBlock(ChunkBlockPos chunkBlockPos, BlockState? blockState) {
-			SetBlock(chunkBlockPos.ToBlockPos(), blockState);
+			SetBlock(chunkBlockPos.ToBlock(), blockState);
 		}
 
 		public void SetBlockOrPend(ChunkBlockPos chunkBlockPos, BlockState? blockState) {
@@ -475,7 +475,10 @@ namespace SoulboundBackend.Client.World {
 		public int GetSurfaceY(int xpos) {
 			int chunkX = ChunkXAt(xpos);
 			int cx = ToChunkX(xpos);
-			return chunkGenData[chunkX].surfacePoints[cx];
+
+			return chunkGenData.TryGetValue(chunkX, out var value)
+				? value.surfacePoints[cx]
+				: 0;
 		}
 
 		public int GetSurfaceAirY(int xpos) => GetSurfaceY(xpos) + 1;

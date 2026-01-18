@@ -259,7 +259,7 @@ namespace SoulboundBackend.Client {
 			float dist = Vector2.Distance(worldPos, this.center);
 			return dist <= MaxBlockReach 
 				&& !level.GetTilesCovered(playerPhysics.Collider.bounds)
-						.Contains(BlockPos.FromWorld(worldPos, level));
+						 .Contains((BlockPos)worldPos);
 		}
 
 		void IEntitySpawnable<PlayerSpawnData>.ApplySpawnData(PlayerSpawnData spawnData) {

@@ -13,14 +13,15 @@ namespace SoulboundBackend.Client.World {
             this.y = y;
         }
 
+        [Obsolete]
         public static BlockPos FromWorld(Vector2 worldPos, Level level) => level.ToBlockPos(worldPos);
 
         public override string ToString() => $"bx:{x}, by:{y}";
 
         public ChunkBlockPos ToChunk() {
             int cx = Level.ToChunkX(this.x);
-            int chunkX = Level.ChunkXAt(cx);
-            return new ChunkBlockPos(cx, this.y, cx);
+            int chunkX = Level.ChunkXAt(x);
+            return new ChunkBlockPos(cx, this.y, chunkX);
         }
 
         public static bool operator !=(BlockPos pos1, BlockPos pos2) => !(pos1 == pos2);

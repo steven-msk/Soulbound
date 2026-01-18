@@ -1,5 +1,6 @@
 ﻿using SoulboundBackend.Common.Json;
 using SoulboundBackend.Core;
+using System;
 using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
 
@@ -16,7 +17,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 			this.chunkX = chunkX;
 		}
 
-        public WorldChunk UnderlyingChunk(Level level) => level.ChunkAt(this.ToBlockPos());
+        public WorldChunk UnderlyingChunk(Level level) => level.ChunkAt(this.ToBlock());
 
         public static ChunkBlockPos FromBlockPos(BlockPos blockPos) {
 			int chunkX = Mathf.FloorToInt((float)blockPos.x / Level.CHUNK_LENGTH);
@@ -24,7 +25,9 @@ namespace SoulboundBackend.Client.World.Chunk {
 			return new ChunkBlockPos(localX, blockPos.y, chunkX);
 		}
 
-		public static ChunkBlockPos FromWorld(Vector2 position, Level level) => FromBlockPos(BlockPos.FromWorld(position, level));
+		public static ChunkBlockPos FromWorld(Vector2 worldPos) {
+			return ((BlockPos)worldPos).ToChunk();
+		}
 
 		public static bool operator !=(ChunkBlockPos pos1, ChunkBlockPos pos2) => !(pos1 == pos2);
 
@@ -36,7 +39,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 
 		public override string ToString() => $"cx:{x}, cy:{y}, c:{chunkX}";
 
-		public BlockPos ToBlockPos() => new BlockPos(this.x + this.chunkX * Level.CHUNK_LENGTH, this.y);
+		public BlockPos ToBlock() => new BlockPos(this.x + this.chunkX * Level.CHUNK_LENGTH, this.y);
 
 		public int WorldYToIndex() => WorldYToIndex(this.y);
 

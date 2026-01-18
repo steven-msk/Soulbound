@@ -26,7 +26,7 @@ public sealed class Main : MonoBehaviour {
 	private static Main instance;
 	private static Soulbound soulbound;
 
-    private void Awake() => instance = this;
+	private void Awake() => instance = this;
 
 	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
 	public static void StartWorld() {

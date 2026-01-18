@@ -60,7 +60,7 @@ public class ChunkBlockPosTests {
         const int CHUNK_LENGTH = Level.CHUNK_LENGTH;
         var pos = new ChunkBlockPos(5, 10, 2);
 
-        var worldBlock = pos.ToBlockPos();
+        var worldBlock = pos.ToBlock();
 
         Assert.AreEqual(5 + 2 * CHUNK_LENGTH, worldBlock.x);
         Assert.AreEqual(10, worldBlock.y);
@@ -97,20 +97,8 @@ public class ChunkBlockPosTests {
 		Level level = new Level(LevelGridContext.FromRuntimePrefabs(), 0);
 
 		var worldPos = new Vector2(18.5f, 6.2f);
-		var chunkPos = ChunkBlockPos.FromWorld(worldPos, level);
+		var chunkPos = ChunkBlockPos.FromWorld(worldPos);
 
 		Assert.AreEqual(Mathf.FloorToInt(worldPos.y), chunkPos.y);
 	}
-
-	//[Test]
-	//public void UnderlyingChunk_ReturnsExpectedChunk() {
-	//	Level level = new Level(LevelGridContext.FromRuntimePrefabs(), 0);
- //       level.BootstrapWorld(null);
-
- //       var pos = new ChunkBlockPos(2, 3, 1);
-	//	var chunk = pos.UnderlyingChunk(level);
-
-	//	Assert.IsNotNull(chunk);
-	//	Assert.AreEqual(1, chunk.xpos);
-	//}
 }

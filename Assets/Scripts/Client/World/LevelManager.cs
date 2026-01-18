@@ -133,10 +133,9 @@ namespace SoulboundBackend.Core {
 
 					worldRenderer.RenderView(player?.position ?? level.GetWorldSpawnPoint());
 
-					yield return endOfFrame;
-
 					EndFrame();
 				}
+				yield return endOfFrame;
 			}
 		}
 

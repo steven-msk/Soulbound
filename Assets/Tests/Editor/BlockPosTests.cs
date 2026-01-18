@@ -119,8 +119,8 @@ public class BlockPosTests {
 
 	[Test]
 	public void ToChunkBlockPos_ComputesRelativeToChunk() {
-		var blockPos = new BlockPos(20, 15);
-		int chunkX = 1;
+		var blockPos = new BlockPos(-40, 15);
+		int chunkX = -2;
 
 		var chunkPos = blockPos.ToChunk();
 
@@ -128,16 +128,5 @@ public class BlockPosTests {
 		Assert.AreEqual(expectedLocalX, chunkPos.x);
 		Assert.AreEqual(blockPos.y, chunkPos.y);
 		Assert.AreEqual(chunkX, chunkPos.chunkX);
-	}
-
-	[Test]
-	public void FromWorld_UsesLevelConversion() {
-		Level level = new Level(LevelGridContext.FromRuntimePrefabs(), 0);
-
-		var worldPos = new Vector2(12.3f, 7.7f);
-		var blockPos = BlockPos.FromWorld(worldPos, level);
-
-		Assert.AreEqual(Mathf.FloorToInt(worldPos.x), blockPos.x);
-		Assert.AreEqual(Mathf.FloorToInt(worldPos.y), blockPos.y);
 	}
 }
