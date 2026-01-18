@@ -7,22 +7,25 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SoulboundBackend.Client.UI.Screens {
-	[PROTOTYPICAL]
-	public class Screen : ChildReferenceContainer, IDisposable {
+	public abstract class Screen {
+
+		public virtual ScreenObject BuildObject(Transform rootParent) {
+			GameObject obj = new("Screen Object");
+			obj.transform.parent = rootParent;
+
+			ScreenObject screenObject = obj.AddComponent<ScreenObject>();
+			screenObject.Init(this);
+
+			return screenObject;
+		}
+
 		public virtual void OnShow() {
-			gameObject.SetActive(true);
 		}
 
 		public virtual void OnHide() {
-			gameObject.SetActive(false);
 		}
 
-		public virtual void Dispose() {
-			Destroy(gameObject);
-		}
-		public new void RegisterChildReference(ChildReference reference) {
-			UnityEngine.Debug.Log("register child in screen: " + reference.gameObject.name);
-			childMap.RegisterChildReference(reference);
+		public virtual void OnDispose() {
 		}
 	}
 }

@@ -23,6 +23,7 @@ namespace SoulboundBackend.Core {
 	public sealed class Soulbound {
 		public static Soulbound instance { get; private set; } = null!;
 		private readonly GameConfig config;
+		private readonly UIHandler uiHandler;
 		public readonly WorldManager worldManager;
 		public readonly Settings settings;
 		public readonly PlayerInputActions playerInputActions;
@@ -47,15 +48,28 @@ namespace SoulboundBackend.Core {
 			ISerializer<WorldDump> worldSerializer = new JsonSerializer<WorldDump>(globalJsonSettings);
 			SerializationPipeline<WorldDump> worldSerializationPipeline = new(worldSerializer);
 			this.worldManager = new WorldManager(new WorldSerializationService(saveStrategy, worldSerializationPipeline));
+			this.uiHandler = new UIHandler(GameObject.FindFirstObjectByType<Canvas>());
+		}
+
+		public void Run() {
+
+			// this will be removed later
+			// as the play tests will explode in time
+			// if the player spawns automatically
 			worldManager.onWorldLoaded += (levelManager, dump) => {
 				levelManager.SpawnPlayer(dump?.player);
 			};
+
+			uiHandler.SetScreen(new TitleScreen());
 		}
 
 		public void Prototype_LoadDevWorld() {
 			string world = config.dev.loadDevWorldFromSave
 				? config.dev.devWorld
 				: $"altw_{Guid.NewGuid()}";
+
+			uiHandler.DisposeScreenStack();
+
 			worldManager.LoadWorld(world,
 				GameObject.FindFirstObjectByType<SceneContext>,
 				() => SceneManager.LoadScene("WorldScene")
@@ -65,6 +79,8 @@ namespace SoulboundBackend.Core {
 		public void OnApplicationQuit() {
 			settings.Save();
 		}
+
+		public UIHandler GetUIHandler() => uiHandler;
 
 		[PROTOTYPICAL]
 		public Level? GetActiveLevel() {

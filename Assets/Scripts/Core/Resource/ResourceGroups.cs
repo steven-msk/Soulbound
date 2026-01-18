@@ -18,7 +18,7 @@ namespace SoulboundBackend.Core.Resource {
 				public static void Register() => ResourceManager.RegisterGroupDefinition<Prefabs, GameObject>(instance);
 				public string address => $"{Runtime.parentAddress}prefabs/";
 				public string scriptableObjectName => "runtimeGroup";
-            }
+			}
 		}
 
 		public static class Items {
@@ -29,7 +29,7 @@ namespace SoulboundBackend.Core.Resource {
 				public static void Register() => ResourceManager.RegisterGroupDefinition<Icons, Sprite>(instance);
 				public string address => Items.parentAddress + "icons/";
 				public string scriptableObjectName => "iconsGroup";
-            }
+			}
 		}
 
 		public sealed class Tiles : IResourceGroupDefinition<TileBase> {
@@ -37,20 +37,28 @@ namespace SoulboundBackend.Core.Resource {
 			public static void Register() => ResourceManager.RegisterGroupDefinition<Tiles, TileBase>(instance);
 			public string address => "tiles/";
 			public string scriptableObjectName => "tilesGroup";
-        }
+		}
 
 		public sealed class Prefabs : IResourceGroupDefinition<GameObject> {
 			public static readonly Prefabs instance = new();
 			public static void Register() => ResourceManager.RegisterGroupDefinition<Prefabs, GameObject>(instance);
 			public string address => "prefabs/";
 			public string scriptableObjectName => "prefabsGroup";
-        }
+		}
 
 		public sealed class Fonts : IResourceGroupDefinition<TMP_FontAsset> {
 			public static readonly Fonts instance = new();
 			public static void Register() => ResourceManager.RegisterGroupDefinition<Fonts, TMP_FontAsset>(instance);
 			public string address => "fonts/";
 			public string scriptableObjectName => "fontsGroup";
-        }
+		}
+
+		public sealed class UI : IResourceGroupDefinition<GameObject> {
+			public static readonly UI instance = new();
+			public static void Register() => ResourceManager.RegisterGroupDefinition<UI, GameObject>(instance);
+			public string address => "ui/";
+			public string scriptableObjectName => "uiGroup";
+
+		}
 	}
 }

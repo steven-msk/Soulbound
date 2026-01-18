@@ -1,5 +1,6 @@
 ﻿using SoulboundBackend.Client.UI.Screens;
 using SoulboundBackend.Core;
+using SoulboundBackend.Core.Resource;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,20 +11,25 @@ using UnityEngine.UI;
 using Screen = SoulboundBackend.Client.UI.Screens.Screen;
 
 namespace SoulboundBackend.Client.UI {
-	public class TitleScreen : IScreenBuilder {
+	public class TitleScreen : Screen {
 		private readonly UIManager uiManager;
 
 		public TitleScreen() {
 			this.uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
 		}
 
-		public Screen GetScreen() {
-			Screen screen = uiManager.screenChildMap.GetChild("TitleScreen").GetComponent<Screen>();
+		public override ScreenObject BuildObject(Transform rootParent) {
+			ScreenObject screen = base.BuildObject(rootParent);
 
-			var enterButton = screen.GetChildComponent<Button>("WorldEnter");
-			enterButton.onClick.RemoveAllListeners();
-			enterButton.onClick.AddListener(Soulbound.instance.Prototype_LoadDevWorld);
+			// this makes no sense but its the only way its parenting it properly
+			var prefab = ResourceManager.Get<GameObject, ResourceGroups.UI>("WorldEnter");
+			var obj = GameObject.Instantiate(prefab, rootParent);
+			obj.transform.SetParent(screen.transform);
 
+			var b = obj.GetComponent<Button>();
+			b.onClick.AddListener(Soulbound.instance.Prototype_LoadDevWorld);
+
+			screen.GetChildMap().AddChild(obj);
 			return screen;
 		}
 	}

@@ -62,6 +62,7 @@ namespace SoulboundBackend.Core {
 			this.container = container;
 			this.worldManager = container.Resolve<WorldManager>();
 			this.worldCanvas = container.Resolve<Canvas>();
+			Soulbound.instance.GetUIHandler().SetCanvas(worldCanvas);
 
 			inputMappings = container.Resolve<PlayerInputActions>();
 			InputActionMap playerActionMap = inputMappings.asset.FindActionMap("Player");
@@ -185,7 +186,7 @@ namespace SoulboundBackend.Core {
 		}
 
 		private void OnEscPressed() {
-			if (UIManager.OnEscPressed()) {
+			if (!Soulbound.instance.GetUIHandler().GetScreenManager().OnEscPressed()) {
 				TogglePause();
 			}
 		}
@@ -194,7 +195,10 @@ namespace SoulboundBackend.Core {
 			this.paused = !this.paused;
 			Time.timeScale = this.paused ? 0f : 1f;
 			inputHandler.PauseInputs(this.paused);
-			UIManager.SetScreen(paused ? new GamePausedScreen().GetScreen() : null);
+			Soulbound.instance.GetUIHandler().SetScreen(paused
+				? new GamePausedScreen()
+				: null);
+			//UIManager.SetScreen(paused ? new GamePausedScreen().GetScreen() : null);
 		}
 
 		public WorldDump CreateDump() {

@@ -37,8 +37,7 @@ public sealed class Main : MonoBehaviour {
 		}
 #endif
 		soulbound = new Soulbound(instance.gameConfig);
-		var uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
-		uiManager.SetScreen(new TitleScreen());
+		soulbound.Run();
 	}
 
 	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -49,4 +48,5 @@ public sealed class Main : MonoBehaviour {
 	private void OnApplicationQuit() {
 		soulbound.OnApplicationQuit();
 	}
+
 }

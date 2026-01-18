@@ -13,7 +13,7 @@ using UnityEngine.UI;
 
 namespace SoulboundBackend.Client.UI.Screens {
 	[PROTOTYPICAL]
-	public sealed class GamePausedScreen : IScreenBuilder {
+	public sealed class GamePausedScreen : Screen {
 		private readonly Canvas canvas;
 		private readonly UIManager uiManager;
 
@@ -22,22 +22,33 @@ namespace SoulboundBackend.Client.UI.Screens {
 			this.uiManager = canvas.GetComponent<UIManager>();
 		}
 
-		public Screen GetScreen() {
-			GameObject screenObject = GameObject.Instantiate(ResourceManager.GetRuntimePrefab("GamePausedMenu"), canvas.transform);
-			Screen screen = screenObject.GetComponent<Screen>();
-			screen.BroadcastMessage("OnRegisterChildrenReferences", SendMessageOptions.DontRequireReceiver);
+		// prototypical; its only made to work with the ui backend rework
+		[PROTOTYPICAL]
+		public override ScreenObject BuildObject(Transform rootParent) {
+			ScreenObject screen =  base.BuildObject(rootParent);
+			ChildMap childMap = screen.GetChildMap();
 
-			Button settingsButton = screen.GetChild("SettingsButton").GetComponent<Button>();
-			settingsButton.onClick.RemoveAllListeners();
-			settingsButton.onClick.AddListener(() => uiManager.SetScreen<SettingsScreen>());
+			var title = GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.UI>("GameMenuTitle"), rootParent);
+			title.transform.SetParent(screen.transform);
+			childMap.AddChild(title);
 
-			Button resumeButton = screen.GetChild("ResumeButton").GetComponent<Button>();
-			resumeButton.onClick.RemoveAllListeners();
-			resumeButton.onClick.AddListener(Soulbound.instance.GetActiveLevelManager().TogglePause);
 
-			Button quitButton = screen.GetChild("QuitWorld").GetComponent<Button>();
-			quitButton.onClick.RemoveAllListeners();
-			quitButton.onClick.AddListener(() => CoroutineRunner.GetInstance().StartCoroutine(QuitWorld()));
+			var container = GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.UI>("ButtonContainer"), rootParent);
+			container.transform.SetParent(screen.transform);
+			childMap.AddChild(container);
+
+
+			var settingsButton = GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.UI>("SettingsButton"), rootParent);
+			settingsButton.transform.SetParent(container.transform);
+			childMap.AddChild(settingsButton);
+
+			var resumeButton = GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.UI>("ResumeButton"), rootParent);
+			resumeButton.transform.SetParent(container.transform);
+			childMap.AddChild(resumeButton);
+
+			var quitButton = GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.UI>("QuitWorld"), rootParent);
+			quitButton.transform.SetParent(container.transform);
+			childMap.AddChild(quitButton);
 
 			return screen;
 		}
@@ -52,8 +63,10 @@ namespace SoulboundBackend.Client.UI.Screens {
 			yield return new WaitUntil(() => async.isDone);
 			Time.timeScale = 1f;
 
-			var uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
-			uiManager.SetScreen(new TitleScreen());
+			//var uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
+			//uiManager.SetScreen(new TitleScreen());
+			Soulbound.instance.GetUIHandler().SetCanvas(UnityEngine.Object.FindFirstObjectByType<Canvas>());
+			Soulbound.instance.GetUIHandler().SetScreen(new TitleScreen());
 		}
 	}
 }

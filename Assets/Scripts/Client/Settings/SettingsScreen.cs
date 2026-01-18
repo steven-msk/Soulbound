@@ -13,17 +13,12 @@ namespace SoulboundBackend.Client.UI.Screens {
 	public class SettingsScreen : Screen {
 		private SettingEntryGroup entryGroup;
 
-		public override void OnShow() {
-			base.OnShow();
-			entryGroup = GetComponentInChildren<SettingEntryGroup>();
-			entryGroup.AddEntry(Settings.floatSetting);
-			entryGroup.AddEntry(Settings.floatSetting_2);
-			entryGroup.AddEntry(KeybindMappings.jump);
-		}
-
-		public override void Dispose() {
-			// intended overriding, do not delete
-		}
+		//public override void OnShow() {
+		//	entryGroup = GetComponentInChildren<SettingEntryGroup>();
+		//	entryGroup.AddEntry(Settings.floatSetting);
+		//	entryGroup.AddEntry(Settings.floatSetting_2);
+		//	entryGroup.AddEntry(KeybindMappings.jump);
+		//}
 
 		//public override void OnHide() {
 		//	base.OnHide();

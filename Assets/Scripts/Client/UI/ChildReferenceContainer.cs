@@ -8,12 +8,13 @@ using UnityEngine;
 
 namespace SoulboundBackend.Client.UI {
 	[DisallowMultipleComponent]
+	[Obsolete]
 	public class ChildReferenceContainer : MonoBehaviour {
-		protected ChildReferenceMap childMap = new();
+		protected ChildMap childMap = new();
 
 		public virtual void RegisterChildReference(ChildReference reference) {
 			UnityEngine.Debug.Log("register child: " + reference.gameObject.name);
-			childMap.RegisterChildReference(reference);
+			//childMap.RegisterChildReference(reference);
 		}
 
 		public void BroadcastRegisterMessage() {
@@ -22,12 +23,13 @@ namespace SoulboundBackend.Client.UI {
 
 		public void BruteForceRegisterAllChildren() {
 			foreach (var childReference in GetComponentsInChildren<ChildReference>(true)) {
-				childReference.OnRegisterChildrenReferences();
+				//childReference.OnRegisterChildrenReferences();
 			}
 		}
 
 		public GameObject GetChild(string accessor) {
-			return childMap.GetChild(accessor);
+			//return childMap.GetChild(accessor);
+			return null;
 		}
 
 		public T GetChildComponent<T>(string accessor) where T : Component {
