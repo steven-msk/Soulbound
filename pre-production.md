@@ -39,6 +39,7 @@ The exact cause of this behavior is currently unknown, and there is no reliable 
 | **Serialization** | ⚙️ Prototype | Most of the data is saved as json, which is memory-heavy and time consuming, at the cost of human readability and maintainability. Will be replaced with a more obfuscated approach later in production. |
 | **UI Management** | ⚠️ Stable, but Prototypical | Many of he current features need further improvement and/or refactor. | 
 | **Action Request System** | ⚙️ Prototype | Current implementation lives in InputHandler, and is not respecting separation of concerns. Multiple organization related problems are raised alongside. |
+| **Resource (assets) system** | ⚠️ Extremely unreliable | Current ResourceManager implementation uses Resources as the processor. This is highly inefficient and will be replaced with AssetBundles and Addressables before prod. |
 
 ---
 
@@ -398,9 +399,13 @@ Status: ⚙️ Prototype (implemented poorly, not respecting separation of conce
 - Internal timing system
 - Any action systems that happen concurrently
 
-#### 19. Level system
+## 19. Level system
 Status: ⚙️ Prototype (currently very limiting)
 - General aspects of the level (contexts, events, block, entity management, serialization)
+
+## 20. Resource system (Assets)
+Status: ⚠️ Needs entire rework
+- Everything related to asset usage
 
 ## Recommended Production Order (Top to bottom)
 Based on the dependency graph, this could be an optimal order:
@@ -414,6 +419,7 @@ Based on the dependency graph, this could be an optimal order:
 7. [Chunk generation](#9-chunk-generation)* >| *Proper world generation is delayed until further notice*
 11. [World rendering](#10-world-rendering) >| *Some performance issues still persist, but will be tackled during prod*
 12. [Level system](#19-level-system) <-
+13. [Resource (asset) system](#20-resource-system-assets) <-
 13. [Physics system](#7-physics-system) (universal overhaul)
 14. [UI Core layer & navigation system](#13-ui-systems-overall)
 15. [Tooltips](#14-tooltips)

@@ -1,4 +1,6 @@
-﻿using SoulboundBackend.Common.Logging;
+﻿using SoulboundBackend.Common;
+using SoulboundBackend.Common.Logging;
+using System;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
@@ -9,6 +11,8 @@ using Logger = SoulboundBackend.Common.Logging.Logger;
 namespace SoulboundBackend.Core.Resource {
 
 	[CreateAssetMenu(menuName = "Resource Group")]
+	[PROTOTYPICAL]
+	[Obsolete]
 	public class ResourceGroup : ScriptableObject {
 		private static readonly Logger logger = Logger.CreateInstance();
 		public string groupAddress = "";

@@ -1,4 +1,5 @@
 ﻿using SoulboundBackend.Client.Input;
+using SoulboundBackend.Common;
 using SoulboundBackend.Common.Logging;
 using SoulboundBackend.Core.Bootstrap;
 using System;
@@ -12,6 +13,9 @@ using Logger = SoulboundBackend.Common.Logging.Logger;
 #nullable enable
 
 namespace SoulboundBackend.Core.Resource {
+    // see pre-production.md
+    [PROTOTYPICAL]
+    [Obsolete]
 	public static class ResourceManager {
         private static readonly Logger logger = Logger.CreateInstance();
         public static bool groupsPreloaded { get; private set; } = false;
