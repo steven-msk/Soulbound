@@ -1,6 +1,7 @@
 ﻿using SoulboundBackend.Client.Combat;
 using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.UI.Tooltip;
+using SoulboundBackend.Core.AssetManagement;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -12,7 +13,7 @@ using UnityEngine;
 public sealed class WeaponItem_test : Item, IAttackSourceProvider {
 	public override string name => "weaponItem_test";
 
-	public override ItemAspect aspect => ItemAspectRegistry.Get(this, () => ItemAspect.Simple("fruit_icon"));
+	public override ItemAspect aspect => ItemAspectRegistry.Get(this, () => ItemAspect.Simple(new AssetKey("fruit_icon")));
 
 	public override int maxStackSize => 1;
 

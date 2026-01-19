@@ -67,7 +67,7 @@ namespace SoulboundBackend.Client.World {
 		private void RenderBlock(BlockState state, TileEntity? tileEntity, BlockPos pos, Tilemap tilemap) {
 			
 			var tile = state.block != Blocks.air
-				? Core.Resource.ResourceManager.Get<TileBase, ResourceGroups.Tiles>(state.block.tileKey?.key)
+				? Core.Resource.ResourceManager.Get<TileBase, ResourceGroups.Tiles>(state.block.tileKey.address)
 				: null!;
 
 			tilemap.SetTile((Vector3Int)pos, tile);

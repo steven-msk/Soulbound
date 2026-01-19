@@ -2,6 +2,7 @@
 using SoulboundBackend.Client.Stats;
 using SoulboundBackend.Client.UI.Tooltip;
 using SoulboundBackend.Common;
+using SoulboundBackend.Core.AssetManagement;
 using System;
 using System.Collections.Generic;
 
@@ -13,7 +14,7 @@ public sealed class ArmorItem_test : ArmorItem {
 	public override string name => "armorItem_test";
 
 	public override ItemAspect aspect => _aspect;
-	private readonly ItemAspect _aspect = ItemAspect.Simple("chestplate_overlay");
+	private readonly ItemAspect _aspect = ItemAspect.Simple(new AssetKey("chestplate_overlay"));
 
 	public override int maxStackSize => 1;
 

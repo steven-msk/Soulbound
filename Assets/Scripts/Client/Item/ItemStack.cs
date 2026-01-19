@@ -48,7 +48,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 			GameObject? worldPrefab = item.aspect.worldPrefabSupplier?.Invoke();
 			if (item.aspect.worldPrefabSupplier == null) {
 				logger.LogError(null, "No world prefab supplier for item {}. Using icon fallback.", item);
-				worldPrefab = WorldPrefabFactory.FromIcon(item.aspect.icon).Invoke();
+				worldPrefab = WorldPrefabFactory.GetInstantiator().Invoke();
 			}
 			GameObject droppedItem = worldPrefab!;
 			DroppedItem pickup = droppedItem.GetComponent<DroppedItem>() ?? droppedItem.AddComponent<DroppedItem>();

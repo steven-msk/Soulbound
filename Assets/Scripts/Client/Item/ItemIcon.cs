@@ -1,14 +1,14 @@
-﻿using UnityEngine;
+﻿using SoulboundBackend.Core.AssetManagement;
+using System;
+using UnityEngine;
 
 namespace SoulboundBackend.Client.ItemSystem {
-	public class ItemIcon {
-		public Sprite sprite { get; }
-		public float intendedPixelsPerUnit { get; }
+	public record ItemIcon {
+		public readonly AssetKey spriteKey;
+		public readonly float intendedPixelsPerUnit;
 
-		public float importedPixelsPerUnit => sprite.pixelsPerUnit;
-
-		public ItemIcon(Sprite sprite, float pixelsPerUnit) {
-			this.sprite = sprite;
+		public ItemIcon(AssetKey spriteKey, float pixelsPerUnit) {
+			this.spriteKey = spriteKey;
 			this.intendedPixelsPerUnit = pixelsPerUnit;
 		}
 	}

@@ -2,6 +2,7 @@
 using SoulboundBackend.Client.Stats;
 using SoulboundBackend.Client.UI.Tooltip;
 using SoulboundBackend.Common;
+using SoulboundBackend.Core.AssetManagement;
 using System;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -10,7 +11,7 @@ using UnityEngine;
 public sealed class ConsumableStatItem_test : ConsumableStatItem {
 	public override string name => "ConsumableStatItem_test";
 
-	public override ItemAspect aspect => ItemAspectRegistry.Get(this, () => ItemAspect.Simple("fruit_icon"));
+	public override ItemAspect aspect => ItemAspectRegistry.Get(this, () => ItemAspect.Simple(new AssetKey("fruit_icon")));
 
 	public override int maxStackSize => Item.DEFAULT_MAX_STACK;
 

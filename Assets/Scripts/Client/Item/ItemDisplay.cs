@@ -22,7 +22,10 @@ namespace SoulboundBackend.Client.ItemSystem {
 				itemStack = value;
 
 				// prototypical - will be implemented correctly when visuals system is improved
-				gameObject.GetComponent<Image>().sprite = itemStack.item.aspect.icon.sprite;
+
+				//gameObject.GetComponent<Image>().sprite = itemStack.item.aspect.icon.sprite;
+				var sprite = ResourceManager.Get<Sprite, ResourceGroups.Items.Icons>(itemStack.item.aspect.icon.spriteKey.address);
+				gameObject.GetComponent<Image>().sprite = sprite;
 			}
 		}
 		public Item? item => stack?.item;

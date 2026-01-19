@@ -5,6 +5,7 @@ using SoulboundBackend.Client.UI.Storage;
 using SoulboundBackend.Client.UI.Tooltip;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core;
+using SoulboundBackend.Core.AssetManagement;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ using System.Linq;
 public sealed class StatItem_test : StatItem {
 	public override string name => "StatItem_test";
 
-	public override ItemAspect aspect => ItemAspectRegistry.Get(this, () => ItemAspect.Simple("gem_icon"));
+	public override ItemAspect aspect => ItemAspectRegistry.Get(this, () => ItemAspect.Simple(new AssetKey("gem_icon")));
 
 	public override int maxStackSize => Item.CustomMaxStack(128);
 

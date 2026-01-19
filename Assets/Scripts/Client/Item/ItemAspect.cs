@@ -1,4 +1,5 @@
 ﻿using SoulboundBackend.Client.ItemSystem;
+using SoulboundBackend.Core.AssetManagement;
 using SoulboundBackend.Core.Resource;
 using System;
 using UnityEngine;
@@ -12,12 +13,8 @@ public record ItemAspect {
 		this.worldPrefabSupplier = worldPrefabSupplier;
 	}
 
-	public static ItemAspect Simple(string iconSpriteName, int ppu = 100) {
-		ItemIcon icon = new(GetIconSprite(iconSpriteName), ppu);
-		return new ItemAspect(icon, WorldPrefabFactory.FromIcon(icon));
-	}
-
-	public static Sprite GetIconSprite(string spriteName) {
-		return ResourceManager.Get<Sprite, ResourceGroups.Items.Icons>(spriteName);
+	public static ItemAspect Simple(AssetKey spriteKey, int ppu = 100) {
+		ItemIcon icon = new(spriteKey, ppu);
+		return new ItemAspect(icon, WorldPrefabFactory.GetInstantiator());
 	}
 }

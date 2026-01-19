@@ -3,6 +3,7 @@ using SoulboundBackend.Client.World.Chunk;
 using SoulboundBackend.Client.World.EntitySystem.SpawnData;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core;
+using SoulboundBackend.Core.Resource;
 using System;
 using UnityEditor.Profiling;
 using UnityEngine;
@@ -43,9 +44,10 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 		[PROTOTYPICAL]
 		private void ApplyIcon(ItemIcon icon) {
 			SpriteRenderer spriteRenderer = ComponentUtility.GetOrAddComponent<SpriteRenderer>(gameObject);
-			spriteRenderer.sprite = icon.sprite;
+			var sprite = ResourceManager.Get<Sprite, ResourceGroups.Items.Icons>(itemStack.item.aspect.icon.spriteKey.address);
+			spriteRenderer.sprite = sprite;
 
-			float scale = (float)icon.importedPixelsPerUnit / icon.intendedPixelsPerUnit;
+			float scale = (float)sprite.pixelsPerUnit / icon.intendedPixelsPerUnit;
 			transform.localScale = new Vector3(scale, scale, scale);
 
 			Rigidbody2D rigidbody = gameObject.AddComponent<Rigidbody2D>();

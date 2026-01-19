@@ -5,5 +5,5 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace SoulboundBackend.Core.AssetManagement {
-	public sealed record AssetKey(string key);
+	public sealed record AssetKey(string address);
 }

@@ -1,5 +1,6 @@
 ﻿using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.UI.Tooltip;
+using SoulboundBackend.Core.AssetManagement;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,7 @@ public sealed class ToolItem_test : Item, IBreakingTool {
 
     public override string name => "crappy pickaxe";
 
-    public override ItemAspect aspect => ItemAspectRegistry.Get(this, () => ItemAspect.Simple("crappy_pickaxe"));
+    public override ItemAspect aspect => ItemAspectRegistry.Get(this, () => ItemAspect.Simple(new AssetKey("crappy_pickaxe")));
 
     public override int maxStackSize => 1;
 
