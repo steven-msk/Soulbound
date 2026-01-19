@@ -574,7 +574,20 @@ PlayerSettings:
   webGLWebAssemblyBigInt: 0
   webGLCloseOnQuit: 0
   webWasm2023: 0
-  scriptingDefineSymbols: {}
+  scriptingDefineSymbols:
+    Android: 
+    EmbeddedLinux: 
+    LinuxHeadlessSimulation: 
+    Nintendo Switch: 
+    PS4: 
+    QNX: 
+    Server: 
+    Standalone: 
+    WebGL: 
+    Windows Store Apps: 
+    XboxOne: 
+    iPhone: 
+    tvOS: 
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:

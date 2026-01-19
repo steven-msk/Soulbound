@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using Logger = SoulboundBackend.Common.Logging.Logger;
 
 #nullable enable
