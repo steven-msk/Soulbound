@@ -2,6 +2,7 @@
 using SoulboundBackend.Client.World.Chunk;
 using SoulboundBackend.Common;
 using SoulboundBackend.Common.Logging;
+using SoulboundBackend.Core.AssetManagement;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,9 +18,13 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		private static readonly Logger logger = Logger.CreateInstance();
 		public string id { get; private set; } = null!;
 		public abstract string name { get; init; }
-		public abstract TileBase tileReference { get; init; }
+		//[Obsolete]
+		//public abstract TileBase tileReference { get; init; }
+		[Obsolete]
 		public abstract BlockItem? itemReference { get; init; }
 		public virtual BreakRequirement? breakRequirement { get; init; } = null;
+
+		public abstract AssetKey tileKey { get; init; }
 
 		private Dictionary<int, BlockState> statesByHash = new();
 		private readonly BlockPropertyPool propertyPool = new();
@@ -29,9 +34,18 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 
 		protected Block(string id) => this.ConstructNonGeneric(id);
 
-		protected Block(string id, string name, TileBase tileReference, BlockItem itemReference, BreakRequirement? breakRequirement) {
+		//[Obsolete]
+		//protected Block(string id, string name, TileBase tileReference, BlockItem itemReference, BreakRequirement? breakRequirement) {
+		//	this.name = name;
+		//	this.tileReference = tileReference;
+		//	this.itemReference = itemReference;
+		//	this.breakRequirement = breakRequirement;
+		//	this.ConstructNonGeneric(id);
+		//}
+
+		protected Block(string id, string name, AssetKey tileKey, BlockItem itemReference, BreakRequirement? breakRequirement) {
 			this.name = name;
-			this.tileReference = tileReference;
+			this.tileKey = tileKey;
 			this.itemReference = itemReference;
 			this.breakRequirement = breakRequirement;
 			this.ConstructNonGeneric(id);
@@ -53,7 +67,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 
 		protected abstract void RegisterProperties(BlockPropertyPool pool);
 		protected abstract BlockState CreateDefaultState(BlockPropertyPool propertyPool);
-		public virtual void CreateStates(BlockStateRegisterer registerer, BlockPropertyEntries properties) {
+		protected virtual void CreateStates(BlockStateRegisterer registerer, BlockPropertyEntries properties) {
 		}
 		public virtual TileEntity? GetTileEntity(WorldChunk chunk, BlockPos blockPos) {
 			return null;
@@ -66,10 +80,11 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		}
 		public abstract IEnumerable<ItemStack> GetDrops(BlockState blockState, BreakSource source);
 
-		public virtual void Render(BlockState state, TileEntity? tileEntity, BlockPos pos, Tilemap tilemap) {
-			tilemap.SetTile((Vector3Int)pos, tileReference);
-			tileEntity?.Render(state, tilemap);
-		}
+		//[Obsolete]
+		//public virtual void Render(BlockState state, TileEntity? tileEntity, BlockPos pos, Tilemap tilemap) {
+		//	tilemap.SetTile((Vector3Int)pos, tileReference);
+		//	tileEntity?.Render(state, tilemap);
+		//}
 
 		public bool TryGetState(int hash, out BlockState state) {
 			return statesByHash.TryGetValue(hash, out state);
@@ -86,7 +101,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public override string ToString() {
 			return $"Block[" +
 				$"name:'{name}', " +
-				$"tileReference:'{tileReference}', " +
+				//$"tileReference:'{tileReference}', " +
 				$"itemReference:'{itemReference}', " +
 				$"propertyPool:[{propertyPool}]]";
 		}

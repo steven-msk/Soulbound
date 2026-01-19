@@ -1,4 +1,7 @@
 ﻿using SoulboundBackend.Client.World.BlockSystem;
+using SoulboundBackend.Common;
+using SoulboundBackend.Core.Resource;
+using System.Resources;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -45,15 +48,30 @@ namespace SoulboundBackend.Client.World {
 				BlockState? blockState = level.BlockStateAt(blockPos);
 				TileEntity? tileEntity = level.TileEntityAt(blockPos);
 
-				blockState?.block.Render(blockState, tileEntity, blockPos, tilemap);
+				RenderBlock(blockState, tileEntity, blockPos, tilemap);
+
+				//blockState?.block.Render(blockState, tileEntity, blockPos, tilemap);
 			}
 
 		}
 
 		public void RenderBlock(BlockPos blockPos, BlockState? blockState) {
 			if (IsInRenderView(blockPos)) {
-				blockState?.block.Render(blockState, level.TileEntityAt(blockPos), blockPos, tilemap);
+				RenderBlock(blockState, level.TileEntityAt(blockPos), blockPos, tilemap);
+
+				//blockState?.block.Render(blockState, level.TileEntityAt(blockPos), blockPos, tilemap);
 			}
+		}
+
+		[PROTOTYPICAL]
+		private void RenderBlock(BlockState state, TileEntity? tileEntity, BlockPos pos, Tilemap tilemap) {
+			
+			var tile = state.block != Blocks.air
+				? Core.Resource.ResourceManager.Get<TileBase, ResourceGroups.Tiles>(state.block.tileKey?.key)
+				: null!;
+
+			tilemap.SetTile((Vector3Int)pos, tile);
+			tileEntity?.Render(state, tilemap);
 		}
 
 		private RectInt ToRect(Vector2Int pivot) {

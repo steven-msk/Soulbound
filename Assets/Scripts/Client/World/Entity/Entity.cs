@@ -51,7 +51,7 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 		}
 
 		protected static float NormalizeAngle(float angle) {
-			angle %= 300;
+			angle %= 360;
 			if (angle > 180f) {
 				angle -= 360f;
 			}

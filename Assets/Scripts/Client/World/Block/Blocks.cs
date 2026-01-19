@@ -1,5 +1,6 @@
 ﻿using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Common;
+using SoulboundBackend.Core.AssetManagement;
 using SoulboundBackend.Core.Resource;
 using System;
 using System.Collections.Concurrent;
@@ -22,10 +23,10 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		//[BlockCache(nameof(leaves))]public static Block leaves => Lookup(() => new LeafBlock());
 
 		public static readonly Block air = new GenericBlock("air", "Air", null, null, null);
-		public static readonly Block grass = new GenericBlock("grass", "Grass Block", Tile("grass"), Items.grassBlock, new BreakRequirement(1, ToolType.None, 10));
-		public static readonly Block dirt = new GenericBlock("dirt", "Dirt Block", Tile("dirt"), Items.dirtBlock, new BreakRequirement(1, ToolType.None, 10));
-		public static readonly Block stone = new GenericBlock("stone", "Stone Block", Tile("stone"), Items.stoneBlock, new BreakRequirement(1, ToolType.None, 10));
-		public static readonly Block wood = new GenericBlock("wood", "Wood", Tile("wood"), Items.woodBlock, new BreakRequirement(0, ToolType.None, 10));
+		public static readonly Block grass = new GenericBlock("grass", "Grass Block", /* Tile("grass") */ new AssetKey("grass"), Items.grassBlock, new BreakRequirement(1, ToolType.None, 10));
+		public static readonly Block dirt = new GenericBlock("dirt", "Dirt Block", /* Tile("dirt") */ new AssetKey("dirt"), Items.dirtBlock, new BreakRequirement(1, ToolType.None, 10));
+		public static readonly Block stone = new GenericBlock("stone", "Stone Block", /* Tile("stone") */ new AssetKey("stone"), Items.stoneBlock, new BreakRequirement(1, ToolType.None, 10));
+		public static readonly Block wood = new GenericBlock("wood", "Wood", /* Tile("wood") */ new AssetKey("wood"), Items.woodBlock, new BreakRequirement(0, ToolType.None, 10));
 		public static readonly Block leaves = new LeafBlock();
 
 		[Obsolete]
