@@ -1,6 +1,7 @@
 ﻿using SoulboundBackend.Client.Input;
 using SoulboundBackend.Common;
 using SoulboundBackend.Common.Logging;
+using SoulboundBackend.Core.AssetManagement;
 using SoulboundBackend.Core.Bootstrap;
 using System;
 using System.Collections.Generic;
@@ -62,7 +63,7 @@ namespace SoulboundBackend.Core.Resource {
         }
 
 
-        public static TAsset? Get<TAsset, TGroup>(string name)
+        public static TAsset? Get<TAsset, TGroup>(AssetKey assetKey)
 				where TAsset : UnityEngine.Object
 				where TGroup : IResourceGroupDefinition<TAsset> {
             string address = "";
@@ -87,7 +88,7 @@ namespace SoulboundBackend.Core.Resource {
                 }
             }
 
-			return group.GetAsset<TAsset>(name);
+			return group.GetAsset<TAsset>(assetKey.address);
 		}
 
         public static string GetAddressFromGroupDefinition<TGroup>() {
@@ -126,8 +127,8 @@ namespace SoulboundBackend.Core.Resource {
             definitionsRegistered = false;
         }
 
-        public static GameObject? GetRuntimePrefab(string name) {
-            return Get<GameObject, ResourceGroups.Runtime.Prefabs>(name);
+        public static GameObject? GetRuntimePrefab(AssetKey assetKey) {
+            return Get<GameObject, ResourceGroups.Runtime.Prefabs>(assetKey);
         }
     }
 }

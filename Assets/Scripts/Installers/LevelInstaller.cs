@@ -1,6 +1,7 @@
  using SoulboundBackend.Client;
 using SoulboundBackend.Client.Input;
 using SoulboundBackend.Client.UI;
+using SoulboundBackend.Core.AssetManagement;
 using SoulboundBackend.Core.Resource;
 using System;
 using UnityEngine;
@@ -17,7 +18,7 @@ namespace SoulboundBackend.Core.Bootstrap {
 		}
 
 		public override void InstallBindings(DiContainer container) {
-			var levelManagerPrefab = ResourceManager.GetRuntimePrefab("levelManager");
+			var levelManagerPrefab = ResourceManager.GetRuntimePrefab(new AssetKey("levelManager"));
 
 			container.BindInstance<PlayerInputActions>(Soulbound.instance?.playerInputActions ?? new PlayerInputActions()).AsSingle().NonLazy();
 			container.BindInstance<WorldManager>(worldManager).AsSingle();

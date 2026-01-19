@@ -1,17 +1,18 @@
-﻿using SoulboundBackend.Core.Resource;
+﻿using SoulboundBackend.Core.AssetManagement;
+using SoulboundBackend.Core.Resource;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
 namespace SoulboundBackend.Client.World {
 	public class Tiles : IResourceModule {
-		public static Tile air => GetTile<Tile>("air");
-		public static RuleTile grass => GetTile<RuleTile>("grass");
-		public static Tile stone => GetTile<Tile>("stone");
-		public static Tile dirt => GetTile<Tile>("dirt");
-		public static Tile wood => GetTile<Tile>("wood");
+		public static Tile air => GetTile<Tile>(new AssetKey("air"));
+		public static RuleTile grass => GetTile<RuleTile>(new AssetKey("grass"));
+		public static Tile stone => GetTile<Tile>(new AssetKey("stone"));
+		public static Tile dirt => GetTile<Tile>(new AssetKey("dirt"));
+		public static Tile wood => GetTile<Tile>(new AssetKey("wood"));
 
-		private static TTile GetTile<TTile>(string name) where TTile : TileBase {
-			return (TTile)IResourceModule.Resource<TileBase, ResourceGroups.Tiles>(name);
+		private static TTile GetTile<TTile>(AssetKey assetKey) where TTile : TileBase {
+			return (TTile)IResourceModule.Resource<TileBase, ResourceGroups.Tiles>(assetKey);
 		}
 	}
 }

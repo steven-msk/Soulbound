@@ -1,4 +1,5 @@
 ﻿using SoulboundBackend.Common;
+using SoulboundBackend.Core.AssetManagement;
 using SoulboundBackend.Core.Resource;
 using System;
 using System.Collections.Generic;
@@ -12,11 +13,11 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 		static readonly Dictionary<Type, EntityDescriptor> byType = new();
 
 		private static readonly EntityDescriptor player = Register(
-			new PrefabEntityDescriptor("entity.player", "Player", "player", ResourceManager.GetRuntimePrefab), 
+			new PrefabEntityDescriptor("entity.player", "Player", new AssetKey("player"), ResourceManager.GetRuntimePrefab), 
 			typeof(PlayerController)
 		);
 		private static readonly EntityDescriptor droppedItem = Register(
-			new PrefabEntityDescriptor("entity.droppedItem", nameof(DroppedItem), "droppedItem"),
+			new PrefabEntityDescriptor("entity.droppedItem", nameof(DroppedItem), new AssetKey("droppedItem")),
 			typeof(DroppedItem)
 		);
 		

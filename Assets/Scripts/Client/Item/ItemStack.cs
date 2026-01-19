@@ -2,6 +2,7 @@ using SoulboundBackend.Client.UI.Storage;
 using SoulboundBackend.Client.World.EntitySystem;
 using SoulboundBackend.Client.World.EntitySystem.SpawnData;
 using SoulboundBackend.Core;
+using SoulboundBackend.Core.AssetManagement;
 using SoulboundBackend.Core.Resource;
 using TMPro;
 using UnityEngine;
@@ -24,7 +25,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 		}
 
 		public GameObject AssignDisplay(ItemDisplay parent) {
-			var prefab = ResourceManager.Get<GameObject, ResourceGroups.Prefabs>("stackNumberPrefab");
+			var prefab = ResourceManager.Get<GameObject, ResourceGroups.Prefabs>(new AssetKey("stackNumberPrefab"));
             GameObject? stackText = GameObject.Instantiate(prefab, parent.transform);
 			TextMeshProUGUI? text = stackText!.GetComponent<TextMeshProUGUI>();
 			text.enabled = item.IsStackable;

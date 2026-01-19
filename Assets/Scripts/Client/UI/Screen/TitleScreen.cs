@@ -1,5 +1,6 @@
 ﻿using SoulboundBackend.Client.UI.Screens;
 using SoulboundBackend.Core;
+using SoulboundBackend.Core.AssetManagement;
 using SoulboundBackend.Core.Resource;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ namespace SoulboundBackend.Client.UI {
 			ScreenObject screen = base.BuildObject(rootParent);
 
 			// this makes no sense but its the only way its parenting it properly
-			var prefab = ResourceManager.Get<GameObject, ResourceGroups.UI>("WorldEnter");
+			var prefab = ResourceManager.Get<GameObject, ResourceGroups.UI>(new AssetKey("WorldEnter"));
 			var obj = GameObject.Instantiate(prefab, rootParent);
 			obj.transform.SetParent(screen.transform);
 

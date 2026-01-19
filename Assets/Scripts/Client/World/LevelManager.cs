@@ -8,6 +8,7 @@ using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Client.World.Chunk;
 using SoulboundBackend.Client.World.EntitySystem;
 using SoulboundBackend.Common.Json;
+using SoulboundBackend.Core.AssetManagement;
 using SoulboundBackend.Core.Bootstrap;
 using SoulboundBackend.Core.Resource;
 using System;
@@ -106,7 +107,7 @@ namespace SoulboundBackend.Core {
 				entityManager.RemoveEntity(playerEntity);
 			}
 			this.player = container.InstantiatePrefabForComponent<PlayerController>(
-				ResourceManager.GetRuntimePrefab("player")
+				ResourceManager.GetRuntimePrefab(new AssetKey("player"))
 			);
 			container.BindInstance<PlayerController>(this.player).AsSingle();
 			var playerContext = this.player.GetComponent<GameObjectContext>();
@@ -225,7 +226,7 @@ namespace SoulboundBackend.Core {
 		} 
 
 		public static LevelManager CreateInstance() {
-			GameObject? levelManagerPrefab = ResourceManager.GetRuntimePrefab("levelManager");
+			GameObject? levelManagerPrefab = ResourceManager.GetRuntimePrefab(new AssetKey("levelManager"));
 			return GameObject.Instantiate(levelManagerPrefab)?.GetComponent<LevelManager>()
 				?? throw new ArgumentException("LevelManager prefab not found!");
 		}
@@ -233,8 +234,8 @@ namespace SoulboundBackend.Core {
 
 	public record LevelGridContext(Grid grid, Tilemap tilemap) {
 		public static LevelGridContext FromRuntimePrefabs() {
-			var gridPrefab = ResourceManager.GetRuntimePrefab("Grid");
-			var tilemapPrefab = ResourceManager.GetRuntimePrefab("Tilemap");
+			var gridPrefab = ResourceManager.GetRuntimePrefab(new AssetKey("Grid"));
+			var tilemapPrefab = ResourceManager.GetRuntimePrefab(new AssetKey("Tilemap"));
 
 			var gridObj = GameObject.Instantiate(gridPrefab);
 			var tilemapObj = GameObject.Instantiate(tilemapPrefab, gridObj.transform);

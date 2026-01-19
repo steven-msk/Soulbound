@@ -1,5 +1,6 @@
 ﻿using SoulboundBackend.Common;
 using SoulboundBackend.Core;
+using SoulboundBackend.Core.AssetManagement;
 using SoulboundBackend.Core.Resource;
 using System;
 using System.Collections;
@@ -28,25 +29,25 @@ namespace SoulboundBackend.Client.UI.Screens {
 			ScreenObject screen =  base.BuildObject(rootParent);
 			ChildMap childMap = screen.GetChildMap();
 
-			var title = GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.UI>("GameMenuTitle"), rootParent);
+			var title = GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.UI>(new AssetKey("GameMenuTitle")), rootParent);
 			title.transform.SetParent(screen.transform);
 			childMap.AddChild(title);
 
 
-			var container = GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.UI>("ButtonContainer"), rootParent);
+			var container = GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.UI>(new AssetKey("ButtonContainer")), rootParent);
 			container.transform.SetParent(screen.transform);
 			childMap.AddChild(container);
 
 
-			var settingsButton = GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.UI>("SettingsButton"), rootParent);
+			var settingsButton = GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.UI>(new AssetKey("SettingsButton")), rootParent);
 			settingsButton.transform.SetParent(container.transform);
 			childMap.AddChild(settingsButton);
 
-			var resumeButton = GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.UI>("ResumeButton"), rootParent);
+			var resumeButton = GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.UI>(new AssetKey("ResumeButton")), rootParent);
 			resumeButton.transform.SetParent(container.transform);
 			childMap.AddChild(resumeButton);
 
-			var quitButton = GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.UI>("QuitWorld"), rootParent);
+			var quitButton = GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.UI>(new AssetKey("QuitWorld")), rootParent);
 			quitButton.transform.SetParent(container.transform);
 			childMap.AddChild(quitButton);
 

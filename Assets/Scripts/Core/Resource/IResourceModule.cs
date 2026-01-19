@@ -1,9 +1,11 @@
-﻿namespace SoulboundBackend.Core.Resource {
+﻿using SoulboundBackend.Core.AssetManagement;
+
+namespace SoulboundBackend.Core.Resource {
 	public interface IResourceModule {
-		protected static TAsset Resource<TAsset, TGroup>(string name)
+		protected static TAsset Resource<TAsset, TGroup>(AssetKey assetKey)
 				where TAsset : UnityEngine.Object
 				where TGroup : IResourceGroupDefinition<TAsset> {
-			return ResourceManager.Get<TAsset, TGroup>(name);
+			return ResourceManager.Get<TAsset, TGroup>(assetKey);
 		}
 	}
 }

@@ -44,10 +44,6 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			return (TBlock)ICachedRegistry<Block>.Lookup(propertyName, instanceSupplier);
 		}
 
-		private static TileBase Tile(string name) {
-			return IResourceModule.Resource<TileBase, ResourceGroups.Tiles>(name);
-		}
-
 		[Obsolete]
 		public static Block ByHashedID(int hashedID) {
 			//if (ICachedRegistry<Block>.cached.TryGetValue(hashedID, out Block block)) {

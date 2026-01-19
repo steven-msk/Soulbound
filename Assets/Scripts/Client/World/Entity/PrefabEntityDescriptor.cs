@@ -1,4 +1,5 @@
-﻿using SoulboundBackend.Core.Resource;
+﻿using SoulboundBackend.Core.AssetManagement;
+using SoulboundBackend.Core.Resource;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,21 +9,21 @@ using UnityEngine;
 
 namespace SoulboundBackend.Client.World.EntitySystem {
 	public class PrefabEntityDescriptor : EntityDescriptor {
-		private readonly string prefabId;
-		private Func<string, GameObject> resourceSelector;
+		private readonly AssetKey assetKey;
+		private Func<AssetKey, GameObject> resourceSelector;
 
-		public PrefabEntityDescriptor(string id, string name, string prefabId, Func<string, GameObject> resourceSelector)
+		public PrefabEntityDescriptor(string id, string name, AssetKey assetKey, Func<AssetKey, GameObject> resourceSelector)
 			: base(id, name) {
-			this.prefabId = prefabId;
+			this.assetKey = assetKey;
 			this.resourceSelector = resourceSelector;
 		}
 
-		public PrefabEntityDescriptor(string id, string name, string prefabId)
-			: this(id, name, prefabId, ResourceManager.Get<GameObject, ResourceGroups.Prefabs>) {
+		public PrefabEntityDescriptor(string id, string name, AssetKey  assetKey)
+			: this(id, name, assetKey, ResourceManager.Get<GameObject, ResourceGroups.Prefabs>) {
 		}
 
 		public override Entity CreateInstance() {
-			var prefab = resourceSelector(prefabId);
+			var prefab = resourceSelector(assetKey);
 			var obj = GameObject.Instantiate(prefab);
 			return obj.GetComponent<Entity>();
 		}

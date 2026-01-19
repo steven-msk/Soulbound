@@ -1,4 +1,5 @@
-﻿using SoulboundBackend.Core.Resource;
+﻿using SoulboundBackend.Core.AssetManagement;
+using SoulboundBackend.Core.Resource;
 using System;
 using TMPro;
 using UnityEngine;
@@ -22,11 +23,11 @@ namespace SoulboundBackend.Client.UI.Tooltip {
 				return null;
 			}
 			data.PurgeInvalidNodes();
-			GameObject panel = GameObject.Instantiate(GetTooltipPrefab("tooltipPanel"), parent, false);
+			GameObject panel = GameObject.Instantiate(GetTooltipPrefab(new AssetKey("tooltipPanel")), parent, false);
 			Transform panelTransform = panel.GetComponent<Transform>();
 
 			foreach (var dataNode in data.nodes) {
-				GameObject nodeObj = GameObject.Instantiate(GetTooltipPrefab("tooltipSection"), panelTransform);
+				GameObject nodeObj = GameObject.Instantiate(GetTooltipPrefab(new AssetKey("tooltipSection")), panelTransform);
 				TextMeshProUGUI node = nodeObj.GetComponent<TextMeshProUGUI>();
 
 				node.text = dataNode.text;
@@ -38,8 +39,8 @@ namespace SoulboundBackend.Client.UI.Tooltip {
 			return panel;
 		}
 
-		private static GameObject GetTooltipPrefab(string name) {
-			return ResourceManager.Get<GameObject, ResourceGroups.Prefabs>(name);
+		private static GameObject GetTooltipPrefab(AssetKey assetKey) {
+			return ResourceManager.Get<GameObject, ResourceGroups.Prefabs>(assetKey);
 		}
 	}
 }
