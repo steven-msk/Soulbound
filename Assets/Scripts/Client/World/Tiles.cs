@@ -12,7 +12,7 @@ namespace SoulboundBackend.Client.World {
 		public static Tile wood => GetTile<Tile>(new AssetKey("wood"));
 
 		private static TTile GetTile<TTile>(AssetKey assetKey) where TTile : TileBase {
-			return (TTile)IResourceModule.Resource<TileBase, ResourceGroups.Tiles>(assetKey);
+			return (TTile)IResourceModule.Resource<TileBase>(assetKey);
 		}
 	}
 }

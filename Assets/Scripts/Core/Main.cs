@@ -40,11 +40,6 @@ public sealed class Main : MonoBehaviour {
 		soulbound.Run();
 	}
 
-	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-	public static void ResetStaticDomain() {
-		ResourceManager.PreloadGroups();
-	}
-
 	private void OnApplicationQuit() {
 		soulbound.OnApplicationQuit();
 	}
