@@ -28,7 +28,7 @@ namespace SoulboundBackend.Client.UI.Screens {
 				stack.Push(screenObject);
 				screenObject.Show();
 			} else {
-				DisposeStack();
+				Flush();
 			}
 		}
 
@@ -54,7 +54,7 @@ namespace SoulboundBackend.Client.UI.Screens {
 				: null;
 		}
 
-		public void DisposeStack() {
+		public void Flush() {
 			while (!stack.IsEmpty()) {
 				var screenObject = stack.Pop();
 				screenObject.Hide();

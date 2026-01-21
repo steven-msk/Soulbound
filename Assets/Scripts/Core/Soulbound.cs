@@ -68,7 +68,7 @@ namespace SoulboundBackend.Core {
 				? config.dev.devWorld
 				: $"altw_{Guid.NewGuid()}";
 
-			uiHandler.DisposeScreenStack();
+			uiHandler.FlushScreens();
 
 			worldManager.LoadWorld(world,
 				GameObject.FindFirstObjectByType<SceneContext>,

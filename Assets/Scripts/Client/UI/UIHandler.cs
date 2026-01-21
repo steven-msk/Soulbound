@@ -28,7 +28,7 @@ namespace SoulboundBackend.Client.UI {
 			screenManager = new ScreenManager(canvas.transform);
 		}
 
-		public void DisposeScreenStack() => screenManager.DisposeStack();
+		public void FlushScreens() => screenManager.Flush();
 
 		public ScreenManager GetScreenManager() => screenManager;
 	}

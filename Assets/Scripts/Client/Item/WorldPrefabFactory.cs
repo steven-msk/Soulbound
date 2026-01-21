@@ -6,7 +6,6 @@ using UnityEngine;
 
 namespace SoulboundBackend.Client.ItemSystem {
 	public static class WorldPrefabFactory {
-		//public static readonly GameObject worldPrefab = ResourceManager.Get<GameObject, ResourceGroups.Prefabs>(new AssetKey("droppedItem"));
 		public static readonly GameObject worldPrefab = ResourceManager.GetAddressableSync<GameObject>(new AssetKey("droppedItem"));
 
 		public static Func<GameObject> GetInstantiator() {
