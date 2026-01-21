@@ -10,7 +10,7 @@ namespace SoulboundBackend.Client.UI.Tooltip {
 		public FontStyles fontStyle = FontStyles.Normal;
 		public TextAlignmentOptions alignment = TextAlignmentOptions.Left;
 		public Vector4 margin = Vector4.zero;
-		public TMP_FontAsset fontAsset = ResourceManager.GetAddressableSync<TMP_FontAsset>(new AssetKey("Urbanist-SemiBold SDF"));
+		public TMP_FontAsset fontAsset = AssetManager.Resolve<TMP_FontAsset>(new AssetKey("Urbanist-SemiBold SDF"));
 		//...animations, shaders?
 
 		public void Apply(TextMeshProUGUI textComponent) {

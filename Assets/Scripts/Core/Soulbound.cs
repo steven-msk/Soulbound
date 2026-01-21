@@ -78,6 +78,7 @@ namespace SoulboundBackend.Core {
 
 		public void OnApplicationQuit() {
 			settings.Save();
+			AssetManager.Shutdown();
 		}
 
 		public UIHandler GetUIHandler() => uiHandler;

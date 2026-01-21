@@ -23,7 +23,7 @@ namespace SoulboundBackend.Client.UI {
 			ScreenObject screen = base.BuildObject(rootParent);
 
 			// this makes no sense but its the only way its parenting it properly
-			var prefab = ResourceManager.GetAddressableSync<GameObject>(new AssetKey("WorldEnter"));
+			var prefab = AssetManager.Resolve<GameObject>(new AssetKey("WorldEnter"));
 			var obj = GameObject.Instantiate(prefab, rootParent);
 			obj.transform.SetParent(screen.transform);
 

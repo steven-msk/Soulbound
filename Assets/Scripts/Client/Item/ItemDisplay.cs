@@ -24,7 +24,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 
 				// prototypical - will be implemented correctly when visuals system is improved
 
-				var sprite = ResourceManager.GetAddressableSync<Sprite>(itemStack.item.aspect.icon.spriteKey);
+				var sprite = AssetManager.Resolve<Sprite>(itemStack.item.aspect.icon.spriteKey);
 				gameObject.GetComponent<Image>().sprite = sprite;
 			}
 		}
@@ -33,7 +33,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public bool isGrabbed { get; private set; }
 
 		public static ItemDisplay Create(ItemStack itemStack, Func<Transform?> parentSupplier) {
-			var prefab = ResourceManager.GetAddressableSync<GameObject>(new AssetKey("itemDisplayPrefab"));
+			var prefab = AssetManager.Resolve<GameObject>(new AssetKey("itemDisplayPrefab"));
 			GameObject? obj = Instantiate(prefab, parentSupplier.Invoke());
 			ItemDisplay? display = obj?.GetComponent<ItemDisplay>();
 			UnityEngine.Debug.Assert(display != null, $"ItemDisplay component not found in item display prefab");

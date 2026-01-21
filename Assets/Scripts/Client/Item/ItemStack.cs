@@ -25,7 +25,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 		}
 
 		public GameObject AssignDisplay(ItemDisplay parent) {
-			var prefab = ResourceManager.GetAddressableSync<GameObject>(new AssetKey("stackNumberPrefab"));
+			var prefab = AssetManager.Resolve<GameObject>(new AssetKey("stackNumberPrefab"));
             GameObject? stackText = GameObject.Instantiate(prefab, parent.transform);
 			TextMeshProUGUI? text = stackText!.GetComponent<TextMeshProUGUI>();
 			text.enabled = item.IsStackable;

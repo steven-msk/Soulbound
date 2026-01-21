@@ -4,7 +4,7 @@ using UnityEngine;
 using SoulboundBackend.Client.UI.Tooltip;
 using System.Resources;
 using SoulboundBackend.Core.Resource;
-using ResourceManager = SoulboundBackend.Core.Resource.ResourceManager;
+using ResourceManager = SoulboundBackend.Core.Resource.AssetManager;
 using SoulboundBackend.Core;
 using SoulboundBackend.Client.UI.Storage;
 

@@ -29,25 +29,25 @@ namespace SoulboundBackend.Client.UI.Screens {
 			ScreenObject screen =  base.BuildObject(rootParent);
 			ChildMap childMap = screen.GetChildMap();
 
-			var title = GameObject.Instantiate(ResourceManager.GetAddressableSync<GameObject>(new AssetKey("GameMenuTitle")), rootParent);
+			var title = GameObject.Instantiate(AssetManager.Resolve<GameObject>(new AssetKey("GameMenuTitle")), rootParent);
 			title.transform.SetParent(screen.transform);
 			childMap.AddChild(title);
 
 
-			var container = GameObject.Instantiate(ResourceManager.GetAddressableSync<GameObject>(new AssetKey("ButtonContainer")), rootParent);
+			var container = GameObject.Instantiate(AssetManager.Resolve<GameObject>(new AssetKey("ButtonContainer")), rootParent);
 			container.transform.SetParent(screen.transform);
 			childMap.AddChild(container);
 
 
-			var settingsButton = GameObject.Instantiate(ResourceManager.GetAddressableSync<GameObject>(new AssetKey("SettingsButton")), rootParent);
+			var settingsButton = GameObject.Instantiate(AssetManager.Resolve<GameObject>(new AssetKey("SettingsButton")), rootParent);
 			settingsButton.transform.SetParent(container.transform);
 			childMap.AddChild(settingsButton);
 
-			var resumeButton = GameObject.Instantiate(ResourceManager.GetAddressableSync<GameObject>(new AssetKey("ResumeButton")), rootParent);
+			var resumeButton = GameObject.Instantiate(AssetManager.Resolve<GameObject>(new AssetKey("ResumeButton")), rootParent);
 			resumeButton.transform.SetParent(container.transform);
 			childMap.AddChild(resumeButton);
 
-			var quitButton = GameObject.Instantiate(ResourceManager.GetAddressableSync<GameObject>(new AssetKey("QuitWorld")), rootParent);
+			var quitButton = GameObject.Instantiate(AssetManager.Resolve<GameObject>(new AssetKey("QuitWorld")), rootParent);
 			quitButton.transform.SetParent(container.transform);
 			quitButton.GetComponent<Button>().onClick.AddListener(() =>
 				CoroutineRunner.GetInstance().StartCoroutine(QuitWorld())

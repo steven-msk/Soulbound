@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace SoulboundBackend.Client.World.EntitySystem {
 	public static class EntityDescriptorRegistry {
@@ -13,7 +14,7 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 		static readonly Dictionary<Type, EntityDescriptor> byType = new();
 
 		private static readonly EntityDescriptor player = Register(
-			new PrefabEntityDescriptor("entity.player", "Player", new AssetKey("player"), ResourceManager.GetRuntimePrefab), 
+			new PrefabEntityDescriptor("entity.player", "Player", new AssetKey("player"), AssetManager.Resolve<GameObject>), 
 			typeof(PlayerController)
 		);
 		private static readonly EntityDescriptor droppedItem = Register(

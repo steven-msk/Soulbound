@@ -23,7 +23,7 @@ namespace SoulboundBackend.Core.Bootstrap {
 		}
 
 		public override void InstallBindings(DiContainer container) {
-			GameObject inventoryPrefab = ResourceManager.GetRuntimePrefab(new AssetKey("Inventory"));
+			GameObject inventoryPrefab = AssetManager.Resolve<GameObject>(new AssetKey("Inventory"));
 
 			container.BindInterfacesAndSelfTo<ConcurrentActionResolver>().AsSingle();
 			container.BindInstance<InputHandler>(inputHandler).AsSingle();

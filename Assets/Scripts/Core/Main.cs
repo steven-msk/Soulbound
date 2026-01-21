@@ -40,6 +40,11 @@ public sealed class Main : MonoBehaviour {
 		soulbound.Run();
 	}
 
+	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+	public static void Preload() {
+		AssetManager.PreloadAll();
+	}
+
 	private void OnApplicationQuit() {
 		soulbound.OnApplicationQuit();
 	}
