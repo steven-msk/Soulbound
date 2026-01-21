@@ -57,12 +57,11 @@ namespace Assets.Scripts.Client.World.Biome {
 			const int trunkHeightMin = 5;
 			const int trunkHeightMax = 20;
 
-			int chunkX = chunk.WorldXToChunkX(originX), ypos = originY;
-			ChunkBlockPos trunkPos = new(chunkX, ypos, chunk.xpos);
+			BlockPos trunkPos = new(originX, originY);
 			int height = UnityEngine.Random.Range(trunkHeightMin, trunkHeightMax + 1);
 
 			for (int y = 0; y < height; y++) {
-				chunk.SetBlock(trunkPos, Blocks.wood.defaultState);
+				chunk.SetBlock(trunkPos.ToChunk(), Blocks.wood.defaultState);
 				trunkPos.y++;
 			}
 
@@ -83,8 +82,8 @@ namespace Assets.Scripts.Client.World.Biome {
 				int y = kvp.Key;
 				List<int> xs = kvp.Value;
 				for (int x = xs.Min(); x <= xs.Max(); x++) {
-					ChunkBlockPos pos = new(Level.ToChunkX(x), y, Level.ChunkXAt(x));
-					level.SetBlockOrPend(pos, Blocks.leaves.defaultState);
+					BlockPos blockPos = new(x, y);
+					level.SetBlockOrPend(blockPos.ToChunk(), Blocks.leaves.defaultState);
 				}
 			}
 
