@@ -16,11 +16,5 @@ MonoBehaviour:
   searchFolder: Assets/Resources/Registry/Tiles
   assetType: TileBase
   extension: .asset
-  refreshAutomatically: 1
-  resourceAddresses:
-  - Assets/Resources/Registry/Tiles/air.asset
-  - Assets/Resources/Registry/Tiles/dirt.asset
-  - Assets/Resources/Registry/Tiles/grass.asset
-  - Assets/Resources/Registry/Tiles/leaves.asset
-  - Assets/Resources/Registry/Tiles/stone.asset
-  - Assets/Resources/Registry/Tiles/wood.asset
+  issueAutomaticRefreshes: 1
+  resourceAddresses: []

@@ -17,13 +17,4 @@ MonoBehaviour:
   assetType: GameObject
   extension: .prefab
   issueAutomaticRefreshes: 1
-  resourceAddresses:
-  - Assets/Resources/Registry/UI/ButtonContainer.prefab
-  - Assets/Resources/Registry/UI/GameMenuTitle.prefab
-  - Assets/Resources/Registry/UI/QuitWorld.prefab
-  - Assets/Resources/Registry/UI/ResumeButton.prefab
-  - Assets/Resources/Registry/UI/SettingEntries.prefab
-  - Assets/Resources/Registry/UI/SettingsButton.prefab
-  - Assets/Resources/Registry/UI/SettingsTitle.prefab
-  - Assets/Resources/Registry/UI/StatisticsButton.prefab
-  - Assets/Resources/Registry/UI/WorldEnter.prefab
+  resourceAddresses: []

@@ -25,7 +25,8 @@ namespace SoulboundBackend.Client.ItemSystem {
 				// prototypical - will be implemented correctly when visuals system is improved
 
 				//gameObject.GetComponent<Image>().sprite = itemStack.item.aspect.icon.sprite;
-				var sprite = ResourceManager.Get<Sprite, ResourceGroups.Items.Icons>(itemStack.item.aspect.icon.spriteKey);
+				//var sprite = ResourceManager.Get<Sprite, ResourceGroups.Items.Icons>(itemStack.item.aspect.icon.spriteKey);
+				var sprite = ResourceManager.GetAddressableSync<Sprite>(itemStack.item.aspect.icon.spriteKey);
 				gameObject.GetComponent<Image>().sprite = sprite;
 			}
 		}
@@ -34,7 +35,8 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public bool isGrabbed { get; private set; }
 
 		public static ItemDisplay Create(ItemStack itemStack, Func<Transform?> parentSupplier) {
-			var prefab = ResourceManager.Get<GameObject, ResourceGroups.Prefabs>(new AssetKey("itemDisplayPrefab"));
+			//var prefab = ResourceManager.Get<GameObject, ResourceGroups.Prefabs>(new AssetKey("itemDisplayPrefab"));
+			var prefab = ResourceManager.GetAddressableSync<GameObject>(new AssetKey("itemDisplayPrefab"));
 			GameObject? obj = Instantiate(prefab, parentSupplier.Invoke());
 			ItemDisplay? display = obj?.GetComponent<ItemDisplay>();
 			UnityEngine.Debug.Assert(display != null, $"ItemDisplay component not found in item display prefab");

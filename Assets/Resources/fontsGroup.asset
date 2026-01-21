@@ -16,9 +16,5 @@ MonoBehaviour:
   searchFolder: Assets/Resources/Registry/Fonts
   assetType: TMP_FontAsset
   extension: .asset
-  refreshAutomatically: 1
-  resourceAddresses:
-  - Assets/Resources/Registry/Fonts/JosefinSans-Medium SDF.asset
-  - Assets/Resources/Registry/Fonts/JosefinSans-Regular SDF.asset
-  - Assets/Resources/Registry/Fonts/Urbanist-Bold SDF.asset
-  - Assets/Resources/Registry/Fonts/Urbanist-SemiBold SDF.asset
+  issueAutomaticRefreshes: 1
+  resourceAddresses: []

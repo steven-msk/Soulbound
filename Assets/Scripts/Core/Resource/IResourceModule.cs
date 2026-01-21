@@ -5,7 +5,7 @@ namespace SoulboundBackend.Core.Resource {
 		protected static TAsset Resource<TAsset, TGroup>(AssetKey assetKey)
 				where TAsset : UnityEngine.Object
 				where TGroup : IResourceGroupDefinition<TAsset> {
-			return ResourceManager.Get<TAsset, TGroup>(assetKey);
+			return ResourceManager.GetAddressableSync<TAsset>(assetKey);
 		}
 	}
 }

@@ -16,15 +16,5 @@ MonoBehaviour:
   searchFolder: Assets/Resources/Registry/Sprites
   assetType: Sprite
   extension: .asset
-  refreshAutomatically: 1
-  resourceAddresses:
-  - Assets/Resources/Registry/Sprites/chestplate_overlay.asset
-  - Assets/Resources/Registry/Sprites/crappy_pickaxe.asset
-  - Assets/Resources/Registry/Sprites/dirt_icon.asset
-  - Assets/Resources/Registry/Sprites/fruit_icon.asset
-  - Assets/Resources/Registry/Sprites/gem_icon.asset
-  - Assets/Resources/Registry/Sprites/grass_icon.asset
-  - Assets/Resources/Registry/Sprites/grass_top.asset
-  - Assets/Resources/Registry/Sprites/leaves_icon.asset
-  - Assets/Resources/Registry/Sprites/stone_icon.asset
-  - Assets/Resources/Registry/Sprites/wood_icon.asset
+  issueAutomaticRefreshes: 1
+  resourceAddresses: []

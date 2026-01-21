@@ -8,7 +8,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 		private Dictionary<WorldChunk, LineRenderer> outlines = new();
 
 		public void ShowOutline(WorldChunk chunk) {
-			GameObject obj = GameObject.Instantiate(ResourceManager.Get<GameObject, ResourceGroups.Prefabs>(new AssetKey("chunkOutline")));
+			GameObject obj = GameObject.Instantiate(ResourceManager.GetAddressableSync<GameObject>(new AssetKey("chunkOutline")));
 			LineRenderer renderer = obj.GetComponent<LineRenderer>();
 			outlines[chunk] = renderer;
 

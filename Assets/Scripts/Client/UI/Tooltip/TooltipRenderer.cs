@@ -40,7 +40,7 @@ namespace SoulboundBackend.Client.UI.Tooltip {
 		}
 
 		private static GameObject GetTooltipPrefab(AssetKey assetKey) {
-			return ResourceManager.Get<GameObject, ResourceGroups.Prefabs>(assetKey);
+			return ResourceManager.GetAddressableSync<GameObject>(assetKey);
 		}
 	}
 }

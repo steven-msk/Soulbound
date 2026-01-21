@@ -19,7 +19,7 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 		}
 
 		public PrefabEntityDescriptor(string id, string name, AssetKey  assetKey)
-			: this(id, name, assetKey, ResourceManager.Get<GameObject, ResourceGroups.Prefabs>) {
+			: this(id, name, assetKey, ResourceManager.GetAddressableSync<GameObject>) {
 		}
 
 		public override Entity CreateInstance() {

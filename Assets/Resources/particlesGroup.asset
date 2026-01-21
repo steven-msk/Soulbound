@@ -17,6 +17,4 @@ MonoBehaviour:
   assetType: GameObject
   extension: .prefab
   issueAutomaticRefreshes: 1
-  resourceAddresses:
-  - Assets/Resources/Registry/Prefabs/ParticleEffects/blockHitEffect.prefab
-  - Assets/Resources/Registry/Prefabs/ParticleEffects/heartParticle.prefab
+  resourceAddresses: []

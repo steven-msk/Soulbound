@@ -44,7 +44,7 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 		[PROTOTYPICAL]
 		private void ApplyIcon(ItemIcon icon) {
 			SpriteRenderer spriteRenderer = ComponentUtility.GetOrAddComponent<SpriteRenderer>(gameObject);
-			var sprite = ResourceManager.Get<Sprite, ResourceGroups.Items.Icons>(itemStack.item.aspect.icon.spriteKey);
+			var sprite = ResourceManager.GetAddressableSync<Sprite>(itemStack.item.aspect.icon.spriteKey);
 			spriteRenderer.sprite = sprite;
 
 			float scale = (float)sprite.pixelsPerUnit / icon.intendedPixelsPerUnit;

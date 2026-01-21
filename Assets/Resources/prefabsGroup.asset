@@ -17,12 +17,4 @@ MonoBehaviour:
   assetType: GameObject
   extension: .prefab
   issueAutomaticRefreshes: 1
-  resourceAddresses:
-  - Assets/Resources/Registry/Prefabs/ai test.prefab
-  - Assets/Resources/Registry/Prefabs/armorSlotOverlay.prefab
-  - Assets/Resources/Registry/Prefabs/chunkOutline.prefab
-  - Assets/Resources/Registry/Prefabs/droppedItem.prefab
-  - Assets/Resources/Registry/Prefabs/itemDisplayPrefab.prefab
-  - Assets/Resources/Registry/Prefabs/stackNumberPrefab.prefab
-  - Assets/Resources/Registry/Prefabs/tooltipPanel.prefab
-  - Assets/Resources/Registry/Prefabs/tooltipSection.prefab
+  resourceAddresses: []
