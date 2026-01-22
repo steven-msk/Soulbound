@@ -409,24 +409,27 @@ Status: ⚠️ Needs entire rework
 
 ## Recommended Production Order (Top to bottom)
 Based on the dependency graph, this could be an optimal order:
-[EDIT]: For convenience during late prototyping, categories have been marked accordingly to ease development: `*` means started but not finished, `<-` marks a focus point, `>|` means ready for production, `>>>` means progressively developed (see [notes](#notes))
-1. [Input system](#4-input-system) **>|**
-2. [Action Request System](#18-action-request-system) **>|**
-3. [Serialization](#17-serialization) (foundation only) * *delayed until all WorldDump fields are stable*
-4. [Stat system](#5-stat-system) * *some features might be missing, but most systems are working*
-5. [Entity system](#6-entity-system) >| *components wil be handled during productions*
-6. [Block system](#8-block-system) >| *TileEntity serialization and lifetime aspects TBD when working on the level system*
-7. [Chunk generation](#9-chunk-generation)* >| *Proper world generation is delayed until further notice*
-11. [World rendering](#10-world-rendering) >| *Some performance issues still persist, but will be tackled during prod*
-12. [Level system](#19-level-system) <-
-13. [Resource (asset) system](#20-resource-system-assets) <-
+[EDIT]: For convenience during late prototyping, categories have been marked accordingly to ease development: `*` means started but not finished, `<-` marks a focus point, `>|` means ready for production, `>>>` means progressively developed (see [exceptions](#exceptions))
+1. [Input system](#4-input-system)* **>|** (*read note below*)
+2. [Action Request System](#18-action-request-system)* **>|** (*read note below*)
+3. [Serialization](#17-serialization) (foundation only)* *delayed until all serialization parameters are stable*
+4. [Stat system](#5-stat-system) (*some features might be missing, but most of the system is working*)
+5. [Entity system](#6-entity-system)* **>|** *(components will be introduced as the serialization and action requests designs develop)*
+6. [Block system](#8-block-system)* **>|** *TileEntity serialization and lifetime aspects TBD when working on the level system*
+7. [Chunk generation](#9-chunk-generation) **>|** *(proper world generation is delayed to prod)*
+11. [World rendering](#10-world-rendering) **>|** *(some performance issues may still persist, but will be tackled in prod)*
+12. [Level system](#19-level-system) **<-**
+13. [Resource (asset) system](#20-resource-system-assets) **>|** *(async preload will be resolved in prod)*
 13. [Physics system](#7-physics-system) (universal overhaul)
-14. [UI Core layer & navigation system](#13-ui-systems-overall)
+14. [UI core layer & navigation system](#13-ui-systems-overall)
 15. [Tooltips](#14-tooltips)
-16. [Settings](#16-settings-ui) *
+16. [Settings](#16-settings-ui)*
 17. [Debug visuals](#15-debug-visuals)
 18. [Lighting](#11-lighting-system)
 19. [Audio](#12-audio-system)
+
+> A thing to note about the `input system` and `action request system`: while they may be finished, further development revealed an overhead for their implementations, that being contexts. Their methods are always called under a certain context, whether its a player jump, attack, block placement, ui click, it all depends on what capabilities the current context offers. 
+These will be resolved in prod as there are barely any features using these, but note that this will imply a heavy refactor once more features will be introduced.
 
 ##### Exceptions
 
@@ -449,3 +452,5 @@ This system is also marked with a special focus point the same as DI/State init.
 By December 2025-early January 2026 the project will (hopefully) be considered in a production-ready state.
 Starting from this point and until further notice, **all systems are considered mutable and subject to redesign, or complete overhaul if necessary**, for a production-ready foundation.  
 The project is now considered to be in a late-prototype state.
+
+Update: it is not ready for prod, not even close. The time of prod release is undetermined and will likely remain unknown for now.

@@ -18,252 +18,302 @@ MonoBehaviour:
   - m_GUID: 0450c75f5dcdfad4f998fb9e57b2bc54
     m_Address: weaponTestAnim
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 13bd427b029dcaa4cbd789c8d21c4966
     m_Address: blockHitEffect
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 14d9459257b5b3345a235f5545becbb3
     m_Address: GameMenuTitle
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 1535861a9572f724fb9bebf03b0ec575
     m_Address: ai test
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 1d4b4106a81f3804ea66b9bdda7db69b
     m_Address: Grid
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 22de33d73f0feda4e9a52553b3394a28
     m_Address: grass
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 2ac223bfff0dc2b4ab7323e9c062fedf
     m_Address: stone_icon
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 2f4fa2d652bbd884b95bb39ae884fbb9
     m_Address: FlightTimePanel
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 3278a884a65c5e042a2f890d5cb8d8e0
     m_Address: SettingsTitle
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 3ddab628e43f7114c804ef2cf0dff34b
     m_Address: JosefinSans-Regular SDF
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 4020c73e3815cf64490d111e3762919a
     m_Address: tooltipSection
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 4b0ef74baad2bf6428410446463b874f
     m_Address: leaves
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 4cffaf4bd4c9c5b49ab2de69200080a0
     m_Address: Urbanist-SemiBold SDF
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5c5dbc3200a937c498da76e029222e08
     m_Address: air
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 60a185f7b5c69d34582b24d8560c4263
     m_Address: crappy_pickaxe
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 64067c85458cdc84f9649a00354a7755
     m_Address: StatisticsButton
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 6dba1d9a1a8ab8244bbe1ac62086a249
     m_Address: stone
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 72d2e449dee691d4c9fdaac2e75735fb
     m_Address: Rectangular Palette
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 7350909f237a6674fa7ddcd933435fe2
     m_Address: dirt
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 73b53856178d60e448dda63bdce09c1c
     m_Address: chunkOutline
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 779797e769489a9449d6f94f635cf0ea
     m_Address: stackNumberPrefab
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 7821d7075ebcfed489a2aa4baa56e562
     m_Address: SettingEntries
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 7fa8aacfb5495fa46a782e28efb99c16
     m_Address: WorldEnter
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 80c92652bc11e0841b371cf25dc1c521
     m_Address: grass_top
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 81a7f847bab6ddf4b846b8c28c1f63ae
     m_Address: ButtonContainer
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 83091ff37e0613643b4c9a13662a6824
     m_Address: itemDisplayPrefab
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 844f6663ed1a4434ca2b1a83f2dd156b
     m_Address: grass_icon
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 8629ffabd7d222f479c12b7270b1b5ea
     m_Address: chestplate_overlay
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 8b9103ed92586f24792eb9384634e736
     m_Address: debugVisuals
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 912e916946948ac4284086ac7f5aff5c
     m_Address: Canvas
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 9270827d9dd361140a7264d2052a621d
     m_Address: wood
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 9f075694fab0bb148995c10809a8a506
     m_Address: wood_icon
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b16b127a850751c43b96c1a20ee39205
     m_Address: fruit_icon
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b54940d46e298384382541cf7ed92bda
     m_Address: Tilemap
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b54c53a458224b0478ce39fcc0ef54ec
     m_Address: sceneContext
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b6cd3b84e09533a4bac580bcec724555
     m_Address: heartParticle
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b76a12af57d7e284bb0d42b2df31bf48
     m_Address: droppedItem
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b8e974e7315dc3b408e80437cd281dee
     m_Address: Inventory
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: bc877545e8f940848bf14c741b0fe691
     m_Address: levelManager
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: c31a5e9c910fa9c42a037cf94c1b620b
     m_Address: QuitWorld
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: cbf0dfe6112d8e84c849d454f1474d8f
     m_Address: JosefinSans-Medium SDF
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d7098cf14f04d554ba27ce5128185a3d
     m_Address: leaves_icon
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: dd90606c5da2287499c83477a2cd6c1f
     m_Address: armorSlotOverlay
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: dedc175c69fa52f4db514e00ef93386b
     m_Address: tooltipPanel
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e116241861752154f8e50619c5299109
     m_Address: player
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e4c24be95ba79204eab3ad6416f34b34
     m_Address: dirt_icon
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e73082fccdc33f448a63fd6d559f6ab9
     m_Address: SettingsButton
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: f049a0888a77da944982503d46f573a6
     m_Address: ResumeButton
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: f6426e6fd6941634a8f5292711ce4db8
     m_Address: Urbanist-Bold SDF
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: fe11377655a5323408cb2fd311172436
     m_Address: gem_icon
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - preload
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 86c38b1330a98214fa67b09a1d18e360, type: 2}
