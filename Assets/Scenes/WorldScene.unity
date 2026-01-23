@@ -495,8 +495,8 @@ GameObject:
   m_Component:
   - component: {fileID: 770402293}
   - component: {fileID: 770402292}
-  - component: {fileID: 770402294}
   - component: {fileID: 770402295}
+  - component: {fileID: 770402296}
   m_Layer: 0
   m_Name: Root
   m_TagString: Untagged
@@ -518,7 +518,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _scriptableObjectInstallers: []
   _monoInstallers:
-  - {fileID: 770402294}
+  - {fileID: 770402296}
   _installerPrefabs: []
   _autoRun: 0
   OnPreInstall:
@@ -551,19 +551,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &770402294
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 770402291}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 92566ccabadc01245be7ccbd19a679fb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  worldCanvas: {fileID: 1237554554}
 --- !u!114 &770402295
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -576,6 +563,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf4f5a136ac8f1447a25884fdefdf445, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &770402296
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 770402291}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f791aef2185a71744805a29f979acb5a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  canvas: {fileID: 1237554554}
 --- !u!1001 &1237554553
 PrefabInstance:
   m_ObjectHideFlags: 0

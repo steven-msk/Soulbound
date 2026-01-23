@@ -45,8 +45,6 @@ namespace SoulboundBackend.Core {
 		public Level level { get; private set; } = null!;
 		public PlayerController? player { get; private set; }
 
-		public UIManager UIManager => GameObject.Find("Canvas").GetComponent<UIManager>();
-
 		public const string worldDump = "worldDump.json";
 		public static readonly JsonSerializerSettings globalJsonSettings = new() {
 			TypeNameHandling = TypeNameHandling.Auto,

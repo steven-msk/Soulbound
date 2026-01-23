@@ -26,7 +26,7 @@ using Scene = UnityEngine.SceneManagement.Scene;
 public sealed class WorldManager {
 	[Obsolete]
 	public event Action<LevelManager, WorldDump?>? onWorldLoaded;
-	[Inject] public LevelManager? activeLevelManager { get; private set; }
+	public LevelManager? activeLevelManager { get; private set; }
 	private readonly WorldSerializationService serializationService;
 
 	public WorldManager(WorldSerializationService serializationService) {
@@ -68,19 +68,18 @@ public sealed class WorldManager {
 		yield return null;
 
 		var root = rootGetter()
-			?? throw new InvalidOperationException("Failed to load world scene: missing scene root");
+			?? throw new InvalidOperationException("Failed to load world scene: missing root");
 
+		root.sceneContext.PreInstall += () => {
+			root.sceneContext.Container.BindInstance(this).AsSingle();
+		};
 		root.sceneContext.Install();
 		root.sceneContext.Resolve();
-		root.sceneContext.Container.Inject(this);
 
 		var levelManager = root.sceneContext.Container.Resolve<LevelManager>();
 		activeLevelManager = levelManager;
 
-		var gridContext = root.CreateGridContext();
-
-		activeLevelManager.BootstrapWorld(world, dump, seed, gridContext);
-
+		activeLevelManager.BootstrapWorld(world, dump, seed, root.CreateGridContext());
 		activeLevelManager.SpawnPlayer(dump?.player);
 	}
 

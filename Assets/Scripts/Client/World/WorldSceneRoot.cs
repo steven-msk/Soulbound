@@ -1,3 +1,4 @@
+using SoulboundBackend.Core.Bootstrap;
 using System;
 using System.Collections.Generic;
 using System.Linq;
