@@ -47,21 +47,13 @@ namespace SoulboundBackend.Core {
 			IWorldSaveStrategy saveStrategy = config.dev.loadDevWorldFromSave
 				? new WorldSaveStrategy(config.file.savesFolder, Application.persistentDataPath)
 				: new DoNotSaveWorldStrategy();
-			ISerializer<WorldDump> worldSerializer = new JsonSerializer<WorldDump>(globalJsonSettings);
-			SerializationPipeline<WorldDump> worldSerializationPipeline = new(worldSerializer);
+			var worldSerializer = new JsonSerializer<WorldDump>(globalJsonSettings);
+			var worldSerializationPipeline = new SerializationPipeline<WorldDump>(worldSerializer);
 			worldManager = new WorldManager(new WorldSerializationService(saveStrategy, worldSerializationPipeline));
 			uiHandler = new UIHandler(UnityEngine.Object.FindFirstObjectByType<Canvas>());
 		}
 
 		public void Run() {
-
-			// this will be removed later
-			// as the play tests will explode in time
-			// if the player spawns automatically
-			worldManager.onWorldLoaded += (levelManager, dump) => {
-				levelManager.SpawnPlayer(dump?.player);
-			};
-
 			uiHandler.SetScreen(new TitleScreen());
 		}
 
@@ -87,16 +79,19 @@ namespace SoulboundBackend.Core {
 		public UIHandler GetUIHandler() => uiHandler;
 
 		[PROTOTYPICAL]
+		[Obsolete]
 		public Level? GetActiveLevel() {
 			return GetActiveLevelManager()?.level;
 		}
 
 		[PROTOTYPICAL]
+		[Obsolete]
 		public LevelManager? GetActiveLevelManager() {
 			return worldManager.activeLevelManager;
 		}
 
 		[PROTOTYPICAL]
+		[Obsolete]
 		public PlayerController? GetPlayerInstance() {
 			return worldManager.activeLevelManager?.player;
 		}

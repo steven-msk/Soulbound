@@ -20,7 +20,7 @@ public sealed class Main : MonoBehaviour {
 		soulbound.Run();
 	}
 
-	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
 	public static void Preload() {
 		AssetManager.PreloadAll();
 	}

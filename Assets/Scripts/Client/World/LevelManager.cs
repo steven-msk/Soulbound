@@ -27,7 +27,6 @@ using Logger = SoulboundBackend.Common.Logging.Logger;
 namespace SoulboundBackend.Core {
 	public class LevelManager : MonoBehaviour {
 		private static readonly Logger logger = Logger.CreateInstance();
-		public event Action<Level>? onLevelLoaded;
 		public const float tickRate = 0.02f;        // 50 tps
 		private float tickStartTime;
 		private float frameStartTime;
@@ -97,7 +96,6 @@ namespace SoulboundBackend.Core {
 
 			StartCoroutine(GameFrameLoop());
 			StartCoroutine(GameTickLoop());
-			onLevelLoaded?.Invoke(level);
 		}
 
 		public void SpawnPlayer(SerializedEntity? serialized) {

@@ -61,7 +61,6 @@ namespace SoulboundBackend.Client {
 		public bool CanAttack { get; set; } = true;
 
 		public Vector2 center => playerPhysics.Collider.bounds.center;
-		public BlockPos blockPos => Soulbound.instance.GetActiveLevel()!.ToBlockPos(this.position);
 
 		public Vector2 itemDropForce {
 			get {
@@ -200,10 +199,10 @@ namespace SoulboundBackend.Client {
 				.UnderToken(PlayerActionTokens.BlockBreak)
 				.Execute(() => {
 					Level level = Soulbound.instance.GetActiveLevel()!;
-					BlockPos blockPos = level.ToBlockPos(mouseWorldPos);
+					BlockPos blockPos = (BlockPos)mouseWorldPos;
 					Block? targetBlock = level.BlockAt(blockPos);
 
-					if (0 >= targetBlock.breakRequirement?.minBreakPower) {
+					if (0 >= targetBlock?.breakRequirement?.minBreakPower) {
 						level.BreakBlock(blockPos, new PlayerToolBreakSource(this, null));
 					}
 				})

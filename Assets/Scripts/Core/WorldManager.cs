@@ -25,8 +25,6 @@ using Scene = UnityEngine.SceneManagement.Scene;
 #nullable enable
 
 public sealed class WorldManager {
-	[Obsolete]
-	public event Action<LevelManager, WorldDump?>? onWorldLoaded;
 	public LevelManager? activeLevelManager { get; private set; }
 	private readonly WorldSerializationService serializationService;
 
@@ -46,7 +44,7 @@ public sealed class WorldManager {
 	//}
 
 	public async UniTask<WorldDump?> LoadWorld(
-			string world, 
+			string world,
 			AsyncOperation sceneLoader,
 			int seed,
 			Func<IWorldSceneRoot> rootGetter

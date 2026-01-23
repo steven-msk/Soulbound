@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -36,7 +36,7 @@ namespace SoulboundBackend.Core.Serialization {
 		}
 
 		public static void WriteDictionary<K, V>(
-this BinaryWriter writer,
+			this BinaryWriter writer,
 			Dictionary<K, V> dictionary,
 			Action<BinaryWriter, K> writeKey,
 			Action<BinaryWriter, V> writeValue

@@ -500,7 +500,7 @@ GameObject:
   m_Component:
   - component: {fileID: 770402293}
   - component: {fileID: 770402292}
-  - component: {fileID: 770402295}
+  - component: {fileID: 770402297}
   - component: {fileID: 770402296}
   m_Layer: 0
   m_Name: Root
@@ -556,7 +556,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &770402295
+--- !u!114 &770402296
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 770402291}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f791aef2185a71744805a29f979acb5a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneRoot: {fileID: 770402297}
+--- !u!114 &770402297
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -572,19 +585,6 @@ MonoBehaviour:
   _grid: {fileID: 153482352}
   _tilemap: {fileID: 486148870}
   _canvas: {fileID: 1237554554}
---- !u!114 &770402296
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 770402291}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f791aef2185a71744805a29f979acb5a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sceneRoot: {fileID: 770402295}
 --- !u!1001 &1237554553
 PrefabInstance:
   m_ObjectHideFlags: 0

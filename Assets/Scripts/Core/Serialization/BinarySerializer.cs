@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Client.World;
+using SoulboundBackend.Client.World;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,27 +7,22 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace SoulboundBackend.Core.Serialization {
-	public class BinarySerializer<T> : ISerializer<T> {
-		private readonly Func<BinaryReader, T> deserializer;
-		private readonly Action<BinaryWriter, T> serializer;
-
-		public BinarySerializer(Func<BinaryReader, T> deserializer, Action<BinaryWriter, T> serializer) {
-			this.deserializer = deserializer;
-			this.serializer = serializer;
-		}
+	public abstract class BinarySerializer<T> : ISerializer<T> {
+		protected abstract T ReadBinary(BinaryReader reader);
+		protected abstract byte[] WriteBinary(T obj, BinaryWriter writer);
 
 		public virtual T Deserialize(byte[] data) {
 			using var memoryStream = new MemoryStream(data);
 			using var reader = new BinaryReader(memoryStream);
 
-			return deserializer.Invoke(reader);
+			return ReadBinary(reader);
 		}
 
 		public virtual byte[] Serialize(T obj) {
 			using var memoryStream = new MemoryStream();
 			using var writer = new BinaryWriter(memoryStream);
 
-			serializer.Invoke(writer, obj);
+			WriteBinary(obj, writer);
 
 			return memoryStream.ToArray();
 		}
