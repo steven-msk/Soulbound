@@ -13,6 +13,7 @@ namespace SoulboundBackend.Client.World {
 		SceneContext sceneContext { get; }
 		Grid grid { get; }
 		Tilemap tilemap { get; }
+		Canvas canvas { get; }
 
 		public LevelGridContext CreateGridContext() {
 			return new LevelGridContext(grid, tilemap);

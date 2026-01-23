@@ -10,10 +10,10 @@ using Zenject;
 
 namespace SoulboundBackend.Client.World {
 	public class LevelInstallerComponent : MonoInstaller {
-		[SerializeField] Canvas canvas;
+		[SerializeField] WorldSceneRoot sceneRoot;
 
 		public override void InstallBindings() {
-			new LevelInstaller(canvas).InstallBindings(Container);
+			new LevelInstaller(sceneRoot.canvas).InstallBindings(Container);
 		}
 	}
 }

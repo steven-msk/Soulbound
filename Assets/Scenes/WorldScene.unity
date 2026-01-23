@@ -238,6 +238,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 207337779363731776, guid: b54940d46e298384382541cf7ed92bda, type: 3}
   m_PrefabInstance: {fileID: 486148868}
   m_PrefabAsset: {fileID: 0}
+--- !u!1839735485 &486148870 stripped
+Tilemap:
+  m_CorrespondingSourceObject: {fileID: 7535127857577438315, guid: b54940d46e298384382541cf7ed92bda, type: 3}
+  m_PrefabInstance: {fileID: 486148868}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &486148875
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -563,6 +568,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf4f5a136ac8f1447a25884fdefdf445, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _sceneContext: {fileID: 770402292}
+  _grid: {fileID: 153482352}
+  _tilemap: {fileID: 486148870}
+  _canvas: {fileID: 1237554554}
 --- !u!114 &770402296
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -575,7 +584,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f791aef2185a71744805a29f979acb5a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  canvas: {fileID: 1237554554}
+  sceneRoot: {fileID: 770402295}
 --- !u!1001 &1237554553
 PrefabInstance:
   m_ObjectHideFlags: 0

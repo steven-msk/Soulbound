@@ -10,8 +10,14 @@ using Zenject;
 
 namespace SoulboundBackend.Client.World {
 	public sealed class WorldSceneRoot : MonoBehaviour, IWorldSceneRoot {
-		public SceneContext sceneContext => GetComponent<SceneContext>();
-		public Grid grid => FindFirstObjectByType<Grid>();
-		public Tilemap tilemap => FindFirstObjectByType<Tilemap>();
+		[SerializeField] SceneContext _sceneContext;
+		[SerializeField] Grid _grid;
+		[SerializeField] Tilemap _tilemap;
+		[SerializeField] Canvas _canvas;
+
+		public SceneContext sceneContext => _sceneContext;
+		public Grid grid => _grid;
+		public Tilemap tilemap => _tilemap;
+		public Canvas canvas => _canvas;
 	}
 }
