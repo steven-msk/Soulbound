@@ -1,9 +1,11 @@
+using Cysharp.Threading.Tasks;
 using SoulboundBackend.Client;
 using SoulboundBackend.Client.SettingSystem;
 using SoulboundBackend.Client.UI;
 using SoulboundBackend.Client.World;
 using SoulboundBackend.Common;
 using SoulboundBackend.Common.Json;
+using SoulboundBackend.Common.Logging;
 using SoulboundBackend.Core.Bootstrap;
 using SoulboundBackend.Core.Resource;
 using SoulboundBackend.Core.Serialization;
@@ -74,7 +76,7 @@ namespace SoulboundBackend.Core {
 				SceneManager.LoadSceneAsync("WorldScene"),
 				seed: 12345,
 				() => UnityEngine.Object.FindFirstObjectByType<WorldSceneRoot>()
-			);
+			).Forget(Debug.LogException);
 		}
 
 		public void OnApplicationQuit() {

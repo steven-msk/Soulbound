@@ -45,7 +45,7 @@ public sealed class WorldManager {
 	//	}
 	//}
 
-	public WorldDump? LoadWorld(
+	public async UniTask<WorldDump?> LoadWorld(
 			string world, 
 			AsyncOperation sceneLoader,
 			int seed,
@@ -57,15 +57,17 @@ public sealed class WorldManager {
 		}
 		seed = dump?.seed ?? seed;
 
-		CoroutineRunner.GetInstance().StartCoroutine(
-			LevelSceneLoad(sceneLoader, rootGetter, world, dump, seed)
-		);
+		var levelManager = await LoadWorldSceneAsync(sceneLoader, rootGetter);
+		activeLevelManager = levelManager;
 
+		activeLevelManager.BootstrapWorld(world, dump, seed, rootGetter().CreateGridContext());
+		activeLevelManager.SpawnPlayer(dump?.player);
+		
 		return dump;
 	}
 
-	public IEnumerator LevelSceneLoad(AsyncOperation sceneLoader, Func<IWorldSceneRoot> rootGetter, string world, WorldDump? dump, int seed) {
-		yield return sceneLoader;
+	public async UniTask<LevelManager> LoadWorldSceneAsync(AsyncOperation sceneLoader, Func<IWorldSceneRoot> rootGetter) {
+		await sceneLoader.ToUniTask();
 
 		var root = rootGetter()
 			?? throw new InvalidOperationException("Failed to load world scene: missing root");
@@ -76,11 +78,7 @@ public sealed class WorldManager {
 		root.sceneContext.Install();
 		root.sceneContext.Resolve();
 
-		var levelManager = root.sceneContext.Container.Resolve<LevelManager>();
-		activeLevelManager = levelManager;
-
-		activeLevelManager.BootstrapWorld(world, dump, seed, root.CreateGridContext());
-		activeLevelManager.SpawnPlayer(dump?.player);
+		return root.sceneContext.Container.Resolve<LevelManager>();
 	}
 
 	public void SaveWorld(string world, LevelManager levelManager) {
@@ -91,11 +89,8 @@ public sealed class WorldManager {
 		serializationService.Save(dump, world);
 	}
 
-	public IEnumerator TerminateWorldProcess(Scene worldScene, string world, Func<WorldDump> dumpSupplier) {
-		this.SaveWorld(world, dumpSupplier.Invoke());
-
-		var async = SceneManager.UnloadSceneAsync(worldScene);
-		yield return new WaitUntil(() => async.isDone);
-		yield return null;
+	public async UniTask TerminateWorldProcess(Scene worldScene, string world, Func<WorldDump> dumpSupplier) {
+		SaveWorld(world, dumpSupplier.Invoke());
+		await SceneManager.UnloadSceneAsync(worldScene).ToUniTask();
 	}
 }
