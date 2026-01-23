@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using SoulboundBackend.Client;
 using SoulboundBackend.Client.World;
@@ -46,7 +47,7 @@ public sealed class WorldManager {
 
 	public WorldDump? LoadWorld(
 			string world, 
-			Action sceneLoader,
+			AsyncOperation sceneLoader,
 			int seed,
 			Func<IWorldSceneRoot> rootGetter
 		) {
@@ -63,9 +64,8 @@ public sealed class WorldManager {
 		return dump;
 	}
 
-	IEnumerator LevelSceneLoad(Action sceneLoader, Func<IWorldSceneRoot> rootGetter, string world, WorldDump? dump, int seed) {
-		sceneLoader.Invoke();
-		yield return null;
+	public IEnumerator LevelSceneLoad(AsyncOperation sceneLoader, Func<IWorldSceneRoot> rootGetter, string world, WorldDump? dump, int seed) {
+		yield return sceneLoader;
 
 		var root = rootGetter()
 			?? throw new InvalidOperationException("Failed to load world scene: missing root");

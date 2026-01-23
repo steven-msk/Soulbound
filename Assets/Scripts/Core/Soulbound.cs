@@ -71,7 +71,7 @@ namespace SoulboundBackend.Core {
 			uiHandler.FlushScreens();
 
 			worldManager.LoadWorld(world,
-				() => SceneManager.LoadScene("WorldScene"),
+				SceneManager.LoadSceneAsync("WorldScene"),
 				seed: 12345,
 				() => UnityEngine.Object.FindFirstObjectByType<WorldSceneRoot>()
 			);

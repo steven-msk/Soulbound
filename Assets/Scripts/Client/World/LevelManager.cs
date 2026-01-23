@@ -92,8 +92,8 @@ namespace SoulboundBackend.Core {
 			entityManager.Deserialize(dump?.serializedEntities ?? new());
 			sessionRunning = true;
 
-			container.BindInstance<Level>(level).AsSingle();
-			container.BindInstance<EntityManager>(entityManager).AsSingle();
+			container.BindInstance(level).AsSingle();
+			container.BindInstance(entityManager).AsSingle();
 
 			StartCoroutine(GameFrameLoop());
 			StartCoroutine(GameTickLoop());
