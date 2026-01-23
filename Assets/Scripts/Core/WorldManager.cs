@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using SoulboundBackend.Client;
 using SoulboundBackend.Client.World;
 using SoulboundBackend.Client.World.BlockSystem;
@@ -14,6 +14,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.LightTransport;
 using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
 using Zenject;
@@ -23,6 +24,7 @@ using Scene = UnityEngine.SceneManagement.Scene;
 #nullable enable
 
 public sealed class WorldManager {
+	[Obsolete]
 	public event Action<LevelManager, WorldDump?>? onWorldLoaded;
 	[Inject] public LevelManager? activeLevelManager { get; private set; }
 	private readonly WorldSerializationService serializationService;
@@ -44,60 +46,50 @@ public sealed class WorldManager {
 
 	public WorldDump? LoadWorld(
 			string world, 
-			Func<SceneContext> sceneContextSupplier,
-			Action sceneLoader
+			Action sceneLoader,
+			int seed,
+			Func<IWorldSceneRoot> rootGetter
 		) {
 		WorldDump? dump = serializationService.Load(world);
 		if (!dump?.nonNulled ?? true) {
 			dump = null;
 		}
-		int seed = dump?.seed ?? 12345;
+		seed = dump?.seed ?? seed;
 
-		IEnumerator LevelSceneLoader() {
-			sceneLoader.Invoke();
-			yield return null;
-
-			var sceneContext = sceneContextSupplier.Invoke();
-			yield return new WaitUntil(() => sceneContext.HasInstalled && sceneContext.HasResolved);
-
-			sceneContext.Container.Inject(this);
-			if (activeLevelManager == null) {
-				throw new InvalidOperationException("Level Manager is not injected");
-			}
-
-			LevelGridContext gridContext;
-			GameObject grid = GameObject.Find("Grid");
-			if (grid == null) {
-				gridContext = LevelGridContext.FromRuntimePrefabs();
-			} else {
-				Tilemap tilemap = grid.GetComponentInChildren<Tilemap>();
-				gridContext = new LevelGridContext(grid.GetComponent<Grid>(), tilemap);
-			}
-
-			activeLevelManager.BootstrapWorld(world, dump, seed, gridContext);
-			onWorldLoaded?.Invoke(activeLevelManager, dump);
-			
-		}
-		CoroutineRunner.GetInstance().StartCoroutine(LevelSceneLoader());
+		CoroutineRunner.GetInstance().StartCoroutine(
+			LevelSceneLoad(sceneLoader, rootGetter, world, dump, seed)
+		);
 
 		return dump;
 	}
 
+	IEnumerator LevelSceneLoad(Action sceneLoader, Func<IWorldSceneRoot> rootGetter, string world, WorldDump? dump, int seed) {
+		sceneLoader.Invoke();
+		yield return null;
+
+		var root = rootGetter()
+			?? throw new InvalidOperationException("Failed to load world scene: missing scene root");
+
+		root.sceneContext.Install();
+		root.sceneContext.Resolve();
+		root.sceneContext.Container.Inject(this);
+
+		var levelManager = root.sceneContext.Container.Resolve<LevelManager>();
+		activeLevelManager = levelManager;
+
+		var gridContext = root.CreateGridContext();
+
+		activeLevelManager.BootstrapWorld(world, dump, seed, gridContext);
+
+		activeLevelManager.SpawnPlayer(dump?.player);
+	}
+
 	public void SaveWorld(string world, LevelManager levelManager) {
-		this.SaveWorld(world, levelManager.CreateDump());
+		SaveWorld(world, levelManager.CreateDump());
 	}
 
 	public void SaveWorld(string world, WorldDump dump) {
 		serializationService.Save(dump, world);
-
-		//var persistent = ICachedRegistry<Block>.GetCachedRegistry().Values
-		//	.Select(block => new KeyValuePair<Block, IBlockStateCacheStrategy>(block, block.stateCacheStrategy))
-		//	.Where(e => e.Value is IPersistentStateCache)
-		//	.Select(e => new KeyValuePair<Block, IPersistentStateCache>(e.Key, (IPersistentStateCache)e.Value));
-
-		//foreach (var persistentEntry in persistent) {
-		//	persistentEntry.Value.Save(persistentEntry.Key);
-		//}
 	}
 
 	public IEnumerator TerminateWorldProcess(Scene worldScene, string world, Func<WorldDump> dumpSupplier) {

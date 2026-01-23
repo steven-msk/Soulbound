@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Client;
+using SoulboundBackend.Client;
 using SoulboundBackend.Client.SettingSystem;
 using SoulboundBackend.Client.UI;
 using SoulboundBackend.Client.World;
@@ -40,15 +40,15 @@ namespace SoulboundBackend.Core {
 		public Soulbound(GameConfig config) {
 			instance = this;
 			this.config = config;
-			this.settings = new Settings();
-			this.playerInputActions = new PlayerInputActions();
+			settings = new Settings();
+			playerInputActions = new PlayerInputActions();
 			IWorldSaveStrategy saveStrategy = config.dev.loadDevWorldFromSave
 				? new WorldSaveStrategy(config.file.savesFolder, Application.persistentDataPath)
 				: new DoNotSaveWorldStrategy();
 			ISerializer<WorldDump> worldSerializer = new JsonSerializer<WorldDump>(globalJsonSettings);
 			SerializationPipeline<WorldDump> worldSerializationPipeline = new(worldSerializer);
-			this.worldManager = new WorldManager(new WorldSerializationService(saveStrategy, worldSerializationPipeline));
-			this.uiHandler = new UIHandler(GameObject.FindFirstObjectByType<Canvas>());
+			worldManager = new WorldManager(new WorldSerializationService(saveStrategy, worldSerializationPipeline));
+			uiHandler = new UIHandler(UnityEngine.Object.FindFirstObjectByType<Canvas>());
 		}
 
 		public void Run() {
@@ -71,8 +71,9 @@ namespace SoulboundBackend.Core {
 			uiHandler.FlushScreens();
 
 			worldManager.LoadWorld(world,
-				GameObject.FindFirstObjectByType<SceneContext>,
-				() => SceneManager.LoadScene("WorldScene")
+				() => SceneManager.LoadScene("WorldScene"),
+				seed: 12345,
+				() => UnityEngine.Object.FindFirstObjectByType<WorldSceneRoot>()
 			);
 		}
 
