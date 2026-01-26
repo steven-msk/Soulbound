@@ -6,7 +6,6 @@ using UnityEngine.SceneManagement;
 public sealed class Main : MonoBehaviour {
 	[SerializeField] private GameConfig gameConfig;
 	private static Main instance;
-	private static Soulbound soulbound;
 
 	private void Awake() => instance = this;
 
@@ -16,17 +15,11 @@ public sealed class Main : MonoBehaviour {
 				|| (!instance?.gameObject.activeSelf ?? true)) {
 			return;
 		}
-		soulbound = new Soulbound(instance.gameConfig);
-		soulbound.Run();
+		new Soulbound(instance.gameConfig).Launch();
 	}
 
 	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
 	public static void Preload() {
 		AssetManager.PreloadAll();
 	}
-
-	private void OnApplicationQuit() {
-		soulbound.OnApplicationQuit();
-	}
-
 }

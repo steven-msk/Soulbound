@@ -128,7 +128,7 @@ namespace SoulboundBackend.Core {
 		IEnumerator GameFrameLoop() {
 			WaitForEndOfFrame endOfFrame = new();
 			while (sessionRunning) {
-				if (!this.paused) {
+				if (!paused) {
 					StartFrame();
 
 					worldRenderer.RenderView(player?.position ?? level.GetWorldSpawnPoint());
@@ -150,7 +150,7 @@ namespace SoulboundBackend.Core {
 		IEnumerator GameTickLoop() {
 			WaitForSecondsRealtime tickDelay = new(tickRate);
 			while (sessionRunning) {
-				if (!this.paused) {
+				if (!paused) {
 					StartTick();
 					// do things
 					entityManager.Tick();
@@ -214,10 +214,6 @@ namespace SoulboundBackend.Core {
 				serializedEntities
 			);
 		}
-
-		private void OnApplicationQuit() {
-			Soulbound.instance.OnApplicationQuit();
-		} 
 
 		public static LevelManager CreateInstance() {
 			GameObject? levelManagerPrefab = AssetManager.Resolve<GameObject>(new AssetKey("levelManager"));

@@ -22,8 +22,9 @@ using Zenject;
 #nullable enable
 
 namespace SoulboundBackend.Core {
-	public sealed class Soulbound {
+	public sealed class Soulbound : IApplicationController {
 		public static Soulbound instance { get; private set; } = null!;
+		private bool running;
 		private readonly GameConfig config;
 		private readonly UIHandler uiHandler;
 		private readonly WorldManager worldManager;
@@ -53,7 +54,12 @@ namespace SoulboundBackend.Core {
 			uiHandler = new UIHandler(UnityEngine.Object.FindFirstObjectByType<Canvas>());
 		}
 
-		public void Run() {
+		public void Launch() {
+			if (running) return;
+			running = true;
+
+			Application.quitting += OnApplicationQuit;
+
 			uiHandler.SetScreen(new TitleScreen());
 		}
 
