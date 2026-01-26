@@ -32,7 +32,6 @@ namespace SoulboundBackend.Client.World {
 		}
 
 		public string GetSavesRoot() {
-			UnityEngine.Debug.Log(saveStrategy.GetType());
 			return saveStrategy.GetSavesRoot();
 		}
 	}

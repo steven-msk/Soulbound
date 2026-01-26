@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.LightTransport;
 using UnityEngine.UI;
 using Screen = SoulboundBackend.Client.UI.Screens.Screen;
 
@@ -22,27 +23,37 @@ namespace SoulboundBackend.Client.UI {
 
 		public override ScreenObject BuildObject(Transform rootParent) {
 			ScreenObject screen = base.BuildObject(rootParent);
-
-			var prefab = AssetManager.Resolve<GameObject>(new AssetKey("WorldEnter"));
+			
 			float leadingY = 0f;
 
 			// prototypical
 			var saves = Soulbound.instance.worldManager.ListSaves().ToList();
-			UnityEngine.Debug.Log(saves.Count);
 			foreach (var world in saves) {
-				var obj = GameObject.Instantiate(prefab, rootParent);
-				obj.GetComponent<TextMeshProUGUI>().text = world;
-				obj.GetComponent<RectTransform>().anchoredPosition += new Vector2(0, leadingY);
-				leadingY -= 30f;
-
-				obj.transform.SetParent(screen.transform);
-				var b = obj.GetComponent<Button>();
-
-				b.onClick.AddListener(Soulbound.instance.Prototype_LoadDevWorld);
-				screen.GetChildMap().AddChild(obj);
+				var button = CreateButton(world, ref leadingY, rootParent, screen);
+				button.onClick.AddListener(() => Soulbound.instance.LoadWorld(world));
 			}
+
+			leadingY -= 40f;
+
+			var newWorldButton = CreateButton("new world", ref leadingY, rootParent, screen);
+			newWorldButton.onClick.AddListener(() => Soulbound.instance.LoadWorld($"world_{Guid.NewGuid()}"));
 
 			return screen;
 		}
+
+		private Button CreateButton(string text, ref float leadingY, Transform rootParent, ScreenObject screen) {
+			var prefab = AssetManager.Resolve<GameObject>(new AssetKey("WorldEnter"));
+			var obj = GameObject.Instantiate(prefab, rootParent);
+			obj.GetComponent<TextMeshProUGUI>().text = text;
+			obj.GetComponent<RectTransform>().anchoredPosition += new Vector2(0, leadingY);
+			leadingY -= 30f;
+
+			obj.transform.SetParent(screen.transform);
+			var b = obj.GetComponent<Button>();
+
+			screen.GetChildMap().AddChild(obj);
+			return b;
+		}
+
 	}
 }

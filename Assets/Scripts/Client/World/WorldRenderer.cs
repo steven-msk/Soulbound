@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Client.World.BlockSystem;
+using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core.Resource;
 using System.Resources;
@@ -64,10 +64,10 @@ namespace SoulboundBackend.Client.World {
 		}
 
 		[PROTOTYPICAL]
-		private void RenderBlock(BlockState state, TileEntity? tileEntity, BlockPos pos, Tilemap tilemap) {
+		private void RenderBlock(BlockState? state, TileEntity? tileEntity, BlockPos pos, Tilemap tilemap) {
 			
-			var tile = state.block != Blocks.air
-				? Core.Resource.AssetManager.Resolve<TileBase>(state.block.tileKey)
+			var tile = state?.block != Blocks.air
+				? Core.Resource.AssetManager.Resolve<TileBase>((state?.block ?? Blocks.air).tileKey)
 				: null!;
 
 			tilemap.SetTile((Vector3Int)pos, tile);

@@ -34,7 +34,6 @@ public sealed class WorldManager {
 
 	public IEnumerable<string> ListSaves() {
 		string savesRoot = serializationService.GetSavesRoot();
-		UnityEngine.Debug.Log(savesRoot);
 		if (!Directory.Exists(savesRoot)) {
 			yield break;
 		}

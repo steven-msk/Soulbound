@@ -59,10 +59,17 @@ namespace SoulboundBackend.Core {
 
 		[PROTOTYPICAL]
 		public void Prototype_LoadDevWorld() {
+			LoadWorld(config.dev.devWorld);
+		}
+
+		// aware of the problem with world deserialization
+
+		[PROTOTYPICAL]
+		public void LoadWorld(string world) {
 			uiHandler.FlushScreens();
 
 			// prototypical
-			worldManager.LoadWorld(config.dev.devWorld,
+			worldManager.LoadWorld(world,
 				SceneManager.LoadSceneAsync("WorldScene"),
 				seed: config.dev.seed,
 				() => UnityEngine.Object.FindFirstObjectByType<WorldSceneRoot>()

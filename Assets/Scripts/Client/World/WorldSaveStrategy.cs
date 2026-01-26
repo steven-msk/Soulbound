@@ -50,16 +50,18 @@ namespace SoulboundBackend.Client.World {
 		}
 
 		public void SaveRaw(byte[] data, string world) {
+			Directory.CreateDirectory(GetSaveFolder(world));
 			File.WriteAllBytes(GetDumpPath(world), data);
 		}
 
 		public string GetDumpPath(string world) {
-			string worldFolder = Path.Combine(root, world);
-			if (!Directory.Exists(worldFolder)) {
-				return string.Empty;
-			}
+			string relativeFolder = Path.Combine(root, world);
+			return CombineDataPath(relativeFolder, LevelManager.worldDump);
+		}
 
-			return CombineDataPath(worldFolder, LevelManager.worldDump);
+		public string GetSaveFolder(string world) {
+			string relativeFolder = Path.Combine(root, world);
+			return CombineDataPath(relativeFolder);
 		}
 
 		private string CombineDataPath(params string[] paths) {
