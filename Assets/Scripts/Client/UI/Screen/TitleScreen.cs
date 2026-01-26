@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Client.UI.Screens;
+using SoulboundBackend.Client.UI.Screens;
 using SoulboundBackend.Core;
 using SoulboundBackend.Core.AssetManagement;
 using SoulboundBackend.Core.Resource;
@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Screen = SoulboundBackend.Client.UI.Screens.Screen;
@@ -22,15 +23,25 @@ namespace SoulboundBackend.Client.UI {
 		public override ScreenObject BuildObject(Transform rootParent) {
 			ScreenObject screen = base.BuildObject(rootParent);
 
-			// this makes no sense but its the only way its parenting it properly
 			var prefab = AssetManager.Resolve<GameObject>(new AssetKey("WorldEnter"));
-			var obj = GameObject.Instantiate(prefab, rootParent);
-			obj.transform.SetParent(screen.transform);
+			float leadingY = 0f;
 
-			var b = obj.GetComponent<Button>();
-			b.onClick.AddListener(Soulbound.instance.Prototype_LoadDevWorld);
+			// prototypical
+			var saves = Soulbound.instance.worldManager.ListSaves().ToList();
+			UnityEngine.Debug.Log(saves.Count);
+			foreach (var world in saves) {
+				var obj = GameObject.Instantiate(prefab, rootParent);
+				obj.GetComponent<TextMeshProUGUI>().text = world;
+				obj.GetComponent<RectTransform>().anchoredPosition += new Vector2(0, leadingY);
+				leadingY -= 30f;
 
-			screen.GetChildMap().AddChild(obj);
+				obj.transform.SetParent(screen.transform);
+				var b = obj.GetComponent<Button>();
+
+				b.onClick.AddListener(Soulbound.instance.Prototype_LoadDevWorld);
+				screen.GetChildMap().AddChild(obj);
+			}
+
 			return screen;
 		}
 	}

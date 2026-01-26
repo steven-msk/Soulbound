@@ -72786,9 +72786,10 @@ MonoBehaviour:
     file:
       savesFolder: saves
     dev:
-      loadDevWorldFromSave: 0
+      useDoNotSaveWorldStrategy: 0
       devWorld: devWorld
       devScene: DevScene
+      seed: 12345
 --- !u!4 &2144701901
 Transform:
   m_ObjectHideFlags: 0

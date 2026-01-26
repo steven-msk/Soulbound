@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Client.World;
+using SoulboundBackend.Client.World;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 
 namespace SoulboundBackend.Core {
     public interface IWorldSaveStrategy {
+		string GetSavesRoot();
+
         WorldDump? Load(string world);
         void Save(WorldDump obj, string world);
 

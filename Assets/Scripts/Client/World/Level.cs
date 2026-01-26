@@ -1,4 +1,4 @@
-﻿using Assets.Scripts.Client.World.Biome;
+using Assets.Scripts.Client.World.Biome;
 using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Client.World.Chunk;
 using SoulboundBackend.Client.World.EntitySystem;
@@ -35,15 +35,15 @@ namespace SoulboundBackend.Client.World {
 		// POTENTIAL: post world events to the ticking system
 
 		public readonly int seed;
-		[Obsolete] static Dictionary<string, StructureTemplate> registeredStructureTemplates = new();
-		private Dictionary<int, WorldChunk> loadedChunks = new();
+		//[Obsolete] static Dictionary<string, StructureTemplate> registeredStructureTemplates = new();
+		private readonly Dictionary<int, WorldChunk> loadedChunks = new();
 		private Dictionary<int, WorldChunk> generatedChunks = new(); 
-		private ChunkOutlineRenderer chunkOutlineRenderer = new();
-		[Obsolete] private Dictionary<int, List<StructurePlacement>> structurePlacements = new();
+		private readonly ChunkOutlineRenderer chunkOutlineRenderer = new();
+		//[Obsolete] private Dictionary<int, List<StructurePlacement>> structurePlacements = new();
 		[Obsolete] private Dictionary<int, List<(ChunkBlockPos pos, BlockState? state)>> pendingUpdates = new();
 		[Obsolete] private readonly ConcurrentDictionary<int, List<OnChunkGenerated>> deferredGenerations = new();
 		private readonly Dictionary<int, ChunkGenData> chunkGenData = new();
-		private LevelGridContext gridContext;
+		private readonly LevelGridContext gridContext;
 		private LevelManager levelManager = null!;
 		public bool isWorldLoaded { get; private set; } = false;
 
@@ -72,19 +72,19 @@ namespace SoulboundBackend.Client.World {
 			Dictionary<int, int[][]> chunkIDmap = new();
 
 			if (dump == null) {
-				for (int dx = -RENDER_DISTANCE; dx <= RENDER_DISTANCE; dx++) {
-					this.GenerateNewChunk(dx);
+				for (int cx = -RENDER_DISTANCE; cx <= RENDER_DISTANCE; cx++) {
+					GenerateNewChunk(cx);
 				}
 			} else {
-				this.generatedChunks = dump.Value.generatedChunks.ToDictionary(chunk => chunk.xpos, chunk => chunk);
-				this.structurePlacements = dump.Value.structurePlacements;
+				generatedChunks = dump.Value.generatedChunks.ToDictionary(chunk => chunk.xpos, chunk => chunk);
+				//this.structurePlacements = dump.Value.structurePlacements;
 			}
 
-			foreach (var structureTemplate in registeredStructureTemplates.Values) {
-				if (structureTemplate?.blockStateChangedCallback is not null) {
-					BlockStateChanged += structureTemplate.blockStateChangedCallback;
-				}
-			}
+			//foreach (var structureTemplate in registeredStructureTemplates.Values) {
+			//	if (structureTemplate?.blockStateChangedCallback is not null) {
+			//		BlockStateChanged += structureTemplate.blockStateChangedCallback;
+			//	}
+			//}
 
 			Vector2 spawnPoint = dump != null
 				? dump.Value.player.lastPosition
@@ -104,10 +104,10 @@ namespace SoulboundBackend.Client.World {
 			return new Vector2(0f, GetSurfaceAirY(0));
 		}
 
-		public void Dump(out int seed, out WorldChunk[] generatedChunks, out Dictionary<int, List<StructurePlacement>> structurePlacements) {
+		public void Dump(out int seed, out WorldChunk[] generatedChunks) {
 			seed = this.seed;
 			generatedChunks = this.generatedChunks.Values.ToArray();
-			structurePlacements = this.structurePlacements;
+			//structurePlacements = this.structurePlacements;
 		}
 
 		public void UpdateChunks(Vector2 pivot) {
@@ -216,101 +216,101 @@ namespace SoulboundBackend.Client.World {
 			}
 		}
 
-		[Obsolete]
-		public bool TryPlaceStructure(
-				int chunkBlockX,
-				int chunkX, 
-				out StructurePlacement structurePlacement
-			) {
-			foreach (var structureID in registeredStructureTemplates.Keys) {
-				StructureTemplate structure = registeredStructureTemplates[structureID];
-				var context = new StructureGenerationContext(chunkBlockX, 0, chunkX, this);
-				var data = structure.placementFunction.Invoke(context, false);
+		//[Obsolete]
+		//public bool TryPlaceStructure(
+		//		int chunkBlockX,
+		//		int chunkX, 
+		//		out StructurePlacement structurePlacement
+		//	) {
+		//	foreach (var structureID in registeredStructureTemplates.Keys) {
+		//		StructureTemplate structure = registeredStructureTemplates[structureID];
+		//		var context = new StructureGenerationContext(chunkBlockX, 0, chunkX, this);
+		//		var data = structure.placementFunction.Invoke(context, false);
 
-				if (data != null && structure.validationFunction.Invoke(context, data.Value)) {
-					var placementConstraints = structure.placementGenerator.Invoke(context, data.Value);
-					structurePlacement = structure.FinalizePlacement(placementConstraints);
-					return true;
-				}
-			}
+		//		if (data != null && structure.validationFunction.Invoke(context, data.Value)) {
+		//			var placementConstraints = structure.placementGenerator.Invoke(context, data.Value);
+		//			structurePlacement = structure.FinalizePlacement(placementConstraints);
+		//			return true;
+		//		}
+		//	}
 
-			structurePlacement = null!;
-			return false;
-		}
+		//	structurePlacement = null!;
+		//	return false;
+		//}
 
-		[Obsolete]
-		public StructurePlacement ForceGeneratePlacement(ChunkBlockPos chunkBlockPos, StructureTemplate template) {
-			WorldChunk? chunk = chunkBlockPos.UnderlyingChunk(this);
-			var context = new StructureGenerationContext(chunkBlockPos.x, chunkBlockPos.y, chunkBlockPos.chunkX, this);
-			var structureData = template.placementFunction.Invoke(context, true);
+		//[Obsolete]
+		//public StructurePlacement ForceGeneratePlacement(ChunkBlockPos chunkBlockPos, StructureTemplate template) {
+		//	WorldChunk? chunk = chunkBlockPos.UnderlyingChunk(this);
+		//	var context = new StructureGenerationContext(chunkBlockPos.x, chunkBlockPos.y, chunkBlockPos.chunkX, this);
+		//	var structureData = template.placementFunction.Invoke(context, true);
 
-			return template.FinalizePlacement(template.placementGenerator.Invoke(context, structureData));
-		}
+		//	return template.FinalizePlacement(template.placementGenerator.Invoke(context, structureData));
+		//}
 
-		[Obsolete]
-		public void ForcePlaceStructure(ChunkBlockPos chunkBlockPos, StructureTemplate template) {
-			StructurePlacement placement = ForceGeneratePlacement(chunkBlockPos, template);
-			PlaceStructure(chunkBlockPos.chunkX, placement);
-		}
+		//[Obsolete]
+		//public void ForcePlaceStructure(ChunkBlockPos chunkBlockPos, StructureTemplate template) {
+		//	StructurePlacement placement = ForceGeneratePlacement(chunkBlockPos, template);
+		//	PlaceStructure(chunkBlockPos.chunkX, placement);
+		//}
 
-		[Obsolete]
-		public bool StructureAt(BlockPos blockPos, out StructurePlacement structure) {
-			int chunkX = ChunkXAt((Vector2Int)blockPos);
-			if (structurePlacements.TryGetValue(chunkX, out var chunkFeatures)) {
-				ChunkBlockPos chunkBlockPos = blockPos.ToChunk();
-				structure = chunkFeatures
-					.FirstOrDefault(f => f.bounds.Contains((Vector2Int)chunkBlockPos));
-				return structure?.PersistentExistence() ?? false;
-			}
+		//[Obsolete]
+		//public bool StructureAt(BlockPos blockPos, out StructurePlacement structure) {
+		//	int chunkX = ChunkXAt((Vector2Int)blockPos);
+		//	if (structurePlacements.TryGetValue(chunkX, out var chunkFeatures)) {
+		//		ChunkBlockPos chunkBlockPos = blockPos.ToChunk();
+		//		structure = chunkFeatures
+		//			.FirstOrDefault(f => f.bounds.Contains((Vector2Int)chunkBlockPos));
+		//		return structure?.PersistentExistence() ?? false;
+		//	}
 
-			structure = null!;
-			return false;
-		}
-
-
-		[Obsolete]
-		public bool OverlappingStructures(BlockPos blockPos, out List<StructurePlacement> overlappingStructures) {
-			int chunkX = ChunkXAt((Vector2Int)blockPos);
-
-			if (structurePlacements.TryGetValue(chunkX, out var placementsInChunk)) {
-				ChunkBlockPos chunkBlockPos = blockPos.ToChunk();
-				overlappingStructures = placementsInChunk
-					.Where(f => f.bounds.Contains((Vector2Int)chunkBlockPos))
-					.ToList();
-				return overlappingStructures.Count > 0;
-			}
-
-			overlappingStructures = new List<StructurePlacement>();
-			return false;
-		}
-
-		[Obsolete]
-		public void PlaceStructure(int chunkX, StructurePlacement placement) {
-			if (!structurePlacements.ContainsKey(chunkX)) {
-				structurePlacements.Add(chunkX, new List<StructurePlacement>());
-			}
-			structurePlacements[chunkX].Add(placement);
-
-			foreach (var stateOverride in placement.stateOverrides) {
-				ChunkBlockPos chunkBlockPos = stateOverride.Key;
-				BlockState blockState = stateOverride.Value;
-				WorldChunk? underlyingChunk = chunkBlockPos.UnderlyingChunk(this);
-
-				if (underlyingChunk == null) {
-					PendBlock(chunkBlockPos, blockState);
-				} else if (loadedChunks.ContainsKey(chunkBlockPos.chunkX) && underlyingChunk != null) {
-					SetBlock(chunkBlockPos, blockState);
-				} else {
-					underlyingChunk?.SetBlock(chunkBlockPos, blockState);
-				}
-			}
-		}
+		//	structure = null!;
+		//	return false;
+		//}
 
 
-		[Obsolete]
-		public void MarkStructureDirty(StructurePlacement placement) { 
-			structurePlacements[placement.origin.chunkX].Remove(placement);
-		}
+		//[Obsolete]
+		//public bool OverlappingStructures(BlockPos blockPos, out List<StructurePlacement> overlappingStructures) {
+		//	int chunkX = ChunkXAt((Vector2Int)blockPos);
+
+		//	if (structurePlacements.TryGetValue(chunkX, out var placementsInChunk)) {
+		//		ChunkBlockPos chunkBlockPos = blockPos.ToChunk();
+		//		overlappingStructures = placementsInChunk
+		//			.Where(f => f.bounds.Contains((Vector2Int)chunkBlockPos))
+		//			.ToList();
+		//		return overlappingStructures.Count > 0;
+		//	}
+
+		//	overlappingStructures = new List<StructurePlacement>();
+		//	return false;
+		//}
+
+		//[Obsolete]
+		//public void PlaceStructure(int chunkX, StructurePlacement placement) {
+		//	if (!structurePlacements.ContainsKey(chunkX)) {
+		//		structurePlacements.Add(chunkX, new List<StructurePlacement>());
+		//	}
+		//	structurePlacements[chunkX].Add(placement);
+
+		//	foreach (var stateOverride in placement.stateOverrides) {
+		//		ChunkBlockPos chunkBlockPos = stateOverride.Key;
+		//		BlockState blockState = stateOverride.Value;
+		//		WorldChunk? underlyingChunk = chunkBlockPos.UnderlyingChunk(this);
+
+		//		if (underlyingChunk == null) {
+		//			PendBlock(chunkBlockPos, blockState);
+		//		} else if (loadedChunks.ContainsKey(chunkBlockPos.chunkX) && underlyingChunk != null) {
+		//			SetBlock(chunkBlockPos, blockState);
+		//		} else {
+		//			underlyingChunk?.SetBlock(chunkBlockPos, blockState);
+		//		}
+		//	}
+		//}
+
+
+		//[Obsolete]
+		//public void MarkStructureDirty(StructurePlacement placement) { 
+		//	structurePlacements[placement.origin.chunkX].Remove(placement);
+		//}
 
 		public void SetBlock(BlockPos blockPos, BlockState? blockState) {
 			WorldChunk? chunk = this.ChunkAt(blockPos);
@@ -440,12 +440,6 @@ namespace SoulboundBackend.Client.World {
 			return generatedChunks!.GetValueOrDefault(ChunkXAt(blockPos.x), null);
 		}
 
-		[Obsolete]
-		public BlockPos ToBlockPos(Vector2 worldPos) {
-			Vector2Int intPos = (Vector2Int)gridContext.grid.WorldToCell(worldPos);
-			return new BlockPos(intPos.x, intPos.y);
-		}
-
 		public WorldChunk? GetChunk(int chunkX) {
 			if (generatedChunks.TryGetValue(chunkX, out var chunk)) {
 				return chunk;
@@ -487,15 +481,15 @@ namespace SoulboundBackend.Client.World {
 			return coveredTiles;
 		}
 
-		public static void RegisterStructure(StructureTemplate structure) {
-			if (!registeredStructureTemplates.ContainsKey(structure.ID)) {
-				registeredStructureTemplates.Add(structure.ID, structure);
-			}
-		}
+		//public static void RegisterStructure(StructureTemplate structure) {
+		//	if (!registeredStructureTemplates.ContainsKey(structure.ID)) {
+		//		registeredStructureTemplates.Add(structure.ID, structure);
+		//	}
+		//}
 
-		public static void ClearStructureRegistry() {
-			registeredStructureTemplates.Clear();
-		}
+		//public static void ClearStructureRegistry() {
+		//	registeredStructureTemplates.Clear();
+		//}
 
 		static int FloorDiv(int a, int b) {
 			int q = a / b;

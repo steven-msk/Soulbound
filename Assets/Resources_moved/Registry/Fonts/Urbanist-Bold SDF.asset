@@ -215,65 +215,8 @@ MonoBehaviour:
   m_SourceFontFilePath: 
   m_AtlasPopulationMode: 1
   InternalDynamicOS: 0
-  m_GlyphTable:
-  - m_Index: 368
-    m_Metrics:
-      m_Width: 47.515625
-      m_Height: 11.296875
-      m_HorizontalBearingX: 3.59375
-      m_HorizontalBearingY: 10.125
-      m_HorizontalAdvance: 56.515625
-    m_GlyphRect:
-      m_X: 10
-      m_Y: 10
-      m_Width: 49
-      m_Height: 13
-    m_Scale: 1
-    m_AtlasIndex: 0
-    m_ClassDefinitionType: 0
-  - m_Index: 383
-    m_Metrics:
-      m_Width: 45
-      m_Height: 10.984375
-      m_HorizontalBearingX: 5.40625
-      m_HorizontalBearingY: 5.9375
-      m_HorizontalAdvance: 55.796875
-    m_GlyphRect:
-      m_X: 78
-      m_Y: 10
-      m_Width: 46
-      m_Height: 12
-    m_Scale: 1
-    m_AtlasIndex: 0
-    m_ClassDefinitionType: 0
-  - m_Index: 320
-    m_Metrics:
-      m_Width: 18.90625
-      m_Height: 63
-      m_HorizontalBearingX: 3.59375
-      m_HorizontalBearingY: 63
-      m_HorizontalAdvance: 29.703125
-    m_GlyphRect:
-      m_X: 143
-      m_Y: 10
-      m_Width: 20
-      m_Height: 63
-    m_Scale: 1
-    m_AtlasIndex: 0
-    m_ClassDefinitionType: 0
-  m_CharacterTable:
-  - m_ElementType: 1
-    m_Unicode: 8230
-    m_GlyphIndex: 368
-    m_Scale: 1
-  - m_ElementType: 1
-    m_Unicode: 95
-    m_GlyphIndex: 383
-    m_Scale: 1
-  - m_ElementType: 1
-    m_Unicode: 49
-    m_GlyphIndex: 320
-    m_Scale: 1
+  m_GlyphTable: []
+  m_CharacterTable: []
   m_AtlasTextures:
   - {fileID: -4576614040727558425}
   m_AtlasTextureIndex: 0
@@ -284,35 +227,11 @@ MonoBehaviour:
   m_AtlasHeight: 1024
   m_AtlasPadding: 9
   m_AtlasRenderMode: 4165
-  m_UsedGlyphRects:
-  - m_X: 0
-    m_Y: 0
-    m_Width: 68
-    m_Height: 32
-  - m_X: 68
-    m_Y: 0
-    m_Width: 65
-    m_Height: 31
-  - m_X: 133
-    m_Y: 0
-    m_Width: 39
-    m_Height: 82
+  m_UsedGlyphRects: []
   m_FreeGlyphRects:
   - m_X: 0
-    m_Y: 82
-    m_Width: 1023
-    m_Height: 941
-  - m_X: 0
-    m_Y: 32
-    m_Width: 133
-    m_Height: 991
-  - m_X: 68
-    m_Y: 31
-    m_Width: 65
-    m_Height: 992
-  - m_X: 172
     m_Y: 0
-    m_Width: 851
+    m_Width: 1023
     m_Height: 1023
   m_FontFeatureTable:
     m_MultipleSubstitutionRecords: []

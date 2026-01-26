@@ -32,16 +32,19 @@ public sealed class WorldManager {
 		this.serializationService = serializationService;
 	}
 
-	//public IEnumerable<string> QuerySaves() {
-	//	if (!Directory.Exists(savesRoot)) {
-	//		yield break;
-	//	}
-	//	foreach (var dir in Directory.GetDirectories(savesRoot)) {
-	//		if (File.Exists(GetRegionedPath(Path.Combine(dir, LevelManager.worldDump)))) {
-	//			yield return Path.GetFileName(dir);
-	//		}
-	//	}
-	//}
+	public IEnumerable<string> ListSaves() {
+		string savesRoot = serializationService.GetSavesRoot();
+		UnityEngine.Debug.Log(savesRoot);
+		if (!Directory.Exists(savesRoot)) {
+			yield break;
+		}
+
+		foreach (var dir in Directory.GetDirectories(savesRoot)) {
+			if (File.Exists(Path.Combine(dir, LevelManager.worldDump))) {
+				yield return Path.GetFileName(dir);
+			}
+		}
+	}
 
 	public async UniTask<WorldDump?> LoadWorld(
 			string world,

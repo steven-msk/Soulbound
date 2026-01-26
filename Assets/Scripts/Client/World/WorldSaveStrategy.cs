@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Core;
+using SoulboundBackend.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,57 +10,64 @@ using Unity.Plastic.Newtonsoft.Json;
 #nullable enable
 
 namespace SoulboundBackend.Client.World {
-    public class WorldSaveStrategy : IWorldSaveStrategy {
-        private readonly string root;
-        private readonly string dataPath;
+	public class WorldSaveStrategy : IWorldSaveStrategy {
+		private readonly string root;
+		private readonly string dataPath;
 
-        public WorldSaveStrategy(string root, string dataPath) {
-            this.root = root;
-            this.dataPath = dataPath;
-        }
+		public WorldSaveStrategy(string root, string dataPath) {
+			this.root = root;
+			this.dataPath = dataPath;
+		}
 
-        public WorldDump? Load(string name) {
-            string path = GetDumpPath(name);
+		public WorldDump? Load(string name) {
+			string path = GetDumpPath(name);
 
-            if (File.Exists(path)) {
-                return JsonConvert.DeserializeObject<WorldDump>(
-                    File.ReadAllText(path),
-                    LevelManager.globalJsonSettings
-                );
-            }
-            return default;
-        }
+			if (File.Exists(path)) {
+				return JsonConvert.DeserializeObject<WorldDump>(
+					File.ReadAllText(path),
+					LevelManager.globalJsonSettings
+				);
+			}
+			return default;
+		}
 
-        public void Save(WorldDump obj, string name) {
-            string json = JsonConvert.SerializeObject(obj, LevelManager.globalJsonSettings);
-            File.WriteAllText(GetDumpPath(name), json);
-        }
+		public void Save(WorldDump obj, string name) {
+			string json = JsonConvert.SerializeObject(obj, LevelManager.globalJsonSettings);
+			string dumpPath = GetDumpPath(name);
+			if (string.IsNullOrEmpty(dumpPath)) {
+				throw new ArgumentException("Failed to save world: " + name);
+			}
+			File.WriteAllText(dumpPath, json);
+		}
 
 		public byte[]? LoadRaw(string world) {
-            string path = GetDumpPath(world);
-            if (!File.Exists(path)) {
-                return null;
-            }
+			string path = GetDumpPath(world);
+			if (!File.Exists(path)) {
+				return null;
+			}
 
-            return File.ReadAllBytes(path);
+			return File.ReadAllBytes(path);
 		}
 
 		public void SaveRaw(byte[] data, string world) {
-            File.WriteAllBytes(GetDumpPath(world), data);
+			File.WriteAllBytes(GetDumpPath(world), data);
 		}
 
 		public string GetDumpPath(string world) {
 			string worldFolder = Path.Combine(root, world);
-			Directory.CreateDirectory(GetDataPath(worldFolder));
+			if (!Directory.Exists(worldFolder)) {
+				return string.Empty;
+			}
 
-			string dumpPath = GetDataPath(worldFolder, LevelManager.worldDump);
-			return dumpPath;
+			return CombineDataPath(worldFolder, LevelManager.worldDump);
 		}
 
-		public string GetDataPath(params string[] paths) {
+		private string CombineDataPath(params string[] paths) {
 			List<string> path = new() { dataPath };
 			path.AddRange(paths);
 			return Path.Combine(path.ToArray());
 		}
+
+		public string GetSavesRoot() => CombineDataPath(root);
 	}
 }

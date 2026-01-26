@@ -146,14 +146,14 @@ namespace SoulboundBackend.Client {
 				});
 			}
 			itemUsageHandler.RegisterCapability<IPlaceable>(ItemUseTrigger.LeftHold, (placeable, stack) => {
-				BlockPos blockPos = level.ToBlockPos(mouseWorldPos);
+				BlockPos blockPos = (BlockPos)mouseWorldPos;
 
 				if (CanPlaceBlockAt(blockPos)) {
 					level.PlaceBlock(blockPos, placeable.Place(stack, blockPos));
 				}
 			});
 			itemUsageHandler.RegisterCapability<IBreakingTool>(ItemUseTrigger.LeftHold, (tool, stack) => {
-				BlockPos blockPos = level.ToBlockPos(mouseWorldPos);
+				BlockPos blockPos = (BlockPos)mouseWorldPos;
 
 				if (IsInBlockReach((Vector2)blockPos)) {
 					tool.TryBreak(blockPos, level, new PlayerToolBreakSource(this, tool));

@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Core;
+using SoulboundBackend.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,18 +9,16 @@ using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.World {
     public class DoNotSaveWorldStrategy : IWorldSaveStrategy {
-        public WorldDump? Load(string world) {
-            return null;
-        }
+		string IWorldSaveStrategy.GetSavesRoot() => string.Empty;
 
-		public byte[]? LoadRaw(string world) {
-			return null;
+		WorldDump? IWorldSaveStrategy.Load(string world) => null;
+
+		byte[]? IWorldSaveStrategy.LoadRaw(string world) => null;
+
+		void IWorldSaveStrategy.Save(WorldDump obj, string world) {
 		}
 
-		public void Save(WorldDump obj, string world) {
-        }
-
-		public void SaveRaw(byte[] data, string world) {
+		void IWorldSaveStrategy.SaveRaw(byte[] data, string world) {
 		}
 	}
 }

@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Core;
+using SoulboundBackend.Core;
 using SoulboundBackend.Core.Serialization;
 using System;
 using System.Collections.Generic;
@@ -28,8 +28,12 @@ namespace SoulboundBackend.Client.World {
 			if (data == null) {
 				return null;
 			}
-
 			return pipeline.Read(data);
+		}
+
+		public string GetSavesRoot() {
+			UnityEngine.Debug.Log(saveStrategy.GetType());
+			return saveStrategy.GetSavesRoot();
 		}
 	}
 }

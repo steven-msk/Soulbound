@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Core;
+using SoulboundBackend.Core;
 using UnityEngine;
 
 namespace SoulboundBackend.Client.World.Chunk {
@@ -13,7 +13,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 			this.chunkX = chunkX;
 		}
 
-        public WorldChunk UnderlyingChunk(Level level) => level.ChunkAt(this.ToWorldBlockPos(level));
+        public readonly WorldChunk UnderlyingChunk(Level level) => level.ChunkAt(ToWorldBlockPos());
 
         public static ChunkWorldPos FromBlockPos(BlockPos blockPos) {
 			int chunkX = Mathf.FloorToInt((float)blockPos.x / Level.CHUNK_LENGTH);
@@ -32,22 +32,22 @@ namespace SoulboundBackend.Client.World.Chunk {
 			return pos1.x == pos2.x && pos1.y == pos2.y && pos1.chunkX == pos2.chunkX;
 		}
 
-		public override string ToString() => $"cwx:{x}, cwy:{y}, c:{chunkX}";
+		public override readonly string ToString() => $"cwx:{x}, cwy:{y}, c:{chunkX}";
 
-		public BlockPos ToWorldBlockPos(Level level) {
-			Vector2 pos = new(this.x + this.chunkX * Level.CHUNK_LENGTH, this.y);
-			return BlockPos.FromWorld(pos, level);
+		public readonly BlockPos ToWorldBlockPos() {
+			Vector2 pos = new(x + chunkX * Level.CHUNK_LENGTH, y);
+			return (BlockPos)pos;
 		}
 
-		public override bool Equals(object obj) {
-			if (!(obj is ChunkWorldPos)) {
+		public override readonly bool Equals(object obj) {
+			if (obj is not ChunkWorldPos) {
 				return false;
 			}
 			var other = (ChunkWorldPos)obj;
 			return this == other;
 		}
 
-		public override int GetHashCode() {
+		public override readonly int GetHashCode() {
 			unchecked {
 				int hash = 17;
 				hash = hash * 31 + (int)x;

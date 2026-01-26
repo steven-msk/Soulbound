@@ -199,7 +199,7 @@ namespace SoulboundBackend.Core {
 		}
 
 		public WorldDump CreateDump() {
-			level.Dump(out var seed, out var generatedChunks, out var structurePlacements);
+			level.Dump(out var seed, out var generatedChunks);
 			var serializedPlayer = player?.Serialize() ?? default;
 			var serializedEntities = entityManager.Serialize();
 			serializedEntities.Remove(serializedPlayer.id);
@@ -208,7 +208,7 @@ namespace SoulboundBackend.Core {
 				seed,
 				generatedChunks,
 				serializedPlayer,
-				structurePlacements,
+				//structurePlacements,
 				serializedEntities
 			);
 		}

@@ -44,12 +44,12 @@ namespace SoulboundBackend.Core {
 			this.config = config;
 			settings = new Settings();
 			playerInputActions = new PlayerInputActions();
-			IWorldSaveStrategy saveStrategy = config.dev.loadDevWorldFromSave
-				? new WorldSaveStrategy(config.file.savesFolder, Application.persistentDataPath)
-				: new DoNotSaveWorldStrategy();
 			var worldSerializer = new JsonSerializer<WorldDump>(globalJsonSettings);
 			var worldSerializationPipeline = new SerializationPipeline<WorldDump>(worldSerializer);
-			worldManager = new WorldManager(new WorldSerializationService(saveStrategy, worldSerializationPipeline));
+			var service = new WorldSerializationService(GetWorldSaveStrategy(), worldSerializationPipeline);
+			worldManager = new WorldManager(service);
+
+			// scene may not be available at this time
 			uiHandler = new UIHandler(UnityEngine.Object.FindFirstObjectByType<Canvas>());
 		}
 
@@ -57,16 +57,14 @@ namespace SoulboundBackend.Core {
 			uiHandler.SetScreen(new TitleScreen());
 		}
 
+		[PROTOTYPICAL]
 		public void Prototype_LoadDevWorld() {
-			string world = config.dev.loadDevWorldFromSave
-				? config.dev.devWorld
-				: $"altw_{Guid.NewGuid()}";
-
 			uiHandler.FlushScreens();
 
-			worldManager.LoadWorld(world,
+			// prototypical
+			worldManager.LoadWorld(config.dev.devWorld,
 				SceneManager.LoadSceneAsync("WorldScene"),
-				seed: 12345,
+				seed: config.dev.seed,
 				() => UnityEngine.Object.FindFirstObjectByType<WorldSceneRoot>()
 			).Forget(Debug.LogException);
 		}
@@ -74,6 +72,12 @@ namespace SoulboundBackend.Core {
 		public void OnApplicationQuit() {
 			settings.Save();
 			AssetManager.Shutdown();
+		}
+
+		private IWorldSaveStrategy GetWorldSaveStrategy() {
+			return !config.dev.useDoNotSaveWorldStrategy
+				? new WorldSaveStrategy(config.file.savesFolder, Application.persistentDataPath)
+				: new DoNotSaveWorldStrategy();
 		}
 
 		public UIHandler GetUIHandler() => uiHandler;

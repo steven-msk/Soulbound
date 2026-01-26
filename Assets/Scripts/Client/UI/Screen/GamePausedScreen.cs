@@ -1,4 +1,5 @@
-﻿using SoulboundBackend.Common;
+using Cysharp.Threading.Tasks;
+using SoulboundBackend.Common;
 using SoulboundBackend.Core;
 using SoulboundBackend.Core.AssetManagement;
 using SoulboundBackend.Core.Resource;
@@ -50,28 +51,27 @@ namespace SoulboundBackend.Client.UI.Screens {
 			var quitButton = GameObject.Instantiate(AssetManager.Resolve<GameObject>(new AssetKey("QuitWorld")), rootParent);
 			quitButton.transform.SetParent(container.transform);
 			quitButton.GetComponent<Button>().onClick.AddListener(() =>
-				CoroutineRunner.GetInstance().StartCoroutine(QuitWorld())
+				QuitWorld().Forget(UnityEngine.Debug.LogException)
 			);
 			childMap.AddChild(quitButton);
 
 			return screen;
 		}
 
-		private IEnumerator QuitWorld() {
+		private async UniTask QuitWorld() {
 			LevelManager levelManager = Soulbound.instance.GetActiveLevelManager();
 			WorldManager worldManager = Soulbound.instance.worldManager;
 
 			worldManager.SaveWorld(levelManager.world, levelManager);
 			levelManager.StopSession();
 			Soulbound.instance.GetUIHandler().FlushScreens();
-			var async = SceneManager.LoadSceneAsync("DevScene");
-			yield return new WaitUntil(() => async.isDone);
 			Time.timeScale = 1f;
 
-			//var uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
-			//uiManager.SetScreen(new TitleScreen());
-			Soulbound.instance.GetUIHandler().SetCanvas(UnityEngine.Object.FindFirstObjectByType<Canvas>());
-			Soulbound.instance.GetUIHandler().SetScreen(new TitleScreen());
+			await SceneManager.LoadSceneAsync("DevScene").ToUniTask();
+
+			var uiHandler = Soulbound.instance.GetUIHandler();
+			uiHandler.SetCanvas(UnityEngine.Object.FindFirstObjectByType<Canvas>());
+			uiHandler.SetScreen(new TitleScreen());
 		}
 	}
 }
