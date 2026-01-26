@@ -1,26 +1,10 @@
 using Cysharp.Threading.Tasks;
-using NUnit.Framework;
-using SoulboundBackend.Client;
 using SoulboundBackend.Client.World;
-using SoulboundBackend.Client.World.BlockSystem;
-using SoulboundBackend.Common;
 using SoulboundBackend.Core;
-using SoulboundBackend.Core.Bootstrap;
-using SoulboundBackend.Core.Resource;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.LightTransport;
-using UnityEngine.SceneManagement;
-using UnityEngine.Tilemaps;
-using Zenject;
-using CoroutineRunner = SoulboundBackend.Core.CoroutineRunner;
-using Scene = UnityEngine.SceneManagement.Scene;
 
 #nullable enable
 
@@ -48,14 +32,12 @@ public sealed class WorldManager {
 	public async UniTask<WorldDump?> LoadWorld(
 			string world,
 			AsyncOperation sceneLoader,
-			int seed,
 			Func<IWorldSceneRoot> rootGetter
 		) {
-		WorldDump? dump = serializationService.Load(world);
-		if (!dump?.nonNulled ?? true) {
-			dump = null;
+		if (!serializationService.Load(world, out WorldDump? dump)) {
+			throw new ArgumentException("World not found: " + world);
 		}
-		seed = dump?.seed ?? seed;
+		var seed = dump.GetValueOrDefault().seed;
 
 		var levelManager = await LoadWorldSceneAsync(sceneLoader, rootGetter);
 		activeLevelManager = levelManager;
@@ -81,16 +63,18 @@ public sealed class WorldManager {
 		return root.sceneContext.Container.Resolve<LevelManager>();
 	}
 
-	public void SaveWorld(string world, LevelManager levelManager) {
-		SaveWorld(world, levelManager.CreateDump());
+	public void SaveWorld(LevelManager levelManager) {
+		serializationService.Save(levelManager.CreateDump(), levelManager.world);
 	}
 
-	public void SaveWorld(string world, WorldDump dump) {
-		serializationService.Save(dump, world);
+	public void QuitActiveSession() {
+		if (activeLevelManager == null) {
+			return;
+		}
+
+		activeLevelManager.StopSession();
+		SaveWorld(activeLevelManager);
 	}
 
-	public async UniTask TerminateWorldProcess(Scene worldScene, string world, Func<WorldDump> dumpSupplier) {
-		SaveWorld(world, dumpSupplier.Invoke());
-		await SceneManager.UnloadSceneAsync(worldScene).ToUniTask();
-	}
+	public bool IsSessionActive() => activeLevelManager != null;
 }

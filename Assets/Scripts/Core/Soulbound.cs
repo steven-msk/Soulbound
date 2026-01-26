@@ -26,7 +26,7 @@ namespace SoulboundBackend.Core {
 		public static Soulbound instance { get; private set; } = null!;
 		private readonly GameConfig config;
 		private readonly UIHandler uiHandler;
-		public readonly WorldManager worldManager;
+		private readonly WorldManager worldManager;
 		public readonly Settings settings;
 		public readonly PlayerInputActions playerInputActions;
 		public static readonly JsonSerializerSettings globalJsonSettings = new() {
@@ -57,26 +57,36 @@ namespace SoulboundBackend.Core {
 			uiHandler.SetScreen(new TitleScreen());
 		}
 
-		[PROTOTYPICAL]
-		public void Prototype_LoadDevWorld() {
-			LoadWorld(config.dev.devWorld);
-		}
-
 		// aware of the problem with world deserialization
 
-		[PROTOTYPICAL]
-		public void LoadWorld(string world) {
+		public void EnterWorld(string world) {
+			if (worldManager.IsSessionActive()) return;
+
 			uiHandler.FlushScreens();
 
-			// prototypical
 			worldManager.LoadWorld(world,
 				SceneManager.LoadSceneAsync("WorldScene"),
-				seed: config.dev.seed,
-				() => UnityEngine.Object.FindFirstObjectByType<WorldSceneRoot>()
+				UnityEngine.Object.FindFirstObjectByType<WorldSceneRoot>
 			).Forget(Debug.LogException);
 		}
 
+		public void QuitActiveWorld() {
+			if (!worldManager.IsSessionActive()) return;
+
+			worldManager.QuitActiveSession();
+			uiHandler.FlushScreens();
+			Time.timeScale = 1f;
+
+			SceneManager.LoadSceneAsync("DevScene").ToUniTask()
+				.ContinueWith(() => {
+					uiHandler.SetCanvas(UnityEngine.Object.FindFirstObjectByType<Canvas>());
+					uiHandler.SetScreen(new TitleScreen());
+				})
+			.Forget(Debug.LogException);
+		}
+
 		public void OnApplicationQuit() {
+			worldManager.QuitActiveSession();
 			settings.Save();
 			AssetManager.Shutdown();
 		}
@@ -106,5 +116,11 @@ namespace SoulboundBackend.Core {
 		public PlayerController? GetPlayerInstance() {
 			return worldManager.activeLevelManager?.player;
 		}
+
+		public IEnumerable<string> ListWorldSaves() {
+			return worldManager.ListSaves();
+		}
+
+		public GameConfig GetGameConfig() => config;
 	}
 }

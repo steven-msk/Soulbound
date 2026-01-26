@@ -102,18 +102,20 @@ namespace SoulboundBackend.Core {
 			if (entityManager.GetEntityByID(serialized.GetValueOrDefault().id, out var playerEntity)) {
 				entityManager.RemoveEntity(playerEntity);
 			}
-			this.player = container.InstantiatePrefabForComponent<PlayerController>(
+
+			player = container.InstantiatePrefabForComponent<PlayerController>(
 				AssetManager.Resolve<GameObject>(new AssetKey("player"))
 			);
-			container.BindInstance<PlayerController>(this.player).AsSingle();
-			var playerContext = this.player.GetComponent<GameObjectContext>();
-			playerContext.AddNormalInstaller(new PlayerInstaller(this.player, worldCanvas, inputHandler));
+			container.BindInstance(player).AsSingle();
+
+			var playerContext = player.GetComponent<GameObjectContext>();
+			playerContext.AddNormalInstaller(new PlayerInstaller(player, worldCanvas, inputHandler));
 			playerContext.Run();
 
 			if (serialized.HasValue) {
-				this.player.Deserialize(serialized.Value);
+				player.Deserialize(serialized.Value);
 			}
-			entityManager.Spawn<PlayerController, PlayerSpawnData>(this.player, new PlayerSpawnData() {
+			entityManager.Spawn(player, new PlayerSpawnData() {
 				position = serialized?.lastPosition ?? level.GetWorldSpawnPoint()
 			});
 		}
@@ -214,11 +216,7 @@ namespace SoulboundBackend.Core {
 		}
 
 		private void OnApplicationQuit() {
-			if (sessionRunning) {
-				worldManager.SaveWorld(world, CreateDump());
-				StopSession();
-			}
-			Soulbound.instance?.OnApplicationQuit();
+			Soulbound.instance.OnApplicationQuit();
 		} 
 
 		public static LevelManager CreateInstance() {

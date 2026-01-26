@@ -23,12 +23,14 @@ namespace SoulboundBackend.Client.World {
 			saveStrategy.SaveRaw(data, world);
 		}
 
-		public WorldDump? Load(string world) {
+		public bool Load(string world, out WorldDump? dump) {
 			byte[]? data = saveStrategy.LoadRaw(world);
 			if (data == null) {
-				return null;
+				dump = null;
+				return false;
 			}
-			return pipeline.Read(data);
+			dump = pipeline.Read(data);
+			return true;
 		}
 
 		public string GetSavesRoot() {

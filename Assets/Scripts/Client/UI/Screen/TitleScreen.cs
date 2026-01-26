@@ -27,16 +27,16 @@ namespace SoulboundBackend.Client.UI {
 			float leadingY = 0f;
 
 			// prototypical
-			var saves = Soulbound.instance.worldManager.ListSaves().ToList();
+			var saves = Soulbound.instance.ListWorldSaves().ToList();
 			foreach (var world in saves) {
 				var button = CreateButton(world, ref leadingY, rootParent, screen);
-				button.onClick.AddListener(() => Soulbound.instance.LoadWorld(world));
+				button.onClick.AddListener(() => Soulbound.instance.EnterWorld(world));
 			}
 
 			leadingY -= 40f;
 
 			var newWorldButton = CreateButton("new world", ref leadingY, rootParent, screen);
-			newWorldButton.onClick.AddListener(() => Soulbound.instance.LoadWorld($"world_{Guid.NewGuid()}"));
+			newWorldButton.onClick.AddListener(() => Soulbound.instance.EnterWorld($"world_{Guid.NewGuid()}"));
 
 			return screen;
 		}

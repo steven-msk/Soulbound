@@ -72786,7 +72786,7 @@ MonoBehaviour:
     file:
       savesFolder: saves
     dev:
-      useDoNotSaveWorldStrategy: 0
+      useDoNotSaveWorldStrategy: 1
       devWorld: devWorld
       devScene: DevScene
       seed: 12345
