@@ -72,13 +72,13 @@ namespace SoulboundBackend.Client {
 
 		public float MaxBlockReach => 5f;
 
-		private Level level;
+		private Level level = null!;
 		private Vector2 mouseScreenPos;
-		private Canvas canvas;
+		private Canvas canvas = null!;
 		private Vector2 mouseWorldPos {
 			get {
 				Vector3 screenPos = mouseScreenPos;
-				RectTransform rootTransform = canvas.GetComponent<UIManager>().GetRootTransform();
+				RectTransform rootTransform = canvas.GetComponent<RectTransform>();
 				if (RectTransformUtility.ScreenPointToWorldPointInRectangle(rootTransform, screenPos, Camera.main, out var worldPoint)) {
 					return worldPoint;
 				}
@@ -95,13 +95,13 @@ namespace SoulboundBackend.Client {
 
 		[Inject]
 		public void Construct(DiContainer container) {
-			this.inputHandler = container.Resolve<InputHandler>();
-			this.playerPhysics = container.Resolve<PlayerPhysics>();
-			this.inventory = container.Resolve<InventoryController>();
-			this.level = container.Resolve<Level>();
-			this.canvas = container.Resolve<Canvas>();
+			inputHandler = container.Resolve<InputHandler>();
+			playerPhysics = container.Resolve<PlayerPhysics>();
+			inventory = container.Resolve<InventoryController>();
+			level = container.Resolve<Level>();
+			canvas = container.Resolve<Canvas>();
 			RegisterItemUsageCandidates(container.Resolve<ItemUsageHandler>());
-			this.actionResolver = container.Resolve<ConcurrentActionResolver>();
+			actionResolver = container.Resolve<ConcurrentActionResolver>();
 
 			attackSource = new AttackSource(2, 10, new PlayerMainHandAttack(),
 				context => {

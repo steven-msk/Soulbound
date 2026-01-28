@@ -15,12 +15,6 @@ using Screen = SoulboundBackend.Client.UI.Screens.Screen;
 
 namespace SoulboundBackend.Client.UI {
 	public class TitleScreen : Screen {
-		private readonly UIManager uiManager;
-
-		public TitleScreen() {
-			this.uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
-		}
-
 		public override ScreenObject BuildObject(Transform rootParent) {
 			ScreenObject screen = base.BuildObject(rootParent);
 			
@@ -29,7 +23,6 @@ namespace SoulboundBackend.Client.UI {
 			// prototypical
 			foreach (var world in Soulbound.instance.ListWorldSaves()) {
 				var button = CreateButton(world, ref leadingY, rootParent, screen);
-				UnityEngine.Debug.Log(world);
 				button.onClick.AddListener(() => Soulbound.instance.EnterWorld(world));
 			}
 

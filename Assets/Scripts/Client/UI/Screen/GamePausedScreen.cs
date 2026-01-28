@@ -16,15 +16,6 @@ using UnityEngine.UI;
 namespace SoulboundBackend.Client.UI.Screens {
 	[PROTOTYPICAL]
 	public sealed class GamePausedScreen : Screen {
-		private readonly Canvas canvas;
-		private readonly UIManager uiManager;
-
-		public GamePausedScreen() {
-			this.canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
-			this.uiManager = canvas.GetComponent<UIManager>();
-		}
-
-		// prototypical; its only made to work with the ui backend rework
 		[PROTOTYPICAL]
 		public override ScreenObject BuildObject(Transform rootParent) {
 			ScreenObject screen =  base.BuildObject(rootParent);
@@ -54,22 +45,6 @@ namespace SoulboundBackend.Client.UI.Screens {
 			childMap.AddChild(quitButton);
 
 			return screen;
-		}
-
-		private async UniTask QuitWorld() {
-			//LevelManager levelManager = Soulbound.instance.GetActiveLevelManager();
-			//WorldManager worldManager = Soulbound.instance.worldManager;
-
-			//worldManager.SaveWorld(levelManager.world, levelManager);
-			//levelManager.StopSession();
-			//Soulbound.instance.GetUIHandler().FlushScreens();
-			//Time.timeScale = 1f;
-
-			//await SceneManager.LoadSceneAsync("DevScene").ToUniTask();
-
-			//var uiHandler = Soulbound.instance.GetUIHandler();
-			//uiHandler.SetCanvas(UnityEngine.Object.FindFirstObjectByType<Canvas>());
-			//uiHandler.SetScreen(new TitleScreen());
 		}
 	}
 }
