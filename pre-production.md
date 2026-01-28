@@ -409,7 +409,7 @@ Status: ⚠️ Needs entire rework
 
 ## Recommended Production Order (Top to bottom)
 Based on the dependency graph, this could be an optimal order:
-[EDIT]: For convenience during late prototyping, categories have been marked accordingly to ease development: `*` means started but not finished, `<-` marks a focus point, `>|` means ready for production, `>>>` means progressively developed (see [exceptions](#exceptions))
+[EDIT]: For convenience during late prototyping, categories have been marked accordingly to ease development: `*` means started but not finished, `<-` marks a focus point, `>|` means closed, `>>>` means progressively developed (see [exceptions](#exceptions))
 1. [Input system](#4-input-system)* **>|** (*read note below*)
 2. [Action Request System](#18-action-request-system)* **>|** (*read note below*)
 3. [Serialization](#17-serialization) (foundation only)* *delayed until all serialization parameters are stable*
@@ -418,10 +418,10 @@ Based on the dependency graph, this could be an optimal order:
 6. [Block system](#8-block-system)* **>|** *TileEntity serialization and lifetime aspects TBD when working on the level system*
 7. [Chunk generation](#9-chunk-generation) **>|** *(proper world generation is delayed to prod)*
 11. [World rendering](#10-world-rendering) **>|** *(some performance issues may still persist, but will be tackled in prod)*
-12. [Level system](#19-level-system) **<-**
+12. [Level system](#19-level-system) **>|**
 13. [Resource (asset) system](#20-resource-system-assets) **>|** *(async preload will be resolved in prod)*
 13. [Physics system](#7-physics-system) (universal overhaul)
-14. [UI core layer & navigation system](#13-ui-systems-overall)
+14. [UI core layer & navigation system](#13-ui-systems-overall) **<-**
 15. [Tooltips](#14-tooltips)
 16. [Settings](#16-settings-ui)*
 17. [Debug visuals](#15-debug-visuals)

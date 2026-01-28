@@ -100,6 +100,10 @@ namespace SoulboundBackend.Core {
 			.Forget(Debug.LogException);
 		}
 
+		public bool IsWorldSessionActive() {
+			return worldManager.IsSessionActive();
+		}
+
 		public void OnApplicationQuit() {
 			worldManager.QuitActiveSession();
 			settings.Save();
