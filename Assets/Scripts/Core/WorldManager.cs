@@ -54,9 +54,6 @@ public sealed class WorldManager {
 		var root = rootGetter()
 			?? throw new InvalidOperationException("Failed to load world scene: missing root");
 
-		root.sceneContext.PreInstall += () => {
-			root.sceneContext.Container.BindInstance(this).AsSingle();
-		};
 		root.sceneContext.Install();
 		root.sceneContext.Resolve();
 

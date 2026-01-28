@@ -34,7 +34,6 @@ namespace SoulboundBackend.Core {
 		private bool sessionRunning;
 
 		private DiContainer container = null!;
-		private WorldManager worldManager = null!;
 		private WorldRenderer worldRenderer = null!;
 		public EntityManager entityManager { get; private set; } = null!;
 		private Canvas worldCanvas = null!;
@@ -58,7 +57,6 @@ namespace SoulboundBackend.Core {
 		[Inject]
 		public void Construct(DiContainer container) {
 			this.container = container;
-			this.worldManager = container.Resolve<WorldManager>();
 			this.worldCanvas = container.Resolve<Canvas>();
 			Soulbound.instance.GetUIHandler().SetCanvas(worldCanvas);
 
@@ -194,10 +192,7 @@ namespace SoulboundBackend.Core {
 			this.paused = !this.paused;
 			Time.timeScale = this.paused ? 0f : 1f;
 			inputHandler.PauseInputs(this.paused);
-			Soulbound.instance.GetUIHandler().SetScreen(paused
-				? new GamePausedScreen()
-				: null);
-			//UIManager.SetScreen(paused ? new GamePausedScreen().GetScreen() : null);
+			Soulbound.instance.GetUIHandler().SetScreen(paused ? new GamePausedScreen() : null);
 		}
 
 		public WorldDump CreateDump() {
