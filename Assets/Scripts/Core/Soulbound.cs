@@ -16,6 +16,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.SceneManagement;
 using Zenject;
 
@@ -65,12 +66,20 @@ namespace SoulboundBackend.Core {
 
 		// aware of the problem with world deserialization
 
+		public void CreateNewWorld(string world) {
+			worldManager.CreateNewWorld(world);
+		}
+
 		public void EnterWorld(string world) {
 			if (worldManager.IsSessionActive()) return;
 
+			if (!worldManager.ListSaves().Any(s => s == world)) {
+				throw new ArgumentException($"World not found: '{world}'");
+			}
+
 			uiHandler.FlushScreens();
 
-			worldManager.LoadWorld(world,
+			worldManager.LoadWorld(world, config.dev.seed,
 				SceneManager.LoadSceneAsync("WorldScene").ToUniTask(),
 				UnityEngine.Object.FindFirstObjectByType<WorldSceneRoot>
 			).Forget(Debug.LogException);

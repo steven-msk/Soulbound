@@ -4,6 +4,7 @@ using SoulboundBackend.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 #nullable enable
@@ -29,15 +30,35 @@ public sealed class WorldManager {
 		}
 	}
 
+	public void CreateNewWorld(string world) {
+		if (ListSaves().Any(s => s == world)) {
+			throw new ArgumentException($"World with name '{world}' already exists");
+		}
+
+		string savesRoot = serializationService.GetSavesRoot();
+		string worldPath = Path.Combine(savesRoot, world);
+		var dir = Directory.CreateDirectory(worldPath);
+		var filePath = Path.Combine(worldPath, LevelManager.worldDump);
+		File.WriteAllText(filePath, string.Empty);
+	}
+
 	public async UniTask<WorldDump?> LoadWorld(
 			string world,
+			int seed,		// placeholder
 			UniTask sceneLoadTask,
 			Func<IWorldSceneRoot> rootGetter
 		) {
-		if (!serializationService.Load(world, out WorldDump? dump)) {
-			throw new ArgumentException("World not found: " + world);
+		WorldDump? dump = null;
+		try {
+			if (!serializationService.Load(world, out dump)) {
+				throw new ArgumentException($"Could not load dump for world '{world}'");
+			}
+		} catch (Exception e) {
+			Debug.LogException(e);
 		}
-		var seed = dump.GetValueOrDefault().seed;
+
+		// placeholder
+		seed = dump.HasValue ? dump.Value.seed : seed;
 
 		var levelManager = await LoadWorldSceneAsync(sceneLoadTask, rootGetter);
 		activeLevelManager = levelManager;
