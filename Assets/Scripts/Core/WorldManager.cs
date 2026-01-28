@@ -31,7 +31,7 @@ public sealed class WorldManager {
 
 	public async UniTask<WorldDump?> LoadWorld(
 			string world,
-			AsyncOperation sceneLoader,
+			UniTask sceneLoadTask,
 			Func<IWorldSceneRoot> rootGetter
 		) {
 		if (!serializationService.Load(world, out WorldDump? dump)) {
@@ -39,7 +39,7 @@ public sealed class WorldManager {
 		}
 		var seed = dump.GetValueOrDefault().seed;
 
-		var levelManager = await LoadWorldSceneAsync(sceneLoader, rootGetter);
+		var levelManager = await LoadWorldSceneAsync(sceneLoadTask, rootGetter);
 		activeLevelManager = levelManager;
 
 		activeLevelManager.BootstrapWorld(world, dump, seed, rootGetter().CreateGridContext());
@@ -48,8 +48,8 @@ public sealed class WorldManager {
 		return dump;
 	}
 
-	public async UniTask<LevelManager> LoadWorldSceneAsync(AsyncOperation sceneLoader, Func<IWorldSceneRoot> rootGetter) {
-		await sceneLoader.ToUniTask();
+	public async UniTask<LevelManager> LoadWorldSceneAsync(UniTask sceneLoadTask, Func<IWorldSceneRoot> rootGetter) {
+		await sceneLoadTask;
 
 		var root = rootGetter()
 			?? throw new InvalidOperationException("Failed to load world scene: missing root");

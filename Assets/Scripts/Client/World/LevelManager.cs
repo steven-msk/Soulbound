@@ -57,12 +57,12 @@ namespace SoulboundBackend.Core {
 		[Inject]
 		public void Construct(DiContainer container) {
 			this.container = container;
-			this.worldCanvas = container.Resolve<Canvas>();
+			worldCanvas = container.Resolve<Canvas>();
 			Soulbound.instance.GetUIHandler().SetCanvas(worldCanvas);
 
 			inputMappings = container.Resolve<PlayerInputActions>();
 			InputActionMap playerActionMap = inputMappings.asset.FindActionMap("Player");
-			this.inputHandler = new InputHandler(playerActionMap);
+			inputHandler = new InputHandler(playerActionMap);
 
 			Settings.keybindMappings.AddRebindTargetMap(playerActionMap);
 			Settings.keybindMappings.ProcessBindings(new Dictionary<KeyMapping, InputAction>() {
@@ -78,12 +78,12 @@ namespace SoulboundBackend.Core {
 		public void BootstrapWorld(string world, WorldDump? dump, int seed, LevelGridContext gridContext) {
 			UnityEngine.Random.InitState(seed);
 			this.world = world;
-			this.level = new Level(gridContext, seed);
-			this.entityManager = new EntityManager(level, new GameObject("Updater").AddComponent<UpdateManager>());
+			level = new Level(gridContext, seed);
+			entityManager = new EntityManager(level, new GameObject("Updater").AddComponent<UpdateManager>());
 
 			RectInt renderRect = new(-128, -76, 256, 156);      // simulation distance
 			//RectInt renderRect = new(-32, -19, 65, 39);		// default view distance
-			this.worldRenderer = new WorldRenderer(renderRect, level, gridContext.tilemap);
+			worldRenderer = new WorldRenderer(renderRect, level, gridContext.tilemap);
 
 			level.BootstrapWorld(dump, this);
 			entityManager.Deserialize(dump?.serializedEntities ?? new());

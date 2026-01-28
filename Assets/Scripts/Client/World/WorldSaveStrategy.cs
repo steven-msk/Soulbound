@@ -32,7 +32,7 @@ namespace SoulboundBackend.Client.World {
 		}
 
 		public void Save(WorldDump obj, string name) {
-			string json = JsonConvert.SerializeObject(obj, LevelManager.globalJsonSettings);
+			string json = JsonConvert.SerializeObject(obj, Soulbound.globalJsonSettings);
 			string dumpPath = GetDumpPath(name);
 			if (string.IsNullOrEmpty(dumpPath)) {
 				throw new ArgumentException("Failed to save world: " + name);

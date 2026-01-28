@@ -55,7 +55,7 @@ public class WorldSaveStrategyTests {
 		Assert.True(File.Exists(dumpPath));
 
 		string json = File.ReadAllText(dumpPath);
-		var loaded = JsonConvert.DeserializeObject<WorldDump>(json, LevelManager.globalJsonSettings);
+		var loaded = JsonConvert.DeserializeObject<WorldDump>(json, Soulbound.globalJsonSettings);
 
 		Assert.AreEqual(123, loaded.seed);
 	}

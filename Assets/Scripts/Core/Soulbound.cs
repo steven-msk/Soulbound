@@ -71,7 +71,7 @@ namespace SoulboundBackend.Core {
 			uiHandler.FlushScreens();
 
 			worldManager.LoadWorld(world,
-				SceneManager.LoadSceneAsync("WorldScene"),
+				SceneManager.LoadSceneAsync("WorldScene").ToUniTask(),
 				UnityEngine.Object.FindFirstObjectByType<WorldSceneRoot>
 			).Forget(Debug.LogException);
 		}
