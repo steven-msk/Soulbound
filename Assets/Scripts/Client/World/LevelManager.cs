@@ -183,7 +183,7 @@ namespace SoulboundBackend.Core {
 		}
 
 		private void OnEscPressed() {
-			if (!Soulbound.instance.GetUIHandler().GetScreenManager().OnEscPressed()) {
+			if (!Soulbound.instance.GetUIHandler().GetScreenManager().PopScreen()) {
 				TogglePause();
 			}
 		}

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,22 +12,22 @@ namespace SoulboundBackend.Client.UI.Screens {
 		
 		public void Init(Screen screenInstance) {
 			this.screenInstance = screenInstance;
-			this.childMap = new ChildMap();
+			childMap = new ChildMap();
 		}
 
 		public void Show() {
 			gameObject.SetActive(true);
-			screenInstance.OnShow();
+			screenInstance.OnShow(this);
 		}
 
 		public void Hide() {
-			screenInstance.OnHide();
+			screenInstance.OnHide(this);
 			gameObject.SetActive(false);
 		}
 
 		public void Dispose() {
-			screenInstance.OnDispose();
-			GameObject.Destroy(this.gameObject);
+			screenInstance.OnDispose(this);
+			Destroy(gameObject);
 		}
 
 		public Screen GetInstance() => screenInstance;

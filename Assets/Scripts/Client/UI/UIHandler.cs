@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Client.UI.Screens;
+using SoulboundBackend.Client.UI.Screens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +20,7 @@ namespace SoulboundBackend.Client.UI {
 		}
 
 		public void SetScreen(Screen? screen) {
-			screenManager.SetScreen(screen);
+			screenManager.PushScreen(screen);
 		}
 
 		public void SetCanvas(Canvas canvas) {
