@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace SoulboundBackend.Client.UI.Screens {
 	public abstract class Screen {
-		public virtual ScreenObject BuildObject(Transform rootParent) {
+		public virtual IScreenObject BuildObject(Transform rootParent) {
 			GameObject obj = new("Screen Object");
 			obj.transform.parent = rootParent;
 

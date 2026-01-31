@@ -10,7 +10,7 @@ using UnityEngine;
 #nullable enable
 
 namespace SoulboundBackend.Client.UI.Screens {
-	sealed record ScreenEntry(ScreenObject obj) {
+	sealed record ScreenEntry(IScreenObject obj) {
 		public Screen screen => obj.GetInstance();
 	}
 
@@ -27,7 +27,7 @@ namespace SoulboundBackend.Client.UI.Screens {
 				activeEntry.obj.Hide();
 			}
 
-			ScreenObject obj = screen.BuildObject(rootTransform);
+			IScreenObject obj = screen.BuildObject(rootTransform);
 			stack.Push(new ScreenEntry(obj));
 			obj.Show();
 		}

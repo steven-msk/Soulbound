@@ -15,8 +15,8 @@ using Screen = SoulboundBackend.Client.UI.Screens.Screen;
 
 namespace SoulboundBackend.Client.UI {
 	public class TitleScreen : Screen {
-		public override ScreenObject BuildObject(Transform rootParent) {
-			ScreenObject screen = base.BuildObject(rootParent);
+		public override IScreenObject BuildObject(Transform rootParent) {
+			ScreenObject screen = (ScreenObject)base.BuildObject(rootParent);
 			
 			float leadingY = 0f;
 

@@ -17,8 +17,8 @@ namespace SoulboundBackend.Client.UI.Screens {
 	[PROTOTYPICAL]
 	public sealed class GamePausedScreen : Screen {
 		[PROTOTYPICAL]
-		public override ScreenObject BuildObject(Transform rootParent) {
-			ScreenObject screen =  base.BuildObject(rootParent);
+		public override IScreenObject BuildObject(Transform rootParent) {
+			ScreenObject screen = (ScreenObject)base.BuildObject(rootParent);
 			ChildMap childMap = screen.GetChildMap();
 
 			var title = GameObject.Instantiate(AssetManager.Resolve<GameObject>(new AssetKey("GameMenuTitle")), rootParent);
