@@ -11,11 +11,11 @@ using UnityEngine;
 using Screen = SoulboundBackend.Client.UI.Screens.Screen;
 
 static class ScreenTestUtils {
-	public static (Screen screen, IScreenObject obj) CreateScreen(Transform root) {
+	public static (Screen screen, IScreenObject obj) CreateScreen(IScreenObjectFactory objectFactory) {
 		Screen screen = Substitute.For<Screen>();
 		IScreenObject obj = Substitute.For<IScreenObject>();
 		obj.GetInstance().Returns(screen);
-		screen.BuildObject(root).Returns(obj);
+		screen.BuildObject(objectFactory).Returns(obj);
 		return (screen, obj);
 	}
 }
@@ -24,9 +24,10 @@ public class ScreenManagerTests {
 	[Test]
 	public void PushScreen_HidesPreviousScreen() {
 		Transform root = new GameObject("root").transform;
-		var (screenA, objA) = ScreenTestUtils.CreateScreen(root);
-		var (screenB, objB) = ScreenTestUtils.CreateScreen(root);
 		ScreenManager manager = new(root);
+
+		var (screenA, objA) = ScreenTestUtils.CreateScreen(manager);
+		var (screenB, objB) = ScreenTestUtils.CreateScreen(manager);
 
 		manager.PushScreen(screenA);
 		manager.PushScreen(screenB);
@@ -40,7 +41,7 @@ public class ScreenManagerTests {
 		Transform root = new GameObject("root").transform;
 		ScreenManager manager = new(root);
 
-		var (screen, obj) = ScreenTestUtils.CreateScreen(root);
+		var (screen, obj) = ScreenTestUtils.CreateScreen(manager);
 		manager.PushScreen(screen);
 
 		obj.Received(1).Show();
@@ -52,7 +53,7 @@ public class ScreenManagerTests {
 		Transform root = new GameObject("root").transform;
 		ScreenManager manager = new(root);
 
-		var (screen, obj) = ScreenTestUtils.CreateScreen(root);
+		var (screen, obj) = ScreenTestUtils.CreateScreen(manager);
 		manager.PushScreen(screen);
 
 		manager.PopScreen();
@@ -66,8 +67,8 @@ public class ScreenManagerTests {
 		Transform root = new GameObject("root").transform;
 		ScreenManager manager = new(root);
 
-		var (screenA, objA) = ScreenTestUtils.CreateScreen(root);
-		var (screenB, _) = ScreenTestUtils.CreateScreen(root);
+		var (screenA, objA) = ScreenTestUtils.CreateScreen(manager);
+		var (screenB, _) = ScreenTestUtils.CreateScreen(manager);
 
 		manager.PushScreen(screenA);
 		manager.PushScreen(screenB);
@@ -91,8 +92,8 @@ public class ScreenManagerTests {
 		Transform root = new GameObject("root").transform;
 		ScreenManager manager = new(root);
 
-		var (screenA, objA) = ScreenTestUtils.CreateScreen(root);
-		var (screenB, objB) = ScreenTestUtils.CreateScreen(root);
+		var (screenA, objA) = ScreenTestUtils.CreateScreen(manager);
+		var (screenB, objB) = ScreenTestUtils.CreateScreen(manager);
 
 		manager.PushScreen(screenA);
 		manager.ReplaceScreen(screenB);
@@ -106,8 +107,8 @@ public class ScreenManagerTests {
 		Transform root = new GameObject("root").transform;
 		ScreenManager manager = new(root);
 
-		var (screenA, _) = ScreenTestUtils.CreateScreen(root);
-		var (screenB, _) = ScreenTestUtils.CreateScreen(root);
+		var (screenA, _) = ScreenTestUtils.CreateScreen(manager);
+		var (screenB, _) = ScreenTestUtils.CreateScreen(manager);
 
 		manager.PushScreen(screenA);
 		manager.PushScreen(screenB);
@@ -128,8 +129,8 @@ public class ScreenManagerTests {
 		Transform root = new GameObject("root").transform;
 		ScreenManager manager = new(root);
 
-		var (screenA, objA) = ScreenTestUtils.CreateScreen(root);
-		var (screenB, objB) = ScreenTestUtils.CreateScreen(root);
+		var (screenA, objA) = ScreenTestUtils.CreateScreen(manager);
+		var (screenB, objB) = ScreenTestUtils.CreateScreen(manager);
 
 		manager.PushScreen(screenA);
 		manager.PushScreen(screenB);

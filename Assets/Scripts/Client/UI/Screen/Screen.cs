@@ -8,23 +8,25 @@ using UnityEngine;
 
 namespace SoulboundBackend.Client.UI.Screens {
 	public abstract class Screen {
-		public virtual IScreenObject BuildObject(Transform rootParent) {
-			GameObject obj = new("Screen Object");
-			obj.transform.parent = rootParent;
+		protected IScreenNavigator navigator;
 
-			ScreenObject screenObject = obj.AddComponent<ScreenObject>();
-			screenObject.Init(this);
-
-			return screenObject;
+		public void Init(IScreenNavigator navigator) {
+			this.navigator = navigator;
 		}
 
-		public virtual void OnShow(ScreenObject obj) {
+		public virtual IScreenObject BuildObject(IScreenObjectFactory objFactory) {
+			GameObject gameObject = objFactory.CreateGameObject();
+			IScreenObject obj = objFactory.CreateSceneObject(this, gameObject);
+			OnBuild(obj);
+			return obj;
 		}
 
-		public virtual void OnHide(ScreenObject obj) {
-		}
+		protected abstract void OnBuild(IScreenObject screenObject);
 
-		public virtual void OnDispose(ScreenObject obj) {
-		}
+		public virtual void OnShow(IScreenObject obj) { }
+
+		public virtual void OnHide(IScreenObject obj) { }
+
+		public virtual void OnDispose(IScreenObject obj) { }
 	}
 }

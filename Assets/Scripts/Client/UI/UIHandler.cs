@@ -19,7 +19,7 @@ namespace SoulboundBackend.Client.UI {
 			this.screenManager = new ScreenManager(canvas.transform);
 		}
 
-		public void SetScreen(Screen? screen) {
+		public void SetScreen(Screen screen) {
 			screenManager.PushScreen(screen);
 		}
 

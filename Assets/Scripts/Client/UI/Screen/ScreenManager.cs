@@ -10,11 +10,7 @@ using UnityEngine;
 #nullable enable
 
 namespace SoulboundBackend.Client.UI.Screens {
-	sealed record ScreenEntry(IScreenObject obj) {
-		public Screen screen => obj.GetInstance();
-	}
-
-	public sealed class ScreenManager {
+	public sealed class ScreenManager : IScreenObjectFactory, IScreenNavigator {
 		private readonly Stack<ScreenEntry> stack = new();
 		private readonly Transform rootTransform;
 
@@ -27,7 +23,7 @@ namespace SoulboundBackend.Client.UI.Screens {
 				activeEntry.obj.Hide();
 			}
 
-			IScreenObject obj = screen.BuildObject(rootTransform);
+			IScreenObject obj = screen.BuildObject(this);
 			stack.Push(new ScreenEntry(obj));
 			obj.Show();
 		}
@@ -63,5 +59,21 @@ namespace SoulboundBackend.Client.UI.Screens {
 				screenObject.obj.Dispose();
 			}
 		}
+
+		GameObject IScreenObjectFactory.CreateGameObject() {
+			GameObject obj = new("Screen Object", typeof(RectTransform));
+			obj.transform.SetParent(rootTransform, false);
+			return obj;
+		}
+
+		IScreenObject IScreenObjectFactory.CreateSceneObject(Screen screen, GameObject gameObject) {
+			ScreenObject screenObject = gameObject.AddComponent<ScreenObject>();
+			screenObject.Init(screen, this, rootTransform);
+			return screenObject;
+		}
+	}
+
+	sealed record ScreenEntry(IScreenObject obj) {
+		public Screen screen => obj.GetInstance();
 	}
 }

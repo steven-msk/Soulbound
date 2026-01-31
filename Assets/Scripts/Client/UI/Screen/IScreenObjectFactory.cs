@@ -1,4 +1,3 @@
-using SoulboundBackend.Client.UI.Screens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,10 +6,8 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SoulboundBackend.Client.UI.Screens {
-	public interface IScreenObject : IChildContainer {
-		void Show();
-		void Hide();
-		void Dispose();
-		Screen GetInstance();
+	public interface IScreenObjectFactory {
+		GameObject CreateGameObject();
+		IScreenObject CreateSceneObject(Screen screen, GameObject obj);
 	}
 }

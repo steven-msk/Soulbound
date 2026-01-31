@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,6 +25,10 @@ namespace SoulboundBackend.Client.UI.Screens {
 				throw new ArgumentException($"No child found with accessor: {accessor}");
 			}
 			return child;
+		}
+
+		public void RemoveChild(string accessor) {
+			childRefs.Remove(accessor);
 		}
 	}
 }
