@@ -45,6 +45,11 @@ namespace SoulboundBackend.Client.UI.Screens {
 			return !stack.IsEmpty();
 		}
 
+		public void ReplaceScreen(Screen screen) {
+			PopScreen();
+			PushScreen(screen);
+		}
+
 		public Screen? GetActiveScreen() {
 			return stack.TryPeek(out var activeEntry)
 				? activeEntry.screen

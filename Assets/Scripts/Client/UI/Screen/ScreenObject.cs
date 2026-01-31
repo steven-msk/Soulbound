@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SoulboundBackend.Client.UI.Screens {
-	public class ScreenObject : MonoBehaviour, IDisposable {
+	public class ScreenObject : MonoBehaviour, IDisposable, IScreenObject {
 		private Screen screenInstance;
 		private ChildMap childMap;
 		
