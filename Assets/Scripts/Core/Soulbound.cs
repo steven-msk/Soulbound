@@ -73,7 +73,7 @@ namespace SoulboundBackend.Core {
 		public void EnterWorld(string world) {
 			if (worldManager.IsSessionActive()) return;
 
-			if (!worldManager.ListSaves().Any(s => s == world)) {
+			if (!worldManager.ListSaves().Any(s => s == world) && !config.dev.useDoNotSaveWorldStrategy) {
 				throw new ArgumentException($"World not found: '{world}'");
 			}
 

@@ -4,12 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 #nullable enable
 
 namespace SoulboundBackend.Client.World {
     public class DoNotSaveWorldStrategy : IWorldSaveStrategy {
-		string IWorldSaveStrategy.GetSavesRoot() => string.Empty;
+		string IWorldSaveStrategy.GetSavesRoot() => Application.temporaryCachePath;
 
 		WorldDump? IWorldSaveStrategy.Load(string world) => null;
 

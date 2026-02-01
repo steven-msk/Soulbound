@@ -15,8 +15,8 @@ namespace SoulboundBackend.Client.UI {
 		private TextAnchor childAlignment = TextAnchor.UpperCenter;
 		private bool reverseArrangement = false;
 		private bool2 controlChildSize = false;
-		private bool2 useChildScale = false;
-		private bool2 childForceExpand = true;
+		private bool2 useChildScale = true;
+		private bool2 childForceExpand = false;
 
 		void IUILayoutController.ApplyTo(GameObject obj) {
 			var group = obj.GetOrAddComponent<T>();
@@ -32,13 +32,26 @@ namespace SoulboundBackend.Client.UI {
 			group.childForceExpandHeight = childForceExpand.y;
 		}
 
-		public HorizontalOrVerticalLayout<T> ChildAlignment(TextAnchor childAlignment) {
-			this.childAlignment = childAlignment;
+		public HorizontalOrVerticalLayout<T> Padding(RectOffset padding) {
+			this.padding = padding;
 			return this;
 		}
 
-		public HorizontalOrVerticalLayout<T> ChildForceExpand(bool2 childForceExpand) {
-			this.childForceExpand = childForceExpand;
+		public HorizontalOrVerticalLayout<T> ChildSizing(ChildSizingMode childSizingMode) {
+			switch (childSizingMode) {
+				case ChildSizingMode.Fixed:
+					controlChildSize = false;
+					childForceExpand = false;
+					break;
+				case ChildSizingMode.Preferred:
+					controlChildSize = true;
+					childForceExpand = false;
+					break;
+				case ChildSizingMode.Stretch:
+					controlChildSize = true;
+					childForceExpand = true;
+					break;
+			}
 			return this;
 		}
 
@@ -47,8 +60,47 @@ namespace SoulboundBackend.Client.UI {
 			return this;
 		}
 
-		public HorizontalOrVerticalLayout<T> Padding(RectOffset padding) {
-			this.padding = padding;
+		public HorizontalOrVerticalLayout<T> ControlChildWidth(bool controlWidth) {
+			controlChildSize.x = controlWidth;
+			return this;
+		}
+
+		public HorizontalOrVerticalLayout<T> ContolChildHeight(bool controlHeight) {
+			controlChildSize.y = controlHeight;
+			return this;
+		}
+
+		public HorizontalOrVerticalLayout<T> Align(UIAlignment alignment) {
+			childAlignment = alignment switch {
+				UIAlignment.Start => typeof(T) == typeof(HorizontalLayoutGroup)
+					? TextAnchor.MiddleLeft
+					: TextAnchor.UpperCenter,
+				UIAlignment.Center => TextAnchor.MiddleCenter,
+				UIAlignment.End => typeof(T) == typeof(HorizontalLayoutGroup)
+					? TextAnchor.MiddleRight
+					: TextAnchor.LowerCenter,
+				_ => throw new NotImplementedException(),
+			};
+			return this;
+		}
+
+		public HorizontalOrVerticalLayout<T> Align(TextAnchor alignment) {
+			childAlignment = alignment;
+			return this;
+		}
+
+		public HorizontalOrVerticalLayout<T> ChildForceExpand(bool2 childForceExpand) {
+			this.childForceExpand = childForceExpand;
+			return this;
+		}
+
+		public HorizontalOrVerticalLayout<T> ChildForceExpandWidth(bool forceExpandWidth) {
+			childForceExpand.x = forceExpandWidth;
+			return this;
+		}
+
+		public  HorizontalOrVerticalLayout<T> ChildForceExpandHeight(bool forceExpandHeight) {
+			childForceExpand.y = forceExpandHeight;
 			return this;
 		}
 
@@ -69,5 +121,6 @@ namespace SoulboundBackend.Client.UI {
 
 		void IUILayoutController.OnChildAdded(UIElementNode node) {
 		}
+
 	}
 }

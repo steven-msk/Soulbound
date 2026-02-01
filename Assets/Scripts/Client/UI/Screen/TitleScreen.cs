@@ -19,7 +19,11 @@ namespace SoulboundBackend.Client.UI {
 			var prefab = AssetManager.Resolve<GameObject>(new AssetKey("WorldEnter"));
 
 			IUIElementContainer container = GUI.Container()
-				.Layout(GUI.Layout.Vertical())
+				.Layout(GUI.Layout.Vertical()
+					.ChildForceExpandWidth(true)
+					.ControlChildWidth(true)
+				)
+				.Frame(new StretchFrame())
 				.Build(screenObject);
 
 			foreach (var world in Soulbound.instance.ListWorldSaves()) {

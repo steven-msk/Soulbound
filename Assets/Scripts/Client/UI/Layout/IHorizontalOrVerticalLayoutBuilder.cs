@@ -11,10 +11,9 @@ namespace SoulboundBackend.Client.UI {
 	public interface IHorizontalOrVerticalLayoutBuilder<T> where T : HorizontalOrVerticalLayoutGroup {
 		HorizontalOrVerticalLayout<T> Padding(RectOffset padding);
 		HorizontalOrVerticalLayout<T> Spacing(float spacing);
-		HorizontalOrVerticalLayout<T> ChildAlignment(TextAnchor childAlignment);
+		HorizontalOrVerticalLayout<T> Align(UIAlignment alignment);
 		HorizontalOrVerticalLayout<T> ReverseArrangement(bool reverseArrangement);
-		HorizontalOrVerticalLayout<T> ControlChildSize(bool2 controlChildSize);
+		HorizontalOrVerticalLayout<T> ChildSizing(ChildSizingMode childSizingMode);
 		HorizontalOrVerticalLayout<T> UseChildSize(bool2 useChildSize);
-		HorizontalOrVerticalLayout<T> ChildForceExpand(bool2 childForceExpand);
 	}
 }

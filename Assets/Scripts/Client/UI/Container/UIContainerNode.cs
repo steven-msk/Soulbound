@@ -25,7 +25,8 @@ namespace SoulboundBackend.Client.UI {
 
 		void IUIElementContainer.AddElement(UIElementNode node) {
 			node.transform.SetParent(transform, false);
-			layout.OnChildAdded(node);	
+			layout.OnChildAdded(node);
+			frame.OnChildAdded(node);
 		}
 	}
 }

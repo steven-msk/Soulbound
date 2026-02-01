@@ -14,5 +14,8 @@ namespace SoulboundBackend.Client.UI {
 			rect.offsetMax = Vector2.zero; 
 			rect.pivot = new Vector2(0.5f, 0.5f);
 		}
+
+		public void OnChildAdded(UIElementNode node) {
+		}
 	}
 }

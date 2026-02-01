@@ -14,8 +14,7 @@ namespace Assets.Scripts.Client.UI.Layout {
 		GridLayout CellSize(Vector2 cellSize);
 		GridLayout Spacing(Vector2 spacing);
 		GridLayout ChildAlignment(TextAnchor childAlignment);
-		GridLayout StartCorner(GridLayoutGroup.Corner startCorner);
-		GridLayout StartAxis(GridLayoutGroup.Axis startAxis);
+		GridLayout Flow(GridFlow flow);
 		GridLayout Constraint(GridLayoutGroup.Constraint constraint);
 	}
 }

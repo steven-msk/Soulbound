@@ -54,13 +54,18 @@ namespace SoulboundBackend.Client.UI {
 			return this;
 		}
 
-		public GridLayout StartAxis(GridLayoutGroup.Axis startAxis) {
-			this.startAxis = startAxis;
-			return this;
-		}
+		public GridLayout Flow(GridFlow flow) {
+			switch (flow) {
+				case GridFlow.RowMajor:
+					startAxis = GridLayoutGroup.Axis.Horizontal;
+					startCorner = GridLayoutGroup.Corner.UpperLeft;
+					break;
 
-		public GridLayout StartCorner(GridLayoutGroup.Corner startCorner) {
-			this.startCorner = startCorner;
+				case GridFlow.ColumnMajor:
+					startAxis = GridLayoutGroup.Axis.Vertical;
+					startCorner = GridLayoutGroup.Corner.UpperLeft;
+					break;
+			}
 			return this;
 		}
 
