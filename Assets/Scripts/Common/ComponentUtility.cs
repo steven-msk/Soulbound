@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 #nullable enable
 
@@ -13,10 +13,7 @@ namespace SoulboundBackend.Common {
 		}
 
 		public static TComponent? GetOrAddComponent<TComponent>(this GameObject gameObject) where TComponent : Component {
-			var component = ComponentUtility.GetComponent<TComponent>(gameObject);
-			if (component == null) {
-				component = ComponentUtility.AddComponent<TComponent>(gameObject);
-			}
+			var component = GetComponent<TComponent>(gameObject) ?? AddComponent<TComponent>(gameObject);
 			return component;
 		}
 	 }

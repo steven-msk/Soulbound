@@ -6,11 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace SoulboundBackend.Client.UI.Screens {
-	public interface IScreenObject : IUIElementContainer {
-		void Show();
-		void Hide();
-		void Dispose();
-		Screen GetInstance();
+namespace SoulboundBackend.Client.UI {
+	public interface IUIElementContainer {
+		void AddElement(UIElementNode node);
 	}
 }

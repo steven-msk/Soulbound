@@ -11,12 +11,14 @@ using Screen = SoulboundBackend.Client.UI.Screens.Screen;
 
 namespace SoulboundBackend.Client.UI {
 	public sealed class UIHandler {
+		private readonly GUI gui;
 		private Canvas canvas;
 		private ScreenManager screenManager;
 
 		public UIHandler(Canvas initialCanvas) {
-			this.canvas = initialCanvas;
-			this.screenManager = new ScreenManager(canvas.transform);
+			gui = new GUI();
+			canvas = initialCanvas;
+			screenManager = new ScreenManager(canvas.transform);
 		}
 
 		public void SetScreen(Screen screen) {

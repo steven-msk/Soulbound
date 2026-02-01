@@ -19,7 +19,7 @@ namespace SoulboundBackend.Client.UI.Screens {
 		}
 
 		public void PushScreen(Screen screen) {
-			if (stack.TryPeek(out var activeEntry)) {
+			if (stack.TryPeek(out ScreenEntry activeEntry)) {
 				activeEntry.obj.Hide();
 			}
 
@@ -29,7 +29,7 @@ namespace SoulboundBackend.Client.UI.Screens {
 		}
 
 		public bool PopScreen() {
-			if (stack.TryPop(out var activeEntry)) {
+			if (stack.TryPop(out ScreenEntry activeEntry)) {
 				activeEntry.obj.Hide();
 				activeEntry.obj.Dispose();
 			}
@@ -47,7 +47,7 @@ namespace SoulboundBackend.Client.UI.Screens {
 		}
 
 		public Screen? GetActiveScreen() {
-			return stack.TryPeek(out var activeEntry)
+			return stack.TryPeek(out ScreenEntry activeEntry)
 				? activeEntry.screen
 				: null;
 		}
@@ -63,12 +63,22 @@ namespace SoulboundBackend.Client.UI.Screens {
 		GameObject IScreenObjectFactory.CreateGameObject() {
 			GameObject obj = new("Screen Object", typeof(RectTransform));
 			obj.transform.SetParent(rootTransform, false);
+
+			// default screen layout
+			RectTransform rectTransform = obj.GetComponent<RectTransform>();
+			rectTransform.anchorMin = Vector2.zero;
+			rectTransform.anchorMax = Vector2.one;
+			rectTransform.pivot		= new Vector2(0.5f, 0.5f);
+			rectTransform.offsetMin = Vector2.zero;
+			rectTransform.offsetMax = Vector2.zero;
+			rectTransform.sizeDelta = Vector2.zero;
+
 			return obj;
 		}
 
 		IScreenObject IScreenObjectFactory.CreateSceneObject(Screen screen, GameObject gameObject) {
 			ScreenObject screenObject = gameObject.AddComponent<ScreenObject>();
-			screenObject.Init(screen, this, rootTransform);
+			screenObject.Init(screen, this);
 			return screenObject;
 		}
 	}

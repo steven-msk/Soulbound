@@ -189,10 +189,14 @@ namespace SoulboundBackend.Core {
 		}
 
 		public void TogglePause() {
-			this.paused = !this.paused;
-			Time.timeScale = this.paused ? 0f : 1f;
-			inputHandler.PauseInputs(this.paused);
-			Soulbound.instance.GetUIHandler().SetScreen(paused ? new GamePausedScreen() : null);
+			paused = !paused;
+			Time.timeScale = paused ? 0f : 1f;
+			inputHandler.PauseInputs(paused);
+			if (!paused) {
+				Soulbound.instance.GetUIHandler().GetScreenManager().PopScreen();
+			} else {
+				Soulbound.instance.GetUIHandler().SetScreen(new GamePausedScreen());
+			}
 		}
 
 		public WorldDump CreateDump() {
