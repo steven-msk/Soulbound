@@ -6,11 +6,15 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.UI {
-	public partial class GUI {
+	public sealed class GUI {
 		public static GUI instance { get; private set; }
+		public static ButtonFactory Button { get; private set; }
+		public static ContainerFactory Container { get; private set; }
 
 		public GUI() {
 			instance = this;
+			Button = new ButtonFactory();
+			Container = new ContainerFactory();
 		}
 	}
 }

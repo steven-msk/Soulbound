@@ -7,12 +7,10 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SoulboundBackend.Client.UI {
-	public partial class GUI {
-		public static class Button {
-			[PROTOTYPICAL]
-			public static ButtonBuilder New(GameObject prefab) {
-				return ButtonBuilder.FromPrefab(prefab);
-			}
+	public sealed class ButtonFactory {
+		[PROTOTYPICAL]
+		public ButtonBuilder New(GameObject prefab) {
+			return ButtonBuilder.FromPrefab(prefab);
 		}
 	}
 }

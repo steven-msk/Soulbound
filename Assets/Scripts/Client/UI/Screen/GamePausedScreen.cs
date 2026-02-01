@@ -37,10 +37,10 @@ namespace SoulboundBackend.Client.UI.Screens {
 			//childMap.AddChild(title);
 
 
-			GUI.Button.New(GetAsset("ResumeButton")).Build(screenObject);
-			GUI.Button.New(GetAsset("SettingsButton")).Build(screenObject);
+			GUI.Button.New(GetAsset("ResumeButton")).Text("Resume").Build(screenObject);
+			GUI.Button.New(GetAsset("SettingsButton")).Text("Settings").Build(screenObject);
 
-			GUI.Button.New(GetAsset("QuitWorld"))
+			GUI.Button.New(GetAsset("QuitWorld")).Text("Quit To Title Screen")
 				.OnClick(Soulbound.instance.QuitActiveWorld)
 				.Build(screenObject);
 

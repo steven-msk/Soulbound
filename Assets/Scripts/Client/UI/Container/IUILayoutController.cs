@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SoulboundBackend.Client.UI {
-	public record UIElementNode(GameObject gameObject) {
-		public Transform transform => gameObject.transform;
+	public interface IUILayoutController {
+		void ApplyTo(GameObject obj);
+		void OnChildAdded(UIElementNode node);
 	}
 }
