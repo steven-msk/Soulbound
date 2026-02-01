@@ -18,7 +18,9 @@ namespace SoulboundBackend.Client.UI {
 		protected override void OnBuild(IScreenObject screenObject) {
 			var prefab = AssetManager.Resolve<GameObject>(new AssetKey("WorldEnter"));
 
-			IUIElementContainer container = GUI.Container.Horizontal().Build(screenObject);
+			IUIElementContainer container = GUI.Container()
+				.Layout(GUI.Layout.Vertical())
+				.Build(screenObject);
 
 			foreach (var world in Soulbound.instance.ListWorldSaves()) {
 				GUI.Button.New(prefab)

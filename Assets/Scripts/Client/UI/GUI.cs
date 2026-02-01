@@ -1,3 +1,4 @@
+using Assets.Scripts.Client.UI.Container;
 using SoulboundBackend.Common;
 using System;
 using System.Collections.Generic;
@@ -9,12 +10,14 @@ namespace SoulboundBackend.Client.UI {
 	public sealed class GUI {
 		public static GUI instance { get; private set; }
 		public static ButtonFactory Button { get; private set; }
-		public static ContainerFactory Container { get; private set; }
+		public static LayoutFactory Layout { get; private set; }
 
 		public GUI() {
 			instance = this;
 			Button = new ButtonFactory();
-			Container = new ContainerFactory();
+			Layout = new LayoutFactory();
 		}
+
+		public static ContainerBuilder Container() => new();
 	}
 }

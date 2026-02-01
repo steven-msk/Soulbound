@@ -8,11 +8,18 @@ using UnityEngine;
 
 namespace Assets.Scripts.Client.UI.Container {
 	public sealed class ContainerBuilder {
-		private readonly Func<IUILayoutController> layoutFactory;
+		private IUILayoutController layout;
+		private IUIFrame frame;
 		private bool built;
 
-		public ContainerBuilder(Func<IUILayoutController> layoutFactory) {
-			this.layoutFactory = layoutFactory;
+		public ContainerBuilder Layout(IUILayoutController layout) {
+			this.layout = layout;
+			return this;
+		}
+
+		public ContainerBuilder Frame(IUIFrame frame) {
+			this.frame = frame;
+			return this;
 		}
 
 		public IUIElementContainer Build(IUIElementContainer container) {
@@ -20,7 +27,7 @@ namespace Assets.Scripts.Client.UI.Container {
 			built = true;
 
 			GameObject obj = new("Container", typeof(RectTransform));
-			UIContainerNode node = new(obj, layoutFactory());
+			UIContainerNode node = new(obj, layout, frame);
 			container.AddElement(node);
 
 			return node;
