@@ -17,6 +17,7 @@ namespace SoulboundBackend.Client.UI {
 		private GridLayoutGroup.Corner startCorner = GridLayoutGroup.Corner.UpperLeft;
 		private GridLayoutGroup.Axis startAxis = GridLayoutGroup.Axis.Horizontal;
 		private GridLayoutGroup.Constraint constraint = GridLayoutGroup.Constraint.Flexible;
+		private int constraintCount = 0;
 
 		void IUILayoutController.ApplyTo(GameObject obj) {
 			GridLayoutGroup group = obj.GetOrAddComponent<GridLayoutGroup>();
@@ -27,20 +28,11 @@ namespace SoulboundBackend.Client.UI {
 			group.startCorner = startCorner;
 			group.startAxis = startAxis;
 			group.constraint = constraint;
+			group.constraintCount = constraintCount;
 		}
 
 		public GridLayout CellSize(Vector2 cellSize) {
 			this.cellSize = cellSize;
-			return this;
-		}
-
-		public GridLayout ChildAlignment(TextAnchor childAlignment) {
-			this.childAlignment = childAlignment;
-			return this;
-		}
-
-		public GridLayout Constraint(GridLayoutGroup.Constraint constraint) {
-			this.constraint = constraint;
 			return this;
 		}
 
@@ -55,17 +47,37 @@ namespace SoulboundBackend.Client.UI {
 		}
 
 		public GridLayout Flow(GridFlow flow) {
-			switch (flow) {
-				case GridFlow.RowMajor:
-					startAxis = GridLayoutGroup.Axis.Horizontal;
-					startCorner = GridLayoutGroup.Corner.UpperLeft;
-					break;
+			startCorner = flow switch {
+				GridFlow.LeftToRight_TopToBottom => GridLayoutGroup.Corner.UpperLeft,
+				GridFlow.LeftToRight_BottomToTop => GridLayoutGroup.Corner.LowerLeft,
+				GridFlow.RightToLeft_TopToBottom => GridLayoutGroup.Corner.UpperRight,
+				GridFlow.RightToLeft_BottomToTop => GridLayoutGroup.Corner.LowerRight,
+				_ => throw new NotImplementedException()
+			};
+			return this;
+		}
 
-				case GridFlow.ColumnMajor:
-					startAxis = GridLayoutGroup.Axis.Vertical;
-					startCorner = GridLayoutGroup.Corner.UpperLeft;
-					break;
+		public GridLayout FlowPattern(GridFlowPattern pattern) {
+			startAxis = pattern switch {
+				GridFlowPattern.FillHorizontal => GridLayoutGroup.Axis.Horizontal,
+				GridFlowPattern.FillVertical => GridLayoutGroup.Axis.Vertical,
+				_ => throw new NotImplementedException()
+			};
+			return this;
+		}
+
+		public GridLayout ContentAlignment(TextAnchor alignment) {
+			childAlignment = alignment;
+			return this;
+		}
+
+		public GridLayout Fixed(GridLayoutGroup.Constraint constraint, int count) {
+			if (constraint == GridLayoutGroup.Constraint.Flexible) {
+				UnityEngine.Debug.Log("Grid layout is already flexible");
+				return this;
 			}
+			this.constraint = constraint;
+			constraintCount = count;
 			return this;
 		}
 

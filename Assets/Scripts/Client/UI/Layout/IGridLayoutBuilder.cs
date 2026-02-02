@@ -13,8 +13,9 @@ namespace Assets.Scripts.Client.UI.Layout {
 		GridLayout Padding(RectOffset padding);
 		GridLayout CellSize(Vector2 cellSize);
 		GridLayout Spacing(Vector2 spacing);
-		GridLayout ChildAlignment(TextAnchor childAlignment);
+		GridLayout ContentAlignment(TextAnchor alignment);
+		GridLayout Fixed(GridLayoutGroup.Constraint constraint, int count);
 		GridLayout Flow(GridFlow flow);
-		GridLayout Constraint(GridLayoutGroup.Constraint constraint);
+		GridLayout FlowPattern(GridFlowPattern pattern);
 	}
 }

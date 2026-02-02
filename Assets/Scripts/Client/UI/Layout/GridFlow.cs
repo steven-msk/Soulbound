@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.UI {
 	public enum GridFlow {
-		RowMajor,		// left -> right, then push down
-		ColumnMajor,	// top -> bottom, then push right
+		LeftToRight_TopToBottom,
+		RightToLeft_TopToBottom,
+		LeftToRight_BottomToTop,
+		RightToLeft_BottomToTop,
 	}
 }
