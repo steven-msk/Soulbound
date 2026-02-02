@@ -8,18 +8,13 @@ using UnityEngine;
 
 namespace Assets.Scripts.Client.UI.Container {
 	public sealed class ContainerBuilder {
-		private IUILayoutController layout;
-		private IUIFrame frame;
+		private readonly IUILayoutController layout;
+		private readonly IUIFrame frame;
 		private bool built;
 
-		public ContainerBuilder Layout(IUILayoutController layout) {
-			this.layout = layout;
-			return this;
-		}
-
-		public ContainerBuilder Frame(IUIFrame frame) {
+		public ContainerBuilder(IUIFrame frame, IUILayoutController layout) {
 			this.frame = frame;
-			return this;
+			this.layout = layout;
 		}
 
 		public IUIElementContainer Build(IUIElementContainer container) {

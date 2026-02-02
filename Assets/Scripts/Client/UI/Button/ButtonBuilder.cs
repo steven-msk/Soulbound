@@ -8,19 +8,15 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SoulboundBackend.Client.UI {
-	public sealed class ButtonBuilder {
-		private readonly GameObject prefab;
+	public class ButtonBuilder {
+		private readonly IUIElementTemplate<ButtonHandle> template;
 		private string text;
 		private bool enabled = true;
 		private Action onClick;
 		private bool built;
 
-		private ButtonBuilder(GameObject prefab) {
-			this.prefab = prefab;
-		}
-
-		public static ButtonBuilder FromPrefab(GameObject prefab) {
-			return new ButtonBuilder(prefab);
+		public ButtonBuilder(IUIElementTemplate<ButtonHandle> template) {
+			this.template = template;
 		}
 
 		public ButtonBuilder Text(string text) {
@@ -42,12 +38,13 @@ namespace SoulboundBackend.Client.UI {
 			if (built) throw new InvalidOperationException("Button already built");
 			built = true;
 
-			GameObject obj = GameObject.Instantiate(prefab);
+			GameObject obj = template.Instantiate();
 			UIElementNode node = new(obj);
 			container.AddElement(node);
 
 			var handle = obj.GetOrAddComponent<ButtonHandle>();
 			handle.Build(text, enabled, onClick);
+			template.Apply(handle);
 
 			return handle;
 		}

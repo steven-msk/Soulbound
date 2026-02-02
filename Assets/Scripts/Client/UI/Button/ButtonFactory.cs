@@ -8,9 +8,10 @@ using UnityEngine;
 
 namespace SoulboundBackend.Client.UI {
 	public sealed class ButtonFactory {
-		[PROTOTYPICAL]
-		public ButtonBuilder New(GameObject prefab) {
-			return ButtonBuilder.FromPrefab(prefab);
+		public ButtonBuilder FromTemplate(IUIElementTemplate<ButtonHandle> template) {
+			return new ButtonBuilder(template);
 		}
+
+		public ButtonBuilder Label() => FromTemplate(new LabelButton());
 	}
 }

@@ -18,23 +18,19 @@ namespace SoulboundBackend.Client.UI.Screens {
 	public sealed class GamePausedScreen : Screen {
 
 		protected override void OnBuild(IScreenObject screenObject) {
-				IUIElementContainer container = GUI.Container()
-				.Layout(GUI.Layout.Vertical()
+			IUIElementContainer container = GUI.Container(
+				GUI.Frame.Stretch(),
+				GUI.Layout.Vertical()
 					.Align(UIAlignment.Center)
 					.ControlChildSize(true)
-				).Frame(new StretchFrame())
-				.Build(screenObject);
+			).Build(screenObject);
 
-			GUI.Button.New(GetAsset("ResumeButton")).Text("Resume").Build(container);
-			GUI.Button.New(GetAsset("SettingsButton")).Text("Settings").Build(container);
+			GUI.Button.Label().Text("Resume").Build(container);
+			GUI.Button.Label().Text("Settings").Build(container);
 
-			GUI.Button.New(GetAsset("QuitWorld")).Text("Quit To Title Screen")
+			GUI.Button.Label().Text("Quit To Title Screen")
 				.OnClick(Soulbound.instance.QuitActiveWorld)
 				.Build(container);
-		}
-
-		private GameObject GetAsset(string key) {
-			return AssetManager.Resolve<GameObject>(new AssetKey(key));
 		}
 	}
 }

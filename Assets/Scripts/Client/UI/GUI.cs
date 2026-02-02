@@ -9,17 +9,21 @@ using System.Threading.Tasks;
 namespace SoulboundBackend.Client.UI {
 	public sealed class GUI {
 		public static GUI instance { get; private set; }
-		public static ButtonFactory Button { get; private set; }
 		public static LayoutFactory Layout { get; private set; }
 		public static FrameFactory Frame { get; private set; }
+		public static ButtonFactory Button { get; private set; }
 
 		public GUI() {
 			instance = this;
-			Button = new ButtonFactory();
 			Layout = new LayoutFactory();
 			Frame = new FrameFactory();
+			Button = new ButtonFactory();
 		}
 
-		public static ContainerBuilder Container() => new();
+		// will be replaced with a ContainerFactory later on
+		// for simplicity and implementation limitation reasons, this method should work
+		public static ContainerBuilder Container(IUIFrame frame, IUILayoutController layout) {
+			return new ContainerBuilder(frame, layout);
+		}
 	}
 }

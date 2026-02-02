@@ -16,24 +16,21 @@ using Screen = SoulboundBackend.Client.UI.Screens.Screen;
 namespace SoulboundBackend.Client.UI {
 	public class TitleScreen : Screen {
 		protected override void OnBuild(IScreenObject screenObject) {
-			var prefab = AssetManager.Resolve<GameObject>(new AssetKey("WorldEnter"));
-
-			IUIElementContainer container = GUI.Container()
-				.Layout(GUI.Layout.Vertical()
+			IUIElementContainer container = GUI.Container(
+				GUI.Frame.Stretch(),
+				GUI.Layout.Vertical()
 					.ChildForceExpandWidth(true)
 					.ControlChildWidth(true)
-				)
-				.Frame(new StretchFrame())
-				.Build(screenObject);
+			).Build(screenObject);
 
 			foreach (var world in Soulbound.instance.ListWorldSaves()) {
-				GUI.Button.New(prefab)
+				GUI.Button.Label()
 					.Text(world)
 					.OnClick(() => Soulbound.instance.EnterWorld(world))
 					.Build(container);
 			}
 
-			GUI.Button.New(prefab)
+			GUI.Button.Label()
 				.Text("new world")
 				.OnClick(() => {
 					string world = $"world_{Guid.NewGuid()}";
