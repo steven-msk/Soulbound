@@ -47,7 +47,7 @@ namespace SoulboundBackend.Client.UI.Screens {
 
 		private void DestroyTooltips() {
 			foreach (var tooltipNode in tooltipNodes) {
-				if (tooltipNode.handle.isAlive) {
+				if (tooltipNode.isAlive) {
 					Destroy(tooltipNode.gameObject);
 				}
 			}

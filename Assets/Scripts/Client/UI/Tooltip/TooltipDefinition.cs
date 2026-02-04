@@ -10,21 +10,22 @@ using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 
-namespace Assets.Scripts.Client.UI.Tooltip {
-	// will be replaced by Tooltip and abstracted
+namespace SoulboundBackend.Client.UI {
+	// will replace Tooltip and be abstracted
 	[PROTOTYPICAL]
-	public class TooltipDefinition : ITooltipDefinition<ITooltipHandle> {
+	public class TooltipDefinition : ITooltipDefinition<TooltipHandle_prototypical> {
 		private readonly string text;
 
 		public TooltipDefinition(string text) {
 			this.text = text;
 		}
 
-		public ITooltipHandle Build(ITooltipManager tooltipManager) {
+		public TooltipHandle_prototypical Build(ITooltipManager tooltipManager) {
 			GameObject obj = new("Tooltip Root", typeof(RectTransform));
 			obj.AddComponent<TextMeshProUGUI>().text = text;
 
-			ITooltipHandle handle = default;
+			// need a proper handle
+			TooltipHandle_prototypical handle = obj.AddComponent<TooltipHandle_prototypical>();
 
 			UITooltipNode node = new(obj, handle);
 			tooltipManager.AddTooltip(node);
