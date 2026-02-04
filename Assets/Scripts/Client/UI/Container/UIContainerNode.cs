@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SoulboundBackend.Client.UI {
-	public record UIContainerNode : UIElementNode, IUIElementContainer {
+	public record UIContainerNode(GameObject obj) : UIElementNode(obj), IUIElementContainer {
 		private readonly IUILayoutController layout;
 		private readonly IUIFrame frame;
 
 		public UIContainerNode(GameObject obj, IUILayoutController layout, IUIFrame frame)
-			: base(obj) {
+			: this(obj) {
 			this.layout = layout;
 			this.frame = frame;
 

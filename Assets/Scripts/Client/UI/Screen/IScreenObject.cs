@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SoulboundBackend.Client.UI.Screens {
-	public interface IScreenObject : IUIElementContainer {
+	public interface IScreenObject : IUIElementContainer, ITooltipManager {
 		void Show();
 		void Hide();
 		void Dispose();

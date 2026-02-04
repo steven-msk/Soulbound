@@ -422,7 +422,7 @@ Based on the dependency graph, this could be an optimal order:
 13. [Resource (asset) system](#20-resource-system-assets) **>|** *(async preload will be resolved in prod)*
 13. [Physics system](#7-physics-system) (universal overhaul)
 14. [UI core layer & navigation system](#13-ui-systems-overall) **>|** *(visuals and FX delayed for prod)*
-15. [Tooltips](#14-tooltips)
+15. [Tooltips](#14-tooltips) **<-**
 16. [Settings](#16-settings-ui)*
 17. [Debug visuals](#15-debug-visuals)
 18. [Lighting](#11-lighting-system)

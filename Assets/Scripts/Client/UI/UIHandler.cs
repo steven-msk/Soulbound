@@ -33,5 +33,10 @@ namespace SoulboundBackend.Client.UI {
 		public void FlushScreens() => screenManager.Flush();
 
 		public ScreenManager GetScreenManager() => screenManager;
+
+		public THandle ShowTooltip<THandle>(ITooltipDefinition<THandle> tooltip)
+				where THandle : ITooltipHandle {
+			return screenManager.BuildTooltip(tooltip);
+		}
 	}
 }
