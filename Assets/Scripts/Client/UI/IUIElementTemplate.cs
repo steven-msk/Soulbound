@@ -10,5 +10,11 @@ namespace SoulboundBackend.Client.UI {
 		GameObject Instantiate();
 		virtual void Apply(THandle handle) {
 		}
+
+		// a note on an element's layout and visual structure:
+		// the current implementation doesnt support any special visual stuff
+		// one of the problems is that Unity's layout components do not mix well with visuals and FX
+		// because of that, UI visuals will be delayed for production, among other artistic-related features
+		// as of the backend for ui visuals, a decorator could handle the internal layout of an element
 	}
 }
