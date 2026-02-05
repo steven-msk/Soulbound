@@ -38,11 +38,19 @@ namespace SoulboundBackend.Client.UI.Screens {
 		void IUIElementContainer.AddElement(UIElementNode node) {
 			node.transform.SetParent(transform, false);
 			childMap.AddChild(node.gameObject);
+
+			foreach (var tooltipTrigger in node.gameObject.GetComponentsInChildren<ITooltipTrigger>(true)) {
+				tooltipTrigger.Init(this);
+			}
 		}
 
 		void ITooltipManager.AddTooltip(UITooltipNode node) {
 			node.transform.SetParent(transform, false);
 			tooltipNodes.Add(node);
+		}
+
+		ITooltipHandle ITooltipRenderer.RenderTooltip(ITooltipDefinition tooltip) {
+			return tooltip.Build(this);
 		}
 
 		private void DestroyTooltips() {

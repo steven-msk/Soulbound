@@ -58,11 +58,6 @@ namespace SoulboundBackend.Client.UI.Screens {
 				: null;
 		}
 
-		public THandle BuildTooltip<THandle>(ITooltipDefinition<THandle> tooltip)
-				where THandle : ITooltipHandle {
-			return tooltip.Build(GetActiveObject());
-		}
-
 		public void Flush() {
 			while (!stack.IsEmpty()) {
 				var screenObject = stack.Pop();

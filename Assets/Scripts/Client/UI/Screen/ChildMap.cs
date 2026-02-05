@@ -1,3 +1,4 @@
+using SoulboundBackend.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace SoulboundBackend.Client.UI.Screens {
 		private readonly Dictionary<string, ChildReference> childRefs = new();
 
 		public ChildReference AddChild(GameObject obj) {
-			var childRef = obj.AddComponent<ChildReference>();
+			ChildReference childRef = obj.GetOrAddComponent<ChildReference>();
 			childRefs[childRef.accessor] = childRef;
 			return childRef;
 		}

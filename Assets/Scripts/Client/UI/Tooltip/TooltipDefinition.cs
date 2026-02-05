@@ -13,14 +13,14 @@ using UnityEngine;
 namespace SoulboundBackend.Client.UI {
 	// will replace Tooltip and be abstracted
 	[PROTOTYPICAL]
-	public class TooltipDefinition : ITooltipDefinition<TooltipHandle_prototypical> {
+	public class TooltipDefinition : ITooltipDefinition {
 		private readonly string text;
 
 		public TooltipDefinition(string text) {
 			this.text = text;
 		}
 
-		public TooltipHandle_prototypical Build(ITooltipManager tooltipManager) {
+		public ITooltipHandle Build(ITooltipManager tooltipManager) {
 			GameObject obj = new("Tooltip Root", typeof(RectTransform));
 			obj.AddComponent<TextMeshProUGUI>().text = text;
 
