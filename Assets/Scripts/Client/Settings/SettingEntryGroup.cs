@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Client.SettingSystem;
+using SoulboundBackend.Client.SettingSystem;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +23,7 @@ namespace SoulboundBackend.Client.SettingSystem {
 			visual.transform.SetParent(container.transform, false);
 			visual.Show(entry);
 
-			TooltipTrigger tooltipTrigger = container.AddComponent<TooltipTrigger>();
+			TooltipTrigger_OLD tooltipTrigger = container.AddComponent<TooltipTrigger_OLD>();
 			tooltipTrigger.Init(entry.tooltipSupplier());
 
 			return containerBuilder;
@@ -47,7 +47,7 @@ namespace SoulboundBackend.Client.SettingSystem {
 			MethodInfo bindMethod = visual.GetType().GetMethod("Show", bindingFlags);
 			bindMethod.Invoke(visual, new object[] { entry });
 
-			TooltipTrigger tooltipTrigger = container.AddComponent<TooltipTrigger>();
+			TooltipTrigger_OLD tooltipTrigger = container.AddComponent<TooltipTrigger_OLD>();
 			tooltipTrigger.Init(entry.tooltipSupplier());
 
 			return containerBuilder;

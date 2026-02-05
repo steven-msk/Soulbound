@@ -7,6 +7,7 @@ using Logger = SoulboundBackend.Common.Logging.Logger;
 #nullable enable
 
 namespace SoulboundBackend.Client.UI.Tooltip {
+	[Obsolete]
 	public class Tooltip {
 		private static readonly Logger logger = Logger.CreateInstance();
 		// FUTURE TODO: implement interactable tooltips, scrollable/collapsable tooltips, comparable tooltips for weapons/souls

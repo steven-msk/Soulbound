@@ -1,6 +1,8 @@
-﻿using System.Linq;
+using System;
+using System.Linq;
 
 namespace SoulboundBackend.Client.UI.Tooltip {
+	[Obsolete]
 	public class TooltipNodeData {
 		public string text { get; set; }
 		public TooltipNode node { get; set; }

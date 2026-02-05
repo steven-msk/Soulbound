@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
 namespace SoulboundBackend.Client.UI.Tooltip {
+	[Obsolete]
 	public static class TooltipNodeStylePresets {
 		static readonly Dictionary<TooltipNode, TooltipNodeStyle> presets = new() {
 			[TooltipNode.Title] = new TooltipNodeStyle() {

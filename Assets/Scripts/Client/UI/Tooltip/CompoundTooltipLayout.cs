@@ -1,9 +1,11 @@
-﻿using SoulboundBackend.Common;
+using SoulboundBackend.Common;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
 
 namespace SoulboundBackend.Client.UI.Tooltip {
+	[Obsolete]
 	public class CompoundTooltipLayout {
 		public RectOffset padding = new(10, 10, 8, 8);
 		public float spacing = 4;

@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 
 #nullable enable
 
 namespace SoulboundBackend.Client.UI.Tooltip {
+	[Obsolete]
 	public class TooltipData {
 		public List<TooltipNodeData> nodes { get; private set; } = new();
 		public CompoundTooltipLayout layout { get; private set; }

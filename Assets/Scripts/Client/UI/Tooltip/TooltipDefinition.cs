@@ -25,7 +25,7 @@ namespace SoulboundBackend.Client.UI {
 			obj.AddComponent<TextMeshProUGUI>().text = text;
 
 			// need a proper handle
-			TooltipHandle_prototypical handle = obj.AddComponent<TooltipHandle_prototypical>();
+			TooltipHandle handle = obj.AddComponent<TooltipHandle>();
 
 			UITooltipNode node = new(obj, handle);
 			tooltipManager.AddTooltip(node);

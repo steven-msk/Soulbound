@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Core.AssetManagement;
+using SoulboundBackend.Core.AssetManagement;
 using SoulboundBackend.Core.Resource;
 using System;
 using TMPro;
@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using Logger = SoulboundBackend.Common.Logging.Logger;
 
 namespace SoulboundBackend.Client.UI.Tooltip {
+	[Obsolete]
 	public class TooltipRenderer {
 		public delegate TooltipNodeStyle NodeStyleFactory(TooltipNode node);
 

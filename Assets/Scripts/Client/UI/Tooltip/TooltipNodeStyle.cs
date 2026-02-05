@@ -1,9 +1,11 @@
-﻿using SoulboundBackend.Core.AssetManagement;
+using SoulboundBackend.Core.AssetManagement;
 using SoulboundBackend.Core.Resource;
+using System;
 using TMPro;
 using UnityEngine;
 
 namespace SoulboundBackend.Client.UI.Tooltip {
+	[Obsolete]
 	public class TooltipNodeStyle {
 		public int fontSize = 10;
 		public Color textColor = Color.white;

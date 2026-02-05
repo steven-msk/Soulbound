@@ -8,12 +8,14 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SoulboundBackend.Client.UI {
-	public class ButtonBuilder {
+	public class ButtonBuilder : IUIElementBuilder<ButtonBuilder> {
 		private readonly IUIElementTemplate<ButtonHandle> template;
 		private string text;
 		private bool enabled = true;
 		private Action onClick;
 		private bool built;
+		private ITooltipDefinition tooltip;
+		private Type tooltipTriggerType;
 
 		public ButtonBuilder(IUIElementTemplate<ButtonHandle> template) {
 			this.template = template;
@@ -34,16 +36,30 @@ namespace SoulboundBackend.Client.UI {
 			return this;
 		}
 
+		public ButtonBuilder Tooltip<TTrigger>(ITooltipDefinition tooltip) where TTrigger : Component, ITooltipTrigger, new() {
+			if (!typeof(MonoBehaviour).IsAssignableFrom(typeof(TTrigger))) {
+				throw new InvalidOperationException("Tooltip trigger component must be a MonoBehaviour");
+			}
+			this.tooltip = tooltip;
+			tooltipTriggerType = typeof(TTrigger);
+			return this;
+		}
+
 		public IButtonHandle Build(IUIElementContainer container) {
 			if (built) throw new InvalidOperationException("Button already built");
 			built = true;
 
 			GameObject obj = template.Instantiate();
+			if (tooltip != null) {
+				ITooltipTrigger trigger = (ITooltipTrigger)obj.AddComponent(tooltipTriggerType);
+				trigger.SetTooltip(tooltip);
+			}
+			var handle = obj.GetOrAddComponent<ButtonHandle>();
+			handle.Build(text, enabled, onClick);
+
 			UIElementNode node = new(obj);
 			container.AddElement(node);
 
-			var handle = obj.GetOrAddComponent<ButtonHandle>();
-			handle.Build(text, enabled, onClick);
 			template.Apply(handle);
 
 			return handle;

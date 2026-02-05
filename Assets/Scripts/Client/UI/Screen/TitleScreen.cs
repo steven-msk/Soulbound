@@ -37,6 +37,7 @@ namespace SoulboundBackend.Client.UI {
 					Soulbound.instance.CreateNewWorld(world);
 					Soulbound.instance.EnterWorld(world);
 				})
+				.Tooltip<TooltipTrigger>(new TooltipDefinition("tooltip from new world"))
 				.Build(container);
 		}
 	}
