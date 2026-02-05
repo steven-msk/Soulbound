@@ -9,5 +9,6 @@ using UnityEngine;
 namespace SoulboundBackend.Client.UI {
 	public interface IUIElementContainer {
 		void AddElement(UIElementNode node);
+		void OnElementAdded(UIElementNode node);
 	}
 }

@@ -22,7 +22,7 @@ namespace Assets.Scripts.Client.UI.Container {
 			built = true;
 
 			GameObject obj = new("Container", typeof(RectTransform));
-			UIContainerNode node = new(obj, layout, frame);
+			UIContainerNode node = new(obj, container, layout, frame);
 			container.AddElement(node);
 
 			return node;

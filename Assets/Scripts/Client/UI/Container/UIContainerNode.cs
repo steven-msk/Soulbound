@@ -8,13 +8,15 @@ using UnityEngine;
 
 namespace SoulboundBackend.Client.UI {
 	public record UIContainerNode : UIElementNode, IUIElementContainer {
+		private readonly IUIElementContainer parent;
 		private readonly IUILayoutController layout;
 		private readonly IUIFrame frame;
 
-		public UIContainerNode(GameObject obj, IUILayoutController layout, IUIFrame frame)
+		public UIContainerNode(GameObject obj, IUIElementContainer parent, IUILayoutController layout, IUIFrame frame)
 			: base(obj) {
 			this.layout = layout;
 			this.frame = frame;
+			this.parent = parent;
 
 			RectTransform rect = obj.GetComponent<RectTransform>();
 			RectTransform parentRect = obj.GetComponentInParent<RectTransform>();
@@ -23,10 +25,15 @@ namespace SoulboundBackend.Client.UI {
 			layout.ApplyTo(obj);
 		}
 
+		void IUIElementContainer.OnElementAdded(UIElementNode node) {
+			parent.OnElementAdded(node);
+		}
+
 		void IUIElementContainer.AddElement(UIElementNode node) {
 			node.transform.SetParent(transform, false);
 			layout.OnChildAdded(node);
 			frame.OnChildAdded(node);
+			parent.OnElementAdded(node);
 		}
 	}
 }

@@ -38,7 +38,10 @@ namespace SoulboundBackend.Client.UI.Screens {
 		void IUIElementContainer.AddElement(UIElementNode node) {
 			node.transform.SetParent(transform, false);
 			childMap.AddChild(node.gameObject);
+			((IUIElementContainer)this).OnElementAdded(node);
+		}
 
+		void IUIElementContainer.OnElementAdded(UIElementNode node) {
 			foreach (var tooltipTrigger in node.gameObject.GetComponentsInChildren<ITooltipTrigger>(true)) {
 				tooltipTrigger.Init(this);
 			}
