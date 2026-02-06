@@ -1,4 +1,6 @@
 using SoulboundBackend.Client.Input;
+using SoulboundBackend.Client.UI;
+using SoulboundBackend.Client.UI.Screens;
 using SoulboundBackend.Client.UI.Storage;
 using SoulboundBackend.Client.UI.Tooltip;
 using SoulboundBackend.Core;
@@ -38,6 +40,13 @@ namespace SoulboundBackend.Client.ItemSystem {
 			ItemDisplay? display = obj?.GetComponent<ItemDisplay>();
 			UnityEngine.Debug.Assert(display != null, $"ItemDisplay component not found in item display prefab");
 
+			// prototypical
+			// will be implemented properly when world ui is overhauled
+			ITooltipTrigger trigger = obj.AddComponent<TooltipTrigger>();
+			ITooltipRenderer renderer = GameObject.FindFirstObjectByType<ScreenObject>();
+			trigger.SetTooltip(new ItemTooltip(itemStack.item));
+			trigger.Init(renderer);
+
 			display!.stack = itemStack;
 			display.stackText = itemStack.AssignDisplay(display);
 			display.transform.SetAsLastSibling();
@@ -58,9 +67,10 @@ namespace SoulboundBackend.Client.ItemSystem {
 			GameObject.Destroy(gameObject);
 		}
 
+		[Obsolete]
 		public void ShowTooltip(Vector2 position, Transform? parent) {
-			activeTooltip = itemStack.item.RenderTooltip(position, this.transform);
-			activeTooltip?.SetParent(parent!, true);
+			//activeTooltip = itemStack.item.RenderTooltip(position, this.transform);
+			//activeTooltip?.SetParent(parent!, true);
 		}
 
 		public void OnGrab(Transform? grabParent, bool keepWorldSpace = false) {
@@ -77,9 +87,10 @@ namespace SoulboundBackend.Client.ItemSystem {
 			gameObject.GetComponent<Image>().raycastTarget = true;
 		}
 
+		[Obsolete]
 		public void DestroyTooltip() {
-			activeTooltip?.Hide();
-			activeTooltip = null;
+			//activeTooltip?.Hide();
+			//activeTooltip = null;
 		}
 
 		public void UpdateStackText() {

@@ -1,5 +1,5 @@
-using Assets.Scripts.Client.UI.Tooltip;
 using SoulboundBackend.Client.UI.Screens;
+using SoulboundBackend.Common;
 using SoulboundBackend.Core;
 using SoulboundBackend.Core.AssetManagement;
 using SoulboundBackend.Core.Resource;
@@ -16,6 +16,8 @@ using Screen = SoulboundBackend.Client.UI.Screens.Screen;
 
 namespace SoulboundBackend.Client.UI {
 	public class TitleScreen : Screen {
+
+		[PROTOTYPICAL]
 		protected override void OnBuild(IScreenObject screenObject) {
 			IUIElementContainer container = GUI.Container(
 				GUI.Frame.Stretch(),
@@ -38,7 +40,6 @@ namespace SoulboundBackend.Client.UI {
 					Soulbound.instance.CreateNewWorld(world);
 					Soulbound.instance.EnterWorld(world);
 				})
-				.Tooltip<TooltipTrigger>(new ItemTooltip("an item", "a description", "some lore"))
 				.Build(container);
 		}
 	}

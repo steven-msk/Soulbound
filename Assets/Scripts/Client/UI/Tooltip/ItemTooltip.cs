@@ -12,7 +12,7 @@ using UnityEngine.UI;
 
 #nullable enable
 
-namespace Assets.Scripts.Client.UI.Tooltip {
+namespace SoulboundBackend.Client.UI {
 	[PROTOTYPICAL]
 	public class ItemTooltip : ITooltipDefinition {
 		private readonly string title;
@@ -25,11 +25,15 @@ namespace Assets.Scripts.Client.UI.Tooltip {
 			this.lore = lore;
 		}
 
+		public ItemTooltip(Item item)
+			: this(item.name, "a description", "some lore") {
+		}
+
 		public ITooltipHandle Build(ITooltipManager tooltipManager) {
 			GameObject obj = new("ItemTooltip", typeof(RectTransform));
 			Image bg = obj.AddComponent<Image>();
 			bg.sprite = null;
-			bg.color = new Color(1f, 1f, 1f, 0.392f);
+			bg.color = new Color(0.5f, 0.5f, 0.5f, 0.392f);
 			VerticalLayoutGroup layoutGroup = obj.AddComponent<VerticalLayoutGroup>();
 			layoutGroup.padding = new RectOffset(10, 0, 0, 0);
 			layoutGroup.childForceExpandWidth = false;

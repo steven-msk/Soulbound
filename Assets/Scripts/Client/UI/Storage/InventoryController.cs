@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Client.Concurrency;
+using SoulboundBackend.Client.Concurrency;
 using SoulboundBackend.Client.Input;
 using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.Stats;
@@ -180,6 +180,9 @@ namespace SoulboundBackend.Client.UI.Storage {
 			foreach (var slot in popupSlots) {
 				slot.OnInventoryPopup(opened);
 			}
+
+			// TEMPORARY TEST FOR ITEM TOOLTIPS
+			slots[0].CreateDisplay(new ItemStack(Items.woodBlock, 10));
 		}
 
 		void IItemContainer.OnItemDisplayAdded(ItemDisplay itemDisplay, IItemSlot slot) {

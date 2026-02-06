@@ -2,23 +2,18 @@ using Cysharp.Threading.Tasks;
 using SoulboundBackend.Client;
 using SoulboundBackend.Client.SettingSystem;
 using SoulboundBackend.Client.UI;
+using SoulboundBackend.Client.UI.Screens;
 using SoulboundBackend.Client.World;
 using SoulboundBackend.Common;
 using SoulboundBackend.Common.Json;
-using SoulboundBackend.Common.Logging;
-using SoulboundBackend.Core.Bootstrap;
 using SoulboundBackend.Core.Resource;
 using SoulboundBackend.Core.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 using UnityEngine.SceneManagement;
-using Zenject;
 
 #nullable enable
 
@@ -82,7 +77,16 @@ namespace SoulboundBackend.Core {
 			worldManager.LoadWorld(world, config.dev.seed,
 				SceneManager.LoadSceneAsync("WorldScene").ToUniTask(),
 				UnityEngine.Object.FindFirstObjectByType<WorldSceneRoot>
-			).Forget(Debug.LogException);
+			).ContinueWith(dump => {
+				// prototypical
+				uiHandler.SetScreen(new emptyScreen());
+			}).Forget(Debug.LogException);
+		}
+
+		[PROTOTYPICAL]
+		private class emptyScreen : Client.UI.Screens.Screen {
+			protected override void OnBuild(IScreenObject screenObject) {
+			}
 		}
 
 		public void QuitActiveWorld() {
