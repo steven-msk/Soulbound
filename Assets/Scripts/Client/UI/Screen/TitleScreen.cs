@@ -1,3 +1,4 @@
+using Assets.Scripts.Client.UI.Tooltip;
 using SoulboundBackend.Client.UI.Screens;
 using SoulboundBackend.Core;
 using SoulboundBackend.Core.AssetManagement;
@@ -37,7 +38,7 @@ namespace SoulboundBackend.Client.UI {
 					Soulbound.instance.CreateNewWorld(world);
 					Soulbound.instance.EnterWorld(world);
 				})
-				.Tooltip<TooltipTrigger>(new TooltipDefinition("tooltip from new world"))
+				.Tooltip<TooltipTrigger>(new ItemTooltip("an item", "a description", "some lore"))
 				.Build(container);
 		}
 	}
