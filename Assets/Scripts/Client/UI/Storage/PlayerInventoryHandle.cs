@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SoulboundBackend.Client.UI {
-	public sealed class PlayerInventoryHandle : MonoBehaviour, IUIElementHandle {
+	public sealed class PlayerInventoryHandle : MonoBehaviour, IPlayerInventoryHandle {
 		public void SetVisible(bool visible) {
 			throw new NotImplementedException();
 		}
