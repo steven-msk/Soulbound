@@ -36,8 +36,14 @@ namespace SoulboundBackend.Client.ItemSystem {
 
 		public void SetStack(ItemStack stack) {
 			this.stack = stack;
-			setStack(stack);
+			AssertSetStack();
+			setStack?.Invoke(stack);
+		}
 
+		private void AssertSetStack() {
+			if (setStack == null) {
+				UnityEngine.Debug.LogException(new InvalidOperationException("SetStack callback is null"));
+			}
 		}
 	}
 }

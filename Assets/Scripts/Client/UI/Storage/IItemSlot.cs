@@ -83,15 +83,15 @@ namespace SoulboundBackend.Client.UI.Storage {
 			container.OnPointerUp(this, eventData);
 		}
 		[Obsolete] new public virtual void OnPointerEnter(PointerEventData eventData) {
-			container.OnPointerEnter(this, eventData);
-			if (showTooltip) {
-				itemDisplay?.ShowTooltip(eventData.position, container.transform);
-			}
+			//container.OnPointerEnter(this, eventData);
+			//if (showTooltip) {
+			//	itemDisplay?.ShowTooltip(eventData.position, container.transform);
+			//}
 		}
 
 		[Obsolete] new public virtual void OnPointerExit(PointerEventData eventData) {
-			container.OnPointerExit(this, eventData);
-			itemDisplay?.DestroyTooltip();
+			//container.OnPointerExit(this, eventData);
+			//itemDisplay?.DestroyTooltip();
 		}
 
 		/// <summary>

@@ -59,6 +59,8 @@ namespace SoulboundBackend.Client.UI {
 				}
 			};
 
+			inventory.GetSlotByIndex(0).SetStack(new(Items.woodBlock, 10));
+
 			inventory.TogglePopup();
 			return inventoryHandle;
 		}

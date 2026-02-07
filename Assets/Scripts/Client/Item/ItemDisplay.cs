@@ -40,13 +40,6 @@ namespace SoulboundBackend.Client.ItemSystem {
 			ItemDisplay? display = obj?.GetComponent<ItemDisplay>();
 			UnityEngine.Debug.Assert(display != null, $"ItemDisplay component not found in item display prefab");
 
-			// prototypical
-			// will be implemented properly when world ui is overhauled
-			ITooltipTrigger trigger = obj.AddComponent<TooltipTrigger>();
-			ITooltipRenderer renderer = GameObject.FindFirstObjectByType<ScreenObject>();
-			trigger.SetTooltip(new ItemTooltip(itemStack.item));
-			trigger.Init(renderer);
-
 			display!.stack = itemStack;
 			display.stackText = itemStack.AssignDisplay(display);
 			display.transform.SetAsLastSibling();
