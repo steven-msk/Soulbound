@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Client.ItemSystem;
+using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core;
 using System;
@@ -9,24 +9,27 @@ using UnityEngine.EventSystems;
 
 namespace SoulboundBackend.Client.UI.Storage {
 	public interface IItemSlot : IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler, ISerializable<SerializedItemSlot> {
-		public ItemDisplay itemDisplay { get; }
+		[Obsolete] public ItemDisplay itemDisplay { get; }
 		public IItemContainer container { get; }
-		public int index { get; set; }
-		public Transform transform { get; }
-		public bool showTooltip { get; set; }
+		public int index { get; [Obsolete] set; }
+		[Obsolete] public Transform transform { get; }
+		[Obsolete] public bool showTooltip { get; set; }
 
 		public ItemStack? stack => itemDisplay?.stack;
 		public Item? item => stack?.item;
 
-		public bool HasItem => itemDisplay != null;
-		public bool IsEmpty => itemDisplay == null;
+		public bool HasItem => GetStack() != null;
+		public bool IsEmpty => GetStack() == null;
 
-		public void AttachItemDisplay(ItemDisplay itemDisplay) {
+		ItemStack? GetStack();
+		int GetIndex();
+
+		[Obsolete] public void AttachItemDisplay(ItemDisplay itemDisplay) {
 			itemDisplay.OnRelease(transform);
 			item!.OnAttachedInSlot(this);
 		}
 
-		public void DetachItemDisplay(Transform newParent) {
+		[Obsolete] public void DetachItemDisplay(Transform newParent) {
 			if (itemDisplay == null) {
 				return;
 			}
@@ -50,7 +53,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 			return add;
 		}
 
-		public ItemDisplay CreateDisplay(ItemStack itemStack) {
+		[Obsolete] public ItemDisplay CreateDisplay(ItemStack itemStack) {
 			ItemDisplay display = ItemDisplay.Create(itemStack, () => transform);
 			itemStack.item.OnAttachedInSlot(this);
 			container.OnItemDisplayAdded(display, this);
@@ -62,7 +65,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 			container.OnItemDisplayAdded(display, this);
 		}
 
-		public bool CreateDisplayIfEmpty(ItemStack itemStack, out ItemDisplay? display) {
+		[Obsolete] public bool CreateDisplayIfEmpty(ItemStack itemStack, out ItemDisplay? display) {
 			if (this.stack == null) {
 				display = CreateDisplay(itemStack);
 				return true;
@@ -71,20 +74,20 @@ namespace SoulboundBackend.Client.UI.Storage {
 			return false;
 		}
 
-		new public virtual void OnPointerDown(PointerEventData eventData) {
+		[Obsolete] new public virtual void OnPointerDown(PointerEventData eventData) {
 			container.OnPointerDown(this, eventData);
 		}
-		new public virtual void OnPointerUp(PointerEventData eventData) {
+		[Obsolete] new public virtual void OnPointerUp(PointerEventData eventData) {
 			container.OnPointerUp(this, eventData);
 		}
-		new public virtual void OnPointerEnter(PointerEventData eventData) {
+		[Obsolete] new public virtual void OnPointerEnter(PointerEventData eventData) {
 			container.OnPointerEnter(this, eventData);
 			if (showTooltip) {
 				itemDisplay?.ShowTooltip(eventData.position, container.transform);
 			}
 		}
 
-		new public virtual void OnPointerExit(PointerEventData eventData) {
+		[Obsolete] new public virtual void OnPointerExit(PointerEventData eventData) {
 			container.OnPointerExit(this, eventData);
 			itemDisplay?.DestroyTooltip();
 		}
@@ -96,10 +99,10 @@ namespace SoulboundBackend.Client.UI.Storage {
 			return interactionMode == SlotInteractionMode.Click ? !(grabbedItem == null && this.IsEmpty) : true;
 		}
 
-		void IPointerDownHandler.OnPointerDown(PointerEventData eventData) => this.OnPointerDown(eventData);
-		void IPointerUpHandler.OnPointerUp(PointerEventData eventData) => this.OnPointerUp(eventData);
-		void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData) => this.OnPointerEnter(eventData);
-		void IPointerExitHandler.OnPointerExit(PointerEventData eventData) => this.OnPointerExit(eventData);
+		[Obsolete] void IPointerDownHandler.OnPointerDown(PointerEventData eventData) => this.OnPointerDown(eventData);
+		[Obsolete] void IPointerUpHandler.OnPointerUp(PointerEventData eventData) => this.OnPointerUp(eventData);
+		[Obsolete] void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData) => this.OnPointerEnter(eventData);
+		[Obsolete] void IPointerExitHandler.OnPointerExit(PointerEventData eventData) => this.OnPointerExit(eventData);
 	}
 
 	public static class ItemSlotDeserializer {

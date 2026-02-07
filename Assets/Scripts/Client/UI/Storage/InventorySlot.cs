@@ -1,29 +1,36 @@
 using SoulboundBackend.Client.ItemSystem;
+using SoulboundBackend.Client.UI.Storage;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using UnityEngine;
 
 #nullable enable
 
-namespace SoulboundBackend.Client.UI.Storage {
-	public class InventorySlot : MonoBehaviour, IItemSlot {
-		public IItemContainer container => gameObject.GetComponentInParent<InventoryController>(true);
-		public ItemDisplay? itemDisplay => gameObject.GetComponentInChildren<ItemDisplay>();
-		public int index { get; set; }
-		public bool HasItem => itemDisplay != null;
-		public bool IsEmpty => itemDisplay == null;
+namespace SoulboundBackend.Client.ItemSystem {
+	public sealed class InventorySlot : IItemSlot {
+		public int index { get; [Obsolete] set; }
+		public IItemContainer container { get; }
+		private ItemStack? stack;
 
-		public ItemStack? stack => itemDisplay?.stack;
-		public Item? item => stack?.item;
-		public bool showTooltip { get; set; } = true;
+		public InventorySlot(IItemContainer container, int index) {
+			this.container = container;
+			this.index = index;
+		}
+
+		[Obsolete] public ItemDisplay itemDisplay => throw new NotImplementedException();
+
+		[Obsolete] public Transform transform => throw new NotImplementedException();
+
+		[Obsolete] public bool showTooltip { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
 		public void Deserialize(SerializedItemSlot serialized) {
-			ItemSlotDeserializer.Deserialize(this, serialized);
+			stack = serialized.itemStack;
 		}
 
-		public void OnInventoryPopup(bool opened) {
-			if (!opened && this.HasItem) {
-				itemDisplay!.DestroyTooltip();
-			}
-		}
+		public int GetIndex() => index;
+		public ItemStack? GetStack() => stack;
 	}
 }

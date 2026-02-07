@@ -42,17 +42,16 @@ namespace SoulboundBackend.Client.UI.Storage {
 		public GrabbedItemContext GrabbedContext { get; set; } = new(null, null);
 		private IItemSlot? lastKnownGrabbedSlot;
 
-		public InventorySlot[] MainPlayerSlots { get; private set; }
+		public InventorySlotHandle[] MainPlayerSlots { get; private set; }
 
 		public int Rows => rows;
-		[SerializeField] private int rows;
-
+		const int rows = 9;
 		public int Columns => columns;
-		[SerializeField] private int columns;
+		const int columns = 3;
 
-		private static Dictionary<int, InventorySlot> popupSlotsByIndex = new();
-		public InventorySlot[,] popupSlots;
-		public InventorySlot this[int row, int col] => popupSlots[row, col];
+		private static Dictionary<int, InventorySlotHandle> popupSlotsByIndex = new();
+		public InventorySlotHandle[,] popupSlots;
+		public InventorySlotHandle this[int row, int col] => popupSlots[row, col];
 		IItemSlot IItemContainer2D.this[int row, int column] => this[row, column];
 		public IReadOnlyList<IItemSlot> slots => popupSlots.Flatten();
 
@@ -77,7 +76,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 			this.SetupGrid();
 			this.PreInitState();
 
-			List<InventorySlot> mainPlayerSlots = hotbar.Slots.ToList();
+			List<InventorySlotHandle> mainPlayerSlots = hotbar.Slots.ToList();
 			mainPlayerSlots.AddRange(popupSlots);
 			MainPlayerSlots = mainPlayerSlots.ToArray();
 			hotbar.SetActiveSlot(0);
@@ -107,7 +106,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 		}
 
 		public void SetupGrid() {
-			InventorySlot[] flatPopupSlots = popup.GetComponentsInChildren<InventorySlot>(true);
+			InventorySlotHandle[] flatPopupSlots = popup.GetComponentsInChildren<InventorySlotHandle>(true);
 			for (int i = 0; i < flatPopupSlots.Length; i++) {
 				flatPopupSlots[i].index = i;
 				popupSlotsByIndex[i] = flatPopupSlots[i];
@@ -188,7 +187,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 		void IItemContainer.OnItemDisplayAdded(ItemDisplay itemDisplay, IItemSlot slot) {
 			itemDisplay.onDestroy += player.OnItemDisplayDestroyed;
 
-			InventorySlot hotbarSlot = itemDisplay.GetComponentInParent<InventorySlot>();
+			InventorySlotHandle hotbarSlot = itemDisplay.GetComponentInParent<InventorySlotHandle>();
 			if (!this.IsOpened && hotbarSlot != null && Hotbar.ActiveSlot != hotbarSlot) {
 				itemDisplay.stackText.GetComponent<TextMeshProUGUI>().color = Hotbar.inactiveSlotNumberColor;
 			}
@@ -241,7 +240,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 
 		public bool PickUpItem(ItemStack itemStack, out int remaining) {
 			if (!itemStack.item.IsStackable) {
-				InventorySlot? emptySlot = GetFirstEmptySlot();
+				InventorySlotHandle? emptySlot = GetFirstEmptySlot();
 				if (emptySlot != null) {
 					(emptySlot as IItemSlot).CreateDisplay(itemStack);
 					itemStack.OnPickedUp();
@@ -271,7 +270,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 				}
 
 				// Flow to empty slots
-				InventorySlot[] availableSlots = MainPlayerSlots;
+				InventorySlotHandle[] availableSlots = MainPlayerSlots;
 				for (int i = 0; i < availableSlots.Length; i++) {
 					if (!availableSlots[i].HasItem) {
 						int toAdd = Mathf.Min(remaining, itemStack.item.maxStackSize);
@@ -288,20 +287,20 @@ namespace SoulboundBackend.Client.UI.Storage {
 			}
 		}
 
-		public InventorySlot? GetFirstEmptySlot() => MainPlayerSlots.First(slot => slot.IsEmpty) ?? null;
+		public InventorySlotHandle? GetFirstEmptySlot() => MainPlayerSlots.First(slot => slot.IsEmpty) ?? null;
 
-		public InventorySlot[]? GetOccupiedSlots() => MainPlayerSlots.Where(slot => slot.HasItem)?.ToArray();
+		public InventorySlotHandle[]? GetOccupiedSlots() => MainPlayerSlots.Where(slot => slot.HasItem)?.ToArray();
 
-		public InventorySlot[]? GetOccupiedSlots(Item item) => GetOccupiedSlots().Where(slot => slot.stack.item.Equals(item))?.ToArray();
+		public InventorySlotHandle[]? GetOccupiedSlots(Item item) => GetOccupiedSlots().Where(slot => slot.stack.item.Equals(item))?.ToArray();
 
-		public InventorySlot[]? GetEmptySlots() => MainPlayerSlots.Where(slot => !slot.HasItem)?.ToArray();
+		public InventorySlotHandle[]? GetEmptySlots() => MainPlayerSlots.Where(slot => !slot.HasItem)?.ToArray();
 
-		public void EquipHotbarItem(InventorySlot slot) {
+		public void EquipHotbarItem(InventorySlotHandle slot) {
 			ItemDisplay? itemDisplay = slot.itemDisplay;
 			player.SetMainHandItem(itemDisplay?.stack!);
 		}
 
-		public InventorySlot GetSlotByIndex(int index) => popupSlotsByIndex[index];
+		public InventorySlotHandle GetSlotByIndex(int index) => popupSlotsByIndex[index];
 		IItemSlot IItemContainer.GetSlotByIndex(int index) => popupSlotsByIndex[index];
 
 		public void OnPointerDown(IItemSlot clickedSlot, PointerEventData eventData) {
@@ -654,6 +653,10 @@ namespace SoulboundBackend.Client.UI.Storage {
 				return true;
 			}
 			return false;
+		}
+
+		IReadOnlyList<IItemSlot> IItemContainer.GetAllSlots() {
+			throw new NotImplementedException();
 		}
 	}
 }

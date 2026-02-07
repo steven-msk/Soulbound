@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Client.ItemSystem;
+using SoulboundBackend.Client.ItemSystem;
 using System;
 using UnityEngine;
 
@@ -13,6 +13,9 @@ namespace SoulboundBackend.Client.UI.Storage {
 		public abstract bool showTooltip { get; set; }
 
 		public abstract void Deserialize(SerializedItemSlot serialized);
+
+		ItemStack IItemSlot.GetStack() => stack;
+		int IItemSlot.GetIndex() => index;
 
 		//[InputAction("ItemDrag", Priority = 10, BlocksContexts = new[] { "ItemUse" })]
 		//public virtual void OnClick(ItemDisplay grabbedItem, InventoryController inventory) {

@@ -29,19 +29,19 @@ namespace SoulboundBackend.Client.UI.Storage {
 		[Header("")]
 		[SerializeField] private TextMeshProUGUI activeItemText;
 
-		private (InventorySlot hotbarSlot, int key) active;
-		public InventorySlot ActiveSlot => active.hotbarSlot;
+		private (InventorySlotHandle hotbarSlot, int key) active;
+		public InventorySlotHandle ActiveSlot => active.hotbarSlot;
 		public int ActiveKey => active.key;
 
 		private InventoryController inventory = null!;
 		public static int length => 9;
 
-		private InventorySlot[] slots = null!;
-		public InventorySlot[] Slots => slots;
+		private InventorySlotHandle[] slots = null!;
+		public InventorySlotHandle[] Slots => slots;
 		IReadOnlyList<IItemSlot> IItemContainer.slots => slots;
 
-		public InventorySlot this[int index] => slots[index];
-		private static Dictionary<int, InventorySlot> slotsByIndex = new();
+		public InventorySlotHandle this[int index] => slots[index];
+		private static Dictionary<int, InventorySlotHandle> slotsByIndex = new();
 
 		public void Construct(InventoryController inventory) {
 			this.inventory = inventory;
@@ -49,7 +49,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 		}
 
 		public void SetupGrid() {
-			slots = gameObject.GetComponentsInChildren<InventorySlot>();
+			slots = gameObject.GetComponentsInChildren<InventorySlotHandle>();
 			for (int i = 0; i < length; i++) {
 				slots[i].index = i;
 				slotsByIndex[i] = slots[i];
@@ -58,7 +58,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 
 		public void SetActiveSlot(int slotKey) {
 			UnityEngine.Debug.Assert(slotKey >= 0 && slotKey < length, $"Unexpected hotbar slotKey {slotKey}");
-			InventorySlot hotbarSlot = this[slotKey];
+			InventorySlotHandle hotbarSlot = this[slotKey];
 			if (active.hotbarSlot == null) {
 				active = (hotbarSlot, slotKey);
 				ApplySelectionChanges(active.hotbarSlot, activeSlotColor, activeSlotNumberColor, activeItemStackColor, activeSlotOffset, activeSlotScale);
@@ -86,7 +86,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 			SetActiveSlot(Mathf.Clamp(nextSlot, 0, length - 1));
 		}
 
-		private void ApplySelectionChanges(InventorySlot slot, Color color, Color slotNumberColor, Color itemStackColor, Vector3 offset, Vector3 scale) {
+		private void ApplySelectionChanges(InventorySlotHandle slot, Color color, Color slotNumberColor, Color itemStackColor, Vector3 offset, Vector3 scale) {
 			slot.transform.localScale = scale;
 			slot.transform.localPosition += offset;
 			Vector3 localPos = slot.transform.localPosition;
@@ -126,7 +126,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 			}
 		}
 
-		public InventorySlot GetSlotByIndex(int index) => slotsByIndex[index];
+		public InventorySlotHandle GetSlotByIndex(int index) => slotsByIndex[index];
 		IItemSlot IItemContainer.GetSlotByIndex(int index) => slotsByIndex[index];
 
 		public void OnPointerDown(IItemSlot slot, PointerEventData eventData) {
@@ -148,5 +148,9 @@ namespace SoulboundBackend.Client.UI.Storage {
         public void OnItemDisplayAdded(ItemDisplay itemDisplay, IItemSlot slot) {
             throw new NotImplementedException();
         }
+
+		IReadOnlyList<IItemSlot> IItemContainer.GetAllSlots() {
+			throw new NotImplementedException();
+		}
 	}
 }

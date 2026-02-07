@@ -77,16 +77,9 @@ namespace SoulboundBackend.Core {
 			worldManager.LoadWorld(world, config.dev.seed,
 				SceneManager.LoadSceneAsync("WorldScene").ToUniTask(),
 				UnityEngine.Object.FindFirstObjectByType<WorldSceneRoot>
-			).ContinueWith(dump => {
-				// prototypical
-				uiHandler.SetScreen(new emptyScreen());
+			).ContinueWith(session => {
+				uiHandler.SetScreen(new WorldScreen(session.player));
 			}).Forget(Debug.LogException);
-		}
-
-		[PROTOTYPICAL]
-		private class emptyScreen : Client.UI.Screens.Screen {
-			protected override void OnBuild(IScreenObject screenObject) {
-			}
 		}
 
 		public void QuitActiveWorld() {

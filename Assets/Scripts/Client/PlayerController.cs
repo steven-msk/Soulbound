@@ -35,7 +35,9 @@ namespace SoulboundBackend.Client {
 		public override Type scriptType => typeof(PlayerController);
 		public override EntityDescriptor descriptor => EntityDescriptorRegistry.ByType<PlayerController>();
 		[SerializeField] private InventoryController inventory;
-		public InventoryController Inventory => inventory;
+		[Obsolete] public InventoryController Inventory => inventory;
+		private readonly PlayerInventory _inventory = new();
+		public PlayerInventory GetInventory() => _inventory;
 
 		[SerializeField] private PlayerStats stats;
 		public PlayerStats Stats => stats;
@@ -97,7 +99,7 @@ namespace SoulboundBackend.Client {
 		public void Construct(DiContainer container) {
 			inputHandler = container.Resolve<InputHandler>();
 			playerPhysics = container.Resolve<PlayerPhysics>();
-			inventory = container.Resolve<InventoryController>();
+			//inventory = container.Resolve<InventoryController>();
 			level = container.Resolve<Level>();
 			canvas = container.Resolve<Canvas>();
 			RegisterItemUsageCandidates(container.Resolve<ItemUsageHandler>());
@@ -269,16 +271,16 @@ namespace SoulboundBackend.Client {
 
 		public override void Deserialize(SerializedEntity serialized) {
 			base.Deserialize(serialized);
-			this.stats = new();
-			var properties = SerializedEntityPropertyList.From(serialized.properties);
-			inventory.Deserialize(properties.GetOrThrow<SerializedInventory>("inventory"));
+			//this.stats = new();
+			//var properties = SerializedEntityPropertyList.From(serialized.properties);
+			//inventory.Deserialize(properties.GetOrThrow<SerializedInventory>("inventory"));
 		}
 
 		public override SerializedEntity Serialize() {
 			var serialized = base.Serialize();
 
 			var properties = SerializedEntityPropertyList.From(serialized.properties);
-			properties.Set("inventory", inventory.Serialize());
+			//properties.Set("inventory", inventory.Serialize());
 
 			serialized.properties = properties;
 			return serialized;

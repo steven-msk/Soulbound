@@ -96,7 +96,7 @@ namespace SoulboundBackend.Core {
 			StartCoroutine(GameTickLoop());
 		}
 
-		public void SpawnPlayer(SerializedEntity? serialized) {
+		public PlayerController SpawnPlayer(SerializedEntity? serialized) {
 			if (entityManager.GetEntityByID(serialized.GetValueOrDefault().id, out var playerEntity)) {
 				entityManager.RemoveEntity(playerEntity);
 			}
@@ -116,6 +116,8 @@ namespace SoulboundBackend.Core {
 			entityManager.Spawn(player, new PlayerSpawnData() {
 				position = serialized?.lastPosition ?? level.GetWorldSpawnPoint()
 			});
+
+			return player;
 		}
 
 		private void Update() {

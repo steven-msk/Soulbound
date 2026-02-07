@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SoulboundBackend.Client.UI {
-	public class ButtonBuilder : IUIElementBuilder<ButtonBuilder> {
+	public class ButtonBuilder : IUIElementHandleBuilder<IButtonHandle>, ITooltipComponentBuilder<ButtonBuilder> {
 		private readonly IUIElementTemplate<ButtonHandle> template;
 		private string text;
 		private bool enabled = true;
