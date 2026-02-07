@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
@@ -35,8 +36,14 @@ namespace SoulboundBackend.Client.UI {
 			sizeFitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
 			sizeFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
-			foreach (var slot in inventory.GetAllSlots()) {
+			foreach (var slot in inventory.GetPopup()) {
 				GameObject slotObj = CreateSlotObj(slot);
+				slotObj.transform.SetParent(obj.transform, false);
+			}
+
+			InventorySlot[] hotbar = inventory.GetHotbar();
+			for (int i = 0; i < hotbar.Length; i++) {
+				GameObject slotObj = CreateHotbarSlotObj(hotbar[i], i + 1);
 				slotObj.transform.SetParent(obj.transform, false);
 			}
 
@@ -47,10 +54,28 @@ namespace SoulboundBackend.Client.UI {
 
 
 		private GameObject CreateSlotObj(IItemSlot slot) {
-			GameObject slotObj = GameObject.Instantiate(slotPrefab);
-			InventorySlotHandle slotHandle = slotObj.AddComponent<InventorySlotHandle>();
+			GameObject obj = GameObject.Instantiate(slotPrefab);
+			InventorySlotHandle slotHandle = obj.AddComponent<InventorySlotHandle>();
 			slotHandle.Init(slot.GetStack() /* , container */);
-			return slotObj;
+			return obj;
+		}
+
+		private GameObject CreateHotbarSlotObj(IItemSlot slot, int index) {
+			GameObject obj = CreateSlotObj(slot);
+			GameObject textObj = new("Hotbar Slot Number", typeof(RectTransform));
+
+			ContentSizeFitter sizeFitter = textObj.AddComponent<ContentSizeFitter>();
+			sizeFitter.horizontalFit = sizeFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+			TextMeshProUGUI text = textObj.AddComponent<TextMeshProUGUI>();
+			text.fontSize = 7f;
+			text.text = index.ToString();
+
+			RectTransform rect = textObj.GetComponent<RectTransform>();
+			rect.pivot = rect.anchorMax = rect.anchorMin = new Vector2(0.5f, 1f);
+
+			textObj.transform.SetParent(obj.transform, false);
+			return obj;
 		}
 	}
 }

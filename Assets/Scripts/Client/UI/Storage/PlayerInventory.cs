@@ -17,9 +17,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 			int i = 0;
 			for (; i < 27; i++) popupSlots[i] = new InventorySlot(this, i);
 			for (; i < 36; i++) hotbarSlots[i - 27] = new InventorySlot(this, i);
-			//for (; i < 39; i++) {
-			//	armorSlots[i] = new ArmorSlot(this, i);
-			//}
+			//for (; i < 39; i++) armorSlots[i - 36] = new ArmorSlot(this, i);
 		}
 
 		public IReadOnlyList<IItemSlot> GetAllSlots() {
