@@ -1,3 +1,4 @@
+using SoulboundBackend.Client.Input;
 using SoulboundBackend.Client.UI.Storage;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,8 @@ namespace SoulboundBackend.Client.ItemSystem {
 		private readonly InventorySlot[] popupSlots = new InventorySlot[27];
 		private readonly InventorySlot[] hotbarSlots = new InventorySlot[9];
 		//private readonly InventorySlot[] armorSlots = new InventorySlot[4];	// TBD
+		private bool popupVisible = false;
+		public event Action togglePopup;
 
 		public PlayerInventory() {
 			int i = 0;
@@ -48,8 +51,15 @@ namespace SoulboundBackend.Client.ItemSystem {
 			return grid;
 		}
 
+		public void TogglePopup() {
+			popupVisible = !popupVisible;
+			togglePopup();
+		}
+
 		public InventorySlot[] GetPopup() => popupSlots;
 		public InventorySlot[] GetHotbar() => hotbarSlots;
+
+		public bool IsPopupVisible() => popupVisible;
 
 		[Obsolete] public IReadOnlyList<IItemSlot> slots { get => throw new NotImplementedException(); }
 		[Obsolete] public Transform transform => throw new NotImplementedException();

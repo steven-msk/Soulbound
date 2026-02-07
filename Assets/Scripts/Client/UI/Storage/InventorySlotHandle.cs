@@ -5,7 +5,7 @@ using UnityEngine;
 #nullable enable
 
 namespace SoulboundBackend.Client.UI.Storage {
-	public class InventorySlotHandle : MonoBehaviour, IItemSlot {
+	public class InventorySlotHandle : MonoBehaviour, IItemSlot, IUIElementHandle {
 		public IItemContainer container => gameObject.GetComponentInParent<InventoryController>(true);
 		[Obsolete] public ItemDisplay? itemDisplay => gameObject.GetComponentInChildren<ItemDisplay>();
 		public int index { get; set; }
@@ -34,5 +34,11 @@ namespace SoulboundBackend.Client.UI.Storage {
 
 		ItemStack? IItemSlot.GetStack() => _stack;
 		int IItemSlot.GetIndex() => index;
+
+		public void SetVisible(bool visible) => gameObject.SetActive(visible);
+
+		public void ToggleVisibility() {
+			gameObject.SetActive(!gameObject.activeSelf);
+		}
 	}
 }

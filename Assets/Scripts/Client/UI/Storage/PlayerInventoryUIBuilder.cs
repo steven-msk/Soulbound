@@ -33,35 +33,46 @@ namespace SoulboundBackend.Client.UI {
 			layoutGroup.cellSize = new Vector2(32f, 32f);
 
 			ContentSizeFitter sizeFitter = obj.AddComponent<ContentSizeFitter>();
-			sizeFitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
-			sizeFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+			sizeFitter.verticalFit = sizeFitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
 
+			List<InventorySlotHandle> popupHandles = new();
 			foreach (var slot in inventory.GetPopup()) {
-				GameObject slotObj = CreateSlotObj(slot);
+				GameObject slotObj = CreateSlotObj(slot, out var handle);
+				popupHandles.Add(handle);
 				slotObj.transform.SetParent(obj.transform, false);
 			}
 
 			InventorySlot[] hotbar = inventory.GetHotbar();
+			List<InventorySlotHandle> hotbaHandles = new();
 			for (int i = 0; i < hotbar.Length; i++) {
-				GameObject slotObj = CreateHotbarSlotObj(hotbar[i], i + 1);
+				GameObject slotObj = CreateHotbarSlotObj(hotbar[i], i + 1, out var handle);
+				hotbaHandles.Add(handle);
 				slotObj.transform.SetParent(obj.transform, false);
 			}
 
-			IPlayerInventoryHandle handle = obj.AddComponent<PlayerInventoryHandle>();
+			IPlayerInventoryHandle inventoryHandle = obj.AddComponent<PlayerInventoryHandle>();
 			container.AddElement(new UIElementNode(obj));
-			return handle;
+
+			inventory.togglePopup += () => {
+				foreach (var popupHandle in popupHandles) {
+					popupHandle.ToggleVisibility();
+				}
+			};
+			inventory.TogglePopup();
+
+			return inventoryHandle;
 		}
 
 
-		private GameObject CreateSlotObj(IItemSlot slot) {
+		private GameObject CreateSlotObj(IItemSlot slot, out InventorySlotHandle handle) {
 			GameObject obj = GameObject.Instantiate(slotPrefab);
-			InventorySlotHandle slotHandle = obj.AddComponent<InventorySlotHandle>();
-			slotHandle.Init(slot.GetStack() /* , container */);
+			handle = obj.AddComponent<InventorySlotHandle>();
+			handle.Init(slot.GetStack() /* , container */);
 			return obj;
 		}
 
-		private GameObject CreateHotbarSlotObj(IItemSlot slot, int index) {
-			GameObject obj = CreateSlotObj(slot);
+		private GameObject CreateHotbarSlotObj(IItemSlot slot, int index, out InventorySlotHandle handle) {
+			GameObject obj = CreateSlotObj(slot, out handle);
 			GameObject textObj = new("Hotbar Slot Number", typeof(RectTransform));
 
 			ContentSizeFitter sizeFitter = textObj.AddComponent<ContentSizeFitter>();
