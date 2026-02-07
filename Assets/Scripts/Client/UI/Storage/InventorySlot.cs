@@ -14,6 +14,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public int index { get; [Obsolete] set; }
 		public IItemContainer container { get; }
 		private ItemStack? stack;
+		public event Action<ItemStack> setStack;
 
 		public InventorySlot(IItemContainer container, int index) {
 			this.container = container;
@@ -32,5 +33,11 @@ namespace SoulboundBackend.Client.ItemSystem {
 
 		public int GetIndex() => index;
 		public ItemStack? GetStack() => stack;
+
+		public void SetStack(ItemStack stack) {
+			this.stack = stack;
+			setStack(stack);
+
+		}
 	}
 }

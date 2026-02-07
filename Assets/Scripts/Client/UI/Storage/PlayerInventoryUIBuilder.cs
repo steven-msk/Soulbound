@@ -58,8 +58,8 @@ namespace SoulboundBackend.Client.UI {
 					popupHandle.ToggleVisibility();
 				}
 			};
-			inventory.TogglePopup();
 
+			inventory.TogglePopup();
 			return inventoryHandle;
 		}
 
@@ -67,7 +67,7 @@ namespace SoulboundBackend.Client.UI {
 		private GameObject CreateSlotObj(IItemSlot slot, out InventorySlotHandle handle) {
 			GameObject obj = GameObject.Instantiate(slotPrefab);
 			handle = obj.AddComponent<InventorySlotHandle>();
-			handle.Init(slot.GetStack() /* , container */);
+			handle.Init(slot, inventory);
 			return obj;
 		}
 

@@ -12,10 +12,24 @@ namespace SoulboundBackend.Client.UI.Storage {
 		public ItemStack stack => itemDisplay?.stack;
 		public abstract bool showTooltip { get; set; }
 
+		event Action<ItemStack> IItemSlot.setStack {
+			add {
+				throw new NotImplementedException();
+			}
+
+			remove {
+				throw new NotImplementedException();
+			}
+		}
+
 		public abstract void Deserialize(SerializedItemSlot serialized);
 
 		ItemStack IItemSlot.GetStack() => stack;
 		int IItemSlot.GetIndex() => index;
+
+		void IItemSlot.SetStack(ItemStack stack) {
+			throw new NotImplementedException();
+		}
 
 		//[InputAction("ItemDrag", Priority = 10, BlocksContexts = new[] { "ItemUse" })]
 		//public virtual void OnClick(ItemDisplay grabbedItem, InventoryController inventory) {
