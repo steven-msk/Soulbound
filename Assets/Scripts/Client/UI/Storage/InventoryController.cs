@@ -407,7 +407,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 			foreach (var slot in snapshotSlots) {
 				quantitySnapshots[slot] = slot.stack?.quantity ?? 0;
 			}
-			return new DragHandler(dragOrigin, () => slots.ToArray(), this.InterpretDrag, quantitySnapshots, dragButton);
+			return new DragHandler(dragOrigin, slots.ToArray, this.InterpretDrag, quantitySnapshots, dragButton);
 		}
 
 		public void EndDrag() {

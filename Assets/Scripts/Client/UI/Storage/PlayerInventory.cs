@@ -10,16 +10,21 @@ using UnityEngine.EventSystems;
 
 namespace SoulboundBackend.Client.ItemSystem {
 	public sealed class PlayerInventory : IItemContainer, IItemContainerDomain {
-		private readonly InventorySlot[] popupSlots = new InventorySlot[27];
-		private readonly InventorySlot[] hotbarSlots = new InventorySlot[9];
+		public const int ROWS = 9;
+		public const int COLUMNS = 4;
+		public const int POPUP_COLUMNS = 3;
+		public const int HOTBAR_ROWS = ROWS;
+
+		private readonly InventorySlot[] popupSlots = new InventorySlot[ROWS * POPUP_COLUMNS];
+		private readonly InventorySlot[] hotbarSlots = new InventorySlot[ROWS];
 		//private readonly InventorySlot[] armorSlots = new InventorySlot[4];	// TBD
 		private bool popupOpen = false;
 		public event Action togglePopup;
 
 		public PlayerInventory() {
 			int i = 0;
-			for (; i < 27; i++) popupSlots[i] = new InventorySlot(this, i);
-			for (; i < 36; i++) hotbarSlots[i - 27] = new InventorySlot(this, i);
+			for (; i < ROWS * POPUP_COLUMNS; i++) popupSlots[i] = new InventorySlot(this, i);
+			for (; i < ROWS * POPUP_COLUMNS + HOTBAR_ROWS; i++) hotbarSlots[i - ROWS * POPUP_COLUMNS] = new InventorySlot(this, i);
 			//for (; i < 39; i++) armorSlots[i - 36] = new ArmorSlot(this, i);
 		}
 
@@ -31,20 +36,20 @@ namespace SoulboundBackend.Client.ItemSystem {
 		}
 
 		public IItemSlot GetSlot(int index) {
-			if (index < 27) return popupSlots[index];
-			if (index < 36) return hotbarSlots[index];
+			if (index < ROWS * POPUP_COLUMNS) return popupSlots[index];
+			if (index < ROWS * POPUP_COLUMNS + HOTBAR_ROWS) return hotbarSlots[index - ROWS * POPUP_COLUMNS];
 			//else if (index < 39) return armorSlots[index];
 			throw new ArgumentException("Slot index out of range: " + index);
 		}
 
 		public InventorySlot[][] GetPopupGrid() {
-			InventorySlot[][] grid = new InventorySlot[3][];
+			InventorySlot[][] grid = new InventorySlot[POPUP_COLUMNS][];
 			int index = 0;
 
-			for (int i = 0; i < 3; i++) {
-				grid[i] = new InventorySlot[9];
+			for (int i = 0; i < POPUP_COLUMNS; i++) {
+				grid[i] = new InventorySlot[ROWS];
 
-				for (int j = 0; j < 9; j++) {
+				for (int j = 0; j < ROWS; j++) {
 					grid[i][j] = popupSlots[index++];
 				}
 			}

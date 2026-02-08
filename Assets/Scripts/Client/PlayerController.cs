@@ -172,7 +172,6 @@ namespace SoulboundBackend.Client {
 				return;
 			}
 			attackHandler = new AttackHandler(source);
-			logger.LogInfo("executing attack");
 			attackHandler.StartAttack(this, null);
 		}
 
