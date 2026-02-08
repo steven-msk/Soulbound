@@ -13,15 +13,16 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace SoulboundBackend.Client.UI {
-	public sealed class PlayerInventoryUIBuilder : IUIElementHandleBuilder<IPlayerInventoryHandle> {
-		private static readonly GameObject slotPrefab = AssetManager.Resolve<GameObject>(new AssetKey("Slot"));
+	public sealed class PlayerInventoryUIBuilder : IUIElementHandleBuilder<IItemContainerHandle> {
+		private static readonly AssetKey slotKey = new("Slot");
 		private readonly PlayerInventory inventory;
+		private IItemSlotEventCallbacks handleCallbacks;
 
 		public PlayerInventoryUIBuilder(PlayerInventory inventory) {
 			this.inventory = inventory;
 		}
 
-		public IPlayerInventoryHandle Build(IUIElementContainer container) {
+		public IItemContainerHandle Build(IUIElementContainer container) {
 			GameObject obj = new("Player Inventory", typeof(RectTransform));
 			RectTransform rect = obj.GetComponent<RectTransform>();
 			rect.pivot = rect.anchorMin = rect.anchorMax = Vector2.zero;
@@ -34,6 +35,10 @@ namespace SoulboundBackend.Client.UI {
 
 			ContentSizeFitter sizeFitter = obj.AddComponent<ContentSizeFitter>();
 			sizeFitter.verticalFit = sizeFitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+			PlayerInventoryHandle inventoryHandle = obj.AddComponent<PlayerInventoryHandle>();
+			handleCallbacks = (IItemSlotEventCallbacks)inventoryHandle;
+			inventoryHandle.Init(inventory);
 
 			List<InventorySlotHandle> popupHandles = new();
 			foreach (var slot in inventory.GetPopup()) {
@@ -50,7 +55,6 @@ namespace SoulboundBackend.Client.UI {
 				slotObj.transform.SetParent(obj.transform, false);
 			}
 
-			IPlayerInventoryHandle inventoryHandle = obj.AddComponent<PlayerInventoryHandle>();
 			container.AddElement(new UIElementNode(obj));
 
 			inventory.togglePopup += () => {
@@ -59,7 +63,8 @@ namespace SoulboundBackend.Client.UI {
 				}
 			};
 
-			inventory.GetSlotByIndex(0).SetStack(new(Items.woodBlock, 10));
+			// prototypical
+			inventory.GetSlot(0).SetStack(new(Items.woodBlock, 10));
 
 			inventory.TogglePopup();
 			return inventoryHandle;
@@ -67,9 +72,13 @@ namespace SoulboundBackend.Client.UI {
 
 
 		private GameObject CreateSlotObj(IItemSlot slot, out InventorySlotHandle handle) {
-			GameObject obj = GameObject.Instantiate(slotPrefab);
+			GameObject obj = GameObject.Instantiate(AssetManager.Resolve<GameObject>(slotKey));
 			handle = obj.AddComponent<InventorySlotHandle>();
-			handle.Init(slot, inventory);
+			handle.Init(slot);
+			handle.pointerDown += handleCallbacks.OnPointerDown;
+			handle.pointerUp += handleCallbacks.OnPointerUp;
+			handle.pointerEnter += handleCallbacks.OnPointerEnter;
+			handle.pointerExit += handleCallbacks.OnPointerExit;
 			return obj;
 		}
 

@@ -24,7 +24,6 @@ namespace SoulboundBackend.Client.UI.Storage {
 		event Action<ItemStack?> setStack;
 		ItemStack? GetStack();
 		void SetStack(ItemStack? stack);
-		int GetIndex();
 
 		[Obsolete] public void AttachItemDisplay(ItemDisplay itemDisplay) {
 			itemDisplay.OnRelease(transform);
@@ -77,10 +76,10 @@ namespace SoulboundBackend.Client.UI.Storage {
 		}
 
 		[Obsolete] new public virtual void OnPointerDown(PointerEventData eventData) {
-			container.OnPointerDown(this, eventData);
+			//container.OnPointerDown(this, eventData);
 		}
 		[Obsolete] new public virtual void OnPointerUp(PointerEventData eventData) {
-			container.OnPointerUp(this, eventData);
+			//container.OnPointerUp(this, eventData);
 		}
 		[Obsolete] new public virtual void OnPointerEnter(PointerEventData eventData) {
 			//container.OnPointerEnter(this, eventData);

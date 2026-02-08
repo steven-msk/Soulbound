@@ -9,11 +9,11 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace SoulboundBackend.Client.ItemSystem {
-	public sealed class PlayerInventory : IItemContainer {
+	public sealed class PlayerInventory : IItemContainer, IItemContainerDomain {
 		private readonly InventorySlot[] popupSlots = new InventorySlot[27];
 		private readonly InventorySlot[] hotbarSlots = new InventorySlot[9];
 		//private readonly InventorySlot[] armorSlots = new InventorySlot[4];	// TBD
-		private bool popupVisible = false;
+		private bool popupOpen = false;
 		public event Action togglePopup;
 
 		public PlayerInventory() {
@@ -30,7 +30,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 			return slots;
 		}
 
-		public IItemSlot GetSlotByIndex(int index) {
+		public IItemSlot GetSlot(int index) {
 			if (index < 27) return popupSlots[index];
 			if (index < 36) return hotbarSlots[index];
 			//else if (index < 39) return armorSlots[index];
@@ -52,14 +52,14 @@ namespace SoulboundBackend.Client.ItemSystem {
 		}
 
 		public void TogglePopup() {
-			popupVisible = !popupVisible;
+			popupOpen = !popupOpen;
 			togglePopup();
 		}
 
 		public InventorySlot[] GetPopup() => popupSlots;
 		public InventorySlot[] GetHotbar() => hotbarSlots;
 
-		public bool IsPopupVisible() => popupVisible;
+		public bool IsPopupOpen() => popupOpen;
 
 		[Obsolete] public IReadOnlyList<IItemSlot> slots { get => throw new NotImplementedException(); }
 		[Obsolete] public Transform transform => throw new NotImplementedException();

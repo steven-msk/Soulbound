@@ -127,7 +127,6 @@ namespace SoulboundBackend.Client.UI.Storage {
 		}
 
 		public InventorySlotHandle GetSlotByIndex(int index) => slotsByIndex[index];
-		IItemSlot IItemContainer.GetSlotByIndex(int index) => slotsByIndex[index];
 
 		public void OnPointerDown(IItemSlot slot, PointerEventData eventData) {
 			throw new NotImplementedException();

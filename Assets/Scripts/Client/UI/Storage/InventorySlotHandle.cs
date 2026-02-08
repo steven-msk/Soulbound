@@ -8,12 +8,15 @@ using UnityEngine.EventSystems;
 #nullable enable
 
 namespace SoulboundBackend.Client.UI.Storage {
-	public class InventorySlotHandle : MonoBehaviour, IItemSlot, IItemSlotHandle, ITooltipTrigger, IPointerEnterHandler, IPointerExitHandler {
-		[Obsolete] private IItemSlot slot = null!;
-		[Obsolete] private IItemContainer container = null!;
+	public class InventorySlotHandle : MonoBehaviour, IItemSlot, IItemSlotHandle, ITooltipTrigger, IItemSlotEvents {
+		private IItemSlot slot = null!;
 		private ITooltipDefinition tooltip = null!;
 		private ITooltipRenderer tooltipRenderer = null!;
 		private ITooltipHandle? tooltipHandle;
+		public event Action<int, PointerEventData>? pointerDown;
+		public event Action<int, PointerEventData>? pointerUp;
+		public event Action<int, PointerEventData>? pointerEnter;
+		public event Action<int, PointerEventData>? pointerExit;
 		[Obsolete] public ItemDisplay? itemDisplay => gameObject.GetComponentInChildren<ItemDisplay>();
 		public int index { get; set; }
 		public bool HasItem => itemDisplay != null;
@@ -38,10 +41,8 @@ namespace SoulboundBackend.Client.UI.Storage {
 			}
 		}
 
-		public void Init(IItemSlot slot, IItemContainer container) {
+		public void Init(IItemSlot slot) {
 			this.slot = slot;
-			this.container = container;
-
 			slot.setStack += SetStack;
 			SetStack(slot.GetStack());
 		}
@@ -60,9 +61,19 @@ namespace SoulboundBackend.Client.UI.Storage {
 		void ITooltipTrigger.Init(ITooltipRenderer tooltipRenderer) => this.tooltipRenderer = tooltipRenderer;
 		void ITooltipTrigger.SetTooltip(ITooltipDefinition tooltip) => this.tooltip = tooltip;
 		void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData) {
+			pointerEnter?.Invoke(slot.index, eventData);
 			tooltipHandle = tooltipRenderer.RenderTooltip(tooltip);
 		}
-		void IPointerExitHandler.OnPointerExit(PointerEventData eventData) => DestroyTooltip();
+		void IPointerExitHandler.OnPointerExit(PointerEventData eventData) {
+			pointerExit?.Invoke(slot.index, eventData);
+			DestroyTooltip();
+		}
+		void IPointerDownHandler.OnPointerDown(PointerEventData eventData) {
+			pointerDown?.Invoke(slot.index, eventData);
+		}
+		void IPointerUpHandler.OnPointerUp(PointerEventData eventData) {
+			pointerUp?.Invoke(slot.index, eventData);
+		}
 
 		[Obsolete]
 		public void OnInventoryPopup(bool opened) {
@@ -91,10 +102,6 @@ namespace SoulboundBackend.Client.UI.Storage {
 		}
 
 		void IItemSlot.SetStack(ItemStack? stack) {
-			throw new NotImplementedException();
-		}
-
-		int IItemSlot.GetIndex() {
 			throw new NotImplementedException();
 		}
 

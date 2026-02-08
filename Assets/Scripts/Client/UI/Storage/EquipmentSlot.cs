@@ -25,7 +25,6 @@ namespace SoulboundBackend.Client.UI.Storage {
 		public abstract void Deserialize(SerializedItemSlot serialized);
 
 		ItemStack IItemSlot.GetStack() => stack;
-		int IItemSlot.GetIndex() => index;
 
 		void IItemSlot.SetStack(ItemStack stack) {
 			throw new NotImplementedException();

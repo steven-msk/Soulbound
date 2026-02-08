@@ -1,6 +1,7 @@
 using SoulboundBackend.Client.ItemSystem;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -11,7 +12,6 @@ namespace SoulboundBackend.Client.UI.Storage {
 		[Obsolete] public IReadOnlyList<IItemSlot> slots { get; }
 		[Obsolete] public Transform? transform { get; }
 
-		public IItemSlot GetSlotByIndex(int index);
 		public IReadOnlyList<IItemSlot> GetAllSlots();
 
 		[Obsolete] void OnPointerDown(IItemSlot slot, PointerEventData eventData);
@@ -19,15 +19,10 @@ namespace SoulboundBackend.Client.UI.Storage {
 		[Obsolete] void OnPointerEnter(IItemSlot slot, PointerEventData data);
 		[Obsolete] void OnPointerExit(IItemSlot slot, PointerEventData data);
 
-		void OnItemDisplayAdded(ItemDisplay itemDisplay, IItemSlot slot);
+		[Obsolete] void OnItemDisplayAdded(ItemDisplay itemDisplay, IItemSlot slot);
 
-		public virtual bool ContainsItem(Item item) {
-			foreach (var slot in slots) {
-				if (slot.HasItem && slot.item == item) {
-					return true;
-				}
-			}
-			return false;
+		public bool ContainsItem(Item item) {
+			return GetAllSlots().Any(s => s.GetStack()?.item == item);
 		}
 
 	}

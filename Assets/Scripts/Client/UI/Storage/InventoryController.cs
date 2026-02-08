@@ -302,7 +302,6 @@ namespace SoulboundBackend.Client.UI.Storage {
 		}
 
 		public InventorySlotHandle GetSlotByIndex(int index) => popupSlotsByIndex[index];
-		IItemSlot IItemContainer.GetSlotByIndex(int index) => popupSlotsByIndex[index];
 
 		public void OnPointerDown(IItemSlot clickedSlot, PointerEventData eventData) {
 			float time = Time.time;
