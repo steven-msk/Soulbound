@@ -7,7 +7,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 		public abstract IItemContainer container { get; }
 		public ItemDisplay itemDisplay => gameObject.GetComponentInChildren<ItemDisplay>();
 		public abstract int index { get; set; }
-		public bool HasItem => itemDisplay != null;
+		public bool hasItem => itemDisplay != null;
 		public bool IsEmpty => itemDisplay == null;
 		public ItemStack stack => itemDisplay?.stack;
 		public abstract bool showTooltip { get; set; }

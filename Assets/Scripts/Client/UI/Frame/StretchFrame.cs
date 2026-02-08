@@ -27,5 +27,8 @@ namespace SoulboundBackend.Client.UI {
 
 		void IUIFrame.OnChildAdded(UIElementNode node) {
 		}
+
+		void IUIFrame.OnChildRemoved(UIElementNode node) {
+		}
 	}
 }

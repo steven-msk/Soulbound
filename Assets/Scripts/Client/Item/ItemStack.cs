@@ -4,6 +4,7 @@ using SoulboundBackend.Client.World.EntitySystem.SpawnData;
 using SoulboundBackend.Core;
 using SoulboundBackend.Core.AssetManagement;
 using SoulboundBackend.Core.Resource;
+using System;
 using TMPro;
 using UnityEngine;
 using Logger = SoulboundBackend.Common.Logging.Logger;
@@ -13,38 +14,18 @@ using Logger = SoulboundBackend.Common.Logging.Logger;
 namespace SoulboundBackend.Client.ItemSystem {
 	public class ItemStack {
 		private static readonly Logger logger = Logger.CreateInstance();
+		public event Action<int, int>? onQuantityChanged;
 		public Item item { get; }
-		private ItemDisplay? display = null;
 		public int quantity { get; private set; }
 		public int MaxStackSize => item.maxStackSize;
-		public bool isDropped { get; private set; } = false;
+		[Obsolete] public bool isDropped { get; private set; } = false;
 
 		public ItemStack(Item item, int quantity) {
 			this.item = item;
 			this.quantity = Mathf.Min(quantity, item.maxStackSize);
 		}
 
-		public GameObject AssignDisplay(ItemDisplay parent) {
-			var prefab = AssetManager.Resolve<GameObject>(new AssetKey("stackNumberPrefab"));
-            GameObject? stackText = GameObject.Instantiate(prefab, parent.transform);
-			TextMeshProUGUI? text = stackText!.GetComponent<TextMeshProUGUI>();
-			text.enabled = item.IsStackable;
-			RectTransform rectTransform = stackText!.GetComponent<RectTransform>();
-			if (item.IsStackable) {
-				text!.autoSizeTextContainer = true;
-				text.text = quantity.ToString();
-				text.color = Color.white;
-				rectTransform.pivot = new Vector2(1f, 0f);
-				rectTransform.anchorMax = new Vector2(0.9375f, 0.0625f);
-				rectTransform.anchorMin = rectTransform.anchorMax;
-				rectTransform.anchoredPosition = Vector2.zero;
-				text.rectTransform.sizeDelta = text.GetPreferredValues(Mathf.Infinity, Mathf.Infinity);
-				rectTransform.anchoredPosition = new(Mathf.Max(-4, rectTransform.sizeDelta.x - 19.14f), rectTransform.anchoredPosition.y);
-			}
-			this.display = parent;
-			return stackText;
-		}
-
+		[Obsolete]
 		public void Drop(Vector2 pos, Vector2 dropForce, bool playerAction = false) {
 			GameObject? worldPrefab = item.aspect.worldPrefabSupplier?.Invoke();
 			if (item.aspect.worldPrefabSupplier == null) {
@@ -62,24 +43,22 @@ namespace SoulboundBackend.Client.ItemSystem {
 			isDropped = true;
 		}
 
-        public void UpdateText() => display?.UpdateStackText();
-
-        public void OnPickedUp() => isDropped = false;
+		[Obsolete] public void OnPickedUp() => isDropped = false;
 
 		public bool IsFull() => quantity >= item.maxStackSize;
 		public bool IsEmpty() => quantity <= 0;
 
 		public void SetQuantity(int amount) {
 			int oldQuantity = quantity;
-			this.quantity = Mathf.Min(amount, MaxStackSize);
+			quantity = Mathf.Min(amount, MaxStackSize);
+			quantity = Mathf.Max(0, quantity);		// disallow negative quantity
 			OnQuantityChanged(oldQuantity, quantity);
 		}
 
 		// Try to add items, return how many were actually added
 		public int Increment(int amount = 1) {
-			if (amount <= 0) {
-				return 0;
-			}
+			if (amount <= 0) return 0;
+
 			int space = MaxStackSize - quantity;
 			int added = Mathf.Min(space, amount);
 			quantity += added;
@@ -89,9 +68,8 @@ namespace SoulboundBackend.Client.ItemSystem {
 
 		// Try to remove items, returns how many were actually removed
 		public int Decrement(int amount = 1) {
-			if (amount <= 0) {
-				return 0;
-			}
+			if (amount <= 0) return 0;
+
 			int removed = Mathf.Min(quantity, amount);
 			quantity -= removed;
 			OnQuantityChanged(quantity + removed, quantity);
@@ -99,7 +77,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 		}
 
 		private void OnQuantityChanged(int old, int @new) {
-			display?.OnStackQuantityChanged(old, @new);
+			onQuantityChanged?.Invoke(old, @new);
 		}
 
 		// FEATUREIMPL: dropped item stacks converging to avoid lag

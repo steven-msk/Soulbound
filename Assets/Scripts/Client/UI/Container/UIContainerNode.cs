@@ -35,5 +35,14 @@ namespace SoulboundBackend.Client.UI {
 			frame.OnChildAdded(node);
 			parent.OnElementAdded(node);
 		}
+
+		void IUIElementContainer.RemoveElement(UIElementNode node) {
+			node.transform.SetParent(gameObject.GetComponentInParent<Transform>(), false);
+			parent.OnElementRemoved(node);
+		}
+
+		void IUIElementContainer.OnElementRemoved(UIElementNode node) {
+			parent.OnElementRemoved(node);
+		}
 	}
 }

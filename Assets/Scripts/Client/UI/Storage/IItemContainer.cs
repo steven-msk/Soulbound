@@ -8,11 +8,11 @@ using UnityEngine.EventSystems;
 #nullable enable
 
 namespace SoulboundBackend.Client.UI.Storage {
-	public interface IItemContainer {
+	public interface IItemContainer : IItemContainerDomain {
 		[Obsolete] public IReadOnlyList<IItemSlot> slots { get; }
 		[Obsolete] public Transform? transform { get; }
 
-		public IReadOnlyList<IItemSlot> GetAllSlots();
+		IReadOnlyList<IItemSlot> GetAllSlots();
 
 		[Obsolete] void OnPointerDown(IItemSlot slot, PointerEventData eventData);
 		[Obsolete] void OnPointerUp(IItemSlot slot, PointerEventData eventData);

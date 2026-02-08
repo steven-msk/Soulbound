@@ -9,5 +9,6 @@ namespace SoulboundBackend.Client.UI {
 	public interface IUILayoutController {
 		void ApplyTo(GameObject obj);
 		void OnChildAdded(UIElementNode node);
+		void OnChildRemoved(UIElementNode node);
 	}
 }

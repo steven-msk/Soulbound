@@ -19,7 +19,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 		public event Action<int, PointerEventData>? pointerExit;
 		[Obsolete] public ItemDisplay? itemDisplay => gameObject.GetComponentInChildren<ItemDisplay>();
 		public int index { get; set; }
-		public bool HasItem => itemDisplay != null;
+		public bool hasItem => itemDisplay != null;
 		public bool IsEmpty => itemDisplay == null;
 
 		public ItemStack? stack => itemDisplay?.stack;
@@ -48,21 +48,29 @@ namespace SoulboundBackend.Client.UI.Storage {
 		}
 
 		private void SetStack(ItemStack? stack) {
-			_stack = stack;
+			if (_stack != null) _stack.onQuantityChanged -= OnStackQuantityChanged;
 			if (activeDisplay != null) activeDisplay.Destroy();
+			_stack = stack;
+
 			if (stack != null) {
 				activeDisplay = ItemDisplay.Create(stack, () => transform);
 				DestroyTooltip();
+				stack.onQuantityChanged += OnStackQuantityChanged;
+
 				// prototypical
-				((ITooltipTrigger)this).SetTooltip(new ItemTooltip(stack.item));
+				SetTooltip(new ItemTooltip(stack.item));
+			} else {
+				SetTooltip(null!);
 			}
 		}
 
 		void ITooltipTrigger.Init(ITooltipRenderer tooltipRenderer) => this.tooltipRenderer = tooltipRenderer;
-		void ITooltipTrigger.SetTooltip(ITooltipDefinition tooltip) => this.tooltip = tooltip;
+		public void SetTooltip(ITooltipDefinition tooltip) => this.tooltip = tooltip;
 		void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData) {
 			pointerEnter?.Invoke(slot.index, eventData);
-			tooltipHandle = tooltipRenderer.RenderTooltip(tooltip);
+			if (tooltip != null) {
+				tooltipHandle = tooltipRenderer.RenderTooltip(tooltip);
+			}
 		}
 		void IPointerExitHandler.OnPointerExit(PointerEventData eventData) {
 			pointerExit?.Invoke(slot.index, eventData);
@@ -75,9 +83,18 @@ namespace SoulboundBackend.Client.UI.Storage {
 			pointerUp?.Invoke(slot.index, eventData);
 		}
 
+		private void OnStackQuantityChanged(int old, int @new) {
+			if (@new <= 0) {
+				DestroyTooltip();
+				tooltip = null!;
+				_stack!.onQuantityChanged -= OnStackQuantityChanged;
+				_stack = null;
+			}
+		}
+
 		[Obsolete]
 		public void OnInventoryPopup(bool opened) {
-			if (!opened && this.HasItem) {
+			if (!opened && this.hasItem) {
 				itemDisplay!.DestroyTooltip();
 			}
 		}

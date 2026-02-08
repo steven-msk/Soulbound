@@ -18,12 +18,14 @@ namespace SoulboundBackend.Client.UI.Storage {
 		public ItemStack? stack => itemDisplay?.stack;
 		public Item? item => stack?.item;
 
-		public bool HasItem => GetStack() != null;
-		public bool IsEmpty => GetStack() == null;
+		[Obsolete] public bool hasItem => GetStack() != null;
+		[Obsolete] public bool IsEmpty => GetStack() == null;
 
 		event Action<ItemStack?> setStack;
 		ItemStack? GetStack();
 		void SetStack(ItemStack? stack);
+
+		public bool HasStack() => GetStack()?.quantity > 0;
 
 		[Obsolete] public void AttachItemDisplay(ItemDisplay itemDisplay) {
 			itemDisplay.OnRelease(transform);

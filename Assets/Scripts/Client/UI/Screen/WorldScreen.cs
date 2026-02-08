@@ -1,4 +1,5 @@
 using SoulboundBackend.Client.UI.Screens;
+using SoulboundBackend.Client.UI.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,7 @@ namespace SoulboundBackend.Client.UI {
 
 		protected override void OnBuild(IScreenObject screenObject) {
 			IItemContainerHandle playerInventory = new PlayerInventoryUIBuilder(player.GetInventory()).Build(screenObject);
+			new TransitStack(screenObject);
 		}
 	}
 }

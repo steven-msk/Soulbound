@@ -9,5 +9,6 @@ namespace SoulboundBackend.Client.UI {
 	public interface IUIFrame {
 		void Apply(RectTransform rect, RectTransform parent);
 		void OnChildAdded(UIElementNode node);
+		void OnChildRemoved(UIElementNode node);
 	}
 }

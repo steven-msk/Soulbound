@@ -273,7 +273,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 				// Flow to empty slots
 				InventorySlotHandle[] availableSlots = MainPlayerSlots;
 				for (int i = 0; i < availableSlots.Length; i++) {
-					if (!availableSlots[i].HasItem) {
+					if (!availableSlots[i].hasItem) {
 						int toAdd = Mathf.Min(remaining, itemStack.item.maxStackSize);
 						(availableSlots[i] as IItemSlot).CreateDisplay(new ItemStack(itemStack.item, toAdd));
 						remaining -= toAdd;
@@ -290,11 +290,11 @@ namespace SoulboundBackend.Client.UI.Storage {
 
 		public InventorySlotHandle? GetFirstEmptySlot() => MainPlayerSlots.First(slot => slot.IsEmpty) ?? null;
 
-		public InventorySlotHandle[]? GetOccupiedSlots() => MainPlayerSlots.Where(slot => slot.HasItem)?.ToArray();
+		public InventorySlotHandle[]? GetOccupiedSlots() => MainPlayerSlots.Where(slot => slot.hasItem)?.ToArray();
 
 		public InventorySlotHandle[]? GetOccupiedSlots(Item item) => GetOccupiedSlots().Where(slot => slot.stack.item.Equals(item))?.ToArray();
 
-		public InventorySlotHandle[]? GetEmptySlots() => MainPlayerSlots.Where(slot => !slot.HasItem)?.ToArray();
+		public InventorySlotHandle[]? GetEmptySlots() => MainPlayerSlots.Where(slot => !slot.hasItem)?.ToArray();
 
 		public void EquipHotbarItem(InventorySlotHandle slot) {
 			ItemDisplay? itemDisplay = slot.itemDisplay;
@@ -545,7 +545,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 
 		[InterpretationFunctionCandidate]
 		public void ReleaseItemInSlot(IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
-			if (slot.HasItem || grabbedItem.value == null) {
+			if (slot.HasStack() || grabbedItem.value == null) {
 				return;
 			}
 			(slot as IItemSlot).AttachItemDisplay(grabbedItem.value);
@@ -595,8 +595,8 @@ namespace SoulboundBackend.Client.UI.Storage {
 
 		public void SplitDistributeToDraggedSlot(DragHandler handler, IItemSlot slot, RefBox<ItemDisplay> grabbedItem) {
 			if (handler.DraggedSlots.Contains(slot)
-					|| (slot.HasItem && slot.item != handler.origin!.item)
-					|| (slot.HasItem && slot.stack!.IsFull())) {
+					|| (slot.HasStack() && slot.item != handler.origin!.item)
+					|| (slot.HasStack() && slot.stack!.IsFull())) {
 				return;
 			}
 
@@ -656,6 +656,10 @@ namespace SoulboundBackend.Client.UI.Storage {
 		}
 
 		IReadOnlyList<IItemSlot> IItemContainer.GetAllSlots() {
+			throw new NotImplementedException();
+		}
+
+		IItemSlot IItemContainerDomain.GetSlot(int index) {
 			throw new NotImplementedException();
 		}
 	}

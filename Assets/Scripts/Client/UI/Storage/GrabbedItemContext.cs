@@ -1,8 +1,10 @@
-﻿#nullable enable
+#nullable enable
 
 using SoulboundBackend.Client.ItemSystem;
+using System;
 
 namespace SoulboundBackend.Client.UI.Storage {
+	[Obsolete]
 	public class GrabbedItemContext {
 		public ItemDisplay? value { get; private set; }
 		public IItemSlot? lastKnownSlot { get; private set; }

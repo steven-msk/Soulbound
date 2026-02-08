@@ -83,5 +83,8 @@ namespace SoulboundBackend.Client.UI {
 
 		void IUILayoutController.OnChildAdded(UIElementNode node) {
 		}
+
+		void IUILayoutController.OnChildRemoved(UIElementNode node) {
+		}
 	}
 }

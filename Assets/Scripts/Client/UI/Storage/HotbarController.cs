@@ -120,7 +120,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 			if (slot == (IItemSlot)active.hotbarSlot) {
 				if (slot.IsEmpty && grabbedItem.value != null) {
 					grabbedItem.value.transform.localScale = Vector3.one;
-				} else if (slot.HasItem && grabbedItem.value == null) {
+				} else if (slot.HasStack() && grabbedItem.value == null) {
 					slot.itemDisplay.transform.localScale = Vector3.one;
 				}
 			}
@@ -150,6 +150,10 @@ namespace SoulboundBackend.Client.UI.Storage {
 
 		IReadOnlyList<IItemSlot> IItemContainer.GetAllSlots() {
 			throw new NotImplementedException();
+		}
+
+		public IItemSlot GetSlot(int index) {
+			return ((IItemContainerDomain)inventory).GetSlot(index);
 		}
 	}
 }

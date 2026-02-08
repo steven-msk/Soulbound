@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Client.ItemSystem;
+using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.Stats;
 using SoulboundBackend.Core;
 using UnityEngine;
@@ -23,14 +23,14 @@ namespace SoulboundBackend.Client.UI.Storage {
 			PlayerStats playerStats = Soulbound.instance.GetPlayerInstance().Stats;
 
 			if (grabbedItem?.item is ArmorItem armor && armor.armorType == this.AcceptedType) {
-				if (this.HasItem) {
+				if (this.hasItem) {
 					//this.CastDisplayed()!.OnUnequipped(playerStats);
 				}
 				//armor.OnEquip(playerStats);
 				overlay.SetActive(false);
 				return true;
 			}
-			if (grabbedItem == null && this.HasItem) {
+			if (grabbedItem == null && this.hasItem) {
 				//this.CastDisplayed()?.OnUnequipped(playerStats);
 				overlay.SetActive(true);
 				return true;
@@ -42,7 +42,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 
 		public override void Deserialize(SerializedItemSlot serialized) {
 			ItemSlotDeserializer.Deserialize(this, serialized);
-			this.overlay.SetActive(!this.HasItem);
+			this.overlay.SetActive(!this.hasItem);
 		}
 	}
 }
