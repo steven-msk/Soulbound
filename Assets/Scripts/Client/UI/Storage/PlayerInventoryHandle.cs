@@ -14,7 +14,7 @@ using UnityEngine.InputSystem;
 #nullable enable
 
 namespace SoulboundBackend.Client.UI {
-	delegate void SlotFunction(int slotIndex);
+	delegate bool SlotFunction(int slotIndex);
 	struct DragContext {
 		public Item item;
 		public int origin;
@@ -38,10 +38,20 @@ namespace SoulboundBackend.Client.UI {
 			// prototypical
 			container.GetSlot(0).SetStack(new(Items.woodBlock, 10));
 			container.GetSlot(1).SetStack(new(Items.leavesBlock, 100));
+			container.GetSlot(2).SetStack(new(Items.leavesBlock, 256));
+			container.GetSlot(3).SetStack(new(Items.leavesBlock, 256));
 		}
 
 		public void SetVisible(bool visible) {
 			throw new NotImplementedException();
+		}
+
+		private IEnumerable<IItemSlot> GetSlotsContaining(Item item) {
+			foreach (var slot in container.GetAllSlots()) {
+				if (slot.GetStack()?.item == item) {
+					yield return slot;
+				}
+			}
 		}
 
 		void IItemSlotEventCallbacks.OnPointerDown(int slotIndex, PointerEventData eventData) {
@@ -81,23 +91,6 @@ namespace SoulboundBackend.Client.UI {
 			//	}
 			//});
 		}
-
-		private void StartDrag(int origin, PointerEventData.InputButton clickButton) {
-			IItemSlot slot = container.GetSlot(origin);
-			if (!slot.HasStack() || dragging) return;
-
-			dragging = true;
-			dragCtx = new DragContext() {
-				item = slot.GetStack()!.item,
-				origin = origin,
-				draggedSlots = new HashSet<int>() { origin },
-				button = clickButton,
-				quantitySnapshots = new Dictionary<int, int>(),
-				originStack = slot.GetStack()!.quantity
-			};
-		}
-
-		private void EndDrag() => dragging = false;
 
 		void IItemSlotEventCallbacks.OnPointerEnter(int slotIndex, PointerEventData eventData) {
 			if (!dragging) return;
@@ -159,20 +152,37 @@ namespace SoulboundBackend.Client.UI {
 			return null!;
 		}
 
-		private void SplitDistributeToDraggedSlot(int slotIndex) {
+		private void StartDrag(int origin, PointerEventData.InputButton clickButton) {
+			IItemSlot slot = container.GetSlot(origin);
+			if (!slot.HasStack() || dragging) return;
+
+			dragging = true;
+			dragCtx = new DragContext() {
+				item = slot.GetStack()!.item,
+				origin = origin,
+				draggedSlots = new HashSet<int>() { origin },
+				button = clickButton,
+				quantitySnapshots = new Dictionary<int, int>(),
+				originStack = slot.GetStack()!.quantity
+			};
+		}
+
+		private void EndDrag() => dragging = false;
+
+		private bool SplitDistributeToDraggedSlot(int slotIndex) {
 			IItemSlot slot = container.GetSlot(slotIndex);
 			IItemSlot originSlot = container.GetSlot(dragCtx.origin);
 
 			if (dragCtx.draggedSlots.Contains(slotIndex)
 				|| (slot.HasStack() && slot.GetStack()!.item != originSlot.GetStack()!.item)
-				|| (slot.HasStack() && slot.GetStack()!.IsFull())) return;
+				|| (slot.HasStack() && slot.GetStack()!.IsFull())) return false;
 
 			// Clone to preview distribution
 			HashSet<int> preview = Enumerable.ToHashSet(new List<int>(dragCtx.draggedSlots) { slotIndex });
 
 			int toSplit = dragCtx.originStack;
 			int splitAmount = toSplit / (preview.Count);
-			if (splitAmount <= 0) return;
+			if (splitAmount <= 0) return false;
 
 			// Commit the slot to dragged list
 			dragCtx.draggedSlots.Add(slotIndex);
@@ -194,11 +204,12 @@ namespace SoulboundBackend.Client.UI {
 				}
 				i++;
 			}
+			return true;
 		}
 
-		private void DoNothing(int slotIndex) { }
+		private bool DoNothing(int slotIndex) => true;
 
-		private void TransferTransit(int slotIndex) {
+		private bool TransferTransit(int slotIndex) {
 			//PlayerController player = Soulbound.instance.GetPlayerInstance();
 			//void SetRightClickAvailable(bool enabled) {
 			//	Action<ItemUseTrigger[]> action = enabled ? player.ItemUsageHandler.Enable : player.ItemUsageHandler.Disable;
@@ -206,84 +217,86 @@ namespace SoulboundBackend.Client.UI {
 			//}
 			ItemStack? slotStack = container.GetSlot(slotIndex).GetStack();
 			ItemStack? transitStack = TransitStack.GetStack();
-			if (slotStack == null && transitStack == null) return;
+			if (slotStack == null && transitStack == null) return false;
 
-			// Grab if slot has item, grabbed is empty
-			if (!TransitStack.HasStack() && slotStack != null) {
-				//SetRightClickAvailable(false);
-				GrabItemFromSlot(slotIndex);
-				return;
-			}
+			if (MergeTransitInSlot(slotIndex)) return true;
+			if (GrabItemFromSlot(slotIndex)) return true;
+			if (SwapTransit(slotIndex)) return true;
+			//Grab if slot has item, grabbed is empty
+			//if (!TransitStack.HasStack() && slotStack != null) {
+			//	//SetRightClickAvailable(false);
+			//	return;
+			//}
 
 			// Release if slot is empty, grabbed has item
-			if (TransitStack.HasStack() && slotStack == null) {
-				//SetRightClickAvailable(true);
-				ReleaseItemInSlot(slotIndex);
-				return;
-			}
+			//if (TransitStack.HasStack() && slotStack == null) {
+			//	//SetRightClickAvailable(true);
+			//	return;
+			//}
 
 
 			// Swap if different items or max quantity exists in either stack
 			if (slotStack.item != transitStack.item || slotStack.IsFull() || transitStack.IsFull()) {
-				SwapTransit(slotIndex);
 			} else {
 				// Merge in slot for compatible stacks
-				MergeTransitInSlot(slotIndex);
 				//SetRightClickAvailable(MergeInSlot(slot, grabbedItem));
 			}
+			return false;
 		}
 
-		private void GrabItemFromSlot(int slotIndex) {
+		private bool GrabItemFromSlot(int slotIndex) {
 			IItemSlot slot = container.GetSlot(slotIndex);
-			if (!slot.HasStack() || TransitStack.HasStack()) return;
+			if (!slot.HasStack() || TransitStack.HasStack()) return false;
 
 			TransitStack.instance.SetStack(slot.GetStack()!);
 			slot.SetStack(null);
+			return true;
 		}
 
-		private void ReleaseItemInSlot(int slotIndex) {
+		private bool ReleaseTransitInEmptySlot(int slotIndex) {
 			IItemSlot slot = container.GetSlot(slotIndex);
-			if (slot.HasStack() || !TransitStack.HasStack()) return;
+			if (slot.HasStack() || !TransitStack.HasStack()) return false;
 
 			slot.SetStack(TransitStack.GetStack());
 			TransitStack.instance.Release();
+			return true;
 		}
 
-		private void SwapTransit(int slotIndex) {
+		private bool SwapTransit(int slotIndex) {
 			IItemSlot slot = container.GetSlot(slotIndex);
-			if (!slot.HasStack() || !TransitStack.HasStack()) return;
+			if (!slot.HasStack() || !TransitStack.HasStack()) return false;
 
 			ItemStack previous = TransitStack.GetStack()!;
 			TransitStack.instance.SetStack(slot.GetStack()!);
 			slot.SetStack(previous);
+			return true;
 		}
 
-		private void MergeTransitInSlot(int slotIndex) {
+		private bool MergeTransitInSlot(int slotIndex) {
 			IItemSlot slot = container.GetSlot(slotIndex);
 			ItemStack? transitStack = TransitStack.GetStack();
-			if (transitStack == null) return;
+			if (transitStack == null) return false;
 
-			if (!slot.HasStack()) {
-				ReleaseItemInSlot(slotIndex);
-				return;
-			}
-			if (transitStack.item != transitStack.item) return;
+			if (ReleaseTransitInEmptySlot(slotIndex)) return true;
+
+			if (transitStack.item != slot.GetStack()!.item) return false;
 
 			int space = transitStack.item.maxStackSize - slot.GetStack()!.quantity;
-			if (space < 0) return;
+			if (space <= 0) return false;
 
 			int transfer = Math.Min(space, transitStack.quantity);
 			slot.GetStack()!.Increment(transfer);
 			transitStack.Decrement(transfer);
+			return true;
 		}
 
-		private void CollectAllToTransit(Item item) {
-			if (TransitStack.GetStack()?.IsFull() ?? true || item == null) return;
+		private bool CollectAllToTransit(Item item) {
+			if (TransitStack.GetStack()?.IsFull() ?? true || item == null) return false;
 
 			var slots = GetSlotsContaining(item)
 				.OrderBy(slot => slot.GetStack()!.quantity)
 				.ToList();
-			if (slots == null || slots.Count == 0) return;
+			if (slots == null || slots.Count == 0) return false;
 
 			ItemStack transitStack = TransitStack.GetStack()!;
 			int spaceLeft = item.maxStackSize - transitStack.quantity;
@@ -294,11 +307,12 @@ namespace SoulboundBackend.Client.UI {
 				slot.GetStack()!.Decrement(transfer);
 				spaceLeft -= transfer;
 			}
+			return true;
 		}
 
-		public void TransferSingleToSlot(int slotIndex) {
+		public bool TransferSingleToSlot(int slotIndex) {
 			IItemSlot slot = container.GetSlot(slotIndex);
-			if (!TransitStack.HasStack()) return;
+			if (!TransitStack.HasStack()) return false;
 			ItemStack transitStack = TransitStack.GetStack()!;
 
 			if (!slot.HasStack()) {
@@ -307,25 +321,19 @@ namespace SoulboundBackend.Client.UI {
 			} else if (slot.GetStack()!.Increment() > 0) {
 				transitStack.Decrement();
 			}
+			return true;
 		}
 
-		public void HalveStackFromSlot(int slotIndex) {
+		public bool HalveStackFromSlot(int slotIndex) {
 			IItemSlot slot = container.GetSlot(slotIndex);
-			if (!slot.HasStack() || TransitStack.HasStack()) return;
+			if (!slot.HasStack() || TransitStack.HasStack()) return false;
 
 			int half = slot.GetStack()!.quantity / 2;
 			int remainder = slot.GetStack()!.quantity % 2;
 			int transfer = half + remainder;
 			slot.GetStack()!.Decrement(transfer);
 			TransitStack.instance.SetStack(new ItemStack(slot.GetStack()!.item, transfer));
-		}
-
-		private IEnumerable<IItemSlot> GetSlotsContaining(Item item) {
-			foreach (var slot in container.GetAllSlots()) {
-				if (slot.GetStack()?.item == item) {
-					yield return slot;
-				}	
-			}
+			return true;
 		}
 	}
 }
