@@ -8,10 +8,10 @@ using UnityEngine.EventSystems;
 #nullable enable
 
 namespace SoulboundBackend.Client.UI.Storage {
-	public interface IItemSlot : IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler, IPointerExitHandler, ISerializable<SerializedItemSlot> {
+	public interface IItemSlot : ISerializable<SerializedItemSlot> {
 		[Obsolete] public ItemDisplay itemDisplay { get; }
 		public IItemContainer container { get; }
-		public int index { get; [Obsolete] set; }
+		[Obsolete] public int index { get; set; }
 		[Obsolete] public Transform transform { get; }
 		[Obsolete] public bool showTooltip { get; set; }
 
@@ -43,10 +43,6 @@ namespace SoulboundBackend.Client.UI.Storage {
 
 		SerializedItemSlot ISerializable<SerializedItemSlot>.Serialize() => new(index, stack);
 
-		public void TrySetStack(int quantity, Item fallback) {
-			CreateDisplayIfEmpty(new ItemStack(fallback, quantity), out var display);
-			this.stack!.SetQuantity(quantity);
-		}
 
 		public int TryAddStack(int add, Item fallback) {
 			if (!CreateDisplayIfEmpty(new ItemStack(fallback, 0), out var display)) {
@@ -77,38 +73,17 @@ namespace SoulboundBackend.Client.UI.Storage {
 			return false;
 		}
 
-		[Obsolete] new public virtual void OnPointerDown(PointerEventData eventData) {
-			//container.OnPointerDown(this, eventData);
-		}
-		[Obsolete] new public virtual void OnPointerUp(PointerEventData eventData) {
-			//container.OnPointerUp(this, eventData);
-		}
-		[Obsolete] new public virtual void OnPointerEnter(PointerEventData eventData) {
-			//container.OnPointerEnter(this, eventData);
-			//if (showTooltip) {
-			//	itemDisplay?.ShowTooltip(eventData.position, container.transform);
-			//}
-		}
-
-		[Obsolete] new public virtual void OnPointerExit(PointerEventData eventData) {
-			//container.OnPointerExit(this, eventData);
-			//itemDisplay?.DestroyTooltip();
-		}
-
 		/// <summary>
 		/// Validates whether this slot agrees to interact with the given item upon the given interaction mode
 		/// </summary>
+		[Obsolete]
 		virtual bool Handshake(ItemDisplay? grabbedItem, SlotInteractionMode interactionMode) {
 			return interactionMode == SlotInteractionMode.Click ? !(grabbedItem == null && this.IsEmpty) : true;
 		}
-
-		[Obsolete] void IPointerDownHandler.OnPointerDown(PointerEventData eventData) => this.OnPointerDown(eventData);
-		[Obsolete] void IPointerUpHandler.OnPointerUp(PointerEventData eventData) => this.OnPointerUp(eventData);
-		[Obsolete] void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData) => this.OnPointerEnter(eventData);
-		[Obsolete] void IPointerExitHandler.OnPointerExit(PointerEventData eventData) => this.OnPointerExit(eventData);
 	}
 
 	public static class ItemSlotDeserializer {
+		[Obsolete]
 		public static ItemDisplay Deserialize(this IItemSlot slot, SerializedItemSlot serialized) {
 			slot.InternalDeserialize(serialized);
 			return slot.itemDisplay;

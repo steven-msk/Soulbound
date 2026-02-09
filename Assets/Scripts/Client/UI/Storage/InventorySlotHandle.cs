@@ -99,9 +99,6 @@ namespace SoulboundBackend.Client.UI.Storage {
 			}
 		}
 
-		//IItemContainer IItemSlotHandle.GetContainer() => container;
-		//IItemSlot IItemSlotHandle.GetSlot() => slot;
-
 		public void SetVisible(bool visible) {
 			gameObject.SetActive(visible);
 			if (!visible) DestroyTooltip();

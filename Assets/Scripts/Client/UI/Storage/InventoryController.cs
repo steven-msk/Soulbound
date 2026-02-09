@@ -27,8 +27,8 @@ using Logger = SoulboundBackend.Common.Logging.Logger;
 namespace SoulboundBackend.Client.UI.Storage {
 	[Obsolete]
 	public class InventoryController : MonoBehaviour, IItemContainer2D, ISerializable<SerializedInventory>, IStatContextProvider {
-		public delegate void InterpretationFunction(IItemSlot slot, RefBox<ItemDisplay> grabbedItem);
-		public delegate InterpretationFunction? InterpretationProvider(DragHandler handler, IItemSlot draggedSlot, RefBox<ItemDisplay> grabbedItem);
+		[Obsolete] public delegate void InterpretationFunction(IItemSlot slot, RefBox<ItemDisplay> grabbedItem);
+		[Obsolete] public delegate InterpretationFunction? InterpretationProvider(DragHandler handler, IItemSlot draggedSlot, RefBox<ItemDisplay> grabbedItem);
 
 		private static readonly Logger logger = Logger.CreateInstance();
 		public HotbarController Hotbar => hotbar;

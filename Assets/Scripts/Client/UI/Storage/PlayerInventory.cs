@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -16,7 +17,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public const int HOTBAR_ROWS = ROWS;
 
 		private readonly InventorySlot[] popupSlots = new InventorySlot[ROWS * POPUP_COLUMNS];
-		private readonly InventorySlot[] hotbarSlots = new InventorySlot[ROWS];
+		private readonly InventorySlot[] hotbarSlots = new InventorySlot[HOTBAR_ROWS];
 		//private readonly InventorySlot[] armorSlots = new InventorySlot[4];	// TBD
 		private bool popupOpen = false;
 		public event Action togglePopup;
@@ -24,15 +25,10 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public PlayerInventory() {
 			int i = 0;
 			for (; i < ROWS * POPUP_COLUMNS; i++) popupSlots[i] = new InventorySlot(this, i);
-			for (; i < ROWS * POPUP_COLUMNS + HOTBAR_ROWS; i++) hotbarSlots[i - ROWS * POPUP_COLUMNS] = new InventorySlot(this, i);
+			for (; i < ROWS * POPUP_COLUMNS + HOTBAR_ROWS; i++) {
+				hotbarSlots[i - ROWS * POPUP_COLUMNS] = new InventorySlot(this, i);
+			}
 			//for (; i < 39; i++) armorSlots[i - 36] = new ArmorSlot(this, i);
-		}
-
-		public IReadOnlyList<IItemSlot> GetAllSlots() {
-			List<IItemSlot> slots = new();
-			slots.AddRange(popupSlots);
-			slots.AddRange(hotbarSlots);
-			return slots;
 		}
 
 		public IItemSlot GetSlot(int index) {
@@ -56,6 +52,13 @@ namespace SoulboundBackend.Client.ItemSystem {
 			return grid;
 		}
 
+		public IReadOnlyList<IItemSlot> GetAllSlots() {
+			return new List<IItemSlot>()
+				.Concat(popupSlots)
+				.Concat(hotbarSlots)
+				.ToList();
+		}
+
 		public void TogglePopup() {
 			popupOpen = !popupOpen;
 			togglePopup();
@@ -66,27 +69,10 @@ namespace SoulboundBackend.Client.ItemSystem {
 
 		public bool IsPopupOpen() => popupOpen;
 
+		void IItemContainer.OnItemDisplayAdded(ItemDisplay itemDisplay, IItemSlot slot) {
+			throw new NotImplementedException();
+		}
+
 		[Obsolete] public IReadOnlyList<IItemSlot> slots { get => throw new NotImplementedException(); }
-		[Obsolete] public Transform transform => throw new NotImplementedException();
-		[Obsolete]
-		public void OnItemDisplayAdded(ItemDisplay itemDisplay, IItemSlot slot) {
-			throw new NotImplementedException();
-		}
-		[Obsolete]
-		public void OnPointerDown(IItemSlot slot, PointerEventData eventData) {
-			throw new NotImplementedException();
-		}
-		[Obsolete]
-		public void OnPointerEnter(IItemSlot slot, PointerEventData data) {
-			throw new NotImplementedException();
-		}
-		[Obsolete]
-		public void OnPointerExit(IItemSlot slot, PointerEventData data) {
-			throw new NotImplementedException();
-		}
-		[Obsolete]
-		public void OnPointerUp(IItemSlot slot, PointerEventData eventData) {
-			throw new NotImplementedException();
-		}
 	}
 }
