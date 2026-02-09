@@ -36,8 +36,10 @@ namespace SoulboundBackend.Client {
 		public override EntityDescriptor descriptor => EntityDescriptorRegistry.ByType<PlayerController>();
 		[SerializeField] private InventoryController inventory;
 		[Obsolete] public InventoryController Inventory => inventory;
-		private PlayerInventory _inventory;
-		public PlayerInventory GetInventory() => _inventory;
+		private Inventory _inventory;
+		private Hotbar hotbar;
+		public Inventory GetInventory() => _inventory;
+		public Hotbar GetHotbar() => hotbar;
 
 		[SerializeField] private PlayerStats stats;
 		public PlayerStats Stats => stats;
@@ -100,10 +102,11 @@ namespace SoulboundBackend.Client {
 			inputHandler = container.Resolve<InputHandler>();
 			playerPhysics = container.Resolve<PlayerPhysics>();
 			//inventory = container.Resolve<InventoryController>();
-			_inventory = new PlayerInventory();
+			_inventory = new Inventory();
 			inputHandler.RegisterInputEvent(inputHandler.GetAction("Toggle Inventory"), pausable: true, binding => {
-				binding.Performed(_ => _inventory.TogglePopup());
+				binding.Performed(_ => _inventory.Toggle());
 			});
+			this.hotbar = new Hotbar();
 			level = container.Resolve<Level>();
 			canvas = container.Resolve<Canvas>();
 			RegisterItemUsageCandidates(container.Resolve<ItemUsageHandler>());

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using UnityEngine.EventSystems;
 
 namespace SoulboundBackend.Client.UI {
-	public interface IItemSlotEventCallbacks {
+	public interface IItemSlotHandleCallbacks {
 		void OnPointerDown(int slotIndex, PointerEventData eventData);
 		void OnPointerUp(int slotIndex, PointerEventData eventData);
 		void OnPointerEnter(int slotIndex, PointerEventData eventData);

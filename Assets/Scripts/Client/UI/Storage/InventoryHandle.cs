@@ -14,7 +14,7 @@ using UnityEngine.InputSystem;
 #nullable enable
 
 namespace SoulboundBackend.Client.UI {
-	public sealed class PlayerInventoryHandle : MonoBehaviour, IItemContainerHandle {
+	public sealed class InventoryHandle : MonoBehaviour, IItemContainerHandle {
 		private float lastClickTime;
 		private int lastClickedSlot;
 		const float doubleClickThreshold = 0.15f;
@@ -24,19 +24,13 @@ namespace SoulboundBackend.Client.UI {
 
 		public void Init(IItemContainer container) {
 			this.container = container;
-
-			// prototypical
-			container.GetSlot(0).SetStack(new(Items.woodBlock, 10));
-			container.GetSlot(1).SetStack(new(Items.leavesBlock, 100));
-			container.GetSlot(2).SetStack(new(Items.leavesBlock, 256));
-			container.GetSlot(3).SetStack(new(Items.leavesBlock, 256));
 		}
 
 		public void SetVisible(bool visible) {
 			throw new NotImplementedException();
 		}
 
-		void IItemSlotEventCallbacks.OnPointerDown(int slotIndex, PointerEventData eventData) {
+		void IItemSlotHandleCallbacks.OnPointerDown(int slotIndex, PointerEventData eventData) {
 			float time = Time.time;
 			bool doubleClick = lastClickedSlot == slotIndex && (time - lastClickTime) <= doubleClickThreshold;
 			lastClickTime = time;
@@ -83,7 +77,7 @@ namespace SoulboundBackend.Client.UI {
 			//});
 		}
 
-		void IItemSlotEventCallbacks.OnPointerEnter(int slotIndex, PointerEventData eventData) {
+		void IItemSlotHandleCallbacks.OnPointerEnter(int slotIndex, PointerEventData eventData) {
 			if (!dragging) return;
 
 			ISlotOperation operation = GetDrag(slotIndex);
@@ -94,11 +88,6 @@ namespace SoulboundBackend.Client.UI {
 
 			operation.Execute();
 		}
-
-		void IItemSlotEventCallbacks.OnPointerExit(int slotIndex, PointerEventData eventData) {
-		}
-
-		void IItemSlotEventCallbacks.OnPointerUp(int slotIndex, PointerEventData eventData) => EndDrag();
 
 		private ISlotOperation GetClick(int slotIndex, PointerEventData.InputButton clickButton, bool doubleClick) {
 			bool shift = Keyboard.current.shiftKey.isPressed;
@@ -128,6 +117,7 @@ namespace SoulboundBackend.Client.UI {
 		private ISlotOperation GetDrag(int slotIndex) {
 			if (dragCtx.button == PointerEventData.InputButton.Left) {
 				return new SplitDistributeToDraggedSlot(slotIndex, container, dragCtx);
+
 			} else if (dragCtx.button == PointerEventData.InputButton.Right) {
 				ItemStack? slotStack = container.GetSlot(slotIndex).GetStack();
 				ItemStack? transitStack = TransitStack.GetStack();
@@ -160,5 +150,10 @@ namespace SoulboundBackend.Client.UI {
 		}
 
 		private void EndDrag() => dragging = false;
+
+		void IItemSlotHandleCallbacks.OnPointerExit(int slotIndex, PointerEventData eventData) {
+		}
+
+		void IItemSlotHandleCallbacks.OnPointerUp(int slotIndex, PointerEventData eventData) => EndDrag();
 	}
 }

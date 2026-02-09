@@ -15,7 +15,11 @@ namespace SoulboundBackend.Client.UI {
 		}
 
 		protected override void OnBuild(IScreenObject screenObject) {
-			IItemContainerHandle playerInventory = new PlayerInventoryUIBuilder(player.GetInventory()).Build(screenObject);
+			InventoryUIBuilder inventoryUIBuilder = new(player.GetInventory(), player.GetHotbar());
+			IItemContainerHandle inventory = inventoryUIBuilder.BuildInventory(screenObject);
+			IItemContainerHandle hotbar = inventoryUIBuilder.BuildHotbar(screenObject);
+			inventoryUIBuilder.FixInventoryPosition(inventory, hotbar);
+
 			new TransitStack(screenObject);
 		}
 	}
