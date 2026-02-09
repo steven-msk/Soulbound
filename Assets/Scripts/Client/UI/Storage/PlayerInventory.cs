@@ -59,6 +59,14 @@ namespace SoulboundBackend.Client.ItemSystem {
 				.ToList();
 		}
 
+		public IReadOnlyList<int> GetAllSlots_indexed() {
+			List<int> list = new();
+			int i = 0;
+			for (; i < ROWS * POPUP_COLUMNS; i++) list.Add(i);
+			for (; i < ROWS * POPUP_COLUMNS + HOTBAR_ROWS; i++) list.Add(i);
+			return list;
+		}
+
 		public void TogglePopup() {
 			popupOpen = !popupOpen;
 			togglePopup();

@@ -662,5 +662,9 @@ namespace SoulboundBackend.Client.UI.Storage {
 		IItemSlot IItemContainerDomain.GetSlot(int index) {
 			throw new NotImplementedException();
 		}
+
+		IReadOnlyList<int> IItemContainer.GetAllSlots_indexed() {
+			throw new NotImplementedException();
+		}
 	}
 }

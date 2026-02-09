@@ -4,6 +4,7 @@ using SoulboundBackend.Client.UI.Storage;
 using SoulboundBackend.Core;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEditor.Graphs;
 using UnityEngine;
@@ -151,7 +152,9 @@ namespace SoulboundBackend.Client.UI {
 				origin = origin,
 				draggedSlots = new HashSet<int>() { origin },
 				button = clickButton,
-				quantitySnapshots = new Dictionary<int, int>(),
+				quantitySnapshots = container.GetAllSlots_indexed()
+					.Where(i => container.GetSlot(i).GetStack()?.quantity > 0)
+					.ToDictionary(i => i, i => container.GetSlot(i).GetStack()!.quantity),
 				originStack = slot.GetStack()!.quantity
 			};
 		}

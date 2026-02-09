@@ -155,5 +155,9 @@ namespace SoulboundBackend.Client.UI.Storage {
 		public IItemSlot GetSlot(int index) {
 			return ((IItemContainerDomain)inventory).GetSlot(index);
 		}
+
+		public IReadOnlyList<int> GetAllSlots_indexed() {
+			return ((IItemContainer)inventory).GetAllSlots_indexed();
+		}
 	}
 }

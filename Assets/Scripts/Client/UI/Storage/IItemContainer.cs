@@ -14,6 +14,9 @@ namespace SoulboundBackend.Client.UI.Storage {
 
 		IReadOnlyList<IItemSlot> GetAllSlots();
 
+		// will replace current GetAllSlots()
+		IReadOnlyList<int> GetAllSlots_indexed();
+
 		[Obsolete] void OnItemDisplayAdded(ItemDisplay itemDisplay, IItemSlot slot);
 
 		public bool ContainsItem(Item item) {
