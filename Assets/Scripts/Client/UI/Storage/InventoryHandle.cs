@@ -50,7 +50,10 @@ namespace SoulboundBackend.Client.UI {
 		void IItemSlotHandleCallbacks.OnPointerEnter(int slotIndex, PointerEventData eventData) {
 			if (!scope.InDragState()) return;
 
-			ISlotOperation operation = GetDrag(slotIndex, eventData.button);
+			// eventData.button does not retain drag click information because its called OnPointerEnter
+			PointerEventData.InputButton dragButton = scope.GetDragState()!.button;
+
+			ISlotOperation operation = GetDrag(slotIndex, dragButton);
 			if (operation == null) {
 				UnityEngine.Debug.LogException(new InvalidOperationException("GetDrag() returned null"));
 				return;
@@ -63,23 +66,23 @@ namespace SoulboundBackend.Client.UI {
 			bool shift = Keyboard.current.shiftKey.isPressed;
 			bool ctrl = Keyboard.current.ctrlKey.isPressed;
 			bool alt = Keyboard.current.altKey.isPressed;
-			ItemStack? slotStack = container.GetSlot(slotIndex).GetStack();
 
 			if (clickButton == PointerEventData.InputButton.Left) {
-				if (doubleClick && scope.transitStack.HasStack()) {
-					return new CollectAllItemsToTransit(scope);
-				}
-				return new TransferTransit(container, slotIndex, scope);
-			} else if (clickButton == PointerEventData.InputButton.Right) {
-				if (scope.transitStack.HasStack() && slotStack != null) {
-					if (scope.transitStack.GetStack()!.item != slotStack.item) {
-						return new NoSlotOperation();
-					}
-				}
-				if (scope.transitStack.HasStack()) {
-					return new TransferSingleToSlot(container, slotIndex, scope);
-				}
-				return new HalveStackFromSlot(container, slotIndex, scope);
+				CollectAllItemsToTransit collectToTransit = new(scope);
+
+				return doubleClick && collectToTransit.CanExecute()
+					? collectToTransit
+					: new TransferTransit(container, slotIndex, scope);
+			}
+
+			if (clickButton == PointerEventData.InputButton.Right) {
+				TransferSingleToSlot transferSingleToSlot = new(container, slotIndex, scope);
+				HalveStackFromSlot halveStackFromSlot = new(container, slotIndex, scope);
+
+				if (transferSingleToSlot.CanExecute()) return transferSingleToSlot;
+				if (halveStackFromSlot.CanExecute()) return halveStackFromSlot;
+
+				return new NoSlotOperation();
 			}
 			return null!;
 		}
@@ -87,18 +90,16 @@ namespace SoulboundBackend.Client.UI {
 		private ISlotOperation GetDrag(int slotIndex, PointerEventData.InputButton button) {
 			if (button == PointerEventData.InputButton.Left) {
 				return new SplitDistributeToDraggedSlot(slotIndex, container, scope);
+			}
+			if (button == PointerEventData.InputButton.Right) {
+				TransferSingleToSlot transferSingleToSlot = new(container, slotIndex, scope);
 
-			} else if (button == PointerEventData.InputButton.Right) {
-				ItemStack? slotStack = container.GetSlot(slotIndex).GetStack();
-				ItemStack? transitStack = scope.transitStack.GetStack();
-
-				if (transitStack != null && slotStack != null
-						&& transitStack.item != slotStack.item) {
-					return new NoSlotOperation();
+				if (transferSingleToSlot.CanExecute()) {
+					scope.ExtendDrag(container, slotIndex);
+					return transferSingleToSlot;
 				}
 
-				scope.ExtendDrag(container, slotIndex);
-				return new TransferSingleToSlot(container, slotIndex, scope);
+				return new NoSlotOperation();
 			}
 			return null!;
 		}

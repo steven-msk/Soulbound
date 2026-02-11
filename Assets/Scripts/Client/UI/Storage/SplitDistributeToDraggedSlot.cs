@@ -30,7 +30,7 @@ namespace SoulboundBackend.Client.UI {
 
 		public bool CanExecute() {
 			SlotRef slotRef = new(container, slotIndex);
-			return !scope.GetDragState().draggedSlots.Contains(slotRef) && IsStackValid();
+			return !scope.GetDragState().IsSlotDragged(slotRef) && IsStackValid();
 		}
 
 		bool ISlotOperation.Execute() {

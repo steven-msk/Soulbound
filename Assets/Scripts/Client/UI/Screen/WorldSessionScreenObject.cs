@@ -67,7 +67,7 @@ namespace SoulboundBackend.Client.UI {
 		public void EndDrag() => dragState = null;
 
 		public void ExtendDrag(IItemContainer container, int slotIndex) {
-			dragState?.draggedSlots.Add(new SlotRef(container, slotIndex));
+			dragState?.AddDraggedSlot(container, slotIndex);
 		}
 
 		public bool InDragState() => dragState != null;

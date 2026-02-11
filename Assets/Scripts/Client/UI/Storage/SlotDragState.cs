@@ -19,9 +19,10 @@ namespace SoulboundBackend.Client.UI {
 
 		public IItemContainer GetOriginContainer() => originContainer;
 
-		public bool TryGetQuantity(IItemContainer container, int slotIndex, out int quantity) {
-			SlotRef slotRef = new(container, slotIndex);
-			return quantitySnapshots.TryGetValue(slotRef, out quantity);
+		public void AddDraggedSlot(IItemContainer container, int slotIndex) {
+			draggedSlots.Add(new SlotRef(container, slotIndex));
 		}
+
+		public bool IsSlotDragged(SlotRef slotRef) => draggedSlots.Contains(slotRef);
 	}
 }
