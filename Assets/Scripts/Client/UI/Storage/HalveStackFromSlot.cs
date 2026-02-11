@@ -3,12 +3,12 @@ using SoulboundBackend.Client.UI.Storage;
 
 namespace SoulboundBackend.Client.UI {
 	public sealed class HalveStackFromSlot : SingleSlotOperation {
-		public HalveStackFromSlot(IItemContainer container, int slotIndex, TransitStack transitStack)
-			: base(container, slotIndex, transitStack) {
+		public HalveStackFromSlot(IItemContainer container, int slotIndex, IItemContainerScope scope)
+			: base(container, slotIndex, scope) {
 		}
 
 		public override bool CanExecute() {
-			return slot.HasStack() && !transitStack.HasStack();
+			return slot.HasStack() && !scope.transitStack.HasStack();
 		}
 
 		public override bool Execute() {
@@ -19,7 +19,8 @@ namespace SoulboundBackend.Client.UI {
 			int remainder = slot.GetStack()!.quantity % 2;
 			int transfer = half + remainder;
 			slot.GetStack()!.Decrement(transfer);
-			transitStack.SetStack(new ItemStack(slot.GetStack()!.item, transfer));
+			ItemStack halvedTransit = new(slot.GetStack()!.item, transfer);
+			scope.transitStack.SetStack(halvedTransit);
 			return true;
 		}
 	}

@@ -5,26 +5,26 @@ namespace SoulboundBackend.Client.UI {
 		private readonly IItemContainer container;
 		private readonly int slotIndex;
 
-		public TransferTransit(IItemContainer container, int slotIndex, TransitStack transitStack)
-			: base(container, slotIndex, transitStack) {
+		public TransferTransit(IItemContainer container, int slotIndex, IItemContainerScope scope)
+			: base(container, slotIndex, scope) {
 			this.container = container;
 			this.slotIndex = slotIndex;
 		}
 
 		public override bool CanExecute() {
-			return slot.HasStack() || transitStack.HasStack();
+			return slot.HasStack() || scope.transitStack.HasStack();
 		}
 
 		public override bool Execute() {
 			if (!CanExecute()) return false;
 
-			MergeTransitInSlot mergeInSlot = new(container, slotIndex, transitStack);
+			MergeTransitInSlot mergeInSlot = new(container, slotIndex, scope);
 			if (mergeInSlot.CanExecute()) return mergeInSlot.Execute();
 
-			GrabStackFromSlot grabFromSlot = new(container, slotIndex, transitStack);
+			GrabStackFromSlot grabFromSlot = new(container, slotIndex, scope);
 			if (grabFromSlot.CanExecute()) return grabFromSlot.Execute();
 
-			SwapTransit swapTransit = new(container, slotIndex, transitStack);
+			SwapTransit swapTransit = new(container, slotIndex, scope);
 			if (swapTransit.CanExecute()) return swapTransit.Execute();
 
 			return false;

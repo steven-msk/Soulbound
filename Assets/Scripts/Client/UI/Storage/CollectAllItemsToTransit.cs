@@ -1,34 +1,34 @@
 using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.UI.Storage;
+using System.Collections.Generic;
 using System.Linq;
 
 #nullable enable
 
 namespace SoulboundBackend.Client.UI {
 	public sealed class CollectAllItemsToTransit : SingleSlotOperation {
-		private readonly Item item;
 		private readonly IItemContainer container;
 
-		public CollectAllItemsToTransit(Item item, IItemContainer container, int slotIndex, TransitStack transitStack)
-			: base(container, slotIndex, transitStack) {
-			this.item = item;
+		public CollectAllItemsToTransit(IItemContainer container, int slotIndex, IItemContainerScope scope)
+			: base(container, slotIndex, scope) {
 			this.container = container;
 		}
 
 		public override bool CanExecute() {
-			if (!transitStack.HasStack()) return false;
-			return item != null && !transitStack.GetStack()!.IsFull();
+			if (!scope.transitStack.HasStack()) return false;
+			return !scope.transitStack.GetStack()!.IsFull();
 		}
 
 		public override bool Execute() {
 			if (!CanExecute()) return false;
 
-			var slots = container.GetSlotsContaining(item)
-			.OrderBy(slot => slot.GetStack()!.quantity)
-			.ToList();
+			Item item = scope.transitStack.GetStack()!.item;
+			List<IItemSlot> slots = container.GetSlotsContaining(item)
+				.OrderBy(slot => slot.GetStack()!.quantity)
+				.ToList();
 			if (slots == null || slots.Count == 0) return false;
 
-			ItemStack transitStack = this.transitStack.GetStack()!;
+			ItemStack transitStack = scope.transitStack.GetStack()!;
 			int spaceLeft = item.maxStackSize - transitStack.quantity;
 			foreach (var slot in slots) {
 				if (spaceLeft <= 0) break;

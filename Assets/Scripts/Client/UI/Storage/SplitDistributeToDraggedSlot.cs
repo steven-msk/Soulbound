@@ -8,9 +8,9 @@ namespace SoulboundBackend.Client.UI {
 		private readonly IItemContainer container;
 		private readonly int slotIndex;
 		private readonly IItemSlot slot;
-		private readonly SlotDragContext dragCtx;
+		private readonly SlotDragState dragCtx;
 
-		public SplitDistributeToDraggedSlot(int slotIndex, IItemContainer container, SlotDragContext dragCtx) {
+		public SplitDistributeToDraggedSlot(int slotIndex, IItemContainer container, SlotDragState dragCtx) {
 			this.container = container;
 			this.slotIndex = slotIndex;
 			this.slot = container.GetSlot(slotIndex);

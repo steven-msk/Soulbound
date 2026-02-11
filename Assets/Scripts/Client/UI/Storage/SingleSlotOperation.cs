@@ -5,11 +5,11 @@ using SoulboundBackend.Client.UI.Storage;
 namespace SoulboundBackend.Client.UI {
 	public abstract class SingleSlotOperation : ISlotOperation {
 		protected readonly IItemSlot slot;
-		protected readonly TransitStack transitStack;
+		protected readonly IItemContainerScope scope;
 
-		public SingleSlotOperation(IItemContainer container, int slotIndex, TransitStack transitStack) {
+		public SingleSlotOperation(IItemContainer container, int slotIndex, IItemContainerScope scope) {
 			this.slot = container.GetSlot(slotIndex);
-			this.transitStack = transitStack;
+			this.scope = scope;
 		}
 
 		public abstract bool CanExecute();

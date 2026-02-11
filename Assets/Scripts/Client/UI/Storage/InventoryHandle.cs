@@ -19,13 +19,13 @@ namespace SoulboundBackend.Client.UI {
 		private int lastClickedSlot;
 		const float doubleClickThreshold = 0.15f;
 		private bool dragging = false;
-		private SlotDragContext dragCtx;
+		private SlotDragState dragCtx;
 		private IItemContainer container = null!;
-		private TransitStack transitStack = null!;
+		private IItemContainerScope scope = null!;
 
-		public void Init(IItemContainer container, TransitStack transitStack) {
+		public void Init(IItemContainer container, IItemContainerScope scope) {
 			this.container = container;
-			this.transitStack = transitStack;
+			this.scope = scope;
 		}
 
 		public void SetVisible(bool visible) {
@@ -98,20 +98,20 @@ namespace SoulboundBackend.Client.UI {
 			ItemStack? slotStack = container.GetSlot(slotIndex).GetStack();
 
 			if (clickButton == PointerEventData.InputButton.Left) {
-				if (doubleClick && transitStack.HasStack()) {
-					return new CollectAllItemsToTransit(transitStack.GetStack()?.item, container, slotIndex, transitStack);
+				if (doubleClick && scope.transitStack.HasStack()) {
+					return new CollectAllItemsToTransit(container, slotIndex, scope);
 				}
-				return new TransferTransit(container, slotIndex, transitStack);
+				return new TransferTransit(container, slotIndex, scope);
 			} else if (clickButton == PointerEventData.InputButton.Right) {
-				if (transitStack.HasStack() && slotStack != null) {
-					if (transitStack.GetStack()!.item != slotStack.item) {
+				if (scope.transitStack.HasStack() && slotStack != null) {
+					if (scope.transitStack.GetStack()!.item != slotStack.item) {
 						return new NoSlotOperation();
 					}
 				}
-				if (transitStack.HasStack()) {
-					return new TransferSingleToSlot(container, slotIndex, transitStack);
+				if (scope.transitStack.HasStack()) {
+					return new TransferSingleToSlot(container, slotIndex, scope);
 				}
-				return new HalveStackFromSlot(container, slotIndex, transitStack);
+				return new HalveStackFromSlot(container, slotIndex, scope);
 			}
 			return null!;
 		}
@@ -122,14 +122,14 @@ namespace SoulboundBackend.Client.UI {
 
 			} else if (dragCtx.button == PointerEventData.InputButton.Right) {
 				ItemStack? slotStack = container.GetSlot(slotIndex).GetStack();
-				ItemStack? transitStack = this.transitStack.GetStack();
+				ItemStack? transitStack = scope.transitStack.GetStack();
 
 				if (transitStack != null && slotStack != null
 						&& transitStack.item != slotStack.item) {
 					return new NoSlotOperation();
 				}
 				dragCtx.draggedSlots.Add(slotIndex);
-				return new TransferSingleToSlot(container, slotIndex, this.transitStack);
+				return new TransferSingleToSlot(container, slotIndex, scope);
 			}
 			return null!;
 		}
@@ -139,7 +139,7 @@ namespace SoulboundBackend.Client.UI {
 			if (!slot.HasStack() || dragging) return;
 
 			dragging = true;
-			dragCtx = new SlotDragContext() {
+			dragCtx = new SlotDragState(container) {
 				item = slot.GetStack()!.item,
 				origin = origin,
 				draggedSlots = new HashSet<int>() { origin },
