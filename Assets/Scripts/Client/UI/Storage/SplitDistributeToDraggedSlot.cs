@@ -4,14 +4,17 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace SoulboundBackend.Client.UI {
-	public sealed class SplitDistributeToDraggedSlot : SingleDraggedSlotOperation {
+	public sealed class SplitDistributeToDraggedSlot : ISlotOperation {
 		private readonly IItemContainer container;
 		private readonly int slotIndex;
+		private readonly IItemSlot slot;
+		private readonly SlotDragContext dragCtx;
 
-		public SplitDistributeToDraggedSlot(int slotIndex, IItemContainer container, SlotDragContext dragCtx)
-			: base(container, slotIndex, dragCtx) {
+		public SplitDistributeToDraggedSlot(int slotIndex, IItemContainer container, SlotDragContext dragCtx) {
 			this.container = container;
 			this.slotIndex = slotIndex;
+			this.slot = container.GetSlot(slotIndex);
+			this.dragCtx = dragCtx;
 		}
 
 		bool IsStackValid() {
@@ -24,11 +27,11 @@ namespace SoulboundBackend.Client.UI {
 			return true;
 		}
 
-		public override bool CanExecute() {
+		public bool CanExecute() {
 			return !dragCtx.draggedSlots.Contains(slotIndex) && IsStackValid();
 		}
 
-		public override bool Execute() {
+		bool ISlotOperation.Execute() {
 			if (!CanExecute()) return false;
 
 			// Clone to preview distribution

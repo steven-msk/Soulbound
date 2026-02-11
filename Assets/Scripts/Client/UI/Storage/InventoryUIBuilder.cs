@@ -30,7 +30,7 @@ namespace SoulboundBackend.Client.UI {
 			this.hotbar = hotbar;
 		}
 
-		public IItemContainerHandle BuildInventory(IUIElementContainer container) {
+		public IItemContainerHandle BuildInventory(IWorldSessionScreenObject sessionScreen) {
 			InventoryHandle inventory = CreateContainerObject<InventoryHandle>(
 				"Inventory", Inventory.COLUMNS
 			);
@@ -49,14 +49,14 @@ namespace SoulboundBackend.Client.UI {
 					handle.ToggleVisibility();
 				}
 			};
-			inventory.Init(this.inventory);
+			inventory.Init(this.inventory, sessionScreen.GetTransitStack());
 
 			this.inventory.Toggle();
-			container.AddElement(new UIElementNode(inventory.gameObject));
+			sessionScreen.AddElement(new UIElementNode(inventory.gameObject));
 			return inventory;
 		}
 
-		public IItemContainerHandle BuildHotbar(IUIElementContainer container) {
+		public IItemContainerHandle BuildHotbar(IWorldSessionScreenObject sessionScreen) {
 			InventoryHandle hotbar = CreateContainerObject<InventoryHandle>(
 				"Hotbar", Hotbar.COLUMNS
 			);
@@ -71,9 +71,9 @@ namespace SoulboundBackend.Client.UI {
 				i++;
 			}
 
-			hotbar.Init(this.hotbar);
+			hotbar.Init(this.hotbar, sessionScreen.GetTransitStack());
 
-			container.AddElement(new UIElementNode(hotbar.gameObject));
+			sessionScreen.AddElement(new UIElementNode(hotbar.gameObject));
 			return hotbar;
 		}
 

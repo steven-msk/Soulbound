@@ -9,21 +9,21 @@ namespace SoulboundBackend.Client.UI {
 		private readonly IItemContainer container;
 		private readonly int slotIndex;
 
-		public MergeTransitInSlot(IItemContainer container, int slotIndex)
-			: base(container, slotIndex) {
+		public MergeTransitInSlot(IItemContainer container, int slotIndex, TransitStack transitStack)
+			: base(container, slotIndex, transitStack) {
 			this.container = container;
 			this.slotIndex = slotIndex;
 		}
 
-		public override bool CanExecute() => TransitStack.HasStack();
+		public override bool CanExecute() => transitStack.HasStack();
 
 		public override bool Execute() {
-			ReleaseTransitInEmptySlot releaseInSlot = new(container, slotIndex);
+			ReleaseTransitInEmptySlot releaseInSlot = new(container, slotIndex, this.transitStack);
 			if (releaseInSlot.CanExecute()) return releaseInSlot.Execute();
 
 			if (!CanExecute()) return false;
 
-			ItemStack transitStack = TransitStack.GetStack()!;
+			ItemStack transitStack = this.transitStack.GetStack()!;
 			int space = transitStack.item.maxStackSize - slot.GetStack()!.quantity;
 			if (space <= 0) return false;
 

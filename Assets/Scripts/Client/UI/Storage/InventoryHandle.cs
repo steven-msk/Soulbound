@@ -21,9 +21,11 @@ namespace SoulboundBackend.Client.UI {
 		private bool dragging = false;
 		private SlotDragContext dragCtx;
 		private IItemContainer container = null!;
+		private TransitStack transitStack = null!;
 
-		public void Init(IItemContainer container) {
+		public void Init(IItemContainer container, TransitStack transitStack) {
 			this.container = container;
+			this.transitStack = transitStack;
 		}
 
 		public void SetVisible(bool visible) {
@@ -96,20 +98,20 @@ namespace SoulboundBackend.Client.UI {
 			ItemStack? slotStack = container.GetSlot(slotIndex).GetStack();
 
 			if (clickButton == PointerEventData.InputButton.Left) {
-				if (doubleClick && TransitStack.HasStack()) {
-					return new CollectAllItemsToTransit(TransitStack.GetStack()?.item, container, slotIndex);
+				if (doubleClick && transitStack.HasStack()) {
+					return new CollectAllItemsToTransit(transitStack.GetStack()?.item, container, slotIndex, transitStack);
 				}
-				return new TransferTransit(container, slotIndex);
+				return new TransferTransit(container, slotIndex, transitStack);
 			} else if (clickButton == PointerEventData.InputButton.Right) {
-				if (TransitStack.HasStack() && slotStack != null) {
-					if (TransitStack.GetStack()!.item != slotStack.item) {
+				if (transitStack.HasStack() && slotStack != null) {
+					if (transitStack.GetStack()!.item != slotStack.item) {
 						return new NoSlotOperation();
 					}
 				}
-				if (TransitStack.HasStack()) {
-					return new TransferSingleToSlot(container, slotIndex);
+				if (transitStack.HasStack()) {
+					return new TransferSingleToSlot(container, slotIndex, transitStack);
 				}
-				return new HalveStackFromSlot(container, slotIndex);
+				return new HalveStackFromSlot(container, slotIndex, transitStack);
 			}
 			return null!;
 		}
@@ -120,14 +122,14 @@ namespace SoulboundBackend.Client.UI {
 
 			} else if (dragCtx.button == PointerEventData.InputButton.Right) {
 				ItemStack? slotStack = container.GetSlot(slotIndex).GetStack();
-				ItemStack? transitStack = TransitStack.GetStack();
+				ItemStack? transitStack = this.transitStack.GetStack();
 
 				if (transitStack != null && slotStack != null
 						&& transitStack.item != slotStack.item) {
 					return new NoSlotOperation();
 				}
 				dragCtx.draggedSlots.Add(slotIndex);
-				return new TransferSingleToSlot(container, slotIndex);
+				return new TransferSingleToSlot(container, slotIndex, this.transitStack);
 			}
 			return null!;
 		}

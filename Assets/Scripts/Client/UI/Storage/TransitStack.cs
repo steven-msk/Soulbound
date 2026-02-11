@@ -10,14 +10,12 @@ using UnityEngine;
 
 namespace SoulboundBackend.Client.UI.Storage {
 	public sealed class TransitStack {
-		public static TransitStack instance { get; private set; } = null!;
 		public event Action<ItemStack?, ItemStack?>? onStackChanged;
 		private readonly IUIElementContainer transitContainer;
 		private ItemDisplay? display;
 		private UIElementNode node = null!;
 
 		public TransitStack(IUIElementContainer transitContainer) {
-			instance = this;
 			this.transitContainer = transitContainer;
 		}
 
@@ -45,9 +43,9 @@ namespace SoulboundBackend.Client.UI.Storage {
 			if (previous != null) onStackChanged?.Invoke(previous, null);
 		}
 
-		public static bool HasStack() => instance.display != null;
-		public static ItemStack? GetStack() => instance.display != null
-			? instance.display.stack
+		public bool HasStack() => display != null;
+		public ItemStack? GetStack() => display != null
+			? display.stack
 			: null;
 
 		private void OnDisplayDestroyed(ItemStack stack) {

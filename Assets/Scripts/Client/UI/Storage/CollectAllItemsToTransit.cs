@@ -9,15 +9,15 @@ namespace SoulboundBackend.Client.UI {
 		private readonly Item item;
 		private readonly IItemContainer container;
 
-		public CollectAllItemsToTransit(Item item, IItemContainer container, int slotIndex)
-			: base(container, slotIndex) {
+		public CollectAllItemsToTransit(Item item, IItemContainer container, int slotIndex, TransitStack transitStack)
+			: base(container, slotIndex, transitStack) {
 			this.item = item;
 			this.container = container;
 		}
 
 		public override bool CanExecute() {
-			if (!TransitStack.HasStack()) return false;
-			return item != null && !TransitStack.GetStack()!.IsFull();
+			if (!transitStack.HasStack()) return false;
+			return item != null && !transitStack.GetStack()!.IsFull();
 		}
 
 		public override bool Execute() {
@@ -28,7 +28,7 @@ namespace SoulboundBackend.Client.UI {
 			.ToList();
 			if (slots == null || slots.Count == 0) return false;
 
-			ItemStack transitStack = TransitStack.GetStack()!;
+			ItemStack transitStack = this.transitStack.GetStack()!;
 			int spaceLeft = item.maxStackSize - transitStack.quantity;
 			foreach (var slot in slots) {
 				if (spaceLeft <= 0) break;
