@@ -8,17 +8,17 @@ namespace SoulboundBackend.Client.UI {
 		private readonly IItemContainer container;
 		private readonly int slotIndex;
 		private readonly IItemSlot slot;
-		private readonly SlotDragState dragCtx;
+		private readonly IItemContainerScope scope;
 
-		public SplitDistributeToDraggedSlot(int slotIndex, IItemContainer container, SlotDragState dragCtx) {
+		public SplitDistributeToDraggedSlot(int slotIndex, IItemContainer container, IItemContainerScope scope) {
 			this.container = container;
 			this.slotIndex = slotIndex;
 			this.slot = container.GetSlot(slotIndex);
-			this.dragCtx = dragCtx;
+			this.scope = scope;
 		}
 
 		bool IsStackValid() {
-			IItemSlot dragOrigin = container.GetSlot(dragCtx.origin);
+			IItemSlot dragOrigin = scope.GetDragState().origin.GetSlot();
 
 			if (slot.HasStack()) {
 				return slot.GetStack()!.item == dragOrigin.GetStack()!.item
@@ -28,36 +28,45 @@ namespace SoulboundBackend.Client.UI {
 		}
 
 		public bool CanExecute() {
-			return !dragCtx.draggedSlots.Contains(slotIndex) && IsStackValid();
+			SlotRef slotRef = new(container, slotIndex);
+			return !scope.GetDragState().draggedSlots.Contains(slotRef) && IsStackValid();
+		}
+
+		private HashSet<int> ResolveDraggedSlots() {
+			return scope.GetDragState().draggedSlots
+				.Where(r => r.container == this.container)
+				.Select(r => r.index)
+				.ToHashSet();
 		}
 
 		bool ISlotOperation.Execute() {
 			if (!CanExecute()) return false;
 
 			// Clone to preview distribution
-			HashSet<int> preview = Enumerable.ToHashSet(new List<int>(dragCtx.draggedSlots) { slotIndex });
+			HashSet<int> preview = ResolveDraggedSlots();
+			preview.Add(slotIndex);
 
-			int toSplit = dragCtx.originStack;
+			int toSplit = scope.GetDragState().originStack;
 			int splitAmount = toSplit / preview.Count;
 			if (splitAmount <= 0) return false;
 
 			// Commit the slot to dragged list
-			dragCtx.draggedSlots.Add(slotIndex);
-			int remainder = toSplit % dragCtx.draggedSlots.Count();
+			scope.GetDragState().draggedSlots.Add(new SlotRef(container, slotIndex));
+			int remainder = toSplit % scope.GetDragState().draggedSlots.Count();
 
-			HashSet<int>.Enumerator enumerator = dragCtx.draggedSlots.GetEnumerator();
+			HashSet<int>.Enumerator enumerator = ResolveDraggedSlots().GetEnumerator();
 			int i = 0;
 			while (enumerator.MoveNext()) {
 				IItemSlot draggedSlot = container.GetSlot(enumerator.Current);
 				int amount = splitAmount + (i < remainder ? 1 : 0);
 
 				if (!draggedSlot.HasStack()) {
-					draggedSlot.SetStack(new ItemStack(dragCtx.item, amount));
+					draggedSlot.SetStack(new ItemStack(scope.GetDragState().item, amount));
 				}
 
-				bool hasSnapshot = dragCtx.quantitySnapshots.TryGetValue(enumerator.Current, out var snapshot);
-				if (hasSnapshot && enumerator.Current != dragCtx.origin) {
-					draggedSlot.GetStack()!.SetQuantity(snapshot + amount);
+				bool hasSnapshot = scope.GetDragState().TryGetQuantity(container, slotIndex, out int quantity);
+				if (hasSnapshot && enumerator.Current != scope.GetDragState().origin.index) {
+					draggedSlot.GetStack()!.SetQuantity(quantity + amount);
 				} else {
 					draggedSlot.GetStack()!.SetQuantity(amount);
 				}

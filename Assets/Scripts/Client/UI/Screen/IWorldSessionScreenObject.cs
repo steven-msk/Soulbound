@@ -8,5 +8,6 @@ using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.UI {
 	public interface IWorldSessionScreenObject : IScreenObject, IItemContainerScope {
+		void AddItemContainer(UIItemContainerNode node);
 	}
 }

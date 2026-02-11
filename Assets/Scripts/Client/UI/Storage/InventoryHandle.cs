@@ -18,8 +18,6 @@ namespace SoulboundBackend.Client.UI {
 		private float lastClickTime;
 		private int lastClickedSlot;
 		const float doubleClickThreshold = 0.15f;
-		private bool dragging = false;
-		private SlotDragState dragCtx;
 		private IItemContainer container = null!;
 		private IItemContainerScope scope = null!;
 
@@ -54,8 +52,8 @@ namespace SoulboundBackend.Client.UI {
 				return;
 			}
 
-			if (!dragging) operation.Execute();
-			StartDrag(slotIndex, clickButton);
+			if (!scope.InDragState()) operation.Execute();
+			StartDrag(slotIndex, eventData);
 
 			// temporarily remove action resolver
 
@@ -80,9 +78,9 @@ namespace SoulboundBackend.Client.UI {
 		}
 
 		void IItemSlotHandleCallbacks.OnPointerEnter(int slotIndex, PointerEventData eventData) {
-			if (!dragging) return;
+			if (!scope.InDragState()) return;
 
-			ISlotOperation operation = GetDrag(slotIndex);
+			ISlotOperation operation = GetDrag(slotIndex, eventData.button);
 			if (operation == null) {
 				UnityEngine.Debug.LogException(new InvalidOperationException("GetDrag() returned null"));
 				return;
@@ -116,11 +114,11 @@ namespace SoulboundBackend.Client.UI {
 			return null!;
 		}
 
-		private ISlotOperation GetDrag(int slotIndex) {
-			if (dragCtx.button == PointerEventData.InputButton.Left) {
-				return new SplitDistributeToDraggedSlot(slotIndex, container, dragCtx);
+		private ISlotOperation GetDrag(int slotIndex, PointerEventData.InputButton button) {
+			if (button == PointerEventData.InputButton.Left) {
+				return new SplitDistributeToDraggedSlot(slotIndex, container, scope);
 
-			} else if (dragCtx.button == PointerEventData.InputButton.Right) {
+			} else if (button == PointerEventData.InputButton.Right) {
 				ItemStack? slotStack = container.GetSlot(slotIndex).GetStack();
 				ItemStack? transitStack = scope.transitStack.GetStack();
 
@@ -128,34 +126,35 @@ namespace SoulboundBackend.Client.UI {
 						&& transitStack.item != slotStack.item) {
 					return new NoSlotOperation();
 				}
-				dragCtx.draggedSlots.Add(slotIndex);
+				scope.ExtendDrag(container, slotIndex);
+				//draggedSlots.Add(slotIndex);
 				return new TransferSingleToSlot(container, slotIndex, scope);
 			}
 			return null!;
 		}
 
-		private void StartDrag(int origin, PointerEventData.InputButton clickButton) {
+		private void StartDrag(int origin, PointerEventData eventData) {
 			IItemSlot slot = container.GetSlot(origin);
-			if (!slot.HasStack() || dragging) return;
+			if (!slot.HasStack()) return;
 
-			dragging = true;
-			dragCtx = new SlotDragState(container) {
-				item = slot.GetStack()!.item,
-				origin = origin,
-				draggedSlots = new HashSet<int>() { origin },
-				button = clickButton,
-				quantitySnapshots = container.GetAllSlots_indexed()
-					.Where(i => container.GetSlot(i).GetStack()?.quantity > 0)
-					.ToDictionary(i => i, i => container.GetSlot(i).GetStack()!.quantity),
-				originStack = slot.GetStack()!.quantity
-			};
+			scope.TryBeginDrag(container, origin, eventData);
+
+			//dragging = true;
+			//dragCtx = new SlotDragState(container) {
+			//	item = slot.GetStack()!.item,
+			//	origin = origin,
+			//	draggedSlots = new HashSet<int>() { origin },
+			//	button = clickButton,
+			//	quantitySnapshots = container.GetAllSlots_indexed()
+			//		.Where(i => container.GetSlot(i).GetStack()?.quantity > 0)
+			//		.ToDictionary(i => i, i => container.GetSlot(i).GetStack()!.quantity),
+			//	originStack = slot.GetStack()!.quantity
+			//};
 		}
-
-		private void EndDrag() => dragging = false;
 
 		void IItemSlotHandleCallbacks.OnPointerExit(int slotIndex, PointerEventData eventData) {
 		}
 
-		void IItemSlotHandleCallbacks.OnPointerUp(int slotIndex, PointerEventData eventData) => EndDrag();
+		void IItemSlotHandleCallbacks.OnPointerUp(int slotIndex, PointerEventData eventData) => scope.EndDrag();
 	}
 }
