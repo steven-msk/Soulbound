@@ -2,6 +2,7 @@ using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.UI.Storage;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 
 namespace SoulboundBackend.Client.UI {
 	public sealed class SplitDistributeToDraggedSlot : ISlotOperation {
@@ -32,40 +33,28 @@ namespace SoulboundBackend.Client.UI {
 			return !scope.GetDragState().draggedSlots.Contains(slotRef) && IsStackValid();
 		}
 
-		private HashSet<int> ResolveDraggedSlots() {
-			return scope.GetDragState().draggedSlots
-				.Where(r => r.container == this.container)
-				.Select(r => r.index)
-				.ToHashSet();
-		}
-
 		bool ISlotOperation.Execute() {
 			if (!CanExecute()) return false;
 
-			// Clone to preview distribution
-			HashSet<int> preview = ResolveDraggedSlots();
-			preview.Add(slotIndex);
-
+			int previewCount = scope.GetDragState().draggedSlots.Count + 1;
 			int toSplit = scope.GetDragState().originStack;
-			int splitAmount = toSplit / preview.Count;
+			int splitAmount = toSplit / previewCount;
 			if (splitAmount <= 0) return false;
 
-			// Commit the slot to dragged list
-			scope.GetDragState().draggedSlots.Add(new SlotRef(container, slotIndex));
+			scope.ExtendDrag(container, slotIndex);
 			int remainder = toSplit % scope.GetDragState().draggedSlots.Count();
 
-			HashSet<int>.Enumerator enumerator = ResolveDraggedSlots().GetEnumerator();
+			SortedSet<SlotRef>.Enumerator enumerator = scope.GetDragState().draggedSlots.GetEnumerator();
 			int i = 0;
 			while (enumerator.MoveNext()) {
-				IItemSlot draggedSlot = container.GetSlot(enumerator.Current);
+				IItemSlot draggedSlot = enumerator.Current.GetSlot();
 				int amount = splitAmount + (i < remainder ? 1 : 0);
 
 				if (!draggedSlot.HasStack()) {
 					draggedSlot.SetStack(new ItemStack(scope.GetDragState().item, amount));
 				}
-
-				bool hasSnapshot = scope.GetDragState().TryGetQuantity(container, slotIndex, out int quantity);
-				if (hasSnapshot && enumerator.Current != scope.GetDragState().origin.index) {
+				bool hasSnapshot = scope.GetDragState().quantitySnapshots.TryGetValue(enumerator.Current, out int quantity);
+				if (hasSnapshot && !enumerator.Current.Equals(scope.GetDragState().origin)) {
 					draggedSlot.GetStack()!.SetQuantity(quantity + amount);
 				} else {
 					draggedSlot.GetStack()!.SetQuantity(amount);

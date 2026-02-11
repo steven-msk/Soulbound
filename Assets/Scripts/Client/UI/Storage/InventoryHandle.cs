@@ -36,15 +36,6 @@ namespace SoulboundBackend.Client.UI {
 			lastClickTime = time;
 			lastClickedSlot = slotIndex;
 
-			// somewhere along the line should be the following commented section
-			// although this logic doesnt belong here
-
-			//PlayerController player = Soulbound.instance.GetPlayerInstance();
-			//void SetRightClickAvailable(bool enabled) {
-			//	Action<ItemUseTrigger[]> action = enabled ? player.ItemUsageHandler.Enable : player.ItemUsageHandler.Disable;
-			//	action.Invoke(new ItemUseTrigger[] { ItemUseTrigger.RightClick, ItemUseTrigger.RightHold });
-			//}
-
 			PointerEventData.InputButton clickButton = eventData.button;
 			ISlotOperation operation = GetClick(slotIndex, clickButton, doubleClick);
 			if (operation == null) {
@@ -53,28 +44,7 @@ namespace SoulboundBackend.Client.UI {
 			}
 
 			if (!scope.InDragState()) operation.Execute();
-			StartDrag(slotIndex, eventData);
-
-			// temporarily remove action resolver
-
-			//actionResolver.Submit(Request.New()
-			//	.UnderToken(PlayerActionTokens.SlotClick)
-			//	.Execute(() => {
-			//})
-			//.OnCondition(() => clickedSlot.Handshake(GrabbedContext.value, SlotInteractionMode.Click))
-			//.WithPriority(PlayerActionTokens.SlotClick.effectivePriority)
-			//.Suppress(PlayerActionTokens.ItemUse, () => !leftHold)
-			//.Suppress(PlayerActionTokens.Attack, () => !leftHold)
-			//);
-
-
-			//ExecuteOnGrabbedReference(clickedSlot, (slot, grabbedReference) => {
-			//	interpretationFunction.Invoke(slot!, grabbedReference);
-			//	hotbar.OnItemTransfer(slot!, grabbedReference);
-			//	if (GrabbedContext.value != null && !doubleClick && !cancelDrag) {
-			//		activeDragHandler = this.StartDrag(slot!, dragButton);
-			//	}
-			//});
+			StartDrag(slotIndex, clickButton);
 		}
 
 		void IItemSlotHandleCallbacks.OnPointerEnter(int slotIndex, PointerEventData eventData) {
@@ -126,30 +96,18 @@ namespace SoulboundBackend.Client.UI {
 						&& transitStack.item != slotStack.item) {
 					return new NoSlotOperation();
 				}
+
 				scope.ExtendDrag(container, slotIndex);
-				//draggedSlots.Add(slotIndex);
 				return new TransferSingleToSlot(container, slotIndex, scope);
 			}
 			return null!;
 		}
 
-		private void StartDrag(int origin, PointerEventData eventData) {
+		private void StartDrag(int origin, PointerEventData.InputButton button) {
 			IItemSlot slot = container.GetSlot(origin);
 			if (!slot.HasStack()) return;
 
-			scope.TryBeginDrag(container, origin, eventData);
-
-			//dragging = true;
-			//dragCtx = new SlotDragState(container) {
-			//	item = slot.GetStack()!.item,
-			//	origin = origin,
-			//	draggedSlots = new HashSet<int>() { origin },
-			//	button = clickButton,
-			//	quantitySnapshots = container.GetAllSlots_indexed()
-			//		.Where(i => container.GetSlot(i).GetStack()?.quantity > 0)
-			//		.ToDictionary(i => i, i => container.GetSlot(i).GetStack()!.quantity),
-			//	originStack = slot.GetStack()!.quantity
-			//};
+			scope.TryBeginDrag(container, origin, button);
 		}
 
 		void IItemSlotHandleCallbacks.OnPointerExit(int slotIndex, PointerEventData eventData) {

@@ -49,7 +49,10 @@ namespace SoulboundBackend.Client.UI {
 					handle.ToggleVisibility();
 				}
 			};
+
 			inventory.Init(this.inventory, sessionScreen);
+			UIItemContainerNode node = new(inventory.gameObject, this.inventory, inventory);
+			sessionScreen.AddItemContainer(node);
 
 			this.inventory.Toggle();
 			sessionScreen.AddElement(new UIElementNode(inventory.gameObject));
@@ -72,6 +75,8 @@ namespace SoulboundBackend.Client.UI {
 			}
 
 			hotbar.Init(this.hotbar, sessionScreen);
+			UIItemContainerNode node = new(hotbar.gameObject, this.hotbar, hotbar);
+			sessionScreen.AddItemContainer(node);
 
 			sessionScreen.AddElement(new UIElementNode(hotbar.gameObject));
 			return hotbar;

@@ -26,7 +26,7 @@ namespace SoulboundBackend.Client.UI {
 
 		public void AddItemContainer(UIItemContainerNode node) => openContainers.Add(node);
 
-		public bool TryBeginDrag(IItemContainer container, int originSlotIndex, PointerEventData eventData) {
+		public bool TryBeginDrag(IItemContainer container, int originSlotIndex, PointerEventData.InputButton button) {
 			if (InDragState()) return false;
 
 			IItemSlot originSlot = container.GetSlot(originSlotIndex);
@@ -37,7 +37,7 @@ namespace SoulboundBackend.Client.UI {
 				item = originSlot.GetStack()!.item,
 				origin = originRef,
 				draggedSlots = draggedSlots,
-				button = eventData.button,
+				button = button,
 				quantitySnapshots = CreateQuantitySnapshots(),
 				originStack = originSlot.GetStack()!.quantity
 			};
