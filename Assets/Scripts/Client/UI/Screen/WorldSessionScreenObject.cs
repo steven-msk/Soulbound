@@ -73,5 +73,11 @@ namespace SoulboundBackend.Client.UI {
 		public bool InDragState() => dragState != null;
 
 		public SlotDragState? GetDragState() => dragState;
+
+		public IEnumerable<IItemContainer> GetOpenContainers() {
+			foreach (var node in openContainers) {
+				yield return node.container;
+			}
+		}
 	}
 }

@@ -11,6 +11,7 @@ using UnityEngine.EventSystems;
 namespace SoulboundBackend.Client.UI {
 	public interface IItemContainerScope {
 		TransitStack transitStack { get; }
+		IEnumerable<IItemContainer> GetOpenContainers();
 
 		bool InDragState();
 		SlotDragState? GetDragState();

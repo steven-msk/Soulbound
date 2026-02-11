@@ -6,26 +6,30 @@ using System.Linq;
 #nullable enable
 
 namespace SoulboundBackend.Client.UI {
-	public sealed class CollectAllItemsToTransit : SingleSlotOperation {
-		private readonly IItemContainer container;
+	public sealed class CollectAllItemsToTransit : ISlotOperation {
+		private readonly IItemContainerScope scope;
 
-		public CollectAllItemsToTransit(IItemContainer container, int slotIndex, IItemContainerScope scope)
-			: base(container, slotIndex, scope) {
-			this.container = container;
+		public CollectAllItemsToTransit(IItemContainerScope scope) {
+			this.scope = scope;
 		}
 
-		public override bool CanExecute() {
+		public bool CanExecute() {
 			if (!scope.transitStack.HasStack()) return false;
 			return !scope.transitStack.GetStack()!.IsFull();
 		}
 
-		public override bool Execute() {
+		private List<IItemSlot> GetSlotsContaining(Item item) {
+			return scope.GetOpenContainers()
+				.SelectMany(c => c.GetSlotsContaining(item))
+				.OrderBy(s => s.GetStack()!.quantity)
+				.ToList();
+		}
+
+		bool ISlotOperation.Execute() {
 			if (!CanExecute()) return false;
 
 			Item item = scope.transitStack.GetStack()!.item;
-			List<IItemSlot> slots = container.GetSlotsContaining(item)
-				.OrderBy(slot => slot.GetStack()!.quantity)
-				.ToList();
+			List<IItemSlot> slots = GetSlotsContaining(item);
 			if (slots == null || slots.Count == 0) return false;
 
 			ItemStack transitStack = scope.transitStack.GetStack()!;

@@ -67,7 +67,7 @@ namespace SoulboundBackend.Client.UI {
 
 			if (clickButton == PointerEventData.InputButton.Left) {
 				if (doubleClick && scope.transitStack.HasStack()) {
-					return new CollectAllItemsToTransit(container, slotIndex, scope);
+					return new CollectAllItemsToTransit(scope);
 				}
 				return new TransferTransit(container, slotIndex, scope);
 			} else if (clickButton == PointerEventData.InputButton.Right) {
