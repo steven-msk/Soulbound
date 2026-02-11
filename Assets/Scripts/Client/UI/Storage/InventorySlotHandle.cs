@@ -10,7 +10,7 @@ using UnityEngine.EventSystems;
 namespace SoulboundBackend.Client.UI.Storage {
 	public class InventorySlotHandle : MonoBehaviour, IItemSlot, IItemSlotHandle, ITooltipTrigger, IItemSlotEvents {
 		private IItemSlot slot = null!;
-		private ITooltipDefinition tooltip = null!;
+		private ITooltip tooltip = null!;
 		private ITooltipRenderer tooltipRenderer = null!;
 		private ITooltipHandle? tooltipHandle;
 		public event Action<int, PointerEventData>? pointerDown;
@@ -65,7 +65,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 		}
 
 		void ITooltipTrigger.Init(ITooltipRenderer tooltipRenderer) => this.tooltipRenderer = tooltipRenderer;
-		public void SetTooltip(ITooltipDefinition tooltip) => this.tooltip = tooltip;
+		public void SetTooltip(ITooltip tooltip) => this.tooltip = tooltip;
 		void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData) {
 			pointerEnter?.Invoke(slot.index, eventData);
 			if (tooltip != null) {

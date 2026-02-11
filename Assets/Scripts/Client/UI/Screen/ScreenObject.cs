@@ -11,10 +11,8 @@ namespace SoulboundBackend.Client.UI.Screens {
 		private ChildMap childMap;
 		private readonly List<UITooltipNode> tooltipNodes = new();
 		
-		public void Init(Screen screenInstance, IScreenNavigator navigator) {
+		public void Init(Screen screenInstance) {
 			this.screenInstance = screenInstance;
-
-			screenInstance.Init(navigator);
 			childMap = new ChildMap();
 		}
 
@@ -59,9 +57,12 @@ namespace SoulboundBackend.Client.UI.Screens {
 		void ITooltipManager.AddTooltip(UITooltipNode node) {
 			node.transform.SetParent(transform, false);
 			tooltipNodes.Add(node);
+			node.handle.onDestroyed += () => {
+				tooltipNodes.Remove(node);
+			};
 		}
 
-		ITooltipHandle ITooltipRenderer.RenderTooltip(ITooltipDefinition tooltip) {
+		ITooltipHandle ITooltipRenderer.RenderTooltip(ITooltip tooltip) {
 			return tooltip.Build(this);
 		}
 

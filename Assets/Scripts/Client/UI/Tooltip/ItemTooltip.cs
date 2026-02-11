@@ -14,7 +14,7 @@ using UnityEngine.UI;
 
 namespace SoulboundBackend.Client.UI {
 	[PROTOTYPICAL]
-	public class ItemTooltip : ITooltipDefinition {
+	public class ItemTooltip : ITooltip {
 		private readonly string title;
 		private readonly string? description;
 		private readonly string? lore;

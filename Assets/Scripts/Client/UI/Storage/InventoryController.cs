@@ -12,14 +12,11 @@ using System.Linq;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEditor;
-using UnityEditor.Timeline.Actions;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using Zenject;
-using static PlayerInputActions;
-using static UnityEngine.InputSystem.DefaultInputActions;
 using Logger = SoulboundBackend.Common.Logging.Logger;
 
 #nullable enable

@@ -20,14 +20,6 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public virtual int maxStackSize { get; } = DEFAULT_MAX_STACK;
 		public bool IsStackable => maxStackSize > 1;
 
-		public virtual Tooltip? RenderTooltip(Vector2 position, Transform parent) {
-			TooltipData tooltipData = Tooltip.Plain(this.name);
-			TooltipRenderer renderer = new(TooltipNodeStylePresets.PresetProvider());
-			Tooltip tooltip = new Tooltip(renderer, tooltipData);
-			tooltip.Show(position, parent);
-			return tooltip;
-		}
-
 		public virtual void OnAttachedInSlot(IItemSlot slot) {
 		}
 

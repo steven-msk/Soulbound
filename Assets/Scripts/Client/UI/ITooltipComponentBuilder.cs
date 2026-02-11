@@ -7,6 +7,6 @@ using UnityEngine;
 
 namespace SoulboundBackend.Client.UI {
 	public interface ITooltipComponentBuilder<TBuilder> where TBuilder : ITooltipComponentBuilder<TBuilder> {
-		TBuilder Tooltip<TTrigger>(ITooltipDefinition tooltip) where TTrigger : Component, ITooltipTrigger, new();
+		TBuilder Tooltip<TTrigger>(ITooltip tooltip) where TTrigger : Component, ITooltipTrigger, new();
 	}
 }

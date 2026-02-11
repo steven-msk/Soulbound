@@ -53,7 +53,6 @@ namespace SoulboundBackend.Client.UI {
 				}
 
 				bool hasSnapshot = dragCtx.quantitySnapshots.TryGetValue(enumerator.Current, out var snapshot);
-				UnityEngine.Debug.Log(snapshot + " snapshot quantity for slot" + enumerator.Current);
 				if (hasSnapshot && enumerator.Current != dragCtx.origin) {
 					draggedSlot.GetStack()!.SetQuantity(snapshot + amount);
 				} else {

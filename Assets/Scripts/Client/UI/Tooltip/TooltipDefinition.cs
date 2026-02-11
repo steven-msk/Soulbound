@@ -1,5 +1,3 @@
-using SoulboundBackend.Client.UI;
-using SoulboundBackend.Client.UI.Screens;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core;
 using System;
@@ -13,7 +11,7 @@ using UnityEngine;
 namespace SoulboundBackend.Client.UI {
 	// will replace Tooltip and be abstracted
 	[PROTOTYPICAL]
-	public class TooltipDefinition : ITooltipDefinition {
+	public class TooltipDefinition : ITooltip {
 		private readonly string text;
 
 		public TooltipDefinition(string text) {

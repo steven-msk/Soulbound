@@ -14,6 +14,10 @@ namespace SoulboundBackend.Client.UI {
 			this.player = player;
 		}
 
+		public override IScreenObject BuildObject(IScreenObjectFactory objFactory) {
+			return base.BuildObject(new WorldSessionScreenFactory(objFactory));
+		}
+
 		protected override void OnBuild(IScreenObject screenObject) {
 			InventoryUIBuilder inventoryUIBuilder = new(player.GetInventory(), player.GetHotbar());
 			IItemContainerHandle inventory = inventoryUIBuilder.BuildInventory(screenObject);
@@ -22,5 +26,6 @@ namespace SoulboundBackend.Client.UI {
 
 			new TransitStack(screenObject);
 		}
+
 	}
 }

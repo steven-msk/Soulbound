@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.UI {
-	public interface ITooltipRenderer {
-		ITooltipHandle RenderTooltip(ITooltip tooltip);
+	public interface ITooltip {
+		ITooltipHandle Build(ITooltipManager manager);
 	}
 }

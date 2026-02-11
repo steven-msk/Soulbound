@@ -14,7 +14,7 @@ namespace SoulboundBackend.Client.UI {
 		private bool enabled = true;
 		private Action onClick;
 		private bool built;
-		private ITooltipDefinition tooltip;
+		private ITooltip tooltip;
 		private Type tooltipTriggerType;
 
 		public ButtonBuilder(IUIElementTemplate<ButtonHandle> template) {
@@ -36,7 +36,7 @@ namespace SoulboundBackend.Client.UI {
 			return this;
 		}
 
-		public ButtonBuilder Tooltip<TTrigger>(ITooltipDefinition tooltip) where TTrigger : Component, ITooltipTrigger, new() {
+		public ButtonBuilder Tooltip<TTrigger>(ITooltip tooltip) where TTrigger : Component, ITooltipTrigger, new() {
 			if (!typeof(MonoBehaviour).IsAssignableFrom(typeof(TTrigger))) {
 				throw new InvalidOperationException("Tooltip trigger component must be a MonoBehaviour");
 			}

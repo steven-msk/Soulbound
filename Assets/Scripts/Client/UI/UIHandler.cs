@@ -21,6 +21,7 @@ namespace SoulboundBackend.Client.UI {
 			screenManager = new ScreenManager(canvas.transform);
 		}
 
+		[Obsolete]
 		public void SetScreen(Screen screen) {
 			screenManager.PushScreen(screen);
 		}
@@ -32,6 +33,6 @@ namespace SoulboundBackend.Client.UI {
 
 		public void FlushScreens() => screenManager.Flush();
 
-		public ScreenManager GetScreenManager() => screenManager;
+		public IScreenNavigator GetScreenNavigator() => screenManager;
 	}
 }

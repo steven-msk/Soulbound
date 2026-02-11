@@ -185,7 +185,7 @@ namespace SoulboundBackend.Core {
 		}
 
 		private void OnEscPressed() {
-			if (!Soulbound.instance.GetUIHandler().GetScreenManager().PopScreen()) {
+			if (!Soulbound.instance.GetUIHandler().GetScreenNavigator().PopScreen()) {
 				TogglePause();
 			}
 		}
@@ -195,7 +195,7 @@ namespace SoulboundBackend.Core {
 			Time.timeScale = paused ? 0f : 1f;
 			inputHandler.PauseInputs(paused);
 			if (!paused) {
-				Soulbound.instance.GetUIHandler().GetScreenManager().PopScreen();
+				Soulbound.instance.GetUIHandler().GetScreenNavigator().PopScreen();
 			} else {
 				Soulbound.instance.GetUIHandler().SetScreen(new GamePausedScreen());
 			}

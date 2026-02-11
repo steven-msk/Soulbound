@@ -8,10 +8,10 @@ using UnityEngine;
 
 namespace SoulboundBackend.Client.UI.Screens {
 	public abstract class Screen {
-		protected IScreenNavigator navigator;
+		protected IScreenNavigator screenNavigator;
 
 		public void Init(IScreenNavigator navigator) {
-			this.navigator = navigator;
+			this.screenNavigator = navigator;
 		}
 
 		public virtual IScreenObject BuildObject(IScreenObjectFactory objFactory) {

@@ -23,6 +23,7 @@ namespace SoulboundBackend.Client.UI.Screens {
 				activeEntry.obj.Hide();
 			}
 
+			screen.Init(this);
 			IScreenObject obj = screen.BuildObject(this);
 			stack.Push(new ScreenEntry(obj));
 			obj.Show();
@@ -84,7 +85,7 @@ namespace SoulboundBackend.Client.UI.Screens {
 
 		IScreenObject IScreenObjectFactory.CreateSceneObject(Screen screen, GameObject gameObject) {
 			ScreenObject screenObject = gameObject.AddComponent<ScreenObject>();
-			screenObject.Init(screen, this);
+			screenObject.Init(screen);
 			return screenObject;
 		}
 	}

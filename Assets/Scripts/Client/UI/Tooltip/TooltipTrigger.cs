@@ -13,13 +13,13 @@ namespace SoulboundBackend.Client.UI {
 	public class TooltipTrigger : MonoBehaviour, ITooltipTrigger, IPointerEnterHandler, IPointerExitHandler {
 		private ITooltipHandle handle;
 		private ITooltipRenderer tooltipRenderer;
-		private ITooltipDefinition tooltip;
+		private ITooltip tooltip;
 
 		void ITooltipTrigger.Init(ITooltipRenderer tooltipRenderer) {
 			this.tooltipRenderer = tooltipRenderer;
 		}
 
-		void ITooltipTrigger.SetTooltip(ITooltipDefinition tooltip) {
+		void ITooltipTrigger.SetTooltip(ITooltip tooltip) {
 			this.tooltip = tooltip;
 		}
 
