@@ -50,7 +50,7 @@ namespace SoulboundBackend.Client.UI {
 		void IItemSlotHandleCallbacks.OnPointerEnter(int slotIndex, PointerEventData eventData) {
 			if (!scope.InDragState()) return;
 
-			// eventData.button does not retain drag click information because its called OnPointerEnter
+			// eventData.button does not retain drag click button because its called OnPointerEnter
 			PointerEventData.InputButton dragButton = scope.GetDragState()!.button;
 
 			ISlotOperation operation = GetDrag(slotIndex, dragButton);

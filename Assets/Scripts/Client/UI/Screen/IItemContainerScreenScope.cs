@@ -7,7 +7,11 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.UI {
-	public interface IWorldSessionScreenObject : IScreenObject, IItemContainerScope {
+	public interface IItemContainerScreenScope : IScreenObject, IItemContainerScope {
 		void AddItemContainer(UIItemContainerNode node);
+		void RemoveItemContainer(UIItemContainerNode node);
+
+		void SetTransitStack(UITransitStackNode node);
+		void RemoveTransitStack();
 	}
 }

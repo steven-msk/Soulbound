@@ -183,7 +183,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 		}
 
 		void IItemContainer.OnItemDisplayAdded(ItemDisplay itemDisplay, IItemSlot slot) {
-			itemDisplay.onDestroy += player.OnItemDisplayDestroyed;
+			itemDisplay.onDestroy += (display) => player.OnItemDisplayDestroyed(display.stack);
 
 			InventorySlotHandle hotbarSlot = itemDisplay.GetComponentInParent<InventorySlotHandle>();
 			if (!this.IsOpened && hotbarSlot != null && Hotbar.ActiveSlot != hotbarSlot) {

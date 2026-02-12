@@ -30,7 +30,7 @@ namespace SoulboundBackend.Client.UI {
 			this.hotbar = hotbar;
 		}
 
-		public IItemContainerHandle BuildInventory(IWorldSessionScreenObject sessionScreen) {
+		public IItemContainerHandle BuildInventory(IItemContainerScreenScope screenScope) {
 			InventoryHandle inventory = CreateContainerObject<InventoryHandle>(
 				"Inventory", Inventory.COLUMNS
 			);
@@ -50,16 +50,16 @@ namespace SoulboundBackend.Client.UI {
 				}
 			};
 
-			inventory.Init(this.inventory, sessionScreen);
+			inventory.Init(this.inventory, screenScope);
 			UIItemContainerNode node = new(inventory.gameObject, this.inventory, inventory);
-			sessionScreen.AddItemContainer(node);
+			screenScope.AddItemContainer(node);
 
 			this.inventory.Toggle();
-			sessionScreen.AddElement(new UIElementNode(inventory.gameObject));
+			screenScope.AddElement(new UIElementNode(inventory.gameObject));
 			return inventory;
 		}
 
-		public IItemContainerHandle BuildHotbar(IWorldSessionScreenObject sessionScreen) {
+		public IItemContainerHandle BuildHotbar(IItemContainerScreenScope screenScope) {
 			InventoryHandle hotbar = CreateContainerObject<InventoryHandle>(
 				"Hotbar", Hotbar.COLUMNS
 			);
@@ -74,11 +74,11 @@ namespace SoulboundBackend.Client.UI {
 				i++;
 			}
 
-			hotbar.Init(this.hotbar, sessionScreen);
+			hotbar.Init(this.hotbar, screenScope);
 			UIItemContainerNode node = new(hotbar.gameObject, this.hotbar, hotbar);
-			sessionScreen.AddItemContainer(node);
+			screenScope.AddItemContainer(node);
 
-			sessionScreen.AddElement(new UIElementNode(hotbar.gameObject));
+			screenScope.AddElement(new UIElementNode(hotbar.gameObject));
 			return hotbar;
 		}
 

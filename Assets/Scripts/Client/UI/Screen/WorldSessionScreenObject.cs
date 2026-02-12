@@ -13,18 +13,17 @@ using static UnityEngine.UI.Image;
 #nullable enable
 
 namespace SoulboundBackend.Client.UI {
-	public class WorldSessionScreenObject : ScreenObject, IWorldSessionScreenObject {
+	public class WorldSessionScreenObject : ScreenObject, IItemContainerScreenScope {
 		private TransitStack transitStack = null!;
 		private SlotDragState? dragState;
 		private readonly List<UIItemContainerNode> openContainers = new();
+		private UITransitStackNode? transitStackNode;
 		TransitStack IItemContainerScope.transitStack => transitStack;
 
 		public new void Init(Screen screen) {
 			base.Init(screen);
 			this.transitStack = new TransitStack(this);
 		}
-
-		public void AddItemContainer(UIItemContainerNode node) => openContainers.Add(node);
 
 		public bool TryBeginDrag(IItemContainer container, int originSlotIndex, PointerEventData.InputButton button) {
 			if (InDragState()) return false;
@@ -78,6 +77,19 @@ namespace SoulboundBackend.Client.UI {
 			foreach (var node in openContainers) {
 				yield return node.container;
 			}
+		}
+
+		public void AddItemContainer(UIItemContainerNode node) => openContainers.Add(node);
+		public void RemoveItemContainer(UIItemContainerNode node) => openContainers.Remove(node);
+
+		public void SetTransitStack(UITransitStackNode node) {
+			node.transform.SetParent(transform, false);
+			transitStackNode = node;
+		}
+
+		public void RemoveTransitStack() {
+			transitStackNode?.handle.Destroy();
+			transitStackNode = null;
 		}
 	}
 }

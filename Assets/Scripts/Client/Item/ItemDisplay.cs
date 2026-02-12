@@ -17,8 +17,9 @@ using UnityEngine.UI;
 namespace SoulboundBackend.Client.ItemSystem {
 	public class ItemDisplay : MonoBehaviour {
 		[Obsolete] private static readonly AssetKey itemDisplay = new("itemDisplayPrefab");
-		public event Action<ItemStack>? onDestroy;
-		public GameObject stackText { get; private set; } = null!;
+		[Obsolete] private static readonly AssetKey stackNumber = new("stackNumberPrefab");
+		public event Action<ItemDisplay>? onDestroy;
+		public TextMeshProUGUI stackText { get; private set; } = null!;
 		private ItemStack itemStack = null!;
 		public ItemStack stack {
 			get => itemStack;
@@ -45,16 +46,16 @@ namespace SoulboundBackend.Client.ItemSystem {
 			return display;
 		}
 
-		private static GameObject GetText(ItemDisplay display) {
-			var prefab = AssetManager.Resolve<GameObject>(new AssetKey("stackNumberPrefab"));
-			GameObject? stackText = GameObject.Instantiate(prefab, display.transform);
+		private static TextMeshProUGUI GetText(ItemDisplay display) {
+			var prefab = AssetManager.Resolve<GameObject>(stackNumber);
+			GameObject? obj = GameObject.Instantiate(prefab, display.transform);
 
-			TextMeshProUGUI? text = stackText!.GetComponent<TextMeshProUGUI>();
+			TextMeshProUGUI? text = obj.GetComponent<TextMeshProUGUI>();
 			text!.autoSizeTextContainer = true;
 			text.text = display.stack.quantity.ToString();
 			text.color = Color.white;
 
-			RectTransform rect = stackText!.GetComponent<RectTransform>();
+			RectTransform rect = obj.GetComponent<RectTransform>();
 			rect.pivot = new Vector2(1f, 0f);
 			rect.anchorMax = new Vector2(0.9375f, 0.0625f);
 			rect.anchorMin = rect.anchorMax;
@@ -63,17 +64,19 @@ namespace SoulboundBackend.Client.ItemSystem {
 			rect.anchoredPosition = new(Mathf.Max(-4, rect.sizeDelta.x - 19.14f), rect.anchoredPosition.y);
 
 			text.enabled = display.item.IsStackable;
-			return stackText;
+			return text;
 		}
 
+		public void SetRaycastTarget(bool raycastTarget) {
+			this.GetComponent<Image>().raycastTarget = raycastTarget;
+		}
 
 		public void Destroy() {
-			onDestroy?.Invoke(itemStack);
+			onDestroy?.Invoke(this);
 			itemStack.onQuantityChanged -= OnStackQuantityChanged;
 			//DestroyTooltip();
 			GameObject.Destroy(gameObject);
 		}
-
 
 		[Obsolete]
 		public void OnGrab(Transform? grabParent, bool keepWorldSpace = false) {
@@ -96,8 +99,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 		}
 
 		public void UpdateStackText() {
-			TextMeshProUGUI? stackText = this.stackText.GetComponent<TextMeshProUGUI>();
-			stackText!.text = itemStack.quantity.ToString();
+			stackText.text = itemStack.quantity.ToString();
 		}
 
 		public void OnStackQuantityChanged(int old, int @new) {

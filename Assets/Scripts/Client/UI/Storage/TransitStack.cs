@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
 
 #nullable enable
@@ -11,25 +12,27 @@ using UnityEngine;
 namespace SoulboundBackend.Client.UI.Storage {
 	public sealed class TransitStack {
 		public event Action<ItemStack?, ItemStack?>? onStackChanged;
-		private readonly IUIElementContainer transitContainer;
+		private readonly IItemContainerScreenScope screenScope;
 		private ItemDisplay? display;
-		private UIElementNode node = null!;
 
-		public TransitStack(IUIElementContainer transitContainer) {
-			this.transitContainer = transitContainer;
+		public TransitStack(IItemContainerScreenScope screenScope) {
+			this.screenScope = screenScope;
 		}
 
 		public void SetStack(ItemStack itemStack) {
-			if (itemStack == null) throw new ArgumentException("TransitStack cannot be set to null. Call Release() instead");
-
+			if (itemStack == null) {
+				UnityEngine.Debug.LogException(new ArgumentException("TransitStack cannot be set to null. Call Release() instead"));
+				return;
+			}
 			ItemStack? previous = GetStack();
-			if (display != null) display.Destroy();
+			if (display != null) screenScope.RemoveTransitStack();
 
 			display = ItemDisplay.Create(itemStack, () => null);
-			display.onDestroy += OnDisplayDestroyed;
+			ITransitStackHandle handle = display.AddComponent<TransitStackHandle>();
 
-			node = new UIElementNode(display.gameObject);
-			transitContainer.AddElement(node);
+			handle.Init(display);
+			display.onDestroy += OnDisplayDestroyed;
+			screenScope.SetTransitStack(new UITransitStackNode(display.gameObject, handle));
 
 			onStackChanged?.Invoke(previous, itemStack);
 		}
@@ -37,8 +40,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 		public void Release() {
 			ItemStack? previous = GetStack();
 
-			if (display != null) display.Destroy();
-			display = null;
+			if (display != null) OnDisplayDestroyed(display);
 
 			if (previous != null) onStackChanged?.Invoke(previous, null);
 		}
@@ -48,9 +50,10 @@ namespace SoulboundBackend.Client.UI.Storage {
 			? display.stack
 			: null;
 
-		private void OnDisplayDestroyed(ItemStack stack) {
-			transitContainer.RemoveElement(node);
-			node = null!;
+		private void OnDisplayDestroyed(ItemDisplay display) {
+			display.onDestroy -= OnDisplayDestroyed;
+			screenScope.RemoveTransitStack();
+			this.display = null;
 		}
 	}
 }
