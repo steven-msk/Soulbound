@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Client.UI.Tooltip;
+using SoulboundBackend.Client.UI;
 using SoulboundBackend.Common;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ namespace SoulboundBackend.Client.Stats {
 		public DynamicMap<AbstractValueModifier> dynamicStats { get; private set; } = new();
 		public DynamicMap<IStatEffectHandler> dynamicEffectHandlers { get; private set; } = new();
 		public List<StatActivator> activators { get; private set; } = new();
-		public List<TooltipNodeData> tooltipNodes { get; private set; } = new();
+		public List<Tooltip> tooltipNodes { get; private set; } = new();
 
 		public StatMappingBuilder(Func<DynamicMap<AbstractValueModifier>> dynamicStatSupplier = null) {
 			dynamicStats = dynamicStatSupplier?.Invoke() ?? new DynamicMap<AbstractValueModifier>();
@@ -41,7 +41,7 @@ namespace SoulboundBackend.Client.Stats {
 			return this;
 		}
 
-		public StatMappingBuilder WithTooltipNodes(Func<DynamicMap<AbstractValueModifier>, IEnumerable<TooltipNodeData>> nodesSupplier) {
+		public StatMappingBuilder WithTooltipNodes(Func<DynamicMap<AbstractValueModifier>, IEnumerable<Tooltip>> nodesSupplier) {
 			this.tooltipNodes.AddRange(nodesSupplier.Invoke(dynamicStats));
 			return this;
 		}
@@ -61,7 +61,7 @@ namespace SoulboundBackend.Client.Stats {
 				.ToList();
 		}
 
-		public TooltipNodeData[] ResolveTooltipNodes() {
+		public Tooltip[] ResolveTooltipNodes() {
 			return this.tooltipNodes.ToArray();
 		}
 	}

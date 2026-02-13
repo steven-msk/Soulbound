@@ -34,8 +34,6 @@ namespace SoulboundBackend.Client {
 		private static readonly Logger logger = Logger.CreateInstance();
 		public override Type scriptType => typeof(PlayerController);
 		public override EntityDescriptor descriptor => EntityDescriptorRegistry.ByType<PlayerController>();
-		[SerializeField] private InventoryController inventory;
-		[Obsolete] public InventoryController Inventory => inventory;
 		private Inventory _inventory;
 		private Hotbar hotbar;
 		public Inventory GetInventory() => _inventory;
@@ -124,6 +122,9 @@ namespace SoulboundBackend.Client {
 					hotbar.SetMainSlot(nextSlot);
 				});
 			});
+			//inputHandler.RegisterInputEvent(inputHandler.GetAction("Drop Item"), pausable: true, binding => {
+			//	binding.Performed(_ => DropHoveredOrActiveItem());
+			//});
 
 			level = container.Resolve<Level>();
 			canvas = container.Resolve<Canvas>();

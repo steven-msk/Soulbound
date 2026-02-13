@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace SoulboundBackend.Client.UI {
-	public sealed class HotbarSlotHandle : InventorySlotHandle {
+	public sealed class HotbarSlotHandle : ItemSlotHandle {
 		static readonly Color fadedColor = new(0.6f, 0.6f, 0.6f);
 		static readonly Color normalColor = new(1f, 1f, 1f);
 		private bool fadedLayout;

@@ -1,7 +1,6 @@
 using System;
 using Logger = SoulboundBackend.Common.Logging.Logger;
 using UnityEngine;
-using SoulboundBackend.Client.UI.Tooltip;
 using System.Resources;
 using SoulboundBackend.Core.Resource;
 using ResourceManager = SoulboundBackend.Core.Resource.AssetManager;

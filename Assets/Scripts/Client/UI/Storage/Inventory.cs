@@ -11,23 +11,17 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace SoulboundBackend.Client.ItemSystem {
-	public sealed class Inventory : IItemContainer, IItemContainerDomain {
+	public sealed class Inventory : IItemContainer {
 		public const int COLUMNS = 9;
 		public const int ROWS = 3;
-		private readonly InventorySlot[] slots = new InventorySlot[ROWS * COLUMNS];
+		private readonly ItemSlot[] slots = new ItemSlot[ROWS * COLUMNS];
 		private bool isOpen = false;
 		public event Action toggle;
 
 		public Inventory() {
 			for (int i = 0; i < ROWS * COLUMNS; i++) {
-				slots[i] = new InventorySlot(this, i);
+				slots[i] = new ItemSlot(this, i);
 			}
-
-			// prototypical
-			slots[0].SetStack(new(Items.woodBlock, 10));
-			slots[1].SetStack(new(Items.leavesBlock, 100));
-			slots[2].SetStack(new(Items.leavesBlock, 256));
-			slots[3].SetStack(new(Items.leavesBlock, 256));
 		}
 
 		public IItemSlot GetSlot(int index) {
@@ -49,10 +43,5 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public bool IsOpen() => isOpen;
 
 		public int GetSlotCount() => ROWS * COLUMNS;
-
-		void IItemContainer.OnItemDisplayAdded(ItemDisplay itemDisplay, IItemSlot slot) {
-			throw new NotImplementedException();
-		}
-		IReadOnlyList<IItemSlot> IItemContainer.slots => throw new NotImplementedException();
 	}
 }

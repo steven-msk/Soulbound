@@ -1,6 +1,5 @@
-﻿using SoulboundBackend.Client.Combat;
+using SoulboundBackend.Client.Combat;
 using SoulboundBackend.Client.ItemSystem;
-using SoulboundBackend.Client.UI.Tooltip;
 using SoulboundBackend.Core.AssetManagement;
 using System;
 using System.Collections.Generic;

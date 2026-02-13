@@ -11,7 +11,6 @@ using UnityEngine;
 
 namespace SoulboundBackend.Client.UI.Storage {
 	public sealed class TransitStack {
-		public event Action<ItemStack?, ItemStack?>? onStackChanged;
 		private readonly IItemContainerScreenScope screenScope;
 		private ItemDisplay? display;
 
@@ -33,16 +32,10 @@ namespace SoulboundBackend.Client.UI.Storage {
 			handle.Init(display);
 			display.onDestroy += OnDisplayDestroyed;
 			screenScope.SetTransitStack(new UITransitStackNode(display.gameObject, handle));
-
-			onStackChanged?.Invoke(previous, itemStack);
 		}
 
 		public void Release() {
-			ItemStack? previous = GetStack();
-
 			if (display != null) OnDisplayDestroyed(display);
-
-			if (previous != null) onStackChanged?.Invoke(previous, null);
 		}
 
 		public bool HasStack() => display != null;

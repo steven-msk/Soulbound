@@ -1,9 +1,8 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using NUnit.Framework.Internal.Execution;
 using SoulboundBackend.Client.Combat;
 using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.UI.Storage;
-using SoulboundBackend.Client.UI.Tooltip;
 using System;
 using System.Collections;
 using System.Collections.Generic;

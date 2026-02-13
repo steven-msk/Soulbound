@@ -9,13 +9,10 @@ using UnityEngine.EventSystems;
 #nullable enable
 
 namespace SoulboundBackend.Client.UI.Storage {
-	public interface IItemContainer : IItemContainerDomain {
-		[Obsolete] public IReadOnlyList<IItemSlot> slots { get; }
-
+	public interface IItemContainer {
+		IItemSlot GetSlot(int index);
 		IReadOnlyList<int> GetAllSlots();
 		int GetSlotCount();
-
-		[Obsolete] void OnItemDisplayAdded(ItemDisplay itemDisplay, IItemSlot slot);
 
 		public bool ContainsItem(Item item) {
 			return GetAllSlots().Any(i => GetSlot(i).GetStack()?.item == item);
@@ -30,5 +27,6 @@ namespace SoulboundBackend.Client.UI.Storage {
 				}
 			}
 		}
+
 	}
 }

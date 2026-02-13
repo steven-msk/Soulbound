@@ -2,8 +2,6 @@ using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.UI.Storage;
 using System;
 
-#nullable enable
-
 namespace SoulboundBackend.Client.UI {
 	public sealed class MergeTransitInSlot : SingleSlotOperation {
 		private readonly IItemContainer container;

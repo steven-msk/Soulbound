@@ -1,4 +1,3 @@
-﻿using SoulboundBackend.Client.UI.Tooltip;
 using SoulboundBackend.Client.World;
 using SoulboundBackend.Client.World.BlockSystem;
 using System;

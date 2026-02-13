@@ -45,10 +45,10 @@ namespace SoulboundBackend.Client.UI {
 			RectTransform rect = inventory.GetComponent<RectTransform>();
 			rect.pivot = rect.anchorMin = rect.anchorMax = Vector2.zero;
 
-			List<InventorySlotHandle> slotHandles = new();
+			List<ItemSlotHandle> slotHandles = new();
 			foreach (var slotIndex in this.inventory.GetAllSlots()) {
 				IItemSlot slot = this.inventory.GetSlot(slotIndex);
-				GameObject slotObj = CreateSlotObj(slot, inventory, out InventorySlotHandle handle);
+				GameObject slotObj = CreateSlotObj(slot, inventory, out ItemSlotHandle handle);
 				slotHandles.Add(handle);
 				slotObj.transform.SetParent(inventory.transform, false);
 			}
@@ -122,9 +122,9 @@ namespace SoulboundBackend.Client.UI {
 			return containerHandle;
 		}
 
-		private GameObject CreateSlotObj(IItemSlot slot, IItemSlotHandleCallbacks handleCallbacks, out InventorySlotHandle handle) {
+		private GameObject CreateSlotObj(IItemSlot slot, IItemSlotHandleCallbacks handleCallbacks, out ItemSlotHandle handle) {
 			GameObject obj = GameObject.Instantiate(AssetManager.Resolve<GameObject>(slotKey));
-			handle = obj.AddComponent<InventorySlotHandle>();
+			handle = obj.AddComponent<ItemSlotHandle>();
 			InitSlotHandle(handle, slot, handleCallbacks);
 			return obj;
 		}
@@ -149,7 +149,7 @@ namespace SoulboundBackend.Client.UI {
 			return obj;
 		}
 
-		private void InitSlotHandle(InventorySlotHandle handle, IItemSlot slot, IItemSlotHandleCallbacks handleCallbacks) {
+		private void InitSlotHandle(ItemSlotHandle handle, IItemSlot slot, IItemSlotHandleCallbacks handleCallbacks) {
 			handle.Init(slot);
 			handle.pointerDown += handleCallbacks.OnPointerDown;
 			handle.pointerUp += handleCallbacks.OnPointerUp;

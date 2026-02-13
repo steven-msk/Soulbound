@@ -1,8 +1,7 @@
-﻿using SoulboundBackend.Client;
+using SoulboundBackend.Client;
 using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.Stats;
 using SoulboundBackend.Client.UI.Storage;
-using SoulboundBackend.Client.UI.Tooltip;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core;
 using SoulboundBackend.Core.AssetManagement;
@@ -22,17 +21,17 @@ public sealed class StatItem_test : StatItem {
 	private bool appliedStats = false;
 
 	public override void OnAttachedInSlot(IItemSlot slot) {
-		if (slot.container is IStatContextProvider statContext && !appliedStats) {
+		if (slot.GetContainer() is IStatContextProvider statContext && !appliedStats) {
 			statContext.statModificationHost.ApplyModifiers(this);
 			this.appliedStats = true;
 		}
 	}
 
 	public override void OnDetachedFromSlot(IItemSlot slot) {
-		if (slot.container.ContainsItem(this)) {
+		if (slot.GetContainer().ContainsItem(this)) {
 			return;
 		}
-		if (slot.container is IStatContextProvider statContext) {
+		if (slot.GetContainer() is IStatContextProvider statContext) {
 			statContext.statModificationHost.RemoveModifiers(this);
 			this.appliedStats = false;
 		}

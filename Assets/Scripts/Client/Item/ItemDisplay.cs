@@ -2,7 +2,6 @@ using SoulboundBackend.Client.Input;
 using SoulboundBackend.Client.UI;
 using SoulboundBackend.Client.UI.Screens;
 using SoulboundBackend.Client.UI.Storage;
-using SoulboundBackend.Client.UI.Tooltip;
 using SoulboundBackend.Core;
 using SoulboundBackend.Core.AssetManagement;
 using SoulboundBackend.Core.Resource;
@@ -37,7 +36,6 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public static ItemDisplay Create(ItemStack itemStack, Func<Transform?> parentSupplier) {
 			GameObject obj = Instantiate(AssetManager.Resolve<GameObject>(itemDisplay), parentSupplier.Invoke());
 			ItemDisplay display = obj.GetComponent<ItemDisplay>();
-			//UnityEngine.Debug.Assert(display != null, $"ItemDisplay component not found in item display prefab");
 
 			itemStack.onQuantityChanged += display.OnStackQuantityChanged;
 			display.stack = itemStack;
@@ -74,28 +72,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public void Destroy() {
 			onDestroy?.Invoke(this);
 			itemStack.onQuantityChanged -= OnStackQuantityChanged;
-			//DestroyTooltip();
 			GameObject.Destroy(gameObject);
-		}
-
-		[Obsolete]
-		public void OnGrab(Transform? grabParent, bool keepWorldSpace = false) {
-			//transform.SetParent(grabParent, keepWorldSpace);
-			//gameObject.GetComponent<Image>().raycastTarget = false;
-			//DestroyTooltip();
-		}
-
-		[Obsolete]
-		public void OnRelease(Transform? releaseParent, bool keepWorldSpace = false) {
-			//transform.SetParent(releaseParent, keepWorldSpace);
-			//gameObject.GetComponent<RectTransform>().anchoredPosition = Vector3.zero;
-			//gameObject.GetComponent<Image>().raycastTarget = true;
-		}
-
-		[Obsolete]
-		public void DestroyTooltip() {
-			//activeTooltip?.Hide();
-			//activeTooltip = null;
 		}
 
 		public void UpdateStackText() {

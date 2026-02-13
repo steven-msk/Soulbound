@@ -1,4 +1,3 @@
-﻿using SoulboundBackend.Client.UI.Tooltip;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,8 +14,8 @@ namespace SoulboundBackend.Client.SettingSystem {
 		private List<InputActionMap> rebindTargetMaps = new();
 		private KeySetting? rebindContextOwner;
 
-		public static readonly KeyMapping backtrackScreen = new("Screen Backtrack", "screen.backtrack", Key.Escape, Tooltip.NoTooltip);
-		public static readonly KeyMapping jump = new("Jump", "jump", Key.Space, Tooltip.NoTooltip);
+		public static readonly KeyMapping backtrackScreen = new("Screen Backtrack", "screen.backtrack", Key.Escape, null);
+		public static readonly KeyMapping jump = new("Jump", "jump", Key.Space, null);
 
 		public KeybindMappings() {
 			InputSystem.EnableDevice(Keyboard.current);

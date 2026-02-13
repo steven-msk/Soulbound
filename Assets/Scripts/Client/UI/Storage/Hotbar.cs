@@ -8,12 +8,15 @@ using System.Threading.Tasks;
 namespace SoulboundBackend.Client.UI.Storage {
 	public sealed class Hotbar : IItemContainer {
 		public const int SLOT_COUNT = 9;
-		private readonly InventorySlot[] slots = new InventorySlot[SLOT_COUNT];
+
+		private readonly ItemSlot[] slots = new ItemSlot[SLOT_COUNT];
 		private int mainSlotIndex= 0;
 		public event Action<int, int> mainSlotChanged;
 
 		public Hotbar() {
-			for (int i = 0; i < SLOT_COUNT; i++) slots[i] = new InventorySlot(this, i);
+			for (int i = 0; i < SLOT_COUNT; i++) {
+				slots[i] = new ItemSlot(this, i);
+			}
 		}
 
 		public IReadOnlyList<int> GetAllSlots() {
@@ -34,10 +37,6 @@ namespace SoulboundBackend.Client.UI.Storage {
 			int previous = mainSlotIndex;
 			mainSlotIndex = index;
 			mainSlotChanged?.Invoke(previous, index);
-		}
-
-		[Obsolete] IReadOnlyList<IItemSlot> IItemContainer.slots => throw new NotImplementedException();
-		[Obsolete] public void OnItemDisplayAdded(ItemDisplay itemDisplay, IItemSlot slot) {
 		}
 	}
 }

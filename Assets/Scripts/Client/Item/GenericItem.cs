@@ -1,4 +1,3 @@
-﻿using SoulboundBackend.Client.UI.Tooltip;
 using System;
 
 #nullable enable

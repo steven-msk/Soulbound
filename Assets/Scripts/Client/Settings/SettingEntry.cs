@@ -1,5 +1,4 @@
 using SoulboundBackend.Client.UI;
-using SoulboundBackend.Client.UI.Tooltip;
 using SoulboundBackend.Common;
 using SoulboundBackend.Common.Logging;
 using SoulboundBackend.Core;

@@ -1,4 +1,3 @@
-﻿using SoulboundBackend.Client.UI.Tooltip;
 using SoulboundBackend.Common;
 using System;
 using System.Collections.Generic;

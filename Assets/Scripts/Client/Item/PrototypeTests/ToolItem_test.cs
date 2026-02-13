@@ -1,5 +1,4 @@
-﻿using SoulboundBackend.Client.ItemSystem;
-using SoulboundBackend.Client.UI.Tooltip;
+using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Core.AssetManagement;
 using System;
 using System.Collections.Generic;

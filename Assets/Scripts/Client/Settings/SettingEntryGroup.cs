@@ -6,8 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using System.Reflection;
-using SoulboundBackend.Client.UI.Tooltip;
 using SoulboundBackend.Common;
+using SoulboundBackend.Client.UI;
 
 namespace SoulboundBackend.Client.SettingSystem {
 	[PROTOTYPICAL]
@@ -23,8 +23,8 @@ namespace SoulboundBackend.Client.SettingSystem {
 			visual.transform.SetParent(container.transform, false);
 			visual.Show(entry);
 
-			TooltipTrigger_OLD tooltipTrigger = container.AddComponent<TooltipTrigger_OLD>();
-			tooltipTrigger.Init(entry.tooltipSupplier());
+			//TooltipTrigger tooltipTrigger = container.AddComponent<TooltipTrigger>();
+			//tooltipTrigger.Init(entry.tooltipSupplier());
 
 			return containerBuilder;
 		}
@@ -47,8 +47,8 @@ namespace SoulboundBackend.Client.SettingSystem {
 			MethodInfo bindMethod = visual.GetType().GetMethod("Show", bindingFlags);
 			bindMethod.Invoke(visual, new object[] { entry });
 
-			TooltipTrigger_OLD tooltipTrigger = container.AddComponent<TooltipTrigger_OLD>();
-			tooltipTrigger.Init(entry.tooltipSupplier());
+			//TooltipTrigger tooltipTrigger = container.AddComponent<TooltipTrigger>();
+			//tooltipTrigger.Init(entry.tooltipSupplier());
 
 			return containerBuilder;
 		}

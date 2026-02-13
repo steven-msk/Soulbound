@@ -1,6 +1,5 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using SoulboundBackend.Client.SettingSystem;
-using SoulboundBackend.Client.UI.Tooltip;
 using System;
 using System.Collections.Generic;
 using System.IO;
