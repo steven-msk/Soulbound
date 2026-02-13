@@ -7,26 +7,33 @@ using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.UI.Storage {
 	public sealed class Hotbar : IItemContainer {
-		public const int COLUMNS = 9;
-		private readonly InventorySlot[] slots = new InventorySlot[COLUMNS];
+		public const int SLOT_COUNT = 9;
+		private readonly InventorySlot[] slots = new InventorySlot[SLOT_COUNT];
+		private int mainSlotIndex= 0;
+		public event Action<int, int> mainSlotChanged;
 
 		public Hotbar() {
-			for (int i = 0; i < COLUMNS; i++) slots[i] = new InventorySlot(this, i);
+			for (int i = 0; i < SLOT_COUNT; i++) slots[i] = new InventorySlot(this, i);
 		}
 
-		public IReadOnlyList<IItemSlot> GetAllSlots() {
-			return GetAllSlots_indexed().Select(s => GetSlot(s)).ToList();
-		}
-
-		public IReadOnlyList<int> GetAllSlots_indexed() {
+		public IReadOnlyList<int> GetAllSlots() {
 			List<int> list = new();
-			for (int i = 0; i < COLUMNS; i++) list.Add(i);
+			for (int i = 0; i < SLOT_COUNT; i++) list.Add(i);
 			return list;
 		}
 
 		public IItemSlot GetSlot(int index) {
 			if (index < 9) return slots[index];
 			throw new ArgumentException("Hotbar slot index out of range: " + index);
+		}
+
+		public int GetSlotCount() => SLOT_COUNT;
+
+		public int GetMainSlot() => mainSlotIndex;
+		public void SetMainSlot(int index) {
+			int previous = mainSlotIndex;
+			mainSlotIndex = index;
+			mainSlotChanged?.Invoke(previous, index);
 		}
 
 		[Obsolete] IReadOnlyList<IItemSlot> IItemContainer.slots => throw new NotImplementedException();

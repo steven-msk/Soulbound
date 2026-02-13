@@ -35,14 +35,9 @@ namespace SoulboundBackend.Client.ItemSystem {
 			throw new ArgumentException("Slot index out of range: " + index);
 		}
 
-		public IReadOnlyList<IItemSlot> GetAllSlots() {
-			return new List<IItemSlot>().Concat(slots).ToList();
-		}
-
-		public IReadOnlyList<int> GetAllSlots_indexed() {
+		public IReadOnlyList<int> GetAllSlots() {
 			List<int> list = new();
-			int i = 0;
-			for (; i < ROWS * COLUMNS; i++) list.Add(i);
+			for (int i = 0; i < ROWS * COLUMNS; i++) list.Add(i);
 			return list;
 		}
 
@@ -52,6 +47,8 @@ namespace SoulboundBackend.Client.ItemSystem {
 		}
 
 		public bool IsOpen() => isOpen;
+
+		public int GetSlotCount() => ROWS * COLUMNS;
 
 		void IItemContainer.OnItemDisplayAdded(ItemDisplay itemDisplay, IItemSlot slot) {
 			throw new NotImplementedException();

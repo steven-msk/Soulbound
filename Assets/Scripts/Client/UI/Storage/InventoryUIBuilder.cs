@@ -30,7 +30,15 @@ namespace SoulboundBackend.Client.UI {
 			this.hotbar = hotbar;
 		}
 
-		public IItemContainerHandle BuildInventory(IItemContainerScreenScope screenScope) {
+		public void Build(IItemContainerScreenScope screenScope, out IItemContainerHandle inventory, out IItemContainerHandle hotbar) {
+			inventory = BuildInventory(screenScope);
+			hotbar = BuildHotbar(screenScope);
+
+			this.inventory.toggle += ((HotbarHandle)hotbar).ToggleFadedLayout;
+			this.inventory.Toggle();
+		}
+
+		private InventoryHandle BuildInventory(IItemContainerScreenScope screenScope) {
 			InventoryHandle inventory = CreateContainerObject<InventoryHandle>(
 				"Inventory", Inventory.COLUMNS
 			);
@@ -38,7 +46,8 @@ namespace SoulboundBackend.Client.UI {
 			rect.pivot = rect.anchorMin = rect.anchorMax = Vector2.zero;
 
 			List<InventorySlotHandle> slotHandles = new();
-			foreach (var slot in this.inventory.GetAllSlots()) {
+			foreach (var slotIndex in this.inventory.GetAllSlots()) {
+				IItemSlot slot = this.inventory.GetSlot(slotIndex);
 				GameObject slotObj = CreateSlotObj(slot, inventory, out InventorySlotHandle handle);
 				slotHandles.Add(handle);
 				slotObj.transform.SetParent(inventory.transform, false);
@@ -54,27 +63,28 @@ namespace SoulboundBackend.Client.UI {
 			UIItemContainerNode node = new(inventory.gameObject, this.inventory, inventory);
 			screenScope.AddItemContainer(node);
 
-			this.inventory.Toggle();
 			screenScope.AddElement(new UIElementNode(inventory.gameObject));
 			return inventory;
 		}
 
-		public IItemContainerHandle BuildHotbar(IItemContainerScreenScope screenScope) {
-			InventoryHandle hotbar = CreateContainerObject<InventoryHandle>(
-				"Hotbar", Hotbar.COLUMNS
+		private InventoryHandle BuildHotbar(IItemContainerScreenScope screenScope) {
+			HotbarHandle hotbar = CreateContainerObject<HotbarHandle>(
+				"Hotbar", Hotbar.SLOT_COUNT
 			);
 			RectTransform rect = hotbar.GetComponent<RectTransform>();
 			rect.pivot = rect.anchorMin = rect.anchorMax = Vector2.zero;
 
-			List<IItemSlot>.Enumerator enumerator = this.hotbar.GetAllSlots().ToList().GetEnumerator();
-			int i = 0;
+			List<int>.Enumerator enumerator = this.hotbar.GetAllSlots().ToList().GetEnumerator();
+			HotbarSlotHandle[] handles = new HotbarSlotHandle[this.hotbar.GetSlotCount()];
+			int slotIndex = 0;
 			while (enumerator.MoveNext()) {
-				GameObject slotObj = CreateHotbarSlotObj(enumerator.Current, hotbar, i, out InventorySlotHandle handle);
+				IItemSlot slot = this.hotbar.GetSlot(enumerator.Current);
+				GameObject slotObj = CreateHotbarSlotObj(slot, hotbar, slotIndex, out HotbarSlotHandle handle);
+				handles[slotIndex++] = handle;
 				slotObj.transform.SetParent(hotbar.transform, false);
-				i++;
 			}
 
-			hotbar.Init(this.hotbar, screenScope);
+			hotbar.Init(this.hotbar, screenScope, handles);
 			UIItemContainerNode node = new(hotbar.gameObject, this.hotbar, hotbar);
 			screenScope.AddItemContainer(node);
 
@@ -115,18 +125,16 @@ namespace SoulboundBackend.Client.UI {
 		private GameObject CreateSlotObj(IItemSlot slot, IItemSlotHandleCallbacks handleCallbacks, out InventorySlotHandle handle) {
 			GameObject obj = GameObject.Instantiate(AssetManager.Resolve<GameObject>(slotKey));
 			handle = obj.AddComponent<InventorySlotHandle>();
-			handle.Init(slot);
-			handle.pointerDown += handleCallbacks.OnPointerDown;
-			handle.pointerUp += handleCallbacks.OnPointerUp;
-			handle.pointerEnter += handleCallbacks.OnPointerEnter;
-			handle.pointerExit += handleCallbacks.OnPointerExit;
+			InitSlotHandle(handle, slot, handleCallbacks);
 			return obj;
 		}
 
-		private GameObject CreateHotbarSlotObj(IItemSlot slot, IItemSlotHandleCallbacks handleCallbacks, int index, out InventorySlotHandle handle) {
-			GameObject obj = CreateSlotObj(slot, handleCallbacks, out handle);
-			GameObject textObj = new("Hotbar Slot Number", typeof(RectTransform));
+		private GameObject CreateHotbarSlotObj(IItemSlot slot, IItemSlotHandleCallbacks handleCallbacks, int index, out HotbarSlotHandle handle) {
+			GameObject obj = GameObject.Instantiate(AssetManager.Resolve<GameObject>(slotKey));
+			handle = obj.AddComponent<HotbarSlotHandle>();
+			InitSlotHandle(handle, slot, handleCallbacks);			
 
+			GameObject textObj = new("Hotbar Slot Number", typeof(RectTransform));
 			ContentSizeFitter sizeFitter = textObj.AddComponent<ContentSizeFitter>();
 			sizeFitter.horizontalFit = sizeFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
@@ -139,6 +147,14 @@ namespace SoulboundBackend.Client.UI {
 
 			textObj.transform.SetParent(obj.transform, false);
 			return obj;
+		}
+
+		private void InitSlotHandle(InventorySlotHandle handle, IItemSlot slot, IItemSlotHandleCallbacks handleCallbacks) {
+			handle.Init(slot);
+			handle.pointerDown += handleCallbacks.OnPointerDown;
+			handle.pointerUp += handleCallbacks.OnPointerUp;
+			handle.pointerEnter += handleCallbacks.OnPointerEnter;
+			handle.pointerExit += handleCallbacks.OnPointerExit;
 		}
 	}
 }

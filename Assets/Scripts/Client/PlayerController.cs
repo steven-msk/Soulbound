@@ -101,12 +101,30 @@ namespace SoulboundBackend.Client {
 		public void Construct(DiContainer container) {
 			inputHandler = container.Resolve<InputHandler>();
 			playerPhysics = container.Resolve<PlayerPhysics>();
-			//inventory = container.Resolve<InventoryController>();
+
 			_inventory = new Inventory();
 			inputHandler.RegisterInputEvent(inputHandler.GetAction("Toggle Inventory"), pausable: true, binding => {
 				binding.Performed(_ => _inventory.Toggle());
 			});
+
 			this.hotbar = new Hotbar();
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Change Hotbar Slot"), pausable: true, binding => {
+				binding.Performed(context => {
+					int slotIndex = int.Parse(context.control.name) - 1;
+					hotbar.SetMainSlot(slotIndex);
+				});
+			});
+			inputHandler.RegisterInputEvent(inputHandler.GetAction("Scroll Hotbar Slot"), pausable: true, binding => {
+				binding.Performed(context => {
+					float scrollDelta = context.ReadValue<float>();
+					int nextSlot = hotbar.GetMainSlot() - (int)scrollDelta;
+
+					if (nextSlot < 0) nextSlot += hotbar.GetSlotCount();
+					nextSlot %= hotbar.GetSlotCount();
+					hotbar.SetMainSlot(nextSlot);
+				});
+			});
+
 			level = container.Resolve<Level>();
 			canvas = container.Resolve<Canvas>();
 			RegisterItemUsageCandidates(container.Resolve<ItemUsageHandler>());

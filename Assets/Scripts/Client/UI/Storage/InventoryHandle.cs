@@ -14,7 +14,7 @@ using UnityEngine.InputSystem;
 #nullable enable
 
 namespace SoulboundBackend.Client.UI {
-	public sealed class InventoryHandle : MonoBehaviour, IItemContainerHandle {
+	public class InventoryHandle : MonoBehaviour, IItemContainerHandle {
 		private float lastClickTime;
 		private int lastClickedSlot;
 		const float doubleClickThreshold = 0.15f;

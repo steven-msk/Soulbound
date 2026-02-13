@@ -58,7 +58,7 @@ namespace SoulboundBackend.Client.UI {
 		}
 
 		private Dictionary<int, int> GetQuantitySnapshotForContainer(IItemContainer container) {
-			return container.GetAllSlots_indexed()
+			return container.GetAllSlots()
 					.Where(i => container.GetSlot(i).GetStack()?.quantity > 0)
 					.ToDictionary(i => i, i => container.GetSlot(i).GetStack()!.quantity);
 		}

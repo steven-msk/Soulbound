@@ -12,19 +12,19 @@ namespace SoulboundBackend.Client.UI.Storage {
 	public interface IItemContainer : IItemContainerDomain {
 		[Obsolete] public IReadOnlyList<IItemSlot> slots { get; }
 
-		IReadOnlyList<IItemSlot> GetAllSlots();
-
-		// will replace current GetAllSlots()
-		IReadOnlyList<int> GetAllSlots_indexed();
+		IReadOnlyList<int> GetAllSlots();
+		int GetSlotCount();
 
 		[Obsolete] void OnItemDisplayAdded(ItemDisplay itemDisplay, IItemSlot slot);
 
 		public bool ContainsItem(Item item) {
-			return GetAllSlots().Any(s => s.GetStack()?.item == item);
+			return GetAllSlots().Any(i => GetSlot(i).GetStack()?.item == item);
 		}
 
 		public IEnumerable<IItemSlot> GetSlotsContaining(Item item) {
-			foreach (var slot in GetAllSlots()) {
+			foreach (var slotIndex in GetAllSlots()) {
+				IItemSlot slot = GetSlot(slotIndex);
+
 				if (slot.GetStack()?.item == item) {
 					yield return slot;
 				}

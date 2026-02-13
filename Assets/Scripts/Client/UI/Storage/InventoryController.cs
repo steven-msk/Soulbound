@@ -652,15 +652,15 @@ namespace SoulboundBackend.Client.UI.Storage {
 			return false;
 		}
 
-		IReadOnlyList<IItemSlot> IItemContainer.GetAllSlots() {
-			throw new NotImplementedException();
-		}
-
 		IItemSlot IItemContainerDomain.GetSlot(int index) {
 			throw new NotImplementedException();
 		}
 
-		IReadOnlyList<int> IItemContainer.GetAllSlots_indexed() {
+		IReadOnlyList<int> IItemContainer.GetAllSlots() {
+			throw new NotImplementedException();
+		}
+
+		public int GetSlotCount() {
 			throw new NotImplementedException();
 		}
 	}
