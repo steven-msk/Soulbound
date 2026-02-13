@@ -25,7 +25,6 @@ namespace SoulboundBackend.Client.UI {
 		}
 
 		private void OnMainSlotChanged(int oldIndex, int newIndex) {
-			UnityEngine.Debug.Log($"OnMainSlotChanged: old {oldIndex} new {newIndex}");
 			handles[oldIndex].RemoveMainSlotLayout();
 			handles[newIndex].SetMainSlotLayout();
 		}

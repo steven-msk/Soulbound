@@ -140,7 +140,7 @@ namespace SoulboundBackend.Client.UI {
 
 			TextMeshProUGUI text = textObj.AddComponent<TextMeshProUGUI>();
 			text.fontSize = HOTBAR_NUMBER_FONT_SIZE;
-			text.text = index.ToString();
+			text.text = (index + 1).ToString();
 
 			RectTransform rect = textObj.GetComponent<RectTransform>();
 			rect.pivot = rect.anchorMax = rect.anchorMin = new Vector2(0.5f, 1f);
