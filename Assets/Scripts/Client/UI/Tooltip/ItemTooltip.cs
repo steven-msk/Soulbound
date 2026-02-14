@@ -34,6 +34,7 @@ namespace SoulboundBackend.Client.UI {
 			Image bg = obj.AddComponent<Image>();
 			bg.sprite = null;
 			bg.color = new Color(0.5f, 0.5f, 0.5f, 0.392f);
+			bg.raycastTarget = false;
 			VerticalLayoutGroup layoutGroup = obj.AddComponent<VerticalLayoutGroup>();
 			layoutGroup.padding = new RectOffset(10, 0, 0, 0);
 			layoutGroup.childForceExpandWidth = false;
@@ -43,6 +44,10 @@ namespace SoulboundBackend.Client.UI {
 			ContentSizeFitter sizeFitter = obj.AddComponent<ContentSizeFitter>();
 			sizeFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 			sizeFitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+			RectTransform rect = obj.GetComponent<RectTransform>();
+			rect.anchorMin = new Vector2(0f, 0f);
+			rect.anchorMin = new Vector2(1f, 1f);
+			rect.pivot = new Vector2(0f, 1f);
 
 			GameObject title = new("Title", typeof(RectTransform));
 			title.transform.SetParent(obj.transform, false);

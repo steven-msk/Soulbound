@@ -31,12 +31,11 @@ using Logger = SoulboundBackend.Common.Logging.Logger;
 
 namespace SoulboundBackend.Client {
 	public class PlayerController : Entity, IAttackPerformer, IItemConsumer, IUpdatable, IEntitySpawnable<PlayerSpawnData> {
-		private static readonly Logger logger = Logger.CreateInstance();
 		public override Type scriptType => typeof(PlayerController);
 		public override EntityDescriptor descriptor => EntityDescriptorRegistry.ByType<PlayerController>();
-		private Inventory _inventory;
+		private Inventory inventory;
 		private Hotbar hotbar;
-		public Inventory GetInventory() => _inventory;
+		public Inventory GetInventory() => inventory;
 		public Hotbar GetHotbar() => hotbar;
 
 		[SerializeField] private PlayerStats stats;
@@ -100,9 +99,9 @@ namespace SoulboundBackend.Client {
 			inputHandler = container.Resolve<InputHandler>();
 			playerPhysics = container.Resolve<PlayerPhysics>();
 
-			_inventory = new Inventory();
+			inventory = new Inventory();
 			inputHandler.RegisterInputEvent(inputHandler.GetAction("Toggle Inventory"), pausable: true, binding => {
-				binding.Performed(_ => _inventory.Toggle());
+				binding.Performed(_ => inventory.Toggle());
 			});
 
 			this.hotbar = new Hotbar();
@@ -122,6 +121,7 @@ namespace SoulboundBackend.Client {
 					hotbar.SetMainSlot(nextSlot);
 				});
 			});
+			inventory.GetSlot(0).SetStack(new ItemStack(Items.leavesBlock, 5));
 			//inputHandler.RegisterInputEvent(inputHandler.GetAction("Drop Item"), pausable: true, binding => {
 			//	binding.Performed(_ => DropHoveredOrActiveItem());
 			//});
