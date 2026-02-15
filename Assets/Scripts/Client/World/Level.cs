@@ -14,8 +14,6 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using Application = UnityEngine.Application;
-using Logger = SoulboundBackend.Common.Logging.Logger;
 
 #nullable enable
 
@@ -23,8 +21,6 @@ namespace SoulboundBackend.Client.World {
 	public delegate void OnChunkGenerated(ChunkGenData genData);
 
 	public sealed class Level : ITickable {
-		private static readonly Logger logger = Logger.CreateInstance();
-		public static readonly LogModule level = new LogModule("LEVEL", "#4682B4");
 		public const int CHUNK_LENGTH = 32;
 		public const int WORLD_HEIGHT = 1024;
 		public const int RENDER_DISTANCE = 8;

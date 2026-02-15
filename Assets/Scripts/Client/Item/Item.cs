@@ -1,5 +1,5 @@
 using System;
-using Logger = SoulboundBackend.Common.Logging.Logger;
+using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 using UnityEngine;
 using System.Resources;
 using SoulboundBackend.Core.Resource;
@@ -11,7 +11,6 @@ using SoulboundBackend.Client.UI.Storage;
 
 namespace SoulboundBackend.Client.ItemSystem {
 	public abstract partial class Item {
-		private static readonly Logger logger = Logger.CreateInstance();
 		public const int DEFAULT_MAX_STACK = 256;
 
 		public abstract string name { get; }

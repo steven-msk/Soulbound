@@ -8,13 +8,14 @@ using UnityEngine;
 namespace SoulboundBackend.Core.Debug {
 	public class SoulboundDebug {
 		public static SoulboundDebug instance { get; private set; }
-		private readonly SoulboundLogHandler logHandler;
+		private readonly ILogger logger;
 
-		public SoulboundDebug(ILogHandler unityLogHandler) {
+		public SoulboundDebug(ILogger logger) {
 			instance = this;
-			this.logHandler = new SoulboundLogHandler(unityLogHandler);
+			this.logger = logger;
+			new Logging.Logger(logger);
 		}
 
-		public SoulboundLogHandler GetLogHandler() => logHandler;
+		public ILogger GetLogger() => logger;
 	}
 }

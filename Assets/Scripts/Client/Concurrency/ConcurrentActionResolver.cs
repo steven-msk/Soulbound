@@ -1,6 +1,6 @@
-﻿using ModestTree;
+using ModestTree;
 using SoulboundBackend.Client.Input;
-using SoulboundBackend.Common.Logging;
+using SoulboundBackend.Core.Debug.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +11,6 @@ using Zenject;
 
 namespace SoulboundBackend.Client.Concurrency {
 	public class ConcurrentActionResolver : ITickable, ILateTickable {
-		private static readonly Logger logger = Logger.CreateInstance();
 		private readonly List<ActionRequest> requests = new();
 		private readonly Dictionary<ActionToken, Func<bool>> suppressions = new();
 
@@ -70,7 +69,7 @@ namespace SoulboundBackend.Client.Concurrency {
 			}
 
 			if (request.action == null) {
-				logger.LogWarning("Caught null concurrent action executable");
+				Logger.LogWarning("Caught null concurrent action executable");
 			}
 			request.action?.Invoke();
 		}

@@ -1,8 +1,8 @@
-﻿using ModestTree;
+using ModestTree;
 using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Common;
 using SoulboundBackend.Common.Json;
-using SoulboundBackend.Common.Logging;
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,7 +13,6 @@ using Unity.Plastic.Newtonsoft.Json;
 
 namespace SoulboundBackend.Client.Stats {
 	public class StatEntry<TValue> : IStatEntry where TValue : struct, IComparable<TValue> {
-		private static readonly Logger logger = Logger.CreateInstance();
 		private Dictionary<ModificationToken, List<IStatEntryModifier<TValue>>> modifiers = new();
 		private Dictionary<IStatEntryModifier<TValue>, IModificationProcedure<TValue>> modificationProcedues = new();
 		public TValue baseValue { get; private set; }

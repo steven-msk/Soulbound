@@ -1,6 +1,6 @@
 using SoulboundBackend.Client.UI;
 using SoulboundBackend.Common;
-using SoulboundBackend.Common.Logging;
+
 using SoulboundBackend.Core;
 using System;
 using System.Collections.Generic;
@@ -12,13 +12,12 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem.Controls;
 using UnityEngine.UI;
-using Logger = SoulboundBackend.Common.Logging.Logger;
+using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
 #nullable enable
 
 namespace SoulboundBackend.Client.SettingSystem {
 	public abstract class AbstractSettingEntry {
-		protected static readonly Logger logger = Logger.CreateInstance();
 		public readonly string displayName;
 		public readonly string id;
 		public readonly Func<Tooltip> tooltipSupplier;
@@ -70,7 +69,7 @@ namespace SoulboundBackend.Client.SettingSystem {
 					valueChanged?.Invoke(oldValue, this.value);
 				}
 			} else {
-				logger.LogWarning("Attempted to set invalid value '{}' to setting '{}'", value!, id);
+				Logger.LogWarning("Attempted to set invalid value '{}' to setting '{}'", value!, id);
 			}
 		}
 

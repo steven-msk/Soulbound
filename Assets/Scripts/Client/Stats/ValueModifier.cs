@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Common.Logging;
+
 using System;
 using System.Linq.Expressions;
 using Unity.Plastic.Newtonsoft.Json;
@@ -8,7 +8,6 @@ using Unity.Plastic.Newtonsoft.Json;
 namespace SoulboundBackend.Client.Stats {
 	public class ValueModifier<TValue> : AbstractValueModifier, IStatEntryModifier<TValue> 
 			where TValue : struct, IComparable<TValue> {
-		private static readonly Logger logger = Logger.CreateInstance();
 		public readonly TValue value;
 		public override bool keepSign { get; }
 

@@ -1,15 +1,14 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-using Logger = SoulboundBackend.Common.Logging.Logger;
+using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
 namespace SoulboundBackend.Client.Combat {
 	[RequireComponent(typeof(Collider2D))]
 	public class Hitbox : MonoBehaviour {
-		private static readonly Logger logger = Logger.CreateInstance();
 		[SerializeField] private new Collider2D collider;
 		private AttackEventDispatcher owner;
 
@@ -18,7 +17,7 @@ namespace SoulboundBackend.Client.Combat {
 
 		private void OnValidate() {
 			if (!collider?.isTrigger ?? false && !flag_invalidState) {
-				logger.LogError(null, "Hitbox collider is not set to trigger collider on {}", gameObject.name);
+				Logger.LogError(null, "Hitbox collider is not set to trigger collider on {}", gameObject.name);
 				flag_invalidState = true;
 			} else {
 				flag_invalidState = false;

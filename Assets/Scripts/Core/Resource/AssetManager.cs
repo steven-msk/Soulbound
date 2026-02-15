@@ -1,6 +1,6 @@
 using SoulboundBackend.Client.Input;
 using SoulboundBackend.Common;
-using SoulboundBackend.Common.Logging;
+
 using SoulboundBackend.Core.AssetManagement;
 using SoulboundBackend.Core.Bootstrap;
 using System;
@@ -15,21 +15,19 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.Exceptions;
 using UnityEngine.ResourceManagement.ResourceLocations;
 using static UnityEditor.FilePathAttribute;
-using Logger = SoulboundBackend.Common.Logging.Logger;
+using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
 #nullable enable
 
 namespace SoulboundBackend.Core.Resource {
 	public static class AssetManager {
 		const string preloadLabel = "preload";
-		private static readonly Logger LOGGER = Logger.CreateInstance();
 		private static readonly ConcurrentDictionary<AssetKey, AsyncOperationHandle> assets = new();
 		private static AsyncOperationHandle<IList<IResourceLocation>> locationsHandle;
-		private static LogModule mod = new("[ASSET]", "#FF0000");
 
 		public static void PreloadAll() {
 			var locations = LoadLocations();
-			LOGGER.LogInfo(mod, "Preloading assets from {} locations", locations.Count());
+			Logger.LogInfo("Preloading assets from {} locations", locations.Count());
 
 			foreach (var location in locations) {
 				var handle = Addressables.LoadAssetAsync<UnityEngine.Object>(location);
@@ -51,7 +49,7 @@ namespace SoulboundBackend.Core.Resource {
 
 		private static void FinishPreload(AssetKey key, AsyncOperationHandle handle) {
 			if (!assets.TryAdd(key, handle)) {
-				LOGGER.LogWarning("Failed to preload asset: key already exists '{}'", key);
+				Logger.LogWarning("Failed to preload asset: key already exists '{}'", key);
 			}
 		}
 

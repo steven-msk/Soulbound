@@ -20,13 +20,12 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
 using Zenject;
-using Logger = SoulboundBackend.Common.Logging.Logger;
+using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
 #nullable enable
 
 namespace SoulboundBackend.Core {
 	public class LevelManager : MonoBehaviour {
-		private static readonly Logger logger = Logger.CreateInstance();
 		public const float tickRate = 0.02f;        // 50 tps
 		private float tickStartTime;
 		private float frameStartTime;
@@ -176,7 +175,7 @@ namespace SoulboundBackend.Core {
 		private void EndTick() {
 			float elapsed = Time.realtimeSinceStartup - tickStartTime;
 			if (elapsed > tickRate) {
-				logger.LogWarning($"Tick lag detected! Tick took {elapsed * 1000f:F1} ms");
+				Logger.LogWarning($"Tick lag detected! Tick took {elapsed * 1000f:F1} ms");
 			}
 		}
 

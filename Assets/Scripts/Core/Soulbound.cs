@@ -16,6 +16,7 @@ using System.Threading;
 using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
 #nullable enable
 
@@ -58,17 +59,24 @@ namespace SoulboundBackend.Core {
 				Thread.CurrentThread.Name = "LaunchThread";
 			} catch(InvalidOperationException) {
 			}
-			new SoulboundDebug(UnityEngine.Debug.unityLogger.logHandler);
+			Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
+			Application.SetStackTraceLogType(LogType.Warning, StackTraceLogType.ScriptOnly);
+			Application.SetStackTraceLogType(LogType.Error, StackTraceLogType.ScriptOnly);
+			new SoulboundDebug(UnityEngine.Debug.unityLogger);
 		}
 
 		public void Launch() {
 			if (running) return;
 			running = true;
 
-			Log.Info("info message");
-			Log.Warn("warn message");
-			Log.Error("error message");
-			Log.Fatal("fatal message");
+			//SoulboundBackend.Common.Logging.Logger.Log(LogType.Error, "message");
+
+			Logger.LogInfo("static info");
+			Logger.LogInfo("non-static info: {}", "obj");
+			Logger.LogWarning("static warning");
+			Logger.LogWarning("non-static warning: {}", "obj");
+			Logger.LogError("static error");
+			Logger.LogError("non-static error: {}", "obj");
 
 			Application.quitting += OnApplicationQuit;
 

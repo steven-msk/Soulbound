@@ -11,6 +11,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 using UnityEngine.UI;
+using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
 #nullable enable
 
@@ -29,7 +30,7 @@ namespace SoulboundBackend.Client.SettingSystem {
 
 		protected virtual void ApplyBinding(InputAction inputAction) {
 			inputAction.ApplyBindingOverride(0, value?.path ?? "");
-			logger.LogInfo("applying binding: " + value ?? "null");
+			Logger.LogInfo("applying binding: " + value ?? "null");
 		}
 
 		protected virtual void RevokeBinding(InputAction inputAction) {
@@ -66,7 +67,7 @@ namespace SoulboundBackend.Client.SettingSystem {
 				}
 				SetAction(this.appliedAction);
 			} else {
-				logger.LogError(null, "Attempted to set invalid key to mapping '{}': '{}'", id, value!.keyCode);
+				Logger.LogError(null, "Attempted to set invalid key to mapping '{}': '{}'", id, value!.keyCode);
 			}
 		}
 	}

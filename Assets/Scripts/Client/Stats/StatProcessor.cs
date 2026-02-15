@@ -1,11 +1,10 @@
-﻿using SoulboundBackend.Common.Logging;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace SoulboundBackend.Client.Stats {
 	public class StatProcessor<TValue> : IStatProcessor<TValue> where TValue : struct, IComparable<TValue> {
-		private static readonly Logger logger = Logger.CreateInstance();
 
 		public TValue ProcessFinalValue(
 				TValue baseValue,

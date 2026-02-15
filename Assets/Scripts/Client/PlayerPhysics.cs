@@ -1,7 +1,7 @@
 using SoulboundBackend.Client;
 using SoulboundBackend.Client.Input;
 using SoulboundBackend.Core;
-using Logger = SoulboundBackend.Common.Logging.Logger;
+using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,7 +16,6 @@ using static PlayerInputActions;
 
 namespace SoulboundBackend.Client {
 	public class PlayerPhysics : MonoBehaviour {
-		private static readonly Logger logger = Logger.CreateInstance();
 		private readonly Dictionary<string, (Action<Collision2D> action, Func<bool> validator)> collisionReactionsByTag = new();
 		private readonly Dictionary<int, (Action<Collider2D> action, Func<bool> validator)> triggerReactionsByLayer = new();
 		private PlayerController player = null!;
@@ -198,7 +197,7 @@ namespace SoulboundBackend.Client {
 				return;
 			}
 			var collisionResponse = collisionReactionsByTag.GetValueOrDefault(collision.gameObject.tag, (collision => {
-				logger.LogWarning("Unknown collision callback tag: {}", collision.gameObject.tag);
+				Logger.LogWarning("Unknown collision callback tag: {}", collision.gameObject.tag);
 			}, null));
 			collisionResponse.action.InvokeIf(collision, collisionResponse.validator ?? (() => true));
 		}

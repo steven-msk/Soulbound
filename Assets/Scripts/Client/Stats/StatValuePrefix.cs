@@ -1,10 +1,10 @@
-﻿using SoulboundBackend.Common.Logging;
+
+using SoulboundBackend.Core.Debug.Logging;
 using System;
 
 namespace SoulboundBackend.Client.Stats {
 	[Obsolete]
 	public class StatValuePrefix<TValue> {
-		private static readonly Logger logger = Logger.CreateInstance();
 		public static StatValuePrefix<TValue> None = new(_ => "");
 		public static StatValuePrefix<TValue> Add;
 		public static StatValuePrefix<TValue> AddAndSubtract;
@@ -26,7 +26,7 @@ namespace SoulboundBackend.Client.Stats {
 				Add = new StatValuePrefix<TValue>(value => Convert.ToSingle(value) > 0f ? "+" : "");
 				AddAndSubtract = Add;
 			} else {
-				logger.LogWarning("Unexpected BonusAdmission type {}", typeof(TValue));
+				Logger.LogWarning("Unexpected BonusAdmission type {}", typeof(TValue));
 				Add = None;
 				AddAndSubtract = None;
 			}

@@ -1,11 +1,10 @@
-﻿using SoulboundBackend.Common.Logging;
+using SoulboundBackend.Core.Debug.Logging;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 
 namespace SoulboundBackend.Common {
 	public class DynamicMap<T> : Dictionary<string, T> {
-		private static readonly Logger logger = Logger.CreateInstance();
 		public DynamicMap() : base(StringComparer.OrdinalIgnoreCase) {
 		}
 
@@ -25,7 +24,7 @@ namespace SoulboundBackend.Common {
 				if (property.GetValue(other) is T value) {
 					this[property.Name] = value;
 				} else {
-					logger.LogError(new InvalidOperationException($"Property '{property.Name}' is not of type {typeof(T).Name}"));
+					Logger.LogError(new InvalidOperationException($"Property '{property.Name}' is not of type {typeof(T).Name}"));
 				}
 			}
 		}

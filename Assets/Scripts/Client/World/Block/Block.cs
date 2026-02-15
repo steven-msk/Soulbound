@@ -1,7 +1,7 @@
-﻿using SoulboundBackend.Client.ItemSystem;
+using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.World.Chunk;
 using SoulboundBackend.Common;
-using SoulboundBackend.Common.Logging;
+
 using SoulboundBackend.Core.AssetManagement;
 using System;
 using System.Collections.Generic;
@@ -9,13 +9,11 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using Logger = SoulboundBackend.Common.Logging.Logger;
 
 #nullable enable
 
 namespace SoulboundBackend.Client.World.BlockSystem {
 	public abstract partial class Block {
-		private static readonly Logger logger = Logger.CreateInstance();
 		public string id { get; private set; } = null!;
 		public abstract string name { get; init; }
 		//[Obsolete]

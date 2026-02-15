@@ -5,11 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using UnityEngine;
 
 #nullable enable
 
-namespace SoulboundBackend.Core.Debug {
+namespace SoulboundBackend.Core.Debug.Logging {
 	public struct LogEntry {
 		public DateTime timestamp;
 		public LogLevel level;
@@ -17,7 +16,7 @@ namespace SoulboundBackend.Core.Debug {
 		public Thread thread;
 		public string message;
 		public object[] args;
-		public GameObject? context;
+		public UnityEngine.Object? context;
 		public Exception? exception;
 	}
 }

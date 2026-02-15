@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Client.ItemSystem;
+using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.UI.Storage;
 using SoulboundBackend.Common.Json;
 using SoulboundBackend.Core;
@@ -6,13 +6,9 @@ using System;
 using System.Collections.Generic;
 using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
-using Logger = SoulboundBackend.Common.Logging.Logger;
 
 namespace SoulboundBackend.Client.Stats {
 	public sealed class PlayerStats : IStatOwner, IStatModificationHost {
-		private static readonly Logger logger = Logger.CreateInstance();
-		private static readonly LogModule playerStats = new LogModule("PLAYER STATS", "#00FFFF");
-
 		private readonly Dictionary<IStatDefinition, IStatEntry> entries = new();
 
 		// REMINDER: current stat default values are subject to change

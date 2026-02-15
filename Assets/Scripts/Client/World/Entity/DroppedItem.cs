@@ -7,11 +7,10 @@ using SoulboundBackend.Core.Resource;
 using System;
 using UnityEditor.Profiling;
 using UnityEngine;
-using Logger = SoulboundBackend.Common.Logging.Logger;
+using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
 namespace SoulboundBackend.Client.World.EntitySystem {
 	public class DroppedItem : Entity, IUpdatable, IChunkListener, IEntitySpawnable<DroppedItem.SpawnData> {
-		private static readonly Logger logger = Logger.CreateInstance();
 		public const float defaultLifespanSeconds = 120f;           // TODO: decide on a dropped item lifespan duration
 		public override EntityDescriptor descriptor => EntityDescriptorRegistry.ByType<DroppedItem>();
 		public override Type scriptType => typeof(DroppedItem);

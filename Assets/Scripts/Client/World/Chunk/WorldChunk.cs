@@ -1,4 +1,4 @@
-﻿using Assets.Scripts.Client.World.Biome;
+using Assets.Scripts.Client.World.Biome;
 using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Client.World.Generation;
 using SoulboundBackend.Common;
@@ -16,14 +16,13 @@ using UnityEngine;
 using UnityEngine.Assertions.Must;
 using UnityEngine.LightTransport;
 using UnityEngine.Tilemaps;
-using Logger = SoulboundBackend.Common.Logging.Logger;
+using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
 #nullable enable
 
 namespace SoulboundBackend.Client.World.Chunk {
 	[JsonConverter(typeof(WorldChunk.Serializer))]
 	public class WorldChunk : ITickable {
-		private static readonly Logger logger = Logger.CreateInstance();
 		public const int minY = -Level.WORLD_HEIGHT / 2;
 		public const int maxY = Level.WORLD_HEIGHT / 2;
 		public const float HEIGHT_SPREAD = 0.01f;

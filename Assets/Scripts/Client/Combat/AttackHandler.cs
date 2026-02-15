@@ -1,17 +1,15 @@
-﻿using SoulboundBackend.Client.World.EntitySystem;
+using SoulboundBackend.Client.World.EntitySystem;
 using SoulboundBackend.Common;
-using SoulboundBackend.Common.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-using Logger = SoulboundBackend.Common.Logging.Logger;
+using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
 namespace SoulboundBackend.Client.Combat {
 	public class AttackHandler {
-		private static readonly Logger logger = Logger.CreateInstance();
 		private readonly AttackSource source;
 		public bool isHandlingAttack { get; private set; }
 		private AttackContext context;
@@ -110,7 +108,7 @@ namespace SoulboundBackend.Client.Combat {
 				return;
 			}
 
-			logger.LogError("Could not find Hurtbox on hitbox collider: {}", collider.gameObject);
+			Logger.LogError("Could not find Hurtbox on hitbox collider: {}", collider.gameObject);
 		}
 
 		private void InjectContext_OnAttackAnimationStart() {

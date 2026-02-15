@@ -1,0 +1,147 @@
+using SoulboundBackend.Core.Debug;
+using System;
+using System.Diagnostics;
+using System.Text;
+using System.Threading;
+using UnityEngine;
+
+#nullable enable
+
+namespace SoulboundBackend.Core.Debug.Logging {
+	public class Logger {
+		const string ARG_MARKER = "{}";
+		const string LOG_FORMAT = "[{0}] [{1}] [{2}/{3}]: {4}";		// [time] [thread] [stackFrame/level]: {message}
+		const string TIME_FORMAT = "{0}-{1}-{2} {3}:{4}:{5}.{6}";   // day-month-year hour:minute:second.millis
+
+		private static Logger instance { get; set; } = null!;
+		private readonly ILogger logger;
+
+		public Logger(ILogger logger) {
+			instance = this;
+			this.logger = logger;
+		}
+
+		private static void LogMessage(
+			Action<string> loggingMethod,
+			LogLevel level,
+			StackFrame stackFrame,
+			string message,
+			Exception? exception = null,
+			UnityEngine.Object? context = null,
+			params object[] args
+		) {
+			LogEntry logEntry = new() {
+				message = message,
+				level = level,
+				args = args,
+				stackFrame = stackFrame,
+				thread = Thread.CurrentThread,
+				timestamp = DateTime.Now,
+				exception = exception,
+				context = context,
+			};
+			string finalMessage = GetFinalMessage(logEntry);
+			loggingMethod(finalMessage);
+		}
+
+		public static void LogInfo(object message) {
+			LogMessage(LogInfo_Method, LogLevel.Info, CaptureStackFrame(), message.ToString());
+		}
+
+		public static void LogInfo(string message, params object[] args) {
+			LogMessage(LogInfo_Method, LogLevel.Info, CaptureStackFrame(), message, args: args);
+		}
+
+		public static void LogWarning(object message) {
+			LogMessage(LogWarning_Method, LogLevel.Warning, CaptureStackFrame(), message.ToString());
+		}
+
+		public static void LogWarning(string message, params object[] args) {
+			LogMessage(LogWarning_Method, LogLevel.Warning, CaptureStackFrame(), message, args: args);
+		}
+
+		public static void LogError(object message) {
+			LogMessage(LogError_Method, LogLevel.Error, CaptureStackFrame(), message.ToString());
+		}
+
+		public static void LogError(string message, params object[] args) {
+			LogMessage(LogError_Method, LogLevel.Error, CaptureStackFrame(), message, args: args);
+		}
+
+		private static void LogInfo_Method(string mesage) => instance.logger.Log(LogType.Log, mesage);
+		private static void LogWarning_Method(string mesage) => instance.logger.Log(LogType.Warning, mesage);
+		private static void LogError_Method(string mesage) => instance.logger.Log(LogType.Error, mesage);
+
+		private static string GetFinalMessage(LogEntry entry) {
+			string message = PlaceArgs(entry.message, ARG_MARKER, entry.args);
+			string timestamp = FormatTimestamp(entry.timestamp);
+			string thread = FormatThread(entry.thread);
+			string level = FormatLevel(entry.level);
+			string stackFrame = FormatStackFrame(entry.stackFrame);
+
+			string formatted = string.Format(LOG_FORMAT,
+				timestamp,
+				thread,
+				stackFrame,
+				level,
+				message
+			);
+			return formatted;
+		}
+
+		private static string FormatTimestamp(DateTime dateTime) {
+			string timestamp = string.Format(TIME_FORMAT,
+				dateTime.Day, dateTime.Month, dateTime.Year,
+				dateTime.Hour, dateTime.Minute, dateTime.Second, dateTime.Millisecond
+			);
+			return timestamp;
+		}
+
+		private static string FormatThread(Thread thread) {
+			int id = thread.ManagedThreadId;
+			string formatted = $"thread-{id}";
+
+			if (!string.IsNullOrEmpty(thread.Name)) {
+				formatted = $"{formatted}({thread.Name})";
+			}
+
+			return formatted;
+		}
+
+		private static string FormatLevel(LogLevel level) {
+			return level.ToString().ToUpper();
+		}
+
+		private static string FormatStackFrame(StackFrame stackFrame) {
+			var method = stackFrame.GetMethod();
+			var declaringType = method.DeclaringType;
+			string caller = declaringType != null ? declaringType.Name : "Unknown";
+			return caller;
+		}
+
+		private static string PlaceArgs(string text, string argMarker, params object[] args) {
+			if (string.IsNullOrEmpty(text) || args == null || args.Length == 0) return text;
+
+			int argIndex = 0;
+			while (text.Contains(argMarker) && argIndex < args.Length) {
+				text = text.ReplaceFirst(argMarker, args[argIndex]?.ToString() ?? "null");
+				argIndex++;
+			}
+			return text;
+		}
+
+		private static StackFrame CaptureStackFrame(int skipFrames = 1) {
+			return new StackFrame(skipFrames + 1, false);
+		} 
+	}
+
+	static class StringReplaceFirst {
+		public static string ReplaceFirst(this string text, string search, string replace) {
+			int pos = text.IndexOf(search);
+			if (pos < 0) {
+				return text;
+			}
+			return text[..pos] + replace + text[(pos + search.Length)..];
+		}
+	}
+}

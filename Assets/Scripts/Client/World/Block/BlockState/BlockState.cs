@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Client.ItemSystem;
+using SoulboundBackend.Client.ItemSystem;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,14 +9,13 @@ using Unity.VisualScripting;
 using Unity.VisualScripting.YamlDotNet.Core.Tokens;
 using UnityEditor.Rendering;
 using UnityEngine;
-using Logger = SoulboundBackend.Common.Logging.Logger;
+using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
 #nullable enable
 
 namespace SoulboundBackend.Client.World.BlockSystem {
 	[JsonConverter(typeof(BlockState.Serializer))]
 	public sealed class BlockState {
-		static readonly Logger logger = Logger.CreateInstance();
 		public Block block { get; }
 		private readonly BlockPropertyEntries properties;
 		public int stateHash => StateHasher.ComputeHash(block, properties);
@@ -74,7 +73,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 					return fallback;
 				}
 				if (reader.TokenType != JsonToken.Integer) {
-					logger.LogError("Invalid json token for block state: {}", reader.TokenType);
+					Logger.LogError("Invalid json token for block state: {}", reader.TokenType);
 					return fallback;
 				}
 
@@ -95,7 +94,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 				if (BlockStateRegistry.TryGet(hash, out var state)) {
 					return state;
 				}
-				logger.LogError("Unknown state hash: {}", hash);
+				Logger.LogError("Unknown state hash: {}", hash);
 				return fallback;
 			}
 		}

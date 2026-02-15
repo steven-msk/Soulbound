@@ -27,7 +27,6 @@ using static PlayerInputActions;
 using static Unity.VisualScripting.Member;
 using static UnityEditor.PlayerSettings;
 using Level = SoulboundBackend.Client.World.Level;
-using Logger = SoulboundBackend.Common.Logging.Logger;
 
 namespace SoulboundBackend.Client {
 	public class PlayerController : Entity, IAttackPerformer, IItemConsumer, IUpdatable, IEntitySpawnable<PlayerSpawnData> {

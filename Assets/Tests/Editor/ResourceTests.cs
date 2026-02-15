@@ -1,5 +1,4 @@
 using NUnit.Framework;
-using SoulboundBackend.Common.Logging;
 using SoulboundBackend.Core.Resource;
 using System;
 using System.Collections;

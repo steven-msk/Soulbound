@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Common.Logging;
+using SoulboundBackend.Core.Debug.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +16,6 @@ namespace SoulboundBackend.Client.Stats {
 	}
 
 	public interface IStatEntryModifier<TValue> : IStatEntryModifier where TValue : struct, IComparable<TValue> {
-		private static readonly Logger logger = Logger.CreateInstance();
 		void Apply(StatEntry<TValue> entry, ModificationToken modificationToken);
 		void Remove(StatEntry<TValue> entry, ModificationToken modificationToken);
 
@@ -24,7 +23,7 @@ namespace SoulboundBackend.Client.Stats {
 			if (entry is StatEntry<TValue> typed) {
 				Apply(typed, modificationToken);
 			} else {
-				logger.LogError("Mistyped entry in Apply, expected {}", typeof(TValue));
+				Logger.LogError("Mistyped entry in Apply, expected {}", typeof(TValue));
 			}
 		}
 
@@ -32,7 +31,7 @@ namespace SoulboundBackend.Client.Stats {
 			if (entry is StatEntry<TValue> typed) {
 				Remove(typed, modificationToken);
 			} else {
-				logger.LogError("Mistyped entry in Remove, expected {}", typeof(TValue));
+				Logger.LogError("Mistyped entry in Remove, expected {}", typeof(TValue));
 			}
 		}
 	}

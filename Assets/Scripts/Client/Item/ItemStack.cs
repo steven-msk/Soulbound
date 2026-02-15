@@ -7,13 +7,12 @@ using SoulboundBackend.Core.Resource;
 using System;
 using TMPro;
 using UnityEngine;
-using Logger = SoulboundBackend.Common.Logging.Logger;
+using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
 #nullable enable
 
 namespace SoulboundBackend.Client.ItemSystem {
 	public class ItemStack {
-		private static readonly Logger logger = Logger.CreateInstance();
 		public event Action<int, int>? onQuantityChanged;
 		public Item item { get; }
 		public int quantity { get; private set; }
@@ -29,7 +28,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public void Drop(Vector2 pos, Vector2 dropForce, bool playerAction = false) {
 			GameObject? worldPrefab = item.aspect.worldPrefabSupplier?.Invoke();
 			if (item.aspect.worldPrefabSupplier == null) {
-				logger.LogError(null, "No world prefab supplier for item {}. Using icon fallback.", item);
+				Logger.LogError(null, "No world prefab supplier for item {}. Using icon fallback.", item);
 				worldPrefab = WorldPrefabFactory.GetInstantiator().Invoke();
 			}
 			GameObject droppedItem = worldPrefab!;

@@ -1,4 +1,4 @@
-using SoulboundBackend.Common.Logging;
+using SoulboundBackend.Core.Debug.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,7 +9,6 @@ using UnityEngine.InputSystem;
 
 namespace SoulboundBackend.Client.SettingSystem {
 	public sealed class Settings {
-		private static readonly Logger logger = Logger.CreateInstance();
 		public const string settingsFile = "settings.txt";
 		public static readonly KeybindMappings keybindMappings = new();
 		public static readonly SettingEntry<int> masterVolume = new("Master Volume", "master_volume", 100, new IntRange(0, 100), null);
@@ -31,7 +30,7 @@ namespace SoulboundBackend.Client.SettingSystem {
 					keybindMappings.ProcessMappings(new KeyMappingReader(settingReader));
 				};
 			} catch (FileNotFoundException) {
-				logger.LogWarning("No settings file found. Initiating with default values");
+				Logger.LogWarning("No settings file found. Initiating with default values");
 			}		
 		}
 

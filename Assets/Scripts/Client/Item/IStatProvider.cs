@@ -1,6 +1,7 @@
-﻿using SoulboundBackend.Client.Stats;
+using SoulboundBackend.Client.Stats;
 using SoulboundBackend.Common;
-using SoulboundBackend.Common.Logging;
+
+using SoulboundBackend.Core.Debug.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,15 +25,13 @@ namespace SoulboundBackend.Client.ItemSystem {
 #nullable enable
 
 		private class StatProviderConverter : JsonConverter<IStatProvider> {
-			private static readonly Logger logger = Logger.CreateInstance();
-
 			public override IStatProvider? ReadJson(JsonReader reader, Type objectType, IStatProvider? existingValue, bool hasExistingValue, JsonSerializer serializer) {
 				int id = Convert.ToInt32(reader.Value);
 				IStatProvider? value = null;
 				try {
 					value = (IStatProvider)Items.ByHashedID(id);
 				} catch (Exception e) {
-					logger.LogError(null, "Could not deserialize IStatProvider type because the item's id doesnt provide such type. {}", e);
+					Logger.LogError(null, "Could not deserialize IStatProvider type because the item's id doesnt provide such type. {}", e);
 					value = null;
 				}
 				return value;
