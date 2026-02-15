@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Client.Input;
+using SoulboundBackend.Client.Input;
 using SoulboundBackend.Common;
 using SoulboundBackend.Common.Logging;
 using SoulboundBackend.Core.AssetManagement;
@@ -22,13 +22,14 @@ using Logger = SoulboundBackend.Common.Logging.Logger;
 namespace SoulboundBackend.Core.Resource {
 	public static class AssetManager {
 		const string preloadLabel = "preload";
-		private static readonly Logger logger = Logger.CreateInstance();
+		private static readonly Logger LOGGER = Logger.CreateInstance();
 		private static readonly ConcurrentDictionary<AssetKey, AsyncOperationHandle> assets = new();
 		private static AsyncOperationHandle<IList<IResourceLocation>> locationsHandle;
+		private static LogModule mod = new("[ASSET]", "#FF0000");
 
 		public static void PreloadAll() {
 			var locations = LoadLocations();
-			logger.LogInfo("Preloading assets from {} locations", locations.Count());
+			LOGGER.LogInfo(mod, "Preloading assets from {} locations", locations.Count());
 
 			foreach (var location in locations) {
 				var handle = Addressables.LoadAssetAsync<UnityEngine.Object>(location);
@@ -50,7 +51,7 @@ namespace SoulboundBackend.Core.Resource {
 
 		private static void FinishPreload(AssetKey key, AsyncOperationHandle handle) {
 			if (!assets.TryAdd(key, handle)) {
-				logger.LogWarning("Failed to preload asset: key already exists '{}'", key);
+				LOGGER.LogWarning("Failed to preload asset: key already exists '{}'", key);
 			}
 		}
 

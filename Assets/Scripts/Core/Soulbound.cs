@@ -6,11 +6,13 @@ using SoulboundBackend.Client.UI.Screens;
 using SoulboundBackend.Client.World;
 using SoulboundBackend.Common;
 using SoulboundBackend.Common.Json;
+using SoulboundBackend.Core.Debug;
 using SoulboundBackend.Core.Resource;
 using SoulboundBackend.Core.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -50,9 +52,23 @@ namespace SoulboundBackend.Core {
 			uiHandler = new UIHandler(UnityEngine.Object.FindFirstObjectByType<Canvas>());
 		}
 
+		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+		public static void SubsystemRegistration() {
+			try {
+				Thread.CurrentThread.Name = "LaunchThread";
+			} catch(InvalidOperationException) {
+			}
+			new SoulboundDebug(UnityEngine.Debug.unityLogger.logHandler);
+		}
+
 		public void Launch() {
 			if (running) return;
 			running = true;
+
+			Log.Info("info message");
+			Log.Warn("warn message");
+			Log.Error("error message");
+			Log.Fatal("fatal message");
 
 			Application.quitting += OnApplicationQuit;
 
@@ -79,7 +95,7 @@ namespace SoulboundBackend.Core {
 				UnityEngine.Object.FindFirstObjectByType<WorldSceneRoot>
 			).ContinueWith(session => {
 				uiHandler.SetScreen(new WorldScreen(session.player));
-			}).Forget(Debug.LogException);
+			}).Forget(UnityEngine.Debug.LogException);
 		}
 
 		public void QuitActiveWorld() {
@@ -94,7 +110,7 @@ namespace SoulboundBackend.Core {
 					uiHandler.SetCanvas(UnityEngine.Object.FindFirstObjectByType<Canvas>());
 					uiHandler.SetScreen(new TitleScreen());
 				})
-			.Forget(Debug.LogException);
+			.Forget(UnityEngine.Debug.LogException);
 		}
 
 		public bool IsWorldSessionActive() {
