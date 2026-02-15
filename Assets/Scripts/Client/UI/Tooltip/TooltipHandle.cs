@@ -18,7 +18,6 @@ namespace SoulboundBackend.Client.UI {
 		[Obsolete]
 		[PROTOTYPICAL]
 		private void Update() {
-
 			if (isAlive) transform.position = UnityEngine.Input.mousePosition;
 		}
 
