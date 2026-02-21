@@ -149,7 +149,7 @@ namespace SoulboundBackend.Core.Debug.Logging {
 		}
 
 		private static StackFrame CaptureStackFrame(int skipFrames = 1) {
-			return new StackFrame(skipFrames + 1, false);
+			return new StackFrame(skipFrames + 1, true);
 		} 
 	}
 

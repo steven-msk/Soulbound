@@ -64,6 +64,7 @@ namespace SoulboundBackend.Core.Debug {
 			layoutGroup.childForceExpandHeight = false;
 			layoutGroup.childForceExpandWidth = true;
 			layoutGroup.spacing = 5f;
+			layoutGroup.padding = new RectOffset(5, 5, 5, 5);
 
 			DebugConsoleHandle handle = obj.AddComponent<DebugConsoleHandle>();
 			foreach (var logEntry in logQueue) {
