@@ -32,8 +32,8 @@ namespace SoulboundBackend.Core.Debug {
 		}
 
 		public void AddLogEntry(LogEntry entry) {
-			if (node != null) node.handle.AddLogEntry(entry);
-			else logQueue.Enqueue(entry);
+			node?.handle.AddLogEntry(entry);
+			logQueue.Enqueue(entry);
 		}
 
 		public void ToggleConsole() {
@@ -60,9 +60,10 @@ namespace SoulboundBackend.Core.Debug {
 
 			VerticalLayoutGroup layoutGroup = obj.AddComponent<VerticalLayoutGroup>();
 			layoutGroup.childControlHeight = false;
-			layoutGroup.childControlWidth = false;
+			layoutGroup.childControlWidth = true;
 			layoutGroup.childForceExpandHeight = false;
-			layoutGroup.childForceExpandWidth = false;
+			layoutGroup.childForceExpandWidth = true;
+			layoutGroup.spacing = 5f;
 
 			DebugConsoleHandle handle = obj.AddComponent<DebugConsoleHandle>();
 			foreach (var logEntry in logQueue) {

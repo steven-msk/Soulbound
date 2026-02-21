@@ -71,6 +71,12 @@ namespace SoulboundBackend.Core {
 
 			Application.quitting += ((IApplicationController)this).OnApplicationQuit;
 
+			Logger.LogError("an error: {}", "an object");
+			Logger.LogFatal(null, "a fatal error: {}", "an object");
+			Logger.LogFatal(new ArgumentException(), "a fatal error with exception: {}", "an object");
+			Logger.LogInfo("a log info with a very long message which should wrap correctly otherwise i have a bug in the code which could be quite annoying to fix. Side note this text is still not long enough to get to the end of the screen but now hopefully its long enough");
+			Logger.LogInfo("just another info log");
+
 			uiHandler.SetScreen(new TitleScreen());
 		}
 
