@@ -1,7 +1,9 @@
 using SoulboundBackend.Core.Debug;
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using UnityEngine;
 
@@ -12,7 +14,7 @@ namespace SoulboundBackend.Core.Debug.Logging {
 		const string ARG_MARKER = "{}";
 		const string LOG_FORMAT = "[{0}] [{1}] [{2}/{3}]: {4}";		// [time] [thread] [stackFrame/level]: {message}
 		const string TIME_FORMAT = "{0}-{1}-{2} {3}:{4}:{5}.{6}";   // day-month-year hour:minute:second.millis
-
+		
 		private static Logger instance { get; set; } = null!;
 		private readonly ILogger logger;
 
@@ -42,30 +44,39 @@ namespace SoulboundBackend.Core.Debug.Logging {
 			};
 			string finalMessage = GetFinalMessage(logEntry);
 			loggingMethod(finalMessage);
+			if (exception != null) instance.logger.LogException(exception, context);
 		}
 
-		public static void LogInfo(object message) {
-			LogMessage(LogInfo_Method, LogLevel.Info, CaptureStackFrame(), message.ToString());
+		public static void LogInfo(object message, UnityEngine.Object? context = null) {
+			LogMessage(LogInfo_Method, LogLevel.Info, CaptureStackFrame(), message.ToString(), context: context);
 		}
 
 		public static void LogInfo(string message, params object[] args) {
 			LogMessage(LogInfo_Method, LogLevel.Info, CaptureStackFrame(), message, args: args);
 		}
 
-		public static void LogWarning(object message) {
-			LogMessage(LogWarning_Method, LogLevel.Warning, CaptureStackFrame(), message.ToString());
+		public static void LogWarning(object message, UnityEngine.Object? context = null) {
+			LogMessage(LogWarning_Method, LogLevel.Warning, CaptureStackFrame(), message.ToString(), context: context);
 		}
 
 		public static void LogWarning(string message, params object[] args) {
 			LogMessage(LogWarning_Method, LogLevel.Warning, CaptureStackFrame(), message, args: args);
 		}
 
-		public static void LogError(object message) {
-			LogMessage(LogError_Method, LogLevel.Error, CaptureStackFrame(), message.ToString());
+		public static void LogError(object message, UnityEngine.Object? context = null) {
+			LogMessage(LogError_Method, LogLevel.Error, CaptureStackFrame(), message.ToString(), context: context);
 		}
 
 		public static void LogError(string message, params object[] args) {
 			LogMessage(LogError_Method, LogLevel.Error, CaptureStackFrame(), message, args: args);
+		}
+
+		public static void LogFatal(Exception? exception, object message, UnityEngine.Object? context = null) {
+			LogMessage(LogError_Method, LogLevel.Fatal, CaptureStackFrame(), message.ToString(), exception, context);
+		}
+
+		public static void LogFatal(Exception? exception, string message, params object[] args) {
+			LogMessage(LogError_Method, LogLevel.Fatal, CaptureStackFrame(), message, exception, args: args);
 		}
 
 		private static void LogInfo_Method(string mesage) => instance.logger.Log(LogType.Log, mesage);
@@ -78,13 +89,10 @@ namespace SoulboundBackend.Core.Debug.Logging {
 			string thread = FormatThread(entry.thread);
 			string level = FormatLevel(entry.level);
 			string stackFrame = FormatStackFrame(entry.stackFrame);
+			message = FormatException(entry.exception, message);
 
 			string formatted = string.Format(LOG_FORMAT,
-				timestamp,
-				thread,
-				stackFrame,
-				level,
-				message
+				timestamp, thread, stackFrame, level, message
 			);
 			return formatted;
 		}
@@ -119,6 +127,13 @@ namespace SoulboundBackend.Core.Debug.Logging {
 			return caller;
 		}
 
+		private static string FormatException(Exception? exception, string message) {
+			string exceptionMark = exception != null
+				? $"Exception thrown! {exception.GetType().Name}: "
+				: string.Empty;
+			return exceptionMark + message;
+		}
+
 		private static string PlaceArgs(string text, string argMarker, params object[] args) {
 			if (string.IsNullOrEmpty(text) || args == null || args.Length == 0) return text;
 
@@ -138,9 +153,7 @@ namespace SoulboundBackend.Core.Debug.Logging {
 	static class StringReplaceFirst {
 		public static string ReplaceFirst(this string text, string search, string replace) {
 			int pos = text.IndexOf(search);
-			if (pos < 0) {
-				return text;
-			}
+			if (pos < 0) return text;
 			return text[..pos] + replace + text[(pos + search.Length)..];
 		}
 	}

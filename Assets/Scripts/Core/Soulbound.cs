@@ -69,14 +69,11 @@ namespace SoulboundBackend.Core {
 			if (running) return;
 			running = true;
 
-			//SoulboundBackend.Common.Logging.Logger.Log(LogType.Error, "message");
-
-			Logger.LogInfo("static info");
-			Logger.LogInfo("non-static info: {}", "obj");
-			Logger.LogWarning("static warning");
-			Logger.LogWarning("non-static warning: {}", "obj");
-			Logger.LogError("static error");
-			Logger.LogError("non-static error: {}", "obj");
+			Logger.LogInfo("info: {}", "obj");
+			Logger.LogWarning("warning: {}", "obj");
+			Logger.LogError("error: {}", "obj");
+			Logger.LogFatal(null, "fatal: {}", "obj");
+			Logger.LogFatal(new ArgumentException(), "an exception has been thrown {}", "obj");
 
 			Application.quitting += OnApplicationQuit;
 
