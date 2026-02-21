@@ -20,11 +20,11 @@ namespace SoulboundBackend.Client.UI {
 		const string TIMESTAMP_FORMAT = "{0}:{1}:{2}.{3}";  // hour:minute:second.millis
 		const string ARG_MARKER = "{}";
 
-		public void AddLogEntry(LogEntry entry) {
-			CreateLog(entry);
+		public GameObject AddLogEntry(LogEntry entry) {
+			return CreateLog(entry);
 		}
 
-		private void CreateLog(LogEntry entry) {
+		private GameObject CreateLog(LogEntry entry) {
 			GameObject obj = new("Log Entry", typeof(RectTransform));
 			obj.transform.SetParent(transform, false);
 
@@ -35,6 +35,8 @@ namespace SoulboundBackend.Client.UI {
 
 			ContentSizeFitter sizeFitter = obj.AddComponent<ContentSizeFitter>();
 			sizeFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+			return obj;
 		}
 
 		private string FormatMessage(LogEntry entry) {
@@ -73,7 +75,7 @@ namespace SoulboundBackend.Client.UI {
 
 		private Color GetLogColor(LogLevel level) {
 			return level switch {
-				LogLevel.Info => new Color(0.95f, 0.95f, 0.95f, 1f),
+				LogLevel.Info => Color.white,
 				LogLevel.Warning => Color.yellow,
 				LogLevel.Error => Color.red,
 				LogLevel.Fatal => Color.red,

@@ -32,7 +32,11 @@ namespace SoulboundBackend.Core.Debug {
 		}
 
 		public void AddLogEntry(LogEntry entry) {
-			node?.handle.AddLogEntry(entry);
+			GameObject logObj = node?.handle.AddLogEntry(entry);
+			if (logObj != null) {
+				logObj.transform.SetParent(node.contentRect.transform, false);
+				AutoScroll(node.scrollRect);
+			}
 			logQueue.Enqueue(entry);
 		}
 
@@ -47,31 +51,73 @@ namespace SoulboundBackend.Core.Debug {
 			}
 		}
 
+		// i am NOT bothering with cleaning this up
+		// dont even think about adding a scrollbar
+		// (at least for now)
 		private UIDebugConsoleNode GetNode() {
-			GameObject obj = new("Debug Console", typeof(RectTransform));
-			RectTransform rect = obj.GetComponent<RectTransform>();
+			GameObject root = new("Debug Console", typeof(RectTransform));
+			RectTransform rect = root.GetComponent<RectTransform>();
 			rect.anchorMin = new Vector2(0f, 0f);
 			rect.anchorMax = new Vector2(1f, 1f);
 			rect.pivot = new Vector2(0.5f, 0.5f);
 			rect.sizeDelta = Vector2.zero;
 
-			Image image = obj.AddComponent<Image>();
-			image.color = new Color(0.15f, 0.15f, 0.15f, 0.55f);
+			Image bg = root.AddComponent<Image>();
+			bg.color = new Color(0.15f, 0.15f, 0.15f, 0.55f);
 
-			VerticalLayoutGroup layoutGroup = obj.AddComponent<VerticalLayoutGroup>();
-			layoutGroup.childControlHeight = false;
-			layoutGroup.childControlWidth = true;
-			layoutGroup.childForceExpandHeight = false;
-			layoutGroup.childForceExpandWidth = true;
-			layoutGroup.spacing = 5f;
-			layoutGroup.padding = new RectOffset(5, 5, 5, 5);
+			ScrollRect scrollRect = root.AddComponent<ScrollRect>();
+			scrollRect.horizontal = false;
+			scrollRect.scrollSensitivity = 7f;
 
-			DebugConsoleHandle handle = obj.AddComponent<DebugConsoleHandle>();
+			GameObject viewport = new("Viewport", typeof(RectTransform), typeof(Image), typeof(Mask));
+			viewport.transform.SetParent(root.transform, false);
+
+			RectTransform viewportRect = viewport.GetComponent<RectTransform>();
+			viewportRect.anchorMin = Vector2.zero;
+			viewportRect.anchorMax = Vector2.one;
+			viewportRect.sizeDelta = Vector2.zero;
+
+			viewport.GetComponent<Image>().color = new Color(1f, 1f, 1f, 0.01f);
+			viewport.GetComponent<Mask>().showMaskGraphic = false;
+
+			GameObject content = new("Content", typeof(RectTransform));
+			content.transform.SetParent(viewport.transform, false);
+
+			RectTransform contentRect = content.GetComponent<RectTransform>();
+			contentRect.anchorMin = new Vector2(0f, 1f);
+			contentRect.anchorMax = new Vector2(1f, 1f);
+			contentRect.pivot = new Vector2(0.5f, 1f);
+			contentRect.anchoredPosition = Vector2.zero;
+			contentRect.sizeDelta = Vector2.zero;
+
+			VerticalLayoutGroup layout = content.AddComponent<VerticalLayoutGroup>();
+			layout.childControlHeight = true;
+			layout.childControlWidth = true;
+			layout.childForceExpandHeight = false;
+			layout.childForceExpandWidth = true;
+			layout.spacing = 5f;
+			layout.padding = new RectOffset(5, 5, 5, 5);
+
+			ContentSizeFitter fitter = content.AddComponent<ContentSizeFitter>();
+			fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+			scrollRect.viewport = viewportRect;
+			scrollRect.content = contentRect;
+
+
+			DebugConsoleHandle handle = root.AddComponent<DebugConsoleHandle>();
 			foreach (var logEntry in logQueue) {
-				handle.AddLogEntry(logEntry);
+				GameObject entryObj = handle.AddLogEntry(logEntry);
+				entryObj.transform.SetParent(content.transform, false);
+				AutoScroll(scrollRect);
 			}
 
-			return new UIDebugConsoleNode(obj, handle);
+			return new UIDebugConsoleNode(root, handle, scrollRect, contentRect);
+		}
+
+		private void AutoScroll(ScrollRect scrollRect) {
+			Canvas.ForceUpdateCanvases();
+			scrollRect.verticalNormalizedPosition = 0f;
 		}
 	}
 }

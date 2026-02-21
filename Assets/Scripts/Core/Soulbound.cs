@@ -49,9 +49,11 @@ namespace SoulboundBackend.Core {
 				Thread.CurrentThread.Name = "LaunchThread";
 			} catch(InvalidOperationException) {
 			}
+#if !UNITY_EDITOR
 			Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
 			Application.SetStackTraceLogType(LogType.Warning, StackTraceLogType.ScriptOnly);
 			Application.SetStackTraceLogType(LogType.Error, StackTraceLogType.ScriptOnly);
+#endif
 			new SoulboundDebug(UnityEngine.Debug.unityLogger);
 
 			AssetManager.PreloadAll();

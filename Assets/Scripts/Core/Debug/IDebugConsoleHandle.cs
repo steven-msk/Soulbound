@@ -5,9 +5,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace SoulboundBackend.Core.Debug {
 	public interface IDebugConsoleHandle : IUIElementHandle {
-		void AddLogEntry(LogEntry entry);
+		GameObject AddLogEntry(LogEntry entry);
 	}
 }

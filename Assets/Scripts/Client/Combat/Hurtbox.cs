@@ -1,9 +1,11 @@
-﻿using System;
+using SoulboundBackend.Core.Debug.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
 namespace SoulboundBackend.Client.Combat {
 	public sealed class Hurtbox : MonoBehaviour {
@@ -25,7 +27,7 @@ namespace SoulboundBackend.Client.Combat {
 #endif
 
 		public void NotifyHit(AttackSource source) {
-			UnityEngine.Debug.Log("hurtbox hit: "+ source.baseDamage);
+			Logger.LogInfo("hurtbox hit: "+ source.baseDamage);
 			this.GetComponentInParent<Rigidbody2D>().AddForce(new Vector2(10f, 10f) * source.knockbackForce);
 			GetComponentInParent<HitFlashEffect>().TriggerFlash();
 
