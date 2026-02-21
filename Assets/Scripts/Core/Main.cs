@@ -17,9 +17,4 @@ public sealed class Main : MonoBehaviour {
 		}
 		new Soulbound(instance.gameConfig).Launch();
 	}
-
-	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
-	public static void Preload() {
-		AssetManager.PreloadAll();
-	}
 }

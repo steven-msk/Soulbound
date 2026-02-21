@@ -44,17 +44,7 @@ namespace SoulboundBackend.Core {
 			this.config = config;
 			settings = new Settings();
 			playerInputActions = new PlayerInputActions();
-			var worldSerializer = new JsonSerializer<WorldDump>(globalJsonSettings);
-			var worldSerializationPipeline = new SerializationPipeline<WorldDump>(worldSerializer);
-			var service = new WorldSerializationService(GetWorldSaveStrategy(), worldSerializationPipeline);
-			worldManager = new WorldManager(service);
 
-			// scene may not be available at this time
-			uiHandler = new UIHandler(UnityEngine.Object.FindFirstObjectByType<Canvas>());
-		}
-
-		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-		public static void SubsystemRegistration() {
 			try {
 				Thread.CurrentThread.Name = "LaunchThread";
 			} catch(InvalidOperationException) {
@@ -63,6 +53,16 @@ namespace SoulboundBackend.Core {
 			Application.SetStackTraceLogType(LogType.Warning, StackTraceLogType.ScriptOnly);
 			Application.SetStackTraceLogType(LogType.Error, StackTraceLogType.ScriptOnly);
 			new SoulboundDebug(UnityEngine.Debug.unityLogger);
+
+			AssetManager.PreloadAll();
+
+			var worldSerializer = new JsonSerializer<WorldDump>(globalJsonSettings);
+			var worldSerializationPipeline = new SerializationPipeline<WorldDump>(worldSerializer);
+			var service = new WorldSerializationService(GetWorldSaveStrategy(), worldSerializationPipeline);
+			worldManager = new WorldManager(service);
+
+			// scene may not be available at this time
+			uiHandler = new UIHandler(UnityEngine.Object.FindFirstObjectByType<Canvas>());
 		}
 
 		public void Launch() {
