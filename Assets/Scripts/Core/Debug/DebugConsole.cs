@@ -7,12 +7,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
 using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
 namespace SoulboundBackend.Core.Debug {
 	public sealed class DebugConsole {
-		private UIOverlayNode node;
+		private UIDebugConsoleNode node;
 		private bool visible;
+		private static readonly Queue<LogEntry> logQueue = new();
 
 		// prototypical, but will be replaced once input actions are stabilized
 		[PROTOTYPICAL]
@@ -29,8 +31,12 @@ namespace SoulboundBackend.Core.Debug {
 			};
 		}
 
+		public void AddLogEntry(LogEntry entry) {
+			if (node != null) node.handle.AddLogEntry(entry);
+			else logQueue.Enqueue(entry);
+		}
+
 		public void ToggleConsole() {
-			Logger.LogInfo("toggle console");
 			visible = !visible;
 
 			if (!visible) node.Destroy();
@@ -41,10 +47,29 @@ namespace SoulboundBackend.Core.Debug {
 			}
 		}
 
-		private UIOverlayNode GetNode() {
-			Logger.LogInfo("new node");
+		private UIDebugConsoleNode GetNode() {
 			GameObject obj = new("Debug Console", typeof(RectTransform));
-			return new UIOverlayNode(obj);
+			RectTransform rect = obj.GetComponent<RectTransform>();
+			rect.anchorMin = new Vector2(0f, 0f);
+			rect.anchorMax = new Vector2(1f, 1f);
+			rect.pivot = new Vector2(0.5f, 0.5f);
+			rect.sizeDelta = Vector2.zero;
+
+			Image image = obj.AddComponent<Image>();
+			image.color = new Color(0.15f, 0.15f, 0.15f, 0.55f);
+
+			VerticalLayoutGroup layoutGroup = obj.AddComponent<VerticalLayoutGroup>();
+			layoutGroup.childControlHeight = false;
+			layoutGroup.childControlWidth = false;
+			layoutGroup.childForceExpandHeight = false;
+			layoutGroup.childForceExpandWidth = false;
+
+			DebugConsoleHandle handle = obj.AddComponent<DebugConsoleHandle>();
+			foreach (var logEntry in logQueue) {
+				handle.AddLogEntry(logEntry);
+			}
+
+			return new UIDebugConsoleNode(obj, handle);
 		}
 	}
 }

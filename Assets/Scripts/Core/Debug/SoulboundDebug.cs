@@ -10,8 +10,8 @@ namespace SoulboundBackend.Core.Debug {
 		private readonly DebugConsole console;
 
 		public SoulboundDebug(ILogger logger) {
-			new Logging.Logger(logger);
 			this.console = new DebugConsole();
+			new Logging.Logger(logger, console);
 		}
 	}
 }

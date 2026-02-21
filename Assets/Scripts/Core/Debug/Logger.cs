@@ -17,10 +17,12 @@ namespace SoulboundBackend.Core.Debug.Logging {
 		
 		private static Logger instance { get; set; } = null!;
 		private readonly ILogger logger;
+		private readonly DebugConsole debugConsole;
 
-		public Logger(ILogger logger) {
+		public Logger(ILogger logger, DebugConsole debugConsole) {
 			instance = this;
 			this.logger = logger;
+			this.debugConsole = debugConsole;
 		}
 
 		private static void LogMessage(
@@ -44,7 +46,8 @@ namespace SoulboundBackend.Core.Debug.Logging {
 			};
 			string finalMessage = GetFinalMessage(logEntry);
 			loggingMethod(finalMessage);
-			if (exception != null) instance.logger.LogException(exception, context);
+			if (exception != null) instance?.logger.LogException(exception, context);
+			instance?.debugConsole.AddLogEntry(logEntry);
 		}
 
 		public static void LogInfo(object message, UnityEngine.Object? context = null) {
@@ -79,9 +82,9 @@ namespace SoulboundBackend.Core.Debug.Logging {
 			LogMessage(LogError_Method, LogLevel.Fatal, CaptureStackFrame(), message, exception, args: args);
 		}
 
-		private static void LogInfo_Method(string mesage) => instance.logger.Log(LogType.Log, mesage);
-		private static void LogWarning_Method(string mesage) => instance.logger.Log(LogType.Warning, mesage);
-		private static void LogError_Method(string mesage) => instance.logger.Log(LogType.Error, mesage);
+		private static void LogInfo_Method(string mesage) => instance?.logger.Log(LogType.Log, mesage);
+		private static void LogWarning_Method(string mesage) => instance?.logger.Log(LogType.Warning, mesage);
+		private static void LogError_Method(string mesage) => instance?.logger.Log(LogType.Error, mesage);
 
 		private static string GetFinalMessage(LogEntry entry) {
 			string message = PlaceArgs(entry.message, ARG_MARKER, entry.args);
