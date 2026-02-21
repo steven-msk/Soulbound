@@ -53,12 +53,6 @@ namespace SoulboundBackend.Client.UI.Screens {
 				: null;
 		}
 
-		private IScreenObject? GetActiveObject() {
-			return stack.TryPeek(out ScreenEntry activeEntry)
-				? activeEntry.obj
-				: null;
-		}
-
 		public void Flush() {
 			while (!stack.IsEmpty()) {
 				var screenObject = stack.Pop();

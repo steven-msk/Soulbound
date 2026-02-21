@@ -23,7 +23,7 @@ namespace SoulboundBackend.Client.SettingSystem {
 				string savePath = GetSavePath();
 				FileStream fileStream = File.Open(savePath, FileMode.Open, FileAccess.Read);
 
-				using (StreamReader reader = new StreamReader(fileStream)) {
+				using (StreamReader reader = new(fileStream)) {
 					var settingReader = new SettingReader(reader);
 
 					ProcessSettings(settingReader);

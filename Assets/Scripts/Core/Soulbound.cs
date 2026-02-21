@@ -69,13 +69,7 @@ namespace SoulboundBackend.Core {
 			if (running) return;
 			running = true;
 
-			Logger.LogInfo("info: {}", "obj");
-			Logger.LogWarning("warning: {}", "obj");
-			Logger.LogError("error: {}", "obj");
-			Logger.LogFatal(null, "fatal: {}", "obj");
-			Logger.LogFatal(new ArgumentException(), "an exception has been thrown {}", "obj");
-
-			Application.quitting += OnApplicationQuit;
+			Application.quitting += ((IApplicationController)this).OnApplicationQuit;
 
 			uiHandler.SetScreen(new TitleScreen());
 		}
@@ -122,7 +116,7 @@ namespace SoulboundBackend.Core {
 			return worldManager.IsSessionActive();
 		}
 
-		public void OnApplicationQuit() {
+		void IApplicationController.OnApplicationQuit() {
 			worldManager.QuitActiveSession();
 			settings.Save();
 			AssetManager.Shutdown();
@@ -157,7 +151,5 @@ namespace SoulboundBackend.Core {
 		public IEnumerable<string> ListWorldSaves() {
 			return worldManager.ListSaves();
 		}
-
-		public GameConfig GetGameConfig() => config;
 	}
 }

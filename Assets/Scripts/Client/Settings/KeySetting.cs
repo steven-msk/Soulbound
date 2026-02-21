@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Client.SettingSystem;
+using SoulboundBackend.Client.SettingSystem;
 using SoulboundBackend.Common;
 using System;
 using System.Collections.Generic;
@@ -24,7 +24,7 @@ namespace SoulboundBackend.Client.SettingSystem {
 			_text.text = GetBindingText(settingEntry.value);
 		}
 
-		private void Update() => PollKeyboard();
+		private void Update() => PollRebind();
 
 		public void UpdateRebinding(KeyControl? keyControl) {
 			_text.text = GetBindingText(keyControl);
@@ -35,10 +35,8 @@ namespace SoulboundBackend.Client.SettingSystem {
 			Settings.keybindMappings.BeginRebindContext(this);
 		}
 
-		private void PollKeyboard() {
-			if (!isRebinding) {
-				return;
-			}
+		private void PollRebind() {
+			if (!isRebinding) return;
 
 			foreach (var keyControl in Keyboard.current.allKeys) {
 				if (keyControl.wasPressedThisFrame) {

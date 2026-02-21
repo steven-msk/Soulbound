@@ -11,7 +11,7 @@ using UnityEngine.InputSystem.Controls;
 
 namespace SoulboundBackend.Client.SettingSystem {
 	public sealed class KeybindMappings {
-		private List<InputActionMap> rebindTargetMaps = new();
+		private readonly List<InputActionMap> rebindTargetMaps = new();
 		private KeySetting? rebindContextOwner;
 
 		public static readonly KeyMapping backtrackScreen = new("Screen Backtrack", "screen.backtrack", Key.Escape, null);

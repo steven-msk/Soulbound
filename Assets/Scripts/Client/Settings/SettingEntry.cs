@@ -17,25 +17,6 @@ using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 #nullable enable
 
 namespace SoulboundBackend.Client.SettingSystem {
-	public abstract class AbstractSettingEntry {
-		public readonly string displayName;
-		public readonly string id;
-		public readonly Func<Tooltip> tooltipSupplier;
-		public abstract object boxedDefaultValue { get; }
-		public abstract object boxedValue { get; }
-		public abstract Type valueType { get; }
-
-		protected AbstractSettingEntry(string name, string id, Func<Tooltip> tooltipSupplier) {
-			this.displayName = name;
-			this.id = id;
-			this.tooltipSupplier = tooltipSupplier;
-		}
-
-		public override string ToString() {
-			return $"{displayName}={boxedValue}";
-		}
-	}
-
 	public class SettingEntry<T> : AbstractSettingEntry {
 		public readonly T defaultValue;
 		public readonly ValueSet<T> valueSet;

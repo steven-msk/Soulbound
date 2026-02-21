@@ -11,6 +11,6 @@ namespace SoulboundBackend.Core {
 
 		// application lifetime
 		void Launch();
-		public void OnApplicationQuit();
+		void OnApplicationQuit();
 	}
 }
