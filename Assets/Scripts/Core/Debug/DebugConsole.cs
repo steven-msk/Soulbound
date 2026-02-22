@@ -137,6 +137,8 @@ namespace SoulboundBackend.Core.Debug {
 			filterWarning.transform.SetParent(filterContainer.transform, false);
 			GameObject filterError = CreateFilterButton(LogType.Error, handle);
 			filterError.transform.SetParent(filterContainer.transform, false);
+			GameObject filterExceptions = CreateFilterButton(LogType.Exception, handle);
+			filterExceptions.transform.SetParent(filterContainer.transform, false);
 
 			return new UIDebugConsoleNode(root, handle, scrollRect, contentRect);
 		}
@@ -147,7 +149,7 @@ namespace SoulboundBackend.Core.Debug {
 			ContentSizeFitter f = obj.AddComponent<ContentSizeFitter>();
 			f.verticalFit = f.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
 			TextMeshProUGUI t = obj.AddComponent<TextMeshProUGUI>();
-			t.text = $"Show {logType.ToString().ToUpper()}";
+			t.text = $"Show {logType.ToString().ToLower()}s";
 			t.fontSize = 20f;
 			obj.AddComponent<Button>().onClick.AddListener(() => {
 				handle.ToggleFilter(logType);
