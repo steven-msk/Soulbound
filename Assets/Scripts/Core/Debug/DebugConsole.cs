@@ -20,20 +20,6 @@ namespace SoulboundBackend.Core.Debug {
 				node?.handle.AddLog(condition, stackTrace, logType);
 				logQueue.Enqueue((condition, stackTrace, logType));
 			};
-			PreInitInput();
-		}
-
-		[Obsolete, PROTOTYPICAL]
-		private void PreInitInput() {
-			//inputActions = Soulbound.instance.playerInputActions.UI;
-			//inputActions.Enable();
-			//inputActions.EnterDebugCommand.performed += _ => StartCommandInput();
-			//inputActions.EnterDebugCommand.Disable();
-			//inputActions.ToggleDebugConsole.performed += _ => ToggleConsole();
-			//inputActions.ToggleDebugConsole.Enable();
-			//Logger.LogInfo("Debug actions: {}", inputActions.enabled);
-			//Logger.LogInfo("Toggle debug console: {}", inputActions.ToggleDebugConsole.enabled);
-			//Logger.LogInfo("Enter debug command: {}", inputActions.EnterDebugCommand.enabled);
 		}
 
 		public void ToggleConsole() {

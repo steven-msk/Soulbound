@@ -31,7 +31,7 @@ namespace SoulboundBackend.Core {
 		private readonly WorldManager worldManager;
 		public readonly Settings settings;
 		private readonly InputManager inputManager;
-		public static readonly InputActionAsset inputActionAsset = new PlayerInputActions().asset;
+		private static readonly PlayerInputActions inputActions = new();
 		public static readonly JsonSerializerSettings globalJsonSettings = new() {
 			TypeNameHandling = TypeNameHandling.Auto,
 			TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
@@ -46,7 +46,7 @@ namespace SoulboundBackend.Core {
 			instance = this;
 			this.config = config;
 			settings = new Settings();
-			inputManager = new InputManager(inputActionAsset);
+			inputManager = new InputManager(inputActions.asset);
 
 			try {
 				Thread.CurrentThread.Name = "LaunchThread";
@@ -131,7 +131,7 @@ namespace SoulboundBackend.Core {
 		void IApplicationController.OnApplicationQuit() {
 			worldManager.QuitActiveSession();
 			settings.Save();
-			inputActionAsset.Disable();
+			inputActions.Dispose();
 			AssetManager.Shutdown();
 		}
 
@@ -164,5 +164,8 @@ namespace SoulboundBackend.Core {
 		public IEnumerable<string> ListWorldSaves() {
 			return worldManager.ListSaves();
 		}
+
+		public InputManager GetInputManager() => inputManager;
+		public InputActionAsset GetInputActionAsset() => inputActions.asset;
 	}
 }

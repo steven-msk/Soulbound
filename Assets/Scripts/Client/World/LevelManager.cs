@@ -7,6 +7,7 @@ using SoulboundBackend.Client.World;
 using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Client.World.Chunk;
 using SoulboundBackend.Client.World.EntitySystem;
+using SoulboundBackend.Common;
 using SoulboundBackend.Common.Json;
 using SoulboundBackend.Core.AssetManagement;
 using SoulboundBackend.Core.Bootstrap;
@@ -25,7 +26,7 @@ using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 #nullable enable
 
 namespace SoulboundBackend.Core {
-	public class LevelManager : MonoBehaviour {
+	public class LevelManager : MonoBehaviour, IInputContext {
 		public const float tickRate = 0.02f;        // 50 tps
 		private float tickStartTime;
 		private float frameStartTime;
@@ -36,8 +37,6 @@ namespace SoulboundBackend.Core {
 		private WorldRenderer worldRenderer = null!;
 		public EntityManager entityManager { get; private set; } = null!;
 		private Canvas worldCanvas = null!;
-		private InputHandler inputHandler = null!;
-		private PlayerInputActions inputMappings = null!;
 		public string world { get; private set; } = null!;
 		public Level level { get; private set; } = null!;
 		public PlayerController? player { get; private set; }
@@ -58,20 +57,21 @@ namespace SoulboundBackend.Core {
 			this.container = container;
 			worldCanvas = container.Resolve<Canvas>();
 			Soulbound.instance.GetUIHandler().SetCanvas(worldCanvas);
+			Soulbound.instance.GetInputManager().PushContext(this);
 
-			inputMappings = container.Resolve<PlayerInputActions>();
-			InputActionMap playerActionMap = inputMappings.asset.FindActionMap("Player");
-			inputHandler = new InputHandler(playerActionMap);
+			//Settings.keybindMappings.AddRebindTargetMap(playerActionMap);
+			//Settings.keybindMappings.ProcessBindings(new Dictionary<KeyMapping, InputAction>() {
+			//	[KeybindMappings.jump] = inputHandler.GetAction("Jump")
+			//});
+		}
 
-			Settings.keybindMappings.AddRebindTargetMap(playerActionMap);
-			Settings.keybindMappings.ProcessBindings(new Dictionary<KeyMapping, InputAction>() {
-				[KeybindMappings.jump] = inputHandler.GetAction("Jump")
-			});
-
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("Esc"), pausable: false, binding => {
-				binding.Performed(_ => OnEscPressed());
-			});
-			inputMappings.Enable();
+		[PROTOTYPICAL]
+		bool IInputContext.HandleInput(in InputEvent inputEvent) {
+			if (inputEvent.token.Equals(InputTokens.p_playerEsc)) {
+				OnEscPressed();
+				return true;
+			}
+			return false;
 		}
 
 		public void BootstrapWorld(string world, WorldDump? dump, int seed, LevelGridContext gridContext) {
@@ -106,7 +106,7 @@ namespace SoulboundBackend.Core {
 			container.BindInstance(player).AsSingle();
 
 			var playerContext = player.GetComponent<GameObjectContext>();
-			playerContext.AddNormalInstaller(new PlayerInstaller(player, worldCanvas, inputHandler));
+			playerContext.AddNormalInstaller(new PlayerInstaller(player, worldCanvas));
 			playerContext.Run();
 
 			if (serialized.HasValue) {
@@ -163,8 +163,6 @@ namespace SoulboundBackend.Core {
 
 		public void StopSession() {
 			sessionRunning = false;
-			inputHandler.FlushCallbacks();
-			inputMappings.Dispose();
 			container.FlushBindings();
 		}
 
@@ -192,7 +190,6 @@ namespace SoulboundBackend.Core {
 		public void TogglePause() {
 			paused = !paused;
 			Time.timeScale = paused ? 0f : 1f;
-			inputHandler.PauseInputs(paused);
 			if (!paused) {
 				Soulbound.instance.GetUIHandler().GetScreenNavigator().PopScreen();
 			} else {

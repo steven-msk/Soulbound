@@ -1,25 +1,27 @@
 using SoulboundBackend.Client;
 using SoulboundBackend.Client.Input;
+using SoulboundBackend.Client.ItemSystem;
+using SoulboundBackend.Common;
 using SoulboundBackend.Core;
-using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
+using SoulboundBackend.Core.Bootstrap;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
-using SoulboundBackend.Common;
-using UnityEngine.UI;
-using SoulboundBackend.Core.Bootstrap;
-using Zenject;
 using System.Runtime.Serialization;
+using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.UI;
+using Zenject;
 using static PlayerInputActions;
+using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
+
 
 #nullable enable
 
 namespace SoulboundBackend.Client {
-	public class PlayerPhysics : MonoBehaviour {
+	public class PlayerPhysics : MonoBehaviour, IInputContext {
 		private readonly Dictionary<string, (Action<Collision2D> action, Func<bool> validator)> collisionReactionsByTag = new();
 		private readonly Dictionary<int, (Action<Collider2D> action, Func<bool> validator)> triggerReactionsByLayer = new();
 		private PlayerController player = null!;
-		private InputHandler inputHandler = null!;
 		private Rigidbody2D rb = null!;
 		private Animator animator = null!;
 		new private CapsuleCollider2D collider = null!;
@@ -72,7 +74,6 @@ namespace SoulboundBackend.Client {
 		[Inject]
 		public void Construct(DiContainer container) {
 			this.player = container.Resolve<PlayerController>();
-			this.inputHandler = container.Resolve<InputHandler>();
 			this.rb = player.GetComponent<Rigidbody2D>();
 			this.animator = player.GetComponent<Animator>();
 			this.collider = player.GetComponent<CapsuleCollider2D>();
@@ -86,26 +87,47 @@ namespace SoulboundBackend.Client {
 				isFlying = false;
 				rb.linearDamping = 0f;
 			}, IsOnGround));
-
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("Move"), pausable: true, binding => {
-				binding.Performed(context => movement.x = context.ReadValue<Vector2>().x);
-				binding.Canceled(context => movement.x = 0f);
-			});
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("LeftClick"), pausable: true, binding => {
-				binding.Performed(_ => leftHold = true);
-				binding.Performed(_ => leftHold = false);
-			});
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("RightClick"), pausable: true, binding => {
-				binding.Performed(_ => rightHold = true);
-				binding.Canceled(_ => rightHold = false);
-			});
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("MousePosition"), pausable: false, (action) => {
-				action.Performed(context => mouseScreenPos = context.ReadValue<Vector2>());
-			});
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("Jump"), pausable: true, (action) => {
-				action.Performed(_ => OnSpacePressed());
-			});
 		}
+
+		[PROTOTYPICAL]
+		public bool HandleInput(in InputEvent inputEvent) {
+			if (inputEvent.token.Equals(InputTokens.p_mousePosition)) {
+				mouseScreenPos = inputEvent.context.ReadValue<Vector2>();
+			}
+			if (inputEvent.token.Equals(InputTokens.p_move)) {
+				if (inputEvent.phase == InputActionPhase.Performed) {
+					movement.x = inputEvent.context.ReadValue<Vector2>().x;
+					return true;
+				} else if (inputEvent.phase == InputActionPhase.Canceled) {
+					movement.x = 0f;
+					return true;
+				}
+			}
+			if (inputEvent.token.Equals(InputTokens.p_leftClick)) {
+				if (inputEvent.phase == InputActionPhase.Performed) {
+					leftHold = true;
+					return true;
+				} else if (inputEvent.phase == InputActionPhase.Canceled) {
+					leftHold = false;
+					return true;
+				}
+			}
+			if (inputEvent.token.Equals(InputTokens.p_rightClick)) {
+				if (inputEvent.phase == InputActionPhase.Performed) {
+					rightHold = true;
+					return true;
+				} else if (inputEvent.phase == InputActionPhase.Canceled) {
+					rightHold = false;
+					return true;
+				}
+			}
+			if (inputEvent.token.Equals(InputTokens.p_jump)) {
+				OnSpacePressed();
+				return true;
+			}
+			return false;
+		}
+
 
 		// FIXME: inconsistent movement
 

@@ -29,7 +29,7 @@ using static UnityEditor.PlayerSettings;
 using Level = SoulboundBackend.Client.World.Level;
 
 namespace SoulboundBackend.Client {
-	public class PlayerController : Entity, IAttackPerformer, IItemConsumer, IUpdatable, IEntitySpawnable<PlayerSpawnData> {
+	public class PlayerController : Entity, IAttackPerformer, IItemConsumer, IUpdatable, IEntitySpawnable<PlayerSpawnData>, IInputContext {
 		public override Type scriptType => typeof(PlayerController);
 		public override EntityDescriptor descriptor => EntityDescriptorRegistry.ByType<PlayerController>();
 		private Inventory inventory;
@@ -44,7 +44,6 @@ namespace SoulboundBackend.Client {
 		[Header("Internal")]
 		[SerializeField] private Rigidbody2D rb;
 		[SerializeField] private Animator animator;
-		private InputHandler inputHandler;
 		private PlayerPhysics playerPhysics;
 		private AttackHandler attackHandler = null!;
 		private AttackSource attackSource = null!;
@@ -95,35 +94,12 @@ namespace SoulboundBackend.Client {
 
 		[Inject]
 		public void Construct(DiContainer container) {
-			inputHandler = container.Resolve<InputHandler>();
 			playerPhysics = container.Resolve<PlayerPhysics>();
-
 			inventory = new Inventory();
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("Toggle Inventory"), pausable: true, binding => {
-				binding.Performed(_ => inventory.Toggle());
-			});
-
 			this.hotbar = new Hotbar();
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("Change Hotbar Slot"), pausable: true, binding => {
-				binding.Performed(context => {
-					int slotIndex = int.Parse(context.control.name) - 1;
-					hotbar.SetMainSlot(slotIndex);
-				});
-			});
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("Scroll Hotbar Slot"), pausable: true, binding => {
-				binding.Performed(context => {
-					float scrollDelta = context.ReadValue<float>();
-					int nextSlot = hotbar.GetMainSlot() - (int)scrollDelta;
+			Soulbound.instance.GetInputManager().PushContext(this);
 
-					if (nextSlot < 0) nextSlot += hotbar.GetSlotCount();
-					nextSlot %= hotbar.GetSlotCount();
-					hotbar.SetMainSlot(nextSlot);
-				});
-			});
 			inventory.GetSlot(0).SetStack(new ItemStack(Items.leavesBlock, 5));
-			//inputHandler.RegisterInputEvent(inputHandler.GetAction("Drop Item"), pausable: true, binding => {
-			//	binding.Performed(_ => DropHoveredOrActiveItem());
-			//});
 
 			level = container.Resolve<Level>();
 			canvas = container.Resolve<Canvas>();
@@ -141,20 +117,59 @@ namespace SoulboundBackend.Client {
 				},
 				animator => animator.SetTrigger("attack")
 			);
+		}
 
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("LeftClick"), pausable: true, binding => {
-				binding.Performed(_ => OnLeftClick());
-				binding.Performed(_ => leftHold = true);
-				binding.Canceled(_ => leftHold = false);
-			});
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("RightClick"), pausable: true, binding => {
-				binding.Performed(_ => OnRightClick());
-				binding.Performed(_ => rightHold = true);
-				binding.Performed(_ => rightHold = true);
-			});
-			inputHandler.RegisterInputEvent(inputHandler.GetAction("MousePosition"), pausable: false, binding => {
-				binding.Performed(context => mouseScreenPos = context.ReadValue<Vector2>());
-			});
+		[PROTOTYPICAL]
+		bool IInputContext.HandleInput(in InputEvent inputEvent) {
+			if (inputEvent.token.Equals(InputTokens.p_toggleInventory)) {
+				inventory.Toggle();
+				return true;
+			}
+			if (inputEvent.token.Equals(InputTokens.p_changeHotbarSlot)) {
+				int slotIndex = int.Parse(inputEvent.context.control.name) - 1;
+				hotbar.SetMainSlot(slotIndex);
+				return true;
+			}
+			if (inputEvent.token.Equals(InputTokens.p_scrollHotbarSlot)) {
+				float scrollDelta = inputEvent.context.ReadValue<float>();
+				int nextSlot = hotbar.GetMainSlot() - (int)scrollDelta;
+
+				if (nextSlot < 0) nextSlot += hotbar.GetSlotCount();
+				nextSlot %= hotbar.GetSlotCount();
+				hotbar.SetMainSlot(nextSlot);
+				return true;
+			}
+			if (inputEvent.token.Equals(InputTokens.p_mousePosition)) {
+				mouseScreenPos = inputEvent.context.ReadValue<Vector2>();
+			}
+			if (inputEvent.token.Equals(InputTokens.p_leftClick)) {
+				if (inputEvent.phase == InputActionPhase.Performed) {
+					OnLeftClick();
+					leftHold = true;
+					playerPhysics.HandleInput(in inputEvent);
+					return true;
+				} else if (inputEvent.phase == InputActionPhase.Canceled) {
+					leftHold = false;
+					playerPhysics.HandleInput(in inputEvent);
+					return true;
+				}
+			}
+			if (inputEvent.token.Equals(InputTokens.p_rightClick)) {
+				if (inputEvent.phase == InputActionPhase.Performed) {
+					OnRightClick();
+					rightHold = true;
+					playerPhysics.HandleInput(in inputEvent);
+					return true;
+				} else if (inputEvent.phase == InputActionPhase.Canceled) {
+					rightHold = false;
+					playerPhysics.HandleInput(in inputEvent);
+					return true;
+				}
+			}
+			//inputHandler.RegisterInputEvent(inputHandler.GetAction("Drop Item"), pausable: true, binding => {
+			//	binding.Performed(_ => DropHoveredOrActiveItem());
+			//});
+			return playerPhysics.HandleInput(in inputEvent);
 		}
 
 		private void RegisterItemUsageCandidates(ItemUsageHandler? itemUsageHandler) {
