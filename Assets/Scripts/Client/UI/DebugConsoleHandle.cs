@@ -13,45 +13,23 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-#nullable enable
-
 namespace SoulboundBackend.Client.UI {
 	public sealed class DebugConsoleHandle : MonoBehaviour, IDebugConsoleHandle {
 		const int LOG_OBJECTS_PER_FRAME = 3;
+		private ScrollRect scrollRect;
+		private Transform contentParent;
 		private readonly List<(GameObject obj, LogType logType)> logObjects = new();
 		private readonly HashSet<LogType> filteredTypes = new();
 		private TMP_InputField commandInput = null!;
-		private bool isTypingCommand => commandInput != null;
 		private readonly Queue<(string condition, string stackTrace, LogType logType)> pendingLogs = new();
-		private Action<GameObject> objectAction = null!;
 
-		public GameObject LogMessageReceivedThreaded(string condition, string stackTrace, LogType logType) {
-			if (logType == LogType.Error || logType == LogType.Exception) {
-				int logSkips = logType == LogType.Error ? 4 : 0;
-				StringBuilder builder = new();
+		public void Init(ScrollRect scrollRect, Transform contentParent) {
+			this.scrollRect = scrollRect;
+			this.contentParent = contentParent;
+		}
 
-				builder.AppendLine(condition);
-				builder.Append(SkipFrames(stackTrace, logSkips));
-				condition = builder.ToString();
-			}
-
-			GameObject obj = new(logType.ToString(), typeof(RectTransform));
-			logObjects.Add((obj, logType));
-
-			TextMeshProUGUI text = obj.AddComponent<TextMeshProUGUI>();
-			text.fontSize = 12f;
-			text.text = condition;
-			text.color = logType switch {
-				LogType.Log => Color.white,
-				LogType.Warning => Color.yellow,
-				LogType.Error => Color.red,
-				LogType.Exception => Color.red,
-				_ => Color.white
-			};
-
-			ContentSizeFitter sizeFitter = obj.AddComponent<ContentSizeFitter>();
-			sizeFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-			return obj;
+		public void AddLog(string condition, string stackTrace, LogType logType) {
+			pendingLogs.Enqueue((condition, stackTrace, logType));
 		}
 
 		public void ToggleFilter(LogType typeFilter) {
@@ -64,7 +42,7 @@ namespace SoulboundBackend.Client.UI {
 		}
 
 		void IDebugConsoleHandle.StartCommandInput(Transform parent) {
-			if (isTypingCommand) return;
+			if (IsTypingCommand()) return;
 
 			CreateCommandInput(parent);
 			commandInput.gameObject.SetActive(true);
@@ -88,16 +66,11 @@ namespace SoulboundBackend.Client.UI {
 			int objLeft = LOG_OBJECTS_PER_FRAME;
 			while (pendingLogs.Count > 0 &&  objLeft-- > 0) {
 				var (condition, stackTrace, logType) = pendingLogs.Dequeue();
-				GameObject obj = LogMessageReceivedThreaded(condition, stackTrace, logType);
-				objectAction(obj);
-			}
-		}
 
-		void IDebugConsoleHandle.PendLogs(List<(string condition, string stackTrace, LogType logType)> pending, Action<GameObject> objectAction) {
-			foreach (var (condition, stackTrace, logType) in pending) {
-				pendingLogs.Enqueue((condition, stackTrace, logType));
+				GameObject obj = CreateLogObject(condition, stackTrace, logType);
+				obj.transform.SetParent(contentParent, false);
+				AutoScroll();
 			}
-			this.objectAction = objectAction;
 		}
 
 		private void SetCaretToEnd() {
@@ -140,11 +113,45 @@ namespace SoulboundBackend.Client.UI {
 			commandInput.onSubmit.AddListener(SubmitCommand);
 		}
 
+		private GameObject CreateLogObject(string condition, string stackTrace, LogType logType) {
+			if (logType == LogType.Error || logType == LogType.Exception) {
+				int logSkips = logType == LogType.Error ? 4 : 0;
+				StringBuilder builder = new();
+
+				builder.AppendLine(condition);
+				builder.Append(SkipFrames(stackTrace, logSkips));
+				condition = builder.ToString();
+			}
+
+			GameObject obj = new(logType.ToString(), typeof(RectTransform));
+			logObjects.Add((obj, logType));
+
+			TextMeshProUGUI text = obj.AddComponent<TextMeshProUGUI>();
+			text.fontSize = 12f;
+			text.text = condition;
+			text.color = logType switch {
+				LogType.Log => Color.white,
+				LogType.Warning => Color.yellow,
+				LogType.Error => Color.red,
+				LogType.Exception => Color.red,
+				_ => Color.white
+			};
+
+			ContentSizeFitter sizeFitter = obj.AddComponent<ContentSizeFitter>();
+			sizeFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+			return obj;
+		}
+
 		private void SubmitCommand(string command) {
 			Core.Debug.Logging.Logger.LogInfo("submitted commmand: {}", command);
 			commandInput.DeactivateInputField();
 			Destroy(commandInput.gameObject);
 			commandInput = null!;
+		}
+
+		private void AutoScroll() {
+			Canvas.ForceUpdateCanvases();
+			scrollRect.verticalNormalizedPosition = 0f;
 		}
 
 		private string SkipFrames(string stackTrace, int skipCount) {
@@ -165,8 +172,6 @@ namespace SoulboundBackend.Client.UI {
 			return builder.ToString();
 		}
 
-		public void SetVisible(bool visible) {
-			throw new NotImplementedException();
-		}
+		private bool IsTypingCommand() => commandInput != null;
 	}
 }

@@ -8,9 +8,8 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SoulboundBackend.Core.Debug {
-	public interface IDebugConsoleHandle : IUIElementHandle {
-		GameObject LogMessageReceivedThreaded(string condition, string stackTrace, LogType logType);
+	public interface IDebugConsoleHandle {
+		void AddLog(string condition, string stackTrace, LogType logType);
 		void StartCommandInput(Transform parent);
-		void PendLogs(List<(string condition, string stackTrace, LogType logType)> pending, Action<GameObject> objectAction);
 	}
 }

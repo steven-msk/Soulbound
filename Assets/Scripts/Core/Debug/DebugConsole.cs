@@ -18,7 +18,7 @@ namespace SoulboundBackend.Core.Debug {
 
 		public DebugConsole() {
 			Application.logMessageReceivedThreaded += (condition, stackTrace, logType) => {
-				HandleNodeLogMessage(condition, stackTrace, logType);
+				node?.handle.AddLog(condition, stackTrace, logType);
 				logQueue.Enqueue((condition, stackTrace, logType));
 			};
 			PreInitInput();
@@ -54,10 +54,9 @@ namespace SoulboundBackend.Core.Debug {
 			node = CreateNode();
 			node.onHide += () => inputActions.EnterDebugCommand.Disable();
 			node.onDestroy += () => node = null;
-			node.handle.PendLogs(logQueue.ToList(), logObj => {
-				logObj.transform.SetParent(node.contentRect.transform, false);
-				AutoScroll(node.scrollRect);
-			});
+			foreach (var (condition, stackTrace, logType) in logQueue) {
+				node.handle.AddLog(condition, stackTrace, logType);
+			}
 			Soulbound.instance.GetUIHandler().AddOverlay(node);
 		}
 
@@ -140,7 +139,9 @@ namespace SoulboundBackend.Core.Debug {
 			GameObject filterExceptions = CreateFilterButton(LogType.Exception, handle);
 			filterExceptions.transform.SetParent(filterContainer.transform, false);
 
-			return new UIDebugConsoleNode(root, handle, scrollRect, contentRect);
+			handle.Init(scrollRect, contentRect);
+
+			return new UIDebugConsoleNode(root, handle);
 		}
 
 		private GameObject CreateFilterButton(LogType logType, DebugConsoleHandle handle) {
@@ -155,19 +156,6 @@ namespace SoulboundBackend.Core.Debug {
 				handle.ToggleFilter(logType);
 			});
 			return obj;
-		}
-
-		private void AutoScroll(ScrollRect scrollRect) {
-			Canvas.ForceUpdateCanvases();
-			scrollRect.verticalNormalizedPosition = 0f;
-		}
-
-		private void HandleNodeLogMessage(string condition, string stackTrace, LogType logType) {
-			GameObject logObj = node?.handle.LogMessageReceivedThreaded(condition, stackTrace, logType);
-			if (logObj != null) {
-				logObj.transform.SetParent(node.contentRect.transform, false);
-				AutoScroll(node.scrollRect);
-			}
 		}
 	}
 }

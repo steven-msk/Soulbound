@@ -10,14 +10,10 @@ using UnityEngine.UI;
 namespace SoulboundBackend.Core.Debug {
 	public sealed record UIDebugConsoleNode : UIOverlayNode {
 		public readonly IDebugConsoleHandle handle;
-		public readonly ScrollRect scrollRect;
-		public readonly RectTransform contentRect;
 
-		public UIDebugConsoleNode(GameObject gameObject, IDebugConsoleHandle handle, ScrollRect scrollRect, RectTransform contentRect)
+		public UIDebugConsoleNode(GameObject gameObject, IDebugConsoleHandle handle)
 			: base(gameObject) {
 			this.handle = handle;
-			this.scrollRect = scrollRect;
-			this.contentRect = contentRect;
 		}
 	}
 }
