@@ -1,3 +1,4 @@
+using SoulboundBackend.Client.Input;
 using SoulboundBackend.Client.UI;
 using SoulboundBackend.Common;
 using System;
@@ -6,13 +7,11 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using static UnityEngine.Rendering.VirtualTexturing.Debugging;
 using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
 namespace SoulboundBackend.Core.Debug {
-	public sealed class DebugConsole {
+	public sealed class DebugConsole : IInputContext {
 		private UIDebugConsoleNode node;
-		private PlayerInputActions.UIActions inputActions;
 		private bool visible;
 		private readonly Queue<(string condition, string stackTrace, LogType logType)> logQueue = new();
 
@@ -26,15 +25,15 @@ namespace SoulboundBackend.Core.Debug {
 
 		[Obsolete, PROTOTYPICAL]
 		private void PreInitInput() {
-			inputActions = Soulbound.instance.playerInputActions.UI;
-			inputActions.Enable();
-			inputActions.EnterDebugCommand.performed += _ => StartCommandInput();
-			inputActions.EnterDebugCommand.Disable();
-			inputActions.ToggleDebugConsole.performed += _ => ToggleConsole();
-			inputActions.ToggleDebugConsole.Enable();
-			Logger.LogInfo("Debug actions: {}", inputActions.enabled);
-			Logger.LogInfo("Toggle debug console: {}", inputActions.ToggleDebugConsole.enabled);
-			Logger.LogInfo("Enter debug command: {}", inputActions.EnterDebugCommand.enabled);
+			//inputActions = Soulbound.instance.playerInputActions.UI;
+			//inputActions.Enable();
+			//inputActions.EnterDebugCommand.performed += _ => StartCommandInput();
+			//inputActions.EnterDebugCommand.Disable();
+			//inputActions.ToggleDebugConsole.performed += _ => ToggleConsole();
+			//inputActions.ToggleDebugConsole.Enable();
+			//Logger.LogInfo("Debug actions: {}", inputActions.enabled);
+			//Logger.LogInfo("Toggle debug console: {}", inputActions.ToggleDebugConsole.enabled);
+			//Logger.LogInfo("Enter debug command: {}", inputActions.EnterDebugCommand.enabled);
 		}
 
 		public void ToggleConsole() {
@@ -42,26 +41,30 @@ namespace SoulboundBackend.Core.Debug {
 			CreateNodeIfNull();
 
 			if (!visible) node.Hide();
-			else {
-				node.Show();
-				inputActions.EnterDebugCommand.Enable();
+			else node.Show();
+		}
+
+		bool IInputContext.HandleInput(in InputEvent inputEvent) {
+			if (inputEvent.token.Equals(InputTokens.toggleDebugConsole)) {
+				ToggleConsole();
+				return true;
 			}
+			if (inputEvent.token.Equals(InputTokens.enterCommand) && visible) {
+				node?.handle.StartCommandInput(node.transform);
+				return true;
+			}
+			return false;
 		}
 
 		private void CreateNodeIfNull() {
 			if (node != null) return;
 
 			node = CreateNode();
-			node.onHide += () => inputActions.EnterDebugCommand.Disable();
 			node.onDestroy += () => node = null;
 			foreach (var (condition, stackTrace, logType) in logQueue) {
 				node.handle.AddLog(condition, stackTrace, logType);
 			}
 			Soulbound.instance.GetUIHandler().AddOverlay(node);
-		}
-
-		private void StartCommandInput() {
-			node?.handle.StartCommandInput(node.transform);
 		}
 
 		// i am NOT bothering with cleaning this up

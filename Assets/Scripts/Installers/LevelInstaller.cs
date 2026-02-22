@@ -16,9 +16,6 @@ namespace SoulboundBackend.Core.Bootstrap {
 		}
 
 		public override void InstallBindings(DiContainer container) {
-			container.BindInstance(Soulbound.instance?.playerInputActions
-				?? new PlayerInputActions()).AsSingle().NonLazy();
-
 			container.Bind<LevelManager>().FromNewComponentOn(
 				new GameObject("LevelManager")
 			).AsSingle().NonLazy();

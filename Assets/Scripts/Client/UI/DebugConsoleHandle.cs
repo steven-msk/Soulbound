@@ -64,7 +64,7 @@ namespace SoulboundBackend.Client.UI {
 			if (pendingLogs.Count == 0) return;
 
 			int objLeft = LOG_OBJECTS_PER_FRAME;
-			while (pendingLogs.Count > 0 &&  objLeft-- > 0) {
+			while (pendingLogs.Count > 0 && objLeft-- > 0) {
 				var (condition, stackTrace, logType) = pendingLogs.Dequeue();
 
 				GameObject obj = CreateLogObject(condition, stackTrace, logType);

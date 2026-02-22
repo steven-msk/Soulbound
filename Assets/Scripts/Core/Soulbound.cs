@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using SoulboundBackend.Client;
+using SoulboundBackend.Client.Input;
 using SoulboundBackend.Client.SettingSystem;
 using SoulboundBackend.Client.UI;
 using SoulboundBackend.Client.UI.Screens;
@@ -15,6 +16,7 @@ using System.Linq;
 using System.Threading;
 using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
@@ -28,7 +30,8 @@ namespace SoulboundBackend.Core {
 		private readonly UIHandler uiHandler;
 		private readonly WorldManager worldManager;
 		public readonly Settings settings;
-		public readonly PlayerInputActions playerInputActions;
+		private readonly InputManager inputManager;
+		public static readonly InputActionAsset inputActionAsset = new PlayerInputActions().asset;
 		public static readonly JsonSerializerSettings globalJsonSettings = new() {
 			TypeNameHandling = TypeNameHandling.Auto,
 			TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
@@ -43,7 +46,7 @@ namespace SoulboundBackend.Core {
 			instance = this;
 			this.config = config;
 			settings = new Settings();
-			playerInputActions = new PlayerInputActions();
+			inputManager = new InputManager(inputActionAsset);
 
 			try {
 				Thread.CurrentThread.Name = "LaunchThread";
@@ -54,7 +57,8 @@ namespace SoulboundBackend.Core {
 			Application.SetStackTraceLogType(LogType.Warning, StackTraceLogType.ScriptOnly);
 			Application.SetStackTraceLogType(LogType.Error, StackTraceLogType.ScriptOnly);
 #endif
-			new SoulboundDebug(UnityEngine.Debug.unityLogger);
+			SoulboundDebug debug = new(UnityEngine.Debug.unityLogger);
+			inputManager.PushContext(debug.GetConsole());
 
 			AssetManager.PreloadAll();
 
@@ -127,6 +131,7 @@ namespace SoulboundBackend.Core {
 		void IApplicationController.OnApplicationQuit() {
 			worldManager.QuitActiveSession();
 			settings.Save();
+			inputActionAsset.Disable();
 			AssetManager.Shutdown();
 		}
 

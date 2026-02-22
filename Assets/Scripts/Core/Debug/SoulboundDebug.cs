@@ -14,5 +14,7 @@ namespace SoulboundBackend.Core.Debug {
 			new Logging.Logger(logger);
 			this.console = new DebugConsole();
 		}
+
+		public DebugConsole GetConsole() => console;
 	}
 }

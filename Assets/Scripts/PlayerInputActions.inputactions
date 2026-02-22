@@ -391,7 +391,7 @@
                     "name": "Submit",
                     "type": "Button",
                     "id": "7607c7b6-cd76-4816-beef-bd0341cfe950",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -400,7 +400,7 @@
                     "name": "Cancel",
                     "type": "Button",
                     "id": "15cef263-9014-4fd5-94d9-4e4a6234a6ef",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -464,24 +464,6 @@
                     "type": "PassThrough",
                     "id": "9caa3d8a-6b2f-4e8e-8bad-6ede561bd9be",
                     "expectedControlType": "Quaternion",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "ToggleDebugConsole",
-                    "type": "Button",
-                    "id": "7a6c7797-04df-4165-be54-63ca112ee1e8",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
-                    "name": "EnterDebugCommand",
-                    "type": "Button",
-                    "id": "33242f2d-709a-476b-9ba7-636eb13d3ad8",
-                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -905,26 +887,52 @@
                     "action": "TrackedDeviceOrientation",
                     "isComposite": false,
                     "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Debug",
+            "id": "358412a5-ca42-4f0a-8837-934e69407396",
+            "actions": [
+                {
+                    "name": "ToggleConsole",
+                    "type": "Button",
+                    "id": "77e53503-d7c3-41db-8455-aa7667ff4ebf",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
+                    "name": "EnterCommand",
+                    "type": "Button",
+                    "id": "7a43f28e-d045-4ab0-a391-b47962b5a4c1",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
                     "name": "",
-                    "id": "6a8c4059-9b60-45e1-913f-ea45e1203e3b",
+                    "id": "e33c3800-9d0b-4935-9ef8-aeeae781e446",
                     "path": "<Keyboard>/f1",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "ToggleDebugConsole",
+                    "action": "ToggleConsole",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "a422d7fa-e1e2-4ae9-9b1d-0b412ad429c1",
+                    "id": "de40eac0-3e06-4f3e-b04e-fcf365a411ba",
                     "path": "<Keyboard>/slash",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "EnterDebugCommand",
+                    "action": "EnterCommand",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
