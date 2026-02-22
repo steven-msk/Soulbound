@@ -1,8 +1,10 @@
 using SoulboundBackend.Client.UI;
 using SoulboundBackend.Common;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEngine.Rendering.VirtualTexturing.Debugging;
 using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
 namespace SoulboundBackend.Core.Debug {
@@ -98,7 +100,40 @@ namespace SoulboundBackend.Core.Debug {
 			scrollRect.content = contentRect;
 
 			DebugConsoleHandle handle = root.AddComponent<DebugConsoleHandle>();
+
+			GameObject filterContainer = new("Filters", typeof(RectTransform));
+			filterContainer.transform.SetParent(root.transform, false);
+			RectTransform r = filterContainer.GetComponent<RectTransform>();
+			r.pivot = r.anchorMin = r.anchorMax = new Vector2(1f, 0f);
+			r.anchoredPosition = Vector2.zero;
+			VerticalLayoutGroup l = filterContainer.AddComponent<VerticalLayoutGroup>();
+			l.childControlWidth = l.childControlHeight = false;
+			l.childForceExpandWidth = l.childForceExpandHeight = false;
+			ContentSizeFitter f = filterContainer.AddComponent<ContentSizeFitter>();
+			f.verticalFit = f.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+			GameObject filterInfo = CreateFilterButton(LogType.Log, handle);
+			filterInfo.transform.SetParent(filterContainer.transform, false);
+			GameObject filterWarning = CreateFilterButton(LogType.Warning, handle);
+			filterWarning.transform.SetParent(filterContainer.transform, false);
+			GameObject filterError = CreateFilterButton(LogType.Error, handle);
+			filterError.transform.SetParent(filterContainer.transform, false);
+
 			return new UIDebugConsoleNode(root, handle, scrollRect, contentRect);
+		}
+
+		private GameObject CreateFilterButton(LogType logType, DebugConsoleHandle handle) {
+			GameObject obj = new($"Filter {logType}", typeof(RectTransform));
+			RectTransform r = obj.GetComponent<RectTransform>();
+			ContentSizeFitter f = obj.AddComponent<ContentSizeFitter>();
+			f.verticalFit = f.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+			TextMeshProUGUI t = obj.AddComponent<TextMeshProUGUI>();
+			t.text = $"Show {logType.ToString().ToUpper()}";
+			t.fontSize = 20f;
+			obj.AddComponent<Button>().onClick.AddListener(() => {
+				handle.ToggleFilter(logType);
+			});
+			return obj;
 		}
 
 		private void AutoScroll(ScrollRect scrollRect) {

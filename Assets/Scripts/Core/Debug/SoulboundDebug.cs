@@ -12,7 +12,7 @@ namespace SoulboundBackend.Core.Debug {
 
 		public SoulboundDebug(ILogger logger) {
 			this.console = new DebugConsole();
-			new Logging.Logger(logger, console);
+			new Logging.Logger(logger);
 		}
 	}
 }

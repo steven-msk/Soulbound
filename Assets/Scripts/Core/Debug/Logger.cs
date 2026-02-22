@@ -17,12 +17,10 @@ namespace SoulboundBackend.Core.Debug.Logging {
 		
 		private static Logger instance { get; set; } = null!;
 		private readonly ILogger logger;
-		private readonly DebugConsole debugConsole;
 
-		public Logger(ILogger logger, DebugConsole debugConsole) {
+		public Logger(ILogger logger) {
 			instance = this;
 			this.logger = logger;
-			this.debugConsole = debugConsole;
 		}
 
 		private static void LogMessage(
@@ -47,7 +45,6 @@ namespace SoulboundBackend.Core.Debug.Logging {
 			string finalMessage = GetFinalMessage(logEntry);
 			loggingMethod(finalMessage);
 			if (exception != null) instance?.logger.LogException(exception, context);
-			//instance?.debugConsole.AddLogEntry(logEntry);
 		}
 
 		public static void LogInfo(object message, UnityEngine.Object? context = null) {
