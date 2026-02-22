@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using SoulboundBackend.Core.Debug;
 using SoulboundBackend.Core.Debug.Logging;
 using System;
@@ -16,10 +17,13 @@ using UnityEngine.UI;
 
 namespace SoulboundBackend.Client.UI {
 	public sealed class DebugConsoleHandle : MonoBehaviour, IDebugConsoleHandle {
+		const int LOG_OBJECTS_PER_FRAME = 3;
 		private readonly List<(GameObject obj, LogType logType)> logObjects = new();
 		private readonly HashSet<LogType> filteredTypes = new();
 		private TMP_InputField commandInput = null!;
 		private bool isTypingCommand => commandInput != null;
+		private readonly Queue<(string condition, string stackTrace, LogType logType)> pendingLogs = new();
+		private Action<GameObject> objectAction = null!;
 
 		public GameObject LogMessageReceivedThreaded(string condition, string stackTrace, LogType logType) {
 			if (logType == LogType.Error || logType == LogType.Exception) {
@@ -74,6 +78,26 @@ namespace SoulboundBackend.Client.UI {
 			commandInput.onValueChanged.RemoveListener(ForceLeadingSlash);
 			commandInput.text = $"/{value}";
 			SetCaretToEnd();
+		}
+
+		private void Update() => ProcessLogPendings();
+
+		private void ProcessLogPendings() {
+			if (pendingLogs.Count == 0) return;
+
+			int objLeft = LOG_OBJECTS_PER_FRAME;
+			while (pendingLogs.Count > 0 &&  objLeft-- > 0) {
+				var (condition, stackTrace, logType) = pendingLogs.Dequeue();
+				GameObject obj = LogMessageReceivedThreaded(condition, stackTrace, logType);
+				objectAction(obj);
+			}
+		}
+
+		void IDebugConsoleHandle.PendLogs(List<(string condition, string stackTrace, LogType logType)> pending, Action<GameObject> objectAction) {
+			foreach (var (condition, stackTrace, logType) in pending) {
+				pendingLogs.Enqueue((condition, stackTrace, logType));
+			}
+			this.objectAction = objectAction;
 		}
 
 		private void SetCaretToEnd() {

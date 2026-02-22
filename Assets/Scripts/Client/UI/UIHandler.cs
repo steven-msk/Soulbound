@@ -23,13 +23,17 @@ namespace SoulboundBackend.Client.UI {
 		}
 
 		public void SetCanvas(Canvas canvas) {
-			foreach (var overlay in overlays) overlay.Destroy();
+			UIOverlayNode[] nodes = overlays.ToArray();
+			for (int i = 0; i < nodes.Length; i++) {
+				nodes[i].Destroy();
+			}
+			overlays.Clear();
 
 			this.canvas = canvas;
 			screenManager = new ScreenManager(canvas.transform);
 		}
 
-		public void ShowOverlay(UIOverlayNode overlayNode) {
+		public void AddOverlay(UIOverlayNode overlayNode) {
 			overlayNode.gameObject.transform.SetParent(canvas.transform, false);
 			overlays.Add(overlayNode);
 			overlayNode.onDestroy += () => overlays.Remove(overlayNode);

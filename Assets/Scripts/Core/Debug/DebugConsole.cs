@@ -2,6 +2,7 @@ using SoulboundBackend.Client.UI;
 using SoulboundBackend.Common;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,7 +14,7 @@ namespace SoulboundBackend.Core.Debug {
 		private UIDebugConsoleNode node;
 		private PlayerInputActions.UIActions inputActions;
 		private bool visible;
-		private static readonly Queue<(string condition, string stackTrace, LogType logType)> logQueue = new();
+		private readonly Queue<(string condition, string stackTrace, LogType logType)> logQueue = new();
 
 		public DebugConsole() {
 			Application.logMessageReceivedThreaded += (condition, stackTrace, logType) => {
@@ -27,7 +28,7 @@ namespace SoulboundBackend.Core.Debug {
 		private void PreInitInput() {
 			inputActions = Soulbound.instance.playerInputActions.UI;
 			inputActions.Enable();
-			inputActions.EnterDebugCommand.performed += _ => StartCommandInput(); 
+			inputActions.EnterDebugCommand.performed += _ => StartCommandInput();
 			inputActions.EnterDebugCommand.Disable();
 			inputActions.ToggleDebugConsole.performed += _ => ToggleConsole();
 			inputActions.ToggleDebugConsole.Enable();
@@ -38,20 +39,26 @@ namespace SoulboundBackend.Core.Debug {
 
 		public void ToggleConsole() {
 			visible = !visible;
+			CreateNodeIfNull();
 
-			if (!visible) node.Destroy();
+			if (!visible) node.Hide();
 			else {
-				node = GetNode();
-				foreach (var (condition, stackTrace, logType) in logQueue) {
-					HandleNodeLogMessage(condition, stackTrace, logType);
-				}
-				node.onDestroy += () => {
-					node = null;
-					inputActions.EnterDebugCommand.Disable();
-				};
-				Soulbound.instance.GetUIHandler().ShowOverlay(node);
+				node.Show();
 				inputActions.EnterDebugCommand.Enable();
 			}
+		}
+
+		private void CreateNodeIfNull() {
+			if (node != null) return;
+
+			node = CreateNode();
+			node.onHide += () => inputActions.EnterDebugCommand.Disable();
+			node.onDestroy += () => node = null;
+			node.handle.PendLogs(logQueue.ToList(), logObj => {
+				logObj.transform.SetParent(node.contentRect.transform, false);
+				AutoScroll(node.scrollRect);
+			});
+			Soulbound.instance.GetUIHandler().AddOverlay(node);
 		}
 
 		private void StartCommandInput() {
@@ -61,7 +68,7 @@ namespace SoulboundBackend.Core.Debug {
 		// i am NOT bothering with cleaning this up
 		// dont even think about adding a scrollbar
 		// (at least for now)
-		private UIDebugConsoleNode GetNode() {
+		private UIDebugConsoleNode CreateNode() {
 			GameObject root = new("Debug Console", typeof(RectTransform));
 			RectTransform rect = root.GetComponent<RectTransform>();
 			rect.anchorMin = new Vector2(0f, 0f);

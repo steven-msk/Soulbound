@@ -10,6 +10,7 @@ using UnityEngine;
 namespace SoulboundBackend.Client.UI {
 	public record UIOverlayNode : UIElementNode {
 		public event Action? onDestroy;
+		public event Action? onHide;
 
 		public UIOverlayNode(GameObject gameObject)
 			: base(gameObject) {
@@ -18,6 +19,15 @@ namespace SoulboundBackend.Client.UI {
 		public void Destroy() {
 			onDestroy?.Invoke();
 			GameObject.Destroy(gameObject);
+		}
+
+		public void Hide() {
+			onHide?.Invoke();
+			gameObject.SetActive(false);
+		}
+
+		public void Show() {
+			gameObject.SetActive(true);
 		}
 	}
 }
