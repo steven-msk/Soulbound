@@ -562,6 +562,15 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""EnterDebugCommand"",
+                    ""type"": ""Button"",
+                    ""id"": ""33242f2d-709a-476b-9ba7-636eb13d3ad8"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -993,6 +1002,17 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""action"": ""ToggleDebugConsole"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a422d7fa-e1e2-4ae9-9b1d-0b412ad429c1"",
+                    ""path"": ""<Keyboard>/slash"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""EnterDebugCommand"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -1085,6 +1105,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_UI_TrackedDevicePosition = m_UI.FindAction("TrackedDevicePosition", throwIfNotFound: true);
         m_UI_TrackedDeviceOrientation = m_UI.FindAction("TrackedDeviceOrientation", throwIfNotFound: true);
         m_UI_ToggleDebugConsole = m_UI.FindAction("ToggleDebugConsole", throwIfNotFound: true);
+        m_UI_EnterDebugCommand = m_UI.FindAction("EnterDebugCommand", throwIfNotFound: true);
     }
 
     ~@PlayerInputActions()
@@ -1372,6 +1393,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_UI_TrackedDevicePosition;
     private readonly InputAction m_UI_TrackedDeviceOrientation;
     private readonly InputAction m_UI_ToggleDebugConsole;
+    private readonly InputAction m_UI_EnterDebugCommand;
     /// <summary>
     /// Provides access to input actions defined in input action map "UI".
     /// </summary>
@@ -1427,6 +1449,10 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "UI/ToggleDebugConsole".
         /// </summary>
         public InputAction @ToggleDebugConsole => m_Wrapper.m_UI_ToggleDebugConsole;
+        /// <summary>
+        /// Provides access to the underlying input action "UI/EnterDebugCommand".
+        /// </summary>
+        public InputAction @EnterDebugCommand => m_Wrapper.m_UI_EnterDebugCommand;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1486,6 +1512,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @ToggleDebugConsole.started += instance.OnToggleDebugConsole;
             @ToggleDebugConsole.performed += instance.OnToggleDebugConsole;
             @ToggleDebugConsole.canceled += instance.OnToggleDebugConsole;
+            @EnterDebugCommand.started += instance.OnEnterDebugCommand;
+            @EnterDebugCommand.performed += instance.OnEnterDebugCommand;
+            @EnterDebugCommand.canceled += instance.OnEnterDebugCommand;
         }
 
         /// <summary>
@@ -1530,6 +1559,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @ToggleDebugConsole.started -= instance.OnToggleDebugConsole;
             @ToggleDebugConsole.performed -= instance.OnToggleDebugConsole;
             @ToggleDebugConsole.canceled -= instance.OnToggleDebugConsole;
+            @EnterDebugCommand.started -= instance.OnEnterDebugCommand;
+            @EnterDebugCommand.performed -= instance.OnEnterDebugCommand;
+            @EnterDebugCommand.canceled -= instance.OnEnterDebugCommand;
         }
 
         /// <summary>
@@ -1790,5 +1822,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnToggleDebugConsole(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "EnterDebugCommand" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnEnterDebugCommand(InputAction.CallbackContext context);
     }
 }

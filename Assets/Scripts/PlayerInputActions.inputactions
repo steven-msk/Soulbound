@@ -476,6 +476,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "EnterDebugCommand",
+                    "type": "Button",
+                    "id": "33242f2d-709a-476b-9ba7-636eb13d3ad8",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -905,6 +914,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "ToggleDebugConsole",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a422d7fa-e1e2-4ae9-9b1d-0b412ad429c1",
+                    "path": "<Keyboard>/slash",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "EnterDebugCommand",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

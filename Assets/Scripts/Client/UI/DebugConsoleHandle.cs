@@ -18,10 +18,12 @@ namespace SoulboundBackend.Client.UI {
 	public sealed class DebugConsoleHandle : MonoBehaviour, IDebugConsoleHandle {
 		private readonly List<(GameObject obj, LogType logType)> logObjects = new();
 		private readonly HashSet<LogType> filteredTypes = new();
+		private TMP_InputField commandInput = null!;
+		private bool isTypingCommand => commandInput != null;
 
 		public GameObject LogMessageReceivedThreaded(string condition, string stackTrace, LogType logType) {
 			if (logType == LogType.Error || logType == LogType.Exception) {
-				int logSkips = logType == LogType.Error ? 4 : 3;
+				int logSkips = logType == LogType.Error ? 4 : 0;
 				StringBuilder builder = new();
 
 				builder.AppendLine(condition);
@@ -55,6 +57,70 @@ namespace SoulboundBackend.Client.UI {
 			foreach (var (obj, _) in logObjects.Where(o => !filteredTypes.Contains(o.logType))) {
 				obj.SetActive(false);
 			}
+		}
+
+		void IDebugConsoleHandle.StartCommandInput(Transform parent) {
+			if (isTypingCommand) return;
+
+			CreateCommandInput(parent);
+			commandInput.gameObject.SetActive(true);
+			commandInput.text = "/";
+			commandInput.onValueChanged.AddListener(ForceLeadingSlash);
+			SetCaretToEnd();
+			commandInput.ActivateInputField();
+		}
+
+		private void ForceLeadingSlash(string value) {
+			commandInput.onValueChanged.RemoveListener(ForceLeadingSlash);
+			commandInput.text = $"/{value}";
+			SetCaretToEnd();
+		}
+
+		private void SetCaretToEnd() {
+			int end = commandInput.text.Length;
+			commandInput.caretPosition = end;
+			commandInput.selectionAnchorPosition = end;
+			commandInput.selectionFocusPosition = end;
+		}
+
+		private void CreateCommandInput(Transform parent) {
+			GameObject obj = new("Command Input", typeof(RectTransform));
+			obj.transform.SetParent(parent, false);
+
+			RectTransform rect = obj.GetComponent<RectTransform>();
+			rect.anchorMin = Vector2.zero;
+			rect.anchorMax = new Vector2(1f, 0f);
+			rect.pivot = new Vector2(0.5f, 0f);
+			rect.sizeDelta = new Vector2(0f, 30f);
+
+			Image bg = obj.AddComponent<Image>();
+			bg.color = new Color(0.1f, 0.1f, 0.1f, 1f);
+
+			commandInput = obj.AddComponent<TMP_InputField>();
+
+			GameObject textObj = new("Text", typeof(RectTransform));
+			textObj.transform.SetParent(obj.transform, false);
+
+			TextMeshProUGUI text = textObj.AddComponent<TextMeshProUGUI>();
+			text.fontSize = 15f;
+			text.color = Color.white;
+
+			RectTransform textRect = textObj.GetComponent<RectTransform>();
+			textRect.anchorMin = Vector2.zero;
+			textRect.anchorMax = Vector2.one;
+			textRect.offsetMin = new Vector2(10f, 0f);
+			textRect.offsetMax = new Vector2(-10f, 0f);
+
+			commandInput.textComponent = text;
+			commandInput.lineType = TMP_InputField.LineType.SingleLine;
+			commandInput.onSubmit.AddListener(SubmitCommand);
+		}
+
+		private void SubmitCommand(string command) {
+			Core.Debug.Logging.Logger.LogInfo("submitted commmand: {}", command);
+			commandInput.DeactivateInputField();
+			Destroy(commandInput.gameObject);
+			commandInput = null!;
 		}
 
 		private string SkipFrames(string stackTrace, int skipCount) {
