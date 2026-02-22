@@ -47,7 +47,7 @@ namespace SoulboundBackend.Core.Debug.Logging {
 			string finalMessage = GetFinalMessage(logEntry);
 			loggingMethod(finalMessage);
 			if (exception != null) instance?.logger.LogException(exception, context);
-			instance?.debugConsole.AddLogEntry(logEntry);
+			//instance?.debugConsole.AddLogEntry(logEntry);
 		}
 
 		public static void LogInfo(object message, UnityEngine.Object? context = null) {

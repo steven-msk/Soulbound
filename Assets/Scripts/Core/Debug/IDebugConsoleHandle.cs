@@ -9,6 +9,6 @@ using UnityEngine;
 
 namespace SoulboundBackend.Core.Debug {
 	public interface IDebugConsoleHandle : IUIElementHandle {
-		GameObject AddLogEntry(LogEntry entry);
+		GameObject LogMessageReceivedThreaded(string condition, string stackTrace, LogType logType);
 	}
 }

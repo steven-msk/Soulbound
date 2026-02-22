@@ -10,7 +10,7 @@ public sealed class Main : MonoBehaviour {
 	private void Awake() => instance = this;
 
 	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-	public static void SessionStart() {
+	public static void GameLaunch() {
 		if (Application.isEditor && SceneManager.GetActiveScene().name != instance?.gameConfig.dev.devScene
 				|| (!instance?.gameObject.activeSelf ?? true)) {
 			return;

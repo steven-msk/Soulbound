@@ -1,11 +1,6 @@
 using SoulboundBackend.Client.UI;
 using SoulboundBackend.Common;
-using SoulboundBackend.Core.Debug.Logging;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
@@ -14,7 +9,7 @@ namespace SoulboundBackend.Core.Debug {
 	public sealed class DebugConsole {
 		private UIDebugConsoleNode node;
 		private bool visible;
-		private static readonly Queue<LogEntry> logQueue = new();
+		private static readonly Queue<(string condition, string stackTrace, LogType logType)> logQueue = new();
 
 		// prototypical, but will be replaced once input actions are stabilized
 		[PROTOTYPICAL]
@@ -29,15 +24,10 @@ namespace SoulboundBackend.Core.Debug {
 			Soulbound.instance.playerInputActions.UI.ToggleDebugConsole.performed += _ => {
 				ToggleConsole();
 			};
-		}
-
-		public void AddLogEntry(LogEntry entry) {
-			GameObject logObj = node?.handle.AddLogEntry(entry);
-			if (logObj != null) {
-				logObj.transform.SetParent(node.contentRect.transform, false);
-				AutoScroll(node.scrollRect);
-			}
-			logQueue.Enqueue(entry);
+			Application.logMessageReceivedThreaded += (condition, stackTrace, logType) => {
+				HandleNodeLogMessage(condition, stackTrace, logType);
+				logQueue.Enqueue((condition, stackTrace, logType));
+			};
 		}
 
 		public void ToggleConsole() {
@@ -46,6 +36,9 @@ namespace SoulboundBackend.Core.Debug {
 			if (!visible) node.Destroy();
 			else {
 				node = GetNode();
+				foreach (var (condition, stackTrace, logType) in logQueue) {
+					HandleNodeLogMessage(condition, stackTrace, logType);
+				}
 				node.onDestroy += () => node = null;
 				Soulbound.instance.GetUIHandler().ShowOverlay(node);
 			}
@@ -104,20 +97,21 @@ namespace SoulboundBackend.Core.Debug {
 			scrollRect.viewport = viewportRect;
 			scrollRect.content = contentRect;
 
-
 			DebugConsoleHandle handle = root.AddComponent<DebugConsoleHandle>();
-			foreach (var logEntry in logQueue) {
-				GameObject entryObj = handle.AddLogEntry(logEntry);
-				entryObj.transform.SetParent(content.transform, false);
-				AutoScroll(scrollRect);
-			}
-
 			return new UIDebugConsoleNode(root, handle, scrollRect, contentRect);
 		}
 
 		private void AutoScroll(ScrollRect scrollRect) {
 			Canvas.ForceUpdateCanvases();
 			scrollRect.verticalNormalizedPosition = 0f;
+		}
+
+		private void HandleNodeLogMessage(string condition, string stackTrace, LogType logType) {
+			GameObject logObj = node?.handle.LogMessageReceivedThreaded(condition, stackTrace, logType);
+			if (logObj != null) {
+				logObj.transform.SetParent(node.contentRect.transform, false);
+				AutoScroll(node.scrollRect);
+			}
 		}
 	}
 }
