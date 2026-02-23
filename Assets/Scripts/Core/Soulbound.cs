@@ -83,6 +83,10 @@ namespace SoulboundBackend.Core {
 			uiHandler.SetScreen(new TitleScreen());
 		}
 
+		public void FrameTick() {
+			inputManager.DispatchInputs();
+		}
+
 		// aware of the problem with world deserialization
 
 		public void CreateNewWorld(string world) {

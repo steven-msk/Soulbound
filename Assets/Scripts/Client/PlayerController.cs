@@ -1,31 +1,18 @@
-using NUnit.Framework.Internal;
 using SoulboundBackend.Client.Combat;
 using SoulboundBackend.Client.Concurrency;
 using SoulboundBackend.Client.Input;
 using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.Stats;
-using SoulboundBackend.Client.UI;
 using SoulboundBackend.Client.UI.Storage;
 using SoulboundBackend.Client.World;
 using SoulboundBackend.Client.World.BlockSystem;
-using SoulboundBackend.Client.World.Chunk;
 using SoulboundBackend.Client.World.EntitySystem;
-using SoulboundBackend.Client.World.EntitySystem.SpawnData;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core;
-using SoulboundBackend.Core.Bootstrap;
 using System;
-using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEditor.Build;
-using UnityEditor.Build.Content;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Tilemaps;
 using Zenject;
-using static PlayerInputActions;
-using static Unity.VisualScripting.Member;
-using static UnityEditor.PlayerSettings;
 using Level = SoulboundBackend.Client.World.Level;
 
 namespace SoulboundBackend.Client {
@@ -140,7 +127,8 @@ namespace SoulboundBackend.Client {
 				hotbar.SetMainSlot(slotIndex);
 				return true;
 			}
-			if (inputEvent.token.Equals(InputTokens.Player.scrollHotbarSlot)) {
+			if (inputEvent.token.Equals(InputTokens.Player.scrollHotbarSlot)
+					&& inputEvent.phase == InputActionPhase.Performed) {
 				float scrollDelta = inputEvent.context.ReadValue<float>();
 				int nextSlot = hotbar.GetMainSlot() - (int)scrollDelta;
 
