@@ -12,11 +12,9 @@ using SoulboundBackend.Core.AssetManagement;
 namespace SoulboundBackend.Core.Bootstrap {
 	public class PlayerInstaller : InstallerAdapter {
 		private readonly PlayerController playerInstance;
-		private readonly Canvas canvas;
 
-		public PlayerInstaller(PlayerController playerInstance, Canvas canvas) {
+		public PlayerInstaller(PlayerController playerInstance) {
 			this.playerInstance = playerInstance;
-			this.canvas = canvas;
 		}
 
 		public override void InstallBindings(DiContainer container) {

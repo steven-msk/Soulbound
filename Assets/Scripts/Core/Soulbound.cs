@@ -66,6 +66,7 @@ namespace SoulboundBackend.Core {
 
 			// scene may not be available at this time
 			uiHandler = new UIHandler(UnityEngine.Object.FindFirstObjectByType<Canvas>());
+			inputManager.PushContext(uiHandler);
 		}
 
 		public void Launch() {

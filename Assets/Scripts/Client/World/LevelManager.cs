@@ -106,7 +106,7 @@ namespace SoulboundBackend.Core {
 			container.BindInstance(player).AsSingle();
 
 			var playerContext = player.GetComponent<GameObjectContext>();
-			playerContext.AddNormalInstaller(new PlayerInstaller(player, worldCanvas));
+			playerContext.AddNormalInstaller(new PlayerInstaller(player));
 			playerContext.Run();
 
 			if (serialized.HasValue) {

@@ -1,3 +1,4 @@
+using SoulboundBackend.Client.Input;
 using SoulboundBackend.Client.UI.Screens;
 using System;
 using System.Collections.Generic;
@@ -5,12 +6,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using Screen = SoulboundBackend.Client.UI.Screens.Screen;
 
 #nullable enable
 
 namespace SoulboundBackend.Client.UI {
-	public sealed class UIHandler {
+	public sealed class UIHandler : IInputContext {
+		int IInputContext.priority => 1000;
 		private readonly GUI gui;
 		private Canvas canvas;
 		private ScreenManager screenManager;
@@ -24,9 +27,7 @@ namespace SoulboundBackend.Client.UI {
 
 		public void SetCanvas(Canvas canvas) {
 			UIOverlayNode[] nodes = overlays.ToArray();
-			for (int i = 0; i < nodes.Length; i++) {
-				nodes[i].Destroy();
-			}
+			for (int i = 0; i < nodes.Length; i++) nodes[i].Destroy();
 			overlays.Clear();
 
 			this.canvas = canvas;
@@ -44,5 +45,13 @@ namespace SoulboundBackend.Client.UI {
 		public void FlushScreens() => screenManager.Flush();
 
 		public IScreenNavigator GetScreenNavigator() => screenManager;
+
+		bool IInputContext.HandleInput(in InputEvent inputEvent) {
+			return EventSystem.current.IsPointerOverGameObject()
+				&& (inputEvent.token.Equals(InputTokens.Mouse.leftClick)
+					|| inputEvent.token.Equals(InputTokens.Mouse.rightClick)
+					|| inputEvent.token.Equals(InputTokens.Mouse.position))
+				&& inputEvent.phase == UnityEngine.InputSystem.InputActionPhase.Performed;
+		}
 	}
 }
