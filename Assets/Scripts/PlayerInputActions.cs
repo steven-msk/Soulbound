@@ -2631,6 +2631,134 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Mouse"",
+            ""id"": ""5d62c64b-84fa-420f-abf2-f4d4b100c2ed"",
+            ""actions"": [
+                {
+                    ""name"": ""Position"",
+                    ""type"": ""Value"",
+                    ""id"": ""708afba8-d747-4416-a854-f0f6103f4fcb"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""LeftClick"",
+                    ""type"": ""Button"",
+                    ""id"": ""6017f032-1ef9-423e-93de-03f1610fecf0"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RightClick"",
+                    ""type"": ""Button"",
+                    ""id"": ""d40c7204-0280-46e2-b231-31af8001eac5"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""MiddleClick"",
+                    ""type"": ""Button"",
+                    ""id"": ""25f97e9c-a8a3-45cb-9fdf-aa7ddeac1f23"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Forward"",
+                    ""type"": ""Button"",
+                    ""id"": ""5c694ae4-83fc-4123-9c1b-b47f125a55d1"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Backward"",
+                    ""type"": ""Button"",
+                    ""id"": ""51faaad6-d09a-4d26-922a-71f1dc449401"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""8ebc9995-fb92-493b-8f29-56e58d7ca661"",
+                    ""path"": ""<Mouse>/position"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Position"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f624ae71-f945-4abf-badd-a29112c21faf"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LeftClick"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ca088e32-a789-4694-97ea-dc85acca4b57"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RightClick"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""894c9b03-8073-45f8-9136-1e26119a3610"",
+                    ""path"": ""<Mouse>/middleButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MiddleClick"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9053e9da-8e22-49ac-a2f7-b9557e9ddc0c"",
+                    ""path"": ""<Mouse>/forwardButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Forward"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a56b04ff-105d-444e-9311-0125c3d080cc"",
+                    ""path"": ""<Mouse>/{Back}"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Backward"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -2806,6 +2934,14 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Keyboard_PAGE_DOWN = m_Keyboard.FindAction("PAGE_DOWN", throwIfNotFound: true);
         m_Keyboard_PRINTSCREEN = m_Keyboard.FindAction("PRINTSCREEN", throwIfNotFound: true);
         m_Keyboard_ANY = m_Keyboard.FindAction("ANY", throwIfNotFound: true);
+        // Mouse
+        m_Mouse = asset.FindActionMap("Mouse", throwIfNotFound: true);
+        m_Mouse_Position = m_Mouse.FindAction("Position", throwIfNotFound: true);
+        m_Mouse_LeftClick = m_Mouse.FindAction("LeftClick", throwIfNotFound: true);
+        m_Mouse_RightClick = m_Mouse.FindAction("RightClick", throwIfNotFound: true);
+        m_Mouse_MiddleClick = m_Mouse.FindAction("MiddleClick", throwIfNotFound: true);
+        m_Mouse_Forward = m_Mouse.FindAction("Forward", throwIfNotFound: true);
+        m_Mouse_Backward = m_Mouse.FindAction("Backward", throwIfNotFound: true);
     }
 
     ~@PlayerInputActions()
@@ -2814,6 +2950,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         UnityEngine.Debug.Assert(!m_UI.enabled, "This will cause a leak and performance issues, PlayerInputActions.UI.Disable() has not been called.");
         UnityEngine.Debug.Assert(!m_Debug.enabled, "This will cause a leak and performance issues, PlayerInputActions.Debug.Disable() has not been called.");
         UnityEngine.Debug.Assert(!m_Keyboard.enabled, "This will cause a leak and performance issues, PlayerInputActions.Keyboard.Disable() has not been called.");
+        UnityEngine.Debug.Assert(!m_Mouse.enabled, "This will cause a leak and performance issues, PlayerInputActions.Mouse.Disable() has not been called.");
     }
 
     /// <summary>
@@ -4347,6 +4484,157 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     /// Provides a new <see cref="KeyboardActions" /> instance referencing this action map.
     /// </summary>
     public KeyboardActions @Keyboard => new KeyboardActions(this);
+
+    // Mouse
+    private readonly InputActionMap m_Mouse;
+    private List<IMouseActions> m_MouseActionsCallbackInterfaces = new List<IMouseActions>();
+    private readonly InputAction m_Mouse_Position;
+    private readonly InputAction m_Mouse_LeftClick;
+    private readonly InputAction m_Mouse_RightClick;
+    private readonly InputAction m_Mouse_MiddleClick;
+    private readonly InputAction m_Mouse_Forward;
+    private readonly InputAction m_Mouse_Backward;
+    /// <summary>
+    /// Provides access to input actions defined in input action map "Mouse".
+    /// </summary>
+    public struct MouseActions
+    {
+        private @PlayerInputActions m_Wrapper;
+
+        /// <summary>
+        /// Construct a new instance of the input action map wrapper class.
+        /// </summary>
+        public MouseActions(@PlayerInputActions wrapper) { m_Wrapper = wrapper; }
+        /// <summary>
+        /// Provides access to the underlying input action "Mouse/Position".
+        /// </summary>
+        public InputAction @Position => m_Wrapper.m_Mouse_Position;
+        /// <summary>
+        /// Provides access to the underlying input action "Mouse/LeftClick".
+        /// </summary>
+        public InputAction @LeftClick => m_Wrapper.m_Mouse_LeftClick;
+        /// <summary>
+        /// Provides access to the underlying input action "Mouse/RightClick".
+        /// </summary>
+        public InputAction @RightClick => m_Wrapper.m_Mouse_RightClick;
+        /// <summary>
+        /// Provides access to the underlying input action "Mouse/MiddleClick".
+        /// </summary>
+        public InputAction @MiddleClick => m_Wrapper.m_Mouse_MiddleClick;
+        /// <summary>
+        /// Provides access to the underlying input action "Mouse/Forward".
+        /// </summary>
+        public InputAction @Forward => m_Wrapper.m_Mouse_Forward;
+        /// <summary>
+        /// Provides access to the underlying input action "Mouse/Backward".
+        /// </summary>
+        public InputAction @Backward => m_Wrapper.m_Mouse_Backward;
+        /// <summary>
+        /// Provides access to the underlying input action map instance.
+        /// </summary>
+        public InputActionMap Get() { return m_Wrapper.m_Mouse; }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
+        public void Enable() { Get().Enable(); }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Disable()" />
+        public void Disable() { Get().Disable(); }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
+        public bool enabled => Get().enabled;
+        /// <summary>
+        /// Implicitly converts an <see ref="MouseActions" /> to an <see ref="InputActionMap" /> instance.
+        /// </summary>
+        public static implicit operator InputActionMap(MouseActions set) { return set.Get(); }
+        /// <summary>
+        /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+        /// </summary>
+        /// <param name="instance">Callback instance.</param>
+        /// <remarks>
+        /// If <paramref name="instance" /> is <c>null</c> or <paramref name="instance"/> have already been added this method does nothing.
+        /// </remarks>
+        /// <seealso cref="MouseActions" />
+        public void AddCallbacks(IMouseActions instance)
+        {
+            if (instance == null || m_Wrapper.m_MouseActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_MouseActionsCallbackInterfaces.Add(instance);
+            @Position.started += instance.OnPosition;
+            @Position.performed += instance.OnPosition;
+            @Position.canceled += instance.OnPosition;
+            @LeftClick.started += instance.OnLeftClick;
+            @LeftClick.performed += instance.OnLeftClick;
+            @LeftClick.canceled += instance.OnLeftClick;
+            @RightClick.started += instance.OnRightClick;
+            @RightClick.performed += instance.OnRightClick;
+            @RightClick.canceled += instance.OnRightClick;
+            @MiddleClick.started += instance.OnMiddleClick;
+            @MiddleClick.performed += instance.OnMiddleClick;
+            @MiddleClick.canceled += instance.OnMiddleClick;
+            @Forward.started += instance.OnForward;
+            @Forward.performed += instance.OnForward;
+            @Forward.canceled += instance.OnForward;
+            @Backward.started += instance.OnBackward;
+            @Backward.performed += instance.OnBackward;
+            @Backward.canceled += instance.OnBackward;
+        }
+
+        /// <summary>
+        /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+        /// </summary>
+        /// <remarks>
+        /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
+        /// </remarks>
+        /// <seealso cref="MouseActions" />
+        private void UnregisterCallbacks(IMouseActions instance)
+        {
+            @Position.started -= instance.OnPosition;
+            @Position.performed -= instance.OnPosition;
+            @Position.canceled -= instance.OnPosition;
+            @LeftClick.started -= instance.OnLeftClick;
+            @LeftClick.performed -= instance.OnLeftClick;
+            @LeftClick.canceled -= instance.OnLeftClick;
+            @RightClick.started -= instance.OnRightClick;
+            @RightClick.performed -= instance.OnRightClick;
+            @RightClick.canceled -= instance.OnRightClick;
+            @MiddleClick.started -= instance.OnMiddleClick;
+            @MiddleClick.performed -= instance.OnMiddleClick;
+            @MiddleClick.canceled -= instance.OnMiddleClick;
+            @Forward.started -= instance.OnForward;
+            @Forward.performed -= instance.OnForward;
+            @Forward.canceled -= instance.OnForward;
+            @Backward.started -= instance.OnBackward;
+            @Backward.performed -= instance.OnBackward;
+            @Backward.canceled -= instance.OnBackward;
+        }
+
+        /// <summary>
+        /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="MouseActions.UnregisterCallbacks(IMouseActions)" />.
+        /// </summary>
+        /// <seealso cref="MouseActions.UnregisterCallbacks(IMouseActions)" />
+        public void RemoveCallbacks(IMouseActions instance)
+        {
+            if (m_Wrapper.m_MouseActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        /// <summary>
+        /// Replaces all existing callback instances and previously registered input action callbacks associated with them with callbacks provided via <param cref="instance" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="instance" /> is <c>null</c>, calling this method will only unregister all existing callbacks but not register any new callbacks.
+        /// </remarks>
+        /// <seealso cref="MouseActions.AddCallbacks(IMouseActions)" />
+        /// <seealso cref="MouseActions.RemoveCallbacks(IMouseActions)" />
+        /// <seealso cref="MouseActions.UnregisterCallbacks(IMouseActions)" />
+        public void SetCallbacks(IMouseActions instance)
+        {
+            foreach (var item in m_Wrapper.m_MouseActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_MouseActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    /// <summary>
+    /// Provides a new <see cref="MouseActions" /> instance referencing this action map.
+    /// </summary>
+    public MouseActions @Mouse => new MouseActions(this);
     private int m_KeyboardMouseSchemeIndex = -1;
     /// <summary>
     /// Provides access to the input control scheme.
@@ -5157,5 +5445,55 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnANY(InputAction.CallbackContext context);
+    }
+    /// <summary>
+    /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Mouse" which allows adding and removing callbacks.
+    /// </summary>
+    /// <seealso cref="MouseActions.AddCallbacks(IMouseActions)" />
+    /// <seealso cref="MouseActions.RemoveCallbacks(IMouseActions)" />
+    public interface IMouseActions
+    {
+        /// <summary>
+        /// Method invoked when associated input action "Position" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnPosition(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "LeftClick" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnLeftClick(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "RightClick" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnRightClick(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "MiddleClick" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnMiddleClick(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Forward" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnForward(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Backward" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnBackward(InputAction.CallbackContext context);
     }
 }
