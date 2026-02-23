@@ -45,15 +45,11 @@ namespace SoulboundBackend.Core {
 		public Soulbound(GameConfig config) {
 			instance = this;
 			this.config = config;
+
 			inputManager = new InputManager(inputActions.asset);
 			InputTokens.Register(inputActions.asset);
 			settings = new Settings();
 
-#if !UNITY_EDITOR
-			Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
-			Application.SetStackTraceLogType(LogType.Warning, StackTraceLogType.ScriptOnly);
-			Application.SetStackTraceLogType(LogType.Error, StackTraceLogType.ScriptOnly);
-#endif
 			SoulboundDebug debug = new(UnityEngine.Debug.unityLogger);
 			inputManager.PushContext(debug.GetConsole());
 

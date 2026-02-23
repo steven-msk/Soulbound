@@ -21,6 +21,7 @@ namespace SoulboundBackend.Client.Input {
 			public static InputToken CTRL, ALT, SPACE, RIGHT_ALT;
 			public static InputToken ARROW_LEFT, ARROW_RIGHT, ARROW_UP, ARROW_DOWN;
 			public static InputToken HOME, END, PAGE_UP, PAGE_DOWN, PRINTSCREEN;
+			public static InputToken ANY;
 
 			public static void Register(InputActionAsset asset) {
 				ESC = Create(asset, "Keyboard/ESC");
@@ -102,6 +103,7 @@ namespace SoulboundBackend.Client.Input {
 				PAGE_UP = Create(asset, "Keyboard/PAGE_UP");
 				PAGE_DOWN = Create(asset, "Keyboard/PAGE_DOWN");
 				PRINTSCREEN = Create(asset, "Keyboard/PRINTSCREEN");
+				ANY = Create(asset, "Keyboard/ANY");
 			}
 		}
 	}

@@ -1652,6 +1652,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "ANY",
+                    "type": "Button",
+                    "id": "9c91f3cd-42aa-4c12-8573-b768f5084ca3",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -2521,6 +2530,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "PRINTSCREEN",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6df5ffdb-5ebf-4dcc-b180-e8e642ced577",
+                    "path": "<Keyboard>/anyKey",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ANY",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

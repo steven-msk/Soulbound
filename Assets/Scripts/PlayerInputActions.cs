@@ -1738,6 +1738,15 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ANY"",
+                    ""type"": ""Button"",
+                    ""id"": ""9c91f3cd-42aa-4c12-8573-b768f5084ca3"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -2609,6 +2618,17 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""action"": ""PRINTSCREEN"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""6df5ffdb-5ebf-4dcc-b180-e8e642ced577"",
+                    ""path"": ""<Keyboard>/anyKey"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ANY"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -2785,6 +2805,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Keyboard_PAGE_UP = m_Keyboard.FindAction("PAGE_UP", throwIfNotFound: true);
         m_Keyboard_PAGE_DOWN = m_Keyboard.FindAction("PAGE_DOWN", throwIfNotFound: true);
         m_Keyboard_PRINTSCREEN = m_Keyboard.FindAction("PRINTSCREEN", throwIfNotFound: true);
+        m_Keyboard_ANY = m_Keyboard.FindAction("ANY", throwIfNotFound: true);
     }
 
     ~@PlayerInputActions()
@@ -3444,6 +3465,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Keyboard_PAGE_UP;
     private readonly InputAction m_Keyboard_PAGE_DOWN;
     private readonly InputAction m_Keyboard_PRINTSCREEN;
+    private readonly InputAction m_Keyboard_ANY;
     /// <summary>
     /// Provides access to input actions defined in input action map "Keyboard".
     /// </summary>
@@ -3772,6 +3794,10 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @PRINTSCREEN => m_Wrapper.m_Keyboard_PRINTSCREEN;
         /// <summary>
+        /// Provides access to the underlying input action "Keyboard/ANY".
+        /// </summary>
+        public InputAction @ANY => m_Wrapper.m_Keyboard_ANY;
+        /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
         public InputActionMap Get() { return m_Wrapper.m_Keyboard; }
@@ -4034,6 +4060,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @PRINTSCREEN.started += instance.OnPRINTSCREEN;
             @PRINTSCREEN.performed += instance.OnPRINTSCREEN;
             @PRINTSCREEN.canceled += instance.OnPRINTSCREEN;
+            @ANY.started += instance.OnANY;
+            @ANY.performed += instance.OnANY;
+            @ANY.canceled += instance.OnANY;
         }
 
         /// <summary>
@@ -4282,6 +4311,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @PRINTSCREEN.started -= instance.OnPRINTSCREEN;
             @PRINTSCREEN.performed -= instance.OnPRINTSCREEN;
             @PRINTSCREEN.canceled -= instance.OnPRINTSCREEN;
+            @ANY.started -= instance.OnANY;
+            @ANY.performed -= instance.OnANY;
+            @ANY.canceled -= instance.OnANY;
         }
 
         /// <summary>
@@ -5118,5 +5150,12 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnPRINTSCREEN(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "ANY" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnANY(InputAction.CallbackContext context);
     }
 }

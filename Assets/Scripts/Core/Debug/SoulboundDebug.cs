@@ -11,6 +11,11 @@ namespace SoulboundBackend.Core.Debug {
 		private readonly DebugConsole console;
 
 		public SoulboundDebug(ILogger logger) {
+#if !UNITY_EDITOR
+			Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
+			Application.SetStackTraceLogType(LogType.Warning, StackTraceLogType.None);
+			Application.SetStackTraceLogType(LogType.Error, StackTraceLogType.ScriptOnly);
+#endif
 			new Logging.Logger(logger);
 			this.console = new DebugConsole();
 		}
