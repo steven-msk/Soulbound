@@ -67,7 +67,7 @@ namespace SoulboundBackend.Core {
 
 		[PROTOTYPICAL]
 		bool IInputContext.HandleInput(in InputEvent inputEvent) {
-			if (inputEvent.token.Equals(InputTokens.esc)) {
+			if (inputEvent.token.Equals(InputTokens.Keyboard.ESC)) {
 				OnEscPressed();
 				return true;
 			}

@@ -31,11 +31,11 @@ namespace SoulboundBackend.Core.Debug {
 		}
 
 		bool IInputContext.HandleInput(in InputEvent inputEvent) {
-			if (inputEvent.token.Equals(InputTokens.toggleDebugConsole)) {
+			if (inputEvent.token.Equals(InputTokens.Debug.toggleConsole)) {
 				ToggleConsole();
 				return true;
 			}
-			if (inputEvent.token.Equals(InputTokens.enterCommand) && visible) {
+			if (inputEvent.token.Equals(InputTokens.Debug.enterCommand) && visible) {
 				node?.handle.StartCommandInput(node.transform);
 				return true;
 			}

@@ -149,10 +149,10 @@ namespace SoulboundBackend.Client {
 				hotbar.SetMainSlot(nextSlot);
 				return true;
 			}
-			if (inputEvent.token.Equals(InputTokens.mousePosition)) {
+			if (inputEvent.token.Equals(InputTokens.Mouse.position)) {
 				mouseScreenPos = inputEvent.context.ReadValue<Vector2>();
 			}
-			if (inputEvent.token.Equals(InputTokens.leftClick)) {
+			if (inputEvent.token.Equals(InputTokens.Mouse.leftClick)) {
 				if (inputEvent.phase == InputActionPhase.Performed) {
 					OnLeftClick();
 					leftHold = true;
@@ -162,7 +162,7 @@ namespace SoulboundBackend.Client {
 					return true;
 				}
 			}
-			if (inputEvent.token.Equals(InputTokens.rightClick)) {
+			if (inputEvent.token.Equals(InputTokens.Mouse.rightClick)) {
 				if (inputEvent.phase == InputActionPhase.Performed) {
 					OnRightClick();
 					rightHold = true;

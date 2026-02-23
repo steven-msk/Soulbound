@@ -79,6 +79,10 @@ namespace SoulboundBackend.Core.Debug.Logging {
 			LogMessage(LogError_Method, LogLevel.Fatal, CaptureStackFrame(), message, exception, args: args);
 		}
 
+		public static void LogFatal(Exception? exception, UnityEngine.Object? context = null) {
+			LogMessage(LogError_Method, LogLevel.Fatal, CaptureStackFrame(), "", exception, context);
+		}
+
 		private static void LogInfo_Method(string mesage) => instance?.logger.Log(LogType.Log, mesage);
 		private static void LogWarning_Method(string mesage) => instance?.logger.Log(LogType.Warning, mesage);
 		private static void LogError_Method(string mesage) => instance?.logger.Log(LogType.Error, mesage);
