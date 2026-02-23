@@ -28,5 +28,9 @@ namespace SoulboundBackend.Client.Input {
 		public int GetHashCode(InputToken obj) {
 			return guid.GetHashCode();
 		}
+
+		public override string ToString() {
+			return $"{mapName}/{actionName}({guid})";
+		}
 	}
 }

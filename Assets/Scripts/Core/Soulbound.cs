@@ -45,9 +45,9 @@ namespace SoulboundBackend.Core {
 		public Soulbound(GameConfig config) {
 			instance = this;
 			this.config = config;
-			settings = new Settings();
-			InputTokens.Register(inputActions.asset);
 			inputManager = new InputManager(inputActions.asset);
+			InputTokens.Register(inputActions.asset);
+			settings = new Settings();
 
 #if !UNITY_EDITOR
 			Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);

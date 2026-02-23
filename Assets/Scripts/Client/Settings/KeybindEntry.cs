@@ -16,27 +16,31 @@ using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 #nullable enable
 
 namespace SoulboundBackend.Client.SettingSystem {
-	public class KeyMapping : SettingEntry<KeyControl> {
-		public event Action<InputAction?, InputAction>? onAppliedActionChanged;
-		private InputAction? appliedAction;
+	public class KeybindEntry : SettingEntry<KeyControl> {
+		[Obsolete] public event Action<InputAction?, InputAction>? onAppliedActionChanged;
+		[Obsolete] private InputAction? appliedAction;
 
-		public KeyMapping(string displayName, string id, Key defaultKey, Func<Tooltip> tooltipSupplier) 
-			: base(displayName, $"keyMapping.{id}", Keyboard.current[defaultKey], new KeyboardValueSet(), tooltipSupplier) {
+		public KeybindEntry(string displayName, string id, Key defaultKey) 
+			: base(displayName, $"keyMapping.{id}", Keyboard.current[defaultKey], new KeyboardValueSet()) {
 		}
 
-		public KeyMapping(string displayName, string id, Key defaultKey, Func<Tooltip> tooltipSupplier, Action<KeyControl, KeyControl> valueChanged) 
-			: base(displayName, $"keyMapping.{id}", Keyboard.current[defaultKey], new KeyboardValueSet(), tooltipSupplier, valueChanged) {
+		public KeybindEntry(string displayName, string id, Key defaultKey, Action<KeyControl, KeyControl> valueChanged) 
+			: base(displayName, $"keyMapping.{id}", Keyboard.current[defaultKey], new KeyboardValueSet(), valueChanged) {
 		}
 
+		[Obsolete]
 		protected virtual void ApplyBinding(InputAction inputAction) {
 			inputAction.ApplyBindingOverride(0, value?.path ?? "");
 			Logger.LogInfo("applying binding: " + value ?? "null");
 		}
 
+
+		[Obsolete]
 		protected virtual void RevokeBinding(InputAction inputAction) {
 			inputAction.RemoveBindingOverride(0);
 		}
 
+		[Obsolete]
 		public void SetAction(InputAction? action) {
 			if (action == null) {
 				return;
@@ -50,25 +54,12 @@ namespace SoulboundBackend.Client.SettingSystem {
 			ApplyBinding(appliedAction);
 		}
 
-		public void SetKey(Key key, bool broadcastChange = true) {
-			this.SetValue(Keyboard.current[key], broadcastChange);
+		public void SetValue(Key key) {
+			base.SetValue(Keyboard.current[key]);
 		}
 
 		public Key GetKey() {
 			return value?.keyCode ?? Key.None;
-		}
-
-		public override void SetValue(KeyControl? value, bool broadcastChange = true) {
-			var oldValue = this.value;
-			if (valueSet.IsValid(value!)) {
-				this.value = value!;
-				if (broadcastChange) {
-					base.InvokeValueChanged(oldValue, this.value!);
-				}
-				SetAction(this.appliedAction);
-			} else {
-				Logger.LogError(null, "Attempted to set invalid key to mapping '{}': '{}'", id, value!.keyCode);
-			}
 		}
 	}
 
@@ -100,8 +91,8 @@ namespace SoulboundBackend.Client.SettingSystem {
 			var keySetting = obj.AddComponent<KeySetting>();
 			keySetting.text = text;
 
-			var rebindingButton = obj.AddComponent<Button>();
-			rebindingButton.onClick.AddListener(keySetting.BeginRebinding);
+			//var rebindingButton = obj.AddComponent<Button>();
+			//rebindingButton.onClick.AddListener(keySetting.BeginRebinding);
 
 			return keySetting;
 		}

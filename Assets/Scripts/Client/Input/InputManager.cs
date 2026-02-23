@@ -1,8 +1,11 @@
+using SoulboundBackend.Client.SettingSystem;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core.Debug.Logging;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using Unity.VisualScripting.YamlDotNet.Core.Tokens;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
@@ -11,7 +14,8 @@ namespace SoulboundBackend.Client.Input {
 	public sealed class InputManager {
 		private readonly InputActionAsset inputAsset;
 		private readonly List<IInputContext> contextStack = new();
-		private readonly Dictionary<Guid, InputToken> tokenRegistry = new();
+		private readonly ConcurrentDictionary<Guid, InputToken> tokenRegistry = new();
+		private readonly ConcurrentDictionary<InputToken, InputAction> actionRegistry = new();
 		private readonly BufferedQueue<InputEvent> eventQueue = new(128);
 
 		public InputManager(InputActionAsset inputAsset) {
@@ -26,7 +30,10 @@ namespace SoulboundBackend.Client.Input {
 					inputAction.performed += ctx => PendEvent(inputAction, ctx);
 					inputAction.started += ctx => PendEvent(inputAction, ctx);
 					inputAction.canceled += ctx => PendEvent(inputAction, ctx);
-					tokenRegistry[inputAction.id] = new InputToken(inputAction);
+
+					InputToken inputToken = new(inputAction);
+					tokenRegistry[inputAction.id] = inputToken;
+					actionRegistry[inputToken] = inputAction;
 				}
 			}
 		}
@@ -34,8 +41,16 @@ namespace SoulboundBackend.Client.Input {
 		private void PendEvent(InputAction action, InputAction.CallbackContext context) {
 			InputEvent inputEvent = new(tokenRegistry[action.id], context.phase, context);
 			if (!eventQueue.TryEnqueue(in inputEvent)) {
-				Logger.LogWarning("Input queue capacity exceeded! Failed to enqueue action '{}' phase '{}'", action.name, context.phase);
+				Logger.LogWarning("Input queue capacity exceeded! Failed to enqueue action '{}' phase '{}", action.name, context.phase);
 			}
+		}
+
+		public void Rebind(InputToken token, KeybindEntry keybind) {
+			if (!actionRegistry.TryGetValue(token, out InputAction action)) {
+				throw new ArgumentException("Invalid InputToken: " + token.ToString());
+			}
+
+			action.ApplyBindingOverride(0, keybind.value?.path ?? "");
 		}
 
 		public void DispatchInputs() {

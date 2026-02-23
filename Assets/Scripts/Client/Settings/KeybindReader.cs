@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,15 +9,15 @@ using UnityEngine.InputSystem.Controls;
 #nullable enable
 
 namespace SoulboundBackend.Client.SettingSystem {
-	public sealed class KeyMappingReader : IKeyMappingProcessor {
+	public sealed class KeybindReader : IKeybindProcessor {
 		private readonly SettingReader reader;
 
-		public KeyMappingReader(SettingReader reader) {
+		public KeybindReader(SettingReader reader) {
 			this.reader = reader;
 		}
 
-		public KeyControl Process(KeyMapping keyMapping) {
-			reader.Decode(keyMapping, keyMapping.id, out KeyControl? value);
+		public KeyControl Process(KeybindEntry keybind) {
+			reader.Decode(keybind, keybind.id, out KeyControl? value);
 			return value;
 		}
 	}

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,15 +8,15 @@ using UnityEngine.InputSystem.Controls;
 using static UnityEngine.EventSystems.EventTrigger;
 
 namespace SoulboundBackend.Client.SettingSystem {
-	public sealed class KeyMappingWriter : IKeyMappingProcessor {
+	public sealed class KeybindWriter : IKeybindProcessor {
 		private readonly SettingWriter writer;
 
-		public KeyMappingWriter(SettingWriter writer) {
+		public KeybindWriter(SettingWriter writer) {
 			this.writer = writer;
 		}
 
-		public KeyControl Process(KeyMapping keyMapping) {
-			return writer.Process(keyMapping);
+		public KeyControl Process(KeybindEntry keybind) {
+			return writer.Process(keybind);
 		}
 	}
 }

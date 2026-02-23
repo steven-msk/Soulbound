@@ -17,47 +17,42 @@ namespace SoulboundBackend.Client.SettingSystem {
 	public class KeySetting : SettingVisual<KeyControl> {
 		[SerializeField] private TextMeshProUGUI _text;
 		public TextMeshProUGUI text { get => _text; set => _text = value; }
-		public KeyMapping mapping => (KeyMapping)this.settingEntry;
+		public KeybindEntry mapping => (KeybindEntry)this.settingEntry;
 		private bool isRebinding;
 
 		public override void Build() {
 			_text.text = GetBindingText(settingEntry.value);
 		}
 
-		private void Update() => PollRebind();
+		//private void Update() => PollRebind();
 
 		public void UpdateRebinding(KeyControl? keyControl) {
 			_text.text = GetBindingText(keyControl);
 		}
 
-		public void BeginRebinding() {
-			this.isRebinding = true;
-			Settings.keybindMappings.BeginRebindContext(this);
-		}
+		//private void PollRebind() {
+		//	if (!isRebinding) return;
 
-		private void PollRebind() {
-			if (!isRebinding) return;
+		//	foreach (var keyControl in Keyboard.current.allKeys) {
+		//		if (keyControl.wasPressedThisFrame) {
+		//			var appliedControl = HandleKeyPress(keyControl);
 
-			foreach (var keyControl in Keyboard.current.allKeys) {
-				if (keyControl.wasPressedThisFrame) {
-					var appliedControl = HandleKeyPress(keyControl);
+		//			mapping.SetValue(appliedControl);
+		//			UpdateRebinding(appliedControl);
 
-					mapping.SetValue(appliedControl);
-					UpdateRebinding(appliedControl);
+		//			this.EndRebinding();
+		//			return;
+		//		}
+		//	}
+		//}
 
-					this.EndRebinding();
-					return;
-				}
-			}
-		}
-
-		private void EndRebinding() {
-			this.isRebinding = false;
-			Settings.keybindMappings.EndRebindContext(this);
-		}
+		//private void EndRebinding() {
+		//	this.isRebinding = false;
+		//	Settings.keybindMappings.EndRebindContext(this);
+		//}
 
 		private KeyControl? HandleKeyPress(KeyControl keyControl) {
-			if (keyControl.keyCode == KeybindMappings.backtrackScreen.GetKey()) {
+			if (keyControl.keyCode == Keybinds.backtrackScreen.GetKey()) {
 				return null;
 			}
 			return keyControl;

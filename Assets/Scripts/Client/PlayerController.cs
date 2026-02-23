@@ -2,6 +2,7 @@ using SoulboundBackend.Client.Combat;
 using SoulboundBackend.Client.Concurrency;
 using SoulboundBackend.Client.Input;
 using SoulboundBackend.Client.ItemSystem;
+using SoulboundBackend.Client.SettingSystem;
 using SoulboundBackend.Client.Stats;
 using SoulboundBackend.Client.UI.Storage;
 using SoulboundBackend.Client.World;
@@ -9,11 +10,13 @@ using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Client.World.EntitySystem;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core;
+using SoulboundBackend.Core.Debug.Logging;
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Zenject;
 using Level = SoulboundBackend.Client.World.Level;
+using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
 namespace SoulboundBackend.Client {
 	public class PlayerController : Entity, IAttackPerformer, IItemConsumer, IUpdatable, IEntitySpawnable<PlayerSpawnData>, IInputContext {
@@ -170,7 +173,8 @@ namespace SoulboundBackend.Client {
 					return true;
 				}
 			}
-			if (inputEvent.token.Equals(InputTokens.Player.jump)) {
+			if (inputEvent.token.Equals(InputTokens.Player.jump)
+					&& inputEvent.phase == InputActionPhase.Performed) {
 				playerPhysics.Jump();
 				return true;
 			}

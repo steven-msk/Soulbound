@@ -10,11 +10,11 @@ using UnityEngine.InputSystem;
 namespace SoulboundBackend.Client.SettingSystem {
 	public sealed class Settings {
 		public const string settingsFile = "settings.txt";
-		public static readonly KeybindMappings keybindMappings = new();
-		public static readonly SettingEntry<int> masterVolume = new("Master Volume", "master_volume", 100, new IntRange(0, 100), null);
+		public static readonly Keybinds keybinds = new();
+		public static readonly SettingEntry<int> masterVolume = new("Master Volume", "master_volume", 100, new IntRange(0, 100));
 
-		public static readonly SettingEntry<float> floatSetting = new("Float Setting", "float_setting", 10f, new FloatRange(0f, 50f), null);
-		public static readonly SettingEntry<float> floatSetting_2 = new("Float Setting 2", "float_setting_2", 100f, new FloatRange(50f, 1000f), null);
+		public static readonly SettingEntry<float> floatSetting = new("Float Setting", "float_setting", 10f, new FloatRange(0f, 50f));
+		public static readonly SettingEntry<float> floatSetting_2 = new("Float Setting 2", "float_setting_2", 100f, new FloatRange(50f, 1000f));
 
 		public Settings() => LoadEntries();
 
@@ -27,7 +27,7 @@ namespace SoulboundBackend.Client.SettingSystem {
 					var settingReader = new SettingReader(reader);
 
 					ProcessSettings(settingReader);
-					keybindMappings.ProcessMappings(new KeyMappingReader(settingReader));
+					keybinds.ProcessMappings(new KeybindReader(settingReader));
 				};
 			} catch (FileNotFoundException) {
 				Logger.LogWarning("No settings file found. Initiating with default values");
@@ -37,11 +37,11 @@ namespace SoulboundBackend.Client.SettingSystem {
 		public void Save() {
 			string savePath = GetSavePath();
 
-			using (StreamWriter writer = new StreamWriter(savePath, append: false)) {
+			using (StreamWriter writer = new(savePath, append: false)) {
 				var settingWriter = new SettingWriter(writer);
 
 				ProcessSettings(settingWriter);
-				keybindMappings.ProcessMappings(new KeyMappingWriter(settingWriter));
+				keybinds.ProcessMappings(new KeybindWriter(settingWriter));
 			};
 		}
 

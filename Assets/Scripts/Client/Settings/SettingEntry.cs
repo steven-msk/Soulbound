@@ -27,35 +27,28 @@ namespace SoulboundBackend.Client.SettingSystem {
 		public override object boxedValue => value!;
 		public override Type valueType => typeof(T);
 
-		public SettingEntry(string displayName, string id, T defaultValue, ValueSet<T> valueSet, Func<Tooltip> tooltipSupplier)
-			: base(displayName, id, tooltipSupplier) {
+		public SettingEntry(string displayName, string id, T defaultValue, ValueSet<T> valueSet)
+			: base(displayName, id) {
 			this.defaultValue = defaultValue;
 			this.valueSet = valueSet;
 			this.value = defaultValue;
 		}
 
-		public SettingEntry(string displayName, string id, T defaultValue, ValueSet<T> valueSet, Func<Tooltip> tooltipSupplier, Action<T, T> valueChanged)
-			: this(displayName, id, defaultValue, valueSet, tooltipSupplier) {
+		public SettingEntry(string displayName, string id, T defaultValue, ValueSet<T> valueSet, Action<T, T> valueChanged)
+			: this(displayName, id, defaultValue, valueSet) {
 			this.valueChanged += valueChanged;
 		}
 
-		public virtual void SetValue(T value, bool broadcastChange = true) {
+		public void SetValue(T value) {
+			if (value?.Equals(this.value) ?? true) return;
 			var oldValue = this.value;
-			if (value?.Equals(this.value) ?? true) {
-				return;
-			}
+
 			if (valueSet.IsValid(value)) {
 				this.value = value;
-				if (broadcastChange) {
-					valueChanged?.Invoke(oldValue, this.value);
-				}
+				valueChanged?.Invoke(oldValue, this.value);
 			} else {
 				Logger.LogWarning("Attempted to set invalid value '{}' to setting '{}'", value!, id);
 			}
-		}
-
-		protected void InvokeValueChanged(T oldValue, T newValue) {
-			valueChanged?.Invoke(oldValue, newValue);
 		}
 	}
 

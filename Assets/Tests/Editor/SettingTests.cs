@@ -256,7 +256,7 @@ namespace SettingTests {
 
 		[Test]
 		public void SettingWriter_ReadsKeyControlStringCorrectly() {
-			var entry = new KeyMapping("", "keyTest", Key.Space, null);
+			var entry = new KeybindEntry("", "keyTest", Key.Space, null);
 
 			using (var writer = new StreamWriter(tempPath)) {
 				new SettingWriter(writer).Process(entry);
@@ -430,7 +430,7 @@ fmtsi.value={fileValue}
 		[Test]
 		public void KeyMapping_SetAction_AppliedBindingOverride() {
 			var action = new InputAction(type: InputActionType.Button, binding: "<Keyboard>/c");
-			var keyMapping = new KeyMapping("Test", "test", Key.B, null);
+			var keyMapping = new KeybindEntry("Test", "test", Key.B, null);
 
 			keyMapping.SetAction(action);
 
@@ -442,7 +442,7 @@ fmtsi.value={fileValue}
 #nullable enable
 		[Test]
 		public void KeyMapping_SetAction_TriggersEvent() {
-			var keyMapping = new KeyMapping("Test", "test", Key.P, null!);
+			var keyMapping = new KeybindEntry("Test", "test", Key.P, null!);
 			var oldAction = new InputAction(type: InputActionType.Button, binding: "<Keyboard>/p");
 			var newAction = new InputAction(type: InputActionType.Button, binding: "<Keyboard>/m");
 			keyMapping.SetAction(oldAction);
@@ -464,9 +464,9 @@ fmtsi.value={fileValue}
 
 		[Test]
 		public void KeyMapping_SetKey_ChangesKeyControl() {
-			var keyMapping = new KeyMapping("Test", "test", Key.N, null);
+			var keyMapping = new KeybindEntry("Test", "test", Key.N, null);
 
-			keyMapping.SetKey(Key.T);
+			keyMapping.SetValue(Key.T);
 
 			Assert.AreEqual(Keyboard.current[Key.T], keyMapping.value);
 		}
@@ -475,11 +475,11 @@ fmtsi.value={fileValue}
 		public void KeyMappingWriter_WritesCorrectFormat() {
 			var stringWriter = new StringWriter();
 			var writer = new SettingWriter(stringWriter);
-			var keyMapping = new KeyMapping("Test", "test", Key.L, null);
+			var keyMapping = new KeybindEntry("Test", "test", Key.L, null);
 
-			keyMapping.SetKey(Key.V);
+			keyMapping.SetValue(Key.V);
 
-			var processor = new KeyMappingWriter(writer);
+			var processor = new KeybindWriter(writer);
 			processor.Process(keyMapping);
 			writer.Flush();
 
@@ -493,9 +493,9 @@ fmtsi.value={fileValue}
 			var settingReader = new SettingReader(
 				new StreamReader(new MemoryStream(Encoding.UTF8.GetBytes(line)))
 			);
-			var keyMapping = new KeyMapping("Test", "test", Key.G, null);
+			var keyMapping = new KeybindEntry("Test", "test", Key.G, null);
 
-			var reader = new KeyMappingReader(settingReader);
+			var reader = new KeybindReader(settingReader);
 
 			KeyControl result = reader.Process(keyMapping);
 
