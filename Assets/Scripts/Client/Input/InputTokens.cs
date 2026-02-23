@@ -1,37 +1,32 @@
+using SoulboundBackend.Common;
 using SoulboundBackend.Core;
 using System;
 using UnityEngine.InputSystem;
 
 namespace SoulboundBackend.Client.Input {
-	public static class InputTokens {
-		public static readonly InputToken toggleDebugConsole;
-		public static readonly InputToken enterCommand;
+	public static partial class InputTokens {
+		public static InputToken toggleDebugConsole;
+		public static InputToken enterCommand;
 
-		[Obsolete] public static readonly InputToken p_jump;
-		[Obsolete] public static readonly InputToken p_playerEsc;
-		[Obsolete] public static readonly InputToken p_toggleInventory;
-		[Obsolete] public static readonly InputToken p_scrollHotbarSlot;
-		[Obsolete] public static readonly InputToken p_changeHotbarSlot;
-		[Obsolete] public static readonly InputToken p_mousePosition;
-		[Obsolete] public static readonly InputToken p_leftClick;
-		[Obsolete] public static readonly InputToken p_rightClick;
-		[Obsolete] public static readonly InputToken p_move;
+		public static InputToken esc;
+		public static InputToken mousePosition;
+		public static InputToken leftClick;
+		public static InputToken rightClick;
 
-		static InputTokens() {
-			InputActionAsset asset = Soulbound.instance.GetInputActionAsset();
+		public static void Register(InputActionAsset asset) {
+			toggleDebugConsole = Create(asset, "Debug/ToggleConsole");
+			enterCommand	   = Create(asset, "Debug/EnterCommand");
 
-			toggleDebugConsole = new InputToken(asset.FindAction("Debug/ToggleConsole"));
-			enterCommand = new InputToken(asset.FindAction("Debug/EnterCommand"));
+			esc				   = Create(asset, "Player/Esc");
+			mousePosition      = Create(asset, "Player/MousePosition");
+			leftClick		   = Create(asset, "Player/LeftClick");
+			rightClick		   = Create(asset, "Player/RightClick");
 
-			p_jump = new InputToken(asset.FindAction("Player/Jump"));
-			p_playerEsc = new InputToken(asset.FindAction("Player/Esc"));
-			p_toggleInventory = new InputToken(asset.FindAction("Player/Toggle Inventory"));
-			p_scrollHotbarSlot = new InputToken(asset.FindAction("Player/Scroll Hotbar Slot"));
-			p_changeHotbarSlot = new InputToken(asset.FindAction("Player/Change Hotbar Slot"));
-			p_mousePosition = new InputToken(asset.FindAction("Player/MousePosition"));
-			p_leftClick = new InputToken(asset.FindAction("Player/LeftClick"));
-			p_rightClick = new InputToken(asset.FindAction("Player/RightClick"));
-			p_move = new InputToken(asset.FindAction("Player/Move"));
+			Player.Register(asset);
+		}
+
+		internal static InputToken Create(InputActionAsset asset, string path) {
+			return new InputToken(asset.FindAction(path));
 		}
 	}
 }

@@ -18,7 +18,7 @@ using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 #nullable enable
 
 namespace SoulboundBackend.Client {
-	public class PlayerPhysics : MonoBehaviour, IInputContext {
+	public class PlayerPhysics : MonoBehaviour {
 		private readonly Dictionary<string, (Action<Collision2D> action, Func<bool> validator)> collisionReactionsByTag = new();
 		private readonly Dictionary<int, (Action<Collider2D> action, Func<bool> validator)> triggerReactionsByLayer = new();
 		private PlayerController player = null!;
@@ -47,29 +47,10 @@ namespace SoulboundBackend.Client {
 
 		[Header("Debug Internal")]
 		[SerializeField] private bool isFlying = false;
-		[SerializeField] private Vector2 movement;
+		[SerializeField] private Vector2 velocity;
 		[SerializeField] private float knockbackStunTimer = 0f;
 		[SerializeField] private bool shouldJump = false;
 		[SerializeField] private float jumpToFlightTimer;
-
-		private float immunityTimeSeconds = 0.5f;
-
-		public bool isBootstrapped { get; private set; }
-
-		private float _facing = 1f;
-		public float facing {
-			get => _facing;
-			set {
-				_facing = value;
-				Vector3 scale = transform.localScale;
-				scale.x = _facing;
-				transform.localScale = scale;
-			}
-		}
-
-		private bool leftHold;
-		private bool rightHold;
-		private Vector2 mouseScreenPos;
 
 		[Inject]
 		public void Construct(DiContainer container) {
@@ -89,60 +70,14 @@ namespace SoulboundBackend.Client {
 			}, IsOnGround));
 		}
 
-		[PROTOTYPICAL]
-		public bool HandleInput(in InputEvent inputEvent) {
-			if (inputEvent.token.Equals(InputTokens.p_mousePosition)) {
-				mouseScreenPos = inputEvent.context.ReadValue<Vector2>();
-			}
-			if (inputEvent.token.Equals(InputTokens.p_move)) {
-				if (inputEvent.phase == InputActionPhase.Performed) {
-					movement.x = inputEvent.context.ReadValue<Vector2>().x;
-					return true;
-				} else if (inputEvent.phase == InputActionPhase.Canceled) {
-					movement.x = 0f;
-					return true;
-				}
-			}
-			if (inputEvent.token.Equals(InputTokens.p_leftClick)) {
-				if (inputEvent.phase == InputActionPhase.Performed) {
-					leftHold = true;
-					return true;
-				} else if (inputEvent.phase == InputActionPhase.Canceled) {
-					leftHold = false;
-					return true;
-				}
-			}
-			if (inputEvent.token.Equals(InputTokens.p_rightClick)) {
-				if (inputEvent.phase == InputActionPhase.Performed) {
-					rightHold = true;
-					return true;
-				} else if (inputEvent.phase == InputActionPhase.Canceled) {
-					rightHold = false;
-					return true;
-				}
-			}
-			if (inputEvent.token.Equals(InputTokens.p_jump)) {
-				OnSpacePressed();
-				return true;
-			}
-			return false;
-		}
+
+		public void SetVelocityX(float x) => velocity.x = x;
+		public void SetVelocityY(float y) => velocity.y = y;
+		public void SetVelocity(Vector2 velocity) => this.velocity = velocity;
+		public Vector2 GetVelocity() => velocity;
 
 
 		// FIXME: inconsistent movement
-
-		private void Update() {
-			if (!player?.isSpawned ?? true) {
-				return;
-			}
-			animator.SetFloat("horizontalSpeed", Mathf.Abs(movement.x));
-			if (movement.x != 0) {
-				this.facing = Mathf.Sign(movement.x);
-			}
-			if (rightHold || leftHold) {
-				this.facing = Mathf.Sign(mouseScreenPos.x - Screen.width / 2);
-			}
-		}
 
 		private void FixedUpdate() {
 			if (!player?.isSpawned ?? true) {
@@ -153,16 +88,16 @@ namespace SoulboundBackend.Client {
 				return;         // knockback immunity will be a thing
 			}
 
-			if (movement.x != 0) {
+			if (velocity.x != 0) {
 				if (!isFlying) {
-					rb.linearVelocityX += player.Stats.horizontalAcceleration * movementSpeedPower * Time.fixedDeltaTime * movement.x;
+					rb.linearVelocityX += player.Stats.horizontalAcceleration * movementSpeedPower * Time.fixedDeltaTime * velocity.x;
 					float speedLimit = player.Stats.movementSpeed.GetProcessedValue();
 					if (Mathf.Abs(rb.linearVelocityX) > speedLimit) {
 						rb.linearVelocityX = Mathf.Sign(rb.linearVelocityX) * speedLimit;
 					}
 				} else {
 					float scaledFlightAcceleration = flightMovementPower * player.Stats.horizontalFlightAcceleration;
-					rb.linearVelocityX += scaledFlightAcceleration * Time.fixedDeltaTime * movement.x;
+					rb.linearVelocityX += scaledFlightAcceleration * Time.fixedDeltaTime * velocity.x;
 					if (rb.linearVelocityX > scaledFlightAcceleration) {
 						rb.linearVelocityX = scaledFlightAcceleration;
 					}
@@ -203,7 +138,7 @@ namespace SoulboundBackend.Client {
 			UpdateFlightTimePanel(isFlying, flightTime, player.Stats.grantedFlightTime);
 		}
 
-		internal void OnSpacePressed() { 
+		internal void Jump() { 
 			if (jumpsLeft > 0 && knockbackStunTimer <= 0) {
 				shouldJump = true;
 				jumpsLeft--;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -33,10 +33,10 @@ namespace SoulboundBackend.Core {
 			return new Facing(signX < 0 ? -1f : 0f, 0f);
 		}
 
-		public static Facing Left => new Facing(-1f);
-		public static Facing Right => new Facing(1f);
-		public static Facing Up => new Facing(0f, 1f);
-		public static Facing Down => new Facing(0f, -1f);
+		public static Facing Left => new(-1f, 0f);
+		public static Facing Right => new(1f, 0f);
+		public static Facing Up => new(0f, 1f);
+		public static Facing Down => new(0f, -1f);
 
 		public bool IsHorizontal => Mathf.Abs(direction.y) < 0.0001f;
 	}

@@ -69,7 +69,7 @@ namespace SoulboundBackend.Client {
 			}
 		}
 
-		public float MaxBlockReach => 5f;
+		const float MAX_BLOCK_REACH = 5f;
 
 		private Level level = null!;
 		private Vector2 mouseScreenPos;
@@ -86,7 +86,17 @@ namespace SoulboundBackend.Client {
 			}
 		}
 
-		public override Facing facing => new(playerPhysics.facing);
+		public override Facing facing => new(m_facing);
+		private float m_facing = 1f;
+		private float _facing {
+			get => m_facing;
+			set {
+				m_facing = value;
+				Vector3 scale = transform.localScale;
+				scale.x = _facing;
+				transform.localScale = scale;
+			}
+		}
 
 		private bool leftHold;
 		private bool rightHold;
@@ -121,16 +131,16 @@ namespace SoulboundBackend.Client {
 
 		[PROTOTYPICAL]
 		bool IInputContext.HandleInput(in InputEvent inputEvent) {
-			if (inputEvent.token.Equals(InputTokens.p_toggleInventory)) {
+			if (inputEvent.token.Equals(InputTokens.Player.toggleInventory)) {
 				inventory.Toggle();
 				return true;
 			}
-			if (inputEvent.token.Equals(InputTokens.p_changeHotbarSlot)) {
+			if (inputEvent.token.Equals(InputTokens.Player.changeHotbarSlot)) {
 				int slotIndex = int.Parse(inputEvent.context.control.name) - 1;
 				hotbar.SetMainSlot(slotIndex);
 				return true;
 			}
-			if (inputEvent.token.Equals(InputTokens.p_scrollHotbarSlot)) {
+			if (inputEvent.token.Equals(InputTokens.Player.scrollHotbarSlot)) {
 				float scrollDelta = inputEvent.context.ReadValue<float>();
 				int nextSlot = hotbar.GetMainSlot() - (int)scrollDelta;
 
@@ -139,37 +149,55 @@ namespace SoulboundBackend.Client {
 				hotbar.SetMainSlot(nextSlot);
 				return true;
 			}
-			if (inputEvent.token.Equals(InputTokens.p_mousePosition)) {
+			if (inputEvent.token.Equals(InputTokens.mousePosition)) {
 				mouseScreenPos = inputEvent.context.ReadValue<Vector2>();
 			}
-			if (inputEvent.token.Equals(InputTokens.p_leftClick)) {
+			if (inputEvent.token.Equals(InputTokens.leftClick)) {
 				if (inputEvent.phase == InputActionPhase.Performed) {
 					OnLeftClick();
 					leftHold = true;
-					playerPhysics.HandleInput(in inputEvent);
 					return true;
 				} else if (inputEvent.phase == InputActionPhase.Canceled) {
 					leftHold = false;
-					playerPhysics.HandleInput(in inputEvent);
 					return true;
 				}
 			}
-			if (inputEvent.token.Equals(InputTokens.p_rightClick)) {
+			if (inputEvent.token.Equals(InputTokens.rightClick)) {
 				if (inputEvent.phase == InputActionPhase.Performed) {
 					OnRightClick();
 					rightHold = true;
-					playerPhysics.HandleInput(in inputEvent);
 					return true;
 				} else if (inputEvent.phase == InputActionPhase.Canceled) {
 					rightHold = false;
-					playerPhysics.HandleInput(in inputEvent);
 					return true;
 				}
 			}
-			//inputHandler.RegisterInputEvent(inputHandler.GetAction("Drop Item"), pausable: true, binding => {
-			//	binding.Performed(_ => DropHoveredOrActiveItem());
-			//});
-			return playerPhysics.HandleInput(in inputEvent);
+
+			if (inputEvent.token.Equals(InputTokens.Player.move)) {
+				if (inputEvent.phase == InputActionPhase.Performed) {
+					playerPhysics.SetVelocityX(inputEvent.context.ReadValue<Vector2>().x);
+					return true;
+				} else if (inputEvent.phase == InputActionPhase.Canceled) {
+					playerPhysics.SetVelocityX(0f);
+					return true;
+				}
+			}
+			if (inputEvent.token.Equals(InputTokens.Player.jump)) {
+				playerPhysics.Jump();
+				return true;
+			}
+			return false;
+		}
+
+		private void Update() {
+			Vector2 velocity = playerPhysics.GetVelocity();
+			if (velocity.x != 0) {
+				_facing = Mathf.Sign(velocity.x);
+			}
+			if (rightHold || leftHold) {
+				_facing = Mathf.Sign(mouseScreenPos.x - Screen.width / 2);
+			}
+			animator.SetFloat("horizontalSpeed", Mathf.Abs(velocity.x));
 		}
 
 		private void RegisterItemUsageCandidates(ItemUsageHandler? itemUsageHandler) {
@@ -212,14 +240,12 @@ namespace SoulboundBackend.Client {
 		}
 
 		void IUpdatable.FrameUpdate(float deltaTime) {
-			InvocationHelper.If(leftHold, OnLeftHold);
-			InvocationHelper.If(rightHold, OnRightHold);
+			if (leftHold) OnLeftHold();
+			if (rightHold) OnRightHold();
 		}
 
 		public void SetMainHandItem(ItemStack? itemStack) {
-			if (MainHandStack == itemStack) {
-				return;
-			}
+			if (MainHandStack == itemStack) return;
 			MainHandStack = itemStack;
 		}
 
@@ -297,7 +323,7 @@ namespace SoulboundBackend.Client {
 		public bool IsInBlockReach(Vector2 worldPos) {
 			Level level = Soulbound.instance.GetActiveLevel()!;
 			float dist = Vector2.Distance(worldPos, this.center);
-			return dist <= MaxBlockReach 
+			return dist <= MAX_BLOCK_REACH 
 				&& !level.GetTilesCovered(playerPhysics.Collider.bounds)
 						 .Contains((BlockPos)worldPos);
 		}
