@@ -4,14 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+#nullable enable
+
 namespace SoulboundBackend.Core.Debug.Commands {
+	public delegate void CommandHandler(CommandContext context);
+
 	public abstract class CommandNode {
 		public abstract string label { get; }
-		protected List<CommandNode> children = new();
-		protected readonly bool IsTerminal;
+		protected readonly List<CommandNode> children = new();
+		protected readonly CommandHandler? handler;
 
-		protected CommandNode(bool isTerminal) {
-			this.IsTerminal = isTerminal;
+		protected CommandNode(CommandHandler? handler = null) {
+			this.handler = handler;
 		}
 
 		public abstract bool Matches(string token, CommandContext context);
@@ -25,6 +29,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 
 		public bool HasChildren() => children.Any();
 
-		public bool IsTerminalNode() => IsTerminal;
+		public bool IsTerminalNode() => handler != null;
+		public CommandHandler? GetHandler() => handler;
 	}
 }

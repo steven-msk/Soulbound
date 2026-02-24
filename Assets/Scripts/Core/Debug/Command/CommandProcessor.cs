@@ -13,18 +13,18 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			CommandNode node = new LiteralCommandNode("command");
 
 			CommandNode subcommand = new LiteralCommandNode("subcommand1");
-			subcommand.AddChild(new LiteralCommandNode("anotherSubCommand", true));
+			subcommand.AddChild(new LiteralCommandNode("anotherSubCommand", context => Logger.LogInfo("anotherSubCommand")));
 
 			node.AddChild(subcommand);
-			node.AddChild(new LiteralCommandNode("subcommand2", true));
-			node.AddChild(new LiteralCommandNode("subcommand3", true));
-			node.AddChild(new LiteralCommandNode("subcommand3", true));
+			node.AddChild(new LiteralCommandNode("subcommand2", context => Logger.LogInfo("subcommand2")));
+			node.AddChild(new LiteralCommandNode("subcommand3", context => Logger.LogInfo("impossible to run")));
+			node.AddChild(new LiteralCommandNode("subcommand3", context => Logger.LogInfo("impossible to run")));
 			registry.Add(node);
 
 			CommandNode tp = new LiteralCommandNode("tp");
 			ArgumentCommandNode<Guid> target = new("target", new GuidParser());
 			ArgumentCommandNode<Coordinate> x = new("x", new CoordinateParser());
-			ArgumentCommandNode<Coordinate> y = new("y", new CoordinateParser(), true);
+			ArgumentCommandNode<Coordinate> y = new("y", new CoordinateParser(), context => Logger.LogInfo("teleported"));
 			x.AddChild(y);
 			target.AddChild(x);
 			tp.AddChild(x);
