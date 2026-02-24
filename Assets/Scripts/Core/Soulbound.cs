@@ -23,13 +23,16 @@ using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 #nullable enable
 
 namespace SoulboundBackend.Core {
-	public sealed class Soulbound : IApplicationController {
+	public sealed class Soulbound : IApplicationController, IDebugMetricsSource {
 		public static Soulbound instance { get; private set; } = null!;
 		private bool running;
 		private readonly GameConfig config;
+		private float currentFps;
 		private readonly UIHandler uiHandler;
 		private readonly WorldManager worldManager;
 		public readonly Settings settings;
+		private readonly DebugMetricsService debugMetricsService;
+		private readonly SoulboundDebug debug;
 		private readonly InputManager inputManager;
 		private static readonly PlayerInputActions inputActions = new();
 		public static readonly JsonSerializerSettings globalJsonSettings = new() {
@@ -50,8 +53,10 @@ namespace SoulboundBackend.Core {
 			InputTokens.Register(inputActions.asset);
 			settings = new Settings();
 
-			SoulboundDebug debug = new(UnityEngine.Debug.unityLogger);
+			debugMetricsService = new DebugMetricsService();
+			debug = new(UnityEngine.Debug.unityLogger, debugMetricsService);
 			inputManager.PushContext(debug);
+			RegisterDebugMetricsSource(this);
 
 			AssetManager.PreloadAll();
 
@@ -81,6 +86,11 @@ namespace SoulboundBackend.Core {
 
 		public void FrameTick() {
 			inputManager.DispatchInputs();
+			currentFps = 1f / Time.unscaledDeltaTime;
+		}
+
+		void IDebugMetricsSource.CollectDebugData(ref DebugMetricsBuilder builder) {
+			builder.Add("fps", currentFps);
 		}
 
 		// aware of the problem with world deserialization
@@ -160,6 +170,13 @@ namespace SoulboundBackend.Core {
 
 		public IEnumerable<string> ListWorldSaves() {
 			return worldManager.ListSaves();
+		}
+
+		public void RegisterDebugMetricsSource(IDebugMetricsSource source) {
+			debugMetricsService.RegisterSource(source);
+		}
+		public void UnregisterDebugMetricsSource(IDebugMetricsSource source) {
+			debugMetricsService.UnregisterSource(source);
 		}
 
 		public InputManager GetInputManager() => inputManager;

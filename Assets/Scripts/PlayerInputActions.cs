@@ -997,6 +997,15 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ToggleMetrics"",
+                    ""type"": ""Button"",
+                    ""id"": ""bbc0a76d-7e7f-4f3e-a8de-208b651b0898"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -1019,6 +1028,17 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""EnterCommand"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""8b587d8c-e692-4fd8-a961-c545b9ce8d34"",
+                    ""path"": ""<Keyboard>/f2"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ToggleMetrics"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -2852,6 +2872,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Debug = asset.FindActionMap("Debug", throwIfNotFound: true);
         m_Debug_ToggleConsole = m_Debug.FindAction("ToggleConsole", throwIfNotFound: true);
         m_Debug_EnterCommand = m_Debug.FindAction("EnterCommand", throwIfNotFound: true);
+        m_Debug_ToggleMetrics = m_Debug.FindAction("ToggleMetrics", throwIfNotFound: true);
         // Keyboard
         m_Keyboard = asset.FindActionMap("Keyboard", throwIfNotFound: true);
         m_Keyboard_ESC = m_Keyboard.FindAction("ESC", throwIfNotFound: true);
@@ -3418,6 +3439,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private List<IDebugActions> m_DebugActionsCallbackInterfaces = new List<IDebugActions>();
     private readonly InputAction m_Debug_ToggleConsole;
     private readonly InputAction m_Debug_EnterCommand;
+    private readonly InputAction m_Debug_ToggleMetrics;
     /// <summary>
     /// Provides access to input actions defined in input action map "Debug".
     /// </summary>
@@ -3437,6 +3459,10 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Debug/EnterCommand".
         /// </summary>
         public InputAction @EnterCommand => m_Wrapper.m_Debug_EnterCommand;
+        /// <summary>
+        /// Provides access to the underlying input action "Debug/ToggleMetrics".
+        /// </summary>
+        public InputAction @ToggleMetrics => m_Wrapper.m_Debug_ToggleMetrics;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -3469,6 +3495,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @EnterCommand.started += instance.OnEnterCommand;
             @EnterCommand.performed += instance.OnEnterCommand;
             @EnterCommand.canceled += instance.OnEnterCommand;
+            @ToggleMetrics.started += instance.OnToggleMetrics;
+            @ToggleMetrics.performed += instance.OnToggleMetrics;
+            @ToggleMetrics.canceled += instance.OnToggleMetrics;
         }
 
         /// <summary>
@@ -3486,6 +3515,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @EnterCommand.started -= instance.OnEnterCommand;
             @EnterCommand.performed -= instance.OnEnterCommand;
             @EnterCommand.canceled -= instance.OnEnterCommand;
+            @ToggleMetrics.started -= instance.OnToggleMetrics;
+            @ToggleMetrics.performed -= instance.OnToggleMetrics;
+            @ToggleMetrics.canceled -= instance.OnToggleMetrics;
         }
 
         /// <summary>
@@ -4877,6 +4909,13 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnEnterCommand(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "ToggleMetrics" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnToggleMetrics(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Keyboard" which allows adding and removing callbacks.

@@ -9,11 +9,13 @@ namespace SoulboundBackend.Client.Input {
 	public static partial class InputTokens {
 		public static class Debug {
 			public static InputToken toggleConsole;
+			public static InputToken toggleMetrics;
 			public static InputToken enterCommand;
 
 			public static void Register(InputActionAsset asset) {
-				toggleConsole	   = Create(asset, "Debug/ToggleConsole");
-				enterCommand	   = Create(asset, "Debug/EnterCommand");
+				toggleConsole = Create(asset, "Debug/ToggleConsole");
+				enterCommand = Create(asset, "Debug/EnterCommand");
+				toggleMetrics = Create(asset, "Debug/ToggleMetrics");
 			}
 		}
 	}

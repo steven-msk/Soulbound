@@ -911,6 +911,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "ToggleMetrics",
+                    "type": "Button",
+                    "id": "bbc0a76d-7e7f-4f3e-a8de-208b651b0898",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -933,6 +942,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "EnterCommand",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8b587d8c-e692-4fd8-a961-c545b9ce8d34",
+                    "path": "<Keyboard>/f2",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ToggleMetrics",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
