@@ -1,4 +1,5 @@
 using SoulboundBackend.Core.Debug;
+using SoulboundBackend.Core.Debug.Commands;
 using SoulboundBackend.Core.Debug.Logging;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,8 @@ namespace SoulboundBackend.Client.UI {
 		private readonly HashSet<LogType> filteredTypes = new();
 		private TMP_InputField commandInput = null!;
 		private readonly Queue<(string condition, string stackTrace, LogType logType)> pendingLogs = new();
+
+		private readonly CommandProcessor commandProcessor = new();
 
 		public void Init(ScrollRect scrollRect, Transform contentParent) {
 			this.scrollRect = scrollRect;
@@ -142,10 +145,11 @@ namespace SoulboundBackend.Client.UI {
 		}
 
 		private void SubmitCommand(string command) {
-			Core.Debug.Logging.Logger.LogInfo("submitted commmand: {}", command);
 			commandInput.DeactivateInputField();
 			Destroy(commandInput.gameObject);
 			commandInput = null!;
+
+			commandProcessor.Process(command);
 		}
 
 		private void AutoScroll() {

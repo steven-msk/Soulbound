@@ -29,11 +29,14 @@ namespace SoulboundBackend.Core.Debug {
 		public DebugConsole GetConsole() => console;
 
 		bool IInputContext.HandleInput(in InputEvent inputEvent) {
-			if (inputEvent.token.Equals(InputTokens.Debug.toggleConsole)) {
+			if (inputEvent.token.Equals(InputTokens.Debug.toggleConsole)
+					|| inputEvent.token.Equals(InputTokens.Keyboard.ESC)
+					&& inputEvent.phase == UnityEngine.InputSystem.InputActionPhase.Performed) {
 				console.Toggle();
 				return true;
 			}
-			if (inputEvent.token.Equals(InputTokens.Debug.enterCommand) && console.IsVisible()) {
+			if (inputEvent.token.Equals(InputTokens.Debug.enterCommand)) {
+				if (!console.IsVisible()) console.Toggle();
 				console.StartCommandInput();
 				return true;
 			}
