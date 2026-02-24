@@ -23,7 +23,7 @@ namespace SoulboundBackend.Client.UI {
 		private TMP_InputField commandInput = null!;
 		private readonly Queue<(string condition, string stackTrace, LogType logType)> pendingLogs = new();
 
-		private readonly CommandProcessor commandProcessor = new();
+		private readonly CommandProcessor commandProcessor = new(new CommandProvider());
 
 		public void Init(ScrollRect scrollRect, Transform contentParent) {
 			this.scrollRect = scrollRect;

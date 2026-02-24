@@ -7,30 +7,10 @@ using System.Threading.Tasks;
 
 namespace SoulboundBackend.Core.Debug.Commands {
 	public sealed class CommandProcessor {
-		private readonly List<CommandNode> registry = new();
+		private readonly ICommandProvider commandProvider;
 
-		public CommandProcessor() {
-			CommandBuilder command = CommandBuilder.Literal("command");
-			command.Then(new LiteralCommandNode("subcommand1"))
-				.Then(new LiteralCommandNode("anotherSubCommand"))
-				.Executes(args => Logger.LogInfo("executing anotherSubCommand"));
-			command.Then(new LiteralCommandNode("subcommand"))
-				.Executes(args => Logger.LogInfo("subcommand2"));
-			command.Then(new LiteralCommandNode("subcommand3"))
-				.Executes(args => Logger.LogInfo("impossible to run"));
-			command.Then(new LiteralCommandNode("subcommand3"))
-				.Executes(args => Logger.LogInfo("impossible to run"));
-			registry.Add(command.GetRootNode());
-
-			CommandBuilder coords = CommandBuilder.Create(new ArgumentCommandNode<Coordinate>("x", new CoordinateParser()))
-				.Then(new ArgumentCommandNode<Coordinate>("y", new CoordinateParser()))
-				.Executes(args => Logger.LogInfo("teleported"));
-
-			CommandBuilder tp = CommandBuilder.Literal("tp");
-			tp.Then(coords);
-			tp.Then(new ArgumentCommandNode<Guid>("target", new GuidParser()))
-				.Then(coords);
-			registry.Add(tp.GetRootNode());
+		public CommandProcessor(ICommandProvider commandProvider) {
+			this.commandProvider = commandProvider;
 		}
 
 		public void Process(string input) {
@@ -42,12 +22,17 @@ namespace SoulboundBackend.Core.Debug.Commands {
 				return;
 			}
 
-			List<CommandNode> matching = registry
-				.Where(n => n.Matches(tokens[0], args))
-				.ToList();
-			if (matching.Count > 1) {
-				Logger.LogInfo("ambiguity between commands {}", tokens[0]);
-				return;
+			string rootToken = tokens[0];
+			List<CommandNode> matching = new();
+			foreach (var command in commandProvider.GetCommands()) {
+				if (command.Matches(rootToken, args)) {
+					matching.Add(command);
+
+					if (matching.Count > 1) {
+						Logger.LogInfo("ambiguity between commands {}", tokens[0]);
+						return;
+					}
+				}
 			}
 
 			CommandNode currentNode = matching.FirstOrDefault();
