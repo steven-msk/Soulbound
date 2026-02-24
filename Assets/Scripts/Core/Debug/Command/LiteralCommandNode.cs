@@ -15,7 +15,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			this.label = label;
 		} 
 
-		public override bool Matches(string token, CommandContext context) {
+		public override bool Matches(string token, CommandArguments args) {
 			return token == label;
 		}
 	}

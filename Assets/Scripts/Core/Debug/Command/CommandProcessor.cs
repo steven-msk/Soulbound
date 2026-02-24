@@ -10,31 +10,32 @@ namespace SoulboundBackend.Core.Debug.Commands {
 		private readonly List<CommandNode> registry = new();
 
 		public CommandProcessor() {
-			CommandNode node = new LiteralCommandNode("command");
+			CommandBuilder command = CommandBuilder.Literal("command");
+			command.Then(new LiteralCommandNode("subcommand1"))
+				.Then(new LiteralCommandNode("anotherSubCommand"))
+				.Executes(args => Logger.LogInfo("executing anotherSubCommand"));
+			command.Then(new LiteralCommandNode("subcommand"))
+				.Executes(args => Logger.LogInfo("subcommand2"));
+			command.Then(new LiteralCommandNode("subcommand3"))
+				.Executes(args => Logger.LogInfo("impossible to run"));
+			command.Then(new LiteralCommandNode("subcommand3"))
+				.Executes(args => Logger.LogInfo("impossible to run"));
+			registry.Add(command.GetRootNode());
 
-			CommandNode subcommand = new LiteralCommandNode("subcommand1");
-			subcommand.AddChild(new LiteralCommandNode("anotherSubCommand", context => Logger.LogInfo("anotherSubCommand")));
+			CommandBuilder coords = CommandBuilder.Create(new ArgumentCommandNode<Coordinate>("x", new CoordinateParser()))
+				.Then(new ArgumentCommandNode<Coordinate>("y", new CoordinateParser()))
+				.Executes(args => Logger.LogInfo("teleported"));
 
-			node.AddChild(subcommand);
-			node.AddChild(new LiteralCommandNode("subcommand2", context => Logger.LogInfo("subcommand2")));
-			node.AddChild(new LiteralCommandNode("subcommand3", context => Logger.LogInfo("impossible to run")));
-			node.AddChild(new LiteralCommandNode("subcommand3", context => Logger.LogInfo("impossible to run")));
-			registry.Add(node);
-
-			CommandNode tp = new LiteralCommandNode("tp");
-			ArgumentCommandNode<Guid> target = new("target", new GuidParser());
-			ArgumentCommandNode<Coordinate> x = new("x", new CoordinateParser());
-			ArgumentCommandNode<Coordinate> y = new("y", new CoordinateParser(), context => Logger.LogInfo("teleported"));
-			x.AddChild(y);
-			target.AddChild(x);
-			tp.AddChild(x);
-			tp.AddChild(target);
-			registry.Add(tp);
+			CommandBuilder tp = CommandBuilder.Literal("tp");
+			tp.Then(coords);
+			tp.Then(new ArgumentCommandNode<Guid>("target", new GuidParser()))
+				.Then(coords);
+			registry.Add(tp.GetRootNode());
 		}
 
 		public void Process(string input) {
 			string[] tokens = Tokenize(input);
-			CommandContext context = new();
+			CommandArguments args = new();
 
 			if (tokens == null || tokens.Length == 0) {
 				Logger.LogInfo("empty command");
@@ -42,7 +43,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			}
 
 			List<CommandNode> matching = registry
-				.Where(n => n.Matches(tokens[0], context))
+				.Where(n => n.Matches(tokens[0], args))
 				.ToList();
 			if (matching.Count > 1) {
 				Logger.LogInfo("ambiguity between commands {}", tokens[0]);
@@ -58,7 +59,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			for (int i = 1; i < tokens.Length; i++) {
 				List<CommandNode> matchingSubnodes = currentNode
 					.GetChildren()
-					.Where(n => n.Matches(tokens[i], context))
+					.Where(n => n.Matches(tokens[i], args))
 					.ToList();
 				if (matchingSubnodes.Count > 1) {
 					Logger.LogInfo("ambiguity between commands {}", tokens[i]);
