@@ -1,14 +1,8 @@
 using SoulboundBackend.Client.UI.Screens;
 using SoulboundBackend.Client.UI.Storage;
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEditor.Graphs;
 using UnityEngine.EventSystems;
-using static UnityEngine.UI.Image;
 
 #nullable enable
 

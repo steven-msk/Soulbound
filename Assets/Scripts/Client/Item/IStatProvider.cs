@@ -5,7 +5,7 @@ using SoulboundBackend.Core.Debug.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.Plastic.Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace SoulboundBackend.Client.ItemSystem {
 	[JsonConverter(typeof(StatProviderConverter))]

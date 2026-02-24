@@ -1,13 +1,6 @@
-using SoulboundBackend.Client.ItemSystem;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using Unity.Plastic.Newtonsoft.Json;
-using Unity.Plastic.Newtonsoft.Json.Linq;
-using Unity.VisualScripting;
-using Unity.VisualScripting.YamlDotNet.Core.Tokens;
-using UnityEditor.Rendering;
+using Newtonsoft.Json;
 using UnityEngine;
 using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 

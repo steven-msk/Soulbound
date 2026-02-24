@@ -1,17 +1,7 @@
 using SoulboundBackend.Client.UI.Screens;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core;
-using SoulboundBackend.Core.AssetManagement;
-using SoulboundBackend.Core.Resource;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TMPro;
-using UnityEngine;
-using UnityEngine.LightTransport;
-using UnityEngine.UI;
 using Screen = SoulboundBackend.Client.UI.Screens.Screen;
 
 namespace SoulboundBackend.Client.UI {

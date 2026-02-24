@@ -1,15 +1,11 @@
-﻿using SoulboundBackend.Client.World.BlockSystem;
+using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core.AssetManagement;
-using SoulboundBackend.Core.Resource;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Unity.Plastic.Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace SoulboundBackend.Client.ItemSystem {
 	public partial class Items : ICachedRegistry<Item> {

@@ -24,11 +24,10 @@
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        "Unity.Plastic.Newtonsoft.Json.dll",
-        "log4netPlastic.dll",
         "nunit.framework.dll",
         "Unity.VisualScripting.YamlDotNet.dll",
-        "Zenject-usage.dll"
+        "Zenject-usage.dll",
+        "Newtonsoft.Json.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [],

@@ -1,6 +1,6 @@
-﻿using System;
-using Unity.Plastic.Newtonsoft.Json;
-using Unity.Plastic.Newtonsoft.Json.Linq;
+using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace SoulboundBackend.Common.Json {
 	public sealed class BoundsInt2DJsonConverter : JsonConverter<BoundsInt2D> {

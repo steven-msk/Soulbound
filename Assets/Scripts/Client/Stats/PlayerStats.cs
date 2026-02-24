@@ -1,11 +1,4 @@
-using SoulboundBackend.Client.ItemSystem;
-using SoulboundBackend.Client.UI.Storage;
-using SoulboundBackend.Common.Json;
-using SoulboundBackend.Core;
-using System;
 using System.Collections.Generic;
-using Unity.Plastic.Newtonsoft.Json;
-using UnityEngine;
 
 namespace SoulboundBackend.Client.Stats {
 	public sealed class PlayerStats : IStatOwner, IStatModificationHost {

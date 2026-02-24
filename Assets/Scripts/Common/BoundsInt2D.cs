@@ -1,5 +1,5 @@
-﻿using SoulboundBackend.Common.Json;
-using Unity.Plastic.Newtonsoft.Json;
+using SoulboundBackend.Common.Json;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace SoulboundBackend.Common {

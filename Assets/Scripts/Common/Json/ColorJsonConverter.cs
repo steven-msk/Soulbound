@@ -1,5 +1,5 @@
-﻿using System;
-using Unity.Plastic.Newtonsoft.Json;
+using System;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace SoulboundBackend.Common.Json {

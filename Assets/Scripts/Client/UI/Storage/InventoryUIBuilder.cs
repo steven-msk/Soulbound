@@ -3,15 +3,9 @@ using SoulboundBackend.Client.UI.Storage;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core.AssetManagement;
 using SoulboundBackend.Core.Resource;
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TMPro;
-using Unity.VisualScripting;
-using UnityEditor.Graphs;
 using UnityEngine;
 using UnityEngine.UI;
 

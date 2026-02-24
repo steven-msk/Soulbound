@@ -1,7 +1,7 @@
-﻿using SoulboundBackend.Client.World.Chunk;
+using SoulboundBackend.Client.World.Chunk;
 using System;
-using Unity.Plastic.Newtonsoft.Json;
-using Unity.Plastic.Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace SoulboundBackend.Common.Json {
 	public sealed class ChunkBlockPosJsonConverter : JsonConverter<ChunkBlockPos> {

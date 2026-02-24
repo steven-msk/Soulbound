@@ -1,12 +1,5 @@
-using SoulboundBackend.Client.Concurrency;
-using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.UI.Storage;
-using SoulboundBackend.Core;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
-using UnityEditor.Graphs;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;

@@ -1,11 +1,11 @@
-﻿using SoulboundBackend.Client.World.BlockSystem;
+using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Client.World.Chunk;
 using SoulboundBackend.Common;
 using SoulboundBackend.Common.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Unity.Plastic.Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace SoulboundBackend.Client.World.Structure {
 	public class StructurePlacement {

@@ -1,16 +1,11 @@
-﻿using SoulboundBackend.Client.ItemSystem;
+using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core.AssetManagement;
 using SoulboundBackend.Core.Resource;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using Unity.Plastic.Newtonsoft.Json;
-using UnityEditor;
-using UnityEngine.Tilemaps;
+using Newtonsoft.Json;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
 	public partial class Blocks : IResourceModule, ICachedRegistry<Block> {

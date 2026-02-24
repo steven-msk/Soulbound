@@ -1,11 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEditor.Rendering;
 using UnityEngine.InputSystem.Controls;
-using static UnityEngine.EventSystems.EventTrigger;
 
 namespace SoulboundBackend.Client.SettingSystem {
 	public sealed class KeybindWriter : IKeybindProcessor {

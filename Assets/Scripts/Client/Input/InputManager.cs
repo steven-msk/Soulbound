@@ -1,12 +1,8 @@
 using SoulboundBackend.Client.SettingSystem;
 using SoulboundBackend.Common;
-using SoulboundBackend.Core.Debug.Logging;
 using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using Unity.VisualScripting.YamlDotNet.Core.Tokens;
-using UnityEngine;
 using UnityEngine.InputSystem;
 using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 

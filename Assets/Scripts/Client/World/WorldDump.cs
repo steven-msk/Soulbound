@@ -1,9 +1,8 @@
 using SoulboundBackend.Client.World.Chunk;
 using SoulboundBackend.Client.World.EntitySystem;
-using SoulboundBackend.Client.World.Structure;
 using System;
 using System.Collections.Generic;
-using Unity.Plastic.Newtonsoft.Json;
+using Newtonsoft.Json;
 
 #nullable enable
 

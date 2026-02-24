@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Unity.Plastic.Newtonsoft.Json;
-using Unity.Plastic.Newtonsoft.Json.Linq;
-using Unity.VisualScripting;
+using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
     [JsonConverter(typeof(BlockPropertyJsonConverter))]

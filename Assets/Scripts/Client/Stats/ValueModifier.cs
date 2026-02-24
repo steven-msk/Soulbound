@@ -1,7 +1,6 @@
 
 using System;
 using System.Linq.Expressions;
-using Unity.Plastic.Newtonsoft.Json;
 
 #nullable enable
 

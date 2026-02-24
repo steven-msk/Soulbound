@@ -5,9 +5,7 @@ using SoulboundBackend.Common;
 using SoulboundBackend.Core;
 using SoulboundBackend.Core.Resource;
 using System;
-using UnityEditor.Profiling;
 using UnityEngine;
-using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
 namespace SoulboundBackend.Client.World.EntitySystem {
 	public class DroppedItem : Entity, IUpdatable, IChunkListener, IEntitySpawnable<DroppedItem.SpawnData> {
