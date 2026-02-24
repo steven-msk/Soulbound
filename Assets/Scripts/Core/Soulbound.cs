@@ -153,9 +153,13 @@ namespace SoulboundBackend.Core {
 		}
 
 		private IWorldSaveStrategy GetWorldSaveStrategy() {
+#if !UNITY_EDITOR
+		return new WorldSaveStrategy(config.file.savesFolder, Application.persistentDataPath);
+#else
 			return !config.dev.useDoNotSaveWorldStrategy
 				? new WorldSaveStrategy(config.file.savesFolder, Application.persistentDataPath)
 				: new DoNotSaveWorldStrategy();
+#endif
 		}
 
 		public UIHandler GetUIHandler() => uiHandler;
