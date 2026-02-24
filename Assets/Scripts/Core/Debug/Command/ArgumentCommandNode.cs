@@ -9,8 +9,8 @@ namespace SoulboundBackend.Core.Debug.Commands {
 		private readonly ICommandArgumentParser<T> parser;
 		public override string label { get; }
 
-		public ArgumentCommandNode(string label, ICommandArgumentParser<T> parser, bool isExecutable = false)
-			: base(isExecutable) {
+		public ArgumentCommandNode(string label, ICommandArgumentParser<T> parser, bool isTerminal = false)
+			: base(isTerminal) {
 			this.label = label;
 			this.parser = parser;
 		}

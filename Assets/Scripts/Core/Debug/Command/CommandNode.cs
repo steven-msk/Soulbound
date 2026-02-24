@@ -8,10 +8,10 @@ namespace SoulboundBackend.Core.Debug.Commands {
 	public abstract class CommandNode {
 		public abstract string label { get; }
 		protected List<CommandNode> children = new();
-		protected readonly bool isExecutable;
+		protected readonly bool IsTerminal;
 
-		protected CommandNode(bool isExecutable) {
-			this.isExecutable = isExecutable; 
+		protected CommandNode(bool isTerminal) {
+			this.IsTerminal = isTerminal;
 		}
 
 		public abstract bool Matches(string token, CommandContext context);
@@ -25,6 +25,6 @@ namespace SoulboundBackend.Core.Debug.Commands {
 
 		public bool HasChildren() => children.Any();
 
-		public bool IsExecutable() => isExecutable;
+		public bool IsTerminalNode() => IsTerminal;
 	}
 }

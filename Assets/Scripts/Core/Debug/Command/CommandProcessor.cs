@@ -22,10 +22,13 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			registry.Add(node);
 
 			CommandNode tp = new LiteralCommandNode("tp");
+			ArgumentCommandNode<Guid> target = new("target", new GuidParser());
 			ArgumentCommandNode<Coordinate> x = new("x", new CoordinateParser());
 			ArgumentCommandNode<Coordinate> y = new("y", new CoordinateParser(), true);
 			x.AddChild(y);
+			target.AddChild(x);
 			tp.AddChild(x);
+			tp.AddChild(target);
 			registry.Add(tp);
 		}
 
@@ -69,40 +72,12 @@ namespace SoulboundBackend.Core.Debug.Commands {
 				currentNode = matchingSubnodes.FirstOrDefault();
 			}
 
-			if (currentNode.IsExecutable()) {
+			if (currentNode.IsTerminalNode()) {
 				Logger.LogInfo("completed command: {}", input);
 			} else {
 				Logger.LogInfo("incorrect command: {}", input);
 			}
 
-			//ProcessChildrenRecursive(root, tokens, 1, context);
-		}
-
-		public void ProcessChildrenRecursive(CommandNode root, string[] tokens, int tokenIndex, CommandContext context) {
-			if (tokenIndex >= tokens.Length) {
-				Logger.LogInfo("reached end of children");
-				return;
-			}
-
-			List<CommandNode> matching = new();
-
-			foreach (var child in root.GetChildren()) {
-				if (child.HasChildren()) ProcessChildrenRecursive(child, tokens, tokenIndex + 1, context);
-
-				if (child.Matches(tokens[tokenIndex], context)) matching.Add(child);
-			}
-
-			if (matching.Count > 1) {
-				Logger.LogInfo("ambiguity between children {}", tokens[tokenIndex]);
-				return;
-			}
-
-			if (!matching.Any() && root.HasChildren()) {
-				Logger.LogInfo("no matching child {}", tokens[tokenIndex]);
-				return;
-			}
-
-			Logger.LogInfo("completed command: /{}", string.Join(" ", tokens));
 		}
 
 		private string[] Tokenize(string input) {

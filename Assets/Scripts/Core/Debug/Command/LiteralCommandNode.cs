@@ -8,8 +8,8 @@ namespace SoulboundBackend.Core.Debug.Commands {
 	public class LiteralCommandNode : CommandNode {
 		public override string label { get; }
 
-		public LiteralCommandNode(string label, bool isExecutable = false)
-			: base(isExecutable) {
+		public LiteralCommandNode(string label, bool isTerminal = false)
+			: base(isTerminal) {
 			this.label = label;
 		} 
 
