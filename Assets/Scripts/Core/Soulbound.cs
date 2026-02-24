@@ -27,7 +27,7 @@ namespace SoulboundBackend.Core {
 		public static Soulbound instance { get; private set; } = null!;
 		private bool running;
 		private readonly GameConfig config;
-		private float currentFps;
+		private readonly PerformanceMetrics performanceMetrics;
 		private readonly UIHandler uiHandler;
 		private readonly WorldManager worldManager;
 		public readonly Settings settings;
@@ -57,6 +57,7 @@ namespace SoulboundBackend.Core {
 			debug = new(UnityEngine.Debug.unityLogger, debugMetricsService);
 			inputManager.PushContext(debug);
 			RegisterDebugMetricsSource(this);
+			performanceMetrics = new PerformanceMetrics();
 
 			AssetManager.PreloadAll();
 
@@ -85,12 +86,21 @@ namespace SoulboundBackend.Core {
 		}
 
 		public void FrameTick() {
+			performanceMetrics.Tick();
 			inputManager.DispatchInputs();
-			currentFps = 1f / Time.unscaledDeltaTime;
 		}
 
 		void IDebugMetricsSource.CollectDebugData(ref DebugMetricsBuilder builder) {
-			builder.Add("fps", currentFps);
+			builder.Add("fps", performanceMetrics.InstantFps);
+			builder.Add("frameTime", performanceMetrics.FrameTime);
+			builder.Add("fixedUpdateTime", performanceMetrics.FixedUpdateTime);
+			builder.Add("totalManagedMemory", performanceMetrics.TotalManagedMemoryMB);
+			builder.Add("totalUnityReservedMemory", performanceMetrics.TotalUnityReservedMemoryMB);
+			builder.Add("monoHeap", performanceMetrics.MonoHeapMB);
+			builder.Add("monoUsed", performanceMetrics.MonoUsedMB);
+			builder.Add("gpuManagedMemory", performanceMetrics.GPUManagedMemoryMB);
+			builder.Add("gpuReservedMemory", performanceMetrics.GPUReservedMemoryMB);
+			builder.Add("gcAlloc", performanceMetrics.GcAllocBytesThisFrame);
 		}
 
 		// aware of the problem with world deserialization
@@ -179,6 +189,7 @@ namespace SoulboundBackend.Core {
 			debugMetricsService.UnregisterSource(source);
 		}
 
+		public PerformanceMetrics GetPerformanceMetrics() => performanceMetrics;
 		public InputManager GetInputManager() => inputManager;
 		public InputActionAsset GetInputActionAsset() => inputActions.asset;
 	}

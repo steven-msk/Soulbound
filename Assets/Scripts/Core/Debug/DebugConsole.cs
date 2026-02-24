@@ -38,7 +38,10 @@ namespace SoulboundBackend.Core.Debug {
 			if (node != null) return;
 
 			node = CreateNode();
-			node.onDestroy += () => node = null;
+			node.onDestroy += () => {
+				node = null;
+				visible = false;
+			};
 			foreach (var (condition, stackTrace, logType) in logQueue) {
 				node.handle.AddLog(condition, stackTrace, logType);
 			}

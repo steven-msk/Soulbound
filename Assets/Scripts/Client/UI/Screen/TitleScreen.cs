@@ -20,7 +20,7 @@ namespace SoulboundBackend.Client.UI {
 		[PROTOTYPICAL]
 		protected override void OnBuild(IScreenObject screenObject) {
 			IUIElementContainer container = GUI.Container(
-				GUI.Frame.Stretch(),
+				GUI.Frame.StretchWithPadding(100f),
 				GUI.Layout.Vertical()
 					.ChildForceExpandWidth(true)
 					.ControlChildWidth(true)
