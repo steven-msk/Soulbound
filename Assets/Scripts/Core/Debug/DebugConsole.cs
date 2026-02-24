@@ -10,7 +10,7 @@ using UnityEngine.UI;
 using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
 namespace SoulboundBackend.Core.Debug {
-	public sealed class DebugConsole : IInputContext {
+	public sealed class DebugConsole {
 		private UIDebugConsoleNode node;
 		private bool visible;
 		private readonly Queue<(string condition, string stackTrace, LogType logType)> logQueue = new();
@@ -22,7 +22,7 @@ namespace SoulboundBackend.Core.Debug {
 			};
 		}
 
-		public void ToggleConsole() {
+		public void Toggle() {
 			visible = !visible;
 			CreateNodeIfNull();
 
@@ -30,16 +30,8 @@ namespace SoulboundBackend.Core.Debug {
 			else node.Show();
 		}
 
-		bool IInputContext.HandleInput(in InputEvent inputEvent) {
-			if (inputEvent.token.Equals(InputTokens.Debug.toggleConsole)) {
-				ToggleConsole();
-				return true;
-			}
-			if (inputEvent.token.Equals(InputTokens.Debug.enterCommand) && visible) {
-				node?.handle.StartCommandInput(node.transform);
-				return true;
-			}
-			return false;
+		public void StartCommandInput() {
+			node?.handle.StartCommandInput(node.transform);
 		}
 
 		private void CreateNodeIfNull() {
@@ -146,5 +138,7 @@ namespace SoulboundBackend.Core.Debug {
 			});
 			return obj;
 		}
+
+		public bool IsVisible() => visible;
 	}
 }

@@ -428,41 +428,6 @@ fmtsi.value={fileValue}
 		}
 
 		[Test]
-		public void KeyMapping_SetAction_AppliedBindingOverride() {
-			var action = new InputAction(type: InputActionType.Button, binding: "<Keyboard>/c");
-			var keyMapping = new KeybindEntry("Test", "test", Key.B, null);
-
-			keyMapping.SetAction(action);
-
-			Assert.AreEqual("/Keyboard/b", action.bindings[0].effectivePath);
-			Assert.AreEqual("/Keyboard/b", action.bindings[0].overridePath);
-			Assert.AreEqual("<Keyboard>/c", action.bindings[0].path);
-		}
-
-#nullable enable
-		[Test]
-		public void KeyMapping_SetAction_TriggersEvent() {
-			var keyMapping = new KeybindEntry("Test", "test", Key.P, null!);
-			var oldAction = new InputAction(type: InputActionType.Button, binding: "<Keyboard>/p");
-			var newAction = new InputAction(type: InputActionType.Button, binding: "<Keyboard>/m");
-			keyMapping.SetAction(oldAction);
-
-			InputAction? receievedOld = null;
-			InputAction? receivedNew = null;
-
-			keyMapping.onAppliedActionChanged += (oldAction, newAction) => {
-				receievedOld = oldAction;
-				receivedNew = newAction;
-			};
-
-			keyMapping.SetAction(newAction);
-
-			Assert.AreEqual(oldAction, receievedOld);
-			Assert.AreEqual(newAction, receivedNew);
-		}
-#nullable disable
-
-		[Test]
 		public void KeyMapping_SetKey_ChangesKeyControl() {
 			var keyMapping = new KeybindEntry("Test", "test", Key.N, null);
 

@@ -13,7 +13,7 @@ namespace SoulboundBackend.Client.SettingSystem {
 		[SerializeField] private Slider _slider;
 		public Slider slider { get => _slider; set => _slider = value; }
 
-		public override void Build() {
+		protected override void Build() {
 			_slider.value = settingEntry.value;
 			_slider.onValueChanged.AddListener(OnValueChanged);
 		}

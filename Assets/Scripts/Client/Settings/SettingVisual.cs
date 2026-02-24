@@ -11,7 +11,7 @@ namespace SoulboundBackend.Client.SettingSystem {
 	public abstract class SettingVisual<T> : MonoBehaviour {
 		protected SettingEntry<T> settingEntry;
 
-		public abstract void Build();
+		protected abstract void Build();
 
 		public virtual void Show(SettingEntry<T> settingEntry) {
 			this.settingEntry = settingEntry;

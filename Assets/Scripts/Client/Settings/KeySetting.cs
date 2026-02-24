@@ -1,5 +1,7 @@
+using SoulboundBackend.Client.Input;
 using SoulboundBackend.Client.SettingSystem;
 using SoulboundBackend.Common;
+using SoulboundBackend.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,52 +16,57 @@ using UnityEngine.InputSystem.Controls;
 
 namespace SoulboundBackend.Client.SettingSystem {
 	[PROTOTYPICAL]
-	public class KeySetting : SettingVisual<KeyControl> {
-		[SerializeField] private TextMeshProUGUI _text;
-		public TextMeshProUGUI text { get => _text; set => _text = value; }
-		public KeybindEntry mapping => (KeybindEntry)this.settingEntry;
+	public class KeySetting : SettingVisual<KeyControl>, IInputContext {
+		int IInputContext.priority => 100; 
+		[SerializeField] private TextMeshProUGUI text;
 		private bool isRebinding;
 
-		public override void Build() {
-			_text.text = GetBindingText(settingEntry.value);
+		protected override void Build() {
+			SetText(GetBindingText(settingEntry.value));
 		}
 
-		//private void Update() => PollRebind();
+		private void Update() => PollRebind();
 
-		public void UpdateRebinding(KeyControl? keyControl) {
-			_text.text = GetBindingText(keyControl);
+		public void BeginRebind() {
+			isRebinding = true;
+			Soulbound.instance.GetInputManager().PushContext(this);
 		}
 
-		//private void PollRebind() {
-		//	if (!isRebinding) return;
+		private void PollRebind() {
+			if (!isRebinding) return;
 
-		//	foreach (var keyControl in Keyboard.current.allKeys) {
-		//		if (keyControl.wasPressedThisFrame) {
-		//			var appliedControl = HandleKeyPress(keyControl);
+			foreach (var keyControl in Keyboard.current.allKeys) {
+				if (keyControl.wasPressedThisFrame) {
+					KeyControl? appliedControl = keyControl.keyCode != Key.Escape
+						? keyControl
+						: null;
 
-		//			mapping.SetValue(appliedControl);
-		//			UpdateRebinding(appliedControl);
+					settingEntry.SetValue(appliedControl);
+					SetText(GetBindingText(appliedControl));
 
-		//			this.EndRebinding();
-		//			return;
-		//		}
-		//	}
-		//}
-
-		//private void EndRebinding() {
-		//	this.isRebinding = false;
-		//	Settings.keybindMappings.EndRebindContext(this);
-		//}
-
-		private KeyControl? HandleKeyPress(KeyControl keyControl) {
-			if (keyControl.keyCode == Keybinds.backtrackScreen.GetKey()) {
-				return null;
+					EndRebind();
+					return;
+				}
 			}
-			return keyControl;
+		}
+
+		private void EndRebind() {
+			isRebinding = false;
+			Soulbound.instance.GetInputManager().RemoveContext(this);
+		}
+
+		bool IInputContext.HandleInput(in InputEvent inputEvent) {
+			return isRebinding
+				&& inputEvent.token.Equals(InputTokens.Keyboard.ANY)
+				&& inputEvent.phase == InputActionPhase.Performed;
 		}
 
 		public string GetBindingText(KeyControl? keyControl) {
-			return keyControl?.keyCode.ToString() ?? "Not Bound";
-		} 
+			return keyControl?.keyCode.ToString() ?? "Unbound";
+		}
+
+		public void SetText(string text) {
+			this.text.text = text;
+		}
 	}
 }

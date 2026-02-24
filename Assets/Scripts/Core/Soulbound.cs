@@ -51,7 +51,7 @@ namespace SoulboundBackend.Core {
 			settings = new Settings();
 
 			SoulboundDebug debug = new(UnityEngine.Debug.unityLogger);
-			inputManager.PushContext(debug.GetConsole());
+			inputManager.PushContext(debug);
 
 			AssetManager.PreloadAll();
 

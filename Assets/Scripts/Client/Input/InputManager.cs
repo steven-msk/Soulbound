@@ -41,7 +41,7 @@ namespace SoulboundBackend.Client.Input {
 		private void PendEvent(InputAction action, InputAction.CallbackContext context) {
 			InputEvent inputEvent = new(tokenRegistry[action.id], context.phase, context);
 			if (!eventQueue.TryEnqueue(in inputEvent)) {
-				Logger.LogWarning("Input queue capacity exceeded! Failed to enqueue action '{}' phase '{}", action.name, context.phase);
+				Logger.LogWarning("Too many input actions! Failed to enqueue action '{}' phase '{}", action.name, context.phase);
 			}
 		}
 
