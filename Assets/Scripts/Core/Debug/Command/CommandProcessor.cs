@@ -1,3 +1,4 @@
+using SoulboundBackend.Client;
 using SoulboundBackend.Core.Debug.Logging;
 using System;
 using System.Collections.Generic;

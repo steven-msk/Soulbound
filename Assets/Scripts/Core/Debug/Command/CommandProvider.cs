@@ -38,17 +38,22 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			CommandBuilder coords = CommandBuilder.Create(new ArgumentCommandNode<Coordinate>("x", new CoordinateParser()))
 				.Then(new ArgumentCommandNode<Coordinate>("y", new CoordinateParser()))
 				.Executes(ctx => {
-					string target = ctx.Args.TryGet("target", out Guid guid)
-						? guid.ToString()
-						: "player";
-					Coordinate xcoord = ctx.Args.Get<Coordinate>("x");
-					Coordinate ycoord = ctx.Args.Get<Coordinate>("y");
-					float x = xcoord.isRelative
-						? ctx.Data.Player.GetPos().x + xcoord.value
-						: xcoord.value;
-					float y = ycoord.isRelative
-						? ctx.Data.Player.GetPos().x + ycoord.value
-						: ycoord.value;
+					Guid targetGuid = ctx.Args.TryGet("target", out Guid guid)
+					   ? guid
+					   : ctx.Data.Player.GetGuid();
+
+					var target = ctx.Data.Entities.TryGetEntity(targetGuid, out var entity)
+						? entity
+						: ctx.Data.Player;
+
+					var pos = target.GetPos();
+
+					var xcoord = ctx.Args.Get<Coordinate>("x");
+					var ycoord = ctx.Args.Get<Coordinate>("y");
+
+					float x = xcoord.isRelative ? pos.x + xcoord.value : xcoord.value;
+					float y = ycoord.isRelative ? pos.y + ycoord.value : ycoord.value;
+
 					Logger.LogInfo("teleported {} to x:{} y:{}", target, x, y);
 				});
 

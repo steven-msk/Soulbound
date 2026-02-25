@@ -1,6 +1,7 @@
 using SoulboundBackend.Client.Input;
 using SoulboundBackend.Client.UI;
 using SoulboundBackend.Common;
+using SoulboundBackend.Core.Debug.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,8 +15,10 @@ namespace SoulboundBackend.Core.Debug {
 		private UIDebugConsoleNode node;
 		private bool visible;
 		private readonly Queue<(string condition, string stackTrace, LogType logType)> logQueue = new();
+		private readonly CommandProcessor commandProcessor;
 
-		public DebugConsole() {
+		public DebugConsole(CommandProcessor commandProcessor) {
+			this.commandProcessor = commandProcessor;
 			Application.logMessageReceivedThreaded += (condition, stackTrace, logType) => {
 				node?.handle.AddLog(condition, stackTrace, logType);
 				logQueue.Enqueue((condition, stackTrace, logType));
@@ -123,7 +126,7 @@ namespace SoulboundBackend.Core.Debug {
 			GameObject filterExceptions = CreateFilterButton(LogType.Exception, handle);
 			filterExceptions.transform.SetParent(filterContainer.transform, false);
 
-			handle.Init(scrollRect, contentRect);
+			handle.Init(scrollRect, contentRect, commandProcessor);
 
 			return new UIDebugConsoleNode(root, handle);
 		}

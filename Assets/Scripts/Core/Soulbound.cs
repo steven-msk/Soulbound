@@ -19,6 +19,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
+using SoulboundBackend.Core.Debug.Commands;
 
 #nullable enable
 
@@ -31,6 +32,9 @@ namespace SoulboundBackend.Core {
 		private readonly UIHandler uiHandler;
 		private readonly WorldManager worldManager;
 		public readonly Settings settings;
+		private readonly IDynamicDataProvider dynamicDataProvider;
+		private readonly CommandProcessor commandProcessor;
+		private readonly ICommandProvider commandProvider;
 		private readonly DebugMetricsService debugMetricsService;
 		private readonly SoulboundDebug debug;
 		private readonly InputManager inputManager;
@@ -53,8 +57,11 @@ namespace SoulboundBackend.Core {
 			InputTokens.Register(inputActions.asset);
 			settings = new Settings();
 
+			dynamicDataProvider = new DynamicDataProvider();
+			commandProvider = new CommandProvider();
+			commandProcessor = new CommandProcessor(commandProvider, dynamicDataProvider);
 			debugMetricsService = new DebugMetricsService();
-			debug = new(UnityEngine.Debug.unityLogger, debugMetricsService);
+			debug = new SoulboundDebug(UnityEngine.Debug.unityLogger, debugMetricsService, commandProcessor);
 			inputManager.PushContext(debug);
 			RegisterDebugMetricsSource(this);
 			performanceMetrics = new PerformanceMetrics();
@@ -196,5 +203,6 @@ namespace SoulboundBackend.Core {
 		public PerformanceMetrics GetPerformanceMetrics() => performanceMetrics;
 		public InputManager GetInputManager() => inputManager;
 		public InputActionAsset GetInputActionAsset() => inputActions.asset;
+		public IDynamicDataProvider GetDynamicDataProvider() => dynamicDataProvider;
 	}
 }

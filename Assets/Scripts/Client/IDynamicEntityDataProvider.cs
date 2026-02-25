@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SoulboundBackend.Core.Debug.Commands {
+namespace SoulboundBackend.Client {
 	public interface IDynamicEntityDataProvider {
 		bool TryGetEntity(Guid guid, out IEntityView entity);
 		IEnumerable<IEntityView> GetAllEntities();

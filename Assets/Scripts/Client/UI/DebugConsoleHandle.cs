@@ -20,14 +20,14 @@ namespace SoulboundBackend.Client.UI {
 		private Transform contentParent;
 		private readonly List<(GameObject obj, LogType logType)> logObjects = new();
 		private readonly HashSet<LogType> filteredTypes = new();
-		private TMP_InputField commandInput = null!;
+		private TMP_InputField commandInput;
 		private readonly Queue<(string condition, string stackTrace, LogType logType)> pendingLogs = new();
+		private CommandProcessor commandProcessor;
 
-		private readonly CommandProcessor commandProcessor = new(new CommandProvider());
-
-		public void Init(ScrollRect scrollRect, Transform contentParent) {
+		public void Init(ScrollRect scrollRect, Transform contentParent, CommandProcessor commandProcessor) {
 			this.scrollRect = scrollRect;
 			this.contentParent = contentParent;
+			this.commandProcessor = commandProcessor;
 		}
 
 		public void AddLog(string condition, string stackTrace, LogType logType) {
@@ -148,7 +148,6 @@ namespace SoulboundBackend.Client.UI {
 			commandInput.DeactivateInputField();
 			Destroy(commandInput.gameObject);
 			commandInput = null!;
-
 			commandProcessor.Process(command);
 		}
 

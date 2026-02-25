@@ -1,5 +1,6 @@
 using Assets.Scripts.Core.Debug;
 using SoulboundBackend.Client.Input;
+using SoulboundBackend.Core.Debug.Commands;
 using SoulboundBackend.Core.Debug.Logging;
 using System;
 using System.Collections.Generic;
@@ -13,15 +14,17 @@ namespace SoulboundBackend.Core.Debug {
 		private readonly DebugConsole console;
 		private readonly MetricsHUD metricsHud;
 		private readonly DebugMetricsService metricsService;
+		private readonly CommandProcessor commandProcessor;
 
-		public SoulboundDebug(ILogger logger, DebugMetricsService metricsService) {
+		public SoulboundDebug(ILogger logger, DebugMetricsService metricsService, CommandProcessor commandProcessor) {
 #if !UNITY_EDITOR
 			Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
 			Application.SetStackTraceLogType(LogType.Warning, StackTraceLogType.None);
 			Application.SetStackTraceLogType(LogType.Error, StackTraceLogType.ScriptOnly);
 #endif
 			new Logging.Logger(logger);
-			console = new DebugConsole();
+			this.commandProcessor = commandProcessor;
+			console = new DebugConsole(commandProcessor);
 			this.metricsService = metricsService;
 			metricsHud = new MetricsHUD(metricsService);
 		}
