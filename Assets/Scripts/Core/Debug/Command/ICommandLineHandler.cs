@@ -8,5 +8,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 	public interface ICommandLineHandler {
 		void InsertCompletion();
 		void ShowCompletions(string value);
+		void SelectNextCompletion();
+		void SelectPreviousCompletion();
 	}
 }

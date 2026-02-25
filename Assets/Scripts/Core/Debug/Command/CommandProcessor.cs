@@ -62,7 +62,6 @@ namespace SoulboundBackend.Core.Debug.Commands {
 
 		public IEnumerable<CommandCompletionToken> GetCompletions(string input) {
 			string[] tokens = Tokenize(input);
-			Logger.LogInfo(string.Join(", ", tokens));
 			CommandArguments args = new();
 			CommandParsingContext ctx = new(args, dataProvider, execServices);
 

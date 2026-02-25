@@ -37,6 +37,8 @@ namespace SoulboundBackend.Core.Debug {
 		}
 
 		public void InsertCompletion() => node?.handle.InsertCompletion();
+		public void SelectNextCompletion() => node?.handle.SelectNextCompletion();
+		public void SelectPreviousCompletion() => node?.handle.SelectPreviousCompletion();
 
 		protected override UIHandledOverlayNode<ICommandLineHandler> GetNode() {
 			GameObject obj = new("Command Line", typeof(RectTransform));

@@ -16,14 +16,16 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			selectedIndex = completions.Count > 0 ? 0 : -1;
 		}
 
-		public void SelectNext() {
-			if (completions.Count == 0) return;
+		public int SelectNext() {
+			if (completions.Count == 0) return -1;
 			selectedIndex = (selectedIndex + 1) % completions.Count;
+			return selectedIndex;
 		}
 
-		public void SelectPrevious() {
-			if (completions.Count == 0) return;
+		public int SelectPrevious() {
+			if (completions.Count == 0) return -1;
 			selectedIndex = (selectedIndex - 1 + completions.Count) % completions.Count;
+			return selectedIndex;
 		}
 
 		public CommandCompletionToken? GetSelected() {

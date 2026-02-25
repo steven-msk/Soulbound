@@ -39,6 +39,8 @@ namespace SoulboundBackend.Core.Debug {
 			// but it works for now
 			if (commandLine.IsVisible()) {
 				if (inputEvent.Performed(InputTokens.Keyboard.TAB)) commandLine.InsertCompletion();
+				if (inputEvent.Performed(InputTokens.Keyboard.ARROW_UP)) commandLine.SelectPreviousCompletion();
+				if (inputEvent.Performed(InputTokens.Keyboard.ARROW_DOWN)) commandLine.SelectNextCompletion();
 				return true;
 			}
 
