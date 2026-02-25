@@ -106,11 +106,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			if (!input.StartsWith("/")) return Array.Empty<string>();
 
 			input = input[1..];
-			var tokens = input
-				.Split(' ')
-				.ToList();
-
-			return tokens.ToArray();
+			return input.Split(' ');
 		}
 
 		private IEnumerable<CommandNode> EnumerateAllCommands() {

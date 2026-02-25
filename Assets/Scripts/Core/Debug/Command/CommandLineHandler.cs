@@ -46,7 +46,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			if(InvalidCompletionState()) return;
 
 			CommandCompletionToken completionToken = completion.GetSelected().Value;
-			string append = inputField.text + completionToken.value[completionToken.start..] + " ";
+			string append = inputField.text + completionToken.value[completionToken.start..];
 			inputField.text = append;
 			SetCaretToEnd();
 		}
@@ -63,10 +63,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 					component.gameObject.SetActive(false);
 				}
 			}
-			else {
-				completionPanel.SetActive(false);
-				return;
-			}
+			else completionPanel.SetActive(false);
 
 			TextMeshProUGUI[] pool = completionPanel.GetComponentsInChildren<TextMeshProUGUI>(true);
 
@@ -81,12 +78,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			}
 
 			int currentSelected = completion.GetSelectedIndex();
-			TextMeshProUGUI[] components = completionPanel.GetComponentsInChildren<TextMeshProUGUI>();
-			if (previousSelected != -1 && previousSelected < components.Length) {
-				UpdateSelectedCompletion(previousSelected, currentSelected);
-			} else {
-				ApplySelectedLayout(components[currentSelected]);
-			}
+			UpdateSelectedCompletion(previousSelected, currentSelected);
 		}
 
 		void ICommandLineHandler.SelectNextCompletion() {
@@ -107,13 +99,12 @@ namespace SoulboundBackend.Core.Debug.Commands {
 
 		private void UpdateSelectedCompletion(int previousIndex, int currentIndex) {
 			TextMeshProUGUI[] components = completionPanel.GetComponentsInChildren<TextMeshProUGUI>();
-			RevokeSelectedLayout(components[previousIndex]);
-			ApplySelectedLayout(components[currentIndex]);
+			if (previousIndex != -1) RevokeSelectedLayout(components[previousIndex]);
+			if (currentIndex != -1) ApplySelectedLayout(components[currentIndex]);
 		}
 
 		private bool InvalidCompletionState() {
-			return (completionPanel != null && !completionPanel.activeSelf)
-				|| completion.GetSelectedIndex() == -1;
+			return (completionPanel != null && !completionPanel.activeSelf);
 		}
 
 		private GameObject CreateCompletionPanel() {

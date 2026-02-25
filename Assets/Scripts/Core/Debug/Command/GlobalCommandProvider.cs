@@ -8,9 +8,11 @@ using System.Threading.Tasks;
 namespace SoulboundBackend.Core.Debug.Commands {
 	public sealed class GlobalCommandProvider : ICommandProvider {
 		private CommandNode prototypeCommand;
+		private CommandNode prototype_1;
 
 		public IEnumerable<CommandNode> GetCommands() {
 			yield return Prototype();
+			yield return Prototype_1();
 		}
 
 		private CommandNode Prototype() {
@@ -30,6 +32,16 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			return prototypeCommand;
 		}
 
-		
+		private CommandNode Prototype_1() {
+			if (prototype_1 != null) return prototype_1;
+
+			CommandBuilder builder = CommandBuilder.Literal("command_1")
+				.Then(new ArgumentCommandNode<Coordinate>("coord", new CoordinateParser()))
+				.Executes(_ => Logger.LogInfo("coord"))
+				.Then(new LiteralCommandNode("literal"))
+				.Executes(ctx => Logger.LogInfo("literal"));
+			prototype_1 = builder.GetRootNode();
+			return prototype_1;
+		}
 	}
 }
