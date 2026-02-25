@@ -1,3 +1,4 @@
+using SoulboundBackend.Client.Input;
 using SoulboundBackend.Core.Debug.Logging;
 using System;
 using System.Collections;
@@ -21,7 +22,6 @@ namespace SoulboundBackend.Core.Debug.Commands {
 		public void Init(TMP_InputField inputField, CommandProcessor commandProcessor) {
 			this.inputField = inputField;
 			this.commandProcessor = commandProcessor;
-			inputField.onValidateInput += ValidateInput;
 			StartCoroutine(ActivateNextFrame());
 		}
 
@@ -29,12 +29,10 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			yield return null;
 
 			inputField.ActivateInputField();
-
 			inputField.SetTextWithoutNotify("/");
 			inputField.ForceLabelUpdate();
 
 			yield return null;
-
 			SetCaretToEnd();
 		}
 
@@ -45,27 +43,17 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			inputField.selectionFocusPosition = end;
 		}
 
-		private void Update() {
+		public void InsertCompletion() {
 			if (completionPanel != null && !completionPanel.activeSelf) return;
-
-			if (Input.GetKeyDown(KeyCode.Tab)) ApplySelection();
-			
-	 	}
-
-		private void ApplySelection() {
 			if (!completion.GetSelected().HasValue) return;
+
 			CommandCompletionToken completionToken = completion.GetSelected().Value;
-			Logger.LogInfo(completionToken.value[completionToken.start..]);
 			string append = inputField.text + completionToken.value[completionToken.start..] + " ";
 			inputField.text = append;
 			SetCaretToEnd();
 		}
 
-		private char ValidateInput(string text, int charIndex, char addedChar) {
-			return addedChar;
-		}
-
-		public void ValueChanged(string value) {
+		public void ShowCompletions(string value) {
 			if (completionPanel == null) completionPanel = CreateCompletionPanel();
 
 			List<CommandCompletionToken> completions = commandProcessor.GetCompletions(value).ToList();

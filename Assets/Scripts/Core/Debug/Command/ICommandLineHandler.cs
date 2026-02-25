@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace SoulboundBackend.Core.Debug.Commands {
 	public interface ICommandLineHandler {
-		void ValueChanged(string value);
+		void InsertCompletion();
+		void ShowCompletions(string value);
 	}
 }

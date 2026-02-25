@@ -11,7 +11,7 @@ using UnityEngine.UI;
 using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
 namespace SoulboundBackend.Core.Debug {
-	public sealed class DebugConsole : ToggleableOverlay<UIDebugConsoleNode> {
+	public sealed class DebugConsole : ToggleableOverlay<UIHandledOverlayNode<IDebugConsoleHandle>> {
 		private readonly Queue<(string condition, string stackTrace, LogType logType)> logQueue = new();
 
 		public DebugConsole() {
@@ -24,7 +24,7 @@ namespace SoulboundBackend.Core.Debug {
 		// i am NOT bothering with cleaning this up
 		// dont even think about adding a scrollbar
 		// (at least for now)
-		protected override UIDebugConsoleNode GetNode() {
+		protected override UIHandledOverlayNode<IDebugConsoleHandle> GetNode() {
 			GameObject root = new("Debug Console", typeof(RectTransform));
 			RectTransform rect = root.GetComponent<RectTransform>();
 			rect.anchorMin = new Vector2(0f, 0f);
@@ -101,7 +101,7 @@ namespace SoulboundBackend.Core.Debug {
 				handle.AddLog(condition, stackTrace, logType);
 			}
 
-			return new UIDebugConsoleNode(root, handle);
+			return new UIHandledOverlayNode<IDebugConsoleHandle>(root, handle);
 		}
 
 		private GameObject CreateFilterButton(LogType logType, DebugConsoleHandle handle) {

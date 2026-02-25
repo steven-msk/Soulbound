@@ -16,5 +16,25 @@ namespace SoulboundBackend.Client.Input {
 			this.phase = phase;
 			this.context = context;
 		}
+
+		public bool Performed(InputToken token) {
+			return this.token.Equals(token) && phase == InputActionPhase.Performed;
+		}
+
+		public bool Started(InputToken token) {
+			return this.token.Equals(token) && phase == InputActionPhase.Started;
+		}
+
+		public bool Canceled(InputToken token) {
+			return this.token.Equals(token) && phase == InputActionPhase.Canceled;
+		}
+
+		public bool Waiting(InputToken token) {
+			return this.token.Equals(token) && phase == InputActionPhase.Waiting;
+		}
+
+		public bool Disabled(InputToken token) {
+			return this.token.Equals(token) && phase == InputActionPhase.Disabled;
+		}
 	}
 }

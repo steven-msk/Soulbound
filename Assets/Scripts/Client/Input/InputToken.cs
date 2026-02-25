@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine.InputSystem;
 
 namespace SoulboundBackend.Client.Input {
-	public readonly struct InputToken : IEqualityComparer<InputToken> {
+	public readonly struct InputToken {
 		public readonly Guid guid;
 		public readonly string actionName;
 		public readonly string mapName;
@@ -21,13 +21,11 @@ namespace SoulboundBackend.Client.Input {
 			this.mapName = mapName;
 		}
 
-		public bool Equals(InputToken x, InputToken y) {
-			return x.guid.Equals(y.guid);
+		public override bool Equals(object obj) {
+			return obj is InputToken token && this.guid.Equals(token.guid);
 		}
 
-		public int GetHashCode(InputToken obj) {
-			return guid.GetHashCode();
-		}
+		public override int GetHashCode() => guid.GetHashCode();
 
 		public override string ToString() {
 			return $"{mapName}/{actionName}({guid})";

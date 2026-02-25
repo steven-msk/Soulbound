@@ -1,3 +1,4 @@
+using SoulboundBackend.Client.Input;
 using SoulboundBackend.Client.UI;
 using SoulboundBackend.Core.Debug.Commands;
 using System;
@@ -11,7 +12,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace SoulboundBackend.Core.Debug {
-	public sealed class CommandLine : ToggleableOverlay<UIOverlayNode> {
+	public sealed class CommandLine : ToggleableOverlay<UIHandledOverlayNode<ICommandLineHandler>> {
 		private readonly CommandProcessor commandProcessor;
 
 		public CommandLine(CommandProcessor commandProcessor) {
@@ -35,7 +36,9 @@ namespace SoulboundBackend.Core.Debug {
 			commandProcessor.SubmitCommand(command);
 		}
 
-		protected override UIOverlayNode GetNode() {
+		public void InsertCompletion() => node?.handle.InsertCompletion();
+
+		protected override UIHandledOverlayNode<ICommandLineHandler> GetNode() {
 			GameObject obj = new("Command Line", typeof(RectTransform));
 
 			RectTransform rect = obj.GetComponent<RectTransform>();
@@ -84,9 +87,9 @@ namespace SoulboundBackend.Core.Debug {
 			inputField.textViewport = obj.GetComponent<RectTransform>();
 			inputField.lineType = TMP_InputField.LineType.SingleLine;
 			inputField.onSubmit.AddListener(SubmitCommand);
-			inputField.onValueChanged.AddListener(handler.ValueChanged);
+			inputField.onValueChanged.AddListener(handler.ShowCompletions);
 
-			return new UIOverlayNode(obj);
+			return new UIHandledOverlayNode<ICommandLineHandler>(obj, handler);
 		}
 
 	}
