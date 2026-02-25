@@ -45,7 +45,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 
 			CommandBuilder tp = CommandBuilder.Literal("tp");
 			tp.Then(coords);
-			tp.Then(new ArgumentCommandNode<Guid>("target", new EntityParser()))
+			tp.Then(new EntityArgumentCommandNode("target"))
 				.Then(coords);
 			return tp.GetRootNode();
 		}
