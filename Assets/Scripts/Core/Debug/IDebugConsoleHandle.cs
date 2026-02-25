@@ -10,6 +10,5 @@ using UnityEngine;
 namespace SoulboundBackend.Core.Debug {
 	public interface IDebugConsoleHandle {
 		void AddLog(string condition, string stackTrace, LogType logType);
-		void StartCommandInput(Transform parent);
 	}
 }

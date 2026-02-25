@@ -11,50 +11,20 @@ using UnityEngine.UI;
 using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
 namespace SoulboundBackend.Core.Debug {
-	public sealed class DebugConsole {
-		private UIDebugConsoleNode node;
-		private bool visible;
+	public sealed class DebugConsole : ToggleableOverlay<UIDebugConsoleNode> {
 		private readonly Queue<(string condition, string stackTrace, LogType logType)> logQueue = new();
-		private readonly CommandProcessor commandProcessor;
 
-		public DebugConsole(CommandProcessor commandProcessor) {
-			this.commandProcessor = commandProcessor;
+		public DebugConsole() {
 			Application.logMessageReceivedThreaded += (condition, stackTrace, logType) => {
 				node?.handle.AddLog(condition, stackTrace, logType);
 				logQueue.Enqueue((condition, stackTrace, logType));
 			};
 		}
 
-		public void Toggle() {
-			visible = !visible;
-			CreateNodeIfNull();
-
-			if (!visible) node.Hide();
-			else node.Show();
-		}
-
-		public void StartCommandInput() {
-			node?.handle.StartCommandInput(node.transform);
-		}
-
-		private void CreateNodeIfNull() {
-			if (node != null) return;
-
-			node = CreateNode();
-			node.onDestroy += () => {
-				node = null;
-				visible = false;
-			};
-			foreach (var (condition, stackTrace, logType) in logQueue) {
-				node.handle.AddLog(condition, stackTrace, logType);
-			}
-			Soulbound.instance.GetUIHandler().AddOverlay(node);
-		}
-
 		// i am NOT bothering with cleaning this up
 		// dont even think about adding a scrollbar
 		// (at least for now)
-		private UIDebugConsoleNode CreateNode() {
+		protected override UIDebugConsoleNode GetNode() {
 			GameObject root = new("Debug Console", typeof(RectTransform));
 			RectTransform rect = root.GetComponent<RectTransform>();
 			rect.anchorMin = new Vector2(0f, 0f);
@@ -126,7 +96,10 @@ namespace SoulboundBackend.Core.Debug {
 			GameObject filterExceptions = CreateFilterButton(LogType.Exception, handle);
 			filterExceptions.transform.SetParent(filterContainer.transform, false);
 
-			handle.Init(scrollRect, contentRect, commandProcessor);
+			handle.Init(scrollRect, contentRect);
+			foreach (var (condition, stackTrace, logType) in logQueue) {
+				handle.AddLog(condition, stackTrace, logType);
+			}
 
 			return new UIDebugConsoleNode(root, handle);
 		}
@@ -145,6 +118,5 @@ namespace SoulboundBackend.Core.Debug {
 			return obj;
 		}
 
-		public bool IsVisible() => visible;
 	}
 }

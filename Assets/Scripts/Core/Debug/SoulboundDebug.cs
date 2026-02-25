@@ -12,21 +12,21 @@ using UnityEngine;
 namespace SoulboundBackend.Core.Debug {
 	public sealed class SoulboundDebug : IInputContext {
 		private readonly DebugConsole console;
+		private readonly CommandLine commandLine;
 		private readonly MetricsHUD metricsHud;
 		private readonly DebugMetricsService metricsService;
-		private readonly CommandProcessor commandProcessor;
 
 		public SoulboundDebug(ILogger logger, DebugMetricsService metricsService, CommandProcessor commandProcessor) {
+			new Logging.Logger(logger);
+			console = new DebugConsole();
+			commandLine = new CommandLine(commandProcessor);
+			this.metricsService = metricsService;
+			metricsHud = new MetricsHUD(metricsService);
 #if !UNITY_EDITOR
 			Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
 			Application.SetStackTraceLogType(LogType.Warning, StackTraceLogType.None);
 			Application.SetStackTraceLogType(LogType.Error, StackTraceLogType.ScriptOnly);
 #endif
-			new Logging.Logger(logger);
-			this.commandProcessor = commandProcessor;
-			console = new DebugConsole(commandProcessor);
-			this.metricsService = metricsService;
-			metricsHud = new MetricsHUD(metricsService);
 		}
 
 		public DebugConsole GetConsole() => console;
@@ -39,8 +39,7 @@ namespace SoulboundBackend.Core.Debug {
 				return true;
 			}
 			if (inputEvent.token.Equals(InputTokens.Debug.enterCommand)) {
-				if (!console.IsVisible()) console.Toggle();
-				console.StartCommandInput();
+				commandLine.Show();
 				return true;
 			}
 

@@ -8,16 +8,15 @@ using System.Threading.Tasks;
 
 namespace SoulboundBackend.Core.Debug.Commands {
 	public sealed class CommandProcessor {
-		private readonly ICommandProvider commandProvider;
+		private readonly List<ICommandProvider> providerBuffer = new();
 		private readonly IDynamicDataProvider dataProvider;
 
-		public CommandProcessor(ICommandProvider commandProvider, IDynamicDataProvider dataProvider) {
-			this.commandProvider = commandProvider;
+		public CommandProcessor(IDynamicDataProvider dataProvider) {
 			this.dataProvider = dataProvider;
 		}
 
 		// Follows Brigadier parsing architecture
-		public void Process(string input) {
+		public void SubmitCommand(string input) {
 			string[] tokens = Tokenize(input);
 			CommandArguments args = new();
 			CommandParsingContext ctx = new(args, dataProvider);
@@ -29,7 +28,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 
 			string rootToken = tokens[0];
 			List<CommandNode> matching = new();
-			foreach (var command in commandProvider.GetCommands()) {
+			foreach (var command in EnumerateAllCommands()) {
 				if (command.Matches(rootToken, ctx)) {
 					matching.Add(command);
 
@@ -73,6 +72,21 @@ namespace SoulboundBackend.Core.Debug.Commands {
 
 		private string[] Tokenize(string input) {
 			return input[1..].Split(' ', StringSplitOptions.RemoveEmptyEntries);
+		}
+
+		private IEnumerable<CommandNode> EnumerateAllCommands() {
+			for (int i = 0; i < providerBuffer.Count; i++) {
+				foreach (var command in providerBuffer[i].GetCommands()) {
+					yield return command;
+				}
+			}
+		}
+
+		public void RegisterProvider(ICommandProvider provider) {
+			providerBuffer.Add(provider);
+		}
+		public void UnregisterProvider(ICommandProvider provider) {
+			providerBuffer.Remove(provider);
 		}
 
 	}

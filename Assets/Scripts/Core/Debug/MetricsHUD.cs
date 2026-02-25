@@ -10,35 +10,14 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace Assets.Scripts.Core.Debug {
-	public sealed class MetricsHUD  : IDebugMetricsProvider {
+	public sealed class MetricsHUD  : ToggleableOverlay<UIOverlayNode>, IDebugMetricsProvider {
 		private readonly DebugMetricsService metricsService;
-		private bool visible;
-		private UIOverlayNode node;
 
 		public MetricsHUD(DebugMetricsService metricsService) {
 			this.metricsService = metricsService;
 		}
 
-		public void Toggle() {
-			visible = !visible;
-			CreateNodeIfNull();
-
-			if (visible) node.Show();
-			else node.Hide();
-		}
-
-		private void CreateNodeIfNull() {
-			if (node != null) return;
-
-			node = CreateNode();
-			node.onDestroy += () => {
-				node = null;
-				visible = false;
-			};
-			Soulbound.instance.GetUIHandler().AddOverlay(node);
-		}
-
-		private UIOverlayNode CreateNode() {
+		protected override UIOverlayNode GetNode() {
 			GameObject obj = new("Metrics HUD", typeof(RectTransform));
 			VerticalLayoutGroup layout = obj.AddComponent<VerticalLayoutGroup>();
 			layout.childControlWidth = layout.childControlHeight = false;

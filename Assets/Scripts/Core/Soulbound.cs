@@ -59,7 +59,7 @@ namespace SoulboundBackend.Core {
 
 			dynamicDataProvider = new DynamicDataProvider();
 			commandProvider = new CommandProvider();
-			commandProcessor = new CommandProcessor(commandProvider, dynamicDataProvider);
+			commandProcessor = new CommandProcessor(dynamicDataProvider);
 			debugMetricsService = new DebugMetricsService();
 			debug = new SoulboundDebug(UnityEngine.Debug.unityLogger, debugMetricsService, commandProcessor);
 			inputManager.PushContext(debug);
