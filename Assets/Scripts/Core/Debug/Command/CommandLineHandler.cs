@@ -1,5 +1,6 @@
 using SoulboundBackend.Core.Debug.Logging;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,13 +21,20 @@ namespace SoulboundBackend.Core.Debug.Commands {
 		public void Init(TMP_InputField inputField, CommandProcessor commandProcessor) {
 			this.inputField = inputField;
 			this.commandProcessor = commandProcessor;
-			inputField.text = "/";
-			inputField.onValueChanged.AddListener(ForceLeadingSlash);
+			inputField.onValidateInput += ValidateInput;
+			StartCoroutine(ActivateNextFrame());
 		}
 
-		private void ForceLeadingSlash(string value) {
-			inputField.onValueChanged.RemoveListener(ForceLeadingSlash);
-			inputField.text = $"/{value}";
+		IEnumerator ActivateNextFrame() {
+			yield return null;
+
+			inputField.ActivateInputField();
+
+			inputField.SetTextWithoutNotify("/");
+			inputField.ForceLabelUpdate();
+
+			yield return null;
+
 			SetCaretToEnd();
 		}
 
@@ -37,15 +45,31 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			inputField.selectionFocusPosition = end;
 		}
 
-		public void ValueChanged(string value) {
-			foreach (var completion in commandProcessor.GetCompletions(value)) {
-				Logger.LogInfo(completion);
-			}
-			Logger.LogInfo("");
+		private void Update() {
+			if (completionPanel != null && !completionPanel.activeSelf) return;
 
+			if (Input.GetKeyDown(KeyCode.Tab)) ApplySelection();
+			
+	 	}
+
+		private void ApplySelection() {
+			if (!completion.GetSelected().HasValue) return;
+			CommandCompletionToken completionToken = completion.GetSelected().Value;
+			Logger.LogInfo(completionToken.value[completionToken.start..]);
+			string append = inputField.text + completionToken.value[completionToken.start..] + " ";
+			inputField.text = append;
+			SetCaretToEnd();
+		}
+
+		private char ValidateInput(string text, int charIndex, char addedChar) {
+			return addedChar;
+		}
+
+		public void ValueChanged(string value) {
 			if (completionPanel == null) completionPanel = CreateCompletionPanel();
 
-			List<string> completions = commandProcessor.GetCompletions(value).ToList();
+			List<CommandCompletionToken> completions = commandProcessor.GetCompletions(value).ToList();
+			completion.SetCompletions(completions);
 			if (completions.Any()) {
 				completionPanel.SetActive(true);
 				foreach (var component in completionPanel.GetComponentsInChildren<TextMeshProUGUI>()) {
@@ -62,11 +86,11 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			int i = 0;
 			for (; i < pool.Length && i < completions.Count; i++) {
 				pool[i].gameObject.SetActive(true);
-				pool[i].text = completions[i];
+				pool[i].text = completions[i].value;
 			}
 
 			for (; i < completions.Count; i++) {
-				CreateCompletionComponent(completions[i]);
+				CreateCompletionComponent(completions[i].value);
 			}
 		}
 

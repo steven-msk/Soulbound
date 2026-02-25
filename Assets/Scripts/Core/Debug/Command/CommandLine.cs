@@ -85,7 +85,6 @@ namespace SoulboundBackend.Core.Debug {
 			inputField.lineType = TMP_InputField.LineType.SingleLine;
 			inputField.onSubmit.AddListener(SubmitCommand);
 			inputField.onValueChanged.AddListener(handler.ValueChanged);
-			inputField.ActivateInputField();
 
 			return new UIOverlayNode(obj);
 		}

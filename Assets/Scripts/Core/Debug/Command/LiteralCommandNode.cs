@@ -19,9 +19,9 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			return token == label;
 		}
 
-		public override IEnumerable<string> GetCompletions(string partialToken, CommandParsingContext ctx) {
+		public override IEnumerable<CommandCompletionToken> GetCompletions(string partialToken, CommandParsingContext ctx) {
 			if (label.StartsWith(partialToken)) {
-				yield return label;
+				yield return new CommandCompletionToken(label, partialToken);
 			}
 			yield break;
 		}

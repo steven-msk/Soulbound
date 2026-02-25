@@ -19,7 +19,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 		}
 
 		public abstract bool Matches(string token, CommandParsingContext ctx);
-		public abstract IEnumerable<string> GetCompletions(string partialToken, CommandParsingContext ctx);
+		public abstract IEnumerable<CommandCompletionToken> GetCompletions(string partialToken, CommandParsingContext ctx);
 
 		public void AddChild(CommandNode child) => children.Add(child);
 		public IEnumerable<CommandNode> GetChildren() {

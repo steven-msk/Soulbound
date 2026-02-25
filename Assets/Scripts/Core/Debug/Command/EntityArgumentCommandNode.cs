@@ -12,11 +12,11 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			: base(label, new EntityParser(), handler) {
 		}
 
-		public override IEnumerable<string> GetCompletions(string partialToken, CommandParsingContext ctx) {
+		public override IEnumerable<CommandCompletionToken> GetCompletions(string partialToken, CommandParsingContext ctx) {
 			foreach (var entity in ctx.Data.Entities.GetAllEntities().ToList()) {
-				if (entity.GetGuid().ToString().StartsWith(partialToken)
-						|| entity.GetName().StartsWith(partialToken)) {
-					yield return entity.GetGuid().ToString();
+				string value = entity.GetGuid().ToString();
+				if (value.StartsWith(partialToken) || entity.GetName().StartsWith(partialToken)) {
+					yield return new CommandCompletionToken(value, partialToken);
 				}
 			}
 		}

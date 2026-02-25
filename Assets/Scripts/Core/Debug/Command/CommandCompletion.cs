@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace SoulboundBackend.Core.Debug.Commands {
 	public sealed class CommandCompletion {
-		private List<string> completions = new();
-		private int selectedIndex;
+		private List<CommandCompletionToken> completions = new();
+		private int selectedIndex = -1;
 
-		public void SetCompletions(IEnumerable<string> values) {
-			completions = values.ToList();
+		public void SetCompletions(List<CommandCompletionToken> values) {
+			this.completions = values;
 			selectedIndex = completions.Count > 0 ? 0 : -1;
 		}
 
@@ -26,10 +26,12 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			selectedIndex = (selectedIndex - 1 + completions.Count) % completions.Count;
 		}
 
-		public string? GetSelected() {
+		public CommandCompletionToken? GetSelected() {
 			return selectedIndex >= 0
 				? completions[selectedIndex]
 				: null;
 		}
+
+		public int GetSelectedIndex() => selectedIndex;
 	}
 }

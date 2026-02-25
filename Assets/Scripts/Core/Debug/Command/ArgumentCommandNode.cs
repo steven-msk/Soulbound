@@ -25,7 +25,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			return true;
 		}
 
-		public override IEnumerable<string> GetCompletions(string partialToken, CommandParsingContext ctx) {
+		public override IEnumerable<CommandCompletionToken> GetCompletions(string partialToken, CommandParsingContext ctx) {
 			yield break;
 		}
 	}
