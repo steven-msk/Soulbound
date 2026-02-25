@@ -18,5 +18,12 @@ namespace SoulboundBackend.Core.Debug.Commands {
 		public override bool Matches(string token, CommandParsingContext ctx) {
 			return token == label;
 		}
+
+		public override IEnumerable<string> GetCompletions(string partialToken, CommandParsingContext ctx) {
+			if (label.StartsWith(partialToken)) {
+				yield return label;
+			}
+			yield break;
+		}
 	}
 }

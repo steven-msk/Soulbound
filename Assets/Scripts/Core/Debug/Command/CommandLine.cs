@@ -62,7 +62,7 @@ namespace SoulboundBackend.Core.Debug {
 			textRect.offsetMax = new Vector2(-10f, 0f);
 
 			CommandLineHandler handler = obj.AddComponent<CommandLineHandler>();
-			handler.Init(inputField);
+			handler.Init(inputField, commandProcessor);
 
 			inputField.textComponent = text;
 			inputField.lineType = TMP_InputField.LineType.SingleLine;

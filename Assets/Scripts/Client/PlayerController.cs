@@ -125,7 +125,8 @@ namespace SoulboundBackend.Client {
 				inventory.Toggle();
 				return true;
 			}
-			if (inputEvent.token.Equals(InputTokens.Player.changeHotbarSlot)) {
+			if (inputEvent.token.Equals(InputTokens.Player.changeHotbarSlot)
+					&& inputEvent.phase == InputActionPhase.Performed) {
 				int slotIndex = int.Parse(inputEvent.context.control.name) - 1;
 				hotbar.SetMainSlot(slotIndex);
 				return true;

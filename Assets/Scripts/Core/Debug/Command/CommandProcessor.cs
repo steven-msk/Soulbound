@@ -11,6 +11,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 		private readonly List<ICommandProvider> providerBuffer = new();
 		private readonly IRuntimeDataProvider dataProvider;
 		private readonly IRuntimeExecutionServices execServices;
+		private CommandNode rootNode;
 
 		public CommandProcessor(IRuntimeDataProvider dataProvider, IRuntimeExecutionServices execServices) {
 			this.dataProvider = dataProvider;
@@ -28,26 +29,13 @@ namespace SoulboundBackend.Core.Debug.Commands {
 				return;
 			}
 
-			string rootToken = tokens[0];
-			List<CommandNode> matching = new();
-			foreach (var command in EnumerateAllCommands()) {
-				if (command.Matches(rootToken, ctx)) {
-					matching.Add(command);
-
-					if (matching.Count > 1) {
-						Logger.LogInfo("ambiguity between commands {}", tokens[0]);
-						return;
-					}
-				}
-			}
-
-			CommandNode currentNode = matching.FirstOrDefault();
+			CommandNode currentNode = rootNode;
 			if (currentNode == null) {
 				Logger.LogInfo("no matching command {}", tokens[0]);
 				return;
 			}
 
-			for (int i = 1; i < tokens.Length; i++) {
+			for (int i = 0; i < tokens.Length; i++) {
 				List<CommandNode> matchingSubnodes = currentNode
 					.GetChildren()
 					.Where(n => n.Matches(tokens[i], ctx))
@@ -72,8 +60,46 @@ namespace SoulboundBackend.Core.Debug.Commands {
 
 		}
 
+		public IEnumerable<string> GetCompletions(string input) {
+			string[] tokens = Tokenize(input);
+			CommandArguments args = new();
+			CommandParsingContext ctx = new(args, dataProvider, execServices);
+
+			if (tokens == null || tokens.Length == 0) yield break;
+
+			CommandNode currentNode = rootNode;
+			int i;
+			for (i = 0; i < tokens.Length; i++) {
+				List<CommandNode> fullMatch = currentNode
+					.GetChildren()
+					.Where(c => c.Matches(tokens[i], ctx))
+					.ToList();
+				if (fullMatch.Count > 1) break;
+				if (!fullMatch.Any()) break;
+				currentNode = fullMatch.First();
+			}
+
+			if (i < tokens.Length) {
+				string partialToken = tokens[i];
+				foreach (var child in currentNode.GetChildren()) {
+					foreach (var completion in child.GetCompletions(partialToken, ctx)) {
+						yield return completion;
+					}
+				}
+				yield break;
+			}
+
+			foreach (var child in currentNode.GetChildren()) {
+				foreach (var completion in child.GetCompletions("", ctx)) {
+					yield return completion;
+				}
+			}
+		}
+
 		private string[] Tokenize(string input) {
-			return input[1..].Split(' ', StringSplitOptions.RemoveEmptyEntries);
+			if (input.Length == 0) return new string[] { };
+			input = input[1..];
+			return input.Split(' ');
 		}
 
 		private IEnumerable<CommandNode> EnumerateAllCommands() {
@@ -84,11 +110,21 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			}
 		}
 
+		private void RebuildRoot() {
+			CommandBuilder currentNodeBuilder = CommandBuilder.Literal("_root_");
+			foreach (var command in EnumerateAllCommands()) {
+				currentNodeBuilder.Then(command);
+			}
+			rootNode = currentNodeBuilder.GetRootNode();
+		}
+
 		public void RegisterProvider(ICommandProvider provider) {
 			providerBuffer.Add(provider);
+			RebuildRoot();
 		}
 		public void UnregisterProvider(ICommandProvider provider) {
 			providerBuffer.Remove(provider);
+			RebuildRoot();
 		}
 
 	}

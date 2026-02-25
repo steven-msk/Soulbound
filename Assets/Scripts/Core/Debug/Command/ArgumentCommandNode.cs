@@ -24,5 +24,9 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			ctx.Args.Set(label, result.value);
 			return true;
 		}
+
+		public override IEnumerable<string> GetCompletions(string partialToken, CommandParsingContext ctx) {
+			yield break;
+		}
 	}
 }
