@@ -62,11 +62,13 @@ namespace SoulboundBackend.Core.Debug.Commands {
 
 		public IEnumerable<CommandCompletionToken> GetCompletions(string input) {
 			string[] tokens = Tokenize(input);
+			Logger.LogInfo(string.Join(", ", tokens.Select(s => string.IsNullOrEmpty(s) ? "EMPTY" : s)));
 			CommandArguments args = new();
 			CommandParsingContext ctx = new(args, dataProvider, execServices);
 
 			if (tokens == null || tokens.Length == 0) yield break;
 
+			CommandNode previousNode = rootNode;
 			CommandNode currentNode = rootNode;
 			int i;
 			for (i = 0; i < tokens.Length; i++) {
@@ -76,6 +78,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 					.ToList();
 				if (fullMatch.Count > 1) break;
 				if (!fullMatch.Any()) break;
+				previousNode = currentNode;
 				currentNode = fullMatch.First();
 			}
 
@@ -89,7 +92,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 				yield break;
 			}
 
-			foreach (var child in currentNode.GetChildren()) {
+			foreach (var child in previousNode.GetChildren()) {
 				foreach (var completion in child.GetCompletions("", ctx)) {
 					yield return completion;
 				}
@@ -101,10 +104,10 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			if (!input.StartsWith("/")) return Array.Empty<string>();
 
 			input = input[1..];
-
-			List<string> tokens = input
-				.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+			var tokens = input
+				.Split(' ')
 				.ToList();
+
 			return tokens.ToArray();
 		}
 
