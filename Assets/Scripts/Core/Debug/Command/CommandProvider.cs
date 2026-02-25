@@ -41,14 +41,20 @@ namespace SoulboundBackend.Core.Debug.Commands {
 					string target = ctx.Args.TryGet("target", out Guid guid)
 						? guid.ToString()
 						: "player";
-					Coordinate x = ctx.Args.Get<Coordinate>("x");
-					Coordinate y = ctx.Args.Get<Coordinate>("y");
-					Logger.LogInfo("teleported {} to x:{} y:{}", target, x.value, y.value);
+					Coordinate xcoord = ctx.Args.Get<Coordinate>("x");
+					Coordinate ycoord = ctx.Args.Get<Coordinate>("y");
+					float x = xcoord.isRelative
+						? ctx.Data.Player.GetPos().x + xcoord.value
+						: xcoord.value;
+					float y = ycoord.isRelative
+						? ctx.Data.Player.GetPos().x + ycoord.value
+						: ycoord.value;
+					Logger.LogInfo("teleported {} to x:{} y:{}", target, x, y);
 				});
 
 			CommandBuilder tp = CommandBuilder.Literal("tp");
 			tp.Then(coords);
-			tp.Then(new ArgumentCommandNode<Guid>("target", new GuidParser()))
+			tp.Then(new ArgumentCommandNode<Guid>("target", new EntityParser()))
 				.Then(coords);
 			teleport = tp.GetRootNode();
 			return teleport;

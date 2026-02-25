@@ -18,9 +18,10 @@ namespace SoulboundBackend.Core.Debug.Commands {
 		}
 
 		public override bool Matches(string token, CommandParsingContext ctx) {
-			if (!parser.TryParse(token, out T value)) return false;
+			ParseResult<T> result = parser.TryParse(token, ctx);
+			if (!result.success) return false;
 
-			ctx.Args.Set(label, value);
+			ctx.Args.Set(label, result.value);
 			return true;
 		}
 	}

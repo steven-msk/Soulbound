@@ -6,34 +6,33 @@ using System.Threading.Tasks;
 
 namespace SoulboundBackend.Core.Debug.Commands {
 	public sealed class CoordinateParser : ICommandArgumentParser<Coordinate> {
-		public bool TryParse(string token, out Coordinate value) {
-			value = default;
-
+		public ParseResult<Coordinate> TryParse(string token, CommandParsingContext ctx) {
 			if (token.StartsWith("~")) {
 				string remainder = token[1..];
 				float offset = 0;
 
 				if (!string.IsNullOrEmpty(remainder)) {
 					if (!float.TryParse(remainder, out offset)) {
-						return false;
+						return ParseResult<Coordinate>.Fail();
 					}
 				}
-
-				value = new Coordinate {
+				
+				Coordinate coord = new() {
 					isRelative = true,
 					value = offset
 				};
+				return ParseResult<Coordinate>.Success(coord);
 			}
 
 			if (float.TryParse(token, out float absolute)) {
-				value = new Coordinate {
+				Coordinate coord = new() {
 					isRelative = false,
 					value = absolute
 				};
-				return true;
+				return ParseResult<Coordinate>.Success(coord);
 			}
 
-			return false;
+			return ParseResult<Coordinate>.Fail();
 		}
 	}
 }

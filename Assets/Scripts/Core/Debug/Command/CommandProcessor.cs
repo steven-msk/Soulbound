@@ -8,16 +8,18 @@ using System.Threading.Tasks;
 namespace SoulboundBackend.Core.Debug.Commands {
 	public sealed class CommandProcessor {
 		private readonly ICommandProvider commandProvider;
+		private readonly IDynamicDataProvider dataProvider;
 
-		public CommandProcessor(ICommandProvider commandProvider) {
+		public CommandProcessor(ICommandProvider commandProvider, IDynamicDataProvider dataProvider) {
 			this.commandProvider = commandProvider;
+			this.dataProvider = dataProvider;
 		}
 
 		// Follows Brigadier parsing architecture
 		public void Process(string input) {
 			string[] tokens = Tokenize(input);
 			CommandArguments args = new();
-			CommandParsingContext ctx = new(args);
+			CommandParsingContext ctx = new(args, dataProvider);
 
 			if (tokens == null || tokens.Length == 0) {
 				Logger.LogInfo("empty command");

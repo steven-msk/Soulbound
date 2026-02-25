@@ -5,7 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace SoulboundBackend.Core.Debug.Commands {
-	public interface ICommandArgumentParser<T> {
-		ParseResult<T> TryParse(string token, CommandParsingContext ctx);
+	public interface IDynamicDataProvider {
+		IDynamicPlayerDataProvider Player { get; }
+		IDynamicEntityDataProvider Entities { get; }
 	}
 }
