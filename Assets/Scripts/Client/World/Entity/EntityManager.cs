@@ -131,5 +131,7 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 		public void AddSubsystem(IEntitySubsystem subsystem) {
 			this.subsystems.Add(subsystem);
 		}
+
+		public IEnumerable<Guid> GetAllEntities() => all.Keys.AsEnumerable();
 	}
 }

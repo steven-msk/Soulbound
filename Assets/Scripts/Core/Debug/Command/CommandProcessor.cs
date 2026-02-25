@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 namespace SoulboundBackend.Core.Debug.Commands {
 	public sealed class CommandProcessor {
 		private readonly List<ICommandProvider> providerBuffer = new();
-		private readonly IDynamicDataProvider dataProvider;
+		private readonly IRuntimeDataProvider dataProvider;
 
-		public CommandProcessor(IDynamicDataProvider dataProvider) {
+		public CommandProcessor(IRuntimeDataProvider dataProvider) {
 			this.dataProvider = dataProvider;
 		}
 

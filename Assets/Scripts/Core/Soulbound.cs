@@ -32,9 +32,10 @@ namespace SoulboundBackend.Core {
 		private readonly UIHandler uiHandler;
 		private readonly WorldManager worldManager;
 		public readonly Settings settings;
-		private readonly IDynamicDataProvider dynamicDataProvider;
+		private readonly RuntimeDataProvider runtimeDataProvider;
 		private readonly CommandProcessor commandProcessor;
-		private readonly ICommandProvider commandProvider;
+		private readonly GlobalCommandProvider globalCommandProvider;
+		private readonly WorldSessionCommands worldSessionCommands = new();
 		private readonly DebugMetricsService debugMetricsService;
 		private readonly SoulboundDebug debug;
 		private readonly InputManager inputManager;
@@ -57,9 +58,11 @@ namespace SoulboundBackend.Core {
 			InputTokens.Register(inputActions.asset);
 			settings = new Settings();
 
-			dynamicDataProvider = new DynamicDataProvider();
-			commandProvider = new CommandProvider();
-			commandProcessor = new CommandProcessor(dynamicDataProvider);
+			runtimeDataProvider = new RuntimeDataProvider();
+			globalCommandProvider = new GlobalCommandProvider();
+			commandProcessor = new CommandProcessor(runtimeDataProvider);
+			commandProcessor.RegisterProvider(globalCommandProvider);
+
 			debugMetricsService = new DebugMetricsService();
 			debug = new SoulboundDebug(UnityEngine.Debug.unityLogger, debugMetricsService, commandProcessor);
 			inputManager.PushContext(debug);
@@ -130,6 +133,9 @@ namespace SoulboundBackend.Core {
 				UnityEngine.Object.FindFirstObjectByType<WorldSceneRoot>
 			).ContinueWith(session => {
 				uiHandler.SetScreen(new WorldScreen(session.player));
+
+				commandProcessor.RegisterProvider(worldSessionCommands);
+				runtimeDataProvider.SetWorldSessionState(session);
 			}).Forget(UnityEngine.Debug.LogException);
 		}
 
@@ -144,6 +150,9 @@ namespace SoulboundBackend.Core {
 				.ContinueWith(() => {
 					uiHandler.SetCanvas(UnityEngine.Object.FindFirstObjectByType<Canvas>());
 					uiHandler.SetScreen(new TitleScreen());
+
+					commandProcessor.UnregisterProvider(worldSessionCommands);
+					runtimeDataProvider.ExitWorldSessionState();
 				})
 			.Forget(UnityEngine.Debug.LogException);
 		}
@@ -202,7 +211,5 @@ namespace SoulboundBackend.Core {
 
 		public PerformanceMetrics GetPerformanceMetrics() => performanceMetrics;
 		public InputManager GetInputManager() => inputManager;
-		public InputActionAsset GetInputActionAsset() => inputActions.asset;
-		public IDynamicDataProvider GetDynamicDataProvider() => dynamicDataProvider;
 	}
 }

@@ -66,10 +66,13 @@ namespace SoulboundBackend.Client.World {
 
 			activeLevelManager.BootstrapWorld(world, dump, seed, rootGetter().CreateGridContext());
 			PlayerController player = activeLevelManager.SpawnPlayer(dump?.player);
-		
+
 			return new WorldSession {
 				deserializationData = dump,
-				player = player
+				player = player,
+				levelManager = levelManager,
+				entityManager = levelManager.entityManager,
+				level = levelManager.level
 			};
 		}
 

@@ -6,33 +6,18 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace SoulboundBackend.Core.Debug.Commands {
-	public sealed class CommandProvider : ICommandProvider {
-		private CommandNode prototypeCommand;
-		private CommandNode teleport;
+	public sealed class WorldSessionCommands : ICommandProvider {
+		private readonly CommandNode teleport;
+
+		public WorldSessionCommands() {
+			teleport = CreateTeleportCommand();
+		}
 
 		public IEnumerable<CommandNode> GetCommands() {
-			yield return Prototype();
-			yield return Teleport();
+			yield return teleport;
 		}
 
-		private CommandNode Prototype() {
-			if (prototypeCommand != null) return prototypeCommand;
-
-			CommandBuilder command = CommandBuilder.Literal("command");
-			command.Then(new LiteralCommandNode("subcommand1"))
-				.Then(new LiteralCommandNode("anotherSubCommand"))
-				.Executes(_ => Logger.LogInfo("executing anotherSubCommand"));
-			command.Then(new LiteralCommandNode("subcommand"))
-				.Executes(_ => Logger.LogInfo("subcommand2"));
-			command.Then(new LiteralCommandNode("subcommand3"))
-				.Executes(_ => Logger.LogInfo("impossible to run"));
-			command.Then(new LiteralCommandNode("subcommand3"))
-				.Executes(_ => Logger.LogInfo("impossible to run"));
-			prototypeCommand = command.GetRootNode();
-			return prototypeCommand;
-		}
-
-		private CommandNode Teleport() {
+		private CommandNode CreateTeleportCommand() {
 			if (teleport != null) return teleport;
 
 			CommandBuilder coords = CommandBuilder.Create(new ArgumentCommandNode<Coordinate>("x", new CoordinateParser()))
@@ -61,8 +46,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			tp.Then(coords);
 			tp.Then(new ArgumentCommandNode<Guid>("target", new EntityParser()))
 				.Then(coords);
-			teleport = tp.GetRootNode();
-			return teleport;
+			return tp.GetRootNode();
 		}
 	}
 }

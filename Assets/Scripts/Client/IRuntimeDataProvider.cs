@@ -1,4 +1,3 @@
-using Assets.Scripts.Core.Debug.Command;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client {
-	public interface IDynamicPlayerDataProvider : IEntityView {
-
+	public interface IRuntimeDataProvider {
+		IRuntimePlayerDataProvider Player { get; }
+		IRuntimeEntityDataProvider Entities { get; }
 	}
 }
