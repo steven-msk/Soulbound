@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -64,7 +65,23 @@ namespace SoulboundBackend.Core.Debug {
 			CommandLineHandler handler = obj.AddComponent<CommandLineHandler>();
 			handler.Init(inputField, commandProcessor);
 
+			GameObject viewport = new("Viewport", typeof(RectTransform), typeof(Mask), typeof(Image));
+			viewport.transform.SetParent(obj.transform, false);
+
+			Mask mask = viewport.GetComponent<Mask>();
+			mask.showMaskGraphic = false;
+
+			RectTransform viewportRect = viewport.GetComponent<RectTransform>();
+			viewportRect.anchorMin = Vector2.zero;
+			viewportRect.anchorMax = Vector2.one;
+			viewportRect.offsetMin = Vector2.zero;
+			viewportRect.offsetMax = Vector2.zero;
+
+			textObj.transform.SetParent(viewportRect.transform, false);
+
 			inputField.textComponent = text;
+			inputField.textViewport = viewportRect;
+			inputField.textViewport = obj.GetComponent<RectTransform>();
 			inputField.lineType = TMP_InputField.LineType.SingleLine;
 			inputField.onSubmit.AddListener(SubmitCommand);
 			inputField.onValueChanged.AddListener(handler.ValueChanged);

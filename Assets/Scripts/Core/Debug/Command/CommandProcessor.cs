@@ -20,7 +20,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 
 		// Follows Brigadier parsing architecture
 		public void SubmitCommand(string input) {
-			string[] tokens = Tokenize(input);
+			CommandToken[] tokens = Tokenize(input);
 			CommandArguments args = new();
 			CommandParsingContext ctx = new(args, dataProvider, execServices);
 
@@ -38,7 +38,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			for (int i = 0; i < tokens.Length; i++) {
 				List<CommandNode> matchingSubnodes = currentNode
 					.GetChildren()
-					.Where(n => n.Matches(tokens[i], ctx))
+					.Where(n => n.Matches(tokens[i].value, ctx))
 					.ToList();
 				if (matchingSubnodes.Count > 1) {
 					Logger.LogInfo("ambiguity between commands {}", tokens[i]);
@@ -61,7 +61,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 		}
 
 		public IEnumerable<string> GetCompletions(string input) {
-			string[] tokens = Tokenize(input);
+			CommandToken[] tokens = Tokenize(input);
 			CommandArguments args = new();
 			CommandParsingContext ctx = new(args, dataProvider, execServices);
 
@@ -72,7 +72,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			for (i = 0; i < tokens.Length; i++) {
 				List<CommandNode> fullMatch = currentNode
 					.GetChildren()
-					.Where(c => c.Matches(tokens[i], ctx))
+					.Where(c => c.Matches(tokens[i].value, ctx))
 					.ToList();
 				if (fullMatch.Count > 1) break;
 				if (!fullMatch.Any()) break;
@@ -80,7 +80,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			}
 
 			if (i < tokens.Length) {
-				string partialToken = tokens[i];
+				string partialToken = tokens[i].value;
 				foreach (var child in currentNode.GetChildren()) {
 					foreach (var completion in child.GetCompletions(partialToken, ctx)) {
 						yield return completion;
@@ -96,10 +96,21 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			}
 		}
 
-		private string[] Tokenize(string input) {
-			if (input.Length == 0) return new string[] { };
+		private CommandToken[] Tokenize(string input) {
+			if (input.Length == 0) return new CommandToken[] { };
 			input = input[1..];
-			return input.Split(' ');
+			string[] split = input.Split(' ');
+			CommandToken[] tokens = new CommandToken[split.Length];
+			int start = 0;
+			for (int i = 0; i < tokens.Length; i++) {
+				tokens[i] = new CommandToken {
+					value = split[i],
+					start = start,
+					length = split[i].Length
+				};
+				start += split[i].Length;
+			}
+			return tokens;
 		}
 
 		private IEnumerable<CommandNode> EnumerateAllCommands() {

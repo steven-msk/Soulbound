@@ -42,7 +42,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 					float x = xcoord.isRelative ? pos.x + xcoord.value : xcoord.value;
 					float y = ycoord.isRelative ? pos.y + ycoord.value : ycoord.value;
 
-					ctx.ExecServices.Entity.SetPos(targetGuid, new UnityEngine.Vector2(x, y));
+					ctx.ExecServices.Entity.SetPos(targetGuid, new Vector2(x, y));
 					Logger.LogInfo("teleported {} to x:{} y:{}", target, x, y);
 				});
 
