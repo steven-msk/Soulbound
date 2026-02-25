@@ -93,7 +93,9 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			}
 
 			foreach (var child in previousNode.GetChildren()) {
-				foreach (var completion in child.GetCompletions("", ctx)) {
+				if (child.Matches(tokens.Last(), ctx)) continue;
+
+				foreach (var completion in child.GetCompletions(tokens.Last(), ctx)) {
 					yield return completion;
 				}
 			}
