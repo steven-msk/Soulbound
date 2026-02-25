@@ -1,9 +1,12 @@
+using Assets.Scripts.Core.Debug.Command;
 using SoulboundBackend.Core.Debug.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
+using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
 namespace SoulboundBackend.Core.Debug.Commands {
 	public sealed class WorldSessionCommands : ICommandProvider {
@@ -27,19 +30,19 @@ namespace SoulboundBackend.Core.Debug.Commands {
 					   ? guid
 					   : ctx.Data.Player.GetGuid();
 
-					var target = ctx.Data.Entities.TryGetEntity(targetGuid, out var entity)
+					IEntityView target = ctx.Data.Entities.TryGetEntity(targetGuid, out var entity)
 						? entity
 						: ctx.Data.Player;
 
-					var pos = target.GetPos();
+					Vector2 pos = target.GetPos();
 
-					var xcoord = ctx.Args.Get<Coordinate>("x");
-					var ycoord = ctx.Args.Get<Coordinate>("y");
+					Coordinate xcoord = ctx.Args.Get<Coordinate>("x");
+					Coordinate ycoord = ctx.Args.Get<Coordinate>("y");
 
 					float x = xcoord.isRelative ? pos.x + xcoord.value : xcoord.value;
 					float y = ycoord.isRelative ? pos.y + ycoord.value : ycoord.value;
 
-					ctx.ExecServices.Player.SetPos(new UnityEngine.Vector2(x, y));
+					ctx.ExecServices.Entity.SetPos(targetGuid, new UnityEngine.Vector2(x, y));
 					Logger.LogInfo("teleported {} to x:{} y:{}", target, x, y);
 				});
 
