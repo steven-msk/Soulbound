@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 #nullable enable
 
 namespace SoulboundBackend.Core.Debug.Commands {
-	public delegate void CommandHandler(CommandArguments args);
+	public delegate void CommandHandler(CommandParsingContext ctx);
 
 	public abstract class CommandNode {
 		public abstract string label { get; }
@@ -18,7 +18,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			this.handler = handler;
 		}
 
-		public abstract bool Matches(string token, CommandArguments args);
+		public abstract bool Matches(string token, CommandParsingContext ctx);
 
 		public void AddChild(CommandNode child) => children.Add(child);
 		public IEnumerable<CommandNode> GetChildren() {

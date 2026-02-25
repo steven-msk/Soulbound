@@ -13,9 +13,11 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			this.commandProvider = commandProvider;
 		}
 
+		// Follows Brigadier parsing architecture
 		public void Process(string input) {
 			string[] tokens = Tokenize(input);
 			CommandArguments args = new();
+			CommandParsingContext ctx = new(args);
 
 			if (tokens == null || tokens.Length == 0) {
 				Logger.LogInfo("empty command");
@@ -25,7 +27,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			string rootToken = tokens[0];
 			List<CommandNode> matching = new();
 			foreach (var command in commandProvider.GetCommands()) {
-				if (command.Matches(rootToken, args)) {
+				if (command.Matches(rootToken, ctx)) {
 					matching.Add(command);
 
 					if (matching.Count > 1) {
@@ -44,7 +46,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			for (int i = 1; i < tokens.Length; i++) {
 				List<CommandNode> matchingSubnodes = currentNode
 					.GetChildren()
-					.Where(n => n.Matches(tokens[i], args))
+					.Where(n => n.Matches(tokens[i], ctx))
 					.ToList();
 				if (matchingSubnodes.Count > 1) {
 					Logger.LogInfo("ambiguity between commands {}", tokens[i]);
@@ -59,7 +61,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			}
 
 			if (currentNode.IsTerminalNode()) {
-				Logger.LogInfo("completed command: {}", input);
+				currentNode.GetHandler()(ctx);
 			} else {
 				Logger.LogInfo("incorrect command: {}", input);
 			}

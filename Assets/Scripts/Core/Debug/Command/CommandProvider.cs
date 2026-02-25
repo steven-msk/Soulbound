@@ -21,13 +21,13 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			CommandBuilder command = CommandBuilder.Literal("command");
 			command.Then(new LiteralCommandNode("subcommand1"))
 				.Then(new LiteralCommandNode("anotherSubCommand"))
-				.Executes(args => Logger.LogInfo("executing anotherSubCommand"));
+				.Executes(_ => Logger.LogInfo("executing anotherSubCommand"));
 			command.Then(new LiteralCommandNode("subcommand"))
-				.Executes(args => Logger.LogInfo("subcommand2"));
+				.Executes(_ => Logger.LogInfo("subcommand2"));
 			command.Then(new LiteralCommandNode("subcommand3"))
-				.Executes(args => Logger.LogInfo("impossible to run"));
+				.Executes(_ => Logger.LogInfo("impossible to run"));
 			command.Then(new LiteralCommandNode("subcommand3"))
-				.Executes(args => Logger.LogInfo("impossible to run"));
+				.Executes(_ => Logger.LogInfo("impossible to run"));
 			prototypeCommand = command.GetRootNode();
 			return prototypeCommand;
 		}
@@ -37,7 +37,14 @@ namespace SoulboundBackend.Core.Debug.Commands {
 
 			CommandBuilder coords = CommandBuilder.Create(new ArgumentCommandNode<Coordinate>("x", new CoordinateParser()))
 				.Then(new ArgumentCommandNode<Coordinate>("y", new CoordinateParser()))
-				.Executes(args => Logger.LogInfo("teleported"));
+				.Executes(ctx => {
+					string target = ctx.Args.TryGet("target", out Guid guid)
+						? guid.ToString()
+						: "player";
+					Coordinate x = ctx.Args.Get<Coordinate>("x");
+					Coordinate y = ctx.Args.Get<Coordinate>("y");
+					Logger.LogInfo("teleported {} to x:{} y:{}", target, x.value, y.value);
+				});
 
 			CommandBuilder tp = CommandBuilder.Literal("tp");
 			tp.Then(coords);

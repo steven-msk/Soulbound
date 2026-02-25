@@ -17,10 +17,10 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			this.parser = parser;
 		}
 
-		public override bool Matches(string token, CommandArguments args) {
+		public override bool Matches(string token, CommandParsingContext ctx) {
 			if (!parser.TryParse(token, out T value)) return false;
 
-			args.Set(token, value);
+			ctx.Args.Set(label, value);
 			return true;
 		}
 	}
