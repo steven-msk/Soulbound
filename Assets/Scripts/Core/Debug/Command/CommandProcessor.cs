@@ -10,16 +10,18 @@ namespace SoulboundBackend.Core.Debug.Commands {
 	public sealed class CommandProcessor {
 		private readonly List<ICommandProvider> providerBuffer = new();
 		private readonly IRuntimeDataProvider dataProvider;
+		private readonly IRuntimeExecutionServices execServices;
 
-		public CommandProcessor(IRuntimeDataProvider dataProvider) {
+		public CommandProcessor(IRuntimeDataProvider dataProvider, IRuntimeExecutionServices execServices) {
 			this.dataProvider = dataProvider;
+			this.execServices = execServices;
 		}
 
 		// Follows Brigadier parsing architecture
 		public void SubmitCommand(string input) {
 			string[] tokens = Tokenize(input);
 			CommandArguments args = new();
-			CommandParsingContext ctx = new(args, dataProvider);
+			CommandParsingContext ctx = new(args, dataProvider, execServices);
 
 			if (tokens == null || tokens.Length == 0) {
 				Logger.LogInfo("empty command");

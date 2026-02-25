@@ -6,5 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace SoulboundBackend.Core.Debug.Commands {
-	public sealed record CommandParsingContext(CommandArguments Args, IRuntimeDataProvider Data);
+	public sealed record CommandParsingContext(
+		CommandArguments Args,
+		IRuntimeDataProvider Data,
+		IRuntimeExecutionServices ExecServices
+	);
 }

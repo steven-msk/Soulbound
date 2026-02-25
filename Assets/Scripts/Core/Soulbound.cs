@@ -32,9 +32,10 @@ namespace SoulboundBackend.Core {
 		private readonly UIHandler uiHandler;
 		private readonly WorldManager worldManager;
 		public readonly Settings settings;
-		private readonly RuntimeDataProvider runtimeDataProvider;
+		private readonly RuntimeDataProvider runtimeDataProvider = new();
+		private readonly RuntimeExecutionServices runtimeExecutionServices = new();
 		private readonly CommandProcessor commandProcessor;
-		private readonly GlobalCommandProvider globalCommandProvider;
+		private readonly GlobalCommandProvider globalCommandProvider = new();
 		private readonly WorldSessionCommands worldSessionCommands = new();
 		private readonly DebugMetricsService debugMetricsService;
 		private readonly SoulboundDebug debug;
@@ -58,9 +59,7 @@ namespace SoulboundBackend.Core {
 			InputTokens.Register(inputActions.asset);
 			settings = new Settings();
 
-			runtimeDataProvider = new RuntimeDataProvider();
-			globalCommandProvider = new GlobalCommandProvider();
-			commandProcessor = new CommandProcessor(runtimeDataProvider);
+			commandProcessor = new CommandProcessor(runtimeDataProvider, runtimeExecutionServices);
 			commandProcessor.RegisterProvider(globalCommandProvider);
 
 			debugMetricsService = new DebugMetricsService();
@@ -134,8 +133,9 @@ namespace SoulboundBackend.Core {
 			).ContinueWith(session => {
 				uiHandler.SetScreen(new WorldScreen(session.player));
 
-				commandProcessor.RegisterProvider(worldSessionCommands);
 				runtimeDataProvider.SetWorldSessionState(session);
+				runtimeExecutionServices.SetWorldSesstionState(session);
+				commandProcessor.RegisterProvider(worldSessionCommands);
 			}).Forget(UnityEngine.Debug.LogException);
 		}
 
@@ -151,8 +151,9 @@ namespace SoulboundBackend.Core {
 					uiHandler.SetCanvas(UnityEngine.Object.FindFirstObjectByType<Canvas>());
 					uiHandler.SetScreen(new TitleScreen());
 
-					commandProcessor.UnregisterProvider(worldSessionCommands);
 					runtimeDataProvider.ExitWorldSessionState();
+					runtimeExecutionServices.ExitWorldSessionState();
+					commandProcessor.UnregisterProvider(worldSessionCommands);
 				})
 			.Forget(UnityEngine.Debug.LogException);
 		}

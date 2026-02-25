@@ -16,10 +16,10 @@ namespace SoulboundBackend.Client {
 		private IRuntimeEntityDataProvider? _entities;
 
 		public IRuntimePlayerDataProvider Player {
-			get => _player ?? throw new InvalidOperationException("Dynamic player data is only available within a world session");
+			get => _player ?? throw new InvalidOperationException("Runtime player data is only available within a world session");
 		}
 		public IRuntimeEntityDataProvider Entities {
-			get => _entities ?? throw new InvalidOperationException("Dynamic entity data is only available within a world session");
+			get => _entities ?? throw new InvalidOperationException("Runtime entity data is only available within a world session");
 		}
 
 		public void SetWorldSessionState(WorldSession session) {
@@ -66,11 +66,11 @@ namespace SoulboundBackend.Client {
 			bool found = entityManager.GetEntityByID(guid, out Entity result);
 			entity = found
 				? new EntityView(result)
-				: default!;
+				: default;
 			return found;
 		}
 
-		private class EntityView : IEntityView {
+		private readonly struct EntityView : IEntityView {
 			private readonly Entity entity;
 
 			public EntityView(Entity entity) {
