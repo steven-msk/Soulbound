@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
 namespace SoulboundBackend.Core.Debug {
@@ -38,9 +39,10 @@ namespace SoulboundBackend.Core.Debug {
 			// this is risky because ALL inputs are consumed
 			// but it works for now
 			if (commandLine.IsVisible()) {
-				if (inputEvent.Performed(InputTokens.Keyboard.TAB)) commandLine.InsertCompletion();
-				if (inputEvent.Performed(InputTokens.Keyboard.ARROW_UP)) commandLine.SelectPreviousCompletion();
-				if (inputEvent.Performed(InputTokens.Keyboard.ARROW_DOWN)) commandLine.SelectNextCompletion();
+				if (inputEvent.Performed(InputTokens.Keyboard.TAB)) commandLine.HandleKey(Key.Tab);
+				if (inputEvent.Performed(InputTokens.Keyboard.ARROW_UP)) commandLine.HandleKey(Key.UpArrow);
+				if (inputEvent.Performed(InputTokens.Keyboard.ARROW_DOWN)) commandLine.HandleKey(Key.DownArrow);
+				if (inputEvent.Performed(InputTokens.Keyboard.ESC)) commandLine.HandleKey(Key.Escape);
 				return true;
 			}
 

@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
@@ -16,11 +17,15 @@ namespace SoulboundBackend.Core.Debug.Commands {
 		private TMP_InputField inputField;
 		private CommandProcessor commandProcessor;
 		private readonly CommandCompletion completion = new();
+		private List<string> history;
 		private GameObject completionPanel;
+		private int historyIndex;
+		private CommandInputMode currentInputMode;
 
-		public void Init(TMP_InputField inputField, CommandProcessor commandProcessor) {
+		public void Init(TMP_InputField inputField, CommandProcessor commandProcessor, IEnumerable<string> history) {
 			this.inputField = inputField;
 			this.commandProcessor = commandProcessor;
+			this.history = history.ToList();
 			StartCoroutine(ActivateNextFrame());
 		}
 
@@ -42,21 +47,99 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			inputField.selectionFocusPosition = end;
 		}
 
-		void ICommandLineHandler.InsertCompletion() {
-			if(InvalidCompletionState()) return;
+		void ICommandLineHandler.HandleKey(Key key) {
+			switch (currentInputMode) {
+				case CommandInputMode.Typing: HandleTyping(key);
+					break;
+				case CommandInputMode.CyclingCompletions: HandleCompletion(key);
+					break;
+				case CommandInputMode.CyclingHistory: HandleHistory(key);
+					break;
+			}
+			if (key == Key.Escape) {
+				inputField.ActivateInputField();
+			}
+		}
 
+		private void HandleTyping(Key key) {
+			if ((key == Key.Tab || key == Key.UpArrow || key == Key.DownArrow || key == Key.Escape)
+					&& completion.GetCompletionCount() > 0) {
+				currentInputMode = CommandInputMode.CyclingCompletions;
+				HandleCompletion(key);
+			} else if ((key == Key.UpArrow || key == Key.DownArrow)
+					&& history.Count > 0) {
+				currentInputMode = CommandInputMode.CyclingHistory;
+				HandleHistory(key);
+			}
+		}
+
+		private void HandleCompletion(Key key) {
+			int previousIndex = completion.GetSelectedIndex();
+
+			if (key == Key.DownArrow) {
+				HighlightCompletion(previousIndex, completion.SelectNext());
+			} else if (key == Key.UpArrow) {
+				HighlightCompletion(previousIndex, completion.SelectPrevious());
+			} else if (key == Key.Tab) {
+				InsertCompletion();
+			} else if (key == Key.Escape) {
+				ExitCompletion();
+			}
+		}
+
+		private void HandleHistory(Key key) {
+			if (key == Key.UpArrow) {
+				historyIndex--;
+				if (historyIndex < 0) historyIndex = history.Count - 1;
+				InsertHistory();
+			} else if (key == Key.DownArrow) {
+				historyIndex = (historyIndex + 1) % history.Count;
+				InsertHistory();
+			} else if (key == Key.Escape) {
+				ExitHistory();
+			}  else {
+				HandleTyping(key);
+			}
+		}
+
+		public void InsertCompletion() {
+			if (completion.GetCompletionCount() == 0) return;
 			CommandCompletionToken completionToken = completion.GetSelected().Value;
 			string append = inputField.text + completionToken.value[completionToken.start..];
 			inputField.text = append;
 			SetCaretToEnd();
 		}
 
+		private void InsertHistory() {
+			inputField.text = history[historyIndex];
+			SetCaretToEnd();
+		}
+
+		private void ExitCompletion() {
+			Destroy(completionPanel);
+			completion.ClearCompletions();
+			currentInputMode = CommandInputMode.Typing;
+		}
+
+		private void ExitHistory() {
+			currentInputMode = CommandInputMode.Typing;
+		}
+
+		public void ValueChanged(string value) {
+			int previous = completion.GetSelectedIndex();
+			if (previous != -1 && !InvalidCompletionPanel()) {
+				RevokeSelectedLayout(completionPanel.GetComponentsInChildren<TextMeshProUGUI>(true)[previous]);
+			}
+			ShowCompletions(value);
+			HighlightCompletion(previous, completion.GetSelectedIndex());
+		}
+
 		public void ShowCompletions(string value) {
 			if (completionPanel == null) completionPanel = CreateCompletionPanel();
 
 			List<CommandCompletionToken> completions = commandProcessor.GetCompletions(value).ToList();
-			int previousSelected = completion.GetSelectedIndex();
 			completion.SetCompletions(completions);
+
 			if (completions.Any()) {
 				completionPanel.SetActive(true);
 				foreach (var component in completionPanel.GetComponentsInChildren<TextMeshProUGUI>()) {
@@ -76,35 +159,18 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			for (; i < completions.Count; i++) {
 				CreateCompletionComponent(completions[i].value);
 			}
-
-			int currentSelected = completion.GetSelectedIndex();
-			UpdateSelectedCompletion(previousSelected, currentSelected);
 		}
 
-		void ICommandLineHandler.SelectNextCompletion() {
-			if (InvalidCompletionState()) return;
-
-			int previousIndex = completion.GetSelectedIndex();
-			int index = completion.SelectNext();
-			UpdateSelectedCompletion(previousIndex, index);
-		}
-
-		void ICommandLineHandler.SelectPreviousCompletion() {
-			if (InvalidCompletionState()) return;
-
-			int previousIndex = completion.GetSelectedIndex();
-			int index = completion.SelectPrevious();
-			UpdateSelectedCompletion(previousIndex, index);
-		}
-
-		private void UpdateSelectedCompletion(int previousIndex, int currentIndex) {
-			TextMeshProUGUI[] components = completionPanel.GetComponentsInChildren<TextMeshProUGUI>();
+		private void HighlightCompletion(int previousIndex, int currentIndex) {
+			if (InvalidCompletionPanel()) return;
+			TextMeshProUGUI[] components = completionPanel.GetComponentsInChildren<TextMeshProUGUI>(true);
 			if (previousIndex != -1) RevokeSelectedLayout(components[previousIndex]);
 			if (currentIndex != -1) ApplySelectedLayout(components[currentIndex]);
 		}
 
-		private bool InvalidCompletionState() {
-			return (completionPanel != null && !completionPanel.activeSelf);
+		private bool InvalidCompletionPanel() {
+			return completionPanel == null
+				|| (completionPanel != null && !completionPanel.activeSelf);
 		}
 
 		private GameObject CreateCompletionPanel() {

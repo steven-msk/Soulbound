@@ -35,5 +35,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 		}
 
 		public int GetSelectedIndex() => selectedIndex;
+		public int GetCompletionCount() => completions.Count;
+		public void ClearCompletions() => completions.Clear();
 	}
 }

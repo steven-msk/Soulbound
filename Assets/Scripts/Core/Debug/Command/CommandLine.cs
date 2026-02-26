@@ -9,11 +9,13 @@ using System.Threading.Tasks;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace SoulboundBackend.Core.Debug {
 	public sealed class CommandLine : ToggleableOverlay<UIHandledOverlayNode<ICommandLineHandler>> {
 		private readonly CommandProcessor commandProcessor;
+		private readonly List<string> history = new();
 
 		public CommandLine(CommandProcessor commandProcessor) {
 			this.commandProcessor = commandProcessor;
@@ -34,11 +36,10 @@ namespace SoulboundBackend.Core.Debug {
 		private void SubmitCommand(string command) {
 			node.Destroy();
 			commandProcessor.SubmitCommand(command);
+			history.Add(command);
 		}
 
-		public void InsertCompletion() => node?.handle.InsertCompletion();
-		public void SelectNextCompletion() => node?.handle.SelectNextCompletion();
-		public void SelectPreviousCompletion() => node?.handle.SelectPreviousCompletion();
+		public void HandleKey(Key key) => node?.handle.HandleKey(key);
 
 		protected override UIHandledOverlayNode<ICommandLineHandler> GetNode() {
 			GameObject obj = new("Command Line", typeof(RectTransform));
@@ -68,7 +69,7 @@ namespace SoulboundBackend.Core.Debug {
 			textRect.offsetMax = new Vector2(-10f, 0f);
 
 			CommandLineHandler handler = obj.AddComponent<CommandLineHandler>();
-			handler.Init(inputField, commandProcessor);
+			handler.Init(inputField, commandProcessor, history);
 
 			GameObject viewport = new("Viewport", typeof(RectTransform), typeof(Mask), typeof(Image));
 			viewport.transform.SetParent(obj.transform, false);
@@ -89,7 +90,10 @@ namespace SoulboundBackend.Core.Debug {
 			inputField.textViewport = obj.GetComponent<RectTransform>();
 			inputField.lineType = TMP_InputField.LineType.SingleLine;
 			inputField.onSubmit.AddListener(SubmitCommand);
-			inputField.onValueChanged.AddListener(handler.ShowCompletions);
+			inputField.onValueChanged.AddListener(handler.ValueChanged);
+			inputField.onFocusSelectAll = false;
+			inputField.restoreOriginalTextOnEscape = false;
+			inputField.onDeselect.AddListener(_ => inputField.ActivateInputField());
 
 			return new UIHandledOverlayNode<ICommandLineHandler>(obj, handler);
 		}
