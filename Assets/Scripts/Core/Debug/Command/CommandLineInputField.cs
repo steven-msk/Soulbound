@@ -24,6 +24,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 				eventData.Use();
 				return;
 			}
+
 			base.OnUpdateSelected(eventData);
 		}
 	}

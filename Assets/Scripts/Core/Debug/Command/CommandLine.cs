@@ -1,3 +1,5 @@
+using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks.Triggers;
 using SoulboundBackend.Client.Input;
 using SoulboundBackend.Client.UI;
 using SoulboundBackend.Core.Debug.Commands;
@@ -44,6 +46,10 @@ namespace SoulboundBackend.Core.Debug {
 		protected override UIHandledOverlayNode<ICommandLineHandler> GetNode() {
 			GameObject obj = new("Command Line", typeof(RectTransform));
 
+			// TMP_InputField misses the condition to create the caret object when OnEnable is called
+			// the object needs to be disabled before the component is added
+			obj.SetActive(false);
+
 			RectTransform rect = obj.GetComponent<RectTransform>();
 			rect.anchorMin = Vector2.zero;
 			rect.anchorMax = new Vector2(1f, 0f);
@@ -88,13 +94,15 @@ namespace SoulboundBackend.Core.Debug {
 
 			inputField.textComponent = text;
 			inputField.textViewport = viewportRect;
-			inputField.textViewport = obj.GetComponent<RectTransform>();
 			inputField.lineType = TMP_InputField.LineType.SingleLine;
 			inputField.onSubmit.AddListener(SubmitCommand);
-			inputField.onValueChanged.AddListener(handler.ValueChanged);
+			inputField.onValueChanged.AddListener(handler.ShowCompletions);
 			inputField.onFocusSelectAll = false;
 			inputField.restoreOriginalTextOnEscape = false;
 			inputField.onDeselect.AddListener(_ => inputField.ActivateInputField());
+
+			// now the caret object will be created
+			obj.SetActive(true);
 
 			return new UIHandledOverlayNode<ICommandLineHandler>(obj, handler);
 		}

@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using SoulboundBackend.Client.Input;
 using SoulboundBackend.Core.Debug.Logging;
 using System;
@@ -29,19 +30,17 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			this.commandProcessor = commandProcessor;
 			this.history = history.ToList();
 			inputField.ShouldBlockNavigation = () => true;
-			StartCoroutine(ActivateNextFrame());
-		}
 
-		IEnumerator ActivateNextFrame() {
-			yield return null;
+			// activate and prefix text mext frame
+			// so TMP can finish internal processes
+			UniTask.Post(async () => {
+				await UniTask.NextFrame();
 
-			inputField.ActivateInputField();
-			inputField.SetTextWithoutNotify("/");
-			inputField.ForceLabelUpdate();
-			ValueChanged("/");
-
-			yield return null;
-			SetCaretToEnd();
+				inputField.ActivateInputField();
+				inputField.text = "/";
+				ShowCompletions("/");
+				SetCaretToEnd();
+			});
 		}
 
 		private void SetCaretToEnd() {
@@ -108,7 +107,11 @@ namespace SoulboundBackend.Core.Debug.Commands {
 
 		public void InsertCompletion() {
 			if (completion.GetCompletionCount() == 0) return;
+
 			CommandCompletionToken completionToken = completion.GetSelected().Value;
+
+			
+
 			string append = inputField.text + completionToken.value[completionToken.start..];
 			inputField.text = append;
 			SetCaretToEnd();
@@ -127,11 +130,6 @@ namespace SoulboundBackend.Core.Debug.Commands {
 
 		private void ExitHistory() {
 			currentInputMode = CommandInputMode.Typing;
-		}
-
-		public void ValueChanged(string value) {
-			ShowCompletions(value);
-			HighlightCompletion(completion.GetSelectedIndex());
 		}
 
 		public void ShowCompletions(string value) {
@@ -160,6 +158,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 				CreateCompletionComponent(completions[i].value);
 			}
 			currentCompletions = completionPanel.GetComponentsInChildren<TextMeshProUGUI>(true);
+			HighlightCompletion(completion.GetSelectedIndex());
 		}
 
 		private void HighlightCompletion(int index) {
