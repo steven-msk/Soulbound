@@ -24,8 +24,6 @@
     "allowUnsafeCode": false,
     "overrideReferences": true,
     "precompiledReferences": [
-        "nunit.framework.dll",
-        "Unity.VisualScripting.YamlDotNet.dll",
         "Zenject-usage.dll",
         "Newtonsoft.Json.dll"
     ],

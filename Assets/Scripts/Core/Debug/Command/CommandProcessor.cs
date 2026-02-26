@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
+using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
 namespace SoulboundBackend.Core.Debug.Commands {
 	public sealed class CommandProcessor {
@@ -20,44 +22,21 @@ namespace SoulboundBackend.Core.Debug.Commands {
 
 		// Follows Brigadier parsing architecture
 		public void SubmitCommand(string input) {
+			if (!Validate(input)) return;
+
 			string[] tokens = Tokenize(input);
 			CommandArguments args = new();
 			CommandParsingContext ctx = new(args, dataProvider, execServices);
 
-			if (tokens == null || tokens.Length == 0) {
-				Logger.LogInfo("empty command");
-				return;
-			}
-
 			CommandNode currentNode = rootNode;
-			if (currentNode == null) {
-				Logger.LogInfo("no matching command {}", tokens[0]);
-				return;
-			}
-
 			for (int i = 0; i < tokens.Length; i++) {
-				List<CommandNode> matchingSubnodes = currentNode
+				currentNode = currentNode
 					.GetChildren()
-					.Where(n => n.Matches(tokens[i], ctx))
-					.ToList();
-				if (matchingSubnodes.Count > 1) {
-					Logger.LogInfo("ambiguity between commands {}", tokens[i]);
-					return;
-				}
-
-				if (!matchingSubnodes.Any()) {
-					Logger.LogInfo("no matching command {}", tokens[i]);
-					return;
-				}
-				currentNode = matchingSubnodes.FirstOrDefault();
+					.FirstOrDefault(n => n.Matches(tokens[i], ctx))
+					?? throw new UnexpectedCommandException(tokens, i);
 			}
 
-			if (currentNode.IsTerminalNode()) {
-				currentNode.GetHandler()(ctx);
-			} else {
-				Logger.LogInfo("incorrect command: {}", input);
-			}
-
+			currentNode.GetHandler()(ctx);
 		}
 
 		public IEnumerable<CommandCompletionToken> GetCompletions(string input) {
@@ -66,6 +45,10 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			CommandParsingContext ctx = new(args, dataProvider, execServices);
 
 			if (tokens == null || tokens.Length == 0) yield break;
+
+			for (int t = 0; t < tokens.Length - 1; t++) {
+				if (string.IsNullOrWhiteSpace(tokens[t])) yield break;
+			}
 
 			CommandNode previousNode = rootNode;
 			CommandNode currentNode = rootNode;
@@ -83,6 +66,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 
 			if (i < tokens.Length) {
 				string partialToken = tokens[i];
+
 				foreach (var child in currentNode.GetChildren()) {
 					foreach (var completion in child.GetCompletions(partialToken, ctx)) {
 						yield return completion;
@@ -98,6 +82,44 @@ namespace SoulboundBackend.Core.Debug.Commands {
 					yield return completion;
 				}
 			}
+		}
+
+		private bool Validate(string input) {
+			string[] tokens = Tokenize(input);
+			Logger.LogInfo(string.Join(',', tokens.Select(s => string.IsNullOrEmpty(s) ? "EMPTY" : s)));
+
+			CommandArguments args = new();
+			CommandParsingContext ctx = new(args, dataProvider, execServices);
+
+			for (int t = 0; t < tokens.Length; t++) {
+				if (string.IsNullOrWhiteSpace(tokens[t])) {
+					throw new InvalidCommandSyntaxException("Unexpected white space", tokens, t, format: "{0}<<");
+				}
+			}
+
+			CommandNode currentNode = rootNode;
+			int i;
+			for (i = 0; i < tokens.Length; i++) {
+				List<CommandNode> matchingNodes = new();
+				foreach (var child in currentNode.GetChildren()) {
+					if (child.Matches(tokens[i], ctx)) {
+						matchingNodes.Add(child);
+					}
+				}
+				if (matchingNodes.Count > 1) throw new AmbiguousCommandException(
+					matchingNodes.Select(n => n.label).ToArray(), tokens, i
+				);
+				if (!matchingNodes.Any()) {
+					throw new UnknownOrIncompleteCommandException(tokens, i);
+				}
+				currentNode = matchingNodes.First();
+			}
+
+			if (!currentNode.IsTerminalNode()) {
+				throw new UnknownOrIncompleteCommandException(tokens, tokens.Length - 1);
+			}
+
+			return true;
 		}
 
 		private string[] Tokenize(string input) {
@@ -133,5 +155,59 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			RebuildRoot();
 		}
 
+	}
+
+	public static class CommandFormat {
+		public const string MARKER_FORMAT = ">>{0}<<";
+
+		public static string FormatWhere(string[] tokens, int tokenIndex, string format = MARKER_FORMAT) {
+			StringBuilder builder = new();
+
+			int startPrefix = Mathf.Max(0, tokenIndex - 3);
+			builder.AppendJoin(' ', tokens[startPrefix..tokenIndex]);
+
+			builder.Append(' ').AppendFormat(format, tokens[tokenIndex]);
+
+			int endSuffix = Mathf.Min(tokens.Length, tokenIndex + 3);
+			builder.AppendJoin(' ', tokens[(tokenIndex + 1)..endSuffix]);
+
+			return builder.ToString();
+		}
+
+		public static string FormatQuoting(string[] entries) {
+			return string.Join(", ", entries.Select(s => $"'{s}'"));
+		}
+	}
+
+	public sealed class InvalidCommandSyntaxException : Exception {
+		public InvalidCommandSyntaxException(string message, string[] tokens, int tokenIndex, string format = CommandFormat.MARKER_FORMAT)
+			: base($"{message}: {CommandFormat.FormatWhere(tokens, tokenIndex, format)}") {
+		}
+
+		public InvalidCommandSyntaxException(string message)
+			: base(message) {
+		}
+	}
+
+	public sealed class AmbiguousCommandException : Exception {
+		public AmbiguousCommandException(string[] matching, string[] tokens, int tokenIndex, string format = CommandFormat.MARKER_FORMAT)
+			:  base($"Ambiguity between {CommandFormat.FormatQuoting(matching)}" +
+				   $" at token '{tokens[tokenIndex]}': " +
+				   $"\"{CommandFormat.FormatWhere(tokens, tokenIndex, format)}\"") {
+		}
+	}
+
+	public sealed class UnknownOrIncompleteCommandException : Exception {
+		public UnknownOrIncompleteCommandException(string[] tokens, int tokenIndex)
+			: base($"Unknown or incomplete command at token '{tokens[tokenIndex]}': " +
+				  $"{CommandFormat.FormatWhere(tokens, tokenIndex)}") {
+		}
+	}
+
+	public sealed class UnexpectedCommandException : Exception {
+		public UnexpectedCommandException(string[] tokens, int tokenIndex)
+			: base($"Unexpected command exception at token '{tokens[tokenIndex]}': " +
+				  $"{CommandFormat.FormatWhere(tokens, tokenIndex)}") {
+		}
 	}
 }

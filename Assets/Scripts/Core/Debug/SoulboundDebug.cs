@@ -26,7 +26,7 @@ namespace SoulboundBackend.Core.Debug {
 #if !UNITY_EDITOR
 			Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
 			Application.SetStackTraceLogType(LogType.Warning, StackTraceLogType.None);
-			Application.SetStackTraceLogType(LogType.Error, StackTraceLogType.ScriptOnly);
+			Application.SetStackTraceLogType(LogType.Error, StackTraceLogType.None);
 #endif
 		}
 

@@ -38,6 +38,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			inputField.ActivateInputField();
 			inputField.SetTextWithoutNotify("/");
 			inputField.ForceLabelUpdate();
+			ValueChanged("/");
 
 			yield return null;
 			SetCaretToEnd();
