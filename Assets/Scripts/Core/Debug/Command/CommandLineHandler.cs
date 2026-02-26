@@ -14,18 +14,21 @@ using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
 namespace SoulboundBackend.Core.Debug.Commands {
 	public sealed class CommandLineHandler : MonoBehaviour, ICommandLineHandler {
-		private TMP_InputField inputField;
+		private CommandLineInputField inputField;
 		private CommandProcessor commandProcessor;
 		private readonly CommandCompletion completion = new();
 		private List<string> history;
 		private GameObject completionPanel;
 		private int historyIndex;
+		private bool historyLocked;
 		private CommandInputMode currentInputMode;
+		public event Action shouldCloseCommandLine;
 
-		public void Init(TMP_InputField inputField, CommandProcessor commandProcessor, IEnumerable<string> history) {
+		public void Init(CommandLineInputField inputField, CommandProcessor commandProcessor, IEnumerable<string> history) {
 			this.inputField = inputField;
 			this.commandProcessor = commandProcessor;
 			this.history = history.ToList();
+			inputField.ShouldBlockNavigation = () => true;
 			StartCoroutine(ActivateNextFrame());
 		}
 
@@ -48,6 +51,12 @@ namespace SoulboundBackend.Core.Debug.Commands {
 		}
 
 		void ICommandLineHandler.HandleKey(Key key) {
+			if (key == Key.Escape
+					&& completion.GetCompletionCount() == 0
+					&& currentInputMode == CommandInputMode.Typing) {
+				shouldCloseCommandLine();
+				return;
+			}
 			switch (currentInputMode) {
 				case CommandInputMode.Typing: HandleTyping(key);
 					break;
@@ -56,9 +65,6 @@ namespace SoulboundBackend.Core.Debug.Commands {
 				case CommandInputMode.CyclingHistory: HandleHistory(key);
 					break;
 			}
-			if (key == Key.Escape) {
-				inputField.ActivateInputField();
-			}
 		}
 
 		private void HandleTyping(Key key) {
@@ -66,8 +72,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 					&& completion.GetCompletionCount() > 0) {
 				currentInputMode = CommandInputMode.CyclingCompletions;
 				HandleCompletion(key);
-			} else if ((key == Key.UpArrow || key == Key.DownArrow)
-					&& history.Count > 0) {
+			} else if ((key == Key.UpArrow || key == Key.DownArrow) && history.Count > 0 && !historyLocked) {
 				currentInputMode = CommandInputMode.CyclingHistory;
 				HandleHistory(key);
 			}
@@ -145,8 +150,8 @@ namespace SoulboundBackend.Core.Debug.Commands {
 				foreach (var component in completionPanel.GetComponentsInChildren<TextMeshProUGUI>()) {
 					component.gameObject.SetActive(false);
 				}
-			}
-			else completionPanel.SetActive(false);
+			} else {
+				completionPanel.SetActive(false); }
 
 			TextMeshProUGUI[] pool = completionPanel.GetComponentsInChildren<TextMeshProUGUI>(true);
 

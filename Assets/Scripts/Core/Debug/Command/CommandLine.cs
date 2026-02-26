@@ -53,7 +53,7 @@ namespace SoulboundBackend.Core.Debug {
 			Image bg = obj.AddComponent<Image>();
 			bg.color = new Color(0.1f, 0.1f, 0.1f, 1f);
 
-			TMP_InputField inputField = obj.AddComponent<TMP_InputField>();
+			CommandLineInputField inputField = obj.AddComponent<CommandLineInputField>();
 
 			GameObject textObj = new("Text", typeof(RectTransform));
 			textObj.transform.SetParent(obj.transform, false);
@@ -70,6 +70,7 @@ namespace SoulboundBackend.Core.Debug {
 
 			CommandLineHandler handler = obj.AddComponent<CommandLineHandler>();
 			handler.Init(inputField, commandProcessor, history);
+			handler.shouldCloseCommandLine += Toggle;
 
 			GameObject viewport = new("Viewport", typeof(RectTransform), typeof(Mask), typeof(Image));
 			viewport.transform.SetParent(obj.transform, false);

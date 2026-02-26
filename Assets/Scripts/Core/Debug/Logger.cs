@@ -48,7 +48,7 @@ namespace SoulboundBackend.Core.Debug.Logging {
 		}
 
 		public static void LogInfo(object message, UnityEngine.Object? context = null) {
-			LogMessage(LogInfo_Method, LogLevel.Info, CaptureStackFrame(), message.ToString(), context: context);
+			LogMessage(LogInfo_Method, LogLevel.Info, CaptureStackFrame(), message?.ToString() ?? "null", context: context);
 		}
 
 		public static void LogInfo(string message, params object[] args) {
@@ -56,7 +56,7 @@ namespace SoulboundBackend.Core.Debug.Logging {
 		}
 
 		public static void LogWarning(object message, UnityEngine.Object? context = null) {
-			LogMessage(LogWarning_Method, LogLevel.Warning, CaptureStackFrame(), message.ToString(), context: context);
+			LogMessage(LogWarning_Method, LogLevel.Warning, CaptureStackFrame(), message?.ToString() ?? "null", context: context);
 		}
 
 		public static void LogWarning(string message, params object[] args) {
@@ -64,7 +64,7 @@ namespace SoulboundBackend.Core.Debug.Logging {
 		}
 
 		public static void LogError(object message, UnityEngine.Object? context = null) {
-			LogMessage(LogError_Method, LogLevel.Error, CaptureStackFrame(), message.ToString(), context: context);
+			LogMessage(LogError_Method, LogLevel.Error, CaptureStackFrame(), message?.ToString() ?? "null", context: context);
 		}
 
 		public static void LogError(string message, params object[] args) {
@@ -72,7 +72,7 @@ namespace SoulboundBackend.Core.Debug.Logging {
 		}
 
 		public static void LogFatal(Exception? exception, object message, UnityEngine.Object? context = null) {
-			LogMessage(LogError_Method, LogLevel.Fatal, CaptureStackFrame(), message.ToString(), exception, context);
+			LogMessage(LogError_Method, LogLevel.Fatal, CaptureStackFrame(), message?.ToString() ?? "null", exception, context);
 		}
 
 		public static void LogFatal(Exception? exception, string message, params object[] args) {
