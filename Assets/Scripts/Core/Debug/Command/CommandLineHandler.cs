@@ -18,11 +18,11 @@ namespace SoulboundBackend.Core.Debug.Commands {
 		private CommandProcessor commandProcessor;
 		private readonly CommandCompletion completion = new();
 		private List<string> history;
-		private GameObject completionPanel;
+		private VerticalLayoutGroup completionPanel;
 		private int historyIndex;
-		private bool historyLocked;
 		private CommandInputMode currentInputMode;
 		public event Action shouldCloseCommandLine;
+		private TextMeshProUGUI[] currentCompletions;
 
 		public void Init(CommandLineInputField inputField, CommandProcessor commandProcessor, IEnumerable<string> history) {
 			this.inputField = inputField;
@@ -72,19 +72,17 @@ namespace SoulboundBackend.Core.Debug.Commands {
 					&& completion.GetCompletionCount() > 0) {
 				currentInputMode = CommandInputMode.CyclingCompletions;
 				HandleCompletion(key);
-			} else if ((key == Key.UpArrow || key == Key.DownArrow) && history.Count > 0 && !historyLocked) {
+			} else if ((key == Key.UpArrow || key == Key.DownArrow) && history.Count > 0) {
 				currentInputMode = CommandInputMode.CyclingHistory;
 				HandleHistory(key);
 			}
 		}
 
 		private void HandleCompletion(Key key) {
-			int previousIndex = completion.GetSelectedIndex();
-
 			if (key == Key.DownArrow) {
-				HighlightCompletion(previousIndex, completion.SelectNext());
+				HighlightCompletion(completion.SelectNext());
 			} else if (key == Key.UpArrow) {
-				HighlightCompletion(previousIndex, completion.SelectPrevious());
+				HighlightCompletion(completion.SelectPrevious());
 			} else if (key == Key.Tab) {
 				InsertCompletion();
 			} else if (key == Key.Escape) {
@@ -121,7 +119,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 		}
 
 		private void ExitCompletion() {
-			Destroy(completionPanel);
+			Destroy(completionPanel.gameObject);
 			completion.ClearCompletions();
 			currentInputMode = CommandInputMode.Typing;
 		}
@@ -131,12 +129,8 @@ namespace SoulboundBackend.Core.Debug.Commands {
 		}
 
 		public void ValueChanged(string value) {
-			int previous = completion.GetSelectedIndex();
-			if (previous != -1 && !InvalidCompletionPanel()) {
-				RevokeSelectedLayout(completionPanel.GetComponentsInChildren<TextMeshProUGUI>(true)[previous]);
-			}
 			ShowCompletions(value);
-			HighlightCompletion(previous, completion.GetSelectedIndex());
+			HighlightCompletion(completion.GetSelectedIndex());
 		}
 
 		public void ShowCompletions(string value) {
@@ -146,39 +140,50 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			completion.SetCompletions(completions);
 
 			if (completions.Any()) {
-				completionPanel.SetActive(true);
+				completionPanel.gameObject.SetActive(true);
 				foreach (var component in completionPanel.GetComponentsInChildren<TextMeshProUGUI>()) {
 					component.gameObject.SetActive(false);
 				}
-			} else {
-				completionPanel.SetActive(false); }
+			} else completionPanel.gameObject.SetActive(false);
 
-			TextMeshProUGUI[] pool = completionPanel.GetComponentsInChildren<TextMeshProUGUI>(true);
+			currentCompletions = completionPanel.GetComponentsInChildren<TextMeshProUGUI>(true);
 
 			int i = 0;
-			for (; i < pool.Length && i < completions.Count; i++) {
-				pool[i].gameObject.SetActive(true);
-				pool[i].text = completions[i].value;
+			for (; i < currentCompletions.Length && i < completions.Count; i++) {
+				currentCompletions[i].gameObject.SetActive(true);
+				currentCompletions[i].text = completions[i].value;
+				currentCompletions[i].Rebuild(CanvasUpdate.LatePreRender);
 			}
 
 			for (; i < completions.Count; i++) {
 				CreateCompletionComponent(completions[i].value);
 			}
+			currentCompletions = completionPanel.GetComponentsInChildren<TextMeshProUGUI>(true);
 		}
 
-		private void HighlightCompletion(int previousIndex, int currentIndex) {
+		private void HighlightCompletion(int index) {
 			if (InvalidCompletionPanel()) return;
-			TextMeshProUGUI[] components = completionPanel.GetComponentsInChildren<TextMeshProUGUI>(true);
-			if (previousIndex != -1) RevokeSelectedLayout(components[previousIndex]);
-			if (currentIndex != -1) ApplySelectedLayout(components[currentIndex]);
+			for (int i = 0; i < currentCompletions.Length; i++) {
+				RevokeSelectedLayout(currentCompletions[i]);
+			}
+			if (index != -1) ApplySelectedLayout(currentCompletions[index]);
+			RebuildPanelLayout();
 		}
 
 		private bool InvalidCompletionPanel() {
 			return completionPanel == null
-				|| (completionPanel != null && !completionPanel.activeSelf);
+				|| (completionPanel != null && !completionPanel.gameObject.activeSelf);
 		}
 
-		private GameObject CreateCompletionPanel() {
+		private void RebuildPanelLayout() {
+			if (!InvalidCompletionPanel()) {
+				LayoutRebuilder.ForceRebuildLayoutImmediate(
+					completionPanel.GetComponent<RectTransform>()
+				);
+			}
+		}
+
+		private VerticalLayoutGroup CreateCompletionPanel() {
 			GameObject obj = new("Completion Panel", typeof(RectTransform));
 			obj.transform.SetParent(transform, false);
 
@@ -196,7 +201,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			fitter.verticalFit = fitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
 
 			obj.SetActive(true);
-			return obj;
+			return layout;
 		}
 
 		private void CreateCompletionComponent(string completion) {
