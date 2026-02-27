@@ -342,7 +342,7 @@ Status: ⚙️ Prototype
 - Item system
 - Stat system
 
-## 15. Debug visuals
+## 15. Debug features
 Status: ⚙️ Prototype, dependency injection and variable dat organization issues
 - Displays chunk info, coords, structure bounds, variable data, input & event logs
 
@@ -410,10 +410,10 @@ Status: ⚠️ Needs entire rework
 ## Recommended Production Order (Top to bottom)
 Based on the dependency graph, this could be an optimal order:
 [EDIT]: For convenience during late prototyping, categories have been marked accordingly to ease development: `*` means started but not finished, `<-` marks a focus point, `>|` means closed, `>>>` means progressively developed (see [exceptions](#exceptions))
-1. [Input system](#4-input-system)* **>|** (*read note below*)
-2. [Action Request System](#18-action-request-system)* **>|** (*read note below*)
-3. [Serialization](#17-serialization) (foundation only)* *delayed until all serialization parameters are stable*
-4. [Stat system](#5-stat-system) (*some features might be missing, but most of the system is working*)
+1. [Input system](#4-input-system) **>|**
+2. [*Action Request System*](#18-action-request-system)* **>|** *("deprecated" - read note below)*
+3. [Serialization](#17-serialization)* (foundation only) *delayed until all serialization parameters are stable*
+4. [Stat system](#5-stat-system) (+Item system)* (*some features might be missing, but most of the system is working*)
 5. [Entity system](#6-entity-system)* **>|** *(components will be introduced as the serialization and action requests designs develop)*
 6. [Block system](#8-block-system)* **>|** *TileEntity serialization and lifetime aspects TBD when working on the level system*
 7. [Chunk generation](#9-chunk-generation) **>|** *(proper world generation is delayed to prod)*
@@ -423,13 +423,16 @@ Based on the dependency graph, this could be an optimal order:
 13. [Physics system](#7-physics-system) (universal overhaul)
 14. [UI core layer & navigation system](#13-ui-systems-overall) **>|** *(visuals and FX delayed for prod)*
 15. [Tooltips](#14-tooltips) **>|**
-16. [Settings](#16-settings-ui)*
-17. [Debug visuals](#15-debug-visuals) **<-**
+16. [Settings](#16-settings-ui) **>|**
+17. [Debug features](#15-debug-visuals) **>|** *(base infrastructure is done, but specialized systems will be covered in prod)*
 18. [Lighting](#11-lighting-system)
 19. [Audio](#12-audio-system)
 
 > A thing to note about the `input system` and `action request system`: while they may be finished, further development revealed an overhead for their implementations, that being contexts. Their methods are always called under a certain context, whether its a player jump, attack, block placement, ui click, it all depends on what capabilities the current context offers. 
 These will be resolved in prod as there are barely any features using these, but note that this will imply a heavy refactor once more features will be introduced.
+
+> EDIT: during debug features implementation, there was a rework of the input system which has brought it to a stable state. Because of this, the action request system is somewhat deprecated. Additionally, the introduction of the commands feature also brought the conept of IRuntimeDataProvider and IRuntimeExecutionService, both of which can be used across the large project.
+> Alongside this, some revisits need to be made for the Entity, Item, Stats and Block systems due to other systems which are now changed having effect on those.
 
 ##### Exceptions
 
