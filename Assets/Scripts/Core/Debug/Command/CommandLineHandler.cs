@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using SoulboundBackend.Client.Input;
+using SoulboundBackend.Common;
 using SoulboundBackend.Core.Debug.Logging;
 using System;
 using System.Collections;
@@ -8,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -24,6 +26,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 		private CommandInputMode currentInputMode;
 		public event Action shouldCloseCommandLine;
 		private TextMeshProUGUI[] currentCompletions;
+		private int lastCaretPos = 0;
 
 		public void Init(CommandLineInputField inputField, CommandProcessor commandProcessor, IEnumerable<string> history) {
 			this.inputField = inputField;
@@ -31,16 +34,22 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			this.history = history.ToList();
 			inputField.ShouldBlockNavigation = () => true;
 
-			// activate and prefix text mext frame
+			// activate and prefix text next frame
 			// so TMP can finish internal processes
 			UniTask.Post(async () => {
 				await UniTask.NextFrame();
 
 				inputField.ActivateInputField();
 				inputField.text = "/";
-				ShowCompletions("/");
 				SetCaretToEnd();
 			});
+		}
+
+		private void Update() {
+			if (lastCaretPos != inputField.caretPosition) {
+				ShowCompletions(inputField.text);
+			}
+			lastCaretPos = inputField.caretPosition;
 		}
 
 		private void SetCaretToEnd() {
@@ -105,16 +114,24 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			}
 		}
 
-		public void InsertCompletion() {
+		public void InsertCompletion()	{
 			if (completion.GetCompletionCount() == 0) return;
 
-			CommandCompletionToken completionToken = completion.GetSelected().Value;
+			CommandCompletionToken token = completion.GetSelected().Value;
 
-			
+			string insert = token.text;
 
-			string append = inputField.text + completionToken.value[completionToken.start..];
-			inputField.text = append;
-			SetCaretToEnd();
+			string prefix = inputField.text[..token.absoluteStart];
+			int suffixStart = Mathf.Min(inputField.text.Length, token.absoluteStart + token.replaceLength);
+			string suffix = inputField.text[suffixStart..];
+
+			string result = prefix + insert + suffix;
+			inputField.text = result;
+
+			int newCaret = prefix.Length + insert.Length;
+			inputField.caretPosition = newCaret;
+			inputField.selectionAnchorPosition = newCaret;
+			inputField.selectionFocusPosition = newCaret;
 		}
 
 		private void InsertHistory() {
@@ -135,7 +152,11 @@ namespace SoulboundBackend.Core.Debug.Commands {
 		public void ShowCompletions(string value) {
 			if (completionPanel == null) completionPanel = CreateCompletionPanel();
 
-			List<CommandCompletionToken> completions = commandProcessor.GetCompletions(value).ToList();
+			int caretPos = inputField.caretPosition;
+			List<CommandCompletionToken> completions = new();
+			foreach (var completionToken in commandProcessor.GetCompletions(value, caretPos)) {
+				completions.Add(completionToken);
+			}
 			completion.SetCompletions(completions);
 
 			if (completions.Any()) {
@@ -150,12 +171,12 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			int i = 0;
 			for (; i < currentCompletions.Length && i < completions.Count; i++) {
 				currentCompletions[i].gameObject.SetActive(true);
-				currentCompletions[i].text = completions[i].value;
+				currentCompletions[i].text = completions[i].text;
 				currentCompletions[i].Rebuild(CanvasUpdate.LatePreRender);
 			}
 
 			for (; i < completions.Count; i++) {
-				CreateCompletionComponent(completions[i].value);
+				CreateCompletionComponent(completions[i].text);
 			}
 			currentCompletions = completionPanel.GetComponentsInChildren<TextMeshProUGUI>(true);
 			HighlightCompletion(completion.GetSelectedIndex());

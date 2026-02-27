@@ -1,3 +1,4 @@
+using ModestTree;
 using SoulboundBackend.Client;
 using SoulboundBackend.Core.Debug.Logging;
 using System;
@@ -39,47 +40,50 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			currentNode.GetHandler()(ctx);
 		}
 
-		public IEnumerable<CommandCompletionToken> GetCompletions(string input) {
+		public IEnumerable<CommandCompletionToken> GetCompletions(string input, int caretPos) {
 			string[] tokens = Tokenize(input);
 			CommandArguments args = new();
 			CommandParsingContext ctx = new(args, dataProvider, execServices);
 
-			if (tokens == null || tokens.Length == 0) yield break;
+			if (tokens.IsEmpty() || caretPos == 0) yield break;
 
 			for (int t = 0; t < tokens.Length - 1; t++) {
 				if (string.IsNullOrWhiteSpace(tokens[t])) yield break;
 			}
 
-			CommandNode previousNode = rootNode;
 			CommandNode currentNode = rootNode;
-			int i;
-			for (i = 0; i < tokens.Length; i++) {
+			int lastFullMatchIndex = 0;
+			int lastTokenSpan = 1;	// includes the leading '/'
+			for (lastFullMatchIndex = 0; lastFullMatchIndex < tokens.Length; lastFullMatchIndex++) {
 				List<CommandNode> fullMatch = currentNode
 					.GetChildren()
-					.Where(c => c.Matches(tokens[i], ctx))
+					.Where(c => c.Matches(tokens[lastFullMatchIndex], ctx))
 					.ToList();
-				if (fullMatch.Count > 1) break;
+
+				lastTokenSpan += tokens[lastFullMatchIndex].Length + 1;
+
 				if (!fullMatch.Any()) break;
-				previousNode = currentNode;
+				if (lastTokenSpan - 1 >= caretPos) break;
+
 				currentNode = fullMatch.First();
 			}
+			lastTokenSpan--;    // remove last whitespace
 
-			if (i < tokens.Length) {
-				string partialToken = tokens[i];
+			string lastToken = tokens[lastFullMatchIndex];
 
-				foreach (var child in currentNode.GetChildren()) {
-					foreach (var completion in child.GetCompletions(partialToken, ctx)) {
-						yield return completion;
-					}
-				}
-				yield break;
-			}
+			int caretRelativeRemaining = lastTokenSpan - caretPos;
+			if (caretRelativeRemaining < 0) yield break;
 
-			foreach (var child in previousNode.GetChildren()) {
-				if (child.Matches(tokens.Last(), ctx)) continue;
+			int caretRelativePos = lastToken.Length - caretRelativeRemaining;
+			string caretRelativeToken = lastToken[..caretRelativePos];
 
-				foreach (var completion in child.GetCompletions(tokens.Last(), ctx)) {
-					yield return completion;
+			foreach (var child in currentNode.GetChildren()) {
+				foreach (var completion in child.GetCompletions(caretRelativeToken, ctx)) {
+					yield return new CommandCompletionToken {
+						text = completion,
+						replaceLength = lastToken.Length,
+						absoluteStart = lastTokenSpan - lastToken.Length,
+					};
 				}
 			}
 		}

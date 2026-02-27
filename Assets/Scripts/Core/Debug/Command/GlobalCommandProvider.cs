@@ -19,7 +19,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			if (prototypeCommand != null) return prototypeCommand;
 
 			CommandBuilder command = CommandBuilder.Literal("command");
-			command.Then(new LiteralCommandNode("subcommand1"))
+			command.Then(new LiteralCommandNode("subcommand111111111"))
 				.Then(new LiteralCommandNode("anotherSubCommand"))
 				.Executes(_ => Logger.LogInfo("executing anotherSubCommand"));
 			command.Then(new LiteralCommandNode("subcommand"))

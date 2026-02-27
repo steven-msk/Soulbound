@@ -96,7 +96,6 @@ namespace SoulboundBackend.Core.Debug {
 			inputField.textViewport = viewportRect;
 			inputField.lineType = TMP_InputField.LineType.SingleLine;
 			inputField.onSubmit.AddListener(SubmitCommand);
-			inputField.onValueChanged.AddListener(handler.ShowCompletions);
 			inputField.onFocusSelectAll = false;
 			inputField.restoreOriginalTextOnEscape = false;
 			inputField.onDeselect.AddListener(_ => inputField.ActivateInputField());
