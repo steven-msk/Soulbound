@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Client.ItemSystem;
+using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Core.AssetManagement;
 using System;
 using System.Collections.Generic;
@@ -20,13 +20,6 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 
 		public override IEnumerable<ItemStack> GetDrops(BlockState blockState, BreakSource source) {
 			yield break;
-		}
-
-		protected override BlockState CreateDefaultState(BlockPropertyPool propertyPool) {
-			return new(this, propertyPool.CreateEntries());
-		}
-
-		protected override void RegisterProperties(BlockPropertyPool pool) {
 		}
 	}
 }

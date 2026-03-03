@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Client.ItemSystem;
+using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Core.AssetManagement;
 using SoulboundBackend.Core.Resource;
 using System;
@@ -28,8 +28,8 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			yield return new(Items.leavesBlock, 1);
 		}
 
-		protected override BlockState CreateDefaultState(BlockPropertyPool propertyPool) {
-			return new(this, propertyPool.CreateEntries().With(persistent, true));
+		protected override BlockState CreateDefaultState(BlockStateRegisterer registerer, BlockPropertyEntries propertyEntries) {
+			return registerer.AddWithProperties(propertyEntries.With(persistent, true));
 		}
 
 		protected override void RegisterProperties(BlockPropertyPool pool) {

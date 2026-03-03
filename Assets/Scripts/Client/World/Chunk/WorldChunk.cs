@@ -21,10 +21,10 @@ namespace SoulboundBackend.Client.World.Chunk {
 		public const float SURFACE_HEIGHT_RANGE = 50f;
 		public const float UNDERGROUND_HEIGHT_RANGE = 20f;
 
-		private readonly int[][] stateHashes = new int[Level.CHUNK_LENGTH][];
+		private readonly int[][] blockStateIDs = new int[Level.CHUNK_LENGTH][];
 		private readonly TileEntity?[][] tileEntities = new TileEntity[Level.CHUNK_LENGTH][];
 		private readonly TileEntityTickManager tickManager = new();
-		private int cx;
+		private readonly int cx;
 		public int xpos => cx;
 
 		public WorldChunk(int cx) { 
@@ -32,7 +32,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 
 			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
 				tileEntities[x] = new TileEntity?[Level.WORLD_HEIGHT];
-				stateHashes[x] = new int[Level.WORLD_HEIGHT];
+				blockStateIDs[x] = new int[Level.WORLD_HEIGHT];
 			}
 		}
 
@@ -148,7 +148,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 
 		public void SetBlock(int cx, int yIndex, BlockState blockState) {
 			Block block = blockState.block;
-			stateHashes[cx][yIndex] = blockState.stateHash;
+			blockStateIDs[cx][yIndex] = blockState.stateID;
 
 			if (block.hasTileEntity) {
 				BlockPos blockPos = new(ChunkXToWorldX(cx), IndexToWorldY(yIndex));
@@ -164,22 +164,22 @@ namespace SoulboundBackend.Client.World.Chunk {
 		}
 
 		public BlockState? BlockStateAt(ChunkBlockPos chunkPos) {
-			int stateHash = stateHashes[chunkPos.x][WorldYToIndex(chunkPos.y)];
-			return BlockStateRegistry.TryGet(stateHash, out var state)
-				? state
-				: null;
+			if (!Level.IsInBounds(chunkPos.ToBlock())) return null;
+
+			int stateID = blockStateIDs[chunkPos.x][WorldYToIndex(chunkPos.y)];
+			return BlockStateRegistry.Get(stateID);
 		}
 
 		public TileEntity? TileEntityAt(ChunkBlockPos chunkPos) {
 			return tileEntities[chunkPos.x][WorldYToIndex(chunkPos.y)];
 		}
 
-		private void ParseDeserialized(int[][] stateHashes) {
+		private void ParseDeserialized(int[][] blockStateIDs) {
 			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
 				for (int y = minY; y < maxY; y++) {
 					int yIndex = WorldYToIndex(y);
 
-					this.stateHashes[x][yIndex] = stateHashes[x][yIndex];
+					this.blockStateIDs[x][yIndex] = blockStateIDs[x][yIndex];
 				}
 			}
 		}
@@ -228,10 +228,10 @@ namespace SoulboundBackend.Client.World.Chunk {
 
 				writer.WritePropertyName("blockStates");
 				writer.WriteStartArray();
-				foreach (var row in value.stateHashes) {
+				foreach (var row in value.blockStateIDs) {
 					writer.WriteStartArray();
-					foreach (var stateHash in row) {
-						writer.WriteValue(stateHash);
+					foreach (var stateID in row) {
+						writer.WriteValue(stateID);
 					}
 					writer.WriteEndArray();
 				}

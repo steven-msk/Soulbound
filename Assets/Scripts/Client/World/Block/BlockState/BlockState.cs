@@ -8,41 +8,19 @@ using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
 	[JsonConverter(typeof(BlockState.Serializer))]
-	public sealed class BlockState {
+	public class BlockState {
 		public Block block { get; }
 		private readonly BlockPropertyEntries properties;
-		public int stateHash => StateHasher.ComputeHash(block, properties);
+		public readonly int stateHash;
+		internal int stateID;	// assigned by registry
 
-		public BlockState(Block block, BlockPropertyEntries properties) {
+		internal BlockState(Block block, BlockPropertyEntries properties) {
 			this.block = block ?? Blocks.air;
 			this.properties = properties;
-		}
-
-		public void OnNeighborStateChanged(BlockPos selfPos, BlockPos neighborPos, BlockState? oldState, BlockState? newState) {
-			block.OnNeighborStateChanged(selfPos, neighborPos, oldState, newState);
-		}
-
-		public void DropOnBroken(BlockPos pos, BreakSource source) {
-			Vector2 dropForce = new(UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(2.5f, 3f));
-			var drops = block.GetDrops(this, source);
-
-			foreach (var stack in drops) {
-				stack.Drop(pos.CenterAligned(), dropForce);
-			}
+			stateHash = StateHasher.ComputeHash(block, properties);
 		}
 
 		public T Get<T>(BlockProperty<T> property) => properties.Get<T>(property);
-
-		public BlockState With<T>(BlockProperty<T> property, T value) {
-			if (!block.HasProperty(property)) {
-				throw new InvalidOperationException($"Block {block.name} does not have property {property.name}");
-			}
-
-			if (EqualityComparer<T>.Default.Equals(Get(property), value)) {
-				return this;
-			}
-			return new BlockState(block, properties.With(property, value));
-		}
 
 		public override bool Equals(object obj) {
 			return obj is BlockState other
@@ -84,7 +62,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			}
 
 			public static BlockState ToState(int hash) {
-				if (BlockStateRegistry.TryGet(hash, out var state)) {
+				if (BlockStateRegistry.TryGetByHash(hash, out var state)) {
 					return state;
 				}
 				Logger.LogError("Unknown state hash: {}", hash);

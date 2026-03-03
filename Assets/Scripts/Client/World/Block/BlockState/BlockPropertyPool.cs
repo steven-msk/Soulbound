@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 namespace SoulboundBackend.Client.World.BlockSystem {
 	public sealed class BlockPropertyPool {
 		private readonly Dictionary<string, IBlockStateProperty> pool = new();
-		public IEnumerable<IBlockStateProperty> AllProperties => pool.Values;
 
 		public BlockProperty<T> Register<T>(string name) {
 			var property = new BlockProperty<T>(name);

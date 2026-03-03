@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,28 +6,31 @@ using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
 	public static class BlockStateRegistry {
-		static readonly Dictionary<int, BlockState> stateByHash = new();
+		static readonly List<BlockState> states = new();
+		static readonly Dictionary<int, int> hashToID = new();
 
 		public static int Register(BlockState state) {
 			int hash = state.stateHash;
-			UnityEngine.Debug.Log("registering hash " + hash  + " block " + state.block);
-			if (stateByHash.ContainsKey(hash)) {
-				return hash;
+
+			if (hashToID.TryGetValue(hash, out int existing)) {
+				return existing;
 			}
-			stateByHash[hash] = state;
-			return hash;
+			int id = states.Count;
+			states.Add(state);
+			state.stateID = id;
+			hashToID[hash] = id;
+			return id;
 		}
 
-		public static BlockState Get(int hash) {
-			return stateByHash[hash];
-		}
+		public static BlockState Get(int stateID) => states[stateID];
 
-		public static bool TryGet(int hash, out BlockState state) {
-			return stateByHash.TryGetValue(hash, out state);
-		}
-
-		public static IEnumerable<BlockState> All() {
-			return stateByHash.Values.AsEnumerable();
+		public static bool TryGetByHash(int hash, out BlockState state) {
+			if (hashToID.TryGetValue(hash, out int stateID)) {
+				state = states[stateID];
+				return true;
+			}
+			state = default;
+			return false;
 		}
 	}
 }

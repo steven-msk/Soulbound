@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,21 +13,32 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			this.pool = pool;
 		}
 
+		private BlockPropertyEntries(BlockPropertyPool pool, Dictionary<IBlockStateProperty, object> entries) {
+			this.pool = pool;
+			this.entries = entries;
+		}
+
 		public T Get<T>(BlockProperty<T> property) {
-			if (!entries.ContainsKey(property)) {
-				return (T)GetZeroValue(property);
-			}
+			if (!entries.ContainsKey(property)) return (T)GetZeroValue(property);
 			return (T)entries[property];
 		}
 
 		public BlockPropertyEntries With<T>(BlockProperty<T> property, T value) {
-			entries[property] = value;
-			return this;
+			Dictionary<IBlockStateProperty, object> newEntries = new(entries) {
+				[property] = value
+			};
+			return new BlockPropertyEntries(pool, newEntries);
+		}
+
+		public BlockPropertyEntries With<T>(string property, T value) {
+			return With(pool.Get<T>(property), value);
 		}
 
 		private object GetZeroValue(IBlockStateProperty prop) {
 			var type = prop.valueType;
-			return type.IsValueType ? Activator.CreateInstance(type)! : null!;
+			return type.IsValueType
+				? Activator.CreateInstance(type)
+				: null;
 		}
 
 		public override bool Equals(object obj) {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,14 +13,13 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			this.block = block;
 		}
 
-		public BlockState Register(BlockPropertyEntries properties) {
-			var state = new BlockState(block, properties);
-			registered.Add(state);
-			return state;
+		public BlockState AddWithProperties(BlockPropertyEntries properties) {
+			BlockState state = new(block, properties);
+			return Add(state);
 		}
 
-		public BlockState Register(BlockState state) {
-			registered.Add(state);
+		public BlockState Add(BlockState state) {
+			if (!registered.Contains(state)) registered.Add(state);
 			return state;
 		}
 
