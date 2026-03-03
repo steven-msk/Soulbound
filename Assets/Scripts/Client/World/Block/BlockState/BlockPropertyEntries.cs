@@ -6,44 +6,36 @@ using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
 	public sealed class BlockPropertyEntries {
-		private readonly Dictionary<IBlockStateProperty, object> entries = new();
-		private readonly BlockPropertyPool pool;
+		// note that invalid property states are possible for this configuration
+		private readonly Dictionary<string, object> entries = new();
 
-		public BlockPropertyEntries(BlockPropertyPool pool) {
-			this.pool = pool;
-		}
+		public BlockPropertyEntries() { }
 
-		private BlockPropertyEntries(BlockPropertyPool pool, Dictionary<IBlockStateProperty, object> entries) {
-			this.pool = pool;
+		private BlockPropertyEntries(Dictionary<string, object> entries) {
 			this.entries = entries;
 		}
 
-		public T Get<T>(BlockProperty<T> property) {
-			if (!entries.ContainsKey(property)) return (T)GetZeroValue(property);
-			return (T)entries[property];
-		}
-
-		public BlockPropertyEntries With<T>(BlockProperty<T> property, T value) {
-			Dictionary<IBlockStateProperty, object> newEntries = new(entries) {
+		public BlockPropertyEntries With<T>(string property, T value) {
+			Dictionary<string, object> newEntries = new(entries) {
 				[property] = value
 			};
-			return new BlockPropertyEntries(pool, newEntries);
+			return new BlockPropertyEntries(newEntries);
 		}
 
-		public BlockPropertyEntries With<T>(string property, T value) {
-			return With(pool.Get<T>(property), value);
-		}
 
-		private object GetZeroValue(IBlockStateProperty prop) {
-			var type = prop.valueType;
-			return type.IsValueType
-				? Activator.CreateInstance(type)
-				: null;
+		public T Get<T>(string property) => (T)entries[property];
+
+		public bool TryGet<T>(string property, out T value) {
+			if (entries.TryGetValue(property, out object boxed)) {
+				value = (T)boxed;
+				return true;
+			}
+			value = default;
+			return false;
 		}
 
 		public override bool Equals(object obj) {
 			return obj is BlockPropertyEntries other
-				&& other.pool == this.pool
 				&& other.entries.SequenceEqual(this.entries);
 		}
 
@@ -52,13 +44,13 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		}
 
 		public override int GetHashCode() {
-			return HashCode.Combine(entries, pool);
+			return HashCode.Combine(entries);
 		}
 
 		public IDictionary<string, object> GetSorted() {
 			return entries
-				.OrderBy(kvp => kvp.Key.name)
-				.ToDictionary(kvp => kvp.Key.name, kvp => kvp.Value);
+				.OrderBy(kvp => kvp.Key)
+				.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 		}
 	}
 }

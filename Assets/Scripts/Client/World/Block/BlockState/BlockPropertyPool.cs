@@ -31,7 +31,6 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			return pool.GetHashCode();
 		}
 
-		public BlockPropertyEntries CreateEntries() => new(this);
 
 		public override string ToString() {
 			return string.Join(',', pool.Keys);

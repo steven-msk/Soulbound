@@ -20,7 +20,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			stateHash = StateHasher.ComputeHash(block, properties);
 		}
 
-		public T Get<T>(BlockProperty<T> property) => properties.Get<T>(property);
+		public T Get<T>(string property) => properties.Get<T>(property);
 
 		public override bool Equals(object obj) {
 			return obj is BlockState other

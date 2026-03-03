@@ -21,7 +21,6 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 
 		public abstract AssetKey tileKey { get; init; }
 
-		private readonly BlockPropertyPool propertyPool = new();
 
 		public BlockState defaultState { get; private set; } = null!;
 		public virtual bool hasTileEntity { get; protected set; } = false;
@@ -40,18 +39,14 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			this.id = id;
 			this.hashedID = HashHelper.StableHash(id);
 
-			RegisterProperties(propertyPool);
-			BlockPropertyEntries propertyEntries = propertyPool.CreateEntries();
+			BlockPropertyEntries properties = new();
 			BlockStateRegisterer stateRegisterer = new(this);
 
-			defaultState = CreateDefaultState(stateRegisterer, propertyEntries);
-			CreateStates(stateRegisterer, propertyEntries);
+			defaultState = CreateDefaultState(stateRegisterer, properties);
+			CreateStates(stateRegisterer, properties);
 
 			stateRegisterer.Add(defaultState);
 			stateRegisterer.PostAll();
-		}
-
-		protected virtual void RegisterProperties(BlockPropertyPool pool) {
 		}
 
 		protected virtual BlockState CreateDefaultState(BlockStateRegisterer registerer, BlockPropertyEntries propertyEntries) {

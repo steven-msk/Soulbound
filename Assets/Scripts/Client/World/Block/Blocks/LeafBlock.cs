@@ -29,11 +29,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		}
 
 		protected override BlockState CreateDefaultState(BlockStateRegisterer registerer, BlockPropertyEntries propertyEntries) {
-			return registerer.AddWithProperties(propertyEntries.With(persistent, true));
-		}
-
-		protected override void RegisterProperties(BlockPropertyPool pool) {
-			persistent = pool.Register<bool>("persistent");
+			return registerer.AddWithProperties(propertyEntries.With("persistent", true));
 		}
 	}
 }
