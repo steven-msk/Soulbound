@@ -21,6 +21,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public static readonly ToggleBlock toggleBlock = new();
 		public static readonly NeighborReactiveBlock neighborReactiveBlock = new();
 		public static readonly TickingBlock tickingBlock = new();
+		public static readonly PulsateTickingBlock pulsateTickingBlock = new();
 
 		[Obsolete]
 		static Blocks() {
