@@ -1,5 +1,6 @@
 using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Common;
+using SoulboundBackend.Core.AssetManagement;
 using SoulboundBackend.Core.Resource;
 using System.Resources;
 using UnityEngine;
@@ -22,9 +23,7 @@ namespace SoulboundBackend.Client.World {
 
 		public void RenderView(Vector2 pivot) {
 			Vector2Int currentPivot = Vector2Int.FloorToInt(pivot);
-			if (this.lastPivot == currentPivot) {
-				return;
-			}
+			if (this.lastPivot == currentPivot) return;
 
 			var lastView = ToRect(lastPivot);
 			this.lastPivot = currentPivot;
@@ -49,8 +48,6 @@ namespace SoulboundBackend.Client.World {
 				TileEntity? tileEntity = level.TileEntityAt(blockPos);
 
 				RenderBlock(blockState, tileEntity, blockPos, tilemap);
-
-				//blockState?.block.Render(blockState, tileEntity, blockPos, tilemap);
 			}
 
 		}
@@ -58,17 +55,16 @@ namespace SoulboundBackend.Client.World {
 		public void RenderBlock(BlockPos blockPos, BlockState? blockState) {
 			if (IsInRenderView(blockPos)) {
 				RenderBlock(blockState, level.TileEntityAt(blockPos), blockPos, tilemap);
-
-				//blockState?.block.Render(blockState, level.TileEntityAt(blockPos), blockPos, tilemap);
 			}
 		}
 
 		[PROTOTYPICAL]
 		private void RenderBlock(BlockState? state, TileEntity? tileEntity, BlockPos pos, Tilemap tilemap) {
-			
-			var tile = state?.block != Blocks.air
-				? Core.Resource.AssetManager.Resolve<TileBase>((state?.block ?? Blocks.air).tileKey)
-				: null!;
+			state ??= Blocks.air.defaultState;
+			AssetKey tileKey = state.block.GetRenderTileKey(state);
+			TileBase? tile = tileKey != null
+				? AssetManager.Resolve<TileBase>(tileKey)
+				: null;
 
 			tilemap.SetTile((Vector3Int)pos, tile);
 			tileEntity?.Render(state, tilemap);

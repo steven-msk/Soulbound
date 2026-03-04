@@ -15,11 +15,8 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 
 		public LeafBlock() : base("leaves") { }
 		public override string name { get; init; } = "Leaves";
-		//public override TileBase tileReference { get; init; } = ResourceManager.Get<TileBase, ResourceGroups.Tiles>("leaves");
 		public override BlockItem itemReference { get; init; } = Items.leavesBlock;
 		public override BreakRequirement breakRequirement { get; init; } = new BreakRequirement(0, ToolType.All, 10);
-		public override AssetKey tileKey { get; init; } = new("leaves");
-		// protected
 
 		public override IEnumerable<ItemStack> GetDrops(BlockState blockState, BreakSource source) {
 			if (source is not PlayerToolBreakSource) {
@@ -27,6 +24,8 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			}
 			yield return new(Items.leavesBlock, 1);
 		}
+
+		public override AssetKey GetRenderTileKey(BlockState blockState) => new("leaves");
 
 		protected override BlockState CreateDefaultState(BlockStateRegisterer registerer, BlockPropertyEntries propertyEntries) {
 			return registerer.AddWithProperties(propertyEntries.With("persistent", true));

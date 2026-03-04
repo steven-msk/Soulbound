@@ -13,13 +13,12 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		}
 
 		public override string name { get; init; } = "Air";
-		//public override TileBase tileReference { get; init; } = null;
 		public override BlockItem itemReference { get; init; } = null;
-		public override AssetKey tileKey { get; init; }
-		//protected
 
 		public override IEnumerable<ItemStack> GetDrops(BlockState blockState, BreakSource source) {
 			yield break;
 		}
+
+		public override AssetKey GetRenderTileKey(BlockState blockState) => null;
 	}
 }

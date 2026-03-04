@@ -12,22 +12,23 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		//public override TileBase tileReference { get; init; }
 		public override BlockItem itemReference { get; init; }
 		public override BreakRequirement? breakRequirement { get; init; }
-		public override AssetKey tileKey { get; init; }
+		private readonly AssetKey tileKey;
 		// proteted
 
 		public GenericBlock(
 				string id,
 				string name,
-				//TileBase tileReference,
 				AssetKey tileKey,
 				BlockItem itemReference,
 				BreakRequirement? breakRequirement
-			//) : base(id, name, tileReference, itemReference, breakRequirement) {
-			) : base(id, name, tileKey, itemReference, breakRequirement) {
+			) : base(id, name, itemReference, breakRequirement) {
+			this.tileKey = tileKey;
 		}
 
 		public override IEnumerable<ItemStack> GetDrops(BlockState blockState, BreakSource source) {
 			yield return new(itemReference, 1);
 		}
+
+		public override AssetKey GetRenderTileKey(BlockState blockState) => tileKey;
 	}
 }

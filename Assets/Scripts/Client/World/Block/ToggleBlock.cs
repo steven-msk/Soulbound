@@ -13,15 +13,20 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public BlockState off { get; private set; }
 		public override string name { get; init; } = "Toggle Block";
 		public override BlockItem itemReference { get; init; } = null;
-		public override AssetKey tileKey { get; init; } = new("WhiteSquareTile");
 
 		public ToggleBlock() : base("toggleBlock") { }
 
+		public override AssetKey GetRenderTileKey(BlockState blockState) {
+			bool isOn = blockState.Get<bool>("on");
+			return isOn
+				? new AssetKey("ToggleOnTile")
+				: new AssetKey("ToggleOffTile");
+		}
 
 		public void OnInteract(Level level, BlockPos blockPos, BlockState blockState) {
 			bool isOn = blockState.Get<bool>("on");
 			level.SetBlockState(blockPos, isOn ? off : on);
-			Logger.LogInfo("block at {} is now {}", blockPos, isOn ? "on" : "off");
+			Logger.LogInfo("block at {} is now {}", blockPos, isOn ? "off" : "on");
 		}
 
 		protected override BlockState CreateDefaultState(BlockStateRegisterer registerer, BlockPropertyEntries propertyEntries) {

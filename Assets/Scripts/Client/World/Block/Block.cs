@@ -19,17 +19,14 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		[Obsolete] public abstract BlockItem? itemReference { get; init; }
 		public virtual BreakRequirement? breakRequirement { get; init; } = null;
 
-		public abstract AssetKey tileKey { get; init; }
-
 
 		public BlockState defaultState { get; private set; } = null!;
 		public virtual bool hasTileEntity { get; protected set; } = false;
 
 		protected Block(string id) => this.ConstructNonGeneric(id);
 
-		protected Block(string id, string name, AssetKey tileKey, BlockItem itemReference, BreakRequirement? breakRequirement) {
+		protected Block(string id, string name, BlockItem itemReference, BreakRequirement? breakRequirement) {
 			this.name = name;
-			this.tileKey = tileKey;
 			this.itemReference = itemReference;
 			this.breakRequirement = breakRequirement;
 			this.ConstructNonGeneric(id);
@@ -48,6 +45,8 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			stateRegisterer.Add(defaultState);
 			stateRegisterer.PostAll();
 		}
+
+		public abstract AssetKey GetRenderTileKey(BlockState blockState);
 
 		protected virtual BlockState CreateDefaultState(BlockStateRegisterer registerer, BlockPropertyEntries propertyEntries) {
 			return registerer.AddWithProperties(propertyEntries);
