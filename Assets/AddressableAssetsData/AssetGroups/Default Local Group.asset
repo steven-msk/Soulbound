@@ -189,6 +189,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8724c1264053d504fafbab8150f117a6
+    m_Address: ToggleOffTile
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 8b9103ed92586f24792eb9384634e736
     m_Address: debugVisuals
     m_ReadOnly: 0

@@ -186,7 +186,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 			}
 		}
 
-		public BlockState? BlockStateAt(ChunkBlockPos chunkPos) {
+		public BlockState? GetBlockState(ChunkBlockPos chunkPos) {
 			if (!Level.IsInBounds(chunkPos.ToBlock())) return null;
 
 			int stateID = blockStateIDs[chunkPos.x][WorldYToIndex(chunkPos.y)];

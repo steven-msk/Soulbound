@@ -208,11 +208,26 @@ namespace SoulboundBackend.Client.World {
 				?? throw new InvalidOperationException("Block pos not valid: " + blockPos);
 			chunk.SetBlockState(blockPos.ToChunkPos(), blockState);
 			levelManager.RenderRequest(blockPos, blockState);
+			NotifyNeighboringStates(blockPos);
+		}
+
+		private void NotifyNeighboringStates(BlockPos blockPos) {
+			foreach (var neighborPos in blockPos.GetCardinalNeighbors()) {
+				WorldChunk? chunk = ChunkAt(blockPos);
+				if (chunk == null) return;
+
+				BlockState? blockState = GetBlockState(neighborPos);
+				Block block = blockState?.block ?? Blocks.air;
+
+				if (block is INeighborUpdateHandler neighborUpdateHandler) {
+					neighborUpdateHandler.OnNeighborChanged(this, neighborPos, blockPos);
+				}
+			}
 		}
 
 		[PROTOTYPICAL]
 		public void InteractBlock(BlockPos blockPos) {
-			// provisory
+			// provisory for toggle block
 
 			BlockState? blockState = GetBlockState(blockPos);
 			Block block = blockState?.block ?? Blocks.air;
@@ -227,21 +242,21 @@ namespace SoulboundBackend.Client.World {
 		public void SetBlock(BlockPos blockPos, BlockState? blockState) {
 			WorldChunk? chunk = this.ChunkAt(blockPos);
 			blockState ??= Blocks.air.defaultState;
-			BlockState? oldState = chunk?.BlockStateAt(blockPos.ToChunkPos()) ?? null;
+			BlockState? oldState = chunk?.GetBlockState(blockPos.ToChunkPos()) ?? null;
 			if (oldState == blockState) {
 				return;
 			}
 
 			chunk?.SetBlock(blockPos.ToChunkPos(), blockState);
 			levelManager.RenderRequest(blockPos, blockState);
-			blockPos.ForEachAdjacent((direction, neighborPos) => {
+			foreach (var neighborPos in blockPos.GetCardinalNeighbors()) {
 				BlockState? neighborBlockState = GetBlockState(neighborPos);
 
 				// as of the BlockState refactor, block logic shouldnt live in BlockState
 				//neighborBlockState?.OnNeighborStateChanged(neighborPos, blockPos, oldState, blockState);
 
 				gridContext.tilemap.RefreshTile((Vector3Int)neighborPos);
-			});
+			}
 		}
 
 		public void SetBlock(ChunkBlockPos chunkBlockPos, BlockState? blockState) {
@@ -319,7 +334,7 @@ namespace SoulboundBackend.Client.World {
 
 		public BlockState? GetBlockState(BlockPos blockPos) {
 			WorldChunk? chunk = ChunkAt(blockPos);
-			return chunk?.BlockStateAt(blockPos.ToChunkPos());
+			return chunk?.GetBlockState(blockPos.ToChunkPos());
 		}
 
 		public TileEntity? TileEntityAt(BlockPos blockPos) {

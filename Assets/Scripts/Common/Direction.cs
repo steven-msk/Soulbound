@@ -1,5 +1,7 @@
-﻿using SoulboundBackend.Client.World;
+using SoulboundBackend.Client.World;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SoulboundBackend.Common {
@@ -66,10 +68,9 @@ namespace SoulboundBackend.Common {
 
 		public static Direction FromVector((int x, int y) vector) => FromVector(vector.x, vector.y);
 
-		public static void ForEachAdjacent(this BlockPos pos, Action<Direction, BlockPos> neighborAction) {
+		public static IEnumerable<BlockPos> GetCardinalNeighbors(this BlockPos pos) {
 			foreach (Direction direction in Enum.GetValues(typeof(Direction))) {
-				BlockPos neighborPos = pos + direction.AsVector();
-				neighborAction.Invoke(direction, neighborPos);
+				yield return pos + direction.AsVector();
 			}
 		}
 
