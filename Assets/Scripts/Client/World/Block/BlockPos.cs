@@ -15,7 +15,7 @@ namespace SoulboundBackend.Client.World {
 
         public override readonly string ToString() => $"bx:{x}, by:{y}";
 
-        public readonly ChunkBlockPos ToChunk() {
+        public readonly ChunkBlockPos ToChunkPos() {
             int cx = Level.ToChunkX(x);
             int chunkX = Level.ChunkXAt(x);
             return new ChunkBlockPos(cx, this.y, chunkX);

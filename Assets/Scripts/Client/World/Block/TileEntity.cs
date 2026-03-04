@@ -4,24 +4,12 @@ using UnityEngine.Tilemaps;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
 	public abstract class TileEntity {
-		public WorldChunk chunk { get; private set; }
-		public BlockPos blockPos { get; private set; }
-		protected readonly Dictionary<string, object> data = new();
+		protected readonly Level level;
+		public readonly BlockPos blockPos;
 
-		public TileEntity(WorldChunk chunk, BlockPos blockPos) {
-			this.chunk = chunk;
+		public TileEntity(Level level, BlockPos blockPos) {
+			this.level = level;
 			this.blockPos = blockPos;
-		}
-
-		protected T Get<T>(string key, T defaultValue = default) {
-			if (data.TryGetValue(key, out var value)) {
-				return (T)value;
-			}
-			return defaultValue;
-		}
-
-		protected void Set<T>(string key, T value) {
-			data[key] = value;
 		}
 
 		public virtual void Render(BlockState blockState, Tilemap tilemap) { }

@@ -1,4 +1,6 @@
 using Assets.Scripts.Client.World.Biome;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Client.World.Generation;
 using SoulboundBackend.Core;
@@ -6,9 +8,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Reflection;
 using UnityEngine;
+
 
 #nullable enable
 
@@ -22,7 +24,8 @@ namespace SoulboundBackend.Client.World.Chunk {
 		public const float UNDERGROUND_HEIGHT_RANGE = 20f;
 
 		private readonly int[][] blockStateIDs = new int[Level.CHUNK_LENGTH][];
-		private readonly TileEntity?[][] tileEntities = new TileEntity[Level.CHUNK_LENGTH][];
+		// needs better storage - this kills performance as of right now
+		[Obsolete] private readonly TileEntity?[][] tileEntities = new TileEntity[Level.CHUNK_LENGTH][];
 		private readonly TileEntityTickManager tickManager = new();
 		private readonly int cx;
 		public int xpos => cx;
@@ -142,10 +145,30 @@ namespace SoulboundBackend.Client.World.Chunk {
 			outlineRenderer.HideOutline(this);
 		}
 
+
+		public void SetBlockState(ChunkBlockPos chunkPos, BlockState? blockState) {
+			blockState ??= Blocks.air.defaultState;
+			Block block = blockState.block;
+			int yIndex = WorldYToIndex(chunkPos.y);
+			blockStateIDs[chunkPos.x][yIndex] = blockState.stateID;
+
+			if (block.hasTileEntity) {
+				BlockPos blockPos = new(ChunkXToWorldX(cx), IndexToWorldY(yIndex));
+				TileEntity? tileEntity = block.GetTileEntity(this, blockPos);
+
+				if (tileEntities[chunkPos.x][yIndex] != null) {
+					tickManager.RemoveTileEntity(tileEntity);
+				}
+
+				tileEntities[chunkPos.x][yIndex] = tileEntity;
+				tickManager.AddTileEntity(tileEntity);
+			}
+		}
+
+
 		public void SetBlock(ChunkBlockPos chunkPos, BlockState blockState) {
 			this.SetBlock(chunkPos.x, WorldYToIndex(chunkPos.y), blockState);
 		}
-
 		public void SetBlock(int cx, int yIndex, BlockState blockState) {
 			Block block = blockState.block;
 			blockStateIDs[cx][yIndex] = blockState.stateID;

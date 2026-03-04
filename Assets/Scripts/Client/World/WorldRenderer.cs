@@ -45,7 +45,7 @@ namespace SoulboundBackend.Client.World {
 					continue;
 				}
 
-				BlockState? blockState = level.BlockStateAt(blockPos);
+				BlockState? blockState = level.GetBlockState(blockPos);
 				TileEntity? tileEntity = level.TileEntityAt(blockPos);
 
 				RenderBlock(blockState, tileEntity, blockPos, tilemap);

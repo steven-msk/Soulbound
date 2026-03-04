@@ -202,18 +202,40 @@ namespace SoulboundBackend.Client.World {
 			}
 		}
 
+		[PROTOTYPICAL]
+		public void SetBlockState(BlockPos blockPos, BlockState? blockState) {
+			WorldChunk chunk = ChunkAt(blockPos)
+				?? throw new InvalidOperationException("Block pos not valid: " + blockPos);
+			chunk.SetBlockState(blockPos.ToChunkPos(), blockState);
+			levelManager.RenderRequest(blockPos, blockState);
+		}
+
+		[PROTOTYPICAL]
+		public void InteractBlock(BlockPos blockPos) {
+			// provisory
+
+			BlockState? blockState = GetBlockState(blockPos);
+			Block block = blockState?.block ?? Blocks.air;
+
+			if (block is IBlockInteractionHandler interactionHandler) {
+				interactionHandler.OnInteract(this, blockPos, blockState);
+			}
+		}
+
+
+
 		public void SetBlock(BlockPos blockPos, BlockState? blockState) {
 			WorldChunk? chunk = this.ChunkAt(blockPos);
 			blockState ??= Blocks.air.defaultState;
-			BlockState? oldState = chunk?.BlockStateAt(blockPos.ToChunk()) ?? null;
+			BlockState? oldState = chunk?.BlockStateAt(blockPos.ToChunkPos()) ?? null;
 			if (oldState == blockState) {
 				return;
 			}
 
-			chunk?.SetBlock(blockPos.ToChunk(), blockState);
+			chunk?.SetBlock(blockPos.ToChunkPos(), blockState);
 			levelManager.RenderRequest(blockPos, blockState);
 			blockPos.ForEachAdjacent((direction, neighborPos) => {
-				BlockState? neighborBlockState = BlockStateAt(neighborPos);
+				BlockState? neighborBlockState = GetBlockState(neighborPos);
 
 				// as of the BlockState refactor, block logic shouldnt live in BlockState
 				//neighborBlockState?.OnNeighborStateChanged(neighborPos, blockPos, oldState, blockState);
@@ -237,12 +259,12 @@ namespace SoulboundBackend.Client.World {
 		}
 
 		public void PlaceBlock(BlockPos blockPos, BlockState newState) {
-			BlockState? oldState = BlockStateAt(blockPos);
+			BlockState? oldState = GetBlockState(blockPos);
 			SetBlock(blockPos, newState);
 			BroadcastBlockEvent(new BlockChangeInfo(
 				blockPos,
 				oldState,
-				BlockStateAt(blockPos),
+				GetBlockState(blockPos),
 				this,
 				BlockEventType.Placed,
 				Optional<BreakSource>.Empty()
@@ -255,7 +277,7 @@ namespace SoulboundBackend.Client.World {
 		}
 
 		public void BreakBlock(BlockPos blockPos, BreakSource source) {
-			BlockState? brokenBlock = BlockStateAt(blockPos);
+			BlockState? brokenBlock = GetBlockState(blockPos);
 			SetBlock(blockPos, null);
 
 			// as of the BlockState refactor, block logic shouldnt live in BlockState
@@ -295,24 +317,24 @@ namespace SoulboundBackend.Client.World {
 			}
 		}
 
-		public BlockState? BlockStateAt(BlockPos blockPos) {
+		public BlockState? GetBlockState(BlockPos blockPos) {
 			WorldChunk? chunk = ChunkAt(blockPos);
-			return chunk?.BlockStateAt(blockPos.ToChunk());
+			return chunk?.BlockStateAt(blockPos.ToChunkPos());
 		}
 
 		public TileEntity? TileEntityAt(BlockPos blockPos) {
 			WorldChunk? chunk = ChunkAt(blockPos);
-			return chunk?.TileEntityAt(blockPos.ToChunk());
+			return chunk?.TileEntityAt(blockPos.ToChunkPos());
 		}
 
 		public Block? BlockAt(BlockPos blockPos) {
-			BlockState? blockState = BlockStateAt(blockPos);
+			BlockState? blockState = GetBlockState(blockPos);
 			return blockState?.block;
 		}
 
 		public BlockState? GetAdjacentBlockState(BlockPos startPos, Direction direction) {
 			BlockPos adjacentPos = startPos + direction.AsVector();
-			return BlockStateAt(adjacentPos);
+			return GetBlockState(adjacentPos);
 		}
 
 		public static int ChunkXAt(Vector2 worldPos) => ChunkXAt(worldPos.x);

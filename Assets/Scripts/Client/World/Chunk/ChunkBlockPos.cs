@@ -24,7 +24,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 		}
 
 		public static ChunkBlockPos FromWorld(Vector2 worldPos) {
-			return ((BlockPos)worldPos).ToChunk();
+			return ((BlockPos)worldPos).ToChunkPos();
 		}
 
 		public static bool operator !=(ChunkBlockPos pos1, ChunkBlockPos pos2) => !(pos1 == pos2);

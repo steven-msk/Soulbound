@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using SoulboundBackend.Client.World;
 using SoulboundBackend.Core;
 using System;
@@ -121,7 +121,7 @@ public class BlockPosTests {
 		var blockPos = new BlockPos(-40, 15);
 		int chunkX = -2;
 
-		var chunkPos = blockPos.ToChunk();
+		var chunkPos = blockPos.ToChunkPos();
 
 		int expectedLocalX = blockPos.x - chunkX * Level.CHUNK_LENGTH;
 		Assert.AreEqual(expectedLocalX, chunkPos.x);

@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Client.World;
+using SoulboundBackend.Client.World;
 using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Client.World.Chunk;
 using SoulboundBackend.Client.World.Generation;
@@ -61,7 +61,7 @@ namespace Assets.Scripts.Client.World.Biome {
 			int height = UnityEngine.Random.Range(trunkHeightMin, trunkHeightMax + 1);
 
 			for (int y = 0; y < height; y++) {
-				chunk.SetBlock(trunkPos.ToChunk(), Blocks.wood.defaultState);
+				chunk.SetBlock(trunkPos.ToChunkPos(), Blocks.wood.defaultState);
 				trunkPos.y++;
 			}
 
@@ -83,7 +83,7 @@ namespace Assets.Scripts.Client.World.Biome {
 				List<int> xs = kvp.Value;
 				for (int x = xs.Min(); x <= xs.Max(); x++) {
 					BlockPos blockPos = new(x, y);
-					level.SetBlockOrPend(blockPos.ToChunk(), Blocks.leaves.defaultState);
+					level.SetBlockOrPend(blockPos.ToChunkPos(), Blocks.leaves.defaultState);
 				}
 			}
 

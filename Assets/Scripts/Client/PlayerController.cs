@@ -244,10 +244,16 @@ namespace SoulboundBackend.Client {
 
 		private void OnLeftClick() {
 			RequestMainHandItemUse(ItemUseTrigger.LeftClick);
+
+			// provisory
+			level.SetBlockState((BlockPos)mouseWorldPos, Blocks.toggleBlock.on);
 		}
 
 		private void OnRightClick() {
 			RequestMainHandItemUse(ItemUseTrigger.RightClick);
+
+			// provisory
+			level.InteractBlock((BlockPos)mouseWorldPos);
 		}
 
 		// POTENTIAL FEATUREIMPL: add Reach int stat

@@ -32,5 +32,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			state = default;
 			return false;
 		}
+
+		public static IEnumerable<BlockState> AllStates() => states;
 	}
 }
