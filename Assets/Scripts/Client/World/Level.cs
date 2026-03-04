@@ -208,6 +208,14 @@ namespace SoulboundBackend.Client.World {
 				?? throw new InvalidOperationException("Block pos not valid: " + blockPos);
 			chunk.SetBlockState(blockPos.ToChunkPos(), blockState);
 			levelManager.RenderRequest(blockPos, blockState);
+
+			// neighbor updates arent dispatched for a block that has just been placed
+			// hence we manually update the block through another neighbor update
+			// this isnt entirely correct, but for the sake of simplicity it worksS
+			if (blockState?.block is INeighborUpdateHandler neighborUpdateHandler) {
+				neighborUpdateHandler.OnNeighborChanged(this, blockPos, blockPos);
+			}
+
 			NotifyNeighboringStates(blockPos);
 		}
 
