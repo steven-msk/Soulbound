@@ -244,9 +244,6 @@ namespace SoulboundBackend.Client {
 
 		private void OnLeftClick() {
 			RequestMainHandItemUse(ItemUseTrigger.LeftClick);
-
-			// provisory
-			level.SetBlockState((BlockPos)mouseWorldPos, Blocks.toggleBlock.on);
 		}
 
 		private void OnRightClick() {

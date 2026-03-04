@@ -9,5 +9,6 @@ namespace SoulboundBackend.Client {
 	public interface IRuntimeExecutionServices {
 		IPlayerExecutionService Player { get; }
 		IEntityExecutionService Entity { get; }
+		ILevelExecutionService Level { get; }
 	}
 }

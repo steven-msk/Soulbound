@@ -29,10 +29,16 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			return this;
 		}
 
-		public CommandBuilder Then(CommandBuilder builder) {
-			CommandNode child = builder.GetRootNode();
-			cursor.AddChild(child);
-			return new CommandBuilder(child, root);
+		public CommandBuilder ThenRootOf(CommandBuilder builder) {
+			CommandNode root = builder.GetRootNode();
+			cursor.AddChild(root);
+			return new CommandBuilder(root, this.root);
+		}
+
+		public CommandBuilder ThenCursorOf(CommandBuilder builder) {
+			CommandNode cursor = builder.GetCursorNode();
+			this.cursor.AddChild(builder.GetRootNode());
+			return new CommandBuilder(cursor, root);
 		}
 
 		public CommandNode GetCursorNode() => cursor;

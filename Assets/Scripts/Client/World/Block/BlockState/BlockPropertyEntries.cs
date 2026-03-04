@@ -22,7 +22,6 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			return new BlockPropertyEntries(newEntries);
 		}
 
-
 		public T Get<T>(string property) => (T)entries[property];
 
 		public bool TryGet<T>(string property, out T value) {

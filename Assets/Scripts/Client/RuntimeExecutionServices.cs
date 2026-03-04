@@ -14,6 +14,7 @@ namespace SoulboundBackend.Client {
 	public class RuntimeExecutionServices : IRuntimeExecutionServices {
 		private IPlayerExecutionService? _player;
 		private IEntityExecutionService? _entity;
+		private ILevelExecutionService? _level;
 
 		public IPlayerExecutionService Player {
 			get => _player ?? throw new InvalidOperationException("Runtime player execution only available within world session");
@@ -21,14 +22,20 @@ namespace SoulboundBackend.Client {
 		public IEntityExecutionService Entity {
 			get => _entity ?? throw new InvalidOperationException("Runtime entity execution only available within world session");
 		}
+		public ILevelExecutionService Level {
+			get => _level ?? throw new InvalidOperationException("Runtime level execution only available within world session");
+		}
 
 		public void SetWorldSesstionState(WorldSession session) {
 			_player = new RuntimePlayerExecutionService(session.player);
 			_entity = new RuntimeEntityExecutionService(session.entityManager);
+			_level = session.level;
 		}
 
 		public void ExitWorldSessionState() {
 			_player = null;
+			_entity = null;
+			_level = null;
 		}
 	}
 

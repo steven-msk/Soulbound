@@ -41,15 +41,16 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 
 			defaultState = CreateDefaultState(stateRegisterer, properties);
 			CreateStates(stateRegisterer, properties);
-
 			stateRegisterer.Add(defaultState);
+
 			stateRegisterer.PostAll();
+			BlockRegistry.Register(this);
 		}
 
 		public abstract AssetKey GetRenderTileKey(BlockState blockState);
 
-		protected virtual BlockState CreateDefaultState(BlockStateRegisterer registerer, BlockPropertyEntries propertyEntries) {
-			return registerer.AddWithProperties(propertyEntries);
+		protected virtual BlockState CreateDefaultState(BlockStateRegisterer registerer, BlockPropertyEntries properties) {
+			return registerer.AddWithProperties(properties);
 		}
 
 		protected virtual void CreateStates(BlockStateRegisterer registerer, BlockPropertyEntries properties) {

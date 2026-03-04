@@ -23,8 +23,11 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			return state;
 		}
 
-		public Dictionary<int, BlockState> PostAll() {
-			return registered.ToDictionary(s => BlockStateRegistry.Register(s), s => s);
+		public void PostAll() {
+			foreach (var blockState in registered) {
+				BlockStateRegistry.Register(blockState);
+			}
 		}
+
 	}
 }

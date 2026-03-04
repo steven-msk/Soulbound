@@ -20,7 +20,7 @@ using UnityEngine.Tilemaps;
 namespace SoulboundBackend.Client.World {
 	public delegate void OnChunkGenerated(ChunkGenData genData);
 
-	public sealed class Level : ITickable {
+	public sealed class Level : ITickable, ILevelExecutionService {
 		public const int CHUNK_LENGTH = 32;
 		public const int WORLD_HEIGHT = 1024;
 		public const int RENDER_DISTANCE = 8;

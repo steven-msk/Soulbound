@@ -8,5 +8,9 @@ namespace SoulboundBackend.Core.Debug.Commands {
 	public struct Coordinate {
 		public bool isRelative;
 		public float value;
+
+		public readonly float GetPos(float relative) {
+			return isRelative ? relative + value : value;
+		}
 	}
 }

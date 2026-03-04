@@ -23,7 +23,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 
 		// Follows Brigadier parsing architecture
 		public void SubmitCommand(string input) {
-			if (!Validate(input)) return;
+			Validate(input);
 
 			string[] tokens = Tokenize(input);
 			CommandArguments args = new();
@@ -88,7 +88,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			}
 		}
 
-		private bool Validate(string input) {
+		private void Validate(string input) {
 			string[] tokens = Tokenize(input);
 			Logger.LogInfo(string.Join(',', tokens.Select(s => string.IsNullOrEmpty(s) ? "EMPTY" : s)));
 
@@ -120,10 +120,8 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			}
 
 			if (!currentNode.IsTerminalNode()) {
-				throw new UnknownOrIncompleteCommandException(tokens, tokens.Length - 1);
+				throw new CommandNodeNotTerminalException(tokens, tokens.Length - 1);
 			}
-
-			return true;
 		}
 
 		private string[] Tokenize(string input) {
@@ -211,6 +209,13 @@ namespace SoulboundBackend.Core.Debug.Commands {
 	public sealed class UnexpectedCommandException : Exception {
 		public UnexpectedCommandException(string[] tokens, int tokenIndex)
 			: base($"Unexpected command exception at token '{tokens[tokenIndex]}': " +
+				  $"{CommandFormat.FormatWhere(tokens, tokenIndex)}") {
+		}
+	}
+
+	public sealed class CommandNodeNotTerminalException : Exception {
+		public CommandNodeNotTerminalException(string[] tokens, int tokenIndex)
+			: base($"Node not terminal: {tokens[tokenIndex]}: " +
 				  $"{CommandFormat.FormatWhere(tokens, tokenIndex)}") {
 		}
 	}

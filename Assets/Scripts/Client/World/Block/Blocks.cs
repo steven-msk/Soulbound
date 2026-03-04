@@ -18,7 +18,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public static readonly Block wood = new GenericBlock("wood", "Wood", new AssetKey("wood"), Items.woodBlock, new BreakRequirement(0, ToolType.None, 10));
 		public static readonly Block leaves = new LeafBlock();
 
-		public static readonly ToggleBlock toggleBlock = new ToggleBlock();
+		public static readonly ToggleBlock toggleBlock = new();
 
 		[Obsolete]
 		static Blocks() {
