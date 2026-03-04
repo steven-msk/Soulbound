@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: TickBlockOff
   m_EditorClassIdentifier: 
   m_Sprite: {fileID: 21300000, guid: f42f60f14add7b34d9c8c3502f443036, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.0057404665, g: 0.4056604, b: 0.23505236, a: 1}
   m_Transform:
     e00: 1
     e01: 0

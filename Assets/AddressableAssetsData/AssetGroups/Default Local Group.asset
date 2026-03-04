@@ -273,6 +273,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d863461c1411eba4b9a64e81eecfc1ca
+    m_Address: TickBlockOff
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d9a6f678a69fb4649833517db99e2361
     m_Address: ReactActiveTile
     m_ReadOnly: 0
@@ -317,6 +323,12 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: f049a0888a77da944982503d46f573a6
     m_Address: ResumeButton
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f10baa890a05f7d4e95dd8f94a06742f
+    m_Address: TickBlockOn
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload
