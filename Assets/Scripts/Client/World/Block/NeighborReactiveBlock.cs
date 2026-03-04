@@ -24,7 +24,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 				: new AssetKey("ReactInactiveTile");
 		}
 
-		protected override BlockState CreateDefaultState(BlockStateRegisterer registerer, BlockPropertyEntries properties) {
+		protected override BlockState GetDefaultState(BlockStateRegisterer registerer, BlockPropertyEntries properties) {
 			return registerer.AddWithProperties(properties.With("on", false));
 		}
 

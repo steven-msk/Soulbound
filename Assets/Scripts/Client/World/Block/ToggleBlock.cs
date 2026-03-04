@@ -29,7 +29,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			Logger.LogInfo("block at {} is now {}", blockPos, isOn ? "off" : "on");
 		}
 
-		protected override BlockState CreateDefaultState(BlockStateRegisterer registerer, BlockPropertyEntries properties) {
+		protected override BlockState GetDefaultState(BlockStateRegisterer registerer, BlockPropertyEntries properties) {
 			return registerer.AddWithProperties(properties.With("on", true));
 		}
 

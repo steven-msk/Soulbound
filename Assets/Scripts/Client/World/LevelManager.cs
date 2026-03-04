@@ -25,7 +25,7 @@ namespace SoulboundBackend.Core {
 		public const float tickRate = 0.02f;        // 50 tps
 		private float tickStartTime;
 		private float frameStartTime;
-		public bool paused { get; private set; }
+		public bool paused { get; private set; } = false;
 		private bool sessionRunning;
 
 		private DiContainer container = null!;
@@ -46,6 +46,8 @@ namespace SoulboundBackend.Core {
 				new ColorJsonConverter()
 			},
 		};
+
+		private static readonly RectInt simulationRect = new(-128, -76, 256, 156);
 
 		[Inject]
 		public void Construct(DiContainer container) {
@@ -75,9 +77,8 @@ namespace SoulboundBackend.Core {
 			level = new Level(gridContext, seed);
 			entityManager = new EntityManager(level, new GameObject("Updater").AddComponent<UpdateManager>());
 
-			RectInt renderRect = new(-128, -76, 256, 156);      // simulation distance
 			//RectInt renderRect = new(-32, -19, 65, 39);		// default view distance
-			worldRenderer = new WorldRenderer(renderRect, level, gridContext.tilemap);
+			worldRenderer = new WorldRenderer(simulationRect, level, gridContext.tilemap);
 
 			level.BootstrapWorld(dump, this);
 			entityManager.Deserialize(dump?.serializedEntities ?? new());
@@ -125,7 +126,7 @@ namespace SoulboundBackend.Core {
 				if (!paused) {
 					StartFrame();
 
-					worldRenderer.RenderView(player?.position ?? level.GetWorldSpawnPoint());
+					worldRenderer.RenderView(player != null ? player.position : level.GetWorldSpawnPoint());
 
 					EndFrame();
 				}
@@ -148,12 +149,21 @@ namespace SoulboundBackend.Core {
 					StartTick();
 					// do things
 					entityManager.Tick();
-					level.Tick();
+					level.Tick(GetRelativeSimulationRect(player != null ? player.position : level.GetWorldSpawnPoint()));
 					// TODO: implement proper ticking system
 					EndTick();
 				}
 				yield return tickDelay;
 			}
+		}
+
+		private RectInt GetRelativeSimulationRect(Vector2 pivot) {
+			return new(
+				Mathf.FloorToInt(pivot.x) + simulationRect.x,
+				Mathf.FloorToInt(pivot.y) + simulationRect.y,
+				simulationRect.width,
+				simulationRect.height
+			);
 		}
 
 		public void StopSession() {

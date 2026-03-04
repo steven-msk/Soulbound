@@ -27,7 +27,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 
 		public override AssetKey GetRenderTileKey(BlockState blockState) => new("leaves");
 
-		protected override BlockState CreateDefaultState(BlockStateRegisterer registerer, BlockPropertyEntries propertyEntries) {
+		protected override BlockState GetDefaultState(BlockStateRegisterer registerer, BlockPropertyEntries propertyEntries) {
 			return registerer.AddWithProperties(propertyEntries.With("persistent", true));
 		}
 	}

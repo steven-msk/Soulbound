@@ -123,6 +123,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 714a27d172464694bbafd67b6569eace
+    m_Address: ReactInactiveTile
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 72d2e449dee691d4c9fdaac2e75735fb
     m_Address: Rectangular Palette
     m_ReadOnly: 0
@@ -263,6 +269,12 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d7098cf14f04d554ba27ce5128185a3d
     m_Address: leaves_icon
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d9a6f678a69fb4649833517db99e2361
+    m_Address: ReactActiveTile
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload

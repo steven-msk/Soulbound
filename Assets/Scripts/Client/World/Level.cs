@@ -1,26 +1,21 @@
 using Assets.Scripts.Client.World.Biome;
 using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Client.World.Chunk;
-using SoulboundBackend.Client.World.EntitySystem;
 using SoulboundBackend.Client.World.Generation;
-using SoulboundBackend.Client.World.Structure;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core;
-using SoulboundBackend.Core.Noise;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
 #nullable enable
 
 namespace SoulboundBackend.Client.World {
 	public delegate void OnChunkGenerated(ChunkGenData genData);
 
-	public sealed class Level : ITickable, ILevelExecutionService {
+	public sealed class Level : ILevelExecutionService {
 		public const int CHUNK_LENGTH = 32;
 		public const int WORLD_HEIGHT = 1024;
 		public const int RENDER_DISTANCE = 8;
@@ -44,6 +39,8 @@ namespace SoulboundBackend.Client.World {
 		private readonly BiomeMap biomeMap;
 		private readonly Heightmap heightmap;
 		private readonly Cavemap cavemap;
+
+		private readonly HashSet<BlockPos> tickingBlocks = new();
 
 		public Level(LevelGridContext gridContext, int seed) {
 			this.gridContext = gridContext;
@@ -81,7 +78,16 @@ namespace SoulboundBackend.Client.World {
 			isWorldLoaded = true;
 		}
 
-		public void Tick() {
+		public void Tick(RectInt simulationRect) {
+			foreach (var pos in tickingBlocks.ToArray()) {
+				if (!simulationRect.Contains((Vector2Int)pos)) continue;
+
+				BlockState? blockState = GetBlockState(pos);
+				if (blockState == null) continue;
+
+				((ITickingBlock)blockState.block).Tick(this, pos, blockState);
+			}
+
 			foreach (var chunk in loadedChunks.Values) {
 				chunk.Tick();
 			}
@@ -204,14 +210,21 @@ namespace SoulboundBackend.Client.World {
 
 		[PROTOTYPICAL]
 		public void SetBlockState(BlockPos blockPos, BlockState? blockState) {
+			BlockState? oldState = GetBlockState(blockPos);
 			WorldChunk chunk = ChunkAt(blockPos)
 				?? throw new InvalidOperationException("Block pos not valid: " + blockPos);
+
 			chunk.SetBlockState(blockPos.ToChunkPos(), blockState);
 			levelManager.RenderRequest(blockPos, blockState);
 
+			bool oldTicks = oldState?.block is ITickingBlock;
+			bool newTicks = blockState?.block is ITickingBlock;
+			if (oldTicks) tickingBlocks.Remove(blockPos);
+			if (newTicks) tickingBlocks.Add(blockPos);
+
 			// neighbor updates arent dispatched for a block that has just been placed
 			// hence we manually update the block through another neighbor update
-			// this isnt entirely correct, but for the sake of simplicity it worksS
+			// this isnt entirely correct, but for the sake of simplicity it works
 			if (blockState?.block is INeighborUpdateHandler neighborUpdateHandler) {
 				neighborUpdateHandler.OnNeighborChanged(this, blockPos, blockPos);
 			}
