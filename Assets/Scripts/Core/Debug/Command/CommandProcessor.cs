@@ -90,8 +90,6 @@ namespace SoulboundBackend.Core.Debug.Commands {
 
 		private void Validate(string input) {
 			string[] tokens = Tokenize(input);
-			Logger.LogInfo(string.Join(',', tokens.Select(s => string.IsNullOrEmpty(s) ? "EMPTY" : s)));
-
 			CommandArguments args = new();
 			CommandParsingContext ctx = new(args, dataProvider, execServices);
 

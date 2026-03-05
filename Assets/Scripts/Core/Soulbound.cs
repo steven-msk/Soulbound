@@ -35,7 +35,6 @@ namespace SoulboundBackend.Core {
 		private readonly RuntimeDataProvider runtimeDataProvider = new();
 		private readonly RuntimeExecutionServices runtimeExecutionServices = new();
 		private readonly CommandProcessor commandProcessor;
-		private readonly GlobalCommandProvider globalCommandProvider = new();
 		private readonly WorldSessionCommands worldSessionCommands = new();
 		private readonly DebugMetricsService debugMetricsService;
 		private readonly SoulboundDebug debug;
@@ -60,8 +59,6 @@ namespace SoulboundBackend.Core {
 			settings = new Settings();
 
 			commandProcessor = new CommandProcessor(runtimeDataProvider, runtimeExecutionServices);
-			commandProcessor.RegisterProvider(globalCommandProvider);
-
 			debugMetricsService = new DebugMetricsService();
 			debug = new SoulboundDebug(UnityEngine.Debug.unityLogger, debugMetricsService, commandProcessor);
 			inputManager.PushContext(debug);

@@ -42,6 +42,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 				inputField.ActivateInputField();
 				inputField.text = "/";
 				SetCaretToEnd();
+				if (history.Any()) currentInputMode = CommandInputMode.CyclingHistory;
 			});
 		}
 
