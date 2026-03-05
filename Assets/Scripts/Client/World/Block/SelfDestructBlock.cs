@@ -10,10 +10,10 @@ using System.Threading.Tasks;
 namespace SoulboundBackend.Client.World.BlockSystem {
 	[PROTOTYPICAL]
 	public sealed class SelfDestructBlock : Block {
-		public override string name { get; init; } = "Self Destruct Ticking Block";
+		public override string name { get; init; } = "Self Destruct Block";
 		public override BlockItem itemReference { get; init; }
 
-		public SelfDestructBlock() : base("selfDestructTickingBlock") {
+		public SelfDestructBlock() : base("selfDestructBlock") {
 		}
 
 		public override AssetKey GetRenderTileKey(BlockState blockState) => new("RedSquareTile");
