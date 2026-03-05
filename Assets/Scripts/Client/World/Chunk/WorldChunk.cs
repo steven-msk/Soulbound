@@ -24,17 +24,17 @@ namespace SoulboundBackend.Client.World.Chunk {
 		public const float UNDERGROUND_HEIGHT_RANGE = 20f;
 
 		private readonly int[][] blockStateIDs = new int[Level.CHUNK_LENGTH][];
-		// needs better storage - this kills performance as of right now
-		[Obsolete] private readonly TileEntity?[][] tileEntities = new TileEntity[Level.CHUNK_LENGTH][];
+		private readonly Dictionary<BlockPos, TileEntity> tileEntities = new();
 		private readonly TileEntityTickManager tickManager = new();
+		private readonly Level level;
 		private readonly int cx;
 		public int xpos => cx;
 
-		public WorldChunk(int cx) { 
+		public WorldChunk(Level level, int cx) { 
+			this.level = level;
 			this.cx = cx;
 
 			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
-				tileEntities[x] = new TileEntity?[Level.WORLD_HEIGHT];
 				blockStateIDs[x] = new int[Level.WORLD_HEIGHT];
 			}
 		}
@@ -146,44 +146,58 @@ namespace SoulboundBackend.Client.World.Chunk {
 		}
 
 
-		public void SetBlockState(ChunkBlockPos chunkPos, BlockState? blockState) {
+		public void SetBlockState(BlockPos blockPos, BlockState? blockState) {
 			blockState ??= Blocks.air.defaultState;
-			Block block = blockState.block;
+
+			ChunkBlockPos chunkPos = blockPos.ToChunkPos();
 			int yIndex = WorldYToIndex(chunkPos.y);
+			BlockState oldState = GetBlockState(chunkPos) ?? Blocks.air.defaultState;
+			Block oldBlock = oldState.block;
+			Block newBlock = blockState.block;
+
 			blockStateIDs[chunkPos.x][yIndex] = blockState.stateID;
 
-			if (block.hasTileEntity) {
-				BlockPos blockPos = new(ChunkXToWorldX(cx), IndexToWorldY(yIndex));
-				TileEntity? tileEntity = block.GetTileEntity(this, blockPos);
+			// tile entities only change when blocks differ in type
+			// however some blocks may handle tile entity persistence differently
+			// when oldBlock and newBlock are the same
+			if (newBlock != oldBlock) {
+				bool oldHasTileEntity = oldBlock.HasTileEntity(level, blockPos, oldState);
+				bool newHasTileEntity = blockState.block.HasTileEntity(level, blockPos, blockState);
 
-				if (tileEntities[chunkPos.x][yIndex] != null) {
-					tickManager.RemoveTileEntity(tileEntity);
+				if (oldHasTileEntity && tileEntities.ContainsKey(blockPos)) {
+					tickManager.RemoveTileEntity(tileEntities[blockPos]);
+					tileEntities.Remove(blockPos);
 				}
-
-				tileEntities[chunkPos.x][yIndex] = tileEntity;
-				tickManager.AddTileEntity(tileEntity);
+				if (newHasTileEntity) {
+					TileEntity tileEntity = newBlock.GetTileEntity(level, blockPos);
+					tileEntities[blockPos] = tileEntity;
+					tickManager.AddTileEntity(tileEntity);
+				}
 			}
 		}
 
 
+		[Obsolete]
 		public void SetBlock(ChunkBlockPos chunkPos, BlockState blockState) {
 			this.SetBlock(chunkPos.x, WorldYToIndex(chunkPos.y), blockState);
 		}
+		[Obsolete]
 		public void SetBlock(int cx, int yIndex, BlockState blockState) {
-			Block block = blockState.block;
-			blockStateIDs[cx][yIndex] = blockState.stateID;
+			SetBlockState(new BlockPos(ChunkXToWorldX(cx), IndexToWorldY(yIndex)), blockState);
+			//Block block = blockState.block;
+			//blockStateIDs[cx][yIndex] = blockState.stateID;
 
-			if (block.hasTileEntity) {
-				BlockPos blockPos = new(ChunkXToWorldX(cx), IndexToWorldY(yIndex));
-				TileEntity? tileEntity = block.GetTileEntity(this, blockPos);
-				
-				if (tileEntities[cx][yIndex] != null) {
-					tickManager.RemoveTileEntity(tileEntity);
-				}
-				
-				tileEntities[cx][yIndex] = tileEntity;
-				tickManager.AddTileEntity(tileEntity);
-			}
+			//if (block.hasTileEntity) {
+			//	BlockPos blockPos = new(ChunkXToWorldX(cx), IndexToWorldY(yIndex));
+			//	TileEntity? tileEntity = block.GetTileEntity(level, blockPos);
+
+			//	if (tileEntities[cx][yIndex] != null) {
+			//		tickManager.RemoveTileEntity(tileEntity);
+			//	}
+
+			//	tileEntities[cx][yIndex] = tileEntity;
+			//	tickManager.AddTileEntity(tileEntity);
+			//}
 		}
 
 		public BlockState? GetBlockState(ChunkBlockPos chunkPos) {
@@ -193,8 +207,10 @@ namespace SoulboundBackend.Client.World.Chunk {
 			return BlockStateRegistry.Get(stateID);
 		}
 
-		public TileEntity? TileEntityAt(ChunkBlockPos chunkPos) {
-			return tileEntities[chunkPos.x][WorldYToIndex(chunkPos.y)];
+		public TileEntity? TileEntityAt(BlockPos blockPos) {
+			return tileEntities.TryGetValue(blockPos, out TileEntity tileEntity)
+				? tileEntity
+				: null;
 		}
 
 		private void ParseDeserialized(int[][] blockStateIDs) {
@@ -235,7 +251,7 @@ namespace SoulboundBackend.Client.World.Chunk {
 					}
 				}
 
-				WorldChunk chunk = new(xpos);
+				WorldChunk chunk = new(null, xpos);
 				chunk.ParseDeserialized(stateHashes);
 				return chunk;
 			}

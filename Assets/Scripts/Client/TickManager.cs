@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Core;
+using SoulboundBackend.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +18,7 @@ namespace SoulboundBackend.Client {
 		}
 
 		public virtual void Tick() {
-			foreach (var tickable in tickables) {
+			foreach (var tickable in tickables.ToArray()) {
 				tickable.Tick();
 			}
 		}

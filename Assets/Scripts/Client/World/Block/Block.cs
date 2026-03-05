@@ -56,7 +56,8 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		protected virtual void CreateStates(BlockStateRegisterer registerer, BlockPropertyEntries properties) {
 		}
 
-		public virtual TileEntity? GetTileEntity(WorldChunk chunk, BlockPos blockPos) {
+		public virtual bool HasTileEntity(Level level, BlockPos blockPos, BlockState blockState) => false;
+		public virtual TileEntity? GetTileEntity(Level level, BlockPos blockPos) {
 			return null;
 		}
 

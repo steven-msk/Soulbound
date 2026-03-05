@@ -143,7 +143,7 @@ namespace SoulboundBackend.Client.World {
 		// for now all implementations regarding this are obsolete
 		
 		private WorldChunk GenerateNewChunk(int chunkX) {
-			WorldChunk chunk = new(chunkX);
+			WorldChunk chunk = new(this, chunkX);
 			generatedChunks[chunkX] = chunk;
 
 			chunk.Generate(biomeMap, heightmap, cavemap, out ChunkGenData genData);
@@ -214,7 +214,7 @@ namespace SoulboundBackend.Client.World {
 			WorldChunk chunk = ChunkAt(blockPos)
 				?? throw new InvalidOperationException("Block pos not valid: " + blockPos);
 
-			chunk.SetBlockState(blockPos.ToChunkPos(), blockState);
+			chunk.SetBlockState(blockPos, blockState);
 			levelManager.RenderRequest(blockPos, blockState);
 
 			bool oldTicks = oldState?.block is ITickingBlock;
@@ -360,7 +360,7 @@ namespace SoulboundBackend.Client.World {
 
 		public TileEntity? TileEntityAt(BlockPos blockPos) {
 			WorldChunk? chunk = ChunkAt(blockPos);
-			return chunk?.TileEntityAt(blockPos.ToChunkPos());
+			return chunk?.TileEntityAt(blockPos);
 		}
 
 		public Block? BlockAt(BlockPos blockPos) {

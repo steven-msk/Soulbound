@@ -1,4 +1,5 @@
 using SoulboundBackend.Client.World.Chunk;
+using System;
 using System.Collections.Generic;
 using UnityEngine.Tilemaps;
 
@@ -12,6 +13,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			this.blockPos = blockPos;
 		}
 
+		[Obsolete]
 		public virtual void Render(BlockState blockState, Tilemap tilemap) { }
 	}
 }
