@@ -23,6 +23,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public static readonly TickingBlock tickingBlock = new();
 		public static readonly PulsateTickingBlock pulsateTickingBlock = new();
 		public static readonly SelfDestructTickingBlock selfDestructTickingBlock = new();
+		public static readonly MovingTickingBlock movingTickingBlock = new();
 
 		[Obsolete]
 		static Blocks() {
