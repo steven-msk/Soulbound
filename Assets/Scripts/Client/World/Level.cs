@@ -43,6 +43,7 @@ namespace SoulboundBackend.Client.World {
 
 		private readonly HashSet<BlockPos> tickingBlocks = new();
 		private readonly Dictionary<Guid, Entity> entities = new();
+		private readonly List<ITickingEntity> tickingEntities = new();
 
 		public Level(LevelGridContext gridContext, int seed) {
 			this.gridContext = gridContext;
@@ -88,6 +89,12 @@ namespace SoulboundBackend.Client.World {
 				if (blockState == null) continue;
 
 				((ITickingBlock)blockState.block).Tick(this, pos, blockState);
+			}
+
+			foreach (var entity in tickingEntities.ToArray()) {
+				if (simulationRect.Contains(Vector2Int.FloorToInt(((Entity)entity).GetPos()))) {
+					entity.Tick();
+				}
 			}
 
 			foreach (var chunk in loadedChunks.Values) {
@@ -238,6 +245,10 @@ namespace SoulboundBackend.Client.World {
 			Guid guid = Guid.NewGuid();
 			entity.AttachToLevel(this, guid);
 			entities[guid] = entity;
+
+			if (entity is ITickingEntity ticking) {
+				tickingEntities.Add(ticking);
+			}
 		}
 
 		public void RemoveEntity(Entity entity) {
@@ -245,6 +256,10 @@ namespace SoulboundBackend.Client.World {
 
 			entities.Remove(entity.guid);
 			entity.Dispose();
+
+			if  (entity is ITickingEntity ticking) {
+				tickingEntities.Remove(ticking);
+			}
 		}
 
 		private void NotifyNeighboringStates(BlockPos blockPos) {

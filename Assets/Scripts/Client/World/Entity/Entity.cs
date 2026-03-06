@@ -10,7 +10,7 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 		public Guid guid { get; private set; }
 		protected Level level;
 		protected IEntityTransform transform;
-		protected Vector2 pos;
+		private Vector2 pos;
 		protected readonly Vector2 initialPos;
 
 		protected Entity(Vector2 initialPos) {

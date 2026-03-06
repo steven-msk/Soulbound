@@ -246,8 +246,10 @@ namespace SoulboundBackend.Client {
 			RequestMainHandItemUse(ItemUseTrigger.LeftClick);
 
 			// provisory
-			StaticEntity staticEntity = new(position);
-			level.AddEntity(staticEntity);
+			//StaticEntity staticEntity = new(position);
+			//level.AddEntity(staticEntity);
+			MovingEntity movingEntity = new(position);
+			level.AddEntity(movingEntity);
 		}
 
 		private void OnRightClick() {
