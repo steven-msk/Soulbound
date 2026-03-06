@@ -19,7 +19,7 @@ using Level = SoulboundBackend.Client.World.Level;
 using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
 namespace SoulboundBackend.Client {
-	public class PlayerController : Entity, IAttackPerformer, IItemConsumer, IUpdatable, IEntitySpawnable<PlayerSpawnData>, IInputContext {
+	public class PlayerController : Entity_OLD, IAttackPerformer, IItemConsumer, IUpdatable, IEntitySpawnable<PlayerSpawnData>, IInputContext {
 		public override Type scriptType => typeof(PlayerController);
 		public override EntityDescriptor descriptor => EntityDescriptorRegistry.ByType<PlayerController>();
 		private Inventory inventory;

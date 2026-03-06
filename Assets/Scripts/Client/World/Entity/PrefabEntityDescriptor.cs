@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Core.AssetManagement;
+using SoulboundBackend.Core.AssetManagement;
 using SoulboundBackend.Core.Resource;
 using System;
 using System.Collections.Generic;
@@ -22,10 +22,10 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 			: this(id, name, assetKey, AssetManager.Resolve<GameObject>) {
 		}
 
-		public override Entity CreateInstance() {
+		public override Entity_OLD CreateInstance() {
 			var prefab = resourceSelector(assetKey);
 			var obj = GameObject.Instantiate(prefab);
-			return obj.GetComponent<Entity>();
+			return obj.GetComponent<Entity_OLD>();
 		}
 	}
 }

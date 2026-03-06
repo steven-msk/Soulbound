@@ -57,7 +57,7 @@ namespace SoulboundBackend.Client {
 		}
 
 		public void SetPos(Guid entityGuid, Vector2 pos) {
-			if (entityManager.GetEntityByID(entityGuid, out Entity entity)) {
+			if (entityManager.GetEntityByID(entityGuid, out Entity_OLD entity)) {
 				entity.position = pos;
 			}
 		}

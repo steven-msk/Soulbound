@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,6 +14,6 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 			this.ID = id;
 		}
 
-		public abstract Entity CreateInstance();
+		public abstract Entity_OLD CreateInstance();
 	}
 }

@@ -1,6 +1,7 @@
 using Assets.Scripts.Client.World.Biome;
 using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Client.World.Chunk;
+using SoulboundBackend.Client.World.EntitySystem;
 using SoulboundBackend.Client.World.Generation;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core;
@@ -41,6 +42,7 @@ namespace SoulboundBackend.Client.World {
 		private readonly Cavemap cavemap;
 
 		private readonly HashSet<BlockPos> tickingBlocks = new();
+		private readonly Dictionary<Guid, Entity> entities = new();
 
 		public Level(LevelGridContext gridContext, int seed) {
 			this.gridContext = gridContext;
@@ -230,6 +232,12 @@ namespace SoulboundBackend.Client.World {
 			}
 
 			NotifyNeighboringStates(blockPos);
+		}
+
+		public void AddEntity(Entity entity) {
+			Guid guid = Guid.NewGuid();
+			entity.AttachToLevel(this, guid);
+			entities[guid] = entity;
 		}
 
 		private void NotifyNeighboringStates(BlockPos blockPos) {

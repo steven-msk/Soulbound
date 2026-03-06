@@ -1,16 +1,16 @@
-﻿using System;
+using System;
 using UnityEngine;
 
 namespace SoulboundBackend.Client.World.EntitySystem.AI {
 	public class MoveToPositionState : IMutableAIState<MoveToPositionState> {
 		public MutableStateProperty<Vector2> target { get; }
-		private Entity entity;
+		private Entity_OLD entity;
 		private float speed;
 
 		public bool isInterruptable { get; protected set; }
 		public bool isFinished { get; protected set; }
 
-		public MoveToPositionState(Entity entity, Vector2 target, float speed, bool isInterruptable = false) {
+		public MoveToPositionState(Entity_OLD entity, Vector2 target, float speed, bool isInterruptable = false) {
 			this.target = new MutableStateProperty<Vector2>(target);
 			this.entity = entity;
 			this.isInterruptable = isInterruptable;

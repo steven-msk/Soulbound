@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Client.World.EntitySystem;
+using SoulboundBackend.Client.World.EntitySystem;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,14 +9,14 @@ using UnityEngine;
 
 namespace SoulboundBackend.Client.Combat {
 	public class AttackContext {
-		public readonly Entity performer;
+		public readonly Entity_OLD performer;
 		public readonly AttackSource source;
 		public AttackAnimationHandler animationHandler;
 		public AttackEventDispatcher eventDispatcher;
 		public object metadata { get; init; }
 		private List<GameObject> tempObjects = new();
 
-		public AttackContext(Entity performer, AttackSource source) {
+		public AttackContext(Entity_OLD performer, AttackSource source) {
 			this.performer = performer;
 			this.source = source;
 		}

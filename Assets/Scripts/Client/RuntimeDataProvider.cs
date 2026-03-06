@@ -57,13 +57,13 @@ namespace SoulboundBackend.Client {
 
 		public IEnumerable<IEntityView> GetAllEntities() {
 			foreach (var guid in entityManager.GetAllEntities()) {
-				entityManager.GetEntityByID(guid, out Entity entity);
+				entityManager.GetEntityByID(guid, out Entity_OLD entity);
 				yield return new EntityView(entity);
 			}
 		}
 
 		public bool TryGetEntity(Guid guid, out IEntityView entity) {
-			bool found = entityManager.GetEntityByID(guid, out Entity result);
+			bool found = entityManager.GetEntityByID(guid, out Entity_OLD result);
 			entity = found
 				? new EntityView(result)
 				: default;
@@ -71,9 +71,9 @@ namespace SoulboundBackend.Client {
 		}
 
 		private readonly struct EntityView : IEntityView {
-			private readonly Entity entity;
+			private readonly Entity_OLD entity;
 
-			public EntityView(Entity entity) {
+			public EntityView(Entity_OLD entity) {
 				this.entity = entity;
 			}
 

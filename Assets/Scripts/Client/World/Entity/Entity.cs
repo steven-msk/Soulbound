@@ -1,61 +1,37 @@
-﻿using SoulboundBackend.Client.World.Chunk;
-using SoulboundBackend.Client.World.EntitySystem.SpawnData;
-using SoulboundBackend.Core;
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SoulboundBackend.Client.World.EntitySystem {
-	public abstract class Entity : MonoBehaviour, ISerializable<SerializedEntity> {
-		public abstract EntityDescriptor descriptor { get; }
-		public EntityManager manager { get; private set; }
-		public abstract Type scriptType { get; }
-		public Guid id { get; private set; }
-		public Vector2 position { get => transform.position; set => transform.position = value; }
-		protected const float minSignificantFacingAngleDeg = 10f;
-		public virtual Facing facing {
-			get {
-				float z = transform.eulerAngles.z;
-				float absZ = Mathf.Abs(NormalizeAngle(z));
-				
-				if (absZ > minSignificantFacingAngleDeg) {
-					return Facing.FromAngle(absZ);
-				}
+	public abstract class Entity {
+		public Guid guid { get; private set; }
+		protected Level level;
+		protected IEntityTransform transform;
+		protected Vector2 pos;
+		protected readonly Vector2 initialPos;
 
-				float sx = transform.localScale.x;
-				return Facing.FromScale(Mathf.Sign(sx));
-			}
+		protected Entity(Vector2 initialPos) {
+			this.pos = this.initialPos = initialPos;
 		}
 
-		public void InitState(Guid id, EntityManager entityManager) {
-			this.id = id;
-			this.manager = entityManager;
+		public void AttachToLevel(Level level, Guid guid) {
+			this.guid = guid;
+			this.level = level;
+
+			transform = CreateTransform();
+			transform.Bind(this);
+			transform.SetPos(pos);
 		}
 
-		public virtual SerializedEntity Serialize() {
-			var properties = new SerializedEntityPropertyList();
-			foreach (var component in GetComponents<ISerializableComponent>()) {
-				component.Save(properties);
-			}
-			return new SerializedEntity(scriptType, id, descriptor.ID, position, properties);
-		}
+		protected abstract IEntityTransform CreateTransform();
 
-		public virtual void Deserialize(SerializedEntity serialized) {
-			this.id = serialized.id;
-			this.transform.position = serialized.lastPosition;
-			var properties = SerializedEntityPropertyList.From(serialized.properties);
-			foreach (var component in GetComponents<ISerializableComponent>()) {
-				component.Read(properties);
-			}
-		}
-
-		protected static float NormalizeAngle(float angle) {
-			angle %= 360;
-			if (angle > 180f) {
-				angle -= 360f;
-			}
-			return angle;
+		public Vector2 GetPos() => pos;
+		public void SetPos(Vector2 pos) {
+			this.pos = pos;
+			transform?.SetPos(pos);
 		}
 	}
 }

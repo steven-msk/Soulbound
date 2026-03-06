@@ -8,7 +8,7 @@ using System;
 using UnityEngine;
 
 namespace SoulboundBackend.Client.World.EntitySystem {
-	public class DroppedItem : Entity, IUpdatable, IChunkListener, IEntitySpawnable<DroppedItem.SpawnData> {
+	public class DroppedItem : Entity_OLD, IUpdatable, IChunkListener, IEntitySpawnable<DroppedItem.SpawnData> {
 		public const float defaultLifespanSeconds = 120f;           // TODO: decide on a dropped item lifespan duration
 		public override EntityDescriptor descriptor => EntityDescriptorRegistry.ByType<DroppedItem>();
 		public override Type scriptType => typeof(DroppedItem);

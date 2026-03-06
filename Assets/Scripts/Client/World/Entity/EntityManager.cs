@@ -12,7 +12,7 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 		private readonly List<IEntitySubsystem> subsystems = new();
 		private readonly EntityTickManager tickManager;
 		private readonly EntityChunkTracker chunkTracker;
-		private readonly Dictionary<Guid, Entity> all = new();
+		private readonly Dictionary<Guid, Entity_OLD> all = new();
 
 		public EntityManager(Level level, UpdateManager updater) {
 			this.tickManager = new EntityTickManager();
@@ -29,7 +29,7 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 				Guid id = entry.Key;
 
 				var descriptor = EntityDescriptorRegistry.ByID(serializedEntity.descriptorID);
-				Entity entity = descriptor.CreateInstance();
+				Entity_OLD entity = descriptor.CreateInstance();
 
 				entity.Deserialize(serializedEntity);
 				this.AddEntity(entity, id);
@@ -40,7 +40,7 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 			return all.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.Serialize());
 		}
 
-		public void AddEntity(Entity entity, Guid? id = null) {
+		public void AddEntity(Entity_OLD entity, Guid? id = null) {
 			Guid assigned = id ?? Guid.NewGuid();
 			entity.InitState(assigned, this);
 			all.Add(assigned, entity);
@@ -48,19 +48,19 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 			AddToSubsystems(entity);
 		}
 
-		public void Spawn(Entity entity) {
+		public void Spawn(Entity_OLD entity) {
 			Guid id = Guid.NewGuid();
 			this.AddEntity(entity, id);
 		}
 
-		public Entity Spawn(EntityDescriptor descriptor) {
+		public Entity_OLD Spawn(EntityDescriptor descriptor) {
 			var entity = descriptor.CreateInstance();
 			this.Spawn(entity);
 			return entity;
 		}
 
-		public Entity Spawn<TEntity, TData>(EntityDescriptor descriptor, TData spawnData)
-				where TEntity : Entity, IEntitySpawnable<TData>
+		public Entity_OLD Spawn<TEntity, TData>(EntityDescriptor descriptor, TData spawnData)
+				where TEntity : Entity_OLD, IEntitySpawnable<TData>
 				where TData : ISpawnData {
 			TEntity entity = (TEntity)descriptor.CreateInstance();
 			this.Spawn(entity, spawnData);
@@ -68,13 +68,13 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 		}
 
 		public void Spawn<TEntity, TData>(TEntity entity, TData spawnData)
-				where TEntity : Entity, IEntitySpawnable<TData> 
+				where TEntity : Entity_OLD, IEntitySpawnable<TData> 
 				where TData : ISpawnData {
 			entity.ApplySpawnData(spawnData);
 			this.Spawn(entity);
 		}
 
-		public T SpawnSerialized<T>(SerializedEntity serializedEntity) where T : Entity {
+		public T SpawnSerialized<T>(SerializedEntity serializedEntity) where T : Entity_OLD {
 			var descriptor = EntityDescriptorRegistry.ByID(serializedEntity.descriptorID);
 			var entity = descriptor.CreateInstance();
 
@@ -87,7 +87,7 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 		}
 
 		public TEntity SpawnSerialized<TEntity, TData>(SerializedEntity serializedEntity, TData spawnData)
-				where TEntity : Entity, IEntitySpawnable<TData>
+				where TEntity : Entity_OLD, IEntitySpawnable<TData>
 				where TData : ISpawnData {
 			var descriptor = EntityDescriptorRegistry.ByID(serializedEntity.descriptorID);
 			var entity = (TEntity)descriptor.CreateInstance();
@@ -101,7 +101,7 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 			return entity;
 		}
 
-		public void RemoveEntity(Entity entity) {
+		public void RemoveEntity(Entity_OLD entity) {
 			foreach (var subsystem in subsystems) {
 				subsystem.RemoveEntity(entity);
 			}
@@ -118,11 +118,11 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 			}
 		}
 
-		public bool GetEntityByID(Guid id, out Entity entity) {
+		public bool GetEntityByID(Guid id, out Entity_OLD entity) {
 			return all.TryGetValue(id, out entity);
 		}
 
-		private void AddToSubsystems(Entity entity) {
+		private void AddToSubsystems(Entity_OLD entity) {
 			foreach (var subsystem in subsystems) {
 				subsystem.AddEntity(entity);
 			}
