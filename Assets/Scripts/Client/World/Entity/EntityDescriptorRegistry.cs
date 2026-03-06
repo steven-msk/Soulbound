@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Common;
+using SoulboundBackend.Common;
 using SoulboundBackend.Core.AssetManagement;
 using SoulboundBackend.Core.Resource;
 using System;
@@ -10,19 +10,19 @@ using UnityEngine;
 
 namespace SoulboundBackend.Client.World.EntitySystem {
 	public static class EntityDescriptorRegistry {
-		static readonly Dictionary<string, EntityDescriptor> byId = new();
-		static readonly Dictionary<Type, EntityDescriptor> byType = new();
+		static readonly Dictionary<string, EntityDescriptor_OLD> byId = new();
+		static readonly Dictionary<Type, EntityDescriptor_OLD> byType = new();
 
-		private static readonly EntityDescriptor player = Register(
+		private static readonly EntityDescriptor_OLD player = Register(
 			new PrefabEntityDescriptor("entity.player", "Player", new AssetKey("player"), AssetManager.Resolve<GameObject>), 
 			typeof(PlayerController)
 		);
-		private static readonly EntityDescriptor droppedItem = Register(
+		private static readonly EntityDescriptor_OLD droppedItem = Register(
 			new PrefabEntityDescriptor("entity.droppedItem", nameof(DroppedItem), new AssetKey("droppedItem")),
 			typeof(DroppedItem)
 		);
 		
-		private static EntityDescriptor Register(EntityDescriptor descriptor, Type type = null) {
+		private static EntityDescriptor_OLD Register(EntityDescriptor_OLD descriptor, Type type = null) {
 			byId[descriptor.ID] = descriptor;
 			if (type != null) {
 				byType[type] = descriptor;
@@ -30,15 +30,15 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 			return descriptor;
 		}
 
-		public static EntityDescriptor ByID(string id) {
+		public static EntityDescriptor_OLD ByID(string id) {
 			return byId[id];
 		}
 
-		public static EntityDescriptor ByType(Type type) {
+		public static EntityDescriptor_OLD ByType(Type type) {
 			return byType[type];
 		}
 
-		public static EntityDescriptor ByType<T>() {
+		public static EntityDescriptor_OLD ByType<T>() {
 			return byType[typeof(T)];
 		}
 	}

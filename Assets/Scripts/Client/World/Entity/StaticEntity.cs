@@ -11,10 +11,16 @@ using UnityEngine;
 namespace SoulboundBackend.Client.World.EntitySystem {
 	[PROTOTYPICAL]
 	public sealed class StaticEntity : Entity {
-		private AssetKey spriteKey = new("WhiteSquare");
+		public static readonly EntityDescriptor DESCRIPTOR = EntityRegistry.Register(
+			new EntityDescriptor(
+				"staticEntity",
+				pos => new StaticEntity(pos)
+			)
+		);
+		private readonly AssetKey spriteKey = new("WhiteSquare");
 
 		public StaticEntity(Vector2 initialPos)
-			: base(initialPos) {
+			: base(DESCRIPTOR, initialPos) {
 		}
 
 		protected override IEntityTransform CreateTransform() {

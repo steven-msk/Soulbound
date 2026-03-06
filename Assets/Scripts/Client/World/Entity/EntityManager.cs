@@ -53,13 +53,13 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 			this.AddEntity(entity, id);
 		}
 
-		public Entity_OLD Spawn(EntityDescriptor descriptor) {
+		public Entity_OLD Spawn(EntityDescriptor_OLD descriptor) {
 			var entity = descriptor.CreateInstance();
 			this.Spawn(entity);
 			return entity;
 		}
 
-		public Entity_OLD Spawn<TEntity, TData>(EntityDescriptor descriptor, TData spawnData)
+		public Entity_OLD Spawn<TEntity, TData>(EntityDescriptor_OLD descriptor, TData spawnData)
 				where TEntity : Entity_OLD, IEntitySpawnable<TData>
 				where TData : ISpawnData {
 			TEntity entity = (TEntity)descriptor.CreateInstance();

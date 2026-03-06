@@ -3,17 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace SoulboundBackend.Client.World.EntitySystem {
-	public abstract class EntityDescriptor {
-		public string name { get; private set; }
-		public string ID { get; private set; }
+	public class EntityDescriptor {
+		public readonly string id;
+		private readonly Func<Vector2, Entity> factory;
 
-		public EntityDescriptor(string id, string name) {
-			this.name = name;
-			this.ID = id;
+		public EntityDescriptor(string id, Func<Vector2, Entity> factory) {
+			this.id = id;
+			this.factory = factory;
 		}
 
-		public abstract Entity_OLD CreateInstance();
+		public Entity Create(Vector2 pos) => factory(pos);
 	}
 }

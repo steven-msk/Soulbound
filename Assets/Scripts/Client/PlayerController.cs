@@ -21,7 +21,7 @@ using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 namespace SoulboundBackend.Client {
 	public class PlayerController : Entity_OLD, IAttackPerformer, IItemConsumer, IUpdatable, IEntitySpawnable<PlayerSpawnData>, IInputContext {
 		public override Type scriptType => typeof(PlayerController);
-		public override EntityDescriptor descriptor => EntityDescriptorRegistry.ByType<PlayerController>();
+		public override EntityDescriptor_OLD descriptor => EntityDescriptorRegistry.ByType<PlayerController>();
 		private Inventory inventory;
 		private Hotbar hotbar;
 		public Inventory GetInventory() => inventory;
@@ -244,12 +244,6 @@ namespace SoulboundBackend.Client {
 
 		private void OnLeftClick() {
 			RequestMainHandItemUse(ItemUseTrigger.LeftClick);
-
-			// provisory
-			//StaticEntity staticEntity = new(position);
-			//level.AddEntity(staticEntity);
-			MovingEntity movingEntity = new(position);
-			level.AddEntity(movingEntity);
 		}
 
 		private void OnRightClick() {

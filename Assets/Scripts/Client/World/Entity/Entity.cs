@@ -8,13 +8,15 @@ using UnityEngine;
 namespace SoulboundBackend.Client.World.EntitySystem {
 	public abstract class Entity : IDisposable {
 		public Guid guid { get; private set; }
+		public readonly EntityDescriptor descriptor;
 		protected Level level;
 		protected IEntityTransform transform;
 		private Vector2 pos;
 		protected readonly Vector2 initialPos;
 
-		protected Entity(Vector2 initialPos) {
+		protected Entity(EntityDescriptor descriptor, Vector2 initialPos) {
 			this.pos = this.initialPos = initialPos;
+			this.descriptor = descriptor;
 		}
 
 		public void AttachToLevel(Level level, Guid guid) {

@@ -11,10 +11,16 @@ using UnityEngine;
 namespace SoulboundBackend.Client.World.EntitySystem {
 	[PROTOTYPICAL]
 	public sealed class MovingEntity : Entity, ITickingEntity {
-		private AssetKey spriteKey = new("WhiteSquare");
+		public static readonly EntityDescriptor DESCRIPTOR = EntityRegistry.Register(
+			new EntityDescriptor(
+				"movingEntity",
+				pos => new MovingEntity(pos)
+			)
+		);
+		private readonly AssetKey spriteKey = new("WhiteSquare");
 
 		public MovingEntity(Vector2 initialPos)
-			: base(initialPos) {
+			: base(DESCRIPTOR, initialPos) {
 		}
 
 		public void Tick() {

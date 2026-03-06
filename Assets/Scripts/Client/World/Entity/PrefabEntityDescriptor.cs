@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SoulboundBackend.Client.World.EntitySystem {
-	public class PrefabEntityDescriptor : EntityDescriptor {
+	public class PrefabEntityDescriptor : EntityDescriptor_OLD {
 		private readonly AssetKey assetKey;
 		private Func<AssetKey, GameObject> resourceSelector;
 
