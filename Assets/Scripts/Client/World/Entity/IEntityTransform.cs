@@ -10,5 +10,6 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 		void Bind(Entity entity);
 		Vector2 GetPos();
 		void SetPos(Vector2 position);
+		void Destroy();
 	}
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SoulboundBackend.Client.World.EntitySystem {
-	public abstract class Entity {
+	public abstract class Entity : IDisposable {
 		public Guid guid { get; private set; }
 		protected Level level;
 		protected IEntityTransform transform;
@@ -32,6 +32,14 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 		public void SetPos(Vector2 pos) {
 			this.pos = pos;
 			transform?.SetPos(pos);
+		}
+
+		public void Dispose() {
+			OnDisposed();
+			transform?.Destroy();
+		}
+
+		protected virtual void OnDisposed() {
 		}
 	}
 }

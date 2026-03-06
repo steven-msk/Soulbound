@@ -240,6 +240,13 @@ namespace SoulboundBackend.Client.World {
 			entities[guid] = entity;
 		}
 
+		public void RemoveEntity(Entity entity) {
+			if (!entities.ContainsKey(entity.guid)) return;
+
+			entities.Remove(entity.guid);
+			entity.Dispose();
+		}
+
 		private void NotifyNeighboringStates(BlockPos blockPos) {
 			foreach (var neighborPos in blockPos.GetCardinalNeighbors()) {
 				WorldChunk? chunk = ChunkAt(blockPos);
