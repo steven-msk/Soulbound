@@ -28,7 +28,7 @@ namespace SoulboundBackend.Client {
 
 		public void SetWorldSesstionState(WorldSession session) {
 			_player = new RuntimePlayerExecutionService(session.player);
-			_entity = new RuntimeEntityExecutionService(session.entityManager);
+			_entity = new RuntimeEntityExecutionService(session.level);
 			_level = session.level;
 		}
 
@@ -50,15 +50,19 @@ namespace SoulboundBackend.Client {
 	}
 
 	public class RuntimeEntityExecutionService : IEntityExecutionService {
-		public readonly EntityManager entityManager;
+		public readonly IEntityManager entityManager;
 
-		public RuntimeEntityExecutionService(EntityManager entityManager) {
+		public RuntimeEntityExecutionService(IEntityManager entityManager) {
 			this.entityManager = entityManager;
 		}
 
+		public void AddEntity(Entity entity) {
+			entityManager.AddEntity(entity);
+		}
+
 		public void SetPos(Guid entityGuid, Vector2 pos) {
-			if (entityManager.GetEntityByID(entityGuid, out Entity_OLD entity)) {
-				entity.position = pos;
+			if (entityManager.TryGetEntity(entityGuid, out Entity entity)) {
+				entity.SetPos(pos);
 			}
 		}
 	}

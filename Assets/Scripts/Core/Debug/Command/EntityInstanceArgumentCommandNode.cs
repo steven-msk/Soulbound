@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 #nullable enable
 
 namespace SoulboundBackend.Core.Debug.Commands {
-	public class EntityArgumentCommandNode : ArgumentCommandNode<Guid> {
-		public EntityArgumentCommandNode(string label, CommandHandler? handler = null)
+	public class EntityInstanceArgumentCommandNode : ArgumentCommandNode<Guid> {
+		public EntityInstanceArgumentCommandNode(string label, CommandHandler? handler = null)
 			: base(label, new EntityParser(), handler) {
 		}
 

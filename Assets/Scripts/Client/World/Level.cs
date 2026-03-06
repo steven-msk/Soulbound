@@ -16,7 +16,7 @@ using UnityEngine;
 namespace SoulboundBackend.Client.World {
 	public delegate void OnChunkGenerated(ChunkGenData genData);
 
-	public sealed class Level : ILevelExecutionService {
+	public sealed class Level : ILevelExecutionService, IEntityManager {
 		public const int CHUNK_LENGTH = 32;
 		public const int WORLD_HEIGHT = 1024;
 		public const int RENDER_DISTANCE = 8;
@@ -54,6 +54,7 @@ namespace SoulboundBackend.Client.World {
 			this.biomeMap = new BiomeMap(new IBiome[] { biome1, biome2 });
 			this.heightmap = new Heightmap(TERRAIN_PLANE_Y);
 			this.cavemap = new Cavemap(seed);
+			System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(EntityType).TypeHandle);
 		}
 
 		// PLANNED REWORK: world rendering system
@@ -260,6 +261,10 @@ namespace SoulboundBackend.Client.World {
 			if  (entity is ITickingEntity ticking) {
 				tickingEntities.Remove(ticking);
 			}
+		}
+
+		public bool TryGetEntity(Guid guid, out Entity entity) {
+			return entities.TryGetValue(guid, out entity);
 		}
 
 		private void NotifyNeighboringStates(BlockPos blockPos) {

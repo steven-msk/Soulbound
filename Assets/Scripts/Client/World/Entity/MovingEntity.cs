@@ -1,5 +1,6 @@
 using SoulboundBackend.Common;
 using SoulboundBackend.Core.AssetManagement;
+using SoulboundBackend.Core.Debug.Logging;
 using SoulboundBackend.Core.Resource;
 using System;
 using System.Collections.Generic;
@@ -7,20 +8,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
 namespace SoulboundBackend.Client.World.EntitySystem {
 	[PROTOTYPICAL]
 	public sealed class MovingEntity : Entity, ITickingEntity {
-		public static readonly EntityDescriptor DESCRIPTOR = EntityRegistry.Register(
-			new EntityDescriptor(
-				"movingEntity",
-				pos => new MovingEntity(pos)
-			)
-		);
 		private readonly AssetKey spriteKey = new("WhiteSquare");
 
 		public MovingEntity(Vector2 initialPos)
-			: base(DESCRIPTOR, initialPos) {
+			: base(EntityType.MOVING_ENTITY, initialPos) {
 		}
 
 		public void Tick() {
@@ -35,5 +31,6 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 
 			return obj.GetComponent<StaticTransform>();
 		}
+
 	}
 }

@@ -1,6 +1,7 @@
 using Assets.Scripts.Core.Debug.Command;
 using SoulboundBackend.Client.World;
 using SoulboundBackend.Client.World.BlockSystem;
+using SoulboundBackend.Client.World.EntitySystem;
 using SoulboundBackend.Core.Debug.Logging;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
 namespace SoulboundBackend.Core.Debug.Commands {
 	public sealed class WorldSessionCommands : ICommandProvider {
-		private readonly CommandNode teleport;
+		private readonly CommandNode teleport = TeleportCommand();
 		private readonly CommandNode setblock = CommandBuilder.Literal("setblock")
 				.ThenCursorOf(Coords2D())
 				.Then(new BlockArgumentCommandNode("block"))
@@ -27,14 +28,12 @@ namespace SoulboundBackend.Core.Debug.Commands {
 					Logger.LogInfo("Set block {} at {}", block.id, blockPos);
 				})
 				.GetRootNode();
-
-		public WorldSessionCommands() {
-			teleport = TeleportCommand();
-		}
+		private readonly CommandNode spawn = SpawnCommand();
 
 		public IEnumerable<CommandNode> GetCommands() {
 			yield return teleport;
 			yield return setblock;
+			yield return spawn;
 		}
 
 		private static CommandBuilder Coords2D() {
@@ -42,7 +41,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 				.Then(new ArgumentCommandNode<Coordinate>("y", new CoordinateParser()));
 		}
 
-		private CommandNode TeleportCommand() {
+		private static CommandNode TeleportCommand() {
 			CommandBuilder coords = Coords2D()
 				.Executes(ctx => {
 					Guid targetGuid = ctx.Args.TryGet("target", out Guid guid)
@@ -67,9 +66,32 @@ namespace SoulboundBackend.Core.Debug.Commands {
 
 			CommandBuilder tp = CommandBuilder.Literal("tp");
 			tp.ThenRootOf(coords);
-			tp.Then(new EntityArgumentCommandNode("target"))
+			tp.Then(new EntityInstanceArgumentCommandNode("target"))
 				.ThenRootOf(coords);
 			return tp.GetRootNode();
+		}
+
+		private static CommandNode SpawnCommand() {
+			static void spawnEntity(CommandParsingContext ctx) {
+				EntityDescriptor entityDescriptor = ctx.Args.Get<EntityDescriptor>("entity");
+				Vector2 pos = ctx.Data.Player.GetPos();
+
+				Coordinate? xcoord = ctx.Args.TryGet<Coordinate>("x", out var x) ? x : null;
+				Coordinate? ycoord = ctx.Args.TryGet<Coordinate>("y", out var y) ? y : null;
+				if (xcoord != null && ycoord != null) {
+					pos = new Vector2(xcoord.Value.GetPos(pos.x), ycoord.Value.GetPos(pos.y));
+				}
+
+				Entity entity = entityDescriptor.Create(pos);
+				ctx.ExecServices.Entity.AddEntity(entity);
+			}
+
+			return CommandBuilder.Literal("spawn")
+				.Then(new EntityTypeArgumentCommandNode("entity"))
+				.Executes(spawnEntity)
+				.ThenCursorOf(Coords2D())
+				.Executes(spawnEntity)
+			.GetRootNode();
 		}
 	}
 }
