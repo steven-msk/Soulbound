@@ -16,5 +16,7 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 		}
 
 		public Entity Create(Vector2 pos) => factory(pos);
+
+		public override string ToString() => id;
 	}
 }

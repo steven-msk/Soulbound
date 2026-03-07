@@ -9,10 +9,13 @@ using UnityEngine;
 namespace SoulboundBackend.Client.World.EntitySystem {
 	[PROTOTYPICAL]
 	internal class StaticTransform : MonoBehaviour, IEntityTransform {
-		public void Bind(Entity entity) {
-		}
+		private Entity entity;
+
+		public void Bind(Entity entity) => this.entity = entity;
 
 		public void Destroy() => Destroy(gameObject);
+
+		public Entity GetEntity() => entity;
 
 		public Vector2 GetPos() => transform.position;
 

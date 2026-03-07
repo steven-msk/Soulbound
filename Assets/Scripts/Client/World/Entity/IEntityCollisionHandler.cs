@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SoulboundBackend.Client.World.EntitySystem {
-	public interface IEntityTransform {
-		void Bind(Entity entity);
-		Entity GetEntity();
-		Vector2 GetPos();
-		void SetPos(Vector2 position);
-		void Destroy();
+	public interface IEntityCollisionHandler {
+		void OnCollisionEnter(EntityCollision collision);
+		void OnCollisionExit(EntityCollision collision);
 	}
 }

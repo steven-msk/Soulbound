@@ -5,12 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
+#nullable enable
+
 namespace SoulboundBackend.Client.World.EntitySystem {
-	public interface IEntityTransform {
-		void Bind(Entity entity);
-		Entity GetEntity();
-		Vector2 GetPos();
-		void SetPos(Vector2 position);
-		void Destroy();
+	public struct EntityCollision {
+		public Entity self;
+		public Entity? other;
+		public Vector2 point;
+		public Vector2 normal;
+		public GameObject otherObject;
 	}
 }
