@@ -21,7 +21,7 @@ using Zenject;
 #nullable enable
 
 namespace SoulboundBackend.Client {
-	public class Player : Entity, IAttackPerformer, IItemConsumer, IUpdatable, IInputContext {
+	public class Player : Entity, IAttackPerformer, IItemConsumer, IInputContext, IFrameUpdatableEntity {
 		private static readonly AssetKey playerKey = new("player");
 		private static readonly EntityDescriptor DESCRIPTOR = new("player", null);
 		private readonly Inventory inventory;
@@ -29,32 +29,21 @@ namespace SoulboundBackend.Client {
 		private readonly Canvas canvas;
 		private readonly PlayerStats stats = new();
 		private readonly ItemUsageHandler itemUsageHandler;
-		private readonly AttackSource attackSource;
+		[Obsolete] private readonly AttackSource attackSource;
 		public PlayerStats Stats => stats;
 		IStatModificationHost IStatContextProvider.statModificationHost => stats;
 		private PlayerTransform playerTransform = null!;
-		private AttackHandler attackHandler;
+		[Obsolete] private AttackHandler attackHandler;
 
 		public ItemStack? MainHandStack { get; private set; }
 
 		const float MAX_BLOCK_REACH = 5f;
 
-		public Vector2 mouseScreenPos;
-		public Vector2 mouseWorldPos {
-			get {
-				Vector3 screenPos = mouseScreenPos;
-				RectTransform rootTransform = canvas.GetComponent<RectTransform>();
-				if (RectTransformUtility.ScreenPointToWorldPointInRectangle(rootTransform, screenPos, Camera.main, out var worldPoint)) {
-					return worldPoint;
-				}
-				screenPos.z = -Camera.main.transform.position.z;
-				return Camera.main.ScreenToWorldPoint(screenPos);
-			}
-		}
+		private Vector2 screenPointerPos;
 
 		private bool isHoldingLeftClick;
 		private bool isHoldingRightClick;
-		private ConcurrentActionResolver actionResolver = null!;
+		[Obsolete] private ConcurrentActionResolver actionResolver = null!;
 
 		public Player(Canvas canvas, Vector2 initialPos)
 			: base(DESCRIPTOR, initialPos) {
@@ -113,7 +102,7 @@ namespace SoulboundBackend.Client {
 				return true;
 			}
 			if (inputEvent.token.Equals(InputTokens.Mouse.position)) {
-				mouseScreenPos = inputEvent.context.ReadValue<Vector2>();
+				screenPointerPos = inputEvent.context.ReadValue<Vector2>();
 			}
 			if (inputEvent.token.Equals(InputTokens.Mouse.leftClick)) {
 				if (inputEvent.phase == InputActionPhase.Performed) {
@@ -153,6 +142,7 @@ namespace SoulboundBackend.Client {
 			return false;
 		}
 
+		[Obsolete]
 		private void RegisterItemUsageCandidates() {
 			itemUsageHandler.RegisterCapability<IConsumable>(ItemUseTrigger.RightClick, (consumable, stack) => consumable.StartConsume(this, stack));
 			foreach (ItemUseTrigger trigger in Enum.GetValues(typeof(ItemUseTrigger))) {
@@ -164,14 +154,14 @@ namespace SoulboundBackend.Client {
 				});
 			}
 			itemUsageHandler.RegisterCapability<IPlaceable>(ItemUseTrigger.LeftHold, (placeable, stack) => {
-				BlockPos blockPos = (BlockPos)mouseWorldPos;
+				BlockPos blockPos = (BlockPos)GetWorldPointerPos();
 
 				if (CanPlaceBlockAt(blockPos)) {
 					level.PlaceBlock(blockPos, placeable.Place(stack, blockPos));
 				}
 			});
 			itemUsageHandler.RegisterCapability<IBreakingTool>(ItemUseTrigger.LeftHold, (tool, stack) => {
-				BlockPos blockPos = (BlockPos)mouseWorldPos;
+				BlockPos blockPos = (BlockPos)GetWorldPointerPos();
 
 				if (IsInBlockReach((Vector2)blockPos)) {
 					tool.TryBreak(blockPos, level, new PlayerToolBreakSource(this, tool));
@@ -179,21 +169,16 @@ namespace SoulboundBackend.Client {
 			});
 		}
 
+		[Obsolete]
 		public void TryAttack(AttackSource source) {
 			if (attackHandler?.isHandlingAttack ?? false) return;
 			attackHandler = new AttackHandler(source);
 			attackHandler.StartAttack(this, null);
 		}
 
-		[Obsolete]
-		void IUpdatable.FrameUpdate(float deltaTime) {
+		void IFrameUpdatableEntity.FrameUpdate() {
 			if (isHoldingLeftClick) OnLeftHold();
 			if (isHoldingRightClick) OnRightHold();
-		}
-
-		public void SetMainHandItem(ItemStack? itemStack) {
-			if (MainHandStack == itemStack) return;
-			MainHandStack = itemStack;
 		}
 
 		private void OnLeftClick() {
@@ -204,7 +189,7 @@ namespace SoulboundBackend.Client {
 			RequestMainHandItemUse(ItemUseTrigger.RightClick);
 
 			// provisory
-			level.InteractBlock((BlockPos)mouseWorldPos);
+			level.InteractBlock((BlockPos)GetWorldPointerPos());
 		}
 
 		// POTENTIAL FEATUREIMPL: add Reach int stat
@@ -215,14 +200,14 @@ namespace SoulboundBackend.Client {
 			actionResolver.Submit(Request.New()
 				.UnderToken(PlayerActionTokens.BlockBreak)
 				.Execute(() => {
-					BlockPos blockPos = (BlockPos)mouseWorldPos;
+					BlockPos blockPos = (BlockPos)GetWorldPointerPos();
 					Block? targetBlock = level.BlockAt(blockPos);
 
 					if (0 >= targetBlock?.breakRequirement?.minBreakPower) {
 						level.BreakBlock(blockPos, new PlayerToolBreakSource(this, null));
 					}
 				})
-				.OnCondition(() => CanBreakBlockAt((BlockPos)mouseWorldPos))
+				.OnCondition(() => CanBreakBlockAt((BlockPos)GetWorldPointerPos()))
 				.Suppress(PlayerActionTokens.Attack, () => !isHoldingLeftClick)
 			);
 
@@ -247,12 +232,6 @@ namespace SoulboundBackend.Client {
 				.Suppress(PlayerActionTokens.BlockBreak, () => !isHoldingLeftClick)
 				.Suppress(PlayerActionTokens.Attack, () => !isHoldingLeftClick)
 			);
-		}
-
-		public void OnItemDisplayDestroyed(ItemStack stack) {
-			if (stack == MainHandStack) {
-				this.SetMainHandItem(null);
-			}
 		}
 
 		public bool CanPlaceBlockAt(BlockPos blockPos) {
@@ -282,57 +261,20 @@ namespace SoulboundBackend.Client {
 		public bool IsHoldingLeftClick() => isHoldingLeftClick;
 		public bool IsHoldingRightClick() => isHoldingRightClick;
 
-		// since this is a lazy player entity addition, not all methods need implementation (for now)
-		// TODO: properly implement player entity methods
+		public Vector2 GetScreenPointerPos() => screenPointerPos;
+		public Vector2 GetWorldPointerPos() {
+			Vector3 screenPos = screenPointerPos;
+			RectTransform rootTransform = canvas.GetComponent<RectTransform>();
+			bool inWorldPoint = RectTransformUtility.ScreenPointToWorldPointInRectangle(
+				rootTransform,
+				screenPos,
+				Camera.main,
+				out var worldPoint
+			);
+			if (inWorldPoint) return worldPoint;
 
-		//public override void Spawn(EntitySpawnData spawnData) {
-		//	base.Spawn(spawnData);
-		//	logger.LogInfo("Player spawned at {}", spawnData.Get<Vector2>("position"));
-		//	this.isSpawned = true;
-		//}
-
-		//public override void OnChunkLoaded() {
-		//}
-
-		//public override void OnChunkUnloaded() {
-		//}
-
-		//public override Bounds GetBounds() => this.GetColliderBounds();
-
-		//public override void OnDeath() {
-		//	logger.LogInfo("Player died");
-		//}
-
-		//public override void OnDamageTaken(float damage) {
-		//	logger.LogInfo("Player has taken {} damage", damage);
-		//}
-
-		//public override void ApplySerializedProperties(ComponentSerializer properties) {
-		//	base.ApplySerializedProperties(properties);
-		//	this.stats = new();
-		//	inventory.Deserialize(properties.GetOrThrow<SerializedInventory>("inventory"));
-		//	//stats.UpdateInjectedMappings();
-		//	//stats.MaxHealth.OnModifiersChanged += maxHealth => {
-		//	//	bool wasFullHealth = this.currentHealth == this.maxHealth;
-		//	//	this.maxHealth = maxHealth.GetProcessedValue();
-		//	//	if (wasFullHealth) {
-		//	//		this.currentHealth = this.maxHealth;
-		//	//	}
-		//	//};
-
-		//	this.maxHealth = stats.maxHealth.GetProcessedValue();
-		//	this.currentHealth = maxHealth;         // might cause problems later with OnDeath handling
-		//											// If the player were to leave while having the death screen active,
-		//											// Upon rejoining it would reset their health to max, completely overriding the death state.
-		//											// Death screen implementation should be prioritized when deserializing.
-		//}
-
-		//public override ComponentSerializer GetSerializedProperties() {
-		//	return base.GetSerializedProperties()
-		//		//.Add("stats", this.stats)
-		//		.Add("inventory", inventory.Serialize());
-		//}
-
+			screenPos.z = -Camera.main.transform.position.z;
+			return Camera.main.ScreenToWorldPoint(screenPos);
+		}
 	}
-
 }

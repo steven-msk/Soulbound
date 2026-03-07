@@ -101,7 +101,7 @@ namespace SoulboundBackend.Core {
 
 					Vector2 playerPos = player != null ? player.GetPos() : level.GetWorldSpawnPoint();
 					worldRenderer.RenderView(playerPos);
-					level.UpdateChunks(playerPos);
+					level.FrameUpdate(playerPos);
 
 					EndFrame();
 				}

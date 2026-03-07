@@ -44,6 +44,7 @@ namespace SoulboundBackend.Client.World {
 		private readonly HashSet<BlockPos> tickingBlocks = new();
 		private readonly Dictionary<Guid, Entity> entities = new();
 		private readonly List<ITickingEntity> tickingEntities = new();
+		private readonly List<IFrameUpdatableEntity> frameUpdatableEntities = new();
 
 		public Level(LevelGridContext gridContext, int seed) {
 			this.gridContext = gridContext;
@@ -107,8 +108,8 @@ namespace SoulboundBackend.Client.World {
 			generatedChunks = this.generatedChunks.Values.ToArray();
 		}
 
-		public void UpdateChunks(Vector2 pivot) {
-			int pivotChunkX = ChunkXAt(pivot);
+		public void FrameUpdate(Vector2 playerPos) {
+			int pivotChunkX = ChunkXAt(playerPos);
 			this.UnloadDistantChunks(pivotChunkX, RENDER_DISTANCE);
 
 			for (int dx = -RENDER_DISTANCE; dx <= RENDER_DISTANCE; dx++) {
@@ -134,6 +135,10 @@ namespace SoulboundBackend.Client.World {
 					loadedChunks[chunkX] = chunk;
 					chunk.OnLoad(chunkOutlineRenderer);
 				}
+			}
+
+			foreach (var frameUpdatableEntity in frameUpdatableEntities.ToArray()) {
+				frameUpdatableEntity.FrameUpdate();
 			}
 		}
 		
@@ -245,6 +250,9 @@ namespace SoulboundBackend.Client.World {
 			if (entity is ITickingEntity ticking) {
 				tickingEntities.Add(ticking);
 			}
+			if (entity is IFrameUpdatableEntity frameUpdatable) {
+				frameUpdatableEntities.Add(frameUpdatable);
+			}
 		}
 
 		public void RemoveEntity(Entity entity) {
@@ -255,6 +263,9 @@ namespace SoulboundBackend.Client.World {
 
 			if  (entity is ITickingEntity ticking) {
 				tickingEntities.Remove(ticking);
+			}
+			if (entity is IFrameUpdatableEntity frameUpdatable) {
+				frameUpdatableEntities.Remove(frameUpdatable);
 			}
 		}
 

@@ -91,7 +91,7 @@ namespace SoulboundBackend.Client {
 				facing = Mathf.Sign(velocity.x);
 			}
 			if (player.IsHoldingRightClick() || player.IsHoldingLeftClick()) {
-				facing = Mathf.Sign(player.mouseScreenPos.x - Screen.width / 2);
+				facing = Mathf.Sign(player.GetScreenPointerPos().x - Screen.width / 2);
 			}
 			animator.SetFloat("horizontalSpeed", Mathf.Abs(velocity.x));
 		}
