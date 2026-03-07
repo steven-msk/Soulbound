@@ -35,6 +35,7 @@ namespace SoulboundBackend.Client.World {
 		private readonly Dictionary<int, ChunkGenData> chunkGenData = new();
 		private readonly LevelGridContext gridContext;
 		private LevelManager levelManager = null!;
+		private readonly Player player;
 		public bool isWorldLoaded { get; private set; } = false;
 
 		private readonly BiomeMap biomeMap;
@@ -49,6 +50,7 @@ namespace SoulboundBackend.Client.World {
 		public Level(LevelGridContext gridContext, int seed) {
 			this.gridContext = gridContext;
 			this.seed = seed;
+			this.player = new Player(GetWorldSpawnPoint());
 
 			var biome1 = new PlainsBiome_test(seed);
 			var biome2 = new HillsBiome_test(seed);
@@ -76,6 +78,8 @@ namespace SoulboundBackend.Client.World {
 			}
 
 			isWorldLoaded = true;
+			AddEntity(player);
+			player.SetPos(GetWorldSpawnPoint());
 		}
 
 		public void Tick(RectInt simulationRect) {
@@ -108,8 +112,8 @@ namespace SoulboundBackend.Client.World {
 			generatedChunks = this.generatedChunks.Values.ToArray();
 		}
 
-		public void FrameUpdate(Vector2 playerPos) {
-			int pivotChunkX = ChunkXAt(playerPos);
+		public void FrameUpdate() {
+			int pivotChunkX = ChunkXAt(player.GetPos());
 			this.UnloadDistantChunks(pivotChunkX, RENDER_DISTANCE);
 
 			for (int dx = -RENDER_DISTANCE; dx <= RENDER_DISTANCE; dx++) {
@@ -468,5 +472,8 @@ namespace SoulboundBackend.Client.World {
 			}
 			return coveredTiles;
 		}
+
+		public Player GetPlayer() => player;
+
 	}
 }

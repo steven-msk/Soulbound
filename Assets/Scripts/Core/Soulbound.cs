@@ -193,7 +193,7 @@ namespace SoulboundBackend.Core {
 		[PROTOTYPICAL]
 		[Obsolete]
 		public Player? GetPlayerInstance() {
-			return worldManager.activeLevelManager?.player;
+			return worldManager.activeLevelManager?.level.GetPlayer();
 		}
 
 		public IEnumerable<string> ListWorldSaves() {

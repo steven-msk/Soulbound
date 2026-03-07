@@ -26,7 +26,6 @@ namespace SoulboundBackend.Client {
 		private static readonly EntityDescriptor DESCRIPTOR = new("player", null);
 		private readonly Inventory inventory;
 		private readonly Hotbar hotbar;
-		private readonly Canvas canvas;
 		private readonly PlayerStats stats = new();
 		private readonly ItemUsageHandler itemUsageHandler;
 		[Obsolete] private readonly AttackSource attackSource;
@@ -34,6 +33,7 @@ namespace SoulboundBackend.Client {
 		IStatModificationHost IStatContextProvider.statModificationHost => stats;
 		private PlayerTransform playerTransform = null!;
 		[Obsolete] private AttackHandler attackHandler;
+		private new Vector2 initialPos;
 
 		public ItemStack? MainHandStack { get; private set; }
 
@@ -45,11 +45,10 @@ namespace SoulboundBackend.Client {
 		private bool isHoldingRightClick;
 		[Obsolete] private ConcurrentActionResolver actionResolver = null!;
 
-		public Player(Canvas canvas, Vector2 initialPos)
+		public Player(Vector2 initialPos)
 			: base(DESCRIPTOR, initialPos) {
 			inventory = new Inventory();
 			hotbar = new Hotbar();
-			this.canvas = canvas;
 			Soulbound.instance.GetInputManager().PushContext(this);
 
 			actionResolver = new ConcurrentActionResolver();
@@ -70,12 +69,10 @@ namespace SoulboundBackend.Client {
 			attackHandler = new AttackHandler(attackSource);
 		}
 
-		public override void SetPos(Vector2 pos) => transform.SetPos(pos);
-		public override Vector2 GetPos() => transform.GetPos();
-
 		protected override IEntityTransform CreateTransform() {
 			GameObject obj = GameObject.Instantiate(AssetManager.Resolve<GameObject>(playerKey));
 			playerTransform = obj.GetComponent<PlayerTransform>();
+			playerTransform.SetPos(initialPos);
 			return playerTransform;
 		}
 
@@ -264,6 +261,8 @@ namespace SoulboundBackend.Client {
 		public Vector2 GetScreenPointerPos() => screenPointerPos;
 		public Vector2 GetWorldPointerPos() {
 			Vector3 screenPos = screenPointerPos;
+
+			Canvas canvas = Soulbound.instance.GetUIHandler().GetCanvas();
 			RectTransform rootTransform = canvas.GetComponent<RectTransform>();
 			bool inWorldPoint = RectTransformUtility.ScreenPointToWorldPointInRectangle(
 				rootTransform,
@@ -276,5 +275,11 @@ namespace SoulboundBackend.Client {
 			screenPos.z = -Camera.main.transform.position.z;
 			return Camera.main.ScreenToWorldPoint(screenPos);
 		}
+
+		public override void SetPos(Vector2 pos) {
+			if (transform != null) transform.SetPos(pos);
+			else initialPos = pos;
+		}
+		public override Vector2 GetPos() => transform?.GetPos() ?? initialPos;
 	}
 }

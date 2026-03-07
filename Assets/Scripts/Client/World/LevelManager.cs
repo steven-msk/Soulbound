@@ -33,7 +33,6 @@ namespace SoulboundBackend.Core {
 		private Canvas canvas = null!;
 		public string world { get; private set; } = null!;
 		public Level level { get; private set; } = null!;
-		public Player? player { get; private set; }
 
 		public const string worldDump = "worldDump.json";
 		public static readonly JsonSerializerSettings globalJsonSettings = new() {
@@ -71,7 +70,7 @@ namespace SoulboundBackend.Core {
 			return false;
 		}
 
-		public void BootstrapWorld(string world, WorldDump? dump, int seed, LevelGridContext gridContext) {
+		public Level BootstrapWorld(string world, WorldDump? dump, int seed, LevelGridContext gridContext) {
 			UnityEngine.Random.InitState(seed);
 			this.world = world;
 			level = new Level(gridContext, seed);
@@ -85,12 +84,8 @@ namespace SoulboundBackend.Core {
 
 			StartCoroutine(GameFrameLoop());
 			StartCoroutine(GameTickLoop());
-		}
 
-		public Player SpawnPlayer() {
-			player = new Player(canvas, level.GetWorldSpawnPoint());
-			level.AddEntity(player);
-			return player;
+			return level;
 		}
 
 		IEnumerator GameFrameLoop() {
@@ -99,9 +94,9 @@ namespace SoulboundBackend.Core {
 				if (!paused) {
 					StartFrame();
 
-					Vector2 playerPos = player != null ? player.GetPos() : level.GetWorldSpawnPoint();
-					worldRenderer.RenderView(playerPos);
-					level.FrameUpdate(playerPos);
+					Vector2 pivotPos = level.GetPlayer()?.GetPos() ?? level.GetWorldSpawnPoint();
+					level.FrameUpdate();
+					worldRenderer.RenderView(pivotPos);
 
 					EndFrame();
 				}
@@ -123,8 +118,8 @@ namespace SoulboundBackend.Core {
 				if (!paused) {
 					StartTick();
 
-					Vector2 playerPos = player != null ? player.GetPos() : level.GetWorldSpawnPoint();
-					level.Tick(GetRelativeSimulationRect(playerPos));
+					Vector2 pivotPos = level.GetPlayer()?.GetPos() ?? level.GetWorldSpawnPoint();
+					level.Tick(GetRelativeSimulationRect(pivotPos));
 
 					EndTick();
 				}

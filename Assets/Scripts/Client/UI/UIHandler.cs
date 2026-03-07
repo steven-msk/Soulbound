@@ -36,6 +36,8 @@ namespace SoulboundBackend.Client.UI {
 			screenManager = new ScreenManager(canvas.transform);
 		}
 
+		public Canvas GetCanvas() => canvas;
+
 		public void AddOverlay(UIOverlayNode overlayNode) {
 			overlayNode.gameObject.transform.SetParent(canvas.transform, false);
 			overlays.Add(overlayNode);

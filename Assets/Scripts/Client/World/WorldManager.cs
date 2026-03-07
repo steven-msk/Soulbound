@@ -64,12 +64,11 @@ namespace SoulboundBackend.Client.World {
 			LevelManager levelManager = await LoadWorldSceneAsync(sceneLoadTask, rootGetter);
 			activeLevelManager = levelManager;
 
-			activeLevelManager.BootstrapWorld(world, dump, seed, rootGetter().CreateGridContext());
-			Player player = activeLevelManager.SpawnPlayer();
+			Level level = activeLevelManager.BootstrapWorld(world, dump, seed, rootGetter().CreateGridContext());
 
 			return new WorldSession {
 				deserializationData = dump,
-				player = player,
+				player = level.GetPlayer(),
 				levelManager = levelManager,
 				level = levelManager.level
 			};
