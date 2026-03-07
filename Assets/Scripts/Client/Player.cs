@@ -10,7 +10,9 @@ using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Client.World.EntitySystem;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core;
+using SoulboundBackend.Core.AssetManagement;
 using SoulboundBackend.Core.Debug.Logging;
+using SoulboundBackend.Core.Resource;
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -19,52 +21,31 @@ using Level = SoulboundBackend.Client.World.Level;
 using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
 namespace SoulboundBackend.Client {
-	public class PlayerController : Entity_OLD, IAttackPerformer, IItemConsumer, IUpdatable, IEntitySpawnable<PlayerSpawnData>, IInputContext {
-		public override Type scriptType => typeof(PlayerController);
-		public override EntityDescriptor_OLD descriptor => EntityDescriptorRegistry.ByType<PlayerController>();
-		private Inventory inventory;
-		private Hotbar hotbar;
-		public Inventory GetInventory() => inventory;
-		public Hotbar GetHotbar() => hotbar;
+	public class Player : Entity, IAttackPerformer, IItemConsumer, IUpdatable, IInputContext {
+		private static readonly AssetKey playerKey = new("player");
+		private static readonly EntityDescriptor DESCRIPTOR = new("player", null);
+		private readonly Inventory inventory;
+		private readonly Hotbar hotbar;
 
-		[SerializeField] private PlayerStats stats;
+		private PlayerStats stats = new();
 		public PlayerStats Stats => stats;
 		IStatModificationHost IStatContextProvider.statModificationHost => stats;
 
-		[Header("Internal")]
-		[SerializeField] private Rigidbody2D rb;
-		[SerializeField] private Animator animator;
-		private PlayerPhysics playerPhysics;
-		private AttackHandler attackHandler = null!;
-		private AttackSource attackSource = null!;
-
-		public bool isSpawned { get; private set; }
-
-
+		private PlayerTransform playerTransform;
+		private AttackHandler attackHandler;
+		private AttackSource attackSource;
 		private ItemUsageHandler itemUsageHandler;
-		public ItemUsageHandler ItemUsageHandler => itemUsageHandler!;
 
 #nullable enable
 		public ItemStack? MainHandStack { get; private set; }
 
-		public bool CanAttack { get; set; } = true;
-
-		public Vector2 center => playerPhysics.Collider.bounds.center;
-
-		public Vector2 itemDropForce {
-			get {
-				Vector2 force = new Vector2(3f, 4f);
-				force.x *= facing.direction.x;
-				return force;
-			}
-		}
+		public Vector2 center => playerTransform.Collider.bounds.center;
 
 		const float MAX_BLOCK_REACH = 5f;
 
-		private Level level = null!;
-		private Vector2 mouseScreenPos;
+		public Vector2 mouseScreenPos;
 		private Canvas canvas = null!;
-		private Vector2 mouseWorldPos {
+		public Vector2 mouseWorldPos {
 			get {
 				Vector3 screenPos = mouseScreenPos;
 				RectTransform rootTransform = canvas.GetComponent<RectTransform>();
@@ -76,47 +57,42 @@ namespace SoulboundBackend.Client {
 			}
 		}
 
-		public override Facing facing => new(m_facing);
-		private float m_facing = 1f;
-		private float _facing {
-			get => m_facing;
-			set {
-				m_facing = value;
-				Vector3 scale = transform.localScale;
-				scale.x = _facing;
-				transform.localScale = scale;
-			}
-		}
-
-		private bool leftHold;
-		private bool rightHold;
+		public bool leftHold;
+		public bool rightHold;
 		private ConcurrentActionResolver actionResolver = null!;
 
-		[Inject]
-		public void Construct(DiContainer container) {
-			playerPhysics = container.Resolve<PlayerPhysics>();
+		public Player(Canvas canvas, Vector2 initialPos)
+			: base(DESCRIPTOR, initialPos) {
 			inventory = new Inventory();
-			this.hotbar = new Hotbar();
+			hotbar = new Hotbar();
+			this.canvas = canvas;
 			Soulbound.instance.GetInputManager().PushContext(this);
 
 			inventory.GetSlot(0).SetStack(new ItemStack(Items.leavesBlock, 5));
 
-			level = container.Resolve<Level>();
-			canvas = container.Resolve<Canvas>();
-			RegisterItemUsageCandidates(container.Resolve<ItemUsageHandler>());
-			actionResolver = container.Resolve<ConcurrentActionResolver>();
+			actionResolver = new ConcurrentActionResolver();
+			RegisterItemUsageCandidates(new ItemUsageHandler(this));
 
 			attackSource = new AttackSource(2, 10, new PlayerMainHandAttack(),
 				context => {
-					var eventDispatcher = GetComponent<AttackEventDispatcher>();
+					var eventDispatcher = playerTransform.GetComponent<AttackEventDispatcher>();
 					context.eventDispatcher = eventDispatcher;
 					return AttackAnimatorChannel.FromDelegates(
-						GetComponent<Animator>,
+						playerTransform.GetComponent<Animator>,
 						() => eventDispatcher
 					);
 				},
 				animator => animator.SetTrigger("attack")
 			);
+		}
+
+		public override void SetPos(Vector2 pos) => transform.SetPos(pos);
+		public override Vector2 GetPos() => transform.GetPos();
+
+		protected override IEntityTransform CreateTransform() {
+			GameObject obj = GameObject.Instantiate(AssetManager.Resolve<GameObject>(playerKey));
+			playerTransform = obj.GetComponent<PlayerTransform>();
+			return playerTransform;
 		}
 
 		[PROTOTYPICAL]
@@ -167,30 +143,19 @@ namespace SoulboundBackend.Client {
 
 			if (inputEvent.token.Equals(InputTokens.Player.move)) {
 				if (inputEvent.phase == InputActionPhase.Performed) {
-					playerPhysics.SetVelocityX(inputEvent.context.ReadValue<Vector2>().x);
+					playerTransform.SetVelocityX(inputEvent.context.ReadValue<Vector2>().x);
 					return true;
 				} else if (inputEvent.phase == InputActionPhase.Canceled) {
-					playerPhysics.SetVelocityX(0f);
+					playerTransform.SetVelocityX(0f);
 					return true;
 				}
 			}
 			if (inputEvent.token.Equals(InputTokens.Player.jump)
 					&& inputEvent.phase == InputActionPhase.Performed) {
-				playerPhysics.Jump();
+				playerTransform.Jump();
 				return true;
 			}
 			return false;
-		}
-
-		private void Update() {
-			Vector2 velocity = playerPhysics.GetVelocity();
-			if (velocity.x != 0) {
-				_facing = Mathf.Sign(velocity.x);
-			}
-			if (rightHold || leftHold) {
-				_facing = Mathf.Sign(mouseScreenPos.x - Screen.width / 2);
-			}
-			animator.SetFloat("horizontalSpeed", Mathf.Abs(velocity.x));
 		}
 
 		private void RegisterItemUsageCandidates(ItemUsageHandler? itemUsageHandler) {
@@ -320,33 +285,12 @@ namespace SoulboundBackend.Client {
 			Level level = Soulbound.instance.GetActiveLevel()!;
 			float dist = Vector2.Distance(worldPos, this.center);
 			return dist <= MAX_BLOCK_REACH 
-				&& !level.GetTilesCovered(playerPhysics.Collider.bounds)
+				&& !level.GetTilesCovered(playerTransform.Collider.bounds)
 						 .Contains((BlockPos)worldPos);
 		}
 
-		void IEntitySpawnable<PlayerSpawnData>.ApplySpawnData(PlayerSpawnData spawnData) {
-			this.transform.position = spawnData.position;
-			this.stats = new();
-			this.isSpawned = true;
-		}
-
-		public override void Deserialize(SerializedEntity serialized) {
-			base.Deserialize(serialized);
-			//this.stats = new();
-			//var properties = SerializedEntityPropertyList.From(serialized.properties);
-			//inventory.Deserialize(properties.GetOrThrow<SerializedInventory>("inventory"));
-		}
-
-		public override SerializedEntity Serialize() {
-			var serialized = base.Serialize();
-
-			var properties = SerializedEntityPropertyList.From(serialized.properties);
-			//properties.Set("inventory", inventory.Serialize());
-
-			serialized.properties = properties;
-			return serialized;
-		}
-
+		public Inventory GetInventory() => inventory;
+		public Hotbar GetHotbar() => hotbar;
 
 		// since this is a lazy player entity addition, not all methods need implementation (for now)
 		// TODO: properly implement player entity methods

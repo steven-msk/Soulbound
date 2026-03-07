@@ -18,7 +18,7 @@ namespace SoulboundBackend.Client.Combat {
 
 		public AttackHandler(AttackSource source) => this.source = source;
 		
-		public void StartAttack(Entity_OLD performer, object metadata) {
+		public void StartAttack(Entity performer, object metadata) {
 			AssertNotHandling();
 			var context = new AttackContext(performer, source) {
 				metadata = metadata

@@ -1,27 +1,19 @@
-using SoulboundBackend.Client;
-using SoulboundBackend.Client.Input;
-using SoulboundBackend.Client.ItemSystem;
+using SoulboundBackend.Client.World.EntitySystem;
 using SoulboundBackend.Common;
-using SoulboundBackend.Core;
-using SoulboundBackend.Core.Bootstrap;
 using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using Zenject;
-using static PlayerInputActions;
 using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
-
 
 #nullable enable
 
 namespace SoulboundBackend.Client {
-	public class PlayerPhysics : MonoBehaviour {
+	public class PlayerTransform : MonoBehaviour, IEntityTransform {
 		private readonly Dictionary<string, (Action<Collision2D> action, Func<bool> validator)> collisionReactionsByTag = new();
 		private readonly Dictionary<int, (Action<Collider2D> action, Func<bool> validator)> triggerReactionsByLayer = new();
-		private PlayerController player = null!;
+		private Player player = null!;
 		private Rigidbody2D rb = null!;
 		private Animator animator = null!;
 		new private CapsuleCollider2D collider = null!;
@@ -51,13 +43,22 @@ namespace SoulboundBackend.Client {
 		[SerializeField] private float knockbackStunTimer = 0f;
 		[SerializeField] private bool shouldJump = false;
 		[SerializeField] private float jumpToFlightTimer;
+		[SerializeField] private float _facing;
+		public float facing {
+			get => facing;
+			set {
+				_facing = value;
+				Vector3 scale = transform.localScale;
+				scale.x = _facing;
+				transform.localScale = scale;
+			}
+		}
 
-		[Inject]
-		public void Construct(DiContainer container) {
-			this.player = container.Resolve<PlayerController>();
-			this.rb = player.GetComponent<Rigidbody2D>();
-			this.animator = player.GetComponent<Animator>();
-			this.collider = player.GetComponent<CapsuleCollider2D>();
+		void IEntityTransform.Bind(Entity entity) {
+			this.player = (Player)entity;
+			this.rb = GetComponent<Rigidbody2D>();
+			this.animator = GetComponent<Animator>();
+			this.collider = GetComponent<CapsuleCollider2D>();
 
 			collisionReactionsByTag.Add("Ground", ((collision) => {
 				animator.SetBool("jumping", false);
@@ -70,6 +71,12 @@ namespace SoulboundBackend.Client {
 			}, IsOnGround));
 		}
 
+		Entity IEntityTransform.GetEntity() => player;
+
+		public Vector2 GetPos() => transform.position;
+		public void SetPos(Vector2 position) => transform.position = position;
+
+		void IEntityTransform.Destroy() => Destroy(gameObject);
 
 		public void SetVelocityX(float x) => velocity.x = x;
 		public void SetVelocityY(float y) => velocity.y = y;
@@ -79,10 +86,17 @@ namespace SoulboundBackend.Client {
 
 		// FIXME: inconsistent movement
 
-		private void FixedUpdate() {
-			if (!player?.isSpawned ?? true) {
-				return;
+		private void Update() {
+			if (velocity.x != 0) {
+				facing = Mathf.Sign(velocity.x);
 			}
+			if (player.rightHold || player.leftHold) {
+				facing = Mathf.Sign(player.mouseScreenPos.x - Screen.width / 2);
+			}
+			animator.SetFloat("horizontalSpeed", Mathf.Abs(velocity.x));
+		}
+
+		private void FixedUpdate() {
 			if (knockbackStunTimer > 0) {
 				knockbackStunTimer -= Time.fixedDeltaTime;
 				return;         // knockback immunity will be a thing
@@ -150,9 +164,6 @@ namespace SoulboundBackend.Client {
 		}
 
 		private void OnCollisionStay2D(Collision2D collision) {
-			if (!player?.isSpawned ?? true) {
-				return;
-			}
 			var collisionResponse = collisionReactionsByTag.GetValueOrDefault(collision.gameObject.tag, (collision => {
 				Logger.LogWarning("Unknown collision callback tag: {}", collision.gameObject.tag);
 			}, null));

@@ -90,11 +90,8 @@ GameObject:
   - component: {fileID: 7173614313263793406}
   - component: {fileID: 8592448353225578507}
   - component: {fileID: 2992365726666747388}
-  - component: {fileID: 3686694642803221904}
   - component: {fileID: 3616289421697308197}
-  - component: {fileID: 5492268416738884276}
   - component: {fileID: 6417993767097125418}
-  - component: {fileID: 4868740217009558417}
   - component: {fileID: -252812794557671114}
   - component: {fileID: -8339891887899060621}
   m_Layer: 7
@@ -224,21 +221,6 @@ Rigidbody2D:
   m_SleepingMode: 0
   m_CollisionDetection: 1
   m_Constraints: 4
---- !u!114 &3686694642803221904
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8095950580177048670}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c1f1052fc3ce1104bb8ffca9b92abb12, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  inventory: {fileID: 701114529275448436, guid: b8e974e7315dc3b408e80437cd281dee, type: 3}
-  rb: {fileID: 2992365726666747388}
-  animator: {fileID: 8592448353225578507}
 --- !u!114 &3616289421697308197
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -265,25 +247,10 @@ MonoBehaviour:
   flightTimeReductionMultiplier: 50
   slowFallTimeReductionMultiplier: 400
   isFlying: 0
-  movement: {x: 0, y: 0}
+  velocity: {x: 0, y: 0}
   knockbackStunTimer: 0
   shouldJump: 0
   jumpToFlightTimer: 0
---- !u!114 &5492268416738884276
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8095950580177048670}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd3369f55a8e1c7428f3bbef7b61a5c9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxStepHeight: 1
-  stepSearchOvershoot: 0.01
-  smoothStepDuration: 0.05
 --- !u!70 &6417993767097125418
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -321,23 +288,6 @@ CapsuleCollider2D:
   m_Offset: {x: -0, y: 1}
   m_Size: {x: 1, y: 1.75}
   m_Direction: 0
---- !u!114 &4868740217009558417
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8095950580177048670}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 08eca9f7688a0a24685b89133b020c8e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _scriptableObjectInstallers: []
-  _monoInstallers: []
-  _installerPrefabs: []
-  _autoRun: 0
-  _kernel: {fileID: 0}
 --- !u!114 &-252812794557671114
 MonoBehaviour:
   m_ObjectHideFlags: 0

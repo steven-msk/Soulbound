@@ -15,12 +15,6 @@ namespace SoulboundBackend.Client.ItemSystem {
 		[ItemCache(nameof(woodBlock))] public static BlockItem woodBlock => Lookup(() => new BlockItem("Wood Block", ItemAspect.Simple(new AssetKey("wood_icon"), ppu: 8), Item.DEFAULT_MAX_STACK, () => Blocks.wood));
 		[ItemCache(nameof(leavesBlock))] public static BlockItem leavesBlock => Lookup(() => new BlockItem("Leaves Block", ItemAspect.Simple(new AssetKey("leaves_icon"), ppu: 8), Item.DEFAULT_MAX_STACK, () => Blocks.leaves));
 
-		[ItemCache(nameof(armorItem_test))] public static ArmorItem_test armorItem_test => Lookup(() => new ArmorItem_test());
-		[ItemCache(nameof(consumableStatItem_test))] public static ConsumableStatItem_test consumableStatItem_test => Lookup(() => new ConsumableStatItem_test());
-		[ItemCache(nameof(statItem_test))] public static StatItem_test statItem_test => Lookup(() => new StatItem_test());
-		[ItemCache(nameof(toolItem_test))] public static ToolItem_test toolItem_test => Lookup(() => new ToolItem_test());
-		[ItemCache(nameof(weaponItem_test))] public static WeaponItem_test weaponItem_test => Lookup(() => new WeaponItem_test());
-
 		static Items() {
             foreach (var property in typeof(Items).GetProperties(BindingFlags.Static | BindingFlags.Public)) {
                 var cacheAttribute = property.GetCustomAttribute<ItemCache>();

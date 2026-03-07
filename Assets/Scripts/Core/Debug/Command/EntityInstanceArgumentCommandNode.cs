@@ -15,7 +15,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 		public override IEnumerable<string> GetCompletions(string partialToken, CommandParsingContext ctx) {
 			foreach (var entity in ctx.Data.Entities.GetAllEntities().ToList()) {
 				string value = entity.GetGuid().ToString();
-				if (value.StartsWith(partialToken) || entity.GetName().StartsWith(partialToken)) {
+				if (value.StartsWith(partialToken) || entity.GetID().StartsWith(partialToken)) {
 					yield return value;
 				}
 			}

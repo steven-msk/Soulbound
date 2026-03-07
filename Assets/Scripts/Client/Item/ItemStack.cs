@@ -1,13 +1,5 @@
-using SoulboundBackend.Client.UI.Storage;
-using SoulboundBackend.Client.World.EntitySystem;
-using SoulboundBackend.Client.World.EntitySystem.SpawnData;
-using SoulboundBackend.Core;
-using SoulboundBackend.Core.AssetManagement;
-using SoulboundBackend.Core.Resource;
 using System;
-using TMPro;
 using UnityEngine;
-using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
 #nullable enable
 
@@ -23,26 +15,6 @@ namespace SoulboundBackend.Client.ItemSystem {
 			this.item = item;
 			this.quantity = Mathf.Min(quantity, item.maxStackSize);
 		}
-
-		[Obsolete]
-		public void Drop(Vector2 pos, Vector2 dropForce, bool playerAction = false) {
-			GameObject? worldPrefab = item.aspect.worldPrefabSupplier?.Invoke();
-			if (item.aspect.worldPrefabSupplier == null) {
-				Logger.LogError(null, "No world prefab supplier for item {}. Using icon fallback.", item);
-				worldPrefab = WorldPrefabFactory.GetInstantiator().Invoke();
-			}
-			GameObject droppedItem = worldPrefab!;
-			DroppedItem pickup = droppedItem.GetComponent<DroppedItem>() ?? droppedItem.AddComponent<DroppedItem>();
-			Soulbound.instance.GetActiveLevelManager().entityManager.Spawn(pickup, new DroppedItem.SpawnData() {
-				 position = pos,
-				 itemStack = this,
-				 dropForce = dropForce,
-				 pickupDelay = playerAction ? 2f : 0f
-			});
-			isDropped = true;
-		}
-
-		[Obsolete] public void OnPickedUp() => isDropped = false;
 
 		public bool IsFull() => quantity >= item.maxStackSize;
 		public bool IsEmpty() => quantity <= 0;

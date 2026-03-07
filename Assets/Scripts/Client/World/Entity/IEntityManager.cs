@@ -9,5 +9,6 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 		void AddEntity(Entity entity);
 		void RemoveEntity(Entity entity);
 		bool TryGetEntity(Guid guid, out Entity entity);
+		IEnumerable<Entity> GetAllEntities();
 	}
 }

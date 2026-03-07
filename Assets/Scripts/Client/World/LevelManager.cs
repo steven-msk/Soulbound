@@ -30,11 +30,10 @@ namespace SoulboundBackend.Core {
 
 		private DiContainer container = null!;
 		private WorldRenderer worldRenderer = null!;
-		public EntityManager entityManager { get; private set; } = null!;
-		private Canvas worldCanvas = null!;
+		private Canvas canvas = null!;
 		public string world { get; private set; } = null!;
 		public Level level { get; private set; } = null!;
-		public PlayerController? player { get; private set; }
+		public Player? player { get; private set; }
 
 		public const string worldDump = "worldDump.json";
 		public static readonly JsonSerializerSettings globalJsonSettings = new() {
@@ -48,12 +47,13 @@ namespace SoulboundBackend.Core {
 		};
 
 		private static readonly RectInt simulationRect = new(-128, -76, 256, 156);
+		private static readonly RectInt renderRect = new(-32, -19, 65, 39);
 
 		[Inject]
 		public void Construct(DiContainer container) {
 			this.container = container;
-			worldCanvas = container.Resolve<Canvas>();
-			Soulbound.instance.GetUIHandler().SetCanvas(worldCanvas);
+			canvas = container.Resolve<Canvas>();
+			Soulbound.instance.GetUIHandler().SetCanvas(canvas);
 			Soulbound.instance.GetInputManager().PushContext(this);
 
 			//Settings.keybindMappings.AddRebindTargetMap(playerActionMap);
@@ -75,49 +75,22 @@ namespace SoulboundBackend.Core {
 			UnityEngine.Random.InitState(seed);
 			this.world = world;
 			level = new Level(gridContext, seed);
-			entityManager = new EntityManager(level, new GameObject("Updater").AddComponent<UpdateManager>());
 
-			//RectInt renderRect = new(-32, -19, 65, 39);		// default view distance
 			worldRenderer = new WorldRenderer(simulationRect, level, gridContext.tilemap);
 
 			level.BootstrapWorld(dump, this);
-			entityManager.Deserialize(dump?.serializedEntities ?? new());
 			sessionRunning = true;
 
 			container.BindInstance(level).AsSingle();
-			container.BindInstance(entityManager).AsSingle();
 
 			StartCoroutine(GameFrameLoop());
 			StartCoroutine(GameTickLoop());
 		}
 
-		public PlayerController SpawnPlayer(SerializedEntity? serialized) {
-			if (entityManager.GetEntityByID(serialized.GetValueOrDefault().id, out var playerEntity)) {
-				entityManager.RemoveEntity(playerEntity);
-			}
-
-			player = container.InstantiatePrefabForComponent<PlayerController>(
-				AssetManager.Resolve<GameObject>(new AssetKey("player"))
-			);
-			container.BindInstance(player).AsSingle();
-
-			var playerContext = player.GetComponent<GameObjectContext>();
-			playerContext.AddNormalInstaller(new PlayerInstaller(player));
-			playerContext.Run();
-
-			if (serialized.HasValue) {
-				player.Deserialize(serialized.Value);
-			}
-			entityManager.Spawn(player, new PlayerSpawnData() {
-				position = serialized?.lastPosition ?? level.GetWorldSpawnPoint()
-			});
-
+		public Player SpawnPlayer() {
+			player = new Player(canvas, level.GetWorldSpawnPoint());
+			level.AddEntity(player);
 			return player;
-		}
-
-		private void Update() {
-			level?.UpdateChunks(player?.position ?? new Vector2(0f, 0f));
-			entityManager?.Update(Time.deltaTime);
 		}
 
 		IEnumerator GameFrameLoop() {
@@ -126,7 +99,9 @@ namespace SoulboundBackend.Core {
 				if (!paused) {
 					StartFrame();
 
-					worldRenderer.RenderView(player != null ? player.position : level.GetWorldSpawnPoint());
+					Vector2 playerPos = player != null ? player.GetPos() : level.GetWorldSpawnPoint();
+					worldRenderer.RenderView(playerPos);
+					level.UpdateChunks(playerPos);
 
 					EndFrame();
 				}
@@ -147,10 +122,10 @@ namespace SoulboundBackend.Core {
 			while (sessionRunning) {
 				if (!paused) {
 					StartTick();
-					// do things
-					entityManager.Tick();
-					level.Tick(GetRelativeSimulationRect(player != null ? player.position : level.GetWorldSpawnPoint()));
-					// TODO: implement proper ticking system
+
+					Vector2 playerPos = player != null ? player.GetPos() : level.GetWorldSpawnPoint();
+					level.Tick(GetRelativeSimulationRect(playerPos));
+
 					EndTick();
 				}
 				yield return tickDelay;
@@ -204,23 +179,11 @@ namespace SoulboundBackend.Core {
 
 		public WorldDump CreateDump() {
 			level.Dump(out var seed, out var generatedChunks);
-			var serializedPlayer = player?.Serialize() ?? default;
-			var serializedEntities = entityManager.Serialize();
-			serializedEntities.Remove(serializedPlayer.id);
 
 			return new WorldDump(
 				seed,
-				generatedChunks,
-				serializedPlayer,
-				//structurePlacements,
-				serializedEntities
+				generatedChunks
 			);
-		}
-
-		public static LevelManager CreateInstance() {
-			GameObject? levelManagerPrefab = AssetManager.Resolve<GameObject>(new AssetKey("levelManager"));
-			return GameObject.Instantiate(levelManagerPrefab)?.GetComponent<LevelManager>()
-				?? throw new ArgumentException("LevelManager prefab not found!");
 		}
 	}
 

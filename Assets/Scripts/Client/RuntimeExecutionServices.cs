@@ -40,13 +40,13 @@ namespace SoulboundBackend.Client {
 	}
 
 	public class RuntimePlayerExecutionService : IPlayerExecutionService {
-		public readonly PlayerController player;
+		public readonly Player player;
 
-		public RuntimePlayerExecutionService(PlayerController player) {
+		public RuntimePlayerExecutionService(Player player) {
 			this.player = player;
 		}
 
-		public void SetPos(Vector2 pos) => player.position = pos;
+		public void SetPos(Vector2 pos) => player.SetPos(pos);
 	}
 
 	public class RuntimeEntityExecutionService : IEntityExecutionService {

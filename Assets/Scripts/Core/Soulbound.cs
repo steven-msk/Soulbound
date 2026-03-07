@@ -192,7 +192,7 @@ namespace SoulboundBackend.Core {
 
 		[PROTOTYPICAL]
 		[Obsolete]
-		public PlayerController? GetPlayerInstance() {
+		public Player? GetPlayerInstance() {
 			return worldManager.activeLevelManager?.player;
 		}
 

@@ -10,24 +10,15 @@ namespace SoulboundBackend.Client.World {
 	public struct WorldDump {
 		public int seed;
 		public WorldChunk[]? generatedChunks;
-		//public Dictionary<int, List<StructurePlacement>> structurePlacements;
-		public SerializedEntity player;
-		public Dictionary<Guid, SerializedEntity> serializedEntities;
 		public bool nonNulled;
 
 		[JsonConstructor]
 		public WorldDump(
 				int seed, 
-				WorldChunk[] generatedChunks,
-				SerializedEntity player, 
-				//Dictionary<int, List<StructurePlacement>> structurePlacements,
-				Dictionary<Guid, SerializedEntity> serializedEntities
+				WorldChunk[] generatedChunks
 			) {
 			this.seed = seed;
 			this.generatedChunks = generatedChunks;
-			//this.structurePlacements = structurePlacements;
-			this.serializedEntities = serializedEntities;
-			this.player = player;
 			this.nonNulled = true;
 		}
 	}

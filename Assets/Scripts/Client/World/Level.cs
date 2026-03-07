@@ -74,11 +74,6 @@ namespace SoulboundBackend.Client.World {
 				generatedChunks = dump.Value.generatedChunks.ToDictionary(chunk => chunk.xpos, chunk => chunk);
 			}
 
-			Vector2 spawnPoint = dump != null
-				? dump.Value.player.lastPosition
-				: GetWorldSpawnPoint();
-			this.UpdateChunks(spawnPoint);
-
 			isWorldLoaded = true;
 		}
 
@@ -266,6 +261,8 @@ namespace SoulboundBackend.Client.World {
 		public bool TryGetEntity(Guid guid, out Entity entity) {
 			return entities.TryGetValue(guid, out entity);
 		}
+
+		public IEnumerable<Entity> GetAllEntities() => entities.Values;
 
 		private void NotifyNeighboringStates(BlockPos blockPos) {
 			foreach (var neighborPos in blockPos.GetCardinalNeighbors()) {

@@ -4,13 +4,13 @@ using UnityEngine;
 namespace SoulboundBackend.Client.World.EntitySystem.AI {
 	public class MoveToPositionState : IMutableAIState<MoveToPositionState> {
 		public MutableStateProperty<Vector2> target { get; }
-		private Entity_OLD entity;
+		private Entity entity;
 		private float speed;
 
 		public bool isInterruptable { get; protected set; }
 		public bool isFinished { get; protected set; }
 
-		public MoveToPositionState(Entity_OLD entity, Vector2 target, float speed, bool isInterruptable = false) {
+		public MoveToPositionState(Entity entity, Vector2 target, float speed, bool isInterruptable = false) {
 			this.target = new MutableStateProperty<Vector2>(target);
 			this.entity = entity;
 			this.isInterruptable = isInterruptable;
@@ -30,13 +30,14 @@ namespace SoulboundBackend.Client.World.EntitySystem.AI {
 		}
 
 		public void OnUpdate(float deltaTime) {
-			Vector2 dir = (target.value - entity.position);
+			Vector2 dir = (target.value - entity.GetPos());
 			if (dir.magnitude < 0.1f) {
 				isFinished = true;
 				return;
 			}
 			dir.Normalize();
-			entity.transform.position += (Vector3)dir * deltaTime * speed;
+			Vector2 pos = entity.GetPos() + deltaTime * speed * dir;
+			entity.SetPos(pos);
 		}
 
 		public void Mutate(Action<MoveToPositionState> fieldUpdater) {

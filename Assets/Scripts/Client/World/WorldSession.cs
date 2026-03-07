@@ -9,9 +9,8 @@ using System.Threading.Tasks;
 namespace SoulboundBackend.Client.World {
 	public struct WorldSession {
 		public WorldDump? deserializationData;
-		public PlayerController player;
+		public Player player;
 		public LevelManager levelManager;
-		public EntityManager entityManager;
 		public Level level;
 	}
 }

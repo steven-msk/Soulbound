@@ -7,7 +7,7 @@ using UnityEngine;
 namespace SoulboundBackend.Client.Debug {
 	[PROTOTYPICAL]
 	public class DebugInfoDisplay : MonoBehaviour {
-		private PlayerController player;
+		private Player player;
 		private Level level;
 
 		[SerializeField] private VectorCoordinateVisual worldPos;

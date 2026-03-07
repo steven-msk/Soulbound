@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Assets.Scripts.Core.Debug.Command {
 	public interface IEntityView {
 		Guid GetGuid();
-		string GetName();
+		string GetID();
 		Vector2 GetPos();
 	}
 }

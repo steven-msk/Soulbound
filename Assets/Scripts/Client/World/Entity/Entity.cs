@@ -30,8 +30,8 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 
 		protected abstract IEntityTransform CreateTransform();
 
-		public Vector2 GetPos() => pos;
-		public void SetPos(Vector2 pos) {
+		public virtual Vector2 GetPos() => pos;
+		public virtual void SetPos(Vector2 pos) {
 			this.pos = pos;
 			transform?.SetPos(pos);
 		}

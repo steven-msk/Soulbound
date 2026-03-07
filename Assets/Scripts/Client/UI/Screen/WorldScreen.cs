@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.UI {
 	public sealed class WorldScreen : Screen {
-		private readonly PlayerController player;
+		private readonly Player player;
 
-		public WorldScreen(PlayerController player) {
+		public WorldScreen(Player player) {
 			this.player = player;
 		}
 

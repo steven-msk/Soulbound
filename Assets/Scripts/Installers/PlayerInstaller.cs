@@ -10,17 +10,18 @@ using SoulboundBackend.Client.Concurrency;
 using SoulboundBackend.Core.AssetManagement;
 
 namespace SoulboundBackend.Core.Bootstrap {
+	[Obsolete]
 	public class PlayerInstaller : InstallerAdapter {
-		private readonly PlayerController playerInstance;
+		private readonly Player playerInstance;
 
-		public PlayerInstaller(PlayerController playerInstance) {
+		public PlayerInstaller(Player playerInstance) {
 			this.playerInstance = playerInstance;
 		}
 
 		public override void InstallBindings(DiContainer container) {
 			container.BindInterfacesAndSelfTo<ConcurrentActionResolver>().AsSingle();
-			container.BindInstance<PlayerController>(playerInstance).AsSingle();
-			container.Bind<PlayerPhysics>().FromComponentOn(playerInstance.gameObject).AsSingle();
+			container.BindInstance<Player>(playerInstance).AsSingle();
+			//container.Bind<PlayerPhysics>().FromComponentOn(playerInstance.gameObject).AsSingle();
 			container.Bind<ItemUsageHandler>().AsSingle();
 		}
 	}

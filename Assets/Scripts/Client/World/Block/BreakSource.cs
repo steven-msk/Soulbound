@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Client.ItemSystem;
+using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Common;
 
 #nullable enable
@@ -8,7 +8,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
         public abstract bool fromPlayer { get; }
     }
 
-    public record PlayerToolBreakSource(PlayerController player, IBreakingTool? tool) : BreakSource {
+    public record PlayerToolBreakSource(Player player, IBreakingTool? tool) : BreakSource {
         public override bool fromPlayer => true;
     }
 

@@ -5,13 +5,13 @@ namespace SoulboundBackend.Client.World.EntitySystem.AI {
 	public class AIController : ITickable {
 		public delegate IAIState StateResolver();
 
-		private Entity_OLD self;
+		private Entity self;
 		private StateResolver stateResolver;
 		private Queue<IAIState> stateQueue = new();
 		private IAIState currentState;
 		public IAIState CurrentState => currentState;
 
-		public AIController(Entity_OLD self, StateResolver stateResolver, IAIState initialState) {
+		public AIController(Entity self, StateResolver stateResolver, IAIState initialState) {
 			this.self = self;
 			this.stateResolver = stateResolver;
 			this.currentState = initialState;

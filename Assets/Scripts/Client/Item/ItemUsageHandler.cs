@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Client;
+using SoulboundBackend.Client;
 using SoulboundBackend.Client.World;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core;
@@ -10,9 +10,9 @@ namespace SoulboundBackend.Client.ItemSystem {
     public sealed class ItemUsageHandler {
 		private readonly Dictionary<(Type itemCapability, ItemUseTrigger useTrigger), Action<ItemStack>> handlers = new();
 		private readonly List<ItemUseTrigger> disabledTriggers = new();
-		private readonly PlayerController player;
+		private readonly Player player;
 
-		public ItemUsageHandler(PlayerController player) {
+		public ItemUsageHandler(Player player) {
 			this.player = player;
 		}
 

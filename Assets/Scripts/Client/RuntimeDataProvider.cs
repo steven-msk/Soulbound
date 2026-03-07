@@ -24,7 +24,7 @@ namespace SoulboundBackend.Client {
 
 		public void SetWorldSessionState(WorldSession session) {
 			_player = new RuntimePlayerDataProvider(session.player);
-			_entities = new RuntimeEntityDataProvider(session.entityManager);
+			_entities = new RuntimeEntityDataProvider(session.level);
 		}
 
 		public void ExitWorldSessionState() {
@@ -34,36 +34,35 @@ namespace SoulboundBackend.Client {
 	}
 
 	public class RuntimePlayerDataProvider : IRuntimePlayerDataProvider {
-		public readonly PlayerController player;
+		public readonly Player player;
 
-		public RuntimePlayerDataProvider(PlayerController player) {
+		public RuntimePlayerDataProvider(Player player) {
 			this.player = player;
 		}
 
-		public Guid GetGuid() => player.id;
+		public Guid GetGuid() => player.guid;
 
-		public string GetName() => "player";
+		public string GetID() => "player";
 
-		public Vector2 GetPos() => player.position;
+		public Vector2 GetPos() => player.GetPos();
 	}
 
 
 	public class RuntimeEntityDataProvider : IRuntimeEntityDataProvider {
-		public readonly EntityManager entityManager;
+		public readonly IEntityManager entityManager;
 
-		public RuntimeEntityDataProvider(EntityManager entityManager) {
+		public RuntimeEntityDataProvider(IEntityManager entityManager) {
 			this.entityManager = entityManager;
 		}
 
 		public IEnumerable<IEntityView> GetAllEntities() {
-			foreach (var guid in entityManager.GetAllEntities()) {
-				entityManager.GetEntityByID(guid, out Entity_OLD entity);
+			foreach (var entity in entityManager.GetAllEntities()) {
 				yield return new EntityView(entity);
 			}
 		}
 
 		public bool TryGetEntity(Guid guid, out IEntityView entity) {
-			bool found = entityManager.GetEntityByID(guid, out Entity_OLD result);
+			bool found = entityManager.TryGetEntity(guid, out Entity result);
 			entity = found
 				? new EntityView(result)
 				: default;
@@ -71,20 +70,20 @@ namespace SoulboundBackend.Client {
 		}
 
 		private readonly struct EntityView : IEntityView {
-			private readonly Entity_OLD entity;
+			private readonly Entity entity;
 
-			public EntityView(Entity_OLD entity) {
+			public EntityView(Entity entity) {
 				this.entity = entity;
 			}
 
-			public Guid GetGuid() => entity.id;
+			public Guid GetGuid() => entity.guid;
 
-			public string GetName() => entity.name;
+			public string GetID() => entity.descriptor.id;
 
-			public Vector2 GetPos() => entity.position;
+			public Vector2 GetPos() => entity.GetPos();
 
 			public override string ToString() {
-				return $"entity:{GetName()}/{GetGuid()}";
+				return $"entity:{GetID()}/{GetGuid()}";
 			}
 		}
 	}
