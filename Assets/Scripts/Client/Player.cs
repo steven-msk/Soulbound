@@ -17,8 +17,8 @@ using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Zenject;
-using Level = SoulboundBackend.Client.World.Level;
-using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
+
+#nullable enable
 
 namespace SoulboundBackend.Client {
 	public class Player : Entity, IAttackPerformer, IItemConsumer, IUpdatable, IInputContext {
@@ -26,25 +26,20 @@ namespace SoulboundBackend.Client {
 		private static readonly EntityDescriptor DESCRIPTOR = new("player", null);
 		private readonly Inventory inventory;
 		private readonly Hotbar hotbar;
-
-		private PlayerStats stats = new();
+		private readonly Canvas canvas;
+		private readonly PlayerStats stats = new();
+		private readonly ItemUsageHandler itemUsageHandler;
+		private readonly AttackSource attackSource;
 		public PlayerStats Stats => stats;
 		IStatModificationHost IStatContextProvider.statModificationHost => stats;
-
-		private PlayerTransform playerTransform;
+		private PlayerTransform playerTransform = null!;
 		private AttackHandler attackHandler;
-		private AttackSource attackSource;
-		private ItemUsageHandler itemUsageHandler;
 
-#nullable enable
 		public ItemStack? MainHandStack { get; private set; }
-
-		public Vector2 center => playerTransform.Collider.bounds.center;
 
 		const float MAX_BLOCK_REACH = 5f;
 
 		public Vector2 mouseScreenPos;
-		private Canvas canvas = null!;
 		public Vector2 mouseWorldPos {
 			get {
 				Vector3 screenPos = mouseScreenPos;
@@ -57,8 +52,8 @@ namespace SoulboundBackend.Client {
 			}
 		}
 
-		public bool leftHold;
-		public bool rightHold;
+		private bool isHoldingLeftClick;
+		private bool isHoldingRightClick;
 		private ConcurrentActionResolver actionResolver = null!;
 
 		public Player(Canvas canvas, Vector2 initialPos)
@@ -68,10 +63,9 @@ namespace SoulboundBackend.Client {
 			this.canvas = canvas;
 			Soulbound.instance.GetInputManager().PushContext(this);
 
-			inventory.GetSlot(0).SetStack(new ItemStack(Items.leavesBlock, 5));
-
 			actionResolver = new ConcurrentActionResolver();
-			RegisterItemUsageCandidates(new ItemUsageHandler(this));
+			itemUsageHandler = new ItemUsageHandler(this);
+			RegisterItemUsageCandidates();
 
 			attackSource = new AttackSource(2, 10, new PlayerMainHandAttack(),
 				context => {
@@ -84,6 +78,7 @@ namespace SoulboundBackend.Client {
 				},
 				animator => animator.SetTrigger("attack")
 			);
+			attackHandler = new AttackHandler(attackSource);
 		}
 
 		public override void SetPos(Vector2 pos) => transform.SetPos(pos);
@@ -123,20 +118,20 @@ namespace SoulboundBackend.Client {
 			if (inputEvent.token.Equals(InputTokens.Mouse.leftClick)) {
 				if (inputEvent.phase == InputActionPhase.Performed) {
 					OnLeftClick();
-					leftHold = true;
+					isHoldingLeftClick = true;
 					return true;
 				} else if (inputEvent.phase == InputActionPhase.Canceled) {
-					leftHold = false;
+					isHoldingLeftClick = false;
 					return true;
 				}
 			}
 			if (inputEvent.token.Equals(InputTokens.Mouse.rightClick)) {
 				if (inputEvent.phase == InputActionPhase.Performed) {
 					OnRightClick();
-					rightHold = true;
+					isHoldingRightClick = true;
 					return true;
 				} else if (inputEvent.phase == InputActionPhase.Canceled) {
-					rightHold = false;
+					isHoldingRightClick = false;
 					return true;
 				}
 			}
@@ -158,12 +153,7 @@ namespace SoulboundBackend.Client {
 			return false;
 		}
 
-		private void RegisterItemUsageCandidates(ItemUsageHandler? itemUsageHandler) {
-			if (itemUsageHandler == null) {
-				return;
-			}
-			this.itemUsageHandler = itemUsageHandler;
-
+		private void RegisterItemUsageCandidates() {
 			itemUsageHandler.RegisterCapability<IConsumable>(ItemUseTrigger.RightClick, (consumable, stack) => consumable.StartConsume(this, stack));
 			foreach (ItemUseTrigger trigger in Enum.GetValues(typeof(ItemUseTrigger))) {
 				itemUsageHandler.RegisterCapability<IAttackSourceProvider>(trigger, (sourceProvider, stack) => {
@@ -190,16 +180,15 @@ namespace SoulboundBackend.Client {
 		}
 
 		public void TryAttack(AttackSource source) {
-			if (attackHandler?.isHandlingAttack ?? false) {
-				return;
-			}
+			if (attackHandler?.isHandlingAttack ?? false) return;
 			attackHandler = new AttackHandler(source);
 			attackHandler.StartAttack(this, null);
 		}
 
+		[Obsolete]
 		void IUpdatable.FrameUpdate(float deltaTime) {
-			if (leftHold) OnLeftHold();
-			if (rightHold) OnRightHold();
+			if (isHoldingLeftClick) OnLeftHold();
+			if (isHoldingRightClick) OnRightHold();
 		}
 
 		public void SetMainHandItem(ItemStack? itemStack) {
@@ -226,7 +215,6 @@ namespace SoulboundBackend.Client {
 			actionResolver.Submit(Request.New()
 				.UnderToken(PlayerActionTokens.BlockBreak)
 				.Execute(() => {
-					Level level = Soulbound.instance.GetActiveLevel()!;
 					BlockPos blockPos = (BlockPos)mouseWorldPos;
 					Block? targetBlock = level.BlockAt(blockPos);
 
@@ -235,13 +223,13 @@ namespace SoulboundBackend.Client {
 					}
 				})
 				.OnCondition(() => CanBreakBlockAt((BlockPos)mouseWorldPos))
-				.Suppress(PlayerActionTokens.Attack, () => !leftHold)
+				.Suppress(PlayerActionTokens.Attack, () => !isHoldingLeftClick)
 			);
 
 			actionResolver.Submit(Request.New()
 				.UnderToken(PlayerActionTokens.Attack)
 				.Execute(() => TryAttack(attackSource))
-				.Suppress(PlayerActionTokens.BlockBreak, () => !leftHold)
+				.Suppress(PlayerActionTokens.BlockBreak, () => !isHoldingLeftClick)
 			);
 		}
 
@@ -256,8 +244,8 @@ namespace SoulboundBackend.Client {
 					itemUsageHandler.HandleInput(trigger, MainHandStack);
 				})
 				.OnCondition(() => MainHandStack != null)
-				.Suppress(PlayerActionTokens.BlockBreak, () => !leftHold)
-				.Suppress(PlayerActionTokens.Attack, () => !leftHold)
+				.Suppress(PlayerActionTokens.BlockBreak, () => !isHoldingLeftClick)
+				.Suppress(PlayerActionTokens.Attack, () => !isHoldingLeftClick)
 			);
 		}
 
@@ -270,20 +258,17 @@ namespace SoulboundBackend.Client {
 		public bool CanPlaceBlockAt(BlockPos blockPos) {
 			Vector2 worldPos = (Vector2)blockPos;
 			return IsInBlockReach(worldPos)
-				   && Soulbound.instance.GetActiveLevel()!
-						.BlockAt(blockPos) == Blocks.air;
+				   && level?.BlockAt(blockPos) == Blocks.air;
 		}
 
 		public bool CanBreakBlockAt(BlockPos blockPos) {
 			Vector2 worldPos = (Vector2)blockPos;
 			return IsInBlockReach(worldPos)
-				   && Soulbound.instance.GetActiveLevel()!
-						.BlockAt(blockPos) != Blocks.air;
+				   && level?.BlockAt(blockPos) != Blocks.air;
 		}
 
 		public bool IsInBlockReach(Vector2 worldPos) {
-			Level level = Soulbound.instance.GetActiveLevel()!;
-			float dist = Vector2.Distance(worldPos, this.center);
+			float dist = Vector2.Distance(worldPos, GetCenter());
 			return dist <= MAX_BLOCK_REACH 
 				&& !level.GetTilesCovered(playerTransform.Collider.bounds)
 						 .Contains((BlockPos)worldPos);
@@ -291,6 +276,11 @@ namespace SoulboundBackend.Client {
 
 		public Inventory GetInventory() => inventory;
 		public Hotbar GetHotbar() => hotbar;
+
+		public Vector2 GetCenter() => playerTransform.Collider.bounds.center;
+
+		public bool IsHoldingLeftClick() => isHoldingLeftClick;
+		public bool IsHoldingRightClick() => isHoldingRightClick;
 
 		// since this is a lazy player entity addition, not all methods need implementation (for now)
 		// TODO: properly implement player entity methods
