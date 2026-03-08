@@ -10,6 +10,9 @@ using UnityEngine.EventSystems;
 namespace SoulboundBackend.Client.UI.Storage {
 	public interface IItemSlot {
 		event Action<ItemStack?> setStack;
+		event Action<ItemStack?, ItemStack?>? stackChanged;
+		event Action<ItemStack, int, int>? quantityChanged;
+
 		ItemStack? GetStack();
 		void SetStack(ItemStack? stack);
 

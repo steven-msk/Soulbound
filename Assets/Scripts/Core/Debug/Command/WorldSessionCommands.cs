@@ -122,6 +122,9 @@ namespace SoulboundBackend.Core.Debug.Commands {
 				}
 				if (remainder > 0) stacks[i] = item.CreateStack(remainder);
 
+				// might move this to an extension of IItemContainer
+				// which would have more util methods
+
 				// flow to stackable
 				List<int> flowSlots = stackSnapshots
 					.Where(kvp => kvp.Value?.item == item)
@@ -164,7 +167,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 				}
 
 				if (stacks.Any(s => !s.IsEmpty())) {
-					Logger.LogWarning("/give stacks exceeded capacity");
+					Logger.LogWarning("/give stacks exceeded inventory capacity");
 				}
 			}
 
