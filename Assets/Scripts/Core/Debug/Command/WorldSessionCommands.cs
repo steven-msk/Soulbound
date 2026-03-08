@@ -158,7 +158,6 @@ namespace SoulboundBackend.Core.Debug.Commands {
 					if (stack.IsEmpty()) continue;
 
 					ctx.ExecServices.Player.Inventory.SetStack(slot, stack);
-					stack.Decrement(stack.quantity);
 					currentStack++;
 
 					if (currentStack >= stacks.Length) break;

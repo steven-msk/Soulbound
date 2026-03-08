@@ -29,6 +29,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 		private void SetStack(ItemStack? stack) {
 			if (_stack != null) _stack.onQuantityChanged -= OnStackQuantityChanged;
 			if (activeDisplay != null) activeDisplay.Destroy();
+			OnStackQuantityChanged(_stack?.quantity ?? 0, stack?.quantity ?? 0);
 			_stack = stack;
 
 			if (stack != null) {
@@ -66,7 +67,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 			if (@new <= 0) {
 				DestroyTooltip();
 				tooltip = null!;
-				_stack!.onQuantityChanged -= OnStackQuantityChanged;
+				if (_stack != null) _stack.onQuantityChanged -= OnStackQuantityChanged;
 				_stack = null;
 			}
 		}

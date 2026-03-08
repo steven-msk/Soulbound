@@ -15,7 +15,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public const int COLUMNS = 9;
 		public const int ROWS = 3;
 		private readonly ItemSlot[] slots = new ItemSlot[ROWS * COLUMNS];
-		private bool isOpen = false;
+		private bool isOpen = true;
 		public event Action toggle;
 
 		public Inventory() {
