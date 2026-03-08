@@ -19,32 +19,23 @@ namespace SoulboundBackend.Client.ItemSystem {
 		[Obsolete] private static readonly AssetKey stackNumber = new("stackNumberPrefab");
 		public event Action<ItemDisplay>? onDestroy;
 		public TextMeshProUGUI stackText { get; private set; } = null!;
-		private ItemStack itemStack = null!;
-		public ItemStack stack {
-			get => itemStack;
-			set {
-				itemStack = value;
+		public ItemStack stack { get; private set; } = null!;
 
-				// prototypical - will be implemented correctly when visuals system is improved
-
-				var sprite = AssetManager.Resolve<Sprite>(itemStack.item.aspect.icon.spriteKey);
-				gameObject.GetComponent<Image>().sprite = sprite;
-			}
-		}
-		public Item item => stack.item;
-
+		// at some point display rebinding will be necessary to avoid UI churn
+		// item displays are currently not cached for stacks, all displays are recreated for each stack
+		// this results in displays dissapearing for a frame or two until the object is fully visible
+		// this issue will be handled during prod
 		public static ItemDisplay Create(ItemStack itemStack, Func<Transform?> parentSupplier) {
 			GameObject obj = Instantiate(AssetManager.Resolve<GameObject>(itemDisplay), parentSupplier.Invoke());
 			ItemDisplay display = obj.GetComponent<ItemDisplay>();
 
-			itemStack.onQuantityChanged += display.OnStackQuantityChanged;
-			display.stack = itemStack;
-			display.stackText = GetText(display);
-			display.transform.SetAsLastSibling();
+			display.SetStack(itemStack);
+			display.stackText = CreateStackText(display);
+			display.BuildVisuals();
 			return display;
 		}
 
-		private static TextMeshProUGUI GetText(ItemDisplay display) {
+		private static TextMeshProUGUI CreateStackText(ItemDisplay display) {
 			var prefab = AssetManager.Resolve<GameObject>(stackNumber);
 			GameObject? obj = GameObject.Instantiate(prefab, display.transform);
 
@@ -61,8 +52,24 @@ namespace SoulboundBackend.Client.ItemSystem {
 			text.rectTransform.sizeDelta = text.GetPreferredValues(Mathf.Infinity, Mathf.Infinity);
 			rect.anchoredPosition = new(Mathf.Max(-4, rect.sizeDelta.x - 19.14f), rect.anchoredPosition.y);
 
-			text.enabled = display.item.IsStackable();
 			return text;
+		}
+
+		private void SetStack(ItemStack stack) {
+			this.stack = stack;
+			stack.onQuantityChanged += OnStackQuantityChanged;
+			BuildVisuals();
+		}
+
+		private void BuildVisuals() {
+			Sprite sprite = AssetManager.Resolve<Sprite>(stack.item.aspect.icon.spriteKey);
+			GetComponent<Image>().sprite = sprite;
+			stackText.enabled = stack.item.IsStackable();
+
+			// the display needs to be last in rendering layer
+			// setting the transform to last sibling doesnt guarantee total visibility for every layer
+			// but for this stage of the game its good enough
+			transform.SetAsLastSibling();
 		}
 
 		public void SetRaycastTarget(bool raycastTarget) {
@@ -71,14 +78,15 @@ namespace SoulboundBackend.Client.ItemSystem {
 
 		public void Destroy() {
 			onDestroy?.Invoke(this);
-			itemStack.onQuantityChanged -= OnStackQuantityChanged;
+			stack.onQuantityChanged -= OnStackQuantityChanged;
 			GameObject.Destroy(gameObject);
 		}
 
 		public void UpdateStackText() {
-			stackText.text = itemStack.quantity.ToString();
+			stackText.text = stack.quantity.ToString();
 		}
 
+		[Obsolete("Destroy shouldnt be autonomously called")]
 		public void OnStackQuantityChanged(int old, int @new) {
 			if (@new <= 0) Destroy();
 			else UpdateStackText();
