@@ -58,7 +58,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 		private void SetStack(ItemStack stack) {
 			this.stack = stack;
 			stack.onQuantityChanged += OnStackQuantityChanged;
-			BuildVisuals();
+			RebuildVisuals();
 		}
 
 		private void BuildVisuals() {
@@ -70,6 +70,11 @@ namespace SoulboundBackend.Client.ItemSystem {
 			// setting the transform to last sibling doesnt guarantee total visibility for every layer
 			// but for this stage of the game its good enough
 			transform.SetAsLastSibling();
+		}
+
+		private void RebuildVisuals() {
+			Sprite sprite = AssetManager.Resolve<Sprite>(stack.item.aspect.icon.spriteKey);
+			GetComponent<Image>().sprite = sprite;
 		}
 
 		public void SetRaycastTarget(bool raycastTarget) {
