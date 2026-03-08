@@ -13,7 +13,6 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public BlockState active { get; private set; }
 		public BlockState inactive { get; private set; }
 		public override string name { get; init; } = "Neighbor Reactive Block";
-		public override BlockItem itemReference { get; init; }
 
 		public NeighborReactiveBlock() : base("neighborReactiveBlock") {
 		}

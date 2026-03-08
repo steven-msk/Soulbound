@@ -13,7 +13,6 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		}
 
 		public override string name { get; init; } = "Air";
-		public override BlockItem itemReference { get; init; } = null;
 
 		public override IEnumerable<ItemStack> GetDrops(BlockState blockState, BreakSource source) {
 			yield break;

@@ -21,7 +21,7 @@ using Zenject;
 #nullable enable
 
 namespace SoulboundBackend.Client {
-	public class Player : Entity, IAttackPerformer, IItemConsumer, IInputContext, IFrameUpdatableEntity {
+	public class Player : Entity, IAttackPerformer, IInputContext, IFrameUpdatableEntity {
 		private static readonly AssetKey playerKey = new("player");
 		private static readonly EntityDescriptor DESCRIPTOR = new("player", null);
 		private readonly Inventory inventory;
@@ -30,7 +30,6 @@ namespace SoulboundBackend.Client {
 		private readonly ItemUsageHandler itemUsageHandler;
 		[Obsolete] private readonly AttackSource attackSource;
 		public PlayerStats Stats => stats;
-		IStatModificationHost IStatContextProvider.statModificationHost => stats;
 		private PlayerTransform playerTransform = null!;
 		[Obsolete] private AttackHandler attackHandler;
 		private new Vector2 initialPos;
@@ -49,6 +48,7 @@ namespace SoulboundBackend.Client {
 			: base(DESCRIPTOR, initialPos) {
 			inventory = new Inventory();
 			hotbar = new Hotbar();
+			this.initialPos = initialPos;
 			Soulbound.instance.GetInputManager().PushContext(this);
 
 			actionResolver = new ConcurrentActionResolver();
@@ -141,29 +141,29 @@ namespace SoulboundBackend.Client {
 
 		[Obsolete]
 		private void RegisterItemUsageCandidates() {
-			itemUsageHandler.RegisterCapability<IConsumable>(ItemUseTrigger.RightClick, (consumable, stack) => consumable.StartConsume(this, stack));
-			foreach (ItemUseTrigger trigger in Enum.GetValues(typeof(ItemUseTrigger))) {
-				itemUsageHandler.RegisterCapability<IAttackSourceProvider>(trigger, (sourceProvider, stack) => {
-					if (sourceProvider.GetAttackSource(trigger, out var attackSource)) {
-						UnityEngine.Debug.Log("using attack item: "+ trigger);
-						TryAttack(attackSource);
-					}
-				});
-			}
-			itemUsageHandler.RegisterCapability<IPlaceable>(ItemUseTrigger.LeftHold, (placeable, stack) => {
-				BlockPos blockPos = (BlockPos)GetWorldPointerPos();
+			//itemUsageHandler.RegisterCapability<IConsumable>(ItemUseTrigger.RightClick, (consumable, stack) => consumable.StartConsume(this, stack));
+			//foreach (ItemUseTrigger trigger in Enum.GetValues(typeof(ItemUseTrigger))) {
+			//	itemUsageHandler.RegisterCapability<IAttackSourceProvider>(trigger, (sourceProvider, stack) => {
+			//		if (sourceProvider.GetAttackSource(trigger, out var attackSource)) {
+			//			UnityEngine.Debug.Log("using attack item: "+ trigger);
+			//			TryAttack(attackSource);
+			//		}
+			//	});
+			//}
+			//itemUsageHandler.RegisterCapability<IPlaceable>(ItemUseTrigger.LeftHold, (placeable, stack) => {
+			//	BlockPos blockPos = (BlockPos)GetWorldPointerPos();
 
-				if (CanPlaceBlockAt(blockPos)) {
-					level.PlaceBlock(blockPos, placeable.Place(stack, blockPos));
-				}
-			});
-			itemUsageHandler.RegisterCapability<IBreakingTool>(ItemUseTrigger.LeftHold, (tool, stack) => {
-				BlockPos blockPos = (BlockPos)GetWorldPointerPos();
+			//	if (CanPlaceBlockAt(blockPos)) {
+			//		level.PlaceBlock(blockPos, placeable.Place(stack, blockPos));
+			//	}
+			//});
+			//itemUsageHandler.RegisterCapability<IBreakingTool>(ItemUseTrigger.LeftHold, (tool, stack) => {
+			//	BlockPos blockPos = (BlockPos)GetWorldPointerPos();
 
-				if (IsInBlockReach((Vector2)blockPos)) {
-					tool.TryBreak(blockPos, level, new PlayerToolBreakSource(this, tool));
-				}
-			});
+			//	if (IsInBlockReach((Vector2)blockPos)) {
+			//		tool.TryBreak(blockPos, level, new PlayerToolBreakSource(this, tool));
+			//	}
+			//});
 		}
 
 		[Obsolete]
@@ -201,7 +201,7 @@ namespace SoulboundBackend.Client {
 					Block? targetBlock = level.BlockAt(blockPos);
 
 					if (0 >= targetBlock?.breakRequirement?.minBreakPower) {
-						level.BreakBlock(blockPos, new PlayerToolBreakSource(this, null));
+						level.BreakBlock(blockPos, new PlayerToolBreakSource(this));
 					}
 				})
 				.OnCondition(() => CanBreakBlockAt((BlockPos)GetWorldPointerPos()))

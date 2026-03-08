@@ -1,45 +1,35 @@
 using System;
-using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 using UnityEngine;
-using System.Resources;
-using SoulboundBackend.Core.Resource;
-using ResourceManager = SoulboundBackend.Core.Resource.AssetManager;
-using SoulboundBackend.Core;
-using SoulboundBackend.Client.UI.Storage;
 
 #nullable enable
 
 namespace SoulboundBackend.Client.ItemSystem {
 	public abstract partial class Item {
-		public const int DEFAULT_MAX_STACK = 256;
+		public const int DEFAULT_FULL_STACK = 256;
 
+		private readonly string id;
 		public abstract string name { get; }
 		public abstract ItemAspect aspect { get; }
-		public virtual int maxStackSize { get; } = DEFAULT_MAX_STACK;
-		public bool IsStackable => maxStackSize > 1;
+		public virtual int fullStackSize { get; } = DEFAULT_FULL_STACK;
 
-		public virtual void OnAttachedInSlot(IItemSlot slot) {
+		protected Item(string id) {
+			this.id = id;
 		}
 
-		public virtual void OnDetachedFromSlot(IItemSlot slot) {
-		}
-
-		public static int CustomMaxStack(int maxStack) => maxStack;
-
-		public bool HasCapability<T>() where T : IItemCapability {
-			return typeof(T).IsAssignableFrom(this.GetType());
-		}
-
-		public bool HasCapability(Type type) {
-			return type.IsAssignableFrom(this.GetType());
+		public virtual ItemStack CreateStack(int quantity = 1) {
+			return new ItemStack(this, Mathf.Clamp(quantity, 0, fullStackSize));
 		}
 
 		public override string ToString() {
-			return name;
+			return $"item:{name}";
 		}
 
 		public override int GetHashCode() {
-			return HashCode.Combine(name, aspect, maxStackSize, IsStackable, hashedID);
+			return HashCode.Combine(name, aspect, fullStackSize, hashedID);
 		}
+
+		public bool IsStackable() => fullStackSize > 1;
+
+		public string GetID() => id;
 	}
 }

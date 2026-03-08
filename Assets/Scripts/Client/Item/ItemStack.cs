@@ -6,23 +6,20 @@ using UnityEngine;
 namespace SoulboundBackend.Client.ItemSystem {
 	public class ItemStack {
 		public event Action<int, int>? onQuantityChanged;
-		public Item item { get; }
+		public readonly Item item;
 		public int quantity { get; private set; }
-		public int MaxStackSize => item.maxStackSize;
-		[Obsolete] public bool isDropped { get; private set; } = false;
 
-		public ItemStack(Item item, int quantity) {
+		internal ItemStack(Item item, int quantity) {
 			this.item = item;
-			this.quantity = Mathf.Min(quantity, item.maxStackSize);
+			this.quantity = Mathf.Clamp(quantity, 0, item.fullStackSize);
 		}
 
-		public bool IsFull() => quantity >= item.maxStackSize;
+		public bool IsFull() => quantity >= item.fullStackSize;
 		public bool IsEmpty() => quantity <= 0;
 
 		public void SetQuantity(int amount) {
 			int oldQuantity = quantity;
-			quantity = Mathf.Min(amount, MaxStackSize);
-			quantity = Mathf.Max(0, quantity);		// disallow negative quantity
+			quantity = Mathf.Clamp(amount, 0, item.fullStackSize);
 			OnQuantityChanged(oldQuantity, quantity);
 		}
 
@@ -30,8 +27,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public int Increment(int amount = 1) {
 			if (amount <= 0) return 0;
 
-			int space = MaxStackSize - quantity;
-			int added = Mathf.Min(space, amount);
+			int added = Mathf.Min(GetSpaceLeft(), amount);
 			quantity += added;
 			OnQuantityChanged(quantity - added, quantity);
 			return added;
@@ -52,5 +48,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 		}
 
 		// FEATUREIMPL: dropped item stacks converging to avoid lag
+
+		public int GetSpaceLeft() => item.fullStackSize - quantity;
 	}
 }

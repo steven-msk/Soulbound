@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Client.ItemSystem;
+using SoulboundBackend.Client.ItemSystem;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,10 +15,6 @@ namespace SoulboundBackend.Client.World.BlockSystem {
             this.minBreakPower = minBreakPower;
             this.compatibleTypes = compatibleTypes;
             this.explosionResistance = explosionResistance;
-        }
-
-        public bool CanBreakWith(IBreakingTool tool) {
-            return tool.breakingPower >= minBreakPower && compatibleTypes.HasFlag(tool.types);
         }
     }
 }

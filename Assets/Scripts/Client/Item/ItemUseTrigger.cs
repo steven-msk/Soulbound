@@ -1,4 +1,7 @@
-﻿public enum ItemUseTrigger {
+using System;
+
+[Obsolete]
+public enum ItemUseTrigger {
 	None = 0,
 	LeftClick,
 	RightClick,

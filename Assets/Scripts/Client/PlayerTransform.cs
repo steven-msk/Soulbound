@@ -45,7 +45,7 @@ namespace SoulboundBackend.Client {
 		[SerializeField] private float jumpToFlightTimer;
 		[SerializeField] private float _facing;
 		public float facing {
-			get => facing;
+			get => _facing;
 			set {
 				_facing = value;
 				Vector3 scale = transform.localScale;

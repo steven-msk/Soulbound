@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace SoulboundBackend.Client.ItemSystem {
+	[Obsolete]
     public sealed class ItemUsageHandler {
 		private readonly Dictionary<(Type itemCapability, ItemUseTrigger useTrigger), Action<ItemStack>> handlers = new();
 		private readonly List<ItemUseTrigger> disabledTriggers = new();
@@ -16,7 +17,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 			this.player = player;
 		}
 
-		public void RegisterCapability<T>(ItemUseTrigger trigger, Action<T, ItemStack> action) where T : IItemCapability {
+		public void RegisterCapability<T>(ItemUseTrigger trigger, Action<T, ItemStack> action) {
 			handlers[(typeof(T), trigger)] = (itemStack => {
 				if (itemStack.item is T item) {
 					action.Invoke(item, itemStack);

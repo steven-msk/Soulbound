@@ -8,7 +8,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
         public abstract bool fromPlayer { get; }
     }
 
-    public record PlayerToolBreakSource(Player player, IBreakingTool? tool) : BreakSource {
+    public record PlayerToolBreakSource(Player player) : BreakSource {
         public override bool fromPlayer => true;
     }
 

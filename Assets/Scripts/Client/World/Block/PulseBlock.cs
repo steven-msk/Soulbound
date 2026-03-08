@@ -13,7 +13,6 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public BlockState on { get; private set; }
 		public BlockState off { get; private set; }
 		public override string name { get; init; } = "Pulse Block";
-		public override BlockItem itemReference { get; init; }
 
 		public PulseBlock() : base("pulseBlock") {
 		}

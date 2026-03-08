@@ -13,7 +13,6 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		private BlockState movingState;
 		private BlockState staticState;
 		public override string name { get; init; } = "Moving Ticking Block";
-		public override BlockItem itemReference { get; init; }
 
 		public override AssetKey GetRenderTileKey(BlockState blockState) => new("WhiteSquareTile");
 

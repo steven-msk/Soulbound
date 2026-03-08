@@ -33,7 +33,7 @@ namespace SoulboundBackend.Client.UI {
 			if (slots == null || slots.Count == 0) return false;
 
 			ItemStack transitStack = scope.transitStack.GetStack()!;
-			int spaceLeft = item.maxStackSize - transitStack.quantity;
+			int spaceLeft = item.fullStackSize - transitStack.quantity;
 			foreach (var slot in slots) {
 				if (spaceLeft <= 0) break;
 

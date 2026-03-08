@@ -16,18 +16,15 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 	public abstract partial class Block {
 		public string id { get; private set; } = null!;
 		public abstract string name { get; init; }
-		[Obsolete] public abstract BlockItem? itemReference { get; init; }
 		public virtual BreakRequirement? breakRequirement { get; init; } = null;
-
 
 		public BlockState defaultState { get; private set; } = null!;
 		public virtual bool hasTileEntity { get; protected set; } = false;
 
 		protected Block(string id) => this.ConstructNonGeneric(id);
 
-		protected Block(string id, string name, BlockItem itemReference, BreakRequirement? breakRequirement) {
+		protected Block(string id, string name, BreakRequirement? breakRequirement) {
 			this.name = name;
-			this.itemReference = itemReference;
 			this.breakRequirement = breakRequirement;
 			this.ConstructNonGeneric(id);
 		}

@@ -61,7 +61,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 			text.rectTransform.sizeDelta = text.GetPreferredValues(Mathf.Infinity, Mathf.Infinity);
 			rect.anchoredPosition = new(Mathf.Max(-4, rect.sizeDelta.x - 19.14f), rect.anchoredPosition.y);
 
-			text.enabled = display.item.IsStackable;
+			text.enabled = display.item.IsStackable();
 			return text;
 		}
 

@@ -22,7 +22,7 @@ namespace SoulboundBackend.Client.UI {
 			if (!CanExecute()) return false;
 
 			ItemStack transitStack = scope.transitStack.GetStack()!;
-			int space = transitStack.item.maxStackSize - slot.GetStack()!.quantity;
+			int space = transitStack.item.fullStackSize - slot.GetStack()!.quantity;
 			if (space <= 0) return false;
 
 			int transfer = Math.Min(space, transitStack.quantity);

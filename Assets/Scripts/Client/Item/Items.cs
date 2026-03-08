@@ -9,11 +9,6 @@ using Newtonsoft.Json;
 
 namespace SoulboundBackend.Client.ItemSystem {
 	public partial class Items : ICachedRegistry<Item> {
-		[ItemCache(nameof(grassBlock))] public static BlockItem grassBlock => Lookup(() => new BlockItem("Grass Block", ItemAspect.Simple(new AssetKey("grass_icon"), ppu: 16), 210, () => Blocks.grass));
-		[ItemCache(nameof(stoneBlock))] public static BlockItem stoneBlock => Lookup(() => new BlockItem("Stone Block", ItemAspect.Simple(new AssetKey("stone_icon"), ppu: 8), Item.DEFAULT_MAX_STACK, () => Blocks.stone));
-		[ItemCache(nameof(dirtBlock))] public static BlockItem dirtBlock => Lookup(() => new BlockItem("Dirt Block", ItemAspect.Simple(new AssetKey("dirt_icon"), ppu: 8), Item.DEFAULT_MAX_STACK, () => Blocks.dirt));
-		[ItemCache(nameof(woodBlock))] public static BlockItem woodBlock => Lookup(() => new BlockItem("Wood Block", ItemAspect.Simple(new AssetKey("wood_icon"), ppu: 8), Item.DEFAULT_MAX_STACK, () => Blocks.wood));
-		[ItemCache(nameof(leavesBlock))] public static BlockItem leavesBlock => Lookup(() => new BlockItem("Leaves Block", ItemAspect.Simple(new AssetKey("leaves_icon"), ppu: 8), Item.DEFAULT_MAX_STACK, () => Blocks.leaves));
 
 		static Items() {
             foreach (var property in typeof(Items).GetProperties(BindingFlags.Static | BindingFlags.Public)) {

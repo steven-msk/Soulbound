@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 namespace SoulboundBackend.Client.ItemSystem {
 	[JsonConverter(typeof(StatProviderConverter))]
 	[Obsolete]
-	public interface IStatProvider : IItemCapability {
+	public interface IStatProvider {
 		public IEnumerable<StatMapping> statMappings { get; }
 		public ContextHandle<IStatReceiver> contextHandle { get; }
 
