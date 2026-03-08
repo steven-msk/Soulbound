@@ -10,6 +10,12 @@ using Newtonsoft.Json;
 namespace SoulboundBackend.Client.ItemSystem {
 	public partial class Items : ICachedRegistry<Item> {
 
+		public static readonly StackItem stackitem_1 = new(1);
+		public static readonly StackItem stackitem_10 = new(10);
+		public static readonly StackItem stackitem_256 = new(Item.DEFAULT_FULL_STACK);
+		public static readonly StackItem stackitem_64 = new(64);
+
+		[Obsolete]
 		static Items() {
             foreach (var property in typeof(Items).GetProperties(BindingFlags.Static | BindingFlags.Public)) {
                 var cacheAttribute = property.GetCustomAttribute<ItemCache>();
@@ -19,10 +25,12 @@ namespace SoulboundBackend.Client.ItemSystem {
             }
         }
 
+		[Obsolete]
 		private static TItem Lookup<TItem>(Func<TItem> instanceSupplier, [CallerMemberName] string propertyName = null) where TItem : Item {
 			return (TItem)ICachedRegistry<Item>.Lookup(propertyName, instanceSupplier);
 		}
 
+		[Obsolete]
 		public static Item ByHashedID(int hashedID) {
 			if (ICachedRegistry<Item>.cached.TryGetValue(hashedID, out Item item)) {
 				return item;
