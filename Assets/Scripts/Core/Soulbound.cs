@@ -1,25 +1,29 @@
 using Cysharp.Threading.Tasks;
+using Newtonsoft.Json;
 using SoulboundBackend.Client;
 using SoulboundBackend.Client.Input;
+using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.SettingSystem;
 using SoulboundBackend.Client.UI;
 using SoulboundBackend.Client.UI.Screens;
 using SoulboundBackend.Client.World;
+using SoulboundBackend.Client.World.EntitySystem;
 using SoulboundBackend.Common;
 using SoulboundBackend.Common.Json;
 using SoulboundBackend.Core.Debug;
+using SoulboundBackend.Core.Debug.Commands;
 using SoulboundBackend.Core.Resource;
 using SoulboundBackend.Core.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
-using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
-using SoulboundBackend.Core.Debug.Commands;
+
 
 #nullable enable
 
@@ -75,6 +79,9 @@ namespace SoulboundBackend.Core {
 			// scene may not be available at this time
 			uiHandler = new UIHandler(UnityEngine.Object.FindFirstObjectByType<Canvas>());
 			inputManager.PushContext(uiHandler);
+
+			RuntimeHelpers.RunClassConstructor(typeof(EntityType).TypeHandle);
+			RuntimeHelpers.RunClassConstructor(typeof(Items).TypeHandle);
 		}
 
 		public void Launch() {

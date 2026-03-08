@@ -50,5 +50,16 @@ namespace SoulboundBackend.Client.ItemSystem {
 		// FEATUREIMPL: dropped item stacks converging to avoid lag
 
 		public int GetSpaceLeft() => item.fullStackSize - quantity;
+
+		public bool IsStackableWith(ItemStack itemStack) {
+			return itemStack.item == this.item && this.GetSpaceLeft() > 0;
+		}
+
+		public void FillFrom(ItemStack itemStack) {
+			if (!IsStackableWith(itemStack)) return;
+
+			int added = itemStack.Decrement(GetSpaceLeft());
+			this.Increment(added);
+		}
 	}
 }

@@ -1,3 +1,4 @@
+using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.World;
 using SoulboundBackend.Client.World.EntitySystem;
 using SoulboundBackend.Core.Debug.Commands;
@@ -41,12 +42,27 @@ namespace SoulboundBackend.Client {
 
 	public class RuntimePlayerExecutionService : IPlayerExecutionService {
 		public readonly Player player;
+		private readonly IInventoryExecutionService _inventory;
+		public IInventoryExecutionService Inventory => _inventory;
 
 		public RuntimePlayerExecutionService(Player player) {
 			this.player = player;
+			_inventory = new RuntimeInventoryExecutionService(player.GetInventory());
 		}
 
 		public void SetPos(Vector2 pos) => player.SetPos(pos);
+	}
+
+	public class RuntimeInventoryExecutionService : IInventoryExecutionService {
+		private readonly Inventory inventory;
+
+		public RuntimeInventoryExecutionService(Inventory inventory) {
+			this.inventory = inventory;
+		}
+
+		public void SetStack(int slotIndex, ItemStack? stack) {
+			inventory.GetSlot(slotIndex).SetStack(stack);
+		}
 	}
 
 	public class RuntimeEntityExecutionService : IEntityExecutionService {

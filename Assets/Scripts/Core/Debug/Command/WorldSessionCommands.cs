@@ -1,4 +1,6 @@
 using Assets.Scripts.Core.Debug.Command;
+using SoulboundBackend.Client.ItemSystem;
+using SoulboundBackend.Client.UI.Storage;
 using SoulboundBackend.Client.World;
 using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Client.World.EntitySystem;
@@ -10,6 +12,8 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
+
+#nullable enable
 
 namespace SoulboundBackend.Core.Debug.Commands {
 	public sealed class WorldSessionCommands : ICommandProvider {
@@ -29,11 +33,13 @@ namespace SoulboundBackend.Core.Debug.Commands {
 				})
 				.GetRootNode();
 		private readonly CommandNode spawn = SpawnCommand();
+		private readonly CommandNode give = GiveCommand();
 
 		public IEnumerable<CommandNode> GetCommands() {
 			yield return teleport;
 			yield return setblock;
 			yield return spawn;
+			yield return give;
 		}
 
 		private static CommandBuilder Coords2D() {
@@ -91,6 +97,83 @@ namespace SoulboundBackend.Core.Debug.Commands {
 				.Executes(spawnEntity)
 				.ThenCursorOf(Coords2D())
 				.Executes(spawnEntity)
+			.GetRootNode();
+		}
+
+		private static CommandNode GiveCommand() {
+			static void giveItem(CommandParsingContext ctx) {
+				Item item = ctx.Args.Get<Item>("item");
+				int quantity = ctx.Args.TryGet("quantity", out int result) ? result : 1;
+				if (quantity <= 0) {
+					Logger.LogWarning("Quantity must be positive");
+					return;
+				}
+
+				Dictionary<int, ItemStack?> stackSnapshots = ctx.Data.Player.GetInventory().stacks;
+				int fullStacks = quantity / item.fullStackSize;
+				int remainder = quantity % item.fullStackSize;
+
+				// get stacks
+				int stackCount = fullStacks + (remainder > 0 ? 1 : 0);
+				ItemStack[] stacks = new ItemStack[stackCount];
+				int i;
+				for (i = 0; i < fullStacks; i++) {
+					stacks[i] = item.CreateStack(item.fullStackSize);
+				}
+				if (remainder > 0) stacks[i] = item.CreateStack(remainder);
+
+				// flow to stackable
+				List<int> flowSlots = stackSnapshots
+					.Where(kvp => kvp.Value?.item == item)
+					.Where(kvp => kvp.Value!.GetSpaceLeft() > 0)
+					.Select(kvp => kvp.Key)
+					.ToList();
+				int currentStack = 0;
+				foreach (var slot in flowSlots) {
+					ItemStack stack = stackSnapshots[slot]!;
+					if (!stack.IsStackableWith(stacks[currentStack])) continue;
+
+					stack.FillFrom(stacks[currentStack]);
+					ctx.ExecServices.Player.Inventory.SetStack(slot, stack);
+
+					if (stacks[currentStack].IsEmpty()) currentStack++;
+					if (currentStack >= stacks.Length) break;
+				}
+
+				// refill remaining stacks
+				for (i = 0; i < stacks.Length - 1; i++) {
+					for (int j = i + 1; j < stacks.Length; j++) {
+						stacks[i].FillFrom(stacks[j]);
+					}
+				}
+
+				// flow to empty slots
+				List<int> emptySlots = ctx.Data.Player.GetInventory().stacks
+					.Where(kvp => kvp.Value?.IsEmpty() ?? true)
+					.Select(kvp => kvp.Key)
+					.ToList();
+				currentStack = 0;
+				foreach (var slot in emptySlots) {
+					ItemStack stack = stacks[currentStack];
+					if (stack.IsEmpty()) continue;
+
+					ctx.ExecServices.Player.Inventory.SetStack(slot, stack);
+					stack.Decrement(stack.quantity);
+					currentStack++;
+
+					if (currentStack >= stacks.Length) break;
+				}
+
+				if (stacks.Any(s => !s.IsEmpty())) {
+					Logger.LogWarning("/give stacks exceeded capacity");
+				}
+			}
+
+			return CommandBuilder.Literal("give")
+				.Then(new ItemArgumentCommandNode("item"))
+				.Executes(giveItem)
+				.Then(new ArgumentCommandNode<int>("quantity", new IntParser()))
+				.Executes(giveItem)
 			.GetRootNode();
 		}
 	}

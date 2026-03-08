@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 namespace SoulboundBackend.Client.ItemSystem {
 	[PROTOTYPICAL]
 	public sealed class StackItem : Item {
-		public override string name => "Stackable Item";
+		public override string name => $"Stack Item: {fullStackSize}";
 
-		public override ItemAspect aspect => ItemAspect.Simple(new AssetKey("Circle"));
+		public override ItemAspect aspect => ItemAspect.Simple(new AssetKey("idkwhatthisis"));
 
 		public override int fullStackSize { get; }
 

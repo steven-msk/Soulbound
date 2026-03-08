@@ -1,11 +1,13 @@
 using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.UI.Storage;
+using SoulboundBackend.Core.Debug.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
 #nullable enable
 
@@ -31,7 +33,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 
 		private void AssertSetStack() {
 			if (setStack == null) {
-				UnityEngine.Debug.LogException(new InvalidOperationException("SetStack callback is null"));
+				Logger.LogError(new InvalidOperationException("SetStack callback is null"));
 			}
 		}
 

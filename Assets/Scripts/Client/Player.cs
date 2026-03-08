@@ -187,8 +187,6 @@ namespace SoulboundBackend.Client {
 
 			// provisory
 			level.InteractBlock((BlockPos)GetWorldPointerPos());
-
-			inventory.GetSlot(0).SetStack(Items.stackitem_256.CreateStack());
 		}
 
 		// POTENTIAL FEATUREIMPL: add Reach int stat

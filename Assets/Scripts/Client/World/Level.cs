@@ -57,7 +57,6 @@ namespace SoulboundBackend.Client.World {
 			this.biomeMap = new BiomeMap(new IBiome[] { biome1, biome2 });
 			this.heightmap = new Heightmap(TERRAIN_PLANE_Y);
 			this.cavemap = new Cavemap(seed);
-			System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(EntityType).TypeHandle);
 		}
 
 		// PLANNED REWORK: world rendering system

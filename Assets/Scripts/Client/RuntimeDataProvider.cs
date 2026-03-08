@@ -1,4 +1,5 @@
 using Assets.Scripts.Core.Debug.Command;
+using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.World;
 using SoulboundBackend.Client.World.EntitySystem;
 using System;
@@ -42,9 +43,20 @@ namespace SoulboundBackend.Client {
 
 		public Guid GetGuid() => player.guid;
 
-		public string GetID() => "player";
+		public string GetID() => player.descriptor.id;
 
 		public Vector2 GetPos() => player.GetPos();
+
+		public InventoryData GetInventory() {
+			Inventory inventory = player.GetInventory();
+			IEnumerable<int> slots = inventory.GetAllSlots();
+
+			return new InventoryData {
+				slots = slots,
+				stacks = slots.ToDictionary(s => s, s => inventory.GetSlot(s).GetStack())
+			};
+		}
+
 	}
 
 
