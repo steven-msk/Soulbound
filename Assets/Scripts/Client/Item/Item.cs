@@ -14,6 +14,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 
 		protected Item(string id) {
 			this.id = id;
+			ItemRegistry.Register(this);
 		}
 
 		public virtual ItemStack CreateStack(int quantity = 1) {
