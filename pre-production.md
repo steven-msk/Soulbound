@@ -413,9 +413,9 @@ Based on the dependency graph, this could be an optimal order:
 1. [Input system](#4-input-system) **>|**
 2. [*Action Request System*](#18-action-request-system)* **>|** *("deprecated" - read note below)*
 3. [Serialization](#17-serialization)* (foundation only) *delayed until all serialization parameters are stable*
-4. [Stat system](#5-stat-system) (+Item system)* (*some features might be missing, but most of the system is working*)
-5. [Entity system](#6-entity-system)* **>|** *(components will be introduced as the serialization and action requests designs develop)*
-6. [Block system](#8-block-system)* **>|** *TileEntity serialization and lifetime aspects TBD when working on the level system*
+4. [*Stat system*](#5-stat-system) (*deprecated*)
+5. [Entity system](#6-entity-system) **>|** *components will be introduced as the serialization and action requests designs develop*
+6. [Block system](#8-block-system) **>|** *TileEntity serialization and lifetime aspects TBD when working on the level system*
 7. [Chunk generation](#9-chunk-generation) **>|** *(proper world generation is delayed to prod)*
 11. [World rendering](#10-world-rendering) **>|** *(some performance issues may still persist, but will be tackled in prod)*
 12. [Level system](#19-level-system) **>|**
@@ -433,6 +433,7 @@ These will be resolved in prod as there are barely any features using these, but
 
 > EDIT: during debug features implementation, there was a rework of the input system which has brought it to a stable state. Because of this, the action request system is somewhat deprecated. Additionally, the introduction of the commands feature also brought the conept of IRuntimeDataProvider and IRuntimeExecutionService, both of which can be used across the large project.
 > Alongside this, some revisits need to be made for the Entity, Item, Stats and Block systems due to other systems which are now changed having effect on those.
+> ANOTHER EDIT (3.9.2026): the three systems (blocks, entities and items) are now up to date and ready to push for prod.
 
 ##### Exceptions
 
