@@ -13,6 +13,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public BlockState on { get; private set; }
 		public BlockState off { get; private set; }
 		public override string name { get; init; } = "Pulse Block";
+		public override int minBreakLevel { get; init; } = 0;
 
 		public PulseBlock() : base("pulseBlock") {
 		}

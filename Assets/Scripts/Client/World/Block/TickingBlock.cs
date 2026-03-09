@@ -12,6 +12,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 	public sealed class TickingBlock : Block, ITickingBlock {
 		private BlockState[,] states;	// [on=1/off=0, counter={0..19}]
 		public override string name { get; init; } = "Ticking Block";
+		public override int minBreakLevel { get; init; } = 0;
 
 		public TickingBlock() : base("tickingBlock") {
 		}

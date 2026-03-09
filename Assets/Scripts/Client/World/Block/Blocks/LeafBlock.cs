@@ -15,14 +15,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 
 		public LeafBlock() : base("leaves") { }
 		public override string name { get; init; } = "Leaves";
-		public override BreakRequirement breakRequirement { get; init; } = new BreakRequirement(0, ToolType.All, 10);
-
-		//public override IEnumerable<ItemStack> GetDrops(BlockState blockState, BreakSource source) {
-		//	if (source is not PlayerToolBreakSource) {
-		//		yield break;
-		//	}
-		//	yield return new(Items.leavesBlock, 1);
-		//}
+		public override int minBreakLevel { get; init; } = 0;
 
 		public override AssetKey GetRenderTileKey(BlockState blockState) => new("leaves");
 

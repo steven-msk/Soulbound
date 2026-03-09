@@ -13,6 +13,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public BlockState active { get; private set; }
 		public BlockState inactive { get; private set; }
 		public override string name { get; init; } = "Neighbor Reactive Block";
+		public override int minBreakLevel { get; init; } = 0;
 
 		public NeighborReactiveBlock() : base("neighborReactiveBlock") {
 		}

@@ -11,11 +11,11 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 	public partial class Blocks : IResourceModule, ICachedRegistry<Block> {
 		private static Dictionary<int, Block> blocksByHashedId = new();
 
-		public static readonly Block air = new GenericBlock("air", "Air", null, null);
-		public static readonly Block grass = new GenericBlock("grass", "Grass Block", new AssetKey("grass"), new BreakRequirement(1, ToolType.None, 10));
-		public static readonly Block dirt = new GenericBlock("dirt", "Dirt Block", new AssetKey("dirt"), new BreakRequirement(1, ToolType.None, 10));
-		public static readonly Block stone = new GenericBlock("stone", "Stone Block", new AssetKey("stone"), new BreakRequirement(1, ToolType.None, 10));
-		public static readonly Block wood = new GenericBlock("wood", "Wood", new AssetKey("wood"), new BreakRequirement(0, ToolType.None, 10));
+		public static readonly Block air = new AirBlock();
+		public static readonly Block grass = new GenericBlock("grass", "Grass Block", new AssetKey("grass"), 0);
+		public static readonly Block dirt = new GenericBlock("dirt", "Dirt Block", new AssetKey("dirt"), 0);
+		public static readonly Block stone = new GenericBlock("stone", "Stone Block", new AssetKey("stone"), 1);
+		public static readonly Block wood = new GenericBlock("wood", "Wood", new AssetKey("wood"), 0);
 		public static readonly Block leaves = new LeafBlock();
 
 		public static readonly ToggleBlock toggleBlock = new();

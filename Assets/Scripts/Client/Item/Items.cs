@@ -20,6 +20,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public static readonly ChargeableItem chargeableItem = new();
 		public static readonly DebugPointerItem debugPointer = new();
 		public static readonly InventoryListenerItem inventoryListenerItem = new();
+		public static readonly BlockBreakerItem blockBreakerItem = new();
 
 		[Obsolete]
 		static Items() {

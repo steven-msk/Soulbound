@@ -11,6 +11,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 	[PROTOTYPICAL]
 	public sealed class SelfDestructBlock : Block {
 		public override string name { get; init; } = "Self Destruct Block";
+		public override int minBreakLevel { get; init; } = 0;
 
 		public SelfDestructBlock() : base("selfDestructBlock") {
 		}

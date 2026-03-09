@@ -9,13 +9,10 @@ using UnityEngine.Tilemaps;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
 	public sealed class AirBlock : Block {
-		public AirBlock() : base("air") {
-		}
-
 		public override string name { get; init; } = "Air";
+		public override int minBreakLevel { get; init; } = 0;
 
-		public override IEnumerable<ItemStack> GetDrops(BlockState blockState, BreakSource source) {
-			yield break;
+		public AirBlock() : base("air") {
 		}
 
 		public override AssetKey GetRenderTileKey(BlockState blockState) => null;
