@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.ItemSystem {
-	public interface IItemAction {
+	public interface IItemActionHandler {
 		bool ValidateTrigger(ItemActionTrigger trigger);
 
 		// pass in a context param if number of params grows

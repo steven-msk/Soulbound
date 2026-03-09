@@ -196,7 +196,7 @@ namespace SoulboundBackend.Client {
 			Item? item = itemStack?.item;
 			if (item == null) return false;
 
-			if (item is not IItemAction action) return false;
+			if (item is not IItemActionHandler action) return false;
 			if (!action.ValidateTrigger(trigger)) return false;
 
 			ItemActionContext context = new() {

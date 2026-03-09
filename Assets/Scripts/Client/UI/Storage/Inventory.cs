@@ -1,14 +1,9 @@
-using SoulboundBackend.Client.Input;
 using SoulboundBackend.Client.UI.Storage;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Unity.VisualScripting;
-using UnityEngine;
-using UnityEngine.EventSystems;
+
+#nullable enable
 
 namespace SoulboundBackend.Client.ItemSystem {
 	public sealed class Inventory : IItemContainer {
@@ -16,12 +11,32 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public const int ROWS = 3;
 		private readonly ItemSlot[] slots = new ItemSlot[ROWS * COLUMNS];
 		private bool isOpen = true;
-		public event Action toggle;
+		private readonly HashSet<Item> uniqueItems = new();
+		public event Action<Item>? onItemAdded;
+		public event Action<Item>? onItemRemoved;
+		public event Action toggle = null!;
 
 		public Inventory() {
 			for (int i = 0; i < ROWS * COLUMNS; i++) {
-				slots[i] = new ItemSlot(this, i);
+				ItemSlot slot = new(this, i);
+				slots[i] = slot;
+
+				slot.stackChanged += UpdateUniqueItems;
 			}
+			onItemAdded += item => {
+				foreach (var uniqueItem in uniqueItems) {
+					if (uniqueItem is IInventoryListener containerListener) {
+						containerListener.OnItemAdded(item, this);
+					}
+				}
+			};
+			onItemRemoved += item => {
+				foreach (var uniqueItem in uniqueItems) {
+					if (uniqueItem is IInventoryListener containerListener) {
+						containerListener.OnItemRemoved(item, this);
+					}
+				}
+			};
 		}
 
 		public IItemSlot GetSlot(int index) {
@@ -38,6 +53,26 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public void Toggle() {
 			isOpen = !isOpen;
 			toggle();
+		}
+
+		private void UpdateUniqueItems(ItemStack? oldStack, ItemStack? newStack) {
+			if (newStack != null && !uniqueItems.Contains(newStack.item)) {
+				uniqueItems.Add(newStack.item);
+				onItemAdded?.Invoke(newStack.item);
+			}
+			if (oldStack != null) {
+				bool stillExists = false;
+				foreach (var slot in slots) {
+					if (slot.GetStack()?.item == oldStack.item) {
+						stillExists = true;
+						break;
+					}
+				}
+				if (!stillExists) {
+					uniqueItems.Remove(oldStack.item);
+					onItemRemoved?.Invoke(oldStack.item);
+				}
+			}
 		}
 
 		public bool IsOpen() => isOpen;

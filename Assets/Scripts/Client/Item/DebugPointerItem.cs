@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.ItemSystem {
 	[PROTOTYPICAL]
-	public sealed class DebugPointerItem : Item, IItemAction {
+	public sealed class DebugPointerItem : Item, IItemActionHandler {
 		public override string name => "Debug Pointer";
 		public override int fullStackSize => 1;
 		public override ItemAspect aspect => ItemAspect.Simple(new AssetKey("debugPointer"));

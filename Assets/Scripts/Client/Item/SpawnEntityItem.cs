@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.ItemSystem {
 	[PROTOTYPICAL]
-	public sealed class SpawnEntityItem : Item, IItemAction {
+	public sealed class SpawnEntityItem : Item, IItemActionHandler {
 		public override string name => "Spawn Entity Item";
 		public override ItemAspect aspect => ItemAspect.Simple(new AssetKey("bluething"));
 

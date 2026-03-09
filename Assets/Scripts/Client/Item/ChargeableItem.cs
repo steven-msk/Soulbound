@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.ItemSystem {
 	[PROTOTYPICAL]
-	public sealed class ChargeableItem : Item, IItemAction {
+	public sealed class ChargeableItem : Item, IItemActionHandler {
 		// might pull this up into IChargeableItem for the future
 
 		public override string name => "Chargeable Item";

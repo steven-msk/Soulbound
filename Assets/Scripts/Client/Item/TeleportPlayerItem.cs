@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.ItemSystem {
 	[PROTOTYPICAL]
-	public sealed class TeleportPlayerItem : Item, IItemAction {
+	public sealed class TeleportPlayerItem : Item, IItemActionHandler {
 		public override string name => "Move Player Item";
 		public override int fullStackSize => 1;
 
