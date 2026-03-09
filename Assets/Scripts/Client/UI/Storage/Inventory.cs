@@ -25,14 +25,14 @@ namespace SoulboundBackend.Client.ItemSystem {
 			}
 			onItemAdded += item => {
 				foreach (var uniqueItem in uniqueItems) {
-					if (uniqueItem is IInventoryListener containerListener) {
+					if (uniqueItem is IContainerItemListener containerListener) {
 						containerListener.OnItemAdded(item, this);
 					}
 				}
 			};
 			onItemRemoved += item => {
 				foreach (var uniqueItem in uniqueItems) {
-					if (uniqueItem is IInventoryListener containerListener) {
+					if (uniqueItem is IContainerItemListener containerListener) {
 						containerListener.OnItemRemoved(item, this);
 					}
 				}

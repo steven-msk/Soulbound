@@ -6,8 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.ItemSystem {
-	public interface IInventoryListener {
-		void OnItemAdded(Item item, Inventory inventory);
-		void OnItemRemoved(Item item, Inventory inventory);
+	public interface IContainerItemListener {
+		void OnItemAdded(Item item, IItemContainer container);
+		void OnItemRemoved(Item item, IItemContainer container);
 	}
 }
