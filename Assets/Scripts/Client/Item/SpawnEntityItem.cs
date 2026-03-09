@@ -21,13 +21,13 @@ namespace SoulboundBackend.Client.ItemSystem {
 			return trigger == ItemActionTrigger.LeftHold || trigger == ItemActionTrigger.LeftClick;
 		}
 
-		public bool CanExecute(ItemStack itemStack, Player player, Level level) {
+		public bool CanExecute(ItemStack itemStack, ItemActionContext ctx) {
 			return true;
 		}
 
-		public bool TryExecute(ItemStack itemStack, Player player, Level level) {
-			Entity entity = new PhysicsEntity(player.GetWorldPointerPos());
-			level.AddEntity(entity);
+		public bool TryExecute(ItemStack itemStack, ItemActionContext ctx) {
+			Entity entity = new PhysicsEntity(ctx.player.GetWorldPointerPos());
+			ctx.level.AddEntity(entity);
 			itemStack.Decrement();
 			return true;
 		}

@@ -14,17 +14,17 @@ namespace SoulboundBackend.Client.ItemSystem {
 			return trigger == ItemActionTrigger.LeftHold || trigger == ItemActionTrigger.LeftClick;
 		}
 
-		bool IItemAction.CanExecute(ItemStack itemStack, Player player, Level level) {
-			BlockPos blockPos = (BlockPos)player.GetWorldPointerPos();
-			return player.CanPlaceBlockAt(blockPos);
+		bool IItemAction.CanExecute(ItemStack itemStack, ItemActionContext ctx) {
+			BlockPos blockPos = (BlockPos)ctx.player.GetWorldPointerPos();
+			return ctx.player.CanPlaceBlockAt(blockPos);
 		}
 
-		bool IItemAction.TryExecute(ItemStack itemStack, Player player, Level level) {
-			if (!CanExecute(itemStack, player, level)) return false;
+		bool IItemAction.TryExecute(ItemStack itemStack, ItemActionContext ctx) {
+			if (!CanExecute(itemStack, ctx)) return false;
 
 			BlockState blockState = GetBlockState(itemStack);
-			BlockPos blockPos = (BlockPos)player.GetWorldPointerPos();
-			level.SetBlockState(blockPos, blockState);
+			BlockPos blockPos = (BlockPos)ctx.player.GetWorldPointerPos();
+			ctx.level.SetBlockState(blockPos, blockState);
 
 			itemStack.Decrement();
 

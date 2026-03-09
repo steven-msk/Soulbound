@@ -199,9 +199,16 @@ namespace SoulboundBackend.Client {
 			if (item is not IItemAction action) return false;
 			if (!action.ValidateTrigger(trigger)) return false;
 
-			if (!action.CanExecute(itemStack, this, level)) return false;
+			ItemActionContext context = new() {
+				itemStack = itemStack,
+				player = this,
+				level = level,
+				trigger = trigger
+			};
 
-			return action.TryExecute(itemStack, this, level);
+			if (!action.CanExecute(itemStack, context)) return false;
+
+			return action.TryExecute(itemStack, context);
 		}
 
 		public bool CanPlaceBlockAt(BlockPos blockPos) {

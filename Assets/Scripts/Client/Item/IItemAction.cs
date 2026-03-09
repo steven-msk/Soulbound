@@ -10,7 +10,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 		bool ValidateTrigger(ItemActionTrigger trigger);
 
 		// pass in a context param if number of params grows
-		bool CanExecute(ItemStack itemStack, Player player, Level level);
-		bool TryExecute(ItemStack itemStack, Player player, Level level);
+		bool CanExecute(ItemStack itemStack, ItemActionContext ctx);
+		bool TryExecute(ItemStack itemStack, ItemActionContext ctx);
 	}
 }

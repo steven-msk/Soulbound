@@ -22,12 +22,12 @@ namespace SoulboundBackend.Client.ItemSystem {
 			return trigger == ItemActionTrigger.LeftClick;
 		}
 
-		public bool CanExecute(ItemStack itemStack, Player player, Level level) {
+		public bool CanExecute(ItemStack itemStack, ItemActionContext ctx) {
 			return true;
 		}
 
-		public bool TryExecute(ItemStack itemStack, Player player, Level level) {
-			player.SetPos(player.GetWorldPointerPos());
+		public bool TryExecute(ItemStack itemStack, ItemActionContext ctx) {
+			ctx.player.SetPos(ctx.player.GetWorldPointerPos());
 			return true;
 		}
 	}
