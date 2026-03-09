@@ -21,7 +21,7 @@ namespace SoulboundBackend.Client.UI {
 		public void ToggleFadedLayout() {
 			fadedLayout = !fadedLayout;
 			foreach (var handle in handles) handle.ApplyFadedLayout(fadedLayout);
-			handles[hotbar.GetMainSlot()].SetMainSlotLayout();
+			handles[hotbar.GetMainSlotIndex()].SetMainSlotLayout();
 		}
 
 		private void OnMainSlotChanged(int oldIndex, int newIndex) {

@@ -32,8 +32,8 @@ namespace SoulboundBackend.Client.UI.Storage {
 
 		public int GetSlotCount() => SLOT_COUNT;
 
-		public int GetMainSlot() => mainSlotIndex;
-		public void SetMainSlot(int index) {
+		public int GetMainSlotIndex() => mainSlotIndex;
+		public void SetMainSlotIndex(int index) {
 			int previous = mainSlotIndex;
 			mainSlotIndex = index;
 			mainSlotChanged?.Invoke(previous, index);

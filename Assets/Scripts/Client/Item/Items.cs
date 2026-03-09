@@ -14,6 +14,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public static readonly StackItem stackitem_10 = new(10);
 		public static readonly StackItem stackitem_256 = new(Item.DEFAULT_FULL_STACK);
 		public static readonly StackItem stackitem_64 = new(64);
+		public static readonly PlaceableItem placeableItem = new();
 
 		[Obsolete]
 		static Items() {

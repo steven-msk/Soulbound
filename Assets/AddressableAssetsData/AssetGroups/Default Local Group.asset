@@ -273,6 +273,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bcfaae8d59c8cf04abaa5647af14f012
+    m_Address: bluething
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: c31a5e9c910fa9c42a037cf94c1b620b
     m_Address: QuitWorld
     m_ReadOnly: 0
@@ -335,6 +341,12 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e73082fccdc33f448a63fd6d559f6ab9
     m_Address: SettingsButton
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ed4c9386a9e5d4b40ae6ea11d705f4a4
+    m_Address: idkwhatthisis
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload

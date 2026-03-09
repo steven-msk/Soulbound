@@ -48,6 +48,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 		private void OnQuantityChanged(int old, int @new) {
 			if (stack != null) {
 				quantityChanged?.Invoke(stack, old, @new);
+				if (@new <= 0) SetStack(null);
 			}
 		}
 

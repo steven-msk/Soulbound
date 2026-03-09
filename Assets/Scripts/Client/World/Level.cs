@@ -305,7 +305,7 @@ namespace SoulboundBackend.Client.World {
 		}
 
 
-
+		[Obsolete]
 		public void SetBlock(BlockPos blockPos, BlockState? blockState) {
 			WorldChunk? chunk = this.ChunkAt(blockPos);
 			blockState ??= Blocks.air.defaultState;
@@ -326,10 +326,12 @@ namespace SoulboundBackend.Client.World {
 			}
 		}
 
+		[Obsolete]
 		public void SetBlock(ChunkBlockPos chunkBlockPos, BlockState? blockState) {
 			SetBlock(chunkBlockPos.ToBlock(), blockState);
 		}
 
+		[Obsolete]
 		public void SetBlockOrPend(ChunkBlockPos chunkBlockPos, BlockState? blockState) {
 			int chunkX = chunkBlockPos.chunkX;
 
@@ -340,38 +342,10 @@ namespace SoulboundBackend.Client.World {
 			}
 		}
 
-		public void PlaceBlock(BlockPos blockPos, BlockState newState) {
-			BlockState? oldState = GetBlockState(blockPos);
-			SetBlock(blockPos, newState);
-			BroadcastBlockEvent(new BlockChangeInfo(
-				blockPos,
-				oldState,
-				GetBlockState(blockPos),
-				this,
-				BlockEventType.Placed,
-				Optional<BreakSource>.Empty()
-			));
-		}
-
+		[Obsolete]
 		public void BroadcastBlockEvent(BlockChangeInfo changeInfo, Action<BlockState?, BlockState?>? followUp = null) {
 			followUp?.Invoke(changeInfo.oldState, changeInfo.newState);
 			BlockStateChanged?.Invoke(changeInfo);
-		}
-
-		public void BreakBlock(BlockPos blockPos, BreakSource source) {
-			BlockState? brokenBlock = GetBlockState(blockPos);
-			SetBlock(blockPos, null);
-
-			// as of the BlockState refactor, block logic shouldnt live in BlockState
-
-			//BroadcastBlockEvent(new BlockChangeInfo(
-			//	blockPos, 
-			//	brokenBlock,
-			//	BlockStateAt(blockPos),
-			//	this,
-			//	BlockEventType.Broken,
-			//	Optional<BreakSource>.Of(source)
-			//), (oldState, newState) => oldState?.DropOnBroken(blockPos, source));
 		}
 
 		[Obsolete]
@@ -409,14 +383,9 @@ namespace SoulboundBackend.Client.World {
 			return chunk?.TileEntityAt(blockPos);
 		}
 
-		public Block? BlockAt(BlockPos blockPos) {
+		public Block? GetBlock(BlockPos blockPos) {
 			BlockState? blockState = GetBlockState(blockPos);
 			return blockState?.block;
-		}
-
-		public BlockState? GetAdjacentBlockState(BlockPos startPos, Direction direction) {
-			BlockPos adjacentPos = startPos + direction.AsVector();
-			return GetBlockState(adjacentPos);
 		}
 
 		public static int ChunkXAt(Vector2 worldPos) => ChunkXAt(worldPos.x);

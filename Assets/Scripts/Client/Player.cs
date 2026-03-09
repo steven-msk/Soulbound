@@ -14,6 +14,8 @@ using SoulboundBackend.Core.AssetManagement;
 using SoulboundBackend.Core.Debug.Logging;
 using SoulboundBackend.Core.Resource;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Zenject;
@@ -27,7 +29,6 @@ namespace SoulboundBackend.Client {
 		private readonly Inventory inventory;
 		private readonly Hotbar hotbar;
 		private readonly PlayerStats stats = new();
-		private readonly ItemUsageHandler itemUsageHandler;
 		[Obsolete] private readonly AttackSource attackSource;
 		public PlayerStats Stats => stats;
 		private PlayerTransform playerTransform = null!;
@@ -36,24 +37,32 @@ namespace SoulboundBackend.Client {
 
 		public ItemStack? MainHandStack { get; private set; }
 
+		private int mainHandIndex;
 		const float MAX_BLOCK_REACH = 5f;
 
 		private Vector2 screenPointerPos;
 
 		private bool isHoldingLeftClick;
 		private bool isHoldingRightClick;
-		[Obsolete] private ConcurrentActionResolver actionResolver = null!;
 
 		public Player(Vector2 initialPos)
 			: base(DESCRIPTOR, initialPos) {
 			inventory = new Inventory();
 			hotbar = new Hotbar();
+			hotbar.mainSlotChanged += (oldIndex, newIndex) => {
+				IItemSlot oldSlot = hotbar.GetSlot(oldIndex);
+				oldSlot.stackChanged -= MainHandStackChanged;
+				oldSlot.quantityChanged -= MainHandQuantityChanged;
+
+				IItemSlot newSlot = hotbar.GetSlot(newIndex);
+				newSlot.stackChanged += MainHandStackChanged;
+				newSlot.quantityChanged += MainHandQuantityChanged;
+
+				mainHandIndex = newIndex;
+				MainHandStackChanged(oldSlot.GetStack(), newSlot.GetStack());
+			};
 			this.initialPos = initialPos;
 			Soulbound.instance.GetInputManager().PushContext(this);
-
-			actionResolver = new ConcurrentActionResolver();
-			itemUsageHandler = new ItemUsageHandler(this);
-			RegisterItemUsageCandidates();
 
 			attackSource = new AttackSource(2, 10, new PlayerMainHandAttack(),
 				context => {
@@ -73,6 +82,12 @@ namespace SoulboundBackend.Client {
 			GameObject obj = GameObject.Instantiate(AssetManager.Resolve<GameObject>(playerKey));
 			playerTransform = obj.GetComponent<PlayerTransform>();
 			playerTransform.SetPos(initialPos);
+
+			mainHandIndex = hotbar.GetMainSlotIndex();
+			IItemSlot mainHandSlot = hotbar.GetSlot(mainHandIndex);
+			mainHandSlot.stackChanged += MainHandStackChanged;
+			mainHandSlot.quantityChanged += MainHandQuantityChanged;
+
 			return playerTransform;
 		}
 
@@ -85,17 +100,17 @@ namespace SoulboundBackend.Client {
 			if (inputEvent.token.Equals(InputTokens.Player.changeHotbarSlot)
 					&& inputEvent.phase == InputActionPhase.Performed) {
 				int slotIndex = int.Parse(inputEvent.context.control.name) - 1;
-				hotbar.SetMainSlot(slotIndex);
+				hotbar.SetMainSlotIndex(slotIndex);
 				return true;
 			}
 			if (inputEvent.token.Equals(InputTokens.Player.scrollHotbarSlot)
 					&& inputEvent.phase == InputActionPhase.Performed) {
 				float scrollDelta = inputEvent.context.ReadValue<float>();
-				int nextSlot = hotbar.GetMainSlot() - (int)scrollDelta;
+				int nextSlot = hotbar.GetMainSlotIndex() - (int)scrollDelta;
 
 				if (nextSlot < 0) nextSlot += hotbar.GetSlotCount();
 				nextSlot %= hotbar.GetSlotCount();
-				hotbar.SetMainSlot(nextSlot);
+				hotbar.SetMainSlotIndex(nextSlot);
 				return true;
 			}
 			if (inputEvent.token.Equals(InputTokens.Mouse.position)) {
@@ -107,6 +122,7 @@ namespace SoulboundBackend.Client {
 					isHoldingLeftClick = true;
 					return true;
 				} else if (inputEvent.phase == InputActionPhase.Canceled) {
+					OnLeftRelease();
 					isHoldingLeftClick = false;
 					return true;
 				}
@@ -117,6 +133,7 @@ namespace SoulboundBackend.Client {
 					isHoldingRightClick = true;
 					return true;
 				} else if (inputEvent.phase == InputActionPhase.Canceled) {
+					OnRightRelease();
 					isHoldingRightClick = false;
 					return true;
 				}
@@ -140,33 +157,6 @@ namespace SoulboundBackend.Client {
 		}
 
 		[Obsolete]
-		private void RegisterItemUsageCandidates() {
-			//itemUsageHandler.RegisterCapability<IConsumable>(ItemUseTrigger.RightClick, (consumable, stack) => consumable.StartConsume(this, stack));
-			//foreach (ItemUseTrigger trigger in Enum.GetValues(typeof(ItemUseTrigger))) {
-			//	itemUsageHandler.RegisterCapability<IAttackSourceProvider>(trigger, (sourceProvider, stack) => {
-			//		if (sourceProvider.GetAttackSource(trigger, out var attackSource)) {
-			//			UnityEngine.Debug.Log("using attack item: "+ trigger);
-			//			TryAttack(attackSource);
-			//		}
-			//	});
-			//}
-			//itemUsageHandler.RegisterCapability<IPlaceable>(ItemUseTrigger.LeftHold, (placeable, stack) => {
-			//	BlockPos blockPos = (BlockPos)GetWorldPointerPos();
-
-			//	if (CanPlaceBlockAt(blockPos)) {
-			//		level.PlaceBlock(blockPos, placeable.Place(stack, blockPos));
-			//	}
-			//});
-			//itemUsageHandler.RegisterCapability<IBreakingTool>(ItemUseTrigger.LeftHold, (tool, stack) => {
-			//	BlockPos blockPos = (BlockPos)GetWorldPointerPos();
-
-			//	if (IsInBlockReach((Vector2)blockPos)) {
-			//		tool.TryBreak(blockPos, level, new PlayerToolBreakSource(this, tool));
-			//	}
-			//});
-		}
-
-		[Obsolete]
 		public void TryAttack(AttackSource source) {
 			if (attackHandler?.isHandlingAttack ?? false) return;
 			attackHandler = new AttackHandler(source);
@@ -179,68 +169,51 @@ namespace SoulboundBackend.Client {
 		}
 
 		private void OnLeftClick() {
-			RequestMainHandItemUse(ItemUseTrigger.LeftClick);
+			TryUseItem(GetMainHandStack(), ItemActionTrigger.LeftClick);
 		}
-
 		private void OnRightClick() {
-			RequestMainHandItemUse(ItemUseTrigger.RightClick);
+			TryUseItem(GetMainHandStack(), ItemActionTrigger.RightClick);
 
 			// provisory
 			level.InteractBlock((BlockPos)GetWorldPointerPos());
 		}
 
-		// POTENTIAL FEATUREIMPL: add Reach int stat
-
 		private void OnLeftHold() {
-			RequestMainHandItemUse(ItemUseTrigger.LeftHold);
-
-			actionResolver.Submit(Request.New()
-				.UnderToken(PlayerActionTokens.BlockBreak)
-				.Execute(() => {
-					BlockPos blockPos = (BlockPos)GetWorldPointerPos();
-					Block? targetBlock = level.BlockAt(blockPos);
-
-					if (0 >= targetBlock?.breakRequirement?.minBreakPower) {
-						level.BreakBlock(blockPos, new PlayerToolBreakSource(this));
-					}
-				})
-				.OnCondition(() => CanBreakBlockAt((BlockPos)GetWorldPointerPos()))
-				.Suppress(PlayerActionTokens.Attack, () => !isHoldingLeftClick)
-			);
-
-			actionResolver.Submit(Request.New()
-				.UnderToken(PlayerActionTokens.Attack)
-				.Execute(() => TryAttack(attackSource))
-				.Suppress(PlayerActionTokens.BlockBreak, () => !isHoldingLeftClick)
-			);
+			TryUseItem(GetMainHandStack(), ItemActionTrigger.LeftHold);
 		}
-
 		private void OnRightHold() {
-			RequestMainHandItemUse(ItemUseTrigger.RightHold);
+			TryUseItem(GetMainHandStack(), ItemActionTrigger.RightHold);
 		}
 
-		private void RequestMainHandItemUse(ItemUseTrigger trigger) {
-			actionResolver.Submit(Request.New()
-				.UnderToken(PlayerActionTokens.ItemUse)
-				.Execute(() => {
-					itemUsageHandler.HandleInput(trigger, MainHandStack);
-				})
-				.OnCondition(() => MainHandStack != null)
-				.Suppress(PlayerActionTokens.BlockBreak, () => !isHoldingLeftClick)
-				.Suppress(PlayerActionTokens.Attack, () => !isHoldingLeftClick)
-			);
+		private void OnLeftRelease() {
+			TryUseItem(GetMainHandStack(), ItemActionTrigger.LeftRelease);			
+		}
+		private void OnRightRelease() {
+			TryUseItem(GetMainHandStack(), ItemActionTrigger.RightRelease);
+		}
+
+		private bool TryUseItem(ItemStack? itemStack, ItemActionTrigger trigger) {
+			Item? item = itemStack?.item;
+			if (item == null) return false;
+
+			if (item is not IItemAction action) return false;
+			if (!action.ValidateTrigger(trigger)) return false;
+
+			if (!action.CanExecute(itemStack, this, level)) return false;
+
+			return action.TryExecute(itemStack, this, level);
 		}
 
 		public bool CanPlaceBlockAt(BlockPos blockPos) {
 			Vector2 worldPos = (Vector2)blockPos;
 			return IsInBlockReach(worldPos)
-				   && level?.BlockAt(blockPos) == Blocks.air;
+				   && level?.GetBlock(blockPos) == Blocks.air;
 		}
 
 		public bool CanBreakBlockAt(BlockPos blockPos) {
 			Vector2 worldPos = (Vector2)blockPos;
 			return IsInBlockReach(worldPos)
-				   && level?.BlockAt(blockPos) != Blocks.air;
+				   && level?.GetBlock(blockPos) != Blocks.air;
 		}
 
 		public bool IsInBlockReach(Vector2 worldPos) {
@@ -252,6 +225,16 @@ namespace SoulboundBackend.Client {
 
 		public Inventory GetInventory() => inventory;
 		public Hotbar GetHotbar() => hotbar;
+
+		public ItemStack? GetMainHandStack() {
+			return hotbar.GetSlot(mainHandIndex).GetStack();
+		}
+		private void MainHandStackChanged(ItemStack? oldStack, ItemStack? newStack) {
+
+		}
+		private void MainHandQuantityChanged(ItemStack itemStack, int oldQuantity, int newQuantity) {
+
+		}
 
 		public Vector2 GetCenter() => playerTransform.Collider.bounds.center;
 
