@@ -45,7 +45,6 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 		public void OnCollisionEnter(EntityCollision collision) {
 			colliding = true;
 			physicsTransform.GetComponent<SpriteRenderer>().color = GetSpriteColor();
-			Logger.LogInfo("collision enter: " + collision.other?.descriptor ?? "null");
 		}
 
 		public void OnCollisionExit(EntityCollision collision) {

@@ -37,21 +37,21 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 		}
 
 		private void OnCollisionEnter2D(Collision2D collision) {
-			collisionHandler?.OnCollisionEnter(GetEntityCollision(collision));
+			collisionHandler?.OnCollisionEnter(new EntityCollision {
+				self = entity,
+				other = collision.otherCollider.GetComponent<IEntityTransform>()?.GetEntity(),
+				point = collision.GetContact(0).point,
+				normal = collision.GetContact(0).normal,
+				otherObject = collision.otherCollider.gameObject
+			});
 		}
 
 		private void OnCollisionExit2D(Collision2D collision) {
-			collisionHandler?.OnCollisionExit(GetEntityCollision(collision));
-		}
-
-		private EntityCollision GetEntityCollision(Collision2D collision) {
-			return new EntityCollision {
+			collisionHandler?.OnCollisionExit(new EntityCollision {
 				self = entity,
 				other = collision.otherCollider.GetComponent<IEntityTransform>()?.GetEntity(),
-				point = collision.contacts[0].point,
-				normal = collision.contacts[0].normal,
 				otherObject = collision.otherCollider.gameObject
-			};
+			});
 		}
 	}
 }

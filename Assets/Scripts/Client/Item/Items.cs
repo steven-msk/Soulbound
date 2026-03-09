@@ -16,6 +16,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public static readonly StackItem stackitem_64 = new(64);
 		public static readonly PlaceableItem placeableItem = new();
 		public static readonly TeleportPlayerItem teleportPlayerItem = new();
+		public static readonly SpawnEntityItem spawnEntityItem = new();
 
 		[Obsolete]
 		static Items() {
