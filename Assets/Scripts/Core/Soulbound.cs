@@ -30,6 +30,16 @@ using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 namespace SoulboundBackend.Core {
 	public sealed class Soulbound : IApplicationController, IDebugMetricsSource {
 		public static Soulbound instance { get; private set; } = null!;
+		private static readonly PlayerInputActions inputActions = new();
+		public static readonly JsonSerializerSettings globalJsonSettings = new() {
+			TypeNameHandling = TypeNameHandling.Auto,
+			TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
+			Converters = new List<JsonConverter> {
+				new Vector2JsonConverter(),
+				new Vector3JsonConverter(),
+				new ColorJsonConverter()
+			},
+		};
 		private bool running;
 		private readonly GameConfig config;
 		private readonly PerformanceMetrics performanceMetrics;
@@ -43,16 +53,7 @@ namespace SoulboundBackend.Core {
 		private readonly DebugMetricsService debugMetricsService;
 		private readonly SoulboundDebug debug;
 		private readonly InputManager inputManager;
-		private static readonly PlayerInputActions inputActions = new();
-		public static readonly JsonSerializerSettings globalJsonSettings = new() {
-			TypeNameHandling = TypeNameHandling.Auto,
-			TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
-			Converters = new List<JsonConverter> {
-				new Vector2JsonConverter(),
-				new Vector3JsonConverter(),
-				new ColorJsonConverter()
-			},
-		};
+		private WorldSession? activeWorldSession;
 
 		public Soulbound(GameConfig config) {
 			instance = this;
@@ -103,27 +104,12 @@ namespace SoulboundBackend.Core {
 			inputManager.DispatchInputs();
 		}
 
-		void IDebugMetricsSource.CollectDebugData(ref DebugMetricsBuilder builder) {
-			builder.Add("fps", performanceMetrics.InstantFps);
-			builder.Add("frameTime", performanceMetrics.FrameTime);
-			builder.Add("fixedUpdateTime", performanceMetrics.FixedUpdateTime);
-			builder.Add("totalManagedMemory", performanceMetrics.TotalManagedMemoryMB);
-			builder.Add("totalUnityReservedMemory", performanceMetrics.TotalUnityReservedMemoryMB);
-			builder.Add("monoHeap", performanceMetrics.MonoHeapMB);
-			builder.Add("monoUsed", performanceMetrics.MonoUsedMB);
-			builder.Add("gpuManagedMemory", performanceMetrics.GPUManagedMemoryMB);
-			builder.Add("gpuReservedMemory", performanceMetrics.GPUReservedMemoryMB);
-			builder.Add("gcAlloc", performanceMetrics.GcAllocBytesThisFrame);
-		}
-
-		// aware of the problem with world deserialization
-
 		public void CreateNewWorld(string world) {
 			worldManager.CreateNewWorld(world);
 		}
 
 		public void EnterWorld(string world) {
-			if (worldManager.IsSessionActive()) return;
+			if (IsWorldSessionActive())
 
 			if (!worldManager.ListSaves().Any(s => s == world) && !config.dev.useDoNotSaveWorldStrategy) {
 				throw new ArgumentException($"World not found: '{world}'");
@@ -131,27 +117,32 @@ namespace SoulboundBackend.Core {
 
 			uiHandler.FlushScreens();
 
-			worldManager.LoadWorld(world, config.dev.seed,
+			// manual seed for prototyping
+			LevelLoader levelLoader = new(world, config.dev.seed);
+
+			levelLoader.LoadLevel(
 				SceneManager.LoadSceneAsync("WorldScene").ToUniTask(),
 				UnityEngine.Object.FindFirstObjectByType<WorldSceneRoot>
 			).ContinueWith(session => {
+				activeWorldSession = session;
 				uiHandler.SetScreen(new WorldScreen(session.player));
 
 				runtimeDataProvider.SetWorldSessionState(session);
 				runtimeExecutionServices.SetWorldSesstionState(session);
 				commandProcessor.RegisterProvider(worldSessionCommands);
-			}).Forget(UnityEngine.Debug.LogException);
+			}).Forget(e => Logger.LogFatal(e));
 		}
 
 		public void QuitActiveWorld() {
-			if (!worldManager.IsSessionActive()) return;
+			if (!IsWorldSessionActive()) return;
 
-			worldManager.QuitActiveSession();
+			activeWorldSession?.levelManager.StopSession();
 			uiHandler.FlushScreens();
 			Time.timeScale = 1f;
 
 			SceneManager.LoadSceneAsync("DevScene").ToUniTask()
 				.ContinueWith(() => {
+					activeWorldSession = null;
 					uiHandler.SetCanvas(UnityEngine.Object.FindFirstObjectByType<Canvas>());
 					uiHandler.SetScreen(new TitleScreen());
 
@@ -162,12 +153,8 @@ namespace SoulboundBackend.Core {
 			.Forget(UnityEngine.Debug.LogException);
 		}
 
-		public bool IsWorldSessionActive() {
-			return worldManager.IsSessionActive();
-		}
-
 		void IApplicationController.OnApplicationQuit() {
-			worldManager.QuitActiveSession();
+			activeWorldSession?.levelManager.StopSession();
 			settings.Save();
 			inputActions.Dispose();
 			AssetManager.Shutdown();
@@ -175,7 +162,7 @@ namespace SoulboundBackend.Core {
 
 		private IWorldSaveStrategy GetWorldSaveStrategy() {
 #if !UNITY_EDITOR
-		return new WorldSaveStrategy(config.file.savesFolder, Application.persistentDataPath);
+			return new WorldSaveStrategy(config.file.savesFolder, Application.persistentDataPath);
 #else
 			return !config.dev.useDoNotSaveWorldStrategy
 				? new WorldSaveStrategy(config.file.savesFolder, Application.persistentDataPath)
@@ -183,24 +170,15 @@ namespace SoulboundBackend.Core {
 #endif
 		}
 
+		public bool IsWorldSessionActive() => activeWorldSession != null;
+
 		public UIHandler GetUIHandler() => uiHandler;
 
-		[PROTOTYPICAL]
-		[Obsolete]
-		public Level? GetActiveLevel() {
-			return GetActiveLevelManager()?.level;
-		}
-
-		[PROTOTYPICAL]
-		[Obsolete]
-		public LevelManager? GetActiveLevelManager() {
-			return worldManager.activeLevelManager;
-		}
 
 		[PROTOTYPICAL]
 		[Obsolete]
 		public Player? GetPlayerInstance() {
-			return worldManager.activeLevelManager?.level.GetPlayer();
+			return activeWorldSession?.player;
 		}
 
 		public IEnumerable<string> ListWorldSaves() {
@@ -212,6 +190,19 @@ namespace SoulboundBackend.Core {
 		}
 		public void UnregisterDebugMetricsSource(IDebugMetricsSource source) {
 			debugMetricsService.UnregisterSource(source);
+		}
+
+		void IDebugMetricsSource.CollectDebugData(ref DebugMetricsBuilder builder) {
+			builder.Add("fps", performanceMetrics.InstantFps);
+			builder.Add("frameTime", performanceMetrics.FrameTime);
+			builder.Add("fixedUpdateTime", performanceMetrics.FixedUpdateTime);
+			builder.Add("totalManagedMemory", performanceMetrics.TotalManagedMemoryMB);
+			builder.Add("totalUnityReservedMemory", performanceMetrics.TotalUnityReservedMemoryMB);
+			builder.Add("monoHeap", performanceMetrics.MonoHeapMB);
+			builder.Add("monoUsed", performanceMetrics.MonoUsedMB);
+			builder.Add("gpuManagedMemory", performanceMetrics.GPUManagedMemoryMB);
+			builder.Add("gpuReservedMemory", performanceMetrics.GPUReservedMemoryMB);
+			builder.Add("gcAlloc", performanceMetrics.GcAllocBytesThisFrame);
 		}
 
 		public PerformanceMetrics GetPerformanceMetrics() => performanceMetrics;

@@ -17,6 +17,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using Zenject;
 using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
+using Cysharp.Threading.Tasks;
 
 #nullable enable
 
@@ -79,17 +80,17 @@ namespace SoulboundBackend.Core {
 
 			level.BootstrapWorld(dump, this);
 			sessionRunning = true;
+			Soulbound.instance.GetInputManager().PushContext(level.GetPlayer());
 
 			container.BindInstance(level).AsSingle();
 
-			StartCoroutine(GameFrameLoop());
-			StartCoroutine(GameTickLoop());
+			UniTask.Post(LevelFrameLoop);
+			UniTask.Post(LevelTickLoop);
 
 			return level;
 		}
 
-		IEnumerator GameFrameLoop() {
-			WaitForEndOfFrame endOfFrame = new();
+		private async void LevelFrameLoop() {
 			while (sessionRunning) {
 				if (!paused) {
 					StartFrame();
@@ -100,7 +101,21 @@ namespace SoulboundBackend.Core {
 
 					EndFrame();
 				}
-				yield return endOfFrame;
+				await UniTask.WaitForEndOfFrame();
+			}
+		}
+
+		private async void LevelTickLoop() {
+			while (sessionRunning) {
+				if (!paused) {
+					StartTick();
+
+					Vector2 pivotPos = level.GetPlayer()?.GetPos() ?? level.GetWorldSpawnPoint();
+					level.Tick(GetRelativeSimulationRect(pivotPos));
+
+					EndTick();
+				}
+				await UniTask.WaitForSeconds(tickRate, true);
 			}
 		}
 
@@ -112,35 +127,6 @@ namespace SoulboundBackend.Core {
 			float fps = 1f / (Time.realtimeSinceStartup - frameStartTime);
 		}
 
-		IEnumerator GameTickLoop() {
-			WaitForSecondsRealtime tickDelay = new(tickRate);
-			while (sessionRunning) {
-				if (!paused) {
-					StartTick();
-
-					Vector2 pivotPos = level.GetPlayer()?.GetPos() ?? level.GetWorldSpawnPoint();
-					level.Tick(GetRelativeSimulationRect(pivotPos));
-
-					EndTick();
-				}
-				yield return tickDelay;
-			}
-		}
-
-		private RectInt GetRelativeSimulationRect(Vector2 pivot) {
-			return new(
-				Mathf.FloorToInt(pivot.x) + simulationRect.x,
-				Mathf.FloorToInt(pivot.y) + simulationRect.y,
-				simulationRect.width,
-				simulationRect.height
-			);
-		}
-
-		public void StopSession() {
-			sessionRunning = false;
-			container.FlushBindings();
-		}
-
 		private void StartTick() {
 			tickStartTime = Time.realtimeSinceStartup;
 		}
@@ -150,6 +136,21 @@ namespace SoulboundBackend.Core {
 			if (elapsed > tickRate) {
 				Logger.LogWarning($"Tick lag detected! Tick took {elapsed * 1000f:F1} ms");
 			}
+		}
+
+		public void StopSession() {
+			sessionRunning = false;
+			container.FlushBindings();
+			Soulbound.instance.GetInputManager().RemoveContext(level.GetPlayer());
+		}
+
+		private RectInt GetRelativeSimulationRect(Vector2 pivot) {
+			return new(
+				Mathf.FloorToInt(pivot.x) + simulationRect.x,
+				Mathf.FloorToInt(pivot.y) + simulationRect.y,
+				simulationRect.width,
+				simulationRect.height
+			);
 		}
 
 		public void RenderRequest(BlockPos blockPos, BlockState? blockState) {

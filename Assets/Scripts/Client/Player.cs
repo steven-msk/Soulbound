@@ -46,7 +46,6 @@ namespace SoulboundBackend.Client {
 			inventory = new Inventory();
 			hotbar = new Hotbar();
 			this.initialPos = initialPos;
-			Soulbound.instance.GetInputManager().PushContext(this);
 
 			attackSource = new AttackSource(2, 10, new PlayerMainHandAttack(),
 				context => {

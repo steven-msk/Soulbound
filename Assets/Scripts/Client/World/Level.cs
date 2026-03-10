@@ -144,7 +144,7 @@ namespace SoulboundBackend.Client.World {
 				frameUpdatableEntity.FrameUpdate();
 			}
 		}
-		
+
 		// currently world generation uses WorldChunk as the logic executor
 		// when in reality it shouldnt at all
 		// the target design will use world "macroing"
@@ -154,7 +154,7 @@ namespace SoulboundBackend.Client.World {
 		// since this is a far too complex feature, it will be delayed 
 		// until further notice on world generation
 		// for now all implementations regarding this are obsolete
-		
+
 		private WorldChunk GenerateNewChunk(int chunkX) {
 			WorldChunk chunk = new(this, chunkX);
 			generatedChunks[chunkX] = chunk;

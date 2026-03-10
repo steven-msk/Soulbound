@@ -57,6 +57,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 291cc8ec7deb2aa4fbfda55996bfe132
+    m_Address: debugPointer
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 2ac223bfff0dc2b4ab7323e9c062fedf
     m_Address: stone_icon
     m_ReadOnly: 0

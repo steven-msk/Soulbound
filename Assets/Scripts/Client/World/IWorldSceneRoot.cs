@@ -15,8 +15,8 @@ namespace SoulboundBackend.Client.World {
 		Tilemap tilemap { get; }
 		Canvas canvas { get; }
 
-		public LevelGridContext CreateGridContext() {
-			return new LevelGridContext(grid, tilemap);
-		}
+		LevelManager GetLevelManager();
+
+		public LevelGridContext GetGridContext() => new(grid, tilemap);
 	}
 }
