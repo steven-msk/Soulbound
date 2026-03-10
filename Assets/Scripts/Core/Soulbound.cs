@@ -117,8 +117,9 @@ namespace SoulboundBackend.Core {
 
 			uiHandler.FlushScreens();
 
-			// manual seed for prototyping
-			LevelLoader levelLoader = new(world, config.dev.seed);
+			// manual dev seed for prototyping
+			DevSeedProvider seedProvider = new(config.dev);
+			LevelLoader levelLoader = new(world, seedProvider);
 
 			levelLoader.LoadLevel(
 				SceneManager.LoadSceneAsync("WorldScene").ToUniTask(),

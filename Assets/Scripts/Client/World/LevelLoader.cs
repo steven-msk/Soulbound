@@ -10,11 +10,11 @@ using UnityEngine.ResourceManagement.Exceptions;
 namespace SoulboundBackend.Client.World {
 	public sealed class LevelLoader {
 		private readonly string worldName;
-		private readonly int seed;
+		private readonly ISeedProvider seedProvider;
 
-		public LevelLoader(string worldName, int seed) {
+		public LevelLoader(string worldName, ISeedProvider seedProvider) {
 			this.worldName = worldName;
-			this.seed = seed;
+			this.seedProvider = seedProvider;
 		}
 
 		public async UniTask<WorldSession> LoadLevel(UniTask sceneLoadTask, Func<IWorldSceneRoot> rootProvider) {
@@ -28,6 +28,7 @@ namespace SoulboundBackend.Client.World {
 			LevelManager levelManager = sceneRoot.GetLevelManager();
 
 			// WorldDump? dump param will remain null until serialization is properly implemented
+			int seed = seedProvider.GetSeed();
 			Level level = levelManager.BootstrapWorld(worldName, dump: null, seed, sceneRoot.GetGridContext());
 
 			return new WorldSession {
