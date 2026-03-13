@@ -48,7 +48,7 @@ public class BlockPosTests {
 	[Test]
 	public void CenterAligned_ReturnsMiddleOfBlock() {
 		var pos = new BlockPos(1, 2);
-		var center = pos.CenterAligned();
+		var center = pos.GetCenter();
 		Assert.AreEqual(new Vector2(1.5f, 2.5f), center);
 	}
 

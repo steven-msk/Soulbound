@@ -165,11 +165,15 @@ namespace SoulboundBackend.Client.World.Chunk {
 				bool newHasTileEntity = blockState.block.HasTileEntity(level, blockPos, blockState);
 
 				if (oldHasTileEntity && tileEntities.ContainsKey(blockPos)) {
-					tickManager.RemoveTileEntity(tileEntities[blockPos]);
+					TileEntity tileEntity = tileEntities[blockPos];
+
+					tickManager.RemoveTileEntity(tileEntity);
 					tileEntities.Remove(blockPos);
+					tileEntity.OnDispose();
 				}
 				if (newHasTileEntity) {
 					TileEntity tileEntity = newBlock.GetTileEntity(level, blockPos);
+
 					tileEntities[blockPos] = tileEntity;
 					tickManager.AddTileEntity(tileEntity);
 				}

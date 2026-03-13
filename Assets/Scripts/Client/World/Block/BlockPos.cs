@@ -60,7 +60,7 @@ namespace SoulboundBackend.Client.World {
             return new BlockPos(pos.x / scalar, pos.y / scalar);
         }
 
-        public readonly Vector2 CenterAligned() => new(x + 0.5f, y + 0.5f);
+        public readonly Vector2 GetCenter() => new(x + 0.5f, y + 0.5f);
 
 		public override readonly bool Equals(object obj) {
             if (obj is BlockPos other) {

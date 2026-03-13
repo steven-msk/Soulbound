@@ -15,5 +15,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 
 		[Obsolete]
 		public virtual void Render(BlockState blockState, Tilemap tilemap) { }
+
+		public virtual void OnDispose() { }
 	}
 }
