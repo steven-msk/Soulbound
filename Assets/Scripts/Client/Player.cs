@@ -64,7 +64,6 @@ namespace SoulboundBackend.Client {
 		protected override IEntityTransform CreateTransform() {
 			GameObject obj = GameObject.Instantiate(AssetManager.Resolve<GameObject>(playerKey));
 			playerTransform = obj.GetComponent<PlayerTransform>();
-			playerTransform.SetPos(initialPos);
 			return playerTransform;
 		}
 
@@ -118,10 +117,10 @@ namespace SoulboundBackend.Client {
 
 			if (inputEvent.token.Equals(InputTokens.Player.move)) {
 				if (inputEvent.phase == InputActionPhase.Performed) {
-					playerTransform.SetVelocityX(inputEvent.context.ReadValue<Vector2>().x);
+					playerTransform.SetNormalVelocityX(inputEvent.context.ReadValue<Vector2>().x);
 					return true;
 				} else if (inputEvent.phase == InputActionPhase.Canceled) {
-					playerTransform.SetVelocityX(0f);
+					playerTransform.SetNormalVelocityX(0f);
 					return true;
 				}
 			}

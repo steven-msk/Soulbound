@@ -78,7 +78,7 @@ namespace SoulboundBackend.Client.World {
 
 			isWorldLoaded = true;
 			AddEntity(player);
-			player.SetPos(GetWorldSpawnPoint());
+			player.SetPos(GetWorldSpawnPoint() + Vector2.up * 2f);
 		}
 
 		public void Tick(RectInt simulationRect) {
