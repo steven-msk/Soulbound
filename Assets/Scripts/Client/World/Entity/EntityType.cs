@@ -13,5 +13,6 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 		public static readonly EntityDescriptor STATIC_ENTITY = EntityRegistry.Register(new("staticEntity", pos => new StaticEntity(pos)));
 		[PROTOTYPICAL]
 		public static readonly EntityDescriptor PHYSICS_ENTITY = EntityRegistry.Register(new("physicsEntity", pos => new PhysicsEntity(pos)));
+		public static readonly EntityDescriptor AREA_TRIGGER_ENTITY = EntityRegistry.Register(new("areaTriggerEntity", pos => new AreaTriggerEntity(pos)));
 	}
 }

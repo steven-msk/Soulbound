@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
-	public class TriggerCallbacksComponent : MonoBehaviour {
+	public class TriggerCollisionListener : MonoBehaviour {
 		public event Action<Collider2D> onTriggerEnter;
 		public event Action<Collider2D> onTriggerExit;
 

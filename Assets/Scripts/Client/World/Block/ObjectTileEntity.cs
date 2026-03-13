@@ -26,9 +26,9 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			collider.excludeLayers = ~LayerMask.GetMask("EntityCharacter");
 			collider.radius = 2.5f;
 
-			TriggerCallbacksComponent triggerCallbacks = gameObject.AddComponent<TriggerCallbacksComponent>();
-			triggerCallbacks.onTriggerEnter += OnTriggerEnter;
-			triggerCallbacks.onTriggerExit += OnTriggerExit;
+			TriggerCollisionListener triggerListener = gameObject.AddComponent<TriggerCollisionListener>();
+			triggerListener.onTriggerEnter += OnTriggerEnter;
+			triggerListener.onTriggerExit += OnTriggerExit;
 		}
 
 		private void OnTriggerEnter(Collider2D collider) {

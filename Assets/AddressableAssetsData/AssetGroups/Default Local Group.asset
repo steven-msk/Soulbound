@@ -57,6 +57,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 266b90b32eeb1ec4e9de7f3921f2d5e6
+    m_Address: AreaTriggerTile
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 291cc8ec7deb2aa4fbfda55996bfe132
     m_Address: debugPointer
     m_ReadOnly: 0
