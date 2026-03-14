@@ -22,6 +22,7 @@ namespace SoulboundBackend.Client {
 		[SerializeField] private Vector2 normalVelocity;
 		[SerializeField] private Vector2 rbVelocity;
 		[SerializeField] private bool isGrounded;
+		[SerializeField] private bool isJumping;
 
 		[Header("Data knobs")]
 		[SerializeField] private float speed = 1f;
@@ -43,16 +44,21 @@ namespace SoulboundBackend.Client {
 
 		private void Update() {
 			rb.linearVelocity = new Vector2(normalVelocity.x * speed, rb.linearVelocityY);
+			rbVelocity = rb.linearVelocity;
+
+			if (isJumping && isGrounded) Jump();
 		}
 
 		private void FixedUpdate() {
 			UpdateIsGrounded();
 		}
 
-		internal void Jump() {
-			if (isGrounded) {
-				rb.linearVelocity = new Vector2(rb.linearVelocityX, jumpForce);
-			}
+		internal void SetJumping(bool value) {
+			this.isJumping = value;
+		}
+
+		public void Jump() {
+			rb.linearVelocity = new Vector2(rb.linearVelocityX, jumpForce);
 		}
 
 		private void UpdateIsGrounded() {

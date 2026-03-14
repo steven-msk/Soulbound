@@ -124,10 +124,14 @@ namespace SoulboundBackend.Client {
 					return true;
 				}
 			}
-			if (inputEvent.token.Equals(InputTokens.Player.jump)
-					&& inputEvent.phase == InputActionPhase.Performed) {
-				playerTransform.Jump();
-				return true;
+			if (inputEvent.token.Equals(InputTokens.Player.jump)) {
+				if (inputEvent.phase == InputActionPhase.Performed) {
+					playerTransform.SetJumping(true);
+					return true;
+				} else if (inputEvent.phase == InputActionPhase.Canceled) {
+					playerTransform.SetJumping(false);
+					return true;
+				}
 			}
 			return false;
 		}
