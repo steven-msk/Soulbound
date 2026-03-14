@@ -56,13 +56,14 @@ namespace SoulboundBackend.Client.ItemSystem {
 			obj.transform.SetParent(parent, false);
 
 			RectTransform rect = obj.GetComponent<RectTransform>();
-			rect.anchorMin = rect.anchorMax = Vector2.zero;
+			rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f);
 			rect.sizeDelta = new Vector2(IMAGE_SIZE, IMAGE_SIZE);
+			rect.anchoredPosition = Vector2.zero;
 
 			Image itemImage = obj.AddComponent<Image>();
 			itemImage.raycastTarget = false;
 			TextMeshProUGUI stackText = CreateStackText(itemStack, rect);
-
+			
 			UIItemDisplayView displayView = obj.AddComponent<UIItemDisplayView>();
 			displayView.Init(stackText, itemImage);
 			displayView.SetStack(itemStack);
@@ -80,13 +81,15 @@ namespace SoulboundBackend.Client.ItemSystem {
 			text.color = Color.white;
 			text.fontSize = STACK_TEXT_SIZE;
 
+			ContentSizeFitter sizeFitter = obj.AddComponent<ContentSizeFitter>();
+			sizeFitter.verticalFit = sizeFitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+
 			RectTransform rect = obj.GetComponent<RectTransform>();
 			rect.pivot = new Vector2(1f, 0f);
 			rect.anchorMax = new Vector2(0.9375f, 0.0625f);
 			rect.anchorMin = rect.anchorMax;
 			rect.anchoredPosition = Vector2.zero;
-			text.rectTransform.sizeDelta = text.GetPreferredValues(Mathf.Infinity, Mathf.Infinity);
-			rect.anchoredPosition = new Vector2(Mathf.Max(-4, rect.sizeDelta.x - 19.14f), rect.anchoredPosition.y);
+			//rect.anchoredPosition = new Vector2(Mathf.Max(-4, rect.sizeDelta.x - 19.14f), rect.anchoredPosition.y);
 
 			return text;
 		}

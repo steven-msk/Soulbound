@@ -8,32 +8,35 @@ using UnityEngine.EventSystems;
 #nullable enable
 
 namespace SoulboundBackend.Client.UI.Storage {
+	[RequireComponent(typeof(RectTransform))]
 	public class ItemSlotHandle : MonoBehaviour, IItemSlotHandle, ITooltipTrigger, IItemSlotEvents {
 		private IItemSlot slot = null!;
 		private ITooltip tooltip = null!;
 		private ITooltipRenderer tooltipRenderer = null!;
 		private ITooltipHandle? tooltipHandle;
+		private RectTransform rect = null!;
 		public event Action<int, PointerEventData>? pointerDown;
 		public event Action<int, PointerEventData>? pointerUp;
 		public event Action<int, PointerEventData>? pointerEnter;
 		public event Action<int, PointerEventData>? pointerExit;
-		private ItemDisplay? activeDisplay;
-		private ItemStack? _stack;
+		private UIItemDisplay? activeDisplay;
+		private ItemStack? stack;
 
 		public void Init(IItemSlot slot) {
 			this.slot = slot;
+			rect = GetComponent<RectTransform>();
 			slot.setStack += SetStack;
 			SetStack(slot.GetStack());
 		}
 
 		private void SetStack(ItemStack? stack) {
-			if (_stack != null) _stack.onQuantityChanged -= OnStackQuantityChanged;
-			if (activeDisplay != null) activeDisplay.Destroy();
-			OnStackQuantityChanged(_stack?.quantity ?? 0, stack?.quantity ?? 0);
-			_stack = stack;
+			if (this.stack != null) this.stack.onQuantityChanged -= OnStackQuantityChanged;
+			activeDisplay?.Destroy();
+			OnStackQuantityChanged(this.stack?.quantity ?? 0, stack?.quantity ?? 0);
+			this.stack = stack;
 
 			if (stack != null) {
-				activeDisplay = ItemDisplay.Create(stack, () => transform);
+				activeDisplay = new UIItemDisplay(rect, stack);
 				DestroyTooltip();
 				stack.onQuantityChanged += OnStackQuantityChanged;
 
@@ -41,6 +44,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 				SetTooltip(new ItemTooltip(stack.item));
 			} else {
 				SetTooltip(null!);
+				activeDisplay = null;
 			}
 		}
 
@@ -67,8 +71,11 @@ namespace SoulboundBackend.Client.UI.Storage {
 			if (@new <= 0) {
 				DestroyTooltip();
 				tooltip = null!;
-				if (_stack != null) _stack.onQuantityChanged -= OnStackQuantityChanged;
-				_stack = null;
+
+				if (stack != null) {
+					stack.onQuantityChanged -= OnStackQuantityChanged;
+				}
+				stack = null;
 			}
 		}
 
