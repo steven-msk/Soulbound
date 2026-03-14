@@ -8,22 +8,21 @@ using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SoulboundBackend.Client.UI {
-	public class TransitStackHandle : MonoBehaviour, ITransitStackHandle {
-		private ItemDisplay display;
+	public class TransitStackHandle : ITransitStackHandle {
+		private readonly UIItemDisplay display;
 
-		public void Init(ItemDisplay display) {
+		public TransitStackHandle(UIItemDisplay display) {
 			this.display = display;
-			display.SetRaycastTarget(false);
-		}
-
-		[PROTOTYPICAL]
-		[Obsolete]
-		private void Update() {
-			display.transform.position = UnityEngine.Input.mousePosition;
 		}
 
 		void ITransitStackHandle.Destroy() => display.Destroy();
 
-		ItemStack ITransitStackHandle.GetStack() => display.stack;
+		void ITransitStackHandle.SetDisplayPosition(Vector2 position) {
+			display.SetPosition(position);
+		}
+
+		void ITransitStackHandle.SetDisplayParent(RectTransform parent) {
+			display.SetParent(parent);
+		}
 	}
 }

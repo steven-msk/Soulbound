@@ -66,8 +66,8 @@ namespace SoulboundBackend.Client.ItemSystem {
 			GetComponent<Image>().sprite = sprite;
 			stackText.enabled = stack.item.IsStackable();
 
-			// the display needs to be last in rendering layer
-			// setting the transform to last sibling doesnt guarantee total visibility for every layer
+			// the display needs to be in the last rendering layer
+			// setting the transform to last sibling doesnt guarantee full visibility for every layer
 			// but for this stage of the game its good enough
 			transform.SetAsLastSibling();
 		}

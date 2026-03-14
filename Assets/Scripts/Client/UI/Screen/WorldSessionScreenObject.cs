@@ -2,21 +2,26 @@ using SoulboundBackend.Client.UI.Screens;
 using SoulboundBackend.Client.UI.Storage;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using UnityEngine.EventSystems;
+using Screen = SoulboundBackend.Client.UI.Screens.Screen;
 
 #nullable enable
 
 namespace SoulboundBackend.Client.UI {
+	[RequireComponent(typeof(RectTransform))]
 	public class WorldSessionScreenObject : ScreenObject, IItemContainerScreenScope {
+		private RectTransform rect = null!;
 		private TransitStack transitStack = null!;
 		private SlotDragState? dragState;
 		private readonly List<UIItemContainerNode> openContainers = new();
-		private UITransitStackNode? transitStackNode;
+		private ITransitStackHandle? currentTransitStackHandle;
 		TransitStack IItemContainerScope.transitStack => transitStack;
 
 		public new void Init(Screen screen) {
 			base.Init(screen);
 			this.transitStack = new TransitStack(this);
+			rect = GetComponent<RectTransform>();
 		}
 
 		public bool TryBeginDrag(IItemContainer container, int originSlotIndex, PointerEventData.InputButton button) {
@@ -76,14 +81,14 @@ namespace SoulboundBackend.Client.UI {
 		public void AddItemContainer(UIItemContainerNode node) => openContainers.Add(node);
 		public void RemoveItemContainer(UIItemContainerNode node) => openContainers.Remove(node);
 
-		public void SetTransitStack(UITransitStackNode node) {
-			node.transform.SetParent(transform, false);
-			transitStackNode = node;
+		void IItemContainerScreenScope.SetTransitStack(ITransitStackHandle transitStackHandle) {
+			currentTransitStackHandle = transitStackHandle;
+			transitStackHandle.SetDisplayParent(rect);
 		}
 
 		public void RemoveTransitStack() {
-			transitStackNode?.handle.Destroy();
-			transitStackNode = null;
+			currentTransitStackHandle?.Destroy();
+			currentTransitStackHandle = null;
 		}
 	}
 }
