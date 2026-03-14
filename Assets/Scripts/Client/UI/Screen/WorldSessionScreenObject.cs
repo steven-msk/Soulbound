@@ -20,6 +20,7 @@ namespace SoulboundBackend.Client.UI {
 		private SlotDragState? dragState;
 		private readonly List<UIItemContainerNode> openContainers = new();
 		private ITransitStackHandle? currentTransitStackHandle;
+		private Vector2 pointerPosition;
 		TransitStack IItemContainerScope.transitStack => transitStack;
 		int IInputContext.priority => 5000;
 
@@ -27,6 +28,7 @@ namespace SoulboundBackend.Client.UI {
 			base.Init(screen);
 			this.transitStack = new TransitStack(this);
 			rect = GetComponent<RectTransform>();
+			Soulbound.instance.GetInputManager().PushContext(this);
 		}
 
 		public bool TryBeginDrag(IItemContainer container, int originSlotIndex, PointerEventData.InputButton button) {
@@ -88,8 +90,8 @@ namespace SoulboundBackend.Client.UI {
 
 		bool IInputContext.HandleInput(in InputEvent inputEvent) {
 			if (inputEvent.token.Equals(InputTokens.Mouse.position)) {
-				Vector2 mousePos = inputEvent.context.ReadValue<Vector2>();
-				currentTransitStackHandle?.SetDisplayPosition(mousePos);
+				pointerPosition = inputEvent.context.ReadValue<Vector2>();
+				currentTransitStackHandle?.SetDisplayPosition(pointerPosition);
 			}
 			return false;
 		}
@@ -97,12 +99,15 @@ namespace SoulboundBackend.Client.UI {
 		void IItemContainerScreenScope.SetTransitStack(ITransitStackHandle transitStackHandle) {
 			currentTransitStackHandle = transitStackHandle;
 			transitStackHandle.SetDisplayParent(rect);
-			Soulbound.instance.GetInputManager().PushContext(this);
+			transitStackHandle.SetDisplayPosition(pointerPosition);
 		}
 
 		void IItemContainerScreenScope.RemoveTransitStack() {
 			currentTransitStackHandle?.Destroy();
 			currentTransitStackHandle = null;
+		}
+
+		private void OnDestroy() {
 			Soulbound.instance.GetInputManager().RemoveContext(this);
 		}
 	}
