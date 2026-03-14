@@ -56,9 +56,11 @@ namespace SoulboundBackend.Client.ItemSystem {
 			obj.transform.SetParent(parent, false);
 
 			RectTransform rect = obj.GetComponent<RectTransform>();
+			rect.anchorMin = rect.anchorMax = Vector2.zero;
 			rect.sizeDelta = new Vector2(IMAGE_SIZE, IMAGE_SIZE);
 
 			Image itemImage = obj.AddComponent<Image>();
+			itemImage.raycastTarget = false;
 			TextMeshProUGUI stackText = CreateStackText(itemStack, rect);
 
 			UIItemDisplayView displayView = obj.AddComponent<UIItemDisplayView>();

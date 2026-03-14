@@ -1,22 +1,27 @@
+using SoulboundBackend.Client.Input;
 using SoulboundBackend.Client.UI.Screens;
 using SoulboundBackend.Client.UI.Storage;
+using SoulboundBackend.Core;
+using SoulboundBackend.Core.Debug.Logging;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 using Screen = SoulboundBackend.Client.UI.Screens.Screen;
 
 #nullable enable
 
 namespace SoulboundBackend.Client.UI {
 	[RequireComponent(typeof(RectTransform))]
-	public class WorldSessionScreenObject : ScreenObject, IItemContainerScreenScope {
+	public class WorldSessionScreenObject : ScreenObject, IItemContainerScreenScope, IInputContext {
 		private RectTransform rect = null!;
 		private TransitStack transitStack = null!;
 		private SlotDragState? dragState;
 		private readonly List<UIItemContainerNode> openContainers = new();
 		private ITransitStackHandle? currentTransitStackHandle;
 		TransitStack IItemContainerScope.transitStack => transitStack;
+		int IInputContext.priority => 5000;
 
 		public new void Init(Screen screen) {
 			base.Init(screen);
@@ -81,14 +86,24 @@ namespace SoulboundBackend.Client.UI {
 		public void AddItemContainer(UIItemContainerNode node) => openContainers.Add(node);
 		public void RemoveItemContainer(UIItemContainerNode node) => openContainers.Remove(node);
 
+		bool IInputContext.HandleInput(in InputEvent inputEvent) {
+			if (inputEvent.token.Equals(InputTokens.Mouse.position)) {
+				Vector2 mousePos = inputEvent.context.ReadValue<Vector2>();
+				currentTransitStackHandle?.SetDisplayPosition(mousePos);
+			}
+			return false;
+		}
+
 		void IItemContainerScreenScope.SetTransitStack(ITransitStackHandle transitStackHandle) {
 			currentTransitStackHandle = transitStackHandle;
 			transitStackHandle.SetDisplayParent(rect);
+			Soulbound.instance.GetInputManager().PushContext(this);
 		}
 
-		public void RemoveTransitStack() {
+		void IItemContainerScreenScope.RemoveTransitStack() {
 			currentTransitStackHandle?.Destroy();
 			currentTransitStackHandle = null;
+			Soulbound.instance.GetInputManager().RemoveContext(this);
 		}
 	}
 }

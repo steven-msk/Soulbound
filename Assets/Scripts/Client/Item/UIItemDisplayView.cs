@@ -1,4 +1,5 @@
 using SoulboundBackend.Client.ItemSystem;
+using SoulboundBackend.Core.Debug.Logging;
 using SoulboundBackend.Core.Resource;
 using System;
 using System.Collections;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
 #nullable enable
 
@@ -34,13 +36,14 @@ namespace SoulboundBackend.Client.UI {
 		}
 
 		public void SetPosition(Vector2 position) {
-			rect.anchoredPosition = position;
+			// position param is in screen space coordinates
+			// rect.anchoredPosition cannot be used in this case
+			rect.transform.position = position;
 		}
 
 		public void SetParent(RectTransform parent) {
 			rect.SetParent(parent, false);
 		}
-
 
 		public void Destroy() => GameObject.Destroy(gameObject);
 
