@@ -241,6 +241,11 @@ namespace SoulboundBackend.Client {
 			mainHandSlot.SetStack(null);
 		}
 
+		public bool TryAddItemStack(ItemStack itemStack) {
+			if (inventory.TryAddStack(itemStack)) return true;
+			return hotbar.TryAddStack(itemStack);
+		}
+
 		public bool CanPlaceBlockAt(BlockPos blockPos) {
 			Vector2 worldPos = (Vector2)blockPos;
 			return IsInBlockReach(worldPos)

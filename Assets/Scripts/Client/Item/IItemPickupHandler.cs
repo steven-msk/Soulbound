@@ -6,6 +6,6 @@ using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.ItemSystem {
 	public interface IItemPickupHandler {
-		void PickupStack(ItemStack itemStack);
+		bool TryPickupStack(ItemStack itemStack);
 	}
 }

@@ -75,9 +75,9 @@ namespace SoulboundBackend.Client {
 		public void SetNormalVelocity(Vector2 velocity) => normalVelocity = velocity;
 		public Vector2 GetNormalVelocity() => normalVelocity;
 
-		void IItemPickupHandler.PickupStack(ItemStack itemStack) {
-			Logger.LogInfo("picked up {} items", itemStack.quantity);
-			itemStack.Decrement(itemStack.quantity);
+		bool IItemPickupHandler.TryPickupStack(ItemStack itemStack) {
+			return player.TryAddItemStack(itemStack);
 		}
+
 	}
 }

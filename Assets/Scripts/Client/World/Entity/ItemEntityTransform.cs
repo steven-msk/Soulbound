@@ -48,8 +48,7 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 			Entity? collidedEntity = entityTrigger ? entityTransform.GetEntity() : null;
 			if (!CanBePickedUp(collidedEntity)) return false;
 
-			pickupHandler.PickupStack(entity.GetStack());
-			return entity.GetStack().IsEmpty();
+			return pickupHandler.TryPickupStack(entity.GetStack());
 		}
 
 		private bool CanBePickedUp(Entity? collidedEntity) {

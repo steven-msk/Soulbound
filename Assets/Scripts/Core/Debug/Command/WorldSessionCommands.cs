@@ -102,6 +102,8 @@ namespace SoulboundBackend.Core.Debug.Commands {
 
 		private static CommandNode GiveCommand() {
 			static void giveItem(CommandParsingContext ctx) {
+				// TODO: simplify give command logic
+
 				Item item = ctx.Args.Get<Item>("item");
 				int quantity = ctx.Args.TryGet("quantity", out int result) ? result : 1;
 				if (quantity <= 0) {
@@ -122,8 +124,6 @@ namespace SoulboundBackend.Core.Debug.Commands {
 				}
 				if (remainder > 0) stacks[i] = item.CreateStack(remainder);
 
-				// might move this to an extension of IItemContainer
-				// which would have more util methods
 
 				// flow to stackable
 				List<int> flowSlots = stackSnapshots
