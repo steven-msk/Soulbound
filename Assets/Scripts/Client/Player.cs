@@ -133,6 +133,11 @@ namespace SoulboundBackend.Client {
 					return true;
 				}
 			}
+
+			if (inputEvent.Performed(InputTokens.Keyboard.Q)) {
+				ThrowMainHandStack();
+				return true;
+			}
 			return false;
 		}
 
@@ -230,7 +235,10 @@ namespace SoulboundBackend.Client {
 			if (!mainHandSlot.HasStack()) return;
 
 			ItemStack stack = mainHandSlot.GetStack()!;
+			ItemEntity itemEntity = new(stack, transform.GetPos());
+			level.AddEntity(itemEntity);
 
+			mainHandSlot.SetStack(null);
 		}
 
 		public bool CanPlaceBlockAt(BlockPos blockPos) {
