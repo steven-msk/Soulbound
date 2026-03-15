@@ -1,4 +1,5 @@
 using SoulboundBackend.Common;
+using SoulboundBackend.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +24,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 
 			CircleCollider2D collider = gameObject.AddComponent<CircleCollider2D>();
 			collider.isTrigger = true;
-			collider.excludeLayers = ~LayerMask.GetMask("EntityCharacter");
+			collider.excludeLayers = ~LayerMask.GetMask(Layers.EntityCharacter);
 			collider.radius = 2.5f;
 
 			TriggerCollisionListener triggerListener = gameObject.AddComponent<TriggerCollisionListener>();

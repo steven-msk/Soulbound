@@ -1,5 +1,6 @@
 using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Common;
+using SoulboundBackend.Core;
 using SoulboundBackend.Core.Debug.Logging;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 			BoxCollider2D collider = obj.AddComponent<BoxCollider2D>();
 			collider.size = new Vector2(4f, 0.15f);
 			collider.isTrigger = true;
-			collider.excludeLayers = ~LayerMask.GetMask("EntityCharacter");
+			collider.excludeLayers = ~LayerMask.GetMask(Layers.EntityCharacter);
 
 			TriggerCollisionListener triggerListener = obj.AddComponent<TriggerCollisionListener>();
 			triggerListener.onTriggerEnter += OnAreaEnter;

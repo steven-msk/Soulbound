@@ -1,5 +1,6 @@
 using SoulboundBackend.Client.World.EntitySystem;
 using SoulboundBackend.Common;
+using SoulboundBackend.Core;
 using System;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -62,7 +63,7 @@ namespace SoulboundBackend.Client {
 		}
 
 		private void UpdateIsGrounded() {
-			int groundMask = LayerMask.GetMask("Ground");
+			int groundMask = LayerMask.GetMask(Layers.Ground);
 			RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 1.1f, groundMask);
 			UnityEngine.Debug.DrawRay(transform.position, Vector2.down * 1.1f, Color.red, 1, false);
 			isGrounded = hit.collider != null;

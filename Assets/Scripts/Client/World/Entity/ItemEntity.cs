@@ -1,4 +1,5 @@
 using SoulboundBackend.Client.ItemSystem;
+using SoulboundBackend.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,7 +32,7 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 			Rigidbody2D rigidbody = obj.GetComponent<Rigidbody2D>();
 			rigidbody.constraints = RigidbodyConstraints2D.FreezeRotation;
 			BoxCollider2D physicsCollider = obj.AddComponent<BoxCollider2D>();
-			physicsCollider.excludeLayers = LayerMask.GetMask("EntityCharacter");
+			physicsCollider.excludeLayers = LayerMask.GetMask(Layers.EntityCharacter);
 
 			return transform;
 		}
