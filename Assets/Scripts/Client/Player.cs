@@ -225,6 +225,14 @@ namespace SoulboundBackend.Client {
 			return -1;
 		}
 
+		private void ThrowMainHandStack() {
+			IItemSlot mainHandSlot = hotbar.GetSlot(hotbar.GetMainSlotIndex());
+			if (!mainHandSlot.HasStack()) return;
+
+			ItemStack stack = mainHandSlot.GetStack()!;
+
+		}
+
 		public bool CanPlaceBlockAt(BlockPos blockPos) {
 			Vector2 worldPos = (Vector2)blockPos;
 			return IsInBlockReach(worldPos)

@@ -8,5 +8,8 @@ namespace SoulboundBackend.Client.ItemSystem {
 	public interface IItemDisplay {
 		void SetStack(ItemStack itemStack);
 		ItemStack GetStack();
+
+		void Destroy();
+		bool IsDestroyed();
 	}
 }

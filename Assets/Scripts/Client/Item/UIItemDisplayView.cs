@@ -56,7 +56,7 @@ namespace SoulboundBackend.Client.UI {
 			if (newStack != null) {
 				newStack.onQuantityChanged += OnStackQuantityChanged;
 
-				// TODO: rework UI item display visual render approach
+				// TODO: rework visual render approach for UI item displays
 				Sprite sprite = AssetManager.Resolve<Sprite>(newStack.item.aspect.icon.spriteKey);
 				itemImage.sprite = sprite;
 
