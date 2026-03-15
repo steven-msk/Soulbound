@@ -13,7 +13,7 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 	public class ItemEntityTransform : MonoBehaviour, IEntityTransform {
 		private ItemEntity entity = null!;
 		private Entity? owner;
-		private float pickupDelay;
+		private float pickupDelaySec;
 		private float spawnTime;
 		private Rigidbody2D rb = null!;
 
@@ -21,7 +21,7 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 			this.entity = (ItemEntity)entity;
 			rb = GetComponent<Rigidbody2D>();
 			spawnTime = Time.unscaledTime;
-			pickupDelay = this.entity.GetPickupDelay();
+			pickupDelaySec = this.entity.GetPickupDelay();
 			owner = this.entity.GetOwner();
 		}
 
@@ -53,7 +53,7 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 
 		private bool CanBePickedUp(Entity? collidedEntity) {
 			if (collidedEntity != owner) return true;
-			return Time.unscaledTime > spawnTime + pickupDelay;
+			return Time.unscaledTime > spawnTime + pickupDelaySec;
 		}
 	}
 }

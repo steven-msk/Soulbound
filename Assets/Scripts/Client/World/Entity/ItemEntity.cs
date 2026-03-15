@@ -15,21 +15,21 @@ namespace SoulboundBackend.Client.World.EntitySystem {
 		private static readonly Vector3 TRANSFORM_SCALE = new(2.5f, 2.5f, 2.5f);
 
 		private readonly Entity? owner;
-		private readonly float pickupDelay;
+		private readonly float pickupDelaySec;
 		private readonly ItemStack itemStack;
 
 		public ItemEntity(ItemStack itemStack, Vector2 initialPos)
 			: this(null, 0f, itemStack, initialPos) {
 		}
 
-		public ItemEntity(Entity? owner, float pickupDelay, ItemStack itemStack, Vector2 initialPos)
+		public ItemEntity(Entity? owner, float pickupDelaySec, ItemStack itemStack, Vector2 initialPos)
 			: base(DESCRIPTOR, initialPos) {
 			this.itemStack = itemStack;
 			this.owner= owner;
-			this.pickupDelay = pickupDelay;
+			this.pickupDelaySec = pickupDelaySec;
 		}
 
-		public float GetPickupDelay() => pickupDelay;
+		public float GetPickupDelay() => pickupDelaySec;
 		public Entity? GetOwner() => owner;
 		public ItemStack GetStack() => itemStack;
 

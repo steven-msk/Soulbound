@@ -23,16 +23,13 @@ using Zenject;
 #nullable enable
 
 namespace SoulboundBackend.Client {
-	public class Player : Entity, IAttackPerformer, IInputContext, IFrameUpdatableEntity {
+	public class Player : Entity, IInputContext, IFrameUpdatableEntity {
 		private static readonly AssetKey playerKey = new("player");
 		private static readonly EntityDescriptor DESCRIPTOR = new("player", null);
 		private readonly Inventory inventory;
 		private readonly Hotbar hotbar;
-		private readonly PlayerStats stats = new();
-		[Obsolete] private readonly AttackSource attackSource;
-		public PlayerStats Stats => stats;
+		private ITransitStackSource tranistStackSource = null!;
 		private PlayerTransform playerTransform = null!;
-		[Obsolete] private AttackHandler attackHandler;
 		private new Vector2 initialPos;
 
 		const float MAX_BLOCK_REACH = 5f;
@@ -46,19 +43,6 @@ namespace SoulboundBackend.Client {
 			inventory = new Inventory();
 			hotbar = new Hotbar();
 			this.initialPos = initialPos;
-
-			attackSource = new AttackSource(2, 10, new PlayerMainHandAttack(),
-				context => {
-					var eventDispatcher = playerTransform.GetComponent<AttackEventDispatcher>();
-					context.eventDispatcher = eventDispatcher;
-					return AttackAnimatorChannel.FromDelegates(
-						playerTransform.GetComponent<Animator>,
-						() => eventDispatcher
-					);
-				},
-				animator => animator.SetTrigger("attack")
-			);
-			attackHandler = new AttackHandler(attackSource);
 		}
 
 		protected override IEntityTransform CreateTransform() {
@@ -141,13 +125,6 @@ namespace SoulboundBackend.Client {
 			return false;
 		}
 
-		[Obsolete]
-		public void TryAttack(AttackSource source) {
-			if (attackHandler?.isHandlingAttack ?? false) return;
-			attackHandler = new AttackHandler(source);
-			attackHandler.StartAttack(this, null);
-		}
-
 		void IFrameUpdatableEntity.FrameUpdate() {
 			if (isHoldingLeftClick) OnLeftHold();
 			if (isHoldingRightClick) OnRightHold();
@@ -170,7 +147,7 @@ namespace SoulboundBackend.Client {
 		private void OnLeftHold() {
 			ItemStack? mainHandStack = GetMainHandStack();
 
-			if (!TryUseItem(mainHandStack, ItemActionTrigger.LeftClick)) {
+			if (!TryUseItem(mainHandStack, ItemActionTrigger.LeftHold)) {
 				TryBreakBlock((BlockPos)GetWorldPointerPos());
 			}
 		}
@@ -235,7 +212,7 @@ namespace SoulboundBackend.Client {
 			if (!mainHandSlot.HasStack()) return;
 
 			ItemStack stack = mainHandSlot.GetStack()!;
-			ItemEntity itemEntity = new(this, 2f, stack, transform.GetPos());
+			ItemEntity itemEntity = new(this, pickupDelaySec: 2f, stack, transform.GetPos());
 			level.AddEntity(itemEntity);
 
 			mainHandSlot.SetStack(null);
@@ -269,7 +246,8 @@ namespace SoulboundBackend.Client {
 		public Hotbar GetHotbar() => hotbar;
 
 		public ItemStack? GetMainHandStack() {
-			return hotbar.GetSlot(hotbar.GetMainSlotIndex()).GetStack();
+			ItemStack? transitStack = tranistStackSource.GetTransitStack();
+			return transitStack ?? hotbar.GetSlot(hotbar.GetMainSlotIndex()).GetStack();
 		}
 
 		public Vector2 GetCenter() => playerTransform.Collider.bounds.center;
@@ -300,5 +278,9 @@ namespace SoulboundBackend.Client {
 			else initialPos = pos;
 		}
 		public override Vector2 GetPos() => transform?.GetPos() ?? initialPos;
+
+		public void SetTransitStackSource(ITransitStackSource source) {
+			this.tranistStackSource = source;
+		}
 	}
 }

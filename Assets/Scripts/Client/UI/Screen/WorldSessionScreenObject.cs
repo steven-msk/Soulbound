@@ -1,4 +1,5 @@
 using SoulboundBackend.Client.Input;
+using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.UI.Screens;
 using SoulboundBackend.Client.UI.Storage;
 using SoulboundBackend.Core;
@@ -14,7 +15,7 @@ using Screen = SoulboundBackend.Client.UI.Screens.Screen;
 
 namespace SoulboundBackend.Client.UI {
 	[RequireComponent(typeof(RectTransform))]
-	public class WorldSessionScreenObject : ScreenObject, IItemContainerScreenScope, IInputContext {
+	public class WorldSessionScreenObject : ScreenObject, IItemContainerScreenScope, IInputContext, ITransitStackSource {
 		private RectTransform rect = null!;
 		private TransitStack transitStack = null!;
 		private SlotDragState? dragState;
@@ -106,6 +107,8 @@ namespace SoulboundBackend.Client.UI {
 			currentTransitStackHandle?.Destroy();
 			currentTransitStackHandle = null;
 		}
+
+		ItemStack? ITransitStackSource.GetTransitStack() => transitStack?.GetStack();
 
 		private void OnDestroy() {
 			Soulbound.instance.GetInputManager().RemoveContext(this);
