@@ -1,3 +1,4 @@
+using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.World.EntitySystem;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core;
@@ -13,7 +14,7 @@ using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
 namespace SoulboundBackend.Client {
 	[RequireComponent(typeof(Rigidbody2D))]
-	public class PlayerTransform : MonoBehaviour, IEntityTransform {
+	public class PlayerTransform : MonoBehaviour, IEntityTransform,IItemPickupHandler {
 		private Player player = null!;
 		private Rigidbody2D rb = null!;
 		new private CapsuleCollider2D collider = null!;
@@ -73,6 +74,10 @@ namespace SoulboundBackend.Client {
 		public void SetNormalVelocityY(float y) => normalVelocity.y = y;
 		public void SetNormalVelocity(Vector2 velocity) => normalVelocity = velocity;
 		public Vector2 GetNormalVelocity() => normalVelocity;
-	}
 
+		void IItemPickupHandler.PickupStack(ItemStack itemStack) {
+			Logger.LogInfo("picked up {} items", itemStack.quantity);
+			itemStack.Decrement(itemStack.quantity);
+		}
+	}
 }

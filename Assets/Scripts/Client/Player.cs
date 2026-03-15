@@ -235,7 +235,7 @@ namespace SoulboundBackend.Client {
 			if (!mainHandSlot.HasStack()) return;
 
 			ItemStack stack = mainHandSlot.GetStack()!;
-			ItemEntity itemEntity = new(stack, transform.GetPos());
+			ItemEntity itemEntity = new(this, 2f, stack, transform.GetPos());
 			level.AddEntity(itemEntity);
 
 			mainHandSlot.SetStack(null);
