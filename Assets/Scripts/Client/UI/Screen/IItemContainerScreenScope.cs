@@ -11,7 +11,7 @@ namespace SoulboundBackend.Client.UI {
 		void AddItemContainer(UIItemContainerNode node);
 		void RemoveItemContainer(UIItemContainerNode node);
 
-		void SetTransitStack(ITransitStackHandle transitStackHandle);
+		void SetTransitStackHandle(ITransitStackHandle transitStackHandle);
 		void RemoveTransitStack();
 	}
 }

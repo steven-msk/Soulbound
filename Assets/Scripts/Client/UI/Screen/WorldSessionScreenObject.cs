@@ -15,14 +15,13 @@ using Screen = SoulboundBackend.Client.UI.Screens.Screen;
 
 namespace SoulboundBackend.Client.UI {
 	[RequireComponent(typeof(RectTransform))]
-	public class WorldSessionScreenObject : ScreenObject, IItemContainerScreenScope, IInputContext, ITransitStackSource {
+	public class WorldSessionScreenObject : ScreenObject, IItemContainerScreenScope, IInputContext {
 		private RectTransform rect = null!;
 		private TransitStack transitStack = null!;
 		private SlotDragState? dragState;
 		private readonly List<UIItemContainerNode> openContainers = new();
 		private ITransitStackHandle? currentTransitStackHandle;
 		private Vector2 pointerPosition;
-		TransitStack IItemContainerScope.transitStack => transitStack;
 		int IInputContext.priority => 5000;
 
 		public new void Init(Screen screen) {
@@ -97,7 +96,7 @@ namespace SoulboundBackend.Client.UI {
 			return false;
 		}
 
-		void IItemContainerScreenScope.SetTransitStack(ITransitStackHandle transitStackHandle) {
+		void IItemContainerScreenScope.SetTransitStackHandle(ITransitStackHandle transitStackHandle) {
 			currentTransitStackHandle = transitStackHandle;
 			transitStackHandle.SetDisplayParent(rect);
 			transitStackHandle.SetDisplayPosition(pointerPosition);
@@ -108,7 +107,12 @@ namespace SoulboundBackend.Client.UI {
 			currentTransitStackHandle = null;
 		}
 
-		ItemStack? ITransitStackSource.GetTransitStack() => transitStack?.GetStack();
+		ItemStack? ITransitStackSource.GetTransitStack() => transitStack.GetStack();
+		bool ITransitStackSource.HasTransitStack() => transitStack.HasStack();
+		void ITransitStackSource.SetTransitStack(ItemStack? itemStack) {
+			if (itemStack == null) transitStack.Release();
+			else transitStack.SetStack(itemStack);
+		}
 
 		private void OnDestroy() {
 			Soulbound.instance.GetInputManager().RemoveContext(this);

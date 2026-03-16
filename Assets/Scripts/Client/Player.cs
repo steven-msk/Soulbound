@@ -220,7 +220,7 @@ namespace SoulboundBackend.Client {
 			if (mainHandStack == null) return;
 
 			int throwAmount = ctrl ? mainHandStack.quantity : 1;
-			ItemStack thrownStack = mainHandStack.item.CreateStack(throwAmount);
+			ItemStack thrownStack = mainHandStack.Clone(throwAmount);
 			mainHandStack.Decrement(throwAmount);
 
 			ItemEntity itemEntity = new(this, pickupDelaySec: 2f, thrownStack, transform.GetPos());

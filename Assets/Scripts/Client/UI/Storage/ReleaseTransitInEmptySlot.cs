@@ -7,14 +7,14 @@ namespace SoulboundBackend.Client.UI {
 		}
 
 		public override bool CanExecute() {
-			return !slot.HasStack() && scope.transitStack.HasStack();
+			return !slot.HasStack() && scope.HasTransitStack();
 		}
 
 		public override bool Execute() {
 			if (!CanExecute()) return false;
 
-			slot.SetStack(scope.transitStack.GetStack());
-			scope.transitStack.Release();
+			slot.SetStack(scope.GetTransitStack());
+			scope.SetTransitStack(null);
 			return true;
 		}
 	}

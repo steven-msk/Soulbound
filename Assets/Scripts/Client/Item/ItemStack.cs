@@ -51,8 +51,8 @@ namespace SoulboundBackend.Client.ItemSystem {
 
 		public int GetSpaceLeft() => item.fullStackSize - quantity;
 
-		public bool IsStackableWith(ItemStack itemStack) {
-			return itemStack.item == this.item && this.GetSpaceLeft() > 0;
+		public bool IsStackableWith(ItemStack? itemStack) {
+			return itemStack?.item == item && GetSpaceLeft() > 0;
 		}
 
 		public void FillFrom(ItemStack itemStack) {
@@ -61,5 +61,12 @@ namespace SoulboundBackend.Client.ItemSystem {
 			int added = itemStack.Decrement(GetSpaceLeft());
 			this.Increment(added);
 		}
+
+		public ItemStack Clone(int newQuantity) {
+			// TODO: rework item stack cloning when data becomes a thing
+			return new ItemStack(item, newQuantity);
+		}
+
+		public ItemStack Clone() => Clone(quantity);
 	}
 }

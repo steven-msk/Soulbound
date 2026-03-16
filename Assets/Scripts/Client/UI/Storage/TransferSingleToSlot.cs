@@ -7,15 +7,24 @@ namespace SoulboundBackend.Client.UI {
 			: base(container, slotIndex, scope) {
 		}
 
-		public override bool CanExecute() => scope.transitStack.HasStack();
+		public override bool CanExecute() {
+			return slot.HasStack()
+				? slot.GetStack().IsStackableWith(scope.GetTransitStack())
+				: scope.HasTransitStack();
+		}
 
 		public override bool Execute() {
 			if (!CanExecute()) return false;
 
-			ItemStack transitStack = scope.transitStack.GetStack()!;
-			if (!slot.HasStack()) slot.SetStack(new ItemStack(transitStack.item, 0));
+			ItemStack transitStack = scope.GetTransitStack();
+			if (!slot.HasStack()) {
+				ItemStack cloned = transitStack.Clone(1);
+				transitStack.Decrement();
+				slot.SetStack(cloned);
+				return true;
+			}
 
-			int added = slot.GetStack()!.Increment();
+			int added = slot.GetStack().Increment();
 			if (added > 0) transitStack.Decrement();
 			return true;
 		}

@@ -8,19 +8,20 @@ namespace SoulboundBackend.Client.UI {
 		}
 
 		public override bool CanExecute() {
-			return slot.HasStack() && !scope.transitStack.HasStack();
+			return slot.HasStack() && !scope.HasTransitStack();
 		}
 
 		public override bool Execute() {
 			if (!CanExecute()) return false;
 
-
-			int half = slot.GetStack()!.quantity / 2;
-			int remainder = slot.GetStack()!.quantity % 2;
+			int half = slot.GetStack().quantity / 2;
+			int remainder = slot.GetStack().quantity % 2;
 			int transfer = half + remainder;
-			slot.GetStack()!.Decrement(transfer);
-			ItemStack halvedTransit = new(slot.GetStack()!.item, transfer);
-			scope.transitStack.SetStack(halvedTransit);
+
+			ItemStack halvedTransit = slot.GetStack().Clone(transfer);
+			slot.GetStack().Decrement(transfer);
+			scope.SetTransitStack(halvedTransit);
+
 			return true;
 		}
 	}

@@ -29,7 +29,7 @@ namespace SoulboundBackend.Client.UI.Storage {
 			TransitStackHandle handle = new(display);
 
 			display.onDestroyed += OnDisplayDestroyed;
-			screenScope.SetTransitStack(handle);
+			screenScope.SetTransitStackHandle(handle);
 		}
 
 		public void Release() {

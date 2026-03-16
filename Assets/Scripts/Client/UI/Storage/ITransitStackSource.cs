@@ -9,5 +9,7 @@ using System.Threading.Tasks;
 namespace SoulboundBackend.Client.ItemSystem {
 	public interface ITransitStackSource {
 		ItemStack? GetTransitStack();
+		bool HasTransitStack();
+		void SetTransitStack(ItemStack? itemStack);
 	}
 }

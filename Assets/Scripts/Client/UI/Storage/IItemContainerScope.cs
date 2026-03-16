@@ -1,3 +1,4 @@
+using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.UI.Storage;
 using System;
 using System.Collections.Generic;
@@ -9,8 +10,7 @@ using UnityEngine.EventSystems;
 #nullable enable
 
 namespace SoulboundBackend.Client.UI {
-	public interface IItemContainerScope {
-		TransitStack transitStack { get; }
+	public interface IItemContainerScope : ITransitStackSource {
 		IEnumerable<IItemContainer> GetOpenContainers();
 
 		bool InDragState();

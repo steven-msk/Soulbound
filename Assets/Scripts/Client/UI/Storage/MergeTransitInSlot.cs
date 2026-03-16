@@ -13,7 +13,11 @@ namespace SoulboundBackend.Client.UI {
 			this.slotIndex = slotIndex;
 		}
 
-		public override bool CanExecute() => scope.transitStack.HasStack();
+		public override bool CanExecute() {
+			return slot.HasStack()
+				? slot.GetStack().IsStackableWith(scope.GetTransitStack())
+				: scope.HasTransitStack();
+		}
 
 		public override bool Execute() {
 			ReleaseTransitInEmptySlot releaseInSlot = new(container, slotIndex, scope);
@@ -21,13 +25,15 @@ namespace SoulboundBackend.Client.UI {
 
 			if (!CanExecute()) return false;
 
-			ItemStack transitStack = scope.transitStack.GetStack()!;
-			int space = transitStack.item.fullStackSize - slot.GetStack()!.quantity;
+			int space = slot.GetStack().GetSpaceLeft();
 			if (space <= 0) return false;
 
+			ItemStack transitStack = scope.GetTransitStack();
 			int transfer = Math.Min(space, transitStack.quantity);
-			slot.GetStack()!.Increment(transfer);
+
+			slot.GetStack().Increment(transfer);
 			transitStack.Decrement(transfer);
+
 			return true;
 		}
 	}

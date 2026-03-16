@@ -14,8 +14,8 @@ namespace SoulboundBackend.Client.UI {
 		}
 
 		public bool CanExecute() {
-			if (!scope.transitStack.HasStack()) return false;
-			return !scope.transitStack.GetStack()!.IsFull();
+			if (!scope.HasTransitStack()) return false;
+			return !scope.GetTransitStack()!.IsFull();
 		}
 
 		private List<IItemSlot> GetSlotsContaining(Item item) {
@@ -28,11 +28,11 @@ namespace SoulboundBackend.Client.UI {
 		bool ISlotOperation.Execute() {
 			if (!CanExecute()) return false;
 
-			Item item = scope.transitStack.GetStack()!.item;
+			ItemStack transitStack = scope.GetTransitStack()!;
+			Item item = transitStack.item;
 			List<IItemSlot> slots = GetSlotsContaining(item);
 			if (slots == null || slots.Count == 0) return false;
 
-			ItemStack transitStack = scope.transitStack.GetStack()!;
 			int spaceLeft = item.fullStackSize - transitStack.quantity;
 			foreach (var slot in slots) {
 				if (spaceLeft <= 0) break;
