@@ -37,6 +37,7 @@ namespace SoulboundBackend.Client {
 		private Vector2 screenPointerPos;
 		private bool isHoldingLeftClick;
 		private bool isHoldingRightClick;
+		private bool isHoldingCtrl;
 
 		public Player(Vector2 initialPos)
 			: base(DESCRIPTOR, initialPos) {
@@ -119,8 +120,15 @@ namespace SoulboundBackend.Client {
 			}
 
 			if (inputEvent.Performed(InputTokens.Keyboard.Q)) {
-				ThrowMainHandStack();
+				ThrowFromMainHand(isHoldingCtrl);
 				return true;
+			}
+			if (inputEvent.token.Equals(InputTokens.Keyboard.CTRL)) {
+				if (inputEvent.phase == InputActionPhase.Performed) {
+					isHoldingCtrl = true;
+				} else if (inputEvent.phase == InputActionPhase.Canceled) {
+					isHoldingCtrl = false;
+				}
 			}
 			return false;
 		}
@@ -207,15 +215,16 @@ namespace SoulboundBackend.Client {
 			return -1;
 		}
 
-		private void ThrowMainHandStack() {
-			IItemSlot mainHandSlot = hotbar.GetSlot(hotbar.GetMainSlotIndex());
-			if (!mainHandSlot.HasStack()) return;
+		private void ThrowFromMainHand(bool ctrl) {
+			ItemStack? mainHandStack = GetMainHandStack();
+			if (mainHandStack == null) return;
 
-			ItemStack stack = mainHandSlot.GetStack()!;
-			ItemEntity itemEntity = new(this, pickupDelaySec: 2f, stack, transform.GetPos());
+			int throwAmount = ctrl ? mainHandStack.quantity : 1;
+			ItemStack thrownStack = mainHandStack.item.CreateStack(throwAmount);
+			mainHandStack.Decrement(throwAmount);
+
+			ItemEntity itemEntity = new(this, pickupDelaySec: 2f, thrownStack, transform.GetPos());
 			level.AddEntity(itemEntity);
-
-			mainHandSlot.SetStack(null);
 		}
 
 		public bool TryAddItemStack(ItemStack itemStack) {
@@ -246,7 +255,7 @@ namespace SoulboundBackend.Client {
 		public Hotbar GetHotbar() => hotbar;
 
 		public ItemStack? GetMainHandStack() {
-			ItemStack? transitStack = tranistStackSource.GetTransitStack();
+			ItemStack? transitStack = tranistStackSource?.GetTransitStack();
 			return transitStack ?? hotbar.GetSlot(hotbar.GetMainSlotIndex()).GetStack();
 		}
 
