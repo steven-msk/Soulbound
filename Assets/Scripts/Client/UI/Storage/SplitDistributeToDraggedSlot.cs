@@ -51,7 +51,7 @@ namespace SoulboundBackend.Client.UI {
 				int amount = splitAmount + (i < remainder ? 1 : 0);
 
 				if (!draggedSlot.HasStack()) {
-					draggedSlot.SetStack(new ItemStack(scope.GetDragState().item, amount));
+					draggedSlot.SetStack(scope.GetDragState().item.CreateStack(amount));
 				}
 				bool hasSnapshot = scope.GetDragState().quantitySnapshots.TryGetValue(enumerator.Current, out int quantity);
 				if (hasSnapshot && !enumerator.Current.Equals(scope.GetDragState().origin)) {

@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 #nullable enable
@@ -7,11 +10,17 @@ namespace SoulboundBackend.Client.ItemSystem {
 	public class ItemStack {
 		public event Action<int, int>? onQuantityChanged;
 		public readonly Item item;
+		private readonly Dictionary<Type, IItemStackData> data = new();
 		public int quantity { get; private set; }
 
 		internal ItemStack(Item item, int quantity) {
 			this.item = item;
 			this.quantity = Mathf.Clamp(quantity, 0, item.fullStackSize);
+		}
+
+		private ItemStack(Item item, int quantity, Dictionary<Type, IItemStackData> data)
+			: this(item, quantity) {
+			this.data = data;
 		}
 
 		public bool IsFull() => quantity >= item.fullStackSize;
@@ -52,7 +61,9 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public int GetSpaceLeft() => item.fullStackSize - quantity;
 
 		public bool IsStackableWith(ItemStack? itemStack) {
-			return itemStack?.item == item && GetSpaceLeft() > 0;
+			return itemStack?.item == item
+				&& GetSpaceLeft() > 0
+				&& GetData().SequenceEqual(itemStack.GetData());
 		}
 
 		public void FillFrom(ItemStack itemStack) {
@@ -62,9 +73,18 @@ namespace SoulboundBackend.Client.ItemSystem {
 			this.Increment(added);
 		}
 
+		public T GetData<T>() where T : IItemStackData {
+			return (T)data[typeof(T)];
+		}
+
+		public void SetData<T>(T data) where T : IItemStackData {
+			this.data[typeof(T)] = data;
+		}
+
+		public IEnumerable<IItemStackData> GetData() => data.Values;
+	
 		public ItemStack Clone(int newQuantity) {
-			// TODO: rework item stack cloning when data becomes a thing
-			return new ItemStack(item, newQuantity);
+			return new ItemStack(item, newQuantity, data);
 		}
 
 		public ItemStack Clone() => Clone(quantity);
