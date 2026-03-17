@@ -17,15 +17,15 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public DebugPointerItem() : base("debugPointer") {
 		}
 
-		public bool ValidateTrigger(ItemInteractionTrigger trigger) {
-			return trigger == ItemInteractionTrigger.LeftClick;
+		public bool ValidateTrigger(InteractionTrigger trigger) {
+			return trigger == InteractionTrigger.LeftClick;
 		}
 
-		public bool CanExecute(ItemStack itemStack, ItemInteraction ctx) {
+		public bool CanExecute(ItemStack itemStack, in ItemInteraction ctx) {
 			return true;
 		}
 
-		public bool TryExecute(ItemStack itemStack, ItemInteraction ctx) {
+		public bool TryExecute(ItemStack itemStack, in ItemInteraction ctx) {
 			Logger.LogInfo("Pointer: {}", ctx.player.GetWorldPointerPos());
 			return true;
 		}

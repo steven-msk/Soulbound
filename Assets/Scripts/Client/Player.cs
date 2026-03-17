@@ -19,11 +19,14 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Zenject;
+using static Unity.Collections.AllocatorManager;
+using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
+
 
 #nullable enable
 
 namespace SoulboundBackend.Client {
-	public class Player : Entity, IInputContext, IFrameUpdatableEntity, IInteractionHandler<ItemInteraction> {
+	public class Player : Entity, IInputContext, IFrameUpdatableEntity, IInteractionHandler<ItemInteraction>, IInteractionHandler<BlockInteraction> {
 		private static readonly AssetKey playerKey = new("player");
 		private static readonly EntityDescriptor DESCRIPTOR = new("player", null);
 		private readonly Inventory inventory;
@@ -42,13 +45,17 @@ namespace SoulboundBackend.Client {
 		private bool isHoldingRightClick;
 		private bool isHoldingCtrl;
 
+		// provisory guard for not breaking the block instantly after it was placed
+		private bool leftClickBlockBreakGuard;
+
 		public Player(Vector2 initialPos)
 			: base(DESCRIPTOR, initialPos) {
 			inventory = new Inventory();
 			hotbar = new Hotbar();
 			this.initialPos = initialPos;
 
-			interactionResolver.RegisterHandler(this);
+			interactionResolver.RegisterHandler<ItemInteraction>(this);
+			interactionResolver.RegisterHandler<BlockInteraction>(this);
 		}
 
 		protected override IEntityTransform CreateTransform() {
@@ -144,43 +151,57 @@ namespace SoulboundBackend.Client {
 		}
 
 		private void OnLeftClick() {
-			ItemInteraction mainHandInteraction = GetMainHandInteraction(ItemInteractionTrigger.LeftClick);
-			if (interactionResolver.Resolve(mainHandInteraction)) {
+			if (!ResolveItemOrBlockInteraction(InteractionTrigger.LeftClick)) {
 				TryBreakBlock((BlockPos)GetWorldPointerPos());
 			}
 		}
 		private void OnRightClick() {
-			TryUseItem(GetMainHandStack(), ItemInteractionTrigger.RightClick);
-
-			// provisory
-			level.InteractBlock((BlockPos)GetWorldPointerPos());
+			ResolveItemOrBlockInteraction(InteractionTrigger.RightClick);
 		}
 
 		private void OnLeftHold() {
-			ItemStack? mainHandStack = GetMainHandStack();
-
-			if (!TryUseItem(mainHandStack, ItemInteractionTrigger.LeftHold)) {
+			if (!ResolveItemOrBlockInteraction(InteractionTrigger.LeftHold)) {
 				TryBreakBlock((BlockPos)GetWorldPointerPos());
 			}
 		}
 		private void OnRightHold() {
-			TryUseItem(GetMainHandStack(), ItemInteractionTrigger.RightHold);
+			ResolveItemOrBlockInteraction(InteractionTrigger.RightHold);
 		}
 
 		private void OnLeftRelease() {
-			TryUseItem(GetMainHandStack(), ItemInteractionTrigger.LeftRelease);			
+			ResolveItemOrBlockInteraction(InteractionTrigger.LeftRelease);
+			leftClickBlockBreakGuard = false;
 		}
 		private void OnRightRelease() {
-			TryUseItem(GetMainHandStack(), ItemInteractionTrigger.RightRelease);
+			ResolveItemOrBlockInteraction(InteractionTrigger.RightRelease);
 		}
 
-		private ItemInteraction GetMainHandInteraction(ItemInteractionTrigger trigger) {
-			ItemStack? mainHandStack = GetMainHandStack();
+		private bool ResolveItemOrBlockInteraction(InteractionTrigger trigger) {
+			ItemInteraction itemInteraction = GetItemInteraction(trigger);
+			if (interactionResolver.Resolve(itemInteraction)) {
+				leftClickBlockBreakGuard = itemInteraction.itemStack?.item is IPlaceableItem;
+				return true;
+			}
+			return interactionResolver.Resolve(GetBlockInteraction(trigger));
+		}
+
+		private ItemInteraction GetItemInteraction(InteractionTrigger trigger) {
 			return new ItemInteraction {
-				itemStack = mainHandStack,
+				itemStack = GetMainHandStack(),
 				player = this,
-				level = level,
+				level = this.level,
 				trigger = trigger
+			};
+		}
+
+		private BlockInteraction GetBlockInteraction(InteractionTrigger trigger) {
+			BlockPos blockPos = (BlockPos)GetWorldPointerPos();
+			return new BlockInteraction {
+				trigger = trigger,
+				blockPos = blockPos,
+				blockState = this.level.GetBlockState(blockPos),
+				itemStack = GetMainHandStack(),
+				level = this.level
 			};
 		}
 
@@ -193,37 +214,42 @@ namespace SoulboundBackend.Client {
 
 			if (!listener.ValidateTrigger(ctx.trigger)) return false;
 
-			return listener.CanExecute(ctx.itemStack, ctx);
+			return listener.CanExecute(ctx.itemStack, in ctx);
 		}
 
 		bool IInteractionHandler<ItemInteraction>.Handle(in ItemInteraction ctx) {
 			ItemStack stack = ctx.itemStack;
 			IItemInteractionListener listener = (IItemInteractionListener)stack.item;
-			return listener.TryExecute(stack, ctx);
+			return listener.TryExecute(stack, in ctx);
 		}
 
-		[Obsolete]
-		private bool TryUseItem(ItemStack? itemStack, ItemInteractionTrigger trigger) {
-			Item? item = itemStack?.item;
-			if (item == null) return false;
+		int IInteractionHandler<BlockInteraction>.priority => 0;
 
-			if (item is not IItemInteractionListener action) return false;
-			if (!action.ValidateTrigger(trigger)) return false;
+		bool IInteractionHandler<BlockInteraction>.CanHandle(in BlockInteraction ctx) {
 
-			ItemInteraction context = new() {
-				itemStack = itemStack,
-				player = this,
-				level = level,
-				trigger = trigger
-			};
+			// interaction handler shouldnt guard block interactions only inside the player reach
+			// some blocks may be interactable even if theyre out of reach, though this is a false assumption for pre-prod
+			// CanInteract will need to explicitly check if the player is in range if it requires it
+			// for this case the handler is implemented in Player so the this CanHandle guards it
+			// but keep this in mind for future implementations
+			bool isInReach = IsInBlockReach((Vector2)ctx.blockPos);
+			if (!isInReach) return false;
 
-			if (!action.CanExecute(itemStack, context)) return false;
+			if (ctx.blockState.block is not IBlockInteractionListener listener) return false;
 
-			return action.TryExecute(itemStack, context);
+			if (!listener.ValidateTrigger(ctx.trigger)) return false;
+
+			return listener.CanInteract(in ctx);
+		}
+
+		bool IInteractionHandler<BlockInteraction>.Handle(in BlockInteraction ctx) {
+			IBlockInteractionListener listener = (IBlockInteractionListener)ctx.blockState.block;
+			listener.OnInteract(in ctx);
+			return true;
 		}
 
 		private bool TryBreakBlock(BlockPos blockPos) {
-			if (!IsInBlockReach((Vector2)blockPos)) return false;
+			if (!IsInBlockReach((Vector2)blockPos) || leftClickBlockBreakGuard) return false;
 
 			BlockState blockState = level.GetBlockState(blockPos) ?? Blocks.air.defaultState;
 			if (blockState.block == Blocks.air) return false;

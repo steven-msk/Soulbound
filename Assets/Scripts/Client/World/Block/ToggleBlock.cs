@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
-	public sealed class ToggleBlock : Block, IBlockInteractionHandler {
+	public sealed class ToggleBlock : Block, IBlockInteractionListener {
 		public BlockState on { get; private set; }
 		public BlockState off { get; private set; }
 		public override string name { get; init; } = "Toggle Block";
@@ -23,18 +23,24 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 				: new AssetKey("ToggleOffTile");
 		}
 
-		public void OnInteract(Level level, BlockPos blockPos, BlockState blockState) {
-			bool isOn = blockState.Get<bool>("on");
-			level.SetBlockState(blockPos, isOn ? off : on);
-			Logger.LogInfo("block at {} is now {}", blockPos, isOn ? "off" : "on");
+		public void OnInteract(in BlockInteraction ctx) {
+			bool isOn = ctx.blockState.Get<bool>("on");
+			ctx.level.SetBlockState(ctx.blockPos, isOn ? off : on);
+			Logger.LogInfo("block at {} is now {}", ctx.blockPos, isOn ? "off" : "on");
+		}
+
+		public bool CanInteract(in BlockInteraction ctx) => true;
+
+		public bool ValidateTrigger(InteractionTrigger trigger) {
+			return trigger == InteractionTrigger.RightClick;
 		}
 
 		protected override BlockState GetDefaultState(BlockStateRegisterer registerer, BlockPropertyEntries properties) {
-			return registerer.AddWithProperties(properties.With("on", true));
+			return on;
 		}
 
 		protected override void CreateStates(BlockStateRegisterer registerer, BlockPropertyEntries properties) {
-			on = defaultState;
+			on = registerer.AddWithProperties(properties.With("on", true));
 			off = registerer.AddWithProperties(properties.With("on", false));
 		}
 

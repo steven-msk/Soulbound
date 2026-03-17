@@ -292,18 +292,6 @@ namespace SoulboundBackend.Client.World {
 			}
 		}
 
-		[PROTOTYPICAL]
-		public void InteractBlock(BlockPos blockPos) {
-			// provisory for toggle block
-
-			BlockState? blockState = GetBlockState(blockPos);
-			Block block = blockState?.block ?? Blocks.air;
-
-			if (block is IBlockInteractionHandler interactionHandler) {
-				interactionHandler.OnInteract(this, blockPos, blockState);
-			}
-		}
-
 
 		[Obsolete]
 		public void SetBlock(BlockPos blockPos, BlockState? blockState) {

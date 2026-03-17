@@ -1,5 +1,6 @@
 using SoulboundBackend.Client.World;
 using SoulboundBackend.Client.World.BlockSystem;
+using SoulboundBackend.Core.Debug.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,18 +11,16 @@ namespace SoulboundBackend.Client.ItemSystem {
 	public interface IPlaceableItem : IItemInteractionListener {
 		BlockState GetBlockState(ItemStack itemStack);
 
-		bool IItemInteractionListener.ValidateTrigger(ItemInteractionTrigger trigger) {
-			return trigger == ItemInteractionTrigger.LeftHold || trigger == ItemInteractionTrigger.LeftClick;
+		bool IItemInteractionListener.ValidateTrigger(InteractionTrigger trigger) {
+			return trigger == InteractionTrigger.LeftHold || trigger == InteractionTrigger.LeftClick;
 		}
 
-		bool IItemInteractionListener.CanExecute(ItemStack itemStack, ItemInteraction ctx) {
+		bool IItemInteractionListener.CanExecute(ItemStack itemStack, in ItemInteraction ctx) {
 			BlockPos blockPos = (BlockPos)ctx.player.GetWorldPointerPos();
 			return ctx.player.CanPlaceBlockAt(blockPos);
 		}
 
-		bool IItemInteractionListener.TryExecute(ItemStack itemStack, ItemInteraction ctx) {
-			if (!CanExecute(itemStack, ctx)) return false;
-
+		bool IItemInteractionListener.TryExecute(ItemStack itemStack, in ItemInteraction ctx) {
 			BlockState blockState = GetBlockState(itemStack);
 			BlockPos blockPos = (BlockPos)ctx.player.GetWorldPointerPos();
 			ctx.level.SetBlockState(blockPos, blockState);

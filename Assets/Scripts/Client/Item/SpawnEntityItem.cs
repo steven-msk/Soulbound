@@ -17,15 +17,15 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public SpawnEntityItem() : base("spawnEntityItem") {
 		}
 
-		public bool ValidateTrigger(ItemInteractionTrigger trigger) {
-			return trigger == ItemInteractionTrigger.LeftHold || trigger == ItemInteractionTrigger.LeftClick;
+		public bool ValidateTrigger(InteractionTrigger trigger) {
+			return trigger == InteractionTrigger.LeftHold || trigger == InteractionTrigger.LeftClick;
 		}
 
-		public bool CanExecute(ItemStack itemStack, ItemInteraction ctx) {
+		public bool CanExecute(ItemStack itemStack, in ItemInteraction ctx) {
 			return true;
 		}
 
-		public bool TryExecute(ItemStack itemStack, ItemInteraction ctx) {
+		public bool TryExecute(ItemStack itemStack, in ItemInteraction ctx) {
 			Entity entity = new PhysicsEntity(ctx.player.GetWorldPointerPos());
 			ctx.level.AddEntity(entity);
 			itemStack.Decrement();

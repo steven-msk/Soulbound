@@ -19,20 +19,20 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public ChargeableItem() : base("chargeableItem") {
 		}
 
-		public bool ValidateTrigger(ItemInteractionTrigger trigger) {
-			return trigger == ItemInteractionTrigger.LeftHold
-				|| trigger == ItemInteractionTrigger.LeftClick
-				|| trigger == ItemInteractionTrigger.LeftRelease;
+		public bool ValidateTrigger(InteractionTrigger trigger) {
+			return trigger == InteractionTrigger.LeftHold
+				|| trigger == InteractionTrigger.LeftClick
+				|| trigger == InteractionTrigger.LeftRelease;
 		}
 
-		public bool CanExecute(ItemStack itemStack, ItemInteraction ctx) {
+		public bool CanExecute(ItemStack itemStack, in ItemInteraction ctx) {
 			return true;
 		}
 
-		public bool TryExecute(ItemStack itemStack, ItemInteraction ctx) {
-			if (ctx.trigger == ItemInteractionTrigger.LeftClick) {
+		public bool TryExecute(ItemStack itemStack, in ItemInteraction ctx) {
+			if (ctx.trigger == InteractionTrigger.LeftClick) {
 				Logger.LogInfo("Start charge");
-			} else if (ctx.trigger == ItemInteractionTrigger.LeftHold) {
+			} else if (ctx.trigger == InteractionTrigger.LeftHold) {
 				Logger.LogInfo("Charging..........");
 			} else {
 				Logger.LogInfo("Released charge");

@@ -17,10 +17,6 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public PlaceableItem() : base("placeableItem") {
 		}
 
-		bool IItemInteractionListener.ValidateTrigger(ItemInteractionTrigger trigger) {
-			return trigger == ItemInteractionTrigger.LeftClick;
-		}
-
 		public BlockState GetBlockState(ItemStack itemStack) {
 			return Blocks.movingTickingBlock.defaultState;
 		}

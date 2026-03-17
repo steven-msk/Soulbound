@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.ItemSystem {
 	public interface IItemInteractionListener {
-		bool ValidateTrigger(ItemInteractionTrigger trigger);
+		bool ValidateTrigger(InteractionTrigger trigger);
 
 		// pass in a context param if number of params grows
-		bool CanExecute(ItemStack itemStack, ItemInteraction ctx);
-		bool TryExecute(ItemStack itemStack, ItemInteraction ctx);
+		bool CanExecute(ItemStack itemStack, in ItemInteraction ctx);
+		bool TryExecute(ItemStack itemStack, in ItemInteraction ctx);
 	}
 }
