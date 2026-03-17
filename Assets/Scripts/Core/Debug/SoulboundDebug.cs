@@ -43,6 +43,7 @@ namespace SoulboundBackend.Core.Debug {
 				if (inputEvent.Performed(InputTokens.Keyboard.ARROW_UP)) commandLine.HandleKey(Key.UpArrow);
 				if (inputEvent.Performed(InputTokens.Keyboard.ARROW_DOWN)) commandLine.HandleKey(Key.DownArrow);
 				if (inputEvent.Performed(InputTokens.Keyboard.ESC)) commandLine.HandleKey(Key.Escape);
+				if (inputEvent.Performed(InputTokens.Keyboard.BACKSPACE)) commandLine.HandleKey(Key.Backspace);
 				return true;
 			}
 

@@ -27,6 +27,8 @@ namespace SoulboundBackend.Core.Debug.Commands {
 		public event Action shouldCloseCommandLine;
 		private TextMeshProUGUI[] currentCompletions;
 		private int lastCaretPos = 0;
+		private bool eligibleForHistoryCycling;
+		private bool hasEnteredText = false;
 
 		public void Init(CommandLineInputField inputField, CommandProcessor commandProcessor, IEnumerable<string> history) {
 			this.inputField = inputField;
@@ -40,9 +42,17 @@ namespace SoulboundBackend.Core.Debug.Commands {
 				await UniTask.NextFrame();
 
 				inputField.ActivateInputField();
-				inputField.text = "/";
+				inputField.SetTextWithoutNotify("/");
+				inputField.ForceLabelUpdate();
+				inputField.onValueChanged.AddListener(value => {
+					if (!hasEnteredText) hasEnteredText = value.Length > 1;
+					if (value.Equals("")) hasEnteredText = false;
+					eligibleForHistoryCycling = !hasEnteredText || currentInputMode == CommandInputMode.CyclingHistory;
+					if (!eligibleForHistoryCycling) currentInputMode = CommandInputMode.Typing;
+				});
 				SetCaretToEnd();
 				if (history.Any()) currentInputMode = CommandInputMode.CyclingHistory;
+				hasEnteredText = false;
 			});
 		}
 
@@ -61,12 +71,11 @@ namespace SoulboundBackend.Core.Debug.Commands {
 		}
 
 		void ICommandLineHandler.HandleKey(Key key) {
-			if (key == Key.Escape
-					&& completion.GetCompletionCount() == 0
-					&& currentInputMode == CommandInputMode.Typing) {
+			if (key == Key.Escape) {
 				shouldCloseCommandLine();
 				return;
 			}
+			if (key == Key.Backspace) currentInputMode = CommandInputMode.Typing;
 			switch (currentInputMode) {
 				case CommandInputMode.Typing: HandleTyping(key);
 					break;
@@ -78,11 +87,11 @@ namespace SoulboundBackend.Core.Debug.Commands {
 		}
 
 		private void HandleTyping(Key key) {
-			if ((key == Key.Tab || key == Key.UpArrow || key == Key.DownArrow || key == Key.Escape)
+			if ((key == Key.Tab || key == Key.UpArrow || key == Key.DownArrow)
 					&& completion.GetCompletionCount() > 0) {
 				currentInputMode = CommandInputMode.CyclingCompletions;
 				HandleCompletion(key);
-			} else if ((key == Key.UpArrow || key == Key.DownArrow) && history.Count > 0) {
+			} else if ((key == Key.UpArrow || key == Key.DownArrow) && history.Any() && eligibleForHistoryCycling) {
 				currentInputMode = CommandInputMode.CyclingHistory;
 				HandleHistory(key);
 			}
@@ -95,9 +104,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 				HighlightCompletion(completion.SelectPrevious());
 			} else if (key == Key.Tab) {
 				InsertCompletion();
-			} else if (key == Key.Escape) {
-				ExitCompletion();
-			}
+			} 
 		}
 
 		private void HandleHistory(Key key) {
@@ -108,10 +115,6 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			} else if (key == Key.DownArrow) {
 				historyIndex = (historyIndex + 1) % history.Count;
 				InsertHistory();
-			} else if (key == Key.Escape) {
-				ExitHistory();
-			}  else {
-				HandleTyping(key);
 			}
 		}
 
@@ -138,12 +141,6 @@ namespace SoulboundBackend.Core.Debug.Commands {
 		private void InsertHistory() {
 			inputField.text = history[historyIndex];
 			SetCaretToEnd();
-		}
-
-		private void ExitCompletion() {
-			Destroy(completionPanel.gameObject);
-			completion.ClearCompletions();
-			currentInputMode = CommandInputMode.Typing;
 		}
 
 		private void ExitHistory() {
