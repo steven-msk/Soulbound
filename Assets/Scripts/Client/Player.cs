@@ -23,7 +23,7 @@ using Zenject;
 #nullable enable
 
 namespace SoulboundBackend.Client {
-	public class Player : Entity, IInputContext, IFrameUpdatableEntity {
+	public class Player : Entity, IInputContext, IFrameUpdatableEntity, IInteractionHandler<ItemInteraction> {
 		private static readonly AssetKey playerKey = new("player");
 		private static readonly EntityDescriptor DESCRIPTOR = new("player", null);
 		private readonly Inventory inventory;
@@ -31,6 +31,9 @@ namespace SoulboundBackend.Client {
 		private ITransitStackSource tranistStackSource = null!;
 		private PlayerTransform playerTransform = null!;
 		private new Vector2 initialPos;
+
+		// TODO: interaction resolver shouldnt be created by the player
+		private readonly InteractionResolver interactionResolver = new();
 
 		const float MAX_BLOCK_REACH = 5f;
 
@@ -44,6 +47,8 @@ namespace SoulboundBackend.Client {
 			inventory = new Inventory();
 			hotbar = new Hotbar();
 			this.initialPos = initialPos;
+
+			interactionResolver.RegisterHandler(this);
 		}
 
 		protected override IEntityTransform CreateTransform() {
@@ -139,14 +144,13 @@ namespace SoulboundBackend.Client {
 		}
 
 		private void OnLeftClick() {
-			ItemStack? mainHandStack = GetMainHandStack();
-
-			if (!TryUseItem(mainHandStack, ItemActionTrigger.LeftClick)) {
+			ItemInteraction mainHandInteraction = GetMainHandInteraction(ItemInteractionTrigger.LeftClick);
+			if (interactionResolver.Resolve(mainHandInteraction)) {
 				TryBreakBlock((BlockPos)GetWorldPointerPos());
 			}
 		}
 		private void OnRightClick() {
-			TryUseItem(GetMainHandStack(), ItemActionTrigger.RightClick);
+			TryUseItem(GetMainHandStack(), ItemInteractionTrigger.RightClick);
 
 			// provisory
 			level.InteractBlock((BlockPos)GetWorldPointerPos());
@@ -155,29 +159,58 @@ namespace SoulboundBackend.Client {
 		private void OnLeftHold() {
 			ItemStack? mainHandStack = GetMainHandStack();
 
-			if (!TryUseItem(mainHandStack, ItemActionTrigger.LeftHold)) {
+			if (!TryUseItem(mainHandStack, ItemInteractionTrigger.LeftHold)) {
 				TryBreakBlock((BlockPos)GetWorldPointerPos());
 			}
 		}
 		private void OnRightHold() {
-			TryUseItem(GetMainHandStack(), ItemActionTrigger.RightHold);
+			TryUseItem(GetMainHandStack(), ItemInteractionTrigger.RightHold);
 		}
 
 		private void OnLeftRelease() {
-			TryUseItem(GetMainHandStack(), ItemActionTrigger.LeftRelease);			
+			TryUseItem(GetMainHandStack(), ItemInteractionTrigger.LeftRelease);			
 		}
 		private void OnRightRelease() {
-			TryUseItem(GetMainHandStack(), ItemActionTrigger.RightRelease);
+			TryUseItem(GetMainHandStack(), ItemInteractionTrigger.RightRelease);
 		}
 
-		private bool TryUseItem(ItemStack? itemStack, ItemActionTrigger trigger) {
+		private ItemInteraction GetMainHandInteraction(ItemInteractionTrigger trigger) {
+			ItemStack? mainHandStack = GetMainHandStack();
+			return new ItemInteraction {
+				itemStack = mainHandStack,
+				player = this,
+				level = level,
+				trigger = trigger
+			};
+		}
+
+		// provisory priority
+		int IInteractionHandler<ItemInteraction>.priority => 0;
+
+		bool IInteractionHandler<ItemInteraction>.CanHandle(in ItemInteraction ctx) {
+			Item? item = ctx.itemStack?.item;
+			if (item is not IItemInteractionListener listener) return false;
+
+			if (!listener.ValidateTrigger(ctx.trigger)) return false;
+
+			return listener.CanExecute(ctx.itemStack, ctx);
+		}
+
+		bool IInteractionHandler<ItemInteraction>.Handle(in ItemInteraction ctx) {
+			ItemStack stack = ctx.itemStack;
+			IItemInteractionListener listener = (IItemInteractionListener)stack.item;
+			return listener.TryExecute(stack, ctx);
+		}
+
+		[Obsolete]
+		private bool TryUseItem(ItemStack? itemStack, ItemInteractionTrigger trigger) {
 			Item? item = itemStack?.item;
 			if (item == null) return false;
 
-			if (item is not IItemActionHandler action) return false;
+			if (item is not IItemInteractionListener action) return false;
 			if (!action.ValidateTrigger(trigger)) return false;
 
-			ItemActionContext context = new() {
+			ItemInteraction context = new() {
 				itemStack = itemStack,
 				player = this,
 				level = level,

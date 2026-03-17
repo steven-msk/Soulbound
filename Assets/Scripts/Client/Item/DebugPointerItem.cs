@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.ItemSystem {
 	[PROTOTYPICAL]
-	public sealed class DebugPointerItem : Item, IItemActionHandler {
+	public sealed class DebugPointerItem : Item, IItemInteractionListener {
 		public override string name => "Debug Pointer";
 		public override int fullStackSize => 1;
 		public override ItemAspect aspect => ItemAspect.Simple(new AssetKey("debugPointer"));
@@ -17,15 +17,15 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public DebugPointerItem() : base("debugPointer") {
 		}
 
-		public bool ValidateTrigger(ItemActionTrigger trigger) {
-			return trigger == ItemActionTrigger.LeftClick;
+		public bool ValidateTrigger(ItemInteractionTrigger trigger) {
+			return trigger == ItemInteractionTrigger.LeftClick;
 		}
 
-		public bool CanExecute(ItemStack itemStack, ItemActionContext ctx) {
+		public bool CanExecute(ItemStack itemStack, ItemInteraction ctx) {
 			return true;
 		}
 
-		public bool TryExecute(ItemStack itemStack, ItemActionContext ctx) {
+		public bool TryExecute(ItemStack itemStack, ItemInteraction ctx) {
 			Logger.LogInfo("Pointer: {}", ctx.player.GetWorldPointerPos());
 			return true;
 		}

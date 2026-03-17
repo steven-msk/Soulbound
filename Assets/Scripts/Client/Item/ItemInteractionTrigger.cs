@@ -1,6 +1,6 @@
 using System;
 
-public enum ItemActionTrigger {
+public enum ItemInteractionTrigger {
 	None = 0,
 	LeftClick,
 	LeftHold,

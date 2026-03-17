@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.ItemSystem {
 	[PROTOTYPICAL]
-	public sealed class PlaceableItem : Item, IPlaceableItem, IItemActionHandler {
+	public sealed class PlaceableItem : Item, IPlaceableItem, IItemInteractionListener {
 		public override string name => "Placeable Item";
 
 		public override ItemAspect aspect => ItemAspect.Simple(new AssetKey("bluething"));
@@ -17,8 +17,8 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public PlaceableItem() : base("placeableItem") {
 		}
 
-		bool IItemActionHandler.ValidateTrigger(ItemActionTrigger trigger) {
-			return trigger == ItemActionTrigger.LeftClick;
+		bool IItemInteractionListener.ValidateTrigger(ItemInteractionTrigger trigger) {
+			return trigger == ItemInteractionTrigger.LeftClick;
 		}
 
 		public BlockState GetBlockState(ItemStack itemStack) {

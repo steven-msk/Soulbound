@@ -7,19 +7,19 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.ItemSystem {
-	public interface IPlaceableItem : IItemActionHandler {
+	public interface IPlaceableItem : IItemInteractionListener {
 		BlockState GetBlockState(ItemStack itemStack);
 
-		bool IItemActionHandler.ValidateTrigger(ItemActionTrigger trigger) {
-			return trigger == ItemActionTrigger.LeftHold || trigger == ItemActionTrigger.LeftClick;
+		bool IItemInteractionListener.ValidateTrigger(ItemInteractionTrigger trigger) {
+			return trigger == ItemInteractionTrigger.LeftHold || trigger == ItemInteractionTrigger.LeftClick;
 		}
 
-		bool IItemActionHandler.CanExecute(ItemStack itemStack, ItemActionContext ctx) {
+		bool IItemInteractionListener.CanExecute(ItemStack itemStack, ItemInteraction ctx) {
 			BlockPos blockPos = (BlockPos)ctx.player.GetWorldPointerPos();
 			return ctx.player.CanPlaceBlockAt(blockPos);
 		}
 
-		bool IItemActionHandler.TryExecute(ItemStack itemStack, ItemActionContext ctx) {
+		bool IItemInteractionListener.TryExecute(ItemStack itemStack, ItemInteraction ctx) {
 			if (!CanExecute(itemStack, ctx)) return false;
 
 			BlockState blockState = GetBlockState(itemStack);

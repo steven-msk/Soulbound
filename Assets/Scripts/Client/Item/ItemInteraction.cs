@@ -6,10 +6,12 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.ItemSystem {
-	public struct ItemActionContext {
+	public struct ItemInteraction  : IInteractionContext {
 		public Player player;
 		public Level level;
 		public ItemStack itemStack;
-		public ItemActionTrigger trigger;
+		public ItemInteractionTrigger trigger;
+
+		public readonly Level GetLevel() => level;
 	}
 }

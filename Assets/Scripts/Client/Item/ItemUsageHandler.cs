@@ -9,15 +9,15 @@ using System.Linq;
 namespace SoulboundBackend.Client.ItemSystem {
 	[Obsolete]
     public sealed class ItemUsageHandler {
-		private readonly Dictionary<(Type itemCapability, ItemActionTrigger useTrigger), Action<ItemStack>> handlers = new();
-		private readonly List<ItemActionTrigger> disabledTriggers = new();
+		private readonly Dictionary<(Type itemCapability, ItemInteractionTrigger useTrigger), Action<ItemStack>> handlers = new();
+		private readonly List<ItemInteractionTrigger> disabledTriggers = new();
 		private readonly Player player;
 
 		public ItemUsageHandler(Player player) {
 			this.player = player;
 		}
 
-		public void RegisterCapability<T>(ItemActionTrigger trigger, Action<T, ItemStack> action) {
+		public void RegisterCapability<T>(ItemInteractionTrigger trigger, Action<T, ItemStack> action) {
 			handlers[(typeof(T), trigger)] = (itemStack => {
 				if (itemStack.item is T item) {
 					action.Invoke(item, itemStack);
@@ -25,11 +25,11 @@ namespace SoulboundBackend.Client.ItemSystem {
 			});
 		}
 
-		public void Enable(params ItemActionTrigger[] triggers) => triggers.ToList().ForEach((trigger) => disabledTriggers.Remove(trigger));
+		public void Enable(params ItemInteractionTrigger[] triggers) => triggers.ToList().ForEach((trigger) => disabledTriggers.Remove(trigger));
 
-		public void Disable(params ItemActionTrigger[] triggers) => disabledTriggers.AddRange(triggers);
+		public void Disable(params ItemInteractionTrigger[] triggers) => disabledTriggers.AddRange(triggers);
 
-		public void HandleInput(ItemActionTrigger trigger, ItemStack itemStack) {
+		public void HandleInput(ItemInteractionTrigger trigger, ItemStack itemStack) {
 			if (itemStack == null || IsDisabled(trigger)) {
 				return;
 			}
@@ -46,7 +46,7 @@ namespace SoulboundBackend.Client.ItemSystem {
 			}
 		}
 
-		public bool IsDisabled(ItemActionTrigger trigger) => disabledTriggers.Contains((trigger));
+		public bool IsDisabled(ItemInteractionTrigger trigger) => disabledTriggers.Contains((trigger));
     }
 }
 

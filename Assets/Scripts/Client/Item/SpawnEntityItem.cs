@@ -10,22 +10,22 @@ using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.ItemSystem {
 	[PROTOTYPICAL]
-	public sealed class SpawnEntityItem : Item, IItemActionHandler {
+	public sealed class SpawnEntityItem : Item, IItemInteractionListener {
 		public override string name => "Spawn Entity Item";
 		public override ItemAspect aspect => ItemAspect.Simple(new AssetKey("bluething"));
 
 		public SpawnEntityItem() : base("spawnEntityItem") {
 		}
 
-		public bool ValidateTrigger(ItemActionTrigger trigger) {
-			return trigger == ItemActionTrigger.LeftHold || trigger == ItemActionTrigger.LeftClick;
+		public bool ValidateTrigger(ItemInteractionTrigger trigger) {
+			return trigger == ItemInteractionTrigger.LeftHold || trigger == ItemInteractionTrigger.LeftClick;
 		}
 
-		public bool CanExecute(ItemStack itemStack, ItemActionContext ctx) {
+		public bool CanExecute(ItemStack itemStack, ItemInteraction ctx) {
 			return true;
 		}
 
-		public bool TryExecute(ItemStack itemStack, ItemActionContext ctx) {
+		public bool TryExecute(ItemStack itemStack, ItemInteraction ctx) {
 			Entity entity = new PhysicsEntity(ctx.player.GetWorldPointerPos());
 			ctx.level.AddEntity(entity);
 			itemStack.Decrement();

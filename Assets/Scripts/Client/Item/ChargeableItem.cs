@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.ItemSystem {
 	[PROTOTYPICAL]
-	public sealed class ChargeableItem : Item, IItemActionHandler {
+	public sealed class ChargeableItem : Item, IItemInteractionListener {
 		// might pull this up into IChargeableItem for the future
 
 		public override string name => "Chargeable Item";
@@ -19,20 +19,20 @@ namespace SoulboundBackend.Client.ItemSystem {
 		public ChargeableItem() : base("chargeableItem") {
 		}
 
-		public bool ValidateTrigger(ItemActionTrigger trigger) {
-			return trigger == ItemActionTrigger.LeftHold
-				|| trigger == ItemActionTrigger.LeftClick
-				|| trigger == ItemActionTrigger.LeftRelease;
+		public bool ValidateTrigger(ItemInteractionTrigger trigger) {
+			return trigger == ItemInteractionTrigger.LeftHold
+				|| trigger == ItemInteractionTrigger.LeftClick
+				|| trigger == ItemInteractionTrigger.LeftRelease;
 		}
 
-		public bool CanExecute(ItemStack itemStack, ItemActionContext ctx) {
+		public bool CanExecute(ItemStack itemStack, ItemInteraction ctx) {
 			return true;
 		}
 
-		public bool TryExecute(ItemStack itemStack, ItemActionContext ctx) {
-			if (ctx.trigger == ItemActionTrigger.LeftClick) {
+		public bool TryExecute(ItemStack itemStack, ItemInteraction ctx) {
+			if (ctx.trigger == ItemInteractionTrigger.LeftClick) {
 				Logger.LogInfo("Start charge");
-			} else if (ctx.trigger == ItemActionTrigger.LeftHold) {
+			} else if (ctx.trigger == ItemInteractionTrigger.LeftHold) {
 				Logger.LogInfo("Charging..........");
 			} else {
 				Logger.LogInfo("Released charge");
