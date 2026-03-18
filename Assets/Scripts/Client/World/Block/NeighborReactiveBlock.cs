@@ -25,11 +25,11 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		}
 
 		protected override BlockState GetDefaultState(BlockStateRegisterer registerer, BlockPropertyEntries properties) {
-			return registerer.AddWithProperties(properties.With("on", false));
+			return inactive;
 		}
 
 		protected override void CreateStates(BlockStateRegisterer registerer, BlockPropertyEntries properties) {
-			inactive = defaultState;
+			inactive = registerer.AddWithProperties(properties.With("on", false));
 			active = registerer.AddWithProperties(properties.With("on", true));
 		}
 
