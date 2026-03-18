@@ -11,6 +11,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 using Cysharp.Threading.Tasks;
+using System;
 
 #nullable enable
 
@@ -64,7 +65,9 @@ namespace SoulboundBackend.Core {
 
 		private async void LevelFrameLoop() {
 			while (sessionRunning) {
-				if (!paused) {
+				try {
+					if (paused) continue;
+
 					StartFrame();
 
 					Vector2 pivotPos = level.GetPlayer()?.GetPos() ?? level.GetWorldSpawnPoint();
@@ -72,22 +75,28 @@ namespace SoulboundBackend.Core {
 					worldRenderer.RenderView(pivotPos);
 
 					EndFrame();
+					await UniTask.WaitForEndOfFrame();
+				} catch (Exception e) {
+					Logger.LogFatal(e);
 				}
-				await UniTask.WaitForEndOfFrame();
 			}
 		}
 
 		private async void LevelTickLoop() {
 			while (sessionRunning) {
-				if (!paused) {
+				try {
+					if (paused) continue;
+
 					StartTick();
 
 					Vector2 pivotPos = level.GetPlayer()?.GetPos() ?? level.GetWorldSpawnPoint();
 					level.Tick(GetRelativeSimulationRect(pivotPos));
 
 					EndTick();
+					await UniTask.WaitForSeconds(tickRate, true);
+				} catch (Exception e) {
+					Logger.LogFatal(e);
 				}
-				await UniTask.WaitForSeconds(tickRate, true);
 			}
 		}
 
