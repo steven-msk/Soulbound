@@ -19,7 +19,7 @@ namespace SoulboundBackend.Client.World {
 		public async UniTask<WorldSession> LoadLevel(UniTask sceneLoadTask, Func<IWorldSceneRoot> rootProvider) {
 			await sceneLoadTask;
 
-			IWorldSceneRoot sceneRoot = rootProvider();
+			IWorldSceneRoot sceneRoot = rootProvider() ?? throw new OperationException("Root provider returned null");
 
 			Level level = new(seedProvider.GetSeed());
 			LevelManager levelManager = new(level);

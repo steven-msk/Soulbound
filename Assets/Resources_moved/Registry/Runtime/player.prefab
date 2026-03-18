@@ -126,12 +126,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 8095950580177048670}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0fdc207c5f6a714493eb287a525a46b, type: 3}
+  m_Script: {fileID: 11500000, guid: 33f46118119d9834588c399631132cc4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   normalVelocity: {x: 0, y: 0}
   rbVelocity: {x: 0, y: 0}
   isGrounded: 0
+  isJumping: 0
   speed: 7
   jumpForce: 7
 --- !u!70 &2783489176190715120
