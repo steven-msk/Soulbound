@@ -1,4 +1,3 @@
-﻿using ModestTree;
 using NUnit.Framework;
 using SoulboundBackend.Client.Stats;
 using System;
@@ -10,7 +9,6 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine.Assertions;
 using UnityEngine.TestTools;
-using Zenject;
 using Assert = NUnit.Framework.Assert;
 
 namespace StatSystemTests {
@@ -67,7 +65,7 @@ namespace StatSystemTests {
 				if (modifiers.TryGetValue(modificationToken, out var list)) {
 					list.Remove(modifier);
 				}
-				if (list.IsEmpty()) {
+				if (!list.Any()) {
 					modifiers.Remove(modificationToken);
 				}
 			}

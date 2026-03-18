@@ -1,9 +1,5 @@
-using SoulboundBackend.Client.Combat;
-using SoulboundBackend.Client.Concurrency;
 using SoulboundBackend.Client.Input;
 using SoulboundBackend.Client.ItemSystem;
-using SoulboundBackend.Client.SettingSystem;
-using SoulboundBackend.Client.Stats;
 using SoulboundBackend.Client.UI.Storage;
 using SoulboundBackend.Client.World;
 using SoulboundBackend.Client.World.BlockSystem;
@@ -11,17 +7,9 @@ using SoulboundBackend.Client.World.EntitySystem;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core;
 using SoulboundBackend.Core.AssetManagement;
-using SoulboundBackend.Core.Debug.Logging;
 using SoulboundBackend.Core.Resource;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using Zenject;
-using static Unity.Collections.AllocatorManager;
-using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
-
 
 #nullable enable
 
