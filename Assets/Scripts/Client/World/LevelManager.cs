@@ -12,6 +12,7 @@ using UnityEngine.Tilemaps;
 using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 using Cysharp.Threading.Tasks;
 using System;
+using SoulboundBackend.Client.UI;
 
 #nullable enable
 
@@ -47,7 +48,7 @@ namespace SoulboundBackend.Core {
 		[PROTOTYPICAL]
 		bool IInputContext.HandleInput(in InputEvent inputEvent) {
 			if (inputEvent.token.Equals(InputTokens.Keyboard.ESC)) {
-				OnEscPressed();
+				TogglePause();
 				return true;
 			}
 			return false;
@@ -133,19 +134,15 @@ namespace SoulboundBackend.Core {
 			);
 		}
 
-		private void OnEscPressed() {
-			if (!Soulbound.instance.GetUIHandler().GetScreenNavigator().PopScreen()) {
-				TogglePause();
-			}
-		}
-
 		public void TogglePause() {
 			paused = !paused;
 			Time.timeScale = paused ? 0f : 1f;
+			UIHandler uiHandler = Soulbound.instance.GetUIHandler();
+			uiHandler.GetScreenNavigator().PopScreen();
 			if (!paused) {
-				Soulbound.instance.GetUIHandler().GetScreenNavigator().PopScreen();
+				uiHandler.SetScreen(new WorldScreen(level.GetPlayer()));
 			} else {
-				Soulbound.instance.GetUIHandler().SetScreen(new GamePausedScreen());
+				uiHandler.SetScreen(new GamePausedScreen());
 			}
 		}
 
