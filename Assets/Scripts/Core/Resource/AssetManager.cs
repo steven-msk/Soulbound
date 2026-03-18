@@ -25,7 +25,7 @@ namespace SoulboundBackend.Core.Resource {
 				handle.WaitForCompletion();
 
 				if (handle.Status != AsyncOperationStatus.Succeeded) {
-					throw handle.OperationException;
+					Logger.LogFatal(handle.OperationException);
 				}
 
 				FinishPreload(new AssetKey(location.PrimaryKey), handle);
