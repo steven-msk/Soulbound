@@ -225,12 +225,6 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 8b9103ed92586f24792eb9384634e736
-    m_Address: debugVisuals
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 912e916946948ac4284086ac7f5aff5c
     m_Address: Canvas
     m_ReadOnly: 0

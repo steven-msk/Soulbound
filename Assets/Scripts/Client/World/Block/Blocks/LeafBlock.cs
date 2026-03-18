@@ -11,8 +11,6 @@ using static Unity.Collections.AllocatorManager;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
 	public class LeafBlock : Block {
-		public BlockProperty<bool> persistent;
-
 		public LeafBlock() : base("leaves") { }
 		public override string name { get; init; } = "Leaves";
 		public override int minBreakLevel { get; init; } = 0;

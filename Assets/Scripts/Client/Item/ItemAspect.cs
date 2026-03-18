@@ -1,10 +1,11 @@
-﻿using SoulboundBackend.Client.ItemSystem;
+using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Core.AssetManagement;
 using SoulboundBackend.Core.Resource;
 using System;
 using UnityEngine;
 
 public record ItemAspect {
+	private static readonly AssetKey droppedItemKey = new("droppedItem");
 	public ItemIcon icon { get; private set; }
 	public Func<GameObject> worldPrefabSupplier { get; private set; }
 
@@ -15,6 +16,6 @@ public record ItemAspect {
 
 	public static ItemAspect Simple(AssetKey spriteKey, int ppu = 100) {
 		ItemIcon icon = new(spriteKey, ppu);
-		return new ItemAspect(icon, WorldPrefabFactory.GetInstantiator());
+		return new ItemAspect(icon, () => GameObject.Instantiate(AssetManager.Resolve<GameObject>(droppedItemKey)));
 	}
 }

@@ -13,7 +13,6 @@ using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
 namespace SoulboundBackend.Client.World {
 	public sealed class WorldManager {
-		public LevelManager? activeLevelManager { get; private set; }
 		private readonly WorldSerializationService serializationService;
 
 		public WorldManager(WorldSerializationService serializationService) {

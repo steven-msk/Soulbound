@@ -12,7 +12,6 @@ namespace SoulboundBackend.Client.ItemSystem {
 	[Obsolete]
 	public interface IStatProvider {
 		public IEnumerable<StatMapping> statMappings { get; }
-		public ContextHandle<IStatReceiver> contextHandle { get; }
 
 		protected HashSet<StatActivator> GetActivators() {
 			return statMappings.SelectMany(sm => sm.activators).Distinct().ToHashSet();

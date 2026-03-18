@@ -420,7 +420,7 @@ Based on the dependency graph, this could be an optimal order:
 11. [World rendering](#10-world-rendering) **>|** *(some performance issues may still persist, but will be tackled in prod)*
 12. [Level system](#19-level-system) **>|**
 13. [Resource (asset) system](#20-resource-system-assets) **>|** *(async preload will be resolved in prod)*
-13. [Physics system](#7-physics-system) (universal overhaul)
+13. [Physics system](#7-physics-system) (universal overhaul) **>|** *(implemented vaguely but has a good starting point for prod)*
 14. [UI core layer & navigation system](#13-ui-systems-overall) **>|** *(visuals and FX delayed for prod)*
 15. [Tooltips](#14-tooltips) **>|**
 16. [Settings](#16-settings-ui) **>|**
