@@ -39,7 +39,6 @@ sysinfo.txt
 # Builds and output
 *.exe
 *.app
-*.dll
 *.pdb
 *.mdb
 *.mp4
