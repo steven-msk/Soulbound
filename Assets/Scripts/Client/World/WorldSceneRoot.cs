@@ -1,5 +1,4 @@
 using SoulboundBackend.Core;
-using SoulboundBackend.Core.Bootstrap;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +19,5 @@ namespace SoulboundBackend.Client.World {
 		public Grid grid => _grid;
 		public Tilemap tilemap => _tilemap;
 		public Canvas canvas => _canvas;
-
-		public LevelManager GetLevelManager() => sceneContext.Container.Resolve<LevelManager>();
 	}
 }

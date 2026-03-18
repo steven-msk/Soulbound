@@ -33,8 +33,7 @@ namespace SoulboundBackend.Client.World {
 		[Obsolete] private Dictionary<int, List<(ChunkBlockPos pos, BlockState? state)>> pendingUpdates = new();
 		[Obsolete] private readonly ConcurrentDictionary<int, List<OnChunkGenerated>> deferredGenerations = new();
 		private readonly Dictionary<int, ChunkGenData> chunkGenData = new();
-		private readonly LevelGridContext gridContext;
-		private LevelManager levelManager = null!;
+		private WorldRenderer worldRenderer;
 		private readonly Player player;
 		public bool isWorldLoaded { get; private set; } = false;
 
@@ -47,8 +46,7 @@ namespace SoulboundBackend.Client.World {
 		private readonly List<ITickingEntity> tickingEntities = new();
 		private readonly List<IFrameUpdatableEntity> frameUpdatableEntities = new();
 
-		public Level(LevelGridContext gridContext, int seed) {
-			this.gridContext = gridContext;
+		public Level(int seed) {
 			this.seed = seed;
 			this.player = new Player(GetWorldSpawnPoint());
 
@@ -64,8 +62,8 @@ namespace SoulboundBackend.Client.World {
 		// achieve any level of performance. This project is still in prototype phase, so making any
 		// optimization isnt really worth it and might be a waste of time in most cases.
 
-		public void BootstrapWorld(WorldDump? dump, LevelManager levelManager) {
-			this.levelManager = levelManager;
+		public void BootstrapWorld(WorldDump? dump, WorldRenderer worldRenderer) {
+			this.worldRenderer = worldRenderer;
 			Dictionary<int, int[][]> chunkIDmap = new();
 
 			if (dump == null) {
@@ -78,6 +76,7 @@ namespace SoulboundBackend.Client.World {
 
 			isWorldLoaded = true;
 			AddEntity(player);
+			Soulbound.instance.GetInputManager().PushContext(player);
 			player.SetPos(GetWorldSpawnPoint() + Vector2.up * 2f);
 		}
 
@@ -228,7 +227,7 @@ namespace SoulboundBackend.Client.World {
 				?? throw new InvalidOperationException("Block pos not valid: " + blockPos);
 
 			chunk.SetBlockState(blockPos, blockState);
-			levelManager.RenderRequest(blockPos, blockState);
+			worldRenderer.RenderBlock(blockPos, blockState);
 
 			bool oldTicks = oldState?.block is ITickingBlock;
 			bool newTicks = blockState?.block is ITickingBlock;
@@ -243,6 +242,20 @@ namespace SoulboundBackend.Client.World {
 			}
 
 			NotifyNeighboringStates(blockPos);
+		}
+
+		private void NotifyNeighboringStates(BlockPos blockPos) {
+			foreach (var neighborPos in blockPos.GetCardinalNeighbors()) {
+				WorldChunk? chunk = ChunkAt(blockPos);
+				if (chunk == null) return;
+
+				BlockState? blockState = GetBlockState(neighborPos);
+				Block block = blockState?.block ?? Blocks.air;
+
+				if (block is INeighborUpdateHandler neighborUpdateHandler) {
+					neighborUpdateHandler.OnNeighborChanged(this, neighborPos, blockPos);
+				}
+			}
 		}
 
 		public void AddEntity(Entity entity) {
@@ -278,74 +291,6 @@ namespace SoulboundBackend.Client.World {
 
 		public IEnumerable<Entity> GetAllEntities() => entities.Values;
 
-		private void NotifyNeighboringStates(BlockPos blockPos) {
-			foreach (var neighborPos in blockPos.GetCardinalNeighbors()) {
-				WorldChunk? chunk = ChunkAt(blockPos);
-				if (chunk == null) return;
-
-				BlockState? blockState = GetBlockState(neighborPos);
-				Block block = blockState?.block ?? Blocks.air;
-
-				if (block is INeighborUpdateHandler neighborUpdateHandler) {
-					neighborUpdateHandler.OnNeighborChanged(this, neighborPos, blockPos);
-				}
-			}
-		}
-
-
-		[Obsolete]
-		public void SetBlock(BlockPos blockPos, BlockState? blockState) {
-			WorldChunk? chunk = this.ChunkAt(blockPos);
-			blockState ??= Blocks.air.defaultState;
-			BlockState? oldState = chunk?.GetBlockState(blockPos.ToChunkPos()) ?? null;
-			if (oldState == blockState) {
-				return;
-			}
-
-			chunk?.SetBlock(blockPos.ToChunkPos(), blockState);
-			levelManager.RenderRequest(blockPos, blockState);
-			foreach (var neighborPos in blockPos.GetCardinalNeighbors()) {
-				BlockState? neighborBlockState = GetBlockState(neighborPos);
-
-				// as of the BlockState refactor, block logic shouldnt live in BlockState
-				//neighborBlockState?.OnNeighborStateChanged(neighborPos, blockPos, oldState, blockState);
-
-				gridContext.tilemap.RefreshTile((Vector3Int)neighborPos);
-			}
-		}
-
-		[Obsolete]
-		public void SetBlock(ChunkBlockPos chunkBlockPos, BlockState? blockState) {
-			SetBlock(chunkBlockPos.ToBlock(), blockState);
-		}
-
-		[Obsolete]
-		public void SetBlockOrPend(ChunkBlockPos chunkBlockPos, BlockState? blockState) {
-			int chunkX = chunkBlockPos.chunkX;
-
-			if (generatedChunks.ContainsKey(chunkX)) {
-				SetBlock(chunkBlockPos, blockState);
-			} else {
-				PendBlock(chunkBlockPos, blockState);
-			}
-		}
-
-		[Obsolete]
-		public void BroadcastBlockEvent(BlockChangeInfo changeInfo, Action<BlockState?, BlockState?>? followUp = null) {
-			followUp?.Invoke(changeInfo.oldState, changeInfo.newState);
-			BlockStateChanged?.Invoke(changeInfo);
-		}
-
-		[Obsolete]
-		public void PendBlock(ChunkBlockPos chunkBlockPos, BlockState? blockState) {
-			int chunkX = chunkBlockPos.chunkX;
-
-			if (!pendingUpdates.ContainsKey(chunkX)) {
-				pendingUpdates[chunkX] = new List<(ChunkBlockPos, BlockState?)>();
-			}
-			pendingUpdates[chunkX].Add((chunkBlockPos, blockState));
-		}
-
 		public void UnloadDistantChunks(int pivotChunkX, int viewDistance) {
 			List<WorldChunk> toRemove = new();
 
@@ -359,6 +304,10 @@ namespace SoulboundBackend.Client.World {
 				loadedChunks.Remove(chunk.xpos);
 				chunk.OnUnload(chunkOutlineRenderer);
 			}
+		}
+
+		public void OnSessionStop() {
+			Soulbound.instance.GetInputManager().RemoveContext(player);
 		}
 
 		public BlockState? GetBlockState(BlockPos blockPos) {
@@ -418,8 +367,8 @@ namespace SoulboundBackend.Client.World {
 
 		public List<BlockPos> GetTilesCovered(Bounds bounds) {
 			List<BlockPos> coveredTiles = new();
-			Vector2Int min = (Vector2Int)gridContext.grid.WorldToCell(bounds.min);
-			Vector2Int max = (Vector2Int)gridContext.grid.WorldToCell(bounds.max);
+			Vector2Int min = Vector2Int.FloorToInt(bounds.min);
+			Vector2Int max = Vector2Int.FloorToInt(bounds.max);
 
 			for (int x = min.x; x <= max.x; x++) {
 				for (int y = min.y; y <= max.y; y++) {

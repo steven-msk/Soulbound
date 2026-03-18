@@ -1,4 +1,3 @@
-using ModestTree;
 using SoulboundBackend.Common;
 using System;
 using System.Collections.Generic;
@@ -39,7 +38,7 @@ namespace SoulboundBackend.Client.UI.Screens {
 				activeEntry.obj.Show();
 			}
 
-			return !stack.IsEmpty();
+			return stack.Any();
 		}
 
 		public void ReplaceScreen(Screen screen) {
@@ -54,7 +53,7 @@ namespace SoulboundBackend.Client.UI.Screens {
 		}
 
 		public void Flush() {
-			while (!stack.IsEmpty()) {
+			while (stack.Count > 0) {
 				var screenObject = stack.Pop();
 				screenObject.obj.Hide();
 				screenObject.obj.Dispose();

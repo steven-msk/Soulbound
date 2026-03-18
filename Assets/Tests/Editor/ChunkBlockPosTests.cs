@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+using NUnit.Framework;
 using SoulboundBackend.Client.World;
 using SoulboundBackend.Client.World.Chunk;
 using SoulboundBackend.Core;
@@ -94,8 +94,6 @@ public class ChunkBlockPosTests {
 
 	[Test]
 	public void FromWorld_DelegatesToBlockPos() {
-		Level level = new Level(LevelGridContext.FromRuntimePrefabs(), 0);
-
 		var worldPos = new Vector2(18.5f, 6.2f);
 		var chunkPos = ChunkBlockPos.FromWorld(worldPos);
 

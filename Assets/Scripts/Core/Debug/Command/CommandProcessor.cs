@@ -1,4 +1,3 @@
-using ModestTree;
 using SoulboundBackend.Client;
 using SoulboundBackend.Core.Debug.Logging;
 using System;
@@ -45,7 +44,7 @@ namespace SoulboundBackend.Core.Debug.Commands {
 			CommandArguments args = new();
 			CommandParsingContext ctx = new(args, dataProvider, execServices);
 
-			if (tokens.IsEmpty() || caretPos == 0) yield break;
+			if (!tokens.Any() || caretPos == 0) yield break;
 
 			for (int t = 0; t < tokens.Length - 1; t++) {
 				if (string.IsNullOrWhiteSpace(tokens[t])) yield break;

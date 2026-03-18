@@ -119,14 +119,16 @@ namespace SoulboundBackend.Core {
 
 			// manual dev seed for prototyping
 			DevSeedProvider seedProvider = new(config.dev);
-			LevelLoader levelLoader = new(world, seedProvider);
+			LevelLoader levelLoader = new(seedProvider);
 
 			levelLoader.LoadLevel(
 				SceneManager.LoadSceneAsync("WorldScene").ToUniTask(),
 				UnityEngine.Object.FindFirstObjectByType<WorldSceneRoot>
 			).ContinueWith(session => {
 				activeWorldSession = session;
+				uiHandler.SetCanvas(session.canvas);
 				uiHandler.SetScreen(new WorldScreen(session.player));
+				inputManager.PushContext(session.levelManager);
 
 				runtimeDataProvider.SetWorldSessionState(session);
 				runtimeExecutionServices.SetWorldSesstionState(session);
@@ -137,7 +139,9 @@ namespace SoulboundBackend.Core {
 		public void QuitActiveWorld() {
 			if (!IsWorldSessionActive()) return;
 
-			activeWorldSession?.levelManager.StopSession();
+			LevelManager levelManager = activeWorldSession?.levelManager!;
+			levelManager.StopSession();
+			inputManager.RemoveContext(levelManager);
 			uiHandler.FlushScreens();
 			Time.timeScale = 1f;
 

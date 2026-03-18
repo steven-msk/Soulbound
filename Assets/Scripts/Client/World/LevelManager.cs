@@ -7,7 +7,6 @@ using SoulboundBackend.Client.World.EntitySystem;
 using SoulboundBackend.Common;
 using SoulboundBackend.Common.Json;
 using SoulboundBackend.Core.AssetManagement;
-using SoulboundBackend.Core.Bootstrap;
 using SoulboundBackend.Core.Resource;
 using System;
 using System.Collections;
@@ -22,18 +21,15 @@ using Cysharp.Threading.Tasks;
 #nullable enable
 
 namespace SoulboundBackend.Core {
-	public class LevelManager : MonoBehaviour, IInputContext {
+	public class LevelManager : IInputContext {
 		public const float tickRate = 0.02f;        // 50 tps
 		private float tickStartTime;
 		private float frameStartTime;
 		public bool paused { get; private set; } = false;
 		private bool sessionRunning;
 
-		private DiContainer container = null!;
 		private WorldRenderer worldRenderer = null!;
-		private Canvas canvas = null!;
-		public string world { get; private set; } = null!;
-		public Level level { get; private set; } = null!;
+		private readonly Level level;
 
 		public const string worldDump = "worldDump.json";
 		public static readonly JsonSerializerSettings globalJsonSettings = new() {
@@ -49,17 +45,8 @@ namespace SoulboundBackend.Core {
 		private static readonly RectInt simulationRect = new(-128, -76, 256, 156);
 		private static readonly RectInt renderRect = new(-32, -19, 65, 39);
 
-		[Inject]
-		public void Construct(DiContainer container) {
-			this.container = container;
-			canvas = container.Resolve<Canvas>();
-			Soulbound.instance.GetUIHandler().SetCanvas(canvas);
-			Soulbound.instance.GetInputManager().PushContext(this);
-
-			//Settings.keybindMappings.AddRebindTargetMap(playerActionMap);
-			//Settings.keybindMappings.ProcessBindings(new Dictionary<KeyMapping, InputAction>() {
-			//	[KeybindMappings.jump] = inputHandler.GetAction("Jump")
-			//});
+		public LevelManager(Level level) {
+			this.level = level;
 		}
 
 		[PROTOTYPICAL]
@@ -71,23 +58,14 @@ namespace SoulboundBackend.Core {
 			return false;
 		}
 
-		public Level BootstrapWorld(string world, WorldDump? dump, int seed, LevelGridContext gridContext) {
-			UnityEngine.Random.InitState(seed);
-			this.world = world;
-			level = new Level(gridContext, seed);
-
+		public void BootstrapWorld(WorldDump? dump, LevelGridContext gridContext) {
 			worldRenderer = new WorldRenderer(simulationRect, level, gridContext.tilemap);
 
-			level.BootstrapWorld(dump, this);
+			level.BootstrapWorld(dump, worldRenderer);
 			sessionRunning = true;
-			Soulbound.instance.GetInputManager().PushContext(level.GetPlayer());
-
-			container.BindInstance(level).AsSingle();
 
 			UniTask.Post(LevelFrameLoop);
 			UniTask.Post(LevelTickLoop);
-
-			return level;
 		}
 
 		private async void LevelFrameLoop() {
@@ -140,8 +118,7 @@ namespace SoulboundBackend.Core {
 
 		public void StopSession() {
 			sessionRunning = false;
-			container.FlushBindings();
-			Soulbound.instance.GetInputManager().RemoveContext(level.GetPlayer());
+			level.OnSessionStop();
 		}
 
 		private RectInt GetRelativeSimulationRect(Vector2 pivot) {
@@ -151,10 +128,6 @@ namespace SoulboundBackend.Core {
 				simulationRect.width,
 				simulationRect.height
 			);
-		}
-
-		public void RenderRequest(BlockPos blockPos, BlockState? blockState) {
-			worldRenderer.RenderBlock(blockPos, blockState);
 		}
 
 		private void OnEscPressed() {
@@ -173,14 +146,6 @@ namespace SoulboundBackend.Core {
 			}
 		}
 
-		public WorldDump CreateDump() {
-			level.Dump(out var seed, out var generatedChunks);
-
-			return new WorldDump(
-				seed,
-				generatedChunks
-			);
-		}
 	}
 
 	public record LevelGridContext(Grid grid, Tilemap tilemap) {

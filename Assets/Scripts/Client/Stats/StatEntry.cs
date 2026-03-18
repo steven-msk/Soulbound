@@ -1,4 +1,3 @@
-using ModestTree;
 using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Common.Json;
 using System;
@@ -66,7 +65,7 @@ namespace SoulboundBackend.Client.Stats {
 			if (modifiers.TryGetValue(modificationToken, out var list)) {
 				list.Remove(modifier);
 			}
-			if (list.IsEmpty()) {
+			if (!list.Any()) {
 				modifiers.Remove(modificationToken);
 			}
 			modificationProcedues.Remove(modifier);
