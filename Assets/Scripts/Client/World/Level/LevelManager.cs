@@ -60,15 +60,15 @@ namespace SoulboundBackend.Client.World.LevelDomain {
 		private async void LevelFrameLoop() {
 			while (sessionRunning) {
 				try {
-					if (paused) continue;
+					if (!paused) {
+						StartFrame();
 
-					StartFrame();
+						Vector2 pivotPos = level.GetPlayer()?.GetPos() ?? level.GetWorldSpawnPoint();
+						level.FrameUpdate();
+						worldRenderer.RenderView(pivotPos);
 
-					Vector2 pivotPos = level.GetPlayer()?.GetPos() ?? level.GetWorldSpawnPoint();
-					level.FrameUpdate();
-					worldRenderer.RenderView(pivotPos);
-
-					EndFrame();
+						EndFrame();
+					}
 					await UniTask.WaitForEndOfFrame();
 				} catch (Exception e) {
 					Logger.LogFatal(e);
@@ -79,14 +79,14 @@ namespace SoulboundBackend.Client.World.LevelDomain {
 		private async void LevelTickLoop() {
 			while (sessionRunning) {
 				try {
-					if (paused) continue;
+					if (!paused) {
+						StartTick();
 
-					StartTick();
+						Vector2 pivotPos = level.GetPlayer()?.GetPos() ?? level.GetWorldSpawnPoint();
+						level.Tick(GetRelativeSimulationRect(pivotPos));
 
-					Vector2 pivotPos = level.GetPlayer()?.GetPos() ?? level.GetWorldSpawnPoint();
-					level.Tick(GetRelativeSimulationRect(pivotPos));
-
-					EndTick();
+						EndTick();
+					}
 					await UniTask.WaitForSeconds(tickRate, true);
 				} catch (Exception e) {
 					Logger.LogFatal(e);
@@ -131,9 +131,8 @@ namespace SoulboundBackend.Client.World.LevelDomain {
 			paused = !paused;
 			Time.timeScale = paused ? 0f : 1f;
 			UIHandler uiHandler = Soulbound.instance.GetUIHandler();
-			uiHandler.GetScreenNavigator().PopScreen();
 			if (!paused) {
-				uiHandler.SetScreen(new WorldScreen(level.GetPlayer()));
+				uiHandler.GetScreenNavigator().PopScreen();
 			} else {
 				uiHandler.SetScreen(new GamePausedScreen());
 			}

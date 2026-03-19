@@ -9,7 +9,6 @@ using SoulboundBackend.Client.World.EntitySystem.Transform;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core;
 using SoulboundBackend.Core.Assets;
-
 using UnityEngine;
 using UnityEngine.InputSystem;
 
