@@ -21,8 +21,8 @@ namespace SoulboundBackend.Client.SettingSystem {
 				string[] parts = trimmed.Split('=');
 				if (parts.Length < 2) continue;
 
-				string key = parts[0];
-				string value = parts[1];
+				string key = parts[0].Trim();
+				string value = parts[1].Trim();
 				mappings[key] = value;
 			}
 		}

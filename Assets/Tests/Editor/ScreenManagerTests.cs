@@ -75,8 +75,7 @@ public class ScreenManagerTests {
 
 	[Test]
 	public void PopScreenMethod_ReturnsFalse_WhenEmpty() {
-		bool popped = manager.PopScreen();
-		Assert.IsFalse(popped);
+		Assert.That(manager.PopScreen(), Is.False);
 	}
 
 	[Test]

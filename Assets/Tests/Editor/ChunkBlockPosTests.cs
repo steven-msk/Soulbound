@@ -85,5 +85,7 @@ public class ChunkBlockPosTests {
 		var chunkPos = ChunkBlockPos.FromWorld(worldPos);
 
 		Assert.That(chunkPos.y, Is.EqualTo(Mathf.FloorToInt(worldPos.y)));
+		Assert.That(chunkPos.x, Is.EqualTo(18));
+		Assert.That(chunkPos.chunkX, Is.EqualTo(0));
 	}
 }

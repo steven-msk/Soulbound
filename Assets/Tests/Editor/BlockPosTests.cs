@@ -31,7 +31,7 @@ public class BlockPosTests {
 	[Test]
 	public void ToStringMethod_FormatsCorrectly() {
 		var pos = new BlockPos(1, 2);
-		Assert.That("bx:1, by:2", Is.EqualTo(pos.ToString()));
+		Assert.That(pos.ToString(), Is.EqualTo("bx:1, by:2"));
 	}
 
 	[Test]
@@ -95,7 +95,7 @@ public class BlockPosTests {
 	public void MultiplicationAndDivisionOperators_CalculateValuesCorrectly() {
 		var pos = new BlockPos(6, 8);
 
-		Assert.That(pos * 2, Is.EqualTo(new BlockPos(12, 16))); 
+		Assert.That(pos * 2, Is.EqualTo(new BlockPos(12, 16)));
 		Assert.That(pos / 2, Is.EqualTo(new BlockPos(3, 4)));
 	}
 

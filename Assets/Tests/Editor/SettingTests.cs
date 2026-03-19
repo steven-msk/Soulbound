@@ -324,7 +324,7 @@ namespace SettingTests {
 		public void SettingReader_IgnoresEmptyLinesAndWhiteSpace() {
 			const int fileValue = 55;
 			const string key = "fmtsi.value";
-			File.WriteAllText(tempPath, $"\n\n       {key}={fileValue}    \n \n");
+			File.WriteAllText(tempPath, $"\n\n       {key}   =  {fileValue}    \n \n");
 			var entry = new SettingEntry<int>("", key, 0, new IntRange(0, 10), null);
 
 			using (var reader = new StreamReader(tempPath)) {
