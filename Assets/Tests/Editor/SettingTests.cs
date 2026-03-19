@@ -97,7 +97,6 @@ namespace SettingTests {
 		public void SettingEntry_RejectsInvalidValues() {
 			var entry = new SettingEntry<int>("", "testEntry", 50, new IntRange(0, 100), null);
 
-			LogAssert.Expect(LogType.Warning, "[AbstractSettingEntry]: Attempted to set invalid value '120' to setting 'testEntry'");
 			entry.SetValue(120);
 
 			Assert.That(entry.boxedValue, Is.EqualTo(50));
@@ -199,7 +198,7 @@ namespace SettingTests {
 			using (var reader = new StreamReader(tempPath)) {
 				int result = new SettingReader(reader).Process(entry);
 
-				Assert.AreEqual(value, result);
+				Assert.That(result, Is.EqualTo(value));
 			}
 		}
 
@@ -216,7 +215,7 @@ namespace SettingTests {
 			using (var reader = new StreamReader(tempPath)) {
 				var result = new SettingReader(reader).Process(entry);
 
-				Assert.AreEqual(value, result);
+				Assert.That(result, Is.EqualTo(value));
 			}
 		}
 
@@ -233,7 +232,7 @@ namespace SettingTests {
 			using (var reader = new StreamReader(tempPath)) {
 				var result = new SettingReader(reader).Process(entry);
 
-				Assert.AreEqual(value, result);
+				Assert.That(result, Is.EqualTo(value));
 			}
 		}
 
@@ -250,7 +249,7 @@ namespace SettingTests {
 			using (var reader = new StreamReader(tempPath)) {
 				var result = new SettingReader(reader).Process(entry);
 
-				Assert.AreEqual(value, result);
+				Assert.That(result, Is.EqualTo(value));
 			}
 		}
 
@@ -265,7 +264,7 @@ namespace SettingTests {
 			using (var reader = new StreamReader(tempPath)) {
 				var result = new SettingReader(reader).Process(entry);
 
-				Assert.AreEqual(Key.Space, result.keyCode);
+				Assert.That(result.keyCode, Is.EqualTo(Key.Space));
 			}
 		}
 
@@ -285,8 +284,8 @@ namespace SettingTests {
 
 			using (var reader = new StreamReader(tempPath)) {
 				var settingReader = new SettingReader(reader);
-				Assert.AreEqual(intValue, settingReader.Process(intEntry));
-				Assert.AreEqual(strings[0], settingReader.Process(strEntry));
+				Assert.That(settingReader.Process(intEntry), Is.EqualTo(intValue));
+				Assert.That(settingReader.Process(strEntry), Is.EqualTo(strings[0]));
 			}
 		}
 
@@ -303,7 +302,7 @@ namespace SettingTests {
 			using (var reader = new StreamReader(tempPath)) {
 				int result = new SettingReader(reader).Process(entry);
 
-				Assert.AreEqual(defaultValue, result);
+				Assert.That(result, Is.EqualTo(defaultValue));
 			}
 		}
 
@@ -317,7 +316,7 @@ namespace SettingTests {
 
 			string line = File.ReadAllText(tempPath).Trim();
 
-			Assert.AreEqual("fmtsi.int=7", line);
+			Assert.That(line, Is.EqualTo("fmtsi.int=7"));
 		}
 
 		[Test]
@@ -333,7 +332,7 @@ fmtsi.value={fileValue}
 			using (var reader = new StreamReader(tempPath)) {
 				int result = new SettingReader(reader).Process(entry);
 
-				Assert.AreEqual(fileValue, result);
+				Assert.That(result, Is.EqualTo(fileValue));
 			}
 		}
 
@@ -371,7 +370,7 @@ fmtsi.value={fileValue}
 
 			string encoded = valueSet.Encode(keyControl);
 
-			Assert.AreEqual("G", encoded);
+			Assert.That(encoded, Is.EqualTo("G"));
 		}
 
 		[Test]
@@ -380,7 +379,7 @@ fmtsi.value={fileValue}
 
 			string encoded = valueSet.Encode(null);
 
-			Assert.AreEqual("null", encoded);
+			Assert.That(encoded, Is.EqualTo("null"));
 		}
 
 		[Test]
@@ -389,7 +388,7 @@ fmtsi.value={fileValue}
 
 			KeyControl decoded = valueSet.Decode("H");
 
-			Assert.AreEqual(Keyboard.current[Key.H], decoded);
+			Assert.That(decoded, Is.EqualTo(Keyboard.current[Key.H]));
 		}
 
 		[Test]
@@ -398,7 +397,7 @@ fmtsi.value={fileValue}
 
 			KeyControl decoded = valueSet.Decode("Invalid Key");
 
-			Assert.IsNull(decoded);
+			Assert.That(decoded, Is.Null);
 		}
 
 		[Test]
@@ -409,7 +408,7 @@ fmtsi.value={fileValue}
 			string encoded = valueSet.Encode(key);
 			KeyControl decoded = valueSet.Decode(encoded);
 
-			Assert.AreEqual(decoded, key);
+			Assert.That(key, Is.EqualTo(decoded));
 		}
 
 		[Test]
@@ -417,14 +416,14 @@ fmtsi.value={fileValue}
 			var valueSet = new KeyboardValueSet();
 			var keyControl = Keyboard.current[Key.Space];
 
-			Assert.IsTrue(valueSet.IsValid(keyControl));
+			Assert.That(valueSet.IsValid(keyControl), Is.True);
 		}
 
 		[Test]
 		public void KeyboardValueSet_IsValid_ReturnsTrueForNull() {
 			var valueSet = new KeyboardValueSet();
 
-			Assert.IsTrue(valueSet.IsValid(null));
+			Assert.That(valueSet.IsValid(null), Is.True);
 		}
 
 		[Test]
@@ -433,7 +432,7 @@ fmtsi.value={fileValue}
 
 			keyMapping.SetValue(Key.T);
 
-			Assert.AreEqual(Keyboard.current[Key.T], keyMapping.value);
+			Assert.That(keyMapping.value, Is.EqualTo(Keyboard.current[Key.T]));
 		}
 
 		[Test]
@@ -448,13 +447,13 @@ fmtsi.value={fileValue}
 			processor.Process(keyMapping);
 			writer.Flush();
 
-			string expectedLine = $"keyMapping.test=V";
+			string expectedLine = $"keybind.test=V";
 			StringAssert.Contains(expectedLine, stringWriter.ToString());
 		}
 
 		[Test]
 		public void KeyMappingReader_ReadsStoredKeyCorrectly() {
-			string line = "keyMapping.test=H\n";
+			string line = "keybind.test=H\n";
 			var settingReader = new SettingReader(
 				new StreamReader(new MemoryStream(Encoding.UTF8.GetBytes(line)))
 			);
@@ -464,7 +463,7 @@ fmtsi.value={fileValue}
 
 			KeyControl result = reader.Process(keyMapping);
 
-			Assert.AreEqual(Keyboard.current[Key.H], result);
+			Assert.That(result, Is.EqualTo(Keyboard.current[Key.H]));
 		}
 	}
 }

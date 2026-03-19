@@ -1,21 +1,15 @@
 using NUnit.Framework;
-using SoulboundBackend.Client.World;
 using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Client.World.LevelDomain;
-using SoulboundBackend.Core;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 public class BlockPosTests {
 	[Test]
 	public void Constructor_SetsValues() {
 		var pos = new BlockPos(3, 5);
-		Assert.AreEqual(3, pos.x);
-		Assert.AreEqual(5, pos.y);
+		Assert.That(pos.x, Is.EqualTo(3));
+		Assert.That(pos.y, Is.EqualTo(5));
 	}
 
 	[Test]
@@ -24,10 +18,10 @@ public class BlockPosTests {
 		var b = new BlockPos(2, 4);
 		var c = new BlockPos(3, 4);
 
-		Assert.IsTrue(a == b);
-		Assert.IsFalse(a != b);
-		Assert.IsTrue(a != c);
-		Assert.IsFalse(a == c);
+		Assert.That(a == b, Is.True);
+		Assert.That(a != b, Is.False);
+		Assert.That(a != c, Is.True);
+		Assert.That(a == c, Is.False);
 	}
 
 	[Test]
@@ -36,80 +30,80 @@ public class BlockPosTests {
 		var b = new BlockPos(2, 4);
 		var c = new BlockPos(3, 4);
 
-		Assert.IsTrue(a.Equals(b));
-		Assert.IsFalse(a.Equals(c));
-		Assert.AreEqual(a.GetHashCode(), b.GetHashCode());
+		Assert.That(a.Equals(b), Is.True);
+		Assert.That(a.Equals(c), Is.False);
+		Assert.That(a.GetHashCode(), Is.EqualTo(b.GetHashCode()));
 	}
 
 	[Test]
 	public void ToString_FormatsCorrectly() {
 		var pos = new BlockPos(1, 2);
-		Assert.AreEqual("bx:1, by:2", pos.ToString());
+		Assert.That("bx:1, by:2", Is.EqualTo(pos.ToString()));
 	}
 
 	[Test]
 	public void CenterAligned_ReturnsMiddleOfBlock() {
 		var pos = new BlockPos(1, 2);
 		var center = pos.GetCenter();
-		Assert.AreEqual(new Vector2(1.5f, 2.5f), center);
+		Assert.That(center, Is.EqualTo(new Vector2(1.5f, 2.5f)));
 	}
 
 	[Test]
 	public void Conversion_ToAndFrom_Vector2Int() {
 		var pos = new BlockPos(3, 4);
 		var vec = (Vector2Int)pos;
-		Assert.AreEqual(new Vector2Int(3, 4), vec);
+		Assert.That(vec, Is.EqualTo(new Vector2Int(3, 4)));
 
 		var pos2 = (BlockPos)vec;
-		Assert.AreEqual(pos, pos2);
+		Assert.That(pos, Is.EqualTo(pos2));
 	}
 
 	[Test]
 	public void Conversion_ToAndFrom_Vector2_FloorsCorrectly() {
 		var vec = new Vector2(3.9f, 4.1f);
 		var pos = (BlockPos)vec;
-		Assert.AreEqual(new BlockPos(3, 4), pos);
+		Assert.That(pos, Is.EqualTo(new BlockPos(3, 4)));
 
 		var vec2 = (Vector2)pos;
-		Assert.AreEqual(new Vector2(3, 4), vec2);
+		Assert.That(vec2, Is.EqualTo(new Vector2(3f, 4f)));
 	}
 
 	[Test]
 	public void Conversion_ToAndFrom_Vector3_FloorsCorrectly() {
 		var vec = new Vector3(7.9f, 8.1f, 10f);
 		var pos = (BlockPos)vec;
-		Assert.AreEqual(new BlockPos(7, 8), pos);
+		Assert.That(pos, Is.EqualTo(new BlockPos(7, 8)));
 
 		var vec2 = (Vector3)pos;
-		Assert.AreEqual(new Vector3(7, 8, 0f), vec2);
+		Assert.That(vec2, Is.EqualTo(new Vector3(7f, 8f, 0f)));
 	}
 
 	[Test]
 	public void Conversion_ToAndFrom_Vector3Int() {
 		var vec = new Vector3Int(9, 10, 11);
 		var pos = (BlockPos)vec;
-		Assert.AreEqual(new BlockPos(9, 10), pos);
+		Assert.That(pos, Is.EqualTo(new BlockPos(9, 10)));
 
 		var vec2 = (Vector3Int)pos;
-		Assert.AreEqual(new Vector3Int(9, 10, 0), vec2);
+		Assert.That(vec2, Is.EqualTo(new Vector3Int(9, 10, 0)));
 	}
 
 	[Test]
 	public void Operators_AdditionAndSubtraction() {
 		var pos = new BlockPos(5, 5);
 
-		Assert.AreEqual(new BlockPos(7, 9), pos + new Vector2Int(2, 4));
-		Assert.AreEqual(new BlockPos(7, 9), pos + (2, 4));
-		Assert.AreEqual(new BlockPos(3, 1), pos - new Vector2Int(2, 4));
-		Assert.AreEqual(new BlockPos(3, 1), pos - (2, 4));
+		Assert.That(pos + new Vector2Int(2, 4), Is.EqualTo(new BlockPos(7, 9)));
+		Assert.That(pos + (2, 4), Is.EqualTo(new BlockPos(7, 9)));
+		Assert.That(pos - new Vector2Int(2, 4), Is.EqualTo(new BlockPos(3, 1)));
+		Assert.That(pos - (2, 4), Is.EqualTo(new BlockPos(3, 1)));
 	}
 
 	[Test]
 	public void Operators_MultiplicationAndDivision() {
 		var pos = new BlockPos(6, 8);
 
-		Assert.AreEqual(new BlockPos(12, 16), pos * 2); 
-		Assert.AreEqual(new BlockPos(3, 4), pos / 2);
+		Assert.That(pos * 2, Is.EqualTo(new BlockPos(12, 16))); 
+		Assert.That(pos / 2, Is.EqualTo(new BlockPos(3, 4)));
 	}
 
 	[Test]
@@ -126,9 +120,9 @@ public class BlockPosTests {
 		var chunkPos = blockPos.ToChunkPos();
 
 		int expectedLocalX = blockPos.x - chunkX * Level.CHUNK_LENGTH;
-		Assert.AreEqual(expectedLocalX, chunkPos.x);
-		Assert.AreEqual(blockPos.y, chunkPos.y);
-		Assert.AreEqual(chunkX, chunkPos.chunkX);
-		Assert.AreEqual(chunkX, Level.ChunkXAt(blockPos.x));
+		Assert.That(chunkPos.x, Is.EqualTo(expectedLocalX));
+		Assert.That(chunkPos.y, Is.EqualTo(blockPos.y));
+		Assert.That(chunkPos.chunkX, Is.EqualTo(chunkX));
+		Assert.That(Level.ChunkXAt(blockPos.x), Is.EqualTo(chunkX));
 	}
 }

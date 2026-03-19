@@ -2,11 +2,6 @@ using NSubstitute;
 using NSubstitute.ReceivedExtensions;
 using NUnit.Framework;
 using SoulboundBackend.Client.UI.Screens;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using Screen = SoulboundBackend.Client.UI.Screens.Screen;
 
@@ -113,7 +108,7 @@ public class ScreenManagerTests {
 		manager.PushScreen(screenA);
 		manager.PushScreen(screenB);
 
-		Assert.AreSame(screenB, manager.GetActiveScreen());
+		Assert.That(manager.GetActiveScreen(), Is.SameAs(screenB));
 	}
 
 	[Test]
@@ -121,7 +116,7 @@ public class ScreenManagerTests {
 		Transform root = new GameObject("root").transform;
 		ScreenManager manager = new(root);
 
-		Assert.IsNull(manager.GetActiveScreen());
+		Assert.That(manager.GetActiveScreen(), Is.Null);
 	}
 
 	[Test]
@@ -144,11 +139,11 @@ public class ScreenManagerTests {
 	[Test]
 	public void Flush_LeavesManagerEmpty() {
 		Transform root = new GameObject("root").transform;
-		ScreenManager manager = new ScreenManager(root);
+		ScreenManager manager = new(root);
 
 		manager.Flush();
 
-		Assert.IsNull(manager.GetActiveScreen());
+		Assert.That(manager.GetActiveScreen(), Is.Null);
 	}
 
 }
