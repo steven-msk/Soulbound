@@ -1,15 +1,12 @@
 using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.World;
 using SoulboundBackend.Client.World.BlockSystem;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SoulboundBackend.Client.World.BlockSystem.States;
+using SoulboundBackend.Client.World.LevelDomain;
 
 #nullable enable
 
-namespace SoulboundBackend.Client {
+namespace SoulboundBackend.Client.Interaction {
 	public struct BlockInteraction : IInteractionContext {
 		// note: the implementation might change
 		// as more features are introduced during prod

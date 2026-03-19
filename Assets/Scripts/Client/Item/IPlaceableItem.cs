@@ -1,11 +1,7 @@
+using SoulboundBackend.Client.Interaction;
 using SoulboundBackend.Client.World;
 using SoulboundBackend.Client.World.BlockSystem;
-using SoulboundBackend.Core.Debug.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SoulboundBackend.Client.World.BlockSystem.States;
 
 namespace SoulboundBackend.Client.ItemSystem {
 	public interface IPlaceableItem : IItemInteractionListener {

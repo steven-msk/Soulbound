@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 
 #nullable enable
 
-namespace SoulboundBackend.Common {
+namespace SoulboundBackend.Common.Patterns {
 	public class RefBox<T> where T : class {
 		public T? value;
 

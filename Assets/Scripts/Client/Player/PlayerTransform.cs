@@ -1,18 +1,14 @@
 using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.World.EntitySystem;
-using SoulboundBackend.Common;
+using SoulboundBackend.Client.World.EntitySystem.Transform;
 using SoulboundBackend.Core;
-using System;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UI;
 
 #nullable enable
 
-namespace SoulboundBackend.Client {
+namespace SoulboundBackend.Client.Players {
 	[RequireComponent(typeof(Rigidbody2D))]
-	public class PlayerTransform : MonoBehaviour, IEntityTransform,IItemPickupHandler {
+	public class PlayerTransform : MonoBehaviour, IEntityTransform, IItemPickupHandler {
 		private Player player = null!;
 		private Rigidbody2D rb = null!;
 		new private CapsuleCollider2D collider = null!;

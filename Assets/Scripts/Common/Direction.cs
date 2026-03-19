@@ -1,10 +1,11 @@
 using SoulboundBackend.Client.World;
+using SoulboundBackend.Client.World.BlockSystem;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SoulboundBackend.Common {
+namespace SoulboundBackend.Common.Math {
 	public enum Direction {
 		Up,
 		Down,

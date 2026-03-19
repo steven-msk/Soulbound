@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-namespace SoulboundBackend.Core {
+namespace SoulboundBackend.Client.World.Serialization {
     public interface IWorldSaveStrategy {
 		string GetSavesRoot();
 

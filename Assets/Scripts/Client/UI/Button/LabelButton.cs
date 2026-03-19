@@ -1,6 +1,6 @@
 using SoulboundBackend.Client.UI;
 using SoulboundBackend.Common;
-using SoulboundBackend.Core.Resource;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 
-namespace SoulboundBackend.Client.UI {
+namespace SoulboundBackend.Client.UI.Buttons {
 	[PROTOTYPICAL]
 	public class LabelButton : IUIElementTemplate<ButtonHandle> {
 		public GameObject Instantiate() {

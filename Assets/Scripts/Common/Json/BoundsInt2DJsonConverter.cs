@@ -1,6 +1,7 @@
 using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SoulboundBackend.Common.Math;
 
 namespace SoulboundBackend.Common.Json {
 	public sealed class BoundsInt2DJsonConverter : JsonConverter<BoundsInt2D> {

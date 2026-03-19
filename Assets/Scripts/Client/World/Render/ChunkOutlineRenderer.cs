@@ -1,9 +1,11 @@
-﻿using SoulboundBackend.Core.AssetManagement;
-using SoulboundBackend.Core.Resource;
+using SoulboundBackend.Client.World.Chunk;
+using SoulboundBackend.Client.World.LevelDomain;
+using SoulboundBackend.Core.Assets;
+
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SoulboundBackend.Client.World.Chunk {
+namespace SoulboundBackend.Client.World.Render {
 	public sealed class ChunkOutlineRenderer {
 		private Dictionary<WorldChunk, LineRenderer> outlines = new();
 

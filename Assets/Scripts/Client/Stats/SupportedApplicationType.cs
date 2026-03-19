@@ -1,4 +1,5 @@
-﻿using System;
+using SoulboundBackend.Client.ItemSystem;
+using System;
 
 namespace SoulboundBackend.Client.Stats {
 	[Flags]

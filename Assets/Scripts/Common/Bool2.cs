@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 
-namespace SoulboundBackend.Common {
+namespace SoulboundBackend.Common.Math {
 	[Serializable]
 	public struct Bool2 {
 		public bool x;

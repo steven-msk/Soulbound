@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 
 #nullable enable
 
-namespace SoulboundBackend.Common {
+namespace SoulboundBackend.Common.Patterns {
 	public static class InvocationHelper {
 		public static void NullOrElse<T>(this T? actionTarget, Action<T> action, Action fallback) where T : class {
 			if (actionTarget != null) {

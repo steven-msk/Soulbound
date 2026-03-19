@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-namespace SoulboundBackend.Core.Debug.Commands {
+namespace SoulboundBackend.Client.Debug.Commands {
 	public class ArgumentCommandNode<T> : CommandNode {
 		private readonly ICommandArgumentParser<T> parser;
 		public override string label { get; }

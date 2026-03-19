@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SoulboundBackend.Client.World.BlockSystem {
+namespace SoulboundBackend.Client.World.BlockSystem.States {
 	public static class BlockStateRegistry {
 		static readonly List<BlockState> states = new();
 		static readonly Dictionary<int, int> hashToID = new();

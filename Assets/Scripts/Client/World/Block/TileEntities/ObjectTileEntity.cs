@@ -1,13 +1,12 @@
+using SoulboundBackend.Client.Players;
+using SoulboundBackend.Client.World.LevelDomain;
 using SoulboundBackend.Common;
+using SoulboundBackend.Common.Unity;
 using SoulboundBackend.Core;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
-namespace SoulboundBackend.Client.World.BlockSystem {
+namespace SoulboundBackend.Client.World.BlockSystem.TileEntities {
 	[PROTOTYPICAL]
 	public class ObjectTileEntity : TileEntity {
 		// made to work with AreaTriggerBlock

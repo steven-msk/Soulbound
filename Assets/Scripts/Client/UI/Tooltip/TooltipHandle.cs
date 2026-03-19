@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 #nullable enable
 
-namespace SoulboundBackend.Client.UI {
+namespace SoulboundBackend.Client.UI.Tooltips {
 	[PROTOTYPICAL]
 	public class TooltipHandle : MonoBehaviour, ITooltipHandle {
 		public bool isAlive { get; private set; } = true;

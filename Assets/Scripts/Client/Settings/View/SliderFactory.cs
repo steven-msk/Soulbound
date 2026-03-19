@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Client.SettingSystem;
+using SoulboundBackend.Client.SettingSystem;
 using SoulboundBackend.Common;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SoulboundBackend.Client.UI {
+namespace SoulboundBackend.Client.SettingSystem.View {
 	[PROTOTYPICAL]
 	public static class SliderFactory {
 		public static Slider CreateSlider(Transform parent) {

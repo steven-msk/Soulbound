@@ -14,7 +14,7 @@ using UnityEngine.InputSystem.Controls;
 
 #nullable enable
 
-namespace SoulboundBackend.Client.SettingSystem {
+namespace SoulboundBackend.Client.SettingSystem.View {
 	[PROTOTYPICAL]
 	public class KeySetting : SettingVisual<KeyControl>, IInputContext {
 		int IInputContext.priority => 100; 

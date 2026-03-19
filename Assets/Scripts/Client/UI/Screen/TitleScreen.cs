@@ -1,10 +1,10 @@
+using SoulboundBackend.Client.UI.Containers;
 using SoulboundBackend.Client.UI.Screens;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core;
 using System;
-using Screen = SoulboundBackend.Client.UI.Screens.Screen;
 
-namespace SoulboundBackend.Client.UI {
+namespace SoulboundBackend.Client.UI.Screens {
 	public class TitleScreen : Screen {
 
 		[PROTOTYPICAL]

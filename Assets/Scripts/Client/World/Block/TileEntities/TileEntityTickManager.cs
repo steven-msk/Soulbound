@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SoulboundBackend.Client.World  {
+namespace SoulboundBackend.Client.World.BlockSystem.TileEntities {
 	public sealed class TileEntityTickManager {
 		private readonly List<ITickable> tickables = new();
 

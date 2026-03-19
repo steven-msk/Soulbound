@@ -1,6 +1,8 @@
 using SoulboundBackend.Common.Json;
 using Newtonsoft.Json;
 using UnityEngine;
+using SoulboundBackend.Client.World.LevelDomain;
+using SoulboundBackend.Client.World.BlockSystem;
 
 namespace SoulboundBackend.Client.World.Chunk {
 	[JsonConverter(typeof(ChunkBlockPosJsonConverter))]

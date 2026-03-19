@@ -1,18 +1,12 @@
-using SoulboundBackend.Client.UI;
+using SoulboundBackend.Client.SettingSystem.View;
 using SoulboundBackend.Common;
-
 using SoulboundBackend.Core;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.InputSystem.Controls;
 using UnityEngine.UI;
-using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
+using Logger = SoulboundBackend.Client.Debug.Logging.Logger;
 
 #nullable enable
 

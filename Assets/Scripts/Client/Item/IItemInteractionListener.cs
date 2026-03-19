@@ -1,9 +1,4 @@
-using SoulboundBackend.Client.World;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SoulboundBackend.Client.Interaction;
 
 namespace SoulboundBackend.Client.ItemSystem {
 	public interface IItemInteractionListener {

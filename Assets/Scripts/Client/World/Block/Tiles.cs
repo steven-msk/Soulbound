@@ -1,9 +1,9 @@
-﻿using SoulboundBackend.Core.AssetManagement;
-using SoulboundBackend.Core.Resource;
+using SoulboundBackend.Core.Assets;
+
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-namespace SoulboundBackend.Client.World {
+namespace SoulboundBackend.Client.World.BlockSystem {
 	public class Tiles : IResourceModule {
 		public static Tile air => GetTile<Tile>(new AssetKey("air"));
 		public static RuleTile grass => GetTile<RuleTile>(new AssetKey("grass"));

@@ -1,9 +1,15 @@
-using Assets.Scripts.Client.World.Biome;
+using SoulboundBackend.Client.Players;
+using SoulboundBackend.Client.Runtime.Services;
 using SoulboundBackend.Client.World.BlockSystem;
+using SoulboundBackend.Client.World.BlockSystem.States;
+using SoulboundBackend.Client.World.BlockSystem.TileEntities;
 using SoulboundBackend.Client.World.Chunk;
 using SoulboundBackend.Client.World.EntitySystem;
 using SoulboundBackend.Client.World.Generation;
+using SoulboundBackend.Client.World.Render;
+using SoulboundBackend.Client.World.Serialization;
 using SoulboundBackend.Common;
+using SoulboundBackend.Common.Math;
 using SoulboundBackend.Core;
 using System;
 using System.Collections.Concurrent;
@@ -13,10 +19,9 @@ using UnityEngine;
 
 #nullable enable
 
-namespace SoulboundBackend.Client.World {
-	public delegate void OnChunkGenerated(ChunkGenData genData);
-
+namespace SoulboundBackend.Client.World.LevelDomain {
 	public sealed class Level : ILevelExecutionService, IEntityManager {
+		public delegate void OnChunkGenerated(ChunkGenData genData);
 		public const int CHUNK_LENGTH = 32;
 		public const int WORLD_HEIGHT = 1024;
 		public const int RENDER_DISTANCE = 8;

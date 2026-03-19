@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-namespace SoulboundBackend.Core.Debug.Commands {
+namespace SoulboundBackend.Client.Debug.Commands {
 	public sealed class CommandCompletion {
 		private List<CommandCompletionToken> completions = new();
 		private int selectedIndex = -1;

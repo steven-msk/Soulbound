@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SoulboundBackend.Client.World.BlockSystem {
+namespace SoulboundBackend.Client.World.BlockSystem.States {
 	public sealed class BlockStateRegisterer {
 		private readonly List<BlockState> registered = new();
 		private readonly Block block;

@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 #nullable enable
 
-namespace SoulboundBackend.Client.World {
+namespace SoulboundBackend.Client.World.Serialization {
 	public struct WorldDump {
 		public int seed;
 		public WorldChunk[]? generatedChunks;

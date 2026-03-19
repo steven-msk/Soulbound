@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SoulboundBackend.Common {
+namespace SoulboundBackend.Common.Collections {
 	public sealed class BufferedQueue<T> where T : struct {
 		private readonly T[] buffer;
 		private readonly int capacity;

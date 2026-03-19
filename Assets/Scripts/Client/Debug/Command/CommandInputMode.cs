@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SoulboundBackend.Core.Debug.Commands {
+namespace SoulboundBackend.Client.Debug.Commands {
 	public enum CommandInputMode {
 		Typing,
 		CyclingCompletions,

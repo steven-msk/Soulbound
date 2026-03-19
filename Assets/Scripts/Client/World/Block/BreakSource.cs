@@ -1,4 +1,4 @@
-using SoulboundBackend.Client.ItemSystem;
+using SoulboundBackend.Client.Players;
 using SoulboundBackend.Common;
 
 #nullable enable

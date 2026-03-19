@@ -3,10 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
+using SoulboundBackend.Client.World.LevelDomain;
 
 #nullable enable
 
-namespace SoulboundBackend.Client.World {
+namespace SoulboundBackend.Client.World.Serialization {
 	public class WorldSaveStrategy : IWorldSaveStrategy {
 		private readonly string root;
 		private readonly string dataPath;

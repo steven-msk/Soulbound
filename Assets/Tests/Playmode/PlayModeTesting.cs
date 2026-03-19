@@ -1,5 +1,4 @@
-﻿using SoulboundBackend.Core;
-using SoulboundBackend.Core.Resource;
+using SoulboundBackend.Core;
 using System;
 using System.Collections;
 using System.Collections.Generic;

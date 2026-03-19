@@ -1,5 +1,7 @@
 using SoulboundBackend.Client.UI;
+using SoulboundBackend.Client.UI.Tooltips;
 using SoulboundBackend.Common;
+using SoulboundBackend.Common.Collections;
 using System;
 using System.Collections.Generic;
 using System.Linq;

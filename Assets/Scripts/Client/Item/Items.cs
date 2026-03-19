@@ -1,11 +1,10 @@
-using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Common;
-using SoulboundBackend.Core.AssetManagement;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using Newtonsoft.Json;
+using SoulboundBackend.Common.Patterns;
 
 namespace SoulboundBackend.Client.ItemSystem {
 	public partial class Items : ICachedRegistry<Item> {

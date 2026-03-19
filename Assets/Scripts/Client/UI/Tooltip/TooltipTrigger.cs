@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace SoulboundBackend.Client.UI {
+namespace SoulboundBackend.Client.UI.Tooltips {
 	public class TooltipTrigger : MonoBehaviour, ITooltipTrigger, IPointerEnterHandler, IPointerExitHandler {
 		private ITooltipHandle handle;
 		private ITooltipRenderer tooltipRenderer;

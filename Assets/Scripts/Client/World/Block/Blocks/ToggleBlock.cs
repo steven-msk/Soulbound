@@ -1,11 +1,9 @@
+using SoulboundBackend.Client.Interaction;
 using SoulboundBackend.Client.ItemSystem;
-using SoulboundBackend.Core.AssetManagement;
-using SoulboundBackend.Core.Debug.Logging;
-using System;
+using SoulboundBackend.Core.Assets;
+using SoulboundBackend.Client.Debug.Logging;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SoulboundBackend.Client.World.BlockSystem.States;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
 	public sealed class ToggleBlock : Block, IBlockInteractionListener {

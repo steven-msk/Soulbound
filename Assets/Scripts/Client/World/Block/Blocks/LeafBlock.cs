@@ -1,6 +1,7 @@
 using SoulboundBackend.Client.ItemSystem;
-using SoulboundBackend.Core.AssetManagement;
-using SoulboundBackend.Core.Resource;
+using SoulboundBackend.Client.World.BlockSystem.States;
+using SoulboundBackend.Core.Assets;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;

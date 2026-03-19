@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace SoulboundBackend.Client.UI {
+namespace SoulboundBackend.Client.UI.Buttons {
 	public sealed class ButtonFactory {
 		public ButtonBuilder FromTemplate(IUIElementTemplate<ButtonHandle> template) {
 			return new ButtonBuilder(template);

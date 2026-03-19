@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SoulboundBackend.Client.World {
+namespace SoulboundBackend.Client.World.Serialization {
 	public sealed class WorldBinarySerializer : BinarySerializer<WorldDump> {
 		// version?
 		

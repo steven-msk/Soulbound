@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SoulboundBackend.Common {
+namespace SoulboundBackend.Common.Patterns {
     public interface IHashableReference {
         public int hashedID { get; set; }
     }

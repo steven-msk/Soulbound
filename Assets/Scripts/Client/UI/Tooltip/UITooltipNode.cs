@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace SoulboundBackend.Client.UI {
+namespace SoulboundBackend.Client.UI.Tooltips {
 	public record UITooltipNode : UIElementNode {
 		public ITooltipHandle handle { get; private set; }
 		public bool isAlive { get; private set; }

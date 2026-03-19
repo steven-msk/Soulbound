@@ -1,12 +1,12 @@
-using SoulboundBackend.Client.World;
 using SoulboundBackend.Client.World.BlockSystem;
+using SoulboundBackend.Client.World.BlockSystem.States;
 using SoulboundBackend.Client.World.Chunk;
-using SoulboundBackend.Client.World.Generation;
+using SoulboundBackend.Client.World.LevelDomain;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Assets.Scripts.Client.World.Biome {
+namespace SoulboundBackend.Client.World.Generation {
 	public class HillsBiome : IBiome {
 		private readonly int seed;
 		private readonly Heightmap heightmap;

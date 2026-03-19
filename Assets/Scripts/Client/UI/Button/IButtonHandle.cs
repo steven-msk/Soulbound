@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SoulboundBackend.Client.UI {
+namespace SoulboundBackend.Client.UI.Buttons {
 	public interface IButtonHandle :  IUIElementHandle {
 		void SetText(string text);
 		void SetEnabled(bool enabled);

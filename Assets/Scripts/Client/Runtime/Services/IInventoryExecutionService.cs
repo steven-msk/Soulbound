@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-namespace SoulboundBackend.Client {
+namespace SoulboundBackend.Client.Runtime.Services {
 	public interface IInventoryExecutionService {
 		void SetStack(int slotIndex, ItemStack? stack);
 	}

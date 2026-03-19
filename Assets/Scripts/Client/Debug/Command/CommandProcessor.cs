@@ -1,14 +1,11 @@
-using SoulboundBackend.Client;
-using SoulboundBackend.Core.Debug.Logging;
+using SoulboundBackend.Client.Runtime.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 
-namespace SoulboundBackend.Core.Debug.Commands {
+namespace SoulboundBackend.Client.Debug.Commands {
 	public sealed class CommandProcessor {
 		private readonly List<ICommandProvider> providerBuffer = new();
 		private readonly IRuntimeDataProvider dataProvider;

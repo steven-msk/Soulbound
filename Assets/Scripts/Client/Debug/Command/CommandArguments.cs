@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace SoulboundBackend.Core.Debug.Commands {
+namespace SoulboundBackend.Client.Debug.Commands {
 	public class CommandArguments {
 		private readonly Dictionary<string, object> arguments  = new();
 

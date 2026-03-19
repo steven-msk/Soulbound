@@ -1,13 +1,9 @@
-using SoulboundBackend.Client.World.EntitySystem;
+using SoulboundBackend.Client.Players;
+using SoulboundBackend.Client.World.Serialization;
 using SoulboundBackend.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
-namespace SoulboundBackend.Client.World {
+namespace SoulboundBackend.Client.World.LevelDomain {
 	public struct WorldSession {
 		public WorldDump? deserializationData;
 		public Player player;

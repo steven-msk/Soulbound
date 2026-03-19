@@ -1,11 +1,8 @@
+using SoulboundBackend.Client.Interaction;
 using SoulboundBackend.Common;
-using SoulboundBackend.Core.AssetManagement;
-using SoulboundBackend.Core.Debug.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SoulboundBackend.Core.Assets;
+using SoulboundBackend.Client.Debug.Logging;
+using SoulboundBackend.Client.ItemSystem.View;
 
 namespace SoulboundBackend.Client.ItemSystem {
 	[PROTOTYPICAL]

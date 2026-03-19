@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
 
-namespace SoulboundBackend.Core.Debug.Commands {
+namespace SoulboundBackend.Client.Debug.Commands {
 	public struct ParseResult<T> {
 		public string message;
 		public T value;

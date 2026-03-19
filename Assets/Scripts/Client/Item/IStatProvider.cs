@@ -1,7 +1,7 @@
 using SoulboundBackend.Client.Stats;
 using SoulboundBackend.Common;
 
-using SoulboundBackend.Core.Debug.Logging;
+using SoulboundBackend.Client.Debug.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;

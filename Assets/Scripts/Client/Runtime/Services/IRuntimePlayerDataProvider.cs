@@ -1,15 +1,10 @@
-using Assets.Scripts.Core.Debug.Command;
 using SoulboundBackend.Client.ItemSystem;
-using SoulboundBackend.Client.UI.Storage;
-using System;
+using SoulboundBackend.Client.World.EntitySystem;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #nullable enable
 
-namespace SoulboundBackend.Client {
+namespace SoulboundBackend.Client.Runtime.Services {
 	public interface IRuntimePlayerDataProvider : IEntityView {
 		InventoryData GetInventory();
 	}

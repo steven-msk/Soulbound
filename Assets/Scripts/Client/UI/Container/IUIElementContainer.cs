@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace SoulboundBackend.Client.UI {
+namespace SoulboundBackend.Client.UI.Containers {
 	public interface IUIElementContainer {
 		void AddElement(UIElementNode node);
 		void RemoveElement(UIElementNode node);

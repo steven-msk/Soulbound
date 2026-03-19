@@ -1,3 +1,4 @@
+using SoulboundBackend.Client.ItemSystem.View;
 using System;
 using UnityEngine;
 

@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SoulboundBackend.Client.World.BlockSystem {
+namespace SoulboundBackend.Client.World.BlockSystem.States {
 	public static class StateHasher {
 		private const uint FnvOffset = 2166136261;
 		private const uint FnvPrime = 16777619;

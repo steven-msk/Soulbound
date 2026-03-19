@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace SoulboundBackend.Core.Debug.Commands {
+namespace SoulboundBackend.Client.Runtime.Services {
 	public interface IEntityExecutionService {
 		void SetPos(Guid entityGuid, Vector2 pos);
 		void AddEntity(Entity entity);

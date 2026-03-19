@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Unity.Profiling;
 
-namespace SoulboundBackend.Core.Debug.Commands {
+namespace SoulboundBackend.Client.Debug.Commands {
 	public class CommandBuilder {
 		private readonly CommandNode root;
 		private readonly CommandNode cursor;

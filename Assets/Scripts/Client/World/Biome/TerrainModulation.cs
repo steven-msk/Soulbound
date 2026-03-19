@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Assets.Scripts.Client.World.Biome {
+namespace SoulboundBackend.Client.World.Generation {
 	public struct TerrainModulation {
 		public float heightOffset;
 		public float amplitude;

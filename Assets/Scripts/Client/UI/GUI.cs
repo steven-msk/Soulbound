@@ -1,4 +1,7 @@
-using Assets.Scripts.Client.UI.Container;
+using SoulboundBackend.Client.UI.Buttons;
+using SoulboundBackend.Client.UI.Containers;
+using SoulboundBackend.Client.UI.Frames;
+using SoulboundBackend.Client.UI.Layouts;
 using SoulboundBackend.Common;
 using System;
 using System.Collections.Generic;

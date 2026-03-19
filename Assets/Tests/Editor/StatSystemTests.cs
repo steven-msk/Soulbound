@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.Stats;
 using System;
 using System.Collections.Generic;

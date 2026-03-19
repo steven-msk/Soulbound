@@ -1,5 +1,6 @@
 using SoulboundBackend.Client.World;
 using SoulboundBackend.Client.World.BlockSystem;
+using SoulboundBackend.Client.World.BlockSystem.States;
 using SoulboundBackend.Client.World.Chunk;
 using SoulboundBackend.Client.World.Generation;
 using System;
@@ -11,7 +12,7 @@ using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
 
-namespace Assets.Scripts.Client.World.Biome {
+namespace SoulboundBackend.Client.World.Generation {
 	public class PlainsBiome : IBiome {
 		private readonly NoiseSampler largeNoise;
 		private readonly NoiseSampler mediumNoise;

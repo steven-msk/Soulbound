@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-namespace SoulboundBackend.Client.UI {
+namespace SoulboundBackend.Client.UI.Tooltips {
 	public interface ITooltipHandle {
 		event Action? onDestroyed;
 		bool isAlive { get; }

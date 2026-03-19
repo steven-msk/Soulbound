@@ -1,6 +1,6 @@
 using SoulboundBackend.Common;
 using SoulboundBackend.Core;
-using SoulboundBackend.Core.Debug.Logging;
+using SoulboundBackend.Client.Debug.Logging;
 using System;
 using UnityEngine.InputSystem;
 

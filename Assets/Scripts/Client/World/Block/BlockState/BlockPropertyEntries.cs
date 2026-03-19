@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SoulboundBackend.Client.World.BlockSystem {
+namespace SoulboundBackend.Client.World.BlockSystem.States {
 	public sealed class BlockPropertyEntries {
 		// note that invalid property states are possible for this configuration
 		private readonly Dictionary<string, object> entries = new();

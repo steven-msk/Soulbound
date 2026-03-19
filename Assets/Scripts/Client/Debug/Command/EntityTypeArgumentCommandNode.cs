@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SoulboundBackend.Core.Debug.Commands {
+namespace SoulboundBackend.Client.Debug.Commands {
 	public class EntityTypeArgumentCommandNode : ArgumentCommandNode<EntityDescriptor> {
 		public EntityTypeArgumentCommandNode(string label, CommandHandler handler = null)
 			: base(label, new EntityDescriptorParser(), handler) {

@@ -1,13 +1,8 @@
-using SoulboundBackend.Client.ItemSystem;
-using SoulboundBackend.Client.UI.Screens;
-using SoulboundBackend.Client.UI.Storage;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SoulboundBackend.Client.ItemSystem.Container;
+using SoulboundBackend.Client.ItemSystem.Container.View;
+using SoulboundBackend.Client.Players;
 
-namespace SoulboundBackend.Client.UI {
+namespace SoulboundBackend.Client.UI.Screens {
 	public sealed class WorldScreen : Screen {
 		private readonly Player player;
 

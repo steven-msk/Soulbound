@@ -2,7 +2,7 @@ using SoulboundBackend.Common.Json;
 using Newtonsoft.Json;
 using UnityEngine;
 
-namespace SoulboundBackend.Common {
+namespace SoulboundBackend.Common.Math {
     [JsonConverter(typeof(BoundsInt2DJsonConverter))]
     public struct BoundsInt2D {
         public int xMin;

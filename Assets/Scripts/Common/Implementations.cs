@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SoulboundBackend.Common {
+namespace SoulboundBackend.Common.Patterns {
 	public static class Implementations {
 
 		public static List<Type> GetAllImplementationsOf<T>() {

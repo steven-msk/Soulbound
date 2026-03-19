@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-namespace SoulboundBackend.Core.Debug.Commands {
+namespace SoulboundBackend.Client.Debug.Commands {
 	public delegate void CommandHandler(CommandParsingContext ctx);
 
 	public abstract class CommandNode {

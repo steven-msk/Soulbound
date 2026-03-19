@@ -10,6 +10,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using UnityEngine;
+using SoulboundBackend.Client.World.Serialization;
+using SoulboundBackend.Client.World.LevelDomain;
 
 public class WorldSaveStrategyTests {
 	private string CreateTempDir() {

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace SoulboundBackend.Client {
+namespace SoulboundBackend.Client.Runtime.Services {
 	public interface IPlayerExecutionService {
 		IInventoryExecutionService Inventory { get; }
 		void SetPos(Vector2 pos);

@@ -2,7 +2,7 @@ using SoulboundBackend.Core;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-namespace SoulboundBackend.Client.World {
+namespace SoulboundBackend.Client.World.LevelDomain {
 	public interface IWorldSceneRoot {
 		Grid grid { get; }
 		Tilemap tilemap { get; }

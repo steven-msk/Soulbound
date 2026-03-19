@@ -1,11 +1,11 @@
-using Assets.Scripts.Core.Debug.Command;
+using SoulboundBackend.Client.World.EntitySystem;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SoulboundBackend.Core.Debug.Commands {
+namespace SoulboundBackend.Client.Debug.Commands {
 	public sealed class EntityParser : ICommandArgumentParser<Guid> {
 		public ParseResult<Guid> TryParse(string token, CommandParsingContext ctx) {
 			if (!Guid.TryParse(token, out Guid guid)) {

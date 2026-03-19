@@ -1,7 +1,7 @@
 using SoulboundBackend.Client.UI.Screens;
 using SoulboundBackend.Core;
 
-namespace SoulboundBackend.Client.UI {
+namespace SoulboundBackend.Client.UI.Screens {
 	public sealed class WorldSessionScreenFactory : IScreenObjectFactory {
 		private readonly IScreenObjectFactory originalFactory;
 	

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace SoulboundBackend.Core {
+namespace SoulboundBackend.Common.Math {
 	public readonly struct Facing {
 		public readonly Vector2 direction;
 		public float x => direction.x;

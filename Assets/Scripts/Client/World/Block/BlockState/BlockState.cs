@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using UnityEngine;
-using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
+using Logger = SoulboundBackend.Client.Debug.Logging.Logger;
 
 #nullable enable
 
-namespace SoulboundBackend.Client.World.BlockSystem {
+namespace SoulboundBackend.Client.World.BlockSystem.States {
 	[JsonConverter(typeof(BlockState.Serializer))]
 	public class BlockState {
 		public Block block { get; }

@@ -1,4 +1,4 @@
-﻿namespace SoulboundBackend.Common {
+namespace SoulboundBackend.Common.Collections {
 	public static class ArrayHelper {
 		public static T[,] CompressTo2D<T>(this T[] input, int rows, int columns) {
 			UnityEngine.Debug.Assert(input.Length == rows * columns);

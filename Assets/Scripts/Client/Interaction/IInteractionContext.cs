@@ -1,11 +1,7 @@
 using SoulboundBackend.Client.World;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SoulboundBackend.Client.World.LevelDomain;
 
-namespace SoulboundBackend.Client {
+namespace SoulboundBackend.Client.Interaction {
 	public interface IInteractionContext {
 		// TODO: find a proper use for IInteractionContext interface to avoid marking
 		Level GetLevel();

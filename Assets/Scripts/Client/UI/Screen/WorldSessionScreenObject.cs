@@ -1,19 +1,19 @@
 using SoulboundBackend.Client.Input;
 using SoulboundBackend.Client.ItemSystem;
+using SoulboundBackend.Client.ItemSystem.Container;
+using SoulboundBackend.Client.ItemSystem.Container.View;
 using SoulboundBackend.Client.UI.Screens;
-using SoulboundBackend.Client.UI.Storage;
+
 using SoulboundBackend.Core;
-using SoulboundBackend.Core.Debug.Logging;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
 using Screen = SoulboundBackend.Client.UI.Screens.Screen;
 
 #nullable enable
 
-namespace SoulboundBackend.Client.UI {
+namespace SoulboundBackend.Client.UI.Screens {
 	[RequireComponent(typeof(RectTransform))]
 	public class WorldSessionScreenObject : ScreenObject, IItemContainerScreenScope, IInputContext {
 		private RectTransform rect = null!;

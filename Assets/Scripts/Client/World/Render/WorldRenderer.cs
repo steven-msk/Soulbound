@@ -1,14 +1,17 @@
 using SoulboundBackend.Client.World.BlockSystem;
+using SoulboundBackend.Client.World.BlockSystem.States;
+using SoulboundBackend.Client.World.BlockSystem.TileEntities;
+using SoulboundBackend.Client.World.LevelDomain;
 using SoulboundBackend.Common;
-using SoulboundBackend.Core.AssetManagement;
-using SoulboundBackend.Core.Resource;
+using SoulboundBackend.Core.Assets;
+
 using System.Resources;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
 #nullable enable
 
-namespace SoulboundBackend.Client.World {
+namespace SoulboundBackend.Client.World.Render {
 	public sealed class WorldRenderer {
 		private readonly Level level;
 		private readonly Tilemap tilemap;

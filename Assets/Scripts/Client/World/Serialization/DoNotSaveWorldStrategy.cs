@@ -14,7 +14,7 @@ using UnityEditor;
 #nullable enable
 
 
-namespace SoulboundBackend.Client.World {
+namespace SoulboundBackend.Client.World.Serialization {
 	public class DoNotSaveWorldStrategy : IWorldSaveStrategy {
 		string IWorldSaveStrategy.GetSavesRoot() => FileUtil.GetUniqueTempPathInProject();
 

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SoulboundBackend.Client {
+namespace SoulboundBackend.Client.Runtime.Services {
 	public interface IRuntimeDataProvider {
 		IRuntimePlayerDataProvider Player { get; }
 		IRuntimeEntityDataProvider Entities { get; }

@@ -1,10 +1,11 @@
 using SoulboundBackend.Client.SettingSystem;
 using SoulboundBackend.Common;
+using SoulboundBackend.Common.Collections;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
-using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
+using Logger = SoulboundBackend.Client.Debug.Logging.Logger;
 
 namespace SoulboundBackend.Client.Input {
 	public sealed class InputManager {

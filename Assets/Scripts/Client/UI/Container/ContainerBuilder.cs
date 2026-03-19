@@ -1,4 +1,6 @@
 using SoulboundBackend.Client.UI;
+using SoulboundBackend.Client.UI.Frames;
+using SoulboundBackend.Client.UI.Layouts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Assets.Scripts.Client.UI.Container {
+namespace SoulboundBackend.Client.UI.Containers {
 	public sealed class ContainerBuilder {
 		private readonly IUILayoutController layout;
 		private readonly IUIFrame frame;

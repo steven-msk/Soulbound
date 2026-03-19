@@ -3,20 +3,23 @@ using SoulboundBackend.Client.UI.Screens;
 using SoulboundBackend.Client.World;
 using SoulboundBackend.Common;
 using SoulboundBackend.Common.Json;
-using SoulboundBackend.Core.AssetManagement;
-using SoulboundBackend.Core.Resource;
+using SoulboundBackend.Core.Assets;
+
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
+using Logger = SoulboundBackend.Client.Debug.Logging.Logger;
 using Cysharp.Threading.Tasks;
 using System;
 using SoulboundBackend.Client.UI;
+using SoulboundBackend.Client.World.Serialization;
+using SoulboundBackend.Client.World.Render;
+using SoulboundBackend.Core;
 
 #nullable enable
 
-namespace SoulboundBackend.Core {
+namespace SoulboundBackend.Client.World.LevelDomain {
 	public class LevelManager : IInputContext {
 		public const float tickRate = 0.02f;        // 50 tps
 		private float tickStartTime;

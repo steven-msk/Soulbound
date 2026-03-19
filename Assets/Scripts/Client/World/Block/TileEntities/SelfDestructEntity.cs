@@ -1,3 +1,4 @@
+using SoulboundBackend.Client.World.LevelDomain;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core;
 using System;
@@ -6,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SoulboundBackend.Client.World.BlockSystem {
+namespace SoulboundBackend.Client.World.BlockSystem.TileEntities {
 	[PROTOTYPICAL]
 	public sealed class SelfDestructEntity : TileEntity, ITickable {
 		const int TICKS_UNTIL_DESTRUCT = 300;

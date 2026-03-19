@@ -7,7 +7,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SoulboundBackend.Client.UI {
+namespace SoulboundBackend.Client.UI.Layouts {
 	public interface IHorizontalOrVerticalLayoutBuilder<T> where T : HorizontalOrVerticalLayoutGroup {
 		HorizontalOrVerticalLayout<T> Padding(RectOffset padding);
 		HorizontalOrVerticalLayout<T> Spacing(float spacing);

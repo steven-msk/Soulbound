@@ -1,21 +1,16 @@
-using Assets.Scripts.Core.Debug.Command;
+using SoulboundBackend.Client.Debug.Logging;
 using SoulboundBackend.Client.ItemSystem;
-using SoulboundBackend.Client.UI.Storage;
-using SoulboundBackend.Client.World;
 using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Client.World.EntitySystem;
-using SoulboundBackend.Core.Debug.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
+using Logger = SoulboundBackend.Client.Debug.Logging.Logger;
 
 #nullable enable
 
-namespace SoulboundBackend.Core.Debug.Commands {
+namespace SoulboundBackend.Client.Debug.Commands {
 	public sealed class WorldSessionCommands : ICommandProvider {
 		private readonly CommandNode teleport = TeleportCommand();
 		private readonly CommandNode setblock = CommandBuilder.Literal("setblock")

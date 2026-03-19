@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-namespace SoulboundBackend.Client.World {
+namespace SoulboundBackend.Client.World.Serialization {
 	public sealed class WorldSerializationService {
 		private readonly IWorldSaveStrategy saveStrategy;
 		private readonly ISerializationPipeline<WorldDump> pipeline;

@@ -13,7 +13,7 @@ using UnityEngine.UI;
 
 #nullable enable
 
-namespace SoulboundBackend.Client.UI {
+namespace SoulboundBackend.Client.UI.Tooltips {
 	[PROTOTYPICAL]
 	public class ItemTooltip : ITooltip {
 		private readonly string title;

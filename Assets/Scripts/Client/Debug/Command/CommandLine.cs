@@ -1,20 +1,13 @@
-using Cysharp.Threading.Tasks;
-using Cysharp.Threading.Tasks.Triggers;
-using SoulboundBackend.Client.Input;
+using SoulboundBackend.Client.Debug.Commands;
+using SoulboundBackend.Client.Debug.Commands.View;
 using SoulboundBackend.Client.UI;
-using SoulboundBackend.Core.Debug.Commands;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TMPro;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-namespace SoulboundBackend.Core.Debug {
+namespace SoulboundBackend.Client.Debug {
 	public sealed class CommandLine : ToggleableOverlay<UIHandledOverlayNode<ICommandLineHandler>> {
 		private readonly CommandProcessor commandProcessor;
 		private readonly List<string> history = new();

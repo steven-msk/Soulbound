@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 
-namespace SoulboundBackend.Client.UI {
+namespace SoulboundBackend.Client.UI.Tooltips {
 	[PROTOTYPICAL]
 	public class Tooltip : ITooltip {
 		private readonly string text;

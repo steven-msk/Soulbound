@@ -1,9 +1,10 @@
 using SoulboundBackend.Client.World.Chunk;
+using SoulboundBackend.Client.World.LevelDomain;
 using SoulboundBackend.Core;
 using System;
 using UnityEngine;
 
-namespace SoulboundBackend.Client.World {
+namespace SoulboundBackend.Client.World.BlockSystem {
     public struct BlockPos {
         public int x;
         public int y;

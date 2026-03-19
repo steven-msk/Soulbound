@@ -1,4 +1,5 @@
 using SoulboundBackend.Common;
+using SoulboundBackend.Common.Unity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SoulboundBackend.Client.UI {
+namespace SoulboundBackend.Client.UI.Layouts {
 	public class HorizontalOrVerticalLayout<T> : IUILayoutController, IHorizontalOrVerticalLayoutBuilder<T> where T : HorizontalOrVerticalLayoutGroup {
 		private RectOffset padding = new(0, 0, 0, 0);
 		private float spacing = 0f;

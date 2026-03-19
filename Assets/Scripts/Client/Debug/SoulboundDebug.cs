@@ -1,17 +1,13 @@
-using Assets.Scripts.Core.Debug;
+using SoulboundBackend.Client.Debug.Commands;
+using SoulboundBackend.Client.Debug.Logging.Console;
+using SoulboundBackend.Client.Debug.Metrics;
+using SoulboundBackend.Client.Debug.Metrics.View;
 using SoulboundBackend.Client.Input;
-using SoulboundBackend.Core.Debug.Commands;
-using SoulboundBackend.Core.Debug.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using Logger = SoulboundBackend.Core.Debug.Logging.Logger;
+using Logger = SoulboundBackend.Client.Debug.Logging.Logger;
 
-namespace SoulboundBackend.Core.Debug {
+namespace SoulboundBackend.Client.Debug {
 	public sealed class SoulboundDebug : IInputContext {
 		int IInputContext.priority => int.MaxValue;
 		private readonly DebugConsole console;

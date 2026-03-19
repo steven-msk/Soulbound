@@ -1,5 +1,8 @@
 using SoulboundBackend.Client.UI;
+using SoulboundBackend.Client.UI.Containers;
+using SoulboundBackend.Client.UI.Tooltips;
 using SoulboundBackend.Common;
+using SoulboundBackend.Common.Unity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace SoulboundBackend.Client.UI {
+namespace SoulboundBackend.Client.UI.Buttons {
 	public class ButtonBuilder : IUIElementHandleBuilder<IButtonHandle>, ITooltipComponentBuilder<ButtonBuilder> {
 		private readonly IUIElementTemplate<ButtonHandle> template;
 		private string text;

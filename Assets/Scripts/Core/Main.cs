@@ -1,20 +1,22 @@
 using SoulboundBackend.Core;
-using SoulboundBackend.Core.Resource;
+
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public sealed class Main : MonoBehaviour {
-	[SerializeField] private GameConfig gameConfig;
-	private static Main instance;
+namespace SoulboundBackend.Core {
+	public sealed class Main : MonoBehaviour {
+		[SerializeField] private GameConfig gameConfig;
+		private static Main instance;
 
-	private void Awake() => instance = this;
+		private void Awake() => instance = this;
 
-	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-	public static void GameLaunch() {
-		if (Application.isEditor && SceneManager.GetActiveScene().name != instance?.gameConfig.dev.devScene
-				|| (!instance?.gameObject.activeSelf ?? true)) {
-			return;
+		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+		public static void GameLaunch() {
+			if (Application.isEditor && SceneManager.GetActiveScene().name != instance?.gameConfig.dev.devScene
+					|| (!instance?.gameObject.activeSelf ?? true)) {
+				return;
+			}
+			new Soulbound(instance.gameConfig).Launch();
 		}
-		new Soulbound(instance.gameConfig).Launch();
 	}
 }

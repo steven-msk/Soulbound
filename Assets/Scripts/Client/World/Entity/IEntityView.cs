@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Assets.Scripts.Core.Debug.Command {
+namespace SoulboundBackend.Client.World.EntitySystem {
 	public interface IEntityView {
 		Guid GetGuid();
 		string GetID();

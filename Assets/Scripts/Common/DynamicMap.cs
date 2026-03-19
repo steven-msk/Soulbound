@@ -1,9 +1,9 @@
-using SoulboundBackend.Core.Debug.Logging;
+using SoulboundBackend.Client.Debug.Logging;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace SoulboundBackend.Common {
+namespace SoulboundBackend.Common.Collections {
 	public class DynamicMap<T> : Dictionary<string, T> {
 		public DynamicMap() : base(StringComparer.OrdinalIgnoreCase) {
 		}

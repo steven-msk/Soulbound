@@ -1,14 +1,7 @@
-using SoulboundBackend.Client.UI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
-using GridLayout = SoulboundBackend.Client.UI.GridLayout;
 
-namespace Assets.Scripts.Client.UI.Layout {
+namespace SoulboundBackend.Client.UI.Layouts {
 	public interface IGridLayoutBuilder {
 		GridLayout Padding(RectOffset padding);
 		GridLayout CellSize(Vector2 cellSize);

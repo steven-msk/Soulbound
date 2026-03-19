@@ -1,5 +1,5 @@
-using Assets.Scripts.Client.UI.Layout;
 using SoulboundBackend.Common;
+using SoulboundBackend.Common.Unity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SoulboundBackend.Client.UI {
+namespace SoulboundBackend.Client.UI.Layouts {
 	public class GridLayout : IUILayoutController, IGridLayoutBuilder {
 		private RectOffset padding = new(0, 0, 0, 0);
 		private Vector2 cellSize = new(100f, 100f);

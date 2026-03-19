@@ -1,9 +1,11 @@
+using SoulboundBackend.Client.World.BlockSystem.States;
 using SoulboundBackend.Client.World.Chunk;
+using SoulboundBackend.Client.World.LevelDomain;
 using System;
 using System.Collections.Generic;
 using UnityEngine.Tilemaps;
 
-namespace SoulboundBackend.Client.World.BlockSystem {
+namespace SoulboundBackend.Client.World.BlockSystem.TileEntities {
 	public abstract class TileEntity {
 		protected readonly Level level;
 		public readonly BlockPos blockPos;

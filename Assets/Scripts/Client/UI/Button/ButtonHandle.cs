@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 
-namespace SoulboundBackend.Client.UI {
+namespace SoulboundBackend.Client.UI.Buttons {
 	[PROTOTYPICAL]
 	public class ButtonHandle : MonoBehaviour, IButtonHandle {
 		[SerializeField] private UnityEngine.UI.Button button;

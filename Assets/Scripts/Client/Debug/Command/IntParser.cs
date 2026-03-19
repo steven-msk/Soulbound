@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SoulboundBackend.Core.Debug.Commands {
+namespace SoulboundBackend.Client.Debug.Commands {
 	public sealed class IntParser : ICommandArgumentParser<int> {
 		public ParseResult<int> TryParse(string token, CommandParsingContext ctx) {
 			return int.TryParse(token, out int value)

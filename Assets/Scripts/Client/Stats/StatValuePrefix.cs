@@ -1,5 +1,5 @@
 
-using SoulboundBackend.Core.Debug.Logging;
+using SoulboundBackend.Client.Debug.Logging;
 using System;
 
 namespace SoulboundBackend.Client.Stats {

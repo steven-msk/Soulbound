@@ -1,16 +1,7 @@
+using SoulboundBackend.Client.UI.Containers;
+using SoulboundBackend.Client.UI.Layouts;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core;
-using SoulboundBackend.Core.AssetManagement;
-using SoulboundBackend.Core.Resource;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 namespace SoulboundBackend.Client.UI.Screens {
 	[PROTOTYPICAL]

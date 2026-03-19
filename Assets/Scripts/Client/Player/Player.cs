@@ -1,19 +1,21 @@
 using SoulboundBackend.Client.Input;
+using SoulboundBackend.Client.Interaction;
 using SoulboundBackend.Client.ItemSystem;
-using SoulboundBackend.Client.UI.Storage;
-using SoulboundBackend.Client.World;
+using SoulboundBackend.Client.ItemSystem.Container;
 using SoulboundBackend.Client.World.BlockSystem;
+using SoulboundBackend.Client.World.BlockSystem.States;
 using SoulboundBackend.Client.World.EntitySystem;
+using SoulboundBackend.Client.World.EntitySystem.Transform;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core;
-using SoulboundBackend.Core.AssetManagement;
-using SoulboundBackend.Core.Resource;
+using SoulboundBackend.Core.Assets;
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 #nullable enable
 
-namespace SoulboundBackend.Client {
+namespace SoulboundBackend.Client.Players {
 	public class Player : Entity, IInputContext, IFrameUpdatableEntity, IInteractionHandler<ItemInteraction>, IInteractionHandler<BlockInteraction> {
 		private static readonly AssetKey playerKey = new("player");
 		private static readonly EntityDescriptor DESCRIPTOR = new("player", null);

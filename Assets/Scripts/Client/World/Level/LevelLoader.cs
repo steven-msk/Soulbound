@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using SoulboundBackend.Client.World.Generation;
 using SoulboundBackend.Core;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.ResourceManagement.Exceptions;
 
-namespace SoulboundBackend.Client.World {
+namespace SoulboundBackend.Client.World.LevelDomain {
 	public sealed class LevelLoader {
 		private readonly ISeedProvider seedProvider;
 

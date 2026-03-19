@@ -1,4 +1,4 @@
-﻿using SoulboundBackend.Client.World.Generation;
+using SoulboundBackend.Client.World.Generation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 #nullable enable
 
-namespace Assets.Scripts.Client.World.Biome {
+namespace SoulboundBackend.Client.World.Generation {
 	public struct ChunkBiomePartition {
 		public IBiome primary;
 		public IBiome? secondary;
