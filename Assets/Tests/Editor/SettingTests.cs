@@ -152,10 +152,10 @@ namespace SettingTests {
 
 		[SetUp]
 		public void Setup() {
-			tempDir = Path.Combine(Path.GetTempPath(), "SoulboundTests");
+			tempDir = Path.Combine(Path.GetTempPath(), "SoulboundTests", Guid.NewGuid().ToString());
 			Directory.CreateDirectory(tempDir);
 			tempPath = Path.Combine(tempDir, "settings.txt");
-			File.Delete(tempPath);
+			File.Create(tempPath).Close();
 		}
 
 		[TearDown]
@@ -308,7 +308,8 @@ namespace SettingTests {
 
 		[Test]
 		public void SettingWriter_WritesCorrectFormat() {
-			var entry = new SettingEntry<int>("", "fmtsi.int", 7, new IntRange(0, 10), null);
+			const string key = "fmtsi.int";
+			var entry = new SettingEntry<int>("", key, 7, new IntRange(0, 10), null);
 
 			using (var writer = new StreamWriter(tempPath)) {
 				new SettingWriter(writer).Process(entry);
@@ -316,18 +317,15 @@ namespace SettingTests {
 
 			string line = File.ReadAllText(tempPath).Trim();
 
-			Assert.That(line, Is.EqualTo("fmtsi.int=7"));
+			Assert.That(line, Is.EqualTo($"{key}={7}"));
 		}
 
 		[Test]
 		public void SettingReader_IgnoresEmptyLinesAndWhiteSpace() {
 			const int fileValue = 55;
-			File.WriteAllText(tempPath, @$"
-        
-fmtsi.value={fileValue}
-
-".Trim());
-			var entry = new SettingEntry<int>("", "fmtsi.value", 0, new IntRange(0, 10), null);
+			const string key = "fmtsi.value";
+			File.WriteAllText(tempPath, $"\n\n       {key}={fileValue}    \n \n");
+			var entry = new SettingEntry<int>("", key, 0, new IntRange(0, 10), null);
 
 			using (var reader = new StreamReader(tempPath)) {
 				int result = new SettingReader(reader).Process(entry);

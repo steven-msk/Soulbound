@@ -1,4 +1,5 @@
-﻿using System;
+using SoulboundBackend.Client.Debug.Logging;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,8 +14,16 @@ namespace SoulboundBackend.Client.SettingSystem {
 
 		public SettingReader(StreamReader reader) {
 			while (!reader.EndOfStream) {
-				string[] parts = reader.ReadLine().Split('=');
-				mappings[parts[0]] = parts[1];
+				string line = reader.ReadLine();
+				string trimmed = line.Trim();
+				if (string.IsNullOrEmpty(trimmed)) continue;
+
+				string[] parts = trimmed.Split('=');
+				if (parts.Length < 2) continue;
+
+				string key = parts[0];
+				string value = parts[1];
+				mappings[key] = value;
 			}
 		}
 
