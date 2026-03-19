@@ -16,11 +16,20 @@ static class ScreenTestUtils {
 }
 
 public class ScreenManagerTests {
+	private ScreenManager manager;
+
+	private class FakeScreenRoot : IScreenRoot {
+		public void AttachScreenObject(GameObject screenObject) {
+		}
+	}
+
+	[SetUp]
+	public void Setup() {
+		manager = new ScreenManager(new FakeScreenRoot());
+	}
+
 	[Test]
 	public void PushScreen_HidesPreviousScreen() {
-		Transform root = new GameObject("root").transform;
-		ScreenManager manager = new(root);
-
 		var (screenA, objA) = ScreenTestUtils.CreateScreen(manager);
 		var (screenB, objB) = ScreenTestUtils.CreateScreen(manager);
 
@@ -33,9 +42,6 @@ public class ScreenManagerTests {
 
 	[Test]
 	public void PushScreen_ShowsNewScreen() {
-		Transform root = new GameObject("root").transform;
-		ScreenManager manager = new(root);
-
 		var (screen, obj) = ScreenTestUtils.CreateScreen(manager);
 		manager.PushScreen(screen);
 
@@ -45,9 +51,6 @@ public class ScreenManagerTests {
 
 	[Test]
 	public void PopScreen_DisposesTopScreen() {
-		Transform root = new GameObject("root").transform;
-		ScreenManager manager = new(root);
-
 		var (screen, obj) = ScreenTestUtils.CreateScreen(manager);
 		manager.PushScreen(screen);
 
@@ -59,9 +62,6 @@ public class ScreenManagerTests {
 
 	[Test]
 	public void PopScreen_ShowsPreviousScreen() {
-		Transform root = new GameObject("root").transform;
-		ScreenManager manager = new(root);
-
 		var (screenA, objA) = ScreenTestUtils.CreateScreen(manager);
 		var (screenB, _) = ScreenTestUtils.CreateScreen(manager);
 
@@ -75,18 +75,12 @@ public class ScreenManagerTests {
 
 	[Test]
 	public void PopScreen_ReturnsFalse_WhenEmpty() {
-		Transform root = new GameObject("root").transform;
-		ScreenManager manager = new(root);
-
 		bool popped = manager.PopScreen();
 		Assert.IsFalse(popped);
 	}
 
 	[Test]
 	public void ReplaceScreen_DisposesOldAndShowsNew() {
-		Transform root = new GameObject("root").transform;
-		ScreenManager manager = new(root);
-
 		var (screenA, objA) = ScreenTestUtils.CreateScreen(manager);
 		var (screenB, objB) = ScreenTestUtils.CreateScreen(manager);
 
@@ -99,9 +93,6 @@ public class ScreenManagerTests {
 
 	[Test]
 	public void GetActiveScreen_ReturnsTopScreen() {
-		Transform root = new GameObject("root").transform;
-		ScreenManager manager = new(root);
-
 		var (screenA, _) = ScreenTestUtils.CreateScreen(manager);
 		var (screenB, _) = ScreenTestUtils.CreateScreen(manager);
 
@@ -113,17 +104,11 @@ public class ScreenManagerTests {
 
 	[Test]
 	public void GetActiveScreen_ReturnsNull_WhenEmpty() {
-		Transform root = new GameObject("root").transform;
-		ScreenManager manager = new(root);
-
 		Assert.That(manager.GetActiveScreen(), Is.Null);
 	}
 
 	[Test]
 	public void Flush_DisposesAllScreens() {
-		Transform root = new GameObject("root").transform;
-		ScreenManager manager = new(root);
-
 		var (screenA, objA) = ScreenTestUtils.CreateScreen(manager);
 		var (screenB, objB) = ScreenTestUtils.CreateScreen(manager);
 
@@ -138,9 +123,6 @@ public class ScreenManagerTests {
 
 	[Test]
 	public void Flush_LeavesManagerEmpty() {
-		Transform root = new GameObject("root").transform;
-		ScreenManager manager = new(root);
-
 		manager.Flush();
 
 		Assert.That(manager.GetActiveScreen(), Is.Null);

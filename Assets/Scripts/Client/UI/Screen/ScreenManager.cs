@@ -11,10 +11,10 @@ using UnityEngine;
 namespace SoulboundBackend.Client.UI.Screens {
 	public sealed class ScreenManager : IScreenObjectFactory, IScreenNavigator {
 		private readonly Stack<ScreenEntry> stack = new();
-		private readonly Transform rootTransform;
+		private readonly IScreenRoot root;
 
-		public ScreenManager(Transform rootTransform) {
-			this.rootTransform = rootTransform;
+		public ScreenManager(IScreenRoot root) {
+			this.root = root;
 		}
 
 		public void PushScreen(Screen screen) {
@@ -62,7 +62,7 @@ namespace SoulboundBackend.Client.UI.Screens {
 
 		GameObject IScreenObjectFactory.CreateGameObject() {
 			GameObject obj = new("Screen Object", typeof(RectTransform));
-			obj.transform.SetParent(rootTransform, false);
+			root.AttachScreenObject(obj);
 
 			// default screen layout
 			RectTransform rectTransform = obj.GetComponent<RectTransform>();

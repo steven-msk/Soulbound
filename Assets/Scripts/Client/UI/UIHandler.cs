@@ -19,12 +19,14 @@ namespace SoulboundBackend.Client.UI {
 		private readonly GUI gui;
 		private Canvas canvas;
 		private ScreenManager screenManager;
+		private IScreenRoot screenRoot;
 		private readonly List<UIOverlayNode> overlays = new();
 
 		public UIHandler(Canvas initialCanvas) {
 			gui = new GUI();
 			canvas = initialCanvas;
-			screenManager = new ScreenManager(canvas.transform);
+			screenRoot = new ScreenRoot(canvas.transform);
+			screenManager = new ScreenManager(screenRoot);
 		}
 
 		public void SetCanvas(Canvas canvas) {
@@ -33,7 +35,8 @@ namespace SoulboundBackend.Client.UI {
 			overlays.Clear();
 
 			this.canvas = canvas;
-			screenManager = new ScreenManager(canvas.transform);
+			screenRoot = new ScreenRoot(canvas.transform);
+			screenManager = new ScreenManager(screenRoot);
 		}
 
 		public Canvas GetCanvas() => canvas;
