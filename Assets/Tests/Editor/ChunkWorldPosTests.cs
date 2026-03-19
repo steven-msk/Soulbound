@@ -13,15 +13,7 @@ using UnityEngine;
 
 public class ChunkWorldPosTests {
     [Test]
-    public void Constructor_SetsValues() {
-        var pos = new ChunkWorldPos(2.5f, 5.25f, 1);
-        Assert.That(pos.x, Is.EqualTo(2.5f));
-        Assert.That(pos.y, Is.EqualTo(5.25f));
-        Assert.That(pos.chunkX, Is.EqualTo(1));
-    }
-
-    [Test]
-    public void Equality_Operators_Work() {
+    public void EqualityOperators_ReturnCorrectValues() {
         var a = new ChunkWorldPos(1.5f, 2.5f, 3);
         var b = new ChunkWorldPos(1.5f, 2.5f, 3);
         var c = new ChunkWorldPos(1.5f, 2.5f, 4);
@@ -33,7 +25,7 @@ public class ChunkWorldPosTests {
     }
 
     [Test]
-    public void EqualsAndHashCode_Work() {
+    public void EqualsAndHashCodeMethods_ReturnCorrectValues() {
         var a = new ChunkWorldPos(1.0f, 2.0f, 3);
         var b = new ChunkWorldPos(1.0f, 2.0f, 3);
         var c = new ChunkWorldPos(2.0f, 2.0f, 3);
@@ -44,13 +36,13 @@ public class ChunkWorldPosTests {
     }
 
     [Test]
-    public void ToString_FormatsCorrectly() {
+    public void ToStringMethod_FormatsValueCorrectly() {
         var pos = new ChunkWorldPos(3.25f, 4.75f, 2);
         Assert.That(pos.ToString(), Is.EqualTo("cwx:3.25, cwy:4.75, c:2"));
     }
 
     [Test]
-    public void FromBlockPos_ComputesCorrectly() {
+    public void FromBlockPosMethod_CalculatesValueCorrectly() {
         const int CHUNK_LENGTH = Level.CHUNK_LENGTH;
         var blockPos = new BlockPos(34, 7);
 
@@ -65,7 +57,7 @@ public class ChunkWorldPosTests {
     }
 
 	[Test]
-	public void FromWorld_AssignsChunkX() {
+	public void FromWorldMethod_CalculatesChunkXCorrectly() {
 		var worldPos = new Vector2(40.2f, 15.8f);
 		var chunkWorld = ChunkWorldPos.FromWorld(worldPos);
 

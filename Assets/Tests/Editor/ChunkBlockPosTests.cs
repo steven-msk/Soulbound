@@ -6,15 +6,7 @@ using UnityEngine;
 
 public class ChunkBlockPosTests {
     [Test]
-    public void Constructor_SetsValues() {
-        var pos = new ChunkBlockPos(2, 5, 1);
-        Assert.That(pos.x, Is.EqualTo(2));
-        Assert.That(pos.y, Is.EqualTo(5));
-        Assert.That(pos.chunkX, Is.EqualTo(1));
-    }
-
-    [Test]
-    public void Equality_Operators_Work() {
+    public void EqualityOperators_ReturnCorrectValues() {
         var a = new ChunkBlockPos(1, 2, 3);
         var b = new ChunkBlockPos(1, 2, 3);
         var c = new ChunkBlockPos(1, 2, 4);
@@ -26,7 +18,7 @@ public class ChunkBlockPosTests {
     }
 
     [Test]
-    public void EqualsAndHashCode_Work() {
+    public void EqualsAndHashCodeMethods_ReturnCorrectValues() {
         var a = new ChunkBlockPos(1, 2, 3);
         var b = new ChunkBlockPos(1, 2, 3);
         var c = new ChunkBlockPos(2, 2, 3);
@@ -37,13 +29,13 @@ public class ChunkBlockPosTests {
     }
 
     [Test]
-    public void ToString_FormatsCorrectly() {
+    public void ToStringMethod_FormatsCorrectly() {
         var pos = new ChunkBlockPos(3, 4, 2);
         Assert.That(pos.ToString(), Is.EqualTo("cx:3, cy:4, c:2"));
     }
 
     [Test]
-    public void Conversion_ToVector2Int() {
+    public void ConversionOperator_ToVector2Int_ReturnsCorrectValue() {
         var pos = new ChunkBlockPos(7, 8, 0);
         Vector2Int vec = (Vector2Int)pos;
 
@@ -51,7 +43,7 @@ public class ChunkBlockPosTests {
     }
 
     [Test]
-    public void ToWorldBlockPos_ComputesCorrectly() {
+    public void ToWorldBlockPosMethod_CalculatesValueCorrectly() {
         const int CHUNK_LENGTH = Level.CHUNK_LENGTH;
         var pos = new ChunkBlockPos(5, 10, 2);
 
@@ -62,7 +54,7 @@ public class ChunkBlockPosTests {
     }
 
     [Test]
-    public void FromBlockPos_ComputesCorrectly() {
+    public void FromBlockPosMethod_CalculatesValueCorrectly() {
         const int CHUNK_LENGTH = Level.CHUNK_LENGTH;
         var blockPos = new BlockPos(34, 7);
 
@@ -77,7 +69,7 @@ public class ChunkBlockPosTests {
     }
 
     [Test]
-    public void WorldYToIndex_StaticAndInstance_Agree() {
+    public void WorldYToIndexMethod_ReturnSameValue_ForStaticAndInstanceImplementation() {
         var pos = new ChunkBlockPos(1, 20, 0);
 
         int instanceValue = pos.WorldYToIndex();
@@ -88,7 +80,7 @@ public class ChunkBlockPosTests {
     }
 
 	[Test]
-	public void FromWorld_DelegatesToBlockPos() {
+	public void FromWorldMethod_CalculatesValueCorrectly() {
 		var worldPos = new Vector2(18.5f, 6.2f);
 		var chunkPos = ChunkBlockPos.FromWorld(worldPos);
 

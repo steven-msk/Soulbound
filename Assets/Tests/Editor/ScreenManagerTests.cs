@@ -29,7 +29,7 @@ public class ScreenManagerTests {
 	}
 
 	[Test]
-	public void PushScreen_HidesPreviousScreen() {
+	public void PushScreenMethod_HidesPreviousScreen() {
 		var (screenA, objA) = ScreenTestUtils.CreateScreen(manager);
 		var (screenB, objB) = ScreenTestUtils.CreateScreen(manager);
 
@@ -41,7 +41,7 @@ public class ScreenManagerTests {
 	}
 
 	[Test]
-	public void PushScreen_ShowsNewScreen() {
+	public void PushScreenMethod_ShowsNewScreen() {
 		var (screen, obj) = ScreenTestUtils.CreateScreen(manager);
 		manager.PushScreen(screen);
 
@@ -50,7 +50,7 @@ public class ScreenManagerTests {
 	}
 
 	[Test]
-	public void PopScreen_DisposesTopScreen() {
+	public void PopScreenMethod_DisposesTopScreen() {
 		var (screen, obj) = ScreenTestUtils.CreateScreen(manager);
 		manager.PushScreen(screen);
 
@@ -61,7 +61,7 @@ public class ScreenManagerTests {
 	}
 
 	[Test]
-	public void PopScreen_ShowsPreviousScreen() {
+	public void PopScreenMethod_ShowsPreviousScreen() {
 		var (screenA, objA) = ScreenTestUtils.CreateScreen(manager);
 		var (screenB, _) = ScreenTestUtils.CreateScreen(manager);
 
@@ -74,13 +74,13 @@ public class ScreenManagerTests {
 	}
 
 	[Test]
-	public void PopScreen_ReturnsFalse_WhenEmpty() {
+	public void PopScreenMethod_ReturnsFalse_WhenEmpty() {
 		bool popped = manager.PopScreen();
 		Assert.IsFalse(popped);
 	}
 
 	[Test]
-	public void ReplaceScreen_DisposesOldAndShowsNew() {
+	public void ReplaceScreenMethod_DisposesOldAndShowsNew() {
 		var (screenA, objA) = ScreenTestUtils.CreateScreen(manager);
 		var (screenB, objB) = ScreenTestUtils.CreateScreen(manager);
 
@@ -92,7 +92,7 @@ public class ScreenManagerTests {
 	}
 
 	[Test]
-	public void GetActiveScreen_ReturnsTopScreen() {
+	public void GetActiveScreenMethod_ReturnsTopScreen() {
 		var (screenA, _) = ScreenTestUtils.CreateScreen(manager);
 		var (screenB, _) = ScreenTestUtils.CreateScreen(manager);
 
@@ -103,12 +103,12 @@ public class ScreenManagerTests {
 	}
 
 	[Test]
-	public void GetActiveScreen_ReturnsNull_WhenEmpty() {
+	public void GetActiveScreenMethod_ReturnsNull_WhenEmpty() {
 		Assert.That(manager.GetActiveScreen(), Is.Null);
 	}
 
 	[Test]
-	public void Flush_DisposesAllScreens() {
+	public void FlushMethod_DisposesAllScreens() {
 		var (screenA, objA) = ScreenTestUtils.CreateScreen(manager);
 		var (screenB, objB) = ScreenTestUtils.CreateScreen(manager);
 
@@ -122,7 +122,7 @@ public class ScreenManagerTests {
 	}
 
 	[Test]
-	public void Flush_LeavesManagerEmpty() {
+	public void FlushMethod_LeavesManagerEmpty() {
 		manager.Flush();
 
 		Assert.That(manager.GetActiveScreen(), Is.Null);

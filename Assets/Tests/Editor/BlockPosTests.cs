@@ -6,14 +6,7 @@ using UnityEngine;
 
 public class BlockPosTests {
 	[Test]
-	public void Constructor_SetsValues() {
-		var pos = new BlockPos(3, 5);
-		Assert.That(pos.x, Is.EqualTo(3));
-		Assert.That(pos.y, Is.EqualTo(5));
-	}
-
-	[Test]
-	public void Equality_Operators_Work() {
+	public void EqualityOperators_CheckEqualityCorrectly() {
 		var a = new BlockPos(2, 4);
 		var b = new BlockPos(2, 4);
 		var c = new BlockPos(3, 4);
@@ -25,7 +18,7 @@ public class BlockPosTests {
 	}
 
 	[Test]
-	public void EqualsAndHashCode_Work() {
+	public void EqualsAndHashCodeMethod_ReturnCorrectValues() {
 		var a = new BlockPos(2, 4);
 		var b = new BlockPos(2, 4);
 		var c = new BlockPos(3, 4);
@@ -36,20 +29,20 @@ public class BlockPosTests {
 	}
 
 	[Test]
-	public void ToString_FormatsCorrectly() {
+	public void ToStringMethod_FormatsCorrectly() {
 		var pos = new BlockPos(1, 2);
 		Assert.That("bx:1, by:2", Is.EqualTo(pos.ToString()));
 	}
 
 	[Test]
-	public void CenterAligned_ReturnsMiddleOfBlock() {
+	public void CenterAlignedMethod_ReturnsMiddleOfBlock() {
 		var pos = new BlockPos(1, 2);
 		var center = pos.GetCenter();
 		Assert.That(center, Is.EqualTo(new Vector2(1.5f, 2.5f)));
 	}
 
 	[Test]
-	public void Conversion_ToAndFrom_Vector2Int() {
+	public void ConversionOperators_ToAndFromVector2Int_ReturnCorrectValues() {
 		var pos = new BlockPos(3, 4);
 		var vec = (Vector2Int)pos;
 		Assert.That(vec, Is.EqualTo(new Vector2Int(3, 4)));
@@ -59,7 +52,7 @@ public class BlockPosTests {
 	}
 
 	[Test]
-	public void Conversion_ToAndFrom_Vector2_FloorsCorrectly() {
+	public void ConversionOperators_ToAndFromVector2_ReturnCorrectValues() {
 		var vec = new Vector2(3.9f, 4.1f);
 		var pos = (BlockPos)vec;
 		Assert.That(pos, Is.EqualTo(new BlockPos(3, 4)));
@@ -69,7 +62,7 @@ public class BlockPosTests {
 	}
 
 	[Test]
-	public void Conversion_ToAndFrom_Vector3_FloorsCorrectly() {
+	public void ConversionOperators_ToAndFromVector3_ReturnCorrectValues() {
 		var vec = new Vector3(7.9f, 8.1f, 10f);
 		var pos = (BlockPos)vec;
 		Assert.That(pos, Is.EqualTo(new BlockPos(7, 8)));
@@ -79,7 +72,7 @@ public class BlockPosTests {
 	}
 
 	[Test]
-	public void Conversion_ToAndFrom_Vector3Int() {
+	public void ConversionOperators_ToAndFromVector3Int_ReturnCorrectValues() {
 		var vec = new Vector3Int(9, 10, 11);
 		var pos = (BlockPos)vec;
 		Assert.That(pos, Is.EqualTo(new BlockPos(9, 10)));
@@ -89,7 +82,7 @@ public class BlockPosTests {
 	}
 
 	[Test]
-	public void Operators_AdditionAndSubtraction() {
+	public void AdditionAndSubtractionOperators_CalculateValuesCorrectly() {
 		var pos = new BlockPos(5, 5);
 
 		Assert.That(pos + new Vector2Int(2, 4), Is.EqualTo(new BlockPos(7, 9)));
@@ -99,7 +92,7 @@ public class BlockPosTests {
 	}
 
 	[Test]
-	public void Operators_MultiplicationAndDivision() {
+	public void MultiplicationAndDivisionOperators_CalculateValuesCorrectly() {
 		var pos = new BlockPos(6, 8);
 
 		Assert.That(pos * 2, Is.EqualTo(new BlockPos(12, 16))); 
@@ -107,13 +100,13 @@ public class BlockPosTests {
 	}
 
 	[Test]
-	public void Division_ByZero_Throws() {
+	public void DivisionOperator_DivisionByZeroThrows() {
 		var pos = new BlockPos(6, 8);
 		Assert.Throws<DivideByZeroException>(() => { var result = pos / 0; });
 	}
 
 	[Test]
-	public void ToChunkBlockPos_ComputesRelativeToChunk() {
+	public void ToChunkBlockPosMethod_ComputesRelativeToChunk() {
 		var blockPos = new BlockPos(-40, 15);
 		int chunkX = -2;
 

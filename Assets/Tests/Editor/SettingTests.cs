@@ -166,7 +166,7 @@ namespace SettingTests {
 		}
 
 		[Test]
-		public void SettingWriter_WritesAndReader_ReadsCorrectly() {
+		public void SettingWriterAndReader_WritesAndReadsCorrectly() {
 			const int value = 80;
 
 			var entry = new SettingEntry<int>("", "testEntry", value, new IntRange(0, 100), null);
@@ -186,7 +186,7 @@ namespace SettingTests {
 		}
 
 		[Test]
-		public void SettingWriter_ReadsBackIntCorrectly() {
+		public void SettingWriterAndReader_WritesAndReadsIntCorrectly() {
 			const int value = 42;
 
 			var entry = new SettingEntry<int>("", "testInt", value, new IntRange(0, 100), null);
@@ -203,7 +203,7 @@ namespace SettingTests {
 		}
 
 		[Test]
-		public void SettingWriter_ReadsBackFloatCorrectly() {
+		public void SettingWriterAndReader_WritesAndReadsFloatCorrectly() {
 			const float value = 3.14f;
 
 			var entry = new SettingEntry<float>("", "testFloat", value, new FloatRange(0f, 5f), null);
@@ -220,7 +220,7 @@ namespace SettingTests {
 		}
 
 		[Test]
-		public void SettingWriter_ReadsBackDoubleCorrectly() {
+		public void SettingWriterAndReader_WritesAndReadsDoubleCorrectly() {
 			const double value = 0.476846178;
 
 			var entry = new SettingEntry<double>("", "testDouble", value, new DoubleRange(0d, 1d), null);
@@ -237,7 +237,7 @@ namespace SettingTests {
 		}
 
 		[Test]
-		public void SettingWriter_ReadsBackStringCorrectly() {
+		public void SettingWriterAndReader_WritesAndReadsStringCorrectly() {
 			const string value = "someString";
 
 			var entry = new SettingEntry<string>("", "testString", value, new StringValueSet(new[] { value }), null);
@@ -254,7 +254,7 @@ namespace SettingTests {
 		}
 
 		[Test]
-		public void SettingWriter_ReadsKeyControlStringCorrectly() {
+		public void SettingWriterAndReader_WritesAndReadsKeyControlStringCorrectly() {
 			var entry = new KeybindEntry("", "keyTest", Key.Space, null);
 
 			using (var writer = new StreamWriter(tempPath)) {
@@ -269,7 +269,7 @@ namespace SettingTests {
 		}
 
 		[Test]
-		public void SettingWriter_ReadsBackMultipleEntriesCorrectly() {
+		public void SettingWriterAndReader_WritesAndReadsMultipleEntriesCorrectly() {
 			string[] strings = { "o1", "o2", "03" };
 			const int intValue = 10;
 
@@ -335,7 +335,7 @@ namespace SettingTests {
 		}
 
 		[Test]
-		public void FileValue_GetsOverriden_WhenChangingValue() {
+		public void WrittenEntry_GetsOverriden_WhenValueChanges() {
 			var entry = new SettingEntry<int>("", "testEntry", 50, new IntRange(0, 100), null);
 
 			void WriteValue() {
@@ -362,7 +362,7 @@ namespace SettingTests {
 	[TestFixture]
 	public class KeyMappingTests {
 		[Test]
-		public void KeyboardValueSet_Encode_ReturnsKeyEnumString() {
+		public void KeyboardValueSet_EncodeMethod_ReturnsKeyEnumString() {
 			var valueSet = new KeyboardValueSet();
 			var keyControl = Keyboard.current[Key.G];
 
@@ -372,7 +372,7 @@ namespace SettingTests {
 		}
 
 		[Test]
-		public void KeyboardValueSet_Encode_ReturnsNull_ForNull() {
+		public void KeyboardValueSet_EncodeMethod_ReturnsNullCorrectly() {
 			var valueSet = new KeyboardValueSet();
 
 			string encoded = valueSet.Encode(null);
@@ -381,7 +381,7 @@ namespace SettingTests {
 		}
 
 		[Test]
-		public void KeyboardValueSet_Decode_ParsesKeyEnum() {
+		public void KeyboardValueSet_DecodeMethod_ParsesKeyEnumCorrectly() {
 			var valueSet = new KeyboardValueSet();
 
 			KeyControl decoded = valueSet.Decode("H");
@@ -390,7 +390,7 @@ namespace SettingTests {
 		}
 
 		[Test]
-		public void KeyboardValueSet_Decode_ReturnsNull_ForInvalidKey() {
+		public void KeyboardValueSet_DecodeMethod_ReturnsNull_ForInvalidKey() {
 			var valueSet = new KeyboardValueSet();
 
 			KeyControl decoded = valueSet.Decode("Invalid Key");
@@ -399,7 +399,7 @@ namespace SettingTests {
 		}
 
 		[Test]
-		public void KeyboardValueSet_EncodeAndDecode_ReturnCorrectValues() {
+		public void KeyboardValueSet_EncodeAndDecodeMethods_ReturnCorrectValues() {
 			var valueSet = new KeyboardValueSet();
 			var key = Keyboard.current[Key.A];
 
@@ -410,7 +410,7 @@ namespace SettingTests {
 		}
 
 		[Test]
-		public void KeyboardValueSet_IsValid_ReturnsTrueForKeyboardKey() {
+		public void KeyboardValueSet_IsValidMethod_ReturnsTrueForKeyboardKey() {
 			var valueSet = new KeyboardValueSet();
 			var keyControl = Keyboard.current[Key.Space];
 
@@ -418,14 +418,14 @@ namespace SettingTests {
 		}
 
 		[Test]
-		public void KeyboardValueSet_IsValid_ReturnsTrueForNull() {
+		public void KeyboardValueSet_IsValidMethod_ReturnsTrueForNull() {
 			var valueSet = new KeyboardValueSet();
 
 			Assert.That(valueSet.IsValid(null), Is.True);
 		}
 
 		[Test]
-		public void KeyMapping_SetKey_ChangesKeyControl() {
+		public void KeyMapping_SetKeyMethod_ChangesKeyControl() {
 			var keyMapping = new KeybindEntry("Test", "test", Key.N, null);
 
 			keyMapping.SetValue(Key.T);
