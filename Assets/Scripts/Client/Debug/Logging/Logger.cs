@@ -10,7 +10,7 @@ using UnityEngine;
 #nullable enable
 
 namespace SoulboundBackend.Client.Debug.Logging {
-	public sealed class Logger {
+	internal sealed class Logger {
 		const string ARG_MARKER = "{}";
 		const string LOG_FORMAT = "[{0}] [{1}] [{2}/{3}]: {4}";		// [time] [thread] [stackFrame/level]: {message}
 		const string TIME_FORMAT = "{0}-{1}-{2} {3}:{4}:{5}.{6}";   // day-month-year hour:minute:second.millis

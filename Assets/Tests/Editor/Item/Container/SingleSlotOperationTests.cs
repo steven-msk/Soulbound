@@ -15,14 +15,14 @@ public abstract class SingleSlotOperationTests<TOperation> where TOperation : Si
 
 		slot = Substitute.For<IItemSlot>();
 		slot.GetStack().Returns(slotStack);
-		if (slotStack != null) slotStack.onQuantityChanged += QuantityChanged;
 		slot.HasStack().Returns(slotStack != null);
+		if (slotStack != null) slotStack.onQuantityChanged += SlotQuantityChanged;
 		slot.When(s => s.SetStack(Arg.Any<ItemStack>())).Do(callInfo => {
 			ItemStack? previousStack = slot.GetStack();
-			if (previousStack != null) previousStack.onQuantityChanged -= QuantityChanged;
+			if (previousStack != null) previousStack.onQuantityChanged -= SlotQuantityChanged;
 
 			ItemStack? stack = callInfo.Arg<ItemStack>();
-			if (stack != null) stack.onQuantityChanged += QuantityChanged;
+			if (stack != null) stack.onQuantityChanged += SlotQuantityChanged;
 
 			slot.GetStack().Returns(stack);
 			slot.HasStack().Returns(stack != null);
@@ -37,8 +37,14 @@ public abstract class SingleSlotOperationTests<TOperation> where TOperation : Si
 
 		scope.GetTransitStack().Returns(transitStack);
 		scope.HasTransitStack().Returns(transitStack != null);
+		if (transitStack != null) transitStack.onQuantityChanged += TransitQuantityChanged;
 		scope.When(s => s.SetTransitStack(Arg.Any<ItemStack>())).Do(callInfo => {
-			ItemStack stack = callInfo.Arg<ItemStack>();
+			ItemStack? previousStack = scope.GetTransitStack();
+			if (previousStack != null) previousStack.onQuantityChanged -= TransitQuantityChanged;
+
+			ItemStack? stack = callInfo.Arg<ItemStack>();
+			if (stack != null) stack.onQuantityChanged += TransitQuantityChanged;
+
 			scope.GetTransitStack().Returns(stack);
 			scope.HasTransitStack().Returns(stack != null);
 		});
@@ -49,8 +55,12 @@ public abstract class SingleSlotOperationTests<TOperation> where TOperation : Si
 		operation = GetOperation(container, 0, scope);
 	}
 
-	private void QuantityChanged(int old, int @new) {
+	private void SlotQuantityChanged(int old, int @new) {
 		if (@new <= 0) slot.SetStack(null);
+	}
+
+	private void TransitQuantityChanged(int old, int @new) {
+		if (@new <= 0) scope.SetTransitStack(null);
 	}
 
 	protected abstract TOperation GetOperation(IItemContainer container, int slotIndex, IItemContainerScope scope);
