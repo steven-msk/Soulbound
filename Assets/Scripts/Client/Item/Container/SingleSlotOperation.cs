@@ -2,6 +2,8 @@
 
 #nullable enable
 
+using SoulboundBackend.Client.Debug.Logging;
+
 namespace SoulboundBackend.Client.ItemSystem.Container {
 	public abstract class SingleSlotOperation : ISlotOperation {
 		protected readonly IItemSlot slot;
