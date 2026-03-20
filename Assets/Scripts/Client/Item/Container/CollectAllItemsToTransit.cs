@@ -33,13 +33,8 @@ namespace SoulboundBackend.Client.ItemSystem.Container {
 			List<IItemSlot> slots = GetSlotsContaining(item);
 			if (slots == null || slots.Count == 0) return false;
 
-			int spaceLeft = item.fullStackSize - transitStack.quantity;
 			foreach (var slot in slots) {
-				if (spaceLeft <= 0) break;
-
-				int transfer = transitStack.Increment(slot.GetStack()!.quantity);
-				slot.GetStack()!.Decrement(transfer);
-				spaceLeft -= transfer;
+				transitStack.FillFrom(slot.GetStack());
 			}
 			return true;
 		}
