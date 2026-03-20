@@ -30,6 +30,7 @@ namespace ItemTests.Container.Operations {
 		[Test]
 		public void CanExecute_ReturnsFalse_WhenNoTransitStack() {
 			CreateOperation(null);
+
 			Assert.That(operation.CanExecute(), Is.False);
 		}
 
@@ -37,6 +38,7 @@ namespace ItemTests.Container.Operations {
 		public void CanExecute_ReturnsFalse_WhenTransitStackIsFull() {
 			ItemStack stack = fakeItem.CreateStack(fakeItem.fullStackSize);
 			CreateOperation(stack);
+
 			Assert.That(operation.CanExecute(), Is.False);
 		}
 
@@ -44,12 +46,14 @@ namespace ItemTests.Container.Operations {
 		public void CanExecute_ReturnsTrue_WhenTransitStackExistsAndNotFull() {
 			ItemStack stack = fakeItem.CreateStack(3);
 			CreateOperation(stack);
+
 			Assert.That(operation.CanExecute(), Is.True);
 		}
 
 		[Test]
 		public void Execute_ReturnsFalse_WhenCanExecuteIsFalse() {
 			CreateOperation(null);
+
 			Assert.That(operation.Execute(), Is.False);
 		}
 

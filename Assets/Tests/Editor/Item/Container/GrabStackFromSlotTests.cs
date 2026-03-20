@@ -28,37 +28,49 @@ namespace ItemTests.Container.Operations {
 		[Test]
 		public void CanExecute_SlotHasStackAndScopeHasNoTransitStack_ReturnsTrue() {
 			CreateOperation(null, fakeItem.CreateStack());
+
 			Assert.That(operation.CanExecute(), Is.True);
 		}
 
 		[Test]
 		public void CanExecute_SlotHasNoStack_ReturnsFalse() {
 			CreateOperation(null, null);
+
 			Assert.That(operation.CanExecute(), Is.False);
 		}
 
 		[Test]
 		public void CanExecute_ScopeAlreadyHasTransitStack_ReturnsFalse() {
 			CreateOperation(fakeItem.CreateStack(), fakeItem.CreateStack());
+
 			Assert.That(operation.CanExecute(), Is.False);
 		}
 
 		[Test]
 		public void CanExecute_SlotHasNoStackAndScopeHasTransitStack_ReturnsFalse() {
 			CreateOperation(fakeItem.CreateStack(), null);
+
 			Assert.That(operation.CanExecute(), Is.False);
 		}
 
 		[Test]
 		public void Execute_WhenCanExecute_ReturnsTrue() {
 			CreateOperation(null, fakeItem.CreateStack());
+
 			Assert.That(operation.Execute(), Is.True);
+
+			scope.Received().SetTransitStack(Arg.Any<ItemStack>());
+			slot.Received().SetStack(Arg.Is((ItemStack)null));
 		}
 
 		[Test]
 		public void Execute_WhenCannotExecute_ReturnsFalse() {
 			CreateOperation(null, null);
+
 			Assert.That(operation.Execute(), Is.False);
+
+			scope.DidNotReceive().SetTransitStack(Arg.Any<ItemStack>());
+			slot.DidNotReceive().SetStack(Arg.Any<ItemStack>());
 		}
 
 		[Test]
@@ -86,6 +98,9 @@ namespace ItemTests.Container.Operations {
 			Assert.That(operation.Execute(), Is.False);
 			Assert.That(scope.HasTransitStack(), Is.True);
 			Assert.That(scope.GetTransitStack(), Is.EqualTo(transitStack));
+
+			scope.DidNotReceive().SetTransitStack(Arg.Any<ItemStack>());
+			slot.DidNotReceive().SetStack(Arg.Any<ItemStack>());
 		}
 
 		[Test]
@@ -96,6 +111,9 @@ namespace ItemTests.Container.Operations {
 			Assert.That(operation.Execute(), Is.False);
 			Assert.That(slot.HasStack(), Is.True);
 			Assert.That(slot.GetStack(), Is.EqualTo(slotStack));
+
+			scope.DidNotReceive().SetTransitStack(Arg.Any<ItemStack>());
+			slot.DidNotReceive().SetStack(Arg.Any<ItemStack>());
 		}
 
 		[Test]
@@ -106,6 +124,9 @@ namespace ItemTests.Container.Operations {
 			Assert.That(operation.Execute(), Is.True);
 			Assert.That(scope.GetTransitStack(), Is.EqualTo(slotStack));
 			Assert.That(slot.HasStack(), Is.False);
+
+			scope.Received().SetTransitStack(Arg.Any<ItemStack>());
+			slot.Received().SetStack(Arg.Is((ItemStack)null));
 		}
 	}
 }
