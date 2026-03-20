@@ -30,7 +30,6 @@ namespace ItemTests.Container.Operations {
 		[Test]
 		public void CanExecute_ReturnsFalse_WhenNoTransitStack() {
 			CreateOperation(null);
-
 			Assert.That(operation.CanExecute(), Is.False);
 		}
 
@@ -38,7 +37,6 @@ namespace ItemTests.Container.Operations {
 		public void CanExecute_ReturnsFalse_WhenTransitStackIsFull() {
 			ItemStack stack = fakeItem.CreateStack(fakeItem.fullStackSize);
 			CreateOperation(stack);
-
 			Assert.That(operation.CanExecute(), Is.False);
 		}
 
@@ -46,15 +44,12 @@ namespace ItemTests.Container.Operations {
 		public void CanExecute_ReturnsTrue_WhenTransitStackExistsAndNotFull() {
 			ItemStack stack = fakeItem.CreateStack(3);
 			CreateOperation(stack);
-
 			Assert.That(operation.CanExecute(), Is.True);
 		}
 
 		[Test]
 		public void Execute_ReturnsFalse_WhenCanExecuteIsFalse() {
 			CreateOperation(null);
-
-			Assert.That(operation.CanExecute(), Is.False);
 			Assert.That(operation.Execute(), Is.False);
 		}
 
@@ -82,7 +77,6 @@ namespace ItemTests.Container.Operations {
 			};
 			scope.GetOpenContainers().Returns(containers);
 
-			Assert.That(operation.CanExecute(), Is.True);
 			Assert.That(operation.Execute(), Is.False);
 		}
 
@@ -105,7 +99,6 @@ namespace ItemTests.Container.Operations {
 			};
 			scope.GetOpenContainers().Returns(containers);
 
-			Assert.That(operation.CanExecute(), Is.True);
 			Assert.That(operation.Execute(), Is.True);
 			Assert.That(transitStack.quantity, Is.EqualTo(4 + 5 + 4));
 		}
@@ -128,7 +121,6 @@ namespace ItemTests.Container.Operations {
 			};
 			scope.GetOpenContainers().Returns(containers);
 
-			Assert.That(operation.CanExecute(), Is.True);
 			Assert.That(operation.Execute(), Is.True);
 			Assert.That(transitStack.quantity, Is.EqualTo(4 + 5 + 4 + 65 + 12 + 3));
 		}
@@ -151,7 +143,6 @@ namespace ItemTests.Container.Operations {
 			};
 			scope.GetOpenContainers().Returns(containers);
 
-			Assert.That(operation.CanExecute(), Is.True);
 			Assert.That(operation.Execute(), Is.True);
 			Assert.That(transitStack.quantity, Is.EqualTo(maxStackSize));
 		}
@@ -178,7 +169,6 @@ namespace ItemTests.Container.Operations {
 			IEnumerable<IItemContainer> containers = new IItemContainer[] { container };
 			scope.GetOpenContainers().Returns(containers);
 
-			Assert.That(operation.CanExecute(), Is.True);
 			Assert.That(operation.Execute(), Is.True);
 
 			int[] expectedOrder = new int[] { 4, 1, 0, 2, 3 };
@@ -202,7 +192,6 @@ namespace ItemTests.Container.Operations {
 			};
 			scope.GetOpenContainers().Returns(containers);
 
-			Assert.That(operation.CanExecute(), Is.True);
 			Assert.That(operation.Execute(), Is.True);
 			Assert.That(transitStack.quantity, Is.LessThan(fullStackSize));
 		}
@@ -224,7 +213,6 @@ namespace ItemTests.Container.Operations {
 			};
 			scope.GetOpenContainers().Returns(containers);
 
-			Assert.That(operation.CanExecute(), Is.True);
 			Assert.That(operation.Execute(), Is.True);
 			Assert.That(transitStack.quantity, Is.EqualTo(fullStackSize));
 		}
@@ -244,7 +232,6 @@ namespace ItemTests.Container.Operations {
 			};
 			scope.GetOpenContainers().Returns(containers);
 
-			Assert.That(operation.CanExecute(), Is.True);
 			Assert.That(operation.Execute(), Is.True);
 			Assert.That(transitStack.quantity, Is.EqualTo(fullStackSize));
 			Assert.That(stack.quantity, Is.EqualTo(shouldRemain));
@@ -266,7 +253,6 @@ namespace ItemTests.Container.Operations {
 			};
 			scope.GetOpenContainers().Returns(containers);
 
-			Assert.That(operation.CanExecute(), Is.False);
 			Assert.That(operation.Execute(), Is.False);
 			Assert.That(transitStack.quantity, Is.EqualTo(fullStackSize));
 			Assert.That(stack1.quantity, Is.EqualTo(1));
@@ -287,7 +273,6 @@ namespace ItemTests.Container.Operations {
 			IEnumerable<IItemContainer> containers = new IItemContainer[] { container1, container2 };
 			scope.GetOpenContainers().Returns(containers);
 
-			Assert.That(operation.CanExecute(), Is.True);
 			Assert.That(operation.Execute(), Is.True);
 			Assert.That(stack1.IsEmpty(), Is.True);
 			Assert.That(stack2.IsEmpty(), Is.True);

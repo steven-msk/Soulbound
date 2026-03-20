@@ -1,4 +1,3 @@
-using SoulboundBackend.Client.ItemSystem;
 namespace SoulboundBackend.Client.ItemSystem.Container {
 	public sealed class HalveStackFromSlot : SingleSlotOperation {
 		public HalveStackFromSlot(IItemContainer container, int slotIndex, IItemContainerScope scope)
@@ -19,7 +18,6 @@ namespace SoulboundBackend.Client.ItemSystem.Container {
 			ItemStack halvedTransit = slot.GetStack().Clone(transfer);
 			slot.GetStack().Decrement(transfer);
 			scope.SetTransitStack(halvedTransit);
-
 			return true;
 		}
 	}
