@@ -4,18 +4,7 @@ using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.ItemSystem.Container;
 
 namespace ItemTests.Container.Operations {
-	public class MergeTransitInSlotTests : SingleSlotOperationTests<MergeTransitInSlot> {
-		private const int DEFAULT_FULL_STACK = 256;
-		private FakeItem fakeItem;
-
-		[SetUp]
-		public void Setup() {
-			scope = Substitute.For<IItemContainerScope>();
-			fakeItem = new FakeItem() {
-				_fullStackSize = DEFAULT_FULL_STACK,
-			};
-		}
-
+	internal class MergeTransitInSlotTests : SingleSlotOperationTests<MergeTransitInSlot> {
 		protected override MergeTransitInSlot GetOperation(IItemContainer container, int slotIndex, IItemContainerScope scope) {
 			return new MergeTransitInSlot(container, slotIndex, scope);
 		}

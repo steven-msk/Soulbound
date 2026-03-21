@@ -5,18 +5,7 @@ using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.ItemSystem.Container;
 
 namespace ItemTests.Container.Operations {
-	public class ReleaseTransitInEmptySlotTests : SingleSlotOperationTests<ReleaseTransitInEmptySlot> {
-		const int DEFAULT_FULL_STACK = 256;
-		private FakeItem fakeItem;
-
-		[SetUp]
-		public void Setup() {
-			scope = Substitute.For<IItemContainerScope>();
-			fakeItem = new FakeItem {
-				_fullStackSize = DEFAULT_FULL_STACK
-			};
-		}
-
+	internal class ReleaseTransitInEmptySlotTests : SingleSlotOperationTests<ReleaseTransitInEmptySlot> {
 		protected override ReleaseTransitInEmptySlot GetOperation(IItemContainer container, int slotIndex, IItemContainerScope scope) {
 			return new ReleaseTransitInEmptySlot(container, slotIndex, scope);
 		}

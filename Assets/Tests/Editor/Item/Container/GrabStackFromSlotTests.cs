@@ -9,18 +9,7 @@ using System.Collections.Generic;
 #nullable enable
 
 namespace ItemTests.Container.Operations {
-	public class GrabStackFromSlotTests : SingleSlotOperationTests<GrabStackFromSlot> {
-		private const int DEFAULT_FULL_STACK = 256;
-		private FakeItem fakeItem;
-
-		[SetUp]
-		public void Setup() {
-			scope = Substitute.For<IItemContainerScope>();
-			fakeItem = new FakeItem {
-				_fullStackSize = DEFAULT_FULL_STACK,
-			};
-		}
-
+	internal class GrabStackFromSlotTests : SingleSlotOperationTests<GrabStackFromSlot> {
 		protected override GrabStackFromSlot GetOperation(IItemContainer container, int slotIndex, IItemContainerScope scope) {
 			return new GrabStackFromSlot(container, slotIndex, scope);
 		}

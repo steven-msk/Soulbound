@@ -5,27 +5,13 @@ using SoulboundBackend.Client.ItemSystem.Container;
 using System.Collections.Generic;
 
 namespace ItemTests.Container.Operations {
-	public class CollectAllItemsToTransitTests {
-		const int DEFAULT_FULL_STACK = 256;
-		private ISlotOperation operation;
-		private IItemContainerScope scope;
-		private FakeItem fakeItem;
-
-		[SetUp]
-		public void Setup() {
-			scope = Substitute.For<IItemContainerScope>();
-			fakeItem = new FakeItem {
-				_fullStackSize = DEFAULT_FULL_STACK
-			};
-		}
-
+	internal class CollectAllItemsToTransitTests : SlotOperationTest {
 		private void CreateOperation(ItemStack? transitStack) {
 			scope.GetTransitStack().Returns(transitStack);
 			scope.HasTransitStack().Returns(transitStack != null);
 
 			operation = new CollectAllItemsToTransit(scope);
 		}
-
 
 		[Test]
 		public void CanExecute_ReturnsFalse_WhenNoTransitStack() {

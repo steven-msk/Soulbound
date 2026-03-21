@@ -9,18 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ItemTests.Container.Operations {
-	public class TransferSingleToSlotTests : SingleSlotOperationTests<TransferSingleToSlot> {
-		const int DEFAULT_FULL_STACK = 256;
-		private FakeItem fakeItem;
-
-		[SetUp]
-		public void Setup() {
-			scope = Substitute.For<IItemContainerScope>();
-			fakeItem = new FakeItem {
-				_fullStackSize = DEFAULT_FULL_STACK
-			};
-		}
-
+	internal class TransferSingleToSlotTests : SingleSlotOperationTests<TransferSingleToSlot> {
 		protected override TransferSingleToSlot GetOperation(IItemContainer container, int slotIndex, IItemContainerScope scope) {
 			return new TransferSingleToSlot(container, slotIndex, scope);
 		}

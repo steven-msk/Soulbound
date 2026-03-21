@@ -9,13 +9,12 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ItemTests.Container.Operations {
-	public class SwapTransitTests : SingleSlotOperationTests<SwapTransit> {
-		const int DEFAULT_FULL_STACK = 256;
+	internal class SwapTransitTests : SingleSlotOperationTests<SwapTransit> {
 		private FakeItem fakeItemA;
 		private FakeItem fakeItemB;
 
 		[SetUp]
-		public void Setup() {
+		public new void Setup() {
 			scope = Substitute.For<IItemContainerScope>();
 			fakeItemA = new FakeItem {
 				_fullStackSize = DEFAULT_FULL_STACK

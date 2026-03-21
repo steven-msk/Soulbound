@@ -5,10 +5,8 @@ using System.Collections.Generic;
 
 #nullable enable
 
-public abstract class SingleSlotOperationTests<TOperation> where TOperation : SingleSlotOperation {
-	protected IItemContainerScope scope;
-	protected ISlotOperation operation;
-	protected IItemSlot slot;
+internal abstract class SingleSlotOperationTests<TOperation> : SlotOperationTest where TOperation : SingleSlotOperation {
+	protected IItemSlot slot = null!;
 
 	protected void CreateOperation(ItemStack? transitStack, ItemStack? slotStack) {
 		IItemContainer container = Substitute.For<IItemContainer>();

@@ -10,18 +10,7 @@ using System.Threading.Tasks;
 using System.Web.Services.Description;
 
 namespace ItemTests.Container.Operations {
-	public class HalveStackFromSlotTests : SingleSlotOperationTests<HalveStackFromSlot> {
-		private const int DEFAULT_FULL_STACK = 256;
-		private FakeItem fakeItem;
-
-		[SetUp]
-		public void Setup() {
-			scope = Substitute.For<IItemContainerScope>();
-			fakeItem = new FakeItem {
-				_fullStackSize = DEFAULT_FULL_STACK,
-			};
-		}
-
+	internal class HalveStackFromSlotTests : SingleSlotOperationTests<HalveStackFromSlot> {
 		protected override HalveStackFromSlot GetOperation(IItemContainer container, int slotIndex, IItemContainerScope scope) {
 			return new HalveStackFromSlot(container, slotIndex, scope);
 		}
