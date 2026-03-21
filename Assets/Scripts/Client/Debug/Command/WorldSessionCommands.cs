@@ -97,8 +97,6 @@ namespace SoulboundBackend.Client.Debug.Commands {
 
 		private static CommandNode GiveCommand() {
 			static void giveItem(CommandParsingContext ctx) {
-				// TODO: simplify give command logic
-
 				Item item = ctx.Args.Get<Item>("item");
 				int quantity = ctx.Args.TryGet("quantity", out int result) ? result : 1;
 				if (quantity <= 0) {
@@ -106,7 +104,6 @@ namespace SoulboundBackend.Client.Debug.Commands {
 					return;
 				}
 
-				Dictionary<int, ItemStack?> stackSnapshots = ctx.Data.Player.GetInventory().stacks;
 				int fullStacks = quantity / item.fullStackSize;
 				int remainder = quantity % item.fullStackSize;
 
@@ -118,51 +115,8 @@ namespace SoulboundBackend.Client.Debug.Commands {
 					stacks[i] = item.CreateStack(item.fullStackSize);
 				}
 				if (remainder > 0) stacks[i] = item.CreateStack(remainder);
-
-
-				// flow to stackable
-				List<int> flowSlots = stackSnapshots
-					.Where(kvp => kvp.Value?.item == item)
-					.Where(kvp => kvp.Value!.GetSpaceLeft() > 0)
-					.Select(kvp => kvp.Key)
-					.ToList();
-				int currentStack = 0;
-				foreach (var slot in flowSlots) {
-					ItemStack stack = stackSnapshots[slot]!;
-					if (!stack.IsStackableWith(stacks[currentStack])) continue;
-
-					stack.FillFrom(stacks[currentStack]);
-					ctx.ExecServices.Player.Inventory.SetStack(slot, stack);
-
-					if (stacks[currentStack].IsEmpty()) currentStack++;
-					if (currentStack >= stacks.Length) break;
-				}
-
-				// refill remaining stacks
-				for (i = 0; i < stacks.Length - 1; i++) {
-					for (int j = i + 1; j < stacks.Length; j++) {
-						stacks[i].FillFrom(stacks[j]);
-					}
-				}
-
-				// flow to empty slots
-				List<int> emptySlots = ctx.Data.Player.GetInventory().stacks
-					.Where(kvp => kvp.Value?.IsEmpty() ?? true)
-					.Select(kvp => kvp.Key)
-					.ToList();
-				currentStack = 0;
-				foreach (var slot in emptySlots) {
-					ItemStack stack = stacks[currentStack];
-					if (stack.IsEmpty()) continue;
-
-					ctx.ExecServices.Player.Inventory.SetStack(slot, stack);
-					currentStack++;
-
-					if (currentStack >= stacks.Length) break;
-				}
-
-				if (stacks.Any(s => !s.IsEmpty())) {
-					Logger.LogWarning("/give stacks exceeded inventory capacity");
+				for (int j = 0; j < stacks.Length; j++) {
+					ctx.ExecServices.Player.TryAddItemStack(stacks[j]);
 				}
 			}
 

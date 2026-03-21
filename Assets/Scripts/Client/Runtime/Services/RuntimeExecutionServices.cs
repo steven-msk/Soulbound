@@ -49,6 +49,8 @@ namespace SoulboundBackend.Client.Runtime.Services {
 		}
 
 		public void SetPos(Vector2 pos) => player.SetPos(pos);
+
+		public bool TryAddItemStack(ItemStack itemStack) => player.TryAddItemStack(itemStack);
 	}
 
 	public class RuntimeInventoryExecutionService : IInventoryExecutionService {

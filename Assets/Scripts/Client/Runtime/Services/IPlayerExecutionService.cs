@@ -1,3 +1,4 @@
+using SoulboundBackend.Client.ItemSystem;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,5 +10,6 @@ namespace SoulboundBackend.Client.Runtime.Services {
 	public interface IPlayerExecutionService {
 		IInventoryExecutionService Inventory { get; }
 		void SetPos(Vector2 pos);
+		bool TryAddItemStack(ItemStack itemStack);
 	}
 }
