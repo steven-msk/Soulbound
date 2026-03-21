@@ -62,7 +62,6 @@ namespace SoulboundBackend.Client.ItemSystem {
 
 		public bool IsStackableWith(ItemStack? itemStack) {
 			return itemStack?.item == item
-				&& GetSpaceLeft() > 0
 				&& GetData().SequenceEqual(itemStack.GetData());
 		}
 

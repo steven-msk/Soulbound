@@ -50,10 +50,10 @@ namespace ItemTests.Container.Operations {
 		}
 
 		[Test]
-		public void CanExecute_SlotFull_StackableTransitStack_ReturnsFalse() {
+		public void CanExecute_SlotFull_StackableTransitStack_ReturnsTrue() {
 			CreateOperation(fakeItem.CreateStack(), fakeItem.CreateStack(fakeItem.fullStackSize));
 
-			Assert.That(operation.CanExecute(), Is.False);
+			Assert.That(operation.CanExecute(), Is.True);
 		}
 
 		[Test]
