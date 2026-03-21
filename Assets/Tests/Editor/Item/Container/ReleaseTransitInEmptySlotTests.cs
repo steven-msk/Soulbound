@@ -30,7 +30,7 @@ namespace ItemTests.Container.Operations {
 
 		[Test]
 		public void CanExecute_SlotHasStack_ReturnsFalse() {
-			CreateOperation(null, fakeItem.CreateStack());
+			CreateOperation(fakeItem.CreateStack(), fakeItem.CreateStack());
 
 			Assert.That(operation.CanExecute(), Is.False);
 		}
