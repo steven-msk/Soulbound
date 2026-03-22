@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEditor.Graphs;
+
 
 #nullable enable
 
@@ -19,7 +21,7 @@ public class SubstitutedItemSlot : IItemSlot {
 	private ItemStack? stack;
 
 	public SubstitutedItemSlot(ItemStack? stack) {
-		this.stack = stack;
+		Internal_SetStack(stack);
 	}
 
 	public virtual IItemContainer GetContainer() => null!;
@@ -33,16 +35,21 @@ public class SubstitutedItemSlot : IItemSlot {
 	public virtual void SetStack(ItemStack? stack) {
 	}
 
-	internal void Internal_SetStack(ItemStack? stack) => this.stack = stack;
+	internal void Internal_SetStack(ItemStack? stack) {
+		ItemStack? oldStack = this.stack;
+		if (oldStack != null) oldStack.onQuantityChanged -= OnQuantityChanged;
 
-	internal void Internal_OnQuantityChanged(int old, int @new) {
-		if (stack != null) {
-			quantityChanged?.Invoke(stack, old, @new);
-			if (@new <= 0) SetStack(null);
-		}
+		this.stack = stack;
+
+		if (stack != null) stack.onQuantityChanged += OnQuantityChanged;
+		stackChanged?.Invoke(oldStack, stack);
+		this.stack = stack;
 	}
 
-	internal void Internal_StackChanged(ItemStack? old, ItemStack? @new) {
-		stackChanged?.Invoke(old, @new);
+	private void OnQuantityChanged(int old, int @new) {
+		if (stack != null) {
+			quantityChanged?.Invoke(stack, old, @new);
+		}
+		if (@new <= 0) SetStack(null);
 	}
 }

@@ -58,16 +58,7 @@ internal static class ContainerUtils {
 	public static IItemSlot SubstituteSlot(ItemStack? stack) {
 		SubstitutedItemSlot slot = Substitute.For<SubstitutedItemSlot>(stack);
 		slot.When(s => s.SetStack(Arg.Any<ItemStack>()))
-			.Do(callInfo => {
-				ItemStack? oldStack = slot.GetStack();
-				if (oldStack != null) oldStack.onQuantityChanged -= slot.Internal_OnQuantityChanged;
-
-				ItemStack? stack = callInfo.Arg<ItemStack?>();
-				slot.Internal_SetStack(stack);
-
-				if (stack != null) stack.onQuantityChanged += slot.Internal_OnQuantityChanged;
-				slot.Internal_StackChanged(oldStack, stack);
-			});
+			.Do(callInfo => slot.Internal_SetStack(callInfo.Arg<ItemStack?>()));
 		return slot;
 	}
 
@@ -82,5 +73,25 @@ internal static class ContainerUtils {
 
 		container.GetAllSlots().Returns(newIndices);
 		container.GetSlotCount().Returns(newIndices.Count);
+	}
+
+	public static void SubstituteTransit(ItemStack? stack, IItemContainerScope scope) {
+		SubstitutedItemSlot superficialSlot = Substitute.For<SubstitutedItemSlot>(stack);
+
+		scope.GetTransitStack().Returns(stack);
+		scope.HasTransitStack().Returns(stack != null);
+
+		scope.When(s => s.SetTransitStack(Arg.Any<ItemStack>())).Do(callInfo => {
+			ItemStack? stack = callInfo.Arg<ItemStack?>();
+
+			superficialSlot.Internal_SetStack(stack);
+
+			scope.GetTransitStack().Returns(stack);
+			scope.HasTransitStack().Returns(stack != null);
+		});
+
+		superficialSlot.quantityChanged += (_, _, @new) => {
+			if (@new <= 0) scope.SetTransitStack(null);
+		};
 	}
 }
