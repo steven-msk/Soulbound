@@ -19,13 +19,8 @@ namespace SoulboundBackend.Client.ItemSystem.Container {
 		}
 
 		bool IsStackValid() {
-			IItemSlot dragOrigin = scope.GetDragState().origin.GetSlot();
-
-			if (slot.HasStack()) {
-				return slot.GetStack()!.item == dragOrigin.GetStack()!.item
+			return !slot.HasStack() || slot.GetStack().IsStackableWith(scope.GetDragState().stack)
 					&& !slot.GetStack().IsFull();
-			}
-			return true;
 		}
 
 		public bool CanExecute() {
@@ -37,7 +32,7 @@ namespace SoulboundBackend.Client.ItemSystem.Container {
 			if (!CanExecute()) return false;
 
 			int previewCount = scope.GetDragState().draggedSlots.Count + 1;
-			int toSplit = scope.GetDragState().originStack;
+			int toSplit = scope.GetDragState().stack.quantity;
 			int splitAmount = toSplit / previewCount;
 			if (splitAmount <= 0) return false;
 
@@ -51,13 +46,13 @@ namespace SoulboundBackend.Client.ItemSystem.Container {
 				int amount = splitAmount + (i < remainder ? 1 : 0);
 
 				if (!draggedSlot.HasStack()) {
-					draggedSlot.SetStack(scope.GetDragState().item.CreateStack(amount));
-				}
-				bool hasSnapshot = scope.GetDragState().quantitySnapshots.TryGetValue(enumerator.Current, out int quantity);
-				if (hasSnapshot && !enumerator.Current.Equals(scope.GetDragState().origin)) {
-					draggedSlot.GetStack()!.SetQuantity(quantity + amount);
+					draggedSlot.SetStack(scope.GetDragState().stack.item.CreateStack(amount));
 				} else {
-					draggedSlot.GetStack()!.SetQuantity(amount);
+					bool hasSnapshot = scope.GetDragState().quantitySnapshots.TryGetValue(enumerator.Current, out int quantity);
+					draggedSlot.GetStack().SetQuantity(hasSnapshot
+						? quantity + amount
+						: amount
+					);
 				}
 				i++;
 			}

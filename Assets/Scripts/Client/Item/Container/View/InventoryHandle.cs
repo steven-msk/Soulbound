@@ -35,8 +35,15 @@ namespace SoulboundBackend.Client.ItemSystem.Container.View {
 				return;
 			}
 
-			if (!scope.InDragState()) operation.Execute();
-			StartDrag(slotIndex, clickButton);
+			scope.TryBeginDrag(
+				scope.HasTransitStack()
+					? scope.GetTransitStack()!
+					: container.GetSlot(slotIndex).GetStack()!,
+				container,
+				slotIndex,
+				clickButton
+			);
+			operation.Execute();
 		}
 
 		void IItemSlotHandleCallbacks.OnPointerEnter(int slotIndex, PointerEventData eventData) {
@@ -94,13 +101,6 @@ namespace SoulboundBackend.Client.ItemSystem.Container.View {
 				return new NoSlotOperation();
 			}
 			return null!;
-		}
-
-		private void StartDrag(int origin, PointerEventData.InputButton button) {
-			IItemSlot slot = container.GetSlot(origin);
-			if (!slot.HasStack()) return;
-
-			scope.TryBeginDrag(container, origin, button);
 		}
 
 		void IItemSlotHandleCallbacks.OnPointerExit(int slotIndex, PointerEventData eventData) {

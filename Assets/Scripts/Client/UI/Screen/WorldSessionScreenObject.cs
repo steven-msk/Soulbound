@@ -31,20 +31,18 @@ namespace SoulboundBackend.Client.UI.Screens {
 			Soulbound.instance.GetInputManager().PushContext(this);
 		}
 
-		public bool TryBeginDrag(IItemContainer container, int originSlotIndex, PointerEventData.InputButton button) {
-			if (InDragState()) return false;
+		public bool TryBeginDrag(ItemStack stack, IItemContainer container, int originSlotIndex, PointerEventData.InputButton button) {
+			if (InDragState() || stack == null) return false;
 
-			IItemSlot originSlot = container.GetSlot(originSlotIndex);
 			SlotRef originRef = new(container, originSlotIndex);
 			SortedSet<SlotRef> draggedSlots = new(new SlotRef.Comparer()) { originRef };
 
 			dragState = new SlotDragState(container) {
-				item = originSlot.GetStack()!.item,
+				stack = stack.Clone(),
 				origin = originRef,
 				draggedSlots = draggedSlots,
 				button = button,
 				quantitySnapshots = CreateQuantitySnapshots(),
-				originStack = originSlot.GetStack()!.quantity
 			};
 			return true;
 		}

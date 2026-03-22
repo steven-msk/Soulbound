@@ -12,7 +12,7 @@ namespace SoulboundBackend.Client.ItemSystem.Container {
 		bool InDragState();
 		SlotDragState? GetDragState();
 
-		bool TryBeginDrag(IItemContainer container, int originSlotIndex, PointerEventData.InputButton button);
+		bool TryBeginDrag(ItemStack stack, IItemContainer container, int originSlotIndex, PointerEventData.InputButton button);
 		void ExtendDrag(IItemContainer container, int slotIndex);
 		void EndDrag();
 	}
