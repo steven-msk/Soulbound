@@ -20,5 +20,7 @@ namespace SoulboundBackend.Client.ItemSystem.Container {
 		IItemContainer GetContainer();
 
 		public bool HasStack() => GetStack()?.quantity > 0;
+
+		public SlotRef GetRef() => new(GetContainer(), GetIndex());
 	}
 }

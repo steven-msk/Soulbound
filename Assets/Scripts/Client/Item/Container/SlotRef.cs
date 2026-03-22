@@ -35,5 +35,13 @@ namespace SoulboundBackend.Client.ItemSystem.Container {
 				return x.index.CompareTo(y.index);
 			}
 		}
+
+		public sealed class EqualityComparer : IEqualityComparer<SlotRef> {
+			public bool Equals(SlotRef x, SlotRef y) {
+				return x.Equals(y);
+			}
+
+			public int GetHashCode(SlotRef obj) => obj.GetHashCode();
+		}
 	}
 }

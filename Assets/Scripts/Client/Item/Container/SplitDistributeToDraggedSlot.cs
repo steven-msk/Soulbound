@@ -6,25 +6,24 @@ using Unity.VisualScripting;
 
 namespace SoulboundBackend.Client.ItemSystem.Container {
 	public sealed class SplitDistributeToDraggedSlot : ISlotOperation {
-		private readonly IItemContainer container;
-		private readonly int slotIndex;
+		private readonly SlotRef slotRef;
 		private readonly IItemSlot slot;
 		private readonly IItemContainerScope scope;
 
-		public SplitDistributeToDraggedSlot(int slotIndex, IItemContainer container, IItemContainerScope scope) {
-			this.container = container;
-			this.slotIndex = slotIndex;
-			this.slot = container.GetSlot(slotIndex);
+		public SplitDistributeToDraggedSlot(SlotRef slotRef, IItemContainerScope scope) {
+			this.slotRef = slotRef;
+			this.slot = slotRef.GetSlot();
 			this.scope = scope;
 		}
 
 		bool IsStackValid() {
-			return !slot.HasStack() || slot.GetStack().IsStackableWith(scope.GetDragState().stack)
-					&& !slot.GetStack().IsFull();
+			return !slot.HasStack() || (slot.GetStack().IsStackableWith(scope.GetDragState().stack)
+					&& !slot.GetStack().IsFull());
 		}
 
 		public bool CanExecute() {
-			SlotRef slotRef = new(container, slotIndex);
+			if (!scope.InDragState()) return false;
+
 			return !scope.GetDragState().IsSlotDragged(slotRef) && IsStackValid();
 		}
 
@@ -36,10 +35,10 @@ namespace SoulboundBackend.Client.ItemSystem.Container {
 			int splitAmount = toSplit / previewCount;
 			if (splitAmount <= 0) return false;
 
-			scope.ExtendDrag(container, slotIndex);
+			scope.ExtendDrag(slotRef);
 			int remainder = toSplit % scope.GetDragState().draggedSlots.Count();
 
-			SortedSet<SlotRef>.Enumerator enumerator = scope.GetDragState().draggedSlots.GetEnumerator();
+			HashSet<SlotRef>.Enumerator enumerator = scope.GetDragState().draggedSlots.GetEnumerator();
 			int i = 0;
 			while (enumerator.MoveNext()) {
 				IItemSlot draggedSlot = enumerator.Current.GetSlot();

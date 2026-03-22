@@ -39,8 +39,7 @@ namespace SoulboundBackend.Client.ItemSystem.Container.View {
 				scope.HasTransitStack()
 					? scope.GetTransitStack()!
 					: container.GetSlot(slotIndex).GetStack()!,
-				container,
-				slotIndex,
+				new SlotRef(container, slotIndex),
 				clickButton
 			);
 			operation.Execute();
@@ -88,13 +87,13 @@ namespace SoulboundBackend.Client.ItemSystem.Container.View {
 
 		private ISlotOperation GetDrag(int slotIndex, PointerEventData.InputButton button) {
 			if (button == PointerEventData.InputButton.Left) {
-				return new SplitDistributeToDraggedSlot(slotIndex, container, scope);
+				return new SplitDistributeToDraggedSlot(new SlotRef(container, slotIndex), scope);
 			}
 			if (button == PointerEventData.InputButton.Right) {
 				TransferSingleToSlot transferSingleToSlot = new(container, slotIndex, scope);
 
 				if (transferSingleToSlot.CanExecute()) {
-					scope.ExtendDrag(container, slotIndex);
+					scope.ExtendDrag(new SlotRef(container, slotIndex));
 					return transferSingleToSlot;
 				}
 

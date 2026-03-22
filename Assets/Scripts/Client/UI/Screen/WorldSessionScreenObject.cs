@@ -31,15 +31,14 @@ namespace SoulboundBackend.Client.UI.Screens {
 			Soulbound.instance.GetInputManager().PushContext(this);
 		}
 
-		public bool TryBeginDrag(ItemStack stack, IItemContainer container, int originSlotIndex, PointerEventData.InputButton button) {
+		public bool TryBeginDrag(ItemStack stack, SlotRef slotRef, PointerEventData.InputButton button) {
 			if (InDragState() || stack == null) return false;
 
-			SlotRef originRef = new(container, originSlotIndex);
-			SortedSet<SlotRef> draggedSlots = new(new SlotRef.Comparer()) { originRef };
+			HashSet<SlotRef> draggedSlots = new(new SlotRef.EqualityComparer()) { slotRef };
 
-			dragState = new SlotDragState(container) {
+			dragState = new SlotDragState(slotRef.container) {
 				stack = stack.Clone(),
-				origin = originRef,
+				origin = slotRef,
 				draggedSlots = draggedSlots,
 				button = button,
 				quantitySnapshots = CreateQuantitySnapshots(),
@@ -69,8 +68,8 @@ namespace SoulboundBackend.Client.UI.Screens {
 
 		public void EndDrag() => dragState = null;
 
-		public void ExtendDrag(IItemContainer container, int slotIndex) {
-			dragState?.AddDraggedSlot(container, slotIndex);
+		public void ExtendDrag(SlotRef slotRef) {
+			dragState?.ExtendDrag(slotRef);
 		}
 
 		public bool InDragState() => dragState != null;

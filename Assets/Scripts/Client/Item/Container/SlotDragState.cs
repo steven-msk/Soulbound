@@ -8,7 +8,7 @@ namespace SoulboundBackend.Client.ItemSystem.Container {
 		private readonly IItemContainer originContainer;
 		public ItemStack stack { get; init; }
 		public SlotRef origin { get; init; }
-		public SortedSet<SlotRef> draggedSlots { get; init; }
+		public HashSet<SlotRef> draggedSlots { get; init; }
 		public PointerEventData.InputButton button { get; init; }
 		public Dictionary<SlotRef, int> quantitySnapshots { get; init; }
 
@@ -18,8 +18,8 @@ namespace SoulboundBackend.Client.ItemSystem.Container {
 
 		public IItemContainer GetOriginContainer() => originContainer;
 
-		public void AddDraggedSlot(IItemContainer container, int slotIndex) {
-			draggedSlots.Add(new SlotRef(container, slotIndex));
+		public void ExtendDrag(SlotRef slotRef) {
+			draggedSlots.Add(slotRef);
 		}
 
 		public bool IsSlotDragged(SlotRef slotRef) => draggedSlots.Contains(slotRef);
