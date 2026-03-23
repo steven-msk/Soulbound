@@ -38,7 +38,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			level.SetBlockState(blockPos, states[on ? 1 : 0, counter]);
 		}
 
-		protected override void CreateStates(BlockStateRegisterer registerer, BlockPropertyEntries properties) {
+		protected override void CreateStates(IBlockStateRegisterer registerer, BlockPropertyEntries properties) {
 			states = new BlockState[2, 20];
 			for (int on = 0; on <= 1; on++) {
 				for (int counter = 0; counter < 20; counter++) {
@@ -52,7 +52,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			}
 		}
 
-		protected override BlockState GetDefaultState(BlockStateRegisterer registerer, BlockPropertyEntries properties) {
+		protected override BlockState GetDefaultState(IBlockStateRegisterer registerer, BlockPropertyEntries properties) {
 			return states[0, 0];
 		}
 

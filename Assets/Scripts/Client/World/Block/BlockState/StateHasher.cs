@@ -11,7 +11,7 @@ namespace SoulboundBackend.Client.World.BlockSystem.States {
 
 		public static int ComputeHash(Block block, BlockPropertyEntries properties) {
 			uint hash = FnvOffset;
-			hash = HashInt(hash, block.hashedID);
+			hash = HashString(hash, block.GetID());
 
 			foreach (var (property, value) in properties.GetSorted()) {
 				hash = HashString(hash, property);

@@ -42,7 +42,7 @@ namespace SoulboundBackend.Client.Runtime.Services {
 
 		public Guid GetGuid() => player.guid;
 
-		public string GetID() => player.descriptor.id;
+		public string GetID() => player.descriptor.GetID();
 
 		public Vector2 GetPos() => player.GetPos();
 
@@ -89,7 +89,7 @@ namespace SoulboundBackend.Client.Runtime.Services {
 
 			public Guid GetGuid() => entity.guid;
 
-			public string GetID() => entity.descriptor.id;
+			public string GetID() => entity.descriptor.GetID();
 
 			public Vector2 GetPos() => entity.GetPos();
 

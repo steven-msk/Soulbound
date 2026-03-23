@@ -5,15 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.World.BlockSystem.States {
-	public sealed class BlockStateRegisterer {
+	public class GlobalBlockStateRegisterer : IBlockStateRegisterer {
 		private readonly List<BlockState> registered = new();
-		private readonly Block block;
-
-		public BlockStateRegisterer(Block block) {
-			this.block = block;
-		}
+		private Block block;
 
 		public BlockState AddWithProperties(BlockPropertyEntries properties) {
+			if (block == null) throw new NotSupportedException("Block not set");
+
 			BlockState state = new(block, properties);
 			return Add(state);
 		}
@@ -23,11 +21,14 @@ namespace SoulboundBackend.Client.World.BlockSystem.States {
 			return state;
 		}
 
-		public void PostAll() {
+		public void FinishRegistry() {
 			foreach (var blockState in registered) {
 				BlockStateRegistry.Register(blockState);
 			}
 		}
 
+		void IBlockStateRegisterer.SetBlock(Block block) {
+			this.block = block;
+		}
 	}
 }

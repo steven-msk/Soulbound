@@ -48,12 +48,12 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 
 		private BlockPos GetNextPos(BlockPos selfPos) => selfPos.GetAdjacent(Direction.Left); 
 
-		protected override void CreateStates(BlockStateRegisterer registerer, BlockPropertyEntries properties) {
+		protected override void CreateStates(IBlockStateRegisterer registerer, BlockPropertyEntries properties) {
 			movingState = registerer.AddWithProperties(properties.With("canMove", true));
 			staticState = registerer.AddWithProperties(properties.With("canMove", false));
 		}
 
-		protected override BlockState GetDefaultState(BlockStateRegisterer registerer, BlockPropertyEntries properties) {
+		protected override BlockState GetDefaultState(IBlockStateRegisterer registerer, BlockPropertyEntries properties) {
 			return movingState;
 		}
 	}

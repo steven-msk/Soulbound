@@ -15,7 +15,7 @@ namespace SoulboundBackend.Client.World.BlockSystem.States {
 		internal int stateID;	// assigned by registry
 
 		internal BlockState(Block block, BlockPropertyEntries properties) {
-			this.block = block ?? Blocks.air;
+			this.block = block;
 			this.properties = properties;
 			stateHash = StateHasher.ComputeHash(block, properties);
 		}

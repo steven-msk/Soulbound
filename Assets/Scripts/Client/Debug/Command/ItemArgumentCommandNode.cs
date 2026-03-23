@@ -1,4 +1,5 @@
 using SoulboundBackend.Client.ItemSystem;
+using SoulboundBackend.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace SoulboundBackend.Client.Debug.Commands {
 		}
 
 		public override IEnumerable<string> GetCompletions(string partialToken, CommandParsingContext ctx) {
-			Item[] items = ItemRegistry.GetAll().ToArray();
+			Item[] items = Registry<Item>.GetAll().ToArray();
 			foreach (var item in items) {
 				if (item.GetID().StartsWith(partialToken)) {
 					yield return item.GetID();

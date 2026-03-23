@@ -33,11 +33,11 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			return trigger == InteractionTrigger.RightClick;
 		}
 
-		protected override BlockState GetDefaultState(BlockStateRegisterer registerer, BlockPropertyEntries properties) {
+		protected override BlockState GetDefaultState(IBlockStateRegisterer registerer, BlockPropertyEntries properties) {
 			return on;
 		}
 
-		protected override void CreateStates(BlockStateRegisterer registerer, BlockPropertyEntries properties) {
+		protected override void CreateStates(IBlockStateRegisterer registerer, BlockPropertyEntries properties) {
 			on = registerer.AddWithProperties(properties.With("on", true));
 			off = registerer.AddWithProperties(properties.With("on", false));
 		}

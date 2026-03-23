@@ -1,4 +1,5 @@
 using SoulboundBackend.Client.World.BlockSystem;
+using SoulboundBackend.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,9 +13,9 @@ namespace SoulboundBackend.Client.Debug.Commands {
 		}
 
 		public override IEnumerable<string> GetCompletions(string partialToken, CommandParsingContext ctx) {
-			foreach (var block in BlockRegistry.AllBlocks()) {
-				if (block.id.StartsWith(partialToken)) {
-					yield return block.id;
+			foreach (var block in Registry<Block>.GetAll()) {
+				if (block.GetID().StartsWith(partialToken)) {
+					yield return block.GetID();
 				}
 			}
 		}

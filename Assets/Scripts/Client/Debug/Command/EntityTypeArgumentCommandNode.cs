@@ -1,4 +1,5 @@
 using SoulboundBackend.Client.World.EntitySystem;
+using SoulboundBackend.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,9 +13,9 @@ namespace SoulboundBackend.Client.Debug.Commands {
 		}
 
 		public override IEnumerable<string> GetCompletions(string partialToken, CommandParsingContext ctx) {
-			foreach (var entityDescriptor in EntityRegistry.GetAll()) {
-				if (entityDescriptor.id.StartsWith(partialToken)) {
-					yield return entityDescriptor.id;
+			foreach (var entityDescriptor in Registry<EntityDescriptor>.GetAll()) {
+				if (entityDescriptor.GetID().StartsWith(partialToken)) {
+					yield return entityDescriptor.GetID();
 				}
 			}
 		}

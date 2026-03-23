@@ -12,6 +12,7 @@ using SoulboundBackend.Client.SettingSystem;
 using SoulboundBackend.Client.UI;
 using SoulboundBackend.Client.UI.Screens;
 using SoulboundBackend.Client.World;
+using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Client.World.EntitySystem;
 using SoulboundBackend.Client.World.Generation;
 using SoulboundBackend.Client.World.LevelDomain;
@@ -89,6 +90,7 @@ namespace SoulboundBackend.Core {
 
 			RuntimeHelpers.RunClassConstructor(typeof(EntityType).TypeHandle);
 			RuntimeHelpers.RunClassConstructor(typeof(Items).TypeHandle);
+			RuntimeHelpers.RunClassConstructor(typeof(Blocks).TypeHandle);
 		}
 
 		public void Launch() {
