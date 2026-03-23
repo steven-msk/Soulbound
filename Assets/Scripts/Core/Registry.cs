@@ -29,6 +29,8 @@ namespace SoulboundBackend.Core {
 			return registry.TryGetValue(key, out value);
 		}
 
+		public static void Remove(IRegistrationKey<T> key) => registry.Remove(key);
+
 		public static IEnumerable<T> GetAll() => registry.Values;
 
 		private static NotSupportedException ContractNotSet() {

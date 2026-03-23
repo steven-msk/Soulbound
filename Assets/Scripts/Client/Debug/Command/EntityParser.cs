@@ -12,8 +12,8 @@ namespace SoulboundBackend.Client.Debug.Commands {
 				return ParseResult<Guid>.Fail();
 			}
 
-			return ctx.Data.Entities.TryGetEntity(guid, out IEntityView entity)
-				? ParseResult<Guid>.Success(entity.GetGuid())
+			return ctx.Data.Entities.TryGetEntity(guid, out var _)
+				? ParseResult<Guid>.Success(guid)
 				: ParseResult<Guid>.Fail();
 		}
 	}

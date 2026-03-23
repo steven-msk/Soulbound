@@ -13,4 +13,8 @@ public class FakeItem : Item {
 	public FakeItem() : base($"fakeItem_{Guid.NewGuid()}") {
 		_name = this.GetID();
 	}
+
+	public FakeItem(string id) : base(id) {
+		_name = id;
+	}
 }
