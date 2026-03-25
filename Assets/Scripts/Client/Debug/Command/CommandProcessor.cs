@@ -17,9 +17,10 @@ namespace SoulboundBackend.Client.Debug.Commands {
 
 		// Follows Brigadier parsing architecture
 		public void SubmitCommand(string input) {
+			string[] tokens = Tokenize(input);
+			if (!tokens.Any()) return;
 			Validate(input);
 
-			string[] tokens = Tokenize(input);
 			CommandArguments args = new();
 			CommandParsingContext ctx = new(args, dataProvider, execServices);
 
@@ -40,6 +41,7 @@ namespace SoulboundBackend.Client.Debug.Commands {
 			CommandParsingContext ctx = new(args, dataProvider, execServices);
 
 			if (!tokens.Any() || caretPos == 0) yield break;
+			if (caretPos > input.Length) yield break;
 
 			for (int t = 0; t < tokens.Length - 1; t++) {
 				if (string.IsNullOrWhiteSpace(tokens[t])) yield break;
