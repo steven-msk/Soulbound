@@ -109,7 +109,6 @@ namespace SoulboundBackend.Client.Debug.Commands {
 			int fullStacks = quantity / item.fullStackSize;
 			int remainder = quantity % item.fullStackSize;
 
-			// get stacks
 			int stackCount = fullStacks + (remainder > 0 ? 1 : 0);
 			ItemStack[] stacks = new ItemStack[stackCount];
 			int i;
@@ -117,6 +116,7 @@ namespace SoulboundBackend.Client.Debug.Commands {
 				stacks[i] = item.CreateStack(item.fullStackSize);
 			}
 			if (remainder > 0) stacks[i] = item.CreateStack(remainder);
+
 			for (int j = 0; j < stacks.Length; j++) {
 				ctx.ExecServices.Player.TryAddItemStack(stacks[j]);
 			}
