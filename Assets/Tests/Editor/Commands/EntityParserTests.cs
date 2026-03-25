@@ -7,12 +7,12 @@ using System;
 namespace Commands.Parsing {
 	internal class EntityParserTests {
 		private Guid guid;
-		private EntityParser parser;
+		private EntityGUIDParser parser;
 		private CommandParsingContext context;
 
 		[SetUp]
 		public void Setup() {
-			parser = new EntityParser();
+			parser = new EntityGUIDParser();
 
 			IRuntimeDataProvider data = Substitute.For<IRuntimeDataProvider>();
 			IRuntimeEntityDataProvider entityData = Substitute.For<IRuntimeEntityDataProvider>();

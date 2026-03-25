@@ -9,12 +9,14 @@ using System.Threading.Tasks;
 namespace SoulboundBackend.Client.Debug.Commands {
 	public class ArgumentCommandNode<T> : CommandNode {
 		private readonly ICommandArgumentParser<T> parser;
+		private readonly ICommandCompletionSupplier? completionSupplier;
 		public override string label { get; }
 
-		public ArgumentCommandNode(string label, ICommandArgumentParser<T> parser, CommandHandler? handler = null)
+		public ArgumentCommandNode(string label, ICommandArgumentParser<T> parser, ICommandCompletionSupplier? completionSupplier = null, CommandHandler? handler = null)
 			: base(handler) {
 			this.label = label;
 			this.parser = parser;
+			this.completionSupplier = completionSupplier;
 		}
 
 		public override bool Matches(string token, CommandParsingContext ctx) {
@@ -26,7 +28,11 @@ namespace SoulboundBackend.Client.Debug.Commands {
 		}
 
 		public override IEnumerable<string> GetCompletions(string partialToken, CommandParsingContext ctx) {
-			yield break;
+			if (completionSupplier == null) yield break;
+
+			foreach (var completion in completionSupplier.GetCompletions(partialToken, ctx)) {
+				yield return completion;
+			}
 		}
 	}
 }

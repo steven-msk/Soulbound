@@ -2,8 +2,6 @@ using SoulboundBackend.Client.Runtime.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using UnityEngine;
 
 namespace SoulboundBackend.Client.Debug.Commands {
 	public sealed class CommandProcessor {
@@ -134,14 +132,6 @@ namespace SoulboundBackend.Client.Debug.Commands {
 			}
 		}
 
-		private void RebuildRoot() {
-			CommandBuilder currentNodeBuilder = CommandBuilder.Literal("_root_");
-			foreach (var command in EnumerateAllCommands()) {
-				currentNodeBuilder.Then(command);
-			}
-			rootNode = currentNodeBuilder.GetRootNode();
-		}
-
 		public void RegisterProvider(ICommandProvider provider) {
 			providerBuffer.Add(provider);
 			RebuildRoot();
@@ -151,66 +141,12 @@ namespace SoulboundBackend.Client.Debug.Commands {
 			RebuildRoot();
 		}
 
-	}
-
-	public static class CommandFormat {
-		public const string MARKER_FORMAT = ">>{0}<<";
-
-		public static string FormatWhere(string[] tokens, int tokenIndex, string format = MARKER_FORMAT) {
-			StringBuilder builder = new();
-
-			int startPrefix = Mathf.Max(0, tokenIndex - 3);
-			builder.AppendJoin(' ', tokens[startPrefix..tokenIndex]);
-
-			builder.Append(' ').AppendFormat(format, tokens[tokenIndex]);
-
-			int endSuffix = Mathf.Min(tokens.Length, tokenIndex + 3);
-			builder.AppendJoin(' ', tokens[(tokenIndex + 1)..endSuffix]);
-
-			return builder.ToString();
-		}
-
-		public static string FormatQuoting(string[] entries) {
-			return string.Join(", ", entries.Select(s => $"'{s}'"));
-		}
-	}
-
-	public sealed class InvalidCommandSyntaxException : Exception {
-		public InvalidCommandSyntaxException(string message, string[] tokens, int tokenIndex, string format = CommandFormat.MARKER_FORMAT)
-			: base($"{message}: {CommandFormat.FormatWhere(tokens, tokenIndex, format)}") {
-		}
-
-		public InvalidCommandSyntaxException(string message)
-			: base(message) {
-		}
-	}
-
-	public sealed class AmbiguousCommandException : Exception {
-		public AmbiguousCommandException(string[] matching, string[] tokens, int tokenIndex, string format = CommandFormat.MARKER_FORMAT)
-			:  base($"Ambiguity between {CommandFormat.FormatQuoting(matching)}" +
-				   $" at token '{tokens[tokenIndex]}': " +
-				   $"\"{CommandFormat.FormatWhere(tokens, tokenIndex, format)}\"") {
-		}
-	}
-
-	public sealed class UnknownOrIncompleteCommandException : Exception {
-		public UnknownOrIncompleteCommandException(string[] tokens, int tokenIndex)
-			: base($"Unknown or incomplete command at token '{tokens[tokenIndex]}': " +
-				  $"{CommandFormat.FormatWhere(tokens, tokenIndex)}") {
-		}
-	}
-
-	public sealed class UnexpectedCommandException : Exception {
-		public UnexpectedCommandException(string[] tokens, int tokenIndex)
-			: base($"Unexpected command exception at token '{tokens[tokenIndex]}': " +
-				  $"{CommandFormat.FormatWhere(tokens, tokenIndex)}") {
-		}
-	}
-
-	public sealed class CommandNodeNotTerminalException : Exception {
-		public CommandNodeNotTerminalException(string[] tokens, int tokenIndex)
-			: base($"Node not terminal: {tokens[tokenIndex]}: " +
-				  $"{CommandFormat.FormatWhere(tokens, tokenIndex)}") {
+		private void RebuildRoot() {
+			CommandBuilder currentNodeBuilder = CommandBuilder.Literal("_root_");
+			foreach (var command in EnumerateAllCommands()) {
+				currentNodeBuilder.Then(command);
+			}
+			rootNode = currentNodeBuilder.GetRootNode();
 		}
 	}
 }

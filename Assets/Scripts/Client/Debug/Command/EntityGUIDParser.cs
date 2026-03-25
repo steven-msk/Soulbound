@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace SoulboundBackend.Client.Debug.Commands {
-	public sealed class EntityParser : ICommandArgumentParser<Guid> {
+	public sealed class EntityGUIDParser : ICommandArgumentParser<Guid> {
 		public ParseResult<Guid> TryParse(string token, CommandParsingContext ctx) {
 			if (!Guid.TryParse(token, out Guid guid)) {
 				return ParseResult<Guid>.Fail();
