@@ -12,5 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52e955701bfdaef4b967cb64a805cb08, type: 3}
   m_Name: blockBreak
   m_EditorClassIdentifier: 
-  clip: {fileID: 0}
-  volume: 1
+  clips:
+  - {fileID: 8300000, guid: d1c6ab6a2e18fc1498d608d5c24affeb, type: 3}
+  volume: 0.03
+  randomizeVolume: 0
+  volumeMin: 0
+  volumeMax: 1
+  pitch: 1
+  randomizePitch: 1
+  pitchMin: 0.8
+  pitchMax: 1.2

@@ -7,30 +7,25 @@ namespace SoulboundBackend.Core.Audio {
 	public static class AudioManager {
 		public const float MASTER_VOLUME = 1f;
 		private static AudioSource oneShotSource;
-		private static readonly AssetKey jumpClip = new("jump");
-		private static readonly AssetKey blockBreakClip = new("blockBreak");
-		private static readonly AssetKey blockPlaceClip = new("blockPlace");
 
-		public static void Init(AudioSource source) {
+		public static void InitOneShot(AudioSource source) {
 			oneShotSource = source;
 		}
 
-		public static void Emit(AudioCue cue) {
+		public static void Play(AudioCue cue) {
 			SoundDefinition sound = GetSound(cue);
 			if (sound == null) return;
 
 			AudioClip clip = sound.GetClip();
 			oneShotSource.pitch = sound.GetPitch();
-			oneShotSource.PlayOneShot(clip, sound.GetVolume() * MASTER_VOLUME);
+			float volume = cue.volumeOverride != null
+				? cue.volumeOverride.Value
+				: sound.GetVolume();
+			oneShotSource.PlayOneShot(clip, volume * MASTER_VOLUME);
 		}
 
 		private static SoundDefinition GetSound(AudioCue cue) {
-			return AssetManager.Resolve<SoundDefinition>(cue switch {
-				AudioCue.BlockBreak => blockBreakClip,
-				AudioCue.BlockPlace => blockPlaceClip,
-				AudioCue.Jump => jumpClip,
-				_ => null
-			});
+			return AssetManager.Resolve<SoundDefinition>(cue.assetKey);
 		}
 	}
 }

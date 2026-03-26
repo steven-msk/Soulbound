@@ -1,6 +1,5 @@
 using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
-using SoulboundBackend.Client;
 using SoulboundBackend.Client.Debug;
 using SoulboundBackend.Client.Debug.Commands;
 using SoulboundBackend.Client.Debug.Metrics;
@@ -21,7 +20,6 @@ using SoulboundBackend.Common;
 using SoulboundBackend.Common.Json;
 using SoulboundBackend.Core.Assets;
 using SoulboundBackend.Core.Audio;
-using SoulboundBackend.Core.Event;
 using SoulboundBackend.Core.Serialization;
 using System;
 using System.Collections.Generic;
@@ -63,7 +61,7 @@ namespace SoulboundBackend.Core {
 		private readonly InputManager inputManager;
 		private WorldSession? activeWorldSession;
 
-		[PROTOTYPICAL] private AudioEventRouter audioEventRouter = new();
+		private AudioEventBank audioEventBank = new();
 
 		public Soulbound(GameConfig config) {
 			instance = this;
@@ -142,14 +140,12 @@ namespace SoulboundBackend.Core {
 				inputManager.PushContext(session.levelManager);
 
 				runtimeDataProvider.SetWorldSessionState(session);
-				runtimeExecutionServices.SetWorldSesstionState(session);
+				runtimeExecutionServices.SetWorldSessionState(session);
 				commandProcessor.RegisterProvider(worldSessionCommands);
 
 				// PROTOTYPICAL
-				AudioManager.Init(session.audioSource);
-				EventBus.AddListener<BlockPlacedEvent>(audioEventRouter);
-				EventBus.AddListener<BlockBrokenEvent>(audioEventRouter);
-				EventBus.AddListener<PlayerJumpedEvent>(audioEventRouter);
+				AudioManager.InitOneShot(session.audioSource);
+				audioEventBank.Activate();
 			}).Forget(e => Logger.LogFatal(e));
 		}
 
@@ -173,11 +169,9 @@ namespace SoulboundBackend.Core {
 					commandProcessor.UnregisterProvider(worldSessionCommands);
 
 					// PROTOTYPICAL
-					EventBus.RemoveListener<BlockPlacedEvent>(audioEventRouter);
-					EventBus.RemoveListener<BlockBrokenEvent>(audioEventRouter);
-					EventBus.RemoveListener<PlayerJumpedEvent>(audioEventRouter);
+					audioEventBank.Deactivate();
 				})
-			.Forget(UnityEngine.Debug.LogException);
+			.Forget(e => Logger.LogFatal(e));
 		}
 
 		void IApplicationController.OnApplicationQuit() {

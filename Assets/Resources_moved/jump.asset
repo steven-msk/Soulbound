@@ -12,5 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52e955701bfdaef4b967cb64a805cb08, type: 3}
   m_Name: jump
   m_EditorClassIdentifier: 
-  clip: {fileID: 0}
-  volume: 0
+  clips: []
+  volume: 0.07
+  randomizeVolume: 0
+  volumeMin: 0
+  volumeMax: 1
+  pitch: 1
+  randomizePitch: 0
+  pitchMin: 0
+  pitchMax: 0

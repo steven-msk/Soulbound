@@ -39,12 +39,6 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 19624742bc518e445b51ca5612e1d17a
-    m_Address: blockPlace
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 1b6a0acceb53f9a42b1c3987563d2414
     m_Address: WhiteSquareTile
     m_ReadOnly: 0
@@ -117,6 +111,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 546860b57eb820a42acb13ab6589d854
+    m_Address: jump
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 565fe1640666a874298849ae50107d82
     m_Address: Slot
     m_ReadOnly: 0
@@ -141,12 +141,6 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 69bdd23357632644687296d5bf55508f
-    m_Address: jump
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 6dba1d9a1a8ab8244bbe1ac62086a249
     m_Address: stone
     m_ReadOnly: 0
@@ -155,6 +149,12 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 714a27d172464694bbafd67b6569eace
     m_Address: ReactInactiveTile
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 71acae751bde3e641beb5d67e004dfd3
+    m_Address: blockBreak
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload
@@ -191,6 +191,12 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 7fa8aacfb5495fa46a782e28efb99c16
     m_Address: WorldEnter
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 807b2af3fa5a28f45adb103b36cf1aaf
+    m_Address: blockPlace
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload
@@ -305,12 +311,6 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: cbf0dfe6112d8e84c849d454f1474d8f
     m_Address: JosefinSans-Medium SDF
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: d1c6ab6a2e18fc1498d608d5c24affeb
-    m_Address: blockBreak
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload

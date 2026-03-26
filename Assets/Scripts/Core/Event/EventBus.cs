@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 #nullable enable
 
@@ -10,7 +11,8 @@ namespace SoulboundBackend.Core.Event {
 		private static readonly Queue<(IGameEvent, Action<HashSet<Type>>?)> queuedEvents = new();
 		private static readonly Dictionary<Type, List<IListenerWrapper>> listenersByEventType = new();
 		private static readonly Dictionary<Type, List<IHandlerWrapper>> handlersByEventType = new();
-
+		private static readonly Dictionary<Type, EventSubscriptionMetadata> metadataCache = new();
+		
 		public static void Publish<T>(T e, Action<HashSet<Type>>? response = null) where T : struct, IGameEvent {
 			if (isDispatching) {
 				queuedEvents.Enqueue((e, response));
@@ -74,10 +76,79 @@ namespace SoulboundBackend.Core.Event {
 			}
 		}
 
+		public static void AddAllInterfaces(object obj) {
+			Type type = obj.GetType();
+			if (!metadataCache.TryGetValue(type, out var meta)) {
+				meta = BuildMetadata(type);
+				metadataCache[type] = meta;
+			}
+			meta.add(obj);
+		}
+
+		public static void RemoveAllInterfaces(object obj) {
+			Type type = obj.GetType();
+			if (!metadataCache.TryGetValue(type, out var meta)) {
+				meta = BuildMetadata(type);
+				metadataCache[type] = meta;
+			}
+			meta.remove(obj);
+		}
+
+		private static EventSubscriptionMetadata BuildMetadata(Type type) {
+			Type[] interfaces = type.GetInterfaces();
+			List<Action<object>> addActions = new();
+			List<Action<object>> removeActions = new();
+
+			foreach (var iface in interfaces) {
+				if (!iface.IsGenericType) continue;
+
+				Type definition = iface.GetGenericTypeDefinition();
+				Type eventType = iface.GetGenericArguments()[0];
+
+				if (definition == typeof(IEventListener<>)) {
+					MethodInfo addMethod = typeof(EventBus)
+						.GetMethod(nameof(AddListener))
+						.MakeGenericMethod(eventType);
+
+					addActions.Add(obj => addMethod.Invoke(null, new[] { obj }));
+
+					MethodInfo removeMethod = typeof(EventBus)
+						.GetMethod(nameof(RemoveListener))
+						.MakeGenericMethod(eventType);
+
+					removeActions.Add(obj => removeMethod.Invoke(null, new[] { obj }));
+				}
+
+				if (definition == typeof(IEventHandler<>)) {
+					MethodInfo addMethod = typeof(EventBus)
+						.GetMethod(nameof(AddHandler))
+						.MakeGenericMethod(eventType);
+
+					addActions.Add(obj => addMethod.Invoke(null, new[] { obj }));
+
+					MethodInfo removeMethod = typeof(EventBus)
+						.GetMethod(nameof(RemoveHandler))
+						.MakeGenericMethod(eventType);
+
+					removeActions.Add(obj => removeMethod.Invoke(null, new[] { obj }));
+				}
+			}
+
+			return new EventSubscriptionMetadata {
+				add = obj => {
+					foreach (var action in addActions) action(obj);
+				},
+				remove = obj => {
+					foreach (var action in removeActions) action(obj);
+				}
+			};
+		}
+
 		public static void Clear() {
 			listenersByEventType.Clear();
 			handlersByEventType.Clear();
 			queuedEvents.Clear();
+			metadataCache.Clear();
 		}
 
 		private static void OnDispatchFinished() {
