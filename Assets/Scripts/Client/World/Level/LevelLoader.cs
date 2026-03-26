@@ -1,12 +1,6 @@
 using Cysharp.Threading.Tasks;
 using SoulboundBackend.Client.World.Generation;
-using SoulboundBackend.Core;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
 using UnityEngine.ResourceManagement.Exceptions;
 
 namespace SoulboundBackend.Client.World.LevelDomain {
@@ -33,7 +27,8 @@ namespace SoulboundBackend.Client.World.LevelDomain {
 				level = level,
 				levelManager = levelManager,
 				player = level.GetPlayer(),
-				canvas = sceneRoot.canvas
+				canvas = sceneRoot.canvas,
+				audioSource = sceneRoot.audioSource
 			};
 		}
 

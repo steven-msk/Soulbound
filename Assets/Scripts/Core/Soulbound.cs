@@ -20,6 +20,8 @@ using SoulboundBackend.Client.World.Serialization;
 using SoulboundBackend.Common;
 using SoulboundBackend.Common.Json;
 using SoulboundBackend.Core.Assets;
+using SoulboundBackend.Core.Audio;
+using SoulboundBackend.Core.Event;
 using SoulboundBackend.Core.Serialization;
 using System;
 using System.Collections.Generic;
@@ -27,7 +29,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using Logger = SoulboundBackend.Client.Debug.Logging.Logger;
 
@@ -61,6 +62,8 @@ namespace SoulboundBackend.Core {
 		private readonly SoulboundDebug debug;
 		private readonly InputManager inputManager;
 		private WorldSession? activeWorldSession;
+
+		[PROTOTYPICAL] private AudioEventRouter audioEventRouter = new();
 
 		public Soulbound(GameConfig config) {
 			instance = this;
@@ -141,6 +144,12 @@ namespace SoulboundBackend.Core {
 				runtimeDataProvider.SetWorldSessionState(session);
 				runtimeExecutionServices.SetWorldSesstionState(session);
 				commandProcessor.RegisterProvider(worldSessionCommands);
+
+				// PROTOTYPICAL
+				AudioManager.Init(session.audioSource);
+				EventBus.AddListener<BlockPlacedEvent>(audioEventRouter);
+				EventBus.AddListener<BlockBrokenEvent>(audioEventRouter);
+				EventBus.AddListener<PlayerJumpedEvent>(audioEventRouter);
 			}).Forget(e => Logger.LogFatal(e));
 		}
 
@@ -162,6 +171,11 @@ namespace SoulboundBackend.Core {
 					runtimeDataProvider.ExitWorldSessionState();
 					runtimeExecutionServices.ExitWorldSessionState();
 					commandProcessor.UnregisterProvider(worldSessionCommands);
+
+					// PROTOTYPICAL
+					EventBus.RemoveListener<BlockPlacedEvent>(audioEventRouter);
+					EventBus.RemoveListener<BlockBrokenEvent>(audioEventRouter);
+					EventBus.RemoveListener<PlayerJumpedEvent>(audioEventRouter);
 				})
 			.Forget(UnityEngine.Debug.LogException);
 		}

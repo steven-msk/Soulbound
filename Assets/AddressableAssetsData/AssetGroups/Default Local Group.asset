@@ -39,6 +39,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 19624742bc518e445b51ca5612e1d17a
+    m_Address: blockPlace
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 1b6a0acceb53f9a42b1c3987563d2414
     m_Address: WhiteSquareTile
     m_ReadOnly: 0
@@ -131,6 +137,12 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 64067c85458cdc84f9649a00354a7755
     m_Address: StatisticsButton
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 69bdd23357632644687296d5bf55508f
+    m_Address: jump
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload
@@ -293,6 +305,12 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: cbf0dfe6112d8e84c849d454f1474d8f
     m_Address: JosefinSans-Medium SDF
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d1c6ab6a2e18fc1498d608d5c24affeb
+    m_Address: blockBreak
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload

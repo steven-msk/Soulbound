@@ -1,8 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SoulboundBackend.Common {
 	[AttributeUsage(AttributeTargets.Method
@@ -12,7 +8,8 @@ namespace SoulboundBackend.Common {
 		| AttributeTargets.Struct
 		| AttributeTargets.Enum
 		| AttributeTargets.Event
-		| AttributeTargets.Field, AllowMultiple = false)]
+		| AttributeTargets.Field
+		| AttributeTargets.Property, AllowMultiple = false)]
 	/// <summary>
 	/// Used to indicate something is of a prototypical nature, and is yet to be implemented properly.
 	/// Implementations decorated with this attribute are not (yet) subjects to test cases.

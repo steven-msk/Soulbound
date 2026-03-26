@@ -9,6 +9,7 @@ using SoulboundBackend.Client.World.EntitySystem.Transform;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core;
 using SoulboundBackend.Core.Assets;
+using SoulboundBackend.Core.Event;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -141,7 +142,12 @@ namespace SoulboundBackend.Client.Players {
 
 		private void OnLeftClick() {
 			if (!ResolveItemOrBlockInteraction(InteractionTrigger.LeftClick)) {
-				TryBreakBlock((BlockPos)GetWorldPointerPos());
+
+				// PROTOTYPICAL
+				BlockPos blockPos = (BlockPos)GetWorldPointerPos();
+				if (TryBreakBlock(blockPos)) {
+					EventBus.Publish(new BlockBrokenEvent(blockPos, level));
+				}
 			}
 		}
 		private void OnRightClick() {
@@ -150,7 +156,12 @@ namespace SoulboundBackend.Client.Players {
 
 		private void OnLeftHold() {
 			if (!ResolveItemOrBlockInteraction(InteractionTrigger.LeftHold)) {
-				TryBreakBlock((BlockPos)GetWorldPointerPos());
+
+				// PROTOTYPICAL
+				BlockPos blockPos = (BlockPos)GetWorldPointerPos();
+				if (TryBreakBlock(blockPos)) {
+					EventBus.Publish(new BlockBrokenEvent(blockPos, level));
+				}
 			}
 		}
 		private void OnRightHold() {

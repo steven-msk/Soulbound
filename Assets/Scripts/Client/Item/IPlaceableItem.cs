@@ -1,7 +1,7 @@
 using SoulboundBackend.Client.Interaction;
-using SoulboundBackend.Client.World;
 using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Client.World.BlockSystem.States;
+using SoulboundBackend.Core.Event;
 
 namespace SoulboundBackend.Client.ItemSystem {
 	public interface IPlaceableItem : IItemInteractionListener {
@@ -19,7 +19,11 @@ namespace SoulboundBackend.Client.ItemSystem {
 		bool IItemInteractionListener.TryExecute(ItemStack itemStack, in ItemInteraction ctx) {
 			BlockState blockState = GetBlockState(itemStack);
 			BlockPos blockPos = (BlockPos)ctx.player.GetWorldPointerPos();
+
 			ctx.level.SetBlockState(blockPos, blockState);
+
+			// PROTOTYPICAL
+			EventBus.Publish(new BlockPlacedEvent(blockState, blockPos, ctx.level));
 
 			itemStack.Decrement();
 

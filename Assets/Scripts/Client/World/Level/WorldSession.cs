@@ -1,6 +1,6 @@
 using SoulboundBackend.Client.Players;
 using SoulboundBackend.Client.World.Serialization;
-using SoulboundBackend.Core;
+using SoulboundBackend.Common;
 using UnityEngine;
 
 namespace SoulboundBackend.Client.World.LevelDomain {
@@ -10,5 +10,8 @@ namespace SoulboundBackend.Client.World.LevelDomain {
 		public LevelManager levelManager;
 		public Level level;
 		public Canvas canvas;
+
+		[PROTOTYPICAL]
+		public AudioSource audioSource;
 	}
 }

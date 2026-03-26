@@ -6,9 +6,11 @@ namespace SoulboundBackend.Client.World.LevelDomain {
 		[SerializeField] Grid _grid;
 		[SerializeField] Tilemap _tilemap;
 		[SerializeField] Canvas _canvas;
+		[SerializeField] AudioSource _audioSource;
 
 		public Grid grid => _grid;
 		public Tilemap tilemap => _tilemap;
 		public Canvas canvas => _canvas;
+		public AudioSource audioSource => _audioSource;
 	}
 }

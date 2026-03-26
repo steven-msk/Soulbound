@@ -2,6 +2,7 @@ using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.World.EntitySystem;
 using SoulboundBackend.Client.World.EntitySystem.Transform;
 using SoulboundBackend.Core;
+using SoulboundBackend.Core.Event;
 using UnityEngine;
 
 #nullable enable
@@ -55,6 +56,9 @@ namespace SoulboundBackend.Client.Players {
 
 		public void Jump() {
 			rb.linearVelocity = new Vector2(rb.linearVelocityX, jumpForce);
+
+			// PROTOTYPICAL
+			EventBus.Publish(new PlayerJumpedEvent(player));
 		}
 
 		private void UpdateIsGrounded() {
