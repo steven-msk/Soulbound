@@ -24,6 +24,7 @@ namespace SoulboundBackend.Client.Players {
 		[Header("Data knobs")]
 		[SerializeField] private float speed = 1f;
 		[SerializeField] private float jumpForce = 1f;
+		private bool jumpedThisFrame = false;
 
 		void IEntityTransform.Bind(Entity entity) {
 			this.player = (Player)entity;
@@ -43,11 +44,11 @@ namespace SoulboundBackend.Client.Players {
 			rb.linearVelocity = new Vector2(normalVelocity.x * speed, rb.linearVelocityY);
 			rbVelocity = rb.linearVelocity;
 
-			if (isJumping && isGrounded) Jump();
 		}
 
 		private void FixedUpdate() {
 			UpdateIsGrounded();
+			if (isJumping && isGrounded) Jump();
 		}
 
 		internal void SetJumping(bool value) {
@@ -56,15 +57,15 @@ namespace SoulboundBackend.Client.Players {
 
 		public void Jump() {
 			rb.linearVelocity = new Vector2(rb.linearVelocityX, jumpForce);
-
 			// PROTOTYPICAL
+			this.isGrounded = false;
 			EventBus.Publish(new PlayerJumpedEvent(player));
 		}
 
 		private void UpdateIsGrounded() {
 			int groundMask = LayerMask.GetMask(Layers.Ground);
-			RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 1.1f, groundMask);
-			UnityEngine.Debug.DrawRay(transform.position, Vector2.down * 1.1f, Color.red, 1, false);
+			RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 1.05f, groundMask);
+			UnityEngine.Debug.DrawRay(transform.position, Vector2.down * 1.05f, Color.red, 1, false);
 			isGrounded = hit.collider != null;
 		}
 
