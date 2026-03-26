@@ -2,32 +2,42 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+#nullable enable
+
 namespace SoulboundBackend.Core.Event {
 	public static class EventBus {
 		private static bool isDispatching;
-		private static readonly Queue<IGameEvent> queuedEvents = new();
+		private static readonly Queue<(IGameEvent, Action<HashSet<Type>>?)> queuedEvents = new();
 		private static readonly Dictionary<Type, List<IListenerWrapper>> listenersByEventType = new();
+		private static readonly Dictionary<Type, List<IHandlerWrapper>> handlersByEventType = new();
 
-		public static void Publish<T>(T e) where T : struct, IGameEvent {
+		public static void Publish<T>(T e, Action<HashSet<Type>>? response = null) where T : struct, IGameEvent {
 			if (isDispatching) {
-				queuedEvents.Enqueue(e);
+				queuedEvents.Enqueue((e, response));
 				return;
 			}
-			Publish(e);
+			Publish((IGameEvent)e, response);
 		}
 
-		private static void Publish(IGameEvent e) {
+		private static void Publish(IGameEvent e, Action<HashSet<Type>>? response) {
 			if (isDispatching) return;
 			isDispatching = true;
 
-			EventDispatcher dispatcher = new(e);
-			dispatcher.onDispatchFinished += OnDispatchFinished;
+			HashSet<Type> responseTypes = new();
+			if (handlersByEventType.TryGetValue(e.GetType(), out var handlers)) {
+				foreach (var handler in handlers.ToArray()) {
+					handler.Fire(e);
+					responseTypes.Add(handler.GetHandlerType());
+				}
+			}
+			if (listenersByEventType.TryGetValue(e.GetType(), out var listeners)) {
+				foreach (var listener in listeners.ToArray()) {
+					listener.Fire(e);
+				}
+			}
 
-			IEnumerable<IListenerWrapper> listeners = listenersByEventType
-				.Where(kvp => kvp.Key == e.GetType())
-				.SelectMany(kvp => kvp.Value)
-				.ToList();
-			dispatcher.Dispatch(listeners);
+			OnDispatchFinished();
+			response?.Invoke(responseTypes);
 		}
 
 		public static void AddListener<T>(IEventListener<T> listener) where T : struct, IGameEvent {
@@ -47,15 +57,34 @@ namespace SoulboundBackend.Core.Event {
 			}
 		}
 
+		public static void AddHandler<T>(IEventHandler<T> handler) where T : struct, IGameEvent {
+			Type eventType = typeof(T);
+			if (!handlersByEventType.ContainsKey(eventType)) {
+				handlersByEventType[eventType] = new List<IHandlerWrapper>();
+			}
+
+			List<IHandlerWrapper> existing = handlersByEventType[eventType];
+			bool duplicate = existing.Any(h => ReferenceEquals(h.GetWrappedListener(), handler));
+			if (!duplicate) existing.Add(new HandlerWrapper<T>(handler));
+		}
+
+		public static void RemoveHandler<T>(IEventHandler<T> handler) where T : struct, IGameEvent {
+			if (handlersByEventType.TryGetValue(typeof(T), out var wrappers)) {
+				wrappers.RemoveAll(h => ReferenceEquals(h.GetWrappedListener(), handler));
+			}
+		}
+
 		public static void Clear() {
 			listenersByEventType.Clear();
+			handlersByEventType.Clear();
 			queuedEvents.Clear();
 		}
 
 		private static void OnDispatchFinished() {
 			isDispatching = false;
 			if (queuedEvents.Any()) {
-				Publish(queuedEvents.Dequeue());
+				(IGameEvent e, Action<HashSet<Type>>? response) = queuedEvents.Dequeue();
+				Publish(e, response);
 			}
 		}
 
