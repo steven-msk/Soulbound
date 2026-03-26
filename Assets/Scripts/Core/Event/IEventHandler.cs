@@ -1,5 +1,5 @@
 namespace SoulboundBackend.Core.Event {
-	public interface IEventHandler<T> : IEventListener<T> where T : struct, IGameEvent {
+	public interface IEventHandler<in T> : IEventListener<T> where T : struct, IGameEvent {
 
 	}
 }
