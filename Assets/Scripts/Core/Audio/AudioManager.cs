@@ -20,6 +20,7 @@ namespace SoulboundBackend.Core.Audio {
 			if (sound == null) return;
 
 			AudioClip clip = sound.GetClip();
+			oneShotSource.pitch = sound.GetPitch();
 			oneShotSource.PlayOneShot(clip, sound.GetVolume() * MASTER_VOLUME);
 		}
 
