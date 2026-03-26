@@ -5,6 +5,7 @@ using UnityEngine;
 namespace SoulboundBackend.Core.Audio {
 	[PROTOTYPICAL]
 	public static class AudioManager {
+		public const float MASTER_VOLUME = 1f;
 		private static AudioSource oneShotSource;
 		private static readonly AssetKey jumpClip = new("jump");
 		private static readonly AssetKey blockBreakClip = new("blockBreak");
@@ -15,13 +16,15 @@ namespace SoulboundBackend.Core.Audio {
 		}
 
 		public static void Emit(AudioCue cue) {
-			AudioClip clip = GetClip(cue);
-			if (clip == null) return;
-			oneShotSource.PlayOneShot(clip);
+			SoundDefinition sound = GetSound(cue);
+			if (sound == null) return;
+
+			AudioClip clip = sound.GetClip();
+			oneShotSource.PlayOneShot(clip, sound.GetVolume() * MASTER_VOLUME);
 		}
 
-		private static AudioClip GetClip(AudioCue cue) {
-			return AssetManager.Resolve<AudioClip>(cue switch {
+		private static SoundDefinition GetSound(AudioCue cue) {
+			return AssetManager.Resolve<SoundDefinition>(cue switch {
 				AudioCue.BlockBreak => blockBreakClip,
 				AudioCue.BlockPlace => blockPlaceClip,
 				AudioCue.Jump => jumpClip,

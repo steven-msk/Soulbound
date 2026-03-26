@@ -24,7 +24,6 @@ namespace SoulboundBackend.Client.Players {
 		[Header("Data knobs")]
 		[SerializeField] private float speed = 1f;
 		[SerializeField] private float jumpForce = 1f;
-		private bool jumpedThisFrame = false;
 
 		void IEntityTransform.Bind(Entity entity) {
 			this.player = (Player)entity;
@@ -43,7 +42,6 @@ namespace SoulboundBackend.Client.Players {
 		private void Update() {
 			rb.linearVelocity = new Vector2(normalVelocity.x * speed, rb.linearVelocityY);
 			rbVelocity = rb.linearVelocity;
-
 		}
 
 		private void FixedUpdate() {
