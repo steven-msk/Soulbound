@@ -28,7 +28,6 @@ namespace SoulboundBackend.Client.World.LevelDomain {
 				levelManager = levelManager,
 				player = level.GetPlayer(),
 				canvas = sceneRoot.canvas,
-				audioSource = sceneRoot.audioSource
 			};
 		}
 

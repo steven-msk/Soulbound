@@ -5,7 +5,7 @@ using Logger = SoulboundBackend.Client.Debug.Logging.Logger;
 namespace SoulboundBackend.Core.Audio {
 	[CreateAssetMenu(menuName = "Audio/Sound", fileName = "sound")]
 	public class SoundDefinition : ScriptableObject {
-		[Header("Clips")]
+		[SerializeField] private SoundType soundType;
 		[SerializeField] private AudioClip[] clips;
 
 		[Header("Volume")]
@@ -37,5 +37,7 @@ namespace SoulboundBackend.Core.Audio {
 			if (!randomizePitch) return pitch;
 			return UnityEngine.Random.Range(pitchMin, pitchMax);
 		}
+
+		public SoundType GetSoundType() => soundType;
 	}
 }

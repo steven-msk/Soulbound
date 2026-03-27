@@ -90,7 +90,7 @@ namespace SoulboundBackend.Core {
 			uiAudioEventBank.Activate();
 
 			// PROTOTYPICAL
-			AudioManager.InitOneShot(UnityEngine.Object.FindFirstObjectByType<AudioSource>());
+			AudioManager.RebuildPools();
 
 			RuntimeHelpers.RunClassConstructor(typeof(EntityType).TypeHandle);
 			RuntimeHelpers.RunClassConstructor(typeof(Items).TypeHandle);
@@ -147,7 +147,7 @@ namespace SoulboundBackend.Core {
 				commandProcessor.RegisterProvider(worldSessionCommands);
 
 				// PROTOTYPICAL
-				AudioManager.InitOneShot(session.audioSource);
+				AudioManager.RebuildPools();
 				worldAudioEventBank.Activate();
 			}).Forget(e => Logger.LogFatal(e));
 		}
@@ -172,7 +172,7 @@ namespace SoulboundBackend.Core {
 					commandProcessor.UnregisterProvider(worldSessionCommands);
 
 					// PROTOTYPICAL
-					AudioManager.InitOneShot(UnityEngine.Object.FindFirstObjectByType<AudioSource>());
+					AudioManager.RebuildPools();
 					worldAudioEventBank.Deactivate();
 				})
 			.Forget(e => Logger.LogFatal(e));

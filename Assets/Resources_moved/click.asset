@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52e955701bfdaef4b967cb64a805cb08, type: 3}
   m_Name: click
   m_EditorClassIdentifier: 
+  soundType: 1
   clips:
   - {fileID: 8300000, guid: 944bface4a72efd4b9fa2b3aba163f11, type: 3}
-  volume: 1
+  volume: 0.115
   randomizeVolume: 0
   volumeMin: 0
   volumeMax: 1
