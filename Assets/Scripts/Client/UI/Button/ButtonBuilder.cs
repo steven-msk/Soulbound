@@ -1,18 +1,14 @@
-using SoulboundBackend.Client.UI;
 using SoulboundBackend.Client.UI.Containers;
 using SoulboundBackend.Client.UI.Tooltips;
 using SoulboundBackend.Common;
 using SoulboundBackend.Common.Unity;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SoulboundBackend.Client.UI.Buttons {
+	[PROTOTYPICAL]
 	public class ButtonBuilder : IUIElementHandleBuilder<IButtonHandle>, ITooltipComponentBuilder<ButtonBuilder> {
-		private readonly IUIElementTemplate<ButtonHandle> template;
+		private readonly IUIElementTemplate<LabelButtonHandle> template;
 		private string text;
 		private bool enabled = true;
 		private Action onClick;
@@ -20,7 +16,7 @@ namespace SoulboundBackend.Client.UI.Buttons {
 		private ITooltip tooltip;
 		private Type tooltipTriggerType;
 
-		public ButtonBuilder(IUIElementTemplate<ButtonHandle> template) {
+		public ButtonBuilder(IUIElementTemplate<LabelButtonHandle> template) {
 			this.template = template;
 		}
 
@@ -57,7 +53,7 @@ namespace SoulboundBackend.Client.UI.Buttons {
 				ITooltipTrigger trigger = (ITooltipTrigger)obj.AddComponent(tooltipTriggerType);
 				trigger.SetTooltip(tooltip);
 			}
-			var handle = obj.GetOrAddComponent<ButtonHandle>();
+			var handle = obj.GetOrAddComponent<LabelButtonHandle>();
 			handle.Build(text, enabled, onClick);
 
 			UIElementNode node = new(obj);

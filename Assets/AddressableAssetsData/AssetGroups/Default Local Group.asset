@@ -21,6 +21,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0f932da0be6fbc34fa244d63edae9ef8
+    m_Address: click
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 13bd427b029dcaa4cbd789c8d21c4966
     m_Address: blockHitEffect
     m_ReadOnly: 0

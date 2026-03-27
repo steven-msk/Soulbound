@@ -9,7 +9,7 @@ namespace SoulboundBackend.Core.Audio {
 			this.cueSupplier = cueSupplier;
 		}
 
-		public void OnEvent(T e) {
+		public virtual void OnEvent(T e) {
 			AudioManager.Play(cueSupplier());
 		}
 	}

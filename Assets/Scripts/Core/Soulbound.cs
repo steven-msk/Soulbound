@@ -30,7 +30,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Logger = SoulboundBackend.Client.Debug.Logging.Logger;
 
-
 #nullable enable
 
 namespace SoulboundBackend.Core {
@@ -59,9 +58,9 @@ namespace SoulboundBackend.Core {
 		private readonly DebugMetricsService debugMetricsService;
 		private readonly SoulboundDebug debug;
 		private readonly InputManager inputManager;
+		private readonly WorldAudioEventBank worldAudioEventBank = new();
+		private readonly UIAudioEventBank uiAudioEventBank = new();
 		private WorldSession? activeWorldSession;
-
-		private AudioEventBank audioEventBank = new();
 
 		public Soulbound(GameConfig config) {
 			instance = this;
@@ -73,7 +72,7 @@ namespace SoulboundBackend.Core {
 
 			commandProcessor = new CommandProcessor(runtimeDataProvider, runtimeExecutionServices);
 			debugMetricsService = new DebugMetricsService();
-			debug = new SoulboundDebug(UnityEngine.Debug.unityLogger, debugMetricsService, commandProcessor);
+			debug = new SoulboundDebug(Debug.unityLogger, debugMetricsService, commandProcessor);
 			inputManager.PushContext(debug);
 			RegisterDebugMetricsSource(this);
 			performanceMetrics = new PerformanceMetrics();
@@ -88,6 +87,10 @@ namespace SoulboundBackend.Core {
 			// scene may not be available at this time
 			uiHandler = new UIHandler(UnityEngine.Object.FindFirstObjectByType<Canvas>());
 			inputManager.PushContext(uiHandler);
+			uiAudioEventBank.Activate();
+
+			// PROTOTYPICAL
+			AudioManager.InitOneShot(UnityEngine.Object.FindFirstObjectByType<AudioSource>());
 
 			RuntimeHelpers.RunClassConstructor(typeof(EntityType).TypeHandle);
 			RuntimeHelpers.RunClassConstructor(typeof(Items).TypeHandle);
@@ -145,7 +148,7 @@ namespace SoulboundBackend.Core {
 
 				// PROTOTYPICAL
 				AudioManager.InitOneShot(session.audioSource);
-				audioEventBank.Activate();
+				worldAudioEventBank.Activate();
 			}).Forget(e => Logger.LogFatal(e));
 		}
 
@@ -169,7 +172,8 @@ namespace SoulboundBackend.Core {
 					commandProcessor.UnregisterProvider(worldSessionCommands);
 
 					// PROTOTYPICAL
-					audioEventBank.Deactivate();
+					AudioManager.InitOneShot(UnityEngine.Object.FindFirstObjectByType<AudioSource>());
+					worldAudioEventBank.Deactivate();
 				})
 			.Forget(e => Logger.LogFatal(e));
 		}
