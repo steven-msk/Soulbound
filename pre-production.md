@@ -426,7 +426,7 @@ Based on the dependency graph, this could be an optimal order:
 16. [Settings](#16-settings-ui) **>|**
 17. [Debug features](#15-debug-visuals) **>|** *(base infrastructure is done, but specialized systems will be covered in prod)*
 18. [Lighting](#11-lighting-system)
-19. [Audio](#12-audio-system)
+19. [Audio](#12-audio-system) **>|** *(complete infrastructure for this phase; state-aware and amient sounds TBD during prod)*
 
 > A thing to note about the `input system` and `action request system`: while they may be finished, further development revealed an overhead for their implementations, that being contexts. Their methods are always called under a certain context, whether its a player jump, attack, block placement, ui click, it all depends on what capabilities the current context offers. 
 These will be resolved in prod as there are barely any features using these, but note that this will imply a heavy refactor once more features will be introduced.
