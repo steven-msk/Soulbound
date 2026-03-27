@@ -4,8 +4,7 @@ using SoulboundBackend.Client.World.BlockSystem.TileEntities;
 using SoulboundBackend.Client.World.LevelDomain;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core.Assets;
-
-using System.Resources;
+using SoulboundBackend.World.BlockSystem.Render;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -64,13 +63,14 @@ namespace SoulboundBackend.Client.World.Render {
 		[PROTOTYPICAL]
 		private void RenderBlock(BlockState? state, TileEntity? tileEntity, BlockPos pos, Tilemap tilemap) {
 			state ??= Blocks.air.defaultState;
-			AssetKey tileKey = state.block.GetRenderTileKey(state);
+			BlockRenderData renderData = state.block.GetRenderData(state);
+			AssetKey tileKey = renderData.tileKey;
 			TileBase? tile = tileKey != null
 				? AssetManager.Resolve<TileBase>(tileKey)
 				: null;
 
 			tilemap.SetTile((Vector3Int)pos, tile);
-			tileEntity?.Render(state, tilemap);
+			tilemap.SetColor((Vector3Int)pos, renderData.color);
 		}
 
 		private RectInt ToRect(Vector2Int pivot) {

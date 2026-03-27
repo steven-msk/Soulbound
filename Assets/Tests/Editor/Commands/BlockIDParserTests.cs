@@ -5,13 +5,7 @@ using SoulboundBackend.Client.Runtime.Services;
 using SoulboundBackend.Client.World.BlockSystem;
 using SoulboundBackend.Client.World.BlockSystem.States;
 using SoulboundBackend.Core;
-using SoulboundBackend.Core.Assets;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+using SoulboundBackend.World.BlockSystem.Render;
 
 public class FakeBlock : Block {
 	public override string name { get; init; }
@@ -20,8 +14,8 @@ public class FakeBlock : Block {
 	public FakeBlock(string id) : base(id) {
 	}
 
-	public override AssetKey GetRenderTileKey(BlockState blockState) {
-		return null;
+	public override BlockRenderData GetRenderData(BlockState blockState) {
+		return default;
 	}
 }
 

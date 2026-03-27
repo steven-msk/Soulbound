@@ -1,14 +1,6 @@
-using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.World.BlockSystem.States;
 using SoulboundBackend.Core.Assets;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine.Tilemaps;
-using static Unity.Collections.AllocatorManager;
+using SoulboundBackend.World.BlockSystem.Render;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
 	public class LeafBlock : Block {
@@ -16,7 +8,9 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public override string name { get; init; } = "Leaves";
 		public override int minBreakLevel { get; init; } = 0;
 
-		public override AssetKey GetRenderTileKey(BlockState blockState) => new("leaves");
+		public override BlockRenderData GetRenderData(BlockState blockState) {
+			return new BlockRenderData(new AssetKey("leaves"));
+		}
 
 		protected override BlockState GetDefaultState(IBlockStateRegisterer registerer, BlockPropertyEntries propertyEntries) {
 			return registerer.AddWithProperties(propertyEntries.With("persistent", true));

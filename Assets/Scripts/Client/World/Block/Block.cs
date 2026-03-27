@@ -1,17 +1,11 @@
 using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.World.BlockSystem.States;
 using SoulboundBackend.Client.World.BlockSystem.TileEntities;
-using SoulboundBackend.Client.World.Chunk;
 using SoulboundBackend.Client.World.LevelDomain;
-using SoulboundBackend.Common;
 using SoulboundBackend.Core;
-using SoulboundBackend.Core.Assets;
+using SoulboundBackend.World.BlockSystem.Render;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
-using UnityEngine;
-using UnityEngine.Tilemaps;
 
 #nullable enable
 
@@ -49,7 +43,7 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 
 		public string GetID() => id;
 
-		public abstract AssetKey GetRenderTileKey(BlockState blockState);
+		public abstract BlockRenderData GetRenderData(BlockState blockState);
 
 		protected virtual BlockState GetDefaultState(IBlockStateRegisterer registerer, BlockPropertyEntries properties) {
 			return registerer.AddWithProperties(properties);

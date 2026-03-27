@@ -1,14 +1,9 @@
-using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.World.BlockSystem.States;
 using SoulboundBackend.Client.World.LevelDomain;
 using SoulboundBackend.Common;
 using SoulboundBackend.Common.Math;
 using SoulboundBackend.Core.Assets;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SoulboundBackend.World.BlockSystem.Render;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
 	[PROTOTYPICAL]
@@ -19,12 +14,6 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public override int minBreakLevel { get; init; } = 0;
 
 		public NeighborReactiveBlock() : base("neighborReactiveBlock") {
-		}
-
-		public override AssetKey GetRenderTileKey(BlockState blockState) {
-			return blockState.Get<bool>("on")
-				? new AssetKey("ReactActiveTile")
-				: new AssetKey("ReactInactiveTile");
 		}
 
 		protected override BlockState GetDefaultState(IBlockStateRegisterer registerer, BlockPropertyEntries properties) {
@@ -54,6 +43,13 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			if (shouldActivate != isActive) {
 				level.SetBlockState(selfPos, shouldActivate ? active : inactive);
 			}
+		}
+
+		public override BlockRenderData GetRenderData(BlockState blockState) {
+			return new BlockRenderData(blockState.Get<bool>("on")
+				? new AssetKey("ReactActiveTile")
+				: new AssetKey("ReactInactiveTile")
+			);
 		}
 	}
 }

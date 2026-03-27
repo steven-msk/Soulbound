@@ -1,9 +1,10 @@
+using SoulboundBackend.Client.Debug.Logging;
 using SoulboundBackend.Client.Interaction;
 using SoulboundBackend.Client.ItemSystem;
-using SoulboundBackend.Core.Assets;
-using SoulboundBackend.Client.Debug.Logging;
-using System.Collections.Generic;
 using SoulboundBackend.Client.World.BlockSystem.States;
+using SoulboundBackend.Core.Assets;
+using SoulboundBackend.World.BlockSystem.Render;
+using System.Collections.Generic;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
 	public sealed class ToggleBlock : Block, IBlockInteractionListener {
@@ -13,13 +14,6 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public override int minBreakLevel { get; init; } = 0;
 
 		public ToggleBlock() : base("toggleBlock") { }
-
-		public override AssetKey GetRenderTileKey(BlockState blockState) {
-			bool isOn = blockState.Get<bool>("on");
-			return isOn
-				? new AssetKey("ToggleOnTile")
-				: new AssetKey("ToggleOffTile");
-		}
 
 		public void OnInteract(in BlockInteraction ctx) {
 			bool isOn = ctx.blockState.Get<bool>("on");
@@ -44,6 +38,13 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 
 		public override IEnumerable<ItemStack> GetDrops(BlockState blockState, BreakSource source) {
 			yield break;
+		}
+
+		public override BlockRenderData GetRenderData(BlockState blockState) {
+			return new BlockRenderData(blockState.Get<bool>("on")
+				? new AssetKey("ToggleOnTile")
+				: new AssetKey("ToggleOffTile")
+			);
 		}
 	}
 }

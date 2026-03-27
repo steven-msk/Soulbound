@@ -1,14 +1,9 @@
-using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.World.BlockSystem.States;
 using SoulboundBackend.Client.World.BlockSystem.TileEntities;
 using SoulboundBackend.Client.World.LevelDomain;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core.Assets;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SoulboundBackend.World.BlockSystem.Render;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
 	[PROTOTYPICAL]
@@ -19,12 +14,6 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public override int minBreakLevel { get; init; } = 0;
 
 		public PulseBlock() : base("pulseBlock") {
-		}
-
-		public override AssetKey GetRenderTileKey(BlockState blockState) {
-			return blockState.Get<bool>("on")
-				? new AssetKey("TickBlockOn")
-				: new AssetKey("TickBlockOff");
 		}
 
 		protected override void CreateStates(IBlockStateRegisterer registerer, BlockPropertyEntries properties) {
@@ -42,6 +31,13 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 
 		public override bool HasTileEntity(Level level, BlockPos blockPos, BlockState blockState) {
 			return true;
+		}
+
+		public override BlockRenderData GetRenderData(BlockState blockState) {
+			return new BlockRenderData(blockState.Get<bool>("on")
+				? new AssetKey("TickBlockOn")
+				: new AssetKey("TickBlockOff")
+			);
 		}
 	}
 }

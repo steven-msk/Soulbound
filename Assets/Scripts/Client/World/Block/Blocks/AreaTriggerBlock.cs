@@ -1,20 +1,20 @@
 using SoulboundBackend.Client.Players;
+using SoulboundBackend.Client.World.BlockSystem.States;
+using SoulboundBackend.Client.World.BlockSystem.TileEntities;
+using SoulboundBackend.Client.World.LevelDomain;
 using SoulboundBackend.Common;
 using SoulboundBackend.Core.Assets;
-using SoulboundBackend.Client.Debug.Logging;
-using SoulboundBackend.Client.World.BlockSystem.States;
-using SoulboundBackend.Client.World.LevelDomain;
-using SoulboundBackend.Client.World.BlockSystem.TileEntities;
+using SoulboundBackend.World.BlockSystem.Render;
+using UnityEngine;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
 	[PROTOTYPICAL]
 	public sealed class AreaTriggerBlock : Block {
+		private static BlockState inArea;
+		private static BlockState notInArea;
+
 		public override string name { get; init; } = "Area Trigger Block";
 		public override int minBreakLevel { get; init; } = 0;
-
-		public override AssetKey GetRenderTileKey(BlockState blockState) {
-			return new AssetKey("AreaTriggerTile");
-		}
 
 		public AreaTriggerBlock() : base("areaTriggerBlock") {
 		}
@@ -26,22 +26,36 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public override TileEntity GetTileEntity(Level level, BlockPos blockPos) {
 			ObjectTileEntity tileEntity = new(level, blockPos);
 
-			tileEntity.onTriggerEnter += OnAreaEnter;
-			tileEntity.onTriggerExit += OnAreaExit;
-			tileEntity.onDestroyed += () => {
-				tileEntity.onTriggerEnter -= OnAreaEnter;
-				tileEntity.onTriggerExit -= OnAreaExit;
-			};
+			tileEntity.onTriggerEnter += player => OnAreaEnter(level, blockPos, player);
+			tileEntity.onTriggerExit += player => OnAreaExit(level, blockPos, player);
 
 			return tileEntity;
 		}
 
-		private void OnAreaEnter(Player player) {
-			Logger.LogInfo("player entered area");
+		private void OnAreaEnter(Level level, BlockPos selfPos, Player player) {
+			level.SetBlockState(selfPos, inArea);
 		}
 
-		private void OnAreaExit(Player player) {
-			Logger.LogInfo("player left area");
+		private void OnAreaExit(Level level, BlockPos selfPos, Player player) {
+			level.SetBlockState(selfPos, notInArea);
+		}
+
+		protected override void CreateStates(IBlockStateRegisterer registerer, BlockPropertyEntries properties) {
+			inArea = registerer.AddWithProperties(properties.With("inArea", true));
+			notInArea = registerer.AddWithProperties(properties.With("inArea", false));
+		}
+
+		protected override BlockState GetDefaultState(IBlockStateRegisterer registerer, BlockPropertyEntries properties) {
+			return notInArea;
+		}
+
+		public override BlockRenderData GetRenderData(BlockState blockState) {
+			return new BlockRenderData {
+				tileKey = new AssetKey("AreaTriggerTile"),
+				color = blockState.Get<bool>("inArea")
+					? Color.red
+					: Color.green
+			};
 		}
 	}
 }

@@ -1,9 +1,7 @@
-using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.World.BlockSystem.States;
 using SoulboundBackend.Core.Assets;
-using System;
-using System.Collections.Generic;
-using UnityEngine.Tilemaps;
+using SoulboundBackend.World.BlockSystem.Render;
+using UnityEngine;
 
 #nullable enable
 
@@ -23,6 +21,11 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 			this.tileKey = tileKey;
 		}
 
-		public override AssetKey GetRenderTileKey(BlockState blockState) => tileKey;
+		public override BlockRenderData GetRenderData(BlockState blockState) {
+			return new BlockRenderData {
+				tileKey = this.tileKey,
+				color = Color.white
+			};
+		}
 	}
 }

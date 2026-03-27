@@ -1,12 +1,6 @@
-using SoulboundBackend.Client.ItemSystem;
 using SoulboundBackend.Client.World.BlockSystem.States;
-using SoulboundBackend.Core.Assets;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine.Tilemaps;
+using SoulboundBackend.World.BlockSystem.Render;
+using UnityEngine;
 
 namespace SoulboundBackend.Client.World.BlockSystem {
 	public sealed class AirBlock : Block {
@@ -16,6 +10,11 @@ namespace SoulboundBackend.Client.World.BlockSystem {
 		public AirBlock() : base("air") {
 		}
 
-		public override AssetKey GetRenderTileKey(BlockState blockState) => null;
+		public override BlockRenderData GetRenderData(BlockState blockState) {
+			return new BlockRenderData {
+				tileKey = null,
+				color = Color.white
+			};
+		}
 	}
 }
