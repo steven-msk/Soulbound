@@ -1,9 +1,9 @@
 using NSubstitute;
 using NUnit.Framework;
-using SoulboundBackend.Client.Debug.Commands;
-using SoulboundBackend.Client.ItemSystem;
-using SoulboundBackend.Client.Runtime.Services;
-using SoulboundBackend.Core;
+using SoulboundEngine.Client.Debug.Commands;
+using SoulboundEngine.Client.ItemSystem;
+using SoulboundEngine.Client.Runtime.Services;
+using SoulboundEngine.Core;
 
 namespace Commands.Parsing {
 	internal class ItemParserTests {

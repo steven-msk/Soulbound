@@ -1,7 +1,7 @@
 using NSubstitute;
 using NUnit.Framework;
-using SoulboundBackend.Client.ItemSystem;
-using SoulboundBackend.Client.ItemSystem.Container;
+using SoulboundEngine.Client.ItemSystem;
+using SoulboundEngine.Client.ItemSystem.Container;
 using System;
 using System.Collections.Generic;
 using System.Linq;

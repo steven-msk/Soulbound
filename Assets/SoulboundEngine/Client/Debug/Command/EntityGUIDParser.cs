@@ -1,0 +1,20 @@
+using SoulboundEngine.Client.World.EntitySystem;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace SoulboundEngine.Client.Debug.Commands {
+	public sealed class EntityGUIDParser : ICommandArgumentParser<Guid> {
+		public ParseResult<Guid> TryParse(string token, CommandParsingContext ctx) {
+			if (!Guid.TryParse(token, out Guid guid)) {
+				return ParseResult<Guid>.Fail();
+			}
+
+			return ctx.Data.Entities.TryGetEntity(guid, out var _)
+				? ParseResult<Guid>.Success(guid)
+				: ParseResult<Guid>.Fail();
+		}
+	}
+}

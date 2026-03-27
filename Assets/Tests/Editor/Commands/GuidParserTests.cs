@@ -1,7 +1,7 @@
 using NSubstitute;
 using NUnit.Framework;
-using SoulboundBackend.Client.Debug.Commands;
-using SoulboundBackend.Client.Runtime.Services;
+using SoulboundEngine.Client.Debug.Commands;
+using SoulboundEngine.Client.Runtime.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;

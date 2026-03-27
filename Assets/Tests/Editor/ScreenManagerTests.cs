@@ -1,9 +1,9 @@
 using NSubstitute;
 using NSubstitute.ReceivedExtensions;
 using NUnit.Framework;
-using SoulboundBackend.Client.UI.Screens;
+using SoulboundEngine.Client.UI.Screens;
 using UnityEngine;
-using Screen = SoulboundBackend.Client.UI.Screens.Screen;
+using Screen = SoulboundEngine.Client.UI.Screens.Screen;
 
 static class ScreenTestUtils {
 	public static (Screen screen, IScreenObject obj) CreateScreen(IScreenObjectFactory objectFactory) {

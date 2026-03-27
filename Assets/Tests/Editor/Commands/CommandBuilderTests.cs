@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using SoulboundBackend.Client.Debug.Commands;
+using SoulboundEngine.Client.Debug.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;

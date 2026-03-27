@@ -1,11 +1,11 @@
 using NSubstitute;
 using NUnit.Framework;
-using SoulboundBackend.Client.Debug.Commands;
-using SoulboundBackend.Client.Runtime.Services;
-using SoulboundBackend.Client.World.BlockSystem;
-using SoulboundBackend.Client.World.BlockSystem.States;
-using SoulboundBackend.Core;
-using SoulboundBackend.World.BlockSystem.Render;
+using SoulboundEngine.Client.Debug.Commands;
+using SoulboundEngine.Client.Runtime.Services;
+using SoulboundEngine.Client.World.BlockSystem;
+using SoulboundEngine.Client.World.BlockSystem.States;
+using SoulboundEngine.Core;
+using SoulboundEngine.World.BlockSystem.Render;
 
 public class FakeBlock : Block {
 	public override string name { get; init; }

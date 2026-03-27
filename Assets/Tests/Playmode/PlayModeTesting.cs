@@ -1,14 +1,9 @@
-using SoulboundBackend.Core;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace SoulboundBackend.Tests {
+namespace SoulboundEngine.Tests {
     internal class PlayModeTesting {
         public static Scene CreateNewTestScene() {
             return SceneManager.CreateScene(Guid.NewGuid().ToString());

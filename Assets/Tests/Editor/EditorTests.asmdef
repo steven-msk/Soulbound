@@ -3,10 +3,10 @@
     "rootNamespace": "",
     "references": [
         "UnityEditor.TestRunner",
-        "SoulboundBackend",
         "UnityEngine.TestRunner",
         "PlaymodeTests",
-        "Unity.InputSystem"
+        "Unity.InputSystem",
+        "SoulboundEngine"
     ],
     "includePlatforms": [
         "Editor"

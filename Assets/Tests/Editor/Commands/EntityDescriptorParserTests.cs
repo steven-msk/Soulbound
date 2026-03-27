@@ -1,9 +1,9 @@
 using NSubstitute;
 using NUnit.Framework;
-using SoulboundBackend.Client.Debug.Commands;
-using SoulboundBackend.Client.Runtime.Services;
-using SoulboundBackend.Client.World.EntitySystem;
-using SoulboundBackend.Core;
+using SoulboundEngine.Client.Debug.Commands;
+using SoulboundEngine.Client.Runtime.Services;
+using SoulboundEngine.Client.World.EntitySystem;
+using SoulboundEngine.Core;
 
 namespace Commands.Parsing {
 	internal class EntityDescriptorParserTests {

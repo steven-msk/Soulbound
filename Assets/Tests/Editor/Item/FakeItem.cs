@@ -1,5 +1,5 @@
-using SoulboundBackend.Client.ItemSystem;
-using SoulboundBackend.Client.ItemSystem.View;
+using SoulboundEngine.Client.ItemSystem;
+using SoulboundEngine.Client.ItemSystem.View;
 using System;
 #nullable enable
 
