@@ -1,16 +1,12 @@
-using SoulboundEngine.Client.ItemSystem.Container.View;
 using SoulboundEngine.Client.ItemSystem.Render;
 using System;
 using UnityEngine;
-
-
 
 #nullable enable
 
 namespace SoulboundEngine.Client.ItemSystem.Container {
 	public sealed class TransitStack {
 		private readonly RectTransform parent;
-		private readonly IItemContainerScreenScope screenScope;
 		private Vector2 pointerPosition;
 		private ItemStack? itemStack;
 		private UIItemView? itemView;
@@ -27,6 +23,10 @@ namespace SoulboundEngine.Client.ItemSystem.Container {
 			if (itemStack == null) {
 				UnityEngine.Debug.LogException(new ArgumentException("TransitStack cannot be set to null. Call Release() instead"));
 				return;
+			}
+
+			if (this.itemStack != null) {
+				this.itemStack.onQuantityChanged -= OnStackQuantityChanged;
 			}
 
 			this.itemStack = itemStack;
@@ -57,6 +57,9 @@ namespace SoulboundEngine.Client.ItemSystem.Container {
 			if (itemView == null) return;
 
 			itemView.Destroy();
+			if (itemStack != null) {
+				itemStack.onQuantityChanged -= OnStackQuantityChanged;
+			}
 			itemView = null;
 			itemStack = null;
 		}
