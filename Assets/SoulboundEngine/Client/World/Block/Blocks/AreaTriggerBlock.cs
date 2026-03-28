@@ -50,12 +50,12 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 		}
 
 		public override BlockRenderData GetRenderData(BlockState blockState) {
-			return new BlockRenderData {
-				tileKey = new AssetKey("AreaTriggerTile"),
-				color = blockState.Get<bool>("inArea")
+			return new BlockRenderData(
+				new AssetKey("AreaTriggerTile"),
+				blockState.Get<bool>("inArea")
 					? Color.red
 					: Color.green
-			};
+			);
 		}
 	}
 }

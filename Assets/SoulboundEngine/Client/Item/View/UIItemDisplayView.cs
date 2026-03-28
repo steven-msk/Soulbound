@@ -1,18 +1,7 @@
-using Cysharp.Threading.Tasks;
-using SoulboundEngine.Client.ItemSystem;
-using SoulboundEngine.Client.Debug.Logging;
-
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
-using SoulboundEngine.Core.Assets;
 
 #nullable enable
 
@@ -58,8 +47,8 @@ namespace SoulboundEngine.Client.ItemSystem.View {
 				newStack.onQuantityChanged += OnStackQuantityChanged;
 
 				// TODO: rework visual render approach for UI item displays
-				Sprite sprite = AssetManager.Resolve<Sprite>(newStack.item.aspect.icon.spriteKey);
-				itemImage.sprite = sprite;
+				//Sprite sprite = AssetManager.Resolve<Sprite>(newStack.item.aspect.icon.spriteKey);
+				//itemImage.sprite = sprite;
 
 				stackText.enabled = newStack.item.IsStackable();
 

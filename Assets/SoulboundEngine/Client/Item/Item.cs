@@ -1,4 +1,4 @@
-using SoulboundEngine.Client.ItemSystem.View;
+using SoulboundEngine.Client.ItemSystem.Render;
 using SoulboundEngine.Core;
 using System;
 using UnityEngine;
@@ -11,12 +11,13 @@ namespace SoulboundEngine.Client.ItemSystem {
 
 		private readonly string id;
 		public abstract string name { get; }
-		public abstract ItemAspect aspect { get; }
 		public virtual int fullStackSize { get; } = DEFAULT_FULL_STACK;
 
 		protected Item(string id) {
 			this.id = id;
 		}
+
+		public abstract ItemRenderData GetRenderData(ItemStack itemStack);
 
 		public virtual ItemStack CreateStack(int quantity = 1) {
 			return new ItemStack(this, Mathf.Clamp(quantity, 0, fullStackSize));
@@ -27,7 +28,7 @@ namespace SoulboundEngine.Client.ItemSystem {
 		}
 
 		public override int GetHashCode() {
-			return HashCode.Combine(name, aspect, fullStackSize);
+			return HashCode.Combine(id, fullStackSize);
 		}
 
 		public bool IsStackable() => fullStackSize > 1;

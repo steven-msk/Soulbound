@@ -1,6 +1,5 @@
 using SoulboundEngine.Client.World.BlockSystem.Render;
 using SoulboundEngine.Client.World.BlockSystem.States;
-using UnityEngine;
 
 namespace SoulboundEngine.Client.World.BlockSystem {
 	public sealed class AirBlock : Block {
@@ -11,10 +10,7 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 		}
 
 		public override BlockRenderData GetRenderData(BlockState blockState) {
-			return new BlockRenderData {
-				tileKey = null,
-				color = Color.white
-			};
+			return new BlockRenderData(null);
 		}
 	}
 }

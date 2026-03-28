@@ -1,5 +1,3 @@
-using SoulboundEngine.Client.ItemSystem;
-using SoulboundEngine.Core.Assets;
 using UnityEngine;
 
 #nullable enable
@@ -22,8 +20,8 @@ namespace SoulboundEngine.Client.ItemSystem.View {
 
 			// TODO: rework visual render approach for world item displays
 			if (newStack != null) {
-				Sprite sprite = AssetManager.Resolve<Sprite>(newStack.item.aspect.icon.spriteKey);
-				itemRenderer.sprite = sprite;
+				//Sprite sprite = AssetManager.Resolve<Sprite>(newStack.item.aspect.icon.spriteKey);
+				//itemRenderer.sprite = sprite;
 			}
 		}
 

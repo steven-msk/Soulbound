@@ -1,5 +1,5 @@
 using SoulboundEngine.Client.Interaction;
-using SoulboundEngine.Client.ItemSystem.View;
+using SoulboundEngine.Client.ItemSystem.Render;
 using SoulboundEngine.Client.World.EntitySystem;
 using SoulboundEngine.Common;
 using SoulboundEngine.Core.Assets;
@@ -8,7 +8,6 @@ namespace SoulboundEngine.Client.ItemSystem {
 	[PROTOTYPICAL]
 	public sealed class SpawnEntityItem : Item, IItemInteractionListener {
 		public override string name => "Spawn Entity Item";
-		public override ItemAspect aspect => ItemAspect.Simple(new AssetKey("bluething"));
 
 		public SpawnEntityItem() : base("spawnEntityItem") {
 		}
@@ -26,6 +25,10 @@ namespace SoulboundEngine.Client.ItemSystem {
 			ctx.level.AddEntity(entity);
 			itemStack.Decrement();
 			return true;
+		}
+
+		public override ItemRenderData GetRenderData(ItemStack itemStack) {
+			return new ItemRenderData(new AssetKey("bluething"), itemStack);
 		}
 	}
 }
