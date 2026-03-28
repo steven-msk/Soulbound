@@ -136,9 +136,9 @@ namespace SoulboundEngine.Core {
 
 			// manual dev seed for prototyping
 			DevSeedProvider seedProvider = new(config.dev);
-			LevelLoader levelLoader = new(seedProvider);
+			WorldLoader worldLoader = new(seedProvider);
 
-			levelLoader.LoadLevel(
+			worldLoader.LoadWorld(
 				SceneManager.LoadSceneAsync("WorldScene").ToUniTask(),
 				UnityEngine.Object.FindFirstObjectByType<WorldSceneRoot>
 			).ContinueWith(session => {

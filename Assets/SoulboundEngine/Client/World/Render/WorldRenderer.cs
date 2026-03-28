@@ -1,84 +1,76 @@
 using SoulboundEngine.Client.World.BlockSystem;
+using SoulboundEngine.Client.World.BlockSystem.Render;
 using SoulboundEngine.Client.World.BlockSystem.States;
-using SoulboundEngine.Client.World.BlockSystem.TileEntities;
 using SoulboundEngine.Client.World.LevelDomain;
-using SoulboundEngine.Common;
-using SoulboundEngine.Core.Assets;
-using SoulboundEngine.World.BlockSystem.Render;
+using System;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
 #nullable enable
 
 namespace SoulboundEngine.Client.World.Render {
 	public sealed class WorldRenderer {
-		private readonly Level level;
-		private readonly Tilemap tilemap;
+		private readonly BlockRenderer blockRenderer;
+		private readonly BlockModelResolver modelResolver;
 		private Vector2Int lastPivot;
-		private readonly RectInt relativeRect;
+		private readonly RectInt renderView;
 
-		public WorldRenderer(RectInt relativeRect, Level level, Tilemap tilemap) {
-			this.relativeRect = relativeRect;
-			this.level = level;
-			this.tilemap = tilemap;
+		public WorldRenderer(
+				RectInt renderView,
+				BlockRenderer blockRenderer,
+				BlockModelResolver modelResolver
+			) {
+			this.renderView = renderView;
+			this.blockRenderer = blockRenderer;
+			this.modelResolver = modelResolver;
 		}
 
-		public void RenderView(Vector2 pivot) {
+		public void RenderView(Vector2 pivot, Func<BlockPos, BlockState> blockStateSupplier) {
 			Vector2Int currentPivot = Vector2Int.FloorToInt(pivot);
 			if (this.lastPivot == currentPivot) return;
 
-			var lastView = ToRect(lastPivot);
+			RectInt lastView = ToRect(lastPivot);
 			this.lastPivot = currentPivot;
-			var currentView = ToRect(currentPivot);
+			RectInt currentView = ToRect(currentPivot);
 
-			var pos = lastView.allPositionsWithin;
+			RectInt.PositionEnumerator pos = lastView.allPositionsWithin;
 			while (pos.MoveNext()) {
-				if (currentView.Contains(pos.Current)) {
-					continue;
-				}
-				tilemap.SetTile((Vector3Int)pos.Current, null);
+				if (currentView.Contains(pos.Current)) continue;
+
+				RenderBlock((BlockPos)pos.Current, Blocks.air.defaultState);
 			}
 
 			pos = currentView.allPositionsWithin;
 			while (pos.MoveNext()) {
-				BlockPos blockPos = new(pos.Current.x, pos.Current.y);
+				BlockPos blockPos = (BlockPos)pos.Current;
 				if (!Level.IsInBounds(blockPos) || lastView.Contains(pos.Current)) {
 					continue;
 				}
 
-				BlockState? blockState = level.GetBlockState(blockPos);
-				TileEntity? tileEntity = level.TileEntityAt(blockPos);
-
-				RenderBlock(blockState, tileEntity, blockPos, tilemap);
-			}
-
-		}
-
-		public void RenderBlock(BlockPos blockPos, BlockState? blockState) {
-			if (IsInRenderView(blockPos)) {
-				RenderBlock(blockState, level.TileEntityAt(blockPos), blockPos, tilemap);
+				BlockState? blockState = blockStateSupplier(blockPos);
+				RenderBlock(blockPos, blockState);
 			}
 		}
 
-		[PROTOTYPICAL]
-		private void RenderBlock(BlockState? state, TileEntity? tileEntity, BlockPos pos, Tilemap tilemap) {
-			state ??= Blocks.air.defaultState;
-			BlockRenderData renderData = state.block.GetRenderData(state);
-			AssetKey tileKey = renderData.tileKey;
-			TileBase? tile = tileKey != null
-				? AssetManager.Resolve<TileBase>(tileKey)
-				: null;
+		private void RenderBlock(BlockPos blockPos, BlockState blockState) {
+			BlockRenderData renderData = blockState.block.GetRenderData(blockState);
+			BlockRenderModel model = modelResolver.ResolveModel(renderData);
+			blockRenderer.Render(model, blockPos);
+		}
 
-			tilemap.SetTile((Vector3Int)pos, tile);
-			tilemap.SetColor((Vector3Int)pos, renderData.color);
+		public void UpdateModel(BlockPos blockPos, BlockState? blockState) {
+			blockState ??= Blocks.air.defaultState;
+			RenderBlock(blockPos, IsInRenderView(blockPos)
+				? blockState
+				: Blocks.air.defaultState
+			);
 		}
 
 		private RectInt ToRect(Vector2Int pivot) {
 			return new(
-				Mathf.FloorToInt(pivot.x) + relativeRect.x,
-				Mathf.FloorToInt(pivot.y) + relativeRect.y,
-				relativeRect.width,
-				relativeRect.height
+				Mathf.FloorToInt(pivot.x) + renderView.x,
+				Mathf.FloorToInt(pivot.y) + renderView.y,
+				renderView.width,
+				renderView.height
 			);
 		}
 

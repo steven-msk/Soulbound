@@ -1,9 +1,9 @@
 using SoulboundEngine.Client.ItemSystem;
+using SoulboundEngine.Client.World.BlockSystem.Render;
 using SoulboundEngine.Client.World.BlockSystem.States;
 using SoulboundEngine.Client.World.BlockSystem.TileEntities;
 using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Core;
-using SoulboundEngine.World.BlockSystem.Render;
 using System;
 using System.Collections.Generic;
 
@@ -15,21 +15,20 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 		public abstract string name { get; init; }
 		public abstract int minBreakLevel { get; init; }
 		public BlockState defaultState { get; private set; } = null!;
-		public virtual bool hasTileEntity { get; protected set; } = false;
 
 		protected Block(string id, IBlockStateRegisterer? stateRegisterer = null) {
 			this.id = id;
-			ConstructNonGeneric(stateRegisterer);
+			RegisterStates(stateRegisterer);
 		}
 
 		protected Block(string id, string name, int minBreakLevel, IBlockStateRegisterer? stateRegisterer = null) {
 			this.id = id;
 			this.name = name;
 			this.minBreakLevel = minBreakLevel;
-			ConstructNonGeneric(stateRegisterer);
+			RegisterStates(stateRegisterer);
 		}
 
-		private void ConstructNonGeneric(IBlockStateRegisterer? stateRegisterer) {
+		private void RegisterStates(IBlockStateRegisterer? stateRegisterer) {
 			BlockPropertyEntries properties = new();
 			stateRegisterer ??= new GlobalBlockStateRegisterer();
 			stateRegisterer.SetBlock(this);

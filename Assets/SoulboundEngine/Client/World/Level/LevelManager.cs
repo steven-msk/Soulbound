@@ -1,21 +1,18 @@
+using Cysharp.Threading.Tasks;
 using SoulboundEngine.Client.Input;
+using SoulboundEngine.Client.Players;
+using SoulboundEngine.Client.UI;
 using SoulboundEngine.Client.UI.Screens;
-using SoulboundEngine.Client.World;
+using SoulboundEngine.Client.World.BlockSystem.Render;
+using SoulboundEngine.Client.World.Generation;
+using SoulboundEngine.Client.World.Render;
 using SoulboundEngine.Common;
-using SoulboundEngine.Common.Json;
+using SoulboundEngine.Core;
 using SoulboundEngine.Core.Assets;
-
-using System.Collections.Generic;
-using Newtonsoft.Json;
+using System;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
-using Cysharp.Threading.Tasks;
-using System;
-using SoulboundEngine.Client.UI;
-using SoulboundEngine.Client.World.Serialization;
-using SoulboundEngine.Client.World.Render;
-using SoulboundEngine.Core;
 
 #nullable enable
 
@@ -27,15 +24,19 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 		public bool paused { get; private set; } = false;
 		private bool sessionRunning;
 
-		private WorldRenderer worldRenderer = null!;
+		private readonly WorldRenderer worldRenderer;
+
+		// 'readonly' means no multiple dimensions
+		// this is for one dimension only
 		private readonly Level level;
 
 		public const string worldDump = "worldDump.json";
-		private static readonly RectInt simulationRect = new(-128, -76, 256, 156);
+		private static readonly RectInt simulationView = new(-128, -76, 256, 156);
 		private static readonly RectInt renderRect = new(-32, -19, 65, 39);
 
-		public LevelManager(Level level) {
-			this.level = level;
+		public LevelManager(ISeedProvider seedProvider, BlockRenderer blockRenderer, BlockModelResolver blockModelResolver) {
+			worldRenderer = new WorldRenderer(simulationView, blockRenderer, blockModelResolver);
+			level = new Level(worldRenderer, seedProvider.GetSeed());
 		}
 
 		[PROTOTYPICAL]
@@ -47,10 +48,8 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 			return false;
 		}
 
-		public void BootstrapWorld(WorldDump? dump, LevelGridContext gridContext) {
-			worldRenderer = new WorldRenderer(simulationRect, level, gridContext.tilemap);
-
-			level.BootstrapWorld(dump, worldRenderer);
+		public void StartSession() {
+			level.StartSession(new Player(level.GetWorldSpawnPoint()));
 			sessionRunning = true;
 
 			UniTask.Post(LevelFrameLoop);
@@ -65,7 +64,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 
 						Vector2 pivotPos = level.GetPlayer()?.GetPos() ?? level.GetWorldSpawnPoint();
 						level.FrameUpdate();
-						worldRenderer.RenderView(pivotPos);
+						worldRenderer.RenderView(pivotPos, level.GetBlockState);
 
 						EndFrame();
 					}
@@ -120,10 +119,10 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 
 		private RectInt GetRelativeSimulationRect(Vector2 pivot) {
 			return new(
-				Mathf.FloorToInt(pivot.x) + simulationRect.x,
-				Mathf.FloorToInt(pivot.y) + simulationRect.y,
-				simulationRect.width,
-				simulationRect.height
+				Mathf.FloorToInt(pivot.x) + simulationView.x,
+				Mathf.FloorToInt(pivot.y) + simulationView.y,
+				simulationView.width,
+				simulationView.height
 			);
 		}
 
@@ -138,6 +137,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 			}
 		}
 
+		public Level GetLevel() => level;
 	}
 
 	public record LevelGridContext(Grid grid, Tilemap tilemap) {

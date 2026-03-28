@@ -7,7 +7,6 @@ using SoulboundEngine.Client.World.Chunk;
 using SoulboundEngine.Client.World.EntitySystem;
 using SoulboundEngine.Client.World.Generation;
 using SoulboundEngine.Client.World.Render;
-using SoulboundEngine.Client.World.Serialization;
 using SoulboundEngine.Common;
 using SoulboundEngine.Common.Math;
 using SoulboundEngine.Core;
@@ -35,9 +34,8 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 		[Obsolete] private Dictionary<int, List<(ChunkBlockPos pos, BlockState? state)>> pendingUpdates = new();
 		[Obsolete] private readonly ConcurrentDictionary<int, List<OnChunkGenerated>> deferredGenerations = new();
 		private readonly Dictionary<int, ChunkGenData> chunkGenData = new();
-		private WorldRenderer worldRenderer;
-		private readonly Player player;
-		public bool isWorldLoaded { get; private set; } = false;
+		private readonly WorldRenderer worldRenderer;
+		private Player player;
 
 		private readonly BiomeMap biomeMap;
 		private readonly Heightmap heightmap;
@@ -48,9 +46,9 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 		private readonly List<ITickingEntity> tickingEntities = new();
 		private readonly List<IFrameUpdatableEntity> frameUpdatableEntities = new();
 
-		public Level(int seed) {
+		public Level(WorldRenderer worldRenderer, int seed) {
 			this.seed = seed;
-			this.player = new Player(GetWorldSpawnPoint());
+			this.worldRenderer = worldRenderer;
 
 			var biome1 = new PlainsBiome(seed);
 			var biome2 = new HillsBiome(seed);
@@ -59,24 +57,14 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 			this.cavemap = new Cavemap(seed);
 		}
 
-		// PLANNED REWORK: world rendering system
-		// Since this will be an intense tiled game, it will require advanced rendering techniques to
-		// achieve any level of performance. This project is still in prototype phase, so making any
-		// optimization isnt really worth it and might be a waste of time in most cases.
-
-		public void BootstrapWorld(WorldDump? dump, WorldRenderer worldRenderer) {
-			this.worldRenderer = worldRenderer;
-			Dictionary<int, int[][]> chunkIDmap = new();
-
-			if (dump == null) {
-				for (int cx = -RENDER_DISTANCE; cx <= RENDER_DISTANCE; cx++) {
-					GenerateNewChunk(cx);
-				}
-			} else {
-				generatedChunks = dump.Value.generatedChunks.ToDictionary(chunk => chunk.xpos, chunk => chunk);
+		public void GenerateTerrain() {
+			for (int cx = -RENDER_DISTANCE; cx <= RENDER_DISTANCE; cx++) {
+				GenerateNewChunk(cx);
 			}
+		}
 
-			isWorldLoaded = true;
+		public void StartSession(Player player) {
+			this.player = player;
 			AddEntity(player);
 			Soulbound.instance.GetInputManager().PushContext(player);
 			player.SetPos(GetWorldSpawnPoint() + Vector2.up * 2f);
@@ -105,11 +93,6 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 
 		public Vector2 GetWorldSpawnPoint() {
 			return new Vector2(0f, GetSurfaceAirY(0));
-		}
-
-		public void Dump(out int seed, out WorldChunk[] generatedChunks) {
-			seed = this.seed;
-			generatedChunks = this.generatedChunks.Values.ToArray();
 		}
 
 		public void FrameUpdate() {
@@ -229,7 +212,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 				?? throw new InvalidOperationException("Block pos not valid: " + blockPos);
 
 			chunk.SetBlockState(blockPos, blockState);
-			worldRenderer.RenderBlock(blockPos, blockState);
+			worldRenderer.UpdateModel(blockPos, blockState);
 
 			bool oldTicks = oldState?.block is ITickingBlock;
 			bool newTicks = blockState?.block is ITickingBlock;

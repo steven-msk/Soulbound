@@ -1,4 +1,3 @@
-using SoulboundEngine.Client.ItemSystem;
 using System;
 using TMPro;
 using UnityEngine;
@@ -80,8 +79,7 @@ namespace SoulboundEngine.Client.ItemSystem.View {
 
 			RectTransform rect = obj.GetComponent<RectTransform>();
 			rect.pivot = new Vector2(1f, 0f);
-			rect.anchorMax = new Vector2(0.9375f, 0.0625f);
-			rect.anchorMin = rect.anchorMax;
+			rect.anchorMin = rect.anchorMax = new Vector2(0.9375f, 0.0625f);
 			rect.anchoredPosition = Vector2.zero;
 			//rect.anchoredPosition = new Vector2(Mathf.Max(-4, rect.sizeDelta.x - 19.14f), rect.anchoredPosition.y);
 

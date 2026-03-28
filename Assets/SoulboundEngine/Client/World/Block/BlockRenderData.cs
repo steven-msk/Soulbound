@@ -1,7 +1,7 @@
 using SoulboundEngine.Core.Assets;
 using UnityEngine;
 
-namespace SoulboundEngine.World.BlockSystem.Render {
+namespace SoulboundEngine.Client.World.BlockSystem.Render {
 	public struct BlockRenderData {
 		public AssetKey tileKey;
 		public Color color;
