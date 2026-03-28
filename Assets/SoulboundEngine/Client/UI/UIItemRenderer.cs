@@ -9,7 +9,7 @@ namespace SoulboundEngine.Client.ItemSystem.Render {
 		private const float STACK_TEXT_SIZE = 8f;
 
 		public UIItemView CreateView(RectTransform parent) {
-			GameObject obj = new("UI Item View", typeof(RectTransform));
+			GameObject obj = new("UI Item View", typeof(UIItemView));
 			obj.transform.SetParent(parent, false);
 
 			RectTransform rect = obj.GetComponent<RectTransform>();
@@ -21,7 +21,7 @@ namespace SoulboundEngine.Client.ItemSystem.Render {
 			itemImage.raycastTarget = false;
 			TextMeshProUGUI stackText = CreateStackText(obj.GetComponent<RectTransform>());
 
-			UIItemView view = obj.AddComponent<UIItemView>();
+			UIItemView view = obj.GetComponent<UIItemView>();
 			view.Init(stackText, itemImage);
 
 			obj.SetActive(false);

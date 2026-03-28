@@ -68,6 +68,8 @@ namespace SoulboundEngine.Client.ItemSystem.View {
 		}
 
 		public void Destroy() {
+			if (destroyed) return;
+
 			onDestroyed?.Invoke();
 			destroyed = true;
 			itemStack = null;

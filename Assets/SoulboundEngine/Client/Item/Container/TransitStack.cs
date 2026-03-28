@@ -1,23 +1,26 @@
-using SoulboundEngine.Client.ItemSystem;
 using SoulboundEngine.Client.ItemSystem.Container.View;
-using SoulboundEngine.Client.ItemSystem.View;
+using SoulboundEngine.Client.ItemSystem.Render;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Unity.VisualScripting;
 using UnityEngine;
+
+
 
 #nullable enable
 
 namespace SoulboundEngine.Client.ItemSystem.Container {
 	public sealed class TransitStack {
+		private readonly RectTransform parent;
 		private readonly IItemContainerScreenScope screenScope;
-		private UIItemDisplay? display;
+		private Vector2 pointerPosition;
+		private ItemStack? itemStack;
+		private UIItemView? itemView;
 
-		public TransitStack(IItemContainerScreenScope screenScope) {
-			this.screenScope = screenScope;
+		// placeholder
+		private readonly UIItemRenderer itemRenderer = new();
+		private readonly ItemModelResolver modelResolver = new();
+
+		public TransitStack(RectTransform parent) {
+			this.parent = parent;
 		}
 
 		public void SetStack(ItemStack itemStack) {
@@ -25,26 +28,44 @@ namespace SoulboundEngine.Client.ItemSystem.Container {
 				UnityEngine.Debug.LogException(new ArgumentException("TransitStack cannot be set to null. Call Release() instead"));
 				return;
 			}
-			if (display != null) screenScope.RemoveTransitStack();
 
-			display = new UIItemDisplay(null, itemStack);
-			TransitStackHandle handle = new(display);
+			this.itemStack = itemStack;
+			itemStack.onQuantityChanged += OnStackQuantityChanged;
 
-			display.onDestroyed += OnDisplayDestroyed;
-			screenScope.SetTransitStackHandle(handle);
+			Render(itemStack);
 		}
 
-		public void Release() {
-			if (display != null) OnDisplayDestroyed();
+		private void OnStackQuantityChanged(int old, int @new) {
+			if (@new <= 0) Destroy();
+			else if (itemStack != null && itemView != null) Render(itemStack);
 		}
 
-		public bool HasStack() => display != null;
-		public ItemStack? GetStack() => display?.GetStack();
+		private void Render(ItemStack itemStack) {
+			ItemRenderData renderData = itemStack.item.GetRenderData(itemStack);
+			ItemRenderModel model = modelResolver.Resolve(renderData);
+			itemView = itemView != null ? itemView : itemRenderer.CreateView(parent);
 
-		private void OnDisplayDestroyed() {
-			display!.onDestroyed -= OnDisplayDestroyed;
-			screenScope.RemoveTransitStack();
-			display = null;
+			itemRenderer.Render(itemView, model);
+			itemView.SetParent(parent);
+			itemView.SetPosition(pointerPosition);
+		}
+
+		public bool HasStack() => itemView != null;
+		public ItemStack? GetStack() => itemStack;
+
+		public void Destroy() {
+			if (itemView == null) return;
+
+			itemView.Destroy();
+			itemView = null;
+			itemStack = null;
+		}
+
+		public void SetPointerPosition(Vector2 position) {
+			this.pointerPosition = position;
+			if (itemView != null) {
+				itemView.SetPosition(pointerPosition);
+			}
 		}
 	}
 }

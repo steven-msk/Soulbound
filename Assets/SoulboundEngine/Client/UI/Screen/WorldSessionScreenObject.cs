@@ -2,14 +2,12 @@ using SoulboundEngine.Client.Input;
 using SoulboundEngine.Client.ItemSystem;
 using SoulboundEngine.Client.ItemSystem.Container;
 using SoulboundEngine.Client.ItemSystem.Container.View;
-using SoulboundEngine.Client.UI.Screens;
 
 using SoulboundEngine.Core;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using Screen = SoulboundEngine.Client.UI.Screens.Screen;
 
 #nullable enable
 
@@ -20,14 +18,13 @@ namespace SoulboundEngine.Client.UI.Screens {
 		private TransitStack transitStack = null!;
 		private SlotDragState? dragState;
 		private readonly List<UIItemContainerNode> openContainers = new();
-		private ITransitStackHandle? currentTransitStackHandle;
 		private Vector2 pointerPosition;
 		int IInputContext.priority => 5000;
 
 		public new void Init(Screen screen) {
 			base.Init(screen);
-			this.transitStack = new TransitStack(this);
 			rect = GetComponent<RectTransform>();
+			this.transitStack = new TransitStack(rect);
 			Soulbound.instance.GetInputManager().PushContext(this);
 		}
 
@@ -88,26 +85,15 @@ namespace SoulboundEngine.Client.UI.Screens {
 		bool IInputContext.HandleInput(in InputEvent inputEvent) {
 			if (inputEvent.token.Equals(InputTokens.Mouse.position)) {
 				pointerPosition = inputEvent.context.ReadValue<Vector2>();
-				currentTransitStackHandle?.SetDisplayPosition(pointerPosition);
+				transitStack.SetPointerPosition(pointerPosition);
 			}
 			return false;
-		}
-
-		void IItemContainerScreenScope.SetTransitStackHandle(ITransitStackHandle transitStackHandle) {
-			currentTransitStackHandle = transitStackHandle;
-			transitStackHandle.SetDisplayParent(rect);
-			transitStackHandle.SetDisplayPosition(pointerPosition);
-		}
-
-		void IItemContainerScreenScope.RemoveTransitStack() {
-			currentTransitStackHandle?.Destroy();
-			currentTransitStackHandle = null;
 		}
 
 		ItemStack? ITransitStackSource.GetTransitStack() => transitStack.GetStack();
 		bool ITransitStackSource.HasTransitStack() => transitStack.HasStack();
 		void ITransitStackSource.SetTransitStack(ItemStack? itemStack) {
-			if (itemStack == null) transitStack.Release();
+			if (itemStack == null) transitStack.Destroy();
 			else transitStack.SetStack(itemStack);
 		}
 
