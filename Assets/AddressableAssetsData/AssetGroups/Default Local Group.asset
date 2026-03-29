@@ -69,12 +69,6 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 291cc8ec7deb2aa4fbfda55996bfe132
-    m_Address: debugPointer
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 2ac223bfff0dc2b4ab7323e9c062fedf
     m_Address: stone_icon
     m_ReadOnly: 0
@@ -119,6 +113,12 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 546860b57eb820a42acb13ab6589d854
     m_Address: jump
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 54e2b68901269854bbafd631afa1b635
+    m_Address: Items
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload
@@ -303,12 +303,6 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: bcfaae8d59c8cf04abaa5647af14f012
-    m_Address: bluething
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: c31a5e9c910fa9c42a037cf94c1b620b
     m_Address: QuitWorld
     m_ReadOnly: 0
@@ -371,12 +365,6 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e73082fccdc33f448a63fd6d559f6ab9
     m_Address: SettingsButton
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: ed4c9386a9e5d4b40ae6ea11d705f4a4
-    m_Address: idkwhatthisis
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload

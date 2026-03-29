@@ -1,5 +1,6 @@
 using SoulboundEngine.Client.ItemSystem.Render;
 using SoulboundEngine.Client.UI.Tooltips;
+using SoulboundEngine.Core.Render;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -17,7 +18,7 @@ namespace SoulboundEngine.Client.ItemSystem.Container.View {
 		private UIItemView? itemView;
 		private ItemStack? stack;
 
-		private readonly UIItemRenderer itemRenderer = new();
+		private readonly UIItemRenderer itemRenderer = new(new AtlasSpriteResolver());
 		private readonly ItemModelResolver modelResolver = new();
 
 		public void Init(IItemSlot slot, IItemSlotEventListener eventListener) {

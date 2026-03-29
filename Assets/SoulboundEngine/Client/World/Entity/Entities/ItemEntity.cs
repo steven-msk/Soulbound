@@ -3,6 +3,7 @@ using SoulboundEngine.Client.ItemSystem.Render;
 using SoulboundEngine.Client.ItemSystem.View;
 using SoulboundEngine.Client.World.EntitySystem.Transform;
 using SoulboundEngine.Core;
+using SoulboundEngine.Core.Render;
 using UnityEngine;
 
 #nullable enable
@@ -16,7 +17,7 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 		private readonly float pickupDelaySec;
 		private readonly ItemStack itemStack;
 
-		private readonly WorldItemRenderer itemRenderer = new();
+		private readonly WorldItemRenderer itemRenderer = new(new AtlasSpriteResolver());
 		private readonly ItemModelResolver modelResolver = new();
 
 		public ItemEntity(ItemStack itemStack, Vector2 initialPos)

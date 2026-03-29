@@ -1,4 +1,5 @@
 using SoulboundEngine.Client.ItemSystem.Render;
+using SoulboundEngine.Core.Render;
 using System;
 using UnityEngine;
 
@@ -11,8 +12,7 @@ namespace SoulboundEngine.Client.ItemSystem.Container {
 		private ItemStack? itemStack;
 		private UIItemView? itemView;
 
-		// placeholder
-		private readonly UIItemRenderer itemRenderer = new();
+		private readonly UIItemRenderer itemRenderer = new(new AtlasSpriteResolver());
 		private readonly ItemModelResolver modelResolver = new();
 
 		public TransitStack(RectTransform parent) {

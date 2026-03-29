@@ -1,9 +1,15 @@
 using SoulboundEngine.Client.ItemSystem.View;
-using SoulboundEngine.Core.Assets;
+using SoulboundEngine.Core.Render;
 using UnityEngine;
 
 namespace SoulboundEngine.Client.ItemSystem.Render {
 	public sealed class WorldItemRenderer {
+		private readonly ISpriteResolver<SpriteRef> spriteResolver;
+
+		public WorldItemRenderer(ISpriteResolver<SpriteRef> spriteResolver) {
+			this.spriteResolver = spriteResolver;
+		}
+
 		public WorldItemView CreateView(GameObject obj) {
 			WorldItemView view = obj.AddComponent<WorldItemView>();
 
@@ -16,7 +22,7 @@ namespace SoulboundEngine.Client.ItemSystem.Render {
 
 		public void Render(WorldItemView view, ItemRenderModel model) {
 			SpriteRenderer spriteRenderer = view.GetSpriteRenderer();
-			Sprite sprite = AssetManager.Resolve<Sprite>(model.spriteKey);
+			Sprite sprite = spriteResolver.GetSprite(model.spriteRef);
 			spriteRenderer.sprite = sprite;
 
 			view.gameObject.SetActive(true);

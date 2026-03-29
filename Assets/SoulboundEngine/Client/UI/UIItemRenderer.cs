@@ -1,4 +1,4 @@
-using SoulboundEngine.Core.Assets;
+using SoulboundEngine.Core.Render;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,6 +7,11 @@ namespace SoulboundEngine.Client.ItemSystem.Render {
 	public sealed class UIItemRenderer {
 		private const float IMAGE_SIZE = 32f;
 		private const float STACK_TEXT_SIZE = 8f;
+		private readonly ISpriteResolver<SpriteRef> spriteResolver;
+
+		public UIItemRenderer(ISpriteResolver<SpriteRef> spriteResolver) {
+			this.spriteResolver = spriteResolver;
+		}
 
 		public UIItemView CreateView(RectTransform parent) {
 			GameObject obj = new("UI Item View", typeof(UIItemView));
@@ -50,8 +55,8 @@ namespace SoulboundEngine.Client.ItemSystem.Render {
 		}
 
 		public void Render(UIItemView view, ItemRenderModel model) {
-			Sprite itemSprite = AssetManager.Resolve<Sprite>(model.spriteKey);
-			view.GetItemImage().sprite = itemSprite;
+			Sprite sprite = spriteResolver.GetSprite(model.spriteRef);
+			view.GetItemImage().sprite = sprite;
 
 			TextMeshProUGUI stackText = view.GetStackText();
 			stackText.text = model.stackQuantity.ToString();

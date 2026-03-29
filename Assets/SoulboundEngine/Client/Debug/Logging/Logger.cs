@@ -1,9 +1,6 @@
 
 using System;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 using UnityEngine;
 
@@ -133,7 +130,7 @@ namespace SoulboundEngine.Client.Debug.Logging {
 
 		private static string FormatException(Exception? exception, string message) {
 			string exceptionMark = exception != null
-				? $"Exception thrown! {exception.GetType().Name}: "
+				? $"Exception thrown! {exception.GetType().Name}: '{exception.Message}'."
 				: string.Empty;
 			return exceptionMark + message;
 		}

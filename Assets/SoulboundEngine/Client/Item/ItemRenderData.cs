@@ -1,15 +1,20 @@
 using SoulboundEngine.Core.Assets;
+using SoulboundEngine.Core.Render;
 
 namespace SoulboundEngine.Client.ItemSystem.Render {
 	public readonly struct ItemRenderData {
 		public readonly int stackQuantity;
 		public readonly bool isStackable;
-		public readonly AssetKey spriteKey;
+		public readonly SpriteRef spriteRef;
 
-		public ItemRenderData(AssetKey spriteKey, ItemStack itemStack) {
+		public ItemRenderData(string spriteKey, ItemStack itemStack)
+			: this(new SpriteRef(new AssetKey("Items"), spriteKey), itemStack) {
+		}
+
+		public ItemRenderData(SpriteRef spriteRef, ItemStack itemStack) {
 			this.stackQuantity = itemStack.quantity;
 			this.isStackable = itemStack.item.IsStackable();
-			this.spriteKey = spriteKey;
-		}
+			this.spriteRef = spriteRef;
+		} 
 	}
 }

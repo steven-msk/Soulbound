@@ -3,7 +3,7 @@ namespace SoulboundEngine.Client.ItemSystem.Render {
 		public ItemRenderModel Resolve(ItemRenderData renderData) {
 			return new ItemRenderModel {
 				showStackText = renderData.isStackable,
-				spriteKey = renderData.spriteKey,
+				spriteRef = renderData.spriteRef,
 				stackQuantity = renderData.stackQuantity
 			};
 		}

@@ -2,7 +2,6 @@ using SoulboundEngine.Client.Debug.Logging;
 using SoulboundEngine.Client.Interaction;
 using SoulboundEngine.Client.ItemSystem.Render;
 using SoulboundEngine.Common;
-using SoulboundEngine.Core.Assets;
 
 namespace SoulboundEngine.Client.ItemSystem {
 	[PROTOTYPICAL]
@@ -36,7 +35,7 @@ namespace SoulboundEngine.Client.ItemSystem {
 		}
 
 		public override ItemRenderData GetRenderData(ItemStack itemStack) {
-			return new ItemRenderData(new AssetKey("bluething"), itemStack);
+			return new ItemRenderData("bluething", itemStack);
 		}
 	}
 }
