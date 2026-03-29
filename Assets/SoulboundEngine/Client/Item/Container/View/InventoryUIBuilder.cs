@@ -1,4 +1,3 @@
-using SoulboundEngine.Client.ItemSystem.Container;
 using SoulboundEngine.Client.UI;
 using SoulboundEngine.Common;
 using SoulboundEngine.Core.Assets;
@@ -115,17 +114,17 @@ namespace SoulboundEngine.Client.ItemSystem.Container.View {
 			return containerHandle;
 		}
 
-		private GameObject CreateSlotObj(IItemSlot slot, IItemSlotHandleCallbacks handleCallbacks, out ItemSlotHandle handle) {
+		private GameObject CreateSlotObj(IItemSlot slot, IItemSlotEventListener eventListener, out ItemSlotHandle handle) {
 			GameObject obj = GameObject.Instantiate(AssetManager.Resolve<GameObject>(slotKey));
 			handle = obj.AddComponent<ItemSlotHandle>();
-			InitSlotHandle(handle, slot, handleCallbacks);
+			handle.Init(slot, eventListener);
 			return obj;
 		}
 
-		private GameObject CreateHotbarSlotObj(IItemSlot slot, IItemSlotHandleCallbacks handleCallbacks, int index, out HotbarSlotHandle handle) {
+		private GameObject CreateHotbarSlotObj(IItemSlot slot, IItemSlotEventListener eventListener, int index, out HotbarSlotHandle handle) {
 			GameObject obj = GameObject.Instantiate(AssetManager.Resolve<GameObject>(slotKey));
 			handle = obj.AddComponent<HotbarSlotHandle>();
-			InitSlotHandle(handle, slot, handleCallbacks);			
+			handle.Init(slot, eventListener);
 
 			GameObject textObj = new("Hotbar Slot Number", typeof(RectTransform));
 			ContentSizeFitter sizeFitter = textObj.AddComponent<ContentSizeFitter>();
@@ -140,14 +139,6 @@ namespace SoulboundEngine.Client.ItemSystem.Container.View {
 
 			textObj.transform.SetParent(obj.transform, false);
 			return obj;
-		}
-
-		private void InitSlotHandle(ItemSlotHandle handle, IItemSlot slot, IItemSlotHandleCallbacks handleCallbacks) {
-			handle.Init(slot);
-			handle.pointerDown += handleCallbacks.OnPointerDown;
-			handle.pointerUp += handleCallbacks.OnPointerUp;
-			handle.pointerEnter += handleCallbacks.OnPointerEnter;
-			handle.pointerExit += handleCallbacks.OnPointerExit;
 		}
 	}
 }

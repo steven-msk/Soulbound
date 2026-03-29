@@ -22,7 +22,7 @@ namespace SoulboundEngine.Client.ItemSystem.Container.View {
 			throw new NotImplementedException();
 		}
 
-		void IItemSlotHandleCallbacks.OnPointerDown(int slotIndex, PointerEventData eventData) {
+		void IItemSlotEventListener.OnPointerDown(int slotIndex, PointerEventData eventData) {
 			float time = Time.time;
 			bool doubleClick = lastClickedSlot == slotIndex && (time - lastClickTime) <= doubleClickThreshold;
 			lastClickTime = time;
@@ -45,7 +45,7 @@ namespace SoulboundEngine.Client.ItemSystem.Container.View {
 			operation.Execute();
 		}
 
-		void IItemSlotHandleCallbacks.OnPointerEnter(int slotIndex, PointerEventData eventData) {
+		void IItemSlotEventListener.OnPointerEnter(int slotIndex, PointerEventData eventData) {
 			if (!scope.InDragState()) return;
 
 			// eventData.button does not retain drag click button because its called OnPointerEnter
@@ -102,9 +102,9 @@ namespace SoulboundEngine.Client.ItemSystem.Container.View {
 			return null!;
 		}
 
-		void IItemSlotHandleCallbacks.OnPointerExit(int slotIndex, PointerEventData eventData) {
+		void IItemSlotEventListener.OnPointerExit(int slotIndex, PointerEventData eventData) {
 		}
 
-		void IItemSlotHandleCallbacks.OnPointerUp(int slotIndex, PointerEventData eventData) => scope.EndDrag();
+		void IItemSlotEventListener.OnPointerUp(int slotIndex, PointerEventData eventData) => scope.EndDrag();
 	}
 }

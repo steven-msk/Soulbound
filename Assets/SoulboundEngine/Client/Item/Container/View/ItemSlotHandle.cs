@@ -1,9 +1,5 @@
-using SoulboundEngine.Client.ItemSystem;
-using SoulboundEngine.Client.ItemSystem.View;
+using SoulboundEngine.Client.ItemSystem.Render;
 using SoulboundEngine.Client.UI.Tooltips;
-using SoulboundEngine.Core;
-using System;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -11,21 +7,22 @@ using UnityEngine.EventSystems;
 
 namespace SoulboundEngine.Client.ItemSystem.Container.View {
 	[RequireComponent(typeof(RectTransform))]
-	public class ItemSlotHandle : MonoBehaviour, IItemSlotHandle, ITooltipTrigger, IItemSlotEvents {
+	public class ItemSlotHandle : MonoBehaviour, IItemSlotHandle, ITooltipTrigger {
 		private IItemSlot slot = null!;
 		private ITooltip tooltip = null!;
 		private ITooltipRenderer tooltipRenderer = null!;
+		private IItemSlotEventListener eventListener = null!;
 		private ITooltipHandle? tooltipHandle;
 		private RectTransform rect = null!;
-		public event Action<int, PointerEventData>? pointerDown;
-		public event Action<int, PointerEventData>? pointerUp;
-		public event Action<int, PointerEventData>? pointerEnter;
-		public event Action<int, PointerEventData>? pointerExit;
-		private UIItemDisplay? activeDisplay;
+		private UIItemView? itemView;
 		private ItemStack? stack;
 
-		public void Init(IItemSlot slot) {
+		private readonly UIItemRenderer itemRenderer = new();
+		private readonly ItemModelResolver modelResolver = new();
+
+		public void Init(IItemSlot slot, IItemSlotEventListener eventListener) {
 			this.slot = slot;
+			this.eventListener = eventListener;
 			rect = GetComponent<RectTransform>();
 			slot.setStack += SetStack;
 			SetStack(slot.GetStack());
@@ -33,12 +30,10 @@ namespace SoulboundEngine.Client.ItemSystem.Container.View {
 
 		private void SetStack(ItemStack? stack) {
 			if (this.stack != null) this.stack.onQuantityChanged -= OnStackQuantityChanged;
-			activeDisplay?.Destroy();
 			OnStackQuantityChanged(this.stack?.quantity ?? 0, stack?.quantity ?? 0);
 			this.stack = stack;
 
 			if (stack != null) {
-				activeDisplay = new UIItemDisplay(rect, stack);
 				DestroyTooltip();
 				stack.onQuantityChanged += OnStackQuantityChanged;
 
@@ -46,27 +41,39 @@ namespace SoulboundEngine.Client.ItemSystem.Container.View {
 				SetTooltip(new ItemTooltip(stack.item));
 			} else {
 				SetTooltip(null!);
-				activeDisplay = null;
+			}
+			Render(stack);
+		}
+
+		private void Render(ItemStack? itemStack) {
+			if (itemStack == null && itemView != null) {
+				itemView.Destroy();
+			} else if (itemStack != null) {
+				if (itemView == null) itemView = itemRenderer.CreateView(rect);
+
+				ItemRenderData renderData = itemStack.item.GetRenderData(itemStack);
+				ItemRenderModel model = modelResolver.Resolve(renderData);
+				itemRenderer.Render(itemView, model);
 			}
 		}
 
 		void ITooltipTrigger.Init(ITooltipRenderer tooltipRenderer) => this.tooltipRenderer = tooltipRenderer;
 		public void SetTooltip(ITooltip tooltip) => this.tooltip = tooltip;
 		void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData) {
-			pointerEnter?.Invoke(slot.GetIndex(), eventData);
+			eventListener.OnPointerEnter(slot.GetIndex(), eventData);
 			if (tooltip != null) {
 				tooltipHandle = tooltipRenderer.RenderTooltip(tooltip);
 			}
 		}
 		void IPointerExitHandler.OnPointerExit(PointerEventData eventData) {
-			pointerExit?.Invoke(slot.GetIndex(), eventData);
+			eventListener.OnPointerExit(slot.GetIndex(), eventData);
 			DestroyTooltip();
 		}
 		void IPointerDownHandler.OnPointerDown(PointerEventData eventData) {
-			pointerDown?.Invoke(slot.GetIndex(), eventData);
+			eventListener.OnPointerDown(slot.GetIndex(), eventData);
 		}
 		void IPointerUpHandler.OnPointerUp(PointerEventData eventData) {
-			pointerUp?.Invoke(slot.GetIndex(), eventData);
+			eventListener.OnPointerUp(slot.GetIndex(), eventData);
 		}
 
 		private void OnStackQuantityChanged(int old, int @new) {
@@ -78,7 +85,8 @@ namespace SoulboundEngine.Client.ItemSystem.Container.View {
 					stack.onQuantityChanged -= OnStackQuantityChanged;
 				}
 				stack = null;
-			}
+				if (itemView != null) itemView.Destroy();
+			} else if (stack != null) Render(stack);
 		}
 
 		public void SetVisible(bool visible) {
