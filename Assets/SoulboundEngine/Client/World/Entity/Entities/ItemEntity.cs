@@ -1,7 +1,7 @@
 using SoulboundEngine.Client.ItemSystem;
+using SoulboundEngine.Client.ItemSystem.Render;
 using SoulboundEngine.Client.ItemSystem.View;
 using SoulboundEngine.Client.World.EntitySystem.Transform;
-using SoulboundEngine.Client.World.Render;
 using SoulboundEngine.Core;
 using UnityEngine;
 
@@ -15,6 +15,9 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 		private readonly Entity? owner;
 		private readonly float pickupDelaySec;
 		private readonly ItemStack itemStack;
+
+		private readonly WorldItemRenderer itemRenderer = new();
+		private readonly ItemModelResolver modelResolver = new();
 
 		public ItemEntity(ItemStack itemStack, Vector2 initialPos)
 			: this(null, 0f, itemStack, initialPos) {
@@ -36,10 +39,10 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 			ItemEntityTransform transform = obj.AddComponent<ItemEntityTransform>();
 			obj.GetComponent<UnityEngine.Transform>().localScale = TRANSFORM_SCALE;
 
-			SpriteRenderer itemRenderer = obj.AddComponent<SpriteRenderer>();
-			WorldItemDisplayView view = obj.AddComponent<WorldItemDisplayView>();
-			view.Init(itemRenderer);
-			view.SetStack(itemStack);
+			WorldItemView view = itemRenderer.CreateView(obj);
+			ItemRenderData renderData = itemStack.item.GetRenderData(itemStack);
+			ItemRenderModel model = modelResolver.Resolve(renderData);
+			itemRenderer.Render(view, model);
 
 			Rigidbody2D rigidbody = obj.GetComponent<Rigidbody2D>();
 			rigidbody.sleepMode = RigidbodySleepMode2D.NeverSleep;
