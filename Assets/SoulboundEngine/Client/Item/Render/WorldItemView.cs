@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace SoulboundEngine.Client.ItemSystem.View {
+namespace SoulboundEngine.Client.ItemSystem.Render {
 	public class WorldItemView : MonoBehaviour {
 		private SpriteRenderer spriteRenderer;
 

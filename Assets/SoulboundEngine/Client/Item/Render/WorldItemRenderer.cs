@@ -1,4 +1,3 @@
-using SoulboundEngine.Client.ItemSystem.View;
 using SoulboundEngine.Core.Render;
 using UnityEngine;
 

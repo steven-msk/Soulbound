@@ -1,6 +1,5 @@
 using SoulboundEngine.Client.ItemSystem;
 using SoulboundEngine.Client.ItemSystem.Render;
-using SoulboundEngine.Client.ItemSystem.View;
 using SoulboundEngine.Client.World.EntitySystem.Transform;
 using SoulboundEngine.Core;
 using SoulboundEngine.Core.Render;
