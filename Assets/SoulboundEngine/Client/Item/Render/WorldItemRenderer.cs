@@ -1,4 +1,4 @@
-using SoulboundEngine.Core.Render;
+using SoulboundEngine.Core.Render.Sprite;
 using UnityEngine;
 
 namespace SoulboundEngine.Client.ItemSystem.Render {

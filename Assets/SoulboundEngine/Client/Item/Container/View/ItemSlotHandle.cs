@@ -1,6 +1,6 @@
 using SoulboundEngine.Client.ItemSystem.Render;
 using SoulboundEngine.Client.UI.Tooltips;
-using SoulboundEngine.Core.Render;
+using SoulboundEngine.Core.Render.Sprite;
 using UnityEngine;
 using UnityEngine.EventSystems;
 

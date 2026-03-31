@@ -1,7 +1,10 @@
-using SoulboundEngine.Core.Render;
+using SoulboundEngine.Core;
+using SoulboundEngine.Core.Render.Animation;
+using SoulboundEngine.Core.Render.Sprite;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 namespace SoulboundEngine.Client.ItemSystem.Render {
 	public sealed class UIItemRenderer {
@@ -27,7 +30,8 @@ namespace SoulboundEngine.Client.ItemSystem.Render {
 			TextMeshProUGUI stackText = CreateStackText(obj.GetComponent<RectTransform>());
 
 			UIItemView view = obj.GetComponent<UIItemView>();
-			view.Init(stackText, itemImage);
+			SpriteAnimationPlayer animationPlayer = new(view);
+			view.Init(stackText, itemImage, animationPlayer);
 
 			obj.SetActive(false);
 
@@ -61,6 +65,17 @@ namespace SoulboundEngine.Client.ItemSystem.Render {
 			TextMeshProUGUI stackText = view.GetStackText();
 			stackText.text = model.stackQuantity.ToString();
 			stackText.enabled = model.showStackText;
+
+			if (model.spriteAnimation is { } animationKey) {
+				SpriteAnimation.RegistrationKey registrationKey = new(animationKey);
+				if (Registry<SpriteAnimation>.TryGet(registrationKey, out SpriteAnimation animation)) {
+					view.GetAnimationPlayer().Play(animation);
+				} else {
+					Logger.LogError("Could not find sprite animation with key '{}'", animationKey);
+				}
+			} else {
+				view.GetAnimationPlayer().Stop();
+			}
 
 			view.gameObject.SetActive(true);
 		}

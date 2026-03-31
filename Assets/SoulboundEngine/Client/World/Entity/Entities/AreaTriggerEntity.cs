@@ -1,13 +1,13 @@
 using SoulboundEngine.Client.Players;
-using SoulboundEngine.Client.World.BlockSystem;
 using SoulboundEngine.Client.World.EntitySystem.Transform;
 using SoulboundEngine.Common;
 using SoulboundEngine.Common.Unity;
 using SoulboundEngine.Core;
 using UnityEngine;
-using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 namespace SoulboundEngine.Client.World.EntitySystem {
+	using Logger = Debug.Logging.Logger;
+
 	[PROTOTYPICAL]
 	public sealed class AreaTriggerEntity : Entity {
 		public AreaTriggerEntity(Vector2 initialPos)

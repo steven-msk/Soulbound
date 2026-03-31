@@ -4,7 +4,8 @@ namespace SoulboundEngine.Client.ItemSystem.Render {
 			return new ItemRenderModel {
 				showStackText = renderData.isStackable,
 				spriteRef = renderData.spriteRef,
-				stackQuantity = renderData.stackQuantity
+				stackQuantity = renderData.stackQuantity,
+				spriteAnimation = renderData.spriteAnimation,
 			};
 		}
 	}
