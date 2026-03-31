@@ -6,6 +6,6 @@ namespace SoulboundEngine.Client.ItemSystem.Render {
 		public SpriteRef spriteRef;
 		public int stackQuantity;
 		public bool showStackText;
-		public AnimationKey? spriteAnimation;
+		public SpriteAnimation? spriteAnimation;
 	}
 }

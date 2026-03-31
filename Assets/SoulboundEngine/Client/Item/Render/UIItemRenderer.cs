@@ -1,10 +1,8 @@
-using SoulboundEngine.Core;
 using SoulboundEngine.Core.Render.Animation;
 using SoulboundEngine.Core.Render.Sprite;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 namespace SoulboundEngine.Client.ItemSystem.Render {
 	public sealed class UIItemRenderer {
@@ -66,13 +64,8 @@ namespace SoulboundEngine.Client.ItemSystem.Render {
 			stackText.text = model.stackQuantity.ToString();
 			stackText.enabled = model.showStackText;
 
-			if (model.spriteAnimation is { } animationKey) {
-				SpriteAnimation.RegistrationKey registrationKey = new(animationKey);
-				if (Registry<SpriteAnimation>.TryGet(registrationKey, out SpriteAnimation animation)) {
-					view.GetAnimationPlayer().Play(animation);
-				} else {
-					Logger.LogError("Could not find sprite animation with key '{}'", animationKey);
-				}
+			if (model.spriteAnimation is { } animation) {
+				view.GetAnimationPlayer().Play(animation);
 			} else {
 				view.GetAnimationPlayer().Stop();
 			}
