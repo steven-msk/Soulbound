@@ -3,7 +3,12 @@ using System.Linq;
 
 namespace SoulboundEngine.Core.Registry {
 	public readonly struct Identifier : IEquatable<Identifier> {
-		public const string DEFAULT_RESERVED_NAMESPACE = "soulbound";
+		public const string DEFAULT_RESERVED_NAMESPACE =
+#if UNITY_INCLUDE_TESTS
+			"soulbound_tests";
+#else
+			"soulbound";
+#endif
 		private const string ALLOWED_NAMESPACE_SPECIAL_CHARS = "_-";
 		private const string ALLOWED_PATH_SPECIAL_CHARS = "_-";
 

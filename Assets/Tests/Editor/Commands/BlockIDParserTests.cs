@@ -22,7 +22,8 @@ public class FakeBlock : Block {
 
 namespace Commands.Parsing {
 	internal class BlockIDParserTests {
-		private static readonly Identifier id = new("soulbound_tests", new[] { "block" });
+		const string pathKey = "block";
+		private static readonly Identifier id = new(pathKey);
 		private BlockIDParser parser;
 		private CommandParsingContext context;
 		private Block block;
@@ -48,6 +49,14 @@ namespace Commands.Parsing {
 			ParseResult<Block> result = parser.TryParse(id.ToString(), context);
 			Assert.That(result.success, Is.True);
 			Assert.That(result.value, Is.EqualTo(block));
+		}
+
+		[Test]
+		public void TryParse_KnownIdentifier_DifferentNamespace_ReturnsFail() {
+			Identifier identifier = new("some_weird_namespace", new[] { pathKey });
+
+			ParseResult<Block> result = parser.TryParse(identifier.ToString(), context);
+			Assert.That(result.success, Is.False);
 		}
 
 		[Test]

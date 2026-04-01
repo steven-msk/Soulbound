@@ -9,8 +9,6 @@ namespace SoulboundEngine.Client.Debug.Commands {
 				return ParseResult<Block>.Fail();
 			}
 
-			UnityEngine.Debug.Log(identifier);
-
 			return Registry<Block>.TryGet(identifier, out Block block)
 				? ParseResult<Block>.Success(block)
 				: ParseResult<Block>.Fail();

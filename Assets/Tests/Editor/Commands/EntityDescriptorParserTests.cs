@@ -8,7 +8,8 @@ using SoulboundEngine.Core.Registry;
 
 namespace Commands.Parsing {
 	internal class EntityDescriptorParserTests {
-		private static readonly Identifier id = new("soulbound_tests", new[] { "entity" });
+		const string pathKey = "entity";
+		private static readonly Identifier id = new(pathKey);
 		private EntityDescriptorParser parser;
 		private CommandParsingContext context;
 		private EntityDescriptor descriptor;
@@ -34,6 +35,14 @@ namespace Commands.Parsing {
 			ParseResult<EntityDescriptor> result = parser.TryParse(id.ToString(), context);
 			Assert.That(result.success, Is.True);
 			Assert.That(result.value, Is.EqualTo(descriptor));
+		}
+
+		[Test]
+		public void TryParse_KnownIdentifier_DifferentNamespace_ReturnsFail() {
+			Identifier identifier = new("some_weird_namespace", new[] { pathKey });
+
+			ParseResult<EntityDescriptor> result = parser.TryParse(identifier.ToString(), context);
+			Assert.That(result.success, Is.False);
 		}
 
 		[Test]
