@@ -4,22 +4,23 @@ using SoulboundEngine.Core.Registry;
 
 namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 	public abstract class AttributeType : IIdentifierProvider {
-		private readonly Identifier identifier;
-		private readonly IValueRange? defaultRange;
+		protected readonly Identifier identifier;
+		protected readonly IValueRule? valueRule;
 
-		public AttributeType(Identifier identifier, IValueRange? defaultRange) {
+		public AttributeType(Identifier identifier, IValueRule? valueRule) {
 			this.identifier = identifier;
-			this.defaultRange = defaultRange;
+			this.valueRule = valueRule;
 		}
 
 		public Identifier GetIdentifier() => identifier;
-
-		public IValueRange? GetAttributeValueRange() => defaultRange;
+		public IValueRule? GetValueRule() => valueRule;
 	}
 
 	public sealed class AttributeType<T> : AttributeType {
-		public AttributeType(Identifier identifier, IValueRange<T>? defaultRange)
-			: base(identifier, defaultRange) {
+		public AttributeType(Identifier identifier, IValueRule<T>? valueRule)
+			: base(identifier, valueRule) {
 		}
+
+		public new IValueRule<T>? GetValueRule() => (IValueRule<T>?)valueRule;
 	}
 }

@@ -9,7 +9,7 @@ using UnityEngine;
 namespace SoulboundEngine.Client.World.EntitySystem {
 	public class EntityDescriptor : IIdentifierProvider {
 		private readonly Dictionary<AttributeType, object> definedAttributes = new();
-		private readonly Dictionary<AttributeType, IValueRange?> rangeOverrides = new();
+		private readonly Dictionary<AttributeType, IValueRule?> valueRules = new();
 		private readonly Identifier identifier;
 		private readonly Func<Vector2, Entity> factory;
 
@@ -22,15 +22,15 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 				Identifier identifier,
 				Func<Vector2, Entity> factory,
 				Dictionary<AttributeType, object> definedAttributes,
-				Dictionary<AttributeType, IValueRange?> rangeOverrides
+				Dictionary<AttributeType, IValueRule?> valueRules
 			)
 			: this(identifier, factory) {
 			this.definedAttributes = definedAttributes;
-			this.rangeOverrides = rangeOverrides;
+			this.valueRules = valueRules;
 		}
 
 		public AttributeContainer CreateAttributeContainer() {
-			return new AttributeContainer(definedAttributes, rangeOverrides);
+			return new AttributeContainer(definedAttributes, valueRules);
 		}
 
 		public Identifier GetIdentifier() => identifier;

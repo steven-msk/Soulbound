@@ -20,9 +20,9 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 					[Attributes.intType] = 1,
 					[Attributes.stringType] = "string1"
 				},
-				new Dictionary<AttributeType, IValueRange?> {
-					[Attributes.intType] = new NumberRange<int>(0, 100),
-					[Attributes.stringType] = new SetRange<string>("string1", "string2", "string3", "string4", "string5")
+				new Dictionary<AttributeType, IValueRule?> {
+					[Attributes.intType] = new NumberClamper<int>(0, 100),
+					[Attributes.stringType] = new SetValidator<string>(new[] { "string1", "string2", "string3", "string4", "string5" })
 				}
 			)
 		);
