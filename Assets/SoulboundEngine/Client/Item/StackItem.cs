@@ -2,6 +2,7 @@ using SoulboundEngine.Client.ItemSystem.Render;
 using SoulboundEngine.Common;
 using SoulboundEngine.Core;
 using SoulboundEngine.Core.Assets;
+using SoulboundEngine.Core.Registry;
 using SoulboundEngine.Core.Render.Animation;
 using SoulboundEngine.Core.Render.Sprite;
 using UnityEngine;
@@ -14,7 +15,7 @@ namespace SoulboundEngine.Client.ItemSystem {
 		public override int fullStackSize { get; }
 
 		public StackItem(int fullStackSize)
-			: base($"stackItem_{fullStackSize}") {
+			: base(new Identifier($"stackItem_{fullStackSize}")) {
 			this.fullStackSize = fullStackSize;
 
 
@@ -29,7 +30,7 @@ namespace SoulboundEngine.Client.ItemSystem {
 				spriteResolver.GetSprite(new SpriteRef(atlas, "debugPointer"))
 			};
 
-			Registry<SpriteAnimation>.Add(new SpriteAnimation(
+			Registry<SpriteAnimation>.Add(new Identifier($"stackItem_{fullStackSize}", "animation"), new SpriteAnimation(
 				new AnimationKey($"stackItemAnimation_{fullStackSize}"),
 				frames,
 				fullStackSize,
@@ -38,7 +39,7 @@ namespace SoulboundEngine.Client.ItemSystem {
 		}
 
 		public override ItemRenderData GetRenderData(ItemStack itemStack) {
-			return new ItemRenderData("idkwhatthisis", itemStack, new AnimationKey($"stackItemAnimation_{fullStackSize}"));
+			return new ItemRenderData("idkwhatthisis", itemStack, new Identifier($"stackItem_{fullStackSize}", "animation"));
 		}
 
 	}

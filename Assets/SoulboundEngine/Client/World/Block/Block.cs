@@ -3,26 +3,25 @@ using SoulboundEngine.Client.World.BlockSystem.Render;
 using SoulboundEngine.Client.World.BlockSystem.States;
 using SoulboundEngine.Client.World.BlockSystem.TileEntities;
 using SoulboundEngine.Client.World.LevelDomain;
-using SoulboundEngine.Core;
-using System;
+using SoulboundEngine.Core.Registry;
 using System.Collections.Generic;
 
 #nullable enable
 
 namespace SoulboundEngine.Client.World.BlockSystem {
-	public abstract partial class Block {
-		private readonly string id;
+	public abstract partial class Block : IIdentifierProvider {
+		private readonly Identifier identifier;
 		public abstract string name { get; init; }
 		public abstract int minBreakLevel { get; init; }
 		public BlockState defaultState { get; private set; } = null!;
 
-		protected Block(string id, IBlockStateRegisterer? stateRegisterer = null) {
-			this.id = id;
+		protected Block(Identifier identifier, IBlockStateRegisterer? stateRegisterer = null) {
+			this.identifier = identifier;
 			RegisterStates(stateRegisterer);
 		}
 
-		protected Block(string id, string name, int minBreakLevel, IBlockStateRegisterer? stateRegisterer = null) {
-			this.id = id;
+		protected Block(Identifier identifier, string name, int minBreakLevel, IBlockStateRegisterer? stateRegisterer = null) {
+			this.identifier = identifier;
 			this.name = name;
 			this.minBreakLevel = minBreakLevel;
 			RegisterStates(stateRegisterer);
@@ -40,7 +39,7 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 			stateRegisterer.FinishRegistry();
 		}
 
-		public string GetID() => id;
+		public Identifier GetIdentifier() => identifier;
 
 		public abstract BlockRenderData GetRenderData(BlockState blockState);
 
@@ -63,21 +62,6 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 		}
 		public virtual IEnumerable<ItemStack> GetDrops(BlockState blockState, BreakSource source) {
 			yield break;
-		}
-
-		public readonly struct RegistrationKey : IRegistrationKey<Block> {
-			public readonly string blockID;
-
-			public RegistrationKey(string blockID) {
-				this.blockID = blockID;
-			}
-
-			public override bool Equals(object obj) {
-				return obj is RegistrationKey blockKey
-					&& this.blockID == blockKey.blockID;
-			}
-
-			public override int GetHashCode() => HashCode.Combine(blockID);
 		}
 	}
 }

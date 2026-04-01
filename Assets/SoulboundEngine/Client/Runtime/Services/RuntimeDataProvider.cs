@@ -1,8 +1,8 @@
 using SoulboundEngine.Client.ItemSystem.Container;
 using SoulboundEngine.Client.Players;
-using SoulboundEngine.Client.World;
 using SoulboundEngine.Client.World.EntitySystem;
 using SoulboundEngine.Client.World.LevelDomain;
+using SoulboundEngine.Core.Registry;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,7 +42,7 @@ namespace SoulboundEngine.Client.Runtime.Services {
 
 		public Guid GetGuid() => player.guid;
 
-		public string GetID() => player.descriptor.GetID();
+		public Identifier GetIdentifier() => player.descriptor.GetIdentifier();
 
 		public Vector2 GetPos() => player.GetPos();
 
@@ -89,12 +89,12 @@ namespace SoulboundEngine.Client.Runtime.Services {
 
 			public Guid GetGuid() => entity.guid;
 
-			public string GetID() => entity.descriptor.GetID();
+			public Identifier GetIdentifier() => entity.descriptor.GetIdentifier();
 
 			public Vector2 GetPos() => entity.GetPos();
 
 			public override string ToString() {
-				return $"entity:{GetID()}/{GetGuid()}";
+				return $"entity:{GetIdentifier()}/{GetGuid()}";
 			}
 		}
 	}

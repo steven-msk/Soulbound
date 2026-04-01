@@ -5,10 +5,8 @@ namespace SoulboundEngine.Client.ItemSystem.Render {
 	public sealed class ItemModelResolver {
 		public ItemRenderModel Resolve(ItemRenderData renderData) {
 			SpriteAnimation? animation = null;
-			if (renderData.spriteAnimation is { } animationKey) {
-				SpriteAnimation.RegistrationKey registrationKey = new(animationKey);
-				Registry<SpriteAnimation>.TryGet(registrationKey, out SpriteAnimation anim);
-				animation = anim;
+			if (renderData.spriteAnimation is { } identifier) {
+				animation = Registry<SpriteAnimation>.Get(identifier);
 			}
 
 			return new ItemRenderModel {

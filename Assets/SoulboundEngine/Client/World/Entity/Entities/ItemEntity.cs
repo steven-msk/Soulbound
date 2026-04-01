@@ -2,6 +2,7 @@ using SoulboundEngine.Client.ItemSystem;
 using SoulboundEngine.Client.ItemSystem.Render;
 using SoulboundEngine.Client.World.EntitySystem.Transform;
 using SoulboundEngine.Core;
+using SoulboundEngine.Core.Registry;
 using SoulboundEngine.Core.Render.Sprite;
 using UnityEngine;
 
@@ -9,7 +10,8 @@ using UnityEngine;
 
 namespace SoulboundEngine.Client.World.EntitySystem {
 	public class ItemEntity : Entity {
-		private static readonly EntityDescriptor DESCRIPTOR = new("itemEntity", null);
+		private static readonly Identifier identifier = new("itemEntity");
+		private static readonly EntityDescriptor DESCRIPTOR = new(identifier, null);
 		private static readonly Vector3 TRANSFORM_SCALE = new(2.5f, 2.5f, 2.5f);
 
 		private readonly Entity? owner;

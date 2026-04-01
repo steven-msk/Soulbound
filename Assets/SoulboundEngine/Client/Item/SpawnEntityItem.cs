@@ -2,13 +2,15 @@ using SoulboundEngine.Client.Interaction;
 using SoulboundEngine.Client.ItemSystem.Render;
 using SoulboundEngine.Client.World.EntitySystem;
 using SoulboundEngine.Common;
+using SoulboundEngine.Core.Registry;
 
 namespace SoulboundEngine.Client.ItemSystem {
 	[PROTOTYPICAL]
 	public sealed class SpawnEntityItem : Item, IItemInteractionListener {
+		private static readonly Identifier identifier = new("spawnEntityItem");
 		public override string name => "Spawn Entity Item";
 
-		public SpawnEntityItem() : base("spawnEntityItem") {
+		public SpawnEntityItem() : base(identifier) {
 		}
 
 		public bool ValidateTrigger(InteractionTrigger trigger) {

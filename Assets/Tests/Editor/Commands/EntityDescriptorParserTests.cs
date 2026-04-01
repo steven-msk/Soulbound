@@ -4,10 +4,11 @@ using SoulboundEngine.Client.Debug.Commands;
 using SoulboundEngine.Client.Runtime.Services;
 using SoulboundEngine.Client.World.EntitySystem;
 using SoulboundEngine.Core;
+using SoulboundEngine.Core.Registry;
 
 namespace Commands.Parsing {
 	internal class EntityDescriptorParserTests {
-		const string id = "entity";
+		private static readonly Identifier id = new("soulbound_tests", new[] { "entity" });
 		private EntityDescriptorParser parser;
 		private CommandParsingContext context;
 		private EntityDescriptor descriptor;
@@ -20,24 +21,23 @@ namespace Commands.Parsing {
 				Substitute.For<IRuntimeDataProvider>(),
 				Substitute.For<IRuntimeExecutionServices>()
 			);
-			Registry<EntityDescriptor>.SetContract(new EntityType.EntityDescriptorRegistrationContract());
 			descriptor = Registry<EntityDescriptor>.Add(new EntityDescriptor(id, _ => null));
 		}
 
 		[TearDown]
 		public void TearDown() {
-			Registry<EntityDescriptor>.Remove(new EntityDescriptor.RegistrationKey(id));
+			Registry<EntityDescriptor>.Remove(id);
 		}
 
 		[Test]
-		public void TryParse_KnownDescriptorID_ReturnsSuccess() {
-			ParseResult<EntityDescriptor> result = parser.TryParse(id, context);
+		public void TryParse_KnownIdentifier_ReturnsSuccess() {
+			ParseResult<EntityDescriptor> result = parser.TryParse(id.ToString(), context);
 			Assert.That(result.success, Is.True);
 			Assert.That(result.value, Is.EqualTo(descriptor));
 		}
 
 		[Test]
-		public void TryParse_UnknownID_ReturnsFail() {
+		public void TryParse_UnknownIdentifier_ReturnsFail() {
 			ParseResult<EntityDescriptor> result = parser.TryParse("unknownEntity", context);
 			Assert.That(result.success, Is.False);
 		}
@@ -50,8 +50,6 @@ namespace Commands.Parsing {
 
 		[Test]
 		public void TryParse_CaseDifference_ReturnsFail() {
-			Registry<EntityDescriptor>.Add(new EntityDescriptor("entity", _ => null));
-
 			ParseResult<EntityDescriptor> result = parser.TryParse("Entity", context);
 			Assert.That(result.success, Is.False);
 		}

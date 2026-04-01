@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace SoulboundEngine.Client.World.BlockSystem.States {
 	public static class StateHasher {
 		private const uint FnvOffset = 2166136261;
@@ -11,7 +5,7 @@ namespace SoulboundEngine.Client.World.BlockSystem.States {
 
 		public static int ComputeHash(Block block, BlockPropertyEntries properties) {
 			uint hash = FnvOffset;
-			hash = HashString(hash, block.GetID());
+			hash = HashString(hash, block.GetIdentifier().ToString());
 
 			foreach (var (property, value) in properties.GetSorted()) {
 				hash = HashString(hash, property);

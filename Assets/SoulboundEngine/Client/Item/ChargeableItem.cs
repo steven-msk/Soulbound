@@ -2,15 +2,16 @@ using SoulboundEngine.Client.Debug.Logging;
 using SoulboundEngine.Client.Interaction;
 using SoulboundEngine.Client.ItemSystem.Render;
 using SoulboundEngine.Common;
+using SoulboundEngine.Core.Registry;
 
 namespace SoulboundEngine.Client.ItemSystem {
 	[PROTOTYPICAL]
 	public sealed class ChargeableItem : Item, IItemInteractionListener {
 		// might pull this up into IChargeableItem for the future
-
+		private static readonly Identifier identifier = new("chargeableItem");
 		public override string name => "Chargeable Item";
 
-		public ChargeableItem() : base("chargeableItem") {
+		public ChargeableItem() : base(identifier) {
 		}
 
 		public bool ValidateTrigger(InteractionTrigger trigger) {

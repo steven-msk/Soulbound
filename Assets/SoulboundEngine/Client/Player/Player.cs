@@ -10,6 +10,7 @@ using SoulboundEngine.Common;
 using SoulboundEngine.Core;
 using SoulboundEngine.Core.Assets;
 using SoulboundEngine.Core.Event;
+using SoulboundEngine.Core.Registry;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -18,7 +19,8 @@ using UnityEngine.InputSystem;
 namespace SoulboundEngine.Client.Players {
 	public class Player : Entity, IInputContext, IFrameUpdatableEntity, IInteractionHandler<ItemInteraction>, IInteractionHandler<BlockInteraction> {
 		private static readonly AssetKey playerKey = new("player");
-		private static readonly EntityDescriptor DESCRIPTOR = new("player", null);
+		private static readonly Identifier identifier = new("player");
+		private static readonly EntityDescriptor DESCRIPTOR = new(identifier, null);
 		private readonly Inventory inventory;
 		private readonly Hotbar hotbar;
 		private ITransitStackSource tranistStackSource = null!;

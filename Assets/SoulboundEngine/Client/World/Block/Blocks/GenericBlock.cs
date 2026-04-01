@@ -1,6 +1,7 @@
 using SoulboundEngine.Client.World.BlockSystem.Render;
 using SoulboundEngine.Client.World.BlockSystem.States;
 using SoulboundEngine.Core.Assets;
+using SoulboundEngine.Core.Registry;
 
 #nullable enable
 
@@ -12,11 +13,11 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 		private readonly AssetKey tileKey;
 
 		public GenericBlock(
-				string id,
+				Identifier identifier,
 				string name,
 				AssetKey tileKey,
 				int minBreakLevel
-			) : base(id, name, minBreakLevel) {
+			) : base(identifier, name, minBreakLevel) {
 			this.tileKey = tileKey;
 		}
 

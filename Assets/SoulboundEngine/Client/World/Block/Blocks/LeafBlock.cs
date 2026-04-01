@@ -1,10 +1,12 @@
 using SoulboundEngine.Client.World.BlockSystem.Render;
 using SoulboundEngine.Client.World.BlockSystem.States;
 using SoulboundEngine.Core.Assets;
+using SoulboundEngine.Core.Registry;
 
 namespace SoulboundEngine.Client.World.BlockSystem {
 	public class LeafBlock : Block {
-		public LeafBlock() : base("leaves") { }
+		private static readonly Identifier identifier = new("leaves");
+		public LeafBlock() : base(identifier) { }
 		public override string name { get; init; } = "Leaves";
 		public override int minBreakLevel { get; init; } = 0;
 

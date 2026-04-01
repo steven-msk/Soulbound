@@ -24,7 +24,7 @@ namespace SoulboundEngine.Client.Debug.Commands {
 								Mathf.FloorToInt(ctx.Args.Get<Coordinate>("y").GetPos(playerPos.y))
 							);
 							ctx.ExecServices.Level.SetBlockState(blockPos, block.defaultState);
-							Logger.LogInfo("Set block {} at {}", block.GetID(), blockPos);
+							Logger.LogInfo("Set block {} at {}", block.GetIdentifier(), blockPos);
 						})
 			.GetRootNode();
 		private readonly CommandNode spawn = CommandBuilder.Literal("spawn")

@@ -1,20 +1,20 @@
 using SoulboundEngine.Client.ItemSystem.Render;
-using SoulboundEngine.Core;
+using SoulboundEngine.Core.Registry;
 using System;
 using UnityEngine;
 
 #nullable enable
 
 namespace SoulboundEngine.Client.ItemSystem {
-	public abstract partial class Item {
+	public abstract partial class Item : IIdentifierProvider {
 		public const int DEFAULT_FULL_STACK = 256;
 
-		private readonly string id;
+		private readonly Identifier identifier;
 		public abstract string name { get; }
 		public virtual int fullStackSize { get; } = DEFAULT_FULL_STACK;
 
-		protected Item(string id) {
-			this.id = id;
+		protected Item(Identifier identifier) {
+			this.identifier = identifier;
 		}
 
 		public abstract ItemRenderData GetRenderData(ItemStack itemStack);
@@ -23,31 +23,14 @@ namespace SoulboundEngine.Client.ItemSystem {
 			return new ItemStack(this, Mathf.Clamp(quantity, 0, fullStackSize));
 		}
 
-		public override string ToString() {
-			return $"item:{name}";
-		}
+		public override string ToString() => identifier.ToString();
 
 		public override int GetHashCode() {
-			return HashCode.Combine(id, fullStackSize);
+			return HashCode.Combine(identifier, fullStackSize);
 		}
 
 		public bool IsStackable() => fullStackSize > 1;
 
-		public string GetID() => id;
-
-		public readonly struct RegistrationKey : IRegistrationKey<Item> {
-			public readonly string itemID;
-
-			public RegistrationKey(string itemID) {
-				this.itemID = itemID;
-			}
-
-			public override bool Equals(object obj) {
-				return obj is RegistrationKey itemKey
-					&& this.itemID == itemKey.itemID;
-			}
-
-			public override int GetHashCode() => HashCode.Combine(itemID);
-		}
+		public Identifier GetIdentifier() => identifier;
 	}
 }

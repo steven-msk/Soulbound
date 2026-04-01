@@ -1,40 +1,56 @@
+using SoulboundEngine.Client.Debug.Logging;
+using SoulboundEngine.Core.Registry;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Unity.VisualScripting;
 
 namespace SoulboundEngine.Core {
 	public static class Registry<T> {
-		private static readonly Dictionary<IRegistrationKey<T>, T> registry = new();
-		private static IRegistrationContract<T, IRegistrationKey<T>> contract;
+		private static readonly Dictionary<Identifier, T> registry = new();
 
-		public static TValue Add<TValue>(TValue value) where TValue : T {
-			if (contract == null) throw ContractNotSet();
+		public static TSub Add<TSub>(TSub value) where TSub : T, IIdentifierProvider {
+			return Add(value.GetIdentifier(), value);
+		}
 
-			IRegistrationKey<T> key = contract.ValueToKey(value);
-			if (!registry.ContainsKey(key)) registry.Add(key, value);
+		public static TSub Add<TSub>(Identifier identifier, TSub value) where TSub : T {
+			if (registry.ContainsKey(identifier) || IdentifierRegistry.ContainsIdentifier(identifier)) {
+				Logger.LogError("Identifier already exists: {}", identifier);
+				return value;
+			}
+			registry.Add(identifier, value);
+			IdentifierRegistry.AddIdentifier(identifier);
 			return value;
 		}
 
-		public static IRegistrationContract<T, IRegistrationKey<T>> SetContract(IRegistrationContract<T, IRegistrationKey<T>> contract) {
-			Registry<T>.contract = contract;
-			return contract;
+		public static T Get(Identifier identifier) {
+			if (!registry.TryGetValue(identifier, out T value)) {
+				Logger.LogFatal(new ArgumentException($"Could not find registry element with identifier '{identifier}'"));
+				return default;
+			}
+			return value;
 		}
 
-		public static bool TryGet(IRegistrationKey<T> key, out T value) {
-			if (contract == null) throw ContractNotSet();
-
-			return registry.TryGetValue(key, out value);
+		public static bool TryGet(Identifier identifier, out T value) {
+			return registry.TryGetValue(identifier, out value);
 		}
 
-		public static void Remove(IRegistrationKey<T> key) => registry.Remove(key);
+		public static void Remove(Identifier identifier) {
+			registry.Remove(identifier);
+			IdentifierRegistry.RemoveIdentifier(identifier);
+		}
 
 		public static IEnumerable<T> GetAll() => registry.Values;
 
-		private static NotSupportedException ContractNotSet() {
-			return new($"Registry contract not set for type {typeof(T)}");
+	}
+
+	internal static class IdentifierRegistry {
+		private static readonly HashSet<Identifier> allIdentifiers = new();
+
+		public static bool ContainsIdentifier(Identifier identifier) {
+			return allIdentifiers.Contains(identifier);
 		}
+
+		public static void AddIdentifier(Identifier identifier) => allIdentifiers.Add(identifier);
+
+		public static void RemoveIdentifier(Identifier identifier) => allIdentifiers.Remove(identifier);
 	}
 }

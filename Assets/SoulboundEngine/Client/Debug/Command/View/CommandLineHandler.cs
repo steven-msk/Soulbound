@@ -62,12 +62,13 @@ namespace SoulboundEngine.Client.Debug.Commands.View {
 			inputField.selectionFocusPosition = end;
 		}
 
+		// TODO: refactor command line handler logic
 		void ICommandLineHandler.HandleKey(Key key) {
 			if (key == Key.Escape) {
 				shouldCloseCommandLine();
 				return;
 			}
-			if (key == Key.Backspace) currentInputMode = CommandInputMode.Typing;
+			if (key != Key.Tab && key != Key.UpArrow && key != Key.DownArrow) currentInputMode = CommandInputMode.Typing;
 			switch (currentInputMode) {
 				case CommandInputMode.Typing: HandleTyping(key);
 					break;

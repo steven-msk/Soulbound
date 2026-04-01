@@ -4,16 +4,18 @@ using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Common;
 using SoulboundEngine.Common.Math;
 using SoulboundEngine.Core.Assets;
+using SoulboundEngine.Core.Registry;
 
 namespace SoulboundEngine.Client.World.BlockSystem {
 	[PROTOTYPICAL]
 	public sealed class NeighborReactiveBlock : Block, INeighborUpdateHandler {
+		private static readonly Identifier identifier = new("neighborReactiveBlock");
 		public BlockState active { get; private set; }
 		public BlockState inactive { get; private set; }
 		public override string name { get; init; } = "Neighbor Reactive Block";
 		public override int minBreakLevel { get; init; } = 0;
 
-		public NeighborReactiveBlock() : base("neighborReactiveBlock") {
+		public NeighborReactiveBlock() : base(identifier) {
 		}
 
 		protected override BlockState GetDefaultState(IBlockStateRegisterer registerer, BlockPropertyEntries properties) {

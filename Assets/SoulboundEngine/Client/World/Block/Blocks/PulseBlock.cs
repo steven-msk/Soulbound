@@ -4,16 +4,18 @@ using SoulboundEngine.Client.World.BlockSystem.TileEntities;
 using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Common;
 using SoulboundEngine.Core.Assets;
+using SoulboundEngine.Core.Registry;
 
 namespace SoulboundEngine.Client.World.BlockSystem {
 	[PROTOTYPICAL]
 	public sealed class PulseBlock : Block {
+		private static readonly Identifier identifier = new("pulseBlock");
 		public BlockState on { get; private set; }
 		public BlockState off { get; private set; }
 		public override string name { get; init; } = "Pulse Block";
 		public override int minBreakLevel { get; init; } = 0;
 
-		public PulseBlock() : base("pulseBlock") {
+		public PulseBlock() : base(identifier) {
 		}
 
 		protected override void CreateStates(IBlockStateRegisterer registerer, BlockPropertyEntries properties) {
