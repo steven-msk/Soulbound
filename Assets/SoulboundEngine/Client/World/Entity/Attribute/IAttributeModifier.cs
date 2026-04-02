@@ -1,6 +1,7 @@
 namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 	public interface IAttributeModifier {
 		void Apply(ref object value);
+		bool HasPredicate();
 	}
 
 	public interface IAttributeModifier<T> : IAttributeModifier {

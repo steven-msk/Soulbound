@@ -20,7 +20,7 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 					[Attributes.intType] = 1,
 				},
 				new Dictionary<AttributeType, IValueRule?> {
-					[Attributes.intType] = new NumberRange<int>(0, 100),
+					[Attributes.intType] = new NumberRange(-100, 100),
 				}
 			)
 		);

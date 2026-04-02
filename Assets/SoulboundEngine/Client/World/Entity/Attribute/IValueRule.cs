@@ -21,10 +21,10 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 		}
 	}
 
-	public record NumberRange<T>(T minIncluded, T maxIncluded) : IValueRule<T> where T : struct, IComparable<T> {
-		public void Apply(ref T value) {
-			if (value.CompareTo(minIncluded) < 0) value = minIncluded;
-			if (value.CompareTo(maxIncluded) > 0) value = maxIncluded;
+	public record NumberRange(float minIncluded, float maxIncluded) : IValueRule<float> {
+		public void Apply(ref float value) {
+			if (value < minIncluded) value = minIncluded;
+			if (value > maxIncluded) value = maxIncluded;
 		}
 	}
 

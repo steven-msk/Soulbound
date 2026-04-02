@@ -1,4 +1,3 @@
-using SoulboundEngine.Client.Debug.Logging;
 using System.Collections.Generic;
 
 #nullable enable
@@ -18,32 +17,21 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 		}
 
 		public bool TryGetValue<T>(AttributeType<T> type, out T value) {
-			value = default!;
+			T baseValue = default;
 			bool typeIsDefined = false;
-			if (baseValues.TryGetValue(type, out var baseValue)) {
-				value = (T)baseValue;
+			if (baseValues.TryGetValue(type, out var val)) {
+				baseValue = (T)val;
 				typeIsDefined = true;
 			}
 
-			if (modifiers.TryGetValue(type, out var modifierList)) {
-				foreach (var modifier in modifierList) {
-					object wrap = value;
-					modifier.Apply(ref wrap);
-					value = (T)wrap;
-				}
+			List<IAttributeModifier> modifiers = new();
+			if (this.modifiers.TryGetValue(type, out var modifierList)) {
+				modifiers = modifierList;
 				typeIsDefined = true;
 			}
 
-			IValueRule<T>? valueRule = ruleOverrides.TryGetValue(type, out IValueRule? boxed)
-				? (IValueRule<T>?)boxed
-				: type.GetValueRule();
-
-			try {
-				valueRule?.Apply(ref value);
-			} catch (AttributeValueRuleViolationException e) {
-				Logger.LogFatal(e);
-				return false;
-			}
+			IValueRule? ruleOverride = ruleOverrides.GetValueOrDefault(type);
+			value = (T)type.ComputeValue(baseValue, ruleOverride, modifiers);
 
 			return typeIsDefined;
 		}
