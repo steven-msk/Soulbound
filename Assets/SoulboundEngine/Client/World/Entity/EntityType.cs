@@ -18,11 +18,9 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 				pos => new StaticEntity(pos),
 				new Dictionary<AttributeType, object> {
 					[Attributes.intType] = 1,
-					[Attributes.stringType] = "string1"
 				},
 				new Dictionary<AttributeType, IValueRule?> {
 					[Attributes.intType] = new NumberRange<int>(0, 100),
-					[Attributes.stringType] = new SetValidator<string>(new[] { "string1", "string2", "string3", "string4", "string5" })
 				}
 			)
 		);

@@ -37,18 +37,8 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 	public record SetValidator<T>(T[] supportedValues, IEqualityComparer<T>? comparer = null) : IValueRule<T> {
 		public void Apply(ref T value) {
 			if (!supportedValues.Contains(value, comparer ?? EqualityComparer<T>.Default)) {
-				throw new AttributeValueRuleViolationException($"Value is not within supported set: {value}");
+				throw new AttributeValueRuleViolationException($"Value is not within set: {value}");
 			}
-		}
-	}
-
-	public record PatternResolver<T>(Func<T, T> resolver) : IValueRule<T> {
-		public void Apply(ref T value) => value = resolver(value);
-	}
-
-	public record PredicatePatternResolver<T>(Predicate<T> predicate, Func<T, T> resolver) : IValueRule<T> {
-		public void Apply(ref T value) {
-			if (predicate(value)) value = resolver(value);
 		}
 	}
 }
