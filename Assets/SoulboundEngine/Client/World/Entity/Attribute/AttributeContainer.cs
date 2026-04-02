@@ -47,5 +47,18 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 
 			return typeIsDefined;
 		}
+
+		public void AddModifier<T>(AttributeType<T> type, IAttributeModifier<T> modifier) {
+			if (!modifiers.ContainsKey(type)) {
+				modifiers[type] = new List<IAttributeModifier>();
+			}
+			modifiers[type].Add(modifier);
+		}
+
+		public void RemoveModifier<T>(AttributeType<T> type, IAttributeModifier<T> modifier) {
+			if (modifiers.TryGetValue(type, out var modifierList)) {
+				modifierList.Remove(modifier);
+			}
+		}
 	}
 }

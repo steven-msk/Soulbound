@@ -4,6 +4,7 @@ using System;
 
 namespace SoulboundEngine.Common.Patterns {
 	public delegate void RefAction<T>(ref T value);
+	public delegate RefAction<T> RefActionProvider<TTarget, T>(TTarget target);
 
 	public class RefBox<T> where T : class {
 		public T? value;

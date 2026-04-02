@@ -21,7 +21,7 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 		}
 	}
 
-	public record NumberClamper<T>(T minIncluded, T maxIncluded) : IValueRule<T> where T : struct, IComparable<T> {
+	public record NumberRange<T>(T minIncluded, T maxIncluded) : IValueRule<T> where T : struct, IComparable<T> {
 		public void Apply(ref T value) {
 			if (value.CompareTo(minIncluded) < 0) value = minIncluded;
 			if (value.CompareTo(maxIncluded) > 0) value = maxIncluded;
