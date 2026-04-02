@@ -3,6 +3,8 @@ using System;
 #nullable enable
 
 namespace SoulboundEngine.Common.Patterns {
+	public delegate void RefAction<T>(ref T value);
+
 	public class RefBox<T> where T : class {
 		public T? value;
 
