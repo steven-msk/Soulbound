@@ -40,6 +40,26 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 				}
 			}
 
+			// filter targeting modifiers
+			List<INumericModifier> targeting = numericModifiers
+				.Where(m => m.GetTarget() != null)
+				.ToList();
+			foreach (var modifier in numericModifiers) {
+				float effective = modifier.GetNominalValue();
+
+				// TODO: operation order will matter for targeting numeric modifiers
+				foreach (var targeter in targeting) {
+					IEnumerable<INumericModifier> resolved = targeter.GetTarget()!.Resolve(numericModifiers);
+
+					if (resolved.Contains(modifier)) {
+						targeter.Apply(ref effective);
+					}
+				}
+
+				modifier.SetEffectiveValue(effective);
+			}
+			numericModifiers.RemoveAll(m => targeting.Contains(m));
+
 			// filter predicates
 			List<INumericModifier> predicate = numericModifiers
 				.Where(m => m.HasPredicate())

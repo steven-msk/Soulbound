@@ -1,6 +1,6 @@
 namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 	public interface INumericOperation {
-		void Apply(ref float value);
+		void Apply(float effectiveAmount, ref float targetValue);
 		NumericOperationType GetOperationType();
 	}
 }
