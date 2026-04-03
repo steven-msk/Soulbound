@@ -12,24 +12,6 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 			: base(identifier, valueRule) {
 		}
 
-		// default numeric value computation:
-		// A = base + Σ(flat)
-		// B = A * (1 + Σ%) (% of A)
-		// C = B * Π(multipliers)
-		//
-		// snapshot = C
-		//
-		//    where predicate(snapshot) is true:
-		// P_flat = Σ(predicate flats)
-		// P_%    = Σ(predicate %) (% of C)
-		// P_mult = Π(predicate multipliers)
-		//
-		// final = C
-		// final += P_flat
-		// final *= (1 + P_%)
-		// final *= P_mult
-		//  
-		// final = value_rule(final)
 		public override float ComputeValue(float baseValue, IValueRule<float>? ruleOverride, IReadOnlyList<IAttributeModifier<float>> modifiers) {
 			List<INumericModifier> numericModifiers = new();
 			foreach (var modifier in modifiers) {
@@ -41,31 +23,65 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 			}
 
 			// filter targeting modifiers
-			List<INumericModifier> targeting = numericModifiers
-				.Where(m => m.GetTarget() != null)
-				.ToList();
-			foreach (var modifier in numericModifiers) {
-				float effective = modifier.GetNominalValue();
-
-				// TODO: operation order will matter for targeting numeric modifiers
+			{
+				List<INumericModifier> targeting = numericModifiers
+					.Where(m => m.GetTarget() != null)
+					.ToList();
+				Dictionary<INumericModifier, List<INumericModifier>> modifierToItsTargeters = new();
 				foreach (var targeter in targeting) {
-					IEnumerable<INumericModifier> resolved = targeter.GetTarget()!.Resolve(numericModifiers);
+					IEnumerable<INumericModifier> targets = targeter.GetTarget()!.Resolve(numericModifiers);
 
-					if (resolved.Contains(modifier)) {
-						targeter.Apply(ref effective);
+					foreach (var target in targets) {
+						if (!modifierToItsTargeters.ContainsKey(target)) {
+							modifierToItsTargeters[target] = new List<INumericModifier>();
+						}
+						modifierToItsTargeters[target].Add(targeter);
 					}
 				}
 
-				modifier.SetEffectiveValue(effective);
+				foreach (var target in modifierToItsTargeters.Keys) {
+					List<INumericModifier> targeters = modifierToItsTargeters[target];
+
+					// TODO: filter predicate targeters
+
+					float effective = CalculateModifiers(target.GetNominalValue(), targeters);
+
+					target.SetEffectiveValue(effective);
+				}
+
+				numericModifiers.RemoveAll(m => targeting.Contains(m));
 			}
-			numericModifiers.RemoveAll(m => targeting.Contains(m));
 
 			// filter predicates
 			List<INumericModifier> predicate = numericModifiers
 				.Where(m => m.HasPredicate())
 				.ToList();
 			numericModifiers.RemoveAll(m => m.HasPredicate());
-			FilterOperations(numericModifiers,
+
+			float subtotalC = CalculateModifiers(baseValue, numericModifiers);
+
+			IValueRule<float>? valueRule = ruleOverride ?? this.valueRule;
+			AttributeSnapshot<float> snapshot = new(this, baseValue, subtotalC);
+			predicate.RemoveAll(m => !m.CheckPredicate(snapshot));
+			float final = CalculateModifiers(subtotalC, predicate);
+
+			// apply rule
+			try {
+				valueRule?.Apply(ref final);
+			} catch (AttributeValueRuleViolationException e) {
+				Logger.LogFatal(e);
+				return baseValue;
+			}
+
+			return final;
+		}
+
+		// default numeric value computation:
+		// A = base + Σ(flat)
+		// B = A * (1 + Σ%) (% of A)
+		// C = B * Π(multipliers)
+		private float CalculateModifiers(float baseValue, IEnumerable<INumericModifier> modifiers) {
+			FilterOperations(modifiers.ToList(),
 				out List<INumericModifier> additive,
 				out List<INumericModifier> additivePercent,
 				out List<INumericModifier> multiplicative
@@ -91,52 +107,7 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 			}
 			float subtotalC = subtotalB * multplierProduct;
 
-			FilterOperations(predicate,
-				out List<INumericModifier> predicate_additive,
-				out List<INumericModifier> predicate_additivePercent,
-				out List<INumericModifier> predicate_multiplicative
-			);
-
-			IValueRule<float>? valueRule = ruleOverride ?? this.valueRule;
-			AttributeSnapshot<float> snapshot = new(
-				this, baseValue, subtotalC, modifiers, valueRule
-			);
-			float final = subtotalC;
-
-			// apply predicate flat adds/subtracts (P_flat)
-			foreach (var pred_additiveMod in predicate_additive) {
-				if (pred_additiveMod.CheckPredicate(snapshot)) {
-					pred_additiveMod.Apply(ref final);
-				}
-			}
-
-			// apply predicate percentage adds/subtracts (P_%)
-			float predicate_percentSum = 0f;
-			foreach (var pred_additivePercentMod in predicate_additivePercent) {
-				if (pred_additivePercentMod.CheckPredicate(snapshot)) {
-					pred_additivePercentMod.Apply(ref predicate_percentSum);
-				}
-			}
-			final *= 1f + predicate_percentSum;
-
-			// apply predicate flat multipliers (P_multi)
-			float predicate_multiplierProduct = 1f;
-			foreach (var pred_multiplicativeMod in predicate_multiplicative) {
-				if (pred_multiplicativeMod.CheckPredicate(snapshot)) {
-					pred_multiplicativeMod.Apply(ref predicate_multiplierProduct);
-				}
-			}
-			final *= predicate_multiplierProduct;
-
-			// apply rule
-			try {
-				valueRule?.Apply(ref final);
-			} catch (AttributeValueRuleViolationException e) {
-				Logger.LogFatal(e);
-				return baseValue;
-			}
-
-			return final;
+			return subtotalC;
 		}
 
 		private void FilterOperations(
