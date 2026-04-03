@@ -7,10 +7,10 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 		private readonly float amount;
 		private float effectiveAmount;
 		private readonly INumericOperation operation;
-		private readonly Predicate<AttributeSnapshot<float>>? predicate;
+		private readonly Predicate<IAttributeContext>? predicate;
 		private readonly INumericModifierTarget? target;
 
-		public NumericModifier(float amount, INumericOperation operation, INumericModifierTarget? target = null, Predicate<AttributeSnapshot<float>>? predicate = null) {
+		public NumericModifier(float amount, INumericOperation operation, INumericModifierTarget? target = null, Predicate<IAttributeContext>? predicate = null) {
 			this.effectiveAmount = this.amount = amount;
 			this.operation = operation;
 			this.predicate = predicate;
@@ -21,19 +21,17 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 			operation.Apply(effectiveAmount, ref value);
 		}
 
-		public bool CheckPredicate(AttributeSnapshot<float> snapshot) {
-			return predicate?.Invoke(snapshot) ?? true;
+		public bool CheckPredicate(IAttributeContext context) {
+			return predicate?.Invoke(context) ?? true;
 		}
-
-		public float GetNominalValue() => amount;
+		public bool HasPredicate() => predicate != null;
 
 		public NumericOperationType GetOperationType() => operation.GetOperationType();
 		public INumericModifierTarget? GetTarget() => target;
 
-		public bool HasPredicate() => predicate != null;
-
 		public void SetEffectiveValue(float effective) {
 			this.effectiveAmount = effective;
 		}
+		public float GetNominalValue() => amount;
 	}
 }

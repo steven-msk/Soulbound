@@ -16,9 +16,9 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 			this.valueRule = valueRule;
 		}
 
-		public abstract T ComputeValue(T baseValue, IValueRule<T>? ruleOverride, IReadOnlyList<IAttributeModifier<T>> modifiers);
+		public abstract T ComputeValue(T baseValue, IValueRule<T>? ruleOverride, IReadOnlyList<IAttributeModifier<T>> modifiers, IAttributeContext context);
 
-		public override object ComputeValue(object baseValue, IValueRule? ruleOverride, IReadOnlyList<IAttributeModifier> modifiers) {
+		public override object ComputeValue(object baseValue, IValueRule? ruleOverride, IReadOnlyList<IAttributeModifier> modifiers, IAttributeContext context) {
 			if (baseValue is not T) {
 				Logger.LogFatal(ReceivedInvalidComputeValueType(baseValue.GetType().Name));
 				baseValue = default(T);
@@ -42,7 +42,7 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 				}
 			}
 
-			return ComputeValue((T)baseValue, (IValueRule<T>?)ruleOverride, castModifiers);
+			return ComputeValue((T)baseValue, (IValueRule<T>?)ruleOverride, castModifiers, context);
 		}
 
 		public new IValueRule<T>? GetValueRule() => (IValueRule<T>?)valueRule;
@@ -64,6 +64,6 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 		public Identifier GetIdentifier() => identifier;
 		public IValueRule? GetValueRule() => valueRule;
 
-		public abstract object ComputeValue(object baseValue, IValueRule? ruleOverride, IReadOnlyList<IAttributeModifier> modifiers);
+		public abstract object ComputeValue(object baseValue, IValueRule? ruleOverride, IReadOnlyList<IAttributeModifier> modifiers, IAttributeContext context);
 	}
 }

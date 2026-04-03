@@ -16,7 +16,7 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 			this.ruleOverrides = ruleOverrides;
 		}
 
-		public bool TryGetValue<T>(AttributeType<T> type, out T value) {
+		public bool TryGetValue<T>(AttributeType<T> type, IAttributeContext context, out T value) {
 			T baseValue = default;
 			bool typeIsDefined = false;
 			if (baseValues.TryGetValue(type, out var val)) {
@@ -31,7 +31,7 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 			}
 
 			IValueRule? ruleOverride = ruleOverrides.GetValueOrDefault(type);
-			value = (T)type.ComputeValue(baseValue, ruleOverride, modifiers);
+			value = (T)type.ComputeValue(baseValue, ruleOverride, modifiers, context);
 
 			return typeIsDefined;
 		}

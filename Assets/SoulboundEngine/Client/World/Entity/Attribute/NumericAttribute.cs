@@ -12,7 +12,7 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 			: base(identifier, valueRule) {
 		}
 
-		public override float ComputeValue(float baseValue, IValueRule<float>? ruleOverride, IReadOnlyList<IAttributeModifier<float>> modifiers) {
+		public override float ComputeValue(float baseValue, IValueRule<float>? ruleOverride, IReadOnlyList<IAttributeModifier<float>> modifiers, IAttributeContext attributeContext) {
 			List<INumericModifier> numericModifiers = new();
 			foreach (var modifier in modifiers) {
 				if (modifier is not INumericModifier numeric) {
@@ -23,50 +23,48 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 			}
 
 			// filter targeting modifiers
-			{
-				List<INumericModifier> targeting = numericModifiers
-					.Where(m => m.GetTarget() != null)
-					.ToList();
-				Dictionary<INumericModifier, List<INumericModifier>> modifierToItsTargeters = new();
-				foreach (var targeter in targeting) {
-					IEnumerable<INumericModifier> targets = targeter.GetTarget()!.Resolve(numericModifiers);
+			List<INumericModifier> targeting = numericModifiers
+				.Where(m => m.GetTarget() != null)
+				.ToList();
+			Dictionary<INumericModifier, List<INumericModifier>> modifierToItsTargeters = new();
+			foreach (var targeter in targeting) {
+				IEnumerable<INumericModifier> targets = targeter.GetTarget()!.Resolve(numericModifiers);
 
-					foreach (var target in targets) {
-						if (!modifierToItsTargeters.ContainsKey(target)) {
-							modifierToItsTargeters[target] = new List<INumericModifier>();
-						}
-						modifierToItsTargeters[target].Add(targeter);
+				foreach (var target in targets) {
+					if (!modifierToItsTargeters.ContainsKey(target)) {
+						modifierToItsTargeters[target] = new List<INumericModifier>();
 					}
+					modifierToItsTargeters[target].Add(targeter);
 				}
-
-				foreach (var target in modifierToItsTargeters.Keys) {
-					List<INumericModifier> targeters = modifierToItsTargeters[target];
-
-					// TODO: filter predicate targeters
-
-					float effective = CalculateModifiers(target.GetNominalValue(), targeters);
-
-					target.SetEffectiveValue(effective);
-				}
-
-				numericModifiers.RemoveAll(m => targeting.Contains(m));
 			}
 
+			foreach (var target in modifierToItsTargeters.Keys) {
+				List<INumericModifier> targeters = modifierToItsTargeters[target]
+					.Where(m => !m.HasPredicate() || m.CheckPredicate(attributeContext))
+					.ToList();
+
+				// TODO: filter predicate targeters
+
+				float effective = CalculateModifiers(target.GetNominalValue(), targeters);
+
+				target.SetEffectiveValue(effective);
+			}
+
+			numericModifiers.RemoveAll(m => targeting.Contains(m));
+
 			// filter predicates
-			List<INumericModifier> predicate = numericModifiers
+			List<INumericModifier> predicateModifiers = numericModifiers
 				.Where(m => m.HasPredicate())
 				.ToList();
 			numericModifiers.RemoveAll(m => m.HasPredicate());
+			predicateModifiers.RemoveAll(m => !m.CheckPredicate(attributeContext));
 
-			float subtotalC = CalculateModifiers(baseValue, numericModifiers);
-
-			IValueRule<float>? valueRule = ruleOverride ?? this.valueRule;
-			AttributeSnapshot<float> snapshot = new(this, baseValue, subtotalC);
-			predicate.RemoveAll(m => !m.CheckPredicate(snapshot));
-			float final = CalculateModifiers(subtotalC, predicate);
+			float prePredicateResult = CalculateModifiers(baseValue, numericModifiers);
+			float final = CalculateModifiers(prePredicateResult, predicateModifiers);
 
 			// apply rule
 			try {
+				IValueRule<float>? valueRule = ruleOverride ?? this.valueRule;
 				valueRule?.Apply(ref final);
 			} catch (AttributeValueRuleViolationException e) {
 				Logger.LogFatal(e);
@@ -89,21 +87,21 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 
 			// apply all flat adds/subtracts (A)
 			float subtotalA = baseValue;
-			foreach (var additiveMod in additive) {
-				additiveMod.Apply(ref subtotalA);
+			foreach (var modifier in additive) {
+				modifier.Apply(ref subtotalA);
 			}
 
 			// apply all percentage adds (B)
 			float percentSum = 0f;
-			foreach (var additivePercentMod in additivePercent) {
-				additivePercentMod.Apply(ref percentSum);
+			foreach (var modifier in additivePercent) {
+				modifier.Apply(ref percentSum);
 			}
 			float subtotalB = subtotalA * (1f + percentSum);
 
 			// apply multipliers (C)
 			float multplierProduct = 1f;
-			foreach (var multiplicativeMod in multiplicative) {
-				multiplicativeMod.Apply(ref multplierProduct);
+			foreach (var modifier in multiplicative) {
+				modifier.Apply(ref multplierProduct);
 			}
 			float subtotalC = subtotalB * multplierProduct;
 
