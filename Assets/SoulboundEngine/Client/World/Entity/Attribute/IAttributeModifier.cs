@@ -6,6 +6,7 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 
 	public interface IAttributeModifier<T> : IAttributeModifier {
 		void Apply(ref T value);
+		bool CheckPredicate(AttributeSnapshot<T> snapshot);
 
 		void IAttributeModifier.Apply(ref object value) {
 			T wrap = (T)value;

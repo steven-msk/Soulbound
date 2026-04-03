@@ -1,19 +1,29 @@
 using System;
 
-namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
-	public class NumericModifier : IAttributeModifier<float> {
-		protected readonly float amount;
+#nullable enable
 
-		public NumericModifier(float amount) {
+namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
+	public class NumericModifier : INumericModifier {
+		private readonly float amount;
+		private readonly INumericOperation operation;
+		private readonly Predicate<AttributeSnapshot<float>>? predicate;
+
+		public NumericModifier(float amount, INumericOperation operation, Predicate<AttributeSnapshot<float>>? predicate = null) {
 			this.amount = amount;
+			this.operation = operation;
+			this.predicate = predicate;
 		}
 
 		public void Apply(ref float value) {
-			throw new NotImplementedException();
+			operation.Apply(ref value);
 		}
 
-		public bool HasPredicate() {
-			throw new NotImplementedException();
+		public bool CheckPredicate(AttributeSnapshot<float> snapshot) {
+			return predicate?.Invoke(snapshot) ?? true;
 		}
+
+		public NumericOperationType GetOperationType() => operation.GetOperationType();
+
+		public bool HasPredicate() => predicate != null;
 	}
 }
