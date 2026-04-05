@@ -14,28 +14,62 @@ namespace SoulboundEngine.Client.Debug.Commands {
 	public sealed class WorldSessionCommands : ICommandProvider {
 		void ICommandProvider.RegisterCommands(CommandDispatcher<RuntimeCommandSource> dispatcher) {
 			dispatcher.Register(c => c.Literal("setblock")
-				.Then(Coords)
-					.Then(c => c.Argument("block", new BlockArgumentType()))
-						.Executes(ctx => {
-							Block block = ctx.GetArgument<Block>("block");
-							Vector2 playerPos = ctx.Source.data.Player.GetPos();
-							var blockPos = new BlockPos {
-								x = Mathf.FloorToInt(ctx.GetArgument<Coordinate>("x").GetPos(playerPos.x)),
-								y = Mathf.FloorToInt(ctx.GetArgument<Coordinate>("y").GetPos(playerPos.y))
-							};
-							ctx.Source.execServices.Level.SetBlockState(blockPos, block.defaultState);
-							Logger.LogInfo("Set block {} at {}", block.GetIdentifier(), blockPos);
-							return 1;
-						})
+				.Then(c => c.Argument("x", new CoordinateArgumentType())
+					.Then(c => c.Argument("y", new CoordinateArgumentType())
+						.Then(c => c.Argument("block", new BlockArgumentType())
+							.Executes(ctx => {
+								Block block = ctx.GetArgument<Block>("block");
+								Vector2 playerPos = ctx.Source.data.Player.GetPos();
+								var blockPos = new BlockPos {
+									x = Mathf.FloorToInt(ctx.GetArgument<Coordinate>("x").GetPos(playerPos.x)),
+									y = Mathf.FloorToInt(ctx.GetArgument<Coordinate>("y").GetPos(playerPos.y))
+								};
+								ctx.Source.execServices.Level.SetBlockState(blockPos, block.defaultState);
+								Logger.LogInfo("Set block {} at {}", block.GetIdentifier(), blockPos);
+								return 1;
+							})
+						)
+					)
+				)
 			);
 
-			dispatcher.Register(TeleportCommand());
+			dispatcher.Register(c => c.Literal("tp")
+				.Then(c => c.Argument("x", new CoordinateArgumentType())
+					.Then(c => c.Argument("y", new CoordinateArgumentType())
+						.Executes(ctx => Teleport(ctx.Source.data.Player.GetGuid(), ctx))
+					)
+				).Then(c => c.Argument("target", new GuidArgumentType())
+					.Then(c => c.Argument("x", new CoordinateArgumentType())
+						.Then(c => c.Argument("y", new CoordinateArgumentType())
+							.Executes(ctx => Teleport(ctx.GetArgument<Guid>("target"), ctx))
+						)
+					)
+				)
+			);
+			static int Teleport(Guid guid, CommandContext<RuntimeCommandSource> ctx) {
+				if (!ctx.Source.data.Entities.TryGetEntity(guid, out IEntityView target)) {
+					return 0;
+				}
+
+				Vector2 pos = target.GetPos();
+				float x = ctx.GetArgument<Coordinate>("x").GetPos(pos.x);
+				float y = ctx.GetArgument<Coordinate>("y").GetPos(pos.y);
+
+				ctx.Source.execServices.Entity.SetPos(target.GetGuid(), new Vector2(x, y));
+				Logger.LogInfo("teleported {} to x:{} y:{}", target, x, y);
+
+				return 1;
+			};
 
 			dispatcher.Register(c => c.Literal("spawn")
-				.Then(c => c.Argument("entityType", new EntityDescriptorArgumentType()))
+				.Then(c => c.Argument("entityType", new EntityDescriptorArgumentType())
 					.Executes(ctx => SpawnEntity(false, ctx))
-				.Then(Coords)
-					.Executes(ctx => SpawnEntity(true, ctx))
+					.Then(c => c.Argument("x", new CoordinateArgumentType())
+						.Then(c => c.Argument("y", new CoordinateArgumentType())
+							.Executes(ctx => SpawnEntity(true, ctx))
+						)
+					)
+				)
 			);
 			static int SpawnEntity(bool hasPos, CommandContext<RuntimeCommandSource> ctx) {
 				EntityDescriptor entityDescriptor = ctx.GetArgument<EntityDescriptor>("entityType");
@@ -52,10 +86,12 @@ namespace SoulboundEngine.Client.Debug.Commands {
 			}
 
 			dispatcher.Register(c => c.Literal("give")
-				.Then(c => c.Argument("item", new ItemArgumentType()))
+				.Then(c => c.Argument("item", new ItemArgumentType())
 					.Executes(ctx => GiveItem(1, ctx))
-				.Then(c => c.Argument("quantity", Arguments.Integer(min: 1)))
-					.Executes(ctx => GiveItem(ctx.GetArgument<int>("quantity"), ctx))
+					.Then(c => c.Argument("quantity", Arguments.Integer(min: 1))
+						.Executes(ctx => GiveItem(ctx.GetArgument<int>("quantity"), ctx))
+					)
+				)
 			);
 			static int GiveItem(int quantity, CommandContext<RuntimeCommandSource> ctx) {
 				Item item = ctx.GetArgument<Item>("item");
@@ -78,44 +114,6 @@ namespace SoulboundEngine.Client.Debug.Commands {
 				return 1;
 			}
 
-		}
-
-		private LiteralArgumentBuilder<RuntimeCommandSource> TeleportCommand() {
-			LiteralArgumentBuilder<RuntimeCommandSource> builder = new("tp");
-			builder.Then(c => c.Argument("x", new CoordinateArgumentType())
-						.Then(c => c.Argument("y", new CoordinateArgumentType())
-							.Executes(ctx => Teleport(ctx.Source.data.Player.GetGuid(), ctx)
-						)
-					)
-				).Then(c => c.Argument("target", new GuidArgumentType())
-					.Then(c => c.Argument("x", new CoordinateArgumentType())
-						.Then(c => c.Argument("y", new CoordinateArgumentType())
-							.Executes(ctx => Teleport(ctx.GetArgument<Guid>("target"), ctx)
-						)
-					)
-				)
-			);
-			return builder;
-
-			static int Teleport(Guid guid, CommandContext<RuntimeCommandSource> ctx) {
-				if (!ctx.Source.data.Entities.TryGetEntity(guid, out IEntityView target)) {
-					return 0;
-				}
-
-				Vector2 pos = target.GetPos();
-				float x = ctx.GetArgument<Coordinate>("x").GetPos(pos.x);
-				float y = ctx.GetArgument<Coordinate>("y").GetPos(pos.y);
-
-				ctx.Source.execServices.Entity.SetPos(target.GetGuid(), new Vector2(x, y));
-				Logger.LogInfo("teleported {} to x:{} y:{}", target, x, y);
-
-				return 1;
-			}
-		}
-
-		private static RequiredArgumentBuilder<RuntimeCommandSource, Coordinate> Coords(IArgumentContext<RuntimeCommandSource> c) {
-			return c.Argument("x", new CoordinateArgumentType())
-				.Then(c => c.Argument("y", new CoordinateArgumentType()));
 		}
 
 	}
