@@ -1,7 +1,12 @@
 using Brigadier.NET;
+using Brigadier.NET.Exceptions;
+using SoulboundEngine.Client.Debug.Logging;
 using SoulboundEngine.Client.Runtime.Services;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+
+#nullable enable
 
 namespace SoulboundEngine.Client.Debug.Commands {
 	public sealed record RuntimeCommandSource(
@@ -22,6 +27,28 @@ namespace SoulboundEngine.Client.Debug.Commands {
 
 		[Obsolete]
 		public void SubmitCommand(string input) {
+			if (input.StartsWith('/')) input = input[1..];
+
+			RuntimeCommandSource source = new(dataProvider, execServices);
+			ParseResults<RuntimeCommandSource> parseResults = dispatcher.Parse(input, source);
+
+			if (parseResults.Exceptions.Any()) {
+				Logger.LogFatal(parseResults.Exceptions.First().Value);
+			}
+
+			Logger.LogInfo("command: '{}'", parseResults.Reader.Read);
+			Logger.LogInfo("nodes: {}", string.Join(", ", parseResults.Context.Nodes.Select(n => n.Node.Name).ToArray()));
+			Logger.LogInfo("executor: {}", parseResults.Context.Command);
+
+			int code = 0;
+			try {
+				code = dispatcher.Execute(parseResults);
+			} catch (CommandSyntaxException e) {
+				Logger.LogFatal(e);
+				code = -1;
+			} finally {
+				Logger.LogInfo("Command executed with exit code {}", code);
+			}
 			//string[] tokens = Tokenize(input);
 			//if (!tokens.Any()) return;
 			//Validate(input);

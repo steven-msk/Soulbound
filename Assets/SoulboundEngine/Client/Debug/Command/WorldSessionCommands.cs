@@ -82,11 +82,19 @@ namespace SoulboundEngine.Client.Debug.Commands {
 
 		private LiteralArgumentBuilder<RuntimeCommandSource> TeleportCommand() {
 			LiteralArgumentBuilder<RuntimeCommandSource> builder = new("tp");
-			builder.Then(Coords)
-				.Executes(ctx => Teleport(ctx.Source.data.Player.GetGuid(), ctx));
-			builder.Then(c => c.Argument("target", new GuidArgumentType())
-				.Then(Coords)
-					.Executes(ctx => Teleport(ctx.GetArgument<Guid>("target"), ctx)));
+			builder.Then(c => c.Argument("x", new CoordinateArgumentType())
+						.Then(c => c.Argument("y", new CoordinateArgumentType())
+							.Executes(ctx => Teleport(ctx.Source.data.Player.GetGuid(), ctx)
+						)
+					)
+				).Then(c => c.Argument("target", new GuidArgumentType())
+					.Then(c => c.Argument("x", new CoordinateArgumentType())
+						.Then(c => c.Argument("y", new CoordinateArgumentType())
+							.Executes(ctx => Teleport(ctx.GetArgument<Guid>("target"), ctx)
+						)
+					)
+				)
+			);
 			return builder;
 
 			static int Teleport(Guid guid, CommandContext<RuntimeCommandSource> ctx) {
