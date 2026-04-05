@@ -6,6 +6,6 @@ using System.Threading.Tasks;
 
 namespace SoulboundEngine.Client.Debug.Commands {
 	public interface ICommandCompletionSupplier {
-		IEnumerable<string> GetCompletions(string partialToken, CommandParsingContext context);
+		IEnumerable<string> GetCompletions(string partialToken, RuntimeCommandSource context);
 	}
 }

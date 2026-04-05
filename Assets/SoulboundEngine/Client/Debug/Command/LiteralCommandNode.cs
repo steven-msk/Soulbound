@@ -15,11 +15,11 @@ namespace SoulboundEngine.Client.Debug.Commands {
 			this.label = label;
 		} 
 
-		public override bool Matches(string token, CommandParsingContext ctx) {
+		public override bool Matches(string token, RuntimeCommandSource ctx) {
 			return token == label;
 		}
 
-		public override IEnumerable<string> GetCompletions(string partialToken, CommandParsingContext ctx) {
+		public override IEnumerable<string> GetCompletions(string partialToken, RuntimeCommandSource ctx) {
 			if (label.StartsWith(partialToken)) {
 				yield return label;
 			}

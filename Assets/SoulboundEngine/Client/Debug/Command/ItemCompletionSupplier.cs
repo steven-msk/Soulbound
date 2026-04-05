@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace SoulboundEngine.Client.Debug.Commands {
 	public sealed class ItemCompletionSupplier : ICommandCompletionSupplier {
-		public IEnumerable<string> GetCompletions(string partialToken, CommandParsingContext context) {
+		public IEnumerable<string> GetCompletions(string partialToken, RuntimeCommandSource context) {
 			foreach (var item in Registry<Item>.GetAll()) {
 				Identifier identifier = item.GetIdentifier();
 

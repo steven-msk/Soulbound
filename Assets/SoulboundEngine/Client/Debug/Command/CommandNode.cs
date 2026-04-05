@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #nullable enable
 
 namespace SoulboundEngine.Client.Debug.Commands {
-	public delegate void CommandHandler(CommandParsingContext ctx);
+	[Obsolete]
+	public delegate void CommandHandler(RuntimeCommandSource ctx);
 
+	[Obsolete]
 	public abstract class CommandNode {
 		public abstract string label { get; }
 		protected readonly List<CommandNode> children = new();
@@ -18,8 +18,8 @@ namespace SoulboundEngine.Client.Debug.Commands {
 			this.handler = handler;
 		}
 
-		public abstract bool Matches(string token, CommandParsingContext ctx);
-		public abstract IEnumerable<string> GetCompletions(string partialToken, CommandParsingContext ctx);
+		public abstract bool Matches(string token, RuntimeCommandSource ctx);
+		public abstract IEnumerable<string> GetCompletions(string partialToken, RuntimeCommandSource ctx);
 
 		public void AddChild(CommandNode child) => children.Add(child);
 		public IEnumerable<CommandNode> GetChildren() {
