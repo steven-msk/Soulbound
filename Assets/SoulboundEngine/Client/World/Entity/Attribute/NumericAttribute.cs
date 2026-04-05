@@ -38,15 +38,29 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 				}
 			}
 
-			foreach (var target in modifierToItsTargeters.Keys) {
-				List<INumericModifier> targeters = modifierToItsTargeters[target]
-					.Where(m => !m.HasPredicate() || m.CheckPredicate(attributeContext))
-					.ToList();
+			// this design exposes a risk:
+			// predicates, and especially targeting predicates,
+			// may require another attribute's value.
+			// if that attribute has predicate modifiers
+			// which target the value of this attribute
+			// it ends up in a recursive loop.
+			// or even worse, a recursive cycle between multiple modifiers.
+			// TODO: fix recursive cycle risk of predicate modifiers
 
-				// TODO: filter predicate targeters
+			// TODO: fix unordered modifier graph lookup, which is dangerous for recursion
+			foreach (var target in modifierToItsTargeters.Keys) {
+				List<INumericModifier> targeters = modifierToItsTargeters[target];
+				List<INumericModifier> predicate_targeters = targeters
+					.Where(m => m.HasPredicate())
+					.ToList();
 
 				float effective = CalculateModifiers(target.GetNominalValue(), targeters);
 
+				predicate_targeters.RemoveAll(m => !m.CheckPredicate(attributeContext));
+				effective = CalculateModifiers(effective, predicate_targeters);
+
+				// might leak states if modifiers are reused
+				// TODO: separate effective from nominal modifier values
 				target.SetEffectiveValue(effective);
 			}
 
