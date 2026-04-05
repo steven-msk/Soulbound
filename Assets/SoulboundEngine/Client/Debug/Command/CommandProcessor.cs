@@ -1,10 +1,13 @@
 using Brigadier.NET;
 using Brigadier.NET.Exceptions;
+using Brigadier.NET.Suggestion;
+using Cysharp.Threading.Tasks;
 using SoulboundEngine.Client.Debug.Logging;
 using SoulboundEngine.Client.Runtime.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 #nullable enable
 
@@ -45,55 +48,27 @@ namespace SoulboundEngine.Client.Debug.Commands {
 			}
 		}
 
-		[Obsolete]
-		public IEnumerable<CommandCompletionToken> GetCompletions(string input, int caretPos) {
-			yield break;
-			//string[] tokens = Tokenize(input);
-			//CommandArguments args = new();
-			//CommandParsingContext ctx = new(args, dataProvider, execServices);
+		public async UniTask<Suggestions> GetCompletions(string input, int caretPos) {
+			if (input.StartsWith('/')) {
+				input = input[1..];
+				caretPos--;
+			}
+			RuntimeCommandSource source = new(dataProvider, execServices);
+			Task<Suggestions> task;
 
-			//if (!tokens.Any() || caretPos == 0) yield break;
-			//if (caretPos > input.Length) yield break;
+			try {
+				ParseResults<RuntimeCommandSource> parseResults = dispatcher.Parse(input, source);
+				if (parseResults.Exceptions.Any()) {
+					throw parseResults.Exceptions.First().Value;
+				}
 
-			//for (int t = 0; t < tokens.Length - 1; t++) {
-			//	if (string.IsNullOrWhiteSpace(tokens[t])) yield break;
-			//}
+				task = dispatcher.GetCompletionSuggestions(parseResults, caretPos);
+			} catch (CommandSyntaxException) {
+				task = Suggestions.Empty();
+			}
+			await task;
 
-			//CommandNode currentNode = rootNode;
-			//int lastFullMatchIndex = 0;
-			//int lastTokenSpan = 1;	// includes the leading '/'
-			//for (lastFullMatchIndex = 0; lastFullMatchIndex < tokens.Length; lastFullMatchIndex++) {
-			//	List<CommandNode> fullMatch = currentNode
-			//		.GetChildren()
-			//		.Where(c => c.Matches(tokens[lastFullMatchIndex], ctx))
-			//		.ToList();
-
-			//	lastTokenSpan += tokens[lastFullMatchIndex].Length + 1;
-
-			//	if (!fullMatch.Any()) break;
-			//	if (lastTokenSpan - 1 >= caretPos) break;
-
-			//	currentNode = fullMatch.First();
-			//}
-			//lastTokenSpan--;    // remove last whitespace
-
-			//string lastToken = tokens[lastFullMatchIndex];
-
-			//int caretRelativeRemaining = lastTokenSpan - caretPos;
-			//if (caretRelativeRemaining < 0) yield break;
-
-			//int caretRelativePos = lastToken.Length - caretRelativeRemaining;
-			//string caretRelativeToken = lastToken[..caretRelativePos];
-
-			//foreach (var child in currentNode.GetChildren()) {
-			//	foreach (var completion in child.GetCompletions(caretRelativeToken, ctx)) {
-			//		yield return new CommandCompletionToken {
-			//			text = completion,
-			//			replaceLength = lastToken.Length,
-			//			absoluteStart = lastTokenSpan - lastToken.Length,
-			//		};
-			//	}
-			//}
+			return task.Result;
 		}
 
 		[Obsolete]

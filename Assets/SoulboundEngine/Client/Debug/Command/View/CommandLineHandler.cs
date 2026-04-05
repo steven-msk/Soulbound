@@ -1,3 +1,4 @@
+using Brigadier.NET.Suggestion;
 using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
@@ -6,12 +7,13 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 namespace SoulboundEngine.Client.Debug.Commands.View {
 	public sealed class CommandLineHandler : MonoBehaviour, ICommandLineHandler {
 		private CommandLineInputField inputField;
 		private CommandProcessor commandProcessor;
-		private readonly CommandCompletion completion = new();
+		private readonly CommandCompletion completionQueue = new();
 		private List<string> history;
 		private VerticalLayoutGroup completionPanel;
 		private int historyIndex;
@@ -81,7 +83,7 @@ namespace SoulboundEngine.Client.Debug.Commands.View {
 
 		private void HandleTyping(Key key) {
 			if ((key == Key.Tab || key == Key.UpArrow || key == Key.DownArrow)
-					&& completion.GetCompletionCount() > 0) {
+					&& completionQueue.GetCompletionCount() > 0) {
 				currentInputMode = CommandInputMode.CyclingCompletions;
 				HandleCompletion(key);
 			} else if ((key == Key.UpArrow || key == Key.DownArrow) && history.Any() && eligibleForHistoryCycling) {
@@ -92,9 +94,9 @@ namespace SoulboundEngine.Client.Debug.Commands.View {
 
 		private void HandleCompletion(Key key) {
 			if (key == Key.DownArrow) {
-				HighlightCompletion(completion.SelectNext());
+				HighlightCompletion(completionQueue.SelectNext());
 			} else if (key == Key.UpArrow) {
-				HighlightCompletion(completion.SelectPrevious());
+				HighlightCompletion(completionQueue.SelectPrevious());
 			} else if (key == Key.Tab) {
 				InsertCompletion();
 			} 
@@ -112,18 +114,19 @@ namespace SoulboundEngine.Client.Debug.Commands.View {
 		}
 
 		public void InsertCompletion()	{
-			if (completion.GetCompletionCount() == 0) return;
+			if (completionQueue.GetCompletionCount() == 0) return;
 
-			CommandCompletionToken token = completion.GetSelected().Value;
+			Suggestion suggestion = completionQueue.GetSelected();
+			string insert = suggestion.Text;
+	
+			// TODO: fix inconsistent suggestion insertion
 
-			string insert = token.text;
+			string prefix = inputField.text[..suggestion.Range.Start];
+			//int suffixStart = Mathf.Min(inputField.text.Length, suggestion.Range.Start + suggestion.Range.Length);
+			//string suffix = inputField.text[suffixStart..];
 
-			string prefix = inputField.text[..token.absoluteStart];
-			int suffixStart = Mathf.Min(inputField.text.Length, token.absoluteStart + token.replaceLength);
-			string suffix = inputField.text[suffixStart..];
-
-			string result = prefix + insert + suffix;
-			inputField.text = result;
+			//string result = prefix + insert + suffix;
+			inputField.text = suggestion.Apply(inputField.text);
 
 			int newCaret = prefix.Length + insert.Length;
 			inputField.caretPosition = newCaret;
@@ -144,33 +147,37 @@ namespace SoulboundEngine.Client.Debug.Commands.View {
 			if (completionPanel == null) completionPanel = CreateCompletionPanel();
 
 			int caretPos = inputField.caretPosition;
-			List<CommandCompletionToken> completions = new();
-			foreach (var completionToken in commandProcessor.GetCompletions(value, caretPos)) {
-				completions.Add(completionToken);
-			}
-			completion.SetCompletions(completions);
 
-			if (completions.Any()) {
-				completionPanel.gameObject.SetActive(true);
-				foreach (var component in completionPanel.GetComponentsInChildren<TextMeshProUGUI>()) {
-					component.gameObject.SetActive(false);
-				}
-			} else completionPanel.gameObject.SetActive(false);
+			commandProcessor.GetCompletions(value, caretPos)
+				.ContinueWith(suggestions => {
+					if (suggestions.List.Any()) {
+						completionPanel.gameObject.SetActive(true);
+						foreach (var component in completionPanel.GetComponentsInChildren<TextMeshProUGUI>()) {
+							component.gameObject.SetActive(false);
+						}
+					} else completionPanel.gameObject.SetActive(false);
 
-			currentCompletions = completionPanel.GetComponentsInChildren<TextMeshProUGUI>(true);
+					currentCompletions = completionPanel.GetComponentsInChildren<TextMeshProUGUI>(true);
+					completionQueue.SetCompletions(suggestions.List);
 
-			int i = 0;
-			for (; i < currentCompletions.Length && i < completions.Count; i++) {
-				currentCompletions[i].gameObject.SetActive(true);
-				currentCompletions[i].text = completions[i].text;
-				currentCompletions[i].Rebuild(CanvasUpdate.LatePreRender);
-			}
+					int i = 0;
+					for (; i < currentCompletions.Length && i < suggestions.List.Count; i++) {
+						currentCompletions[i].gameObject.SetActive(true);
+						currentCompletions[i].text = suggestions.List[i].Text;
+						currentCompletions[i].Rebuild(CanvasUpdate.LatePreRender);
+					}
 
-			for (; i < completions.Count; i++) {
-				CreateCompletionComponent(completions[i].text);
-			}
-			currentCompletions = completionPanel.GetComponentsInChildren<TextMeshProUGUI>(true);
-			HighlightCompletion(completion.GetSelectedIndex());
+					for (; i < suggestions.List.Count; i++) {
+						CreateCompletionComponent(suggestions.List[i].Text);
+					}
+					currentCompletions = completionPanel.GetComponentsInChildren<TextMeshProUGUI>(true);
+					HighlightCompletion(completionQueue.GetSelectedIndex());
+				}).Forget(e => {
+					completionQueue.SetCompletions(Array.Empty<Suggestion>().ToList());
+					completionPanel.gameObject.SetActive(false);
+					Logger.LogFatal(e);
+				});
+
 		}
 
 		private void HighlightCompletion(int index) {

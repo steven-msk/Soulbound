@@ -114,22 +114,6 @@ namespace SoulboundEngine.Client.Debug.Commands {
 				return 1;
 			}
 
-
-
-			dispatcher.Register(c => c.Literal("literal")
-				.Then(c => c.Argument("x", Arguments.Integer())
-					.Executes(ctx => {
-						Logger.LogInfo(ctx.GetArgument<int>("x"));
-						return 1;
-					})
-				)
-				.Then(c => c.Literal("1")
-					.Executes(_ => {
-						Logger.LogInfo("literal");
-						return 1;
-					})
-				)
-			);
 		}
 
 	}
