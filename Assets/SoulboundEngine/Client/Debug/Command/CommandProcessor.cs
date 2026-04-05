@@ -25,46 +25,24 @@ namespace SoulboundEngine.Client.Debug.Commands {
 			this.execServices = execServices;
 		}
 
-		[Obsolete]
 		public void SubmitCommand(string input) {
 			if (input.StartsWith('/')) input = input[1..];
 
 			RuntimeCommandSource source = new(dataProvider, execServices);
 			ParseResults<RuntimeCommandSource> parseResults = dispatcher.Parse(input, source);
 
-			if (parseResults.Exceptions.Any()) {
-				Logger.LogFatal(parseResults.Exceptions.First().Value);
-			}
-
-			Logger.LogInfo("command: '{}'", parseResults.Reader.Read);
-			Logger.LogInfo("nodes: {}", string.Join(", ", parseResults.Context.Nodes.Select(n => n.Node.Name).ToArray()));
-			Logger.LogInfo("executor: {}", parseResults.Context.Command);
-
 			int code = 0;
 			try {
+				if (parseResults.Exceptions.Any()) {
+					throw parseResults.Exceptions.First().Value;
+				}
 				code = dispatcher.Execute(parseResults);
-			} catch (CommandSyntaxException e) {
+			} catch (Exception e) when (e is CommandSyntaxException) {
 				Logger.LogFatal(e);
 				code = -1;
 			} finally {
-				Logger.LogInfo("Command executed with exit code {}", code);
+				Logger.LogInfo("Command dispatched with exit code {}", code);
 			}
-			//string[] tokens = Tokenize(input);
-			//if (!tokens.Any()) return;
-			//Validate(input);
-
-			//CommandArguments args = new();
-			//CommandParsingContext ctx = new(dataProvider, execServices);
-
-			//CommandNode currentNode = rootNode;
-			//for (int i = 0; i < tokens.Length; i++) {
-			//	currentNode = currentNode
-			//		.GetChildren()
-			//		.FirstOrDefault(n => n.Matches(tokens[i], ctx))
-			//		?? throw new UnexpectedCommandException(tokens, i);
-			//}
-
-			//currentNode.GetHandler()(ctx);
 		}
 
 		[Obsolete]
@@ -187,6 +165,11 @@ namespace SoulboundEngine.Client.Debug.Commands {
 			foreach (var provider in providerBuffer) {
 				provider.RegisterCommands(dispatcher);
 			}
+			dispatcher.FindAmbiguities((parent, child, sibling, inputs) => {
+				Logger.LogFatal(new AmbiguousCommandException(
+					parent.UsageText, child.UsageText, sibling.UsageText, inputs
+				));
+			});
 		}
 	}
 }
