@@ -30,7 +30,7 @@ namespace SoulboundEngine.Client.ItemSystem {
 				spriteResolver.GetSprite(new SpriteRef(atlas, "debugPointer"))
 			};
 
-			Registry<SpriteAnimation>.Add(Identifier.Of($"stack_item_{fullStackSize}", "animation"), new SpriteAnimation(
+			Registry<SpriteAnimation>.Add(Identifier.Of($"stack_item_{fullStackSize}.animation"), new SpriteAnimation(
 				new AnimationKey($"stack_item_animation_{fullStackSize}"),
 				frames,
 				fullStackSize,
@@ -39,7 +39,7 @@ namespace SoulboundEngine.Client.ItemSystem {
 		}
 
 		public override ItemRenderData GetRenderData(ItemStack itemStack) {
-			return new ItemRenderData("idkwhatthisis", itemStack, Identifier.Of($"stackItem_{fullStackSize}", "animation"));
+			return new ItemRenderData("idkwhatthisis", itemStack, Identifier.Of($"stack_item_{fullStackSize}.animation"));
 		}
 
 	}

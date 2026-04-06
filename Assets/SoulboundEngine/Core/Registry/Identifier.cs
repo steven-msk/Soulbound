@@ -47,9 +47,11 @@ namespace SoulboundEngine.Core.Registry {
 		}
 
 		public static bool TryParse(IStringReader reader, out Identifier identifier) {
-			string id = reader.ReadString();
+			string _namespace = reader.ReadUnquotedString();
+			reader.Expect(':');
+			string path = reader.ReadUnquotedString();
 
-			return TryParse(id, out identifier);
+			return TryParse(_namespace, path, out identifier);
 		}
 
 		private static Identifier OfValidated(string id) {
@@ -98,15 +100,9 @@ namespace SoulboundEngine.Core.Registry {
 
 		private static bool IsPathValid(string path) {
 			if (string.IsNullOrEmpty(path)) return false;
-			if (path == DEFAULT_NAMESPACE) return false;
 
-			string[] subPaths = path.Split(PATH_SEPARATORS);
-			foreach (var subPath in subPaths) {
-				if (string.IsNullOrEmpty(subPath)) return false;
-
-				foreach (char c in subPath) {
-					if (!IsPathCharacterValid(c)) return false;
-				}
+			foreach (char c in path) {
+				if (!IsPathCharacterValid(c)) return false;
 			}
 			return true;
 		}
@@ -132,7 +128,8 @@ namespace SoulboundEngine.Core.Registry {
 		public string GetPath() => path;
 
 		public bool Equals(Identifier other) {
-			return other._namespace == _namespace && other.path == path;
+			return other.GetNamespace() == GetNamespace()
+				&& other.GetPath() == GetPath();
 		}
 
 		public override bool Equals(object obj) {
@@ -140,7 +137,7 @@ namespace SoulboundEngine.Core.Registry {
 		}
 
 		public override int GetHashCode() {
-			return HashCode.Combine(_namespace, path);
+			return HashCode.Combine(GetNamespace(), GetPath());
 		}
 
 		[Obsolete("Identifier instances should not be compared with ==. Compare with .Equals instead.", true)]

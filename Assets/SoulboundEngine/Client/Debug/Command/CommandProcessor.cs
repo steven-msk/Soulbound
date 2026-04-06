@@ -68,61 +68,6 @@ namespace SoulboundEngine.Client.Debug.Commands {
 			return task.Result;
 		}
 
-		[Obsolete]
-		private void Validate(string input) {
-			//string[] tokens = Tokenize(input);
-			//CommandArguments args = new();
-			//CommandParsingContext ctx = new(args, dataProvider, execServices);
-
-			//for (int t = 0; t < tokens.Length; t++) {
-			//	if (string.IsNullOrWhiteSpace(tokens[t])) {
-			//		throw new InvalidCommandSyntaxException("Unexpected white space", tokens, t, format: "{0}<<");
-			//	}
-			//}
-
-			//CommandNode currentNode = rootNode;
-			//int i;
-			//for (i = 0; i < tokens.Length; i++) {
-			//	List<CommandNode> matchingNodes = new();
-			//	foreach (var child in currentNode.GetChildren()) {
-			//		if (child.Matches(tokens[i], ctx)) {
-			//			matchingNodes.Add(child);
-			//		}
-			//	}
-			//	if (matchingNodes.Count > 1) throw new AmbiguousCommandException(
-			//		matchingNodes.Select(n => n.label).ToArray(), tokens, i
-			//	);
-			//	if (!matchingNodes.Any()) {
-			//		throw new UnknownOrIncompleteCommandException(tokens, i);
-			//	}
-			//	currentNode = matchingNodes.First();
-			//}
-
-			//if (!currentNode.IsTerminalNode()) {
-			//	throw new CommandNodeNotTerminalException(tokens, tokens.Length - 1);
-			//}
-		}
-
-		[Obsolete]
-		private string[] Tokenize(string input) {
-			return Array.Empty<string>();
-			//if (string.IsNullOrEmpty(input)) return Array.Empty<string>();
-			//if (!input.StartsWith("/")) return Array.Empty<string>();
-
-			//input = input[1..];
-			//return input.Split(' ');
-		}
-
-		[Obsolete]
-		private IEnumerable<CommandNode> EnumerateAllCommands() {
-			yield break;
-			//for (int i = 0; i < providerBuffer.Count; i++) {
-			//	foreach (var command in providerBuffer[i].GetCommands()) {
-			//		yield return command;
-			//	}
-			//}
-		}
-
 		public void RegisterProvider(ICommandProvider provider) {
 			providerBuffer.Add(provider);
 			RebuildDispatcher();

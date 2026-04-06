@@ -3,6 +3,7 @@ using Brigadier.NET.ArgumentTypes;
 using Brigadier.NET.Context;
 using Brigadier.NET.Exceptions;
 using Brigadier.NET.Suggestion;
+using SoulboundEngine.Client.Debug.Logging;
 using SoulboundEngine.Client.ItemSystem;
 using SoulboundEngine.Core;
 using SoulboundEngine.Core.Registry;
@@ -32,7 +33,9 @@ namespace SoulboundEngine.Client.Debug.Commands {
 				throw CommandSyntaxException.BuiltInExceptions.ReaderExpectedSymbol().Create(reader);
 			}
 
+
 			if (!Registry<Item>.TryGet(identifier, out Item item)) {
+				Logger.LogInfo("exception: {}", identifier);
 				reader.Cursor = cursor;
 				throw CommandSyntaxException.BuiltInExceptions.DispatcherUnknownArgument().CreateWithContext(reader);
 			}
