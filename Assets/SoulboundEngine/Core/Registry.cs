@@ -29,7 +29,6 @@ namespace SoulboundEngine.Core {
 		}
 
 		public static bool TryGet(Identifier identifier, out T value) {
-			Logger.LogInfo("attempt: {}", identifier);
 			return registry.TryGetValue(identifier, out value);
 		}
 

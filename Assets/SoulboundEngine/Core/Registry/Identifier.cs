@@ -7,7 +7,7 @@ namespace SoulboundEngine.Core.Registry {
 		private const string ALLOWED_PATH_CHARACTERS = "abcdefghijklmnopqrstuvwxyz1234567890-_./";
 		private const string ALLOWED_NAMESPACE_CHARACTERS = "abcdefghijklmnopqrstuvwxyz1234567890-_";
 		private const char NAMESPACE_SEPARATOR = ':';
-		private static readonly char[] PATH_SEPARATORS = { '.', '/' };
+		private const char PATH_SEPARATOR = '/';
 
 		private readonly string _namespace;
 		private readonly string path;
@@ -46,10 +46,17 @@ namespace SoulboundEngine.Core.Registry {
 			}
 		}
 
-		public static bool TryParse(IStringReader reader, out Identifier identifier) {
+		public static bool TryFromCommandInput(IStringReader reader, out Identifier identifier) {
 			string _namespace = reader.ReadUnquotedString();
-			reader.Expect(':');
-			string path = reader.ReadUnquotedString();
+			string path;
+
+			if (reader.CanRead() && reader.Peek() == ':') {
+				reader.Skip();
+				path = reader.ReadUnquotedString();
+			} else {
+				path = _namespace;
+				_namespace = "";
+			}
 
 			return TryParse(_namespace, path, out identifier);
 		}

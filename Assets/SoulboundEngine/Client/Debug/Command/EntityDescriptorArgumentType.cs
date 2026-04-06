@@ -27,7 +27,7 @@ namespace SoulboundEngine.Client.Debug.Commands {
 		public override EntityDescriptor Parse(IStringReader reader) {
 			int cursor = reader.Cursor;
 
-			if (!Identifier.TryParse(reader, out var identifier)) {
+			if (!Identifier.TryFromCommandInput(reader, out var identifier)) {
 				reader.Cursor = cursor;
 				throw CommandSyntaxException.BuiltInExceptions.ReaderExpectedSymbol().Create(reader);
 			}
