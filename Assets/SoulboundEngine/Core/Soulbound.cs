@@ -6,15 +6,12 @@ using SoulboundEngine.Client.Debug.Logging.Console;
 using SoulboundEngine.Client.Debug.Metrics;
 using SoulboundEngine.Client.Debug.Metrics.View;
 using SoulboundEngine.Client.Input;
-using SoulboundEngine.Client.ItemSystem;
 using SoulboundEngine.Client.Players;
 using SoulboundEngine.Client.Runtime.Services;
 using SoulboundEngine.Client.SettingSystem;
 using SoulboundEngine.Client.UI;
 using SoulboundEngine.Client.UI.Screens;
 using SoulboundEngine.Client.World;
-using SoulboundEngine.Client.World.BlockSystem;
-using SoulboundEngine.Client.World.EntitySystem;
 using SoulboundEngine.Client.World.Generation;
 using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Client.World.Serialization;
@@ -22,11 +19,11 @@ using SoulboundEngine.Common;
 using SoulboundEngine.Common.Json;
 using SoulboundEngine.Core.Assets;
 using SoulboundEngine.Core.Audio;
+using SoulboundEngine.Core.Registry;
 using SoulboundEngine.Core.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -97,9 +94,7 @@ namespace SoulboundEngine.Core {
 			// PROTOTYPICAL
 			AudioManager.RebuildPools();
 
-			RuntimeHelpers.RunClassConstructor(typeof(EntityType).TypeHandle);
-			RuntimeHelpers.RunClassConstructor(typeof(Items).TypeHandle);
-			RuntimeHelpers.RunClassConstructor(typeof(Blocks).TypeHandle);
+			Registries.Init();
 		}
 
 		public void Launch() {

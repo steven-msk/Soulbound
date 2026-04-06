@@ -1,6 +1,5 @@
 using SoulboundEngine.Client.ItemSystem.Render;
 using SoulboundEngine.Common;
-using SoulboundEngine.Core;
 using SoulboundEngine.Core.Assets;
 using SoulboundEngine.Core.Registry;
 using SoulboundEngine.Core.Render.Animation;
@@ -29,7 +28,7 @@ namespace SoulboundEngine.Client.ItemSystem {
 				spriteResolver.GetSprite(new SpriteRef(atlas, "debugPointer"))
 			};
 
-			Registry<SpriteAnimation>.Add(GetIdentifier(), new SpriteAnimation(
+			Registries.Register<SpriteAnimation>(Registries.SPRITE_ANIMATIONS, GetIdentifier(), new SpriteAnimation(
 				new AnimationKey($"stack_item_animation_{fullStackSize}"),
 				frames,
 				fullStackSize,

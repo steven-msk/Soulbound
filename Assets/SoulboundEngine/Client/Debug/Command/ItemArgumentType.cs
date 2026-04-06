@@ -4,7 +4,6 @@ using Brigadier.NET.Context;
 using Brigadier.NET.Exceptions;
 using Brigadier.NET.Suggestion;
 using SoulboundEngine.Client.ItemSystem;
-using SoulboundEngine.Core;
 using SoulboundEngine.Core.Registry;
 using System.Threading.Tasks;
 
@@ -13,7 +12,7 @@ namespace SoulboundEngine.Client.Debug.Commands {
 		public override Task<Suggestions> ListSuggestions<TSource>(CommandContext<TSource> context, SuggestionsBuilder builder) {
 			string remaining = builder.RemainingLowerCase;
 
-			foreach (var item in Registry<Item>.GetAll()) {
+			foreach (var item in Registries.ITEMS) {
 				Identifier id = item.GetIdentifier();
 
 				if (id.GetNamespace().StartsWith(remaining) || id.GetPath().StartsWith(remaining)) {
@@ -32,7 +31,8 @@ namespace SoulboundEngine.Client.Debug.Commands {
 				throw CommandSyntaxException.BuiltInExceptions.ReaderExpectedSymbol().Create(reader);
 			}
 
-			if (!Registry<Item>.TryGet(identifier, out Item item)) {
+			RegistryKey<Item> key = RegistryKey<Item>.Of(Registries.ITEMS.GetKey(), identifier);
+			if (!Registries.ITEMS.TryGet(key, out Item item)) {
 				reader.Cursor = cursor;
 				throw CommandSyntaxException.BuiltInExceptions.DispatcherUnknownArgument().CreateWithContext(reader);
 			}
