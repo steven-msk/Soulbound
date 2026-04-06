@@ -11,9 +11,13 @@ using System.Threading.Tasks;
 namespace SoulboundEngine.Client.Debug.Commands {
 	public class EntityDescriptorArgumentType : ArgumentType<EntityDescriptor> {
 		public override Task<Suggestions> ListSuggestions<TSource>(CommandContext<TSource> context, SuggestionsBuilder builder) {
+			string remaining = builder.RemainingLowerCase;
+
 			foreach (var descriptor in Registry<EntityDescriptor>.GetAll()) {
-				if (descriptor.GetIdentifier().IsPartiallyMatching(builder.RemainingLowerCase)) {
-					builder.Suggest(descriptor.GetIdentifier().ToString());
+				Identifier id = descriptor.GetIdentifier();
+
+				if (id.GetNamespace().StartsWith(remaining) || id.GetPath().StartsWith(remaining)) {
+					builder.Suggest(id.ToString());
 				}
 			}
 
@@ -22,12 +26,12 @@ namespace SoulboundEngine.Client.Debug.Commands {
 
 		public override EntityDescriptor Parse(IStringReader reader) {
 			int cursor = reader.Cursor;
-			string token = reader.ReadString();
 
-			if (!Identifier.TryFromString(token, out var identifier)) {
+			if (!Identifier.TryParse(reader, out var identifier)) {
 				reader.Cursor = cursor;
-				throw CommandSyntaxException.BuiltInExceptions.ReaderExpectedSymbol().CreateWithContext(reader, token);
+				throw CommandSyntaxException.BuiltInExceptions.ReaderExpectedSymbol().Create(reader);
 			}
+
 			if (!Registry<EntityDescriptor>.TryGet(identifier, out EntityDescriptor descriptor)) {
 				reader.Cursor = cursor;
 				throw CommandSyntaxException.BuiltInExceptions.DispatcherUnknownArgument().CreateWithContext(reader);

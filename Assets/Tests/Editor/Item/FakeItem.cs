@@ -10,12 +10,12 @@ public class FakeItem : Item {
 	public override int fullStackSize => _fullStackSize;
 	public int _fullStackSize = Item.DEFAULT_FULL_STACK;
 
-	public FakeItem() : base(new Identifier("soulbound_tests", new[] { $"fakeitem_{DateTime.Now.ToBinary()}" })) {
-		_name = this.GetIdentifier().path;
+	public FakeItem() : base(Identifier.Of("soulbound_tests", $"fakeitem_{DateTime.Now.ToBinary()}")) {
+		_name = this.GetIdentifier().GetPath();
 	}
 
 	public FakeItem(Identifier id) : base(id) {
-		_name = id.path;
+		_name = id.GetPath();
 	}
 
 	public override ItemRenderData GetRenderData(ItemStack itemStack) {

@@ -9,7 +9,7 @@ using SoulboundEngine.Core.Registry;
 namespace SoulboundEngine.Client.World.BlockSystem {
 	[PROTOTYPICAL]
 	public sealed class PulseBlock : Block {
-		private static readonly Identifier identifier = new("pulse_block");
+		private static readonly Identifier identifier = Identifier.Of("pulse_block");
 		public BlockState on { get; private set; }
 		public BlockState off { get; private set; }
 		public override string name { get; init; } = "Pulse Block";

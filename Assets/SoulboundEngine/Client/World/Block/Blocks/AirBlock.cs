@@ -4,7 +4,7 @@ using SoulboundEngine.Core.Registry;
 
 namespace SoulboundEngine.Client.World.BlockSystem {
 	public sealed class AirBlock : Block {
-		private static readonly Identifier identifier = new("air");
+		private static readonly Identifier identifier = Identifier.Of("air");
 		public override string name { get; init; } = "Air";
 		public override int minBreakLevel { get; init; } = 0;
 

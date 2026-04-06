@@ -11,7 +11,7 @@ using UnityEngine;
 namespace SoulboundEngine.Client.World.BlockSystem {
 	[PROTOTYPICAL]
 	public sealed class AreaTriggerBlock : Block {
-		private static readonly Identifier identifier = new("area_trigger_block");
+		private static readonly Identifier identifier = Identifier.Of("area_trigger_block");
 		private static BlockState inArea;
 		private static BlockState notInArea;
 

@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace SoulboundEngine.Client.World.BlockSystem {
 	public sealed class ToggleBlock : Block, IBlockInteractionListener {
-		private static readonly Identifier identifier = new("toggle_block");
+		private static readonly Identifier identifier = Identifier.Of("toggle_block");
 		public BlockState on { get; private set; }
 		public BlockState off { get; private set; }
 		public override string name { get; init; } = "Toggle Block";

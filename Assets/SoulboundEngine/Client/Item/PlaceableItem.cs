@@ -7,7 +7,7 @@ using SoulboundEngine.Core.Registry;
 namespace SoulboundEngine.Client.ItemSystem {
 	[PROTOTYPICAL]
 	public sealed class PlaceableItem : Item, IPlaceableItem, IItemInteractionListener {
-		private static readonly Identifier identifier = new("placeable_item");
+		private static readonly Identifier identifier = Identifier.Of("placeable_item");
 		public override string name => "Placeable Item";
 
 		public PlaceableItem() : base(identifier) {

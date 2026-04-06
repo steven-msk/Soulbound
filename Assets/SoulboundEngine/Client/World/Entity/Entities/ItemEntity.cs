@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace SoulboundEngine.Client.World.EntitySystem {
 	public class ItemEntity : Entity {
-		private static readonly Identifier identifier = new("itemEntity");
+		private static readonly Identifier identifier = Identifier.Of("itemEntity");
 		private static readonly EntityDescriptor DESCRIPTOR = new(identifier, null);
 		private static readonly Vector3 TRANSFORM_SCALE = new(2.5f, 2.5f, 2.5f);
 

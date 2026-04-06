@@ -9,7 +9,7 @@ using SoulboundEngine.Core.Registry;
 namespace SoulboundEngine.Client.World.BlockSystem {
 	[PROTOTYPICAL]
 	public sealed class MovingTickingBlock : Block, ITickingBlock, INeighborUpdateHandler {
-		private static readonly Identifier identifier = new("moving_ticking_block");
+		private static readonly Identifier identifier = Identifier.Of("moving_ticking_block");
 		private BlockState movingState;
 		private BlockState staticState;
 		public override string name { get; init; } = "Moving Ticking Block";

@@ -11,9 +11,13 @@ using System.Threading.Tasks;
 namespace SoulboundEngine.Client.Debug.Commands {
 	public class BlockArgumentType : ArgumentType<Block> {
 		public override Task<Suggestions> ListSuggestions<TSource>(CommandContext<TSource> context, SuggestionsBuilder builder) {
+			string remaining = builder.RemainingLowerCase;
+
 			foreach (var block in Registry<Block>.GetAll()) {
-				if (block.GetIdentifier().IsPartiallyMatching(builder.RemainingLowerCase)) {
-					builder.Suggest(block.GetIdentifier().ToString());
+				Identifier id = block.GetIdentifier();
+
+				if (id.GetNamespace().StartsWith(remaining) || id.GetPath().StartsWith(remaining)) {
+					builder.Suggest(id.ToString());
 				}
 			}
 
@@ -24,7 +28,7 @@ namespace SoulboundEngine.Client.Debug.Commands {
 			int cursor = reader.Cursor;
 			string s = reader.ReadString();
 
-			if (!Identifier.TryFromString(s, out var identifier)) {
+			if (!Identifier.TryParse(reader, out var identifier)) {
 				reader.Cursor = cursor;
 				throw CommandSyntaxException.BuiltInExceptions.ReaderExpectedSymbol().CreateWithContext(reader, s);
 			}

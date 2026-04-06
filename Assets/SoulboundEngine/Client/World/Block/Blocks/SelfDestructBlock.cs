@@ -9,7 +9,7 @@ using SoulboundEngine.Core.Registry;
 namespace SoulboundEngine.Client.World.BlockSystem {
 	[PROTOTYPICAL]
 	public sealed class SelfDestructBlock : Block {
-		private static readonly Identifier identifier = new("self_destruct_block");
+		private static readonly Identifier identifier = Identifier.Of("self_destruct_block");
 		public override string name { get; init; } = "Self Destruct Block";
 		public override int minBreakLevel { get; init; } = 0;
 

@@ -7,7 +7,7 @@ using SoulboundEngine.Core.Registry;
 namespace SoulboundEngine.Client.ItemSystem {
 	[PROTOTYPICAL]
 	public sealed class DebugPointerItem : Item, IItemInteractionListener {
-		private static readonly Identifier identifier = new("debug_pointer");
+		private static readonly Identifier identifier = Identifier.Of("debug_pointer");
 		public override string name => "Debug Pointer";
 		public override int fullStackSize => 1;
 

@@ -5,7 +5,7 @@ using SoulboundEngine.Core.Registry;
 
 namespace SoulboundEngine.Client.World.BlockSystem {
 	public class LeafBlock : Block {
-		private static readonly Identifier identifier = new("leaves");
+		private static readonly Identifier identifier = Identifier.Of("leaves");
 		public LeafBlock() : base(identifier) { }
 		public override string name { get; init; } = "Leaves";
 		public override int minBreakLevel { get; init; } = 0;

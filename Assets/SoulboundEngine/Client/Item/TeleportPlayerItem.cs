@@ -6,7 +6,7 @@ using SoulboundEngine.Core.Registry;
 namespace SoulboundEngine.Client.ItemSystem {
 	[PROTOTYPICAL]
 	public sealed class TeleportPlayerItem : Item, IItemInteractionListener {
-		private static readonly Identifier identifier = new("teleport_player_item");
+		private static readonly Identifier identifier = Identifier.Of("teleport_player_item");
 		public override string name => "Move Player Item";
 		public override int fullStackSize => 1;
 

@@ -7,7 +7,7 @@ using SoulboundEngine.Core.Registry;
 namespace SoulboundEngine.Client.ItemSystem {
 	[PROTOTYPICAL]
 	public sealed class SpawnEntityItem : Item, IItemInteractionListener {
-		private static readonly Identifier identifier = new("spawn_entity_item");
+		private static readonly Identifier identifier = Identifier.Of("spawn_entity_item");
 		public override string name => "Spawn Entity Item";
 
 		public SpawnEntityItem() : base(identifier) {

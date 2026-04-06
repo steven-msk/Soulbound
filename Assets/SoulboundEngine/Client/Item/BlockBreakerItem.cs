@@ -5,7 +5,7 @@ using SoulboundEngine.Core.Registry;
 namespace SoulboundEngine.Client.ItemSystem {
 	[PROTOTYPICAL]
 	public sealed class BlockBreakerItem : Item, IBlockBreakerItem {
-		private static readonly Identifier identifier = new("block_breaker_item");
+		private static readonly Identifier identifier = Identifier.Of("block_breaker_item");
 		public override string name => $"Block Breaker Item";
 
 		public BlockBreakerItem() : base(identifier) {

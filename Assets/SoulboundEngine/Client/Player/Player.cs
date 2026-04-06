@@ -19,7 +19,7 @@ using UnityEngine.InputSystem;
 namespace SoulboundEngine.Client.Players {
 	public class Player : Entity, IInputContext, IFrameUpdatableEntity, IInteractionHandler<ItemInteraction>, IInteractionHandler<BlockInteraction> {
 		private static readonly AssetKey playerKey = new("player");
-		private static readonly Identifier identifier = new("player");
+		private static readonly Identifier identifier = Identifier.Of("player");
 		private static readonly EntityDescriptor DESCRIPTOR = new(identifier, null);
 		private readonly Inventory inventory;
 		private readonly Hotbar hotbar;

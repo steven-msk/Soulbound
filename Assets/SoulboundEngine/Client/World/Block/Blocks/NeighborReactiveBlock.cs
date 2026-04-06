@@ -9,7 +9,7 @@ using SoulboundEngine.Core.Registry;
 namespace SoulboundEngine.Client.World.BlockSystem {
 	[PROTOTYPICAL]
 	public sealed class NeighborReactiveBlock : Block, INeighborUpdateHandler {
-		private static readonly Identifier identifier = new("neighbor_reactive_block");
+		private static readonly Identifier identifier = Identifier.Of("neighbor_reactive_block");
 		public BlockState active { get; private set; }
 		public BlockState inactive { get; private set; }
 		public override string name { get; init; } = "Neighbor Reactive Block";
