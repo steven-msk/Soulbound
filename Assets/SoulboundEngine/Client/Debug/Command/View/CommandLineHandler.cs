@@ -118,15 +118,10 @@ namespace SoulboundEngine.Client.Debug.Commands.View {
 
 			Suggestion suggestion = completionQueue.GetSelected();
 
-			string prefix = inputField.text[..suggestion.Range.Start];
-			//int suffixStart = Mathf.Min(inputField.text.Length, suggestion.Range.Start + suggestion.Range.Length);
-			//string suffix = inputField.text[suffixStart..];
-
-			//string result = prefix + insert + suffix;
 			string withoutLeadingSlash = inputField.text[1..];
-			int newCaret = suggestion.Range.Start + 1 + suggestion.Text.Length;
 			inputField.text = $"/{suggestion.Apply(withoutLeadingSlash)}";
 
+			int newCaret = suggestion.Range.Start + 1 + suggestion.Text.Length;
 			inputField.caretPosition = newCaret;
 			inputField.selectionAnchorPosition = newCaret;
 			inputField.selectionFocusPosition = newCaret;
