@@ -12,12 +12,11 @@ namespace SoulboundEngine.Core {
 		}
 
 		public static TSub Add<TSub>(Identifier identifier, TSub value) where TSub : T {
-			if (registry.ContainsKey(identifier) || IdentifierRegistry.ContainsIdentifier(identifier)) {
+			if (registry.ContainsKey(identifier)) {
 				Logger.LogError("Identifier already exists: {}", identifier);
 				return value;
 			}
 			registry.Add(identifier, value);
-			IdentifierRegistry.AddIdentifier(identifier);
 			return value;
 		}
 
@@ -36,22 +35,8 @@ namespace SoulboundEngine.Core {
 
 		public static void Remove(Identifier identifier) {
 			registry.Remove(identifier);
-			IdentifierRegistry.RemoveIdentifier(identifier);
 		}
 
 		public static IEnumerable<T> GetAll() => registry.Values;
-
-	}
-
-	internal static class IdentifierRegistry {
-		private static readonly HashSet<Identifier> allIdentifiers = new();
-
-		public static bool ContainsIdentifier(Identifier identifier) {
-			return allIdentifiers.Contains(identifier);
-		}
-
-		public static void AddIdentifier(Identifier identifier) => allIdentifiers.Add(identifier);
-
-		public static void RemoveIdentifier(Identifier identifier) => allIdentifiers.Remove(identifier);
 	}
 }
