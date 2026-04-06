@@ -15,7 +15,7 @@ namespace SoulboundEngine.Client.ItemSystem {
 		public override int fullStackSize { get; }
 
 		public StackItem(int fullStackSize)
-			: base(new Identifier($"stackItem_{fullStackSize}")) {
+			: base(new Identifier($"stack_item_{fullStackSize}")) {
 			this.fullStackSize = fullStackSize;
 
 
@@ -30,8 +30,8 @@ namespace SoulboundEngine.Client.ItemSystem {
 				spriteResolver.GetSprite(new SpriteRef(atlas, "debugPointer"))
 			};
 
-			Registry<SpriteAnimation>.Add(new Identifier($"stackItem_{fullStackSize}", "animation"), new SpriteAnimation(
-				new AnimationKey($"stackItemAnimation_{fullStackSize}"),
+			Registry<SpriteAnimation>.Add(new Identifier($"stack_item_{fullStackSize}", "animation"), new SpriteAnimation(
+				new AnimationKey($"stack_item_animation_{fullStackSize}"),
 				frames,
 				fullStackSize,
 				true

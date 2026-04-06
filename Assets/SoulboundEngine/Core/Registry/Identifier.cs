@@ -33,7 +33,7 @@ namespace SoulboundEngine.Core.Registry {
 			if (string.IsNullOrEmpty(_namespace) || string.IsNullOrWhiteSpace(_namespace)) return false;
 			foreach (char c in _namespace) {
 				if (ALLOWED_NAMESPACE_SPECIAL_CHARS.Contains(c)) continue;
-				if (!char.IsLetterOrDigit(c) && !char.IsLower(c)) return false;
+				if (char.IsLetter(c) && !char.IsLower(c)) return false;
 			}
 			return true;
 		}
@@ -47,7 +47,7 @@ namespace SoulboundEngine.Core.Registry {
 
 				foreach (char c in key) {
 					if (ALLOWED_PATH_SPECIAL_CHARS.Contains(c)) continue;
-					if (!char.IsLetterOrDigit(c) && !char.IsLower(c)) return false;
+					if (char.IsLetter(c) && !char.IsLower(c)) return false;
 				}
 			}
 			return true;

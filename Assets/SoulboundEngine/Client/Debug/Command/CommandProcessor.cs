@@ -55,15 +55,12 @@ namespace SoulboundEngine.Client.Debug.Commands {
 			}
 			RuntimeCommandSource source = new(dataProvider, execServices);
 			Task<Suggestions> task;
+			ParseResults<RuntimeCommandSource> parseResults = dispatcher.Parse(input, source);
 
 			try {
-				ParseResults<RuntimeCommandSource> parseResults = dispatcher.Parse(input, source);
-				if (parseResults.Exceptions.Any()) {
-					throw parseResults.Exceptions.First().Value;
-				}
-
 				task = dispatcher.GetCompletionSuggestions(parseResults, caretPos);
-			} catch (CommandSyntaxException) {
+			} catch (CommandSyntaxException e) {
+				Logger.LogError(e);
 				task = Suggestions.Empty();
 			}
 			await task;

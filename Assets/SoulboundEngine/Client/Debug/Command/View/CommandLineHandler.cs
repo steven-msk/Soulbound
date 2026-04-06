@@ -117,18 +117,16 @@ namespace SoulboundEngine.Client.Debug.Commands.View {
 			if (completionQueue.GetCompletionCount() == 0) return;
 
 			Suggestion suggestion = completionQueue.GetSelected();
-			string insert = suggestion.Text;
-	
-			// TODO: fix inconsistent suggestion insertion
 
 			string prefix = inputField.text[..suggestion.Range.Start];
 			//int suffixStart = Mathf.Min(inputField.text.Length, suggestion.Range.Start + suggestion.Range.Length);
 			//string suffix = inputField.text[suffixStart..];
 
 			//string result = prefix + insert + suffix;
-			inputField.text = suggestion.Apply(inputField.text);
+			string withoutLeadingSlash = inputField.text[1..];
+			int newCaret = suggestion.Range.Start + 1 + suggestion.Text.Length;
+			inputField.text = $"/{suggestion.Apply(withoutLeadingSlash)}";
 
-			int newCaret = prefix.Length + insert.Length;
 			inputField.caretPosition = newCaret;
 			inputField.selectionAnchorPosition = newCaret;
 			inputField.selectionFocusPosition = newCaret;

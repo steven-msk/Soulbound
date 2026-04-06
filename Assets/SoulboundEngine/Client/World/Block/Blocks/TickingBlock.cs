@@ -8,7 +8,7 @@ using SoulboundEngine.Core.Registry;
 namespace SoulboundEngine.Client.World.BlockSystem {
 	[PROTOTYPICAL]
 	public sealed class TickingBlock : Block, ITickingBlock {
-		private static readonly Identifier identifier = new("tickingBlock");
+		private static readonly Identifier identifier = new("ticking_block");
 		private BlockState[,] states;	// [on=1/off=0, counter={0..19}]
 		public override string name { get; init; } = "Ticking Block";
 		public override int minBreakLevel { get; init; } = 0;
