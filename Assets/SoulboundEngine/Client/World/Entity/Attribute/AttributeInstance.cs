@@ -82,7 +82,7 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 			List<AttributeModifier> allModifiers = GetModifiers().ToList();
 
 			// filter targeting modifiers
-			ISet<AttributeModifier> targeting = GetTargetingModifiers(allModifiers);
+			IEnumerable<AttributeModifier> targeting = GetTargetingModifiers(allModifiers);
 			allModifiers.RemoveAll(m => targeting.Contains(m));
 
 			Dictionary<AttributeModifier, List<AttributeModifier>> modifierToItsTargeters = new();
@@ -113,12 +113,12 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 			// TODO: fix unordered modifier graph lookup, which is dangerous for recursion
 			foreach (var target in modifierToItsTargeters.Keys) {
 				List<AttributeModifier> targeters = modifierToItsTargeters[target];
-				HashSet<AttributeModifier> predicate_targeters = GetPredicateModifiers(targeters).ToHashSet();
+				List<AttributeModifier> predicate_targeters = GetPredicateModifiers(targeters).ToList();
 				targeters.RemoveAll(m => predicate_targeters.Contains(m));
 
 				double effectiveOverride = CalculateModifiedValue(target.value, targeters, Dictionaries.Empty<AttributeModifier, double>());
 
-				predicate_targeters.RemoveWhere(m => !idToPredicate[m.identifier]());
+				predicate_targeters.RemoveAll(m => !idToPredicate[m.identifier]());
 				effectiveOverride = CalculateModifiedValue(effectiveOverride, predicate_targeters, Dictionaries.Empty<AttributeModifier, double>());
 
 				effectiveOverrides.Add(target, effectiveOverride);
@@ -220,23 +220,27 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 			return idToModifier.TryGetValue(identifier, out modifier);
 		}
 
-		public ISet<AttributeModifier> GetModifiers() => idToModifier.Values.ToHashSet();
+		public IEnumerable<AttributeModifier> GetModifiers() => idToModifier.Values.ToHashSet();
 		public IReadOnlyDictionary<Identifier, AttributeModifier> GetModifiersByOperation(IOperation operation) {
 			return idToModifier
 				.Where(kvp => kvp.Value.operation.Equals(operation))
 				.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 		}
 		public bool HasModifier(Identifier identifier) => idToModifier.ContainsKey(identifier);
-		public ISet<AttributeModifier> GetPersistentModifiers() => persistentModifiers.Values.ToHashSet();
-		private ISet<AttributeModifier> GetTargetingModifiers(IEnumerable<AttributeModifier> modifiers) {
+		public bool HasPredicateModifier(Identifier identifier) => idToPredicate.ContainsKey(identifier);
+		public IEnumerable<AttributeModifier> GetPersistentModifiers() => persistentModifiers.Values.ToHashSet();
+		private IEnumerable<AttributeModifier> GetTargetingModifiers(IEnumerable<AttributeModifier> modifiers) {
 			return modifiers
-				.Where(m => m.target != null)
-				.ToHashSet();
+				.Where(m => m.target != null);
 		}
-		private ISet<AttributeModifier> GetPredicateModifiers(IEnumerable<AttributeModifier> modifiers) {
+		private IEnumerable<AttributeModifier> GetPredicateModifiers(IEnumerable<AttributeModifier> modifiers) {
 			return modifiers
-				.Where(m => IsPredicate(m))
-				.ToHashSet();
+				.Where(m => IsPredicate(m));
+		}
+		public IEnumerable<(AttributeModifier attribute, Func<bool> predicate)> GetPredicateModifiers() {
+			return idToPredicate.Keys
+				.Where(id => idToModifier.ContainsKey(id))
+				.Select(id => (idToModifier[id], idToPredicate[id]));
 		}
 		public bool HasPredicateModifiers() => idToPredicate.Any();
 
