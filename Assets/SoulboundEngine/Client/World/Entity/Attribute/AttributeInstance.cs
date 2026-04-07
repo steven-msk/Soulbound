@@ -13,15 +13,13 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 		private readonly Dictionary<Identifier, AttributeModifier> persistentModifiers = new();
 		private readonly Dictionary<Identifier, Func<bool>> idToPredicate = new();
 		private readonly Dictionary<Identifier, bool> lastPredicateState = new();
-		private readonly Action<AttributeInstance> updateCallback;
 		private readonly RegistryEntry<EntityAttribute> type;
 		private readonly IValueRule? ruleOverride;
 		private double value;
 		private bool dirty;
 
-		public AttributeInstance(RegistryEntry<EntityAttribute> type, Action<AttributeInstance> updateCallback, IValueRule? ruleOverride = null) {
+		public   AttributeInstance(RegistryEntry<EntityAttribute> type, IValueRule? ruleOverride = null) {
 			this.type = type;
-			this.updateCallback = updateCallback;
 			this.dirty = true;
 			this.ruleOverride = ruleOverride;
 		}
@@ -76,8 +74,6 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 
 				if (anyChanged) dirty = true;
 			}
-
-			updateCallback(this);
 		}
 
 		private double ComputeValue() {
@@ -261,33 +257,5 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 			dirty = true;
 		}
 
-		public Packed Pack() => new(type, baseValue, idToModifier.Values.ToList(), idToPredicate, ruleOverride);
-
-		public void Unpack(Packed packed) {
-			this.baseValue = packed.baseValue;
-			foreach (var packedModifier in packed.modifiers) {
-				OverwritePersistentModifier(packedModifier);
-			}
-			foreach (var kvp in packed.predicates) {
-				idToPredicate[kvp.Key] = kvp.Value;
-			}
-			dirty = true;
-		}
-
-		public void SetFrom(AttributeInstance instance) {
-			ClearModifiers();
-			AddPersistentModifiers(instance.GetPersistentModifiers().ToArray());
-			AddPredicateModifiers(instance.GetPersistentModifiers()
-				.Select(m => (m, instance.idToPredicate[m.identifier]))
-				.ToArray());
-		}
-
-		public record Packed(
-			RegistryEntry<EntityAttribute> entry,
-			double baseValue,
-			List<AttributeModifier> modifiers,
-			Dictionary<Identifier, Func<bool>> predicates,
-			IValueRule? ruleOverride
-		);
 	}
 }
