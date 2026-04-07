@@ -1,4 +1,3 @@
-using SoulboundEngine.Client.World.EntitySystem.Attribute;
 using SoulboundEngine.Client.World.EntitySystem.Transform;
 using SoulboundEngine.Client.World.LevelDomain;
 using System;
@@ -8,7 +7,6 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 	public abstract class Entity : IDisposable {
 		public Guid guid { get; private set; }
 		public readonly EntityDescriptor descriptor;
-		private readonly AttributeContainer attributeContainer;
 		protected Level level;
 		protected IEntityTransform transform;
 		private Vector2 pos;
@@ -17,7 +15,6 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 		protected Entity(EntityDescriptor descriptor, Vector2 initialPos) {
 			this.pos = this.initialPos = initialPos;
 			this.descriptor = descriptor;
-			attributeContainer = descriptor.CreateAttributeContainer();
 		}
 
 		public void AttachToLevel(Level level, Guid guid) {
