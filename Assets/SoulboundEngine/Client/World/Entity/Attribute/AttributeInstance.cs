@@ -12,6 +12,7 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 		private readonly Dictionary<Identifier, AttributeModifier> idToModifier = new();
 		private readonly Dictionary<Identifier, AttributeModifier> persistentModifiers = new();
 		private readonly Dictionary<Identifier, Func<bool>> idToPredicate = new();
+		private readonly Dictionary<Identifier, bool> lastPredicateState = new();
 		private readonly Action<AttributeInstance> updateCallback;
 		private readonly RegistryEntry<EntityAttribute> type;
 		private readonly IValueRule? ruleOverride;
@@ -57,6 +58,26 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 			persistentModifiers.Clear();
 			idToPredicate.Clear();
 			dirty = true;
+		}
+
+		public void OnUpdate() {
+			if (HasPredicateModifiers()) {
+				bool anyChanged = false;
+
+				foreach (var id in idToPredicate.Keys) {
+					if (anyChanged) break;
+
+					bool current = idToPredicate[id]();
+					if (current != lastPredicateState.GetValueOrDefault(id, !current)) {
+						anyChanged = true;
+					}
+					lastPredicateState[id] = current;
+				}
+
+				if (anyChanged) dirty = true;
+			}
+
+			updateCallback(this);
 		}
 
 		private double ComputeValue() {
@@ -221,6 +242,7 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 				.Where(m => IsPredicate(m))
 				.ToHashSet();
 		}
+		public bool HasPredicateModifiers() => idToPredicate.Any();
 
 		public void OverwritePersistentModifier(AttributeModifier modifier) {
 			if (!idToModifier.ContainsKey(modifier.identifier)) return;
