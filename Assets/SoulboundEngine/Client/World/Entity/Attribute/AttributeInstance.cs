@@ -63,8 +63,6 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 				bool anyChanged = false;
 
 				foreach (var id in idToPredicate.Keys) {
-					if (anyChanged) break;
-
 					bool current = idToPredicate[id]();
 					if (current != lastPredicateState.GetValueOrDefault(id, !current)) {
 						anyChanged = true;
