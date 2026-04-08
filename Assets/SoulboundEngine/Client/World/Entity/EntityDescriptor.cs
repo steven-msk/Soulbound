@@ -1,23 +1,31 @@
+using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Core.Registry;
-using System;
 using UnityEngine;
 
 #nullable enable
 
 namespace SoulboundEngine.Client.World.EntitySystem {
 	public class EntityDescriptor : IIdentifierProvider {
-		private readonly Identifier identifier;
-		private readonly Func<Vector2, Entity> factory;
+		public delegate Entity EntityFactory(EntityDescriptor descriptor, Level level);
 
-		public EntityDescriptor(Identifier identifier, Func<Vector2, Entity> factory) {
+		private readonly Identifier identifier;
+		private readonly EntityFactory factory;
+
+		public EntityDescriptor(Identifier identifier, EntityFactory factory) {
 			this.identifier = identifier;
 			this.factory = factory;
 		}
 
 		public Identifier GetIdentifier() => identifier;
 
-		public Entity Create(Vector2 pos) => factory(pos);
+		public Entity Create(Level level, Vector2 pos) {
+			Entity entity = factory(this, level);
+			level.AddEntity(entity);
+			entity.SetPos(pos);
+			return entity;
+		}
 
 		public override string ToString() => identifier.ToString();
+
 	}
 }

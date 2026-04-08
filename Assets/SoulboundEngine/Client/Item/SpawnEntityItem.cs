@@ -22,7 +22,8 @@ namespace SoulboundEngine.Client.ItemSystem {
 		}
 
 		public bool TryExecute(ItemStack itemStack, in ItemInteraction ctx) {
-			Entity entity = new PhysicsEntity(ctx.player.GetWorldPointerPos());
+			Entity entity = new PhysicsEntity(ctx.level);
+			entity.SetPos(ctx.player.GetWorldPointerPos());
 			ctx.level.AddEntity(entity);
 			itemStack.Decrement();
 			return true;

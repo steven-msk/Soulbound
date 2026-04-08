@@ -1,15 +1,8 @@
+using SoulboundEngine.Client.World.EntitySystem.Transform;
+using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Common;
 using SoulboundEngine.Core.Assets;
-using SoulboundEngine.Client.Debug.Logging;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
-using SoulboundEngine.Client.World.EntitySystem.Transform;
 
 namespace SoulboundEngine.Client.World.EntitySystem {
 	[PROTOTYPICAL]
@@ -18,8 +11,8 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 		private bool colliding = false;
 		private PhysicsTransform physicsTransform;
 
-		public PhysicsEntity(Vector2 initialPos)
-			: base(EntityType.PHYSICS_ENTITY, initialPos) {
+		public PhysicsEntity(Level level)
+			: base(EntityType.PHYSICS_ENTITY, level) {
 		}
 
 		protected override IEntityTransform CreateTransform() {

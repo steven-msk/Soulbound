@@ -1,5 +1,4 @@
 using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.Common;
 using SoulboundEngine.Core.Registry;
 using System;
 using System.Collections.Generic;
@@ -18,7 +17,7 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 		private double value;
 		private bool dirty;
 
-		public   AttributeInstance(RegistryEntry<EntityAttribute> type, IValueRule? ruleOverride = null) {
+		public AttributeInstance(RegistryEntry<EntityAttribute> type, IValueRule? ruleOverride = null) {
 			this.type = type;
 			this.dirty = true;
 			this.ruleOverride = ruleOverride;
@@ -114,10 +113,10 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 				List<AttributeModifier> predicate_targeters = GetPredicateModifiers(targeters).ToList();
 				targeters.RemoveAll(m => predicate_targeters.Contains(m));
 
-				double effectiveOverride = CalculateModifiedValue(target.value, targeters, Dictionaries.Empty<AttributeModifier, double>());
+				double effectiveOverride = CalculateModifiedValue(target.value, targeters, _ => null);
 
 				predicate_targeters.RemoveAll(m => !idToPredicate[m.identifier]());
-				effectiveOverride = CalculateModifiedValue(effectiveOverride, predicate_targeters, Dictionaries.Empty<AttributeModifier, double>());
+				effectiveOverride = CalculateModifiedValue(effectiveOverride, predicate_targeters, _ => null);
 
 				effectiveOverrides.Add(target, effectiveOverride);
 			}
@@ -125,10 +124,13 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 			// filter predicates
 			HashSet<AttributeModifier> predicateModifiers = GetPredicateModifiers(allModifiers).ToHashSet();
 			allModifiers.RemoveAll(m => predicateModifiers.Contains(m));
-			double prePredicateResult = CalculateModifiedValue(this.baseValue, allModifiers, effectiveOverrides);
+			double? EffectiveOverrideSupplier(AttributeModifier attribute) {
+				return effectiveOverrides.TryGetValue(attribute, out double _override) ? _override : null;
+			}
+			double prePredicateResult = CalculateModifiedValue(this.baseValue, allModifiers, EffectiveOverrideSupplier);
 
 			predicateModifiers.RemoveWhere(m => !idToPredicate[m.identifier]());
-			double final = CalculateModifiedValue(prePredicateResult, predicateModifiers, effectiveOverrides);
+			double final = CalculateModifiedValue(prePredicateResult, predicateModifiers, EffectiveOverrideSupplier);
 
 			// apply value rule
 			try {
@@ -149,35 +151,30 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 		// A = base + Σ(flat)
 		// B = A * (1 + Σ%) (% of A)
 		// C = B * Π(multipliers)
-		private double CalculateModifiedValue(double baseValue, IEnumerable<AttributeModifier> modifiers, Dictionary<AttributeModifier, double> effectiveOverrides) {
+		private double CalculateModifiedValue(double baseValue, IEnumerable<AttributeModifier> modifiers, Func<AttributeModifier, double?> effectiveOverrideSupplier) {
 			FilterOperations(modifiers,
 				out List<AttributeModifier> additive,
 				out List<AttributeModifier> additivePercent,
 				out List<AttributeModifier> multiplicative
 			);
-			double? GetOverride(AttributeModifier modifier) {
-				return effectiveOverrides.TryGetValue(modifier, out double value)
-					? value
-					: null;
-			}
 
 			// apply all flat adds/subtracts (A)
 			double A = baseValue;
 			foreach (var modifier in additive) {
-				modifier.Apply(GetOverride(modifier), ref A);
+				modifier.Apply(effectiveOverrideSupplier(modifier), ref A);
 			}
 
 			// apply all percentage adds (B)
 			double percentSum = 0d;
 			foreach (var modifier in additivePercent) {
-				modifier.Apply(GetOverride(modifier), ref percentSum);
+				modifier.Apply(effectiveOverrideSupplier(modifier), ref percentSum);
 			}
 			double B = A * (1d + percentSum);
 
 			// apply multipliers (C)
 			double multiplierProduct = 1d;
 			foreach (var modifier in multiplicative) {
-				modifier.Apply(GetOverride(modifier), ref multiplierProduct);
+				modifier.Apply(effectiveOverrideSupplier(modifier), ref multiplierProduct);
 			}
 			double C = B * multiplierProduct;
 
@@ -247,8 +244,18 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 
 			idToModifier[modifier.identifier] = modifier;
 			persistentModifiers[modifier.identifier] = modifier;
+			idToPredicate.Remove(modifier.identifier);
 
 			dirty = true;
+		}
+		public void OverwritePredicateModifier(AttributeModifier modifier, Func<bool> predicate) {
+			OverwritePersistentModifier(modifier);
+			idToPredicate.Add(modifier.identifier, predicate);
+		}
+		public void OverwritePredicate(Identifier identifier, Func<bool> predicate) {
+			if (idToPredicate.ContainsKey(identifier)) {
+				idToPredicate[identifier] = predicate;
+			}
 		}
 
 		public void RemoveModifier(AttributeModifier modifier) => RemoveModifier(modifier.identifier);

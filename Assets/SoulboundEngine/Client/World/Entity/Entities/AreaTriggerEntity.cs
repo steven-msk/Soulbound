@@ -1,5 +1,6 @@
 using SoulboundEngine.Client.Players;
 using SoulboundEngine.Client.World.EntitySystem.Transform;
+using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Common;
 using SoulboundEngine.Common.Unity;
 using SoulboundEngine.Core;
@@ -10,8 +11,8 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 
 	[PROTOTYPICAL]
 	public sealed class AreaTriggerEntity : Entity {
-		public AreaTriggerEntity(Vector2 initialPos)
-			: base(EntityType.AREA_TRIGGER_ENTITY, initialPos) {
+		public AreaTriggerEntity(Level level)
+			: base(EntityType.AREA_TRIGGER_ENTITY, level) {
 		}
 
 		protected override IEntityTransform CreateTransform() {

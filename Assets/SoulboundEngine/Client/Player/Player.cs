@@ -6,6 +6,7 @@ using SoulboundEngine.Client.World.BlockSystem;
 using SoulboundEngine.Client.World.BlockSystem.States;
 using SoulboundEngine.Client.World.EntitySystem;
 using SoulboundEngine.Client.World.EntitySystem.Transform;
+using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Common;
 using SoulboundEngine.Core;
 using SoulboundEngine.Core.Assets;
@@ -40,11 +41,10 @@ namespace SoulboundEngine.Client.Players {
 		// provisory guard for not breaking the block instantly after it was placed
 		private bool leftClickBlockBreakGuard;
 
-		public Player(Vector2 initialPos)
-			: base(DESCRIPTOR, initialPos) {
+		public Player(Level level)
+			: base(DESCRIPTOR, level) {
 			inventory = new Inventory();
 			hotbar = new Hotbar();
-			this.initialPos = initialPos;
 
 			interactionResolver.RegisterHandler<ItemInteraction>(this);
 			interactionResolver.RegisterHandler<BlockInteraction>(this);
@@ -284,7 +284,7 @@ namespace SoulboundEngine.Client.Players {
 			ItemStack thrownStack = mainHandStack.Clone(throwAmount);
 			mainHandStack.Decrement(throwAmount);
 
-			ItemEntity itemEntity = new(this, pickupDelaySec: 2f, thrownStack, transform.GetPos());
+			ItemEntity itemEntity = new(this, pickupDelaySec: 2f, thrownStack, level);
 			level.AddEntity(itemEntity);
 		}
 

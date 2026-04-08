@@ -3,23 +3,23 @@ using SoulboundEngine.Client.World.LevelDomain;
 using System;
 using UnityEngine;
 
+#nullable enable
+
 namespace SoulboundEngine.Client.World.EntitySystem {
 	public abstract class Entity : IDisposable {
 		public Guid guid { get; private set; }
-		public readonly EntityDescriptor descriptor;
+		private readonly EntityDescriptor descriptor;
 		protected Level level;
-		protected IEntityTransform transform;
+		protected IEntityTransform? transform;
 		private Vector2 pos;
-		protected readonly Vector2 initialPos;
 
-		protected Entity(EntityDescriptor descriptor, Vector2 initialPos) {
-			this.pos = this.initialPos = initialPos;
+		protected Entity(EntityDescriptor descriptor, Level level) {
 			this.descriptor = descriptor;
+			this.level = level;
 		}
 
-		public void AttachToLevel(Level level, Guid guid) {
+		public void AttachId(Guid guid) {
 			this.guid = guid;
-			this.level = level;
 
 			transform = CreateTransform();
 			transform.Bind(this);
@@ -39,7 +39,11 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 			transform?.Destroy();
 		}
 
+		public bool IsAlive() => transform != null;
+
 		protected virtual void OnDisposed() {
 		}
+
+		public EntityDescriptor GetEntityType() => descriptor;
 	}
 }

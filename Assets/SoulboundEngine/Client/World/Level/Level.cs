@@ -245,7 +245,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 
 		public void AddEntity(Entity entity) {
 			Guid guid = Guid.NewGuid();
-			entity.AttachToLevel(this, guid);
+			entity.AttachId(guid);
 			entities[guid] = entity;
 
 			if (entity is ITickingEntity ticking) {
@@ -268,6 +268,10 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 			if (entity is IFrameUpdatableEntity frameUpdatable) {
 				frameUpdatableEntities.Remove(frameUpdatable);
 			}
+		}
+
+		public void SpawnEntity(EntityDescriptor descriptor, Vector2 pos) {
+			descriptor.Create(this, pos);
 		}
 
 		public bool TryGetEntity(Guid guid, out Entity entity) {

@@ -1,6 +1,7 @@
 using SoulboundEngine.Client.ItemSystem;
 using SoulboundEngine.Client.ItemSystem.Render;
 using SoulboundEngine.Client.World.EntitySystem.Transform;
+using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Core;
 using SoulboundEngine.Core.Registry;
 using SoulboundEngine.Core.Render.Sprite;
@@ -21,12 +22,12 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 		private readonly WorldItemRenderer itemRenderer = new(new AtlasSpriteResolver());
 		private readonly ItemModelResolver modelResolver = new();
 
-		public ItemEntity(ItemStack itemStack, Vector2 initialPos)
-			: this(null, 0f, itemStack, initialPos) {
+		public ItemEntity(ItemStack itemStack, Level level)
+			: this(null, 0f, itemStack, level) {
 		}
 
-		public ItemEntity(Entity? owner, float pickupDelaySec, ItemStack itemStack, Vector2 initialPos)
-			: base(DESCRIPTOR, initialPos) {
+		public ItemEntity(Entity? owner, float pickupDelaySec, ItemStack itemStack, Level level)
+			: base(DESCRIPTOR, level) {
 			this.itemStack = itemStack;
 			this.owner= owner;
 			this.pickupDelaySec = pickupDelaySec;

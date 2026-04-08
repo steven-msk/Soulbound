@@ -1,12 +1,7 @@
 using SoulboundEngine.Client.World.EntitySystem.Transform;
+using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Common;
 using SoulboundEngine.Core.Assets;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SoulboundEngine.Client.World.EntitySystem {
@@ -14,8 +9,8 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 	public sealed class StaticEntity : Entity {
 		private readonly AssetKey spriteKey = new("WhiteSquare");
 
-		public StaticEntity(Vector2 initialPos)
-			: base(EntityType.STATIC_ENTITY, initialPos) {
+		public StaticEntity(Level level)
+			: base(EntityType.STATIC_ENTITY, level) {
 		}
 
 		protected override IEntityTransform CreateTransform() {

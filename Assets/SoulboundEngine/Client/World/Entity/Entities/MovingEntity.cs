@@ -1,23 +1,16 @@
+using SoulboundEngine.Client.World.EntitySystem.Transform;
+using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Common;
 using SoulboundEngine.Core.Assets;
-using SoulboundEngine.Client.Debug.Logging;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
-using SoulboundEngine.Client.World.EntitySystem.Transform;
 
 namespace SoulboundEngine.Client.World.EntitySystem {
 	[PROTOTYPICAL]
 	public sealed class MovingEntity : Entity, ITickingEntity {
 		private readonly AssetKey spriteKey = new("WhiteSquare");
 
-		public MovingEntity(Vector2 initialPos)
-			: base(EntityType.MOVING_ENTITY, initialPos) {
+		public MovingEntity(Level level)
+			: base(EntityType.MOVING_ENTITY, level) {
 		}
 
 		public void Tick() {

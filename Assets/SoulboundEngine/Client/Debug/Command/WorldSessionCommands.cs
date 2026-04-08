@@ -80,8 +80,7 @@ namespace SoulboundEngine.Client.Debug.Commands {
 					Coordinate y = ctx.GetArgument<Coordinate>("y");
 				}
 
-				Entity entity = entityDescriptor.Create(pos);
-				ctx.Source.execServices.Entity.AddEntity(entity);
+				ctx.Source.execServices.Level.SpawnEntity(entityDescriptor, pos);
 				return 1;
 			}
 
