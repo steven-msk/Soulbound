@@ -3,13 +3,21 @@ using SoulboundEngine.Client.World.EntitySystem;
 using SoulboundEngine.Client.World.EntitySystem.Transform;
 using SoulboundEngine.Core;
 using SoulboundEngine.Core.Event;
+using System;
 using UnityEngine;
 
 #nullable enable
 
 namespace SoulboundEngine.Client.Players {
 	[RequireComponent(typeof(Rigidbody2D))]
+	[Obsolete]
 	public class PlayerTransform : MonoBehaviour, IEntityTransform, IItemPickupHandler {
+		// currently the transform leaves the implementation hidden for physics transforms.
+		// this encapsulation doesnt match the default way of entities to express their state.
+		// so PlayerTransform, PhysicsTransform and StaticTransform are obsolete because of this.
+		// specifically about PlayerTransform, the Unity component is leaked from Player class.
+		// this completely destroys headless simulation potential
+
 		private Player player = null!;
 		private Rigidbody2D rb = null!;
 		new private CapsuleCollider2D collider = null!;
@@ -39,7 +47,7 @@ namespace SoulboundEngine.Client.Players {
 
 		void IEntityTransform.Destroy() => Destroy(gameObject);
 
-		private void Update() {
+		void IEntityTransform.FrameUpdate() {
 			rb.linearVelocity = new Vector2(normalVelocity.x * speed, rb.linearVelocityY);
 			rbVelocity = rb.linearVelocity;
 		}

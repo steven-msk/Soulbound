@@ -44,7 +44,6 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 		private readonly HashSet<BlockPos> tickingBlocks = new();
 		private readonly Dictionary<Guid, Entity> entities = new();
 		private readonly List<ITickingEntity> tickingEntities = new();
-		private readonly List<IFrameUpdatableEntity> frameUpdatableEntities = new();
 
 		public Level(WorldRenderer worldRenderer, int seed) {
 			this.seed = seed;
@@ -124,8 +123,8 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 				}
 			}
 
-			foreach (var frameUpdatableEntity in frameUpdatableEntities.ToArray()) {
-				frameUpdatableEntity.FrameUpdate();
+			foreach (var entity in GetAllEntities().ToArray()) {
+				entity.FrameUpdate();
 			}
 		}
 
@@ -251,9 +250,6 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 			if (entity is ITickingEntity ticking) {
 				tickingEntities.Add(ticking);
 			}
-			if (entity is IFrameUpdatableEntity frameUpdatable) {
-				frameUpdatableEntities.Add(frameUpdatable);
-			}
 		}
 
 		public void RemoveEntity(Entity entity) {
@@ -264,9 +260,6 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 
 			if  (entity is ITickingEntity ticking) {
 				tickingEntities.Remove(ticking);
-			}
-			if (entity is IFrameUpdatableEntity frameUpdatable) {
-				frameUpdatableEntities.Remove(frameUpdatable);
 			}
 		}
 

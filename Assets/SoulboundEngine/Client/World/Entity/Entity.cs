@@ -28,6 +28,10 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 
 		protected abstract IEntityTransform CreateTransform();
 
+		public virtual void FrameUpdate() {
+			transform?.FrameUpdate();
+		}
+
 		public virtual Vector2 GetPos() => pos;
 		public virtual void SetPos(Vector2 pos) {
 			this.pos = pos;

@@ -36,6 +36,7 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 		public Entity? GetOwner() => owner;
 		public ItemStack GetStack() => itemStack;
 
+		[Obsolete("Leaking Unity code in potential headless simulation code")]
 		protected override IEntityTransform CreateTransform() {
 			GameObject obj = new("Item Entity");
 			ItemEntityTransform transform = obj.AddComponent<ItemEntityTransform>();

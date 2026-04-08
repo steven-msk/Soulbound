@@ -1,16 +1,18 @@
 using SoulboundEngine.Client.ItemSystem;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 #nullable enable
 
 namespace SoulboundEngine.Client.World.EntitySystem.Transform {
 	[RequireComponent(typeof(Rigidbody2D))]
+	[Obsolete]
 	public class ItemEntityTransform : MonoBehaviour, IEntityTransform {
+		// currently the transform leaves the implementation hidden for physics transforms.
+		// this encapsulation doesnt match the default way of entities to express their state.
+		// with this being changed, ItemEntity will be able to encapsulate ItemEntityTransform logic.
+		// this separation will become important for headless simulations later on
+
 		private ItemEntity entity = null!;
 		private Entity? owner;
 		private float pickupDelaySec;
@@ -54,6 +56,9 @@ namespace SoulboundEngine.Client.World.EntitySystem.Transform {
 		private bool CanBePickedUp(Entity? collidedEntity) {
 			if (collidedEntity != owner) return true;
 			return Time.unscaledTime > spawnTime + pickupDelaySec;
+		}
+
+		void IEntityTransform.FrameUpdate() {
 		}
 	}
 }

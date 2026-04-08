@@ -1,14 +1,14 @@
-using SoulboundEngine.Common;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SoulboundEngine.Client.World.EntitySystem.Transform {
 	[RequireComponent(typeof(Rigidbody2D))]
+	[Obsolete]
 	public class PhysicsTransform : MonoBehaviour, IEntityTransform {
+		// currently the transform leaves the implementation hidden for physics transforms.
+		// this encapsulation doesnt match the default way of entities to express their state.
+		// so PlayerTransform, PhysicsTransform and StaticTransform are obsolete because of this.
+
 		private IEntityCollisionHandler collisionHandler;
 		private Entity entity;
 		private Rigidbody2D body;
@@ -52,6 +52,9 @@ namespace SoulboundEngine.Client.World.EntitySystem.Transform {
 				other = collision.otherCollider.GetComponent<IEntityTransform>()?.GetEntity(),
 				otherObject = collision.otherCollider.gameObject
 			});
+		}
+
+		void IEntityTransform.FrameUpdate() {
 		}
 	}
 }

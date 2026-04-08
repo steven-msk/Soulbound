@@ -4,6 +4,7 @@ using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Common;
 using SoulboundEngine.Common.Unity;
 using SoulboundEngine.Core;
+using System;
 using UnityEngine;
 
 namespace SoulboundEngine.Client.World.EntitySystem {
@@ -15,6 +16,7 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 			: base(EntityType.AREA_TRIGGER_ENTITY, level) {
 		}
 
+		[Obsolete("Leaking Unity code in potential headless simulation code")]
 		protected override IEntityTransform CreateTransform() {
 			GameObject obj = new("Area Trigger Entity");
 

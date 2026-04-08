@@ -18,7 +18,7 @@ using UnityEngine.InputSystem;
 #nullable enable
 
 namespace SoulboundEngine.Client.Players {
-	public class Player : Entity, IInputContext, IFrameUpdatableEntity, IInteractionHandler<ItemInteraction>, IInteractionHandler<BlockInteraction> {
+	public class Player : Entity, IInputContext, IInteractionHandler<ItemInteraction>, IInteractionHandler<BlockInteraction> {
 		private static readonly AssetKey playerKey = new("player");
 		private static readonly EntityDescriptor DESCRIPTOR = new((_, _) => throw new InvalidOperationException("Cannot create new player from factory"));
 		private readonly Inventory inventory;
@@ -49,6 +49,7 @@ namespace SoulboundEngine.Client.Players {
 			interactionResolver.RegisterHandler<BlockInteraction>(this);
 		}
 
+		[Obsolete("Leaking Unity code in potential headless simulation code")]
 		protected override IEntityTransform CreateTransform() {
 			GameObject obj = GameObject.Instantiate(AssetManager.Resolve<GameObject>(playerKey));
 			playerTransform = obj.GetComponent<PlayerTransform>();
@@ -136,7 +137,8 @@ namespace SoulboundEngine.Client.Players {
 			return false;
 		}
 
-		void IFrameUpdatableEntity.FrameUpdate() {
+		public override void FrameUpdate() {
+			base.FrameUpdate();
 			if (isHoldingLeftClick) OnLeftHold();
 			if (isHoldingRightClick) OnRightHold();
 		}

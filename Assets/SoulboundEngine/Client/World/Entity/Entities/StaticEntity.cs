@@ -2,6 +2,7 @@ using SoulboundEngine.Client.World.EntitySystem.Transform;
 using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Common;
 using SoulboundEngine.Core.Assets;
+using System;
 using UnityEngine;
 
 namespace SoulboundEngine.Client.World.EntitySystem {
@@ -13,6 +14,7 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 			: base(EntityType.STATIC_ENTITY, level) {
 		}
 
+		[Obsolete("Leaking Unity code in potential headless simulation code")]
 		protected override IEntityTransform CreateTransform() {
 			GameObject obj = new("Static Entity", typeof(StaticTransform));
 
