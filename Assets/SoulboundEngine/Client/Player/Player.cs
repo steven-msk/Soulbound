@@ -11,7 +11,7 @@ using SoulboundEngine.Common;
 using SoulboundEngine.Core;
 using SoulboundEngine.Core.Assets;
 using SoulboundEngine.Core.Event;
-using SoulboundEngine.Core.Registry;
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -20,8 +20,7 @@ using UnityEngine.InputSystem;
 namespace SoulboundEngine.Client.Players {
 	public class Player : Entity, IInputContext, IFrameUpdatableEntity, IInteractionHandler<ItemInteraction>, IInteractionHandler<BlockInteraction> {
 		private static readonly AssetKey playerKey = new("player");
-		private static readonly Identifier identifier = Identifier.Of("player");
-		private static readonly EntityDescriptor DESCRIPTOR = new(identifier, null);
+		private static readonly EntityDescriptor DESCRIPTOR = new((_, _) => throw new InvalidOperationException("Cannot create new player from factory"));
 		private readonly Inventory inventory;
 		private readonly Hotbar hotbar;
 		private ITransitStackSource tranistStackSource = null!;

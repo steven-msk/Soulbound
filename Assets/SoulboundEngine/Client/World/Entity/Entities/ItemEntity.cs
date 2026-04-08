@@ -3,16 +3,15 @@ using SoulboundEngine.Client.ItemSystem.Render;
 using SoulboundEngine.Client.World.EntitySystem.Transform;
 using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Core;
-using SoulboundEngine.Core.Registry;
 using SoulboundEngine.Core.Render.Sprite;
+using System;
 using UnityEngine;
 
 #nullable enable
 
 namespace SoulboundEngine.Client.World.EntitySystem {
 	public class ItemEntity : Entity {
-		private static readonly Identifier identifier = Identifier.Of("itemEntity");
-		private static readonly EntityDescriptor DESCRIPTOR = new(identifier, null);
+		private static readonly EntityDescriptor DESCRIPTOR = new((_, _) => throw new InvalidOperationException("Creating ItemEntity from factory is not supported"));
 		private static readonly Vector3 TRANSFORM_SCALE = new(2.5f, 2.5f, 2.5f);
 
 		private readonly Entity? owner;

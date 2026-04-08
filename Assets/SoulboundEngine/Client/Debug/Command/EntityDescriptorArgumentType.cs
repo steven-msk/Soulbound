@@ -13,7 +13,7 @@ namespace SoulboundEngine.Client.Debug.Commands {
 			string remaining = builder.RemainingLowerCase;
 
 			foreach (var descriptor in Registries.ENTITIES) {
-				Identifier id = descriptor.GetIdentifier();
+				Identifier id = EntityDescriptor.GetIdentifier(descriptor);
 
 				if (id.GetNamespace().StartsWith(remaining) || id.GetPath().StartsWith(remaining)) {
 					builder.Suggest(id.ToString());

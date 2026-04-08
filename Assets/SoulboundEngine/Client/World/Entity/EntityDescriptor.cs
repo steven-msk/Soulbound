@@ -5,18 +5,18 @@ using UnityEngine;
 #nullable enable
 
 namespace SoulboundEngine.Client.World.EntitySystem {
-	public class EntityDescriptor : IIdentifierProvider {
+	public class EntityDescriptor {
 		public delegate Entity EntityFactory(EntityDescriptor descriptor, Level level);
 
-		private readonly Identifier identifier;
 		private readonly EntityFactory factory;
 
-		public EntityDescriptor(Identifier identifier, EntityFactory factory) {
-			this.identifier = identifier;
+		public EntityDescriptor(EntityFactory factory) {
 			this.factory = factory;
 		}
 
-		public Identifier GetIdentifier() => identifier;
+		public static Identifier GetIdentifier(EntityDescriptor descriptor) {
+			return Registries.ENTITIES.GetIdentifier(descriptor);
+		}
 
 		public Entity Create(Level level, Vector2 pos) {
 			Entity entity = factory(this, level);
@@ -25,7 +25,7 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 			return entity;
 		}
 
-		public override string ToString() => identifier.ToString();
+		public override string ToString() => GetIdentifier(this).ToString();
 
 	}
 }
