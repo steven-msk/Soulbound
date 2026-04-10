@@ -3,18 +3,13 @@ using SoulboundEngine.Client.World.BlockSystem.States;
 using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Common;
 using SoulboundEngine.Core.Assets;
-using SoulboundEngine.Core.Registry;
 
 namespace SoulboundEngine.Client.World.BlockSystem {
 	[PROTOTYPICAL]
 	public sealed class TickingBlock : Block, ITickingBlock {
-		private static readonly Identifier identifier = Identifier.Of("ticking_block");
 		private BlockState[,] states;	// [on=1/off=0, counter={0..19}]
 		public override string name { get; init; } = "Ticking Block";
 		public override int minBreakLevel { get; init; } = 0;
-
-		public TickingBlock() : base(identifier) {
-		}
 
 		public void Tick(Level level, BlockPos blockPos, BlockState blockState) {
 			int counter = blockState.Get<int>("counter");

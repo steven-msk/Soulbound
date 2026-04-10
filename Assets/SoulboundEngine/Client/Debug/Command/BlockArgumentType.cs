@@ -13,7 +13,7 @@ namespace SoulboundEngine.Client.Debug.Commands {
 			string remaining = builder.RemainingLowerCase;
 
 			foreach (var block in Registries.BLOCKS) {
-				Identifier id = block.GetIdentifier();
+				Identifier id = Blocks.GetIdentifier(block);
 
 				if (id.GetNamespace().StartsWith(remaining) || id.GetPath().StartsWith(remaining)) {
 					builder.Suggest(id.ToString());

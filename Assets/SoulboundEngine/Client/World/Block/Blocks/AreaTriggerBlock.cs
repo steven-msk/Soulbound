@@ -5,21 +5,16 @@ using SoulboundEngine.Client.World.BlockSystem.TileEntities;
 using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Common;
 using SoulboundEngine.Core.Assets;
-using SoulboundEngine.Core.Registry;
 using UnityEngine;
 
 namespace SoulboundEngine.Client.World.BlockSystem {
 	[PROTOTYPICAL]
 	public sealed class AreaTriggerBlock : Block {
-		private static readonly Identifier identifier = Identifier.Of("area_trigger_block");
 		private static BlockState inArea;
 		private static BlockState notInArea;
 
 		public override string name { get; init; } = "Area Trigger Block";
 		public override int minBreakLevel { get; init; } = 0;
-
-		public AreaTriggerBlock() : base(identifier) {
-		}
 
 		public override bool HasTileEntity(Level level, BlockPos blockPos, BlockState blockState) {
 			return true;

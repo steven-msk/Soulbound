@@ -1,14 +1,10 @@
 using SoulboundEngine.Client.World.BlockSystem;
 using SoulboundEngine.Client.World.BlockSystem.Render;
 using SoulboundEngine.Client.World.BlockSystem.States;
-using SoulboundEngine.Core.Registry;
 
 public class FakeBlock : Block {
 	public override string name { get; init; }
 	public override int minBreakLevel { get; init; }
-
-	public FakeBlock(Identifier id) : base(id) {
-	}
 
 	public override BlockRenderData GetRenderData(BlockState blockState) {
 		return default;

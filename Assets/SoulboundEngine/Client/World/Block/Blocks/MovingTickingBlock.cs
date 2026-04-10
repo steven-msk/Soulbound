@@ -4,19 +4,14 @@ using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Common;
 using SoulboundEngine.Common.Math;
 using SoulboundEngine.Core.Assets;
-using SoulboundEngine.Core.Registry;
 
 namespace SoulboundEngine.Client.World.BlockSystem {
 	[PROTOTYPICAL]
 	public sealed class MovingTickingBlock : Block, ITickingBlock, INeighborUpdateHandler {
-		private static readonly Identifier identifier = Identifier.Of("moving_ticking_block");
 		private BlockState movingState;
 		private BlockState staticState;
 		public override string name { get; init; } = "Moving Ticking Block";
 		public override int minBreakLevel { get; init; } = 0;
-
-		public MovingTickingBlock() : base(identifier) {
-		}
 
 		void ITickingBlock.Tick(Level level, BlockPos blockPos, BlockState blockState) {
 			if (!blockState.Get<bool>("canMove")) return;

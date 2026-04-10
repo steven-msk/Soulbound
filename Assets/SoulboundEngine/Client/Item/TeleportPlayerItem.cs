@@ -1,17 +1,12 @@
 using SoulboundEngine.Client.Interaction;
 using SoulboundEngine.Client.ItemSystem.Render;
 using SoulboundEngine.Common;
-using SoulboundEngine.Core.Registry;
 
 namespace SoulboundEngine.Client.ItemSystem {
 	[PROTOTYPICAL]
 	public sealed class TeleportPlayerItem : Item, IItemInteractionListener {
-		private static readonly Identifier identifier = Identifier.Of("teleport_player_item");
 		public override string name => "Move Player Item";
 		public override int fullStackSize => 1;
-
-		public TeleportPlayerItem() : base(identifier) {
-		}
 
 		public bool ValidateTrigger(InteractionTrigger trigger) {
 			return trigger == InteractionTrigger.LeftClick;

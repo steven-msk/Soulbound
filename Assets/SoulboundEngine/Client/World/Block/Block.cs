@@ -3,25 +3,21 @@ using SoulboundEngine.Client.World.BlockSystem.Render;
 using SoulboundEngine.Client.World.BlockSystem.States;
 using SoulboundEngine.Client.World.BlockSystem.TileEntities;
 using SoulboundEngine.Client.World.LevelDomain;
-using SoulboundEngine.Core.Registry;
 using System.Collections.Generic;
 
 #nullable enable
 
 namespace SoulboundEngine.Client.World.BlockSystem {
-	public abstract partial class Block : IIdentifierProvider {
-		private readonly Identifier identifier;
+	public abstract partial class Block {
 		public abstract string name { get; init; }
 		public abstract int minBreakLevel { get; init; }
 		public BlockState defaultState { get; private set; } = null!;
 
-		protected Block(Identifier identifier, IBlockStateRegisterer? stateRegisterer = null) {
-			this.identifier = identifier;
+		protected Block(IBlockStateRegisterer? stateRegisterer = null) {
 			RegisterStates(stateRegisterer);
 		}
 
-		protected Block(Identifier identifier, string name, int minBreakLevel, IBlockStateRegisterer? stateRegisterer = null) {
-			this.identifier = identifier;
+		protected Block(string name, int minBreakLevel, IBlockStateRegisterer? stateRegisterer = null) {
 			this.name = name;
 			this.minBreakLevel = minBreakLevel;
 			RegisterStates(stateRegisterer);
@@ -38,8 +34,6 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 
 			stateRegisterer.FinishRegistry();
 		}
-
-		public Identifier GetIdentifier() => identifier;
 
 		public abstract BlockRenderData GetRenderData(BlockState blockState);
 

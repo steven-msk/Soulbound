@@ -5,7 +5,7 @@ namespace SoulboundEngine.Client.World.BlockSystem.States {
 
 		public static int ComputeHash(Block block, BlockPropertyEntries properties) {
 			uint hash = FnvOffset;
-			hash = HashString(hash, block.GetIdentifier().ToString());
+			hash = HashString(hash, block.name);
 
 			foreach (var (property, value) in properties.GetSorted()) {
 				hash = HashString(hash, property);
