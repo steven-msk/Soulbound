@@ -56,12 +56,14 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 			this.cavemap = new Cavemap(seed);
 		}
 
+		// known issue: world architecture design is poorly designed
 		public void GenerateTerrain() {
 			for (int cx = -RENDER_DISTANCE; cx <= RENDER_DISTANCE; cx++) {
 				GenerateNewChunk(cx);
 			}
 		}
 
+		// known issue: player creation assumes block placement is finished
 		public void StartSession(Player player) {
 			this.player = player;
 			AddEntity(player);
@@ -69,6 +71,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 			player.SetPos(GetWorldSpawnPoint() + Vector2.up * 2f);
 		}
 
+		// known issue: inconsistent world update loop design
 		public void Tick(RectInt simulationRect) {
 			foreach (var pos in tickingBlocks.ToArray()) {
 				if (!simulationRect.Contains((Vector2Int)pos)) continue;
@@ -94,6 +97,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 			return new Vector2(0f, GetSurfaceAirY(0));
 		}
 
+		// known issue: inconsistent world update loop design
 		public void FrameUpdate() {
 			int pivotChunkX = ChunkXAt(player.GetPos());
 			this.UnloadDistantChunks(pivotChunkX, RENDER_DISTANCE);
@@ -127,16 +131,6 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 				entity.FrameUpdate();
 			}
 		}
-
-		// currently world generation uses WorldChunk as the logic executor
-		// when in reality it shouldnt at all
-		// the target design will use world "macroing"
-		// start with small artifacts, then expand and apply the same rules
-		// eventually, after enough steps, the result would be the world itself
-		// its only a matter of how these steps are defined as
-		// since this is a far too complex feature, it will be delayed 
-		// until further notice on world generation
-		// for now all implementations regarding this are obsolete
 
 		private WorldChunk GenerateNewChunk(int chunkX) {
 			WorldChunk chunk = new(this, chunkX);
@@ -219,8 +213,8 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 			if (newTicks) tickingBlocks.Add(blockPos);
 
 			// neighbor updates arent dispatched for a block that has just been placed
-			// hence we manually update the block through another neighbor update
-			// this isnt entirely correct, but for the sake of simplicity it works
+			// so we manually update the block through another neighbor update
+			// this isnt entirely correct, but for the sake of simplicity it works for now
 			if (blockState?.block is INeighborUpdateHandler neighborUpdateHandler) {
 				neighborUpdateHandler.OnNeighborChanged(this, blockPos, blockPos);
 			}
@@ -244,7 +238,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 
 		public void AddEntity(Entity entity) {
 			Guid guid = Guid.NewGuid();
-			entity.AttachId(guid);
+			entity.CreateTransform(guid);
 			entities[guid] = entity;
 
 			if (entity is ITickingEntity ticking) {

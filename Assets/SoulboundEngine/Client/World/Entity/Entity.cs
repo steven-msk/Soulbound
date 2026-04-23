@@ -18,7 +18,7 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 			this.level = level;
 		}
 
-		public void AttachId(Guid guid) {
+		public void CreateTransform(Guid guid) {
 			this.guid = guid;
 
 			transform = CreateTransform();
@@ -48,6 +48,6 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 		protected virtual void OnDisposed() {
 		}
 
-		public EntityDescriptor GetEntityType() => descriptor;
+		public EntityDescriptor GetDescriptor() => descriptor;
 	}
 }

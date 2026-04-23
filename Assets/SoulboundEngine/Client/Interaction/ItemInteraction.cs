@@ -1,10 +1,9 @@
 using SoulboundEngine.Client.ItemSystem;
 using SoulboundEngine.Client.Players;
-using SoulboundEngine.Client.World;
 using SoulboundEngine.Client.World.LevelDomain;
 
 namespace SoulboundEngine.Client.Interaction {
-	public struct ItemInteraction  : IInteractionContext {
+	public struct ItemInteraction : IInteractionContext {
 		// note: the implementation might change
 		// as more features are introduced during prod
 

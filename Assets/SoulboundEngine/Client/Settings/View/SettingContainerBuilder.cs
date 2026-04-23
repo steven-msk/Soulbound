@@ -1,9 +1,5 @@
 using SoulboundEngine.Common;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,12 +11,12 @@ namespace SoulboundEngine.Client.SettingSystem.View {
 		public const float DEFAULT_HORIZONTAL_SPACING = 8f;
 		public const ContentSizeFitter.FitMode DEFAULT_FIT_MODE = FitMode.PreferredSize;
 
-		public readonly AbstractSettingEntry entry;
+		public readonly SettingEntry entry;
 		public readonly SettingEntryGroup group;
 		private GameObject container;
 		private GameObject nameObject;
 
-		public SettingContainerBuilder(SettingEntryGroup group, AbstractSettingEntry entry) {
+		public SettingContainerBuilder(SettingEntryGroup group, SettingEntry entry) {
 			this.group = group;
 			this.entry = entry;
 		}

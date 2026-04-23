@@ -43,7 +43,7 @@ namespace SoulboundEngine.Client.World.Chunk {
 
 		public void Tick() => tickManager.Tick();
 
-		[Obsolete]
+		[Obsolete("known issue: world architecture design is poorly designed")]
 		public void Generate(BiomeMap biomeMap, Heightmap heightmap, Cavemap cavemap, out ChunkGenData genData) {
 			genData = new ChunkGenData {
 				chunk = this,

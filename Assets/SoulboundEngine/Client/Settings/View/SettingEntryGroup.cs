@@ -1,8 +1,8 @@
+using SoulboundEngine.Common;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Reflection;
-using SoulboundEngine.Common;
+using UnityEngine;
 
 namespace SoulboundEngine.Client.SettingSystem.View {
 	[PROTOTYPICAL]
@@ -24,7 +24,7 @@ namespace SoulboundEngine.Client.SettingSystem.View {
 			return containerBuilder;
 		}
 
-		public SettingContainerBuilder AddEntry(AbstractSettingEntry entry) {
+		public SettingContainerBuilder AddEntry(SettingEntry entry) {
 			const BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 			Type entryType = typeof(SettingEntry<>).MakeGenericType(entry.valueType);
 

@@ -11,7 +11,24 @@ using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 #nullable enable
 
 namespace SoulboundEngine.Client.SettingSystem {
-	public class SettingEntry<T> : AbstractSettingEntry {
+	public abstract class SettingEntry {
+		public readonly string displayName;
+		public readonly string id;
+		public abstract object boxedDefaultValue { get; }
+		public abstract object boxedValue { get; }
+		public abstract Type valueType { get; }
+
+		protected SettingEntry(string name, string id) {
+			this.displayName = name;
+			this.id = id;
+		}
+
+		public override string ToString() {
+			return $"{displayName}={boxedValue}";
+		}
+	}
+
+	public class SettingEntry<T> : SettingEntry {
 		public readonly T defaultValue;
 		public readonly ValueSet<T> valueSet;
 		public event Action<T, T>? valueChanged;
@@ -67,7 +84,7 @@ namespace SoulboundEngine.Client.SettingSystem {
 		}
 	}
 
-	public record StringValueSet(string[] acceptedValues) : ValueSet<string> {
+	public record StringEnum(string[] acceptedValues) : ValueSet<string> {
 		public override string Decode(string value) => value;
 
 		public override string Encode(string? value) => value ?? string.Empty;

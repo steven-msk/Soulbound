@@ -1,5 +1,4 @@
 using SoulboundEngine.Client.SettingSystem;
-using SoulboundEngine.Common;
 using SoulboundEngine.Common.Collections;
 using System;
 using System.Collections.Concurrent;

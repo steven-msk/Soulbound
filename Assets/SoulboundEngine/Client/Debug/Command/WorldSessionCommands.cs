@@ -25,7 +25,7 @@ namespace SoulboundEngine.Client.Debug.Commands {
 									y = Mathf.FloorToInt(ctx.GetArgument<Coordinate>("y").GetPos(playerPos.y))
 								};
 								ctx.Source.execServices.Level.SetBlockState(blockPos, block.defaultState);
-								Logger.LogInfo("Set block {} at {}", block.GetIdentifier(), blockPos);
+								Logger.LogInfo("Set block {} at {}", Blocks.GetIdentifier(block), blockPos);
 								return 1;
 							})
 						)

@@ -17,6 +17,9 @@ using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 #nullable enable
 
 namespace SoulboundEngine.Client.World.LevelDomain {
+	/// <summary>
+	/// Manages Level lifecycles
+	/// </summary>
 	public class LevelManager : IInputContext {
 		public const float tickRate = 0.02f;        // 50 tps
 		private float tickStartTime;
@@ -34,6 +37,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 		private static readonly RectInt simulationView = new(-128, -76, 256, 156);
 		private static readonly RectInt renderRect = new(-32, -19, 65, 39);
 
+		// known issue: scattered Level and LevelManager dependencies
 		public LevelManager(ISeedProvider seedProvider, BlockRenderer blockRenderer, BlockModelResolver blockModelResolver) {
 			worldRenderer = new WorldRenderer(simulationView, blockRenderer, blockModelResolver);
 			level = new Level(worldRenderer, seedProvider.GetSeed());

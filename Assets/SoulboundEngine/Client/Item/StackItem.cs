@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using SoulboundEngine.Client.ItemSystem.Render;
 using SoulboundEngine.Common;
 using SoulboundEngine.Core.Assets;
@@ -12,8 +13,7 @@ namespace SoulboundEngine.Client.ItemSystem {
 		public override string name => $"Stack Item: {fullStackSize}";
 		public override int fullStackSize { get; }
 
-		public StackItem(int fullStackSize)
-			: base(Identifier.Of($"stack_item_{fullStackSize}")) {
+		public StackItem(int fullStackSize) {
 			this.fullStackSize = fullStackSize;
 
 
@@ -28,16 +28,21 @@ namespace SoulboundEngine.Client.ItemSystem {
 				spriteResolver.GetSprite(new SpriteRef(atlas, "debugPointer"))
 			};
 
-			Registries.Register<SpriteAnimation>(Registries.SPRITE_ANIMATIONS, GetIdentifier(), new SpriteAnimation(
-				new AnimationKey($"stack_item_animation_{fullStackSize}"),
-				frames,
-				fullStackSize,
-				true
-			));
+			UniTask.Post(async () => {
+				await UniTask.WaitForEndOfFrame();
+
+				Registries.Register<SpriteAnimation>(Registries.SPRITE_ANIMATIONS, Items.GetIdentifier(this), new SpriteAnimation(
+					new AnimationKey($"stack_item_animation_{fullStackSize}"),
+					frames,
+					fullStackSize,
+					true
+				));
+			});
+
 		}
 
 		public override ItemRenderData GetRenderData(ItemStack itemStack) {
-			return new ItemRenderData("idkwhatthisis", itemStack, GetIdentifier());
+			return new ItemRenderData("idkwhatthisis", itemStack, Items.GetIdentifier(this));
 		}
 
 	}
