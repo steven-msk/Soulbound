@@ -27,32 +27,14 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 13bd427b029dcaa4cbd789c8d21c4966
-    m_Address: blockHitEffect
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 14d9459257b5b3345a235f5545becbb3
     m_Address: GameMenuTitle
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 1535861a9572f724fb9bebf03b0ec575
-    m_Address: ai test
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 1b6a0acceb53f9a42b1c3987563d2414
     m_Address: WhiteSquareTile
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 1d4b4106a81f3804ea66b9bdda7db69b
-    m_Address: Grid
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload
@@ -75,12 +57,6 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 2f4fa2d652bbd884b95bb39ae884fbb9
-    m_Address: FlightTimePanel
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 3278a884a65c5e042a2f890d5cb8d8e0
     m_Address: SettingsTitle
     m_ReadOnly: 0
@@ -89,12 +65,6 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 3ddab628e43f7114c804ef2cf0dff34b
     m_Address: JosefinSans-Regular SDF
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 4020c73e3815cf64490d111e3762919a
-    m_Address: tooltipSection
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload
@@ -119,12 +89,6 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 54e2b68901269854bbafd631afa1b635
     m_Address: Items
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 565fe1640666a874298849ae50107d82
-    m_Address: Slot
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload
@@ -183,12 +147,6 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 779797e769489a9449d6f94f635cf0ea
-    m_Address: stackNumberPrefab
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 7821d7075ebcfed489a2aa4baa56e562
     m_Address: SettingEntries
     m_ReadOnly: 0
@@ -219,12 +177,6 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 83091ff37e0613643b4c9a13662a6824
-    m_Address: itemDisplayPrefab
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 844f6663ed1a4434ca2b1a83f2dd156b
     m_Address: grass_icon
     m_ReadOnly: 0
@@ -245,12 +197,6 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 8a2891815a45d0d4b87027cb5d74ac11
     m_Address: WhiteSquare
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 912e916946948ac4284086ac7f5aff5c
-    m_Address: Canvas
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload
@@ -285,24 +231,6 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: b54c53a458224b0478ce39fcc0ef54ec
-    m_Address: sceneContext
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: b6cd3b84e09533a4bac580bcec724555
-    m_Address: heartParticle
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: b76a12af57d7e284bb0d42b2df31bf48
-    m_Address: droppedItem
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: c31a5e9c910fa9c42a037cf94c1b620b
     m_Address: QuitWorld
     m_ReadOnly: 0
@@ -329,18 +257,6 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d9a6f678a69fb4649833517db99e2361
     m_Address: ReactActiveTile
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: dd90606c5da2287499c83477a2cd6c1f
-    m_Address: armorSlotOverlay
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: dedc175c69fa52f4db514e00ef93386b
-    m_Address: tooltipPanel
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload
