@@ -7,7 +7,6 @@ using SoulboundEngine.Client.Debug.Logging.Console;
 using SoulboundEngine.Client.Debug.Metrics;
 using SoulboundEngine.Client.Debug.Metrics.View;
 using SoulboundEngine.Client.Input;
-using SoulboundEngine.Client.Players;
 using SoulboundEngine.Client.Runtime.Services;
 using SoulboundEngine.Client.SettingSystem;
 using SoulboundEngine.Client.UI;
@@ -16,7 +15,6 @@ using SoulboundEngine.Client.World;
 using SoulboundEngine.Client.World.Generation;
 using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Client.World.Serialization;
-using SoulboundEngine.Common;
 using SoulboundEngine.Common.Json;
 using SoulboundEngine.Core.Assets;
 using SoulboundEngine.Core.Audio;
@@ -199,13 +197,6 @@ namespace SoulboundEngine.Core {
 		public bool IsWorldSessionActive() => activeWorldSession != null;
 
 		public UIHandler GetUIHandler() => uiHandler;
-
-
-		[PROTOTYPICAL]
-		[Obsolete]
-		public Player? GetPlayerInstance() {
-			return activeWorldSession?.player;
-		}
 
 		public IEnumerable<string> ListWorldSaves() {
 			return worldManager.ListSaves();

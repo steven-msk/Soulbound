@@ -190,20 +190,6 @@ namespace SoulboundEngine.Client.World.Chunk {
 		[Obsolete]
 		public void SetBlock(int cx, int yIndex, BlockState blockState) {
 			SetBlockState(new BlockPos(ChunkXToWorldX(cx), IndexToWorldY(yIndex)), blockState);
-			//Block block = blockState.block;
-			//blockStateIDs[cx][yIndex] = blockState.stateID;
-
-			//if (block.hasTileEntity) {
-			//	BlockPos blockPos = new(ChunkXToWorldX(cx), IndexToWorldY(yIndex));
-			//	TileEntity? tileEntity = block.GetTileEntity(level, blockPos);
-
-			//	if (tileEntities[cx][yIndex] != null) {
-			//		tickManager.RemoveTileEntity(tileEntity);
-			//	}
-
-			//	tileEntities[cx][yIndex] = tileEntity;
-			//	tickManager.AddTileEntity(tileEntity);
-			//}
 		}
 
 		public BlockState? GetBlockState(ChunkBlockPos chunkPos) {

@@ -29,9 +29,8 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 
 		public readonly int seed;
 		private readonly Dictionary<int, WorldChunk> loadedChunks = new();
-		private Dictionary<int, WorldChunk> generatedChunks = new(); 
+		private readonly Dictionary<int, WorldChunk> generatedChunks = new(); 
 		private readonly ChunkOutlineRenderer chunkOutlineRenderer = new();
-		[Obsolete] private Dictionary<int, List<(ChunkBlockPos pos, BlockState? state)>> pendingUpdates = new();
 		[Obsolete] private readonly ConcurrentDictionary<int, List<OnChunkGenerated>> deferredGenerations = new();
 		private readonly Dictionary<int, ChunkGenData> chunkGenData = new();
 		private readonly WorldRenderer worldRenderer;
@@ -113,13 +112,6 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 						generatedChunks[chunkX] = chunk;
 					} else {
 						chunk = generatedChunks[chunkX];
-					}
-
-					if (pendingUpdates.TryGetValue(chunkX, out var stateUpdates)) {
-						stateUpdates.ForEach(stateUpdate => {
-							chunk.SetBlock(stateUpdate.pos, stateUpdate.state);
-						});
-						pendingUpdates.Remove(chunkX);
 					}
 
 					loadedChunks[chunkX] = chunk;
