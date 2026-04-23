@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      castle-logo_0: 4131197244754889041
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

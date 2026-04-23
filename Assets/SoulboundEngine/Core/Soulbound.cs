@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
+using SoulboundBackend.Client.Input;
 using SoulboundEngine.Client.Debug;
 using SoulboundEngine.Client.Debug.Commands;
 using SoulboundEngine.Client.Debug.Logging.Console;
