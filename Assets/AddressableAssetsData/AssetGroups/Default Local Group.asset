@@ -15,20 +15,8 @@ MonoBehaviour:
   m_GroupName: Default Local Group
   m_GUID: 3d327a7b6104f6046a101be5265ddafd
   m_SerializeEntries:
-  - m_GUID: 0450c75f5dcdfad4f998fb9e57b2bc54
-    m_Address: weaponTestAnim
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0f932da0be6fbc34fa244d63edae9ef8
     m_Address: click
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 14d9459257b5b3345a235f5545becbb3
-    m_Address: GameMenuTitle
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload
@@ -47,18 +35,6 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 266b90b32eeb1ec4e9de7f3921f2d5e6
     m_Address: AreaTriggerTile
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 2ac223bfff0dc2b4ab7323e9c062fedf
-    m_Address: stone_icon
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 3278a884a65c5e042a2f890d5cb8d8e0
-    m_Address: SettingsTitle
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload
@@ -93,20 +69,14 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 565fe1640666a874298849ae50107d82
+    m_Address: Slot
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5c5dbc3200a937c498da76e029222e08
     m_Address: air
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 60a185f7b5c69d34582b24d8560c4263
-    m_Address: crappy_pickaxe
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 64067c85458cdc84f9649a00354a7755
-    m_Address: StatisticsButton
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload
@@ -129,12 +99,6 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 72d2e449dee691d4c9fdaac2e75735fb
-    m_Address: Rectangular Palette
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 7350909f237a6674fa7ddcd933435fe2
     m_Address: dirt
     m_ReadOnly: 0
@@ -147,44 +111,8 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 7821d7075ebcfed489a2aa4baa56e562
-    m_Address: SettingEntries
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 7fa8aacfb5495fa46a782e28efb99c16
-    m_Address: WorldEnter
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 807b2af3fa5a28f45adb103b36cf1aaf
     m_Address: blockPlace
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 80c92652bc11e0841b371cf25dc1c521
-    m_Address: grass_top
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 81a7f847bab6ddf4b846b8c28c1f63ae
-    m_Address: ButtonContainer
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 844f6663ed1a4434ca2b1a83f2dd156b
-    m_Address: grass_icon
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 8629ffabd7d222f479c12b7270b1b5ea
-    m_Address: chestplate_overlay
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload
@@ -207,44 +135,14 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 9f075694fab0bb148995c10809a8a506
-    m_Address: wood_icon
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b13141476e8f6134eb600bd09d0d9792
     m_Address: RedSquareTile
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: b16b127a850751c43b96c1a20ee39205
-    m_Address: fruit_icon
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: b54940d46e298384382541cf7ed92bda
-    m_Address: Tilemap
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: c31a5e9c910fa9c42a037cf94c1b620b
-    m_Address: QuitWorld
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: cbf0dfe6112d8e84c849d454f1474d8f
     m_Address: JosefinSans-Medium SDF
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: d7098cf14f04d554ba27ce5128185a3d
-    m_Address: leaves_icon
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload
@@ -273,24 +171,6 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: e4c24be95ba79204eab3ad6416f34b34
-    m_Address: dirt_icon
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: e73082fccdc33f448a63fd6d559f6ab9
-    m_Address: SettingsButton
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: f049a0888a77da944982503d46f573a6
-    m_Address: ResumeButton
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: f10baa890a05f7d4e95dd8f94a06742f
     m_Address: TickBlockOn
     m_ReadOnly: 0
@@ -299,12 +179,6 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: f6426e6fd6941634a8f5292711ce4db8
     m_Address: Urbanist-Bold SDF
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: fe11377655a5323408cb2fd311172436
-    m_Address: gem_icon
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload
