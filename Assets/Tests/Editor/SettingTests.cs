@@ -117,7 +117,7 @@ namespace SettingTests {
 
 		[Test]
 		public void SettingEntry_RejectsNullValues() {
-			var entry = new SettingEntry<string>("", "testEntry", "default", new StringValueSet(new[] { "default", "option1", "option2" }), null);
+			var entry = new SettingEntry<string>("", "testEntry", "default", new StringEnum(new[] { "default", "option1", "option2" }), null);
 
 			bool valueChanged = false;
 			entry.valueChanged += (_, _) => valueChanged = true;
@@ -240,7 +240,7 @@ namespace SettingTests {
 		public void SettingWriterAndReader_WritesAndReadsStringCorrectly() {
 			const string value = "someString";
 
-			var entry = new SettingEntry<string>("", "testString", value, new StringValueSet(new[] { value }), null);
+			var entry = new SettingEntry<string>("", "testString", value, new StringEnum(new[] { value }), null);
 
 			using (var writer = new StreamWriter(tempPath)) {
 				new SettingWriter(writer).Process(entry);
@@ -274,7 +274,7 @@ namespace SettingTests {
 			const int intValue = 10;
 
 			var intEntry = new SettingEntry<int>("Int", "intSetting", intValue, new IntRange(0, 100), null);
-			var strEntry = new SettingEntry<string>("Str", "stringSetting", strings[0], new StringValueSet(strings), null);
+			var strEntry = new SettingEntry<string>("Str", "stringSetting", strings[0], new StringEnum(strings), null);
 
 			using (var writer = new StreamWriter(tempPath)) {
 				var settingWriter = new SettingWriter(writer);

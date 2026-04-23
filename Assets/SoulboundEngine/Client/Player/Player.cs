@@ -62,14 +62,12 @@ namespace SoulboundEngine.Client.Players {
 				inventory.Toggle();
 				return true;
 			}
-			if (inputEvent.token.Equals(InputTokens.Player.changeHotbarSlot)
-					&& inputEvent.phase == InputActionPhase.Performed) {
+			if (inputEvent.Performed(InputTokens.Player.changeHotbarSlot)) {
 				int slotIndex = int.Parse(inputEvent.context.control.name) - 1;
 				hotbar.SetMainSlotIndex(slotIndex);
 				return true;
 			}
-			if (inputEvent.token.Equals(InputTokens.Player.scrollHotbarSlot)
-					&& inputEvent.phase == InputActionPhase.Performed) {
+			if (inputEvent.Performed(InputTokens.Player.scrollHotbarSlot)) {
 				float scrollDelta = inputEvent.context.ReadValue<float>();
 				int nextSlot = hotbar.GetMainSlotIndex() - (int)scrollDelta;
 
