@@ -1,14 +1,6 @@
-using SoulboundEngine.Client.Input;
-using SoulboundEngine.Core;
 using SoulboundEngine.Client.Debug.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Threading.Tasks;
+using SoulboundEngine.Client.Input;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Controls;
 
 #nullable enable
 
@@ -30,7 +22,7 @@ namespace SoulboundEngine.Client.SettingSystem {
 
 		private void AddRebind(KeybindEntry entry, InputToken token) {
 			entry.valueChanged += (_, _) => {
-				Soulbound.instance.GetInputManager().Rebind(token, entry);
+				SoulboundClient.Instance.InputManager.Rebind(token, entry);
 			};
 		}
 

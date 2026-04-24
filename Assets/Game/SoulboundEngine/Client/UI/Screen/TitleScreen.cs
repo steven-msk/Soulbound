@@ -1,7 +1,5 @@
 using SoulboundEngine.Client.UI.Containers;
-using SoulboundEngine.Client.UI.Screens;
 using SoulboundEngine.Common;
-using SoulboundEngine.Core;
 using System;
 
 namespace SoulboundEngine.Client.UI.Screens {
@@ -16,10 +14,10 @@ namespace SoulboundEngine.Client.UI.Screens {
 					.ControlChildWidth(true)
 			).Build(screenObject);
 
-			foreach (var world in Soulbound.instance.ListWorldSaves()) {
+			foreach (var world in SoulboundClient.Instance.ListWorldSaves()) {
 				GUI.Button.Label()
 					.Text(world)
-					.OnClick(() => Soulbound.instance.EnterWorld(world))
+					.OnClick(() => SoulboundClient.Instance.EnterWorld(world))
 					.Build(container);
 			}
 
@@ -27,8 +25,8 @@ namespace SoulboundEngine.Client.UI.Screens {
 				.Text("new world")
 				.OnClick(() => {
 					string world = $"world_{Guid.NewGuid()}";
-					Soulbound.instance.CreateNewWorld(world);
-					Soulbound.instance.EnterWorld(world);
+					SoulboundClient.Instance.CreateNewWorld(world);
+					SoulboundClient.Instance.EnterWorld(world);
 				})
 				.Build(container);
 		}

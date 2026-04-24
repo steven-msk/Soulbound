@@ -1,7 +1,6 @@
 using SoulboundEngine.Client.UI.Containers;
 using SoulboundEngine.Client.UI.Layouts;
 using SoulboundEngine.Common;
-using SoulboundEngine.Core;
 
 namespace SoulboundEngine.Client.UI.Screens {
 	[PROTOTYPICAL]
@@ -19,7 +18,7 @@ namespace SoulboundEngine.Client.UI.Screens {
 			GUI.Button.Label().Text("Settings").Build(container);
 
 			GUI.Button.Label().Text("Quit To Title Screen")
-				.OnClick(Soulbound.instance.QuitActiveWorld)
+				.OnClick(SoulboundClient.Instance.QuitActiveWorld)
 				.Build(container);
 		}
 	}

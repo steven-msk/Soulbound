@@ -2,8 +2,6 @@ using SoulboundEngine.Client.Input;
 using SoulboundEngine.Client.ItemSystem;
 using SoulboundEngine.Client.ItemSystem.Container;
 using SoulboundEngine.Client.ItemSystem.Container.View;
-
-using SoulboundEngine.Core;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -25,7 +23,7 @@ namespace SoulboundEngine.Client.UI.Screens {
 			base.Init(screen);
 			rect = GetComponent<RectTransform>();
 			this.transitStack = new TransitStack(rect);
-			Soulbound.instance.GetInputManager().PushContext(this);
+			SoulboundClient.Instance.InputManager.PushContext(this);
 		}
 
 		public bool TryBeginDrag(ItemStack stack, SlotRef slotRef, PointerEventData.InputButton button) {
@@ -98,7 +96,7 @@ namespace SoulboundEngine.Client.UI.Screens {
 		}
 
 		private void OnDestroy() {
-			Soulbound.instance.GetInputManager().RemoveContext(this);
+			SoulboundClient.Instance.InputManager.RemoveContext(this);
 		}
 	}
 }

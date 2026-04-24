@@ -1,12 +1,5 @@
 using SoulboundEngine.Client.Input;
-using SoulboundEngine.Client.SettingSystem;
 using SoulboundEngine.Common;
-using SoulboundEngine.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -29,7 +22,7 @@ namespace SoulboundEngine.Client.SettingSystem.View {
 
 		public void BeginRebind() {
 			isRebinding = true;
-			Soulbound.instance.GetInputManager().PushContext(this);
+			SoulboundClient.Instance.InputManager.PushContext(this);
 		}
 
 		private void PollRebind() {
@@ -52,7 +45,7 @@ namespace SoulboundEngine.Client.SettingSystem.View {
 
 		private void EndRebind() {
 			isRebinding = false;
-			Soulbound.instance.GetInputManager().RemoveContext(this);
+			SoulboundClient.Instance.InputManager.RemoveContext(this);
 		}
 
 		bool IInputContext.HandleInput(in InputEvent inputEvent) {

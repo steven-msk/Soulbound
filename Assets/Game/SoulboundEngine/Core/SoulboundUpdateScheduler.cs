@@ -19,7 +19,7 @@ namespace SoulboundEngine.Core {
 		}
 
 		private void Update() {
-			Soulbound.instance?.FrameTick();
+			Soulbound.Instance?.Update();
 		}
 
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]

@@ -8,7 +8,6 @@ using SoulboundEngine.Client.World.EntitySystem;
 using SoulboundEngine.Client.World.EntitySystem.Transform;
 using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Common;
-using SoulboundEngine.Core;
 using SoulboundEngine.Core.Assets;
 using SoulboundEngine.Core.Event;
 using System;
@@ -328,7 +327,7 @@ namespace SoulboundEngine.Client.Players {
 		public Vector2 GetWorldPointerPos() {
 			Vector3 screenPos = screenPointerPos;
 
-			Canvas canvas = Soulbound.instance.GetUIHandler().GetCanvas();
+			Canvas canvas = SoulboundClient.Instance.UIHandler.GetCanvas();
 			RectTransform rootTransform = canvas.GetComponent<RectTransform>();
 			bool inWorldPoint = RectTransformUtility.ScreenPointToWorldPointInRectangle(
 				rootTransform,

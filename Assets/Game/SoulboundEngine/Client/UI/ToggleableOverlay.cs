@@ -1,10 +1,3 @@
-using SoulboundEngine.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace SoulboundEngine.Client.UI {
 	public abstract class ToggleableOverlay<TNode> where TNode : UIOverlayNode {
 		protected bool visible;
@@ -26,7 +19,7 @@ namespace SoulboundEngine.Client.UI {
 				node = null;
 				visible = false;
 			};
-			Soulbound.instance.GetUIHandler().AddOverlay(node);
+			SoulboundClient.Instance.UIHandler.AddOverlay(node);
 		}
 
 		protected abstract TNode GetNode();

@@ -9,7 +9,6 @@ using SoulboundEngine.Client.World.Generation;
 using SoulboundEngine.Client.World.Render;
 using SoulboundEngine.Common;
 using SoulboundEngine.Common.Math;
-using SoulboundEngine.Core;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -66,7 +65,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 		public void StartSession(Player player) {
 			this.player = player;
 			AddEntity(player);
-			Soulbound.instance.GetInputManager().PushContext(player);
+			SoulboundClient.Instance.InputManager.PushContext(player);
 			player.SetPos(GetWorldSpawnPoint() + Vector2.up * 2f);
 		}
 
@@ -275,7 +274,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 		}
 
 		public void OnSessionStop() {
-			Soulbound.instance.GetInputManager().RemoveContext(player);
+			SoulboundClient.Instance.InputManager.RemoveContext(player);
 		}
 
 		public BlockState? GetBlockState(BlockPos blockPos) {

@@ -7,7 +7,6 @@ using SoulboundEngine.Client.World.BlockSystem.Render;
 using SoulboundEngine.Client.World.Generation;
 using SoulboundEngine.Client.World.Render;
 using SoulboundEngine.Common;
-using SoulboundEngine.Core;
 using SoulboundEngine.Core.Assets;
 using System;
 using UnityEngine;
@@ -133,7 +132,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 		public void TogglePause() {
 			paused = !paused;
 			Time.timeScale = paused ? 0f : 1f;
-			UIHandler uiHandler = Soulbound.instance.GetUIHandler();
+			UIHandler uiHandler = SoulboundClient.Instance.UIHandler;
 			if (!paused) {
 				uiHandler.GetScreenNavigator().PopScreen();
 			} else {
