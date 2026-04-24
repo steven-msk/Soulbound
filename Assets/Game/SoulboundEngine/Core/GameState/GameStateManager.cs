@@ -1,6 +1,6 @@
 using System;
 
-namespace SoulboundEngine.Core.GameState {
+namespace SoulboundEngine.Core.GameStates {
 	internal static class GameStateManager {
 		private static int currentState = GameState.UNINITIALIZED;
 

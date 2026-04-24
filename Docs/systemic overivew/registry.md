@@ -7,7 +7,7 @@
 - may be extended to support tags, which would be used to target multiple registered objects on top of a registry.
 - known weaknesses: 
     - *(fixed)* registry lookups are slightly underdeveloped
-    - possible inconsistency with registries being mutable after bootstrap
+    - *(fixed)* possible inconsistency with registries being mutable after bootstrap
 
 ## Terminologies
 - a **registry** is an object that holds registry entries, which always contain a string ID and the registered object mapped to that ID. A registry's type parameter indicates the accepted type, and includes subtypes, for example a registry `Registry<Item>` maps `Item` instances. Note that every registry is also a registered value of its own, registered in `Registries.ROOT` with its own id, for example `soulbound:block`, `soulbound:item`.
@@ -32,7 +32,7 @@
 
 ## Known issues
 - *(fixed)* registry lookups might be slightly underdeveloped. `Registry<T>` implements `IEnumerable<T>` which allows enumerations over all registered objects, but theres no way to get all identifiers from a registry.
-- possible inconsistency with registry mutability after bootstrap. By the time all registering has finished, every object should have at least one use somewhere, whether its in frontend or backend. If an object is registered after bootstrap, states are very likely to break and incorrect results may appear. Consider making registries immutable after bootstrap, possibly by "freezing" them. **This must be fixed before prod.**
+- *(fixed)* possible inconsistency with registry mutability after bootstrap. By the time all registering has finished, every object should have at least one use somewhere, whether its in frontend or backend. If an object is registered after bootstrap, states are very likely to break and incorrect results may appear. Consider making registries immutable after bootstrap, possibly by "freezing" them. **This must be fixed before prod.**
 
 ## Extension: Tags (planned)
 - tags will allow grouping of multiple registry entries under a common id.

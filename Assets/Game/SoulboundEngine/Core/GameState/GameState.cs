@@ -1,4 +1,4 @@
-namespace SoulboundEngine.Core.GameState {
+namespace SoulboundEngine.Core.GameStates {
 	public static class GameState {
 		public const int UNINITIALIZED = 1 << 0;	// 1
 		public const int BOOTSTRAPPING = 1 << 1;	// 2

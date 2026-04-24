@@ -11,10 +11,13 @@ namespace SoulboundEngine.Core.Registry {
 		private readonly Dictionary<RegistryKey<T>, RegistryEntry<T>> keyToEntry = new(new KeyComparer());
 		private readonly Dictionary<T, RegistryEntry<T>> valueToEntry = new();
 		private readonly RegistryKey<Registry<T>> key;
+		private bool freezed = false;
 
 		public Registry(RegistryKey<Registry<T>> key) => this.key = key;
 
 		public RegistryEntry<T> CreateEntry(Identifier id, T value) {
+			if (freezed) throw new InvalidOperationException("Registry already freezed");
+
 			RegistryKey<T> key = RegistryKey<T>.Of(this.key, id);
 			RegistryEntry<T> entry = new(this, key, value);
 
@@ -27,6 +30,8 @@ namespace SoulboundEngine.Core.Registry {
 
 		public bool Contains(RegistryKey<T> key) => keyToEntry.ContainsKey(key);
 		public bool ContainsId(Identifier id) => idToEntry.ContainsKey(id);
+
+		void IRegistry.Freeze() => freezed = true;
 
 		public bool TryGet(RegistryKey<T> key, out T value) {
 			RegistryEntry<T>? entry = keyToEntry.GetValueOrDefault(key);

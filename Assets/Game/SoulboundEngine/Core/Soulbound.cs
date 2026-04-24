@@ -18,7 +18,7 @@ using SoulboundEngine.Client.World.Serialization;
 using SoulboundEngine.Common.Json;
 using SoulboundEngine.Core.Assets;
 using SoulboundEngine.Core.Audio;
-using SoulboundEngine.Core.GameState;
+using SoulboundEngine.Core.GameStates;
 using SoulboundEngine.Core.Registry;
 using SoulboundEngine.Core.Serialization;
 using System;
@@ -96,6 +96,7 @@ namespace SoulboundEngine.Core {
 			AudioManager.RebuildPools();
 
 			Registries.Init();
+			Registries.Freeze();
 
 			GameStateManager.SetInitialized();
 		}

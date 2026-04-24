@@ -4,10 +4,12 @@ using SoulboundEngine.Client.World.EntitySystem;
 using SoulboundEngine.Client.World.EntitySystem.Attribute;
 using SoulboundEngine.Common;
 using SoulboundEngine.Core.Render.Animation;
+using System;
 
 namespace SoulboundEngine.Core.Registry {
 	public static class Registries {
 		public delegate void Initializer<T>(Registry<T> registry);
+		private static bool freezed = false;
 		public static readonly Identifier ROOT_IDENTIFIER = Identifier.Of("root");
 		public static readonly Registry<IRegistry> ROOT = new(RegistryKey<IRegistry>.OfRegistry(ROOT_IDENTIFIER));
 
@@ -45,9 +47,11 @@ namespace SoulboundEngine.Core.Registry {
 		}
 
 		private static Registry<T> Create<T>(RegistryKey<Registry<T>> key, Initializer<T> initializer) {
-			Registry<T> registry = Register(ROOT, key.value, new Registry<T>(key));
+			if (freezed) throw new InvalidOperationException("Registries already freezed");
 
+			Registry<T> registry = Register(ROOT, key.value, new Registry<T>(key));
 			initializer(registry);
+
 			return registry;
 		}
 
@@ -56,6 +60,14 @@ namespace SoulboundEngine.Core.Registry {
 			Items.Init();
 			EntityType.Init();
 			AttributeTypes.Init();
+		}
+
+		public static void Freeze() {
+			freezed = true;
+
+			foreach (var registry in ROOT) {
+				registry.Freeze();
+			}
 		}
 	}
 }
