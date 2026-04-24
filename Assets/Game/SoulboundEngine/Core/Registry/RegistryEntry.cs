@@ -1,5 +1,3 @@
-#nullable enable
-
 using System;
 
 namespace SoulboundEngine.Core.Registry {
@@ -17,13 +15,13 @@ namespace SoulboundEngine.Core.Registry {
 		public RegistryKey<T> GetKey() => key;
 		public T GetValue() => value;
 
-		public string GetIdAsString() => GetKey()?.Value.ToString() ?? "null";
+		public string GetIdAsString() => GetKey()?.value.ToString() ?? "null";
 
 		public bool MatchesId(Identifier id) {
-			return key.Value.Equals(id);
+			return key.value.Equals(id);
 		}
 		public bool MatchesKey(RegistryKey<T> key) {
-			return this.key.Value.Equals(key.Value) && this.key.Registry.Equals(key.Registry);
+			return this.key.value.Equals(key.value) && this.key.registry.Equals(key.registry);
 		}
 
 		public override int GetHashCode() => HashCode.Combine(owner, key, value);

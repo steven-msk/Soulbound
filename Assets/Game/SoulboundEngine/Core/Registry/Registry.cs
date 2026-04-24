@@ -64,7 +64,7 @@ namespace SoulboundEngine.Core.Registry {
 			if (!valueToEntry.TryGetValue(value, out RegistryEntry<T> entry)) {
 				return null;
 			}
-			return entry.GetKey().Value;
+			return entry.GetKey().value;
 		}
 
 		public HashSet<Identifier> GetIdentifiers() => idToEntry.Keys.ToHashSet();
@@ -73,12 +73,17 @@ namespace SoulboundEngine.Core.Registry {
 
 		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+		bool IRegistryEntryOwner<T>.OwnerEquals(IRegistryEntryOwner<T> other) {
+			return this == other;
+		}
+
 		private sealed class KeyComparer : IEqualityComparer<RegistryKey<T>> {
 			public bool Equals(RegistryKey<T> x, RegistryKey<T> y) {
-				return x.Value.Equals(y.Value) && x.Registry.Equals(y.Registry);
+				return x.value.Equals(y.value) && x.registry.Equals(y.registry);
 			}
 
 			public int GetHashCode(RegistryKey<T> obj) => obj.GetHashCode();
 		}
+
 	}
 }

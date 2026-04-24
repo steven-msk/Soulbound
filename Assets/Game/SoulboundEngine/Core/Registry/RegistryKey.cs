@@ -2,16 +2,13 @@ using System;
 
 namespace SoulboundEngine.Core.Registry {
 	public sealed class RegistryKey<T> {
-		private readonly Identifier registry;
-		private readonly Identifier value;
+		public Identifier registry { get; }
+		public Identifier value { get; }
 
 		private RegistryKey(Identifier registry, Identifier value) {
 			this.registry = registry;
 			this.value = value;
 		}
-
-		public Identifier Registry => registry;
-		public Identifier Value => value;
 
 		public RegistryKey<Registry<T>> GetRegistryRef() => new(registry, registry);
 

@@ -1,6 +1,6 @@
 ## Top overview:
 - a registry is used to register game objects (not to be confused with Unity Game Objects), such as blocks, items, entity types etc.
-- it maps every block to an `Identifier`, allowing enumerations on all objects of a type across entire registries
+- it maps an object to an `Identifier`, allowing enumerations on all objects of a type across entire registries
 - every registerable object must be added to a registry using an `Identifier`. A `Registry<T>` retains a `RegistryEntry<T>` instance for each object, and can be accessed through a `RegistryKey<T>` or an `Identifier`.
 - at runtime it allows objects to be retrieved dynamically by its `Identifier`, for example in command parsing and entity attributes.
 - doesnt have any dependencies as its a fundemental system

@@ -45,12 +45,11 @@ namespace SoulboundEngine.Core.Registry {
 		}
 
 		private static Registry<T> Create<T>(RegistryKey<Registry<T>> key, Initializer<T> initializer) {
-			Registry<T> registry = Register(ROOT, key.Value, new Registry<T>(key));
+			Registry<T> registry = Register(ROOT, key.value, new Registry<T>(key));
 
 			initializer(registry);
 			return registry;
 		}
-
 
 		public static void Init() {
 			Blocks.Init();

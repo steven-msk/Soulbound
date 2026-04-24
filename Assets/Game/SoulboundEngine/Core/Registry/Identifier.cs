@@ -47,10 +47,11 @@ namespace SoulboundEngine.Core.Registry {
 		}
 
 		public static bool TryFromCommandInput(IStringReader reader, out Identifier identifier) {
-			string _namespace = reader.ReadUnquotedString();
 			string path;
 
-			if (reader.CanRead() && reader.Peek() == ':') {
+			string _namespace = reader.ReadUnquotedString();
+
+			if (reader.CanRead() && reader.Peek() == NAMESPACE_SEPARATOR) {
 				reader.Skip();
 				path = reader.ReadUnquotedString();
 			} else {
