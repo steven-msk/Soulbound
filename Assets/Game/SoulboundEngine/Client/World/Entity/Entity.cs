@@ -19,25 +19,25 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 		}
 
 		public void OnAdd(Guid guid) {
-			if (IsAlive()) throw new InvalidOperationException($"Entity already added: {guid}");
+			if (this.IsAlive()) throw new InvalidOperationException($"Entity already added: {guid}");
 
 			this.guid = guid;
-			this.transform = descriptor.CreateTransform(this);
-			this.transform.SetPos(pos);
-			OnTransformCreated(this.transform);
+			this.transform = this.descriptor.CreateTransform(this);
+			this.transform.SetPos(this.pos);
+			this.OnTransformCreated(this.transform);
 		}
 
 		protected virtual void OnTransformCreated(IEntityTransform transform) {
 		}
 
 		public virtual void FrameUpdate() {
-			transform?.FrameUpdate();
+			this.transform?.FrameUpdate();
 		}
 
 		public virtual Vector2 GetPos() => pos;
 		public virtual void SetPos(Vector2 pos) {
 			this.pos = pos;
-			transform?.SetPos(pos);
+			this.transform?.SetPos(pos);
 		}
 
 		public void Dispose() {

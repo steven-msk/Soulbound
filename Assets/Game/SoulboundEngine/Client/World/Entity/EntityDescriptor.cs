@@ -31,14 +31,14 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 		}
 
 		public E Create(Level level, Vector2 pos) {
-			E entity = factory(this, level);
+			E entity = this.factory(this, level);
 			level.AddEntity(entity);
 			entity.SetPos(pos);
 			return entity;
 		}
 
 		public override IEntityTransform CreateTransform(Entity entity) {
-			IEntityTransform transform = transformSupplier.GetTransform((E)entity);
+			IEntityTransform transform = this.transformSupplier.GetTransform((E)entity);
 			transform.Bind(entity);
 			return transform;
 		}
