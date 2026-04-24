@@ -2,9 +2,9 @@ using Cysharp.Threading.Tasks;
 using SoulboundEngine.Client.ItemSystem.Render;
 using SoulboundEngine.Common;
 using SoulboundEngine.Core.Assets;
-using SoulboundEngine.Core.Registry;
 using SoulboundEngine.Core.Render.Animation;
 using SoulboundEngine.Core.Render.Sprite;
+using System;
 using UnityEngine;
 
 namespace SoulboundEngine.Client.ItemSystem {
@@ -13,11 +13,12 @@ namespace SoulboundEngine.Client.ItemSystem {
 		public override string name => $"Stack Item: {fullStackSize}";
 		public override int fullStackSize { get; }
 
+		[Obsolete]
 		public StackItem(int fullStackSize) {
 			this.fullStackSize = fullStackSize;
 
-
-			// TODO: create centralized animation registry
+			// this will not pass to alpha prod
+			// TODO: create proper animation registry
 
 			AtlasSpriteResolver spriteResolver = new();
 			AssetKey atlas = new("Items");
@@ -31,7 +32,7 @@ namespace SoulboundEngine.Client.ItemSystem {
 			UniTask.Post(async () => {
 				await UniTask.WaitForEndOfFrame();
 
-				Registries.Register<SpriteAnimation>(Registries.SPRITE_ANIMATIONS, Items.GetIdentifier(this), new SpriteAnimation(
+				SpriteAnimation.Registry.Add(Items.GetIdentifier(this), new SpriteAnimation(
 					new AnimationKey($"stack_item_animation_{fullStackSize}"),
 					frames,
 					fullStackSize,

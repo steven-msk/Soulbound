@@ -1,14 +1,12 @@
-using SoulboundEngine.Core.Registry;
 using SoulboundEngine.Core.Render.Animation;
-using System;
+using System.Collections.Generic;
 
 namespace SoulboundEngine.Client.ItemSystem.Render {
 	public sealed class ItemModelResolver {
 		public ItemRenderModel Resolve(ItemRenderData renderData) {
 			SpriteAnimation? animation = null;
 			if (renderData.spriteAnimation is { } identifier) {
-				animation = Registries.SPRITE_ANIMATIONS.GetEntry(identifier)?.GetValue()
-					?? throw new ArgumentException();
+				animation = SpriteAnimation.Registry.Get(identifier) ?? throw new KeyNotFoundException();
 			}
 
 			return new ItemRenderModel {

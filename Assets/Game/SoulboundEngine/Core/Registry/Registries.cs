@@ -2,8 +2,6 @@ using SoulboundEngine.Client.ItemSystem;
 using SoulboundEngine.Client.World.BlockSystem;
 using SoulboundEngine.Client.World.EntitySystem;
 using SoulboundEngine.Client.World.EntitySystem.Attribute;
-using SoulboundEngine.Common;
-using SoulboundEngine.Core.Render.Animation;
 using System;
 
 namespace SoulboundEngine.Core.Registry {
@@ -17,10 +15,6 @@ namespace SoulboundEngine.Core.Registry {
 		public static readonly Registry<Item> ITEMS = Create(RegistryKey<Item>.OfRegistry(Identifier.Of("item")), _ => { });
 		public static readonly Registry<EntityDescriptor> ENTITIES = Create(RegistryKey<EntityDescriptor>.OfRegistry(Identifier.Of("entity")), _ => { });
 		public static readonly Registry<EntityAttribute> ATTRIBUTES = Create(RegistryKey<EntityAttribute>.OfRegistry(Identifier.Of("attribute")), _ => { });
-
-		// placeholder; will not pass to beta prod
-		[PROTOTYPICAL]
-		public static readonly Registry<SpriteAnimation> SPRITE_ANIMATIONS = Create(RegistryKey<SpriteAnimation>.OfRegistry(Identifier.Of("sprite_animation")), _ => { });
 
 		public static T Register<T>(Registry<T> registry, string id, T entry) {
 			return Register<T, T>(registry, Identifier.Of(id), entry);

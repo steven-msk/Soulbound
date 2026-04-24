@@ -1,4 +1,7 @@
 namespace SoulboundEngine.Core.Render.Animation {
+	using SoulboundEngine.Core.Registry;
+	using System;
+	using System.Collections.Generic;
 	using Sprite = UnityEngine.Sprite;
 
 	public readonly struct SpriteAnimation : IAnimationDefinition<Sprite> {
@@ -15,5 +18,18 @@ namespace SoulboundEngine.Core.Render.Animation {
 		}
 
 		public AnimationKey GetKey() => animationKey;
+
+		[Obsolete("Will be removed before alpha prod")]
+		public static class Registry {
+			private static readonly Dictionary<Identifier, SpriteAnimation> animationsById = new();
+
+			public static void Add(Identifier id, SpriteAnimation animation) {
+				animationsById.Add(id, animation);
+			}
+
+			public static SpriteAnimation? Get(Identifier id) {
+				return animationsById.GetValueOrDefault(id);
+			}
+		}
 	}
 }
