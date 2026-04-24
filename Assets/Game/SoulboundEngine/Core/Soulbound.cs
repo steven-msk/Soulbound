@@ -34,13 +34,13 @@ namespace SoulboundEngine.Core {
 			this.config = config;
 			GameStateManager.SetBootstrapping();
 
-			debugMetricsService = new DebugMetricsService();
-			performanceMetrics = new PerformanceMetrics();
-			RegisterDebugMetricsSource(this);
+			this.debugMetricsService = new DebugMetricsService();
+			this.performanceMetrics = new PerformanceMetrics();
+			this.RegisterDebugMetricsSource(this);
 
 			AssetManager.PreloadAll();
 
-			client = new SoulboundClient(config, new ClientInit {
+			this.client = new SoulboundClient(config, new ClientInit {
 				debugMetricsService = this.debugMetricsService
 			});
 
@@ -51,7 +51,7 @@ namespace SoulboundEngine.Core {
 		}
 
 		public void Launch() {
-			if (running) return;
+			if (this.running) return;
 			GameStateManager.SetLaunching();
 
 			try {
@@ -62,53 +62,53 @@ namespace SoulboundEngine.Core {
 			Application.quitting += ((IApplicationController)this).OnApplicationQuit;
 
 			UniTask.Post(async () => {
-				client.Start();
+				this.client.Start();
 
-				while (running) {
+				while (this.running) {
 					await UniTask.NextFrame();
-					Update();
+					this.Update();
 				}
 			});
 
-			running = true;
+			this.running = true;
 			GameStateManager.SetRunning();
 		}
 
 		public void Update() {
-			performanceMetrics.Tick();
-			client.Update();
+			this.performanceMetrics.Tick();
+			this.client.Update();
 		}
 
 		void IApplicationController.OnApplicationQuit() {
 			GameStateManager.SetShutdown();
 
-			client.Shutdown();
+			this.client.Shutdown();
 			AssetManager.Shutdown();
 
 			GameStateManager.SetTerminated();
 		}
 
 		public void RegisterDebugMetricsSource(IDebugMetricsSource source) {
-			debugMetricsService.RegisterSource(source);
+			this.debugMetricsService.RegisterSource(source);
 		}
 		public void UnregisterDebugMetricsSource(IDebugMetricsSource source) {
-			debugMetricsService.UnregisterSource(source);
+			this.debugMetricsService.UnregisterSource(source);
 		}
 
 		void IDebugMetricsSource.CollectDebugData(ref DebugMetricsBuilder builder) {
-			builder.Add("fps", performanceMetrics.InstantFps);
-			builder.Add("frameTime", performanceMetrics.FrameTime);
-			builder.Add("fixedUpdateTime", performanceMetrics.FixedUpdateTime);
-			builder.Add("totalManagedMemory", performanceMetrics.TotalManagedMemoryMB);
-			builder.Add("totalUnityReservedMemory", performanceMetrics.TotalUnityReservedMemoryMB);
-			builder.Add("monoHeap", performanceMetrics.MonoHeapMB);
-			builder.Add("monoUsed", performanceMetrics.MonoUsedMB);
-			builder.Add("gpuManagedMemory", performanceMetrics.GPUManagedMemoryMB);
-			builder.Add("gpuReservedMemory", performanceMetrics.GPUReservedMemoryMB);
-			builder.Add("gcAlloc", performanceMetrics.GcAllocBytesThisFrame);
+			builder.Add("fps", this.performanceMetrics.InstantFps);
+			builder.Add("frameTime", this.performanceMetrics.FrameTime);
+			builder.Add("fixedUpdateTime", this.performanceMetrics.FixedUpdateTime);
+			builder.Add("totalManagedMemory", this.performanceMetrics.TotalManagedMemoryMB);
+			builder.Add("totalUnityReservedMemory", this.performanceMetrics.TotalUnityReservedMemoryMB);
+			builder.Add("monoHeap", this.performanceMetrics.MonoHeapMB);
+			builder.Add("monoUsed", this.performanceMetrics.MonoUsedMB);
+			builder.Add("gpuManagedMemory", this.performanceMetrics.GPUManagedMemoryMB);
+			builder.Add("gpuReservedMemory", this.performanceMetrics.GPUReservedMemoryMB);
+			builder.Add("gcAlloc", this.performanceMetrics.GcAllocBytesThisFrame);
 		}
 
-		public PerformanceMetrics GetPerformanceMetrics() => performanceMetrics;
+		public PerformanceMetrics GetPerformanceMetrics() => this.performanceMetrics;
 
 		public static Soulbound Instance => instance;
 	}

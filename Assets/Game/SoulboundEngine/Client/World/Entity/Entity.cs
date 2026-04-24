@@ -41,15 +41,15 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 		}
 
 		public void Dispose() {
-			OnDisposed();
-			transform?.Destroy();
+			this.OnDisposed();
+			this.transform?.Destroy();
 		}
 
-		public bool IsAlive() => transform != null;
+		public bool IsAlive() => this.transform != null;
 
 		protected virtual void OnDisposed() {
 		}
 
-		public EntityDescriptor GetDescriptor() => descriptor;
+		public EntityDescriptor GetDescriptor() => this.descriptor;
 	}
 }

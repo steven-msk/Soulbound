@@ -44,7 +44,7 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 		}
 
 		public override Entity CreateBoxed(Level level, Vector2 pos) {
-			return Create(level, pos);
+			return this.Create(level, pos);
 		}
 
 		public override string ToString() => GetIdentifier(this).ToString();
