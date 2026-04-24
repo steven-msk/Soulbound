@@ -16,11 +16,11 @@ namespace SoulboundEngine.Core.Render.Animation {
 			Stop();
 
 			float interval = 1f / animation.framerate;
-			tween = Tween.Custom(
+			tween = Tween.Custom(spriteTarget,
 				startValue: 0,
 				endValue: animation.frameArray.Length,
 				duration: animation.frameArray.Length * interval,
-				onValueChange: t => {
+				onValueChange: (spriteTarget, t) => {
 					int index = (int)t;
 					index = Mathf.Clamp(index, 0, animation.frameArray.Length - 1);
 
