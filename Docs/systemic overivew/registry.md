@@ -6,7 +6,7 @@
 - doesnt have any dependencies as its a fundemental system
 - may be extended to support tags, which would be used to target multiple registered objects on top of a registry.
 - known weaknesses: 
-    - registry lookups are slightly underdeveloped
+    - *(fixed)* registry lookups are slightly underdeveloped
     - possible inconsistency with registries being mutable after bootstrap
 
 ## Terminologies
@@ -31,7 +31,7 @@
 - registered objects can be retrieved from each registry using `Get<T>(Identifier)` or `Get<T>(RegistryKey<T>)`. `RegistryEntry<T>` can also be retrieved in the same way: `GetEntry<T>(Identifier)` or `GetEntry<T>(RegistryKey<T>)`
 
 ## Known issues
-- registry lookups might be slightly underdeveloped. `Registry<T>` implements `IEnumerable<T>` which allows enumerations over all registered objects, but theres no way to get all identifiers from a registry.
+- *(fixed)* registry lookups might be slightly underdeveloped. `Registry<T>` implements `IEnumerable<T>` which allows enumerations over all registered objects, but theres no way to get all identifiers from a registry.
 - possible inconsistency with registry mutability after bootstrap. By the time all registering has finished, every object should have at least one use somewhere, whether its in frontend or backend. If an object is registered after bootstrap, states are very likely to break and incorrect results may appear. Consider making registries immutable after bootstrap, possibly by "freezing" them. **This must be fixed before prod.**
 
 ## Extension: Tags (planned)

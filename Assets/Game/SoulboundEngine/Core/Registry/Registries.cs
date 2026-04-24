@@ -16,7 +16,7 @@ namespace SoulboundEngine.Core.Registry {
 		public static readonly Registry<EntityDescriptor> ENTITIES = Create(RegistryKey<EntityDescriptor>.OfRegistry(Identifier.Of("entity")), _ => { });
 		public static readonly Registry<EntityAttribute> ATTRIBUTES = Create(RegistryKey<EntityAttribute>.OfRegistry(Identifier.Of("attribute")), _ => { });
 
-		// placeholder
+		// placeholder; will not pass to beta prod
 		[PROTOTYPICAL]
 		public static readonly Registry<SpriteAnimation> SPRITE_ANIMATIONS = Create(RegistryKey<SpriteAnimation>.OfRegistry(Identifier.Of("sprite_animation")), _ => { });
 

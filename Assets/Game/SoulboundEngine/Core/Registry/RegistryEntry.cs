@@ -25,5 +25,9 @@ namespace SoulboundEngine.Core.Registry {
 		}
 
 		public override int GetHashCode() => HashCode.Combine(owner, key, value);
+
+		public override string ToString() {
+			return $"registry_entry[key: {key}, value: {value}]";
+		}
 	}
 }

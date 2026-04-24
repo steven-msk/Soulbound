@@ -6,7 +6,7 @@ using System.Linq;
 #nullable enable
 
 namespace SoulboundEngine.Core.Registry {
-	public sealed class Registry<T> : IRegistry, IRegistryEntryOwner<T>, IEnumerable<T> {
+	public sealed class Registry<T> : IRegistry, IRegistryEntryOwner<T>, IRegistryEntryLookup<T>, IEnumerable<T> {
 		private readonly Dictionary<Identifier, RegistryEntry<T>> idToEntry = new();
 		private readonly Dictionary<RegistryKey<T>, RegistryEntry<T>> keyToEntry = new(new KeyComparer());
 		private readonly Dictionary<T, RegistryEntry<T>> valueToEntry = new();
@@ -28,13 +28,6 @@ namespace SoulboundEngine.Core.Registry {
 		public bool Contains(RegistryKey<T> key) => keyToEntry.ContainsKey(key);
 		public bool ContainsId(Identifier id) => idToEntry.ContainsKey(id);
 
-		public T Get(RegistryKey<T> key) {
-			if (key is null) throw new ArgumentNullException();
-
-			RegistryEntry<T> entry = keyToEntry.GetValueOrDefault(key) ?? throw new KeyNotFoundException();
-			return entry.GetValue();
-		}
-
 		public bool TryGet(RegistryKey<T> key, out T value) {
 			RegistryEntry<T>? entry = keyToEntry.GetValueOrDefault(key);
 			value = entry != null ? entry.GetValue() : default;
@@ -51,6 +44,8 @@ namespace SoulboundEngine.Core.Registry {
 		public RegistryEntry<T>? GetEntry(Identifier id) => idToEntry.GetValueOrDefault(id);
 
 		public RegistryEntry<T>? GetEntry(T value) => valueToEntry.GetValueOrDefault(value);
+
+		public RegistryEntry<T>? Get(RegistryKey<T> key) => keyToEntry.GetValueOrDefault(key);
 
 		public HashSet<KeyValuePair<RegistryKey<T>, T>> GetEntrySet() {
 			return keyToEntry

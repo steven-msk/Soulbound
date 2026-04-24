@@ -10,8 +10,6 @@ namespace SoulboundEngine.Core.Registry {
 			this.value = value;
 		}
 
-		public RegistryKey<Registry<T>> GetRegistryRef() => new(registry, registry);
-
 		public static RegistryKey<T> Of(RegistryKey<Registry<T>> registry, Identifier value) {
 			return Of(registry.value, value);
 		}
@@ -20,6 +18,8 @@ namespace SoulboundEngine.Core.Registry {
 			return new RegistryKey<T>(registry, value);
 		}
 
+		public RegistryKey<Registry<T>> GetRegistryRef() => OfRegistry(registry);
+
 		public static RegistryKey<Registry<T>> OfRegistry(Identifier registry) {
 			return new(Registries.ROOT_IDENTIFIER, registry);
 		}
@@ -27,7 +27,7 @@ namespace SoulboundEngine.Core.Registry {
 		public override int GetHashCode() => HashCode.Combine(registry, value);
 
 		public override string ToString() {
-			return $"registry_key[registry:\"{registry}\", id:\"{value}\"]";
+			return $"registry_key[registry:\"{GetRegistryRef()}\", id:\"{value}\"]";
 		}
 	}
 }
