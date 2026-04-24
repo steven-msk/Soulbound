@@ -1,20 +1,86 @@
+using SoulboundEngine.Client.World.EntitySystem.Transform;
+using SoulboundEngine.Common.Unity;
+using SoulboundEngine.Core;
+using SoulboundEngine.Core.Assets;
 using SoulboundEngine.Core.Registry;
+using UnityEngine;
 
 #nullable enable
 
 namespace SoulboundEngine.Client.World.EntitySystem {
 	public static class EntityType {
-		public static readonly EntityDescriptor<MovingEntity> MOVING_ENTITY = Register<MovingEntity>("moving_entity", (_, level) => new MovingEntity(level));
-		public static readonly EntityDescriptor<StaticEntity> STATIC_ENTITY = Register<StaticEntity>("static_entity", (_, level) => new StaticEntity(level));
-		public static readonly EntityDescriptor<PhysicsEntity> PHYSICS_ENTITY = Register<PhysicsEntity>("physics_entity", (_, level) => new PhysicsEntity(level));
-		public static readonly EntityDescriptor<AreaTriggerEntity> AREA_TRIGGER_ENTITY = Register<AreaTriggerEntity>("area_trigger_entity", (_, level) => new AreaTriggerEntity(level));
+
+		// TODO: move out transform supplier logic into Unity adapters layer
+
+		public static readonly EntityDescriptor<MovingEntity> MOVING_ENTITY = Register(
+			"moving_entity",
+			(descriptor, level) => new MovingEntity(descriptor, level),
+			ITransformSupplier<MovingEntity>.Of(entity => {
+				GameObject obj = new("Static Entity", typeof(StaticTransform));
+
+				Sprite sprite = AssetManager.Resolve<Sprite>(new AssetKey("WhiteSquare"));
+				obj.AddComponent<SpriteRenderer>().sprite = sprite;
+
+				return obj.GetComponent<StaticTransform>();
+			})
+		);
+		public static readonly EntityDescriptor<StaticEntity> STATIC_ENTITY = Register(
+			"static_entity",
+			(descriptor, level) => new StaticEntity(descriptor, level),
+			ITransformSupplier<StaticEntity>.Of(entity => {
+				GameObject obj = new("Static Entity", typeof(StaticTransform));
+
+				Sprite sprite = AssetManager.Resolve<Sprite>(new AssetKey("WhiteSquare"));
+				obj.AddComponent<SpriteRenderer>().sprite = sprite;
+
+				return obj.GetComponent<StaticTransform>();
+			})
+		);
+		public static readonly EntityDescriptor<PhysicsEntity> PHYSICS_ENTITY = Register(
+			"physics_entity",
+			(descriptor, level) => new PhysicsEntity(descriptor, level),
+			ITransformSupplier<PhysicsEntity>.Of(entity => {
+				GameObject obj = new("Physics Entity", typeof(PhysicsTransform));
+
+				Sprite sprite = AssetManager.Resolve<Sprite>(new AssetKey("WhiteSquare"));
+				SpriteRenderer spriteRenderer = obj.AddComponent<SpriteRenderer>();
+				spriteRenderer.sprite = sprite;
+				spriteRenderer.color = entity.GetSpriteColor();
+
+				obj.GetComponent<Rigidbody2D>().collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+				obj.AddComponent<BoxCollider2D>();
+
+				PhysicsTransform transform = obj.GetComponent<PhysicsTransform>();
+				transform.SetCollisionHandler(entity);
+
+				return transform;
+			})
+		);
+		public static readonly EntityDescriptor<AreaTriggerEntity> AREA_TRIGGER_ENTITY = Register(
+			"area_trigger_entity",
+			(descriptor, level) => new AreaTriggerEntity(descriptor, level),
+			ITransformSupplier<AreaTriggerEntity>.Of(entity => {
+				GameObject obj = new("Area Trigger Entity");
+
+				BoxCollider2D collider = obj.AddComponent<BoxCollider2D>();
+				collider.size = new Vector2(4f, 0.15f);
+				collider.isTrigger = true;
+				collider.excludeLayers = ~LayerMask.GetMask(Layers.EntityCharacter);
+
+				TriggerCollisionListener triggerListener = obj.AddComponent<TriggerCollisionListener>();
+				triggerListener.onTriggerEnter += entity.OnAreaEnter;
+				triggerListener.onTriggerExit += entity.OnAreaExit;
+
+				return obj.AddComponent<StaticTransform>();
+			})
+		);
 
 		private static EntityDescriptor<E> Register<E>(string id, EntityDescriptor<E> descriptor) where E : Entity {
 			return Registries.Register(Registries.ENTITIES, Identifier.Of(id), descriptor);
 		}
 
-		private static EntityDescriptor<E> Register<E>(string id, EntityDescriptor<E>.EntityFactory factory) where E : Entity {
-			return Register(id, EntityDescriptor.Of(factory));
+		private static EntityDescriptor<E> Register<E>(string id, EntityDescriptor<E>.EntityFactory factory, ITransformSupplier<E> transformSupplier) where E : Entity {
+			return Register(id, EntityDescriptor.Of(factory,transformSupplier));
 		}
 
 		public static void Init() { }

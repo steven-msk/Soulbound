@@ -229,7 +229,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 
 		public void AddEntity(Entity entity) {
 			Guid guid = Guid.NewGuid();
-			entity.CreateTransform(guid);
+			entity.OnAdd(guid);
 			entities[guid] = entity;
 
 			if (entity is ITickingEntity ticking) {

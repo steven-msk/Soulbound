@@ -10,7 +10,6 @@ using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Common;
 using SoulboundEngine.Core.Assets;
 using SoulboundEngine.Core.Event;
-using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -18,8 +17,14 @@ using UnityEngine.InputSystem;
 
 namespace SoulboundEngine.Client.Players {
 	public class Player : Entity, IInputContext, IInteractionHandler<ItemInteraction>, IInteractionHandler<BlockInteraction> {
-		public static readonly EntityDescriptor<Player> DESCRIPTOR = EntityDescriptor.Of<Player>((_, level) => new Player(level));
-		private static readonly AssetKey playerKey = new("player");
+		public static readonly EntityDescriptor<Player> DESCRIPTOR = EntityDescriptor.Of(
+			(_, level) => new Player(level),
+			ITransformSupplier<Player>.Of(entity => {
+				GameObject obj = GameObject.Instantiate(AssetManager.Resolve<GameObject>(new AssetKey("player")));
+				PlayerTransform transform = obj.GetComponent<PlayerTransform>();
+				return transform;
+			})
+		);
 		private readonly Inventory inventory;
 		private readonly Hotbar hotbar;
 		private ITransitStackSource tranistStackSource = null!;
@@ -48,11 +53,8 @@ namespace SoulboundEngine.Client.Players {
 			interactionResolver.RegisterHandler<BlockInteraction>(this);
 		}
 
-		[Obsolete("Leaking Unity code in potential headless simulation code")]
-		protected override IEntityTransform CreateTransform() {
-			GameObject obj = GameObject.Instantiate(AssetManager.Resolve<GameObject>(playerKey));
-			playerTransform = obj.GetComponent<PlayerTransform>();
-			return playerTransform;
+		protected override void OnTransformCreated(IEntityTransform transform) {
+			this.playerTransform = (PlayerTransform)transform;
 		}
 
 		[PROTOTYPICAL]

@@ -7,7 +7,6 @@ using SoulboundEngine.Client.World.BlockSystem.Render;
 using SoulboundEngine.Client.World.Generation;
 using SoulboundEngine.Client.World.Render;
 using SoulboundEngine.Common;
-using SoulboundEngine.Core.Assets;
 using System;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -143,19 +142,5 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 		public Level GetLevel() => level;
 	}
 
-	public record LevelGridContext(Grid grid, Tilemap tilemap) {
-		public static LevelGridContext FromRuntimePrefabs() {
-			var gridPrefab = AssetManager.Resolve<GameObject>(new AssetKey("Grid"));
-			var tilemapPrefab = AssetManager.Resolve<GameObject>(new AssetKey("Tilemap"));
-
-			var gridObj = GameObject.Instantiate(gridPrefab);
-			var tilemapObj = GameObject.Instantiate(tilemapPrefab, gridObj.transform);
-			tilemapObj.transform.SetParent(gridObj.transform);
-
-			return new LevelGridContext(
-				gridObj.GetComponent<Grid>(),
-				tilemapObj.GetComponent<Tilemap>()
-			);
-		}
-	}
+	public record LevelGridContext(Grid grid, Tilemap tilemap);
 }

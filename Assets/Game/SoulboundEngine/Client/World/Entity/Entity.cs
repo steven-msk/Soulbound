@@ -18,15 +18,17 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 			this.level = level;
 		}
 
-		public void CreateTransform(Guid guid) {
-			this.guid = guid;
+		public void OnAdd(Guid guid) {
+			if (IsAlive()) throw new InvalidOperationException($"Entity already added: {guid}");
 
-			transform = CreateTransform();
-			transform.Bind(this);
-			transform.SetPos(pos);
+			this.guid = guid;
+			this.transform = descriptor.CreateTransform(this);
+			this.transform.SetPos(pos);
+			OnTransformCreated(this.transform);
 		}
 
-		protected abstract IEntityTransform CreateTransform();
+		protected virtual void OnTransformCreated(IEntityTransform transform) {
+		}
 
 		public virtual void FrameUpdate() {
 			transform?.FrameUpdate();
