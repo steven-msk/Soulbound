@@ -6,15 +6,14 @@ using System;
 
 namespace SoulboundEngine.Core.Registry {
 	public static class Registries {
-		public delegate void Initializer<T>(Registry<T> registry);
 		private static bool freezed = false;
 		public static readonly Identifier ROOT_IDENTIFIER = Identifier.Of("root");
-		public static readonly Registry<IRegistry> ROOT = new(RegistryKey<IRegistry>.OfRegistry(ROOT_IDENTIFIER));
+		public static readonly Registry<IRegistry> ROOT = CreateRoot(ROOT_IDENTIFIER);
 
-		public static readonly Registry<Block> BLOCKS = Create(RegistryKey<Block>.OfRegistry(Identifier.Of("block")), _ => { });
-		public static readonly Registry<Item> ITEMS = Create(RegistryKey<Item>.OfRegistry(Identifier.Of("item")), _ => { });
-		public static readonly Registry<EntityDescriptor> ENTITIES = Create(RegistryKey<EntityDescriptor>.OfRegistry(Identifier.Of("entity")), _ => { });
-		public static readonly Registry<EntityAttribute> ATTRIBUTES = Create(RegistryKey<EntityAttribute>.OfRegistry(Identifier.Of("attribute")), _ => { });
+		public static readonly Registry<Block> BLOCKS = Create(RegistryKey<Block>.OfRegistry(Identifier.Of("block")));
+		public static readonly Registry<Item> ITEMS = Create(RegistryKey<Item>.OfRegistry(Identifier.Of("item")));
+		public static readonly Registry<EntityDescriptor> ENTITIES = Create(RegistryKey<EntityDescriptor>.OfRegistry(Identifier.Of("entity")));
+		public static readonly Registry<EntityAttribute> ATTRIBUTES = Create(RegistryKey<EntityAttribute>.OfRegistry(Identifier.Of("attribute")));
 
 		public static T Register<T>(Registry<T> registry, string id, T entry) {
 			return Register<T, T>(registry, Identifier.Of(id), entry);
@@ -40,13 +39,16 @@ namespace SoulboundEngine.Core.Registry {
 			return registry.CreateEntry(id, entry);
 		}
 
-		private static Registry<T> Create<T>(RegistryKey<Registry<T>> key, Initializer<T> initializer) {
+		private static Registry<T> Create<T>(RegistryKey<Registry<T>> key) {
 			if (freezed) throw new InvalidOperationException("Registries already freezed");
 
 			Registry<T> registry = Register(ROOT, key.value, new Registry<T>(key));
-			initializer(registry);
 
 			return registry;
+		}
+
+		private static Registry<IRegistry> CreateRoot(Identifier identifier) {
+			return new Registry<IRegistry>(RegistryKey<IRegistry>.OfRegistry(identifier));
 		}
 
 		public static void Init() {
