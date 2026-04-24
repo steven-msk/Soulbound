@@ -18,6 +18,7 @@ using SoulboundEngine.Client.World.Serialization;
 using SoulboundEngine.Common.Json;
 using SoulboundEngine.Core.Assets;
 using SoulboundEngine.Core.Audio;
+using SoulboundEngine.Core.GameState;
 using SoulboundEngine.Core.Registry;
 using SoulboundEngine.Core.Serialization;
 using System;
@@ -63,6 +64,7 @@ namespace SoulboundEngine.Core {
 		public Soulbound(GameConfig config) {
 			instance = this;
 			this.config = config;
+			GameStateManager.SetBootstrapping();
 
 			inputManager = new InputManager(inputActions.asset);
 			InputTokens.Register(inputActions.asset);
@@ -94,11 +96,13 @@ namespace SoulboundEngine.Core {
 			AudioManager.RebuildPools();
 
 			Registries.Init();
+
+			GameStateManager.SetInitialized();
 		}
 
 		public void Launch() {
 			if (running) return;
-			running = true;
+			GameStateManager.SetLaunching();
 
 			try {
 				Thread.CurrentThread.Name = "LaunchThread";
@@ -108,6 +112,9 @@ namespace SoulboundEngine.Core {
 			Application.quitting += ((IApplicationController)this).OnApplicationQuit;
 
 			uiHandler.SetScreen(new TitleScreen());
+
+			running = true;
+			GameStateManager.SetRunning();
 		}
 
 		public void FrameTick() {
@@ -178,10 +185,14 @@ namespace SoulboundEngine.Core {
 		}
 
 		void IApplicationController.OnApplicationQuit() {
+			GameStateManager.SetShutdown();
+
 			activeWorldSession?.levelManager.StopSession();
 			settings.Save();
 			inputActions.Dispose();
 			AssetManager.Shutdown();
+
+			GameStateManager.SetTerminated();
 		}
 
 		private IWorldSaveStrategy GetWorldSaveStrategy() {
