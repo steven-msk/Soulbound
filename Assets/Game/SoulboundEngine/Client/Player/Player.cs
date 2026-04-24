@@ -18,8 +18,8 @@ using UnityEngine.InputSystem;
 
 namespace SoulboundEngine.Client.Players {
 	public class Player : Entity, IInputContext, IInteractionHandler<ItemInteraction>, IInteractionHandler<BlockInteraction> {
+		public static readonly EntityDescriptor<Player> DESCRIPTOR = EntityDescriptor.Of<Player>((_, level) => new Player(level));
 		private static readonly AssetKey playerKey = new("player");
-		private static readonly EntityDescriptor DESCRIPTOR = new((_, _) => throw new InvalidOperationException("Cannot create new player from factory"));
 		private readonly Inventory inventory;
 		private readonly Hotbar hotbar;
 		private ITransitStackSource tranistStackSource = null!;

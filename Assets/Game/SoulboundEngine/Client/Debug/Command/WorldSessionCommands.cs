@@ -79,7 +79,6 @@ namespace SoulboundEngine.Client.Debug.Commands {
 					Coordinate x = ctx.GetArgument<Coordinate>("x");
 					Coordinate y = ctx.GetArgument<Coordinate>("y");
 				}
-
 				ctx.Source.execServices.Level.SpawnEntity(entityDescriptor, pos);
 				return 1;
 			}

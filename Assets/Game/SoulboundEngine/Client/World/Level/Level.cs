@@ -248,8 +248,12 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 			}
 		}
 
-		public void SpawnEntity(EntityDescriptor descriptor, Vector2 pos) {
+		public void SpawnEntity<E>(EntityDescriptor<E> descriptor, Vector2 pos) where E : Entity {
 			descriptor.Create(this, pos);
+		}
+
+		void ILevelExecutionService.SpawnEntity(EntityDescriptor descriptor, Vector2 pos) {
+			descriptor.CreateBoxed(this, pos);
 		}
 
 		public bool TryGetEntity(Guid guid, out Entity entity) {

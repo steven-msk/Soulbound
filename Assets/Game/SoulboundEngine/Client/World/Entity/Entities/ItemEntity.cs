@@ -11,7 +11,10 @@ using UnityEngine;
 
 namespace SoulboundEngine.Client.World.EntitySystem {
 	public class ItemEntity : Entity {
-		private static readonly EntityDescriptor DESCRIPTOR = new((_, _) => throw new InvalidOperationException("Creating ItemEntity from factory is not supported"));
+
+		// TODO: add AIR Item
+		public static readonly EntityDescriptor<ItemEntity> DESCRIPTOR = EntityDescriptor.Of<ItemEntity>((_, level) => new ItemEntity(null, level));
+
 		private static readonly Vector3 TRANSFORM_SCALE = new(2.5f, 2.5f, 2.5f);
 
 		private readonly Entity? owner;
@@ -28,7 +31,7 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 		public ItemEntity(Entity? owner, float pickupDelaySec, ItemStack itemStack, Level level)
 			: base(DESCRIPTOR, level) {
 			this.itemStack = itemStack;
-			this.owner= owner;
+			this.owner = owner;
 			this.pickupDelaySec = pickupDelaySec;
 		}
 
