@@ -101,11 +101,11 @@ namespace SoulboundEngine.Client {
 		}
 
 		public void EnterWorld(string world) {
-			if (IsWorldSessionActive())
+			if (IsWorldSessionActive()) return;
 
-				if (!worldManager.ListSaves().Any(s => s == world) && !config.dev.useDoNotSaveWorldStrategy) {
-					throw new ArgumentException($"World not found: '{world}'");
-				}
+			if (!worldManager.ListSaves().Any(s => s == world) && !config.dev.useDoNotSaveWorldStrategy) {
+				throw new ArgumentException($"World not found: '{world}'");
+			}
 
 			uiHandler.FlushScreens();
 

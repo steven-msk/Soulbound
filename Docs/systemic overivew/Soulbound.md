@@ -21,10 +21,10 @@
 - there is no concrete order of initialization. Everything that is currently being initialized is done in a "first in, first served" manner (except for systems that explicitly depend on other systems, in which case the initialization order follows what system has which dependency)
 - poor dependency graph initialization and object authority (client-specific objects are leaked from bootstrap)
     - consider introducing either a topological initialization graph or a staged initialization phase
-- lifecycle hooks are poorly implemented (the current `SoulboundUpdateScheduler` being managed exclusively by Unity and injects updates directly in `Soulbound` without any contract), Unity lifecycle hooks are disregarded
-- no explicit game phases
-- `Launch` has no authority over the (nonexistent) game launch phase. Currently it only locks the running state, sets the name of the current thread to LaunchThread, adds a hook to Application.quitting event, and sets the screen to the title screen.
-- client features leak in engine context. `EnterWorld(string)` and `QuitActiveWorld` are defined within `Soulbound`, but these should be client-specific methods.
+- *(partially fixed)* lifecycle hooks are poorly implemented (the current `SoulboundUpdateScheduler` being managed exclusively by Unity and injects updates directly in `Soulbound` without any contract), Unity lifecycle hooks are disregarded
+- *(fixed)* no explicit game phases
+- *(partially fixed)* `Launch` has no authority over the (nonexistent) game launch phase. Currently it only locks the running state, sets the name of the current thread to LaunchThread, adds a hook to Application.quitting event, and sets the screen to the title screen.
+- *(fixed)* client features leak in engine context. `EnterWorld(string)` and `QuitActiveWorld` are defined within `Soulbound`, but these should be client-specific methods.
 - **missing threaded execution concerns - this will be heavy on prod**
 
 ## Engine and prod considerations

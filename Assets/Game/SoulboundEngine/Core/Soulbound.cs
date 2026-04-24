@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using SoulboundEngine.Client;
 using SoulboundEngine.Client.Debug.Metrics;
@@ -60,7 +61,14 @@ namespace SoulboundEngine.Core {
 
 			Application.quitting += ((IApplicationController)this).OnApplicationQuit;
 
-			client.Start();
+			UniTask.Post(async () => {
+				client.Start();
+
+				while (running) {
+					await UniTask.NextFrame();
+					Update();
+				}
+			});
 
 			running = true;
 			GameStateManager.SetRunning();
