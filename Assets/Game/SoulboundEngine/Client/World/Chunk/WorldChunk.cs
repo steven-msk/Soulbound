@@ -30,18 +30,18 @@ namespace SoulboundEngine.Client.World.Chunk {
 		private readonly TileEntityTickManager tickManager = new();
 		private readonly Level level;
 		private readonly int cx;
-		public int xpos => cx;
+		public int xpos => this.cx;
 
 		public WorldChunk(Level level, int cx) { 
 			this.level = level;
 			this.cx = cx;
 
 			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
-				blockStateIDs[x] = new int[Level.WORLD_HEIGHT];
+				this.blockStateIDs[x] = new int[Level.WORLD_HEIGHT];
 			}
 		}
 
-		public void Tick() => tickManager.Tick();
+		public void Tick() => this.tickManager.Tick();
 
 		[Obsolete("known issue: world architecture design is poorly designed")]
 		public void Generate(BiomeMap biomeMap, Heightmap heightmap, Cavemap cavemap, out ChunkGenData genData) {
@@ -59,13 +59,13 @@ namespace SoulboundEngine.Client.World.Chunk {
 				genData.caveDensities[cx] = new float[Level.WORLD_HEIGHT];
 				genData.caveMask[cx] = new BitArray(Level.WORLD_HEIGHT);
 				genData.genContexts[cx] = new BlockGenContext[Level.WORLD_HEIGHT];
-				int x = ChunkXToWorldX(cx);
+				int x = this.ChunkXToWorldX(cx);
 
 				var weights = biomeMap.ResolveWeights(x);
 				biomeMap.ResolvePrimaryBiomes(weights, out var primary, out var secondary);
 				genData.biomeWeights[cx] = weights;
 
-				var partition = ProcessBiomePartition(x, primary.biome, genData.biomePartition);
+				var partition = this.ProcessBiomePartition(x, primary.biome, genData.biomePartition);
 				genData.biomePartition = partition;
 
 				int height = Mathf.FloorToInt(heightmap.SampleHeight(x, primary, secondary));
@@ -91,7 +91,7 @@ namespace SoulboundEngine.Client.World.Chunk {
 					genData.surfacePoints[cx] = ctx.surfaceY;
 
 					BlockState blockState = blockResolver.ResolveBlock(ctx);
-					SetBlock(cx, y, blockState);
+					this.SetBlock(cx, y, blockState);
 				}
 			}
 
@@ -116,8 +116,8 @@ namespace SoulboundEngine.Client.World.Chunk {
 			IBiome? secondary = genData.biomePartition.secondary;
 
 			int splitX = genData.biomePartition.splitX;
-			int chunkStartX = ChunkXToWorldX(0);
-			int chunkEndX = ChunkXToWorldX(Level.CHUNK_LENGTH - 1);
+			int chunkStartX = this.ChunkXToWorldX(0);
+			int chunkEndX = this.ChunkXToWorldX(Level.CHUNK_LENGTH - 1);
 
 			int partitionStartX = chunkStartX;
 			int partitionLimitX = secondary == null ? chunkEndX : splitX;
@@ -135,9 +135,9 @@ namespace SoulboundEngine.Client.World.Chunk {
 
 		public static int IndexToWorldY(int yIndex) => yIndex + minY;
 
-		public int WorldXToChunkX(int x) => x - xpos * Level.CHUNK_LENGTH;
+		public int WorldXToChunkX(int x) => x - this.xpos * Level.CHUNK_LENGTH;
 
-		public int ChunkXToWorldX(int cx) => cx + xpos * Level.CHUNK_LENGTH;
+		public int ChunkXToWorldX(int cx) => cx + this.xpos * Level.CHUNK_LENGTH;
 
 		public void OnLoad(ChunkOutlineRenderer outlineRenderer) {
 			outlineRenderer.ShowOutline(this);
@@ -149,35 +149,35 @@ namespace SoulboundEngine.Client.World.Chunk {
 
 
 		public void SetBlockState(BlockPos blockPos, BlockState? blockState) {
-			blockState ??= Blocks.air.defaultState;
+			blockState ??= Blocks.air.DefaultState;
 
 			ChunkBlockPos chunkPos = blockPos.ToChunkPos();
 			int yIndex = WorldYToIndex(chunkPos.y);
-			BlockState oldState = GetBlockState(chunkPos) ?? Blocks.air.defaultState;
+			BlockState oldState = this.GetBlockState(chunkPos) ?? Blocks.air.DefaultState;
 			Block oldBlock = oldState.block;
 			Block newBlock = blockState.block;
 
-			blockStateIDs[chunkPos.x][yIndex] = blockState.stateID;
+			this.blockStateIDs[chunkPos.x][yIndex] = Block.GetRawID(blockState);
 
 			// tile entities only change when blocks differ in type
 			// however some blocks may handle tile entity persistence differently
 			// when oldBlock and newBlock are the same
 			if (newBlock != oldBlock) {
-				bool oldHasTileEntity = oldBlock.HasTileEntity(level, blockPos, oldState);
-				bool newHasTileEntity = blockState.block.HasTileEntity(level, blockPos, blockState);
+				bool oldHasTileEntity = oldBlock.HasTileEntity(this.level, blockPos, oldState);
+				bool newHasTileEntity = blockState.block.HasTileEntity(this.level, blockPos, blockState);
 
-				if (oldHasTileEntity && tileEntities.ContainsKey(blockPos)) {
-					TileEntity tileEntity = tileEntities[blockPos];
+				if (oldHasTileEntity && this.tileEntities.ContainsKey(blockPos)) {
+					TileEntity tileEntity = this.tileEntities[blockPos];
 
-					tickManager.RemoveTileEntity(tileEntity);
-					tileEntities.Remove(blockPos);
+					this.tickManager.RemoveTileEntity(tileEntity);
+					this.tileEntities.Remove(blockPos);
 					tileEntity.OnDispose();
 				}
 				if (newHasTileEntity) {
-					TileEntity tileEntity = newBlock.GetTileEntity(level, blockPos);
+					TileEntity tileEntity = newBlock.GetTileEntity(this.level, blockPos);
 
-					tileEntities[blockPos] = tileEntity;
-					tickManager.AddTileEntity(tileEntity);
+					this.tileEntities[blockPos] = tileEntity;
+					this.tickManager.AddTileEntity(tileEntity);
 				}
 			}
 		}
@@ -189,18 +189,18 @@ namespace SoulboundEngine.Client.World.Chunk {
 		}
 		[Obsolete]
 		public void SetBlock(int cx, int yIndex, BlockState blockState) {
-			SetBlockState(new BlockPos(ChunkXToWorldX(cx), IndexToWorldY(yIndex)), blockState);
+			this.SetBlockState(new BlockPos(this.ChunkXToWorldX(cx), IndexToWorldY(yIndex)), blockState);
 		}
 
 		public BlockState? GetBlockState(ChunkBlockPos chunkPos) {
 			if (!Level.IsInBounds(chunkPos.ToBlock())) return null;
 
-			int stateID = blockStateIDs[chunkPos.x][WorldYToIndex(chunkPos.y)];
-			return BlockStateRegistry.Get(stateID);
+			int stateID = this.blockStateIDs[chunkPos.x][WorldYToIndex(chunkPos.y)];
+			return Block.GetState(stateID);
 		}
 
 		public TileEntity? TileEntityAt(BlockPos blockPos) {
-			return tileEntities.TryGetValue(blockPos, out TileEntity tileEntity)
+			return this.tileEntities.TryGetValue(blockPos, out TileEntity tileEntity)
 				? tileEntity
 				: null;
 		}

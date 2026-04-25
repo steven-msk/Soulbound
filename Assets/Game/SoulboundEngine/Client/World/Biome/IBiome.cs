@@ -3,11 +3,6 @@ using SoulboundEngine.Client.World.BlockSystem;
 using SoulboundEngine.Client.World.BlockSystem.States;
 using SoulboundEngine.Client.World.Chunk;
 using SoulboundEngine.Client.World.LevelDomain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SoulboundEngine.Client.World.Generation {
 
@@ -21,7 +16,7 @@ namespace SoulboundEngine.Client.World.Generation {
 		}
 
 		BlockState ResolveCaveBlock(BlockPos pos, float density) {
-			return Blocks.air.defaultState;
+			return Blocks.air.DefaultState;
 		}
 	}
 }

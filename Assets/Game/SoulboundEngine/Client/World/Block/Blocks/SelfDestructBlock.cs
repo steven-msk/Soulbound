@@ -8,8 +8,9 @@ using SoulboundEngine.Core.Assets;
 namespace SoulboundEngine.Client.World.BlockSystem {
 	[PROTOTYPICAL]
 	public sealed class SelfDestructBlock : Block {
-		public override string name { get; init; } = "Self Destruct Block";
-		public override int minBreakLevel { get; init; } = 0;
+		public SelfDestructBlock(Settings settings) 
+			: base(settings) {
+		}
 
 		public override bool HasTileEntity(Level level, BlockPos blockPos, BlockState blockState) => true;
 

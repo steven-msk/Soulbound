@@ -4,19 +4,26 @@ using SoulboundEngine.Client.ItemSystem;
 using SoulboundEngine.Client.World.BlockSystem.Render;
 using SoulboundEngine.Client.World.BlockSystem.States;
 using SoulboundEngine.Core.Assets;
+using SoulboundEngine.Core.States;
 using System.Collections.Generic;
 
 namespace SoulboundEngine.Client.World.BlockSystem {
 	public sealed class ToggleBlock : Block, IBlockInteractionListener {
-		public BlockState on { get; private set; }
-		public BlockState off { get; private set; }
-		public override string name { get; init; } = "Toggle Block";
-		public override int minBreakLevel { get; init; } = 0;
+		public static readonly Property<bool> on = BoolProperty.Of("on");
+
+		public ToggleBlock(Settings settings) 
+			: base(settings) {
+			this.SetDefaultState(this.DefaultState.With(on, false));
+		}
 
 		public void OnInteract(in BlockInteraction ctx) {
-			bool isOn = ctx.blockState.Get<bool>("on");
-			ctx.level.SetBlockState(ctx.blockPos, isOn ? off : on);
+			bool isOn = ctx.blockState.Get(on);
+			ctx.level.SetBlockState(ctx.blockPos, this.DefaultState.With(on, isOn));
 			Logger.LogInfo("block at {} is now {}", ctx.blockPos, isOn ? "off" : "on");
+		}
+
+		protected override void AppendProperties(StateManager<Block, BlockState>.Builder builder) {
+			builder.Add(on);
 		}
 
 		public bool CanInteract(in BlockInteraction ctx) => true;
@@ -25,21 +32,12 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 			return trigger == InteractionTrigger.RightClick;
 		}
 
-		protected override BlockState GetDefaultState(IBlockStateRegisterer registerer, BlockPropertyEntries properties) {
-			return on;
-		}
-
-		protected override void CreateStates(IBlockStateRegisterer registerer, BlockPropertyEntries properties) {
-			on = registerer.AddWithProperties(properties.With("on", true));
-			off = registerer.AddWithProperties(properties.With("on", false));
-		}
-
 		public override IEnumerable<ItemStack> GetDrops(BlockState blockState, BreakSource source) {
 			yield break;
 		}
 
 		public override BlockRenderData GetRenderData(BlockState blockState) {
-			return new BlockRenderData(blockState.Get<bool>("on")
+			return new BlockRenderData(blockState.Get(on)
 				? new AssetKey("ToggleOnTile")
 				: new AssetKey("ToggleOffTile")
 			);

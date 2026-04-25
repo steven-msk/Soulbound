@@ -1,11 +1,6 @@
 using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Common;
 using SoulboundEngine.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SoulboundEngine.Client.World.BlockSystem.TileEntities {
 	[PROTOTYPICAL]
@@ -19,13 +14,10 @@ namespace SoulboundEngine.Client.World.BlockSystem.TileEntities {
 		}
 
 		public void Tick() {
-			timer++;
-			if (timer >= PULSE_INTERVAL) timer = 0;
+			this.timer++;
+			if (this.timer >= PULSE_INTERVAL) this.timer = 0;
 
-			level.SetBlockState(blockPos, timer == PULSE_THRESHOLD
-				? Blocks.pulseBlock.on
-				: Blocks.pulseBlock.off
-			);
+			this.level.SetBlockState(this.blockPos, Blocks.pulseBlock.DefaultState.With(PulseBlock.on, this.timer == PULSE_THRESHOLD));
 		}
 	}
 }

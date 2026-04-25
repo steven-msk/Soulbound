@@ -9,7 +9,7 @@ namespace SoulboundEngine.Core.States {
 		public abstract Type type { get; }
 
 		public override string ToString() {
-			return $"property[name={this.name}, type={this.type}";
+			return $"property[name={this.name}, type={this.type}]";
 		}
 
 		public override int GetHashCode() {

@@ -1,18 +1,23 @@
 using SoulboundEngine.Client.World.BlockSystem.Render;
 using SoulboundEngine.Client.World.BlockSystem.States;
 using SoulboundEngine.Core.Assets;
+using SoulboundEngine.Core.States;
 
 namespace SoulboundEngine.Client.World.BlockSystem {
 	public class LeafBlock : Block {
-		public override string name { get; init; } = "Leaves";
-		public override int minBreakLevel { get; init; } = 0;
+		public static readonly Property<bool> persistent = BoolProperty.Of("persistent");
+
+		public LeafBlock(Settings settings)
+			: base(settings) {
+			this.SetDefaultState(this.DefaultState.With(persistent, true));
+		}
+
+		protected override void AppendProperties(StateManager<Block, BlockState>.Builder builder) {
+			builder.Add(persistent);
+		}
 
 		public override BlockRenderData GetRenderData(BlockState blockState) {
 			return new BlockRenderData(new AssetKey("leaves"));
-		}
-
-		protected override BlockState GetDefaultState(IBlockStateRegisterer registerer, BlockPropertyEntries propertyEntries) {
-			return registerer.AddWithProperties(propertyEntries.With("persistent", true));
 		}
 	}
 }

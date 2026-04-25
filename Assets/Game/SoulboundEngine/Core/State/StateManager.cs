@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using SoulboundEngine.Common;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace SoulboundEngine.Core.States {
@@ -24,7 +25,7 @@ namespace SoulboundEngine.Core.States {
 					(existing, value) => new Dictionary<Property, object>(existing) {
 						[property] = value
 					}
-				);
+				).ToList();
 			}
 
 			// one state per combination
@@ -40,7 +41,7 @@ namespace SoulboundEngine.Core.States {
 			}
 
 			this.states = allStates;
-			this.defaultState = this.states[0];
+			this.defaultState = this.states.FirstOrDefault() ?? factory(owner, Dictionaries.Empty<Property, object>());
 		}
 
 		public S defaultState { get; set; }
@@ -63,7 +64,7 @@ namespace SoulboundEngine.Core.States {
 				this.owner = owner;
 			}
 
-			public Builder Add(Property[] properties) {
+			public Builder Add(params Property[] properties) {
 				foreach (var property in properties) {
 					this.namedProperties.Add(property.name, property);
 				}

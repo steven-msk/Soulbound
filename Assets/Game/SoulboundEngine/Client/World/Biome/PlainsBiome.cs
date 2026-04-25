@@ -1,15 +1,5 @@
-using SoulboundEngine.Client.World;
 using SoulboundEngine.Client.World.BlockSystem;
 using SoulboundEngine.Client.World.BlockSystem.States;
-using SoulboundEngine.Client.World.Chunk;
-using SoulboundEngine.Client.World.Generation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Unity.Mathematics;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace SoulboundEngine.Client.World.Generation {
@@ -19,13 +9,13 @@ namespace SoulboundEngine.Client.World.Generation {
 		private readonly NoiseSampler densityNoise;
 
 		public PlainsBiome(int seed) {
-			largeNoise = new NoiseSampler(1, seed, new(FastNoiseLite.NoiseType.Perlin, 0.007f));
-			mediumNoise = new NoiseSampler(2, seed, new(FastNoiseLite.NoiseType.Perlin, 0.01f));
-			densityNoise = new NoiseSampler(8, seed, new(FastNoiseLite.NoiseType.OpenSimplex2, 0.001f));
+			this.largeNoise = new NoiseSampler(1, seed, new(FastNoiseLite.NoiseType.Perlin, 0.007f));
+			this.mediumNoise = new NoiseSampler(2, seed, new(FastNoiseLite.NoiseType.Perlin, 0.01f));
+			this.densityNoise = new NoiseSampler(8, seed, new(FastNoiseLite.NoiseType.OpenSimplex2, 0.001f));
 		}
 
 		float IBiome.GetDensity(int blockX) {
-			float n = densityNoise.Sample1D(blockX);
+			float n = this.densityNoise.Sample1D(blockX);
 			n = (n + 1f) * 0.5f;
 			n = Mathf.SmoothStep(0f, 1f, n);
 			n = Mathf.Pow(n, 1.5f);
@@ -36,20 +26,20 @@ namespace SoulboundEngine.Client.World.Generation {
 			const float largeAmp = 30f;
 			const float mediumAmp = 20f;
 
-			float ln = (largeNoise.Sample1D(x) + 1f) * 0.5f * largeAmp;
-			float mn = (mediumNoise.Sample1D(x) + 1f) * 0.5f * mediumAmp;
+			float ln = (this.largeNoise.Sample1D(x) + 1f) * 0.5f * largeAmp;
+			float mn = (this.mediumNoise.Sample1D(x) + 1f) * 0.5f * mediumAmp;
 			return ln + mn;
 		}
 
 		BlockState IBiome.ResolveBlock(BlockGenContext ctx) {
 			if (ctx.AboveSurface())
-				return Blocks.air.defaultState;
-			return Blocks.dirt.defaultState;
+				return Blocks.air.DefaultState;
+			return Blocks.dirt.DefaultState;
 		}
 
 		TerrainModulation IBiome.SampleTerrain(int blockX) {
 			return new TerrainModulation {
-				heightOffset = 30 + HeightNoise(blockX),
+				heightOffset = 30 + this.HeightNoise(blockX),
 				amplitude = 0.35f,
 				erosion = 0.85f
 			};

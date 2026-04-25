@@ -28,15 +28,15 @@ namespace SoulboundEngine.Client.World.Render {
 			Vector2Int currentPivot = Vector2Int.FloorToInt(pivot);
 			if (this.lastPivot == currentPivot) return;
 
-			RectInt lastView = ToRect(lastPivot);
+			RectInt lastView = this.ToRect(this.lastPivot);
 			this.lastPivot = currentPivot;
-			RectInt currentView = ToRect(currentPivot);
+			RectInt currentView = this.ToRect(currentPivot);
 
 			RectInt.PositionEnumerator pos = lastView.allPositionsWithin;
 			while (pos.MoveNext()) {
 				if (currentView.Contains(pos.Current)) continue;
 
-				RenderBlock((BlockPos)pos.Current, Blocks.air.defaultState);
+				this.RenderBlock((BlockPos)pos.Current, Blocks.air.DefaultState);
 			}
 
 			pos = currentView.allPositionsWithin;
@@ -47,35 +47,35 @@ namespace SoulboundEngine.Client.World.Render {
 				}
 
 				BlockState? blockState = blockStateSupplier(blockPos);
-				RenderBlock(blockPos, blockState);
+				this.RenderBlock(blockPos, blockState);
 			}
 		}
 
 		private void RenderBlock(BlockPos blockPos, BlockState blockState) {
 			BlockRenderData renderData = blockState.block.GetRenderData(blockState);
-			BlockRenderModel model = modelResolver.ResolveModel(renderData);
-			blockRenderer.Render(model, blockPos);
+			BlockRenderModel model = this.modelResolver.ResolveModel(renderData);
+			this.blockRenderer.Render(model, blockPos);
 		}
 
 		public void UpdateModel(BlockPos blockPos, BlockState? blockState) {
-			blockState ??= Blocks.air.defaultState;
-			RenderBlock(blockPos, IsInRenderView(blockPos)
+			blockState ??= Blocks.air.DefaultState;
+			this.RenderBlock(blockPos, this.IsInRenderView(blockPos)
 				? blockState
-				: Blocks.air.defaultState
+				: Blocks.air.DefaultState
 			);
 		}
 
 		private RectInt ToRect(Vector2Int pivot) {
 			return new(
-				Mathf.FloorToInt(pivot.x) + renderView.x,
-				Mathf.FloorToInt(pivot.y) + renderView.y,
-				renderView.width,
-				renderView.height
+				Mathf.FloorToInt(pivot.x) + this.renderView.x,
+				Mathf.FloorToInt(pivot.y) + this.renderView.y,
+				this.renderView.width,
+				this.renderView.height
 			);
 		}
 
 		public bool IsInRenderView(BlockPos blockPos) {
-			return ToRect(lastPivot).Contains((Vector2Int)blockPos);
+			return this.ToRect(this.lastPivot).Contains((Vector2Int)blockPos);
 		}
 	}
 }

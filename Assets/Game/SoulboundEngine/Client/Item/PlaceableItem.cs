@@ -9,7 +9,7 @@ namespace SoulboundEngine.Client.ItemSystem {
 		public override string name => "Placeable Item";
 
 		public BlockState GetBlockState(ItemStack itemStack) {
-			return Blocks.movingTickingBlock.defaultState;
+			return Blocks.movingTickingBlock.DefaultState;
 		}
 
 		public override ItemRenderData GetRenderData(ItemStack itemStack) {

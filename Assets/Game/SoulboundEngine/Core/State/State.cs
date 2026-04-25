@@ -58,7 +58,7 @@ namespace SoulboundEngine.Core.States {
 					return state;
 				}
 			}
-			throw new ArgumentException($"With state not found. property: {property}, value: {value}");
+			throw new ArgumentException($"Block state not found: {property}, value: {value}");
 		}
 
 		public override string ToString() {
