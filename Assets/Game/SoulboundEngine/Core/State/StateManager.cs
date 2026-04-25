@@ -1,4 +1,5 @@
-﻿using SoulboundEngine.Common;
+﻿using SoulboundEngine.Client.Debug.Logging;
+using SoulboundEngine.Common;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -14,19 +15,34 @@ namespace SoulboundEngine.Core.States {
 			this.properties = new SortedDictionary<string, Property>(propertyMap);
 			this.owner = owner;
 
-			IEnumerable<Dictionary<Property, object>> combinations = new[] {
-				new Dictionary<Property, object>()
-			};
+			List<Dictionary<Property, object>> combinations = new();
 
-			// cartesian product
-			foreach (var property in this.properties.Values) {
-				combinations = combinations.SelectMany(
-					_ => property.GetValues(),
-					(existing, value) => new Dictionary<Property, object>(existing) {
+			Logger.LogInfo("doing cartesian product for: {}", owner);
+
+			// create individual property sets
+			foreach (var property in propertyMap.Values) {
+				IEnumerable<object> values = property.GetValues();
+				foreach (var value in values) {
+					combinations.Add(new Dictionary<Property, object>() {
 						[property] = value
-					}
-				).ToList();
+					});
+				}
 			}
+
+			// cartesian product over each individual set
+			foreach (var propertySet in combinations.ToList()) {
+				foreach (var candidateSet in combinations.ToList()) {
+					if (candidateSet.Equals(propertySet)) continue;
+
+					foreach (var (property, value) in candidateSet) {
+						if (propertySet.ContainsKey(property)) continue;
+
+						propertySet.Add(property, value);
+					}
+				}
+			}
+
+			Logger.LogInfo("finished cartesian product for: {}", owner);
 
 			// one state per combination
 			List<S> allStates = combinations

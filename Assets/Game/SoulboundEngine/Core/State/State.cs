@@ -58,7 +58,7 @@ namespace SoulboundEngine.Core.States {
 					return state;
 				}
 			}
-			throw new ArgumentException($"Block state not found: {property}, value: {value}");
+			throw new ArgumentException($"Block state not found: {property}, value: {value}. Maybe you forgot to override AppendProperties?");
 		}
 
 		public override string ToString() {

@@ -20,6 +20,10 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 			this.staticState = this.DefaultState.With(moving, false);
 		}
 
+		protected override void AppendProperties(StateManager<Block, BlockState>.Builder builder) {
+			builder.Add(moving);
+		}
+
 		void ITickingBlock.Tick(Level level, BlockPos blockPos, BlockState blockState) {
 			if (!blockState.Get(moving)) return;
 

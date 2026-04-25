@@ -1,5 +1,4 @@
 using SoulboundEngine.Client.ItemSystem.Render;
-using SoulboundEngine.Client.World.BlockSystem;
 using SoulboundEngine.Client.World.BlockSystem.States;
 using SoulboundEngine.Common;
 
@@ -9,7 +8,8 @@ namespace SoulboundEngine.Client.ItemSystem {
 		public override string name => "Placeable Item";
 
 		public BlockState GetBlockState(ItemStack itemStack) {
-			return Blocks.movingTickingBlock.DefaultState;
+			//return Blocks.movingTickingBlock.DefaultState;
+			return null;
 		}
 
 		public override ItemRenderData GetRenderData(ItemStack itemStack) {

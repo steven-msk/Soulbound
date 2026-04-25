@@ -17,6 +17,7 @@ namespace SoulboundEngine.Core.State {
 
 			while (current <= maxIncluded) {
 				values[current] = current;
+				current++;
 			}
 
 			return OfList(name, values);
