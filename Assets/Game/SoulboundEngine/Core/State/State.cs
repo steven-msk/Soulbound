@@ -14,7 +14,7 @@ namespace SoulboundEngine.Core.States {
 			this.entries = entries;
 		}
 
-		public bool Contains<T>(Property<T> property) where T : IComparable<T> {
+		public bool Contains<T>(Property<T> property) {
 			return this.entries.ContainsKey(property);
 		}
 
@@ -38,21 +38,21 @@ namespace SoulboundEngine.Core.States {
 			this.withTable = table;
 		}
 
-		public T Get<T>(Property<T> property) where T : IComparable<T> {
+		public T Get<T>(Property<T> property) {
 			return (T)this.entries.GetValueOrDefault(property);
 		}
 
-		public bool TryGet<T>(Property<T> property, out T value) where T : IComparable<T> {
+		public bool TryGet<T>(Property<T> property, out T value) {
 			bool result = this.entries.TryGetValue(property, out object boxed);
 			value = result ? (T)boxed : default;
 			return result;
 		}
 
-		public ReadOnlyDictionary<Property, object> GetEntries() => this.entries;
+		public Entries GetEntries() => this.entries;
 
 		public IEnumerable<Property> GetProperties() => this.entries.Keys;
 
-		public S With<T, V>(Property<T> property, V value) where V : T where T : IComparable<T> {
+		public S With<T, V>(Property<T> property, V value) where V : T {
 			if (this.withTable.TryGetValue(property, out Dictionary<object, S> byValue)) {
 				if (byValue.TryGetValue(value, out S state)) {
 					return state;
@@ -71,7 +71,7 @@ namespace SoulboundEngine.Core.States {
 			}
 
 			public override string ToString() {
-				return $"[{string.Join(", ", this)}]";
+				return $"[{string.Join(", ", this.Select(kvp => $"{kvp.Key}={kvp.Value}"))}]";
 			}
 		}
 	}
