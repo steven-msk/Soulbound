@@ -19,7 +19,7 @@ namespace SoulboundEngine.Core.States {
 		public abstract IEnumerable<object> GetValues();
 	}
 
-	public abstract class Property<T> : Property where T : IComparable<T> {
+	public abstract class Property<T> : Property {
 		public override string name { get; }
 		public override Type type { get; }
 		private int hashCodeCache;
@@ -47,9 +47,7 @@ namespace SoulboundEngine.Core.States {
 			return new Value(this, value);
 		}
 
-		public override string ToString() {
-			return base.ToString();
-		}
+		public override string ToString() => this.name;
 
 		public override int GetHashCode() {
 			return base.GetHashCode();

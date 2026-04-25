@@ -19,9 +19,5 @@ namespace SoulboundEngine.Core.States {
 		public override bool TryParse(string name, out bool value) {
 			return bool.TryParse(name, out value);
 		}
-
-		public override string ToString() {
-			return "bool";
-		}
 	}
 }
