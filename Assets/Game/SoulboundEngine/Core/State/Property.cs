@@ -15,6 +15,8 @@ namespace SoulboundEngine.Core.States {
 		public override int GetHashCode() {
 			return HashCode.Combine(this.name, this.type);
 		}
+
+		public abstract IEnumerable<object> GetValues();
 	}
 
 	public abstract class Property<T> : Property where T : IComparable<T> {
@@ -36,7 +38,6 @@ namespace SoulboundEngine.Core.States {
 
 		public abstract string Name(T value);
 		public abstract bool TryParse(string name, out T value);
-		public abstract IEnumerable<T> GetValues();
 
 		public Value CreateValue<O, S>(State<O, S> state) {
 			return this.CreateValue(state.Get(this));
