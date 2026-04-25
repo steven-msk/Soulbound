@@ -7,6 +7,7 @@ using SoulboundEngine.Common;
 using SoulboundEngine.Core.Assets;
 using SoulboundEngine.Core.States;
 using UnityEngine;
+using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 namespace SoulboundEngine.Client.World.BlockSystem {
 	[PROTOTYPICAL]
@@ -36,10 +37,12 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 		}
 
 		private void OnAreaEnter(Level level, BlockPos selfPos, Player player) {
+			Logger.LogInfo("onAreaEnter");
 			level.SetBlockState(selfPos, this.DefaultState.With(inArea, true));
 		}
 
 		private void OnAreaExit(Level level, BlockPos selfPos, Player player) {
+			Logger.LogInfo("onAreaExit");
 			level.SetBlockState(selfPos, this.DefaultState.With(inArea, false));
 		}
 
