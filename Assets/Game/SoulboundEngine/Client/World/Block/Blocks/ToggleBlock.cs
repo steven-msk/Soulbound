@@ -16,14 +16,15 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 			this.SetDefaultState(this.DefaultState.With(on, false));
 		}
 
-		public void OnInteract(in BlockInteraction ctx) {
-			bool isOn = ctx.blockState.Get(on);
-			ctx.level.SetBlockState(ctx.blockPos, this.DefaultState.With(on, isOn));
-			Logger.LogInfo("block at {} is now {}", ctx.blockPos, isOn ? "off" : "on");
-		}
-
 		protected override void AppendProperties(StateManager<Block, BlockState>.Builder builder) {
 			builder.Add(on);
+		}
+
+		public void OnInteract(in BlockInteraction ctx) {
+			bool isOn = ctx.blockState.Get(on);
+			isOn = !isOn;
+			ctx.level.SetBlockState(ctx.blockPos, this.DefaultState.With(on, isOn));
+			Logger.LogInfo("block at {} is now {}", ctx.blockPos, isOn ? "off" : "on");
 		}
 
 		public bool CanInteract(in BlockInteraction ctx) => true;

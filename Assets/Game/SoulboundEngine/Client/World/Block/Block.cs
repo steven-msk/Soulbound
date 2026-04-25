@@ -1,4 +1,3 @@
-using SoulboundEngine.Client.Debug.Logging;
 using SoulboundEngine.Client.ItemSystem;
 using SoulboundEngine.Client.World.BlockSystem.Render;
 using SoulboundEngine.Client.World.BlockSystem.States;
@@ -22,13 +21,13 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 			StateManager<Block, BlockState>.Builder builder = new(this);
 			this.AppendProperties(builder);
 
-			Logger.LogInfo("current owner: {}", this);
 
 			this.stateManager = builder.Build((owner, propertyMap) => {
 				BlockState state = new(owner, propertyMap);
 				statesByID.Add(state);
 				return state;
 			});
+
 			this.defaultState = this.stateManager.defaultState;
 		}
 
@@ -36,7 +35,7 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 		}
 
 		protected void SetDefaultState(BlockState blockState) {
-			this.defaultState = this.stateManager.defaultState = blockState;
+			this.defaultState = blockState;
 		}
 
 		public BlockState DefaultState => this.defaultState;

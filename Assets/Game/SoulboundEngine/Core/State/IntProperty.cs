@@ -36,5 +36,9 @@ namespace SoulboundEngine.Core.State {
 		public override bool TryParse(string name, out int value) {
 			return int.TryParse(name, out value);
 		}
+
+		public override string ToString() {
+			return "int";
+		}
 	}
 }

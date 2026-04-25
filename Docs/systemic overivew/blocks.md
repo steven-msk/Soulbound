@@ -6,10 +6,10 @@
 - relies on the registry system to register and identify each `Block`, on the item system as some blocks may be convertible into their item form, and on the entity system because some logic that `Block` defines is entity-based.
 - no evolution standards just yet
 - known weaknesses: 
-    - block state registration
+    - *(fixed)* block state registration
     - definition and logic are poorly developed due to lack of features,
     - frontend-backend contract is slightly brittle
-    - deterministic block state properties are missing due to lack of features,
+    - *(fixed)* deterministic block state properties are missing due to lack of features,
     - no block drops due to lack of features, block to item conversion is not supported
     - underveloped update schedules
     - risk of cycling chain reactions in tick and neighbor updates
@@ -44,7 +44,7 @@
 - a block can be marked as "ticking" if the extended `Block` subtype implements `ITickingBlock` and a state of that block is added to the world. All block states that are mapped to this block will receive a `Tick` call no matter the state, so if there are 2 states of a ticking block in the world, `Tick` will be called 2 times for that block for every tick.
 
 ## Known issues:
-- block state registration, definition and logic are poorly developed due to lack of features. Because there arent any features that test the usage, the current implementations are not ideal and too confusing:
+- *(fixed)* block state registration, definition and logic are poorly developed due to lack of features. Because there arent any features that test the usage, the current implementations are not ideal and too confusing:
     - using a `IBlockStateRegisterer` is unnecessary, as the states need to be registered globally either way. 
     - the default state is awkwardly defined by `protected virtual BlockState GetDefaultState(IBlockStateRegisterer, BlockPropertyEntries)`, when it can be set more easily from the constructor.
     - block states are created through a thin opening, `protected virtual void CreateStates(IBlockStateRegisterer, BlockPropertyEntries)`, then posted to registry all while still unable to access states dynamically.
@@ -54,7 +54,7 @@
     - a better implementation would be to switch to a builder pattern, let each state be registered using a state factory which has predefined properties.
 - frontend-contract is slightly brittle. A concept that follows "data -> model -> renderer" is used for this contract; `Block` exposes `BlockRenderData` used by `BlockModelResolver` then passed to a `BlockRenderer` used in the world renderer, which works fine for now, but might be changed identifier-based models instead of dynamically retrieved data. For now this is safe to pass to prod.
     - a possible fix consideration would be to switch a pattern like "block state -> model identifier -> renderer", which simplifies the load on the frontend-backend contract.
-- deterministic block state properties are missing due to lack of features. The only blocks that exist at this time are prototypical and use properties only to test the theoretical implementations. Due to the lack of features, there is no way to guarantee that a certain property will always exist on a block state, for example block facing or variant. This doesnt need an immediate fix, but should be considered for prod.
+- *(fixed)* deterministic block state properties are missing due to lack of features. The only blocks that exist at this time are prototypical and use properties only to test the theoretical implementations. Due to the lack of features, there is no way to guarantee that a certain property will always exist on a block state, for example block facing or variant. This doesnt need an immediate fix, but should be considered for prod.
 - no block drops due to lack of concrete block usages. **Must be fixed before prod**.
 - block to item conversion is not supported. **Must be fixed before prod**.
 - underveloped update schedules due to lack of features and need of continuous updates for those features. **Must be fixed before prod**.

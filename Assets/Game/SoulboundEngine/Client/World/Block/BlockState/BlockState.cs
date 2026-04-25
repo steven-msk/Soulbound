@@ -13,5 +13,9 @@ namespace SoulboundEngine.Client.World.BlockSystem.States {
 		}
 
 		protected override BlockState AsBlockState() => this;
+
+		public override string ToString() {
+			return $"block_state[block={this.block}, properties={this.GetEntries()}]";
+		}
 	}
 }

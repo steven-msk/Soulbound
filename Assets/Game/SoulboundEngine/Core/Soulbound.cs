@@ -34,19 +34,18 @@ namespace SoulboundEngine.Core {
 			this.config = config;
 			GameStateManager.SetBootstrapping();
 
-			AssetManager.PreloadAll();
-
-			Registries.Init();
-			Registries.Freeze();
-
 			this.debugMetricsService = new DebugMetricsService();
 			this.performanceMetrics = new PerformanceMetrics();
 			this.RegisterDebugMetricsSource(this);
 
-
 			this.client = new SoulboundClient(config, new ClientInit {
 				debugMetricsService = this.debugMetricsService
 			});
+
+			AssetManager.PreloadAll();
+
+			Registries.Init();
+			Registries.Freeze();
 
 			GameStateManager.SetInitialized();
 		}
