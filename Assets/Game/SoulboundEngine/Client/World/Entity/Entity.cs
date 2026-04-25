@@ -34,7 +34,7 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 			this.transform?.FrameUpdate();
 		}
 
-		public virtual Vector2 GetPos() => pos;
+		public virtual Vector2 GetPos() => this.pos;
 		public virtual void SetPos(Vector2 pos) {
 			this.pos = pos;
 			this.transform?.SetPos(pos);
