@@ -1,6 +1,7 @@
 using SoulboundEngine.Client.World.BlockSystem;
 using SoulboundEngine.Client.World.BlockSystem.States;
 using UnityEngine;
+using Vendor.FastNoiseLite;
 
 namespace SoulboundEngine.Client.World.Generation {
 	public class PlainsBiome : IBiome {

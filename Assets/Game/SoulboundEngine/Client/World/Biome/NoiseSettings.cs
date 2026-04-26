@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Vendor.FastNoiseLite;
 
 namespace SoulboundEngine.Client.World.Generation {
 	public record NoiseSettings {
@@ -29,20 +25,20 @@ namespace SoulboundEngine.Client.World.Generation {
 		}
 
 		public void ApplyTo(FastNoiseLite noise) {
-			noise.SetNoiseType(noiseType);
-			noise.SetDomainWarpType(domainWarpType);
-			noise.SetFractalType(fractalType);
-			noise.SetRotationType3D(rotationType3D);
-			noise.SetCellularDistanceFunction(cellularDistanceFunction);
-			noise.SetCellularReturnType(cellularReturnType);
-			noise.SetFrequency(frequency);
-			noise.SetDomainWarpAmp(domainWarpAmp);
-			noise.SetFractalGain(fractalGain);
-			noise.SetFractalLacunarity(fractalLacunarity);
-			noise.SetFractalOctaves(fractalOctaves);
-			noise.SetFractalPingPongStrength(fractalPingPingStrength);
-			noise.SetFractalWeightedStrength(fractalWeightedStrength);
-			noise.SetCellularJitter(cellularJitter);
+			noise.SetNoiseType(this.noiseType);
+			noise.SetDomainWarpType(this.domainWarpType);
+			noise.SetFractalType(this.fractalType);
+			noise.SetRotationType3D(this.rotationType3D);
+			noise.SetCellularDistanceFunction(this.cellularDistanceFunction);
+			noise.SetCellularReturnType(this.cellularReturnType);
+			noise.SetFrequency(this.frequency);
+			noise.SetDomainWarpAmp(this.domainWarpAmp);
+			noise.SetFractalGain(this.fractalGain);
+			noise.SetFractalLacunarity(this.fractalLacunarity);
+			noise.SetFractalOctaves(this.fractalOctaves);
+			noise.SetFractalPingPongStrength(this.fractalPingPingStrength);
+			noise.SetFractalWeightedStrength(this.fractalWeightedStrength);
+			noise.SetCellularJitter(this.cellularJitter);
 		}
 	}
 }

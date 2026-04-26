@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
+using Vendor.FastNoiseLite;
 
 namespace SoulboundEngine.Client.World.Generation {
 	public sealed class NoiseSampler : INoise {
@@ -12,11 +8,11 @@ namespace SoulboundEngine.Client.World.Generation {
 
 		public NoiseSampler(int channel, int seed, NoiseSettings settings) {
 			this.noise = new FastNoiseLite(seed);
-			settings.ApplyTo(noise);
+			settings.ApplyTo(this.noise);
 
-			float offsetX = OffsetAxis(seed, channel, 0);
-			float offsetY = OffsetAxis(seed, channel, 1);
-			float offsetZ = OffsetAxis(seed, channel, 2);
+			float offsetX = this.OffsetAxis(seed, channel, 0);
+			float offsetY = this.OffsetAxis(seed, channel, 1);
+			float offsetZ = this.OffsetAxis(seed, channel, 2);
 			this.offset = new Vector3(offsetX, offsetY, offsetZ);
 		}
 
@@ -37,15 +33,15 @@ namespace SoulboundEngine.Client.World.Generation {
 		}
 
 		public float Sample1D(float x) {
-			return noise.GetNoise(x + offset.x, 0f);
+			return this.noise.GetNoise(x + this.offset.x, 0f);
 		}
 
 		public float Sample2D(float x, float y) {
-			return noise.GetNoise(x + offset.x, y + offset.y);
+			return this.noise.GetNoise(x + this.offset.x, y + this.offset.y);
 		}
 
 		public float Sample3D(float x, float y, float z) {
-			return noise.GetNoise(x + offset.x, y + offset.y, z + offset.z);
+			return this.noise.GetNoise(x + this.offset.x, y + this.offset.y, z + this.offset.z);
 		}
 	}
 }
