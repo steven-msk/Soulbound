@@ -1,7 +1,5 @@
 # Soulbound
 
----
-
 - Soulbound is a 2D sandbox survival game built with Unity, inspired by Terraria, Hollow Knight, and Minecraft.
 
 **Current Stage:** Alpha Production
