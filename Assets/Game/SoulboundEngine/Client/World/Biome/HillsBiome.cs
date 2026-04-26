@@ -2,10 +2,10 @@ using SoulboundEngine.Client.World.BlockSystem;
 using SoulboundEngine.Client.World.BlockSystem.States;
 using SoulboundEngine.Client.World.Chunk;
 using SoulboundEngine.Client.World.LevelDomain;
+using SoulboundEngine.Core.Noise;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Vendor.FastNoiseLite;
 
 namespace SoulboundEngine.Client.World.Generation {
 	public class HillsBiome : IBiome {
@@ -19,11 +19,11 @@ namespace SoulboundEngine.Client.World.Generation {
 		int lastTreeX = int.MinValue >> 1;
 
 		public HillsBiome(int seed) {
-			this.largeNoise = new NoiseSampler(1, seed, new(FastNoiseLite.NoiseType.Perlin, 0.01f));
-			this.mediumNoise = new NoiseSampler(2, seed, new(FastNoiseLite.NoiseType.Perlin, 0.02f));
-			this.densityNoise = new NoiseSampler(8, seed, new(FastNoiseLite.NoiseType.OpenSimplex2, 0.0012f));
-			this.forestNoise = new NoiseSampler(6, seed, new(FastNoiseLite.NoiseType.Value, 0.03f));
-			this.forestDensityNoise = new NoiseSampler(7, seed, new(FastNoiseLite.NoiseType.Value, 0.05f));
+			this.largeNoise = new NoiseSampler(1, new NoiseSettings(seed, NoiseType.Perlin, 0.01f));
+			this.mediumNoise = new NoiseSampler(2, new NoiseSettings(seed, NoiseType.Perlin, 0.02f));
+			this.densityNoise = new NoiseSampler(8, new NoiseSettings(seed, NoiseType.OpenSimplex2, 0.0012f));
+			this.forestNoise = new NoiseSampler(6, new NoiseSettings(seed, NoiseType.Value, 0.03f));
+			this.forestDensityNoise = new NoiseSampler(7, new NoiseSettings(seed, NoiseType.Value, 0.05f));
 		}
 
 		float IBiome.GetDensity(int blockX) {

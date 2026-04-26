@@ -1,7 +1,7 @@
 using SoulboundEngine.Client.World.BlockSystem;
 using SoulboundEngine.Client.World.BlockSystem.States;
+using SoulboundEngine.Core.Noise;
 using UnityEngine;
-using Vendor.FastNoiseLite;
 
 namespace SoulboundEngine.Client.World.Generation {
 	public class PlainsBiome : IBiome {
@@ -10,9 +10,9 @@ namespace SoulboundEngine.Client.World.Generation {
 		private readonly NoiseSampler densityNoise;
 
 		public PlainsBiome(int seed) {
-			this.largeNoise = new NoiseSampler(1, seed, new(FastNoiseLite.NoiseType.Perlin, 0.007f));
-			this.mediumNoise = new NoiseSampler(2, seed, new(FastNoiseLite.NoiseType.Perlin, 0.01f));
-			this.densityNoise = new NoiseSampler(8, seed, new(FastNoiseLite.NoiseType.OpenSimplex2, 0.001f));
+			this.largeNoise = new NoiseSampler(1, new NoiseSettings(seed, NoiseType.Perlin, 0.007f));
+			this.mediumNoise = new NoiseSampler(2, new NoiseSettings(seed, NoiseType.Perlin, 0.01f));
+			this.densityNoise = new NoiseSampler(8, new NoiseSettings(seed, NoiseType.OpenSimplex2, 0.001f));
 		}
 
 		float IBiome.GetDensity(int blockX) {

@@ -1,6 +1,6 @@
 using SoulboundEngine.Client.World.Chunk;
+using SoulboundEngine.Core.Noise;
 using UnityEngine;
-using Vendor.FastNoiseLite;
 
 namespace SoulboundEngine.Client.World.Generation {
 	public sealed class Cavemap {
@@ -9,10 +9,11 @@ namespace SoulboundEngine.Client.World.Generation {
 		private readonly DomainWarp warp;
 		
 		public Cavemap(int seed) {
-			this.caveNoise = new NoiseSampler(0, seed, new NoiseSettings(FastNoiseLite.NoiseType.OpenSimplex2, 1.0f));
-			this.warp = new(seed, new NoiseSettings() {
-				noiseType = FastNoiseLite.NoiseType.OpenSimplex2,
-				domainWarpType = FastNoiseLite.DomainWarpType.OpenSimplex2,
+			this.caveNoise = new NoiseSampler(0, new NoiseSettings(seed, NoiseType.OpenSimplex2, 1.0f));
+			this.warp = new DomainWarp(new NoiseSettings() {
+				seed = seed,
+				noiseType = NoiseType.OpenSimplex2,
+				domainWarpType = DomainWarpType.OpenSimplex2,
 				frequency = 1.0f,
 				domainWarpAmp = 0.0f
 			});

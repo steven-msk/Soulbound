@@ -55,8 +55,7 @@ using FNLfloat = System.Single;
 //using FNLfloat = System.Double;
 
 namespace Vendor.FastNoiseLite {
-	public class FastNoiseLite
-	{
+	public class FastNoiseLite {
 		private const short INLINE = 256; // MethodImplOptions.AggressiveInlining;
 		private const short OPTIMISE = 512; // MethodImplOptions.AggressiveOptimization;
 
@@ -151,7 +150,7 @@ namespace Vendor.FastNoiseLite {
 		{
 			this.SetSeed(seed);
 		}
-
+		
 		/// <summary>
 		/// Sets seed used for all noise types
 		/// </summary>

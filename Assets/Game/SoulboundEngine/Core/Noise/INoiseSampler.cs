@@ -1,11 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SoulboundEngine.Client.World.Generation {
-	public interface INoise {
+namespace SoulboundEngine.Core.Noise {
+	public interface INoiseSampler {
 		/// <returns>
 		/// Noise output bounded between -1...1
 		/// </returns>

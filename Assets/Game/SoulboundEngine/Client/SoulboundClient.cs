@@ -50,35 +50,35 @@ namespace SoulboundEngine.Client {
 			instance = this;
 			this.config = config;
 
-			inputActions = new PlayerInputActions();
-			inputManager = new InputManager(inputActions.asset);
-			InputTokens.Register(inputActions.asset);
-			settings = new Settings();
+			this.inputActions = new PlayerInputActions();
+			this.inputManager = new InputManager(this.inputActions.asset);
+			InputTokens.Register(this.inputActions.asset);
+			this.settings = new Settings();
 
-			runtimeDataProvider = new RuntimeDataProvider();
-			runtimeExecutionServices = new RuntimeExecutionServices();
-			commandProcessor = new CommandProcessor(runtimeDataProvider, runtimeExecutionServices);
-			worldSessionCommands = new WorldSessionCommands();
-			CommandLine commandLine = new(commandProcessor);
+			this.runtimeDataProvider = new RuntimeDataProvider();
+			this.runtimeExecutionServices = new RuntimeExecutionServices();
+			this.commandProcessor = new CommandProcessor(this.runtimeDataProvider, this.runtimeExecutionServices);
+			this.worldSessionCommands = new WorldSessionCommands();
+			CommandLine commandLine = new(this.commandProcessor);
 			MetricsHUD metricsHud = new(ctx.debugMetricsService);
 			DebugConsole debugConsole = new();
-			clientDebug = new ClientDebug(unityLogger, debugConsole, commandLine, metricsHud);
-			inputManager.PushContext(clientDebug);
+			this.clientDebug = new ClientDebug(unityLogger, debugConsole, commandLine, metricsHud);
+			this.inputManager.PushContext(this.clientDebug);
 
 			// prototypical; will not pass to alpha prod
 			var worldSerializer = new JsonSerializer<WorldDump>(Soulbound.globalJsonSettings);
 			var worldSerializationPipeline = new SerializationPipeline<WorldDump>(worldSerializer);
-			var service = new WorldSerializationService(GetWorldSaveStrategy(), worldSerializationPipeline);
-			worldManager = new WorldManager(service);
+			var service = new WorldSerializationService(this.GetWorldSaveStrategy(), worldSerializationPipeline);
+			this.worldManager = new WorldManager(service);
 
 			// scene may not be available at this time
 			// TODO: change UIHandler init
-			uiHandler = new UIHandler(Object.FindFirstObjectByType<Canvas>());
-			inputManager.PushContext(uiHandler);
+			this.uiHandler = new UIHandler(Object.FindFirstObjectByType<Canvas>());
+			this.inputManager.PushContext(this.uiHandler);
 
-			uiAudioEventBank = new UIAudioEventBank();
-			worldAudioEventBank = new WorldAudioEventBank();
-			uiAudioEventBank.Activate();
+			this.uiAudioEventBank = new UIAudioEventBank();
+			this.worldAudioEventBank = new WorldAudioEventBank();
+			this.uiAudioEventBank.Activate();
 			AudioManager.RebuildPools();
 		}
 
@@ -86,88 +86,88 @@ namespace SoulboundEngine.Client {
 		/// called once when the game is launched
 		/// </summary>
 		public void Start() {
-			uiHandler.SetScreen(new TitleScreen());
+			this.uiHandler.SetScreen(new TitleScreen());
 		}
 
 		/// <summary>
 		/// called every frame
 		/// </summary>
 		public void Update() {
-			inputManager.DispatchInputs();
+			this.inputManager.DispatchInputs();
 		}
 
 		public void CreateNewWorld(string world) {
-			worldManager.CreateNewWorld(world);
+			this.worldManager.CreateNewWorld(world);
 		}
 
 		public void EnterWorld(string world) {
-			if (IsWorldSessionActive()) return;
+			if (this.IsWorldSessionActive()) return;
 
-			if (!worldManager.ListSaves().Any(s => s == world) && !config.dev.useDoNotSaveWorldStrategy) {
+			if (!this.worldManager.ListSaves().Any(s => s == world) && !this.config.dev.useDoNotSaveWorldStrategy) {
 				throw new ArgumentException($"World not found: '{world}'");
 			}
 
-			uiHandler.FlushScreens();
+			this.uiHandler.FlushScreens();
 
 			// manual dev seed for prototyping
-			DevSeedProvider seedProvider = new(config.dev);
+			DevSeedProvider seedProvider = new(this.config.dev);
 			WorldLoader worldLoader = new(seedProvider);
 
 			worldLoader.LoadWorld(
 				SceneManager.LoadSceneAsync("WorldScene").ToUniTask(),
 				Object.FindFirstObjectByType<WorldSceneRoot>
 			).ContinueWith(session => {
-				activeWorldSession = session;
-				uiHandler.SetCanvas(session.canvas);
-				uiHandler.SetScreen(new WorldScreen(session.player));
-				inputManager.PushContext(session.levelManager);
+				this.activeWorldSession = session;
+				this.uiHandler.SetCanvas(session.canvas);
+				this.uiHandler.SetScreen(new WorldScreen(session.player));
+				this.inputManager.PushContext(session.levelManager);
 
-				runtimeDataProvider.SetWorldSessionState(session);
-				runtimeExecutionServices.SetWorldSessionState(session);
-				commandProcessor.RegisterProvider(worldSessionCommands);
+				this.runtimeDataProvider.SetWorldSessionState(session);
+				this.runtimeExecutionServices.SetWorldSessionState(session);
+				this.commandProcessor.RegisterProvider(this.worldSessionCommands);
 
 				// PROTOTYPICAL
 				AudioManager.RebuildPools();
-				worldAudioEventBank.Activate();
+				this.worldAudioEventBank.Activate();
 			}).Forget(e => Logger.LogFatal(e));
 		}
 
 		public void QuitActiveWorld() {
-			if (!IsWorldSessionActive()) return;
+			if (!this.IsWorldSessionActive()) return;
 
-			LevelManager levelManager = activeWorldSession?.levelManager!;
+			LevelManager levelManager = this.activeWorldSession?.levelManager!;
 			levelManager.StopSession();
-			inputManager.RemoveContext(levelManager);
-			uiHandler.FlushScreens();
+			this.inputManager.RemoveContext(levelManager);
+			this.uiHandler.FlushScreens();
 			Time.timeScale = 1f;
 
 			SceneManager.LoadSceneAsync("DevScene").ToUniTask()
 				.ContinueWith(() => {
-					activeWorldSession = null;
-					uiHandler.SetCanvas(Object.FindFirstObjectByType<Canvas>());
-					uiHandler.SetScreen(new TitleScreen());
+					this.activeWorldSession = null;
+					this.uiHandler.SetCanvas(Object.FindFirstObjectByType<Canvas>());
+					this.uiHandler.SetScreen(new TitleScreen());
 
-					runtimeDataProvider.ExitWorldSessionState();
-					runtimeExecutionServices.ExitWorldSessionState();
-					commandProcessor.UnregisterProvider(worldSessionCommands);
+					this.runtimeDataProvider.ExitWorldSessionState();
+					this.runtimeExecutionServices.ExitWorldSessionState();
+					this.commandProcessor.UnregisterProvider(this.worldSessionCommands);
 
 					// PROTOTYPICAL
 					AudioManager.RebuildPools();
-					worldAudioEventBank.Deactivate();
+					this.worldAudioEventBank.Deactivate();
 				})
 			.Forget(e => Logger.LogFatal(e));
 		}
 
 		public IEnumerable<string> ListWorldSaves() {
-			return worldManager.ListSaves();
+			return this.worldManager.ListSaves();
 		}
 
-		public bool IsWorldSessionActive() => activeWorldSession != null;
+		public bool IsWorldSessionActive() => this.activeWorldSession != null;
 
 		public void Shutdown() {
-			activeWorldSession?.levelManager.StopSession();
-			settings.Save();
-			inputActions.Dispose();
+			this.activeWorldSession?.levelManager.StopSession();
+			this.settings.Save();
+			this.inputActions.Dispose();
 		}
 
 		[Obsolete]
@@ -175,14 +175,14 @@ namespace SoulboundEngine.Client {
 #if !UNITY_EDITOR
 			return new WorldSaveStrategy(config.file.savesFolder, Application.persistentDataPath);
 #else
-			return !config.dev.useDoNotSaveWorldStrategy
-				? new WorldSaveStrategy(config.file.savesFolder, Application.persistentDataPath)
+			return !this.config.dev.useDoNotSaveWorldStrategy
+				? new WorldSaveStrategy(this.config.file.savesFolder, Application.persistentDataPath)
 				: new DoNotSaveWorldStrategy();
 #endif
 		}
 
 		public static SoulboundClient Instance => instance;
-		public InputManager InputManager => inputManager;
-		public UIHandler UIHandler => uiHandler;
+		public InputManager InputManager => this.inputManager;
+		public UIHandler UIHandler => this.uiHandler;
 	}
 }

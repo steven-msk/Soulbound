@@ -14,6 +14,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 #nullable enable
 
@@ -175,7 +176,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 			if (!this.deferredGenerations.TryGetValue(chunkX, out var list)) {
 				this.deferredGenerations[chunkX] = new List<OnChunkGenerated>();
 			}
-			list.Add(onChunkGenerated);
+			list?.Add(onChunkGenerated);
 		}
 
 		[Obsolete]
@@ -192,8 +193,11 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 		[PROTOTYPICAL]
 		public void SetBlockState(BlockPos blockPos, BlockState? blockState) {
 			BlockState? oldState = this.GetBlockState(blockPos);
-			WorldChunk chunk = this.ChunkAt(blockPos)
-				?? throw new InvalidOperationException("Block pos not valid: " + blockPos);
+			WorldChunk chunk = this.ChunkAt(blockPos);
+			if (chunk == null) {
+				Logger.LogError(new InvalidOperationException("Block pos not valid: " + blockPos));
+				return;
+			}
 
 			chunk.SetBlockState(blockPos, blockState);
 			this.worldRenderer.UpdateModel(blockPos, blockState);

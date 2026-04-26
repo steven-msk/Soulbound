@@ -1,12 +1,9 @@
-using Vendor.FastNoiseLite;
-
-namespace SoulboundEngine.Client.World.Generation {
+namespace SoulboundEngine.Core.Noise {
 	public class DomainWarp {
-		private readonly FastNoiseLite warp;
+		private readonly INoise warp;
 
-		public DomainWarp(int seed, NoiseSettings settings) {
-			this.warp = new FastNoiseLite(seed);
-			settings.ApplyTo(this.warp);
+		public DomainWarp(NoiseSettings settings) {
+			this.warp = new FastNoiseLiteAdapter(settings);
 		}
 		
 		public void Warp1D(ref float x) {

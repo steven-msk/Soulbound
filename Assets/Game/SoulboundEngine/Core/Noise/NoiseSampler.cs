@@ -1,18 +1,16 @@
 using UnityEngine;
-using Vendor.FastNoiseLite;
 
-namespace SoulboundEngine.Client.World.Generation {
-	public sealed class NoiseSampler : INoise {
-		private readonly FastNoiseLite noise;
+namespace SoulboundEngine.Core.Noise {
+	public sealed class NoiseSampler : INoiseSampler {
+		private readonly INoise noise;
 		private readonly Vector3 offset;
 
-		public NoiseSampler(int channel, int seed, NoiseSettings settings) {
-			this.noise = new FastNoiseLite(seed);
-			settings.ApplyTo(this.noise);
+		public NoiseSampler(int channel, NoiseSettings settings) {
+			this.noise = new FastNoiseLiteAdapter(settings);
 
-			float offsetX = this.OffsetAxis(seed, channel, 0);
-			float offsetY = this.OffsetAxis(seed, channel, 1);
-			float offsetZ = this.OffsetAxis(seed, channel, 2);
+			float offsetX = this.OffsetAxis(settings.seed, channel, 0);
+			float offsetY = this.OffsetAxis(settings.seed, channel, 1);
+			float offsetZ = this.OffsetAxis(settings.seed, channel, 2);
 			this.offset = new Vector3(offsetX, offsetY, offsetZ);
 		}
 
