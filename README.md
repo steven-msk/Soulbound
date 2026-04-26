@@ -1,216 +1,179 @@
-# Soulbound - Prototype
-
-This repository contains the early-stage prototype of Soulbound, a solo-developed RPG inspired by Terraria, Hollow Knight and Undertale.
-It serves as the foundation for gameplay systems, architecture, and experimentation before moving into the full production phase.
+# Soulbound
 
 ---
 
-## Project Status
+- Soulbound is a 2D sandbox survival game built with Unity, inspired by Terraria, Hollow Knight, and Minecraft.
 
-This is **not** a production-ready project.
-All code, systems, and structures are exerimental and subject to heavy future changes. The purpose is to explore:
-- Core mechanics
-- Input and interaction models
-- UI/UX experimentation
-- Data structures and gameplay flow
-- Gamedev features
-
-Expect:
-- Rapid iteration
-- Spaghetti code in places
-- Untested systems
-- Incomplete or placeholder content
-- Frequent task comments
-- Messy commits (im not the best with git)
+**Current Stage:** Alpha Production
 
 ---
 
-## Built with
+### Table of Contents
 
-- **Unity Engine 6000.0.37f1** (URP 2D, new Input System)
-- Custom input/event context management system
-- Modular components for UI, entity control, and world interaction
+- [Overview](#overview)
+- [Features](#features)
+	- [World generation](#world-generation)
+	- [Block system](#block-system)
+	- [Entity system](#entity-system)
+	- [Inventory & items](#inventory--items)
+	- [Player](#player)
+	- [UI framework](#ui-framework)
+	- [Settings & keybinds](#settings--keybinds)
+- [Getting started](#getting-started)
+	- [Requirements](#requirements)
+	- [Running the game](#running-the-game)
+	- [Versioning and branching](#versioning-and-branching)
+	- [Workflows](#workflows)
+- [Architecture](#architecture)
+	- [Assembly](#assembly)
+	- [Tech stack](#tech-stack)
+	- [Debug & dev tools](#debug--developer-tools)
+- [Known issues](#known-issues)
+- [License](#license)
+- [Notes](#notes)
 
 ---
 
-## External libraries used (not maintained by Unity)
-- Zenject 9.2.0
+## Overview
 
-## Notes
+Soulbound is a 2D survival game currently in alpha production. The core engine systems are being built with a strong emphasis on clean separation of concerns, modularity, and production-readiness. The game features procedurally generated worlds, a block-based environment, entity interactions, and a fully functional inventory system.
 
-- Branching strategy may be used later - currently all changes live in `prototype` branch until probject stabilization.
-- This repo may be squashed or restructured before transitioning to production.
+---
+
+## Features
+> **Note:** These are implemented by an alpha production standard and may be reworked with further iterations.
+
+#### World Generation
+- Procedural terrain generation
+- Biome blending using weighted noise sampling
+- Cave system generation with domain warping and vertical falloff masks
+- Chunk-based world loading and unloading based on player proximity
+- Post-processing passes per biome (e.g. tree placement)
+
+#### Block System
+- Block states with arbitrary property entries (int, bool, enum)
+- Tile entities
+- Neighbor update propagation
+- Interaction listeners
+- Ticking blocks
+
+#### Entity System
+- Entity registry using descriptor-based factory pattern
+- Physics entity with Unity Rigidbody2D integration
+- Item entity (dropped Item form)
+- Frame-updatable and tickable entity interfaces
+
+#### Inventory & Items
+- Slot-based inventory and hotbar system
+- Drag-and-drop with split, merge, transfer, and swap operations
+- Item interaction listeners with trigger validation (click, hold, release)
+
+#### Player
+- Movement, jumping, and physics-based traversal
+- Block breaking and placement with reach limitation
+- Item drop mechanic
+- Hotbar scrolling and main hand switching
+- Input handled through a priority-based context stack
+
+#### UI Framework
+- Screen management with push/pop/replace navigation
+- Overlay system for non-screen UI (debug console, command line, metrics HUD)
+- Tooltip design with trigger and renderer interfaces
+- Layout builders for vertical, horizontal, and grid arrangements
+
+#### Settings & Keybinds
+- Settings serialized to a plain-text file
+- Per-entry encode/decode via value sets
+- Keybind rebinding with input action override *(runtime rebinding available only through code)*
+
+---
+
+## Getting Started
+
+### Requirements
+
+- Unity 6000.3.14f1 (6.3 LTS) or compatible version
+- .NET Standard 2.1
+
+### Running the Game
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/steven-msk/Soulbound.git
+   ```
+2. Open the project in Unity.
+3. Open the `DevScene` scene at `Assets/Game/Scenes/`
+4. Optionally configure `GameConfig` on the `Main` game object in the scene.
+5. Press Play.
+
+### Versioning and branching
+- `main` as primary branch (active development)
+- Feature work may be done in separate branches and merged when stable
+- *No strict versioning is enforced at this stage*
+
+### Workflows
+-  *Deferred for a later release*
+
+---
+
+## Architecture
+
+Soulbound is designed around a backend-first architecture. Unity-specific concerns are isolated an adapter layer.
+
+### Assembly
+
+All game code lives under the `SoulboundEngine` assembly definition (`SoulboundEngine.asmdef`).
+
+
+### Tech Stack
+
+| Technology | Purpose |
+|---|---|
+| Unity (2D) | game engine and rendering |
+| C# | primary language |
+| UniTask | async usage (no Unity coroutine overhead) |
+| Newtonsoft.Json | serialization |
+| FastNoiseLite | procedural noise |
+| Unity Addressables | asset management |
+| Unity Input System | input action management |
+
+---
+
+### Debug & Developer Tools
+
+Soulbound ships with a suite of in-editor and in-game developer tools.
+
+#### Command Line (`/`)
+Press `/` in-game to open the command line. Supports:
+- Tab completion
+- Command history cycling with up/down arrow keys
+- Available commands: `tp`, `setblock`, `spawn`, `give` *(only inside a world)*
+
+#### Debug Console (`F1`)
+Displays all Unity log output (Info, Warning, Error, Exception) with per-type filtering.
+
+#### Metrics HUD (`F2`)
+Displays real-time performance data:
+- FPS and frame time
+- Fixed update time
+- Managed memory, mono heap
+- GPU memory
+- GC allocations per frame
+
+---
+
+## Known Issues
+
+These are intentional deferrals, not bugs:
+
+- **Serialization** - World save/load is partially stubbed. Full NBT-style serialization is deferred to a later milestone (beta or later).
+- **Lighting** - No lighting system yet. Deferred until the rendering pipeline stabilizes.
+- **Animations** - infrastructure exists but visual animations are not yet wired to gameplay.
+- **Modding Support** - Systems are designed with modding in mind, but modding APIs are explicitly deferred.
+- **Visual Polish** - UI visuals, shaders, and artistic assets are placeholder or absent. Production art is out of scope for alpha.
 
 ## License
+This project is licensed under the MIT License. See [LICENSE](./LICENSE) for more details.
 
-Private development. License TBD closer to production.
-
----  
-
-# Developer notes
-
-## Task tokens
-
-The following tokens have been introduced for developer use to improve codebase clarity and task management:
-- `TODO` (Priority: Normal) - used for tasks that need to be implemented or fixed soon. These tasks are relatively high-priority.
-- `FUTURE TODO` (Priority: Low) - indicates a potential upcoming change or design consideration. Similar to `TODO`, but it's not urgent.
-- `FEATUREIMPL` (Priority: High) - indicates a feature that has not yet been implemented but is planned for the near future
-- `REMINDER` (Priority: Low) - used to leave non-critical notes or consideration about future reference.
-- `PLANNED` (Priority: High) - indicates a feature or change that is already decided on, but not implemented yet. Its something you know you want to add, just at a later time.
-- `REFACTOR` (Priority: Normal) - indicates code that works correctly but could be improved for better readability or maintainability.
-- `POTENTIAL` (Priority: Normal) - indicates a possible feature, rework, or refactor that is under consideration but not yet confirmed.  
-- `REWORK` (Priority: High) - indicates that a feature needs deep changes - both game visuals, gameplay, and code logic may be affected by this change
-
-Making combination of task tokens is possible and actually recommended. They help clarify an idea or a future commit in the codebase:
-- `POTENTIAL FEATUREIMPL` - indicates a feature implementation that is being considered but has not yet confirmed.
-- `PLANNED REFACTOR` - a refactor that is already decided on, but not implemented yet.
-
----
-
-<!---
-incoherent capability definitions: capabilities are not instantiatable and arent referenced in each item definition
-
-## Item Capabilities and Effect Definitions
-
-- The central interface for all item behaviors is `IItemCapability`. <b>This is a marker interface and must not be mocked or implemented directly.</b>
-- The base class for use-triggered item behaviors is `ItemUseEffect`. <b>This class is abstract and should not be instantiated or referenced directly.</b> To define behavior, you must inherit from it.
-
-When introducing a new item behavior, create a new interface that inherits from `IItemCapability`, and optionally register it inside ItemUsageHandler to link capability types with behavior mappings.  
-Defining a new use effect should be done using these steps:
-1. Create an abstract effect class inherited from `ItemUseEffect`, then add fields, shared logic, and any custom behavior. You may override the `Execute()` method, but this is not recommended - it will never be called outside of the class's context.
-2. Create the class containing the effect implementation that inherits from your abstract effect class.
-
-Then assign the effect to an item:
-1. Create a class that inherits both `Item` and the new capability interface
-2. Create an asset of the effect class
-3. Assign the effect asset to the item`s effect field (make sure both the field and the item asset exist first)
-
-The following example is taken from an actual feature in the game's code, but may be outdated due to ongoing development:
-
-
-
-#### Capability definition
-```csharp
-public interface IConsumable : IItemCapability {
-	public int ConsumeAmount { get; }
-	public ConsumableEffect ConsumeAction { get; }
-
-	public virtual void Consume(ItemStack itemStack) {
-		ConsumeAction?.OnConsume(this, itemStack);
-		itemStack.Quantity -= ConsumeAmount;
-	}
-}
-```
-
-#### Effect definition
-```csharp
-public abstract class ConsumableEffect : ItemUseEffect {
-	public abstract void OnConsume(IConsumable consumable, ItemStack itemStack);
-}
-```
-
-#### Item asset reference
-```csharp
-[CreateAssetMenu(menuName = "Items/ConsumableItem")]
-public class ConsumableItem : Item, IConsumable {
-	[CanBeNull] [SerializeField] private ConsumableEffect consumeAction;
-
-	public ConsumableEffect ConsumeAction => consumeAction;
-
-	[SerializeField] private int consumeAmount;
-	public int ConsumeAmount => consumeAmount;
-
-	protected override AbstractTooltip GetDefaultTooltip() {
-		return CompoundTooltip.Of(TooltipData.Concat((base.GetDefaultTooltip() as CompoundTooltip).Data.ToArray(), Tooltip.Tag(ItemTag.Consumable).Data));
-	}
-}
-```
-
-#### Effect asset reference
-```csharp
-[CreateAssetMenu(fileName = "ConsumableEffect_test", menuName = "Items/Effects/ConsumableEffect_test")]
-public class ConsumableEffect_test : ConsumableEffect {
-	public override void OnConsume(IConsumable consumable, ItemStack itemStack) {
-		Debug.Log($"consumed {consumable.ConsumeAmount}, remaining: {itemStack.Quantity}");
-	}
-}
-```
-
-#### Use effect registration
-```csharp
-itemUsageHandler.Register<IConsumable>(ItemUseTrigger.LeftClick, (consumable, stack) => consumable.Consume(stack));
-```
--->
-
-
-
-
-
-<!---
-may be moved in code documentation files
-
-## BufferedStat implementation
-
-A `BufferedStat` is a special kind of `SerializableStat` that only applies its effects conditionally, based on external triggers defined through `IBufferedTrigger`. This interface acts as a "stat wrapper" that becomes active or inactive depending on event-based or time-based rules.
-
-#### Fields:
-- `IBufferedTrigger applyBufferedTrigger`:  
-Trigger responsible for determining when the stat should be applied (e.g. after a delay, when a condition is met)
-- `IBufferedTrigger revokeBufferedTrigger`:  
-Trigger responsible for determining when the stat should be revoked or unapplied.
-
-#### Methods:
-```csharp
-public void EnableBuffers(IStatProvider source)
-```
-- Binds both the apply and revoke triggers to a stat source
-- Typically called when the stat is activated in the system
-
-```csharp
-public void DisableBuffers(IStatProvider source)
-```
-- Unbinds both the apply and revoke triggers from the stat source
-- Typically called when the stat is being removed or the provider is disposed
-
-### `IBufferedTrigger`
-
-An interface defining how a buffered stat determined when it should apply or revoke its effects. Acts as an abstraction over time-based, event-passed, or condition-based triggers that "buffer" the actual stat changes.
-
-#### Properties:
-
-```csharp
-BufferedTriggerState State { get; set; }
-```
-- The target action of the trigger (Apply or Revoke)
-- Used for state control - <b> Do not change the value at runtime unless specifically needed to</b>
-
-```csharp
-Func<bool> InvocationValidator { get; }
-```
-- A validation delegate to check whether the trigger is allowed to invoke its logic (e.g. avoid redundant invocation or enfore preconditions)
-
-#### Methods:
-
-```csharp
-void Enable(BufferedStat stat, IStatProvider source)
-```
-- Binds the trigger to a `BufferedStat` and its source
-- Usually hooks into an event system or schedules logic for deferred invocation
-
-```csharp
-void Disable(BufferedStat stat, IStatProvider source)
-```
-- Unbinds or cancels the trigger's logic or event subscriptions
-
-```csharp
-void Invoke(BufferedStat stat, Action action)
-```
-- Executes the trigger logic, wrapping a given action (typically applying or revoking the stat)
-- This allows deferred or conditionally controlled stat application
-
-### Conceptual notes:
-- `BufferedStat` provides declarative and serializable control over when a stat is considered active
-- `IBufferedTrigger` provides reactive control, bridging the stat info with gameplay logic (when/how it applies)
-- This abstraction is ideal for temporary buffs/debuffs, event-driven stat effects (e.g. on hit, on move), and environmental or conditional effects
-- Triggers are modular and interchangeable. You can compose complex behavior by mixing different implementations (e.g. `TimedBufferedTrigger` with `EventTimerBufferedTrigger` and so on)
--->
+## Notes
+- This repo is in active development of the game. Features, systems, and structures are subject to change as development continues.
