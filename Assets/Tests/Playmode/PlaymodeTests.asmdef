@@ -3,7 +3,6 @@
     "rootNamespace": "",
     "references": [
         "UnityEngine.TestRunner",
-        "SoulboundBackend",
         "Unity.InputSystem",
         "Unity.TextMeshPro"
     ],
