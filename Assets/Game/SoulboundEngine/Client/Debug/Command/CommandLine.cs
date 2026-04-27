@@ -2,6 +2,7 @@ using SoulboundEngine.Client.Debug.Commands;
 using SoulboundEngine.Client.Debug.Commands.View;
 using SoulboundEngine.Client.Input;
 using SoulboundEngine.Client.UI;
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -13,6 +14,7 @@ namespace SoulboundEngine.Client.Debug {
 		int IInputEventHandler.priority => 5005;
 		private readonly CommandProcessor commandProcessor;
 		private readonly List<string> history = new();
+		private readonly List<Action> onHideActions = new();
 
 		public CommandLine(CommandProcessor commandProcessor) {
 			this.commandProcessor = commandProcessor;
@@ -22,6 +24,12 @@ namespace SoulboundEngine.Client.Debug {
 			if (!this.visible) {
 				this.visible = true;
 				this.CreateNodeIfNull();
+				this.node.onDestroy += () => {
+					foreach (var action in this.onHideActions) {
+						action();
+					}
+					this.onHideActions.Clear();
+				};
 			}
 		}
 
@@ -34,6 +42,10 @@ namespace SoulboundEngine.Client.Debug {
 			this.node.Destroy();
 			this.commandProcessor.SubmitCommand(command);
 			this.history.Add(command);
+		}
+
+		public void AddHideAction(Action action) {
+			this.onHideActions.Add(action);
 		}
 
 		IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {

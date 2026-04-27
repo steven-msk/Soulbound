@@ -1,6 +1,7 @@
 using SoulboundEngine.Client.Debug.Logging.Console;
 using SoulboundEngine.Client.Debug.Metrics.View;
 using SoulboundEngine.Client.Input;
+using System;
 using UnityEngine;
 
 namespace SoulboundEngine.Client.Debug {
@@ -29,9 +30,11 @@ namespace SoulboundEngine.Client.Debug {
 			}
 		}
 
-		public void ShowCommandLine() {
+		public void ShowCommandLine(Action onHide) {
 			if (!this.commandLine.IsVisible() && !this.console.IsVisible()) {
 				this.commandLine.Show();
+				this.commandLine.AddHideAction(onHide);
+				this.commandLine.AddHideAction(() => this.inputManager.RemoveHandler(this.commandLine));
 				this.inputManager.AddHandler(this.commandLine);
 			}
 		}

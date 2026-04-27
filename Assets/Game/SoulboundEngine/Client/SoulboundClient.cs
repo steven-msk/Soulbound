@@ -173,7 +173,20 @@ namespace SoulboundEngine.Client {
 					this.activeWorldSession?.level.ToggleChunkFeatures();
 					this.clientDebug.ToggleMetricsHUD();
 				}),
-				InputEventListener.ConsumePerformed(InputTokens.Debug.enterCommand, _ => this.clientDebug.ShowCommandLine()),
+
+				// TODO: improve input blocking and command line prioritization
+				InputEventListener.ConsumePerformed(InputTokens.Debug.enterCommand, _ => {
+
+					// command line input needs to suppress all player actions
+					// but there isnt a direct way to know when the console is closed
+					// so we delegate the hide to re-add the player actions
+					Action onHide = () => { };
+					if (this.activeWorldSession is { } session) {
+						this.inputManager.RemoveHandler(session.player);
+						onHide = () => this.inputManager.AddHandler(session.player);
+					}
+					this.clientDebug.ShowCommandLine(onHide);
+				}),
 				InputEventListener.ConsumePerformed(InputTokens.Debug.toggleConsole, _ => this.clientDebug.ToggleConsole())
 			};
 		}
