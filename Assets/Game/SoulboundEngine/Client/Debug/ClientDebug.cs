@@ -31,7 +31,7 @@ namespace SoulboundEngine.Client.Debug {
 		}
 
 		public void ShowCommandLine(Action onHide) {
-			if (!this.commandLine.IsVisible() && !this.console.IsVisible()) {
+			if (!this.commandLine.IsVisible()) {
 				this.commandLine.Show();
 				this.commandLine.AddHideAction(onHide);
 				this.commandLine.AddHideAction(() => this.inputManager.RemoveHandler(this.commandLine));
@@ -39,23 +39,19 @@ namespace SoulboundEngine.Client.Debug {
 			}
 		}
 
-		public bool IsCommandLineVisible() {
-			return this.commandLine.IsVisible();
-		}
-
-		public void HideCommandLine() {
-			if (this.commandLine.IsVisible()) {
-				this.commandLine.Toggle();
-				this.inputManager.RemoveHandler(this.commandLine);
-			}
-		}
-
 		public void ToggleConsole() {
-			this.HideCommandLine();
 			if (this.metricsHud.IsVisible()) {
 				this.metricsHud.Toggle();
 			}
 			this.console.Toggle();
+		}
+
+		public bool IsConsoleVisible() {
+			return this.console.IsVisible();
+		}
+
+		public bool IsMetricsHUDVisible() {
+			return this.metricsHud.IsVisible();
 		}
 	}
 }

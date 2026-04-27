@@ -297,16 +297,16 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 			this.chunkOutlineRenderer.HideOutline(chunk);
 		}
 
-		public void ToggleChunkFeatures() {
-			this.showingChunkFeatures = !this.showingChunkFeatures;
-
-			if (this.showingChunkFeatures) {
-				foreach (var chunk in this.loadedChunks.Values) {
-					this.chunkOutlineRenderer.ShowOutline(chunk);
-				}
-			} else {
-				this.chunkOutlineRenderer.Clear();
+		public void ShowChunkFeatures() {
+			this.showingChunkFeatures = true;
+			foreach (var chunk in this.loadedChunks.Values) {
+				this.chunkOutlineRenderer.ShowOutline(chunk);
 			}
+		}
+
+		public void HideChunkFeatures() {
+			this.showingChunkFeatures = false;
+			this.chunkOutlineRenderer.Clear();
 		}
 
 		public void OnSessionStop() {

@@ -170,8 +170,12 @@ namespace SoulboundEngine.Client {
 		IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {
 			return new InputEventListener[] {
 				InputEventListener.ConsumePerformed(InputTokens.Debug.toggleMetrics, _ => {
-					this.activeWorldSession?.level.ToggleChunkFeatures();
 					this.clientDebug.ToggleMetricsHUD();
+					if (this.clientDebug.IsMetricsHUDVisible()) {
+						this.activeWorldSession?.level.ShowChunkFeatures();
+					} else {
+						this.activeWorldSession?.level.HideChunkFeatures();
+					}
 				}),
 
 				// TODO: improve input blocking and command line prioritization
@@ -187,7 +191,12 @@ namespace SoulboundEngine.Client {
 					}
 					this.clientDebug.ShowCommandLine(onHide);
 				}),
-				InputEventListener.ConsumePerformed(InputTokens.Debug.toggleConsole, _ => this.clientDebug.ToggleConsole())
+				InputEventListener.ConsumePerformed(InputTokens.Debug.toggleConsole, _ => { 
+					this.clientDebug.ToggleConsole();
+					if (this.clientDebug.IsConsoleVisible()) {
+						this.activeWorldSession?.level.HideChunkFeatures();
+					}
+				})
 			};
 		}
 
