@@ -47,6 +47,8 @@ namespace SoulboundEngine.Client {
 		private readonly WorldAudioEventBank worldAudioEventBank;
 		private WorldSession? activeWorldSession;
 
+		int IInputEventHandler.priority => int.MaxValue;
+
 		public SoulboundClient(GameConfig config, ClientInit ctx) {
 			instance = this;
 			this.config = config;
@@ -63,8 +65,7 @@ namespace SoulboundEngine.Client {
 			CommandLine commandLine = new(this.commandProcessor);
 			MetricsHUD metricsHud = new(ctx.debugMetricsService);
 			DebugConsole debugConsole = new();
-			this.clientDebug = new ClientDebug(unityLogger, debugConsole, commandLine, metricsHud);
-			this.inputManager.AddHandler(this.clientDebug);
+			this.clientDebug = new ClientDebug(unityLogger, debugConsole, commandLine, metricsHud, this.inputManager);
 
 			// prototypical; will not pass to alpha prod
 			var worldSerializer = new JsonSerializer<WorldDump>(Soulbound.globalJsonSettings);
@@ -171,7 +172,9 @@ namespace SoulboundEngine.Client {
 				InputEventListener.ConsumePerformed(InputTokens.Debug.toggleMetrics, _ => {
 					this.activeWorldSession?.level.ToggleChunkFeatures();
 					this.clientDebug.ToggleMetricsHUD();
-				})
+				}),
+				InputEventListener.ConsumePerformed(InputTokens.Debug.enterCommand, _ => this.clientDebug.ShowCommandLine()),
+				InputEventListener.ConsumePerformed(InputTokens.Debug.toggleConsole, _ => this.clientDebug.ToggleConsole())
 			};
 		}
 
