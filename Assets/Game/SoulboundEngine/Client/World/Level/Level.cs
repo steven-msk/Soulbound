@@ -31,6 +31,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 		private readonly Dictionary<int, WorldChunk> loadedChunks = new();
 		private readonly Dictionary<int, WorldChunk> generatedChunks = new(); 
 		private readonly ChunkOutlineRenderer chunkOutlineRenderer = new();
+		private bool showingChunkFeatures = false;
 		[Obsolete] private readonly ConcurrentDictionary<int, List<OnChunkGenerated>> deferredGenerations = new();
 		private readonly Dictionary<int, ChunkGenData> chunkGenData = new();
 		private readonly WorldRenderer worldRenderer;
@@ -100,24 +101,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 		public void FrameUpdate() {
 			int pivotChunkX = ChunkXAt(this.player.GetPos());
 			this.UnloadDistantChunks(pivotChunkX, RENDER_DISTANCE);
-
-			for (int dx = -RENDER_DISTANCE; dx <= RENDER_DISTANCE; dx++) {
-				int chunkX = pivotChunkX + dx;
-
-				if (!this.loadedChunks.ContainsKey(chunkX)) {
-					WorldChunk chunk;
-
-					if (!this.generatedChunks.ContainsKey(chunkX)) {
-						chunk = this.GenerateNewChunk(chunkX);
-						this.generatedChunks[chunkX] = chunk;
-					} else {
-						chunk = this.generatedChunks[chunkX];
-					}
-
-					this.loadedChunks[chunkX] = chunk;
-					chunk.OnLoad(this.chunkOutlineRenderer);
-				}
-			}
+			this.UpdateLoadedChunks(pivotChunkX);
 
 			foreach (var entity in this.GetAllEntities().ToArray()) {
 				entity.FrameUpdate();
@@ -278,6 +262,50 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 			foreach (WorldChunk chunk in toRemove) {
 				this.loadedChunks.Remove(chunk.xpos);
 				chunk.OnUnload(this.chunkOutlineRenderer);
+				this.OnChunkUnloaded(chunk);
+			}
+		}
+
+		public void UpdateLoadedChunks(int pivotChunkX) {
+			for (int dx = -RENDER_DISTANCE; dx <= RENDER_DISTANCE; dx++) {
+				int chunkX = pivotChunkX + dx;
+
+				if (!this.loadedChunks.ContainsKey(chunkX)) {
+					WorldChunk chunk;
+
+					if (!this.generatedChunks.ContainsKey(chunkX)) {
+						chunk = this.GenerateNewChunk(chunkX);
+						this.generatedChunks[chunkX] = chunk;
+					} else {
+						chunk = this.generatedChunks[chunkX];
+					}
+
+					this.loadedChunks[chunkX] = chunk;
+					chunk.OnLoad(this.chunkOutlineRenderer);
+					this.OnChunkLoaded(chunk);
+				}
+			}
+		}
+
+		private void OnChunkLoaded(WorldChunk chunk) {
+			if (this.showingChunkFeatures) {
+				this.chunkOutlineRenderer.ShowOutline(chunk);
+			}
+		}
+
+		private void OnChunkUnloaded(WorldChunk chunk) {
+			this.chunkOutlineRenderer.HideOutline(chunk);
+		}
+
+		public void ToggleChunkFeatures() {
+			this.showingChunkFeatures = !this.showingChunkFeatures;
+
+			if (this.showingChunkFeatures) {
+				foreach (var chunk in this.loadedChunks.Values) {
+					this.chunkOutlineRenderer.ShowOutline(chunk);
+				}
+			} else {
+				this.chunkOutlineRenderer.Clear();
 			}
 		}
 

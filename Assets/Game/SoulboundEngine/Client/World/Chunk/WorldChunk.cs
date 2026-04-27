@@ -139,14 +139,15 @@ namespace SoulboundEngine.Client.World.Chunk {
 
 		public int ChunkXToWorldX(int cx) => cx + this.xpos * Level.CHUNK_LENGTH;
 
+		[Obsolete]
 		public void OnLoad(ChunkOutlineRenderer outlineRenderer) {
-			outlineRenderer.ShowOutline(this);
+			//outlineRenderer.ShowOutline(this);
 		}
 
+		[Obsolete]
 		public void OnUnload(ChunkOutlineRenderer outlineRenderer) {
-			outlineRenderer.HideOutline(this);
+			//outlineRenderer.HideOutline(this);
 		}
-
 
 		public void SetBlockState(BlockPos blockPos, BlockState? blockState) {
 			blockState ??= Blocks.air.DefaultState;

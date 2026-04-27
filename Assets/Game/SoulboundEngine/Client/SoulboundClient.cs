@@ -29,7 +29,8 @@ namespace SoulboundEngine.Client {
 	using Object = UnityEngine.Object;
 	using Time = UnityEngine.Time;
 
-	public sealed class SoulboundClient {
+	public sealed class SoulboundClient : IInputContext {
+		int IInputContext.priority => int.MaxValue;
 		private static SoulboundClient instance;
 		private readonly GameConfig config;
 		private readonly PlayerInputActions inputActions;
@@ -87,6 +88,7 @@ namespace SoulboundEngine.Client {
 		/// </summary>
 		public void Start() {
 			this.uiHandler.SetScreen(new TitleScreen());
+			this.inputManager.PushContext(this);
 		}
 
 		/// <summary>
@@ -164,6 +166,15 @@ namespace SoulboundEngine.Client {
 
 		public bool IsWorldSessionActive() => this.activeWorldSession != null;
 
+		bool IInputContext.HandleInput(in InputEvent inputEvent) {
+			if (inputEvent.Performed(InputTokens.Debug.toggleMetrics)) {
+				this.activeWorldSession?.level.ToggleChunkFeatures();
+				this.clientDebug.ToggleMetricsHUD();
+				return true;
+			}
+			return false;
+		}
+
 		public void Shutdown() {
 			this.activeWorldSession?.levelManager.StopSession();
 			this.settings.Save();
@@ -184,5 +195,6 @@ namespace SoulboundEngine.Client {
 		public static SoulboundClient Instance => instance;
 		public InputManager InputManager => this.inputManager;
 		public UIHandler UIHandler => this.uiHandler;
+
 	}
 }

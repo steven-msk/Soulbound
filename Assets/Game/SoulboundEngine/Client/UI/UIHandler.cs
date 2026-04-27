@@ -17,35 +17,35 @@ namespace SoulboundEngine.Client.UI {
 		private readonly List<UIOverlayNode> overlays = new();
 
 		public UIHandler(Canvas initialCanvas) {
-			gui = new GUI();
-			canvas = initialCanvas;
-			screenRoot = new ScreenRoot(canvas.transform);
-			screenManager = new ScreenManager(screenRoot);
+			this.gui = new GUI();
+			this.canvas = initialCanvas;
+			this.screenRoot = new ScreenRoot(this.canvas.transform);
+			this.screenManager = new ScreenManager(this.screenRoot);
 		}
 
 		public void SetCanvas(Canvas canvas) {
-			UIOverlayNode[] nodes = overlays.ToArray();
+			UIOverlayNode[] nodes = this.overlays.ToArray();
 			for (int i = 0; i < nodes.Length; i++) nodes[i].Destroy();
-			overlays.Clear();
+			this.overlays.Clear();
 
 			this.canvas = canvas;
-			screenRoot = new ScreenRoot(canvas.transform);
-			screenManager = new ScreenManager(screenRoot);
+			this.screenRoot = new ScreenRoot(canvas.transform);
+			this.screenManager = new ScreenManager(this.screenRoot);
 		}
 
-		public Canvas GetCanvas() => canvas;
+		public Canvas GetCanvas() => this.canvas;
 
 		public void AddOverlay(UIOverlayNode overlayNode) {
-			overlayNode.gameObject.transform.SetParent(canvas.transform, false);
-			overlays.Add(overlayNode);
-			overlayNode.onDestroy += () => overlays.Remove(overlayNode);
+			overlayNode.gameObject.transform.SetParent(this.canvas.transform, false);
+			this.overlays.Add(overlayNode);
+			overlayNode.onDestroy += () => this.overlays.Remove(overlayNode);
 		}
 
-		public void SetScreen(Screen screen) =>	screenManager.PushScreen(screen);
+		public void SetScreen(Screen screen) => this.screenManager.PushScreen(screen);
 
-		public void FlushScreens() => screenManager.Flush();
+		public void FlushScreens() => this.screenManager.Flush();
 
-		public IScreenNavigator GetScreenNavigator() => screenManager;
+		public IScreenNavigator GetScreenNavigator() => this.screenManager;
 
 		bool IInputContext.HandleInput(in InputEvent inputEvent) {
 			return EventSystem.current.IsPointerOverGameObject()

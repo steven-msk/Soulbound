@@ -1,6 +1,7 @@
 using SoulboundEngine.Client.Debug.Logging.Console;
 using SoulboundEngine.Client.Debug.Metrics.View;
 using SoulboundEngine.Client.Input;
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -23,34 +24,34 @@ namespace SoulboundEngine.Client.Debug {
 #endif
 		}
 
+		[Obsolete]
 		bool IInputContext.HandleInput(in InputEvent inputEvent) {
-			if (!commandLine.IsVisible() && inputEvent.Performed(InputTokens.Debug.enterCommand)) {
-				commandLine.Show();
+			if (!this.commandLine.IsVisible() && inputEvent.Performed(InputTokens.Debug.enterCommand)) {
+				this.commandLine.Show();
 				return true;
 			}
 
 			// this is risky because ALL inputs are consumed
 			// but it works for now
-			if (commandLine.IsVisible()) {
-				if (inputEvent.Performed(InputTokens.Keyboard.TAB)) commandLine.HandleKey(Key.Tab);
-				if (inputEvent.Performed(InputTokens.Keyboard.ARROW_UP)) commandLine.HandleKey(Key.UpArrow);
-				if (inputEvent.Performed(InputTokens.Keyboard.ARROW_DOWN)) commandLine.HandleKey(Key.DownArrow);
-				if (inputEvent.Performed(InputTokens.Keyboard.ESC)) commandLine.HandleKey(Key.Escape);
-				if (inputEvent.Performed(InputTokens.Keyboard.BACKSPACE)) commandLine.HandleKey(Key.Backspace);
+			if (this.commandLine.IsVisible()) {
+				if (inputEvent.Performed(InputTokens.Keyboard.TAB)) this.commandLine.HandleKey(Key.Tab);
+				if (inputEvent.Performed(InputTokens.Keyboard.ARROW_UP)) this.commandLine.HandleKey(Key.UpArrow);
+				if (inputEvent.Performed(InputTokens.Keyboard.ARROW_DOWN)) this.commandLine.HandleKey(Key.DownArrow);
+				if (inputEvent.Performed(InputTokens.Keyboard.ESC)) this.commandLine.HandleKey(Key.Escape);
+				if (inputEvent.Performed(InputTokens.Keyboard.BACKSPACE)) this.commandLine.HandleKey(Key.Backspace);
 				return true;
 			}
 
 			if (inputEvent.Performed(InputTokens.Debug.toggleConsole)) {
-				console.Toggle();
-				return true;
-			}
-
-			if (inputEvent.Performed(InputTokens.Debug.toggleMetrics)) {
-				metricsHud.Toggle();
+				this.console.Toggle();
 				return true;
 			}
 
 			return false;
+		}
+
+		public void ToggleMetricsHUD() {
+			this.metricsHud.Toggle();
 		}
 	}
 }
