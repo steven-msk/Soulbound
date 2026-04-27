@@ -8,8 +8,8 @@ using Screen = SoulboundEngine.Client.UI.Screens.Screen;
 #nullable enable
 
 namespace SoulboundEngine.Client.UI {
-	public sealed class UIHandler : IInputContext {
-		int IInputContext.priority => 1000;
+	public sealed class UIHandler : IInputEventHandler {
+		int IInputEventHandler.priority => 1000;
 		private readonly GUI gui;
 		private Canvas canvas;
 		private ScreenManager screenManager;
@@ -47,12 +47,18 @@ namespace SoulboundEngine.Client.UI {
 
 		public IScreenNavigator GetScreenNavigator() => this.screenManager;
 
-		bool IInputContext.HandleInput(in InputEvent inputEvent) {
-			return EventSystem.current.IsPointerOverGameObject()
-				&& (inputEvent.token.Equals(InputTokens.Mouse.leftClick)
-					|| inputEvent.token.Equals(InputTokens.Mouse.rightClick)
-					|| inputEvent.token.Equals(InputTokens.Mouse.position))
-				&& inputEvent.phase == UnityEngine.InputSystem.InputActionPhase.Performed;
+		IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {
+			static InputEventListener ConsumeWhenOverGameObject(InputToken token) {
+				return InputEventListener.Performed(token, _ => {
+					return EventSystem.current.IsPointerOverGameObject();
+				});
+			}
+
+			return new InputEventListener[] {
+				ConsumeWhenOverGameObject(InputTokens.Mouse.leftClick),
+				ConsumeWhenOverGameObject(InputTokens.Mouse.rightClick),
+				ConsumeWhenOverGameObject(InputTokens.Mouse.position)
+			};
 		}
 	}
 }

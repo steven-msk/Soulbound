@@ -6,8 +6,8 @@ using SoulboundEngine.Client.UI.Screens;
 using SoulboundEngine.Client.World.BlockSystem.Render;
 using SoulboundEngine.Client.World.Generation;
 using SoulboundEngine.Client.World.Render;
-using SoulboundEngine.Common;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
@@ -18,7 +18,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 	/// <summary>
 	/// Manages Level lifecycles
 	/// </summary>
-	public class LevelManager : IInputContext {
+	public class LevelManager : IInputEventHandler {
 		public const float tickRate = 0.02f;        // 50 tps
 		private float tickStartTime;
 		private float frameStartTime;
@@ -37,38 +37,36 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 
 		// known issue: scattered Level and LevelManager dependencies
 		public LevelManager(ISeedProvider seedProvider, BlockRenderer blockRenderer, BlockModelResolver blockModelResolver) {
-			worldRenderer = new WorldRenderer(simulationView, blockRenderer, blockModelResolver);
-			level = new Level(worldRenderer, seedProvider.GetSeed());
+			this.worldRenderer = new WorldRenderer(simulationView, blockRenderer, blockModelResolver);
+			this.level = new Level(this.worldRenderer, seedProvider.GetSeed());
 		}
 
-		[PROTOTYPICAL]
-		bool IInputContext.HandleInput(in InputEvent inputEvent) {
-			if (inputEvent.token.Equals(InputTokens.Keyboard.ESC)) {
-				TogglePause();
+		IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {
+			yield return new(InputTokens.Keyboard.ESC, InputEvent.Phase.Any, _ => {
+				this.TogglePause();
 				return true;
-			}
-			return false;
+			});
 		}
 
 		public void StartSession() {
-			level.StartSession(new Player(level));
-			sessionRunning = true;
+			this.level.StartSession(new Player(this.level));
+			this.sessionRunning = true;
 
-			UniTask.Post(LevelFrameLoop);
-			UniTask.Post(LevelTickLoop);
+			UniTask.Post(this.LevelFrameLoop);
+			UniTask.Post(this.LevelTickLoop);
 		}
 
 		private async void LevelFrameLoop() {
-			while (sessionRunning) {
+			while (this.sessionRunning) {
 				try {
-					if (!paused) {
-						StartFrame();
+					if (!this.paused) {
+						this.StartFrame();
 
-						Vector2 pivotPos = level.GetPlayer()?.GetPos() ?? level.GetWorldSpawnPoint();
-						level.FrameUpdate();
-						worldRenderer.RenderView(pivotPos, level.GetBlockState);
+						Vector2 pivotPos = this.level.GetPlayer()?.GetPos() ?? this.level.GetWorldSpawnPoint();
+						this.level.FrameUpdate();
+						this.worldRenderer.RenderView(pivotPos, this.level.GetBlockState);
 
-						EndFrame();
+						this.EndFrame();
 					}
 					await UniTask.WaitForEndOfFrame();
 				} catch (Exception e) {
@@ -78,15 +76,15 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 		}
 
 		private async void LevelTickLoop() {
-			while (sessionRunning) {
+			while (this.sessionRunning) {
 				try {
-					if (!paused) {
-						StartTick();
+					if (!this.paused) {
+						this.StartTick();
 
-						Vector2 pivotPos = level.GetPlayer()?.GetPos() ?? level.GetWorldSpawnPoint();
-						level.Tick(GetRelativeSimulationRect(pivotPos));
+						Vector2 pivotPos = this.level.GetPlayer()?.GetPos() ?? this.level.GetWorldSpawnPoint();
+						this.level.Tick(this.GetRelativeSimulationRect(pivotPos));
 
-						EndTick();
+						this.EndTick();
 					}
 					await UniTask.WaitForSeconds(tickRate, true);
 				} catch (Exception e) {
@@ -96,27 +94,27 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 		}
 
 		private void StartFrame() {
-			frameStartTime = Time.realtimeSinceStartup;
+			this.frameStartTime = Time.realtimeSinceStartup;
 		}
 
 		private void EndFrame() {
-			float fps = 1f / (Time.realtimeSinceStartup - frameStartTime);
+			float fps = 1f / (Time.realtimeSinceStartup - this.frameStartTime);
 		}
 
 		private void StartTick() {
-			tickStartTime = Time.realtimeSinceStartup;
+			this.tickStartTime = Time.realtimeSinceStartup;
 		}
 
 		private void EndTick() {
-			float elapsed = Time.realtimeSinceStartup - tickStartTime;
+			float elapsed = Time.realtimeSinceStartup - this.tickStartTime;
 			if (elapsed > tickRate) {
 				Logger.LogWarning($"Tick lag detected! Tick took {elapsed * 1000f:F1} ms");
 			}
 		}
 
 		public void StopSession() {
-			sessionRunning = false;
-			level.OnSessionStop();
+			this.sessionRunning = false;
+			this.level.OnSessionStop();
 		}
 
 		private RectInt GetRelativeSimulationRect(Vector2 pivot) {
@@ -129,17 +127,17 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 		}
 
 		public void TogglePause() {
-			paused = !paused;
-			Time.timeScale = paused ? 0f : 1f;
+			this.paused = !this.paused;
+			Time.timeScale = this.paused ? 0f : 1f;
 			UIHandler uiHandler = SoulboundClient.Instance.UIHandler;
-			if (!paused) {
+			if (!this.paused) {
 				uiHandler.GetScreenNavigator().PopScreen();
 			} else {
 				uiHandler.SetScreen(new GamePausedScreen());
 			}
 		}
 
-		public Level GetLevel() => level;
+		public Level GetLevel() => this.level;
 	}
 
 	public record LevelGridContext(Grid grid, Tilemap tilemap);

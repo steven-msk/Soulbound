@@ -7,16 +7,15 @@ using SoulboundEngine.Client.World.BlockSystem.States;
 using SoulboundEngine.Client.World.EntitySystem;
 using SoulboundEngine.Client.World.EntitySystem.Transform;
 using SoulboundEngine.Client.World.LevelDomain;
-using SoulboundEngine.Common;
 using SoulboundEngine.Core.Assets;
 using SoulboundEngine.Core.Event;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 #nullable enable
 
 namespace SoulboundEngine.Client.Players {
-	public class Player : Entity, IInputContext, IInteractionHandler<ItemInteraction>, IInteractionHandler<BlockInteraction> {
+	public class Player : Entity, IInputEventHandler, IInteractionHandler<ItemInteraction>, IInteractionHandler<BlockInteraction> {
 		public static readonly EntityDescriptor<Player> DESCRIPTOR = EntityDescriptor.Of(
 			(_, level) => new Player(level),
 			ITransformSupplier<Player>.Of(entity => {
@@ -57,83 +56,63 @@ namespace SoulboundEngine.Client.Players {
 			this.playerTransform = (PlayerTransform)transform;
 		}
 
-		[PROTOTYPICAL]
-		bool IInputContext.HandleInput(in InputEvent inputEvent) {
-			if (inputEvent.token.Equals(InputTokens.Player.toggleInventory)) {
-				this.inventory.Toggle();
-				return true;
-			}
-			if (inputEvent.Performed(InputTokens.Player.changeHotbarSlot)) {
-				int slotIndex = int.Parse(inputEvent.context.control.name) - 1;
-				this.hotbar.SetMainSlotIndex(slotIndex);
-				return true;
-			}
-			if (inputEvent.Performed(InputTokens.Player.scrollHotbarSlot)) {
-				float scrollDelta = inputEvent.context.ReadValue<float>();
-				int nextSlot = this.hotbar.GetMainSlotIndex() - (int)scrollDelta;
+		IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {
+			return new InputEventListener[] {
+				InputEventListener.ConsumePerformed(InputTokens.Player.toggleInventory, _ => this.inventory.Toggle()),
+				InputEventListener.ConsumePerformed(InputTokens.Player.changeHotbarSlot, inputEvent => {
+					int slotIndex = int.Parse(inputEvent.context.control.name) - 1;
+					this.hotbar.SetMainSlotIndex(slotIndex);
+				}),
+				InputEventListener.ConsumePerformed(InputTokens.Player.scrollHotbarSlot, inputEvent => {
+					float scrollDelta = inputEvent.context.ReadValue<float>();
+					int nextSlot = this.hotbar.GetMainSlotIndex() - (int)scrollDelta;
 
-				if (nextSlot < 0) nextSlot += this.hotbar.GetSlotCount();
-				nextSlot %= this.hotbar.GetSlotCount();
-				this.hotbar.SetMainSlotIndex(nextSlot);
-				return true;
-			}
-			if (inputEvent.token.Equals(InputTokens.Mouse.position)) {
-				this.screenPointerPos = inputEvent.context.ReadValue<Vector2>();
-			}
-			if (inputEvent.token.Equals(InputTokens.Mouse.leftClick)) {
-				if (inputEvent.phase == InputActionPhase.Performed) {
-					this.OnLeftClick();
-					this.isHoldingLeftClick = true;
+					if (nextSlot < 0) nextSlot += this.hotbar.GetSlotCount();
+					nextSlot %= this.hotbar.GetSlotCount();
+					this.hotbar.SetMainSlotIndex(nextSlot);
+				}),
+				new(InputTokens.Mouse.position, InputEvent.Phase.Any, inputEvent => {
+					this.screenPointerPos = inputEvent.context.ReadValue<Vector2>();
+					return false;
+				}),
+				new(InputTokens.Mouse.leftClick, InputEvent.Phase.Performed | InputEvent.Phase.Canceled, inputEvent => {
+					if (inputEvent.phase == InputEvent.Phase.Performed) {
+						this.OnLeftClick();
+						this.isHoldingLeftClick = true;
+					} else if (inputEvent.phase == InputEvent.Phase.Canceled) {
+						this.OnLeftRelease();
+						this.isHoldingLeftClick = false;
+					}
 					return true;
-				} else if (inputEvent.phase == InputActionPhase.Canceled) {
-					this.OnLeftRelease();
-					this.isHoldingLeftClick = false;
+				}),
+				new(InputTokens.Mouse.rightClick, InputEvent.Phase.Performed | InputEvent.Phase.Canceled, inputEvent => {
+					if (inputEvent.phase == InputEvent.Phase.Performed) {
+						this.OnRightClick();
+						this.isHoldingRightClick = true;
+					} else if (inputEvent.phase == InputEvent.Phase.Canceled) {
+						this.OnRightRelease();
+						this.isHoldingRightClick = false;
+					}
 					return true;
-				}
-			}
-			if (inputEvent.token.Equals(InputTokens.Mouse.rightClick)) {
-				if (inputEvent.phase == InputActionPhase.Performed) {
-					this.OnRightClick();
-					this.isHoldingRightClick = true;
+				}),
+				new(InputTokens.Player.move, InputEvent.Phase.Performed | InputEvent.Phase.Canceled, inputEvent => {
+					this.playerTransform.SetNormalVelocityX(
+						inputEvent.phase == InputEvent.Phase.Performed
+							? inputEvent.context.ReadValue<Vector2>().x
+							: 0f
+					);
 					return true;
-				} else if (inputEvent.phase == InputActionPhase.Canceled) {
-					this.OnRightRelease();
-					this.isHoldingRightClick = false;
+				}),
+				new(InputTokens.Player.jump, InputEvent.Phase.Performed | InputEvent.Phase.Canceled, inputEvent => {
+					this.playerTransform.SetJumping(inputEvent.phase == InputEvent.Phase.Performed);
 					return true;
-				}
-			}
-
-			if (inputEvent.token.Equals(InputTokens.Player.move)) {
-				if (inputEvent.phase == InputActionPhase.Performed) {
-					this.playerTransform.SetNormalVelocityX(inputEvent.context.ReadValue<Vector2>().x);
+				}),
+				InputEventListener.ConsumePerformed(InputTokens.Keyboard.Q, _ => this.ThrowFromMainHand(this.isHoldingCtrl)),
+				new(InputTokens.Keyboard.CTRL, InputEvent.Phase.Performed | InputEvent.Phase.Canceled, inputEvent => {
+					this.isHoldingCtrl = inputEvent.phase == InputEvent.Phase.Performed;
 					return true;
-				} else if (inputEvent.phase == InputActionPhase.Canceled) {
-					this.playerTransform.SetNormalVelocityX(0f);
-					return true;
-				}
-			}
-			if (inputEvent.token.Equals(InputTokens.Player.jump)) {
-				if (inputEvent.phase == InputActionPhase.Performed) {
-					this.playerTransform.SetJumping(true);
-					return true;
-				} else if (inputEvent.phase == InputActionPhase.Canceled) {
-					this.playerTransform.SetJumping(false);
-					return true;
-				}
-			}
-
-			if (inputEvent.Performed(InputTokens.Keyboard.Q)) {
-				this.ThrowFromMainHand(this.isHoldingCtrl);
-				return true;
-			}
-			if (inputEvent.token.Equals(InputTokens.Keyboard.CTRL)) {
-				if (inputEvent.phase == InputActionPhase.Performed) {
-					this.isHoldingCtrl = true;
-				} else if (inputEvent.phase == InputActionPhase.Canceled) {
-					this.isHoldingCtrl = false;
-				}
-			}
-			return false;
+				})
+			};
 		}
 
 		public override void FrameUpdate() {

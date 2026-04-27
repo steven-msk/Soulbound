@@ -67,7 +67,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 		public void StartSession(Player player) {
 			this.player = player;
 			this.AddEntity(player);
-			SoulboundClient.Instance.InputManager.PushContext(player);
+			SoulboundClient.Instance.InputManager.AddHandler(player);
 			player.SetPos(this.GetWorldSpawnPoint() + Vector2.up * 2f);
 		}
 
@@ -310,7 +310,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 		}
 
 		public void OnSessionStop() {
-			SoulboundClient.Instance.InputManager.RemoveContext(this.player);
+			SoulboundClient.Instance.InputManager.RemoveHandler(this.player);
 		}
 
 		public BlockState? GetBlockState(BlockPos blockPos) {

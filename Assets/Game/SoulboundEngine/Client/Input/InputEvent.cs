@@ -1,40 +1,36 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine.InputSystem;
 
 namespace SoulboundEngine.Client.Input {
 	public readonly struct InputEvent {
 		public readonly InputToken token;
 		public readonly InputAction.CallbackContext context;
-		public readonly InputActionPhase phase;
+		public readonly Phase phase;
 
-		public InputEvent(InputToken token, InputActionPhase phase, InputAction.CallbackContext context) {
+		public InputEvent(InputToken token, Phase phase, InputAction.CallbackContext context) {
 			this.token = token;
 			this.phase = phase;
 			this.context = context;
 		}
 
 		public bool Performed(InputToken token) {
-			return this.token.Equals(token) && phase == InputActionPhase.Performed;
+			return this.token.Equals(token) && this.phase == Phase.Performed;
 		}
 
 		public bool Started(InputToken token) {
-			return this.token.Equals(token) && phase == InputActionPhase.Started;
+			return this.token.Equals(token) && this.phase == Phase.Started;
 		}
 
 		public bool Canceled(InputToken token) {
-			return this.token.Equals(token) && phase == InputActionPhase.Canceled;
+			return this.token.Equals(token) && this.phase == Phase.Canceled;
 		}
 
-		public bool Waiting(InputToken token) {
-			return this.token.Equals(token) && phase == InputActionPhase.Waiting;
-		}
-
-		public bool Disabled(InputToken token) {
-			return this.token.Equals(token) && phase == InputActionPhase.Disabled;
+		[Flags]
+		public enum Phase {
+			Performed	= 1 << 0,
+			Started		= 1 << 1,
+			Canceled	= 1 << 2,
+			Any = Performed | Started | Canceled
 		}
 	}
 }

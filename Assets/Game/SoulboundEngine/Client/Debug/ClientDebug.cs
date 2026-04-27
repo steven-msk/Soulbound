@@ -1,13 +1,13 @@
 using SoulboundEngine.Client.Debug.Logging.Console;
 using SoulboundEngine.Client.Debug.Metrics.View;
 using SoulboundEngine.Client.Input;
-using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace SoulboundEngine.Client.Debug {
-	public sealed class ClientDebug : IInputContext {
-		int IInputContext.priority => int.MaxValue;
+	public sealed class ClientDebug : IInputEventHandler {
+		int IInputEventHandler.priority => 5005;
 		private readonly DebugConsole console;
 		private readonly CommandLine commandLine;
 		private readonly MetricsHUD metricsHud;
@@ -24,30 +24,27 @@ namespace SoulboundEngine.Client.Debug {
 #endif
 		}
 
-		[Obsolete]
-		bool IInputContext.HandleInput(in InputEvent inputEvent) {
-			if (!this.commandLine.IsVisible() && inputEvent.Performed(InputTokens.Debug.enterCommand)) {
-				this.commandLine.Show();
-				return true;
+		IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {
+			InputEventListener GetCommandLineListener(InputToken token, Key key) {
+				return InputEventListener.ConsumePerformed(token, _ => {
+					this.commandLine.HandleKey(key);
+				});
 			}
 
-			// this is risky because ALL inputs are consumed
-			// but it works for now
-			if (this.commandLine.IsVisible()) {
-				if (inputEvent.Performed(InputTokens.Keyboard.TAB)) this.commandLine.HandleKey(Key.Tab);
-				if (inputEvent.Performed(InputTokens.Keyboard.ARROW_UP)) this.commandLine.HandleKey(Key.UpArrow);
-				if (inputEvent.Performed(InputTokens.Keyboard.ARROW_DOWN)) this.commandLine.HandleKey(Key.DownArrow);
-				if (inputEvent.Performed(InputTokens.Keyboard.ESC)) this.commandLine.HandleKey(Key.Escape);
-				if (inputEvent.Performed(InputTokens.Keyboard.BACKSPACE)) this.commandLine.HandleKey(Key.Backspace);
-				return true;
-			}
+			return new InputEventListener[] {
+				InputEventListener.ConsumePerformed(InputTokens.Debug.enterCommand, _ => {
+					bool alreadyVisible = this.commandLine.IsVisible();
+					if (!alreadyVisible) this.commandLine.Show();
+				}),
 
-			if (inputEvent.Performed(InputTokens.Debug.toggleConsole)) {
-				this.console.Toggle();
-				return true;
-			}
+				GetCommandLineListener(InputTokens.Keyboard.TAB, Key.Tab),
+				GetCommandLineListener(InputTokens.Keyboard.ARROW_UP, Key.UpArrow),
+				GetCommandLineListener(InputTokens.Keyboard.ARROW_DOWN, Key.DownArrow),
+				GetCommandLineListener(InputTokens.Keyboard.ESC, Key.Escape),
+				GetCommandLineListener(InputTokens.Keyboard.BACKSPACE, Key.Backspace),
 
-			return false;
+				InputEventListener.ConsumePerformed(InputTokens.Debug.toggleConsole, _ => this.console.Toggle())
+			};
 		}
 
 		public void ToggleMetricsHUD() {

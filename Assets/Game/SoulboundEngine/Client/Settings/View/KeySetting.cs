@@ -1,5 +1,6 @@
 using SoulboundEngine.Client.Input;
 using SoulboundEngine.Common;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -9,24 +10,24 @@ using UnityEngine.InputSystem.Controls;
 
 namespace SoulboundEngine.Client.SettingSystem.View {
 	[PROTOTYPICAL]
-	public class KeySetting : SettingVisual<KeyControl>, IInputContext {
-		int IInputContext.priority => 100; 
+	public class KeySetting : SettingVisual<KeyControl>, IInputEventHandler {
+		int IInputEventHandler.priority => 100; 
 		[SerializeField] private TextMeshProUGUI text;
 		private bool isRebinding;
 
 		protected override void Build() {
-			SetText(GetBindingText(settingEntry.value));
+			this.SetText(this.GetBindingText(this.settingEntry.value));
 		}
 
-		private void Update() => PollRebind();
+		private void Update() => this.PollRebind();
 
 		public void BeginRebind() {
-			isRebinding = true;
-			SoulboundClient.Instance.InputManager.PushContext(this);
+			this.isRebinding = true;
+			SoulboundClient.Instance.InputManager.AddHandler(this);
 		}
 
 		private void PollRebind() {
-			if (!isRebinding) return;
+			if (!this.isRebinding) return;
 
 			foreach (var keyControl in Keyboard.current.allKeys) {
 				if (keyControl.wasPressedThisFrame) {
@@ -34,24 +35,22 @@ namespace SoulboundEngine.Client.SettingSystem.View {
 						? keyControl
 						: null;
 
-					settingEntry.SetValue(appliedControl);
-					SetText(GetBindingText(appliedControl));
+					this.settingEntry.SetValue(appliedControl);
+					this.SetText(this.GetBindingText(appliedControl));
 
-					EndRebind();
+					this.EndRebind();
 					return;
 				}
 			}
 		}
 
 		private void EndRebind() {
-			isRebinding = false;
-			SoulboundClient.Instance.InputManager.RemoveContext(this);
+			this.isRebinding = false;
+			SoulboundClient.Instance.InputManager.RemoveHandler(this);
 		}
 
-		bool IInputContext.HandleInput(in InputEvent inputEvent) {
-			return isRebinding
-				&& inputEvent.token.Equals(InputTokens.Keyboard.ANY)
-				&& inputEvent.phase == InputActionPhase.Performed;
+		IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {
+			yield return InputEventListener.ConsumePerformed(InputTokens.Keyboard.ANY, _ => { });
 		}
 
 		public string GetBindingText(KeyControl? keyControl) {

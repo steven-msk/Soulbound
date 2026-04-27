@@ -29,8 +29,8 @@ namespace SoulboundEngine.Client {
 	using Object = UnityEngine.Object;
 	using Time = UnityEngine.Time;
 
-	public sealed class SoulboundClient : IInputContext {
-		int IInputContext.priority => int.MaxValue;
+	public sealed class SoulboundClient : IInputEventHandler {
+		const int INPUT_QUEUE_BUFFER_CAPACITY = 128;
 		private static SoulboundClient instance;
 		private readonly GameConfig config;
 		private readonly PlayerInputActions inputActions;
@@ -52,7 +52,7 @@ namespace SoulboundEngine.Client {
 			this.config = config;
 
 			this.inputActions = new PlayerInputActions();
-			this.inputManager = new InputManager(this.inputActions.asset);
+			this.inputManager = new InputManager(INPUT_QUEUE_BUFFER_CAPACITY, this.inputActions.asset);
 			InputTokens.Register(this.inputActions.asset);
 			this.settings = new Settings();
 
@@ -64,7 +64,7 @@ namespace SoulboundEngine.Client {
 			MetricsHUD metricsHud = new(ctx.debugMetricsService);
 			DebugConsole debugConsole = new();
 			this.clientDebug = new ClientDebug(unityLogger, debugConsole, commandLine, metricsHud);
-			this.inputManager.PushContext(this.clientDebug);
+			this.inputManager.AddHandler(this.clientDebug);
 
 			// prototypical; will not pass to alpha prod
 			var worldSerializer = new JsonSerializer<WorldDump>(Soulbound.globalJsonSettings);
@@ -75,7 +75,7 @@ namespace SoulboundEngine.Client {
 			// scene may not be available at this time
 			// TODO: change UIHandler init
 			this.uiHandler = new UIHandler(Object.FindFirstObjectByType<Canvas>());
-			this.inputManager.PushContext(this.uiHandler);
+			this.inputManager.AddHandler(this.uiHandler);
 
 			this.uiAudioEventBank = new UIAudioEventBank();
 			this.worldAudioEventBank = new WorldAudioEventBank();
@@ -88,7 +88,7 @@ namespace SoulboundEngine.Client {
 		/// </summary>
 		public void Start() {
 			this.uiHandler.SetScreen(new TitleScreen());
-			this.inputManager.PushContext(this);
+			this.inputManager.AddHandler(this);
 		}
 
 		/// <summary>
@@ -122,7 +122,7 @@ namespace SoulboundEngine.Client {
 				this.activeWorldSession = session;
 				this.uiHandler.SetCanvas(session.canvas);
 				this.uiHandler.SetScreen(new WorldScreen(session.player));
-				this.inputManager.PushContext(session.levelManager);
+				this.inputManager.AddHandler(session.levelManager);
 
 				this.runtimeDataProvider.SetWorldSessionState(session);
 				this.runtimeExecutionServices.SetWorldSessionState(session);
@@ -139,7 +139,7 @@ namespace SoulboundEngine.Client {
 
 			LevelManager levelManager = this.activeWorldSession?.levelManager!;
 			levelManager.StopSession();
-			this.inputManager.RemoveContext(levelManager);
+			this.inputManager.RemoveHandler(levelManager);
 			this.uiHandler.FlushScreens();
 			Time.timeScale = 1f;
 
@@ -166,13 +166,13 @@ namespace SoulboundEngine.Client {
 
 		public bool IsWorldSessionActive() => this.activeWorldSession != null;
 
-		bool IInputContext.HandleInput(in InputEvent inputEvent) {
-			if (inputEvent.Performed(InputTokens.Debug.toggleMetrics)) {
-				this.activeWorldSession?.level.ToggleChunkFeatures();
-				this.clientDebug.ToggleMetricsHUD();
-				return true;
-			}
-			return false;
+		IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {
+			return new InputEventListener[] {
+				InputEventListener.ConsumePerformed(InputTokens.Debug.toggleMetrics, _ => {
+					this.activeWorldSession?.level.ToggleChunkFeatures();
+					this.clientDebug.ToggleMetricsHUD();
+				})
+			};
 		}
 
 		public void Shutdown() {

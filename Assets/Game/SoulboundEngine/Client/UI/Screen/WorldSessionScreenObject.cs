@@ -11,32 +11,32 @@ using UnityEngine.EventSystems;
 
 namespace SoulboundEngine.Client.UI.Screens {
 	[RequireComponent(typeof(RectTransform))]
-	public class WorldSessionScreenObject : ScreenObject, IItemContainerScreenScope, IInputContext {
+	public class WorldSessionScreenObject : ScreenObject, IItemContainerScreenScope, IInputEventHandler {
 		private RectTransform rect = null!;
 		private TransitStack transitStack = null!;
 		private SlotDragState? dragState;
 		private readonly List<UIItemContainerNode> openContainers = new();
 		private Vector2 pointerPosition;
-		int IInputContext.priority => 5000;
+		int IInputEventHandler.priority => 5000;
 
 		public new void Init(Screen screen) {
 			base.Init(screen);
-			rect = GetComponent<RectTransform>();
-			this.transitStack = new TransitStack(rect);
-			SoulboundClient.Instance.InputManager.PushContext(this);
+			this.rect = this.GetComponent<RectTransform>();
+			this.transitStack = new TransitStack(this.rect);
+			SoulboundClient.Instance.InputManager.AddHandler(this);
 		}
 
 		public bool TryBeginDrag(ItemStack stack, SlotRef slotRef, PointerEventData.InputButton button) {
-			if (InDragState() || stack == null) return false;
+			if (this.InDragState() || stack == null) return false;
 
 			HashSet<SlotRef> draggedSlots = new(new SlotRef.EqualityComparer()) { slotRef };
 
-			dragState = new SlotDragState(slotRef.container) {
+			this.dragState = new SlotDragState(slotRef.container) {
 				stack = stack.Clone(),
 				origin = slotRef,
 				draggedSlots = draggedSlots,
 				button = button,
-				quantitySnapshots = CreateQuantitySnapshots(),
+				quantitySnapshots = this.CreateQuantitySnapshots(),
 			};
 			return true;
 		}
@@ -44,8 +44,8 @@ namespace SoulboundEngine.Client.UI.Screens {
 		private Dictionary<SlotRef, int> CreateQuantitySnapshots() {
 			Dictionary<SlotRef, int> snapshots = new();
 
-			foreach (var node in openContainers) {
-				Dictionary<int, int> quantities = GetQuantitySnapshotForContainer(node.container);
+			foreach (var node in this.openContainers) {
+				Dictionary<int, int> quantities = this.GetQuantitySnapshotForContainer(node.container);
 
 				foreach (var kvp in quantities) {
 					SlotRef slotRef = new(node.container, kvp.Key);
@@ -61,42 +61,42 @@ namespace SoulboundEngine.Client.UI.Screens {
 					.ToDictionary(i => i, i => container.GetSlot(i).GetStack()!.quantity);
 		}
 
-		public void EndDrag() => dragState = null;
+		public void EndDrag() => this.dragState = null;
 
 		public void ExtendDrag(SlotRef slotRef) {
-			dragState?.ExtendDrag(slotRef);
+			this.dragState?.ExtendDrag(slotRef);
 		}
 
-		public bool InDragState() => dragState != null;
+		public bool InDragState() => this.dragState != null;
 
-		public SlotDragState? GetDragState() => dragState;
+		public SlotDragState? GetDragState() => this.dragState;
 
 		public IEnumerable<IItemContainer> GetOpenContainers() {
-			foreach (var node in openContainers) {
+			foreach (var node in this.openContainers) {
 				yield return node.container;
 			}
 		}
 
-		public void AddItemContainer(UIItemContainerNode node) => openContainers.Add(node);
-		public void RemoveItemContainer(UIItemContainerNode node) => openContainers.Remove(node);
+		public void AddItemContainer(UIItemContainerNode node) => this.openContainers.Add(node);
+		public void RemoveItemContainer(UIItemContainerNode node) => this.openContainers.Remove(node);
 
-		bool IInputContext.HandleInput(in InputEvent inputEvent) {
-			if (inputEvent.token.Equals(InputTokens.Mouse.position)) {
-				pointerPosition = inputEvent.context.ReadValue<Vector2>();
-				transitStack.SetPointerPosition(pointerPosition);
-			}
-			return false;
+		IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {
+			yield return new(InputTokens.Mouse.position, InputEvent.Phase.Any, inputEvent => {
+				this.pointerPosition = inputEvent.context.ReadValue<Vector2>();
+				this.transitStack.SetPointerPosition(this.pointerPosition);
+				return false;
+			});
 		}
 
-		ItemStack? ITransitStackSource.GetTransitStack() => transitStack.GetStack();
-		bool ITransitStackSource.HasTransitStack() => transitStack.HasStack();
+		ItemStack? ITransitStackSource.GetTransitStack() => this.transitStack.GetStack();
+		bool ITransitStackSource.HasTransitStack() => this.transitStack.HasStack();
 		void ITransitStackSource.SetTransitStack(ItemStack? itemStack) {
-			if (itemStack == null) transitStack.Destroy();
-			else transitStack.SetStack(itemStack);
+			if (itemStack == null) this.transitStack.Destroy();
+			else this.transitStack.SetStack(itemStack);
 		}
 
 		private void OnDestroy() {
-			SoulboundClient.Instance.InputManager.RemoveContext(this);
+			SoulboundClient.Instance.InputManager.RemoveHandler(this);
 		}
 	}
 }

@@ -7,10 +7,10 @@
 - possible evolution to support cross-platform inputs, not only desktop
 - known issues:
     - current input action asset only has mappings for desktop,
-    - separate token and phase checks may fill up `HandleInput` with too many if statements,
+    - *(fixed)* separate token and phase checks may fill up `HandleInput` with too many if statements,
     - friction between UI input handled internally by Unity and input managed by `InputManager`,
     - early break in dispatch iteration from consumed input could be dangerous,
-    - slight naming problem with `IInputContext`, 
+    - *(fixed)* slight naming problem with `IInputContext`, 
     - input token equality checks are based on internal token registries and can create inconsistencies between direct hardware input mappings (`InputTokens.Keyboard` which map directly to keyboard keys) and custom ones defined in the asset (`InputTokens.Player` which map to custom actions like jump, move).
     - unknown behavior of `waiting` and `disabled` phases
     - poor listener prioritization
@@ -35,13 +35,13 @@
 
 ## Known issues:
 - current input action asset only has mappings for desktop. There are no mappings made in the asset for console or other platform inputs.
-- separate token and phase checks may fill up `HandleInput` with too many if statements. Because of the strict equality checks and the various different input tokens, it is possible that listeners that can react to multiple tokens can fill up the method really quick. For example `Player`'s `IInputContext.HandleInput` is filled with if and nested if statements.
+- *(fixed)* separate token and phase checks may fill up `HandleInput` with too many if statements. Because of the strict equality checks and the various different input tokens, it is possible that listeners that can react to multiple tokens can fill up the method really quick. For example `Player`'s `IInputContext.HandleInput` is filled with if and nested if statements.
     - one fix would be to split up the events in methods based on their trigger phase, so one for perform, one for started, one for canceled. This would remove some clutter from the single `HandleInput` method.
     - another, more recommended long-time fix would be to rework the dispatch design. Instead of a method receiving calls, listeners would directly register callbacks to each token and phase, completely removing the need of cluttered matching logic. The callback registration can be made when the listener is registered to an `InputManager`, and that `InputManager` would map the callbacks to each event.
 - friction between UI input handled internally by Unity and input managed by `InputManager`. Unity's UI handles inputs and especially mouse inputs internally, thus there is a friction between events that Unity receives and dispatches vs. what `InputManager` dispatches. As of right now, the fix consists of the `UIHandler` implementing `IInputContext` with a really high priority and consuming the every UI-related input (mouse clicks for example). This doesnt need fixing before prod, but keep this in mind.
     - a possible fix would be to give the ability to listeners to block other events. In the case of UI, this would block any subsequent mouse clicks if the click were done on a UI object. This would also possibly remove the need of early breaks in the dispatch iteration.
 - early break in dispatch iteration from consumed input could be dangerous. Early breaks in a dispatch iteration may result in unwanted behavior. Use the input consume logic very carefully as it may hide bugs. **This needs to be fixed before prod**
-- slight naming problem with `IInputContext`. Calling the listener a "context" isnt really the right term. Consider renaming ro `IInputListener` or `IInputHandler`.
+- *(fixed)* slight naming problem with `IInputContext`. Calling the listener a "context" isnt really the right term. Consider renaming ro `IInputListener` or `IInputHandler`.
 - input token equality checks are based on internal token registries and can create inconsistencies between direct hardware input mappings (`InputTokens.Keyboard` which map directly to keyboard keys) and custom ones defined in the asset (`InputTokens.Player` which map to custom actions like jump, move). The input actions from the asset and the ones registered need to be synchronized, otherwise bugs may appear.
     - consider making the registry more centralized, possibly make use of the global registry system.
 - unknown behavior of `waiting` and `disabled` phases. As far as I'm concerned, these can be ignored.
