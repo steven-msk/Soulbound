@@ -71,9 +71,8 @@ namespace SoulboundEngine.Client.Players {
 					nextSlot %= this.hotbar.GetSlotCount();
 					this.hotbar.SetMainSlotIndex(nextSlot);
 				}),
-				new(InputTokens.Mouse.position, InputEvent.Phase.Any, inputEvent => {
+				InputEventListener.ObserveAny(InputTokens.Mouse.position, inputEvent => {
 					this.screenPointerPos = inputEvent.context.ReadValue<Vector2>();
-					return false;
 				}),
 				new(InputTokens.Mouse.leftClick, InputEvent.Phase.Performed | InputEvent.Phase.Canceled, inputEvent => {
 					if (inputEvent.phase == InputEvent.Phase.Performed) {
@@ -83,7 +82,7 @@ namespace SoulboundEngine.Client.Players {
 						this.OnLeftRelease();
 						this.isHoldingLeftClick = false;
 					}
-					return true;
+					return InputHandleResult.Consume;
 				}),
 				new(InputTokens.Mouse.rightClick, InputEvent.Phase.Performed | InputEvent.Phase.Canceled, inputEvent => {
 					if (inputEvent.phase == InputEvent.Phase.Performed) {
@@ -93,7 +92,7 @@ namespace SoulboundEngine.Client.Players {
 						this.OnRightRelease();
 						this.isHoldingRightClick = false;
 					}
-					return true;
+					return InputHandleResult.Consume;
 				}),
 				new(InputTokens.Player.move, InputEvent.Phase.Performed | InputEvent.Phase.Canceled, inputEvent => {
 					this.playerTransform.SetNormalVelocityX(
@@ -101,16 +100,16 @@ namespace SoulboundEngine.Client.Players {
 							? inputEvent.context.ReadValue<Vector2>().x
 							: 0f
 					);
-					return true;
+					return InputHandleResult.Consume;
 				}),
 				new(InputTokens.Player.jump, InputEvent.Phase.Performed | InputEvent.Phase.Canceled, inputEvent => {
 					this.playerTransform.SetJumping(inputEvent.phase == InputEvent.Phase.Performed);
-					return true;
+					return InputHandleResult.Consume;
 				}),
 				InputEventListener.ConsumePerformed(InputTokens.Keyboard.Q, _ => this.ThrowFromMainHand(this.isHoldingCtrl)),
 				new(InputTokens.Keyboard.CTRL, InputEvent.Phase.Performed | InputEvent.Phase.Canceled, inputEvent => {
 					this.isHoldingCtrl = inputEvent.phase == InputEvent.Phase.Performed;
-					return true;
+					return InputHandleResult.Consume;
 				})
 			};
 		}

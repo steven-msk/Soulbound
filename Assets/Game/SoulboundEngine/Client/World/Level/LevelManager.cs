@@ -42,10 +42,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 		}
 
 		IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {
-			yield return new(InputTokens.Keyboard.ESC, InputEvent.Phase.Any, _ => {
-				this.TogglePause();
-				return true;
-			});
+			yield return InputEventListener.ConsumePerformed(InputTokens.Keyboard.ESC, _ => this.TogglePause());
 		}
 
 		public void StartSession() {

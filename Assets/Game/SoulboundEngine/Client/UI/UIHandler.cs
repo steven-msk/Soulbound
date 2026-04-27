@@ -50,7 +50,9 @@ namespace SoulboundEngine.Client.UI {
 		IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {
 			static InputEventListener ConsumeWhenOverGameObject(InputToken token) {
 				return InputEventListener.Performed(token, _ => {
-					return EventSystem.current.IsPointerOverGameObject();
+					return EventSystem.current.IsPointerOverGameObject()
+						? InputHandleResult.Consume
+						: InputHandleResult.Pass;
 				});
 			}
 

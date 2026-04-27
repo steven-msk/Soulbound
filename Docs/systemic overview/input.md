@@ -12,7 +12,7 @@
     - early break in dispatch iteration from consumed input could be dangerous,
     - *(fixed)* slight naming problem with `IInputContext`, 
     - input token equality checks are based on internal token registries and can create inconsistencies between direct hardware input mappings (`InputTokens.Keyboard` which map directly to keyboard keys) and custom ones defined in the asset (`InputTokens.Player` which map to custom actions like jump, move).
-    - unknown behavior of `waiting` and `disabled` phases
+    - *(fixed)* unknown behavior of `waiting` and `disabled` phases
     - poor listener prioritization
     - slight input action integration problems
 
@@ -44,7 +44,7 @@
 - *(fixed)* slight naming problem with `IInputContext`. Calling the listener a "context" isnt really the right term. Consider renaming ro `IInputListener` or `IInputHandler`.
 - input token equality checks are based on internal token registries and can create inconsistencies between direct hardware input mappings (`InputTokens.Keyboard` which map directly to keyboard keys) and custom ones defined in the asset (`InputTokens.Player` which map to custom actions like jump, move). The input actions from the asset and the ones registered need to be synchronized, otherwise bugs may appear.
     - consider making the registry more centralized, possibly make use of the global registry system.
-- unknown behavior of `waiting` and `disabled` phases. As far as I'm concerned, these can be ignored.
+- *(fixed)* unknown behavior of `waiting` and `disabled` phases. As far as I'm concerned, these can be ignored.
 - poor listener prioritization. Each `IInputContext` exposes a priority represented by an int, which is then used by `InputManager` to make dispatching order more deterministic. This does fix one layer of determinism, but not fully. Theres still the risk of identical priorities in which case the order of dispatching would theoretically be in the order in which the listeners were registered, which is highly non-deterministic.
 - slight input action integration problems. `InputAction`s in an `InputActionAsset` can map multiple hardware inputs to one action. This simplifies listener logic a bit but introduces complexity for input rebinding. It should be clear that, for simplicity reasons, only actions that have a single hardware input are rebindable, all others are static and shouldnt be changed. This doesnt need an immediate fix but it is something to consider during prod.
 

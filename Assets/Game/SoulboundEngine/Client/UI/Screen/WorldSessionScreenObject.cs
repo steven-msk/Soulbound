@@ -81,10 +81,9 @@ namespace SoulboundEngine.Client.UI.Screens {
 		public void RemoveItemContainer(UIItemContainerNode node) => this.openContainers.Remove(node);
 
 		IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {
-			yield return new(InputTokens.Mouse.position, InputEvent.Phase.Any, inputEvent => {
+			yield return InputEventListener.ObserveAny(InputTokens.Mouse.position, inputEvent => {
 				this.pointerPosition = inputEvent.context.ReadValue<Vector2>();
 				this.transitStack.SetPointerPosition(this.pointerPosition);
-				return false;
 			});
 		}
 

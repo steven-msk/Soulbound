@@ -67,7 +67,9 @@ namespace SoulboundEngine.Client.Input {
 					InputEventListener listener = listeners[i];
 			
 					if (listener.phase.HasFlag(inputEvent.phase)) {
-						if (listener.callback(inputEvent)) break;
+						InputHandleResult result = listener.callback(inputEvent);
+
+						if (result == InputHandleResult.Consume) break;
 					}
 				}
 			}
