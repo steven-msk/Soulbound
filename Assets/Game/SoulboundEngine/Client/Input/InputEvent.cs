@@ -25,6 +25,10 @@ namespace SoulboundEngine.Client.Input {
 			return this.token.Equals(token) && this.phase == Phase.Canceled;
 		}
 
+		public override string ToString() {
+			return $"input_event[token={this.token}, phase={this.phase}]";
+		}
+
 		[Flags]
 		public enum Phase {
 			Performed	= 1 << 0,

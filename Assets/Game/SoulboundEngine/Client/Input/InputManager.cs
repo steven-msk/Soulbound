@@ -1,7 +1,6 @@
 using SoulboundEngine.Client.SettingSystem;
 using SoulboundEngine.Common.Collections;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.InputSystem;
@@ -11,8 +10,8 @@ namespace SoulboundEngine.Client.Input {
 	public sealed class InputManager : IInputManager {
 		private readonly InputActionAsset inputAsset;
 		private readonly BufferedQueue<InputEvent> eventQueue;
-		private readonly ConcurrentDictionary<IInputEventHandler, List<InputEventListener>> listenersByHandler = new();
-		private readonly ConcurrentDictionary<InputToken, List<InputEventListener>> tokenToListeners = new();
+		private readonly Dictionary<IInputEventHandler, List<InputEventListener>> listenersByHandler = new();
+		private readonly Dictionary<InputToken, List<InputEventListener>> tokenToListeners = new();
 		private readonly HashSet<InputToken> dirtyEntries = new();
 
 		public InputManager(int queueBufferSize, InputActionAsset inputAsset) {
@@ -54,25 +53,37 @@ namespace SoulboundEngine.Client.Input {
 				this.dirtyEntries.Clear();
 			}
 
+			// iterate over a copy of the listener dictionary to avoid instant secondary effects from callbacks
+			Dictionary<InputToken, List<InputEventListener>> tokenToListenersCopy = this.tokenToListeners
+				.ToDictionary(kvp => kvp.Key, kvp => new List<InputEventListener>(kvp.Value));
+
 			while (this.eventQueue.TryDequeue(out InputEvent inputEvent)) {
-				this.Dispatch(in inputEvent);
-			}
-		}
+				if (tokenToListenersCopy.TryGetValue(inputEvent.token, out List<InputEventListener> listeners)) {
+					Queue<Func<InputEvent, InputHandleResult>> dispatchQueue = this.GetDispatchQueue(in inputEvent, listeners);
 
-		private void Dispatch(in InputEvent inputEvent) {
-			if (this.tokenToListeners.TryGetValue(inputEvent.token, out List<InputEventListener> listeners)) {
-
-				// listeners are sorted by ascending priority
-				for (int i = listeners.Count - 1; i >= 0; i--) {
-					InputEventListener listener = listeners[i];
-			
-					if (listener.phase.HasFlag(inputEvent.phase)) {
-						InputHandleResult result = listener.callback(inputEvent);
+					while (dispatchQueue.TryDequeue(out Func<InputEvent, InputHandleResult> callback)) {
+						InputHandleResult result = callback(inputEvent);
 
 						if (result == InputHandleResult.Consume) break;
 					}
 				}
 			}
+
+		}
+
+		private Queue<Func<InputEvent, InputHandleResult>> GetDispatchQueue(in InputEvent inputEvent, List<InputEventListener> listeners) {
+			Queue<Func<InputEvent, InputHandleResult>> queue = new();
+
+			// assumes listeners are sorted by ascending priority
+			for (int i = listeners.Count - 1; i >= 0; i--) {
+				InputEventListener listener = listeners[i];
+
+				if (listener.phase.HasFlag(inputEvent.phase)) {
+					queue.Enqueue(listener.callback);
+				}
+			}
+
+			return queue;
 		}
 
 		private void SortListenersByAscendingPriority(List<InputEventListener> listeners) {
@@ -105,7 +116,7 @@ namespace SoulboundEngine.Client.Input {
 		}
 
 		public void RemoveHandler(IInputEventHandler handler) {
-			if (this.listenersByHandler.TryRemove(handler, out List<InputEventListener> listeners)) {
+			if (this.listenersByHandler.Remove(handler, out List<InputEventListener> listeners)) {
 				foreach (var listener in listeners) {
 					this.RemoveListener(listener);
 				}

@@ -1,8 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine.InputSystem;
 
 namespace SoulboundEngine.Client.Input {
@@ -25,10 +21,10 @@ namespace SoulboundEngine.Client.Input {
 			return obj is InputToken token && this.guid.Equals(token.guid);
 		}
 
-		public override int GetHashCode() => guid.GetHashCode();
+		public override int GetHashCode() => this.guid.GetHashCode();
 
 		public override string ToString() {
-			return $"{mapName}/{actionName}({guid})";
+			return $"{this.mapName}/{this.actionName}";
 		}
 	}
 }
