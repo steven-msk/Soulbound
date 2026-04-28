@@ -59,7 +59,13 @@ namespace SoulboundEngine.Client.UI {
 			return new InputEventListener[] {
 				ConsumeWhenOverGameObject(InputTokens.Mouse.leftClick),
 				ConsumeWhenOverGameObject(InputTokens.Mouse.rightClick),
-				ConsumeWhenOverGameObject(InputTokens.Mouse.position)
+				ConsumeWhenOverGameObject(InputTokens.Mouse.position),
+
+				InputEventListener.ConsumePerformed(InputTokens.Keyboard.ESC, _ => {
+					if (this.screenManager.GetActiveScreen()?.SupportsEscapePop() ?? false) {
+						this.screenManager.PopScreen();
+					}
+				})
 			};
 		}
 	}

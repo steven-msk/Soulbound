@@ -9,6 +9,7 @@ namespace SoulboundEngine.Client.UI.Screens {
 
 		public TitleScreen(IWorldAccessor worldAccessor) {
 			this.worldAccessor = worldAccessor;
+			this.supportsEscapePop = false;
 		}
 
 		[PROTOTYPICAL]

@@ -1,14 +1,9 @@
-using SoulboundEngine.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SoulboundEngine.Client.UI.Screens {
 	public abstract class Screen {
 		protected IScreenNavigator screenNavigator;
+		protected bool supportsEscapePop = true;
 
 		public void Init(IScreenNavigator navigator) {
 			this.screenNavigator = navigator;
@@ -17,9 +12,11 @@ namespace SoulboundEngine.Client.UI.Screens {
 		public virtual IScreenObject BuildObject(IScreenObjectFactory objFactory) {
 			GameObject gameObject = objFactory.CreateGameObject();
 			IScreenObject obj = objFactory.CreateSceneObject(this, gameObject);
-			OnBuild(obj);
+			this.OnBuild(obj);
 			return obj;
 		}
+
+		public bool SupportsEscapePop() => this.supportsEscapePop;
 
 		protected abstract void OnBuild(IScreenObject screenObject);
 
