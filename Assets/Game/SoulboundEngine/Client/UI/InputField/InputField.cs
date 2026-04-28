@@ -26,6 +26,8 @@ namespace SoulboundEngine.Client.UI {
 			textRect.anchorMax = Vector2.one;
 			textRect.offsetMin = new Vector2(10f, 0f);
 			textRect.offsetMax = new Vector2(-10f, 0f);
+			ContentSizeFitter textSizeFitter = textObj.AddComponent<ContentSizeFitter>();
+			textSizeFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
 			GameObject viewport = new("Viewport", typeof(RectTransform), typeof(Mask), typeof(Image));
 			viewport.transform.SetParent(obj.transform, false);
