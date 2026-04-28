@@ -230,32 +230,45 @@ namespace SoulboundEngine.Client {
 		public UIHandler UIHandler => this.uiHandler;
 
 		public sealed class DebugOverlayManager {
-			private DebugOverlayFeature activeOverlay = DebugOverlayFeature.None;
+			private readonly Stack<DebugOverlayFeature> overlayStack = new();
 			public event Action<DebugOverlayFeature, DebugOverlayFeature> onOverlayChanged;
+
+			public DebugOverlayManager() {
+				this.overlayStack.Push(DebugOverlayFeature.None);
+			}
 
 			public bool TryShow(DebugOverlayFeature overlay) {
 				if (!this.CanShow(overlay)) return false;
 
-				DebugOverlayFeature prev = this.activeOverlay;
-				this.activeOverlay = overlay;
-				onOverlayChanged?.Invoke(prev, this.activeOverlay);
+				DebugOverlayFeature prev = this.GetActiveOverlay();
+				this.overlayStack.Push(overlay);
+				onOverlayChanged?.Invoke(prev, this.GetActiveOverlay());
 				return true;
 			}
 
 			public void Hide(DebugOverlayFeature overlay) {
-				if (this.activeOverlay != overlay) return;
+				if (this.GetActiveOverlay() != overlay) return;
+				if (overlay == DebugOverlayFeature.None) return;
 
-				DebugOverlayFeature prev = this.activeOverlay;
-				this.activeOverlay = DebugOverlayFeature.None;
-				onOverlayChanged?.Invoke(prev, this.activeOverlay);
+				DebugOverlayFeature prev = this.GetActiveOverlay();
+				this.overlayStack.Pop();
+				onOverlayChanged?.Invoke(prev, this.GetActiveOverlay());
 			}
 
-			public void Clear() => this.Hide(this.activeOverlay);
+			public void Clear() {
+				while (this.GetActiveOverlay() != DebugOverlayFeature.None) {
+					this.Hide(this.GetActiveOverlay());
+				}
+			}
+
+			public DebugOverlayFeature GetActiveOverlay() {
+				return this.overlayStack.Peek();
+			}
 
 			private bool CanShow(DebugOverlayFeature overlay) => overlay switch {
-				DebugOverlayFeature.MetricsHUD => this.activeOverlay == DebugOverlayFeature.None
-					|| this.activeOverlay == DebugOverlayFeature.CommandLine,
-				DebugOverlayFeature.Console => this.activeOverlay == DebugOverlayFeature.None,
+				DebugOverlayFeature.MetricsHUD => this.GetActiveOverlay() == DebugOverlayFeature.None
+					|| this.GetActiveOverlay() == DebugOverlayFeature.CommandLine,
+				DebugOverlayFeature.Console => this.GetActiveOverlay() == DebugOverlayFeature.None,
 				DebugOverlayFeature.CommandLine => true,
 				_ => true
 			};
