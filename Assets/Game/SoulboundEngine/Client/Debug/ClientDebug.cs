@@ -5,6 +5,7 @@ using System;
 using UnityEngine;
 
 namespace SoulboundEngine.Client.Debug {
+	[Obsolete]
 	public sealed class ClientDebug {
 		private readonly DebugConsole console;
 		private readonly CommandLine commandLine;
@@ -17,14 +18,10 @@ namespace SoulboundEngine.Client.Debug {
 			this.commandLine = commandLine;
 			this.metricsHud = metricsHud;
 			this.inputManager = inputManager;
-#if !UNITY_EDITOR
-			Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
-			Application.SetStackTraceLogType(LogType.Warning, StackTraceLogType.None);
-			Application.SetStackTraceLogType(LogType.Error, StackTraceLogType.None);
-#endif
+
 		}
 
-		public void ToggleMetricsHUD() {
+		public void ShowMetricsHUD(bool show) {
 			if (!this.console.IsVisible()) {
 				this.metricsHud.Toggle();
 			}
@@ -33,9 +30,6 @@ namespace SoulboundEngine.Client.Debug {
 		public void ShowCommandLine(Action onHide) {
 			if (!this.commandLine.IsVisible()) {
 				this.commandLine.Show();
-				this.commandLine.AddHideAction(onHide);
-				this.commandLine.AddHideAction(() => this.inputManager.RemoveHandler(this.commandLine));
-				this.inputManager.AddHandler(this.commandLine);
 			}
 		}
 
@@ -44,6 +38,10 @@ namespace SoulboundEngine.Client.Debug {
 				this.metricsHud.Toggle();
 			}
 			this.console.Toggle();
+		}
+
+		public bool IsCommandLineVisible() {
+			return this.commandLine.IsVisible();
 		}
 
 		public bool IsConsoleVisible() {

@@ -3,27 +3,39 @@ namespace SoulboundEngine.Client.UI {
 		protected bool visible;
 		protected TNode node;
 
-		public virtual void Toggle() {
-			visible = !visible;
-			CreateNodeIfNull();
+		public virtual void Show() {
+			if (this.visible) return;
+			this.visible = true;
+			this.CreateNodeIfNull();
+			this.node.Show();
+		}
 
-			if (!visible) node.Hide();
-			else node.Show();
+		public virtual void Hide() {
+			if (!this.visible) return;
+			this.visible = false;
+			this.node?.Hide();
+		}
+
+		public virtual void Toggle() {
+			bool visible = !this.visible;
+
+			if (visible) this.Show();
+			else this.Hide();
 		}
 
 		protected void CreateNodeIfNull() {
-			if (node != null) return;
+			if (this.node != null) return;
 
-			node = GetNode();
-			node.onDestroy += () => {
-				node = null;
-				visible = false;
+			this.node = this.GetNode();
+			this.node.onDestroy += () => {
+				this.node = null;
+				this.visible = false;
 			};
-			SoulboundClient.Instance.UIHandler.AddOverlay(node);
+			SoulboundClient.Instance.UIHandler.AddOverlay(this.node);
 		}
 
 		protected abstract TNode GetNode();
 
-		public bool IsVisible() => visible;
+		public bool IsVisible() => this.visible;
 	}
 }

@@ -2,7 +2,6 @@ using SoulboundEngine.Client.Debug.Commands;
 using SoulboundEngine.Client.Debug.Commands.View;
 using SoulboundEngine.Client.Input;
 using SoulboundEngine.Client.UI;
-using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -14,23 +13,11 @@ namespace SoulboundEngine.Client.Debug {
 		int IInputEventHandler.priority => 5005;
 		private readonly CommandProcessor commandProcessor;
 		private readonly List<string> history = new();
-		private readonly List<Action> onHideActions = new();
+		private readonly SoulboundClient.DebugOverlayManager debugOverlayManager;
 
-		public CommandLine(CommandProcessor commandProcessor) {
+		public CommandLine(CommandProcessor commandProcessor, SoulboundClient.DebugOverlayManager debugOverlayManager) {
+			this.debugOverlayManager = debugOverlayManager;
 			this.commandProcessor = commandProcessor;
-		}
-
-		public void Show() {
-			if (!this.visible) {
-				this.visible = true;
-				this.CreateNodeIfNull();
-				this.node.onDestroy += () => {
-					foreach (var action in this.onHideActions) {
-						action();
-					}
-					this.onHideActions.Clear();
-				};
-			}
 		}
 
 		public override void Toggle() {
@@ -42,15 +29,17 @@ namespace SoulboundEngine.Client.Debug {
 			this.node.Destroy();
 			this.commandProcessor.SubmitCommand(command);
 			this.history.Add(command);
-		}
-
-		public void AddHideAction(Action action) {
-			this.onHideActions.Add(action);
+			this.debugOverlayManager.Hide(SoulboundClient.DebugOverlayFeature.CommandLine);
 		}
 
 		IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {
 			InputEventListener GetKeyListener(InputToken token, Key key) {
-				return InputEventListener.ConsumeAny(token, _ => this.HandleKey(key), priority: int.MaxValue);
+				return new(token, InputEvent.Phase.Any, _ => {
+					if (!this.IsVisible()) return InputHandleResult.Pass;
+
+					this.HandleKey(key);
+					return InputHandleResult.Consume;
+				}, priority: int.MaxValue);
 			}
 
 			return new[] {
@@ -97,7 +86,10 @@ namespace SoulboundEngine.Client.Debug {
 
 			CommandLineHandler handler = obj.AddComponent<CommandLineHandler>();
 			handler.Init(inputField, this.commandProcessor, this.history);
-			handler.shouldCloseCommandLine += this.Toggle;
+			handler.shouldCloseCommandLine += () => {
+				this.debugOverlayManager.Hide(SoulboundClient.DebugOverlayFeature.CommandLine);
+				this.Toggle();
+			};
 
 			GameObject viewport = new("Viewport", typeof(RectTransform), typeof(Mask), typeof(Image));
 			viewport.transform.SetParent(obj.transform, false);

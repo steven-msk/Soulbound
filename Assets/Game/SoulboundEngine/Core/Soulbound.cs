@@ -10,10 +10,12 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
+using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 namespace SoulboundEngine.Core {
 	public sealed class Soulbound : IApplicationController, IDebugMetricsSource {
 		private static Soulbound instance;
+		private static readonly Logger loggerInstance = new(UnityEngine.Debug.unityLogger);
 		public static readonly JsonSerializerSettings globalJsonSettings = new() {
 			TypeNameHandling = TypeNameHandling.Auto,
 			TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
@@ -33,6 +35,12 @@ namespace SoulboundEngine.Core {
 			instance = this;
 			this.config = config;
 			GameStateManager.SetBootstrapping();
+
+#if !UNITY_EDITOR
+			Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
+			Application.SetStackTraceLogType(LogType.Warning, StackTraceLogType.None);
+			Application.SetStackTraceLogType(LogType.Error, StackTraceLogType.None);
+#endif
 
 			this.debugMetricsService = new DebugMetricsService();
 			this.performanceMetrics = new PerformanceMetrics();

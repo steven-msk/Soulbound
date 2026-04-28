@@ -114,6 +114,10 @@ namespace SoulboundEngine.Client.Players {
 			};
 		}
 
+		public void StopHorizontalMovement() {
+			this.playerTransform.SetNormalVelocityX(0f);
+		}
+
 		public override void FrameUpdate() {
 			base.FrameUpdate();
 			if (this.isHoldingLeftClick) this.OnLeftHold();

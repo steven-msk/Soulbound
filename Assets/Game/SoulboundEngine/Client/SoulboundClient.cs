@@ -23,7 +23,6 @@ using System.Linq;
 namespace SoulboundEngine.Client {
 	using System.Collections.Generic;
 	using UnityEngine.SceneManagement;
-	using static UnityEngine.Debug;
 	using Application = UnityEngine.Application;
 	using Canvas = UnityEngine.Canvas;
 	using Object = UnityEngine.Object;
@@ -36,15 +35,18 @@ namespace SoulboundEngine.Client {
 		private readonly PlayerInputActions inputActions;
 		private readonly InputManager inputManager;
 		private readonly Settings settings;
-		private readonly ClientDebug clientDebug;
+		private readonly DebugConsole console;
+		private readonly CommandLine commandLine;
+		private readonly MetricsHUD metricsHud;
 		private readonly CommandProcessor commandProcessor;
-		private readonly WorldSessionCommands worldSessionCommands = new();
+		private readonly WorldSessionCommands worldSessionCommands;
 		private readonly RuntimeDataProvider runtimeDataProvider;
 		private readonly RuntimeExecutionServices runtimeExecutionServices;
 		private readonly WorldManager worldManager;
 		private readonly UIHandler uiHandler;
 		private readonly UIAudioEventBank uiAudioEventBank;
 		private readonly WorldAudioEventBank worldAudioEventBank;
+		private readonly DebugOverlayManager debugOverlayManager;
 		private WorldSession? activeWorldSession;
 
 		int IInputEventHandler.priority => int.MaxValue;
@@ -58,14 +60,21 @@ namespace SoulboundEngine.Client {
 			InputTokens.Register(this.inputActions.asset);
 			this.settings = new Settings();
 
+			this.debugOverlayManager = new DebugOverlayManager();
 			this.runtimeDataProvider = new RuntimeDataProvider();
 			this.runtimeExecutionServices = new RuntimeExecutionServices();
 			this.commandProcessor = new CommandProcessor(this.runtimeDataProvider, this.runtimeExecutionServices);
 			this.worldSessionCommands = new WorldSessionCommands();
-			CommandLine commandLine = new(this.commandProcessor);
-			MetricsHUD metricsHud = new(ctx.debugMetricsService);
-			DebugConsole debugConsole = new();
-			this.clientDebug = new ClientDebug(unityLogger, debugConsole, commandLine, metricsHud, this.inputManager);
+			this.commandLine = new CommandLine(this.commandProcessor, this.debugOverlayManager);
+			this.debugOverlayManager.onOverlayChanged += (prev, next) => {
+				if (this.activeWorldSession is { } session) {
+					if (next == DebugOverlayFeature.CommandLine) this.inputManager.RemoveHandler(session.player);
+					if (prev == DebugOverlayFeature.CommandLine) this.inputManager.AddHandler(session.player);
+				}
+			};
+			this.inputManager.AddHandler(this.commandLine);
+			this.metricsHud = new MetricsHUD(ctx.debugMetricsService);
+			this.console = new DebugConsole();
 
 			// prototypical; will not pass to alpha prod
 			var worldSerializer = new JsonSerializer<WorldDump>(Soulbound.globalJsonSettings);
@@ -123,6 +132,7 @@ namespace SoulboundEngine.Client {
 				this.activeWorldSession = session;
 				this.uiHandler.SetCanvas(session.canvas);
 				this.uiHandler.SetScreen(new WorldScreen(session.player));
+				this.debugOverlayManager.Clear();
 				this.inputManager.AddHandler(session.levelManager);
 
 				this.runtimeDataProvider.SetWorldSessionState(session);
@@ -149,6 +159,7 @@ namespace SoulboundEngine.Client {
 					this.activeWorldSession = null;
 					this.uiHandler.SetCanvas(Object.FindFirstObjectByType<Canvas>());
 					this.uiHandler.SetScreen(new TitleScreen());
+					this.debugOverlayManager.Clear();
 
 					this.runtimeDataProvider.ExitWorldSessionState();
 					this.runtimeExecutionServices.ExitWorldSessionState();
@@ -170,31 +181,28 @@ namespace SoulboundEngine.Client {
 		IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {
 			return new InputEventListener[] {
 				InputEventListener.ConsumePerformed(InputTokens.Debug.toggleMetrics, _ => {
-					this.clientDebug.ToggleMetricsHUD();
-					if (this.clientDebug.IsMetricsHUDVisible()) {
+					if (!this.metricsHud.IsVisible() && this.debugOverlayManager.TryShow(DebugOverlayFeature.MetricsHUD)) {
+						this.metricsHud.Show();
 						this.activeWorldSession?.level.ShowChunkFeatures();
-					} else {
+					} else if (this.metricsHud.IsVisible()) {
+						this.metricsHud.Hide();
 						this.activeWorldSession?.level.HideChunkFeatures();
+						this.debugOverlayManager.Hide(DebugOverlayFeature.MetricsHUD);
 					}
 				}),
 
-				// TODO: improve input blocking and command line prioritization
 				InputEventListener.ConsumePerformed(InputTokens.Debug.enterCommand, _ => {
-
-					// command line input needs to suppress all player actions
-					// but there isnt a direct way to know when the console is closed
-					// so we delegate the hide to re-add the player actions
-					Action onHide = () => { };
-					if (this.activeWorldSession is { } session) {
-						this.inputManager.RemoveHandler(session.player);
-						onHide = () => this.inputManager.AddHandler(session.player);
+					if (this.debugOverlayManager.TryShow(DebugOverlayFeature.CommandLine)) {
+						this.commandLine.Show();
+						this.activeWorldSession?.player.StopHorizontalMovement();
 					}
-					this.clientDebug.ShowCommandLine(onHide);
 				}),
-				InputEventListener.ConsumePerformed(InputTokens.Debug.toggleConsole, _ => { 
-					this.clientDebug.ToggleConsole();
-					if (this.clientDebug.IsConsoleVisible()) {
-						this.activeWorldSession?.level.HideChunkFeatures();
+				InputEventListener.ConsumePerformed(InputTokens.Debug.toggleConsole, _ => {
+					if (!this.console.IsVisible() && this.debugOverlayManager.TryShow(DebugOverlayFeature.Console)) {
+						this.console.Show();
+					} else if (this.console.IsVisible()) {
+						this.console.Hide();
+						this.debugOverlayManager.Hide(DebugOverlayFeature.Console);
 					}
 				})
 			};
@@ -221,5 +229,43 @@ namespace SoulboundEngine.Client {
 		public InputManager InputManager => this.inputManager;
 		public UIHandler UIHandler => this.uiHandler;
 
+		public sealed class DebugOverlayManager {
+			private DebugOverlayFeature activeOverlay = DebugOverlayFeature.None;
+			public event Action<DebugOverlayFeature, DebugOverlayFeature> onOverlayChanged;
+
+			public bool TryShow(DebugOverlayFeature overlay) {
+				if (!this.CanShow(overlay)) return false;
+
+				DebugOverlayFeature prev = this.activeOverlay;
+				this.activeOverlay = overlay;
+				onOverlayChanged?.Invoke(prev, this.activeOverlay);
+				return true;
+			}
+
+			public void Hide(DebugOverlayFeature overlay) {
+				if (this.activeOverlay != overlay) return;
+
+				DebugOverlayFeature prev = this.activeOverlay;
+				this.activeOverlay = DebugOverlayFeature.None;
+				onOverlayChanged?.Invoke(prev, this.activeOverlay);
+			}
+
+			public void Clear() => this.Hide(this.activeOverlay);
+
+			private bool CanShow(DebugOverlayFeature overlay) => overlay switch {
+				DebugOverlayFeature.MetricsHUD => this.activeOverlay == DebugOverlayFeature.None
+					|| this.activeOverlay == DebugOverlayFeature.CommandLine,
+				DebugOverlayFeature.Console => this.activeOverlay == DebugOverlayFeature.None,
+				DebugOverlayFeature.CommandLine => true,
+				_ => true
+			};
+		}
+
+		public enum DebugOverlayFeature {
+			None,
+			CommandLine,
+			MetricsHUD,
+			Console
+		}
 	}
 }
