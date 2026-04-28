@@ -1,10 +1,4 @@
-using SoulboundEngine.Core;
 using SoulboundEngine.Core.Serialization;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #nullable enable
 
@@ -19,22 +13,26 @@ namespace SoulboundEngine.Client.World.Serialization {
 		}
 
 		public void Save(WorldDump dump, string world) {
-			byte[] data = pipeline.Write(dump);
-			saveStrategy.SaveRaw(data, world);
+			byte[] data = this.pipeline.Write(dump);
+			this.saveStrategy.SaveRaw(data, world);
 		}
 
 		public bool Load(string world, out WorldDump? dump) {
-			byte[]? data = saveStrategy.LoadRaw(world);
+			byte[]? data = this.saveStrategy.LoadRaw(world);
 			if (data == null) {
 				dump = null;
 				return false;
 			}
-			dump = pipeline.Read(data);
+			dump = this.pipeline.Read(data);
 			return true;
 		}
 
 		public string GetSavesRoot() {
-			return saveStrategy.GetSavesRoot();
+			return this.saveStrategy.GetSavesRoot();
+		}
+
+		public void Delete(string world) {
+			this.saveStrategy.Delete(world);
 		}
 	}
 }

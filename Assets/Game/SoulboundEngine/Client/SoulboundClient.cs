@@ -170,6 +170,10 @@ namespace SoulboundEngine.Client {
 			return this.worldManager.ListSaves();
 		}
 
+		public void DeleteWorld(string world) {
+			this.worldManager.DeleteWorld(world);
+		}
+
 		public bool IsWorldSessionActive() => this.activeWorldSession != null;
 
 		IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {

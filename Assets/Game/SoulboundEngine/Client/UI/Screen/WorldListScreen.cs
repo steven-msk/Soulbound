@@ -23,17 +23,37 @@ namespace SoulboundEngine.Client.UI.Screens {
 
 			IUIElementContainer savesContainer = GUI.Container(
 				GUI.Frame.Stretch(),
-				GUI.Layout.Vertical()
+				GUI.Layout.Horizontal()
 					.ControlChildSize(true)
 					.Spacing(10)
 			).Build(parentContainer);
+			IUIElementContainer savesCol = GUI.Container(
+				GUI.Frame.Stretch(),
+				GUI.Layout.Vertical()
+					.ControlChildSize(true)
+					.Spacing(10)
+			).Build(savesContainer);
+			IUIElementContainer deleteCol = GUI.Container(
+				GUI.Frame.Stretch(),
+				GUI.Layout.Vertical()
+					.ControlChildSize(true)
+					.Spacing(10)
+			).Build(savesContainer);
 
 			List<string> saves = this.worldAccessor.ListWorldSaves().ToList();
 			foreach (var save in saves) {
 				GUI.Button.Label()
 					.Text(save)
 					.OnClick(() => this.worldAccessor.EnterWorld(save))
-					.Build(savesContainer);
+					.Build(savesCol);
+
+				GUI.Button.Label()
+					.Text("Delete")
+					.OnClick(() => { 
+						this.worldAccessor.DeleteWorld(save);
+						this.screenNavigator.IssueRebuild(this);
+					})
+					.Build(deleteCol);
 			}
 
 			IUIElementContainer newWorldContainer = GUI.Container(
@@ -53,7 +73,7 @@ namespace SoulboundEngine.Client.UI.Screens {
 					string name = inputField.GetText();
 					if (!string.IsNullOrEmpty(name) && this.worldAccessor.ListWorldSaves().Count() < MAX_WORLDS) {
 						this.worldAccessor.CreateNewWorld(name);
-						// issue rebuild?
+						this.screenNavigator.IssueRebuild(this);
 						inputField.Clear();
 					}
 				}).Build(newWorldContainer);

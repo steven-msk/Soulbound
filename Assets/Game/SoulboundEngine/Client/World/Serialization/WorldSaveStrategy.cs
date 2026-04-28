@@ -1,9 +1,9 @@
+using Newtonsoft.Json;
+using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Newtonsoft.Json;
-using SoulboundEngine.Client.World.LevelDomain;
 
 #nullable enable
 
@@ -18,7 +18,7 @@ namespace SoulboundEngine.Client.World.Serialization {
 		}
 
 		public WorldDump? Load(string name) {
-			string path = GetDumpPath(name);
+			string path = this.GetDumpPath(name);
 
 			if (File.Exists(path)) {
 				return JsonConvert.DeserializeObject<WorldDump>(
@@ -31,15 +31,21 @@ namespace SoulboundEngine.Client.World.Serialization {
 
 		public void Save(WorldDump obj, string name) {
 			string json = JsonConvert.SerializeObject(obj, Soulbound.globalJsonSettings);
-			string dumpPath = GetDumpPath(name);
+			string dumpPath = this.GetDumpPath(name);
 			if (string.IsNullOrEmpty(dumpPath)) {
 				throw new ArgumentException("Failed to save world: " + name);
 			}
 			File.WriteAllText(dumpPath, json);
 		}
 
+		public void Delete(string world) {
+
+			// TODO: fix unity leak in world saves
+			UnityEngine.Windows.Directory.Delete(this.GetSaveFolder(world));
+		}
+
 		public byte[]? LoadRaw(string world) {
-			string path = GetDumpPath(world);
+			string path = this.GetDumpPath(world);
 			if (!File.Exists(path)) {
 				return null;
 			}
@@ -48,26 +54,26 @@ namespace SoulboundEngine.Client.World.Serialization {
 		}
 
 		public void SaveRaw(byte[] data, string world) {
-			Directory.CreateDirectory(GetSaveFolder(world));
-			File.WriteAllBytes(GetDumpPath(world), data);
+			Directory.CreateDirectory(this.GetSaveFolder(world));
+			File.WriteAllBytes(this.GetDumpPath(world), data);
 		}
 
 		public string GetDumpPath(string world) {
-			string relativeFolder = Path.Combine(root, world);
-			return CombineDataPath(relativeFolder, LevelManager.worldDump);
+			string relativeFolder = Path.Combine(this.root, world);
+			return this.CombineDataPath(relativeFolder, LevelManager.worldDump);
 		}
 
 		public string GetSaveFolder(string world) {
-			string relativeFolder = Path.Combine(root, world);
-			return CombineDataPath(relativeFolder);
+			string relativeFolder = Path.Combine(this.root, world);
+			return this.CombineDataPath(relativeFolder);
 		}
 
 		private string CombineDataPath(params string[] paths) {
-			List<string> path = new() { dataPath };
+			List<string> path = new() { this.dataPath };
 			path.AddRange(paths);
 			return Path.Combine(path.ToArray());
 		}
 
-		public string GetSavesRoot() => CombineDataPath(root);
+		public string GetSavesRoot() => this.CombineDataPath(this.root);
 	}
 }

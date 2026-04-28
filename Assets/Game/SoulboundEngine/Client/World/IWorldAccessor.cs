@@ -7,5 +7,6 @@ namespace SoulboundEngine.Client.World {
 		IEnumerable<string> ListWorldSaves();
 		bool IsWorldSessionActive();
 		void CreateNewWorld(string world);
+		void DeleteWorld(string world);
 	}
 }

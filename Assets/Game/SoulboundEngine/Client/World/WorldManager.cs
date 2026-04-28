@@ -1,15 +1,9 @@
-using Cysharp.Threading.Tasks;
-using SoulboundEngine.Client.World;
-using SoulboundEngine.Core;
-using SoulboundEngine.Client.Debug.Logging;
+using SoulboundEngine.Client.World.LevelDomain;
+using SoulboundEngine.Client.World.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using UnityEngine;
-using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
-using SoulboundEngine.Client.World.Serialization;
-using SoulboundEngine.Client.World.LevelDomain;
 
 #nullable enable
 
@@ -22,7 +16,7 @@ namespace SoulboundEngine.Client.World {
 		}
 
 		public IEnumerable<string> ListSaves() {
-			string savesRoot = serializationService.GetSavesRoot();
+			string savesRoot = this.serializationService.GetSavesRoot();
 			if (!Directory.Exists(savesRoot)) yield break;
 
 			foreach (var dir in Directory.GetDirectories(savesRoot)) {
@@ -33,16 +27,19 @@ namespace SoulboundEngine.Client.World {
 		}
 
 		public void CreateNewWorld(string world) {
-			if (ListSaves().Any(s => s == world)) {
+			if (this.ListSaves().Any(s => s == world)) {
 				throw new ArgumentException($"World with name '{world}' already exists");
 			}
 
-			string savesRoot = serializationService.GetSavesRoot();
+			string savesRoot = this.serializationService.GetSavesRoot();
 			string worldPath = Path.Combine(savesRoot, world);
 			var dir = Directory.CreateDirectory(worldPath);
 			var filePath = Path.Combine(worldPath, LevelManager.worldDump);
 			File.WriteAllText(filePath, string.Empty);
 		}
 
+		public void DeleteWorld(string world) {
+			this.serializationService.Delete(world);
+		}
 	}
 }

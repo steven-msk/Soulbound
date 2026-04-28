@@ -1,9 +1,5 @@
-using SoulboundEngine.Common;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 #nullable enable
@@ -18,43 +14,48 @@ namespace SoulboundEngine.Client.UI.Screens {
 		}
 
 		public void PushScreen(Screen screen) {
-			if (stack.TryPeek(out ScreenEntry activeEntry)) {
+			if (this.stack.TryPeek(out ScreenEntry activeEntry)) {
 				activeEntry.obj.Hide();
 			}
 
 			screen.Init(this);
 			IScreenObject obj = screen.BuildObject(this);
-			stack.Push(new ScreenEntry(obj));
+			this.stack.Push(new ScreenEntry(obj));
 			obj.Show();
 		}
 
 		public bool PopScreen() {
-			if (stack.TryPop(out ScreenEntry activeEntry)) {
+			if (this.stack.TryPop(out ScreenEntry activeEntry)) {
 				activeEntry.obj.Hide();
 				activeEntry.obj.Dispose();
 			}
 
-			if (stack.TryPeek(out activeEntry)) {
+			if (this.stack.TryPeek(out activeEntry)) {
 				activeEntry.obj.Show();
 			}
 
-			return stack.Any();
+			return this.stack.Any();
 		}
 
 		public void ReplaceScreen(Screen screen) {
-			PopScreen();
-			PushScreen(screen);
+			this.PopScreen();
+			this.PushScreen(screen);
 		}
 
 		public Screen? GetActiveScreen() {
-			return stack.TryPeek(out ScreenEntry activeEntry)
+			return this.stack.TryPeek(out ScreenEntry activeEntry)
 				? activeEntry.screen
 				: null;
 		}
 
+		public void IssueRebuild(Screen screen) {
+			if (this.GetActiveScreen() != screen) return;
+			this.ReplaceScreen(screen);
+		}
+
 		public void Flush() {
-			while (stack.Count > 0) {
-				var screenObject = stack.Pop();
+			while (this.stack.Count > 0) {
+				var screenObject = this.stack.Pop();
 				screenObject.obj.Hide();
 				screenObject.obj.Dispose();
 			}
@@ -62,7 +63,7 @@ namespace SoulboundEngine.Client.UI.Screens {
 
 		GameObject IScreenObjectFactory.CreateGameObject() {
 			GameObject obj = new("Screen Object", typeof(RectTransform));
-			root.AttachScreenObject(obj);
+			this.root.AttachScreenObject(obj);
 
 			// default screen layout
 			RectTransform rectTransform = obj.GetComponent<RectTransform>();
@@ -84,6 +85,6 @@ namespace SoulboundEngine.Client.UI.Screens {
 	}
 
 	sealed record ScreenEntry(IScreenObject obj) {
-		public Screen screen => obj.GetInstance();
+		public Screen screen => this.obj.GetInstance();
 	}
 }

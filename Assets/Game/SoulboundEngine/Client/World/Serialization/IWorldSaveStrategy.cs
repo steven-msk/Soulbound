@@ -1,10 +1,3 @@
-using SoulboundEngine.Client.World;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 #nullable enable
 
 namespace SoulboundEngine.Client.World.Serialization {
@@ -16,5 +9,7 @@ namespace SoulboundEngine.Client.World.Serialization {
 
         byte[]? LoadRaw(string world);
         void SaveRaw(byte[] data, string world);
+
+		void Delete(string world);
     }
 }
