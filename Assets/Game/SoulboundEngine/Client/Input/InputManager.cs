@@ -56,15 +56,21 @@ namespace SoulboundEngine.Client.Input {
 			// iterate over a copy of the listener dictionary to avoid instant secondary effects from callbacks
 			Dictionary<InputToken, List<InputEventListener>> tokenToListenersCopy = this.tokenToListeners
 				.ToDictionary(kvp => kvp.Key, kvp => new List<InputEventListener>(kvp.Value));
+			List<InputToken> consumedTokens = new();
 
 			while (this.eventQueue.TryDequeue(out InputEvent inputEvent)) {
-				if (tokenToListenersCopy.TryGetValue(inputEvent.token, out List<InputEventListener> listeners)) {
-					Queue<Func<InputEvent, InputHandleResult>> dispatchQueue = this.GetDispatchQueue(in inputEvent, listeners);
+				if (consumedTokens.Contains(inputEvent.token)) continue;
 
-					while (dispatchQueue.TryDequeue(out Func<InputEvent, InputHandleResult> callback)) {
-						InputHandleResult result = callback(inputEvent);
+				if (!tokenToListenersCopy.TryGetValue(inputEvent.token, out List<InputEventListener> listeners)) continue;
 
-						if (result == InputHandleResult.Consume) break;
+				Queue<Func<InputEvent, InputHandleResult>> dispatchQueue = this.GetDispatchQueue(in inputEvent, listeners);
+
+				while (dispatchQueue.TryDequeue(out Func<InputEvent, InputHandleResult> callback)) {
+					InputHandleResult result = callback(inputEvent);
+
+					if (result == InputHandleResult.Consume) {
+						consumedTokens.Add(inputEvent.token);
+						break;
 					}
 				}
 			}

@@ -267,6 +267,7 @@ namespace SoulboundEngine.Client.Players {
 			mainHandStack.Decrement(throwAmount);
 
 			ItemEntity itemEntity = new(this, pickupDelaySec: 2f, thrownStack, this.level);
+			itemEntity.SetPos(this.GetPos());
 			this.level.AddEntity(itemEntity);
 		}
 
