@@ -8,6 +8,7 @@ namespace SoulboundEngine.Client.UI.Screens {
 
 		public WorldScreen(Player player) {
 			this.player = player;
+			this.supportsEscapePop = false;
 		}
 
 		public override IScreenObject BuildObject(IScreenObjectFactory objFactory) {
@@ -15,9 +16,9 @@ namespace SoulboundEngine.Client.UI.Screens {
 		}
 
 		protected override void OnBuild(IScreenObject screenObject) {
-			player.SetTransitStackSource((ITransitStackSource)screenObject);
+			this.player.SetTransitStackSource((ITransitStackSource)screenObject);
 
-			InventoryUIBuilder inventoryUIBuilder = new(player.GetInventory(), player.GetHotbar());
+			InventoryUIBuilder inventoryUIBuilder = new(this.player.GetInventory(), this.player.GetHotbar());
 			inventoryUIBuilder.Build(
 				(IItemContainerScreenScope)screenObject,
 				out IItemContainerHandle inventory,

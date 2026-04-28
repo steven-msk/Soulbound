@@ -117,7 +117,7 @@ namespace SoulboundEngine.Client {
 
 			// manual dev seed for prototyping
 			DevSeedProvider seedProvider = new(this.config.dev);
-			WorldLoader worldLoader = new(seedProvider);
+			WorldLoader worldLoader = new(this, seedProvider);
 
 			worldLoader.LoadWorld(
 				SceneManager.LoadSceneAsync(this.config.unity.worldScene).ToUniTask(),

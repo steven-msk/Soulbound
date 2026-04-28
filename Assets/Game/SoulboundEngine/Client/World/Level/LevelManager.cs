@@ -1,7 +1,6 @@
 using Cysharp.Threading.Tasks;
 using SoulboundEngine.Client.Input;
 using SoulboundEngine.Client.Players;
-using SoulboundEngine.Client.UI;
 using SoulboundEngine.Client.UI.Screens;
 using SoulboundEngine.Client.World.BlockSystem.Render;
 using SoulboundEngine.Client.World.Generation;
@@ -26,6 +25,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 		private bool sessionRunning;
 
 		private readonly WorldRenderer worldRenderer;
+		private readonly SoulboundClient client;
 
 		// 'readonly' means no multiple dimensions
 		// this is for one dimension only
@@ -36,9 +36,10 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 		private static readonly RectInt renderRect = new(-32, -19, 65, 39);
 
 		// known issue: scattered Level and LevelManager dependencies
-		public LevelManager(ISeedProvider seedProvider, BlockRenderer blockRenderer, BlockModelResolver blockModelResolver) {
+		public LevelManager(SoulboundClient client, ISeedProvider seedProvider, BlockRenderer blockRenderer, BlockModelResolver blockModelResolver) {
 			this.worldRenderer = new WorldRenderer(simulationView, blockRenderer, blockModelResolver);
 			this.level = new Level(this.worldRenderer, seedProvider.GetSeed());
+			this.client = client;
 		}
 
 		IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {
@@ -123,15 +124,23 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 			);
 		}
 
-		public void TogglePause() {
-			this.paused = !this.paused;
-			Time.timeScale = this.paused ? 0f : 1f;
-			UIHandler uiHandler = SoulboundClient.Instance.UIHandler;
-			if (!this.paused) {
-				uiHandler.GetScreenNavigator().PopScreen();
-			} else {
-				uiHandler.SetScreen(new GamePausedScreen());
-			}
+		private void TogglePause() {
+			if (this.paused) this.UnpauseGame();
+			else this.PauseGame();
+		}
+
+		public void PauseGame() {
+			this.paused = true;
+			Time.timeScale = 0f;
+			this.client.UIHandler.GetScreenNavigator().PushScreen(new GamePausedScreen(this.client, this));
+			this.client.InputManager.RemoveHandler(this.level.GetPlayer());
+		}
+
+		public void UnpauseGame() {
+			this.paused = false;
+			Time.timeScale = 1f;
+			this.client.UIHandler.GetScreenNavigator().PopScreen();
+			this.client.InputManager.AddHandler(this.level.GetPlayer());
 		}
 
 		public Level GetLevel() => this.level;

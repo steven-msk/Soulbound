@@ -6,9 +6,12 @@ using UnityEngine.ResourceManagement.Exceptions;
 
 namespace SoulboundEngine.Client.World.LevelDomain {
 	public sealed class WorldLoader {
+		private readonly SoulboundClient client;
 		private readonly ISeedProvider seedProvider;
 
-		public WorldLoader(ISeedProvider seedProvider) {
+
+		public WorldLoader(SoulboundClient client, ISeedProvider seedProvider) {
+			this.client = client;
 			this.seedProvider = seedProvider;
 		}
 
@@ -19,7 +22,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 
 			BlockRenderer blockRenderer = new(sceneRoot.tilemap);
 			BlockModelResolver blockModelResolver = new();
-			LevelManager levelManager = new(seedProvider, blockRenderer, blockModelResolver);
+			LevelManager levelManager = new(this.client, this.seedProvider, blockRenderer, blockModelResolver);
 
 			// single level for now
 			// multiple dimensions not supported yet
