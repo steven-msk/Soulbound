@@ -22,6 +22,7 @@ namespace SoulboundEngine.Client.UI.Screens {
 
 			GUI.Button.Label()
 				.Text("Play")
+				.Size(26f)
 				.OnClick(() => this.screenNavigator.PushScreen(new WorldListScreen(this.worldAccessor)))
 				.Build(container);
 		}

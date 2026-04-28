@@ -1,10 +1,5 @@
-using SoulboundEngine.Common;
 using SoulboundEngine.Common.Unity;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.UI;
@@ -21,16 +16,16 @@ namespace SoulboundEngine.Client.UI.Layouts {
 
 		void IUILayoutController.ApplyTo(GameObject obj) {
 			var group = obj.GetOrAddComponent<T>();
-			group.padding = padding;
-			group.spacing = spacing;
-			group.childAlignment = childAlignment;
-			group.reverseArrangement = reverseArrangement;
-			group.childControlWidth = controlChildSize.x;
-			group.childControlHeight = controlChildSize.y;
-			group.childScaleWidth = useChildScale.x;
-			group.childScaleHeight = useChildScale.y;
-			group.childForceExpandWidth = childForceExpand.x;
-			group.childForceExpandHeight = childForceExpand.y;
+			group.padding = this.padding;
+			group.spacing = this.spacing;
+			group.childAlignment = this.childAlignment;
+			group.reverseArrangement = this.reverseArrangement;
+			group.childControlWidth = this.controlChildSize.x;
+			group.childControlHeight = this.controlChildSize.y;
+			group.childScaleWidth = this.useChildScale.x;
+			group.childScaleHeight = this.useChildScale.y;
+			group.childForceExpandWidth = this.childForceExpand.x;
+			group.childForceExpandHeight = this.childForceExpand.y;
 		}
 
 		public HorizontalOrVerticalLayout<T> Padding(RectOffset padding) {
@@ -41,16 +36,16 @@ namespace SoulboundEngine.Client.UI.Layouts {
 		public HorizontalOrVerticalLayout<T> ChildSizing(ChildSizingMode childSizingMode) {
 			switch (childSizingMode) {
 				case ChildSizingMode.Fixed:
-					controlChildSize = false;
-					childForceExpand = false;
+					this.controlChildSize = false;
+					this.childForceExpand = false;
 					break;
 				case ChildSizingMode.Preferred:
-					controlChildSize = true;
-					childForceExpand = false;
+					this.controlChildSize = true;
+					this.childForceExpand = false;
 					break;
 				case ChildSizingMode.Stretch:
-					controlChildSize = true;
-					childForceExpand = true;
+					this.controlChildSize = true;
+					this.childForceExpand = true;
 					break;
 			}
 			return this;
@@ -62,17 +57,17 @@ namespace SoulboundEngine.Client.UI.Layouts {
 		}
 
 		public HorizontalOrVerticalLayout<T> ControlChildWidth(bool controlWidth) {
-			controlChildSize.x = controlWidth;
+			this.controlChildSize.x = controlWidth;
 			return this;
 		}
 
-		public HorizontalOrVerticalLayout<T> ContolChildHeight(bool controlHeight) {
-			controlChildSize.y = controlHeight;
+		public HorizontalOrVerticalLayout<T> ControlChildHeight(bool controlHeight) {
+			this.controlChildSize.y = controlHeight;
 			return this;
 		}
 
 		public HorizontalOrVerticalLayout<T> Align(UIAlignment alignment) {
-			childAlignment = alignment switch {
+			this.childAlignment = alignment switch {
 				UIAlignment.Start => typeof(T) == typeof(HorizontalLayoutGroup)
 					? TextAnchor.MiddleLeft
 					: TextAnchor.UpperCenter,
@@ -86,7 +81,7 @@ namespace SoulboundEngine.Client.UI.Layouts {
 		}
 
 		public HorizontalOrVerticalLayout<T> Align(TextAnchor alignment) {
-			childAlignment = alignment;
+			this.childAlignment = alignment;
 			return this;
 		}
 
@@ -96,12 +91,12 @@ namespace SoulboundEngine.Client.UI.Layouts {
 		}
 
 		public HorizontalOrVerticalLayout<T> ChildForceExpandWidth(bool forceExpandWidth) {
-			childForceExpand.x = forceExpandWidth;
+			this.childForceExpand.x = forceExpandWidth;
 			return this;
 		}
 
 		public  HorizontalOrVerticalLayout<T> ChildForceExpandHeight(bool forceExpandHeight) {
-			childForceExpand.y = forceExpandHeight;
+			this.childForceExpand.y = forceExpandHeight;
 			return this;
 		}
 

@@ -63,7 +63,18 @@ namespace SoulboundEngine.Client.UI.Screens {
 					.Align(UIAlignment.Center)
 					.Spacing(10)
 					.Padding(new UnityEngine.RectOffset(0, 0, 40, 40))
-			).Build(parentContainer);
+			).Build(GUI.Container(
+					GUI.Frame.Stretch(),
+					GUI.Layout.Vertical()
+						.ChildSizing(ChildSizingMode.Preferred)
+						.Align(UIAlignment.End)
+				).Build(GUI.Container(
+						GUI.Frame.Stretch(),
+						GUI.Layout.Vertical()
+							.ControlChildSize(true)
+							.ChildForceExpandHeight(true)
+							.Align(UIAlignment.End)
+					).Build(parentContainer)));
 
 			InputFieldHandle inputField = GUI.InputField.Build(newWorldContainer);
 
