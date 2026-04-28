@@ -370,8 +370,10 @@ MonoBehaviour:
     dev:
       useDoNotSaveWorldStrategy: 1
       devWorld: devWorld
-      devScene: DevScene
       seed: 12345
+    unity:
+      mainScene: MainScene
+      worldScene: WorldScene
 --- !u!4 &2144701901
 Transform:
   m_ObjectHideFlags: 0

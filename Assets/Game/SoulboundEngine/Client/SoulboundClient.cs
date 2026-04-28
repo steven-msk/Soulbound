@@ -120,7 +120,7 @@ namespace SoulboundEngine.Client {
 			WorldLoader worldLoader = new(seedProvider);
 
 			worldLoader.LoadWorld(
-				SceneManager.LoadSceneAsync("WorldScene").ToUniTask(),
+				SceneManager.LoadSceneAsync(this.config.unity.worldScene).ToUniTask(),
 				Object.FindFirstObjectByType<WorldSceneRoot>
 			).ContinueWith(session => {
 				this.activeWorldSession = session;
@@ -148,7 +148,7 @@ namespace SoulboundEngine.Client {
 			this.uiHandler.FlushScreens();
 			Time.timeScale = 1f;
 
-			SceneManager.LoadSceneAsync("DevScene").ToUniTask()
+			SceneManager.LoadSceneAsync(this.config.unity.mainScene).ToUniTask()
 				.ContinueWith(() => {
 					this.activeWorldSession = null;
 					this.uiHandler.SetCanvas(Object.FindFirstObjectByType<Canvas>());

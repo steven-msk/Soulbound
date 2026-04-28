@@ -1,7 +1,4 @@
-using SoulboundEngine.Core;
-
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace SoulboundEngine.Core {
 	public sealed class Main : MonoBehaviour {
@@ -12,10 +9,6 @@ namespace SoulboundEngine.Core {
 
 		[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
 		public static void GameLaunch() {
-			if (Application.isEditor && SceneManager.GetActiveScene().name != instance?.gameConfig.dev.devScene
-					|| (!instance?.gameObject.activeSelf ?? true)) {
-				return;
-			}
 			new Soulbound(instance.gameConfig).Launch();
 		}
 	}

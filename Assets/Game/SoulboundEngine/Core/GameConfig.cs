@@ -1,14 +1,11 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SoulboundEngine.Core {
     [Serializable]
     public struct GameConfig {
         public FileConfig file;
         public DevConfig dev;
+		public UnityConfig unity;
     }
 
     [Serializable]
@@ -20,7 +17,12 @@ namespace SoulboundEngine.Core {
     public struct DevConfig {
 		public bool useDoNotSaveWorldStrategy;
 		public string devWorld;
-		public string devScene;
 		public int seed;
     }
+
+	[Serializable]
+	public struct UnityConfig {
+		public string mainScene;
+		public string worldScene;
+	}
 }

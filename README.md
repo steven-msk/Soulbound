@@ -100,7 +100,7 @@ Soulbound is a 2D survival game currently in alpha production. The core engine s
    git clone https://github.com/steven-msk/Soulbound.git
    ```
 2. Open the project in Unity.
-3. Open the `DevScene` scene at `Assets/Game/Scenes/`
+3. Open the `MainScene` scene at `Assets/Game/Scenes/`
 4. Optionally configure `GameConfig` on the `Main` game object in the scene.
 5. Press Play.
 
