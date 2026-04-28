@@ -14,37 +14,36 @@ namespace SoulboundEngine.Client.UI.Buttons {
 		[SerializeField] private TextMeshProUGUI label;
 		private Action onClick;
 
-		public void Build(string text, bool enabled, Action onClick) {
-			button = button != null ? button : GetComponent<UnityEngine.UI.Button>();
-			label = label != null ? label : GetComponent<TextMeshProUGUI>();
+		public void Build(string text, bool enabled, Action onClick, float textSize) {
+			this.button = this.button != null ? this.button : this.GetComponent<UnityEngine.UI.Button>();
+			this.label = this.label != null ? this.label : this.GetComponent<TextMeshProUGUI>();
 
-			SetText(text);
-			SetEnabled(enabled);
-			SetOnClick(onClick);
-			button.onClick.AddListener(OnClick);
+			this.SetText(text);
+			this.SetEnabled(enabled);
+			this.SetOnClick(onClick);
+			this.label.fontSize = textSize;
+			this.button.onClick.AddListener(this.OnClick);
 		}
 
 		public void SetOnClick(Action action) {
-			button.onClick.RemoveAllListeners();
-			onClick = action;
-			if (action != null) {
-			}
+			this.button.onClick.RemoveAllListeners();
+			this.onClick = action;
 		}
 
 		public void SetEnabled(bool enabled) {
-			button.interactable = enabled;
+			this.button.interactable = enabled;
 		}
 
 		public void SetText(string text) {
-			label.text = text;
+			this.label.text = text;
 		}
 
 		public void SetVisible(bool visible) {
-			gameObject.SetActive(visible);
+			this.gameObject.SetActive(visible);
 		}
 
 		private void OnClick() {
-			onClick?.Invoke();
+			this.onClick?.Invoke();
 			EventBus.Publish(new ButtonClickedEvent(this));
 		}
 	}

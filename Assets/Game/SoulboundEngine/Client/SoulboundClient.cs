@@ -28,7 +28,7 @@ namespace SoulboundEngine.Client {
 	using Object = UnityEngine.Object;
 	using Time = UnityEngine.Time;
 
-	public sealed class SoulboundClient : IInputEventHandler {
+	public sealed class SoulboundClient : IInputEventHandler, IWorldAccessor {
 		const int INPUT_QUEUE_BUFFER_CAPACITY = 128;
 		private static SoulboundClient instance;
 		private readonly GameConfig config;
@@ -91,7 +91,7 @@ namespace SoulboundEngine.Client {
 		/// called once when the game is launched
 		/// </summary>
 		public void Start() {
-			this.uiHandler.SetScreen(new TitleScreen());
+			this.uiHandler.SetScreen(new TitleScreen(this));
 			this.inputManager.AddHandler(this);
 		}
 
@@ -152,7 +152,7 @@ namespace SoulboundEngine.Client {
 				.ContinueWith(() => {
 					this.activeWorldSession = null;
 					this.uiHandler.SetCanvas(Object.FindFirstObjectByType<Canvas>());
-					this.uiHandler.SetScreen(new TitleScreen());
+					this.uiHandler.SetScreen(new TitleScreen(this));
 					this.debugOverlayManager.Clear();
 
 					this.runtimeDataProvider.ExitWorldSessionState();

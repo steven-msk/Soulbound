@@ -15,6 +15,7 @@ namespace SoulboundEngine.Client.UI.Buttons {
 		private bool built;
 		private ITooltip tooltip;
 		private Type tooltipTriggerType;
+		private float size = 16f;
 
 		public ButtonBuilder(IUIElementTemplate<LabelButtonHandle> template) {
 			this.template = template;
@@ -35,31 +36,36 @@ namespace SoulboundEngine.Client.UI.Buttons {
 			return this;
 		}
 
+		public ButtonBuilder Size(float size) {
+			this.size = size;
+			return this;
+		}
+
 		public ButtonBuilder Tooltip<TTrigger>(ITooltip tooltip) where TTrigger : Component, ITooltipTrigger, new() {
 			if (!typeof(MonoBehaviour).IsAssignableFrom(typeof(TTrigger))) {
 				throw new InvalidOperationException("Tooltip trigger component must be a MonoBehaviour");
 			}
 			this.tooltip = tooltip;
-			tooltipTriggerType = typeof(TTrigger);
+			this.tooltipTriggerType = typeof(TTrigger);
 			return this;
 		}
 
 		public IButtonHandle Build(IUIElementContainer container) {
-			if (built) throw new InvalidOperationException("Button already built");
-			built = true;
-
-			GameObject obj = template.Instantiate();
-			if (tooltip != null) {
-				ITooltipTrigger trigger = (ITooltipTrigger)obj.AddComponent(tooltipTriggerType);
-				trigger.SetTooltip(tooltip);
+			if (this.built) throw new InvalidOperationException("Button already built");
+			this.built = true;
+			
+			GameObject obj = this.template.Instantiate();
+			if (this.tooltip != null) {
+				ITooltipTrigger trigger = (ITooltipTrigger)obj.AddComponent(this.tooltipTriggerType);
+				trigger.SetTooltip(this.tooltip);
 			}
-			var handle = obj.GetOrAddComponent<LabelButtonHandle>();
-			handle.Build(text, enabled, onClick);
+			LabelButtonHandle handle = obj.GetOrAddComponent<LabelButtonHandle>();
+			handle.Build(this.text, this.enabled, this.onClick, this.size);
 
 			UIElementNode node = new(obj);
 			container.AddElement(node);
 
-			template.Apply(handle);
+			this.template.Apply(handle);
 
 			return handle;
 		}

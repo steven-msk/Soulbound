@@ -2,12 +2,6 @@ using SoulboundEngine.Client.UI.Buttons;
 using SoulboundEngine.Client.UI.Containers;
 using SoulboundEngine.Client.UI.Frames;
 using SoulboundEngine.Client.UI.Layouts;
-using SoulboundEngine.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SoulboundEngine.Client.UI {
 	public sealed class GUI {
@@ -28,5 +22,7 @@ namespace SoulboundEngine.Client.UI {
 		public static ContainerBuilder Container(IUIFrame frame, IUILayoutController layout) {
 			return new ContainerBuilder(frame, layout);
 		}
+
+		public static InputFieldBuilder InputField => new(new InputField());
 	}
 }
