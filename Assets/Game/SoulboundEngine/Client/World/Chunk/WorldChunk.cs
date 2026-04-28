@@ -5,7 +5,6 @@ using SoulboundEngine.Client.World.BlockSystem.States;
 using SoulboundEngine.Client.World.BlockSystem.TileEntities;
 using SoulboundEngine.Client.World.Generation;
 using SoulboundEngine.Client.World.LevelDomain;
-using SoulboundEngine.Client.World.Render;
 using SoulboundEngine.Core;
 using System;
 using System.Collections;
@@ -138,16 +137,6 @@ namespace SoulboundEngine.Client.World.Chunk {
 		public int WorldXToChunkX(int x) => x - this.xpos * Level.CHUNK_LENGTH;
 
 		public int ChunkXToWorldX(int cx) => cx + this.xpos * Level.CHUNK_LENGTH;
-
-		[Obsolete]
-		public void OnLoad(ChunkOutlineRenderer outlineRenderer) {
-			//outlineRenderer.ShowOutline(this);
-		}
-
-		[Obsolete]
-		public void OnUnload(ChunkOutlineRenderer outlineRenderer) {
-			//outlineRenderer.HideOutline(this);
-		}
 
 		public void SetBlockState(BlockPos blockPos, BlockState? blockState) {
 			blockState ??= Blocks.air.DefaultState;

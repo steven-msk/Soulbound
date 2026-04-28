@@ -179,7 +179,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 			BlockState? oldState = this.GetBlockState(blockPos);
 			WorldChunk chunk = this.ChunkAt(blockPos);
 			if (chunk == null) {
-				Logger.LogError(new InvalidOperationException("Block pos not valid: " + blockPos));
+				Logger.LogError("Block pos not valid: " + blockPos);
 				return;
 			}
 
@@ -261,7 +261,6 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 
 			foreach (WorldChunk chunk in toRemove) {
 				this.loadedChunks.Remove(chunk.xpos);
-				chunk.OnUnload(this.chunkOutlineRenderer);
 				this.OnChunkUnloaded(chunk);
 			}
 		}
@@ -281,7 +280,6 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 					}
 
 					this.loadedChunks[chunkX] = chunk;
-					chunk.OnLoad(this.chunkOutlineRenderer);
 					this.OnChunkLoaded(chunk);
 				}
 			}

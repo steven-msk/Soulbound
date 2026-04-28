@@ -76,7 +76,9 @@ namespace SoulboundEngine.Client.UI.Screens {
 							.Align(UIAlignment.End)
 					).Build(parentContainer)));
 
-			InputFieldHandle inputField = GUI.InputField.Build(newWorldContainer);
+			InputFieldHandle inputField = GUI.InputField
+				.Placeholder("World name...")
+				.Build(newWorldContainer);
 
 			GUI.Button.Label()
 				.Text("Create new world")

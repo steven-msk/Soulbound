@@ -56,7 +56,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 
 		private async void LevelFrameLoop() {
 			while (this.sessionRunning) {
-				if (!this.sessionRunning) {
+				if (!this.paused) {
 					this.StartFrame();
 
 					try {

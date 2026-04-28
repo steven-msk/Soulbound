@@ -6,7 +6,7 @@ namespace SoulboundEngine.Client.UI {
 	public sealed class InputFieldHandle : MonoBehaviour, IUIElementHandle {
 		private TMP_InputField field;
 
-		public void Build(TMP_InputField field) {
+		public void OnBuild(TMP_InputField field) {
 			this.field = field;
 		}
 
