@@ -56,38 +56,38 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 
 		private async void LevelFrameLoop() {
 			while (this.sessionRunning) {
-				try {
-					if (!this.paused) {
-						this.StartFrame();
+				if (!this.sessionRunning) {
+					this.StartFrame();
 
+					try {
 						Vector2 pivotPos = this.level.GetPlayer()?.GetPos() ?? this.level.GetWorldSpawnPoint();
 						this.level.FrameUpdate();
 						this.worldRenderer.RenderView(pivotPos, this.level.GetBlockState);
-
-						this.EndFrame();
+					} catch (Exception e) {
+						Logger.LogFatal(e);
 					}
-					await UniTask.WaitForEndOfFrame();
-				} catch (Exception e) {
-					Logger.LogFatal(e);
+
+					this.EndFrame();
 				}
+				await UniTask.NextFrame();
 			}
 		}
 
 		private async void LevelTickLoop() {
 			while (this.sessionRunning) {
-				try {
-					if (!this.paused) {
-						this.StartTick();
+				if (!this.paused) {
+					this.StartTick();
 
+					try {
 						Vector2 pivotPos = this.level.GetPlayer()?.GetPos() ?? this.level.GetWorldSpawnPoint();
 						this.level.Tick(this.GetRelativeSimulationRect(pivotPos));
-
-						this.EndTick();
+					} catch (Exception e) {
+						Logger.LogFatal(e);
 					}
-					await UniTask.WaitForSeconds(tickRate, true);
-				} catch (Exception e) {
-					Logger.LogFatal(e);
+
+					this.EndTick();
 				}
+				await UniTask.WaitForSeconds(tickRate, true);
 			}
 		}
 
