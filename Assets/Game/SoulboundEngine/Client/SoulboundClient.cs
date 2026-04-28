@@ -60,18 +60,12 @@ namespace SoulboundEngine.Client {
 			InputTokens.Register(this.inputActions.asset);
 			this.settings = new Settings();
 
-			this.debugOverlayManager = new DebugOverlayManager();
 			this.runtimeDataProvider = new RuntimeDataProvider();
 			this.runtimeExecutionServices = new RuntimeExecutionServices();
-			this.commandProcessor = new CommandProcessor(this.runtimeDataProvider, this.runtimeExecutionServices);
 			this.worldSessionCommands = new WorldSessionCommands();
+			this.commandProcessor = new CommandProcessor(this.runtimeDataProvider, this.runtimeExecutionServices);
+			this.debugOverlayManager = new DebugOverlayManager(this);
 			this.commandLine = new CommandLine(this.commandProcessor, this.debugOverlayManager);
-			this.debugOverlayManager.onOverlayChanged += (prev, next) => {
-				if (this.activeWorldSession is { } session) {
-					if (next == DebugOverlayFeature.CommandLine) this.inputManager.RemoveHandler(session.player);
-					if (prev == DebugOverlayFeature.CommandLine) this.inputManager.AddHandler(session.player);
-				}
-			};
 			this.inputManager.AddHandler(this.commandLine);
 			this.metricsHud = new MetricsHUD(ctx.debugMetricsService);
 			this.console = new DebugConsole();
@@ -233,8 +227,18 @@ namespace SoulboundEngine.Client {
 			private readonly Stack<DebugOverlayFeature> overlayStack = new();
 			public event Action<DebugOverlayFeature, DebugOverlayFeature> onOverlayChanged;
 
-			public DebugOverlayManager() {
+			public DebugOverlayManager(SoulboundClient client) {
 				this.overlayStack.Push(DebugOverlayFeature.None);
+
+				onOverlayChanged += (prev, next) => {
+					if (client.activeWorldSession is { } session) {
+						if (client.commandLine.IsVisible() || next == DebugOverlayFeature.CommandLine) {
+							client.inputManager.RemoveHandler(session.player);
+						} else if (!client.commandLine.IsVisible() && prev == DebugOverlayFeature.CommandLine) {
+							client.inputManager.AddHandler(session.player);
+						}
+					}
+				};
 			}
 
 			public bool TryShow(DebugOverlayFeature overlay) {
