@@ -15,7 +15,7 @@ namespace SoulboundEngine.Core {
 
     [Serializable]
     public struct DevConfig {
-		public bool useDoNotSaveWorldStrategy;
+		public bool overrideSaves;
 		public string devWorld;
 		public int seed;
     }

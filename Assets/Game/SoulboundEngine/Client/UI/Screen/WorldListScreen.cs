@@ -40,17 +40,17 @@ namespace SoulboundEngine.Client.UI.Screens {
 					.Spacing(10)
 			).Build(savesContainer);
 
-			List<string> saves = this.worldAccessor.ListWorldSaves().ToList();
+			List<WorldSave> saves = this.worldAccessor.ListWorldSaves().ToList();
 			foreach (var save in saves) {
 				GUI.Button.Label()
-					.Text(save)
-					.OnClick(() => this.worldAccessor.EnterWorld(save))
+					.Text($"{save.name} ({save.seed})")
+					.OnClick(() => this.worldAccessor.EnterWorld(save.name))
 					.Build(savesCol);
 
 				GUI.Button.Label()
 					.Text("Delete")
 					.OnClick(() => { 
-						this.worldAccessor.DeleteWorld(save);
+						this.worldAccessor.DeleteWorld(save.name);
 						this.screenNavigator.IssueRebuild(this);
 					})
 					.Build(deleteCol);
@@ -85,12 +85,13 @@ namespace SoulboundEngine.Client.UI.Screens {
 				.OnClick(() => {
 					string name = inputField.GetText();
 					if (!string.IsNullOrEmpty(name) && this.worldAccessor.ListWorldSaves().Count() < MAX_WORLDS) {
-						this.worldAccessor.CreateNewWorld(name);
+						this.worldAccessor.CreateNewWorld(name, WorldManager.GetRandomSeed());
 						this.screenNavigator.IssueRebuild(this);
 						inputField.Clear();
 					}
 				}).Build(newWorldContainer);
 
 		}
+
 	}
 }
