@@ -1,9 +1,7 @@
-using SoulboundEngine.Client.World.BlockSystem.Render;
 using SoulboundEngine.Client.World.BlockSystem.States;
 using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Common;
 using SoulboundEngine.Common.Math;
-using SoulboundEngine.Core.Assets;
 using SoulboundEngine.Core.States;
 
 namespace SoulboundEngine.Client.World.BlockSystem {
@@ -49,8 +47,5 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 
 		private BlockPos GetNextPos(BlockPos selfPos) => selfPos.GetAdjacent(Direction.Left); 
 
-		public override BlockRenderData GetRenderData(BlockState blockState) {
-			return new BlockRenderData(new AssetKey("WhiteSquareTile"));
-		}
 	}
 }
