@@ -1,8 +1,8 @@
 ---
 name: Bug report
 about: Create a report to help us improve
-title: ''
-labels: ''
+title: [BUG]
+labels: bug
 assignees: ''
 
 ---
@@ -19,6 +19,9 @@ Steps to reproduce the behavior:
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.
+
+**How often does this occur?**
+e.g always, often, sometimes, rarely, unable to reproduce
 
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
