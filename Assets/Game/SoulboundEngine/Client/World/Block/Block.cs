@@ -1,3 +1,4 @@
+using SoulboundEngine.Client.ItemSystem;
 using SoulboundEngine.Client.World.BlockSystem.Render;
 using SoulboundEngine.Client.World.BlockSystem.States;
 using SoulboundEngine.Client.World.BlockSystem.TileEntities;
@@ -10,7 +11,7 @@ using System.Collections.Generic;
 #nullable enable
 
 namespace SoulboundEngine.Client.World.BlockSystem {
-	public class Block {
+	public class Block : IItemConvertible {
 		private static readonly List<BlockState> statesByID = new();
 		private readonly Settings settings;
 		private BlockState defaultState;
@@ -48,6 +49,10 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 		public virtual bool HasTileEntity(Level level, BlockPos blockPos, BlockState blockState) => false;
 		public virtual TileEntity? GetTileEntity(Level level, BlockPos blockPos) {
 			return null;
+		}
+
+		public Item AsItem() {
+			return Item.blockItems.TryGetValue(this, out Item item) ? item : Items.AIR;
 		}
 
 		public string name => this.settings.name;

@@ -1,6 +1,8 @@
 using SoulboundEngine.Client.ItemSystem.Render;
+using SoulboundEngine.Client.World.BlockSystem;
 using SoulboundEngine.Core.Registry;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 #nullable enable
@@ -8,6 +10,7 @@ using UnityEngine;
 namespace SoulboundEngine.Client.ItemSystem {
 	public class Item {
 		public const int DEFAULT_FULL_STACK = 256;
+		public static readonly Dictionary<Block, Item> blockItems = new();
 		private readonly Settings settings;
 
 		public Item(Settings settings) {
@@ -17,6 +20,10 @@ namespace SoulboundEngine.Client.ItemSystem {
 		public string name => this.settings.name;
 		public int fullStackSize => this.settings.fullStackSize;
 		public bool IsStackable() => this.settings.IsStackable();
+
+		public void AppendToBlock(Block block) {
+			blockItems.Add(block, this);
+		}
 
 		public ItemRenderData GetRenderData(ItemStack itemStack) {
 			return this.settings.renderFunction(itemStack);

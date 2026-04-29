@@ -1,12 +1,10 @@
 using SoulboundEngine.Client.World.BlockSystem;
 using SoulboundEngine.Core.Registry;
-using System.Collections.Generic;
 
 #nullable enable
 
 namespace SoulboundEngine.Client.ItemSystem {
 	public partial class Items {
-		private static readonly Dictionary<Block, Item> blockItems = new();
 		public static readonly Item AIR = Register(Blocks.air, Item.Settings.Air());
 
 		public static readonly Item placeableItem = Register(Blocks.movingTickingBlock, 
@@ -41,17 +39,12 @@ namespace SoulboundEngine.Client.ItemSystem {
 
 		public static Item Register(Block block, Item.Settings settings) {
 			Item item = Register(Blocks.GetIdentifier(block), new BlockItem(block, settings));
-			blockItems.Add(block, item);
+			item.AppendToBlock(block);
 			return item;
 		}
 
 		public static Identifier GetIdentifier(Item item) {
 			return Registries.ITEMS.GetIdentifier(item);
-		}
-
-		public static Item FromBlock(Block? block) {
-			block ??= Blocks.air;
-			return blockItems.GetValueOrDefault(block, AIR);
 		}
 
 		public static void Init() { }
