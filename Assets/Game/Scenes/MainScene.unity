@@ -368,7 +368,7 @@ MonoBehaviour:
     file:
       savesFolder: saves
     dev:
-      overrideSaves: 1
+      overrideSaves: 0
       devWorld: devWorld
       seed: 12345
     unity:
