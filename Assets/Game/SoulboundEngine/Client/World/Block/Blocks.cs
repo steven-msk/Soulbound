@@ -55,8 +55,8 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 			))
 		));
 
-		private static TBlock Register<TBlock>(string id, TBlock block) where TBlock : Block {
-			return Registries.Register(Registries.BLOCKS, Identifier.Of(id), block);
+		public static TBlock Register<TBlock>(string id, TBlock block) where TBlock : Block {
+			return Registry<Block>.Register(Registries.BLOCKS, Identifier.Of(id), block);
 		}
 
 		public static Identifier GetIdentifier(Block block) {

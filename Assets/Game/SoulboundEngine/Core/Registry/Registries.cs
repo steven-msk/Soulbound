@@ -10,39 +10,16 @@ namespace SoulboundEngine.Core.Registry {
 		public static readonly Identifier ROOT_IDENTIFIER = Identifier.Of("root");
 		public static readonly Registry<IRegistry> ROOT = CreateRoot(ROOT_IDENTIFIER);
 
-		public static readonly Registry<Block> BLOCKS = Create(RegistryKey<Block>.OfRegistry(Identifier.Of("block")));
-		public static readonly Registry<Item> ITEMS = Create(RegistryKey<Item>.OfRegistry(Identifier.Of("item")));
-		public static readonly Registry<EntityDescriptor> ENTITIES = Create(RegistryKey<EntityDescriptor>.OfRegistry(Identifier.Of("entity")));
-		public static readonly Registry<EntityAttribute> ATTRIBUTES = Create(RegistryKey<EntityAttribute>.OfRegistry(Identifier.Of("attribute")));
+		public static readonly Registry<Block> BLOCKS = Create<Block>(Identifier.Of("block"));
+		public static readonly Registry<Item> ITEMS = Create<Item>(Identifier.Of("item"));
+		public static readonly Registry<EntityDescriptor> ENTITIES = Create<EntityDescriptor>(Identifier.Of("entity"));
+		public static readonly Registry<EntityAttribute> ATTRIBUTES = Create<EntityAttribute>(Identifier.Of("attribute"));
 
-		public static T Register<T>(Registry<T> registry, string id, T entry) {
-			return Register<T, T>(registry, Identifier.Of(id), entry);
-		}
-
-		public static T Register<T>(Registry<T> registry, Identifier id, T entry) {
-			return Register<T, T>(registry, id, entry);
-		}
-
-		public static T Register<V, T>(Registry<V> registry, Identifier id, T entry) where T : V {
-			registry.CreateEntry(id, entry);
-			return entry;
-		}
-		public static RegistryEntry<T> RegisterEntry<T>(Registry<T> registry, string id, T entry) {
-			return RegisterEntry<T, T>(registry, Identifier.Of(id), entry);
-		}
-
-		public static RegistryEntry<T> RegisterEntry<T>(Registry<T> registry, Identifier id, T entry) {
-			return RegisterEntry<T, T>(registry, id, entry);
-		}
-
-		public static RegistryEntry<V> RegisterEntry<V, T>(Registry<V> registry, Identifier id, T entry) where T : V {
-			return registry.CreateEntry(id, entry);
-		}
-
-		private static Registry<T> Create<T>(RegistryKey<Registry<T>> key) {
+		private static Registry<T> Create<T>(Identifier id) {
 			if (freezed) throw new InvalidOperationException("Registries already freezed");
 
-			Registry<T> registry = Register(ROOT, key.value, new Registry<T>(key));
+			RegistryKey<Registry<T>> registryKey = RegistryKey<T>.OfRegistry(id);
+			Registry<T> registry = Registry<IRegistry>.Register(ROOT, id, new Registry<T>(registryKey));
 
 			return registry;
 		}

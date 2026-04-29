@@ -15,26 +15,46 @@ namespace SoulboundEngine.Core.Registry {
 
 		public Registry(RegistryKey<Registry<T>> key) => this.key = key;
 
-		public RegistryEntry<T> CreateEntry(Identifier id, T value) {
-			if (freezed) throw new InvalidOperationException("Registry already freezed");
+		public static T Register(Registry<T> registry, string id, T entry) {
+			return Register(registry, Identifier.Of(id), entry);
+		}
+
+		public static T Register(Registry<T> registry, Identifier id, T entry) {
+			return registry.CreateEntry(id, entry).GetValue();
+		}
+
+		public static V Register<V>(Registry<T> registry, Identifier id, V entry) where V : T {
+			return (V)registry.CreateEntry(id, entry).GetValue();
+		}
+
+		public static RegistryEntry<T> RegisterEntry(Registry<T> registry, string id, T entry) {
+			return RegisterEntry(registry, Identifier.Of(id), entry);
+		}
+
+		public static RegistryEntry<T> RegisterEntry(Registry<T> registry, Identifier id, T entry) {
+			return registry.CreateEntry(id, entry);
+		}
+
+		private RegistryEntry<T> CreateEntry(Identifier id, T value) {
+			if (this.freezed) throw new InvalidOperationException("Registry already freezed");
 
 			RegistryKey<T> key = RegistryKey<T>.Of(this.key, id);
 			RegistryEntry<T> entry = new(this, key, value);
 
-			idToEntry.Add(id, entry);
-			keyToEntry.Add(key, entry);
-			valueToEntry.Add(value, entry);
+			this.idToEntry.Add(id, entry);
+			this.keyToEntry.Add(key, entry);
+			this.valueToEntry.Add(value, entry);
 
 			return entry;
 		}
 
-		public bool Contains(RegistryKey<T> key) => keyToEntry.ContainsKey(key);
-		public bool ContainsId(Identifier id) => idToEntry.ContainsKey(id);
+		public bool Contains(RegistryKey<T> key) => this.keyToEntry.ContainsKey(key);
+		public bool ContainsId(Identifier id) => this.idToEntry.ContainsKey(id);
 
-		void IRegistry.Freeze() => freezed = true;
+		void IRegistry.Freeze() => this.freezed = true;
 
 		public bool TryGet(RegistryKey<T> key, out T value) {
-			RegistryEntry<T>? entry = keyToEntry.GetValueOrDefault(key);
+			RegistryEntry<T>? entry = this.keyToEntry.GetValueOrDefault(key);
 			value = entry != null ? entry.GetValue() : default;
 			return entry != null;
 		}
@@ -42,36 +62,36 @@ namespace SoulboundEngine.Core.Registry {
 		public T Get(Identifier id) {
 			if (id is null) throw new ArgumentNullException();
 
-			RegistryEntry<T> entry = idToEntry.GetValueOrDefault(id) ?? throw new KeyNotFoundException();
+			RegistryEntry<T> entry = this.idToEntry.GetValueOrDefault(id) ?? throw new KeyNotFoundException();
 			return entry.GetValue();
 		}
 
-		public RegistryEntry<T>? GetEntry(Identifier id) => idToEntry.GetValueOrDefault(id);
+		public RegistryEntry<T>? GetEntry(Identifier id) => this.idToEntry.GetValueOrDefault(id);
 
-		public RegistryEntry<T>? GetEntry(T value) => valueToEntry.GetValueOrDefault(value);
+		public RegistryEntry<T>? GetEntry(T value) => this.valueToEntry.GetValueOrDefault(value);
 
-		public RegistryEntry<T>? Get(RegistryKey<T> key) => keyToEntry.GetValueOrDefault(key);
+		public RegistryEntry<T>? Get(RegistryKey<T> key) => this.keyToEntry.GetValueOrDefault(key);
 
 		public HashSet<KeyValuePair<RegistryKey<T>, T>> GetEntrySet() {
-			return keyToEntry
+			return this.keyToEntry
 				.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.GetValue())
 				.ToHashSet();
 		}
 
-		public IEnumerator<T> GetEnumerator() => valueToEntry.Keys.GetEnumerator();
+		public IEnumerator<T> GetEnumerator() => this.valueToEntry.Keys.GetEnumerator();
 
 		public Identifier? GetIdentifier(T value) {
-			if (!valueToEntry.TryGetValue(value, out RegistryEntry<T> entry)) {
+			if (!this.valueToEntry.TryGetValue(value, out RegistryEntry<T> entry)) {
 				return null;
 			}
 			return entry.GetKey().value;
 		}
 
-		public HashSet<Identifier> GetIdentifiers() => idToEntry.Keys.ToHashSet();
+		public HashSet<Identifier> GetIdentifiers() => this.idToEntry.Keys.ToHashSet();
 
-		public RegistryKey<Registry<T>> GetKey() => key;
+		public RegistryKey<Registry<T>> GetKey() => this.key;
 
-		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+		IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 
 		bool IRegistryEntryOwner<T>.OwnerEquals(IRegistryEntryOwner<T> other) {
 			return this == other;

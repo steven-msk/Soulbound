@@ -45,9 +45,14 @@ namespace SoulboundEngine.Client.ItemSystem {
 				return Stackable(name, 1, renderFunction);
 			}
 
+			public static Settings Air() {
+				return new("Air", 1, _ => default);
+			}
+
 			public static Func<ItemStack, ItemRenderData> RenderFunction(string spriteKey, Identifier? animation = null) {
 				return itemStack => new ItemRenderData(spriteKey, itemStack, animation);
 			}
+
 
 			public bool IsStackable() => this.fullStackSize > 1;
 		}
