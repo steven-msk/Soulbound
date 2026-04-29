@@ -30,11 +30,11 @@ namespace SoulboundEngine.Client.ItemSystem {
 		));
 
 		public static TItem Register<TItem>(string id, TItem item) where TItem : Item {
-			return Registry<Item>.Register(Registries.ITEMS, Identifier.Of(id), item);
+			return Registry<Item>.Register<TItem>(Registries.ITEMS, KeyOf(id), item);
 		}
 
 		public static TItem Register<TItem>(Identifier id, TItem item) where TItem : Item {
-			return Registry<Item>.Register(Registries.ITEMS, id, item);
+			return Registry<Item>.Register(Registries.ITEMS, KeyOf(id.ToString()), item);
 		}
 
 		public static Item Register(Block block, Item.Settings settings) {
@@ -45,6 +45,10 @@ namespace SoulboundEngine.Client.ItemSystem {
 
 		public static Identifier GetIdentifier(Item item) {
 			return Registries.ITEMS.GetIdentifier(item);
+		}
+
+		private static RegistryKey<Item> KeyOf(string id) {
+			return RegistryKey<Item>.Of(Registries.ITEMS.GetKey(), Identifier.Of(id));
 		}
 
 		public static void Init() { }

@@ -15,34 +15,34 @@ namespace SoulboundEngine.Core.Registry {
 
 		public Registry(RegistryKey<Registry<T>> key) => this.key = key;
 
-		public static T Register(Registry<T> registry, string id, T entry) {
-			return Register(registry, Identifier.Of(id), entry);
+		public static V Register<V>(Registry<T> registry, RegistryKey<T> key, V value) where V : T {
+			return (V)RegisterEntry(registry, key, value).GetValue();
 		}
 
-		public static T Register(Registry<T> registry, Identifier id, T entry) {
-			return registry.CreateEntry(id, entry).GetValue();
+		public static V Register<V>(Registry<T> registry, RegistryKey<V> key, V value) where V : T {
+			return (V)registry.CreateEntry(key, value).GetValue();
 		}
 
-		public static V Register<V>(Registry<T> registry, Identifier id, V entry) where V : T {
-			return (V)registry.CreateEntry(id, entry).GetValue();
+		public static T Register(Registry<T> registry, string id, T value) {
+			return RegisterEntry(registry, Identifier.Of(id), value).GetValue();
 		}
 
-		public static RegistryEntry<T> RegisterEntry(Registry<T> registry, string id, T entry) {
-			return RegisterEntry(registry, Identifier.Of(id), entry);
+		public static RegistryEntry<T> RegisterEntry(Registry<T> registry, Identifier id, T value) {
+			return RegisterEntry(registry, RegistryKey<T>.Of(registry.key, id), value);
 		}
 
-		public static RegistryEntry<T> RegisterEntry(Registry<T> registry, Identifier id, T entry) {
-			return registry.CreateEntry(id, entry);
+		public static RegistryEntry<T> RegisterEntry(Registry<T> registry, RegistryKey<T> key, T value) {
+			return registry.CreateEntry(key, value);
 		}
 
-		private RegistryEntry<T> CreateEntry(Identifier id, T value) {
+		private RegistryEntry<T> CreateEntry<V>(RegistryKey<V> key, V value) where V : T {
 			if (this.freezed) throw new InvalidOperationException("Registry already freezed");
 
-			RegistryKey<T> key = RegistryKey<T>.Of(this.key, id);
-			RegistryEntry<T> entry = new(this, key, value);
+			RegistryKey<T> registryKey = RegistryKey<T>.Of(this.key, key.value);
+			RegistryEntry<T> entry = new(this, registryKey, value);
 
-			this.idToEntry.Add(id, entry);
-			this.keyToEntry.Add(key, entry);
+			this.idToEntry.Add(registryKey.value, entry);
+			this.keyToEntry.Add(registryKey, entry);
 			this.valueToEntry.Add(value, entry);
 
 			return entry;

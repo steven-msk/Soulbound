@@ -56,11 +56,15 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 		));
 
 		public static TBlock Register<TBlock>(string id, TBlock block) where TBlock : Block {
-			return Registry<Block>.Register(Registries.BLOCKS, Identifier.Of(id), block);
+			return Registry<Block>.Register(Registries.BLOCKS, KeyOf(id), block);
 		}
 
 		public static Identifier GetIdentifier(Block block) {
 			return Registries.BLOCKS.GetIdentifier(block);
+		}
+
+		private static RegistryKey<Block> KeyOf(string id) {
+			return RegistryKey<Block>.Of(Registries.BLOCKS.GetKey(), Identifier.Of(id));
 		}
 
 		public static void Init() { }

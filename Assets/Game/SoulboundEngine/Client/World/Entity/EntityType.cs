@@ -76,11 +76,15 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 		);
 
 		private static EntityDescriptor<E> Register<E>(string id, EntityDescriptor<E> descriptor) where E : Entity {
-			return Registry<EntityDescriptor>.Register(Registries.ENTITIES, Identifier.Of(id), descriptor);
+			return Registry<EntityDescriptor>.Register(Registries.ENTITIES, KeyOf(id), descriptor);
 		}
 
 		private static EntityDescriptor<E> Register<E>(string id, EntityDescriptor<E>.EntityFactory factory, ITransformSupplier<E> transformSupplier) where E : Entity {
 			return Register(id, EntityDescriptor.Of(factory,transformSupplier));
+		}
+
+		private static RegistryKey<EntityDescriptor> KeyOf(string id) {
+			return RegistryKey<EntityDescriptor>.Of(Registries.ENTITIES.GetKey(), Identifier.Of(id));
 		}
 
 		public static void Init() { }

@@ -19,7 +19,7 @@ namespace SoulboundEngine.Core.Registry {
 			if (freezed) throw new InvalidOperationException("Registries already freezed");
 
 			RegistryKey<Registry<T>> registryKey = RegistryKey<T>.OfRegistry(id);
-			Registry<T> registry = Registry<IRegistry>.Register(ROOT, id, new Registry<T>(registryKey));
+			Registry<T> registry = Registry<IRegistry>.Register(ROOT, registryKey, new Registry<T>(registryKey));
 
 			return registry;
 		}
