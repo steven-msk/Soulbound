@@ -87,6 +87,8 @@ namespace SoulboundEngine.Core {
 			this.client.Update();
 		}
 
+		public void CloseGame() => Application.Quit();
+
 		void IApplicationController.OnApplicationQuit() {
 			GameStateManager.SetShutdown();
 

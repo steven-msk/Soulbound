@@ -95,10 +95,19 @@ namespace SoulboundEngine.Client {
 		}
 
 		/// <summary>
-		/// called every frame
+		/// called once every frame
 		/// </summary>
 		public void Update() {
 			this.inputManager.DispatchInputs();
+		}
+
+		/// <summary>
+		/// called once when the game is closed
+		/// </summary>
+		public void Shutdown() {
+			this.activeWorldSession?.levelManager.StopSession();
+			this.settings.Save();
+			this.inputActions.Dispose();
 		}
 
 		public void CreateNewWorld(string world, int seed) {
@@ -207,12 +216,6 @@ namespace SoulboundEngine.Client {
 					}
 				})
 			};
-		}
-
-		public void Shutdown() {
-			this.activeWorldSession?.levelManager.StopSession();
-			this.settings.Save();
-			this.inputActions.Dispose();
 		}
 
 		private IWorldSaveStrategy GetWorldSaveStrategy() {
