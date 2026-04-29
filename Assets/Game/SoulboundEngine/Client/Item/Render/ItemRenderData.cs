@@ -2,6 +2,8 @@ using SoulboundEngine.Core.Assets;
 using SoulboundEngine.Core.Registry;
 using SoulboundEngine.Core.Render.Sprite;
 
+#nullable enable
+
 namespace SoulboundEngine.Client.ItemSystem.Render {
 	public readonly struct ItemRenderData {
 		public readonly int stackQuantity;

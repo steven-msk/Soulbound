@@ -2,11 +2,6 @@ using NSubstitute;
 using NUnit.Framework;
 using SoulboundEngine.Client.ItemSystem;
 using SoulboundEngine.Client.ItemSystem.Container;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ItemTests.Container.Operations {
 	internal class TransferSingleToSlotTests : SingleSlotOperationTests<TransferSingleToSlot> {
@@ -16,114 +11,112 @@ namespace ItemTests.Container.Operations {
 
 		[Test]
 		public void CanExecute_SlotEmpty_NoTransitStack_ReturnsFalse() {
-			CreateOperation(null, null);
+			this.CreateOperation(null, null);
 
-			Assert.That(operation.CanExecute(), Is.False);
+			Assert.That(this.operation.CanExecute(), Is.False);
 		}
 
 		[Test]
 		public void CanExecute_SlotEmpty_HasTransitStack_ReturnsTrue() {
-			CreateOperation(fakeItem.CreateStack(), null);
+			this.CreateOperation(this.fakeItem.CreateStack(), null);
 
-			Assert.That(operation.CanExecute(), Is.True);
+			Assert.That(this.operation.CanExecute(), Is.True);
 		}
 
 		[Test]
 		public void CanExecute_SlotOccupied_StackableWithTransit_ReturnsTrue() {
-			CreateOperation(fakeItem.CreateStack(), fakeItem.CreateStack());
+			this.CreateOperation(this.fakeItem.CreateStack(), this.fakeItem.CreateStack());
 
-			Assert.That(operation.CanExecute(), Is.True);
+			Assert.That(this.operation.CanExecute(), Is.True);
 		}
 
 		[Test]
 		public void CanExecute_SlotOccupied_NotStackableWithTransit_ReturnsFalse() {
-			Item other = new FakeItem() {
-				_fullStackSize = DEFAULT_FULL_STACK
-			};
-			CreateOperation(other.CreateStack(), fakeItem.CreateStack());
+			Item other = new FakeItem(DEFAULT_FULL_STACK);
+			this.CreateOperation(other.CreateStack(), this.fakeItem.CreateStack());
 
-			Assert.That(operation.CanExecute(), Is.False);
+			Assert.That(this.operation.CanExecute(), Is.False);
 		}
 
 		[Test]
 		public void Execute_WhenCannotExecute_ReturnsFalseWithNoSideEffects() {
-			CreateOperation(null, null);
+			this.CreateOperation(null, null);
 
-			Assert.That(operation.Execute(), Is.False);
-			Assert.That(slot.HasStack(), Is.False);
-			Assert.That(scope.HasTransitStack(), Is.False);
+			Assert.That(this.operation.Execute(), Is.False);
+			Assert.That(this.slot.HasStack(), Is.False);
+			Assert.That(this.scope.HasTransitStack(), Is.False);
 
-			slot.DidNotReceive().SetStack(Arg.Any<ItemStack>());
-			scope.DidNotReceive().SetTransitStack(Arg.Any<ItemStack>());
+			this.slot.DidNotReceive().SetStack(Arg.Any<ItemStack>());
+			this.scope.DidNotReceive().SetTransitStack(Arg.Any<ItemStack>());
 		}
 
 		[Test]
 		public void Execute_SlotEmpty_ClonesOneItemIntoSlot() {
-			CreateOperation(fakeItem.CreateStack(), null);
+			this.CreateOperation(this.fakeItem.CreateStack(), null);
 
-			Assert.That(operation.Execute(), Is.True);
-			Assert.That(slot.HasStack(), Is.True);
-			Assert.That(slot.GetStack().quantity, Is.EqualTo(1));
+			Assert.That(this.operation.Execute(), Is.True);
+			Assert.That(this.slot.HasStack(), Is.True);
+			Assert.That(this.slot.GetStack().quantity, Is.EqualTo(1));
 
-			slot.Received().SetStack(Arg.Any<ItemStack>());
+			this.slot.Received().SetStack(Arg.Any<ItemStack>());
 		}
 
 		[Test]
 		public void Execute_SlotEmpty_DecrementsTransitStack() {
-			CreateOperation(fakeItem.CreateStack(5), null);
+			this.CreateOperation(this.fakeItem.CreateStack(5), null);
 
-			Assert.That(operation.Execute(), Is.True);
-			Assert.That(scope.HasTransitStack(), Is.True);
-			Assert.That(scope.GetTransitStack().quantity, Is.EqualTo(4));
+			Assert.That(this.operation.Execute(), Is.True);
+			Assert.That(this.scope.HasTransitStack(), Is.True);
+			Assert.That(this.scope.GetTransitStack().quantity, Is.EqualTo(4));
 
-			scope.DidNotReceive().SetTransitStack(Arg.Any<ItemStack>());
+			this.scope.DidNotReceive().SetTransitStack(Arg.Any<ItemStack>());
 		}
 
 		[Test]
 		public void Execute_SlotEmpty_ReturnsTrue() {
-			CreateOperation(fakeItem.CreateStack(), null);
+			this.CreateOperation(this.fakeItem.CreateStack(), null);
 
-			Assert.That(operation.Execute(), Is.True);
+			Assert.That(this.operation.Execute(), Is.True);
 		}
 
 		[Test]
 		public void Execute_SlotOccupied_IncrementsSlotStack() {
-			CreateOperation(fakeItem.CreateStack(), fakeItem.CreateStack(4));
+			this.CreateOperation(this.fakeItem.CreateStack(), this.fakeItem.CreateStack(4));
 
-			Assert.That(operation.Execute(), Is.True);
-			Assert.That(slot.HasStack(), Is.True);
-			Assert.That(slot.GetStack().quantity, Is.EqualTo(5));
+			Assert.That(this.operation.Execute(), Is.True);
+			Assert.That(this.slot.HasStack(), Is.True);
+			Assert.That(this.slot.GetStack().quantity, Is.EqualTo(5));
 
-			slot.DidNotReceive().SetStack(Arg.Any<ItemStack>());
+			this.slot.DidNotReceive().SetStack(Arg.Any<ItemStack>());
 		}
 
 		[Test]
 		public void Execute_SlotOccupied_DecrementsTransit() {
-			CreateOperation(fakeItem.CreateStack(6), fakeItem.CreateStack());
+			this.CreateOperation(this.fakeItem.CreateStack(6), this.fakeItem.CreateStack());
 
-			Assert.That(operation.Execute(), Is.True);
-			Assert.That(scope.HasTransitStack(), Is.True);
-			Assert.That(scope.GetTransitStack().quantity, Is.EqualTo(5));
+			Assert.That(this.operation.Execute(), Is.True);
+			Assert.That(this.scope.HasTransitStack(), Is.True);
+			Assert.That(this.scope.GetTransitStack().quantity, Is.EqualTo(5));
 
-			scope.DidNotReceive().SetTransitStack(Arg.Any<ItemStack>());
+			this.scope.DidNotReceive().SetTransitStack(Arg.Any<ItemStack>());
 		}
 
 		[Test]
 		public void Execute_SlotOccupied_StackFull_DoesNotDecrementTransit() {
-			CreateOperation(fakeItem.CreateStack(5), fakeItem.CreateStack(fakeItem.fullStackSize));
+			this.CreateOperation(this.fakeItem.CreateStack(5), this.fakeItem.CreateStack(this.fakeItem.fullStackSize));
 
-			Assert.That(operation.Execute(), Is.True);
-			Assert.That(scope.HasTransitStack(), Is.True);
-			Assert.That(scope.GetTransitStack().quantity, Is.EqualTo(5));
+			Assert.That(this.operation.Execute(), Is.True);
+			Assert.That(this.scope.HasTransitStack(), Is.True);
+			Assert.That(this.scope.GetTransitStack().quantity, Is.EqualTo(5));
 
-			scope.DidNotReceive().SetTransitStack(Arg.Any<ItemStack>());
+			this.scope.DidNotReceive().SetTransitStack(Arg.Any<ItemStack>());
 		}
 
 		[Test]
 		public void Execute_SlotOccupied_StackFull_ReturnsTrue() {
-			CreateOperation(fakeItem.CreateStack(5), fakeItem.CreateStack(fakeItem.fullStackSize));
+			this.CreateOperation(this.fakeItem.CreateStack(5), this.fakeItem.CreateStack(this.fakeItem.fullStackSize));
 
-			Assert.That(operation.Execute(), Is.True);
+			Assert.That(this.operation.Execute(), Is.True);
 		}
 
 

@@ -1,11 +1,6 @@
 using NSubstitute;
 using NUnit.Framework;
 using SoulboundEngine.Client.ItemSystem.Container;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 [TestFixture]
 internal abstract class SlotOperationTest {
@@ -16,9 +11,7 @@ internal abstract class SlotOperationTest {
 
 	[SetUp]
 	public void Setup() {
-		scope = Substitute.For<IItemContainerScope>();
-		fakeItem = new FakeItem {
-			_fullStackSize = DEFAULT_FULL_STACK
-		};
+		this.scope = Substitute.For<IItemContainerScope>();
+		this.fakeItem = new FakeItem(DEFAULT_FULL_STACK);
 	}
 }
