@@ -57,10 +57,10 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 		}
 
 		public static Block GetBlockFrom(Item? item) {
-			if (item == null) return Blocks.air;
+			if (item == null) return Blocks.AIR;
 			return item is BlockItem blockItem
 				? blockItem.GetBlock()
-				: Blocks.air;
+				: Blocks.AIR;
 		}
 
 		public static void DropStacks(BlockState blockState, Level level, BlockPos blockPos, Entity? owner) {

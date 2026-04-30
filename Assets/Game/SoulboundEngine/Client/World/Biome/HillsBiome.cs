@@ -45,12 +45,12 @@ namespace SoulboundEngine.Client.World.Generation {
 
 		BlockState IBiome.ResolveBlock(BlockGenContext ctx) {
 			if (ctx.AboveSurface())
-				return Blocks.air.DefaultState;
+				return Blocks.AIR.DefaultState;
 			if (ctx.distanceToSurface < 2)
-				return Blocks.grass.DefaultState;
+				return Blocks.GRASS.DefaultState;
 			if (ctx.distanceToSurface < 5)
-				return Blocks.dirt.DefaultState;
-			return Blocks.stone.DefaultState;
+				return Blocks.DIRT.DefaultState;
+			return Blocks.STONE.DefaultState;
 		}
 
 		void PlaceTree(int originX, int originY, WorldChunk chunk, Level level) {
@@ -62,7 +62,7 @@ namespace SoulboundEngine.Client.World.Generation {
 			int height = UnityEngine.Random.Range(trunkHeightMin, trunkHeightMax + 1);
 
 			for (int y = 0; y < height; y++) {
-				chunk.SetBlock(trunkPos.ToChunkPos(), Blocks.wood.DefaultState);
+				chunk.SetBlock(trunkPos.ToChunkPos(), Blocks.WOOD.DefaultState);
 				trunkPos.y++;
 			}
 
@@ -84,7 +84,7 @@ namespace SoulboundEngine.Client.World.Generation {
 				List<int> xs = kvp.Value;
 				for (int x = xs.Min(); x <= xs.Max(); x++) {
 					BlockPos blockPos = new(x, y);
-					level.SetBlockState(blockPos, Blocks.leaves.DefaultState);
+					level.SetBlockState(blockPos, Blocks.LEAVES.DefaultState);
 				}
 			}
 
@@ -141,8 +141,8 @@ namespace SoulboundEngine.Client.World.Generation {
 
 		BlockState IBiome.ResolveCaveBlock(BlockPos pos, float density) {
 			if (Mathf.Abs(density) <= 0.05f)
-				return Blocks.dirt.DefaultState;
-			return Blocks.air.DefaultState;
+				return Blocks.DIRT.DefaultState;
+			return Blocks.AIR.DefaultState;
 		}
 	}
 }

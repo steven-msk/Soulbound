@@ -6,9 +6,14 @@ using SoulboundEngine.Core.Registry;
 namespace SoulboundEngine.Client.ItemSystem {
 	public partial class Items {
 		// TODO: fix AIR item visual case
-		public static readonly Item AIR = Register(Blocks.air, Item.Settings.Air());
+		public static readonly Item AIR = Register(Blocks.AIR, Item.Settings.Air());
+		public static readonly Item GRASS = Register(Blocks.GRASS, Item.Settings.Of("Grass Block", Item.Settings.RenderFunction("grass_top")));
+		public static readonly Item DIRT = Register(Blocks.DIRT, Item.Settings.Of("Dirt Block", Item.Settings.RenderFunction("dirt")));
+		public static readonly Item STONE = Register(Blocks.STONE, Item.Settings.Of("Stone Block", Item.Settings.RenderFunction("stone")));
+		public static readonly Item WOOD = Register(Blocks.WOOD, Item.Settings.Of("Wood Block", Item.Settings.RenderFunction("wood")));
+		public static readonly Item LEAVES = Register(Blocks.LEAVES, Item.Settings.Of("Leaves Block", Item.Settings.RenderFunction("leaves")));
 
-		public static readonly Item placeableItem = Register(Blocks.movingTickingBlock, 
+		public static readonly Item placeableItem = Register(Blocks.MOVING_TICKING_BLOCK, 
 			Item.Settings.Of("Placeable Item", Item.Settings.RenderFunction("bluething"))
 		);
 		public static readonly TeleportPlayerItem teleportPlayerItem = Register("teleport_player_item", new TeleportPlayerItem(

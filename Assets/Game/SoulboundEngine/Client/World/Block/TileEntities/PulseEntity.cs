@@ -17,7 +17,7 @@ namespace SoulboundEngine.Client.World.BlockSystem.TileEntities {
 			this.timer++;
 			if (this.timer >= PULSE_INTERVAL) this.timer = 0;
 
-			this.level.SetBlockState(this.blockPos, Blocks.pulseBlock.DefaultState.With(PulseBlock.on, this.timer == PULSE_THRESHOLD));
+			this.level.SetBlockState(this.blockPos, Blocks.PULSE_BLOCK.DefaultState.With(PulseBlock.on, this.timer == PULSE_THRESHOLD));
 		}
 	}
 }

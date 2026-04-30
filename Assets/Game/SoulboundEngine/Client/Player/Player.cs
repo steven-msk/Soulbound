@@ -235,14 +235,14 @@ namespace SoulboundEngine.Client.Players {
 		private bool TryBreakBlock(BlockPos blockPos) {
 			if (!this.IsInBlockReach((Vector2)blockPos) || this.leftClickBlockBreakGuard) return false;
 
-			BlockState blockState = this.level.GetBlockState(blockPos) ?? Blocks.air.DefaultState;
-			if (blockState.block == Blocks.air) return false;
+			BlockState blockState = this.level.GetBlockState(blockPos) ?? Blocks.AIR.DefaultState;
+			if (blockState.block == Blocks.AIR) return false;
 
 			int itemBreakLevel = this.GetMainHandItemBreakLevel();
 			int minBreakLevel = blockState.block.minBreakLevel;
 			if (itemBreakLevel < minBreakLevel) return false;
 
-			this.level.SetBlockState(blockPos, Blocks.air.DefaultState);
+			this.level.SetBlockState(blockPos, Blocks.AIR.DefaultState);
 			Block.DropStacks(blockState, this.level, blockPos, null);
 			return true;
 		}
@@ -279,13 +279,13 @@ namespace SoulboundEngine.Client.Players {
 		public bool CanPlaceBlockAt(BlockPos blockPos) {
 			Vector2 worldPos = (Vector2)blockPos;
 			return this.IsInBlockReach(worldPos)
-				   && this.level?.GetBlock(blockPos) == Blocks.air;
+				   && this.level?.GetBlock(blockPos) == Blocks.AIR;
 		}
 
 		public bool CanBreakBlockAt(BlockPos blockPos) {
 			Vector2 worldPos = (Vector2)blockPos;
 			return this.IsInBlockReach(worldPos)
-				   && this.level?.GetBlock(blockPos) != Blocks.air;
+				   && this.level?.GetBlock(blockPos) != Blocks.AIR;
 		}
 
 		public bool IsInBlockReach(Vector2 worldPos) {

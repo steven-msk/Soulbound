@@ -26,8 +26,8 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 			if (!blockState.Get(moving)) return;
 
 			BlockPos nextPos = this.GetNextPos(blockPos);
-			if (level.GetBlockState(nextPos) == Blocks.air.DefaultState) {
-				level.SetBlockState(blockPos, Blocks.air.DefaultState);
+			if (level.GetBlockState(nextPos) == Blocks.AIR.DefaultState) {
+				level.SetBlockState(blockPos, Blocks.AIR.DefaultState);
 				level.SetBlockState(nextPos, this.movingState);
 			} else {
 				level.SetBlockState(blockPos, this.staticState);
@@ -40,7 +40,7 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 
 			BlockState neighborState = level.GetBlockState(nextPos);
 			BlockState selfState = level.GetBlockState(selfPos);
-			if (neighborState == Blocks.air.DefaultState && !selfState.Get(moving)) {
+			if (neighborState == Blocks.AIR.DefaultState && !selfState.Get(moving)) {
 				level.SetBlockState(selfPos, this.movingState);
 			}
 		}
