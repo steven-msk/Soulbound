@@ -6,6 +6,8 @@ namespace SoulboundEngine.Core.Render.Sprite {
 
 	public class AtlasSpriteResolver : ISpriteResolver<SpriteRef> {
 		public Sprite GetSprite(SpriteRef key) {
+			if (key.atlasKey == null) return null;
+
 			SpriteAtlas atlas = AssetManager.Resolve<SpriteAtlas>(key.atlasKey);
 			Sprite sprite = atlas.GetSprite(key.spriteKey);
 			return sprite;

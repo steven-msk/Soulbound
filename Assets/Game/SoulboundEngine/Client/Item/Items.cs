@@ -5,6 +5,7 @@ using SoulboundEngine.Core.Registry;
 
 namespace SoulboundEngine.Client.ItemSystem {
 	public partial class Items {
+		// TODO: fix AIR item visual case
 		public static readonly Item AIR = Register(Blocks.air, Item.Settings.Air());
 
 		public static readonly Item placeableItem = Register(Blocks.movingTickingBlock, 

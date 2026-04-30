@@ -243,6 +243,7 @@ namespace SoulboundEngine.Client.Players {
 			if (itemBreakLevel < minBreakLevel) return false;
 
 			this.level.SetBlockState(blockPos, Blocks.air.DefaultState);
+			Block.DropStacks(blockState, this.level, blockPos, null);
 			return true;
 		}
 
@@ -266,7 +267,7 @@ namespace SoulboundEngine.Client.Players {
 			ItemStack thrownStack = mainHandStack.Clone(throwAmount);
 			mainHandStack.Decrement(throwAmount);
 
-			ItemEntity itemEntity = new(this, pickupDelaySec: 2f, thrownStack, this.level);
+			ItemEntity itemEntity = new(this, thrownStack, this.level);
 			itemEntity.SetPos(this.GetPos());
 			this.level.AddEntity(itemEntity);
 		}
