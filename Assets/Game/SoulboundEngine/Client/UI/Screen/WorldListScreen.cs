@@ -1,4 +1,5 @@
-﻿using SoulboundEngine.Client.UI.Containers;
+﻿using SoulboundEngine.Client.Debug.Logging;
+using SoulboundEngine.Client.UI.Containers;
 using SoulboundEngine.Client.UI.Layouts;
 using SoulboundEngine.Client.World;
 using System.Collections.Generic;
@@ -40,17 +41,17 @@ namespace SoulboundEngine.Client.UI.Screens {
 					.Spacing(10)
 			).Build(savesContainer);
 
-			List<string> saves = this.worldAccessor.ListWorldSaves().ToList();
+			List<WorldSave> saves = this.worldAccessor.ListWorldSaves().ToList();
 			foreach (var save in saves) {
 				GUI.Button.Label()
-					.Text(save)
-					.OnClick(() => this.worldAccessor.EnterWorld(save))
+					.Text($"{save.name} ({save.seed})")
+					.OnClick(() => this.worldAccessor.EnterWorld(save.name))
 					.Build(savesCol);
 
 				GUI.Button.Label()
 					.Text("Delete")
 					.OnClick(() => { 
-						this.worldAccessor.DeleteWorld(save);
+						this.worldAccessor.DeleteWorld(save.name);
 						this.screenNavigator.IssueRebuild(this);
 					})
 					.Build(deleteCol);
@@ -76,21 +77,39 @@ namespace SoulboundEngine.Client.UI.Screens {
 							.Align(UIAlignment.End)
 					).Build(parentContainer)));
 
-			InputFieldHandle inputField = GUI.InputField
+			IUIElementContainer dataContainer = GUI.Container(
+				GUI.Frame.Stretch(),
+				GUI.Layout.Vertical()
+					.ChildSizing(ChildSizingMode.Preferred)
+			).Build(newWorldContainer);
+
+			InputFieldHandle nameField = GUI.InputField
 				.Placeholder("World name...")
-				.Build(newWorldContainer);
+				.Build(dataContainer);
+			InputFieldHandle seedField = GUI.InputField
+				.Placeholder("Seed... (leave empty for random)")
+				.Build(dataContainer);
 
 			GUI.Button.Label()
 				.Text("Create new world")
 				.OnClick(() => {
-					string name = inputField.GetText();
+					string name = nameField.GetText();
 					if (!string.IsNullOrEmpty(name) && this.worldAccessor.ListWorldSaves().Count() < MAX_WORLDS) {
-						this.worldAccessor.CreateNewWorld(name);
+						int seed = WorldManager.GetRandomSeed();
+						if (!string.IsNullOrEmpty(seedField.GetText())) {
+							if (!int.TryParse(seedField.GetText(), out seed)) {
+								Logger.LogError("Invalid seed: {}", seedField.GetText());
+								return;
+							}
+						}
+						this.worldAccessor.CreateNewWorld(name, seed);
 						this.screenNavigator.IssueRebuild(this);
-						inputField.Clear();
+						nameField.Clear();
+						seedField.Clear();
 					}
 				}).Build(newWorldContainer);
 
 		}
+
 	}
 }

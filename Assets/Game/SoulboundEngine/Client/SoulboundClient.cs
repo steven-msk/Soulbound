@@ -11,7 +11,6 @@ using SoulboundEngine.Client.SettingSystem;
 using SoulboundEngine.Client.UI;
 using SoulboundEngine.Client.UI.Screens;
 using SoulboundEngine.Client.World;
-using SoulboundEngine.Client.World.Generation;
 using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Client.World.Serialization;
 using SoulboundEngine.Core;
@@ -96,27 +95,40 @@ namespace SoulboundEngine.Client {
 		}
 
 		/// <summary>
-		/// called every frame
+		/// called once every frame
 		/// </summary>
 		public void Update() {
 			this.inputManager.DispatchInputs();
 		}
 
-		public void CreateNewWorld(string world) {
-			this.worldManager.CreateNewWorld(world);
+		/// <summary>
+		/// called once when the game is closed
+		/// </summary>
+		public void Shutdown() {
+			this.activeWorldSession?.levelManager.StopSession();
+			this.settings.Save();
+			this.inputActions.Dispose();
+		}
+
+		public void CreateNewWorld(string world, int seed) {
+			if (this.config.dev.overrideSaves) {
+				seed = this.config.dev.seed;
+				world = this.config.dev.devWorld;
+			}
+			this.worldManager.CreateNewWorld(world, seed);
 		}
 
 		public void EnterWorld(string world) {
 			if (this.IsWorldSessionActive()) return;
-
-			if (!this.worldManager.ListSaves().Any(s => s == world) && !this.config.dev.useDoNotSaveWorldStrategy) {
+			
+			WorldSave? save = this.worldManager.ListSaves().FirstOrDefault(s => s.name == world);
+			if (save == null) {
 				throw new ArgumentException($"World not found: '{world}'");
 			}
 
 			this.uiHandler.FlushScreens();
 
-			// manual dev seed for prototyping
-			DevSeedProvider seedProvider = new(this.config.dev);
+			SeedProvider seedProvider = new(save.GetValueOrDefault());
 			WorldLoader worldLoader = new(this, seedProvider);
 
 			worldLoader.LoadWorld(
@@ -166,7 +178,7 @@ namespace SoulboundEngine.Client {
 			.Forget(e => Logger.LogFatal(e));
 		}
 
-		public IEnumerable<string> ListWorldSaves() {
+		public IEnumerable<WorldSave> ListWorldSaves() {
 			return this.worldManager.ListSaves();
 		}
 
@@ -206,21 +218,8 @@ namespace SoulboundEngine.Client {
 			};
 		}
 
-		public void Shutdown() {
-			this.activeWorldSession?.levelManager.StopSession();
-			this.settings.Save();
-			this.inputActions.Dispose();
-		}
-
-		[Obsolete]
 		private IWorldSaveStrategy GetWorldSaveStrategy() {
-#if !UNITY_EDITOR
-			return new WorldSaveStrategy(config.file.savesFolder, Application.persistentDataPath);
-#else
-			return !this.config.dev.useDoNotSaveWorldStrategy
-				? new WorldSaveStrategy(this.config.file.savesFolder, Application.persistentDataPath)
-				: new DoNotSaveWorldStrategy();
-#endif
+			return new WorldSaveStrategy(this.config.file.savesFolder, Application.persistentDataPath);
 		}
 
 		public static SoulboundClient Instance => instance;

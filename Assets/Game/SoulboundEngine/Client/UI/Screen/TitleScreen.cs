@@ -2,6 +2,7 @@ using SoulboundEngine.Client.UI.Containers;
 using SoulboundEngine.Client.UI.Layouts;
 using SoulboundEngine.Client.World;
 using SoulboundEngine.Common;
+using SoulboundEngine.Core;
 
 namespace SoulboundEngine.Client.UI.Screens {
 	public class TitleScreen : Screen {
@@ -25,6 +26,12 @@ namespace SoulboundEngine.Client.UI.Screens {
 				.Text("Play")
 				.Size(26f)
 				.OnClick(() => this.screenNavigator.PushScreen(new WorldListScreen(this.worldAccessor)))
+				.Build(container);
+
+			GUI.Button.Label()
+				.Text("Exit")
+				.Size(26f)
+				.OnClick(() => Soulbound.Instance.CloseGame())
 				.Build(container);
 		}
 	}

@@ -34,8 +34,8 @@ namespace SoulboundEngine.Client.World.Generation {
 
 		BlockState IBiome.ResolveBlock(BlockGenContext ctx) {
 			if (ctx.AboveSurface())
-				return Blocks.air.DefaultState;
-			return Blocks.dirt.DefaultState;
+				return Blocks.AIR.DefaultState;
+			return Blocks.DIRT.DefaultState;
 		}
 
 		TerrainModulation IBiome.SampleTerrain(int blockX) {

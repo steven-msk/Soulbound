@@ -1,9 +1,7 @@
-using SoulboundEngine.Client.World.BlockSystem.Render;
 using SoulboundEngine.Client.World.BlockSystem.States;
 using SoulboundEngine.Client.World.BlockSystem.TileEntities;
 using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Common;
-using SoulboundEngine.Core.Assets;
 
 namespace SoulboundEngine.Client.World.BlockSystem {
 	[PROTOTYPICAL]
@@ -16,10 +14,6 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 
 		public override TileEntity GetTileEntity(Level level, BlockPos blockPos) {
 			return new SelfDestructEntity(level, blockPos);
-		}
-
-		public override BlockRenderData GetRenderData(BlockState blockState) {
-			return new BlockRenderData(new AssetKey("RedSquareTile"));
 		}
 	}
 }

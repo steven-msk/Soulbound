@@ -1,12 +1,12 @@
 using SoulboundEngine.Client.Interaction;
-using SoulboundEngine.Client.ItemSystem.Render;
 using SoulboundEngine.Client.World.EntitySystem;
 using SoulboundEngine.Common;
 
 namespace SoulboundEngine.Client.ItemSystem {
 	[PROTOTYPICAL]
 	public sealed class SpawnEntityItem : Item, IItemInteractionListener {
-		public override string name => "Spawn Entity Item";
+		public SpawnEntityItem(Settings settings) : base(settings) {
+		}
 
 		public bool ValidateTrigger(InteractionTrigger trigger) {
 			return trigger == InteractionTrigger.LeftHold || trigger == InteractionTrigger.LeftClick;
@@ -20,10 +20,6 @@ namespace SoulboundEngine.Client.ItemSystem {
 			EntityType.PHYSICS_ENTITY.Create(ctx.level, ctx.player.GetWorldPointerPos());
 			itemStack.Decrement();
 			return true;
-		}
-
-		public override ItemRenderData GetRenderData(ItemStack itemStack) {
-			return new ItemRenderData("bluething", itemStack);
 		}
 	}
 }

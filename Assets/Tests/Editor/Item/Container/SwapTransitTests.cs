@@ -2,11 +2,6 @@ using NSubstitute;
 using NUnit.Framework;
 using SoulboundEngine.Client.ItemSystem;
 using SoulboundEngine.Client.ItemSystem.Container;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ItemTests.Container.Operations {
 	internal class SwapTransitTests : SingleSlotOperationTests<SwapTransit> {
@@ -15,13 +10,9 @@ namespace ItemTests.Container.Operations {
 
 		[SetUp]
 		public new void Setup() {
-			scope = Substitute.For<IItemContainerScope>();
-			fakeItemA = new FakeItem {
-				_fullStackSize = DEFAULT_FULL_STACK
-			};
-			fakeItemB = new FakeItem {
-				_fullStackSize = DEFAULT_FULL_STACK
-			};
+			this.scope = Substitute.For<IItemContainerScope>();
+			this.fakeItemA = new FakeItem(DEFAULT_FULL_STACK);
+			this.fakeItemB = new FakeItem(DEFAULT_FULL_STACK);
 		}
 
 		protected override SwapTransit GetOperation(IItemContainer container, int slotIndex, IItemContainerScope scope) {
@@ -30,45 +21,45 @@ namespace ItemTests.Container.Operations {
 
 		[Test]
 		public void CanExecute_SlotHasStack_And_TransitHasStack_ReturnsTrue() {
-			CreateOperation(fakeItemA.CreateStack(), fakeItemB.CreateStack());
+			this.CreateOperation(this.fakeItemA.CreateStack(), this.fakeItemB.CreateStack());
 
-			Assert.That(operation.CanExecute(), Is.True);
+			Assert.That(this.operation.CanExecute(), Is.True);
 		}
 
 		[Test]
 		public void CanExecute_EmptySlot_ReturnsFalse() {
-			CreateOperation(fakeItemA.CreateStack(), null);
+			this.CreateOperation(this.fakeItemA.CreateStack(), null);
 
-			Assert.That(operation.CanExecute(), Is.False);
+			Assert.That(this.operation.CanExecute(), Is.False);
 		}
 
 		[Test]
 		public void CanExecute_NoTransitStack_ReturnsFalse() {
-			CreateOperation(null, fakeItemB.CreateStack());
+			this.CreateOperation(null, this.fakeItemB.CreateStack());
 
-			Assert.That(operation.CanExecute(), Is.False);
+			Assert.That(this.operation.CanExecute(), Is.False);
 		}
 
 
 		[Test]
 		public void Execute_SwapsStacksCorrectly() {
-			ItemStack slotStack = fakeItemB.CreateStack();
-			ItemStack transitStack = fakeItemA.CreateStack();
-			CreateOperation(transitStack, slotStack);
+			ItemStack slotStack = this.fakeItemB.CreateStack();
+			ItemStack transitStack = this.fakeItemA.CreateStack();
+			this.CreateOperation(transitStack, slotStack);
 
-			Assert.That(operation.Execute(), Is.True);
-			Assert.That(scope.GetTransitStack(), Is.EqualTo(slotStack));
-			Assert.That(slot.GetStack(), Is.EqualTo(transitStack));
+			Assert.That(this.operation.Execute(), Is.True);
+			Assert.That(this.scope.GetTransitStack(), Is.EqualTo(slotStack));
+			Assert.That(this.slot.GetStack(), Is.EqualTo(transitStack));
 
-			scope.Received().SetTransitStack(Arg.Is<ItemStack>(slotStack));
-			slot.Received().SetStack(Arg.Is<ItemStack>(transitStack));
+			this.scope.Received().SetTransitStack(Arg.Is<ItemStack>(slotStack));
+			this.slot.Received().SetStack(Arg.Is<ItemStack>(transitStack));
 		}
 
 		[Test]
 		public void Execute_WhenCannotExecute_ReturnsFalse() {
-			CreateOperation(null, null);
+			this.CreateOperation(null, null);
 
-			Assert.That(operation.CanExecute(), Is.False);
+			Assert.That(this.operation.CanExecute(), Is.False);
 		}
 	}
 }

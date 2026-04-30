@@ -5,7 +5,11 @@ namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
 		public static readonly RegistryEntry<EntityAttribute> attribute = Register("attribute", new EntityAttribute(IValueRule.Ranged(-10d, 10d), 1d));
 
 		private static RegistryEntry<EntityAttribute> Register(string id, EntityAttribute attribute) {
-			return Registries.RegisterEntry(Registries.ATTRIBUTES, id, attribute);
+			return Registry<EntityAttribute>.RegisterEntry(Registries.ATTRIBUTES, KeyOf(id), attribute);
+		}
+
+		private static RegistryKey<EntityAttribute> KeyOf(string id) {
+			return RegistryKey<EntityAttribute>.Of(Registries.ATTRIBUTES.GetKey(), Identifier.Of(id));
 		}
 
 		public static void Init() { }

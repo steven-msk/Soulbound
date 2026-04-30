@@ -36,7 +36,7 @@ namespace SoulboundEngine.Client.World.Render {
 			while (pos.MoveNext()) {
 				if (currentView.Contains(pos.Current)) continue;
 
-				this.RenderBlock((BlockPos)pos.Current, Blocks.air.DefaultState);
+				this.RenderBlock((BlockPos)pos.Current, Blocks.AIR.DefaultState);
 			}
 
 			pos = currentView.allPositionsWithin;
@@ -58,10 +58,10 @@ namespace SoulboundEngine.Client.World.Render {
 		}
 
 		public void UpdateModel(BlockPos blockPos, BlockState? blockState) {
-			blockState ??= Blocks.air.DefaultState;
+			blockState ??= Blocks.AIR.DefaultState;
 			this.RenderBlock(blockPos, this.IsInRenderView(blockPos)
 				? blockState
-				: Blocks.air.DefaultState
+				: Blocks.AIR.DefaultState
 			);
 		}
 

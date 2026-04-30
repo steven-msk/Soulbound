@@ -1,12 +1,11 @@
 using SoulboundEngine.Client.Interaction;
-using SoulboundEngine.Client.ItemSystem.Render;
 using SoulboundEngine.Common;
 
 namespace SoulboundEngine.Client.ItemSystem {
 	[PROTOTYPICAL]
 	public sealed class TeleportPlayerItem : Item, IItemInteractionListener {
-		public override string name => "Move Player Item";
-		public override int fullStackSize => 1;
+		public TeleportPlayerItem(Settings settings) : base(settings) {
+		}
 
 		public bool ValidateTrigger(InteractionTrigger trigger) {
 			return trigger == InteractionTrigger.LeftClick;
@@ -21,8 +20,5 @@ namespace SoulboundEngine.Client.ItemSystem {
 			return true;
 		}
 
-		public override ItemRenderData GetRenderData(ItemStack itemStack) {
-			return new ItemRenderData("bluething", itemStack);
-		}
 	}
 }

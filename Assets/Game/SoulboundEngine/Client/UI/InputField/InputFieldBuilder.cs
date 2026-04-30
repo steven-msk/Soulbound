@@ -2,6 +2,7 @@
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 #nullable enable
 
@@ -21,7 +22,7 @@ namespace SoulboundEngine.Client.UI {
 		}
 
 		public InputFieldHandle Build(IUIElementContainer container) {
-			if (this.built) throw new InvalidOperationException("Button already built");
+			if (this.built) throw new InvalidOperationException("Input field already built");
 			this.built = true;
 
 			GameObject obj = this.template.Instantiate();
@@ -39,9 +40,13 @@ namespace SoulboundEngine.Client.UI {
 				placeholder.fontStyle = FontStyles.Italic;
 
 				RectTransform rect = placeholderObj.GetComponent<RectTransform>();
-				rect.anchorMin = rect.anchorMax = Vector2.zero;
+				rect.anchorMin = Vector2.zero;
+				rect.anchorMax = Vector2.one;
 				rect.pivot = new Vector2(0f, 0.5f);
 				rect.anchoredPosition = new Vector2(8f, 0f);
+
+				ContentSizeFitter sizeFitter = placeholderObj.AddComponent<ContentSizeFitter>();
+				sizeFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
 				field.placeholder = placeholder;
 			}

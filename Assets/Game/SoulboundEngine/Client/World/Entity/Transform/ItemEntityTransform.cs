@@ -15,30 +15,28 @@ namespace SoulboundEngine.Client.World.EntitySystem.Transform {
 
 		private ItemEntity entity = null!;
 		private Entity? owner;
-		private float pickupDelaySec;
 		private float spawnTime;
 		private Rigidbody2D rb = null!;
 
 		public void Bind(Entity entity) {
 			this.entity = (ItemEntity)entity;
-			rb = GetComponent<Rigidbody2D>();
-			spawnTime = Time.unscaledTime;
-			pickupDelaySec = this.entity.GetPickupDelay();
-			owner = this.entity.GetOwner();
+			this.rb = this.GetComponent<Rigidbody2D>();
+			this.spawnTime = Time.unscaledTime;
+			this.owner = this.entity.GetOwner();
 		}
 
-		public void Destroy() => Destroy(gameObject);
+		public void Destroy() => Destroy(this.gameObject);
 
-		Entity IEntityTransform.GetEntity() => entity;
-		public ItemEntity GetEntity() => entity;
+		Entity IEntityTransform.GetEntity() => this.entity;
+		public ItemEntity GetEntity() => this.entity;
 
-		public Vector2 GetPos() => rb.position;
+		public Vector2 GetPos() => this.rb.position;
 
-		public void SetPos(Vector2 position) => rb.position = position;
+		public void SetPos(Vector2 position) => this.rb.position = position;
 
 		private void OnTriggerStay2D(Collider2D collider) {
-			if (TryPickup(collider)) {
-				entity.Destroy();
+			if (this.TryPickup(collider)) {
+				this.entity.Destroy();
 			}
 		}
 
@@ -48,14 +46,14 @@ namespace SoulboundEngine.Client.World.EntitySystem.Transform {
 			}
 			bool entityTrigger = collider.TryGetComponent(out IEntityTransform entityTransform);
 			Entity? collidedEntity = entityTrigger ? entityTransform.GetEntity() : null;
-			if (!CanBePickedUp(collidedEntity)) return false;
+			if (!this.CanBePickedUp(collidedEntity)) return false;
 
-			return pickupHandler.TryPickupStack(entity.GetStack());
+			return pickupHandler.TryPickupStack(this.entity.GetStack());
 		}
 
 		private bool CanBePickedUp(Entity? collidedEntity) {
-			if (collidedEntity != owner) return true;
-			return Time.unscaledTime > spawnTime + pickupDelaySec;
+			if (collidedEntity != this.owner) return true;
+			return Time.unscaledTime > this.spawnTime + ItemEntity.CANNOT_PICK_UP_DELAY_SEC;
 		}
 
 		void IEntityTransform.FrameUpdate() {

@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace SoulboundEngine.Client.World.EntitySystem {
 	public class ItemEntity : Entity {
-
+		public const float CANNOT_PICK_UP_DELAY_SEC = 2;
 		// TODO: add AIR Item
 		public static readonly EntityDescriptor<ItemEntity> DESCRIPTOR = EntityDescriptor.Of(
 			(_, level) => new ItemEntity(null, level),
@@ -48,23 +48,22 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 		private readonly ItemModelResolver modelResolver = new();
 
 		public ItemEntity(ItemStack itemStack, Level level)
-			: this(null, 0f, itemStack, level) {
+			: this(null, itemStack, level) {
 		}
 
-		public ItemEntity(Entity? owner, float pickupDelaySec, ItemStack itemStack, Level level)
+		public ItemEntity(Entity? owner, ItemStack itemStack, Level level)
 			: base(DESCRIPTOR, level) {
 			this.itemStack = itemStack;
 			this.owner = owner;
-			this.pickupDelaySec = pickupDelaySec;
 		}
 
-		public float GetPickupDelay() => pickupDelaySec;
-		public Entity? GetOwner() => owner;
-		public ItemStack GetStack() => itemStack;
+		public float GetPickupDelay() => this.pickupDelaySec;
+		public Entity? GetOwner() => this.owner;
+		public ItemStack GetStack() => this.itemStack;
 
 		public void Destroy() {
-			level.RemoveEntity(this);
-			transform.Destroy();
+			this.level.RemoveEntity(this);
+			this.transform.Destroy();
 		}
 	}
 }

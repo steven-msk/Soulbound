@@ -207,7 +207,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 				if (chunk == null) return;
 
 				BlockState? blockState = this.GetBlockState(neighborPos);
-				Block block = blockState?.block ?? Blocks.air;
+				Block block = blockState?.block ?? Blocks.AIR;
 
 				if (block is INeighborUpdateHandler neighborUpdateHandler) {
 					neighborUpdateHandler.OnNeighborChanged(this, neighborPos, blockPos);
