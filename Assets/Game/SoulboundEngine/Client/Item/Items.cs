@@ -9,25 +9,25 @@ namespace SoulboundEngine.Client.ItemSystem {
 		public static readonly Item AIR = Register(Blocks.air, Item.Settings.Air());
 
 		public static readonly Item placeableItem = Register(Blocks.movingTickingBlock, 
-			Item.Settings.Stackable("Placeable Item", Item.DEFAULT_FULL_STACK, Item.Settings.RenderFunction("bluething"))
+			Item.Settings.Of("Placeable Item", Item.Settings.RenderFunction("bluething"))
 		);
 		public static readonly TeleportPlayerItem teleportPlayerItem = Register("teleport_player_item", new TeleportPlayerItem(
-			Item.Settings.NonStackable("Move Player Item", Item.Settings.RenderFunction("bluething"))
+			Item.Settings.Of("Move Player Item", Item.Settings.RenderFunction("bluething")).NonStackable()
 		));
 		public static readonly SpawnEntityItem spawnEntityItem = Register("spawn_entity_item", new SpawnEntityItem(
-			Item.Settings.Stackable("Spawn Entity Item", Item.DEFAULT_FULL_STACK, Item.Settings.RenderFunction("bluething"))
+			Item.Settings.Of("Spawn Entity Item", Item.Settings.RenderFunction("bluething"))
 		));
 		public static readonly ChargeableItem chargeableItem = Register("chargeable_item", new ChargeableItem(
-			Item.Settings.NonStackable("Chargeable Item", Item.Settings.RenderFunction("bluething"))
+			Item.Settings.Of("Chargeable Item", Item.Settings.RenderFunction("bluething")).NonStackable()
 		));
 		public static readonly DebugPointerItem debugPointer = Register("debug_pointer", new DebugPointerItem(
-			Item.Settings.NonStackable("Debug Pointer", Item.Settings.RenderFunction("debugPointer"))
+			Item.Settings.Of("Debug Pointer", Item.Settings.RenderFunction("debugPointer")).NonStackable()
 		));
 		public static readonly InventoryListenerItem inventoryListenerItem = Register("inventory_listener_item", new InventoryListenerItem(
-			Item.Settings.Stackable("Inventory Listener Item", Item.DEFAULT_FULL_STACK, Item.Settings.RenderFunction("bluething"))
+			Item.Settings.Of("Inventory Listener Item", Item.Settings.RenderFunction("bluething"))
 		));
 		public static readonly BlockBreakerItem blockBreakerItem = Register("block_breaker_item", new BlockBreakerItem(
-			Item.Settings.NonStackable("Block Breaker Item", Item.Settings.RenderFunction("bluething"))
+			Item.Settings.Of("Block Breaker Item", Item.Settings.RenderFunction("bluething")).NonStackable()
 		));
 
 		public static TItem Register<TItem>(string id, TItem item) where TItem : Item {

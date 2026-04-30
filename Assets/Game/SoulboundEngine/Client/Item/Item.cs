@@ -35,7 +35,7 @@ namespace SoulboundEngine.Client.ItemSystem {
 
 		public sealed class Settings {
 			public string name { get; private set; }
-			public int fullStackSize { get; } = DEFAULT_FULL_STACK;
+			public int fullStackSize { get; private set; } = DEFAULT_FULL_STACK;
 			public Func<ItemStack, ItemRenderData> renderFunction { get; private set; }
 
 			private Settings(string name, int fullStackSize, Func<ItemStack, ItemRenderData> renderFunction) {
@@ -44,12 +44,18 @@ namespace SoulboundEngine.Client.ItemSystem {
 				this.renderFunction = renderFunction;
 			}
 
-			public static Settings Stackable(string name, int fullStackSize, Func<ItemStack, ItemRenderData> renderFunction) {
-				return new Settings(name, fullStackSize, renderFunction);
+			public static Settings Of(string name, Func<ItemStack, ItemRenderData> renderFunction) {
+				return new Settings(name, DEFAULT_FULL_STACK, renderFunction);
 			}
 
-			public static Settings NonStackable(string name, Func<ItemStack, ItemRenderData> renderFunction) {
-				return Stackable(name, 1, renderFunction);
+			public Settings NonStackable() {
+				this.fullStackSize = 1;
+				return this;
+			}
+
+			public Settings StackUpTo(int count) {
+				this.fullStackSize = count;
+				return this;
 			}
 
 			public static Settings Air() {
