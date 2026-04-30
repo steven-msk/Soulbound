@@ -9,30 +9,27 @@ namespace SoulboundEngine.Client.ItemSystem.Render {
 		private RectTransform rect;
 		private TextMeshProUGUI stackText;
 		private Image itemImage;
-		private SpriteAnimationPlayer animationPlayer;
 
-		public void Init(TextMeshProUGUI stackText, Image itemImage, SpriteAnimationPlayer animationPlayer) {
+		public void Init(TextMeshProUGUI stackText, Image itemImage) {
 			this.stackText = stackText;
 			this.itemImage = itemImage;
-			this.animationPlayer = animationPlayer;
-			rect = GetComponent<RectTransform>();
+			this.rect = this.GetComponent<RectTransform>();
 		}
 
-		public TextMeshProUGUI GetStackText() => stackText;
-		public Image GetItemImage() => itemImage;
-		public SpriteAnimationPlayer GetAnimationPlayer() => animationPlayer;
+		public TextMeshProUGUI GetStackText() => this.stackText;
+		public Image GetItemImage() => this.itemImage;
 
-		public void Destroy() => Destroy(gameObject);
+		public void Destroy() => Destroy(this.gameObject);
 
 		public void SetPosition(Vector2 position) {
-			rect.transform.position = position;
+			this.rect.transform.position = position;
 		}
 
 		public void SetParent(RectTransform rectParent) {
-			rect.SetParent(rectParent, false);
+			this.rect.SetParent(rectParent, false);
 		}
 
-		Sprite IAnimationTarget<Sprite>.Get() => itemImage.sprite;
-		void IAnimationTarget<Sprite>.Set(Sprite value) => itemImage.sprite = value;
+		Sprite IAnimationTarget<Sprite>.Get() => this.itemImage.sprite;
+		void IAnimationTarget<Sprite>.Set(Sprite value) => this.itemImage.sprite = value;
 	}
 }

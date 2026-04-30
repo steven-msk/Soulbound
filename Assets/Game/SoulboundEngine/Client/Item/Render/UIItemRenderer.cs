@@ -1,4 +1,3 @@
-using SoulboundEngine.Core.Render.Animation;
 using SoulboundEngine.Core.Render.Sprite;
 using TMPro;
 using UnityEngine;
@@ -25,11 +24,10 @@ namespace SoulboundEngine.Client.ItemSystem.Render {
 
 			Image itemImage = obj.AddComponent<Image>();
 			itemImage.raycastTarget = false;
-			TextMeshProUGUI stackText = CreateStackText(obj.GetComponent<RectTransform>());
+			TextMeshProUGUI stackText = this.CreateStackText(obj.GetComponent<RectTransform>());
 
 			UIItemView view = obj.GetComponent<UIItemView>();
-			SpriteAnimationPlayer animationPlayer = new(view);
-			view.Init(stackText, itemImage, animationPlayer);
+			view.Init(stackText, itemImage);
 
 			obj.SetActive(false);
 
@@ -57,18 +55,12 @@ namespace SoulboundEngine.Client.ItemSystem.Render {
 		}
 
 		public void Render(UIItemView view, ItemRenderModel model) {
-			Sprite sprite = spriteResolver.GetSprite(model.spriteRef);
+			Sprite sprite = this.spriteResolver.GetSprite(model.spriteRef);
 			view.GetItemImage().sprite = sprite;
 
 			TextMeshProUGUI stackText = view.GetStackText();
 			stackText.text = model.stackQuantity.ToString();
 			stackText.enabled = model.showStackText;
-
-			if (model.spriteAnimation is { } animation) {
-				view.GetAnimationPlayer().Play(animation);
-			} else {
-				view.GetAnimationPlayer().Stop();
-			}
 
 			view.gameObject.SetActive(true);
 		}

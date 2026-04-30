@@ -1,8 +1,9 @@
+using SoulboundEngine.Client.ItemSystem.Render;
 using SoulboundEngine.Core.Render.Animation;
 using System.Collections.Generic;
 
-namespace SoulboundEngine.Client.ItemSystem.Render {
-	public sealed class ItemModelResolver {
+namespace SoulboundEngine.Client.Render.Items {
+	public class ItemModelResolver {
 		public ItemRenderModel Resolve(ItemRenderData renderData) {
 			SpriteAnimation? animation = null;
 			if (renderData.spriteAnimation is { } identifier) {

@@ -1,4 +1,5 @@
 using SoulboundEngine.Client.ItemSystem.Render;
+using SoulboundEngine.Client.Render.Items;
 using SoulboundEngine.Core.Render.Sprite;
 using System;
 using UnityEngine;
@@ -26,48 +27,48 @@ namespace SoulboundEngine.Client.ItemSystem.Container {
 			}
 
 			if (this.itemStack != null) {
-				this.itemStack.onQuantityChanged -= OnStackQuantityChanged;
+				this.itemStack.onQuantityChanged -= this.OnStackQuantityChanged;
 			}
 
 			this.itemStack = itemStack;
-			itemStack.onQuantityChanged += OnStackQuantityChanged;
+			itemStack.onQuantityChanged += this.OnStackQuantityChanged;
 
-			Render(itemStack);
+			this.Render(itemStack);
 		}
 
 		private void OnStackQuantityChanged(int old, int @new) {
-			if (@new <= 0) Destroy();
-			else if (itemStack != null && itemView != null) Render(itemStack);
+			if (@new <= 0) this.Destroy();
+			else if (this.itemStack != null && this.itemView != null) this.Render(this.itemStack);
 		}
 
 		private void Render(ItemStack itemStack) {
 			ItemRenderData renderData = itemStack.item.GetRenderData(itemStack);
-			ItemRenderModel model = modelResolver.Resolve(renderData);
-			itemView = itemView != null ? itemView : itemRenderer.CreateView(parent);
+			ItemRenderModel model = this.modelResolver.Resolve(renderData);
+			this.itemView = this.itemView != null ? this.itemView : this.itemRenderer.CreateView(this.parent);
 
-			itemRenderer.Render(itemView, model);
-			itemView.SetParent(parent);
-			itemView.SetPosition(pointerPosition);
+			this.itemRenderer.Render(this.itemView, model);
+			this.itemView.SetParent(this.parent);
+			this.itemView.SetPosition(this.pointerPosition);
 		}
 
-		public bool HasStack() => itemView != null;
-		public ItemStack? GetStack() => itemStack;
+		public bool HasStack() => this.itemView != null;
+		public ItemStack? GetStack() => this.itemStack;
 
 		public void Destroy() {
-			if (itemView == null) return;
+			if (this.itemView == null) return;
 
-			itemView.Destroy();
-			if (itemStack != null) {
-				itemStack.onQuantityChanged -= OnStackQuantityChanged;
+			this.itemView.Destroy();
+			if (this.itemStack != null) {
+				this.itemStack.onQuantityChanged -= this.OnStackQuantityChanged;
 			}
-			itemView = null;
-			itemStack = null;
+			this.itemView = null;
+			this.itemStack = null;
 		}
 
 		public void SetPointerPosition(Vector2 position) {
 			this.pointerPosition = position;
-			if (itemView != null) {
-				itemView.SetPosition(pointerPosition);
+			if (this.itemView != null) {
+				this.itemView.SetPosition(this.pointerPosition);
 			}
 		}
 	}

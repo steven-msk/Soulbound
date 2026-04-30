@@ -66,7 +66,6 @@ namespace SoulboundEngine.Client.ItemSystem {
 				return itemStack => new ItemRenderData(spriteKey, itemStack, animation);
 			}
 
-
 			public bool IsStackable() => this.fullStackSize > 1;
 		}
 	}

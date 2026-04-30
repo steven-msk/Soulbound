@@ -4,6 +4,7 @@ namespace SoulboundEngine.Core.Render.Animation {
 	using System.Collections.Generic;
 	using Sprite = UnityEngine.Sprite;
 
+	[Obsolete]
 	public readonly struct SpriteAnimation : IAnimationDefinition<Sprite> {
 		private readonly AnimationKey animationKey;
 		public readonly Sprite[] frameArray;
@@ -17,7 +18,7 @@ namespace SoulboundEngine.Core.Render.Animation {
 			this.loop = loop;
 		}
 
-		public AnimationKey GetKey() => animationKey;
+		public AnimationKey GetKey() => this.animationKey;
 
 		[Obsolete("Will be removed before alpha prod")]
 		public static class Registry {
