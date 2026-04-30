@@ -1,3 +1,4 @@
+using SoulboundEngine.Client.ItemSystem;
 using SoulboundEngine.Client.World.EntitySystem.Transform;
 using SoulboundEngine.Client.World.LevelDomain;
 using System;
@@ -38,6 +39,16 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 		public virtual void SetPos(Vector2 pos) {
 			this.pos = pos;
 			this.transform?.SetPos(pos);
+		}
+
+		public ItemEntity DropItem(Level level, IItemConvertible item) {
+			return this.DropStack(level, item.AsItem().CreateStack(1));
+		}
+
+		public ItemEntity DropStack(Level level, ItemStack stack) {
+			ItemEntity entity = new(this, stack, level);
+			entity.SetPos(this.GetPos());
+			return entity;
 		}
 
 		public void Dispose() {
