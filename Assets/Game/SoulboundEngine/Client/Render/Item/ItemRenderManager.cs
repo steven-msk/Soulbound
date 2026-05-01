@@ -27,13 +27,13 @@ namespace SoulboundEngine.Client.Render.Item {
 			object state = renderer.CreateRenderStateBoxed(stack, model);
 			IItemView view = renderer.CreateViewBoxed(state, context);
 
-			this.rendered[key] = new RenderedItem(stack.item, state, view);
+			this.rendered[key] = new RenderedItem(stack.item, state, view, context);
 		}
 
-		public void Update(int key, ItemRenderContext context) {
+		public void Update(int key) {
 			if (!this.rendered.TryGetValue(key, out RenderedItem entry)) return;
 
-			this.GetRenderer(entry).UpdateViewBoxed(entry.state, entry.view, context);
+			this.GetRenderer(entry).UpdateViewBoxed(entry.state, entry.view, entry.context);
 		}
 
 		public void Destroy(int key) {
@@ -45,6 +45,6 @@ namespace SoulboundEngine.Client.Render.Item {
 			return this.renderers[renderedItem.item];
 		}
 
-		internal sealed record RenderedItem(Item item, object state, IItemView view);
+		internal sealed record RenderedItem(Item item, object state, IItemView view, ItemRenderContext context);
 	}
 }
