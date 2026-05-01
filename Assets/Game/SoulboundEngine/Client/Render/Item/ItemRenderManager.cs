@@ -8,16 +8,16 @@ namespace SoulboundEngine.Client.Render.Item {
 	public sealed class ItemRenderManager {
 		private readonly Dictionary<Item, ItemRenderer> renderers;
 		private readonly Func<Item, IItemModelResolver> modelResolverFactory;
-		private readonly Dictionary<int, RenderedItem> rendered = new();
+		private readonly Dictionary<RenderHandle, RenderedItem> rendered = new();
 
 		public ItemRenderManager(List<Item> items) {
 			this.modelResolverFactory = ItemRenderers.GetModelResolverFactory();
 			this.renderers = ItemRenderers.LoadRenderers(items);
 		}
 
-		public void Render(int key, ItemStack stack, ItemRenderContext context) {
-			if (this.rendered.ContainsKey(key)) {
-				this.Destroy(key);
+		public void Render(RenderHandle handle, ItemStack stack, ItemRenderContext context) {
+			if (this.rendered.ContainsKey(handle)) {
+				this.Destroy(handle);
 			}
 
 			ItemRenderer renderer = this.renderers[stack.item];
@@ -27,17 +27,17 @@ namespace SoulboundEngine.Client.Render.Item {
 			object state = renderer.CreateRenderStateBoxed(stack, model);
 			IItemView view = renderer.CreateViewBoxed(state, context);
 
-			this.rendered[key] = new RenderedItem(stack.item, state, view, context);
+			this.rendered[handle] = new RenderedItem(stack.item, state, view, context);
 		}
 
-		public void Update(int key) {
-			if (!this.rendered.TryGetValue(key, out RenderedItem entry)) return;
+		public void Update(RenderHandle handle) {
+			if (!this.rendered.TryGetValue(handle, out RenderedItem entry)) return;
 
 			this.GetRenderer(entry).UpdateViewBoxed(entry.state, entry.view, entry.context);
 		}
 
-		public void Destroy(int key) {
-			if (!this.rendered.Remove(key, out RenderedItem entry)) return;
+		public void Destroy(RenderHandle handle) {
+			if (!this.rendered.Remove(handle, out RenderedItem entry)) return;
 			this.GetRenderer(entry).DestroyView(entry.view);
 		}
 
