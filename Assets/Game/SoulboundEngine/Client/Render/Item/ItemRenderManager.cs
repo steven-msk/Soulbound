@@ -10,9 +10,9 @@ namespace SoulboundEngine.Client.Render.Item {
 		private readonly Func<Item, IItemModelResolver> modelResolverFactory;
 		private readonly Dictionary<int, RenderedItem> rendered = new();
 
-		public ItemRenderManager() {
+		public ItemRenderManager(List<Item> items) {
 			this.modelResolverFactory = ItemRenderers.GetModelResolverFactory();
-			this.renderers = ItemRenderers.LoadRenderers();
+			this.renderers = ItemRenderers.LoadRenderers(items);
 		}
 
 		public void Render(int key, ItemStack stack, ItemRenderContext context) {
@@ -30,7 +30,7 @@ namespace SoulboundEngine.Client.Render.Item {
 			this.rendered[key] = new RenderedItem(stack.item, state, view);
 		}
 
-		public void Update(int key, ItemStack stack, ItemRenderContext context) {
+		public void Update(int key, ItemRenderContext context) {
 			if (!this.rendered.TryGetValue(key, out RenderedItem entry)) return;
 
 			this.GetRenderer(entry).UpdateViewBoxed(entry.state, entry.view, context);

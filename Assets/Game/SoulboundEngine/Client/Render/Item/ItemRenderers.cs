@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace SoulboundEngine.Client.Render.Item {
 	using Item = ItemSystem.Item;
@@ -10,11 +9,23 @@ namespace SoulboundEngine.Client.Render.Item {
 		private static readonly Dictionary<Item, ItemRenderer.Factory> RENDERER_FACTORIES = new();
 
 		public static void Register<R>(Item item, R modelResolver) where R : IItemModelResolver {
-			MODEL_RESOLVERS.Add(item, modelResolver);
+			Register(item, modelResolver, () => new ItemRenderer.Default<Item>());
 		}
 
-		public static Dictionary<Item, ItemRenderer> LoadRenderers() {
-			return RENDERER_FACTORIES.ToDictionary(kvp => kvp.Key, kvp => kvp.Value());
+		public static void Register<R>(Item item, R modelResolver, ItemRenderer.Factory factory) where R : IItemModelResolver {
+			MODEL_RESOLVERS.Add(item, modelResolver);
+			RENDERER_FACTORIES.Add(item, factory);
+		}
+
+		public static Dictionary<Item, ItemRenderer> LoadRenderers(List<Item> items) {
+			Dictionary<Item, ItemRenderer> rendererByItem = new();
+			foreach (var item in items) {
+				rendererByItem.Add(item, RENDERER_FACTORIES.TryGetValue(item, out ItemRenderer.Factory factory)
+					? factory()
+					: new ItemRenderer.Default<Item>()
+				);	
+			}
+			return rendererByItem;
 		}
 
 		public static Func<Item, IItemModelResolver> GetModelResolverFactory() {
