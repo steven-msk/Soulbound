@@ -2,7 +2,7 @@ using SoulboundEngine.Client.ItemSystem.Render;
 using SoulboundEngine.Core.Render.Animation;
 using System.Collections.Generic;
 
-namespace SoulboundEngine.Client.Render.Items {
+namespace SoulboundEngine.Client.Render.Item {
 	public class ItemModelResolver {
 		public ItemRenderModel Resolve(ItemRenderData renderData) {
 			SpriteAnimation? animation = null;

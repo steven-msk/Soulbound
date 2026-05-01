@@ -5,19 +5,22 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SoulboundEngine.Client.Render.Items {
-	public class DefaultItemRenderer<I> : ItemRenderer<I, ItemRenderState<I>> where I : Item {
+namespace SoulboundEngine.Client.Render.Item {
+	public class DefaultItemRenderer<I> : ItemRenderer<I, ItemRenderState<I>> where I : ItemSystem.Item {
 
-		public override ItemRenderState<I> CreateRenderState() {
-			return new ItemRenderState<I>();
+		public override ItemRenderState<I> CreateRenderState(ItemStack stack, ItemModel model) {
+			return new ItemRenderState<I>() {
+				stack = stack,
+				model = model
+			};
 		}
 
-		public override void CreateView(ItemRenderState<I> state, ItemRenderContext context) {
+		public override IItemView CreateView(ItemRenderState<I> state, ItemRenderContext context) {
 			switch (context) {
-				case ItemRenderContext.GUI: {
+				case ItemRenderContext.GUI gui: {
 						GameObject obj = new("UI Item View", typeof(UIItemView));
 						obj.SetActive(false);
-						obj.transform.SetParent(state.parent, false);
+						obj.transform.SetParent(gui.parent, false);
 
 						RectTransform rect = obj.GetComponent<RectTransform>();
 						rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f);
@@ -29,7 +32,7 @@ namespace SoulboundEngine.Client.Render.Items {
 						TextMeshProUGUI stackText = this.CreateStackText(obj.GetComponent<RectTransform>());
 
 						stackText.text = state.stack.quantity.ToString();
-						stackText.enabled = state.showStackText;
+						stackText.enabled = state.showStackCount;
 
 						UIItemView view = obj.GetComponent<UIItemView>();
 						view.Init(stackText, itemImage);
@@ -39,16 +42,17 @@ namespace SoulboundEngine.Client.Render.Items {
 						view.GetItemImage().sprite = sprite;
 
 						view.gameObject.SetActive(true);
+						return IItemView.Of(obj);
 					}
-					break;
 				default: throw new NotImplementedException();
 			}
 		}
 
-		public override void DestroyView(ItemRenderState<I> state) {
+		public override void DestroyView(IItemView view) {
+			view.Destroy();
 		}
 
-		public override void UpdateView(ItemRenderState<I> state, ItemRenderContext context) {
+		public override void UpdateView(ItemRenderState<I> state, IItemView view, ItemRenderContext context) {
 		}
 
 		private TextMeshProUGUI CreateStackText(RectTransform viewParent) {

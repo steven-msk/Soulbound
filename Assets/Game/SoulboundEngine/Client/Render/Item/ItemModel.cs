@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SoulboundEngine.Client.Render.Items {
+namespace SoulboundEngine.Client.Render.Item {
 	public class ItemModel {
 		protected Sprite sprite;
 

@@ -1,6 +1,6 @@
 using SoulboundEngine.Client.ItemSystem;
 using SoulboundEngine.Client.ItemSystem.Render;
-using SoulboundEngine.Client.Render.Items;
+using SoulboundEngine.Client.Render.Item;
 using SoulboundEngine.Client.World.EntitySystem.Transform;
 using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Core;

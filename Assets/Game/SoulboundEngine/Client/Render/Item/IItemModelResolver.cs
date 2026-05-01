@@ -1,7 +1,7 @@
 ﻿using SoulboundEngine.Client.ItemSystem;
 using UnityEngine;
 
-namespace SoulboundEngine.Client.Render.Items {
+namespace SoulboundEngine.Client.Render.Item {
 	public interface IItemModelResolver {
 		ItemModel Resolve(ItemStack itemStack);
 

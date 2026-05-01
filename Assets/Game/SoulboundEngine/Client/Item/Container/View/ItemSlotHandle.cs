@@ -1,5 +1,5 @@
 using SoulboundEngine.Client.ItemSystem.Render;
-using SoulboundEngine.Client.Render.Items;
+using SoulboundEngine.Client.Render.Item;
 using SoulboundEngine.Client.UI.Tooltips;
 using SoulboundEngine.Core.Render.Sprite;
 using UnityEngine;
