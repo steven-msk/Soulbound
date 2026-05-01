@@ -5,7 +5,6 @@
 	using TMPro;
 	using UnityEngine;
 	using UnityEngine.UI;
-	using Item = ItemSystem.Item;
 
 	public abstract class ItemRenderer {
 		public const float IMAGE_SIZE = 32f;
@@ -18,15 +17,15 @@
 		internal abstract void UpdateViewBoxed(object state, IItemView view, ItemRenderContext context);
 		public abstract void DestroyView(IItemView view);
 
-		public sealed class Default<I> : ItemRenderer<I, ItemRenderState<I>> where I : Item {
-			public override ItemRenderState<I> CreateRenderState(ItemStack stack, ItemModel model) {
-				return new ItemRenderState<I>() {
+		public sealed class Default : ItemRenderer<ItemRenderState> {
+			public override ItemRenderState CreateRenderState(ItemStack stack, ItemModel model) {
+				return new ItemRenderState() {
 					stack = stack,
 					model = model
 				};
 			}
 
-			public override IItemView CreateView(ItemRenderState<I> state, ItemRenderContext context) {
+			public override IItemView CreateView(ItemRenderState state, ItemRenderContext context) {
 				switch (context) {
 					case ItemRenderContext.GUI gui: {
 							GameObject obj = new("UI Item View", typeof(UIItemView));
@@ -61,7 +60,7 @@
 
 			public override void DestroyView(IItemView view) => view.Destroy();
 
-			public override void UpdateView(ItemRenderState<I> state, IItemView view, ItemRenderContext context) {
+			public override void UpdateView(ItemRenderState state, IItemView view, ItemRenderContext context) {
 			}
 
 			private TextMeshProUGUI CreateStackText(RectTransform viewParent) {
@@ -86,7 +85,7 @@
 		}
 	}
 
-	public abstract class ItemRenderer<I, S> : ItemRenderer where I : Item where S : ItemRenderState<I> {
+	public abstract class ItemRenderer<S> : ItemRenderer where S : ItemRenderState {
 		public abstract S CreateRenderState(ItemStack stack, ItemModel model);
 
 		public abstract IItemView CreateView(S state, ItemRenderContext context);

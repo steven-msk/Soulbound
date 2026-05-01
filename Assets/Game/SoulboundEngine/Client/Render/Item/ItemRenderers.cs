@@ -9,7 +9,7 @@ namespace SoulboundEngine.Client.Render.Item {
 		private static readonly Dictionary<Item, ItemRenderer.Factory> RENDERER_FACTORIES = new();
 
 		public static void Register<R>(Item item, R modelResolver) where R : IItemModelResolver {
-			Register(item, modelResolver, () => new ItemRenderer.Default<Item>());
+			Register(item, modelResolver, GetDefaultRenderer);
 		}
 
 		public static void Register<R>(Item item, R modelResolver, ItemRenderer.Factory factory) where R : IItemModelResolver {
@@ -22,7 +22,7 @@ namespace SoulboundEngine.Client.Render.Item {
 			foreach (var item in items) {
 				rendererByItem.Add(item, RENDERER_FACTORIES.TryGetValue(item, out ItemRenderer.Factory factory)
 					? factory()
-					: new ItemRenderer.Default<Item>()
+					: GetDefaultRenderer()
 				);	
 			}
 			return rendererByItem;
@@ -30,6 +30,10 @@ namespace SoulboundEngine.Client.Render.Item {
 
 		public static Func<Item, IItemModelResolver> GetModelResolverFactory() {
 			return item => MODEL_RESOLVERS[item];
+		}
+
+		private static ItemRenderer GetDefaultRenderer() {
+			return new ItemRenderer.Default();
 		}
 	}
 }
