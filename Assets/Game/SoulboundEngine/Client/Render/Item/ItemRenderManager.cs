@@ -1,4 +1,5 @@
 ﻿using SoulboundEngine.Client.ItemSystem;
+using SoulboundEngine.Core.Render.Sprite;
 using System;
 using System.Collections.Generic;
 
@@ -9,8 +10,10 @@ namespace SoulboundEngine.Client.Render.Item {
 		private readonly Dictionary<Item, ItemRenderer> renderers;
 		private readonly Func<Item, IItemModelResolver> modelResolverFactory;
 		private readonly Dictionary<RenderHandle, RenderedItem> rendered = new();
+		private readonly ISpriteResolver<SpriteRef> spriteResolver;
 
-		public ItemRenderManager(List<Item> items) {
+		public ItemRenderManager(List<Item> items, ISpriteResolver<SpriteRef> spriteResolver) {
+			this.spriteResolver = spriteResolver;
 			this.modelResolverFactory = ItemRenderers.GetModelResolverFactory();
 			this.renderers = ItemRenderers.LoadRenderers(items);
 		}
@@ -23,7 +26,7 @@ namespace SoulboundEngine.Client.Render.Item {
 			ItemRenderer renderer = this.renderers[stack.item];
 			IItemModelResolver modelResolver = this.modelResolverFactory(stack.item);
 
-			ItemModel model = modelResolver.Resolve(stack);
+			ItemModel model = modelResolver.Resolve(stack, this.spriteResolver);
 			object state = renderer.CreateRenderStateBoxed(stack, model);
 			IItemView view = renderer.CreateViewBoxed(state, context);
 

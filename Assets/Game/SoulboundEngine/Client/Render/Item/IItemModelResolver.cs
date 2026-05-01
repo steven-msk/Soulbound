@@ -1,19 +1,19 @@
 ﻿using SoulboundEngine.Client.ItemSystem;
-using UnityEngine;
+using SoulboundEngine.Core.Render.Sprite;
 
 namespace SoulboundEngine.Client.Render.Item {
 	public interface IItemModelResolver {
-		ItemModel Resolve(ItemStack itemStack);
+		ItemModel Resolve(ItemStack itemStack, ISpriteResolver<SpriteRef> spriteResolver);
 
 		public sealed class Default : IItemModelResolver {
-			private readonly Sprite sprite;
+			private readonly SpriteRef spriteRef;
 
-			public Default(Sprite sprite) {
-				this.sprite = sprite;
+			public Default(SpriteRef spriteRef) {
+				this.spriteRef = spriteRef;
 			}
 
-			public ItemModel Resolve(ItemStack itemStack) {
-				return new BasicItemModel(this.sprite);
+			public ItemModel Resolve(ItemStack itemStack, ISpriteResolver<SpriteRef> spriteResolver) {
+				return new BasicItemModel(spriteResolver.GetSprite(this.spriteRef));
 			}
 		}
 	}
