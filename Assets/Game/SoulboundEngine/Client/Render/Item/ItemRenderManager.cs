@@ -10,11 +10,9 @@ namespace SoulboundEngine.Client.Render.Item {
 		private readonly Dictionary<Item, ItemRenderer> renderers;
 		private readonly Func<Item, IItemModelResolver> modelResolverFactory;
 		private readonly Dictionary<RenderHandle, RenderedItem> rendered = new();
-		private readonly ISpriteResolver<SpriteRef> spriteResolver;
 
-		public ItemRenderManager(List<Item> items, ISpriteResolver<SpriteRef> spriteResolver) {
-			this.spriteResolver = spriteResolver;
-			this.modelResolverFactory = ItemRenderers.GetModelResolverFactory();
+		public ItemRenderManager(List<Item> items, ISpriteResolver<AtlasSpriteRef> spriteResolver) {
+			this.modelResolverFactory = ItemRenderers.GetModelResolverFactory(spriteResolver);
 			this.renderers = ItemRenderers.LoadRenderers(items);
 		}
 
@@ -26,7 +24,7 @@ namespace SoulboundEngine.Client.Render.Item {
 			ItemRenderer renderer = this.renderers[stack.item];
 			IItemModelResolver modelResolver = this.modelResolverFactory(stack.item);
 
-			ItemModel model = modelResolver.Resolve(stack, this.spriteResolver);
+			ItemModel model = modelResolver.Resolve(stack);
 			object state = renderer.CreateRenderStateBoxed(stack, model);
 			IItemView view = renderer.CreateViewBoxed(state, context);
 

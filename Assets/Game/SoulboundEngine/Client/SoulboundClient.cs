@@ -51,7 +51,7 @@ namespace SoulboundEngine.Client {
 		private readonly DebugOverlayManager debugOverlayManager;
 		private WorldSession? activeWorldSession;
 		private readonly ItemRenderManager itemRenderManager;
-		private readonly ISpriteResolver<SpriteRef> spriteResolver;
+		private readonly ISpriteResolver<AtlasSpriteRef> spriteResolver;
 
 		int IInputEventHandler.priority => int.MaxValue;
 

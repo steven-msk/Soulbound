@@ -7,9 +7,9 @@ namespace SoulboundEngine.Client.ItemSystem.Render {
 	public sealed class UIItemRenderer {
 		private const float IMAGE_SIZE = 32f;
 		private const float STACK_TEXT_SIZE = 8f;
-		private readonly ISpriteResolver<SpriteRef> spriteResolver;
+		private readonly ISpriteResolver<AtlasSpriteRef> spriteResolver;
 
-		public UIItemRenderer(ISpriteResolver<SpriteRef> spriteResolver) {
+		public UIItemRenderer(ISpriteResolver<AtlasSpriteRef> spriteResolver) {
 			this.spriteResolver = spriteResolver;
 		}
 

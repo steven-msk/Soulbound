@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace SoulboundEngine.Client.ItemSystem.Render {
 	public sealed class WorldItemRenderer {
-		private readonly ISpriteResolver<SpriteRef> spriteResolver;
+		private readonly ISpriteResolver<AtlasSpriteRef> spriteResolver;
 
-		public WorldItemRenderer(ISpriteResolver<SpriteRef> spriteResolver) {
+		public WorldItemRenderer(ISpriteResolver<AtlasSpriteRef> spriteResolver) {
 			this.spriteResolver = spriteResolver;
 		}
 

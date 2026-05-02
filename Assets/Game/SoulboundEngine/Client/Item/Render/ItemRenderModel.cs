@@ -3,7 +3,7 @@ using SoulboundEngine.Core.Render.Sprite;
 
 namespace SoulboundEngine.Client.ItemSystem.Render {
 	public struct ItemRenderModel {
-		public SpriteRef spriteRef;
+		public AtlasSpriteRef spriteRef;
 		public int stackQuantity;
 		public bool showStackText;
 		public SpriteAnimation? spriteAnimation;
