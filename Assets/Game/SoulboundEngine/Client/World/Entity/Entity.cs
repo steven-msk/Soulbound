@@ -1,5 +1,4 @@
 using SoulboundEngine.Client.ItemSystem;
-using SoulboundEngine.Client.World.EntitySystem.Transform;
 using SoulboundEngine.Client.World.LevelDomain;
 using System;
 using UnityEngine;
@@ -7,14 +6,16 @@ using UnityEngine;
 #nullable enable
 
 namespace SoulboundEngine.Client.World.EntitySystem {
-	public abstract class Entity : IDisposable {
+	public abstract class Entity {
 		public Guid guid { get; private set; }
 		private readonly EntityDescriptor descriptor;
 		protected Level level;
-		protected IEntityTransform? transform;
 		private Vector2 pos;
+		protected bool isAlive;
+		protected readonly PositionSynchronizer positionSynchronizer;
 
 		protected Entity(EntityDescriptor descriptor, Level level) {
+			this.positionSynchronizer = new PositionSynchronizer(this);
 			this.descriptor = descriptor;
 			this.level = level;
 		}
@@ -23,22 +24,15 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 			if (this.IsAlive()) throw new InvalidOperationException($"Entity already added: {guid}");
 
 			this.guid = guid;
-			this.transform = this.descriptor.CreateTransform(this);
-			this.transform.SetPos(this.pos);
-			this.OnTransformCreated(this.transform);
-		}
-
-		protected virtual void OnTransformCreated(IEntityTransform transform) {
+			this.isAlive = true;
 		}
 
 		public virtual void FrameUpdate() {
-			this.transform?.FrameUpdate();
 		}
 
 		public virtual Vector2 GetPos() => this.pos;
 		public virtual void SetPos(Vector2 pos) {
 			this.pos = pos;
-			this.transform?.SetPos(pos);
 		}
 
 		public ItemEntity DropItem(Level level, IItemConvertible item) {
@@ -53,14 +47,49 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 
 		public void Dispose() {
 			this.OnDisposed();
-			this.transform?.Destroy();
+			this.isAlive = false;
 		}
 
-		public bool IsAlive() => this.transform != null;
+		public bool IsAlive() => this.isAlive;
 
 		protected virtual void OnDisposed() {
 		}
 
 		public EntityDescriptor GetDescriptor() => this.descriptor;
+
+		public void SetPhysicsHandle(IPhysicsHandle? physicsHandle) {
+			this.positionSynchronizer.SetPhysicsHandle(physicsHandle);
+		}
+
+		protected sealed class PositionSynchronizer {
+			private readonly Entity entity;
+			private IPhysicsHandle? physicsHandle;
+
+			public PositionSynchronizer(Entity entity) {
+				this.entity = entity;
+			}
+
+			public void SetPhysicsHandle(IPhysicsHandle? handle) {
+				this.physicsHandle = handle;
+			}
+
+			public void SyncPhysicsPosition() {
+				if (this.physicsHandle == null) return;
+				this.entity.pos = this.physicsHandle.GetPosition();
+			}
+		}
+
+		public interface IPhysicsHandle {
+			void SetVelocity(Vector2 velocity);
+			Vector2 GetVelocity();
+			public float GetVelocityX() => this.GetVelocity().x;
+			public float GetVelocityY() => this.GetVelocity().y;
+
+			Vector2 GetPosition();
+
+			void ApplyForce(Vector2 force);
+			public void ApplyForceX(float forceX) => this.ApplyForce(new Vector2(forceX, 0f));
+			public void ApplyForceY(float forceY) => this.ApplyForce(new Vector2(0f, forceY));
+		}
 	}
 }
