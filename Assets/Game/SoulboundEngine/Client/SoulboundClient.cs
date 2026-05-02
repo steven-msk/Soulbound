@@ -94,7 +94,7 @@ namespace SoulboundEngine.Client {
 
 			this.spriteResolver = new AtlasSpriteResolver();
 			this.itemRenderManager = new ItemRenderManager(Registries.ITEMS.ToList(), this.spriteResolver);
-			this.entityRenderManager = new EntityRenderManager(Registries.ENTITIES.ToList());
+			this.entityRenderManager = new EntityRenderManager(Registries.ENTITIES.ToList(), this.itemRenderManager);
 		}
 
 		/// <summary>

@@ -22,9 +22,7 @@ namespace SoulboundEngine.Client.Render.Item {
 			}
 
 			ItemRenderer renderer = this.renderers[stack.item];
-			IItemModelResolver modelResolver = this.modelResolverFactory(stack.item);
-
-			ItemModel model = modelResolver.Resolve(stack);
+			ItemModel model = this.GetModel(stack);
 			object state = renderer.CreateRenderStateBoxed(stack, model, context);
 			IItemView view = renderer.CreateViewBoxed(state, context);
 
@@ -35,16 +33,20 @@ namespace SoulboundEngine.Client.Render.Item {
 		public void Update(RenderHandle handle) {
 			if (!this.rendered.TryGetValue(handle, out RenderedItem entry)) return;
 
-			this.GetRenderer(entry).UpdateViewBoxed(entry.state, entry.view, entry.context);
+			this.GetRenderer(entry.item).UpdateViewBoxed(entry.state, entry.view, entry.context);
 		}
 
 		public void Destroy(RenderHandle handle) {
 			if (!this.rendered.Remove(handle, out RenderedItem entry)) return;
-			this.GetRenderer(entry).DestroyView(entry.view);
+			this.GetRenderer(entry.item).DestroyView(entry.view);
 		}
 
-		private ItemRenderer GetRenderer(RenderedItem renderedItem) {
-			return this.renderers[renderedItem.item];
+		public ItemRenderer GetRenderer(Item item) {
+			return this.renderers[item];
+		}
+
+		public ItemModel GetModel(ItemStack stack) {
+			return this.modelResolverFactory(stack.item).Resolve(stack);
 		}
 
 		internal sealed record RenderedItem(Item item, object state, IItemView view, ItemRenderContext context);

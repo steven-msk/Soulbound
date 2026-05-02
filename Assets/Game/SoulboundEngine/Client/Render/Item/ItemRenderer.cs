@@ -19,7 +19,7 @@
 
 		public sealed class Default : ItemRenderer<ItemRenderState> {
 			public override ItemRenderState CreateRenderState(ItemStack stack, ItemModel model, ItemRenderContext context) {
-				return new ItemRenderState() {
+				return new ItemRenderState {
 					showStackCount = context is ItemRenderContext.GUI && stack.item.IsStackable(),
 					stack = stack,
 					model = model,

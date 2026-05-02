@@ -3,6 +3,10 @@ using UnityEngine;
 
 namespace SoulboundEngine.Client.Render.Entity {
 	public sealed class PlayerEntityRenderer : EntityRenderer<Player, PlayerRenderState, PlayerModel> {
+		public PlayerEntityRenderer(FactoryContext context)
+			: base(context) {
+		}
+
 		public override PlayerRenderState CreateRenderState(Player entity) {
 			return new PlayerRenderState {
 				entity = entity,

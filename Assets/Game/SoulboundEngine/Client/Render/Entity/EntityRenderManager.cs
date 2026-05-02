@@ -1,4 +1,5 @@
-﻿using SoulboundEngine.Client.World.EntitySystem;
+﻿using SoulboundEngine.Client.Render.Item;
+using SoulboundEngine.Client.World.EntitySystem;
 using System;
 using System.Collections.Generic;
 
@@ -10,8 +11,9 @@ namespace SoulboundEngine.Client.Render.Entity {
 		private readonly Dictionary<EntityDescriptor, EntityRenderer> renderers;
 		private readonly Dictionary<Entity, RenderedEntity> renderedEntities = new();
 
-		public EntityRenderManager(List<EntityDescriptor> descriptors) {
-			this.renderers = EntityRenderers.GetRenderers(descriptors);
+		public EntityRenderManager(List<EntityDescriptor> descriptors, ItemRenderManager itemRenderManager) {
+			EntityRenderer.FactoryContext context = new(this, itemRenderManager);
+			this.renderers = EntityRenderers.GetRenderers(descriptors, context);
 			this.modelSupplier = EntityRenderers.GetModelSupplier();
 		}
 
@@ -40,6 +42,7 @@ namespace SoulboundEngine.Client.Render.Entity {
 				this.GetRenderer(entity).DestroyView(renderedEntity.view);
 			}
 		}
+
 		public EntityRenderer GetRenderer(Entity entity) {
 			return this.renderers[entity.GetDescriptor()];
 		}

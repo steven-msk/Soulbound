@@ -10,7 +10,7 @@ using IEntityView = SoulboundEngine.Client.Render.Entity.IEntityView;
 namespace SoulboundEngine.Client.Players {
 	[RequireComponent(typeof(Rigidbody2D))]
 	[RequireComponent(typeof(CapsuleCollider2D))]
-	public class PlayerTransform : MonoBehaviour, IEntityView, Entity.IPhysicsHandle, Entity.IBoundingBoxHandle, Player.IPlayerTransformHandle, IItemPickupHandler {
+	public class PlayerTransform : MonoBehaviour, IEntityView, Entity.IPhysicsHandle, Entity.IBoundingBoxHandle, Player.IPlayerTransformHandle, IItemCollector {
 		private Player player = null!;
 		private Rigidbody2D rb = null!;
 		new private CapsuleCollider2D collider = null!;
@@ -70,7 +70,9 @@ namespace SoulboundEngine.Client.Players {
 		public void SetNormalVelocity(Vector2 velocity) => this.normalVelocity = velocity;
 		public Vector2 GetNormalVelocity() => this.normalVelocity;
 
-		bool IItemPickupHandler.TryPickupStack(ItemStack itemStack) {
+		Entity IItemCollector.GetEntity() => this.player;
+
+		bool IItemCollector.TryPickupStack(ItemStack itemStack) {
 			return this.player.TryAddItemStack(itemStack);
 		}
 

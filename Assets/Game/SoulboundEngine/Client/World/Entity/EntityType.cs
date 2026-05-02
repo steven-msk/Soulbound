@@ -9,6 +9,7 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 		// TODO: move out transform supplier logic into Unity adapters layer
 
 		public static readonly EntityDescriptor<Player> PLAYER = Register("player", Player.DESCRIPTOR);
+		public static readonly EntityDescriptor<ItemEntity> ITEM = Register("item", ItemEntity.DESCRIPTOR);
 
 		//public static readonly EntityDescriptor<MovingEntity> MOVING_ENTITY = Register(
 		//	"moving_entity",
