@@ -1,6 +1,4 @@
-using SoulboundEngine.Client.ItemSystem.Render;
 using SoulboundEngine.Client.Render.Item;
-using SoulboundEngine.Core.Render.Sprite;
 using System;
 using UnityEngine;
 
@@ -11,13 +9,14 @@ namespace SoulboundEngine.Client.ItemSystem.Container {
 		private readonly RectTransform parent;
 		private Vector2 pointerPosition;
 		private ItemStack? itemStack;
-		private UIItemView? itemView;
+		private IItemView? itemView;
+		private readonly ItemRenderManager itemRenderManager;
+		private readonly RenderHandle renderHandle;
 
-		private readonly UIItemRenderer itemRenderer = new(new AtlasSpriteResolver());
-		private readonly ItemModelResolver modelResolver = new();
-
-		public TransitStack(RectTransform parent) {
+		public TransitStack(ItemRenderManager itemRenderManager, RectTransform parent) {
+			this.itemRenderManager = itemRenderManager;
 			this.parent = parent;
+			this.renderHandle = new RenderHandle(this);
 		}
 
 		public void SetStack(ItemStack itemStack) {
@@ -42,13 +41,8 @@ namespace SoulboundEngine.Client.ItemSystem.Container {
 		}
 
 		private void Render(ItemStack itemStack) {
-			ItemRenderData renderData = itemStack.item.GetRenderData(itemStack);
-			ItemRenderModel model = this.modelResolver.Resolve(renderData);
-			this.itemView = this.itemView != null ? this.itemView : this.itemRenderer.CreateView(this.parent);
-
-			this.itemRenderer.Render(this.itemView, model);
-			this.itemView.SetParent(this.parent);
-			this.itemView.SetPosition(this.pointerPosition);
+			this.itemView = this.itemRenderManager.Render(this.renderHandle, itemStack, new ItemRenderContext.GUI { parent = this.parent });
+			this.UpdateViewPosition();
 		}
 
 		public bool HasStack() => this.itemView != null;
@@ -67,8 +61,13 @@ namespace SoulboundEngine.Client.ItemSystem.Container {
 
 		public void SetPointerPosition(Vector2 position) {
 			this.pointerPosition = position;
+			this.UpdateViewPosition();
+		}
+
+
+		private void UpdateViewPosition() {
 			if (this.itemView != null) {
-				this.itemView.SetPosition(this.pointerPosition);
+				this.itemView.GetGameObject().transform.position = this.pointerPosition;
 			}
 		}
 	}

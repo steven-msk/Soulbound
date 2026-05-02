@@ -15,7 +15,7 @@ namespace SoulboundEngine.Client.UI.Screens {
 		}
 
 		public override IScreenObject BuildObject(IScreenObjectFactory objFactory) {
-			return base.BuildObject(new WorldSessionScreenFactory(objFactory));
+			return base.BuildObject(new WorldSessionScreenFactory(this.itemRenderManager, objFactory));
 		}
 
 		protected override void OnBuild(IScreenObject screenObject) {
