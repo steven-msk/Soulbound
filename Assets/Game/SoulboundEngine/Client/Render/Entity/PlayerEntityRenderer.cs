@@ -1,9 +1,8 @@
 ﻿using SoulboundEngine.Client.Players;
-using SoulboundEngine.Core.Assets;
 using UnityEngine;
 
 namespace SoulboundEngine.Client.Render.Entity {
-	public sealed class PlayerEntityRenderer : EntityRenderer<Player, PlayerRenderState> {
+	public sealed class PlayerEntityRenderer : EntityRenderer<Player, PlayerRenderState, PlayerModel> {
 		public override PlayerRenderState CreateRenderState(Player entity) {
 			return new PlayerRenderState {
 				entity = entity,
@@ -11,8 +10,8 @@ namespace SoulboundEngine.Client.Render.Entity {
 			};
 		}
 
-		public override IEntityView CreateView(PlayerRenderState state) {
-			GameObject obj = GameObject.Instantiate(AssetManager.Resolve<GameObject>(new AssetKey("player")));
+		public override IEntityView CreateView(PlayerRenderState state, PlayerModel model) {
+			GameObject obj = GameObject.Instantiate(model.prefab);
 			PlayerTransform transform = obj.GetComponent<PlayerTransform>();
 			transform.Init(state.entity);
 			state.entity.SetPhysicsHandle(transform);

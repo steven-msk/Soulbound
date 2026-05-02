@@ -1,6 +1,8 @@
 ﻿using SoulboundEngine.Client.World.EntitySystem;
+using SoulboundEngine.Core.Assets;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace SoulboundEngine.Client.Render.Entity {
 	using Entity = World.EntitySystem.Entity;
@@ -10,7 +12,7 @@ namespace SoulboundEngine.Client.Render.Entity {
 		private static readonly Dictionary<EntityDescriptor, EntityRenderer.Factory> RENDERER_FACTORIES = new();
 
 		static EntityRenderers() {
-			Register(EntityType.PLAYER, () => new PlayerModel(), () => new PlayerEntityRenderer());
+			Register(EntityType.PLAYER, () => new PlayerModel(AssetManager.Resolve<GameObject>(new AssetKey("player"))), () => new PlayerEntityRenderer());
 		}
 
 		public static void Register(EntityDescriptor descriptor, EntityModel.Factory modelFactory, EntityRenderer.Factory rendererFactory) {
@@ -18,7 +20,7 @@ namespace SoulboundEngine.Client.Render.Entity {
 			RENDERER_FACTORIES.Add(descriptor, rendererFactory);
 		}
 
-		public static Func<EntityDescriptor, EntityModel> GetModelFactory() {
+		public static Func<EntityDescriptor, EntityModel> GetModelSupplier() {
 			return descriptor => MODEL_FACTORIES.GetValueOrDefault(descriptor, () => new MissingEntityModel())();
 		}
 

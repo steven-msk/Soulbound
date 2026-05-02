@@ -6,13 +6,13 @@ namespace SoulboundEngine.Client.Render.Entity {
 	using Entity = World.EntitySystem.Entity;
 
 	public sealed class EntityRenderManager {
-		private readonly Func<EntityDescriptor, EntityModel> modelFactory;
+		private readonly Func<EntityDescriptor, EntityModel> modelSupplier;
 		private readonly Dictionary<EntityDescriptor, EntityRenderer> renderers;
 		private readonly Dictionary<Entity, RenderedEntity> renderedEntities = new();
 
 		public EntityRenderManager(List<EntityDescriptor> descriptors) {
 			this.renderers = EntityRenderers.GetRenderers(descriptors);
-			this.modelFactory = EntityRenderers.GetModelFactory();
+			this.modelSupplier = EntityRenderers.GetModelSupplier();
 		}
 
 		public IEntityView Render(Entity entity) {
@@ -21,9 +21,9 @@ namespace SoulboundEngine.Client.Render.Entity {
 			}
 
 			EntityRenderer renderer = this.GetRenderer(entity);
-			EntityModel model = this.modelFactory(entity.GetDescriptor());
+			EntityModel model = this.modelSupplier(entity.GetDescriptor());
 			object state = renderer.CreateRenderStateBoxed(entity);
-			IEntityView view = renderer.CreateViewBoxed(state);
+			IEntityView view = renderer.CreateViewBoxed(state, model);
 
 			this.renderedEntities[entity] = new RenderedEntity(entity, state, view);
 			return view;
