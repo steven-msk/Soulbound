@@ -12,16 +12,17 @@
 
 		public delegate ItemRenderer Factory();
 
-		internal abstract object CreateRenderStateBoxed(ItemStack stack, ItemModel model);
+		internal abstract object CreateRenderStateBoxed(ItemStack stack, ItemModel model, ItemRenderContext context);
 		internal abstract IItemView CreateViewBoxed(object state, ItemRenderContext context);
 		internal abstract void UpdateViewBoxed(object state, IItemView view, ItemRenderContext context);
 		public abstract void DestroyView(IItemView view);
 
 		public sealed class Default : ItemRenderer<ItemRenderState> {
-			public override ItemRenderState CreateRenderState(ItemStack stack, ItemModel model) {
+			public override ItemRenderState CreateRenderState(ItemStack stack, ItemModel model, ItemRenderContext context) {
 				return new ItemRenderState() {
+					showStackCount = context is ItemRenderContext.GUI && stack.item.IsStackable(),
 					stack = stack,
-					model = model
+					model = model,
 				};
 			}
 
@@ -86,13 +87,13 @@
 	}
 
 	public abstract class ItemRenderer<S> : ItemRenderer where S : ItemRenderState {
-		public abstract S CreateRenderState(ItemStack stack, ItemModel model);
+		public abstract S CreateRenderState(ItemStack stack, ItemModel model, ItemRenderContext context);
 
 		public abstract IItemView CreateView(S state, ItemRenderContext context);
 		public abstract void UpdateView(S state, IItemView view, ItemRenderContext context);
 
-		internal override object CreateRenderStateBoxed(ItemStack stack, ItemModel model) {
-			return this.CreateRenderState(stack, model);
+		internal override object CreateRenderStateBoxed(ItemStack stack, ItemModel model, ItemRenderContext context) {
+			return this.CreateRenderState(stack, model, context);
 		}
 		internal override IItemView CreateViewBoxed(object state, ItemRenderContext context) {
 			return this.CreateView((S)state, context);

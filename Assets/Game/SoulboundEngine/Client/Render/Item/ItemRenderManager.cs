@@ -25,7 +25,7 @@ namespace SoulboundEngine.Client.Render.Item {
 			IItemModelResolver modelResolver = this.modelResolverFactory(stack.item);
 
 			ItemModel model = modelResolver.Resolve(stack);
-			object state = renderer.CreateRenderStateBoxed(stack, model);
+			object state = renderer.CreateRenderStateBoxed(stack, model, context);
 			IItemView view = renderer.CreateViewBoxed(state, context);
 
 			this.rendered[handle] = new RenderedItem(stack.item, state, view, context);
