@@ -1,3 +1,4 @@
+using SoulboundEngine.Client.Render.Item;
 using SoulboundEngine.Client.UI;
 using SoulboundEngine.Common;
 using SoulboundEngine.Core.Assets;
@@ -8,16 +9,18 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace SoulboundEngine.Client.ItemSystem.Container.View {
-	public sealed class InventoryUIBuilder {
+	public sealed class PlayerInventoryRenderer {
 		const float GRID_SPACING = 5f;
 		const float CELL_SIZE = 32f;
 		const float HOTBAR_NUMBER_FONT_SIZE = 7f;
 
 		private static readonly AssetKey slotKey = new("Slot");
 		private readonly Inventory inventory;
+		private readonly ItemRenderManager itemRenderManager;
 
-		public InventoryUIBuilder(Inventory inventory) {
+		public PlayerInventoryRenderer(ItemRenderManager itemRenderManager, Inventory inventory) {
 			this.inventory = inventory;
+			this.itemRenderManager = itemRenderManager;
 		}
 
 		public void Build(IItemContainerScreenScope screenScope, out IItemContainerHandle inventory, out IItemContainerHandle hotbar) {
@@ -114,14 +117,14 @@ namespace SoulboundEngine.Client.ItemSystem.Container.View {
 		private GameObject CreateSlotObj(IItemSlot slot, IItemSlotEventListener eventListener, out ItemSlotHandle handle) {
 			GameObject obj = GameObject.Instantiate(AssetManager.Resolve<GameObject>(slotKey));
 			handle = obj.AddComponent<ItemSlotHandle>();
-			handle.Init(slot, eventListener);
+			handle.Init(itemRenderManager, slot, eventListener);
 			return obj;
 		}
 
 		private GameObject CreateHotbarSlotObj(IItemSlot slot, IItemSlotEventListener eventListener, int index, out HotbarSlotHandle handle) {
 			GameObject obj = GameObject.Instantiate(AssetManager.Resolve<GameObject>(slotKey));
 			handle = obj.AddComponent<HotbarSlotHandle>();
-			handle.Init(slot, eventListener);
+			handle.Init(itemRenderManager, slot, eventListener);
 
 			GameObject textObj = new("Hotbar Slot Number", typeof(RectTransform));
 			ContentSizeFitter sizeFitter = textObj.AddComponent<ContentSizeFitter>();

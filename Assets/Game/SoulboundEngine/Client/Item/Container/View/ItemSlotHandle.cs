@@ -1,7 +1,5 @@
-using SoulboundEngine.Client.ItemSystem.Render;
 using SoulboundEngine.Client.Render.Item;
 using SoulboundEngine.Client.UI.Tooltips;
-using SoulboundEngine.Core.Render.Sprite;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -10,24 +8,27 @@ using UnityEngine.EventSystems;
 namespace SoulboundEngine.Client.ItemSystem.Container.View {
 	[RequireComponent(typeof(RectTransform))]
 	public class ItemSlotHandle : MonoBehaviour, IItemSlotHandle, ITooltipTrigger {
-		private IItemSlot slot = null!;
-		private ITooltip tooltip = null!;
-		private ITooltipRenderer tooltipRenderer = null!;
-		private IItemSlotEventListener eventListener = null!;
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+		private IItemSlot slot;
+		private ITooltip tooltip;
+		private ITooltipRenderer tooltipRenderer;
+		private IItemSlotEventListener eventListener;
 		private ITooltipHandle? tooltipHandle;
-		private RectTransform rect = null!;
-		private UIItemView? itemView;
+		private RectTransform rect;
+		private IItemView? itemView;
 		private ItemStack? stack;
+		private ItemRenderManager itemRenderManager;
+		private RenderHandle renderHandle;
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
-		private readonly UIItemRenderer itemRenderer = new(new AtlasSpriteResolver());
-		private readonly ItemModelResolver modelResolver = new();
-
-		public void Init(IItemSlot slot, IItemSlotEventListener eventListener) {
+		public void Init(ItemRenderManager itemRenderManager, IItemSlot slot, IItemSlotEventListener eventListener) {
+			this.itemRenderManager = itemRenderManager;
 			this.slot = slot;
 			this.eventListener = eventListener;
 			this.rect = this.GetComponent<RectTransform>();
 			slot.setStack += this.SetStack;
 			this.SetStack(slot.GetStack());
+			this.renderHandle = new RenderHandle(this);
 		}
 
 		private void SetStack(ItemStack? stack) {
@@ -51,11 +52,7 @@ namespace SoulboundEngine.Client.ItemSystem.Container.View {
 			if (itemStack == null && this.itemView != null) {
 				this.itemView.Destroy();
 			} else if (itemStack != null) {
-				if (this.itemView == null) this.itemView = this.itemRenderer.CreateView(this.rect);
-
-				ItemRenderData renderData = itemStack.item.GetRenderData(itemStack);
-				ItemRenderModel model = this.modelResolver.Resolve(renderData);
-				this.itemRenderer.Render(this.itemView, model);
+				this.itemView = this.itemRenderManager.Render(this.renderHandle, this.stack, new ItemRenderContext.GUI { parent = this.rect });
 			}
 		}
 
