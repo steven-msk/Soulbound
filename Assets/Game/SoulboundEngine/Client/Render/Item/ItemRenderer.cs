@@ -1,6 +1,6 @@
 ﻿namespace SoulboundEngine.Client.Render.Item {
 	using SoulboundEngine.Client.ItemSystem;
-	using SoulboundEngine.Client.ItemSystem.Render;
+	using SoulboundEngine.Core;
 	using System;
 	using TMPro;
 	using UnityEngine;
@@ -29,7 +29,7 @@
 			public override IItemView CreateView(ItemRenderState state, ItemRenderContext context) {
 				switch (context) {
 					case ItemRenderContext.GUI gui: {
-							GameObject obj = new("UI Item View", typeof(UIItemView));
+							GameObject obj = new("UI Item", typeof(RectTransform));
 							obj.SetActive(false);
 							obj.transform.SetParent(gui.parent, false);
 
@@ -38,21 +38,38 @@
 							rect.sizeDelta = new Vector2(IMAGE_SIZE, IMAGE_SIZE);
 							rect.anchoredPosition = Vector2.zero;
 
+							ItemModel model = state.model;
+							Sprite sprite = model.GetSprite();
 							Image itemImage = obj.AddComponent<Image>();
+							itemImage.sprite = sprite;
 							itemImage.raycastTarget = false;
-							TextMeshProUGUI stackText = this.CreateStackText(obj.GetComponent<RectTransform>());
 
+							TextMeshProUGUI stackText = this.CreateStackText(rect);
 							stackText.text = state.stack.quantity.ToString();
 							stackText.enabled = state.showStackCount;
 
-							UIItemView view = obj.GetComponent<UIItemView>();
-							view.Init(stackText, itemImage);
+							obj.SetActive(true);
+							return IItemView.Of(obj);
+						}
+					case ItemRenderContext.World world: {
+							GameObject obj = new("Item");
+							obj.SetActive(false);
+							obj.transform.position = world.position;
 
-							ItemModel model = state.model;
-							Sprite sprite = model.GetSprite();
-							view.GetItemImage().sprite = sprite;
+							SpriteRenderer spriteRenderer = obj.AddComponent<SpriteRenderer>();
+							spriteRenderer.sprite = state.model.GetSprite();
 
-							view.gameObject.SetActive(true);
+							Rigidbody2D rigidbody = obj.AddComponent<Rigidbody2D>();
+							rigidbody.sleepMode = RigidbodySleepMode2D.NeverSleep;
+							rigidbody.constraints = RigidbodyConstraints2D.FreezeRotation;
+
+							BoxCollider2D physicsCollider = obj.AddComponent<BoxCollider2D>();
+							physicsCollider.excludeLayers = LayerMask.GetMask(Layers.EntityCharacter);
+
+							BoxCollider2D pickupCollider = obj.AddComponent<BoxCollider2D>();
+							pickupCollider.isTrigger = true;
+
+							obj.SetActive(true);
 							return IItemView.Of(obj);
 						}
 					default: throw new NotImplementedException();

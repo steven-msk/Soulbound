@@ -1,6 +1,5 @@
 ﻿using SoulboundEngine.Client.Render.Item;
 using SoulboundEngine.Client.World.EntitySystem;
-using SoulboundEngine.Core;
 using UnityEngine;
 
 namespace SoulboundEngine.Client.Render.Entity {
@@ -30,16 +29,7 @@ namespace SoulboundEngine.Client.Render.Entity {
 
 			GameObject obj = itemView.GetGameObject();
 			ItemEntityTransform transform = obj.AddComponent<ItemEntityTransform>();
-
-			Rigidbody2D rigidbody = obj.GetComponent<Rigidbody2D>();
-			rigidbody.sleepMode = RigidbodySleepMode2D.NeverSleep;
-			rigidbody.constraints = RigidbodyConstraints2D.FreezeRotation;
-
-			BoxCollider2D physicsCollider = obj.AddComponent<BoxCollider2D>();
-			physicsCollider.excludeLayers = LayerMask.GetMask(Layers.EntityCharacter);
-
-			BoxCollider2D pickupCollider = obj.AddComponent<BoxCollider2D>();
-			pickupCollider.isTrigger = true;
+			transform.Init(state.entity);
 
 			return transform;
 		}
