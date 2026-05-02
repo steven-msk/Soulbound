@@ -1,10 +1,10 @@
 ﻿using System;
 
 namespace SoulboundEngine.Client.Render.Item {
-	public sealed class RenderHandle {
+	public sealed class ItemRenderHandle {
 		private readonly object key;
 
-		public RenderHandle(object key) {
+		public ItemRenderHandle(object key) {
 			this.key = key;
 		}
 

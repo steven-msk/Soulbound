@@ -11,12 +11,12 @@ namespace SoulboundEngine.Client.ItemSystem.Container {
 		private ItemStack? itemStack;
 		private IItemView? itemView;
 		private readonly ItemRenderManager itemRenderManager;
-		private readonly RenderHandle renderHandle;
+		private readonly ItemRenderHandle renderHandle;
 
 		public TransitStack(ItemRenderManager itemRenderManager, RectTransform parent) {
 			this.itemRenderManager = itemRenderManager;
 			this.parent = parent;
-			this.renderHandle = new RenderHandle(this);
+			this.renderHandle = new ItemRenderHandle(this);
 		}
 
 		public void SetStack(ItemStack itemStack) {

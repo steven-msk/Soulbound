@@ -18,7 +18,7 @@ namespace SoulboundEngine.Client.ItemSystem.Container.View {
 		private IItemView? itemView;
 		private ItemStack? stack;
 		private ItemRenderManager itemRenderManager;
-		private RenderHandle renderHandle;
+		private ItemRenderHandle renderHandle;
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
 		public void Init(ItemRenderManager itemRenderManager, IItemSlot slot, IItemSlotEventListener eventListener) {
@@ -28,7 +28,7 @@ namespace SoulboundEngine.Client.ItemSystem.Container.View {
 			this.rect = this.GetComponent<RectTransform>();
 			slot.setStack += this.SetStack;
 			this.SetStack(slot.GetStack());
-			this.renderHandle = new RenderHandle(this);
+			this.renderHandle = new ItemRenderHandle(this);
 		}
 
 		private void SetStack(ItemStack? stack) {

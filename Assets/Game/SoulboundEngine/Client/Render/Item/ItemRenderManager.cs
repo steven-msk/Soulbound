@@ -9,14 +9,14 @@ namespace SoulboundEngine.Client.Render.Item {
 	public sealed class ItemRenderManager {
 		private readonly Dictionary<Item, ItemRenderer> renderers;
 		private readonly Func<Item, IItemModelResolver> modelResolverFactory;
-		private readonly Dictionary<RenderHandle, RenderedItem> rendered = new();
+		private readonly Dictionary<ItemRenderHandle, RenderedItem> rendered = new();
 
 		public ItemRenderManager(List<Item> items, ISpriteResolver<AtlasSpriteRef> spriteResolver) {
 			this.modelResolverFactory = ItemRenderers.GetModelResolverFactory(spriteResolver);
 			this.renderers = ItemRenderers.LoadRenderers(items);
 		}
 
-		public IItemView Render(RenderHandle handle, ItemStack stack, ItemRenderContext context) {
+		public IItemView Render(ItemRenderHandle handle, ItemStack stack, ItemRenderContext context) {
 			if (this.rendered.ContainsKey(handle)) {
 				this.Destroy(handle);
 			}
@@ -30,13 +30,13 @@ namespace SoulboundEngine.Client.Render.Item {
 			return view;
 		}
 
-		public void Update(RenderHandle handle) {
+		public void Update(ItemRenderHandle handle) {
 			if (!this.rendered.TryGetValue(handle, out RenderedItem entry)) return;
 
 			this.GetRenderer(entry.item).UpdateViewBoxed(entry.state, entry.view, entry.context);
 		}
 
-		public void Destroy(RenderHandle handle) {
+		public void Destroy(ItemRenderHandle handle) {
 			if (!this.rendered.Remove(handle, out RenderedItem entry)) return;
 			this.GetRenderer(entry.item).DestroyView(entry.view);
 		}

@@ -1,7 +1,4 @@
-using SoulboundEngine.Client.ItemSystem.Render;
 using SoulboundEngine.Client.World.BlockSystem;
-using SoulboundEngine.Core.Registry;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -25,10 +22,6 @@ namespace SoulboundEngine.Client.ItemSystem {
 			blockItems.Add(block, this);
 		}
 
-		public ItemRenderData GetRenderData(ItemStack itemStack) {
-			return this.settings.renderFunction(itemStack);
-		}
-
 		public virtual ItemStack CreateStack(int quantity = 1) {
 			return new ItemStack(this, Mathf.Clamp(quantity, 0, this.fullStackSize));
 		}
@@ -36,16 +29,14 @@ namespace SoulboundEngine.Client.ItemSystem {
 		public sealed class Settings {
 			public string name { get; private set; }
 			public int fullStackSize { get; private set; } = DEFAULT_FULL_STACK;
-			public Func<ItemStack, ItemRenderData> renderFunction { get; private set; }
 
-			private Settings(string name, int fullStackSize, Func<ItemStack, ItemRenderData> renderFunction) {
+			private Settings(string name, int fullStackSize) {
 				this.name = name;
 				this.fullStackSize = fullStackSize;
-				this.renderFunction = renderFunction;
 			}
 
-			public static Settings Of(string name, Func<ItemStack, ItemRenderData> renderFunction) {
-				return new Settings(name, DEFAULT_FULL_STACK, renderFunction);
+			public static Settings Of(string name) {
+				return new Settings(name, DEFAULT_FULL_STACK);
 			}
 
 			public Settings NonStackable() {
@@ -59,11 +50,7 @@ namespace SoulboundEngine.Client.ItemSystem {
 			}
 
 			public static Settings Air() {
-				return new("Air", 1, _ => default);
-			}
-
-			public static Func<ItemStack, ItemRenderData> RenderFunction(string spriteKey, Identifier? animation = null) {
-				return itemStack => new ItemRenderData(spriteKey, itemStack, animation);
+				return new("Air", 1);
 			}
 
 			public bool IsStackable() => this.fullStackSize > 1;
