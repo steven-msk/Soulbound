@@ -14,7 +14,7 @@ namespace SoulboundEngine.Client.Render.Entity {
 
 		public override IEntityView CreateView(EntityRenderState<E> state) {
 			GameObject obj = new("Entity");
-			obj.transform.position = state.entity.GetPos();
+			obj.transform.position = state.entity.GetPosition();
 			return IEntityView.Of(obj);
 		}
 

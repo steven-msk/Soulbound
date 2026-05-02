@@ -68,7 +68,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 			this.player = player;
 			this.AddEntity(player);
 			SoulboundClient.Instance.InputManager.AddHandler(player);
-			player.SetPos(this.GetWorldSpawnPoint() + Vector2.up * 2f);
+			player.SetPosition(this.GetWorldSpawnPoint() + Vector2.up * 2f);
 		}
 
 		// known issue: inconsistent world update loop design
@@ -83,7 +83,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 			}
 
 			foreach (var entity in this.tickingEntities.ToArray()) {
-				if (simulationRect.Contains(Vector2Int.FloorToInt(((Entity)entity).GetPos()))) {
+				if (simulationRect.Contains(Vector2Int.FloorToInt(((Entity)entity).GetPosition()))) {
 					entity.Tick();
 				}
 			}
@@ -99,7 +99,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 
 		// known issue: inconsistent world update loop design
 		public void FrameUpdate() {
-			int pivotChunkX = ChunkXAt(this.player.GetPos());
+			int pivotChunkX = ChunkXAt(this.player.GetPosition());
 			this.UnloadDistantChunks(pivotChunkX, RENDER_DISTANCE);
 			this.UpdateLoadedChunks(pivotChunkX);
 

@@ -10,7 +10,7 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 		}
 
 		public void Tick() {
-			SetPos(GetPos() + new Vector2(1f, 0f));
+			SetPosition(GetPosition() + new Vector2(1f, 0f));
 		}
 	}
 }

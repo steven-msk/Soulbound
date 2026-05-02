@@ -60,7 +60,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 					this.StartFrame();
 
 					try {
-						Vector2 pivotPos = this.level.GetPlayer()?.GetPos() ?? this.level.GetWorldSpawnPoint();
+						Vector2 pivotPos = this.level.GetPlayer()?.GetPosition() ?? this.level.GetWorldSpawnPoint();
 						this.level.FrameUpdate();
 						this.worldRenderer.RenderView(pivotPos, this.level.GetBlockState);
 					} catch (Exception e) {
@@ -79,7 +79,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 					this.StartTick();
 
 					try {
-						Vector2 pivotPos = this.level.GetPlayer()?.GetPos() ?? this.level.GetWorldSpawnPoint();
+						Vector2 pivotPos = this.level.GetPlayer()?.GetPosition() ?? this.level.GetWorldSpawnPoint();
 						this.level.Tick(this.GetRelativeSimulationRect(pivotPos));
 					} catch (Exception e) {
 						Logger.LogFatal(e);

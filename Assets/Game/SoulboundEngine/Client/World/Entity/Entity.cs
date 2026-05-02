@@ -12,10 +12,10 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 		protected Level level;
 		private Vector2 pos;
 		protected bool isAlive;
-		protected readonly PositionSynchronizer positionSynchronizer;
+		protected readonly TransformAdapter transformAdapter;
 
 		protected Entity(EntityDescriptor descriptor, Level level) {
-			this.positionSynchronizer = new PositionSynchronizer(this);
+			this.transformAdapter = new TransformAdapter(this);
 			this.descriptor = descriptor;
 			this.level = level;
 		}
@@ -30,9 +30,10 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 		public virtual void FrameUpdate() {
 		}
 
-		public virtual Vector2 GetPos() => this.pos;
-		public virtual void SetPos(Vector2 pos) {
+		public virtual Vector2 GetPosition() => this.pos;
+		public virtual void SetPosition(Vector2 pos) {
 			this.pos = pos;
+			this.transformAdapter?.SetPosition(pos);
 		}
 
 		public ItemEntity DropItem(Level level, IItemConvertible item) {
@@ -41,7 +42,7 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 
 		public ItemEntity DropStack(Level level, ItemStack stack) {
 			ItemEntity entity = new(this, stack, level);
-			entity.SetPos(this.GetPos());
+			entity.SetPosition(this.GetPosition());
 			return entity;
 		}
 
@@ -52,30 +53,99 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 
 		public bool IsAlive() => this.isAlive;
 
+		protected void AssertAlive() {
+			if (!this.isAlive) throw new NotSupportedException("Entity is not alive.");
+		}
+
 		protected virtual void OnDisposed() {
 		}
 
 		public EntityDescriptor GetDescriptor() => this.descriptor;
 
 		public void SetPhysicsHandle(IPhysicsHandle? physicsHandle) {
-			this.positionSynchronizer.SetPhysicsHandle(physicsHandle);
+			this.transformAdapter.SetPhysicsHandle(physicsHandle);
+		}
+		public void SetBoundingBoxHandle(IBoundingBoxHandle? boundingBoxHandle) {
+			this.transformAdapter.SetBoundingBoxHandle(boundingBoxHandle);
 		}
 
-		protected sealed class PositionSynchronizer {
+		public void SetVelocity(Vector2 velocity) {
+			this.AssertAlive();
+			this.transformAdapter.physicsHandle!.SetVelocity(velocity);
+		}
+		public Vector2 GetVelocity() {
+			this.AssertAlive();
+			return this.transformAdapter.physicsHandle!.GetVelocity();
+		}
+		public float GetVelocityX() => this.GetVelocity().x;
+		public float GetVelocityY() => this.GetVelocity().y;
+		public void SetVelocityX(float velocityX) {
+			Vector2 velocity = this.GetVelocity();
+			this.SetVelocity(new Vector2(velocityX, velocity.y));
+		}
+		public void SetVelocityY(float velocityY) {
+			Vector2 velocity = this.GetVelocity();
+			this.SetVelocity(new Vector2(velocity.x, velocityY));
+		}
+
+		public void SetNormalVelocity(Vector2 normalVelocity) {
+			this.AssertAlive();
+			this.transformAdapter.physicsHandle!.SetNormalVelocity(normalVelocity);
+		}
+		public Vector2 GetNormalVelocity() {
+			this.AssertAlive();
+			return this.transformAdapter.physicsHandle!.GetNormalVelocity();
+		}
+		public float GetNormalVelocityX() => this.GetNormalVelocity().x;
+		public float GetNormalVelocityY() => this.GetNormalVelocity().y;
+		public void SetNormalVelocityX(float normalVelocityX) {
+			Vector2 normalVelocity = this.GetNormalVelocity();
+			this.SetNormalVelocity(new Vector2(normalVelocityX, normalVelocity.y));
+		}
+		public void SetNormalVelocityY(float normalVelocityY) {
+			Vector2 normalVelocity = this.GetNormalVelocity();
+			this.SetNormalVelocity(new Vector2(normalVelocity.x, normalVelocityY));
+		}
+
+		public void ApplyForce(Vector2 force) {
+			this.AssertAlive();
+			this.transformAdapter.physicsHandle!.ApplyForce(force);
+		}
+		public void ApplyForceX(float forceX) => this.ApplyForce(new Vector2(forceX, 0f));
+		public void ApplyForceY(float forceY) => this.ApplyForce(new Vector2(0f, forceY));
+
+		public Bounds GetBoundingBox() {
+			this.AssertAlive();
+			return this.transformAdapter.boundingBoxHandle!.GetBoundingBox();
+		}
+
+		public Vector2 GetCenter() => this.GetBoundingBox().center;
+
+		protected sealed class TransformAdapter {
 			private readonly Entity entity;
-			private IPhysicsHandle? physicsHandle;
+			public IPhysicsHandle? physicsHandle { get; private set; }
+			public IBoundingBoxHandle? boundingBoxHandle { get; private set; }
 
-			public PositionSynchronizer(Entity entity) {
+			public TransformAdapter(Entity entity) {
 				this.entity = entity;
-			}
-
-			public void SetPhysicsHandle(IPhysicsHandle? handle) {
-				this.physicsHandle = handle;
 			}
 
 			public void SyncPhysicsPosition() {
 				if (this.physicsHandle == null) return;
 				this.entity.pos = this.physicsHandle.GetPosition();
+			}
+
+			public void SetPhysicsHandle(IPhysicsHandle? physicsHandle) {
+				this.physicsHandle = physicsHandle;
+				this.SetPosition(this.entity.pos);
+			}
+
+			public void SetBoundingBoxHandle(IBoundingBoxHandle? boundingBoxHandle) {
+				this.boundingBoxHandle = boundingBoxHandle;
+			}
+
+			public void SetPosition(Vector2 pos) {
+				this.physicsHandle?.SetPosition(pos);
 			}
 		}
 
@@ -84,12 +154,39 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 			Vector2 GetVelocity();
 			public float GetVelocityX() => this.GetVelocity().x;
 			public float GetVelocityY() => this.GetVelocity().y;
+			public void SetVelocityX(float velocityX) {
+				Vector2 velocity = this.GetVelocity();
+				this.SetVelocity(new Vector2(velocityX, velocity.y));
+			}
+			public void SetVelocityY(float velocityY) {
+				Vector2 velocity = this.GetVelocity();
+				this.SetVelocity(new Vector2(velocity.x, velocityY));
+			}
+
+			void SetNormalVelocity(Vector2 normalVelocity);
+			Vector2 GetNormalVelocity();
+			public float GetNormalVelocityX() => this.GetNormalVelocity().x;
+			public float GetNormalVelocityY() => this.GetNormalVelocity().y;
+			public void SetNormalVelocityX(float normalVelocityX) {
+				Vector2 normalVelocity = this.GetNormalVelocity();
+				this.SetNormalVelocity(new Vector2(normalVelocityX, normalVelocity.y));
+			}
+			public void SetNormalVelocityY(float normalVelocityY) {
+				Vector2 normalVelocity = this.GetNormalVelocity();
+				this.SetNormalVelocity(new Vector2(normalVelocity.x, normalVelocityY));
+			}
 
 			Vector2 GetPosition();
+			void SetPosition(Vector2 pos);
 
 			void ApplyForce(Vector2 force);
 			public void ApplyForceX(float forceX) => this.ApplyForce(new Vector2(forceX, 0f));
 			public void ApplyForceY(float forceY) => this.ApplyForce(new Vector2(0f, forceY));
+		}
+
+		public interface IBoundingBoxHandle {
+			Bounds GetBoundingBox();
+			public Vector2 GetCenter() => this.GetBoundingBox().center;
 		}
 	}
 }

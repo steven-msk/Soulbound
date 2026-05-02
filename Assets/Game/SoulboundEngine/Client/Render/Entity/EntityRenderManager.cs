@@ -17,7 +17,7 @@ namespace SoulboundEngine.Client.Render.Entity {
 
 		public IEntityView Render(Entity entity) {
 			if (this.renderedEntities.ContainsKey(entity)) {
-				this.Destroy(entity);	
+				this.Destroy(entity);
 			}
 
 			IEntityModelResolver modelResolver = this.modelResolverFactory(entity.GetDescriptor());

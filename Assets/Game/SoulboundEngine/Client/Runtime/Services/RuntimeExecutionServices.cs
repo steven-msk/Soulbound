@@ -48,7 +48,7 @@ namespace SoulboundEngine.Client.Runtime.Services {
 			_inventory = new RuntimeInventoryExecutionService(player.GetInventory());
 		}
 
-		public void SetPos(Vector2 pos) => player.SetPos(pos);
+		public void SetPos(Vector2 pos) => player.SetPosition(pos);
 
 		public bool TryAddItemStack(ItemStack itemStack) => player.TryAddItemStack(itemStack);
 	}
@@ -78,7 +78,7 @@ namespace SoulboundEngine.Client.Runtime.Services {
 
 		public void SetPos(Guid entityGuid, Vector2 pos) {
 			if (entityManager.TryGetEntity(entityGuid, out Entity entity)) {
-				entity.SetPos(pos);
+				entity.SetPosition(pos);
 			}
 		}
 	}

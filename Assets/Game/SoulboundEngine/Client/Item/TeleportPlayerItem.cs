@@ -16,7 +16,7 @@ namespace SoulboundEngine.Client.ItemSystem {
 		}
 
 		public bool TryExecute(ItemStack itemStack, in ItemInteraction ctx) {
-			ctx.player.SetPos(ctx.player.GetWorldPointerPos());
+			ctx.player.SetPosition(ctx.player.GetWorldPointerPos());
 			return true;
 		}
 
