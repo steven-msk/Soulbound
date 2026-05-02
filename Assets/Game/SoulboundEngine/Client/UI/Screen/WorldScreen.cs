@@ -18,7 +18,7 @@ namespace SoulboundEngine.Client.UI.Screens {
 		protected override void OnBuild(IScreenObject screenObject) {
 			this.player.SetTransitStackSource((ITransitStackSource)screenObject);
 
-			InventoryUIBuilder inventoryUIBuilder = new(this.player.GetInventory(), this.player.GetHotbar());
+			InventoryUIBuilder inventoryUIBuilder = new(this.player.GetInventory());
 			inventoryUIBuilder.Build(
 				(IItemContainerScreenScope)screenObject,
 				out IItemContainerHandle inventory,

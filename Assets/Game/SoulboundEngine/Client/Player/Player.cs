@@ -25,7 +25,6 @@ namespace SoulboundEngine.Client.Players {
 			})
 		);
 		private readonly Inventory inventory;
-		private readonly Hotbar hotbar;
 		private ITransitStackSource tranistStackSource = null!;
 		private PlayerTransform playerTransform = null!;
 		private new Vector2 initialPos;
@@ -46,7 +45,6 @@ namespace SoulboundEngine.Client.Players {
 		public Player(Level level)
 			: base(DESCRIPTOR, level) {
 			this.inventory = new Inventory();
-			this.hotbar = new Hotbar();
 
 			this.interactionResolver.RegisterHandler<ItemInteraction>(this);
 			this.interactionResolver.RegisterHandler<BlockInteraction>(this);
@@ -61,15 +59,15 @@ namespace SoulboundEngine.Client.Players {
 				InputEventListener.ConsumePerformed(InputTokens.Player.toggleInventory, _ => this.inventory.Toggle()),
 				InputEventListener.ConsumePerformed(InputTokens.Player.changeHotbarSlot, inputEvent => {
 					int slotIndex = int.Parse(inputEvent.context.control.name) - 1;
-					this.hotbar.SetMainSlotIndex(slotIndex);
+					this.inventory.SetMainSlot(slotIndex);
 				}),
 				InputEventListener.ConsumePerformed(InputTokens.Player.scrollHotbarSlot, inputEvent => {
 					float scrollDelta = inputEvent.context.ReadValue<float>();
-					int nextSlot = this.hotbar.GetMainSlotIndex() - (int)scrollDelta;
+					int nextSlot = this.inventory.GetMainSlot() - (int)scrollDelta;
 
-					if (nextSlot < 0) nextSlot += this.hotbar.GetSlotCount();
-					nextSlot %= this.hotbar.GetSlotCount();
-					this.hotbar.SetMainSlotIndex(nextSlot);
+					if (nextSlot < 0) nextSlot += Inventory.HOTBAR_SIZE;
+					nextSlot %= Inventory.HOTBAR_SIZE;
+					this.inventory.SetMainSlot(nextSlot);
 				}),
 				InputEventListener.ObserveAny(InputTokens.Mouse.position, inputEvent => {
 					this.screenPointerPos = inputEvent.context.ReadValue<Vector2>();
@@ -272,8 +270,7 @@ namespace SoulboundEngine.Client.Players {
 		}
 
 		public bool TryAddItemStack(ItemStack itemStack) {
-			if (this.inventory.TryAddStack(itemStack)) return true;
-			return this.hotbar.TryAddStack(itemStack);
+			return this.inventory.TryAddStack(itemStack);
 		}
 
 		public bool CanPlaceBlockAt(BlockPos blockPos) {
@@ -296,11 +293,10 @@ namespace SoulboundEngine.Client.Players {
 		}
 
 		public Inventory GetInventory() => this.inventory;
-		public Hotbar GetHotbar() => this.hotbar;
 
 		public ItemStack? GetMainHandStack() {
 			ItemStack? transitStack = this.tranistStackSource?.GetTransitStack();
-			return transitStack ?? this.hotbar.GetSlot(this.hotbar.GetMainSlotIndex()).GetStack();
+			return transitStack ?? this.inventory.GetMainStack();
 		}
 
 		public Vector2 GetCenter() => this.playerTransform.Collider.bounds.center;

@@ -12,6 +12,6 @@ namespace SoulboundEngine.Client.ItemSystem.Container {
 	public interface IItemContainer {
 		IItemSlot GetSlot(int index);
 		IReadOnlyList<int> GetAllSlots();
-		int GetSlotCount();
+		int GetSize();
 	}
 }

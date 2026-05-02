@@ -15,32 +15,30 @@ namespace SoulboundEngine.Client.ItemSystem.Container.View {
 
 		private static readonly AssetKey slotKey = new("Slot");
 		private readonly Inventory inventory;
-		private readonly Hotbar hotbar;
 
-		public InventoryUIBuilder(Inventory inventory, Hotbar hotbar) {
+		public InventoryUIBuilder(Inventory inventory) {
 			this.inventory = inventory;
-			this.hotbar = hotbar;
 		}
 
 		public void Build(IItemContainerScreenScope screenScope, out IItemContainerHandle inventory, out IItemContainerHandle hotbar) {
-			inventory = BuildInventory(screenScope);
-			hotbar = BuildHotbar(screenScope);
+			inventory = this.BuildInventory(screenScope);
+			hotbar = this.BuildHotbar(screenScope);
 
 			this.inventory.toggle += ((HotbarHandle)hotbar).ToggleFadedLayout;
 			this.inventory.Toggle();
 		}
 
 		private InventoryHandle BuildInventory(IItemContainerScreenScope screenScope) {
-			InventoryHandle inventory = CreateContainerObject<InventoryHandle>(
+			InventoryHandle inventory = this.CreateContainerObject<InventoryHandle>(
 				"Inventory", Inventory.COLUMNS
 			);
 			RectTransform rect = inventory.GetComponent<RectTransform>();
 			rect.pivot = rect.anchorMin = rect.anchorMax = Vector2.zero;
 
 			List<ItemSlotHandle> slotHandles = new();
-			foreach (var slotIndex in this.inventory.GetAllSlots()) {
+			foreach (var slotIndex in this.inventory.GetPopupSlots()) {
 				IItemSlot slot = this.inventory.GetSlot(slotIndex);
-				GameObject slotObj = CreateSlotObj(slot, inventory, out ItemSlotHandle handle);
+				GameObject slotObj = this.CreateSlotObj(slot, inventory, out ItemSlotHandle handle);
 				slotHandles.Add(handle);
 				slotObj.transform.SetParent(inventory.transform, false);
 			}
@@ -60,24 +58,23 @@ namespace SoulboundEngine.Client.ItemSystem.Container.View {
 		}
 
 		private InventoryHandle BuildHotbar(IItemContainerScreenScope screenScope) {
-			HotbarHandle hotbar = CreateContainerObject<HotbarHandle>(
-				"Hotbar", Hotbar.SLOT_COUNT
-			);
+			const int size = Inventory.HOTBAR_SIZE;
+			HotbarHandle hotbar = this.CreateContainerObject<HotbarHandle>("Hotbar", size);
 			RectTransform rect = hotbar.GetComponent<RectTransform>();
 			rect.pivot = rect.anchorMin = rect.anchorMax = Vector2.zero;
 
-			List<int>.Enumerator enumerator = this.hotbar.GetAllSlots().ToList().GetEnumerator();
-			HotbarSlotHandle[] handles = new HotbarSlotHandle[this.hotbar.GetSlotCount()];
+			List<int>.Enumerator enumerator = this.inventory.GetHotbarSlots().ToList().GetEnumerator();
+			HotbarSlotHandle[] handles = new HotbarSlotHandle[size];
 			int slotIndex = 0;
 			while (enumerator.MoveNext()) {
-				IItemSlot slot = this.hotbar.GetSlot(enumerator.Current);
-				GameObject slotObj = CreateHotbarSlotObj(slot, hotbar, slotIndex, out HotbarSlotHandle handle);
+				IItemSlot slot = this.inventory.GetSlot(enumerator.Current);
+				GameObject slotObj = this.CreateHotbarSlotObj(slot, hotbar, slotIndex, out HotbarSlotHandle handle);
 				handles[slotIndex++] = handle;
 				slotObj.transform.SetParent(hotbar.transform, false);
 			}
 
-			hotbar.Init(this.hotbar, screenScope, handles);
-			UIItemContainerNode node = new(hotbar.gameObject, this.hotbar, hotbar);
+			hotbar.Init(this.inventory, screenScope, handles);
+			UIItemContainerNode node = new(hotbar.gameObject, this.inventory, hotbar);
 			screenScope.AddItemContainer(node);
 
 			screenScope.AddElement(new UIElementNode(hotbar.gameObject));

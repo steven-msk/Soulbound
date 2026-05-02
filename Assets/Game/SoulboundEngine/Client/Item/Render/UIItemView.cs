@@ -1,10 +1,12 @@
 using SoulboundEngine.Core.Render.Animation;
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace SoulboundEngine.Client.ItemSystem.Render {
 	[RequireComponent(typeof(RectTransform))]
+	[Obsolete]
 	public sealed class UIItemView : MonoBehaviour, IAnimationTarget<Sprite> {
 		private RectTransform rect;
 		private TextMeshProUGUI stackText;
