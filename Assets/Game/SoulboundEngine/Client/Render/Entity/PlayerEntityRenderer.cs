@@ -1,6 +1,5 @@
 ﻿using SoulboundEngine.Client.Players;
 using SoulboundEngine.Core.Assets;
-using System;
 using UnityEngine;
 
 namespace SoulboundEngine.Client.Render.Entity {
@@ -15,6 +14,9 @@ namespace SoulboundEngine.Client.Render.Entity {
 		public override IEntityView CreateView(PlayerRenderState state) {
 			GameObject obj = GameObject.Instantiate(AssetManager.Resolve<GameObject>(new AssetKey("player")));
 			PlayerTransform transform = obj.GetComponent<PlayerTransform>();
+			transform.Init(state.entity);
+			state.entity.SetPhysicsHandle(transform);
+			state.entity.SetBoundingBoxHandle(transform);
 			return transform;
 		}
 
@@ -23,7 +25,6 @@ namespace SoulboundEngine.Client.Render.Entity {
 		}
 
 		public override void UpdateView(PlayerRenderState state, IEntityView view) {
-			throw new NotImplementedException();
 		}
 	}
 }

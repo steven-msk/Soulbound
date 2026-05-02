@@ -1,6 +1,8 @@
 using Cysharp.Threading.Tasks;
+using SoulboundEngine.Client.Render.Entity;
 using SoulboundEngine.Client.World.BlockSystem.Render;
 using SoulboundEngine.Client.World.Generation;
+using SoulboundEngine.Client.World.Render;
 using System;
 using UnityEngine.ResourceManagement.Exceptions;
 
@@ -8,11 +10,12 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 	public sealed class WorldLoader {
 		private readonly SoulboundClient client;
 		private readonly ISeedProvider seedProvider;
+		private readonly EntityRenderManager entityRenderManager;
 
-
-		public WorldLoader(SoulboundClient client, ISeedProvider seedProvider) {
+		public WorldLoader(SoulboundClient client, EntityRenderManager entityRenderManager, ISeedProvider seedProvider) {
 			this.client = client;
 			this.seedProvider = seedProvider;
+			this.entityRenderManager = entityRenderManager;
 		}
 
 		public async UniTask<WorldSession> LoadWorld(UniTask sceneLoadTask, Func<IWorldSceneRoot> rootProvider) {
@@ -22,7 +25,8 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 
 			BlockRenderer blockRenderer = new(sceneRoot.tilemap);
 			BlockModelResolver blockModelResolver = new();
-			LevelManager levelManager = new(this.client, this.seedProvider, blockRenderer, blockModelResolver);
+			WorldRenderer worldRenderer = new(LevelManager.simulationView, blockRenderer, blockModelResolver);
+			LevelManager levelManager = new(this.client, this.seedProvider, worldRenderer, this.entityRenderManager);
 
 			// single level for now
 			// multiple dimensions not supported yet

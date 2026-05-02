@@ -1,14 +1,16 @@
 using SoulboundEngine.Client.ItemSystem;
-using SoulboundEngine.Client.Render.Entity;
+using SoulboundEngine.Client.World.EntitySystem;
 using SoulboundEngine.Core;
 using SoulboundEngine.Core.Event;
 using UnityEngine;
+using IEntityView = SoulboundEngine.Client.Render.Entity.IEntityView;
 
 #nullable enable
 
 namespace SoulboundEngine.Client.Players {
 	[RequireComponent(typeof(Rigidbody2D))]
-	public class PlayerTransform : MonoBehaviour, IEntityView, IItemPickupHandler {
+	[RequireComponent(typeof(CapsuleCollider2D))]
+	public class PlayerTransform : MonoBehaviour, IEntityView, Entity.IPhysicsHandle, Entity.IBoundingBoxHandle, IItemPickupHandler {
 		private Player player = null!;
 		private Rigidbody2D rb = null!;
 		new private CapsuleCollider2D collider = null!;
@@ -25,6 +27,12 @@ namespace SoulboundEngine.Client.Players {
 		[SerializeField] private float jumpForce = 1f;
 
 		public Player GetEntity() => this.player;
+
+		public void Init(Player player) {
+			this.player = player;
+			this.rb = this.GetComponent<Rigidbody2D>();
+			this.collider = this.GetComponent<CapsuleCollider2D>();
+		}
 
 		public Vector2 GetPos() => this.rb.position;
 		public void SetPos(Vector2 position) => this.rb.position = position;
@@ -71,5 +79,19 @@ namespace SoulboundEngine.Client.Players {
 		public void SetVisible(bool visible) => this.gameObject.SetActive(visible);
 
 		public void Destroy() => GameObject.Destroy(this.gameObject);
+
+		public void SetVelocity(Vector2 velocity) {
+			this.rb.linearVelocity = velocity;
+		}
+
+		public Vector2 GetVelocity() => this.rb.linearVelocity;
+
+		public Vector2 GetPosition() => this.rb.position;
+
+		public void SetPosition(Vector2 pos) => this.rb.position = pos;
+
+		public void ApplyForce(Vector2 force) => this.rb.AddForce(force);
+
+		public Bounds GetBoundingBox() => this.collider.bounds;
 	}
 }

@@ -71,11 +71,11 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 
 		public void SetVelocity(Vector2 velocity) {
 			this.AssertAlive();
-			this.transformAdapter.physicsHandle!.SetVelocity(velocity);
+			this.transformAdapter.SetVelocity(velocity);
 		}
 		public Vector2 GetVelocity() {
 			this.AssertAlive();
-			return this.transformAdapter.physicsHandle!.GetVelocity();
+			return this.transformAdapter.GetVelocity();
 		}
 		public float GetVelocityX() => this.GetVelocity().x;
 		public float GetVelocityY() => this.GetVelocity().y;
@@ -90,11 +90,11 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 
 		public void SetNormalVelocity(Vector2 normalVelocity) {
 			this.AssertAlive();
-			this.transformAdapter.physicsHandle!.SetNormalVelocity(normalVelocity);
+			this.transformAdapter.SetNormalVelocity(normalVelocity);
 		}
 		public Vector2 GetNormalVelocity() {
 			this.AssertAlive();
-			return this.transformAdapter.physicsHandle!.GetNormalVelocity();
+			return this.transformAdapter.GetNormalVelocity();
 		}
 		public float GetNormalVelocityX() => this.GetNormalVelocity().x;
 		public float GetNormalVelocityY() => this.GetNormalVelocity().y;
@@ -109,14 +109,14 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 
 		public void ApplyForce(Vector2 force) {
 			this.AssertAlive();
-			this.transformAdapter.physicsHandle!.ApplyForce(force);
+			this.transformAdapter.ApplyForce(force);
 		}
 		public void ApplyForceX(float forceX) => this.ApplyForce(new Vector2(forceX, 0f));
 		public void ApplyForceY(float forceY) => this.ApplyForce(new Vector2(0f, forceY));
 
 		public Bounds GetBoundingBox() {
 			this.AssertAlive();
-			return this.transformAdapter.boundingBoxHandle!.GetBoundingBox();
+			return this.transformAdapter.GetBoundingBox();
 		}
 
 		public Vector2 GetCenter() => this.GetBoundingBox().center;
@@ -147,6 +147,15 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 			public void SetPosition(Vector2 pos) {
 				this.physicsHandle?.SetPosition(pos);
 			}
+
+			public Bounds GetBoundingBox() => this.boundingBoxHandle?.GetBoundingBox() ?? default;
+
+			public void SetNormalVelocity(Vector2 normalVelocity) => this.physicsHandle?.SetNormalVelocity(normalVelocity);
+			public Vector2 GetNormalVelocity() => this.physicsHandle?.GetNormalVelocity() ?? Vector2.zero;
+			public void SetVelocity(Vector2 velocity) => this.physicsHandle?.SetVelocity(velocity);
+			public Vector2 GetVelocity() => this.physicsHandle?.GetVelocity() ?? Vector2.zero;
+
+			public void ApplyForce(Vector2 force) => this.physicsHandle?.ApplyForce(force);
 		}
 
 		public interface IPhysicsHandle {
