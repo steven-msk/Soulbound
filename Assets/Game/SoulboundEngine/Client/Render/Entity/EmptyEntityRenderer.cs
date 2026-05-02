@@ -1,5 +1,4 @@
-﻿using SoulboundEngine.Client.World.EntitySystem;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SoulboundEngine.Client.Render.Entity {
 	using Entity = World.EntitySystem.Entity;
@@ -10,10 +9,7 @@ namespace SoulboundEngine.Client.Render.Entity {
 		}
 
 		public override EntityRenderState<E> CreateRenderState(E entity) {
-			return new EntityRenderState<E> {
-				descriptor = (EntityDescriptor<E>)entity.GetDescriptor(),
-				entity = entity
-			};
+			return new EntityRenderState<E> { entity = entity };
 		}
 
 		public override IEntityView CreateView(EntityRenderState<E> state, EntityModel model) {

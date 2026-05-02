@@ -3,8 +3,6 @@
 	using Entity = World.EntitySystem.Entity;
 
 	public abstract class EntityRenderer {
-		public delegate EntityRenderer Factory(FactoryContext context);
-
 		protected readonly EntityRenderManager entityRenderManager;
 
 		protected EntityRenderer(FactoryContext context) {
@@ -18,6 +16,26 @@
 		public abstract void DestroyView(IEntityView view);
 
 		public sealed record FactoryContext(EntityRenderManager entityRenderManager, ItemRenderManager itemRenderManager);
+
+		public delegate EntityRenderer<E, S, M> Factory<E, S, M>(FactoryContext context) where E : Entity where S : EntityRenderState<E> where M : EntityModel;
+
+		public interface IFactory { 
+			EntityRenderer GetRenderer(FactoryContext context);
+
+			public static IFactory Of<E, S, M>(Factory<E, S, M> factory) where E : Entity where S : EntityRenderState<E> where M : EntityModel {
+				return new DelegateImpl<E, S, M>(factory);
+			}
+
+			private sealed class DelegateImpl<E, S, M> : IFactory where E : Entity where S : EntityRenderState<E> where M : EntityModel {
+				private readonly Factory<E, S, M> factory;
+
+				public DelegateImpl(Factory<E, S, M> factory) {
+					this.factory = factory;
+				}
+
+				public EntityRenderer GetRenderer(FactoryContext context) => this.factory(context);
+			}
+		}
 	}
 
 	public abstract class EntityRenderer<E, S, M> : EntityRenderer where E : Entity where S : EntityRenderState<E> where M : EntityModel {
