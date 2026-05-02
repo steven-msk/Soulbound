@@ -17,6 +17,7 @@ namespace SoulboundEngine.Client.Render.Entity {
 			transform.Init(state.entity);
 			state.entity.SetPhysicsHandle(transform);
 			state.entity.SetBoundingBoxHandle(transform);
+			state.entity.SetTransformHandle(transform);
 			return transform;
 		}
 

@@ -10,7 +10,7 @@ using IEntityView = SoulboundEngine.Client.Render.Entity.IEntityView;
 namespace SoulboundEngine.Client.Players {
 	[RequireComponent(typeof(Rigidbody2D))]
 	[RequireComponent(typeof(CapsuleCollider2D))]
-	public class PlayerTransform : MonoBehaviour, IEntityView, Entity.IPhysicsHandle, Entity.IBoundingBoxHandle, IItemPickupHandler {
+	public class PlayerTransform : MonoBehaviour, IEntityView, Entity.IPhysicsHandle, Entity.IBoundingBoxHandle, Player.IPlayerTransformHandle, IItemPickupHandler {
 		private Player player = null!;
 		private Rigidbody2D rb = null!;
 		new private CapsuleCollider2D collider = null!;
@@ -47,7 +47,7 @@ namespace SoulboundEngine.Client.Players {
 			if (this.isJumping && this.isGrounded) this.Jump();
 		}
 
-		internal void SetJumping(bool value) {
+		public void SetJumping(bool value) {
 			this.isJumping = value;
 		}
 

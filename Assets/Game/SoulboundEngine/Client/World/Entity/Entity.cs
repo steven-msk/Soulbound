@@ -121,10 +121,10 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 
 		public Vector2 GetCenter() => this.GetBoundingBox().center;
 
-		protected sealed class TransformAdapter {
+		protected class TransformAdapter {
 			private readonly Entity entity;
-			public IPhysicsHandle? physicsHandle { get; private set; }
-			public IBoundingBoxHandle? boundingBoxHandle { get; private set; }
+			private IPhysicsHandle? physicsHandle;
+			private IBoundingBoxHandle? boundingBoxHandle;
 
 			public TransformAdapter(Entity entity) {
 				this.entity = entity;

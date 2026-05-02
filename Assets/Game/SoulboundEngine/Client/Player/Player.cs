@@ -27,12 +27,14 @@ namespace SoulboundEngine.Client.Players {
 		private bool isHoldingLeftClick;
 		private bool isHoldingRightClick;
 		private bool isHoldingCtrl;
+		private new readonly PlayerTransformAdapter transformAdapter;
 
 		// provisory guard for not breaking the block instantly after it was placed
 		private bool leftClickBlockBreakGuard;
 
 		public Player(Level level)
 			: base(DESCRIPTOR, level) {
+			this.transformAdapter = new PlayerTransformAdapter(this);
 			this.inventory = new Inventory();
 
 			this.interactionResolver.RegisterHandler<ItemInteraction>(this);
@@ -101,6 +103,7 @@ namespace SoulboundEngine.Client.Players {
 
 		public void SetJumping(bool jumping) {
 			this.isJumping = jumping;
+			this.transformAdapter.SetJumping(jumping);
 		}
 
 		public void StopHorizontalMovement() {
@@ -313,6 +316,30 @@ namespace SoulboundEngine.Client.Players {
 
 		public void SetTransitStackSource(ITransitStackSource source) {
 			this.tranistStackSource = source;
+		}
+		
+		public void SetTransformHandle(IPlayerTransformHandle playerTransformHandle) {
+			this.transformAdapter.SetHandle(playerTransformHandle);
+		}
+
+		private sealed class PlayerTransformAdapter : TransformAdapter {
+			private IPlayerTransformHandle? transformHandle;
+
+			public PlayerTransformAdapter(Player player)
+				: base(player) {
+			}
+
+			public void SetHandle(IPlayerTransformHandle? handle) {
+				this.transformHandle = handle;
+			}
+
+			public void SetJumping(bool jumping) {
+				this.transformHandle?.SetJumping(jumping);
+			}
+		}
+
+		public interface IPlayerTransformHandle {
+			void SetJumping(bool jumping);
 		}
 	}
 }
