@@ -24,11 +24,5 @@ namespace SoulboundEngine.Client.Render.Entity {
 			return transform;
 		}
 
-		public override void DestroyView(IEntityView view) {
-			view.Destroy();
-		}
-
-		public override void UpdateView(PlayerRenderState state, IEntityView view) {
-		}
 	}
 }

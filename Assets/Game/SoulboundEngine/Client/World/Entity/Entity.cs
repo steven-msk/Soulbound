@@ -62,6 +62,8 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 
 		public EntityDescriptor GetDescriptor() => this.descriptor;
 
+		public void SyncPhysicalPosition() => this.transformAdapter?.SyncPhysicsPosition();
+
 		public void SetPhysicsHandle(IPhysicsHandle? physicsHandle) {
 			this.transformAdapter.SetPhysicsHandle(physicsHandle);
 		}

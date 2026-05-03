@@ -49,7 +49,12 @@
 		public abstract S CreateRenderState(E entity);
 
 		public abstract IEntityView CreateView(S state, M model);
-		public abstract void UpdateView(S state, IEntityView view);
+		public virtual void UpdateView(S state, IEntityView view) {
+			state.entity.SyncPhysicalPosition();
+		}
+		public override void DestroyView(IEntityView view) {
+			view.Destroy();
+		}
 
 		internal override object CreateRenderStateBoxed(Entity entity) {
 			return this.CreateRenderState((E)entity);

@@ -18,10 +18,6 @@ namespace SoulboundEngine.Client.Render.Entity {
 			return IEntityView.Of(obj);
 		}
 
-		public override void DestroyView(IEntityView view) {
-			view.Destroy();
-		}
-
 		public override void UpdateView(EntityRenderState<E> state, IEntityView view) {
 		}
 	}
