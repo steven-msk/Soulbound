@@ -20,6 +20,7 @@ using System;
 using System.Linq;
 
 namespace SoulboundEngine.Client {
+	using SoulboundEngine.Client.Render.Block;
 	using SoulboundEngine.Client.Render.Entity;
 	using SoulboundEngine.Client.Render.Item;
 	using SoulboundEngine.Core.Registry;
@@ -54,6 +55,7 @@ namespace SoulboundEngine.Client {
 		private readonly ItemRenderManager itemRenderManager;
 		private readonly ISpriteResolver<AtlasSpriteRef> spriteResolver;
 		private readonly EntityRenderManager entityRenderManager;
+		private readonly BlockRenderManager blockRenderManager;
 
 		int IInputEventHandler.priority => int.MaxValue;
 
@@ -95,6 +97,7 @@ namespace SoulboundEngine.Client {
 			this.spriteResolver = new AtlasSpriteResolver();
 			this.itemRenderManager = new ItemRenderManager(Registries.ITEMS.ToList(), this.spriteResolver);
 			this.entityRenderManager = new EntityRenderManager(Registries.ENTITIES.ToList(), this.itemRenderManager);
+			this.blockRenderManager = new BlockRenderManager(Registries.BLOCKS.ToList());
 		}
 
 		/// <summary>
@@ -140,7 +143,7 @@ namespace SoulboundEngine.Client {
 			this.uiHandler.FlushScreens();
 
 			SeedProvider seedProvider = new(save.GetValueOrDefault());
-			WorldLoader worldLoader = new(this, this.entityRenderManager, seedProvider);
+			WorldLoader worldLoader = new(this, this.entityRenderManager, this.blockRenderManager, seedProvider);
 
 			worldLoader.LoadWorld(
 				SceneManager.LoadSceneAsync(this.config.unity.worldScene).ToUniTask(),

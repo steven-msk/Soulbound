@@ -43,6 +43,8 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 
 		public BlockState DefaultState => this.defaultState;
 
+		public StateManager<Block, BlockState> StateManager => this.stateManager;
+
 		public BlockRenderData GetRenderData(BlockState blockState) {
 			return this.settings.renderFunction(blockState);
 		}

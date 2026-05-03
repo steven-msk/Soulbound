@@ -64,7 +64,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 					try {
 						Vector2 pivotPos = this.level.GetPlayer()?.GetPosition() ?? this.level.GetWorldSpawnPoint();
 						this.level.FrameUpdate();
-						this.worldRenderer.RenderView(pivotPos, this.level.GetBlockState);
+						this.worldRenderer.RenderView(pivotPos);
 					} catch (Exception e) {
 						Logger.LogFatal(e);
 					}
