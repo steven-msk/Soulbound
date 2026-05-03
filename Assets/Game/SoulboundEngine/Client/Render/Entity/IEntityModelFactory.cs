@@ -1,12 +1,14 @@
 ﻿namespace SoulboundEngine.Client.Render.Entity {
 	public interface IEntityModelFactory {
-		EntityModel GetModel();
+		EntityModel GetModel(ScriptedEntityModelManager scriptedEntityModelManager);
 	}
 
 	public interface IEntityModelFactory<M> : IEntityModelFactory where M : EntityModel {
-		new M GetModel();
+		new M GetModel(ScriptedEntityModelManager scriptedEntityModelManager);
 
-		EntityModel IEntityModelFactory.GetModel() => this.GetModel();
+		EntityModel IEntityModelFactory.GetModel(ScriptedEntityModelManager scriptedEntityModelManager) {
+			return this.GetModel(scriptedEntityModelManager);
+		}
 
 		public static IEntityModelFactory<M> OfFactory(EntityModel.Factory<M> factory) {
 			return new FactoryImpl(factory);
@@ -19,7 +21,7 @@
 				this.factory = factory;
 			}
 
-			public M GetModel() => this.factory();
+			public M GetModel(ScriptedEntityModelManager scriptedEntityModelManager) => this.factory();
 		}
 	}
 }

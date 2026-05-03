@@ -10,8 +10,12 @@ namespace SoulboundEngine.Client.Render.Entity {
 		private readonly Func<EntityDescriptor, IEntityModelFactory> modelFactorySupplier;
 		private readonly Dictionary<EntityDescriptor, EntityRenderer> renderers;
 		private readonly Dictionary<Entity, RenderedEntity> renderedEntities = new();
+		private readonly ScriptedEntityModelManager scriptedEntityModelManager;
 
-		public EntityRenderManager(List<EntityDescriptor> descriptors, ItemRenderManager itemRenderManager) {
+		public EntityRenderManager(List<EntityDescriptor> descriptors, ItemRenderManager itemRenderManager, string scriptedModelLabel) {
+			this.scriptedEntityModelManager = new ScriptedEntityModelManager(scriptedModelLabel);
+			this.scriptedEntityModelManager.LoadAll();
+
 			EntityRenderer.FactoryContext context = new(this, itemRenderManager);
 			this.renderers = EntityRenderers.GetRenderers(descriptors, context);
 			this.modelFactorySupplier = EntityRenderers.GetModelFactorySupplier();
@@ -24,7 +28,7 @@ namespace SoulboundEngine.Client.Render.Entity {
 
 			EntityRenderer renderer = this.GetRenderer(entity);
 			IEntityModelFactory modelFactory = this.modelFactorySupplier(entity.GetDescriptor());
-			EntityModel model = modelFactory.GetModel();
+			EntityModel model = modelFactory.GetModel(this.scriptedEntityModelManager);
 			object state = renderer.CreateRenderStateBoxed(entity);
 			IEntityView view = renderer.CreateViewBoxed(state, model);
 

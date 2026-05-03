@@ -15,7 +15,10 @@
 		internal abstract void UpdateViewBoxed(object state, IEntityView view);
 		public abstract void DestroyView(IEntityView view);
 
-		public sealed record FactoryContext(EntityRenderManager entityRenderManager, ItemRenderManager itemRenderManager);
+		public sealed record FactoryContext(
+			EntityRenderManager entityRenderManager, 
+			ItemRenderManager itemRenderManager
+		);
 
 		public delegate EntityRenderer<E, S, M> Factory<E, S, M>(FactoryContext context) where E : Entity where S : EntityRenderState<E> where M : EntityModel;
 
