@@ -29,7 +29,9 @@ namespace SoulboundEngine.Client.Render.Entity {
 
 			EntityRenderer renderer = this.GetRenderer(entity);
 			IEntityModelFactory modelFactory = this.modelFactorySupplier(entity.GetDescriptor());
-			EntityModel model = modelFactory.GetModel(this.scriptedEntityModelManager);
+			IEntityModelFactory.Context modelFactoryContext = new(this.scriptedEntityModelManager);
+			
+			EntityModel model = modelFactory.GetModel(modelFactoryContext);
 			object state = renderer.CreateRenderStateBoxed(entity);
 			IEntityView view = renderer.CreateViewBoxed(state, model);
 

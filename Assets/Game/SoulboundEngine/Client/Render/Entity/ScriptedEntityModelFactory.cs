@@ -21,8 +21,8 @@ namespace SoulboundEngine.Client.Render.Entity {
 			this.fallback = fallback;
 		}
 
-		public M GetModel(ScriptedEntityModelManager scriptedEntityModelManager) {
-			ScriptedEntityModel? model = scriptedEntityModelManager.Get(this.identifier);
+		public M GetModel(IEntityModelFactory.Context context) {
+			ScriptedEntityModel? model = context.scriptedEntityModelManager.Get(this.identifier);
 			if (model == null && this.fallback != null) return this.fallback();
 			else if (model == null) {
 				Debug.Logging.Logger.LogInfo("No fallback model available for {}", this.identifier);
