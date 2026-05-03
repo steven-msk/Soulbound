@@ -3,7 +3,7 @@ using SoulboundEngine.Client.World.EntitySystem;
 using UnityEngine;
 
 namespace SoulboundEngine.Client.Render.Entity {
-	public sealed class ItemEntityRenderer : EntityRenderer<ItemEntity, ItemEntityRenderState, EntityModel> {
+	public sealed class ItemEntityRenderer : EntityRenderer<ItemEntity, ItemEntityRenderState, ItemEntityModel> {
 		private readonly ItemRenderManager itemRenderManager;
 
 		public ItemEntityRenderer(FactoryContext context) 
@@ -19,7 +19,7 @@ namespace SoulboundEngine.Client.Render.Entity {
 			};
 		}
 
-		public override IEntityView CreateView(ItemEntityRenderState state, EntityModel model) {
+		public override IEntityView CreateView(ItemEntityRenderState state, ItemEntityModel model) {
 			ItemRenderer itemRenderer = this.itemRenderManager.GetRenderer(state.stack.item);
 			ItemModel itemModel = this.itemRenderManager.GetModel(state.stack);
 
