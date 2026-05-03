@@ -24,8 +24,8 @@ namespace SoulboundEngine.Client.Render.Entity {
 			ItemModel itemModel = this.itemRenderManager.GetModel(state.stack);
 
 			ItemRenderContext renderContext = new ItemRenderContext.World { position = state.entity.GetPosition() };
-			object itemRenderState = itemRenderer.CreateRenderStateBoxed(state.stack, itemModel, renderContext);
-			IItemView itemView = itemRenderer.CreateViewBoxed(itemRenderState, renderContext);
+			object itemRenderState = itemRenderer.CreateRenderStateBoxed(state.stack, renderContext);
+			IItemView itemView = itemRenderer.CreateViewBoxed(itemRenderState, itemModel, renderContext);
 
 			GameObject obj = itemView.GetGameObject();
 			ItemEntityTransform transform = obj.AddComponent<ItemEntityTransform>();

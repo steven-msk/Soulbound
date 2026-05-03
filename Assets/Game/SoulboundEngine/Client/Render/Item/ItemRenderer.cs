@@ -12,21 +12,20 @@
 
 		public delegate ItemRenderer Factory();
 
-		internal abstract object CreateRenderStateBoxed(ItemStack stack, ItemModel model, ItemRenderContext context);
-		internal abstract IItemView CreateViewBoxed(object state, ItemRenderContext context);
+		internal abstract object CreateRenderStateBoxed(ItemStack stack, ItemRenderContext context);
+		internal abstract IItemView CreateViewBoxed(object state, ItemModel model, ItemRenderContext context);
 		internal abstract void UpdateViewBoxed(object state, IItemView view, ItemRenderContext context);
 		public abstract void DestroyView(IItemView view);
 
 		public sealed class Default : ItemRenderer<ItemRenderState> {
-			public override ItemRenderState CreateRenderState(ItemStack stack, ItemModel model, ItemRenderContext context) {
+			public override ItemRenderState CreateRenderState(ItemStack stack, ItemRenderContext context) {
 				return new ItemRenderState {
 					showStackCount = context is ItemRenderContext.GUI && stack.item.IsStackable(),
-					stack = stack,
-					model = model,
+					stack = stack
 				};
 			}
 
-			public override IItemView CreateView(ItemRenderState state, ItemRenderContext context) {
+			public override IItemView CreateView(ItemRenderState state, ItemModel model, ItemRenderContext context) {
 				switch (context) {
 					case ItemRenderContext.GUI gui: {
 							GameObject obj = new("UI Item", typeof(RectTransform));
@@ -38,7 +37,6 @@
 							rect.sizeDelta = new Vector2(IMAGE_SIZE, IMAGE_SIZE);
 							rect.anchoredPosition = Vector2.zero;
 
-							ItemModel model = state.model;
 							Sprite sprite = model.GetSprite();
 							Image itemImage = obj.AddComponent<Image>();
 							itemImage.sprite = sprite;
@@ -57,7 +55,7 @@
 							obj.transform.position = world.position;
 
 							SpriteRenderer spriteRenderer = obj.AddComponent<SpriteRenderer>();
-							spriteRenderer.sprite = state.model.GetSprite();
+							spriteRenderer.sprite = model.GetSprite();
 
 							Rigidbody2D rigidbody = obj.AddComponent<Rigidbody2D>();
 							rigidbody.sleepMode = RigidbodySleepMode2D.NeverSleep;
@@ -104,16 +102,16 @@
 	}
 
 	public abstract class ItemRenderer<S> : ItemRenderer where S : ItemRenderState {
-		public abstract S CreateRenderState(ItemStack stack, ItemModel model, ItemRenderContext context);
+		public abstract S CreateRenderState(ItemStack stack, ItemRenderContext context);
 
-		public abstract IItemView CreateView(S state, ItemRenderContext context);
+		public abstract IItemView CreateView(S state, ItemModel model,ItemRenderContext context);
 		public abstract void UpdateView(S state, IItemView view, ItemRenderContext context);
 
-		internal override object CreateRenderStateBoxed(ItemStack stack, ItemModel model, ItemRenderContext context) {
-			return this.CreateRenderState(stack, model, context);
+		internal override object CreateRenderStateBoxed(ItemStack stack, ItemRenderContext context) {
+			return this.CreateRenderState(stack, context);
 		}
-		internal override IItemView CreateViewBoxed(object state, ItemRenderContext context) {
-			return this.CreateView((S)state, context);
+		internal override IItemView CreateViewBoxed(object state, ItemModel model, ItemRenderContext context) {
+			return this.CreateView((S)state, model, context);
 		}
 		internal override void UpdateViewBoxed(object state, IItemView view, ItemRenderContext context) {
 			this.UpdateView((S)state, view, context);

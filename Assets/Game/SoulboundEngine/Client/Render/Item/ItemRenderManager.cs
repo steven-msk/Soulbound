@@ -23,8 +23,8 @@ namespace SoulboundEngine.Client.Render.Item {
 
 			ItemRenderer renderer = this.renderers[stack.item];
 			ItemModel model = this.GetModel(stack);
-			object state = renderer.CreateRenderStateBoxed(stack, model, context);
-			IItemView view = renderer.CreateViewBoxed(state, context);
+			object state = renderer.CreateRenderStateBoxed(stack, context);
+			IItemView view = renderer.CreateViewBoxed(state, model, context);
 
 			this.rendered[handle] = new RenderedItem(stack.item, state, view, context);
 			return view;
