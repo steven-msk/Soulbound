@@ -7,13 +7,14 @@ namespace SoulboundEngine.Client.Render.Entity {
 	using Entity = World.EntitySystem.Entity;
 
 	public sealed class EntityRenderManager {
+		const string SCRIPTED_ENTITY_MODEL_LABEL = "entity_model";
 		private readonly Func<EntityDescriptor, IEntityModelFactory> modelFactorySupplier;
 		private readonly Dictionary<EntityDescriptor, EntityRenderer> renderers;
 		private readonly Dictionary<Entity, RenderedEntity> renderedEntities = new();
 		private readonly ScriptedEntityModelManager scriptedEntityModelManager;
 
-		public EntityRenderManager(List<EntityDescriptor> descriptors, ItemRenderManager itemRenderManager, string scriptedModelLabel) {
-			this.scriptedEntityModelManager = new ScriptedEntityModelManager(scriptedModelLabel);
+		public EntityRenderManager(List<EntityDescriptor> descriptors, ItemRenderManager itemRenderManager) {
+			this.scriptedEntityModelManager = new ScriptedEntityModelManager(SCRIPTED_ENTITY_MODEL_LABEL);
 			this.scriptedEntityModelManager.LoadAll();
 
 			EntityRenderer.FactoryContext context = new(this, itemRenderManager);

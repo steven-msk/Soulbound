@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Entity Models
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: Entity Models
+  m_GUID: 6d8a34817a09544449f799cfde3418d9
+  m_SerializeEntries:
+  - m_GUID: 1fe346de1bc324141bda168498930b0b
+    m_Address: playerModel
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - entity_model
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 86c38b1330a98214fa67b09a1d18e360, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 917b2af8f7bb3df41b411a9e227d3c7f, type: 2}
+    - {fileID: 11400000, guid: 44724e8c6aae072409d1108402f9c6d1, type: 2}

@@ -33,7 +33,6 @@ namespace SoulboundEngine.Client {
 
 	public sealed class SoulboundClient : IInputEventHandler, IWorldAccessor {
 		const int INPUT_QUEUE_BUFFER_CAPACITY = 128;
-		const string SCRIPTED_ENTITY_MODEL_LABEL = "entity_model";
 		private static SoulboundClient instance;
 		private readonly GameConfig config;
 		private readonly PlayerInputActions inputActions;
@@ -95,7 +94,7 @@ namespace SoulboundEngine.Client {
 
 			this.spriteResolver = new AtlasSpriteResolver();
 			this.itemRenderManager = new ItemRenderManager(Registries.ITEMS.ToList(), this.spriteResolver);
-			this.entityRenderManager = new EntityRenderManager(Registries.ENTITIES.ToList(), this.itemRenderManager, SCRIPTED_ENTITY_MODEL_LABEL);
+			this.entityRenderManager = new EntityRenderManager(Registries.ENTITIES.ToList(), this.itemRenderManager);
 		}
 
 		/// <summary>

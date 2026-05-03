@@ -22,12 +22,13 @@ namespace SoulboundEngine.Client.Render.Entity {
 		}
 
 		public M GetModel(ScriptedEntityModelManager scriptedEntityModelManager) {
-			ScriptedEntityModel model = scriptedEntityModelManager.Get(this.identifier);
-			GameObject obj = model.GetGameObject();
+			ScriptedEntityModel? model = scriptedEntityModelManager.Get(this.identifier);
+			if (model == null && this.fallback != null) return this.fallback();
+			else if (model == null) {
+				Debug.Logging.Logger.LogInfo("No fallback model available for {}", this.identifier);
+			}
 
-			if (obj == null && this.fallback != null) return this.fallback();
-			else Debug.Logging.Logger.LogError("Could not find scripted entity model for '{}'", this.identifier);
-
+			GameObject? obj = model?.GetGameObject();
 			return this.modelSupplier(obj!);
 		}
 	}

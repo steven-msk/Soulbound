@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 214b65627ace624448958630f1cb7f8f, type: 3}
   m_Name: player
   m_EditorClassIdentifier: SoulboundEngine::SoulboundEngine.Client.Render.Entity.ScriptedEntityModel
-  identifier: 
-  gameObject: {fileID: 0}
+  identifier: soulbound:player
+  gameObject: {fileID: 8095950580177048670, guid: e116241861752154f8e50619c5299109, type: 3}

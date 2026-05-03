@@ -6,6 +6,8 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceLocations;
 
+#nullable enable
+
 namespace SoulboundEngine.Client.Render.Entity {
 	public sealed class ScriptedEntityModelManager : IDisposable {
 		private readonly string assetLabel;
@@ -45,7 +47,14 @@ namespace SoulboundEngine.Client.Render.Entity {
 			return this.locationsHandle.Result;
 		}
 
-		public ScriptedEntityModel Get(Identifier identifier) => this.modelById[identifier];
+		public ScriptedEntityModel? Get(Identifier identifier) {
+			if (this.modelById.TryGetValue(identifier, out ScriptedEntityModel model)) {
+				return model;
+			} else {
+				Logger.LogError("Could not find scripted entity model for '{}'", identifier);
+				return null;
+			}
+		}
 
 		public void Dispose() {
 			this.locationsHandle.Release();
