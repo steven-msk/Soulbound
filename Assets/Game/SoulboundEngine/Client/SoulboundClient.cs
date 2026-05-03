@@ -20,6 +20,11 @@ using System;
 using System.Linq;
 
 namespace SoulboundEngine.Client {
+	using SoulboundEngine.Client.Render.Block;
+	using SoulboundEngine.Client.Render.Entity;
+	using SoulboundEngine.Client.Render.Item;
+	using SoulboundEngine.Core.Registry;
+	using SoulboundEngine.Core.Render.Sprite;
 	using System.Collections.Generic;
 	using UnityEngine.SceneManagement;
 	using Application = UnityEngine.Application;
@@ -47,6 +52,10 @@ namespace SoulboundEngine.Client {
 		private readonly WorldAudioEventBank worldAudioEventBank;
 		private readonly DebugOverlayManager debugOverlayManager;
 		private WorldSession? activeWorldSession;
+		private readonly ItemRenderManager itemRenderManager;
+		private readonly ISpriteResolver<AtlasSpriteRef> spriteResolver;
+		private readonly EntityRenderManager entityRenderManager;
+		private readonly BlockRenderManager blockRenderManager;
 
 		int IInputEventHandler.priority => int.MaxValue;
 
@@ -84,6 +93,11 @@ namespace SoulboundEngine.Client {
 			this.worldAudioEventBank = new WorldAudioEventBank();
 			this.uiAudioEventBank.Activate();
 			AudioManager.RebuildPools();
+
+			this.spriteResolver = new AtlasSpriteResolver();
+			this.itemRenderManager = new ItemRenderManager(Registries.ITEMS.ToList(), this.spriteResolver);
+			this.entityRenderManager = new EntityRenderManager(Registries.ENTITIES.ToList(), this.itemRenderManager);
+			this.blockRenderManager = new BlockRenderManager(Registries.BLOCKS.ToList());
 		}
 
 		/// <summary>
@@ -129,7 +143,7 @@ namespace SoulboundEngine.Client {
 			this.uiHandler.FlushScreens();
 
 			SeedProvider seedProvider = new(save.GetValueOrDefault());
-			WorldLoader worldLoader = new(this, seedProvider);
+			WorldLoader worldLoader = new(this, this.entityRenderManager, this.blockRenderManager, seedProvider);
 
 			worldLoader.LoadWorld(
 				SceneManager.LoadSceneAsync(this.config.unity.worldScene).ToUniTask(),
@@ -137,7 +151,7 @@ namespace SoulboundEngine.Client {
 			).ContinueWith(session => {
 				this.activeWorldSession = session;
 				this.uiHandler.SetCanvas(session.canvas);
-				this.uiHandler.SetScreen(new WorldScreen(session.player));
+				this.uiHandler.SetScreen(new WorldScreen(this.itemRenderManager, session.player));
 				this.debugOverlayManager.Clear();
 				this.inputManager.AddHandler(session.levelManager);
 

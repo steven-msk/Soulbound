@@ -1,27 +1,27 @@
 namespace SoulboundEngine.Client.ItemSystem.Container.View {
 	public class HotbarHandle : InventoryHandle {
-		private Hotbar hotbar;
+		private Inventory inventory;
 		private HotbarSlotHandle[] handles;
 		private bool fadedLayout;
 
-		public void Init(Hotbar hotbar, IItemContainerScope scope, HotbarSlotHandle[] handles) {
-			base.Init(hotbar, scope);
-			hotbar.mainSlotChanged += OnMainSlotChanged;
-			this.hotbar = hotbar;
+		public void Init(Inventory inventory, IItemContainerScope scope, HotbarSlotHandle[] handles) {
+			base.Init(inventory, scope);
+			inventory.mainSlotChanged += this.OnMainSlotChanged;
+			this.inventory = inventory;
 			this.handles = handles;
 		}
 
 		public void ToggleFadedLayout() {
-			fadedLayout = !fadedLayout;
-			foreach (var handle in handles) handle.ApplyFadedLayout(fadedLayout);
-			handles[hotbar.GetMainSlotIndex()].SetMainSlotLayout();
+			this.fadedLayout = !this.fadedLayout;
+			foreach (var handle in this.handles) handle.ApplyFadedLayout(this.fadedLayout);
+			this.handles[this.inventory.GetMainSlot()].SetMainSlotLayout();
 		}
 
 		private void OnMainSlotChanged(int oldIndex, int newIndex) {
-			handles[oldIndex].RemoveMainSlotLayout();
-			handles[newIndex].SetMainSlotLayout();
+			this.handles[oldIndex].RemoveMainSlotLayout();
+			this.handles[newIndex].SetMainSlotLayout();
 		}
 
-		private void OnDestroy() => hotbar.mainSlotChanged -= OnMainSlotChanged;
+		private void OnDestroy() => this.inventory.mainSlotChanged -= this.OnMainSlotChanged;
 	}
 }

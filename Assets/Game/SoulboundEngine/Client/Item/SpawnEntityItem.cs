@@ -1,5 +1,4 @@
 using SoulboundEngine.Client.Interaction;
-using SoulboundEngine.Client.World.EntitySystem;
 using SoulboundEngine.Common;
 
 namespace SoulboundEngine.Client.ItemSystem {
@@ -17,7 +16,7 @@ namespace SoulboundEngine.Client.ItemSystem {
 		}
 
 		public bool TryExecute(ItemStack itemStack, in ItemInteraction ctx) {
-			EntityType.PHYSICS_ENTITY.Create(ctx.level, ctx.player.GetWorldPointerPos());
+			//EntityType.MOVING_ENTITY.Create(ctx.level, ctx.player.GetWorldPointerPos());
 			itemStack.Decrement();
 			return true;
 		}

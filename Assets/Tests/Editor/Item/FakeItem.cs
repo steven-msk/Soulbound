@@ -3,6 +3,6 @@ using System;
 #nullable enable
 
 public class FakeItem : Item {
-	public FakeItem(int fullStackSize) : base(Settings.Of($"fakeitem_{DateTime.Now.ToBinary()}", _ => default).StackUpTo(fullStackSize)) {
+	public FakeItem(int fullStackSize) : base(Settings.Of($"fakeitem_{DateTime.Now.ToBinary()}").StackUpTo(fullStackSize)) {
 	}
 }

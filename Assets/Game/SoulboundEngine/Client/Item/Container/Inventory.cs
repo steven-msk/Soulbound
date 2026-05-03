@@ -1,36 +1,39 @@
-using SoulboundEngine.Client.ItemSystem;
 using System;
 using System.Collections.Generic;
+
 
 #nullable enable
 
 namespace SoulboundEngine.Client.ItemSystem.Container {
 	public sealed class Inventory : IItemContainer {
+		public const int HOTBAR_SIZE = 9;
 		public const int COLUMNS = 9;
 		public const int ROWS = 3;
-		private readonly ItemSlot[] slots = new ItemSlot[ROWS * COLUMNS];
+		private readonly ItemSlot[] slots = new ItemSlot[ROWS * COLUMNS + HOTBAR_SIZE];
 		private bool isOpen = true;
+		private int mainSlot = 0;
 		private readonly HashSet<Item> uniqueItems = new();
 		public event Action<Item>? onItemAdded;
 		public event Action<Item>? onItemRemoved;
 		public event Action toggle = null!;
+		public event Action<int, int> mainSlotChanged;
 
 		public Inventory() {
-			for (int i = 0; i < ROWS * COLUMNS; i++) {
+			for (int i = 0; i < this.slots.Length; i++) {
 				ItemSlot slot = new(this, i);
-				slots[i] = slot;
+				this.slots[i] = slot;
 
-				slot.stackChanged += UpdateUniqueItems;
+				slot.stackChanged += this.UpdateUniqueItems;
 			}
 			onItemAdded += item => {
-				foreach (var uniqueItem in uniqueItems) {
+				foreach (var uniqueItem in this.uniqueItems) {
 					if (uniqueItem is IContainerItemListener containerListener) {
 						containerListener.OnItemAdded(item, this);
 					}
 				}
 			};
 			onItemRemoved += item => {
-				foreach (var uniqueItem in uniqueItems) {
+				foreach (var uniqueItem in this.uniqueItems) {
 					if (uniqueItem is IContainerItemListener containerListener) {
 						containerListener.OnItemRemoved(item, this);
 					}
@@ -38,44 +41,63 @@ namespace SoulboundEngine.Client.ItemSystem.Container {
 			};
 		}
 
-		public IItemSlot GetSlot(int index) {
-			if (index < ROWS * COLUMNS) return slots[index];
-			throw new ArgumentException("Slot index out of range: " + index);
-		}
+		public IItemSlot GetSlot(int index) => this.slots[index];
 
 		public IReadOnlyList<int> GetAllSlots() {
 			List<int> list = new();
-			for (int i = 0; i < ROWS * COLUMNS; i++) list.Add(i);
+			for (int i = 0; i < this.slots.Length; i++) list.Add(i);
+			return list;
+		}
+
+		public IReadOnlyList<int> GetPopupSlots() {
+			List<int> list = new();
+			for (int i = 0; i < ROWS * COLUMNS; i++) list.Add(HOTBAR_SIZE + i);
+			return list;
+		}
+
+		public IReadOnlyList<int> GetHotbarSlots() {
+			List<int> list = new();
+			for (int i = 0; i < HOTBAR_SIZE; i++) list.Add(i);
 			return list;
 		}
 
 		public void Toggle() {
-			isOpen = !isOpen;
+			this.isOpen = !this.isOpen;
 			toggle();
 		}
 
 		private void UpdateUniqueItems(ItemStack? oldStack, ItemStack? newStack) {
-			if (newStack != null && !uniqueItems.Contains(newStack.item)) {
-				uniqueItems.Add(newStack.item);
+			if (newStack != null && !this.uniqueItems.Contains(newStack.item)) {
+				this.uniqueItems.Add(newStack.item);
 				onItemAdded?.Invoke(newStack.item);
 			}
 			if (oldStack != null) {
 				bool stillExists = false;
-				foreach (var slot in slots) {
+				foreach (var slot in this.slots) {
 					if (slot.GetStack()?.item == oldStack.item) {
 						stillExists = true;
 						break;
 					}
 				}
 				if (!stillExists) {
-					uniqueItems.Remove(oldStack.item);
+					this.uniqueItems.Remove(oldStack.item);
 					onItemRemoved?.Invoke(oldStack.item);
 				}
 			}
 		}
 
-		public bool IsOpen() => isOpen;
+		public int GetMainSlot() => this.mainSlot;
 
-		public int GetSlotCount() => ROWS * COLUMNS;
+		public void SetMainSlot(int slot) {
+			int previous = this.mainSlot;
+			this.mainSlot = slot;
+			mainSlotChanged?.Invoke(previous, slot);
+		}
+
+		public ItemStack? GetMainStack() {
+			return this.slots[this.mainSlot].GetStack();
+		}
+
+		public int GetSize() => this.slots.Length;
 	}
 }
