@@ -15,6 +15,10 @@ namespace SoulboundEngine.Client.Render.Block {
 			this.color = color;
 		}
 
+		public BlockModel(TileBase tile)
+			: this(tile, Color.white) {
+		}
+
 		public interface IFactory {
 			BlockModel Create(BlockState blockState);
 

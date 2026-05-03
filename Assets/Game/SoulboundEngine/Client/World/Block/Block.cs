@@ -1,10 +1,8 @@
 using SoulboundEngine.Client.ItemSystem;
-using SoulboundEngine.Client.World.BlockSystem.Render;
 using SoulboundEngine.Client.World.BlockSystem.States;
 using SoulboundEngine.Client.World.BlockSystem.TileEntities;
 using SoulboundEngine.Client.World.EntitySystem;
 using SoulboundEngine.Client.World.LevelDomain;
-using SoulboundEngine.Core.Assets;
 using SoulboundEngine.Core.States;
 using System;
 using System.Collections.Generic;
@@ -44,10 +42,6 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 		public BlockState DefaultState => this.defaultState;
 
 		public StateManager<Block, BlockState> StateManager => this.stateManager;
-
-		public BlockRenderData GetRenderData(BlockState blockState) {
-			return this.settings.renderFunction(blockState);
-		}
 
 		public virtual bool HasTileEntity(Level level, BlockPos blockPos, BlockState blockState) => false;
 		public virtual TileEntity? GetTileEntity(Level level, BlockPos blockPos) {
@@ -112,7 +106,6 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 		public sealed class Settings {
 			public string name { get; private set; }
 			public int minBreakLevel { get; private set; } = 0;
-			public Func<BlockState, BlockRenderData> renderFunction { get; private set; } = _ => new BlockRenderData(null);
 			public Func<BlockState, List<ItemStack>> droppedStacks { get; private set; } = DropSingle();
 
 			private Settings(string name) {
@@ -125,16 +118,6 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 
 			public Settings MinBreakLevel(int minBreakLevel) {
 				this.minBreakLevel = minBreakLevel;
-				return this;
-			}
-
-			public Settings RenderFunction(Func<BlockState, BlockRenderData> renderFunction) {
-				this.renderFunction = renderFunction;
-				return this;
-			}
-
-			public Settings RenderFunction(AssetKey assetKey) {
-				this.renderFunction = _ => new BlockRenderData(assetKey);
 				return this;
 			}
 
