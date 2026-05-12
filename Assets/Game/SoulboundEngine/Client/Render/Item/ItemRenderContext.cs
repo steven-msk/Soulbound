@@ -4,6 +4,7 @@
 
 namespace SoulboundEngine.Client.Render.Item {
 	public abstract class ItemRenderContext {
+
 		public sealed class GUI : ItemRenderContext {
 			public RectTransform? parent;
 		}

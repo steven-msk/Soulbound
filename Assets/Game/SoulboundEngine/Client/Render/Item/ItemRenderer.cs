@@ -53,6 +53,7 @@
 							GameObject obj = new("Item");
 							obj.SetActive(false);
 							obj.transform.position = world.position;
+							obj.transform.localScale = model.GetScaleTo(ItemRenderers.TILE_SIZE);
 
 							SpriteRenderer spriteRenderer = obj.AddComponent<SpriteRenderer>();
 							spriteRenderer.sprite = model.GetSprite();

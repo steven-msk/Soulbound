@@ -12,23 +12,23 @@ namespace SoulboundEngine.Client.Render.Item {
 		private static readonly AssetKey ITEM_SPRITE_ATLAS = new("Items");
 		private static readonly Dictionary<Item, IItemModelResolver.Factory> MODEL_RESOLVER_FACTORIES = new();
 		private static readonly Dictionary<Item, ItemRenderer.Factory> RENDERER_FACTORIES = new();
-		public static readonly Vector2 TILE_REFERENCE_SIZE = new(8f, 8f);
-		public static readonly Vector2 DEFAULT_SPRITE_REFERENCE_SIZE = new(32f, 32f);
+		public static readonly Vector2 TILE_SIZE = new(8f, 8f);
+		public static readonly Vector2 DEFAULT_SPRITE_SIZE = new(32f, 32f);
 
 		static ItemRenderers() {
-			Register(Items.GRASS, DefaultResolverFactory("grass_top", TILE_REFERENCE_SIZE));
-			Register(Items.DIRT, DefaultResolverFactory("dirt", TILE_REFERENCE_SIZE));
-			Register(Items.STONE, DefaultResolverFactory("stone", TILE_REFERENCE_SIZE));
-			Register(Items.WOOD, DefaultResolverFactory("wood", TILE_REFERENCE_SIZE));
-			Register(Items.LEAVES, DefaultResolverFactory("leaves", TILE_REFERENCE_SIZE));
+			Register(Items.GRASS, DefaultResolverFactory("grass_top", TILE_SIZE));
+			Register(Items.DIRT, DefaultResolverFactory("dirt", TILE_SIZE));
+			Register(Items.STONE, DefaultResolverFactory("stone", TILE_SIZE));
+			Register(Items.WOOD, DefaultResolverFactory("wood", TILE_SIZE));
+			Register(Items.LEAVES, DefaultResolverFactory("leaves", TILE_SIZE));
 
-			Register(Items.placeableItem, DefaultResolverFactory("bluething", DEFAULT_SPRITE_REFERENCE_SIZE));
-			Register(Items.teleportPlayerItem, DefaultResolverFactory("bluething", DEFAULT_SPRITE_REFERENCE_SIZE));
-			Register(Items.spawnEntityItem, DefaultResolverFactory("bluething", DEFAULT_SPRITE_REFERENCE_SIZE));
-			Register(Items.chargeableItem, DefaultResolverFactory("bluething", DEFAULT_SPRITE_REFERENCE_SIZE));
-			Register(Items.debugPointer, DefaultResolverFactory("debugPointer", DEFAULT_SPRITE_REFERENCE_SIZE));
-			Register(Items.inventoryListenerItem, DefaultResolverFactory("bluething", DEFAULT_SPRITE_REFERENCE_SIZE));
-			Register(Items.blockBreakerItem, DefaultResolverFactory("bluething", DEFAULT_SPRITE_REFERENCE_SIZE));
+			Register(Items.placeableItem, DefaultResolverFactory("bluething", DEFAULT_SPRITE_SIZE));
+			Register(Items.teleportPlayerItem, DefaultResolverFactory("bluething", DEFAULT_SPRITE_SIZE));
+			Register(Items.spawnEntityItem, DefaultResolverFactory("bluething", DEFAULT_SPRITE_SIZE));
+			Register(Items.chargeableItem, DefaultResolverFactory("bluething", DEFAULT_SPRITE_SIZE));
+			Register(Items.debugPointer, DefaultResolverFactory("debugPointer", DEFAULT_SPRITE_SIZE));
+			Register(Items.inventoryListenerItem, DefaultResolverFactory("bluething", DEFAULT_SPRITE_SIZE));
+			Register(Items.blockBreakerItem, DefaultResolverFactory("bluething", DEFAULT_SPRITE_SIZE));
 		}
 
 		public static void Register(Item item, IItemModelResolver.Factory modelResolverFactory) {
