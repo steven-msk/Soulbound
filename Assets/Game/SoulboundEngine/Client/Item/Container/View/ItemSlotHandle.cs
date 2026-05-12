@@ -1,6 +1,5 @@
-using SoulboundEngine.Client.ItemSystem.Render;
+using SoulboundEngine.Client.Render.Item;
 using SoulboundEngine.Client.UI.Tooltips;
-using SoulboundEngine.Core.Render.Sprite;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -9,97 +8,98 @@ using UnityEngine.EventSystems;
 namespace SoulboundEngine.Client.ItemSystem.Container.View {
 	[RequireComponent(typeof(RectTransform))]
 	public class ItemSlotHandle : MonoBehaviour, IItemSlotHandle, ITooltipTrigger {
-		private IItemSlot slot = null!;
-		private ITooltip tooltip = null!;
-		private ITooltipRenderer tooltipRenderer = null!;
-		private IItemSlotEventListener eventListener = null!;
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+		private IItemSlot slot;
+		private ITooltip tooltip;
+		private ITooltipRenderer tooltipRenderer;
+		private IItemSlotEventListener eventListener;
 		private ITooltipHandle? tooltipHandle;
-		private RectTransform rect = null!;
-		private UIItemView? itemView;
+		private RectTransform rect;
+		private IItemView? itemView;
 		private ItemStack? stack;
+		private ItemRenderManager itemRenderManager;
+		private ItemRenderHandle renderHandle;
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
-		private readonly UIItemRenderer itemRenderer = new(new AtlasSpriteResolver());
-		private readonly ItemModelResolver modelResolver = new();
-
-		public void Init(IItemSlot slot, IItemSlotEventListener eventListener) {
+		public void Init(ItemRenderManager itemRenderManager, IItemSlot slot, IItemSlotEventListener eventListener) {
+			this.itemRenderManager = itemRenderManager;
 			this.slot = slot;
 			this.eventListener = eventListener;
-			rect = GetComponent<RectTransform>();
-			slot.setStack += SetStack;
-			SetStack(slot.GetStack());
+			this.rect = this.GetComponent<RectTransform>();
+			slot.setStack += this.SetStack;
+			this.SetStack(slot.GetStack());
+			this.renderHandle = new ItemRenderHandle(this);
 		}
 
 		private void SetStack(ItemStack? stack) {
-			if (this.stack != null) this.stack.onQuantityChanged -= OnStackQuantityChanged;
-			OnStackQuantityChanged(this.stack?.quantity ?? 0, stack?.quantity ?? 0);
+			if (stack?.item == Items.AIR) return;
+
+			if (this.stack != null) this.stack.onQuantityChanged -= this.OnStackQuantityChanged;
+			this.OnStackQuantityChanged(this.stack?.quantity ?? 0, stack?.quantity ?? 0);
 			this.stack = stack;
 
 			if (stack != null) {
-				DestroyTooltip();
-				stack.onQuantityChanged += OnStackQuantityChanged;
+				this.DestroyTooltip();
+				stack.onQuantityChanged += this.OnStackQuantityChanged;
 
 				// prototypical
-				SetTooltip(new ItemTooltip(stack.item));
+				this.SetTooltip(new ItemTooltip(stack.item));
 			} else {
-				SetTooltip(null!);
+				this.SetTooltip(null!);
 			}
-			Render(stack);
+			this.Render(stack);
 		}
 
 		private void Render(ItemStack? itemStack) {
-			if (itemStack == null && itemView != null) {
-				itemView.Destroy();
-			} else if (itemStack != null) {
-				if (itemView == null) itemView = itemRenderer.CreateView(rect);
-
-				ItemRenderData renderData = itemStack.item.GetRenderData(itemStack);
-				ItemRenderModel model = modelResolver.Resolve(renderData);
-				itemRenderer.Render(itemView, model);
+			if (itemStack == null && this.itemView != null) {
+				this.itemView.Destroy();
+			} else if (itemStack != null && itemStack.item != Items.AIR) {
+				this.itemView = this.itemRenderManager.Render(this.renderHandle, this.stack, new ItemRenderContext.GUI { parent = this.rect });
 			}
 		}
 
 		void ITooltipTrigger.Init(ITooltipRenderer tooltipRenderer) => this.tooltipRenderer = tooltipRenderer;
 		public void SetTooltip(ITooltip tooltip) => this.tooltip = tooltip;
 		void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData) {
-			eventListener.OnPointerEnter(slot.GetIndex(), eventData);
-			if (tooltip != null) {
-				tooltipHandle = tooltipRenderer.RenderTooltip(tooltip);
+			this.eventListener.OnPointerEnter(this.slot.GetIndex(), eventData);
+			if (this.tooltip != null) {
+				this.tooltipHandle = this.tooltipRenderer.RenderTooltip(this.tooltip);
 			}
 		}
 		void IPointerExitHandler.OnPointerExit(PointerEventData eventData) {
-			eventListener.OnPointerExit(slot.GetIndex(), eventData);
-			DestroyTooltip();
+			this.eventListener.OnPointerExit(this.slot.GetIndex(), eventData);
+			this.DestroyTooltip();
 		}
 		void IPointerDownHandler.OnPointerDown(PointerEventData eventData) {
-			eventListener.OnPointerDown(slot.GetIndex(), eventData);
+			this.eventListener.OnPointerDown(this.slot.GetIndex(), eventData);
 		}
 		void IPointerUpHandler.OnPointerUp(PointerEventData eventData) {
-			eventListener.OnPointerUp(slot.GetIndex(), eventData);
+			this.eventListener.OnPointerUp(this.slot.GetIndex(), eventData);
 		}
 
 		private void OnStackQuantityChanged(int old, int @new) {
 			if (@new <= 0) {
-				DestroyTooltip();
-				tooltip = null!;
+				this.DestroyTooltip();
+				this.tooltip = null!;
 
-				if (stack != null) {
-					stack.onQuantityChanged -= OnStackQuantityChanged;
+				if (this.stack != null) {
+					this.stack.onQuantityChanged -= this.OnStackQuantityChanged;
 				}
-				stack = null;
-				if (itemView != null) itemView.Destroy();
-			} else if (stack != null) Render(stack);
+				this.stack = null;
+				this.itemView?.Destroy();
+			} else if (this.stack != null) this.Render(this.stack);
 		}
 
 		public void SetVisible(bool visible) {
-			gameObject.SetActive(visible);
-			if (!visible) DestroyTooltip();
+			this.gameObject.SetActive(visible);
+			if (!visible) this.DestroyTooltip();
 		}
 
 		private void DestroyTooltip() {
-			tooltipHandle?.Destroy();
-			tooltipHandle = null;
+			this.tooltipHandle?.Destroy();
+			this.tooltipHandle = null;
 		}
 
-		public void ToggleVisibility() => SetVisible(!gameObject.activeSelf);
+		public void ToggleVisibility() => this.SetVisible(!this.gameObject.activeSelf);
 	}
 }

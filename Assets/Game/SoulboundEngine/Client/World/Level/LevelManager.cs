@@ -1,8 +1,8 @@
 using Cysharp.Threading.Tasks;
 using SoulboundEngine.Client.Input;
 using SoulboundEngine.Client.Players;
+using SoulboundEngine.Client.Render.Entity;
 using SoulboundEngine.Client.UI.Screens;
-using SoulboundEngine.Client.World.BlockSystem.Render;
 using SoulboundEngine.Client.World.Generation;
 using SoulboundEngine.Client.World.Render;
 using System;
@@ -26,19 +26,21 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 
 		private readonly WorldRenderer worldRenderer;
 		private readonly SoulboundClient client;
+		private readonly EntityRenderManager entityRenderManager;
 
 		// 'readonly' means no multiple dimensions
 		// this is for one dimension only
 		private readonly Level level;
 
 		public const string worldDump = "worldDump.json";
-		private static readonly RectInt simulationView = new(-128, -76, 256, 156);
-		private static readonly RectInt renderRect = new(-32, -19, 65, 39);
+		public static readonly RectInt simulationView = new(-128, -76, 256, 156);
+		public static readonly RectInt renderRect = new(-32, -19, 65, 39);
 
 		// known issue: scattered Level and LevelManager dependencies
-		public LevelManager(SoulboundClient client, ISeedProvider seedProvider, BlockRenderer blockRenderer, BlockModelResolver blockModelResolver) {
-			this.worldRenderer = new WorldRenderer(simulationView, blockRenderer, blockModelResolver);
-			this.level = new Level(this.worldRenderer, seedProvider.GetSeed());
+		public LevelManager(SoulboundClient client, ISeedProvider seedProvider, WorldRenderer worldRenderer, EntityRenderManager entityRenderManager) {
+			this.worldRenderer = worldRenderer;
+			this.entityRenderManager = entityRenderManager;
+			this.level = new Level(this.worldRenderer, entityRenderManager, seedProvider.GetSeed());
 			this.client = client;
 		}
 
@@ -60,9 +62,9 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 					this.StartFrame();
 
 					try {
-						Vector2 pivotPos = this.level.GetPlayer()?.GetPos() ?? this.level.GetWorldSpawnPoint();
+						Vector2 pivotPos = this.level.GetPlayer()?.GetPosition() ?? this.level.GetWorldSpawnPoint();
 						this.level.FrameUpdate();
-						this.worldRenderer.RenderView(pivotPos, this.level.GetBlockState);
+						this.worldRenderer.RenderView(pivotPos);
 					} catch (Exception e) {
 						Logger.LogFatal(e);
 					}
@@ -79,7 +81,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 					this.StartTick();
 
 					try {
-						Vector2 pivotPos = this.level.GetPlayer()?.GetPos() ?? this.level.GetWorldSpawnPoint();
+						Vector2 pivotPos = this.level.GetPlayer()?.GetPosition() ?? this.level.GetWorldSpawnPoint();
 						this.level.Tick(this.GetRelativeSimulationRect(pivotPos));
 					} catch (Exception e) {
 						Logger.LogFatal(e);

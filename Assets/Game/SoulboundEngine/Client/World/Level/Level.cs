@@ -1,4 +1,5 @@
 using SoulboundEngine.Client.Players;
+using SoulboundEngine.Client.Render.Entity;
 using SoulboundEngine.Client.Runtime.Services;
 using SoulboundEngine.Client.World.BlockSystem;
 using SoulboundEngine.Client.World.BlockSystem.States;
@@ -35,6 +36,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 		[Obsolete] private readonly ConcurrentDictionary<int, List<OnChunkGenerated>> deferredGenerations = new();
 		private readonly Dictionary<int, ChunkGenData> chunkGenData = new();
 		private readonly WorldRenderer worldRenderer;
+		private readonly EntityRenderManager entityRenderManager;
 		private Player player;
 
 		private readonly BiomeMap biomeMap;
@@ -45,9 +47,10 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 		private readonly Dictionary<Guid, Entity> entities = new();
 		private readonly List<ITickingEntity> tickingEntities = new();
 
-		public Level(WorldRenderer worldRenderer, int seed) {
+		public Level(WorldRenderer worldRenderer, EntityRenderManager entityRenderManager, int seed) {
 			this.seed = seed;
 			this.worldRenderer = worldRenderer;
+			this.entityRenderManager = entityRenderManager;
 
 			var biome1 = new PlainsBiome(seed);
 			var biome2 = new HillsBiome(seed);
@@ -68,7 +71,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 			this.player = player;
 			this.AddEntity(player);
 			SoulboundClient.Instance.InputManager.AddHandler(player);
-			player.SetPos(this.GetWorldSpawnPoint() + Vector2.up * 2f);
+			player.SetPosition(this.GetWorldSpawnPoint() + Vector2.up * 2f);
 		}
 
 		// known issue: inconsistent world update loop design
@@ -83,7 +86,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 			}
 
 			foreach (var entity in this.tickingEntities.ToArray()) {
-				if (simulationRect.Contains(Vector2Int.FloorToInt(((Entity)entity).GetPos()))) {
+				if (simulationRect.Contains(Vector2Int.FloorToInt(((Entity)entity).GetPosition()))) {
 					entity.Tick();
 				}
 			}
@@ -99,12 +102,16 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 
 		// known issue: inconsistent world update loop design
 		public void FrameUpdate() {
-			int pivotChunkX = ChunkXAt(this.player.GetPos());
+			int pivotChunkX = ChunkXAt(this.player.GetPosition());
 			this.UnloadDistantChunks(pivotChunkX, RENDER_DISTANCE);
 			this.UpdateLoadedChunks(pivotChunkX);
 
-			foreach (var entity in this.GetAllEntities().ToArray()) {
+			Entity[] entities = this.GetAllEntities().ToArray();
+			foreach (var entity in entities) {
 				entity.FrameUpdate();
+			}
+			foreach (var entity in entities) {
+				this.entityRenderManager.Update(entity);
 			}
 		}
 
@@ -207,7 +214,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 				if (chunk == null) return;
 
 				BlockState? blockState = this.GetBlockState(neighborPos);
-				Block block = blockState?.block ?? Blocks.air;
+				Block block = blockState?.block ?? Blocks.AIR;
 
 				if (block is INeighborUpdateHandler neighborUpdateHandler) {
 					neighborUpdateHandler.OnNeighborChanged(this, neighborPos, blockPos);
@@ -223,6 +230,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 			if (entity is ITickingEntity ticking) {
 				this.tickingEntities.Add(ticking);
 			}
+			this.entityRenderManager.Render(entity);
 		}
 
 		public void RemoveEntity(Entity entity) {
@@ -234,6 +242,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 			if  (entity is ITickingEntity ticking) {
 				this.tickingEntities.Remove(ticking);
 			}
+			this.entityRenderManager.Destroy(entity);
 		}
 
 		public void SpawnEntity<E>(EntityDescriptor<E> descriptor, Vector2 pos) where E : Entity {

@@ -1,12 +1,9 @@
 using SoulboundEngine.Client.Players;
-using SoulboundEngine.Client.World.BlockSystem.Render;
 using SoulboundEngine.Client.World.BlockSystem.States;
 using SoulboundEngine.Client.World.BlockSystem.TileEntities;
 using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Common;
-using SoulboundEngine.Core.Assets;
 using SoulboundEngine.Core.States;
-using UnityEngine;
 using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 namespace SoulboundEngine.Client.World.BlockSystem {
@@ -44,15 +41,6 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 		private void OnAreaExit(Level level, BlockPos selfPos, Player player) {
 			Logger.LogInfo("onAreaExit");
 			level.SetBlockState(selfPos, this.DefaultState.With(inArea, false));
-		}
-
-		public override BlockRenderData GetRenderData(BlockState blockState) {
-			return new BlockRenderData(
-				new AssetKey("AreaTriggerTile"),
-				blockState.Get(inArea)
-					? Color.red
-					: Color.green
-			);
 		}
 	}
 }

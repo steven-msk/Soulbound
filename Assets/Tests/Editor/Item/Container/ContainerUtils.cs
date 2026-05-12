@@ -14,7 +14,7 @@ using static UnityEngine.CullingGroup;
 internal static class ContainerUtils {
 	public static IItemContainer SubstituteContainer(params ItemStack?[] stacks) {
 		IItemContainer container = Substitute.For<IItemContainer>();
-		container.GetSlotCount().Returns(stacks.Length);
+		container.GetSize().Returns(stacks.Length);
 		int[] slots = new int[stacks.Length];
 
 		for (int i = 0; i < stacks.Length; i++) {
@@ -36,7 +36,7 @@ internal static class ContainerUtils {
 		IReadOnlyList<int> slots = Array.Empty<int>();
 
 		container.GetSlot(Arg.Any<int>()).Returns((IItemSlot?)null);
-		container.GetSlotCount().Returns(0);
+		container.GetSize().Returns(0);
 		container.GetAllSlots().Returns(slots);
 
 		if (scope != null) {
@@ -63,7 +63,7 @@ internal static class ContainerUtils {
 	}
 
 	public static void AddSlot(this IItemContainer container, IItemSlot slot) {
-		int index = container.GetSlotCount();
+		int index = container.GetSize();
 		List<int> newIndices = container.GetAllSlots().ToList();
 		newIndices.Add(index);
 
@@ -72,7 +72,7 @@ internal static class ContainerUtils {
 		slot.GetIndex().Returns(index);
 
 		container.GetAllSlots().Returns(newIndices);
-		container.GetSlotCount().Returns(newIndices.Count);
+		container.GetSize().Returns(newIndices.Count);
 	}
 
 	public static void SubstituteTransit(ItemStack? stack, IItemContainerScope scope) {

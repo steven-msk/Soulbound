@@ -2,6 +2,7 @@ using SoulboundEngine.Client.Input;
 using SoulboundEngine.Client.ItemSystem;
 using SoulboundEngine.Client.ItemSystem.Container;
 using SoulboundEngine.Client.ItemSystem.Container.View;
+using SoulboundEngine.Client.Render.Item;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -19,10 +20,10 @@ namespace SoulboundEngine.Client.UI.Screens {
 		private Vector2 pointerPosition;
 		int IInputEventHandler.priority => 5000;
 
-		public new void Init(Screen screen) {
+		public void Init(ItemRenderManager itemRenderManager, Screen screen) {
 			base.Init(screen);
 			this.rect = this.GetComponent<RectTransform>();
-			this.transitStack = new TransitStack(this.rect);
+			this.transitStack = new TransitStack(itemRenderManager, this.rect);
 			SoulboundClient.Instance.InputManager.AddHandler(this);
 		}
 

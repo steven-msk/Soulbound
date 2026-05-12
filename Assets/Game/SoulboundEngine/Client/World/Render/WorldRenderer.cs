@@ -1,30 +1,28 @@
+using SoulboundEngine.Client.Render.Block;
 using SoulboundEngine.Client.World.BlockSystem;
-using SoulboundEngine.Client.World.BlockSystem.Render;
 using SoulboundEngine.Client.World.BlockSystem.States;
 using SoulboundEngine.Client.World.LevelDomain;
 using System;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 #nullable enable
 
 namespace SoulboundEngine.Client.World.Render {
 	public sealed class WorldRenderer {
-		private readonly BlockRenderer blockRenderer;
-		private readonly BlockModelResolver modelResolver;
+		private readonly BlockRenderManager blockRenderManager;
 		private Vector2Int lastPivot;
 		private readonly RectInt renderView;
+		private Func<BlockPos, BlockState> blockStateSupplier = null!;
+		private readonly Tilemap tilemap;
 
-		public WorldRenderer(
-				RectInt renderView,
-				BlockRenderer blockRenderer,
-				BlockModelResolver modelResolver
-			) {
+		public WorldRenderer(RectInt renderView, BlockRenderManager blockRenderManager, Tilemap tilemap) {
 			this.renderView = renderView;
-			this.blockRenderer = blockRenderer;
-			this.modelResolver = modelResolver;
+			this.blockRenderManager = blockRenderManager;
+			this.tilemap = tilemap;
 		}
 
-		public void RenderView(Vector2 pivot, Func<BlockPos, BlockState> blockStateSupplier) {
+		public void RenderView(Vector2 pivot) {
 			Vector2Int currentPivot = Vector2Int.FloorToInt(pivot);
 			if (this.lastPivot == currentPivot) return;
 
@@ -36,7 +34,7 @@ namespace SoulboundEngine.Client.World.Render {
 			while (pos.MoveNext()) {
 				if (currentView.Contains(pos.Current)) continue;
 
-				this.RenderBlock((BlockPos)pos.Current, Blocks.air.DefaultState);
+				this.RenderBlock((BlockPos)pos.Current, Blocks.AIR.DefaultState);
 			}
 
 			pos = currentView.allPositionsWithin;
@@ -46,22 +44,20 @@ namespace SoulboundEngine.Client.World.Render {
 					continue;
 				}
 
-				BlockState? blockState = blockStateSupplier(blockPos);
+				BlockState? blockState = this.blockStateSupplier(blockPos);
 				this.RenderBlock(blockPos, blockState);
 			}
 		}
 
 		private void RenderBlock(BlockPos blockPos, BlockState blockState) {
-			BlockRenderData renderData = blockState.block.GetRenderData(blockState);
-			BlockRenderModel model = this.modelResolver.ResolveModel(renderData);
-			this.blockRenderer.Render(model, blockPos);
+			this.blockRenderManager.Render(this.tilemap, blockPos, blockState);
 		}
 
 		public void UpdateModel(BlockPos blockPos, BlockState? blockState) {
-			blockState ??= Blocks.air.DefaultState;
+			blockState ??= Blocks.AIR.DefaultState;
 			this.RenderBlock(blockPos, this.IsInRenderView(blockPos)
 				? blockState
-				: Blocks.air.DefaultState
+				: Blocks.AIR.DefaultState
 			);
 		}
 
@@ -76,6 +72,10 @@ namespace SoulboundEngine.Client.World.Render {
 
 		public bool IsInRenderView(BlockPos blockPos) {
 			return this.ToRect(this.lastPivot).Contains((Vector2Int)blockPos);
+		}
+
+		public void SetBlockStateSupplier(Func<BlockPos, BlockState> blockStateSupplier) {
+			this.blockStateSupplier = blockStateSupplier;
 		}
 	}
 }

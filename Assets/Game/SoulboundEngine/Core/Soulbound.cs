@@ -46,14 +46,14 @@ namespace SoulboundEngine.Core {
 			this.performanceMetrics = new PerformanceMetrics();
 			this.RegisterDebugMetricsSource(this);
 
-			this.client = new SoulboundClient(config, new ClientInit {
-				debugMetricsService = this.debugMetricsService
-			});
-
 			AssetManager.PreloadAll();
 
 			Registries.Init();
 			Registries.Freeze();
+
+			this.client = new SoulboundClient(config, new ClientInit {
+				debugMetricsService = this.debugMetricsService
+			});
 
 			GameStateManager.SetInitialized();
 		}
@@ -86,6 +86,8 @@ namespace SoulboundEngine.Core {
 			this.performanceMetrics.Tick();
 			this.client.Update();
 		}
+
+		public void CloseGame() => Application.Quit();
 
 		void IApplicationController.OnApplicationQuit() {
 			GameStateManager.SetShutdown();

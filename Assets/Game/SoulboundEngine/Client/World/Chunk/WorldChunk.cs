@@ -139,11 +139,11 @@ namespace SoulboundEngine.Client.World.Chunk {
 		public int ChunkXToWorldX(int cx) => cx + this.xpos * Level.CHUNK_LENGTH;
 
 		public void SetBlockState(BlockPos blockPos, BlockState? blockState) {
-			blockState ??= Blocks.air.DefaultState;
+			blockState ??= Blocks.AIR.DefaultState;
 
 			ChunkBlockPos chunkPos = blockPos.ToChunkPos();
 			int yIndex = WorldYToIndex(chunkPos.y);
-			BlockState oldState = this.GetBlockState(chunkPos) ?? Blocks.air.DefaultState;
+			BlockState oldState = this.GetBlockState(chunkPos) ?? Blocks.AIR.DefaultState;
 			Block oldBlock = oldState.block;
 			Block newBlock = blockState.block;
 

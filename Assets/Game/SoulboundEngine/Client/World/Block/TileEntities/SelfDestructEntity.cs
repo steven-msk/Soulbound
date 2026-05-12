@@ -16,7 +16,7 @@ namespace SoulboundEngine.Client.World.BlockSystem.TileEntities {
 			this.timer--;
 
 			if (this.timer <= 0) {
-				this.level.SetBlockState(this.blockPos, Blocks.air.DefaultState);
+				this.level.SetBlockState(this.blockPos, Blocks.AIR.DefaultState);
 			}
 		}
 	}

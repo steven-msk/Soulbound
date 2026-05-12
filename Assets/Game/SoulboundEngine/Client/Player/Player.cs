@@ -5,9 +5,7 @@ using SoulboundEngine.Client.ItemSystem.Container;
 using SoulboundEngine.Client.World.BlockSystem;
 using SoulboundEngine.Client.World.BlockSystem.States;
 using SoulboundEngine.Client.World.EntitySystem;
-using SoulboundEngine.Client.World.EntitySystem.Transform;
 using SoulboundEngine.Client.World.LevelDomain;
-using SoulboundEngine.Core.Assets;
 using SoulboundEngine.Core.Event;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,19 +14,9 @@ using UnityEngine;
 
 namespace SoulboundEngine.Client.Players {
 	public class Player : Entity, IInputEventHandler, IInteractionHandler<ItemInteraction>, IInteractionHandler<BlockInteraction> {
-		public static readonly EntityDescriptor<Player> DESCRIPTOR = EntityDescriptor.Of(
-			(_, level) => new Player(level),
-			ITransformSupplier<Player>.Of(entity => {
-				GameObject obj = GameObject.Instantiate(AssetManager.Resolve<GameObject>(new AssetKey("player")));
-				PlayerTransform transform = obj.GetComponent<PlayerTransform>();
-				return transform;
-			})
-		);
+		public static readonly EntityDescriptor<Player> DESCRIPTOR = EntityDescriptor.Of<Player>((_, level) => new Player(level));
 		private readonly Inventory inventory;
-		private readonly Hotbar hotbar;
 		private ITransitStackSource tranistStackSource = null!;
-		private PlayerTransform playerTransform = null!;
-		private new Vector2 initialPos;
 
 		// TODO: interaction resolver shouldnt be created by the player
 		private readonly InteractionResolver interactionResolver = new();
@@ -39,37 +27,36 @@ namespace SoulboundEngine.Client.Players {
 		private bool isHoldingLeftClick;
 		private bool isHoldingRightClick;
 		private bool isHoldingCtrl;
+		private new readonly PlayerTransformAdapter transformAdapter;
 
 		// provisory guard for not breaking the block instantly after it was placed
 		private bool leftClickBlockBreakGuard;
 
 		public Player(Level level)
 			: base(DESCRIPTOR, level) {
+			this.transformAdapter = new PlayerTransformAdapter(this);
 			this.inventory = new Inventory();
-			this.hotbar = new Hotbar();
 
 			this.interactionResolver.RegisterHandler<ItemInteraction>(this);
 			this.interactionResolver.RegisterHandler<BlockInteraction>(this);
 		}
 
-		protected override void OnTransformCreated(IEntityTransform transform) {
-			this.playerTransform = (PlayerTransform)transform;
-		}
+		public bool isJumping { get; private set; }
 
 		IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {
 			return new InputEventListener[] {
 				InputEventListener.ConsumePerformed(InputTokens.Player.toggleInventory, _ => this.inventory.Toggle()),
 				InputEventListener.ConsumePerformed(InputTokens.Player.changeHotbarSlot, inputEvent => {
 					int slotIndex = int.Parse(inputEvent.context.control.name) - 1;
-					this.hotbar.SetMainSlotIndex(slotIndex);
+					this.inventory.SetMainSlot(slotIndex);
 				}),
 				InputEventListener.ConsumePerformed(InputTokens.Player.scrollHotbarSlot, inputEvent => {
 					float scrollDelta = inputEvent.context.ReadValue<float>();
-					int nextSlot = this.hotbar.GetMainSlotIndex() - (int)scrollDelta;
+					int nextSlot = this.inventory.GetMainSlot() - (int)scrollDelta;
 
-					if (nextSlot < 0) nextSlot += this.hotbar.GetSlotCount();
-					nextSlot %= this.hotbar.GetSlotCount();
-					this.hotbar.SetMainSlotIndex(nextSlot);
+					if (nextSlot < 0) nextSlot += Inventory.HOTBAR_SIZE;
+					nextSlot %= Inventory.HOTBAR_SIZE;
+					this.inventory.SetMainSlot(nextSlot);
 				}),
 				InputEventListener.ObserveAny(InputTokens.Mouse.position, inputEvent => {
 					this.screenPointerPos = inputEvent.context.ReadValue<Vector2>();
@@ -95,7 +82,7 @@ namespace SoulboundEngine.Client.Players {
 					return InputHandleResult.Consume;
 				}),
 				new(InputTokens.Player.move, InputEvent.Phase.Performed | InputEvent.Phase.Canceled, inputEvent => {
-					this.playerTransform.SetNormalVelocityX(
+					this.SetNormalVelocityX(
 						inputEvent.phase == InputEvent.Phase.Performed
 							? inputEvent.context.ReadValue<Vector2>().x
 							: 0f
@@ -103,7 +90,7 @@ namespace SoulboundEngine.Client.Players {
 					return InputHandleResult.Consume;
 				}),
 				new(InputTokens.Player.jump, InputEvent.Phase.Performed | InputEvent.Phase.Canceled, inputEvent => {
-					this.playerTransform.SetJumping(inputEvent.phase == InputEvent.Phase.Performed);
+					this.SetJumping(inputEvent.phase == InputEvent.Phase.Performed);
 					return InputHandleResult.Consume;
 				}),
 				InputEventListener.ConsumePerformed(InputTokens.Keyboard.Q, _ => this.ThrowFromMainHand(this.isHoldingCtrl)),
@@ -114,8 +101,13 @@ namespace SoulboundEngine.Client.Players {
 			};
 		}
 
+		public void SetJumping(bool jumping) {
+			this.isJumping = jumping;
+			this.transformAdapter.SetJumping(jumping);
+		}
+
 		public void StopHorizontalMovement() {
-			this.playerTransform.SetNormalVelocityX(0f);
+			this.SetNormalVelocityX(0f);
 		}
 
 		public override void FrameUpdate() {
@@ -235,14 +227,15 @@ namespace SoulboundEngine.Client.Players {
 		private bool TryBreakBlock(BlockPos blockPos) {
 			if (!this.IsInBlockReach((Vector2)blockPos) || this.leftClickBlockBreakGuard) return false;
 
-			BlockState blockState = this.level.GetBlockState(blockPos) ?? Blocks.air.DefaultState;
-			if (blockState.block == Blocks.air) return false;
+			BlockState blockState = this.level.GetBlockState(blockPos) ?? Blocks.AIR.DefaultState;
+			if (blockState.block == Blocks.AIR) return false;
 
 			int itemBreakLevel = this.GetMainHandItemBreakLevel();
 			int minBreakLevel = blockState.block.minBreakLevel;
 			if (itemBreakLevel < minBreakLevel) return false;
 
-			this.level.SetBlockState(blockPos, Blocks.air.DefaultState);
+			this.level.SetBlockState(blockPos, Blocks.AIR.DefaultState);
+			Block.DropStacks(blockState, this.level, blockPos, null);
 			return true;
 		}
 
@@ -266,44 +259,39 @@ namespace SoulboundEngine.Client.Players {
 			ItemStack thrownStack = mainHandStack.Clone(throwAmount);
 			mainHandStack.Decrement(throwAmount);
 
-			ItemEntity itemEntity = new(this, pickupDelaySec: 2f, thrownStack, this.level);
-			itemEntity.SetPos(this.GetPos());
+			ItemEntity itemEntity = this.DropStack(this.level, thrownStack);
 			this.level.AddEntity(itemEntity);
 		}
 
 		public bool TryAddItemStack(ItemStack itemStack) {
-			if (this.inventory.TryAddStack(itemStack)) return true;
-			return this.hotbar.TryAddStack(itemStack);
+			return this.inventory.TryAddStack(itemStack);
 		}
 
 		public bool CanPlaceBlockAt(BlockPos blockPos) {
 			Vector2 worldPos = (Vector2)blockPos;
 			return this.IsInBlockReach(worldPos)
-				   && this.level?.GetBlock(blockPos) == Blocks.air;
+				   && this.level?.GetBlock(blockPos) == Blocks.AIR;
 		}
 
 		public bool CanBreakBlockAt(BlockPos blockPos) {
 			Vector2 worldPos = (Vector2)blockPos;
 			return this.IsInBlockReach(worldPos)
-				   && this.level?.GetBlock(blockPos) != Blocks.air;
+				   && this.level?.GetBlock(blockPos) != Blocks.AIR;
 		}
 
 		public bool IsInBlockReach(Vector2 worldPos) {
 			float dist = Vector2.Distance(worldPos, this.GetCenter());
 			return dist <= MAX_BLOCK_REACH 
-				&& !this.level.GetTilesCovered(this.playerTransform.Collider.bounds)
+				&& !this.level.GetTilesCovered(this.GetBoundingBox())
 						 .Contains((BlockPos)worldPos);
 		}
 
 		public Inventory GetInventory() => this.inventory;
-		public Hotbar GetHotbar() => this.hotbar;
 
 		public ItemStack? GetMainHandStack() {
 			ItemStack? transitStack = this.tranistStackSource?.GetTransitStack();
-			return transitStack ?? this.hotbar.GetSlot(this.hotbar.GetMainSlotIndex()).GetStack();
+			return transitStack ?? this.inventory.GetMainStack();
 		}
-
-		public Vector2 GetCenter() => this.playerTransform.Collider.bounds.center;
 
 		public bool IsHoldingLeftClick() => this.isHoldingLeftClick;
 		public bool IsHoldingRightClick() => this.isHoldingRightClick;
@@ -326,14 +314,32 @@ namespace SoulboundEngine.Client.Players {
 			return Camera.main.ScreenToWorldPoint(screenPos);
 		}
 
-		public override void SetPos(Vector2 pos) {
-			if (this.transform != null) this.transform.SetPos(pos);
-			else this.initialPos = pos;
-		}
-		public override Vector2 GetPos() => this.transform?.GetPos() ?? this.initialPos;
-
 		public void SetTransitStackSource(ITransitStackSource source) {
 			this.tranistStackSource = source;
+		}
+		
+		public void SetTransformHandle(IPlayerTransformHandle playerTransformHandle) {
+			this.transformAdapter.SetHandle(playerTransformHandle);
+		}
+
+		private sealed class PlayerTransformAdapter : TransformAdapter {
+			private IPlayerTransformHandle? transformHandle;
+
+			public PlayerTransformAdapter(Player player)
+				: base(player) {
+			}
+
+			public void SetHandle(IPlayerTransformHandle? handle) {
+				this.transformHandle = handle;
+			}
+
+			public void SetJumping(bool jumping) {
+				this.transformHandle?.SetJumping(jumping);
+			}
+		}
+
+		public interface IPlayerTransformHandle {
+			void SetJumping(bool jumping);
 		}
 	}
 }

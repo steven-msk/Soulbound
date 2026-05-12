@@ -44,7 +44,7 @@ namespace SoulboundEngine.Client.Runtime.Services {
 
 		public Identifier GetIdentifier() => EntityDescriptor.GetIdentifier(player.GetDescriptor());
 
-		public Vector2 GetPos() => player.GetPos();
+		public Vector2 GetPos() => player.GetPosition();
 
 		public InventoryData GetInventory() {
 			Inventory inventory = player.GetInventory();
@@ -91,7 +91,7 @@ namespace SoulboundEngine.Client.Runtime.Services {
 
 			public Identifier GetIdentifier() => EntityDescriptor.GetIdentifier(entity.GetDescriptor());
 
-			public Vector2 GetPos() => entity.GetPos();
+			public Vector2 GetPos() => entity.GetPosition();
 
 			public override string ToString() {
 				return $"entity:{GetIdentifier()}/{GetGuid()}";

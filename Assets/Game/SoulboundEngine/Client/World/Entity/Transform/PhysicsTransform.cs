@@ -29,7 +29,7 @@ namespace SoulboundEngine.Client.World.EntitySystem.Transform {
 		public Entity GetEntity() => entity;
 
 		private void FixedUpdate() {
-			entity.SetPos(body.position);
+			entity.SetPosition(body.position);
 		}
 
 		public void SetCollisionHandler(IEntityCollisionHandler collisionHandler) {

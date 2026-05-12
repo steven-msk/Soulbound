@@ -1,8 +1,6 @@
-using SoulboundEngine.Client.World.BlockSystem.Render;
 using SoulboundEngine.Client.World.BlockSystem.States;
 using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Common;
-using SoulboundEngine.Core.Assets;
 using SoulboundEngine.Core.State;
 using SoulboundEngine.Core.States;
 
@@ -35,11 +33,5 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 			level.SetBlockState(blockPos, state);
 		}
 
-		public override BlockRenderData GetRenderData(BlockState blockState) {
-			return new BlockRenderData(blockState.Get(on)
-				? new AssetKey("TickBlockOn")
-				: new AssetKey("TickBlockOff")
-			);
-		}
 	}
 }

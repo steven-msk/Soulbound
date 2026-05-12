@@ -1,5 +1,4 @@
-using SoulboundEngine.Client.ItemSystem.Render;
-using SoulboundEngine.Core.Render.Sprite;
+using SoulboundEngine.Client.Render.Item;
 using System;
 using UnityEngine;
 
@@ -10,13 +9,14 @@ namespace SoulboundEngine.Client.ItemSystem.Container {
 		private readonly RectTransform parent;
 		private Vector2 pointerPosition;
 		private ItemStack? itemStack;
-		private UIItemView? itemView;
+		private IItemView? itemView;
+		private readonly ItemRenderManager itemRenderManager;
+		private readonly ItemRenderHandle renderHandle;
 
-		private readonly UIItemRenderer itemRenderer = new(new AtlasSpriteResolver());
-		private readonly ItemModelResolver modelResolver = new();
-
-		public TransitStack(RectTransform parent) {
+		public TransitStack(ItemRenderManager itemRenderManager, RectTransform parent) {
+			this.itemRenderManager = itemRenderManager;
 			this.parent = parent;
+			this.renderHandle = new ItemRenderHandle(this);
 		}
 
 		public void SetStack(ItemStack itemStack) {
@@ -26,48 +26,48 @@ namespace SoulboundEngine.Client.ItemSystem.Container {
 			}
 
 			if (this.itemStack != null) {
-				this.itemStack.onQuantityChanged -= OnStackQuantityChanged;
+				this.itemStack.onQuantityChanged -= this.OnStackQuantityChanged;
 			}
 
 			this.itemStack = itemStack;
-			itemStack.onQuantityChanged += OnStackQuantityChanged;
+			itemStack.onQuantityChanged += this.OnStackQuantityChanged;
 
-			Render(itemStack);
+			this.Render(itemStack);
 		}
 
 		private void OnStackQuantityChanged(int old, int @new) {
-			if (@new <= 0) Destroy();
-			else if (itemStack != null && itemView != null) Render(itemStack);
+			if (@new <= 0) this.Destroy();
+			else if (this.itemStack != null && this.itemView != null) this.Render(this.itemStack);
 		}
 
 		private void Render(ItemStack itemStack) {
-			ItemRenderData renderData = itemStack.item.GetRenderData(itemStack);
-			ItemRenderModel model = modelResolver.Resolve(renderData);
-			itemView = itemView != null ? itemView : itemRenderer.CreateView(parent);
-
-			itemRenderer.Render(itemView, model);
-			itemView.SetParent(parent);
-			itemView.SetPosition(pointerPosition);
+			this.itemView = this.itemRenderManager.Render(this.renderHandle, itemStack, new ItemRenderContext.GUI { parent = this.parent });
+			this.UpdateViewPosition();
 		}
 
-		public bool HasStack() => itemView != null;
-		public ItemStack? GetStack() => itemStack;
+		public bool HasStack() => this.itemView != null;
+		public ItemStack? GetStack() => this.itemStack;
 
 		public void Destroy() {
-			if (itemView == null) return;
+			if (this.itemView == null) return;
 
-			itemView.Destroy();
-			if (itemStack != null) {
-				itemStack.onQuantityChanged -= OnStackQuantityChanged;
+			this.itemView.Destroy();
+			if (this.itemStack != null) {
+				this.itemStack.onQuantityChanged -= this.OnStackQuantityChanged;
 			}
-			itemView = null;
-			itemStack = null;
+			this.itemView = null;
+			this.itemStack = null;
 		}
 
 		public void SetPointerPosition(Vector2 position) {
 			this.pointerPosition = position;
-			if (itemView != null) {
-				itemView.SetPosition(pointerPosition);
+			this.UpdateViewPosition();
+		}
+
+
+		private void UpdateViewPosition() {
+			if (this.itemView != null) {
+				this.itemView.GetGameObject().transform.position = this.pointerPosition;
 			}
 		}
 	}

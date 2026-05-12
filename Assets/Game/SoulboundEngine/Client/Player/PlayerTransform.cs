@@ -1,27 +1,20 @@
 using SoulboundEngine.Client.ItemSystem;
 using SoulboundEngine.Client.World.EntitySystem;
-using SoulboundEngine.Client.World.EntitySystem.Transform;
 using SoulboundEngine.Core;
 using SoulboundEngine.Core.Event;
-using System;
 using UnityEngine;
+using IEntityView = SoulboundEngine.Client.Render.Entity.IEntityView;
 
 #nullable enable
 
 namespace SoulboundEngine.Client.Players {
 	[RequireComponent(typeof(Rigidbody2D))]
-	[Obsolete]
-	public class PlayerTransform : MonoBehaviour, IEntityTransform, IItemPickupHandler {
-		// currently the transform leaves the implementation hidden for physics transforms.
-		// this encapsulation doesnt match the default way of entities to express their state.
-		// so PlayerTransform, PhysicsTransform and StaticTransform are obsolete because of this.
-		// specifically about PlayerTransform, the Unity component is leaked from Player class.
-		// this completely destroys headless simulation potential
-
+	[RequireComponent(typeof(CapsuleCollider2D))]
+	public class PlayerTransform : MonoBehaviour, IEntityView, Entity.IPhysicsHandle, Entity.IBoundingBoxHandle, Player.IPlayerTransformHandle, IItemCollector {
 		private Player player = null!;
 		private Rigidbody2D rb = null!;
 		new private CapsuleCollider2D collider = null!;
-		public CapsuleCollider2D Collider => collider;
+		public CapsuleCollider2D Collider => this.collider;
 
 		[Header("Debug info")]
 		[SerializeField] private Vector2 normalVelocity;
@@ -33,56 +26,74 @@ namespace SoulboundEngine.Client.Players {
 		[SerializeField] private float speed = 1f;
 		[SerializeField] private float jumpForce = 1f;
 
-		void IEntityTransform.Bind(Entity entity) {
-			this.player = (Player)entity;
-			this.rb = GetComponent<Rigidbody2D>();
-			this.collider = GetComponent<CapsuleCollider2D>();
+		public Player GetEntity() => this.player;
+
+		public void Init(Player player) {
+			this.player = player;
+			this.rb = this.GetComponent<Rigidbody2D>();
+			this.collider = this.GetComponent<CapsuleCollider2D>();
 		}
 
-		Entity IEntityTransform.GetEntity() => player;
-		public Player GetEntity() => player;
+		public Vector2 GetPos() => this.rb.position;
+		public void SetPos(Vector2 position) => this.rb.position = position;
 
-		public Vector2 GetPos() => rb.position;
-		public void SetPos(Vector2 position) => rb.position = position;
-
-		void IEntityTransform.Destroy() => Destroy(gameObject);
-
-		void IEntityTransform.FrameUpdate() {
-			rb.linearVelocity = new Vector2(normalVelocity.x * speed, rb.linearVelocityY);
-			rbVelocity = rb.linearVelocity;
+		private void Update() {
+			this.rb.linearVelocity = new Vector2(this.normalVelocity.x * this.speed, this.rb.linearVelocityY);
+			this.rbVelocity = this.rb.linearVelocity;
 		}
 
 		private void FixedUpdate() {
-			UpdateIsGrounded();
-			if (isJumping && isGrounded) Jump();
+			this.UpdateIsGrounded();
+			if (this.isJumping && this.isGrounded) this.Jump();
 		}
 
-		internal void SetJumping(bool value) {
+		public void SetJumping(bool value) {
 			this.isJumping = value;
 		}
 
 		public void Jump() {
-			rb.linearVelocity = new Vector2(rb.linearVelocityX, jumpForce);
+			this.rb.linearVelocity = new Vector2(this.rb.linearVelocityX, this.jumpForce);
 			// PROTOTYPICAL
 			this.isGrounded = false;
-			EventBus.Publish(new PlayerJumpedEvent(player));
+			EventBus.Publish(new PlayerJumpedEvent(this.player));
 		}
 
 		private void UpdateIsGrounded() {
 			int groundMask = LayerMask.GetMask(Layers.Ground);
-			RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 1.05f, groundMask);
-			UnityEngine.Debug.DrawRay(transform.position, Vector2.down * 1.05f, Color.red, 1, false);
-			isGrounded = hit.collider != null;
+			RaycastHit2D hit = Physics2D.Raycast(this.transform.position, Vector2.down, 1.05f, groundMask);
+			UnityEngine.Debug.DrawRay(this.transform.position, Vector2.down * 1.05f, Color.red, 1, false);
+			this.isGrounded = hit.collider != null;
 		}
 
-		public void SetNormalVelocityX(float x) => normalVelocity.x = x;
-		public void SetNormalVelocityY(float y) => normalVelocity.y = y;
-		public void SetNormalVelocity(Vector2 velocity) => normalVelocity = velocity;
-		public Vector2 GetNormalVelocity() => normalVelocity;
+		public void SetNormalVelocityX(float x) => this.normalVelocity.x = x;
+		public void SetNormalVelocityY(float y) => this.normalVelocity.y = y;
+		public void SetNormalVelocity(Vector2 velocity) => this.normalVelocity = velocity;
+		public Vector2 GetNormalVelocity() => this.normalVelocity;
 
-		bool IItemPickupHandler.TryPickupStack(ItemStack itemStack) {
-			return player.TryAddItemStack(itemStack);
+		Entity IItemCollector.GetEntity() => this.player;
+
+		bool IItemCollector.TryPickupStack(ItemStack itemStack) {
+			return this.player.TryAddItemStack(itemStack);
 		}
 
+		public GameObject GetGameObject() => this.gameObject;
+
+		public void SetVisible(bool visible) => this.gameObject.SetActive(visible);
+
+		public void Destroy() => GameObject.Destroy(this.gameObject);
+
+		public void SetVelocity(Vector2 velocity) {
+			this.rb.linearVelocity = velocity;
+		}
+
+		public Vector2 GetVelocity() => this.rb.linearVelocity;
+
+		public Vector2 GetPosition() => this.rb.position;
+
+		public void SetPosition(Vector2 pos) => this.rb.position = pos;
+
+		public void ApplyForce(Vector2 force) => this.rb.AddForce(force);
+
+		public Bounds GetBoundingBox() => this.collider.bounds;
 	}
 }

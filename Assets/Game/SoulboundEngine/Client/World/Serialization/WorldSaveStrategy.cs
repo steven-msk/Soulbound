@@ -39,9 +39,25 @@ namespace SoulboundEngine.Client.World.Serialization {
 		}
 
 		public void Delete(string world) {
+			this.DeleteDirectory(this.GetSaveFolder(world));
+		}
 
-			// TODO: fix unity leak in world saves
-			UnityEngine.Windows.Directory.Delete(this.GetSaveFolder(world));
+		private void DeleteDirectory(string targetDir) {
+			File.SetAttributes(targetDir, FileAttributes.Normal);
+
+			string[] files = Directory.GetFiles(targetDir);
+			string[] dirs = Directory.GetDirectories(targetDir);
+
+			foreach (string file in files) {
+				File.SetAttributes(file, FileAttributes.Normal);
+				File.Delete(file);
+			}
+
+			foreach (string dir in dirs) {
+				this.DeleteDirectory(dir);
+			}
+
+			Directory.Delete(targetDir, false);
 		}
 
 		public byte[]? LoadRaw(string world) {

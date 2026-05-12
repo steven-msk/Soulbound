@@ -159,12 +159,6 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: e116241861752154f8e50619c5299109
-    m_Address: player
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e2f0d8709740fce438a7d4dae2c8e55c
     m_Address: ToggleOnTile
     m_ReadOnly: 0

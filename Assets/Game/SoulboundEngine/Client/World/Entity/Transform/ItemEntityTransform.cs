@@ -1,64 +1,51 @@
 using SoulboundEngine.Client.ItemSystem;
-using System;
 using UnityEngine;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.EntitySystem.Transform {
-	[RequireComponent(typeof(Rigidbody2D))]
-	[Obsolete]
-	public class ItemEntityTransform : MonoBehaviour, IEntityTransform {
-		// currently the transform leaves the implementation hidden for physics transforms.
-		// this encapsulation doesnt match the default way of entities to express their state.
-		// with this being changed, ItemEntity will be able to encapsulate ItemEntityTransform logic.
-		// this separation will become important for headless simulations later on
+namespace SoulboundEngine.Client.World.EntitySystem {
 
+	[RequireComponent(typeof(Rigidbody2D))]
+	public class ItemEntityTransform : MonoBehaviour, Client.Render.Entity.IEntityView {
 		private ItemEntity entity = null!;
 		private Entity? owner;
-		private float pickupDelaySec;
 		private float spawnTime;
 		private Rigidbody2D rb = null!;
 
-		public void Bind(Entity entity) {
-			this.entity = (ItemEntity)entity;
-			rb = GetComponent<Rigidbody2D>();
-			spawnTime = Time.unscaledTime;
-			pickupDelaySec = this.entity.GetPickupDelay();
-			owner = this.entity.GetOwner();
+		public void Init(ItemEntity entity) {
+			this.entity = entity;
+			this.rb = this.GetComponent<Rigidbody2D>();
+			this.spawnTime = Time.unscaledTime;
+			this.owner = this.entity.GetOwner();
 		}
 
-		public void Destroy() => Destroy(gameObject);
+		public void Destroy() => Destroy(this.gameObject);
 
-		Entity IEntityTransform.GetEntity() => entity;
-		public ItemEntity GetEntity() => entity;
+		public Vector2 GetPos() => this.rb.position;
 
-		public Vector2 GetPos() => rb.position;
-
-		public void SetPos(Vector2 position) => rb.position = position;
+		public void SetPos(Vector2 position) => this.rb.position = position;
 
 		private void OnTriggerStay2D(Collider2D collider) {
-			if (TryPickup(collider)) {
-				entity.Destroy();
+			if (this.TryPickup(collider)) {
+				this.entity.Destroy();
 			}
 		}
 
 		private bool TryPickup(Collider2D collider) {
-			if (!collider.TryGetComponent<IItemPickupHandler>(out var pickupHandler)) {
+			if (!collider.TryGetComponent<IItemCollector>(out var itemCollector)) {
 				return false;
 			}
-			bool entityTrigger = collider.TryGetComponent(out IEntityTransform entityTransform);
-			Entity? collidedEntity = entityTrigger ? entityTransform.GetEntity() : null;
-			if (!CanBePickedUp(collidedEntity)) return false;
+			if (!this.CanBePickedUp(itemCollector.GetEntity())) return false;
 
-			return pickupHandler.TryPickupStack(entity.GetStack());
+			return itemCollector.TryPickupStack(this.entity.GetStack());
 		}
 
 		private bool CanBePickedUp(Entity? collidedEntity) {
-			if (collidedEntity != owner) return true;
-			return Time.unscaledTime > spawnTime + pickupDelaySec;
+			if (collidedEntity != this.owner) return true;
+			return Time.unscaledTime > this.spawnTime + ItemEntity.CANNOT_PICK_UP_DELAY_SEC;
 		}
 
-		void IEntityTransform.FrameUpdate() {
-		}
+		public GameObject GetGameObject() => this.gameObject;
+		public void SetVisible(bool visible) => this.gameObject.SetActive(visible);
 	}
 }

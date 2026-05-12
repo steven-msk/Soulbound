@@ -16,7 +16,7 @@ namespace SoulboundEngine.Client.World.Generation {
 		}
 
 		BlockState ResolveCaveBlock(BlockPos pos, float density) {
-			return Blocks.air.DefaultState;
+			return Blocks.AIR.DefaultState;
 		}
 	}
 }
