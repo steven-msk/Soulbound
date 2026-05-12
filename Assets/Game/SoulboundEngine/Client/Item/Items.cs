@@ -5,7 +5,6 @@ using SoulboundEngine.Core.Registry;
 
 namespace SoulboundEngine.Client.ItemSystem {
 	public partial class Items {
-		// TODO: fix AIR item visual case
 		public static readonly Item AIR = Register(Blocks.AIR, Item.Settings.Air());
 		public static readonly Item GRASS = Register(Blocks.GRASS, Item.Settings.Of("Grass Block"));
 		public static readonly Item DIRT = Register(Blocks.DIRT, Item.Settings.Of("Dirt Block"));

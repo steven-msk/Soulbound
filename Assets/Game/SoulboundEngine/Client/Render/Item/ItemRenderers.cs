@@ -16,6 +16,7 @@ namespace SoulboundEngine.Client.Render.Item {
 		public static readonly Vector2 DEFAULT_SPRITE_SIZE = new(32f, 32f);
 
 		static ItemRenderers() {
+			Register(Items.AIR, DefaultResolverFactory("air", TILE_SIZE), () => new AirItemRenderer());
 			Register(Items.GRASS, DefaultResolverFactory("grass_top", TILE_SIZE));
 			Register(Items.DIRT, DefaultResolverFactory("dirt", TILE_SIZE));
 			Register(Items.STONE, DefaultResolverFactory("stone", TILE_SIZE));

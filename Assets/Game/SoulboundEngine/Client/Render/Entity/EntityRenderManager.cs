@@ -33,7 +33,9 @@ namespace SoulboundEngine.Client.Render.Entity {
 			
 			EntityModel model = modelFactory.GetModel(modelFactoryContext);
 			object state = renderer.CreateRenderStateBoxed(entity);
+
 			IEntityView view = renderer.CreateViewBoxed(state, model);
+			if (!view.IsValid()) return null;
 
 			this.renderedEntities[entity] = new RenderedEntity(entity, state, view);
 			return view;

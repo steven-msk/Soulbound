@@ -32,6 +32,8 @@ namespace SoulboundEngine.Client.ItemSystem.Container.View {
 		}
 
 		private void SetStack(ItemStack? stack) {
+			if (stack?.item == Items.AIR) return;
+
 			if (this.stack != null) this.stack.onQuantityChanged -= this.OnStackQuantityChanged;
 			this.OnStackQuantityChanged(this.stack?.quantity ?? 0, stack?.quantity ?? 0);
 			this.stack = stack;
@@ -51,7 +53,7 @@ namespace SoulboundEngine.Client.ItemSystem.Container.View {
 		private void Render(ItemStack? itemStack) {
 			if (itemStack == null && this.itemView != null) {
 				this.itemView.Destroy();
-			} else if (itemStack != null) {
+			} else if (itemStack != null && itemStack.item != Items.AIR) {
 				this.itemView = this.itemRenderManager.Render(this.renderHandle, this.stack, new ItemRenderContext.GUI { parent = this.rect });
 			}
 		}
@@ -84,7 +86,7 @@ namespace SoulboundEngine.Client.ItemSystem.Container.View {
 					this.stack.onQuantityChanged -= this.OnStackQuantityChanged;
 				}
 				this.stack = null;
-				if (this.itemView != null) this.itemView.Destroy();
+				this.itemView?.Destroy();
 			} else if (this.stack != null) this.Render(this.stack);
 		}
 

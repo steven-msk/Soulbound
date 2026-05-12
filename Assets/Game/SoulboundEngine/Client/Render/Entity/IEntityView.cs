@@ -6,6 +6,8 @@ namespace SoulboundEngine.Client.Render.Entity {
 		void SetVisible(bool visible);
 		void Destroy();
 
+		public bool IsValid() => this.GetGameObject() != null;
+
 		public static IEntityView Of(GameObject gameObject) => new Impl(gameObject);
 
 		private sealed class Impl : IEntityView {

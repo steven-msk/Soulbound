@@ -28,6 +28,8 @@ namespace SoulboundEngine.Client.Render.Entity {
 			IItemView itemView = itemRenderer.CreateViewBoxed(itemRenderState, itemModel, renderContext);
 
 			GameObject obj = itemView.GetGameObject();
+			if (obj == null) return IEntityView.Of(null);
+
 			ItemEntityTransform transform = obj.AddComponent<ItemEntityTransform>();
 			transform.Init(state.entity);
 

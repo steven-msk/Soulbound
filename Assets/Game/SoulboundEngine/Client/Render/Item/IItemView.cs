@@ -6,6 +6,8 @@ namespace SoulboundEngine.Client.Render.Item {
 		void SetVisible(bool visible);
 		void Destroy();
 
+		public bool IsValid() => this.GetGameObject() != null;
+
 		public static IItemView Of(GameObject gameObject) {
 			return new Impl(gameObject);
 		}
