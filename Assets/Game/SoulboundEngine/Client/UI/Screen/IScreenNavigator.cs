@@ -1,4 +1,4 @@
-namespace SoulboundEngine.Client.UI.Screens {
+namespace SoulboundEngine.Client.UI.Screen {
 	public interface IScreenNavigator {
 		void PushScreen(Screen screen);
 		void ReplaceScreen(Screen screen);

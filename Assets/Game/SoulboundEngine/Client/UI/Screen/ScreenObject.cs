@@ -1,13 +1,12 @@
 using SoulboundEngine.Client.UI.Containers;
+using SoulboundEngine.Client.UI.Screens;
 using SoulboundEngine.Client.UI.Tooltips;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
-namespace SoulboundEngine.Client.UI.Screens {
+namespace SoulboundEngine.Client.UI.Screen {
+	[Obsolete]
 	public class ScreenObject : MonoBehaviour, IScreenObject, IDisposable {
 		private Screen screenInstance;
 		private ChildMap childMap;
@@ -15,35 +14,35 @@ namespace SoulboundEngine.Client.UI.Screens {
 		
 		public void Init(Screen screenInstance) {
 			this.screenInstance = screenInstance;
-			childMap = new ChildMap();
+			this.childMap = new ChildMap();
 		}
 
 		public void Show() {
-			gameObject.SetActive(true);
-			screenInstance.OnShow(this);
+			this.gameObject.SetActive(true);
+			//screenInstance.OnShow(this);
 		}
 
 		public void Hide() {
-			screenInstance.OnHide(this);
-			gameObject.SetActive(false);
-			DestroyTooltips();
+			//screenInstance.OnHide(this);
+			this.gameObject.SetActive(false);
+			this.DestroyTooltips();
 		}
 
 		public void Dispose() {
-			screenInstance.OnDispose(this);
-			DestroyTooltips();
-			Destroy(gameObject);
+			//screenInstance.OnDispose(this);
+			this.DestroyTooltips();
+			Destroy(this.gameObject);
 		}
 
 		void IUIElementContainer.AddElement(UIElementNode node) {
-			node.transform.SetParent(transform, false);
-			childMap.AddChild(node.gameObject);
+			node.transform.SetParent(this.transform, false);
+			this.childMap.AddChild(node.gameObject);
 			((IUIElementContainer)this).OnElementAdded(node);
 		}
 
 		void IUIElementContainer.RemoveElement(UIElementNode node) {
-			node.transform.SetParent(GetComponentInParent<Transform>(), false);
-			childMap.RemoveChild(node.gameObject.name);
+			node.transform.SetParent(this.GetComponentInParent<Transform>(), false);
+			this.childMap.RemoveChild(node.gameObject.name);
 			((IUIElementContainer)this).OnElementRemoved(node);
 		}
 
@@ -57,10 +56,10 @@ namespace SoulboundEngine.Client.UI.Screens {
 		}
 
 		void ITooltipManager.AddTooltip(UITooltipNode node) {
-			node.transform.SetParent(transform, false);
-			tooltipNodes.Add(node);
+			node.transform.SetParent(this.transform, false);
+			this.tooltipNodes.Add(node);
 			node.handle.onDestroyed += () => {
-				tooltipNodes.Remove(node);
+				this.tooltipNodes.Remove(node);
 			};
 		}
 
@@ -69,14 +68,14 @@ namespace SoulboundEngine.Client.UI.Screens {
 		}
 
 		private void DestroyTooltips() {
-			foreach (var tooltipNode in tooltipNodes) {
+			foreach (var tooltipNode in this.tooltipNodes) {
 				if (tooltipNode.isAlive) {
 					Destroy(tooltipNode.gameObject);
 				}
 			}
-			tooltipNodes.Clear();
+			this.tooltipNodes.Clear();
 		}
 
-		public Screen GetInstance() => screenInstance;
+		public Screen GetInstance() => this.screenInstance;
 	}
 }

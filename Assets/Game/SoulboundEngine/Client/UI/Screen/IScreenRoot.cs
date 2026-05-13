@@ -1,12 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
-namespace SoulboundEngine.Client.UI.Screens {
+namespace SoulboundEngine.Client.UI.Screen {
 	public interface IScreenRoot {
+		[Obsolete]
 		void AttachScreenObject(GameObject screenObject);
 	}
 }

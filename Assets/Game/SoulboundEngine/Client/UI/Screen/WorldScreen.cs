@@ -3,7 +3,7 @@ using SoulboundEngine.Client.ItemSystem.Container.View;
 using SoulboundEngine.Client.Players;
 using SoulboundEngine.Client.Render.Item;
 
-namespace SoulboundEngine.Client.UI.Screens {
+namespace SoulboundEngine.Client.UI.Screen {
 	public sealed class WorldScreen : Screen {
 		private readonly Player player;
 		private readonly ItemRenderManager itemRenderManager;
@@ -11,19 +11,20 @@ namespace SoulboundEngine.Client.UI.Screens {
 		public WorldScreen(ItemRenderManager itemRenderManager, Player player) {
 			this.itemRenderManager = itemRenderManager;
 			this.player = player;
-			this.supportsEscapePop = false;
 		}
 
-		public override IScreenObject BuildObject(IScreenObjectFactory objFactory) {
-			return base.BuildObject(new WorldSessionScreenFactory(this.itemRenderManager, objFactory));
-		}
+		public override bool ReturnWithEscape => false;
 
-		protected override void OnBuild(IScreenObject screenObject) {
-			this.player.SetTransitStackSource((ITransitStackSource)screenObject);
+		//public override IScreenObject BuildObject(IScreenObjectFactory objFactory) {
+		//	return base.BuildObject(new WorldSessionScreenFactory(this.itemRenderManager, objFactory));
+		//}
+
+		protected override void OnBuild(IScreenHandle handle) {
+			this.player.SetTransitStackSource((ITransitStackSource)handle);
 
 			PlayerInventoryRenderer inventoryUIBuilder = new(this.itemRenderManager, this.player.GetInventory());
 			inventoryUIBuilder.Build(
-				(IItemContainerScreenScope)screenObject,
+				(IItemContainerScreenScope)handle,
 				out IItemContainerHandle inventory,
 				out IItemContainerHandle hotbar
 			);

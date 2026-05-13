@@ -1,16 +1,16 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
+using UnityEngine.UIElements;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.UI.Screens {
-	public sealed class ScreenManager : IScreenObjectFactory, IScreenNavigator {
+namespace SoulboundEngine.Client.UI.Screen {
+	public sealed class ScreenManager : IScreenNavigator {
 		private readonly Stack<ScreenEntry> stack = new();
-		private readonly IScreenRoot root;
+		private readonly UIToolkitScreenRoot screenRoot;
 
-		public ScreenManager(IScreenRoot root) {
-			this.root = root;
+		public ScreenManager(UIToolkitScreenRoot screenRoot) {
+			this.screenRoot = screenRoot;
 		}
 
 		public void PushScreen(Screen screen) {
@@ -18,10 +18,15 @@ namespace SoulboundEngine.Client.UI.Screens {
 				activeEntry.obj.Hide();
 			}
 
-			screen.Init(this);
-			IScreenObject obj = screen.BuildObject(this);
-			this.stack.Push(new ScreenEntry(obj));
-			obj.Show();
+			VisualElement screenRoot = new();
+			screenRoot.style.flexGrow = 1;
+			this.screenRoot.Attach(screenRoot);
+
+			IScreenHandle handle = new UIToolkitScreenHandle(screen, screenRoot);
+			screen.Init(this, handle);
+
+			this.stack.Push(new ScreenEntry(handle));
+			handle.Show();
 		}
 
 		public bool PopScreen() {
@@ -60,31 +65,9 @@ namespace SoulboundEngine.Client.UI.Screens {
 				screenObject.obj.Dispose();
 			}
 		}
-
-		GameObject IScreenObjectFactory.CreateGameObject() {
-			GameObject obj = new("Screen Object", typeof(RectTransform));
-			this.root.AttachScreenObject(obj);
-
-			// default screen layout
-			RectTransform rectTransform = obj.GetComponent<RectTransform>();
-			rectTransform.anchorMin = Vector2.zero;
-			rectTransform.anchorMax = Vector2.one;
-			rectTransform.pivot		= new Vector2(0.5f, 0.5f);
-			rectTransform.offsetMin = Vector2.zero;
-			rectTransform.offsetMax = Vector2.zero;
-			rectTransform.sizeDelta = Vector2.zero;
-
-			return obj;
-		}
-
-		IScreenObject IScreenObjectFactory.CreateSceneObject(Screen screen, GameObject gameObject) {
-			ScreenObject screenObject = gameObject.AddComponent<ScreenObject>();
-			screenObject.Init(screen);
-			return screenObject;
-		}
 	}
 
-	sealed record ScreenEntry(IScreenObject obj) {
-		public Screen screen => this.obj.GetInstance();
+	sealed record ScreenEntry(IScreenHandle obj) {
+		public Screen screen => this.obj.GetScreen();
 	}
 }

@@ -2,7 +2,7 @@ using Cysharp.Threading.Tasks;
 using SoulboundEngine.Client.Input;
 using SoulboundEngine.Client.Players;
 using SoulboundEngine.Client.Render.Entity;
-using SoulboundEngine.Client.UI.Screens;
+using SoulboundEngine.Client.UI.Screen;
 using SoulboundEngine.Client.World.Generation;
 using SoulboundEngine.Client.World.Render;
 using System;

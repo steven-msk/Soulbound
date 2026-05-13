@@ -1,6 +1,7 @@
 using SoulboundEngine.Client.Players;
 using SoulboundEngine.Client.World.Serialization;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.World.LevelDomain {
 	public struct WorldSession {
@@ -9,5 +10,6 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 		public LevelManager levelManager;
 		public Level level;
 		public Canvas canvas;
+		public UIDocument uiDocument;
 	}
 }

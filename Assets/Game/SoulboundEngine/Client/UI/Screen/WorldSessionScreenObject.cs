@@ -10,7 +10,7 @@ using UnityEngine.EventSystems;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.UI.Screens {
+namespace SoulboundEngine.Client.UI.Screen {
 	[RequireComponent(typeof(RectTransform))]
 	public class WorldSessionScreenObject : ScreenObject, IItemContainerScreenScope, IInputEventHandler {
 		private RectTransform rect = null!;

@@ -9,7 +9,6 @@ using SoulboundEngine.Client.Input;
 using SoulboundEngine.Client.Runtime.Services;
 using SoulboundEngine.Client.SettingSystem;
 using SoulboundEngine.Client.UI;
-using SoulboundEngine.Client.UI.Screens;
 using SoulboundEngine.Client.World;
 using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Client.World.Serialization;
@@ -23,10 +22,12 @@ namespace SoulboundEngine.Client {
 	using SoulboundEngine.Client.Render.Block;
 	using SoulboundEngine.Client.Render.Entity;
 	using SoulboundEngine.Client.Render.Item;
+	using SoulboundEngine.Client.UI.Screen;
 	using SoulboundEngine.Core.Registry;
 	using SoulboundEngine.Core.Render.Sprite;
 	using System.Collections.Generic;
 	using UnityEngine.SceneManagement;
+	using UnityEngine.UIElements;
 	using Application = UnityEngine.Application;
 	using Canvas = UnityEngine.Canvas;
 	using Object = UnityEngine.Object;
@@ -86,7 +87,7 @@ namespace SoulboundEngine.Client {
 
 			// scene may not be available at this time
 			// TODO: change UIHandler init
-			this.uiHandler = new UIHandler(Object.FindFirstObjectByType<Canvas>());
+			this.uiHandler = new UIHandler(Object.FindFirstObjectByType<UIDocument>());
 			this.inputManager.AddHandler(this.uiHandler);
 
 			this.uiAudioEventBank = new UIAudioEventBank();
@@ -150,7 +151,8 @@ namespace SoulboundEngine.Client {
 				Object.FindFirstObjectByType<WorldSceneRoot>
 			).ContinueWith(session => {
 				this.activeWorldSession = session;
-				this.uiHandler.SetCanvas(session.canvas);
+				//this.uiHandler.SetCanvas(session.canvas);
+				this.uiHandler.SetUIDocument(session.uiDocument);
 				this.uiHandler.SetScreen(new WorldScreen(this.itemRenderManager, session.player));
 				this.debugOverlayManager.Clear();
 				this.inputManager.AddHandler(session.levelManager);

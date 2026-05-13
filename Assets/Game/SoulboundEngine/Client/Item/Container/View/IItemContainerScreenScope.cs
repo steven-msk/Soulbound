@@ -1,4 +1,4 @@
-using SoulboundEngine.Client.UI.Screens;
+using SoulboundEngine.Client.UI.Screen;
 namespace SoulboundEngine.Client.ItemSystem.Container.View {
 	public interface IItemContainerScreenScope : IScreenObject, IItemContainerScope {
 		void AddItemContainer(UIItemContainerNode node);

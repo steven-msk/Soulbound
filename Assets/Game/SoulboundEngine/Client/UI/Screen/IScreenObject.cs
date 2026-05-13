@@ -1,14 +1,9 @@
 using SoulboundEngine.Client.UI.Containers;
-using SoulboundEngine.Client.UI.Screens;
 using SoulboundEngine.Client.UI.Tooltips;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
 
-namespace SoulboundEngine.Client.UI.Screens {
+namespace SoulboundEngine.Client.UI.Screen {
+	[Obsolete]
 	public interface IScreenObject : IUIElementContainer, ITooltipManager, ITooltipRenderer {
 		void Show();
 		void Hide();
