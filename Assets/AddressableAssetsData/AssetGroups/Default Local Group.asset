@@ -141,6 +141,18 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b50d4da87d0a01543bf58c788d1f5922
+    m_Address: PanelSettings
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c50f0d493e76e5a429e1630de1dd0778
+    m_Address: TitleScreen
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: cbf0dfe6112d8e84c849d454f1474d8f
     m_Address: JosefinSans-Medium SDF
     m_ReadOnly: 0

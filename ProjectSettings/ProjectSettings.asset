@@ -601,7 +601,7 @@ PlayerSettings:
     PS4: 
     QNX: 
     Server: 
-    Standalone: SOULBOUND_INCLUDE_TESTS
+    Standalone: SOULBOUND_INCLUDE_TESTS;SENTIS_ANALYTICS_ENABLED;APP_UI_EDITOR_ONLY
     WebGL: 
     Windows Store Apps: 
     XboxOne: 

@@ -1,38 +1,43 @@
-using SoulboundEngine.Client.UI.Containers;
-using SoulboundEngine.Client.UI.Layouts;
 using SoulboundEngine.Client.World;
-using SoulboundEngine.Common;
 using SoulboundEngine.Core;
+using SoulboundEngine.Core.Assets;
+using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.UI.Screens {
 	public class TitleScreen : Screen {
 		private readonly IWorldAccessor worldAccessor;
+		private readonly VisualTreeAsset asset;
+		private readonly PanelSettings panelSettings;
 
 		public TitleScreen(IWorldAccessor worldAccessor) {
 			this.worldAccessor = worldAccessor;
 			this.supportsEscapePop = false;
+
+			// TODO: fix resource leak from UI
+			this.asset = AssetManager.Resolve<VisualTreeAsset>(new AssetKey("TitleScreen"));
+			this.panelSettings = AssetManager.Resolve<PanelSettings>(new AssetKey("PanelSettings"));
 		}
 
-		[PROTOTYPICAL]
+		public override IScreenObject BuildObject(IScreenObjectFactory objFactory) {
+			GameObject obj = new("Title Screen");
+
+			UIDocument document = obj.AddComponent<UIDocument>();
+			document.panelSettings = this.panelSettings;
+			document.visualTreeAsset = this.asset;
+
+			Button playButton = document.rootVisualElement.Q<Button>("PlayButton");
+			Button exitButton = document.rootVisualElement.Q<Button>("ExitButton");
+
+			// TODO: fix button events not available after the object's been hidden
+			playButton.clicked += () => this.screenNavigator.PushScreen(new WorldListScreen(this.worldAccessor));
+			exitButton.clicked += Soulbound.Instance.CloseGame;
+
+			IScreenObject screenObj = objFactory.CreateSceneObject(this, obj);
+			return screenObj;
+		}
+
 		protected override void OnBuild(IScreenObject screenObject) {
-			IUIElementContainer container = GUI.Container(
-				GUI.Frame.Stretch(),
-				GUI.Layout.Vertical()
-					.Align(UIAlignment.Center)
-					.ControlChildWidth(true)
-			).Build(screenObject);
-
-			GUI.Button.Label()
-				.Text("Play")
-				.Size(26f)
-				.OnClick(() => this.screenNavigator.PushScreen(new WorldListScreen(this.worldAccessor)))
-				.Build(container);
-
-			GUI.Button.Label()
-				.Text("Exit")
-				.Size(26f)
-				.OnClick(() => Soulbound.Instance.CloseGame())
-				.Build(container);
 		}
 	}
 }
