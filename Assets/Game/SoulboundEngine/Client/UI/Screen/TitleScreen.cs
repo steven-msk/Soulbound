@@ -1,19 +1,21 @@
 using SoulboundEngine.Client.World;
+using SoulboundEngine.Core;
 using SoulboundEngine.Core.Assets;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.UI.Screen {
-	public class TitleScreen : Screen {
+	public class TitleScreen : UxmlScreen {
 		private readonly IWorldAccessor worldAccessor;
-		private readonly VisualTreeAsset asset;
-		private readonly PanelSettings panelSettings;
+		//private readonly VisualTreeAsset asset;
+		//private readonly PanelSettings panelSettings;
 
-		public TitleScreen(IWorldAccessor worldAccessor) {
+		public TitleScreen(IWorldAccessor worldAccessor)
+			: base(AssetManager.Resolve<VisualTreeAsset>(new AssetKey("TitleScreen"))) {
 			this.worldAccessor = worldAccessor;
 
 			// TODO: fix resource leak from UI
-			this.asset = AssetManager.Resolve<VisualTreeAsset>(new AssetKey("TitleScreen"));
-			this.panelSettings = AssetManager.Resolve<PanelSettings>(new AssetKey("PanelSettings"));
+			//this.asset = AssetManager.Resolve<VisualTreeAsset>(new AssetKey("TitleScreen"));
+			//this.panelSettings = AssetManager.Resolve<PanelSettings>(new AssetKey("PanelSettings"));
 		}
 
 		//public override IScreenObject BuildObject(IScreenObjectFactory objFactory) {
@@ -36,7 +38,12 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 		public override bool ReturnWithEscape => false;
 
-		protected override void OnBuild(IScreenHandle handle) {
+		protected override void OnBind(VisualElement root) {
+			Button playButton = root.Q<Button>("PlayButton");
+			Button exitButton = root.Q<Button>("ExitButton");
+
+			playButton.clicked += () => this.screenManager.PushScreen(new WorldListScreen(this.worldAccessor));
+			exitButton.clicked += Soulbound.Instance.CloseGame;
 		}
 	}
 }
