@@ -18,15 +18,23 @@ namespace SoulboundEngine.Client.UI.Screen {
 				activeEntry.obj.Hide();
 			}
 
-			VisualElement screenRoot = new();
-			screenRoot.style.flexGrow = 1;
-			this.screenRoot.Attach(screenRoot);
-
-			IScreenHandle handle = new UIToolkitScreenHandle(screen, screenRoot);
+			VisualElement root = this.CreateScreenRoot();
+			
+			IScreenHandle handle = new UIToolkitScreenHandle(screen, root);
 			screen.Init(this, handle);
+
+			this.screenRoot.Attach(root);
 
 			this.stack.Push(new ScreenEntry(handle));
 			handle.Show();
+		}
+
+		private VisualElement CreateScreenRoot() {
+			VisualElement root = new() {
+				name = "ScreenRoot",
+			};
+			root.style.flexGrow = 1;
+			return root;
 		}
 
 		public bool PopScreen() {

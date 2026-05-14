@@ -9,8 +9,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		}
 
 		protected sealed override void OnBuild(IScreenHandle handle) {
-			TemplateContainer tree = this.asset.Instantiate();
-			handle.Root.Add(tree);
+			this.asset.CloneTree(handle.Root);
 			this.OnBind(handle.Root);
 		}
 

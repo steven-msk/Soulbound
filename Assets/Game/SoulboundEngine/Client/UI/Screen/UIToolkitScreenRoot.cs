@@ -1,18 +1,17 @@
-﻿using SoulboundEngine.Client.UI.Screens;
-using System;
+﻿using System;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.UI.Screen {
 	public sealed class UIToolkitScreenRoot : IScreenRoot {
-		public readonly VisualElement document;
+		public readonly VisualElement root;
 
 		public UIToolkitScreenRoot(UIDocument document) {
-			this.document = document.rootVisualElement;
+			this.root = document.rootVisualElement.Q<VisualElement>("RootLayer");
 		}
 
 		public void Attach(VisualElement screenRoot) {
-			this.document.Add(screenRoot);
+			this.root.Add(screenRoot);
 		} 
 
 		void IScreenRoot.AttachScreenObject(GameObject screenObject) {
