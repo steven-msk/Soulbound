@@ -1,110 +1,134 @@
-﻿using SoulboundEngine.Client.World;
+﻿using SoulboundEngine.Client.Debug.Logging;
+using SoulboundEngine.Client.World;
+using SoulboundEngine.Core.Assets;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.UI.Screen {
-	public sealed class WorldListScreen : Screen {
+	public sealed class WorldListScreen : UxmlScreen {
 		public const int MAX_WORLDS = 10;
 		private readonly IWorldAccessor worldAccessor;
+		private readonly VisualTreeAsset worldEntryAsset;
+		private int nextWorldIndex;
+		private readonly SortedSet<int> removedSlots = new();
+		private readonly Dictionary<VisualElement, EventCallback<ClickEvent>> clickCallbacks = new();
 
-		public WorldListScreen(IWorldAccessor worldAccessor) {
+		public WorldListScreen(IWorldAccessor worldAccessor) 
+			: base(AssetManager.Resolve<VisualTreeAsset>(new AssetKey("WorldListScreen"))) {
 			this.worldAccessor = worldAccessor;
+			this.worldEntryAsset = AssetManager.Resolve<VisualTreeAsset>(new AssetKey("WorldEntry"));
 		}
 
-		protected override void OnBuild(IScreenHandle handle) {
-			//IUIElementContainer parentContainer = GUI.Container(
-			//	GUI.Frame.StretchTop(),
-			//	GUI.Layout.Vertical()
-			//		.ChildSizing(ChildSizingMode.Preferred)
-			//		.Padding(new UnityEngine.RectOffset(0, 0, 20, 20))
-			//).Build(screenObject);
+		protected override void OnBind(VisualElement root) {
+			VisualElement worldList = root.Q<VisualElement>("WorldList");
+			this.CreateSlots(worldList);
+			this.nextWorldIndex = 0;
+			int i = 0;
 
-			//IUIElementContainer savesContainer = GUI.Container(
-			//	GUI.Frame.Stretch(),
-			//	GUI.Layout.Horizontal()
-			//		.ControlChildSize(true)
-			//		.Spacing(10)
-			//).Build(parentContainer);
-			//IUIElementContainer savesCol = GUI.Container(
-			//	GUI.Frame.Stretch(),
-			//	GUI.Layout.Vertical()
-			//		.ControlChildSize(true)
-			//		.Spacing(10)
-			//).Build(savesContainer);
-			//IUIElementContainer deleteCol = GUI.Container(
-			//	GUI.Frame.Stretch(),
-			//	GUI.Layout.Vertical()
-			//		.ControlChildSize(true)
-			//		.Spacing(10)
-			//).Build(savesContainer);
+			foreach (var save in this.worldAccessor.ListWorldSaves()) {
+				if (this.SpaceAvailable() <= 0) break;
 
-			//List<WorldSave> saves = this.worldAccessor.ListWorldSaves().ToList();
-			//foreach (var save in saves) {
-			//	GUI.Button.Label()
-			//		.Text($"{save.name} ({save.seed})")
-			//		.OnClick(() => this.worldAccessor.EnterWorld(save.name))
-			//		.Build(savesCol);
+				VisualElement slot = this.GetNextSlot(worldList);
+				this.AddWorldToList(save.name, save.seed, slot, i++);
+			}
 
-			//	GUI.Button.Label()
-			//		.Text("Delete")
-			//		.OnClick(() => { 
-			//			this.worldAccessor.DeleteWorld(save.name);
-			//			this.screenManager.IssueRebuild(this);
-			//		})
-			//		.Build(deleteCol);
-			//}
 
-			//IUIElementContainer newWorldContainer = GUI.Container(
-			//	GUI.Frame.Stretch(),
-			//	GUI.Layout.Horizontal()
-			//		.ControlChildSize(true)
-			//		.Align(UIAlignment.Center)
-			//		.Spacing(10)
-			//		.Padding(new UnityEngine.RectOffset(0, 0, 40, 40))
-			//).Build(GUI.Container(
-			//		GUI.Frame.Stretch(),
-			//		GUI.Layout.Vertical()
-			//			.ChildSizing(ChildSizingMode.Preferred)
-			//			.Align(UIAlignment.End)
-			//	).Build(GUI.Container(
-			//			GUI.Frame.Stretch(),
-			//			GUI.Layout.Vertical()
-			//				.ControlChildSize(true)
-			//				.ChildForceExpandHeight(true)
-			//				.Align(UIAlignment.End)
-			//		).Build(parentContainer)));
+			root.Q<Button>("CreateWorld").clicked += () => {
+				TextField nameField = root.Q<TextField>("NameField");
+				TextField seedField = root.Q<TextField>("SeedField");
 
-			//IUIElementContainer dataContainer = GUI.Container(
-			//	GUI.Frame.Stretch(),
-			//	GUI.Layout.Vertical()
-			//		.ChildSizing(ChildSizingMode.Preferred)
-			//).Build(newWorldContainer);
+				if (!string.IsNullOrEmpty(nameField.value) && this.SpaceAvailable() > 0) {
+					int seed = WorldManager.GetRandomSeed();
+					string seedText = seedField.value;
+					
+					if (!string.IsNullOrEmpty(seedText)) {
+						if (!int.TryParse(seedText, out seed)) {
+							Logger.LogError("Invalid seed: {}", seedText);
+							return;
+						}
+					}
 
-			//InputFieldHandle nameField = GUI.InputField
-			//	.Placeholder("World name...")
-			//	.Build(dataContainer);
-			//InputFieldHandle seedField = GUI.InputField
-			//	.Placeholder("Seed... (leave empty for random)")
-			//	.Build(dataContainer);
+					this.worldAccessor.CreateNewWorld(nameField.value, seed);
 
-			//GUI.Button.Label()
-			//	.Text("Create new world")
-			//	.OnClick(() => {
-			//		string name = nameField.GetText();
-			//		if (!string.IsNullOrEmpty(name) && this.worldAccessor.ListWorldSaves().Count() < MAX_WORLDS) {
-			//			int seed = WorldManager.GetRandomSeed();
-			//			if (!string.IsNullOrEmpty(seedField.GetText())) {
-			//				if (!int.TryParse(seedField.GetText(), out seed)) {
-			//					Logger.LogError("Invalid seed: {}", seedField.GetText());
-			//					return;
-			//				}
-			//			}
-			//			this.worldAccessor.CreateNewWorld(name, seed);
-			//			this.screenManager.IssueRebuild(this);
-			//			nameField.Clear();
-			//			seedField.Clear();
-			//		}
-			//	}).Build(newWorldContainer);
-
+					VisualElement listRoot = root.Q<VisualElement>("WorldList");
+					VisualElement slot = this.GetNextSlot(listRoot);
+					int index = listRoot.hierarchy.IndexOf(slot);
+					this.AddWorldToList(nameField.value, seed, slot, index);
+					nameField.value = "";
+					seedField.value = "";
+				}
+			};
 		}
 
+		private void CreateSlots(VisualElement listRoot) {
+			for (int i = 0; i < MAX_WORLDS; i++) {
+				VisualElement slot = this.worldEntryAsset.Instantiate();
+				this.ClearSlot(this.GetName(slot), this.GetSeed(slot));
+				listRoot.Add(slot);
+			}
+		}
+
+		private void AddWorldToList(string world, int seed, VisualElement slot, int index) {
+			Label nameLabel = this.GetName(slot);
+			Label seedLabel = this.GetSeed(slot);
+
+			nameLabel.text = world;
+			seedLabel.text = $"Seed: {seed}";
+			seedLabel.style.display = DisplayStyle.Flex;
+
+			Button enterWorld = this.GetEnterButton(slot);
+			Button deleteWorld = this.GetDeleteButton(slot);
+
+			this.clickCallbacks[enterWorld] = _ => this.worldAccessor.EnterWorld(world);
+			this.clickCallbacks[deleteWorld] = _ => {
+				this.worldAccessor.DeleteWorld(world);
+				this.RemoveWorldFromList(slot, index);
+			};
+
+			enterWorld.RegisterCallbackOnce(this.clickCallbacks[enterWorld]);
+			deleteWorld.RegisterCallbackOnce(this.clickCallbacks[deleteWorld]);
+		}
+
+		private void RemoveWorldFromList(VisualElement slot, int index) {
+			Label name = this.GetName(slot);
+			Label seed = this.GetSeed(slot);
+			this.ClearSlot(name, seed);
+
+			Button enterWorld = this.GetEnterButton(slot);
+			Button deleteWorld = this.GetDeleteButton(slot);
+
+			enterWorld.UnregisterCallback(this.clickCallbacks[enterWorld]);
+			deleteWorld.UnregisterCallback(this.clickCallbacks[deleteWorld]);
+
+			this.clickCallbacks.Remove(enterWorld);
+			this.clickCallbacks.Remove(deleteWorld);
+
+			this.removedSlots.Add(index);
+		}
+
+		private void ClearSlot(Label name, Label seed) {
+			name.text = "empty";
+			seed.text = "";
+			seed.style.display = DisplayStyle.None;
+		}
+
+		private Label GetName(VisualElement slot) => slot.Q<Label>("WorldName");
+		private Label GetSeed(VisualElement slot) => slot.Q<Label>("WorldSeed");
+
+		private Button GetEnterButton(VisualElement slot) => slot.Q<Button>("EnterWorld");
+		private Button GetDeleteButton(VisualElement slot) => slot.Q<Button>("DeleteWorld");
+
+		private VisualElement GetNextSlot(VisualElement listRoot) {
+			if (this.removedSlots.Any()) {
+				int first = this.removedSlots.First();
+				this.removedSlots.Remove(first);
+				return listRoot[first];
+			}
+
+			return listRoot[this.nextWorldIndex++];
+		}
+
+		private int SpaceAvailable() => MAX_WORLDS - this.nextWorldIndex;
 	}
 }

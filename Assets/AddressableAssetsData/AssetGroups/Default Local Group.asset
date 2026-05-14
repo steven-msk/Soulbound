@@ -27,6 +27,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1c35bcb58bc9c9a4badb701f7ccbc99b
+    m_Address: WorldEntry
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 22de33d73f0feda4e9a52553b3394a28
     m_Address: grass
     m_ReadOnly: 0
@@ -59,6 +65,12 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 546860b57eb820a42acb13ab6589d854
     m_Address: jump
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 54dccd926a3bbd84f963d8b242907aa2
+    m_Address: WorldListScreen
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload

@@ -1,0 +1,14 @@
+:root {
+}
+
+.background {
+    background-color: rgb(51, 51, 51);
+}
+
+.textColor {
+    color: rgb(229, 229, 229);
+}
+
+.font {
+    -unity-font-definition: url("project://database/Assets/Game/Content/UI/Fonts/Josefin_Sans/static/JosefinSans-SemiBold.ttf?fileID=12800000&guid=72a51e1885304a14099c209e065bb2b7&type=3#JosefinSans-SemiBold");
+}
