@@ -1,3 +1,4 @@
+using SoulboundEngine.Client.Input;
 using SoulboundEngine.Client.ItemSystem;
 using SoulboundEngine.Client.ItemSystem.Container;
 using SoulboundEngine.Client.Players;
@@ -5,16 +6,18 @@ using SoulboundEngine.Client.Render.Item;
 using SoulboundEngine.Core.Assets;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.UI.Screen {
-	public sealed class WorldScreen : UxmlScreen, IItemContainerScope {
+	public sealed class WorldScreen : UxmlScreen, IItemContainerScope, IInputEventHandler {
 		private readonly Player player;
 		private readonly ItemRenderManager itemRenderManager;
 		private PlayerInventoryHandle inventoryHandle;
 		private readonly List<IItemContainer> openContainers = new();
 		private SlotDragState dragState;
 		private TransitStack transitStack;
+		private Vector2 pointerPosition;
 
 		public WorldScreen(ItemRenderManager itemRenderManager, Player player) 
 			: base(AssetManager.Resolve<VisualTreeAsset>(new AssetKey("WorldScreen"))) {
@@ -90,6 +93,22 @@ namespace SoulboundEngine.Client.UI.Screen {
 		void ITransitStackSource.SetTransitStack(ItemStack itemStack) {
 			if (itemStack == null) this.transitStack.Destroy();
 			else this.transitStack.SetStack(itemStack);
+		}
+
+		IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {
+			yield return InputEventListener.ObserveAny(InputTokens.Mouse.position, inputEvent => {
+				this.pointerPosition = inputEvent.context.ReadValue<Vector2>();
+				Vector2 converted = new(this.pointerPosition.x, UnityEngine.Device.Screen.height - this.pointerPosition.y);
+				this.transitStack.SetPointerPosition(converted);
+			});
+		}
+
+		public override void OnHide(IScreenHandle handle) {
+			SoulboundClient.Instance.InputManager.RemoveHandler(this);
+		}
+
+		public override void OnShow(IScreenHandle handle) {
+			SoulboundClient.Instance.InputManager.AddHandler(this);
 		}
 	}
 }

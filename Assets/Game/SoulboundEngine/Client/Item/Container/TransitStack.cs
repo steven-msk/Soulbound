@@ -61,12 +61,21 @@ namespace SoulboundEngine.Client.ItemSystem.Container {
 		}
 
 		public void SetPointerPosition(Vector2 position) {
-			this.pointerPosition = position;
+			Vector2 panelPosition = this.root.panel != null
+				? RuntimePanelUtils.ScreenToPanel(this.root.panel, position)
+				: position;
+
+			this.pointerPosition = this.root.parent != null
+				? this.root.parent.WorldToLocal(panelPosition)
+				: panelPosition;
+
 			this.UpdateViewPosition();
 		}
 
 		private void UpdateViewPosition() {
-			this.itemView?.SetPosition(this.pointerPosition);
+			Vector2 size = this.root.worldBound.size;
+			Vector2 pos = this.pointerPosition - size / 2f;
+			this.itemView?.SetPosition(pos);
 		}
 
 		private ItemRenderContext RenderContext => new ItemRenderContext.UIToolkit { root = this.root };
