@@ -87,12 +87,6 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 565fe1640666a874298849ae50107d82
-    m_Address: Slot
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5c5dbc3200a937c498da76e029222e08
     m_Address: air
     m_ReadOnly: 0
