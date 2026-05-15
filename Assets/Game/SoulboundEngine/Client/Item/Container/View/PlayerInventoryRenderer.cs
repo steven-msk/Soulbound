@@ -27,8 +27,8 @@ namespace SoulboundEngine.Client.ItemSystem.Container.View {
 			inventory = this.BuildInventory(screenScope);
 			hotbar = this.BuildHotbar(screenScope);
 
-			this.inventory.onPopupToggled += ((HotbarHandle)hotbar).ToggleFadedLayout;
-			this.inventory.Toggle();
+			//this.inventory.onPopupToggled += ((HotbarHandle)hotbar).ToggleFadedLayout;
+			//this.inventory.Toggle();
 		}
 
 		private InventoryHandle BuildInventory(IItemContainerScreenScope screenScope) {
@@ -46,11 +46,11 @@ namespace SoulboundEngine.Client.ItemSystem.Container.View {
 				slotObj.transform.SetParent(inventory.transform, false);
 			}
 
-			this.inventory.onPopupToggled += () => {
-				foreach (var handle in slotHandles) {
-					handle.ToggleVisibility();
-				}
-			};
+			//this.inventory.onPopupToggled += () => {
+			//	foreach (var handle in slotHandles) {
+			//		handle.ToggleVisibility();
+			//	}
+			//};
 
 			inventory.Init(this.inventory, screenScope);
 			UIItemContainerNode node = new(inventory.gameObject, this.inventory, inventory);

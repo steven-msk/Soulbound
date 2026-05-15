@@ -1,3 +1,4 @@
+using SoulboundEngine.Client.Players;
 using System;
 using System.Collections.Generic;
 
@@ -10,12 +11,10 @@ namespace SoulboundEngine.Client.ItemSystem.Container {
 		public const int COLUMNS = 9;
 		public const int ROWS = 3;
 		private readonly ItemSlot[] slots = new ItemSlot[ROWS * COLUMNS + HOTBAR_SIZE];
-		private bool isOpen = true;
 		private int mainSlot = 0;
 		private readonly HashSet<Item> uniqueItems = new();
 		public event Action<Item>? onItemAdded;
 		public event Action<Item>? onItemRemoved;
-		public event Action? onPopupToggled;
 		public event Action<int, int>? mainSlotChanged;
 
 		public Inventory() {
@@ -61,11 +60,6 @@ namespace SoulboundEngine.Client.ItemSystem.Container {
 			return list;
 		}
 
-		public void Toggle() {
-			this.isOpen = !this.isOpen;
-			onPopupToggled?.Invoke();
-		}
-
 		private void UpdateUniqueItems(ItemStack? oldStack, ItemStack? newStack) {
 			if (newStack != null && !this.uniqueItems.Contains(newStack.item)) {
 				this.uniqueItems.Add(newStack.item);
@@ -84,6 +78,12 @@ namespace SoulboundEngine.Client.ItemSystem.Container {
 					onItemRemoved?.Invoke(oldStack.item);
 				}
 			}
+		}
+
+		public void OnOpened(Player player) {
+		}
+
+		public void OnClosed(Player player) {
 		}
 
 		public int GetMainSlot() => this.mainSlot;

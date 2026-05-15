@@ -1,4 +1,5 @@
 ﻿using SoulboundEngine.Client.ItemSystem.Container;
+using SoulboundEngine.Client.Players;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -25,6 +26,8 @@ namespace SoulboundEngine.Client.Render.Item {
 			this.scope = scope;
 		}
 
+		public bool isOpen { get; private set; }
+
 		public void OnBind(VisualElement root) {
 			this.root = root;
 
@@ -45,6 +48,20 @@ namespace SoulboundEngine.Client.Render.Item {
 				this.hotbarHandles.Add(handle);
 				this.AddPointerListeners(slotElement, handle, slot);
 			}
+		}
+
+		public void Open(Player player) {
+			this.GetPopup().style.display = DisplayStyle.Flex;
+			this.scope.AddContainer(this.inventory);
+			this.inventory.OnOpened(player);
+			this.isOpen = true;
+		}
+
+		public void Close(Player player) {
+			this.GetPopup().style.display = DisplayStyle.None;
+			this.scope.RemoveContainer(this.inventory);
+			this.inventory.OnClosed(player);
+			this.isOpen = false;
 		}
 
 		private void AddPointerListeners(VisualElement visualElement, UIToolkitItemSlotHandle handle, IItemSlot slot) {

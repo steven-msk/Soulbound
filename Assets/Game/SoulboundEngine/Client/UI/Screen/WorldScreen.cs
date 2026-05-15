@@ -14,10 +14,11 @@ namespace SoulboundEngine.Client.UI.Screen {
 		private readonly Player player;
 		private readonly ItemRenderManager itemRenderManager;
 		private PlayerInventoryHandle inventoryHandle;
-		private readonly List<IItemContainer> openContainers = new();
+		private readonly HashSet<IItemContainer> openContainers = new();
 		private SlotDragState dragState;
 		private TransitStack transitStack;
 		private Vector2 pointerPosition;
+		private bool isActive;
 
 		public WorldScreen(ItemRenderManager itemRenderManager, Player player) 
 			: base(AssetManager.Resolve<VisualTreeAsset>(new AssetKey("WorldScreen"))) {
@@ -34,9 +35,8 @@ namespace SoulboundEngine.Client.UI.Screen {
 			this.transitStack = new TransitStack(this.itemRenderManager, root.Q<VisualElement>("TransitStack"));
 			this.player.SetTransitStackSource(this);
 
-			// inventory is already opened when scene is loaded
-			// TODO: add back inventory popup toggle functionality
-			this.openContainers.Add(this.player.GetInventory());
+			// inventory is open at init
+			this.inventoryHandle.Close(this.player);
 		}
 
 		public override void OnDispose(IScreenHandle handle) {
@@ -100,6 +100,12 @@ namespace SoulboundEngine.Client.UI.Screen {
 		}
 
 		IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {
+			yield return InputEventListener.ConsumePerformed(InputTokens.Player.toggleInventory, _ => {
+				if (!this.isActive) return;
+				if (!this.inventoryHandle.isOpen) this.inventoryHandle.Open(this.player);
+				else this.inventoryHandle.Close(this.player);
+			});
+			
 			yield return InputEventListener.ObserveAny(InputTokens.Mouse.position, inputEvent => {
 				this.pointerPosition = inputEvent.context.ReadValue<Vector2>();
 				Vector2 converted = new(this.pointerPosition.x, UnityEngine.Device.Screen.height - this.pointerPosition.y);
@@ -107,12 +113,22 @@ namespace SoulboundEngine.Client.UI.Screen {
 			});
 		}
 
+		void IItemContainerScope.AddContainer(IItemContainer container) {
+			this.openContainers.Add(container);
+		}
+
+		void IItemContainerScope.RemoveContainer(IItemContainer container) {
+			this.openContainers.Remove(container);
+		}
+
 		public override void OnHide(IScreenHandle handle) {
 			SoulboundClient.Instance.InputManager.RemoveHandler(this);
+			this.isActive = false;
 		}
 
 		public override void OnShow(IScreenHandle handle) {
 			SoulboundClient.Instance.InputManager.AddHandler(this);
+			this.isActive = true;
 		}
 	}
 }

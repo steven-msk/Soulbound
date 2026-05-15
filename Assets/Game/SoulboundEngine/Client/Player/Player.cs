@@ -45,7 +45,6 @@ namespace SoulboundEngine.Client.Players {
 
 		IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {
 			return new InputEventListener[] {
-				InputEventListener.ConsumePerformed(InputTokens.Player.toggleInventory, _ => this.inventory.Toggle()),
 				InputEventListener.ConsumePerformed(InputTokens.Player.changeHotbarSlot, inputEvent => {
 					int slotIndex = int.Parse(inputEvent.context.control.name) - 1;
 					this.inventory.SetMainSlot(slotIndex);

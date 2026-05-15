@@ -101,5 +101,13 @@ namespace SoulboundEngine.Client.UI.Screen {
 		private void OnDestroy() {
 			SoulboundClient.Instance.InputManager.RemoveHandler(this);
 		}
+
+		void IItemContainerScope.AddContainer(IItemContainer container) {
+			throw new NotImplementedException();
+		}
+
+		void IItemContainerScope.RemoveContainer(IItemContainer container) {
+			throw new NotImplementedException();
+		}
 	}
 }

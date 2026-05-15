@@ -5,6 +5,8 @@ using System.Collections.Generic;
 namespace SoulboundEngine.Client.ItemSystem.Container {
 	public interface IItemContainerScope : ITransitStackSource {
 		IEnumerable<IItemContainer> GetOpenContainers();
+		void AddContainer(IItemContainer container);
+		void RemoveContainer(IItemContainer container);
 
 		bool InDragState();
 		SlotDragState? GetDragState();
