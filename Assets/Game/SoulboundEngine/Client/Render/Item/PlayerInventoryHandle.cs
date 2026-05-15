@@ -62,6 +62,7 @@ namespace SoulboundEngine.Client.Render.Item {
 
 			int clickButton = evt.button;
 			ISlotOperation operation = this.GetClick(slot.GetIndex(), clickButton, doubleClick);
+			if (operation is NoSlotOperation) return;
 
 			this.scope.TryBeginDrag(
 				this.scope.HasTransitStack()
@@ -82,6 +83,7 @@ namespace SoulboundEngine.Client.Render.Item {
 
 			int dragButton = this.scope.GetDragState().button;
 			ISlotOperation operation = this.GetDrag(slot.GetIndex(), dragButton);
+			if (operation is NoSlotOperation) return;
 
 			operation.Execute();
 		}

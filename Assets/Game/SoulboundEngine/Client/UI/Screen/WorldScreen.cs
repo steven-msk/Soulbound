@@ -33,6 +33,10 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 			this.transitStack = new TransitStack(this.itemRenderManager, root.Q<VisualElement>("TransitStack"));
 			this.player.SetTransitStackSource(this);
+
+			// inventory is already opened when scene is loaded
+			// TODO: add back inventory popup toggle functionality
+			this.openContainers.Add(this.player.GetInventory());
 		}
 
 		public override void OnDispose(IScreenHandle handle) {
