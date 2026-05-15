@@ -7,6 +7,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 	public sealed class WorldScreen : UxmlScreen {
 		private readonly Player player;
 		private readonly ItemRenderManager itemRenderManager;
+		private PlayerInventoryHandle inventoryHandle;
 
 		public WorldScreen(ItemRenderManager itemRenderManager, Player player) 
 			: base(AssetManager.Resolve<VisualTreeAsset>(new AssetKey("WorldScreen"))) {
@@ -17,6 +18,11 @@ namespace SoulboundEngine.Client.UI.Screen {
 		public override bool ReturnWithEscape => false;
 
 		protected override void OnBind(VisualElement root) {
+			this.inventoryHandle = new PlayerInventoryHandle(root.Q<VisualElement>("Inventory"), this.player.GetInventory(), this.itemRenderManager);
+		}
+
+		public override void OnDispose(IScreenHandle handle) {
+			this.inventoryHandle.Dispose();
 		}
 
 		//public override IScreenObject BuildObject(IScreenObjectFactory objFactory) {

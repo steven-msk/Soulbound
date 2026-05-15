@@ -24,6 +24,8 @@ namespace SoulboundEngine.Client.UI.Screen {
 			base.Init(screen);
 			this.rect = this.GetComponent<RectTransform>();
 			this.transitStack = new TransitStack(itemRenderManager, this.rect);
+
+			// TODO: remove InputManager leaks
 			SoulboundClient.Instance.InputManager.AddHandler(this);
 		}
 

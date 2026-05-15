@@ -15,8 +15,8 @@ namespace SoulboundEngine.Client.ItemSystem.Container {
 		private readonly HashSet<Item> uniqueItems = new();
 		public event Action<Item>? onItemAdded;
 		public event Action<Item>? onItemRemoved;
-		public event Action toggle = null!;
-		public event Action<int, int> mainSlotChanged;
+		public event Action? onPopupToggled;
+		public event Action<int, int>? mainSlotChanged;
 
 		public Inventory() {
 			for (int i = 0; i < this.slots.Length; i++) {
@@ -63,7 +63,7 @@ namespace SoulboundEngine.Client.ItemSystem.Container {
 
 		public void Toggle() {
 			this.isOpen = !this.isOpen;
-			toggle();
+			onPopupToggled?.Invoke();
 		}
 
 		private void UpdateUniqueItems(ItemStack? oldStack, ItemStack? newStack) {

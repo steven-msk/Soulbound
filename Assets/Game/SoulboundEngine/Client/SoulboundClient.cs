@@ -239,7 +239,9 @@ namespace SoulboundEngine.Client {
 		}
 
 		public static SoulboundClient Instance => instance;
+		[Obsolete]
 		public InputManager InputManager => this.inputManager;
+		[Obsolete]
 		public UIHandler UIHandler => this.uiHandler;
 
 		public sealed class DebugOverlayManager {

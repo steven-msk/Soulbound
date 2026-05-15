@@ -27,7 +27,7 @@ namespace SoulboundEngine.Client.ItemSystem.Container.View {
 			inventory = this.BuildInventory(screenScope);
 			hotbar = this.BuildHotbar(screenScope);
 
-			this.inventory.toggle += ((HotbarHandle)hotbar).ToggleFadedLayout;
+			this.inventory.onPopupToggled += ((HotbarHandle)hotbar).ToggleFadedLayout;
 			this.inventory.Toggle();
 		}
 
@@ -46,7 +46,7 @@ namespace SoulboundEngine.Client.ItemSystem.Container.View {
 				slotObj.transform.SetParent(inventory.transform, false);
 			}
 
-			this.inventory.toggle += () => {
+			this.inventory.onPopupToggled += () => {
 				foreach (var handle in slotHandles) {
 					handle.ToggleVisibility();
 				}
@@ -117,14 +117,14 @@ namespace SoulboundEngine.Client.ItemSystem.Container.View {
 		private GameObject CreateSlotObj(IItemSlot slot, IItemSlotEventListener eventListener, out ItemSlotHandle handle) {
 			GameObject obj = GameObject.Instantiate(AssetManager.Resolve<GameObject>(slotKey));
 			handle = obj.AddComponent<ItemSlotHandle>();
-			handle.Init(itemRenderManager, slot, eventListener);
+			handle.Init(this.itemRenderManager, slot, eventListener);
 			return obj;
 		}
 
 		private GameObject CreateHotbarSlotObj(IItemSlot slot, IItemSlotEventListener eventListener, int index, out HotbarSlotHandle handle) {
 			GameObject obj = GameObject.Instantiate(AssetManager.Resolve<GameObject>(slotKey));
 			handle = obj.AddComponent<HotbarSlotHandle>();
-			handle.Init(itemRenderManager, slot, eventListener);
+			handle.Init(this.itemRenderManager, slot, eventListener);
 
 			GameObject textObj = new("Hotbar Slot Number", typeof(RectTransform));
 			ContentSizeFitter sizeFitter = textObj.AddComponent<ContentSizeFitter>();
