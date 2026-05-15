@@ -11,7 +11,7 @@ namespace SoulboundEngine.Client.Render.Item {
 		}
 
 		public sealed class UIToolkit : ItemRenderContext {
-			public VisualElement slot;
+			public VisualElement root;
 		}
 
 		public sealed class World : ItemRenderContext {

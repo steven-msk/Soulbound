@@ -52,14 +52,15 @@ namespace SoulboundEngine.Client.Render.Item {
 							return IItemView.Of(obj);
 						}
 					case ItemRenderContext.UIToolkit uiToolkit: {
-							VisualElement display = uiToolkit.slot.Q<VisualElement>("ItemDisplay");
-							Label stackText = uiToolkit.slot.Q<Label>("StackCount");
+							VisualElement display = uiToolkit.root.Q<VisualElement>("ItemDisplay");
+							Label stackText = uiToolkit.root.Q<Label>("StackCount");
 
 							display.style.backgroundImage = new StyleBackground(model.GetSprite());
 							stackText.text = state.stack.quantity.ToString();
 							stackText.style.display = state.showStackCount ? DisplayStyle.Flex : DisplayStyle.None;
 
-							return IItemView.Of(uiToolkit.slot);
+							uiToolkit.root.style.display = DisplayStyle.Flex;
+							return IItemView.Of(uiToolkit.root);
 						}
 					case ItemRenderContext.World world: {
 							GameObject obj = new("Item");

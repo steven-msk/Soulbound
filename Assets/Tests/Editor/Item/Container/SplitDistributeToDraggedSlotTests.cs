@@ -5,7 +5,6 @@ using SoulboundEngine.Client.ItemSystem.Container;
 using System;
 using System.Collections.Generic;
 
-
 #nullable enable
 
 namespace ItemTests.Container.Operations {
@@ -24,7 +23,7 @@ namespace ItemTests.Container.Operations {
 			SlotDragState state = new(origin.GetContainer()) {
 				origin = originRef,
 				stack = stack.Clone(),
-				button = UnityEngine.EventSystems.PointerEventData.InputButton.Left,
+				button = 0,
 				draggedSlots = dragged,
 				quantitySnapshots = this.CaptureQuantitySnapshots()
 			};

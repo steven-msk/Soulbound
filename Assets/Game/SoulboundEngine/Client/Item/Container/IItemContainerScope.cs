@@ -1,7 +1,4 @@
-using SoulboundEngine.Client.ItemSystem.Container;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEngine.EventSystems;
 
 #nullable enable
 
@@ -12,7 +9,7 @@ namespace SoulboundEngine.Client.ItemSystem.Container {
 		bool InDragState();
 		SlotDragState? GetDragState();
 
-		bool TryBeginDrag(ItemStack stack, SlotRef slotRef, PointerEventData.InputButton button);
+		bool TryBeginDrag(ItemStack stack, SlotRef slotRef, int button);
 		void ExtendDrag(SlotRef slotRef);
 		void EndDrag();
 	}

@@ -300,15 +300,15 @@ namespace SoulboundEngine.Client.Players {
 		public Vector2 GetWorldPointerPos() {
 			Vector3 screenPos = this.screenPointerPos;
 
-			Canvas canvas = SoulboundClient.Instance.UIHandler.GetCanvas();
-			RectTransform rootTransform = canvas.GetComponent<RectTransform>();
-			bool inWorldPoint = RectTransformUtility.ScreenPointToWorldPointInRectangle(
-				rootTransform,
-				screenPos,
-				Camera.main,
-				out var worldPoint
-			);
-			if (inWorldPoint) return worldPoint;
+			//Canvas canvas = SoulboundClient.Instance.UIHandler.GetCanvas();
+			//RectTransform rootTransform = canvas.GetComponent<RectTransform>();
+			//bool inWorldPoint = RectTransformUtility.ScreenPointToWorldPointInRectangle(
+			//	rootTransform,
+			//	screenPos,
+			//	Camera.main,
+			//	out var worldPoint
+			//);
+			//if (inWorldPoint) return worldPoint;
 
 			screenPos.z = -Camera.main.transform.position.z;
 			return Camera.main.ScreenToWorldPoint(screenPos);

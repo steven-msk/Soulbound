@@ -3,15 +3,16 @@ using SoulboundEngine.Client.ItemSystem;
 using SoulboundEngine.Client.ItemSystem.Container;
 using SoulboundEngine.Client.ItemSystem.Container.View;
 using SoulboundEngine.Client.Render.Item;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 #nullable enable
 
 namespace SoulboundEngine.Client.UI.Screen {
 	[RequireComponent(typeof(RectTransform))]
+	[Obsolete]
 	public class WorldSessionScreenObject : ScreenObject, IItemContainerScreenScope, IInputEventHandler {
 		private RectTransform rect = null!;
 		private TransitStack transitStack = null!;
@@ -23,13 +24,13 @@ namespace SoulboundEngine.Client.UI.Screen {
 		public void Init(ItemRenderManager itemRenderManager, Screen screen) {
 			base.Init(screen);
 			this.rect = this.GetComponent<RectTransform>();
-			this.transitStack = new TransitStack(itemRenderManager, this.rect);
+			//this.transitStack = new TransitStack(itemRenderManager, this.rect);
 
 			// TODO: remove InputManager leaks
 			SoulboundClient.Instance.InputManager.AddHandler(this);
 		}
 
-		public bool TryBeginDrag(ItemStack stack, SlotRef slotRef, PointerEventData.InputButton button) {
+		public bool TryBeginDrag(ItemStack stack, SlotRef slotRef, int button) {
 			if (this.InDragState() || stack == null) return false;
 
 			HashSet<SlotRef> draggedSlots = new(new SlotRef.EqualityComparer()) { slotRef };

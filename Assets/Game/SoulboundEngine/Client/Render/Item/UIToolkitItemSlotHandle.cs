@@ -7,18 +7,19 @@ using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.Render.Item {
 	public class UIToolkitItemSlotHandle : IDisposable {
-		private readonly VisualElement visualElement;
+		private readonly VisualElement root;
 		private readonly IItemSlot slot;
 		private readonly ItemRenderManager itemRenderManager;
 		private readonly ItemRenderHandle renderHandle;
 		private ItemStack? stack;
+		private IItemView? view;
 		public event Action<PointerDownEvent>? onPointerDown;
 		public event Action<PointerUpEvent>? onPointerUp;
 		public event Action<PointerEnterEvent>? onPointerEnter;
 		public event Action<PointerLeaveEvent>? onPointerLeave;
 
 		public UIToolkitItemSlotHandle(VisualElement visualElement, IItemSlot slot, ItemRenderManager itemRenderManager) {
-			this.visualElement = visualElement;
+			this.root = visualElement;
 			this.slot = slot;
 			this.itemRenderManager = itemRenderManager;
 			this.renderHandle = new ItemRenderHandle(this);
@@ -62,7 +63,7 @@ namespace SoulboundEngine.Client.Render.Item {
 				return;
 			}
 
-			this.itemRenderManager.Render(this.renderHandle, this.stack, new ItemRenderContext.UIToolkit { slot = this.visualElement });
+			this.view = this.itemRenderManager.Render(this.renderHandle, this.stack, new ItemRenderContext.UIToolkit { root = this.root });
 		}
 
 		public void Dispose() {
@@ -76,10 +77,10 @@ namespace SoulboundEngine.Client.Render.Item {
 
 			this.stack = null;
 
-			this.visualElement.UnregisterCallback<PointerDownEvent>(this.OnPointerDown);
-			this.visualElement.UnregisterCallback<PointerUpEvent>(this.OnPointerUp);
-			this.visualElement.UnregisterCallback<PointerEnterEvent>(this.OnPointerEnter);
-			this.visualElement.UnregisterCallback<PointerLeaveEvent>(this.OnPointerLeave);
+			this.root.UnregisterCallback<PointerDownEvent>(this.OnPointerDown);
+			this.root.UnregisterCallback<PointerUpEvent>(this.OnPointerUp);
+			this.root.UnregisterCallback<PointerEnterEvent>(this.OnPointerEnter);
+			this.root.UnregisterCallback<PointerLeaveEvent>(this.OnPointerLeave);
 		}
 
 		private void OnPointerDown(PointerDownEvent evt) => onPointerDown?.Invoke(evt);

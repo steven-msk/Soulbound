@@ -1,5 +1,6 @@
 using SoulboundEngine.Client.Render.Item;
 using SoulboundEngine.Client.UI.Tooltips;
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -7,6 +8,7 @@ using UnityEngine.EventSystems;
 
 namespace SoulboundEngine.Client.ItemSystem.Container.View {
 	[RequireComponent(typeof(RectTransform))]
+	[Obsolete]
 	public class ItemSlotHandle : MonoBehaviour, IItemSlotHandle, ITooltipTrigger {
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 		private IItemSlot slot;

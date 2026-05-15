@@ -1,7 +1,7 @@
-﻿using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.Client.ItemSystem.Container;
+﻿using SoulboundEngine.Client.ItemSystem.Container;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.Render.Item {
@@ -10,11 +10,19 @@ namespace SoulboundEngine.Client.Render.Item {
 		private readonly List<HotbarSlotHandle> hotbarHandles = new();
 		private readonly Inventory inventory;
 		private readonly ItemRenderManager itemRenderManager;
+		private readonly IItemContainerScope scope;
 		private VisualElement root;
+		private int lastClickedSlot;
+		private float lastClickTime;
+		const float DOUBLE_CLICK_THRESHOLD = 0.15f;
+		const int LEFT_BUTTON = 0;
+		const int MIDDLE_BUTTON = 2;
+		const int RIGHT_BUTTON = 1;
 
-		public PlayerInventoryHandle(Inventory inventory, ItemRenderManager itemRenderManager) {
+		public PlayerInventoryHandle(Inventory inventory, ItemRenderManager itemRenderManager, IItemContainerScope scope) {
 			this.inventory = inventory;
 			this.itemRenderManager = itemRenderManager;
+			this.scope = scope;
 		}
 
 		public void OnBind(VisualElement root) {
@@ -47,19 +55,54 @@ namespace SoulboundEngine.Client.Render.Item {
 		}
 
 		private void OnPointerDown(IItemSlot slot, VisualElement visualElement, PointerDownEvent evt) {
-			Logger.LogInfo("pointer down: {}", slot.GetIndex());
+			float time = Time.time;
+			bool doubleClick = this.lastClickedSlot == slot.GetIndex() && (time - this.lastClickTime) <= DOUBLE_CLICK_THRESHOLD;
+			this.lastClickTime = time;
+			this.lastClickedSlot = slot.GetIndex();
+
+			int clickButton = evt.button;
+			ISlotOperation operation = this.GetClick(slot.GetIndex(), clickButton, doubleClick);
+
+			this.scope.TryBeginDrag(
+				this.scope.HasTransitStack()
+					? this.scope.GetTransitStack()
+					: this.inventory.GetSlot(slot.GetIndex()).GetStack(),
+				new SlotRef(this.inventory, slot.GetIndex()),
+				clickButton
+			);
+			operation.Execute();
 		}
 		
 		private void OnPointerUp(IItemSlot slot, VisualElement visualElement, PointerUpEvent evt) {
-			Logger.LogInfo("pointer up: {}", slot.GetIndex());
 		}
 
 		private void OnPointerEnter(IItemSlot slot, VisualElement visualElement, PointerEnterEvent evt) {
-			Logger.LogInfo("pointer enter: {}", slot.GetIndex());
 		}
 
 		private void OnPointerLeave(IItemSlot slot, VisualElement visualElement, PointerLeaveEvent evt) {
-			Logger.LogInfo("pointer leave: {}", slot.GetIndex());
+		}
+
+		private ISlotOperation GetClick(int slotIndex, int clickButton, bool doubleClick) {
+			if (clickButton < 0) return new NoSlotOperation();
+
+			if (clickButton == LEFT_BUTTON) {
+				CollectAllItemsToTransit collectToTransit = new(this.scope);
+
+				return doubleClick && collectToTransit.CanExecute()
+					? collectToTransit
+					: new TransferTransit(this.inventory, slotIndex, this.scope);
+			}
+
+			if (clickButton == RIGHT_BUTTON) {
+				TransferSingleToSlot transferSingleToSlot = new(this.inventory, slotIndex, this.scope);
+				HalveStackFromSlot halveStackFromSlot = new(this.inventory, slotIndex, this.scope);
+
+				if (transferSingleToSlot.CanExecute()) return transferSingleToSlot;
+				if (halveStackFromSlot.CanExecute()) return halveStackFromSlot;
+
+				return new NoSlotOperation();
+			}
+			return new NoSlotOperation();
 		}
 
 		private VisualElement GetPopup() => this.root.Q<VisualElement>("Popup");

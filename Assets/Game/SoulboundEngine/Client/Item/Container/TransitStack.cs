@@ -1,21 +1,22 @@
 using SoulboundEngine.Client.Render.Item;
 using System;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 #nullable enable
 
 namespace SoulboundEngine.Client.ItemSystem.Container {
 	public sealed class TransitStack {
-		private readonly RectTransform parent;
+		private readonly VisualElement slot;
 		private Vector2 pointerPosition;
 		private ItemStack? itemStack;
 		private IItemView? itemView;
 		private readonly ItemRenderManager itemRenderManager;
 		private readonly ItemRenderHandle renderHandle;
 
-		public TransitStack(ItemRenderManager itemRenderManager, RectTransform parent) {
+		public TransitStack(ItemRenderManager itemRenderManager, VisualElement slot) {
 			this.itemRenderManager = itemRenderManager;
-			this.parent = parent;
+			this.slot = slot;
 			this.renderHandle = new ItemRenderHandle(this);
 		}
 
@@ -41,7 +42,7 @@ namespace SoulboundEngine.Client.ItemSystem.Container {
 		}
 
 		private void Render(ItemStack itemStack) {
-			this.itemView = this.itemRenderManager.Render(this.renderHandle, itemStack, new ItemRenderContext.GUI { parent = this.parent });
+			this.itemView = this.itemRenderManager.Render(this.renderHandle, itemStack, new ItemRenderContext.UIToolkit { root = this.slot });
 			this.UpdateViewPosition();
 		}
 
@@ -67,7 +68,7 @@ namespace SoulboundEngine.Client.ItemSystem.Container {
 
 		private void UpdateViewPosition() {
 			if (this.itemView != null) {
-				this.itemView.GetGameObject().transform.position = this.pointerPosition;
+				this.itemView.SetPosition(this.pointerPosition);
 			}
 		}
 	}

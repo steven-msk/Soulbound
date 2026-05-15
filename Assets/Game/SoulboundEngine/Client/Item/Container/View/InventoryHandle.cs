@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 #nullable enable
 
 namespace SoulboundEngine.Client.ItemSystem.Container.View {
+	[Obsolete]
 	public class InventoryHandle : MonoBehaviour, IItemContainerHandle {
 		private float lastClickTime;
 		private int lastClickedSlot;
@@ -24,34 +25,35 @@ namespace SoulboundEngine.Client.ItemSystem.Container.View {
 
 		void IItemSlotEventListener.OnPointerDown(int slotIndex, PointerEventData eventData) {
 			float time = Time.time;
-			bool doubleClick = lastClickedSlot == slotIndex && (time - lastClickTime) <= doubleClickThreshold;
-			lastClickTime = time;
-			lastClickedSlot = slotIndex;
+			bool doubleClick = this.lastClickedSlot == slotIndex && (time - this.lastClickTime) <= doubleClickThreshold;
+			this.lastClickTime = time;
+			this.lastClickedSlot = slotIndex;
 
 			PointerEventData.InputButton clickButton = eventData.button;
-			ISlotOperation operation = GetClick(slotIndex, clickButton, doubleClick);
+			ISlotOperation operation = this.GetClick(slotIndex, clickButton, doubleClick);
 			if (operation == null) {
 				UnityEngine.Debug.LogException(new NullReferenceException("GetClick() returned null"));
 				return;
 			}
 
-			scope.TryBeginDrag(
-				scope.HasTransitStack()
-					? scope.GetTransitStack()!
-					: container.GetSlot(slotIndex).GetStack()!,
-				new SlotRef(container, slotIndex),
-				clickButton
-			);
+			//scope.TryBeginDrag(
+			//	scope.HasTransitStack()
+			//		? scope.GetTransitStack()!
+			//		: container.GetSlot(slotIndex).GetStack()!,
+			//	new SlotRef(container, slotIndex),
+			//	clickButton
+			//);
 			operation.Execute();
 		}
 
 		void IItemSlotEventListener.OnPointerEnter(int slotIndex, PointerEventData eventData) {
-			if (!scope.InDragState()) return;
+			if (!this.scope.InDragState()) return;
 
 			// eventData.button does not retain drag click button because its called OnPointerEnter
-			PointerEventData.InputButton dragButton = scope.GetDragState()!.button;
+			//PointerEventData.InputButton dragButton = scope.GetDragState()!.button;
+			PointerEventData.InputButton dragButton = default;
 
-			ISlotOperation operation = GetDrag(slotIndex, dragButton);
+			ISlotOperation operation = this.GetDrag(slotIndex, dragButton);
 			if (operation == null) {
 				UnityEngine.Debug.LogException(new InvalidOperationException("GetDrag() returned null"));
 				return;
@@ -66,16 +68,16 @@ namespace SoulboundEngine.Client.ItemSystem.Container.View {
 			bool alt = Keyboard.current.altKey.isPressed;
 
 			if (clickButton == PointerEventData.InputButton.Left) {
-				CollectAllItemsToTransit collectToTransit = new(scope);
+				CollectAllItemsToTransit collectToTransit = new(this.scope);
 
 				return doubleClick && collectToTransit.CanExecute()
 					? collectToTransit
-					: new TransferTransit(container, slotIndex, scope);
+					: new TransferTransit(this.container, slotIndex, this.scope);
 			}
 
 			if (clickButton == PointerEventData.InputButton.Right) {
-				TransferSingleToSlot transferSingleToSlot = new(container, slotIndex, scope);
-				HalveStackFromSlot halveStackFromSlot = new(container, slotIndex, scope);
+				TransferSingleToSlot transferSingleToSlot = new(this.container, slotIndex, this.scope);
+				HalveStackFromSlot halveStackFromSlot = new(this.container, slotIndex, this.scope);
 
 				if (transferSingleToSlot.CanExecute()) return transferSingleToSlot;
 				if (halveStackFromSlot.CanExecute()) return halveStackFromSlot;
@@ -87,13 +89,13 @@ namespace SoulboundEngine.Client.ItemSystem.Container.View {
 
 		private ISlotOperation GetDrag(int slotIndex, PointerEventData.InputButton button) {
 			if (button == PointerEventData.InputButton.Left) {
-				return new SplitDistributeToDraggedSlot(new SlotRef(container, slotIndex), scope);
+				return new SplitDistributeToDraggedSlot(new SlotRef(this.container, slotIndex), this.scope);
 			}
 			if (button == PointerEventData.InputButton.Right) {
-				TransferSingleToSlot transferSingleToSlot = new(container, slotIndex, scope);
+				TransferSingleToSlot transferSingleToSlot = new(this.container, slotIndex, this.scope);
 
 				if (transferSingleToSlot.CanExecute()) {
-					scope.ExtendDrag(new SlotRef(container, slotIndex));
+					this.scope.ExtendDrag(new SlotRef(this.container, slotIndex));
 					return transferSingleToSlot;
 				}
 
@@ -105,6 +107,6 @@ namespace SoulboundEngine.Client.ItemSystem.Container.View {
 		void IItemSlotEventListener.OnPointerExit(int slotIndex, PointerEventData eventData) {
 		}
 
-		void IItemSlotEventListener.OnPointerUp(int slotIndex, PointerEventData eventData) => scope.EndDrag();
+		void IItemSlotEventListener.OnPointerUp(int slotIndex, PointerEventData eventData) => this.scope.EndDrag();
 	}
 }
