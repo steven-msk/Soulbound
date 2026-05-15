@@ -49,7 +49,7 @@ namespace SoulboundEngine.Client.Render.Item {
 
 		private void OnStackQuantityChanged(int oldCount, int newCount) {
 			if (newCount <= 0) {
-				this.Dispose();
+				this.itemRenderManager.Destroy(this.renderHandle);
 				return;
 			}
 
@@ -57,10 +57,12 @@ namespace SoulboundEngine.Client.Render.Item {
 		}
 
 		private void Render() {
-			if (this.stack == null || this.stack.item == Items.AIR) return;
+			if (this.stack == null || this.stack.item == Items.AIR) {
+				this.itemRenderManager.Destroy(this.renderHandle);
+				return;
+			}
 
-			// parent!!!!!!!!!!!!!!!
-			this.itemRenderManager.Render(this.renderHandle, this.stack, new ItemRenderContext.GUI { parent = null });
+			this.itemRenderManager.Render(this.renderHandle, this.stack, new ItemRenderContext.UIToolkit { slot = this.visualElement });
 		}
 
 		public void Dispose() {

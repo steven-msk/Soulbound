@@ -1,14 +1,15 @@
-﻿namespace SoulboundEngine.Client.Render.Item {
+namespace SoulboundEngine.Client.Render.Item {
 	using SoulboundEngine.Client.ItemSystem;
 	using SoulboundEngine.Core;
 	using System;
 	using TMPro;
 	using UnityEngine;
 	using UnityEngine.UI;
+	using UnityEngine.UIElements;
 
 	public abstract class ItemRenderer {
-		public const float IMAGE_SIZE = 32f;
-		public const float STACK_TEXT_SIZE = 8f;
+		public const float IMAGE_SIZE = 64f;
+		public const float STACK_TEXT_SIZE = 13f;
 
 		public delegate ItemRenderer Factory();
 
@@ -20,7 +21,8 @@
 		public sealed class Default : ItemRenderer<ItemRenderState> {
 			public override ItemRenderState CreateRenderState(ItemStack stack, ItemRenderContext context) {
 				return new ItemRenderState {
-					showStackCount = context is ItemRenderContext.GUI && stack.item.IsStackable(),
+					showStackCount = (context is ItemRenderContext.GUI || context is ItemRenderContext.UIToolkit)
+						&& stack.item.IsStackable(),
 					stack = stack
 				};
 			}
@@ -38,7 +40,7 @@
 							rect.anchoredPosition = Vector2.zero;
 
 							Sprite sprite = model.GetSprite();
-							Image itemImage = obj.AddComponent<Image>();
+							UnityEngine.UI.Image itemImage = obj.AddComponent<UnityEngine.UI.Image>();
 							itemImage.sprite = sprite;
 							itemImage.raycastTarget = false;
 
@@ -48,6 +50,16 @@
 
 							obj.SetActive(true);
 							return IItemView.Of(obj);
+						}
+					case ItemRenderContext.UIToolkit uiToolkit: {
+							VisualElement display = uiToolkit.slot.Q<VisualElement>("ItemDisplay");
+							Label stackText = uiToolkit.slot.Q<Label>("StackCount");
+
+							display.style.backgroundImage = new StyleBackground(model.GetSprite());
+							stackText.text = state.stack.quantity.ToString();
+							stackText.style.display = state.showStackCount ? DisplayStyle.Flex : DisplayStyle.None;
+
+							return IItemView.Of(uiToolkit.slot);
 						}
 					case ItemRenderContext.World world: {
 							GameObject obj = new("Item");
@@ -105,18 +117,19 @@
 	public abstract class ItemRenderer<S> : ItemRenderer where S : ItemRenderState {
 		public abstract S CreateRenderState(ItemStack stack, ItemRenderContext context);
 
-		public abstract IItemView CreateView(S state, ItemModel model,ItemRenderContext context);
+		public abstract IItemView CreateView(S state, ItemModel model, ItemRenderContext context);
 		public abstract void UpdateView(S state, IItemView view, ItemRenderContext context);
 
 		internal override object CreateRenderStateBoxed(ItemStack stack, ItemRenderContext context) {
 			return this.CreateRenderState(stack, context);
 		}
+
 		internal override IItemView CreateViewBoxed(object state, ItemModel model, ItemRenderContext context) {
 			return this.CreateView((S)state, model, context);
 		}
+
 		internal override void UpdateViewBoxed(object state, IItemView view, ItemRenderContext context) {
 			this.UpdateView((S)state, view, context);
 		}
-
 	}
 }

@@ -1,27 +1,59 @@
-﻿using UnityEngine;
+using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.Render.Item {
 	public interface IItemView {
 		GameObject GetGameObject();
+		VisualElement GetVisualElement();
 		void SetVisible(bool visible);
 		void Destroy();
-
-		public bool IsValid() => this.GetGameObject() != null;
+		bool IsValid();
 
 		public static IItemView Of(GameObject gameObject) {
-			return new Impl(gameObject);
+			return new GameObjectImpl(gameObject);
 		}
 
-		private sealed class Impl : IItemView {
+		public static IItemView Of(VisualElement visualElement) {
+			return new VisualElementImpl(visualElement);
+		}
+
+		private sealed class GameObjectImpl : IItemView {
 			private readonly GameObject gameObject;
 
-			public Impl(GameObject gameObject) {
+			public GameObjectImpl(GameObject gameObject) {
 				this.gameObject = gameObject;
 			}
 
-			void IItemView.Destroy() => GameObject.Destroy(this.gameObject);
+			void IItemView.Destroy() {
+				if (this.gameObject != null) GameObject.Destroy(this.gameObject);
+			}
+
 			GameObject IItemView.GetGameObject() => this.gameObject;
-			void IItemView.SetVisible(bool visible) => this.gameObject.SetActive(visible);
+			VisualElement IItemView.GetVisualElement() => null;
+			bool IItemView.IsValid() => this.gameObject != null;
+
+			void IItemView.SetVisible(bool visible) {
+				if (this.gameObject != null) this.gameObject.SetActive(visible);
+			}
+		}
+
+		private sealed class VisualElementImpl : IItemView {
+			private readonly VisualElement visualElement;
+
+			public VisualElementImpl(VisualElement visualElement) {
+				this.visualElement = visualElement;
+			}
+
+			void IItemView.Destroy() => this.visualElement?.RemoveFromHierarchy();
+			GameObject IItemView.GetGameObject() => null;
+			VisualElement IItemView.GetVisualElement() => this.visualElement;
+			bool IItemView.IsValid() => this.visualElement != null;
+
+			void IItemView.SetVisible(bool visible) {
+				if (this.visualElement != null) {
+					this.visualElement.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
+				}
+			}
 		}
 	}
 }

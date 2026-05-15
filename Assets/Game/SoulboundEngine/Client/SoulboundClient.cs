@@ -218,10 +218,11 @@ namespace SoulboundEngine.Client {
 				}),
 
 				InputEventListener.ConsumePerformed(InputTokens.Debug.enterCommand, _ => {
-					if (this.debugOverlayManager.TryShow(DebugOverlayFeature.CommandLine)) {
-						this.commandLine.Show();
-						this.activeWorldSession?.player.StopHorizontalMovement();
-					}
+					this.commandProcessor.SubmitCommand("/give soulbound:dirt");
+					//if (this.debugOverlayManager.TryShow(DebugOverlayFeature.CommandLine)) {
+					//	this.commandLine.Show();
+					//	this.activeWorldSession?.player.StopHorizontalMovement();
+					//}
 				}),
 				InputEventListener.ConsumePerformed(InputTokens.Debug.toggleConsole, _ => {
 					if (!this.console.IsVisible() && this.debugOverlayManager.TryShow(DebugOverlayFeature.Console)) {

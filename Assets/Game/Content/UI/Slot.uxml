@@ -1,0 +1,10 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Game/Content/UI/Slot.uss?fileID=7433441132597879392&amp;guid=3c695142df27d314eb16e841ce896c57&amp;type=3#Slot"/>
+    <ui:VisualElement class="slot" style="flex-grow: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0;">
+        <ui:VisualElement style="flex-grow: 1; align-items: center; justify-content: center;">
+            <ui:VisualElement name="ItemDisplay" style="flex-grow: 0; background-image: none; width: 48px; height: 48px; flex-shrink: 0; align-self: auto; align-items: stretch; justify-content: flex-end;">
+                <ui:Label text="" name="StackCount" style="position: relative; top: auto; left: auto; background-color: rgba(26, 26, 26, 0); color: rgb(229, 229, 229); flex-shrink: 0; flex-grow: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; flex-wrap: nowrap; flex-direction: column; justify-content: flex-start; align-items: center; align-content: auto; transform-origin: left bottom; white-space: nowrap; text-overflow: clip; -unity-text-align: middle-right; width: 48px; -unity-font-definition: url(&quot;project://database/Assets/Game/Content/UI/Fonts/Urbanist/static/Urbanist-Bold.ttf?fileID=12800000&amp;guid=5a96c7f726e393f479cad9ff7179752b&amp;type=3#Urbanist-Bold&quot;); right: 2px;"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
