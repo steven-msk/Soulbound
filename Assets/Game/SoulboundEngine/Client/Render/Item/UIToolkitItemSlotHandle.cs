@@ -50,7 +50,7 @@ namespace SoulboundEngine.Client.Render.Item {
 
 		private void OnStackQuantityChanged(int oldCount, int newCount) {
 			if (newCount <= 0) {
-				this.itemRenderManager.Destroy(this.renderHandle);
+				this.itemRenderManager.Destroy(this.renderHandle, this.RenderContext);
 				return;
 			}
 
@@ -59,15 +59,15 @@ namespace SoulboundEngine.Client.Render.Item {
 
 		private void Render() {
 			if (this.stack == null || this.stack.item == Items.AIR) {
-				this.itemRenderManager.Destroy(this.renderHandle);
+				this.itemRenderManager.Destroy(this.renderHandle, this.RenderContext);
 				return;
 			}
 
-			this.view = this.itemRenderManager.Render(this.renderHandle, this.stack, new ItemRenderContext.UIToolkit { root = this.root });
+			this.view = this.itemRenderManager.Render(this.renderHandle, this.stack, this.RenderContext);
 		}
 
 		public void Dispose() {
-			this.itemRenderManager.Destroy(this.renderHandle);
+			this.itemRenderManager.Destroy(this.renderHandle, this.RenderContext);
 
 			this.slot.stackChanged -= this.StackChanged;
 
@@ -87,5 +87,7 @@ namespace SoulboundEngine.Client.Render.Item {
 		private void OnPointerUp(PointerUpEvent evt) => onPointerUp?.Invoke(evt);
 		private void OnPointerEnter(PointerEnterEvent evt) => onPointerEnter?.Invoke(evt);
 		private void OnPointerLeave(PointerLeaveEvent evt) => onPointerLeave?.Invoke(evt);
+
+		private ItemRenderContext RenderContext => new ItemRenderContext.UIToolkit { root = this.root };
 	}
 }

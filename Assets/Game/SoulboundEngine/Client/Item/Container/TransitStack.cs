@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.ItemSystem.Container {
 	public sealed class TransitStack {
-		private readonly VisualElement slot;
+		private readonly VisualElement root;
 		private Vector2 pointerPosition;
 		private ItemStack? itemStack;
 		private IItemView? itemView;
@@ -16,7 +16,7 @@ namespace SoulboundEngine.Client.ItemSystem.Container {
 
 		public TransitStack(ItemRenderManager itemRenderManager, VisualElement slot) {
 			this.itemRenderManager = itemRenderManager;
-			this.slot = slot;
+			this.root = slot;
 			this.renderHandle = new ItemRenderHandle(this);
 		}
 
@@ -42,7 +42,7 @@ namespace SoulboundEngine.Client.ItemSystem.Container {
 		}
 
 		private void Render(ItemStack itemStack) {
-			this.itemView = this.itemRenderManager.Render(this.renderHandle, itemStack, new ItemRenderContext.UIToolkit { root = this.slot });
+			this.itemView = this.itemRenderManager.Render(this.renderHandle, itemStack, this.RenderContext);
 			this.UpdateViewPosition();
 		}
 
@@ -52,7 +52,7 @@ namespace SoulboundEngine.Client.ItemSystem.Container {
 		public void Destroy() {
 			if (this.itemView == null) return;
 
-			this.itemView.Destroy();
+			this.itemRenderManager.Destroy(this.renderHandle, this.RenderContext);
 			if (this.itemStack != null) {
 				this.itemStack.onQuantityChanged -= this.OnStackQuantityChanged;
 			}
@@ -65,11 +65,10 @@ namespace SoulboundEngine.Client.ItemSystem.Container {
 			this.UpdateViewPosition();
 		}
 
-
 		private void UpdateViewPosition() {
-			if (this.itemView != null) {
-				this.itemView.SetPosition(this.pointerPosition);
-			}
+			this.itemView?.SetPosition(this.pointerPosition);
 		}
+
+		private ItemRenderContext RenderContext => new ItemRenderContext.UIToolkit { root = this.root };
 	}
 }

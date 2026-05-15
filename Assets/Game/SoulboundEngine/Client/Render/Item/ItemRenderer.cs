@@ -16,7 +16,7 @@ namespace SoulboundEngine.Client.Render.Item {
 		internal abstract object CreateRenderStateBoxed(ItemStack stack, ItemRenderContext context);
 		internal abstract IItemView CreateViewBoxed(object state, ItemModel model, ItemRenderContext context);
 		internal abstract void UpdateViewBoxed(object state, IItemView view, ItemRenderContext context);
-		public abstract void DestroyView(IItemView view);
+		public abstract void DestroyView(IItemView view, ItemRenderContext context);
 
 		public sealed class Default : ItemRenderer<ItemRenderState> {
 			public override ItemRenderState CreateRenderState(ItemStack stack, ItemRenderContext context) {
@@ -52,8 +52,8 @@ namespace SoulboundEngine.Client.Render.Item {
 							return IItemView.Of(obj);
 						}
 					case ItemRenderContext.UIToolkit uiToolkit: {
-							VisualElement display = uiToolkit.root.Q<VisualElement>("ItemDisplay");
-							Label stackText = uiToolkit.root.Q<Label>("StackCount");
+							VisualElement display = uiToolkit.GetItemDisplay();
+							Label stackText = uiToolkit.GetStackCount();
 
 							display.style.backgroundImage = new StyleBackground(model.GetSprite());
 							stackText.text = state.stack.quantity.ToString();
@@ -88,7 +88,20 @@ namespace SoulboundEngine.Client.Render.Item {
 				}
 			}
 
-			public override void DestroyView(IItemView view) => view.Destroy();
+			public override void DestroyView(IItemView view, ItemRenderContext context) {
+				if (context is ItemRenderContext.UIToolkit uiToolkit) {
+					VisualElement display = uiToolkit.GetItemDisplay();
+					Label stackText = uiToolkit.GetStackCount();
+
+					display.style.backgroundImage = new StyleBackground((Sprite)null);
+					stackText.text = "";
+					stackText.style.display = DisplayStyle.None;
+
+					return;
+				}
+
+				view.Destroy();
+			}
 
 			public override void UpdateView(ItemRenderState state, IItemView view, ItemRenderContext context) {
 			}

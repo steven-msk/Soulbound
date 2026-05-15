@@ -6,7 +6,7 @@ namespace SoulboundEngine.Client.Render.Item {
 
 		public override IItemView CreateView(ItemRenderState state, ItemModel model, ItemRenderContext context) => IItemView.Of((UnityEngine.GameObject)null);
 
-		public override void DestroyView(IItemView view) {
+		public override void DestroyView(IItemView view, ItemRenderContext context) {
 		}
 
 		public override void UpdateView(ItemRenderState state, IItemView view, ItemRenderContext context) {
