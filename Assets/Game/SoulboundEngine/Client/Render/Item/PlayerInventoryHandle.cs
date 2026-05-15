@@ -6,35 +6,37 @@ using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.Render.Item {
 	public sealed class PlayerInventoryHandle : IDisposable {
-		private readonly VisualElement root;
 		private readonly List<UIToolkitItemSlotHandle> popupHandles = new();
 		private readonly List<HotbarSlotHandle> hotbarHandles = new();
 		private readonly Inventory inventory;
 		private readonly ItemRenderManager itemRenderManager;
+		private VisualElement root;
 
-		public PlayerInventoryHandle(VisualElement root, Inventory inventory, ItemRenderManager itemRenderManager) {
-			this.root = root;
+		public PlayerInventoryHandle(Inventory inventory, ItemRenderManager itemRenderManager) {
 			this.inventory = inventory;
 			this.itemRenderManager = itemRenderManager;
+		}
 
-			foreach (var slotIndex in inventory.GetPopupSlots()) {
-				IItemSlot slot = inventory.GetSlot(slotIndex);
+		public void OnBind(VisualElement root) {
+			this.root = root;
+
+			foreach (var slotIndex in this.inventory.GetPopupSlots()) {
+				IItemSlot slot = this.inventory.GetSlot(slotIndex);
 				VisualElement slotElement = this.GetPopup()[slotIndex - Inventory.HOTBAR_SIZE];
 
-				UIToolkitItemSlotHandle handle = new(slotElement, slot, itemRenderManager);
+				UIToolkitItemSlotHandle handle = new(slotElement, slot, this.itemRenderManager);
 				this.popupHandles.Add(handle);
 				this.AddPointerListeners(slotElement, handle, slot);
 			}
 
-			foreach (var slotIndex in inventory.GetHotbarSlots()) {
-				IItemSlot slot = inventory.GetSlot(slotIndex);
+			foreach (var slotIndex in this.inventory.GetHotbarSlots()) {
+				IItemSlot slot = this.inventory.GetSlot(slotIndex);
 				VisualElement slotElement = this.GetHotbar()[slotIndex];
 
-				HotbarSlotHandle handle = new(slotElement, slot, itemRenderManager);
+				HotbarSlotHandle handle = new(slotElement, slot, this.itemRenderManager);
 				this.hotbarHandles.Add(handle);
 				this.AddPointerListeners(slotElement, handle, slot);
 			}
-
 		}
 
 		private void AddPointerListeners(VisualElement visualElement, UIToolkitItemSlotHandle handle, IItemSlot slot) {

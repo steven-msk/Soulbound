@@ -18,7 +18,8 @@ namespace SoulboundEngine.Client.UI.Screen {
 		public override bool ReturnWithEscape => false;
 
 		protected override void OnBind(VisualElement root) {
-			this.inventoryHandle = new PlayerInventoryHandle(root.Q<VisualElement>("Inventory"), this.player.GetInventory(), this.itemRenderManager);
+			this.inventoryHandle = new PlayerInventoryHandle(this.player.GetInventory(), this.itemRenderManager);
+			this.inventoryHandle.OnBind(root.Q<VisualElement>("Inventory"));
 		}
 
 		public override void OnDispose(IScreenHandle handle) {
