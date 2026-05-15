@@ -59,6 +59,9 @@ namespace SoulboundEngine.Client.Render.Item {
 							stackText.text = state.stack.quantity.ToString();
 							stackText.style.display = state.showStackCount ? DisplayStyle.Flex : DisplayStyle.None;
 
+							display.pickingMode = PickingMode.Ignore;
+							stackText.pickingMode = PickingMode.Ignore;
+
 							uiToolkit.root.style.display = DisplayStyle.Flex;
 							return IItemView.Of(uiToolkit.root);
 						}
