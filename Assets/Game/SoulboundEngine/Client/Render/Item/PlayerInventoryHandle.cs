@@ -74,9 +74,16 @@ namespace SoulboundEngine.Client.Render.Item {
 		}
 		
 		private void OnPointerUp(IItemSlot slot, VisualElement visualElement, PointerUpEvent evt) {
+			this.scope.EndDrag();
 		}
 
 		private void OnPointerEnter(IItemSlot slot, VisualElement visualElement, PointerEnterEvent evt) {
+			if (!this.scope.InDragState()) return;
+
+			int dragButton = this.scope.GetDragState().button;
+			ISlotOperation operation = this.GetDrag(slot.GetIndex(), dragButton);
+
+			operation.Execute();
 		}
 
 		private void OnPointerLeave(IItemSlot slot, VisualElement visualElement, PointerLeaveEvent evt) {
@@ -99,6 +106,23 @@ namespace SoulboundEngine.Client.Render.Item {
 
 				if (transferSingleToSlot.CanExecute()) return transferSingleToSlot;
 				if (halveStackFromSlot.CanExecute()) return halveStackFromSlot;
+
+				return new NoSlotOperation();
+			}
+			return new NoSlotOperation();
+		}
+
+		private ISlotOperation GetDrag(int slotIndex, int button) {
+			if (button == LEFT_BUTTON) {
+				return new SplitDistributeToDraggedSlot(new SlotRef(this.inventory, slotIndex), this.scope);
+			}
+			if (button == RIGHT_BUTTON) {
+				TransferSingleToSlot transferSingleToSlot = new(this.inventory, slotIndex, this.scope);
+
+				if (transferSingleToSlot.CanExecute()) {
+					this.scope.ExtendDrag(new SlotRef(this.inventory, slotIndex));
+					return transferSingleToSlot;
+				}
 
 				return new NoSlotOperation();
 			}
