@@ -377,7 +377,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7115096231591057590, guid: 7104856036c2f48469aaf2bf2d99cd1b, type: 3}
       propertyPath: m_Name
-      value: UIDocument
+      value: UIRoot
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

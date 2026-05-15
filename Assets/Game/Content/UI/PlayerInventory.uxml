@@ -1,0 +1,45 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Game/Content/UI/Slot.uss?fileID=7433441132597879392&amp;guid=3c695142df27d314eb16e841ce896c57&amp;type=3#Slot"/>
+    <ui:VisualElement style="align-items: flex-start; align-content: auto; align-self: auto; justify-content: flex-start;">
+        <ui:VisualElement name="Popup" style="flex-grow: 0; flex-direction: row; flex-wrap: wrap; align-content: auto; flex-shrink: 0; flex-basis: auto; justify-content: flex-start; width: 360px; align-items: stretch; align-self: auto; display: flex; visibility: visible;">
+            <ui:VisualElement class="slot" style="flex-grow: 0;"/>
+            <ui:VisualElement class="slot" style="flex-grow: 0;"/>
+            <ui:VisualElement class="slot" style="flex-grow: 0;"/>
+            <ui:VisualElement class="slot" style="flex-grow: 0;"/>
+            <ui:VisualElement class="slot" style="flex-grow: 0;"/>
+            <ui:VisualElement class="slot" style="flex-grow: 0;"/>
+            <ui:VisualElement class="slot" style="flex-grow: 0;"/>
+            <ui:VisualElement class="slot" style="flex-grow: 0;"/>
+            <ui:VisualElement class="slot" style="flex-grow: 0;"/>
+            <ui:VisualElement class="slot" style="flex-grow: 0;"/>
+            <ui:VisualElement class="slot" style="flex-grow: 0;"/>
+            <ui:VisualElement class="slot" style="flex-grow: 0;"/>
+            <ui:VisualElement class="slot" style="flex-grow: 0;"/>
+            <ui:VisualElement class="slot" style="flex-grow: 0;"/>
+            <ui:VisualElement class="slot" style="flex-grow: 0;"/>
+            <ui:VisualElement class="slot" style="flex-grow: 0;"/>
+            <ui:VisualElement class="slot" style="flex-grow: 0;"/>
+            <ui:VisualElement class="slot" style="flex-grow: 0;"/>
+            <ui:VisualElement class="slot" style="flex-grow: 0;"/>
+            <ui:VisualElement class="slot" style="flex-grow: 0;"/>
+            <ui:VisualElement class="slot" style="flex-grow: 0;"/>
+            <ui:VisualElement class="slot" style="flex-grow: 0;"/>
+            <ui:VisualElement class="slot" style="flex-grow: 0;"/>
+            <ui:VisualElement class="slot" style="flex-grow: 0;"/>
+            <ui:VisualElement class="slot" style="flex-grow: 0;"/>
+            <ui:VisualElement class="slot" style="flex-grow: 0;"/>
+            <ui:VisualElement class="slot" style="flex-grow: 0;"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="Hotbar" style="flex-grow: 0; flex-direction: row; width: 360px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0;">
+            <ui:VisualElement name="" class="hotbar-slot selected" style="flex-grow: 0;"/>
+            <ui:VisualElement class="hotbar-slot" style="flex-grow: 0;"/>
+            <ui:VisualElement class="hotbar-slot" style="flex-grow: 0;"/>
+            <ui:VisualElement class="hotbar-slot" style="flex-grow: 0;"/>
+            <ui:VisualElement class="hotbar-slot" style="flex-grow: 0;"/>
+            <ui:VisualElement class="hotbar-slot" style="flex-grow: 0;"/>
+            <ui:VisualElement class="hotbar-slot" style="flex-grow: 0;"/>
+            <ui:VisualElement class="hotbar-slot" style="flex-grow: 0;"/>
+            <ui:VisualElement class="hotbar-slot" style="flex-grow: 0;"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
