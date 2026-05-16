@@ -1,6 +1,7 @@
 using Brigadier.NET.Suggestion;
 using Cysharp.Threading.Tasks;
 using SoulboundEngine.Client.Debug.Commands;
+using SoulboundEngine.Client.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,8 +10,7 @@ using UnityEngine.UIElements;
 using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 namespace SoulboundEngine.Client.Debug {
-	public sealed class CommandLine : IDisposable {
-		private VisualElement root;
+	public sealed class CommandLine : UxmlWidget, IDisposable {
 		private TextField textField;
 		private ListView completionList;
 		private readonly CommandProcessor commandProcessor;
@@ -25,10 +25,8 @@ namespace SoulboundEngine.Client.Debug {
 			this.commandProcessor = commandProcessor;
 		}
 
-		public bool isVisible { get; private set; }
-
-		public void OnBind(VisualElement root) {
-			this.root = root;
+		public override void OnBind(VisualElement root) {
+			base.OnBind(root);
 
 			this.textField = root.Q<TextField>("TextField");
 			this.RegisterCaretChanged((caret) => {
@@ -62,11 +60,8 @@ namespace SoulboundEngine.Client.Debug {
 			this.textField.RegisterCallback<ChangeEvent<string>>(_ => this.textField.schedule.Execute(CheckCaret), TrickleDown.TrickleDown);
 		}
 
-		public void Show() {
-			if (this.isVisible) return;
-			this.isVisible = true;
-
-			this.root.style.display = DisplayStyle.Flex;
+		public override void Show() {
+			base.Show();
 			this.textField.value = "/";
 
 			this.GrabFocus();
@@ -76,11 +71,8 @@ namespace SoulboundEngine.Client.Debug {
 				: CommandInputMode.Typing;
 		}
 
-		public void Hide() {
-			if (!this.isVisible) return;
-			this.isVisible = false;
-
-			this.root.style.display = DisplayStyle.None;
+		public override void Hide() {
+			base.Hide();
 			this.textField.value = "/";
 			this.debugOverlayManager.Hide(SoulboundClient.DebugOverlayFeature.CommandLine);
 		}

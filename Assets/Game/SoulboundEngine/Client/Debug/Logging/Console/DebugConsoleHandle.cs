@@ -20,30 +20,30 @@ namespace SoulboundEngine.Client.Debug.Logging.Console {
 		}
 
 		public void AddLog(string condition, string stackTrace, LogType logType) {
-			pendingLogs.Enqueue((condition, stackTrace, logType));
+			this.pendingLogs.Enqueue((condition, stackTrace, logType));
 		}
 
 		public void ToggleFilter(LogType typeFilter) {
-			if (!filteredTypes.Add(typeFilter)) filteredTypes.Remove(typeFilter);
+			if (!this.filteredTypes.Add(typeFilter)) this.filteredTypes.Remove(typeFilter);
 
-			foreach (var (obj, _) in logObjects) obj.SetActive(true);
-			foreach (var (obj, _) in logObjects.Where(o => !filteredTypes.Contains(o.logType))) {
+			foreach (var (obj, _) in this.logObjects) obj.SetActive(true);
+			foreach (var (obj, _) in this.logObjects.Where(o => !this.filteredTypes.Contains(o.logType))) {
 				obj.SetActive(false);
 			}
 		}
 
-		private void Update() => ProcessLogPendings();
+		private void Update() => this.ProcessLogPendings();
 
 		private void ProcessLogPendings() {
-			if (pendingLogs.Count == 0) return;
+			if (this.pendingLogs.Count == 0) return;
 
 			int objLeft = LOG_OBJECTS_PER_FRAME;
-			while (pendingLogs.Count > 0 && objLeft-- > 0) {
-				var (condition, stackTrace, logType) = pendingLogs.Dequeue();
+			while (this.pendingLogs.Count > 0 && objLeft-- > 0) {
+				var (condition, stackTrace, logType) = this.pendingLogs.Dequeue();
 
-				GameObject obj = CreateLogObject(condition, stackTrace, logType);
-				obj.transform.SetParent(contentParent, false);
-				AutoScroll();
+				GameObject obj = this.CreateLogObject(condition, stackTrace, logType);
+				obj.transform.SetParent(this.contentParent, false);
+				this.AutoScroll();
 			}
 		}
 
@@ -53,12 +53,12 @@ namespace SoulboundEngine.Client.Debug.Logging.Console {
 				StringBuilder builder = new();
 
 				builder.AppendLine(condition);
-				builder.Append(SkipFrames(stackTrace, logSkips));
+				builder.Append(this.SkipFrames(stackTrace, logSkips));
 				condition = builder.ToString();
 			}
 
 			GameObject obj = new(logType.ToString(), typeof(RectTransform));
-			logObjects.Add((obj, logType));
+			this.logObjects.Add((obj, logType));
 
 			TextMeshProUGUI text = obj.AddComponent<TextMeshProUGUI>();
 			text.fontSize = 12f;
@@ -78,7 +78,7 @@ namespace SoulboundEngine.Client.Debug.Logging.Console {
 
 		private void AutoScroll() {
 			Canvas.ForceUpdateCanvases();
-			scrollRect.verticalNormalizedPosition = 0f;
+			this.scrollRect.verticalNormalizedPosition = 0f;
 		}
 
 		private string SkipFrames(string stackTrace, int skipCount) {

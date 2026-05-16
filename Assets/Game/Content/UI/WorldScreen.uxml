@@ -1,5 +1,6 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:Template name="CommandLine" src="project://database/Assets/Game/Content/UI/CommandLine.uxml?fileID=9197481963319205126&amp;guid=e3f791d2bfaef504f98632e37fb8e122&amp;type=3#CommandLine"/>
+    <ui:Template name="LogConsole" src="project://database/Assets/Game/Content/UI/LogConsole.uxml?fileID=9197481963319205126&amp;guid=2684061bf2e4df640af036ce4c3ac404&amp;type=3#LogConsole"/>
     <ui:Template name="MetricsHUD" src="project://database/Assets/Game/Content/UI/MetricsHUD.uxml?fileID=9197481963319205126&amp;guid=e04ae0f2f4b119e4ca6025251e089a4f&amp;type=3#MetricsHUD"/>
     <ui:Template name="PlayerInventory" src="project://database/Assets/Game/Content/UI/PlayerInventory.uxml?fileID=9197481963319205126&amp;guid=5fb502a4ef30a954d901962876e3adc0&amp;type=3#PlayerInventory"/>
     <ui:Instance template="PlayerInventory" name="Inventory" style="flex-direction: column-reverse; flex-grow: 1; align-items: stretch; visibility: visible; display: flex; left: auto;"/>
@@ -15,4 +16,5 @@
     </ui:VisualElement>
     <ui:Instance template="CommandLine" enabled="true" picking-mode="Ignore" name="CommandLine" style="position: absolute; visibility: visible; display: none; overflow: visible; background-color: rgba(0, 0, 0, 0); top: auto; left: 0; bottom: 0; right: 0; flex-grow: 1; flex-direction: column;"/>
     <ui:Instance template="MetricsHUD" name="MetricsHUD" style="position: absolute; flex-grow: 1; top: 0; left: 0; bottom: 0; right: 0; display: none; visibility: visible;"/>
+    <ui:Instance template="LogConsole" name="LogConsole" style="position: absolute; top: 0; left: 0; bottom: 0; right: 0; display: none;"/>
 </ui:UXML>

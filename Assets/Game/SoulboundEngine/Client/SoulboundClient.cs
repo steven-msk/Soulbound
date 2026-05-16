@@ -39,7 +39,7 @@ namespace SoulboundEngine.Client {
 		private readonly PlayerInputActions inputActions;
 		private readonly InputManager inputManager;
 		private readonly Settings settings;
-		private readonly DebugConsole console;
+		private readonly LogConsole logConsole;
 		private readonly CommandLine commandLine;
 		private readonly MetricsHUD metricsHud;
 		private readonly CommandProcessor commandProcessor;
@@ -75,7 +75,7 @@ namespace SoulboundEngine.Client {
 			this.debugOverlayManager = new DebugOverlayManager(this);
 			this.commandLine = new CommandLine(this.commandProcessor, this.debugOverlayManager);
 			this.metricsHud = new MetricsHUD(ctx.debugMetricsService);
-			this.console = new DebugConsole();
+			this.logConsole = new LogConsole();
 
 			// prototypical; will not pass to alpha prod
 			var worldSerializer = new JsonSerializer<WorldDump>(Soulbound.globalJsonSettings);
@@ -113,6 +113,7 @@ namespace SoulboundEngine.Client {
 		public void Update() {
 			this.inputManager.DispatchInputs();
 			this.metricsHud.Refresh();
+			this.logConsole.Update();
 		}
 
 		/// <summary>
@@ -152,7 +153,7 @@ namespace SoulboundEngine.Client {
 				this.activeWorldSession = session;
 				//this.uiHandler.SetCanvas(session.canvas);
 				this.uiHandler.SetUIDocument(session.uiDocument);
-				this.uiHandler.SetScreen(new WorldScreen(this.itemRenderManager, session.player, this.commandLine, this.metricsHud));
+				this.uiHandler.SetScreen(new WorldScreen(this.itemRenderManager, session.player, this.commandLine, this.metricsHud, this.logConsole));
 				this.debugOverlayManager.Clear();
 				this.inputManager.AddHandler(session.levelManager);
 
@@ -223,10 +224,10 @@ namespace SoulboundEngine.Client {
 					}
 				}),
 				InputEventListener.ConsumePerformed(InputTokens.Debug.toggleConsole, _ => {
-					if (!this.console.IsVisible() && this.debugOverlayManager.TryShow(DebugOverlayFeature.Console)) {
-						this.console.Show();
-					} else if (this.console.IsVisible()) {
-						this.console.Hide();
+					if (!this.logConsole.isVisible && this.debugOverlayManager.TryShow(DebugOverlayFeature.Console)) {
+						this.logConsole.Show();
+					} else if (this.logConsole.isVisible) {
+						this.logConsole.Hide();
 						this.debugOverlayManager.Hide(DebugOverlayFeature.Console);
 					}
 				})

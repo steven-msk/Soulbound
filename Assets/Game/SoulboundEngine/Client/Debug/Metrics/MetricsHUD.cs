@@ -1,33 +1,21 @@
+using SoulboundEngine.Client.UI;
 using System;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.Debug.Metrics.View {
-	public sealed class MetricsHUD {
+	public sealed class MetricsHUD : UxmlWidget {
 		private readonly DebugMetricsService metricsService;
 		private readonly AverageFrameCounter fpsCounter = new(10);
 		private readonly AverageFrameCounter frameTimeCounter = new(10);
 		private MetricBinding[] metrics = Array.Empty<MetricBinding>();
-		private VisualElement root;
 
 		public MetricsHUD(DebugMetricsService metricsService) {
 			this.metricsService = metricsService;
 		}
 
-		public bool isVisible { get; private set; }
-
-		public void OnBind(VisualElement root) {
-			this.root = root;
+		public override void OnBind(VisualElement root) {
+			base.OnBind(root);
 			this.metrics = this.CreateMetricBindings(root);
-		}
-
-		public void Show() {
-			this.root.style.display = DisplayStyle.Flex;
-			this.isVisible = true;
-		}
-
-		public void Hide() {
-			this.root.style.display = DisplayStyle.None;
-			this.isVisible = false;
 		}
 
 		private MetricBinding[] CreateMetricBindings(VisualElement root) {

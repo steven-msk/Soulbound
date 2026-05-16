@@ -1,4 +1,5 @@
 using SoulboundEngine.Client.Debug;
+using SoulboundEngine.Client.Debug.Logging.Console;
 using SoulboundEngine.Client.Debug.Metrics.View;
 using SoulboundEngine.Client.Input;
 using SoulboundEngine.Client.ItemSystem;
@@ -17,6 +18,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		private readonly Player player;
 		private readonly CommandLine commandLine;
 		private readonly MetricsHUD metricsHUD;
+		private readonly LogConsole logConsole;
 		private readonly ItemRenderManager itemRenderManager;
 		private PlayerInventoryHandle inventoryHandle;
 		private readonly HashSet<IItemContainer> openContainers = new();
@@ -24,12 +26,13 @@ namespace SoulboundEngine.Client.UI.Screen {
 		private TransitStack transitStack;
 		private Vector2 pointerPosition;
 
-		public WorldScreen(ItemRenderManager itemRenderManager, Player player, CommandLine commandLine, MetricsHUD metricsHUD) 
+		public WorldScreen(ItemRenderManager itemRenderManager, Player player, CommandLine commandLine, MetricsHUD metricsHUD, LogConsole logConsole) 
 			: base(AssetManager.Resolve<VisualTreeAsset>(new AssetKey("WorldScreen"))) {
 			this.itemRenderManager = itemRenderManager;
 			this.player = player;
 			this.commandLine = commandLine;
 			this.metricsHUD = metricsHUD;
+			this.logConsole = logConsole;
 		}
 
 		public override bool ReturnWithEscape => false;
@@ -53,6 +56,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		private void BindDebug(VisualElement root) {
 			this.commandLine.OnBind(root.Q<VisualElement>("CommandLine"));
 			this.metricsHUD.OnBind(root.Q<VisualElement>("MetricsHUD"));
+			this.logConsole.OnBind(root.Q<VisualElement>("LogConsole"));
 		}
 
 		public override void OnDispose(IScreenHandle handle) {
