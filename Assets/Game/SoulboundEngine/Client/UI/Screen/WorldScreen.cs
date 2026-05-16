@@ -8,7 +8,6 @@ using SoulboundEngine.Core.Assets;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 using InputEvent = SoulboundEngine.Client.Input.InputEvent;
 
@@ -23,7 +22,6 @@ namespace SoulboundEngine.Client.UI.Screen {
 		private SlotDragState dragState;
 		private TransitStack transitStack;
 		private Vector2 pointerPosition;
-		private bool isActive;
 
 		public WorldScreen(ItemRenderManager itemRenderManager, Player player, CommandLine commandLine) 
 			: base(AssetManager.Resolve<VisualTreeAsset>(new AssetKey("WorldScreen"))) {
@@ -56,6 +54,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 		public override void OnDispose(IScreenHandle handle) {
 			this.inventoryHandle.Dispose();
+			this.commandLine.Dispose();
 		}
 
 		public bool TryBeginDrag(ItemStack stack, SlotRef slotRef, int button) {
@@ -116,7 +115,6 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 		IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {
 			yield return InputEventListener.ConsumePerformed(InputTokens.Player.toggleInventory, _ => {
-				if (!this.isActive) return;
 				if (!this.inventoryHandle.isOpen) this.inventoryHandle.Open(this.player);
 				else this.inventoryHandle.Close(this.player);
 			});
@@ -127,20 +125,20 @@ namespace SoulboundEngine.Client.UI.Screen {
 				this.transitStack.SetPointerPosition(converted);
 			});
 
-			InputEventListener GetCommandLineKeyListener(InputToken token, Key key) {
-				return new(token, InputEvent.Phase.Any, _ => {
+			InputEventListener GetCommandLineKeyListener(InputToken token, KeyCode key) {
+				return new(token, InputEvent.Phase.Performed, _ => {
 					return this.commandLine.HandleKey(key)
 						? InputHandleResult.Consume
 						: InputHandleResult.Pass;
 				}, priority: int.MaxValue);
 			}
 
-			yield return GetCommandLineKeyListener(InputTokens.Keyboard.TAB, Key.Tab);
-			yield return GetCommandLineKeyListener(InputTokens.Keyboard.ARROW_UP, Key.UpArrow);
-			yield return GetCommandLineKeyListener(InputTokens.Keyboard.ARROW_DOWN, Key.DownArrow);
-			yield return GetCommandLineKeyListener(InputTokens.Keyboard.ESC, Key.Escape);
-			yield return GetCommandLineKeyListener(InputTokens.Keyboard.BACKSPACE, Key.Backspace);
-			yield return GetCommandLineKeyListener(InputTokens.Keyboard.ENTER, Key.Enter);
+			yield return GetCommandLineKeyListener(InputTokens.Keyboard.TAB, KeyCode.Tab);
+			yield return GetCommandLineKeyListener(InputTokens.Keyboard.ARROW_UP, KeyCode.UpArrow);
+			yield return GetCommandLineKeyListener(InputTokens.Keyboard.ARROW_DOWN, KeyCode.DownArrow);
+			yield return GetCommandLineKeyListener(InputTokens.Keyboard.ESC, KeyCode.Escape);
+			yield return GetCommandLineKeyListener(InputTokens.Keyboard.BACKSPACE, KeyCode.Backspace);
+			yield return GetCommandLineKeyListener(InputTokens.Keyboard.ENTER, KeyCode.KeypadEnter);
 		}
 
 		void IItemContainerScope.AddContainer(IItemContainer container) {
@@ -153,12 +151,10 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 		public override void OnHide(IScreenHandle handle) {
 			SoulboundClient.Instance.InputManager.RemoveHandler(this);
-			this.isActive = false;
 		}
 
 		public override void OnShow(IScreenHandle handle) {
 			SoulboundClient.Instance.InputManager.AddHandler(this);
-			this.isActive = true;
 		}
 	}
 }
