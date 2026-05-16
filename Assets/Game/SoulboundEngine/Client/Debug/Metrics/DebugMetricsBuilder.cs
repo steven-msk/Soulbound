@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace SoulboundEngine.Client.Debug.Metrics {
 	public ref struct DebugMetricsBuilder {
 		private readonly DebugMetricData[] buffer;
@@ -15,21 +9,19 @@ namespace SoulboundEngine.Client.Debug.Metrics {
 		}
 
 		public readonly DebugMetricsSnapshot Build() {
-			return new DebugMetricsSnapshot(buffer[..count], count);
+			return new DebugMetricsSnapshot(buffer, count);
 		}
 
-		public void Add(string label, int value) {
+		public void Add(DebugMetricId id, int value) {
 			buffer[count++] = new DebugMetricData {
-				valueType = typeof(int),
-				label = label,
+				id = id,
 				value = value
 			};
 		}
 
-		public void Add(string label, float value) {
+		public void Add(DebugMetricId id, float value) {
 			buffer[count++] = new DebugMetricData {
-				valueType = typeof(float),
-				label = label,
+				id = id,
 				value = value
 			};
 		}

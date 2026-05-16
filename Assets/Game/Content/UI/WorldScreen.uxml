@@ -1,7 +1,8 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:Template name="CommandLine" src="project://database/Assets/Game/Content/UI/CommandLine.uxml?fileID=9197481963319205126&amp;guid=e3f791d2bfaef504f98632e37fb8e122&amp;type=3#CommandLine"/>
+    <ui:Template name="MetricsHUD" src="project://database/Assets/Game/Content/UI/MetricsHUD.uxml?fileID=9197481963319205126&amp;guid=e04ae0f2f4b119e4ca6025251e089a4f&amp;type=3#MetricsHUD"/>
     <ui:Template name="PlayerInventory" src="project://database/Assets/Game/Content/UI/PlayerInventory.uxml?fileID=9197481963319205126&amp;guid=5fb502a4ef30a954d901962876e3adc0&amp;type=3#PlayerInventory"/>
-    <ui:Instance template="PlayerInventory" name="Inventory" style="flex-direction: column-reverse; flex-grow: 1; align-items: stretch; visibility: visible; display: flex;"/>
+    <ui:Instance template="PlayerInventory" name="Inventory" style="flex-direction: column-reverse; flex-grow: 1; align-items: stretch; visibility: visible; display: flex; left: auto;"/>
     <ui:VisualElement name="TransitStack" template="Slot" picking-mode="Ignore" style="visibility: visible; display: flex; position: absolute; color: rgba(27, 27, 27, 0); background-color: rgba(0, 0, 0, 0);">
         <Style src="project://database/Assets/Game/Content/UI/Slot.uss?fileID=7433441132597879392&amp;guid=3c695142df27d314eb16e841ce896c57&amp;type=3#Slot"/>
         <ui:VisualElement picking-mode="Ignore" style="flex-grow: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; border-left-color: rgb(153, 153, 153); border-right-color: rgb(128, 128, 128); border-bottom-color: rgb(128, 128, 128); -unity-material: url(&quot;&quot;); background-image: none; background-color: rgba(102, 102, 102, 0);">
@@ -13,4 +14,5 @@
         </ui:VisualElement>
     </ui:VisualElement>
     <ui:Instance template="CommandLine" enabled="true" picking-mode="Ignore" name="CommandLine" style="position: absolute; visibility: visible; display: none; overflow: visible; background-color: rgba(0, 0, 0, 0); top: auto; left: 0; bottom: 0; right: 0; flex-grow: 1; flex-direction: column;"/>
+    <ui:Instance template="MetricsHUD" name="MetricsHUD" style="position: absolute; flex-grow: 1; top: 0; left: 0; bottom: 0; right: 0; display: none; visibility: visible;"/>
 </ui:UXML>

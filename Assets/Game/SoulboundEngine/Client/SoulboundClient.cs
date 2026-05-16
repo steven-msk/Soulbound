@@ -112,6 +112,7 @@ namespace SoulboundEngine.Client {
 		/// </summary>
 		public void Update() {
 			this.inputManager.DispatchInputs();
+			this.metricsHud.Refresh();
 		}
 
 		/// <summary>
@@ -151,7 +152,7 @@ namespace SoulboundEngine.Client {
 				this.activeWorldSession = session;
 				//this.uiHandler.SetCanvas(session.canvas);
 				this.uiHandler.SetUIDocument(session.uiDocument);
-				this.uiHandler.SetScreen(new WorldScreen(this.itemRenderManager, session.player, this.commandLine));
+				this.uiHandler.SetScreen(new WorldScreen(this.itemRenderManager, session.player, this.commandLine, this.metricsHud));
 				this.debugOverlayManager.Clear();
 				this.inputManager.AddHandler(session.levelManager);
 
@@ -205,10 +206,10 @@ namespace SoulboundEngine.Client {
 		IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {
 			return new InputEventListener[] {
 				InputEventListener.ConsumePerformed(InputTokens.Debug.toggleMetrics, _ => {
-					if (!this.metricsHud.IsVisible() && this.debugOverlayManager.TryShow(DebugOverlayFeature.MetricsHUD)) {
+					if (!this.metricsHud.isVisible && this.debugOverlayManager.TryShow(DebugOverlayFeature.MetricsHUD)) {
 						this.metricsHud.Show();
 						this.activeWorldSession?.level.ShowChunkFeatures();
-					} else if (this.metricsHud.IsVisible()) {
+					} else if (this.metricsHud.isVisible) {
 						this.metricsHud.Hide();
 						this.activeWorldSession?.level.HideChunkFeatures();
 						this.debugOverlayManager.Hide(DebugOverlayFeature.MetricsHUD);

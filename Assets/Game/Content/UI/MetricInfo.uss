@@ -1,0 +1,16 @@
+:root {
+}
+
+.metric-label {
+    -unity-font-definition: url("project://database/Assets/Game/Content/UI/Fonts/Urbanist/static/Urbanist-SemiBold.ttf?fileID=12800000&guid=d9cc80f88ba9ffc4693adf4b8a24e732&type=3#Urbanist-SemiBold");
+    margin-top: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+    color: rgb(229, 229, 255);
+    font-size: 18px;
+}

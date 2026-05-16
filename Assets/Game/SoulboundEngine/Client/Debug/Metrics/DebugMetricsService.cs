@@ -1,9 +1,5 @@
-using System;
 using System.Buffers;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SoulboundEngine.Client.Debug.Metrics {
 	public sealed class DebugMetricsService {
@@ -13,11 +9,15 @@ namespace SoulboundEngine.Client.Debug.Metrics {
 			DebugMetricData[] buffer = ArrayPool<DebugMetricData>.Shared.Rent(32);
 			DebugMetricsBuilder builder = new(buffer);
 
-			for (int i = 0; i < sources.Count; i++) {
-				sources[i].CollectDebugData(ref builder);
-			}
+			try {
+				for (int i = 0; i < sources.Count; i++) {
+					sources[i].CollectDebugData(ref builder);
+				}
 
-			return builder.Build();
+				return builder.Build();
+			} finally {
+				ArrayPool<DebugMetricData>.Shared.Return(buffer);
+			}
 		}
 
 		public void RegisterSource(IDebugMetricsSource source) => sources.Add(source);
