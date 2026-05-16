@@ -75,7 +75,7 @@ namespace SoulboundEngine.Client {
 			this.debugOverlayManager = new DebugOverlayManager(this);
 			this.commandLine = new CommandLine(this.commandProcessor, this.debugOverlayManager);
 			this.metricsHud = new MetricsHUD(ctx.debugMetricsService);
-			this.logConsole = new LogConsole();
+			this.logConsole = ctx.logConsole;
 
 			// prototypical; will not pass to alpha prod
 			var worldSerializer = new JsonSerializer<WorldDump>(Soulbound.globalJsonSettings);

@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using SoulboundEngine.Client;
+using SoulboundEngine.Client.Debug.Logging.Console;
 using SoulboundEngine.Client.Debug.Metrics;
 using SoulboundEngine.Common.Json;
 using SoulboundEngine.Core.Assets;
@@ -30,12 +31,14 @@ namespace SoulboundEngine.Core {
 		private readonly GameConfig config;
 		private readonly PerformanceMetrics performanceMetrics;
 		private readonly DebugMetricsService debugMetricsService;
+		private readonly LogConsole logConsole;
 
 		public Soulbound(GameConfig config) {
 			instance = this;
 			this.config = config;
 			GameStateManager.SetBootstrapping();
 
+			this.logConsole = new LogConsole();
 #if !UNITY_EDITOR
 			Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
 			Application.SetStackTraceLogType(LogType.Warning, StackTraceLogType.None);
@@ -52,7 +55,8 @@ namespace SoulboundEngine.Core {
 			Registries.Freeze();
 
 			this.client = new SoulboundClient(config, new ClientInit {
-				debugMetricsService = this.debugMetricsService
+				debugMetricsService = this.debugMetricsService,
+				logConsole = this.logConsole
 			});
 
 			GameStateManager.SetInitialized();
