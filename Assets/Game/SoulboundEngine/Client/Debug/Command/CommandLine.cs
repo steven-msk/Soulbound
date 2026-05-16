@@ -45,6 +45,7 @@ namespace SoulboundEngine.Client.Debug {
 				Suggestion suggestion = this.completionManager.Get(index);
 				element.Q<Label>("SuggestionText").text = suggestion.Text;
 			};
+			this.completionList.makeNoneElement = () => new VisualElement();
 			this.completionList.itemsChosen += this.OnCompletionChosen;
 		}
 

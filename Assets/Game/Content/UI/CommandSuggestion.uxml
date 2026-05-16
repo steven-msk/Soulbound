@@ -1,5 +1,5 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:VisualElement style="flex-grow: 1;">
-        <ui:Label text="" name="SuggestionText" style="color: rgb(229, 229, 229); margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; -unity-font-style: normal; -unity-font-definition: url(&quot;project://database/Assets/Game/Content/UI/Fonts/Josefin_Sans/static/JosefinSans-SemiBold.ttf?fileID=12800000&amp;guid=72a51e1885304a14099c209e065bb2b7&amp;type=3#JosefinSans-SemiBold&quot;);"/>
+        <ui:Label text="" name="SuggestionText" style="color: rgb(229, 229, 229); margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; -unity-font-style: normal; -unity-font-definition: url(&quot;project://database/Assets/Game/Content/UI/Fonts/Josefin_Sans/static/JosefinSans-SemiBold.ttf?fileID=12800000&amp;guid=72a51e1885304a14099c209e065bb2b7&amp;type=3#JosefinSans-SemiBold&quot;); font-size: 18px;"/>
     </ui:VisualElement>
 </ui:UXML>
