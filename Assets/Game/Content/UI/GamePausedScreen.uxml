@@ -1,0 +1,8 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement style="flex-grow: 1; align-items: center; justify-content: center;">
+        <ui:VisualElement style="flex-grow: 0; align-items: stretch; justify-content: center; flex-wrap: nowrap; align-self: center; align-content: flex-start; flex-direction: column;">
+            <ui:Button text="Resume" name="Resume" style="-unity-font-definition: url(&quot;project://database/Assets/Game/Content/UI/Fonts/Josefin_Sans/static/JosefinSans-SemiBold.ttf?fileID=12800000&amp;guid=72a51e1885304a14099c209e065bb2b7&amp;type=3#JosefinSans-SemiBold&quot;); font-size: 20px; flex-grow: 0; flex-shrink: 1; align-items: center; justify-content: center; align-self: stretch;"/>
+            <ui:Button text="Quit to Title Screen" name="Quit" style="-unity-font-definition: url(&quot;project://database/Assets/Game/Content/UI/Fonts/Josefin_Sans/static/JosefinSans-SemiBold.ttf?fileID=12800000&amp;guid=72a51e1885304a14099c209e065bb2b7&amp;type=3#JosefinSans-SemiBold&quot;); font-size: 20px; align-self: stretch;"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
