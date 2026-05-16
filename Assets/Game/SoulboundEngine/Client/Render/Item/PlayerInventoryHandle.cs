@@ -1,16 +1,16 @@
 ﻿using SoulboundEngine.Client.ItemSystem.Container;
 using SoulboundEngine.Client.Players;
+using SoulboundEngine.Client.UI;
 using System;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.Render.Item {
-	public sealed class PlayerInventoryHandle : IDisposable {
+	public sealed class PlayerInventoryHandle : UxmlWidget, IDisposable {
 		private readonly UIToolkitItemSlotHandle[] slots;
 		private readonly Inventory inventory;
 		private readonly ItemRenderManager itemRenderManager;
 		private readonly IItemContainerScope scope;
-		private VisualElement root;
 		private int lastClickedSlot;
 		private float lastClickTime;
 		const float DOUBLE_CLICK_THRESHOLD = 0.15f;
@@ -27,7 +27,7 @@ namespace SoulboundEngine.Client.Render.Item {
 
 		public bool isOpen { get; private set; }
 
-		public void OnBind(VisualElement root) {
+		public override void OnBind(VisualElement root) {
 			this.root = root;
 
 			foreach (var slotIndex in this.inventory.GetPopupSlots()) {

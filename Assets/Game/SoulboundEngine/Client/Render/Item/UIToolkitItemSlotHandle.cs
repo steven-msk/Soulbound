@@ -1,13 +1,13 @@
 ﻿using SoulboundEngine.Client.ItemSystem;
 using SoulboundEngine.Client.ItemSystem.Container;
+using SoulboundEngine.Client.UI;
 using System;
 using UnityEngine.UIElements;
 
 #nullable enable
 
 namespace SoulboundEngine.Client.Render.Item {
-	public class UIToolkitItemSlotHandle : IDisposable {
-		protected VisualElement root = null!;
+	public class UIToolkitItemSlotHandle : UxmlWidget, IDisposable {
 		protected readonly IItemSlot slot;
 		private readonly ItemRenderManager itemRenderManager;
 		private readonly ItemRenderHandle renderHandle;
@@ -26,7 +26,7 @@ namespace SoulboundEngine.Client.Render.Item {
 			this.SetStack(slot.GetStack());
 		}
 
-		public virtual void OnBind(VisualElement root) {
+		public override void OnBind(VisualElement root) {
 			this.root = root;
 			root.RegisterCallback<PointerDownEvent>(this.OnPointerDown);
 			root.RegisterCallback<PointerUpEvent>(this.OnPointerUp);
@@ -85,11 +85,9 @@ namespace SoulboundEngine.Client.Render.Item {
 		}
 
 		public virtual void SetAsMainSlot() {
-
 		}
 
 		public virtual void UnsetMainSlot() {
-
 		}
 
 		private void OnPointerDown(PointerDownEvent evt) => onPointerDown?.Invoke(evt);

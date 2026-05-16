@@ -20,7 +20,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		private readonly MetricsHUD metricsHUD;
 		private readonly LogConsole logConsole;
 		private readonly ItemRenderManager itemRenderManager;
-		private PlayerInventoryHandle inventoryHandle;
+		private PlayerInventoryHandle inventoryHandle; 
 		private readonly HashSet<IItemContainer> openContainers = new();
 		private SlotDragState dragState;
 		private TransitStack transitStack;

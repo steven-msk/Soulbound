@@ -1,6 +1,5 @@
 using SoulboundEngine.Client.Input;
 using SoulboundEngine.Client.UI.Screen;
-using System;
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
@@ -10,12 +9,10 @@ using UnityEngine.UIElements;
 namespace SoulboundEngine.Client.UI {
 	public sealed class UIHandler : IInputEventHandler {
 		int IInputEventHandler.priority => 1000;
-		private readonly GUI gui;
 		private ScreenManager screenManager;
 		private UIToolkitScreenRoot screenRoot;
 
 		public UIHandler(UIDocument uiDocument) {
-			this.gui = new GUI();
 			this.screenRoot = new UIToolkitScreenRoot(uiDocument);
 			this.screenManager = new ScreenManager(this.screenRoot);
 		}
@@ -24,13 +21,6 @@ namespace SoulboundEngine.Client.UI {
 			this.screenRoot = new UIToolkitScreenRoot(uiDocument);
 			this.screenManager.Flush();
 			this.screenManager = new ScreenManager(this.screenRoot);
-		}
-
-		[Obsolete]
-		public void AddOverlay(UIOverlayNode overlayNode) {
-			//overlayNode.gameObject.transform.SetParent(this.canvas.transform, false);
-			//this.overlays.Add(overlayNode);
-			//overlayNode.onDestroy += () => this.overlays.Remove(overlayNode);
 		}
 
 		public void SetScreen(Screen.Screen screen) => this.screenManager.PushScreen(screen);
