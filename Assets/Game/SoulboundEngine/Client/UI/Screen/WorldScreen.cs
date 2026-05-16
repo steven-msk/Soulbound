@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
-using InputEvent = SoulboundEngine.Client.Input.InputEvent;
 
 namespace SoulboundEngine.Client.UI.Screen {
 	public sealed class WorldScreen : UxmlScreen, IItemContainerScope, IInputEventHandler {
@@ -124,21 +123,6 @@ namespace SoulboundEngine.Client.UI.Screen {
 				Vector2 converted = new(this.pointerPosition.x, UnityEngine.Device.Screen.height - this.pointerPosition.y);
 				this.transitStack.SetPointerPosition(converted);
 			});
-
-			InputEventListener GetCommandLineKeyListener(InputToken token, KeyCode key) {
-				return new(token, InputEvent.Phase.Performed, _ => {
-					return this.commandLine.HandleKey(key)
-						? InputHandleResult.Consume
-						: InputHandleResult.Pass;
-				}, priority: int.MaxValue);
-			}
-
-			yield return GetCommandLineKeyListener(InputTokens.Keyboard.TAB, KeyCode.Tab);
-			yield return GetCommandLineKeyListener(InputTokens.Keyboard.ARROW_UP, KeyCode.UpArrow);
-			yield return GetCommandLineKeyListener(InputTokens.Keyboard.ARROW_DOWN, KeyCode.DownArrow);
-			yield return GetCommandLineKeyListener(InputTokens.Keyboard.ESC, KeyCode.Escape);
-			yield return GetCommandLineKeyListener(InputTokens.Keyboard.BACKSPACE, KeyCode.Backspace);
-			yield return GetCommandLineKeyListener(InputTokens.Keyboard.ENTER, KeyCode.KeypadEnter);
 		}
 
 		void IItemContainerScope.AddContainer(IItemContainer container) {

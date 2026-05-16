@@ -37,6 +37,7 @@ namespace SoulboundEngine.Client.Debug {
 				string command = this.textField.value;
 				this.ShowCompletions(command, caret);
 			});
+			this.textField.RegisterCallback<KeyDownEvent>(this.HandleKeyEvent, TrickleDown.TrickleDown);
 		}
 
 		private void RegisterCaretChanged(Action<int> callback) {
@@ -60,7 +61,11 @@ namespace SoulboundEngine.Client.Debug {
 
 			this.root.style.display = DisplayStyle.Flex;
 			this.textField.value = "/";
-			this.textField.Focus();
+
+			this.textField.schedule.Execute(() => {
+				this.textField.Focus();
+				this.SetCaretToEnd();
+			});
 		}
 
 		public void Hide() {
@@ -74,8 +79,7 @@ namespace SoulboundEngine.Client.Debug {
 
 		private void HandleKeyEvent(KeyDownEvent evt) => this.HandleKey(evt.keyCode);
 
-		public bool HandleKey(KeyCode key) {
-			Logger.LogInfo(key);
+		private bool HandleKey(KeyCode key) {
 			if (!this.isVisible) return false;
 
 			if (key == KeyCode.Escape) {
@@ -83,7 +87,7 @@ namespace SoulboundEngine.Client.Debug {
 				return true;
 			}
 
-			if (key == KeyCode.KeypadEnter) {
+			if (key == KeyCode.Return) {
 				string command = this.textField.value;
 				this.SubmitCommand(command);
 				this.Hide();
