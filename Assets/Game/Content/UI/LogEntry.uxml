@@ -1,3 +1,4 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Game/Content/UI/LogEntry.uss?fileID=7433441132597879392&amp;guid=864800570a46cf446a2fd33d206f40c4&amp;type=3#LogEntry"/>
     <ui:Label text="" name="LogLabel" class="log-label" style="font-size: 18px;"/>
 </ui:UXML>

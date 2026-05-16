@@ -1,6 +1,15 @@
 :root {
 }
 
+#LogList .unity-list-view__item,
+#LogList .unity-list-view__item:hover,
+#LogList .unity-list-view__item--selected,
+#LogList .unity-collection-view__item,
+#LogList .unity-collection-view__item:hover,
+#LogList .unity-collection-view__item--selected {
+    background-color: rgba(0, 0, 0, 0);
+}
+
 .log-label {
     -unity-font-definition: url("project://database/Assets/Game/Content/UI/Fonts/Urbanist/static/Urbanist-SemiBold.ttf?fileID=12800000&guid=d9cc80f88ba9ffc4693adf4b8a24e732&type=3#Urbanist-SemiBold");
     margin-top: 0;
