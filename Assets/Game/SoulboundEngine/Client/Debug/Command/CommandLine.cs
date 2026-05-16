@@ -19,8 +19,6 @@ namespace SoulboundEngine.Client.Debug {
 		private readonly SoulboundClient.DebugOverlayManager debugOverlayManager;
 		private CommandInputMode currentInputMode;
 		private int historyIndex;
-		private bool eligibleForHistoryCycling;
-		private bool hasEnteredText;
 
 		public CommandLine(CommandProcessor commandProcessor, SoulboundClient.DebugOverlayManager debugOverlayManager) {
 			this.debugOverlayManager = debugOverlayManager;
@@ -33,7 +31,6 @@ namespace SoulboundEngine.Client.Debug {
 			this.root = root;
 
 			this.textField = root.Q<TextField>("TextField");
-			this.textField.RegisterValueChangedCallback(this.TextChanged);
 			this.RegisterCaretChanged((caret) => {
 				string command = this.textField.value;
 				this.ShowCompletions(command, caret);
@@ -51,8 +48,9 @@ namespace SoulboundEngine.Client.Debug {
 
 		private void RegisterCaretChanged(Action<int> callback) {
 			int lastCursor = this.textField.cursorIndex;
-			
+
 			void CheckCaret() {
+				if (!this.isVisible) return;
 				if (this.textField.cursorIndex == lastCursor) return;
 
 				lastCursor = this.textField.cursorIndex;
@@ -73,6 +71,9 @@ namespace SoulboundEngine.Client.Debug {
 
 			this.GrabFocus();
 			this.SetCaretToEnd();
+			this.currentInputMode = this.history.Any()
+				? CommandInputMode.CyclingHistory
+				: CommandInputMode.Typing;
 		}
 
 		public void Hide() {
@@ -85,7 +86,7 @@ namespace SoulboundEngine.Client.Debug {
 		}
 
 		private void HandleKeyEvent(KeyDownEvent evt) {
-			if (evt.keyCode is KeyCode.UpArrow or KeyCode.DownArrow or KeyCode.Tab) {
+			if (evt.keyCode is KeyCode.UpArrow or KeyCode.DownArrow or KeyCode.Tab or KeyCode.Return or KeyCode.KeypadEnter) {
 				evt.StopImmediatePropagation();
 			}
 			this.HandleKey(evt.keyCode);
@@ -94,28 +95,31 @@ namespace SoulboundEngine.Client.Debug {
 		private void HandleKey(KeyCode key) {
 			if (!this.isVisible) return;
 
-			if (key == KeyCode.Escape) {
+			if (key is KeyCode.Escape) {
 				this.Hide();
 				return;
 			}
 
-			if (key == KeyCode.Return) {
+			if (key is KeyCode.Return or KeyCode.KeypadEnter) {
 				string command = this.textField.value;
 				this.SubmitCommand(command);
 				this.Hide();
 				return;
 			}
 
-			if (key != KeyCode.Tab && key != KeyCode.UpArrow && key != KeyCode.DownArrow) { 
-				this.currentInputMode = CommandInputMode.Typing; 
+			if (key is not (KeyCode.UpArrow or KeyCode.DownArrow)) { 
+				this.currentInputMode = CommandInputMode.Typing;
 			}
 
 			switch (this.currentInputMode) {
-				case CommandInputMode.Typing: this.HandleTyping(key);
+				case CommandInputMode.Typing: 
+					this.HandleTyping(key);
 					break;
-				case CommandInputMode.CyclingCompletions: this.HandleCompletion(key); 
+				case CommandInputMode.CyclingCompletions: 
+					this.HandleCompletion(key); 
 					break;
-				case CommandInputMode.CyclingHistory: this.HandleHistory(key);
+				case CommandInputMode.CyclingHistory:
+					this.HandleHistory(key);
 					break;
 				default:
 					break;
@@ -123,45 +127,32 @@ namespace SoulboundEngine.Client.Debug {
 		}
 
 		private void HandleTyping(KeyCode key) {
-			if ((key == KeyCode.Tab || key == KeyCode.UpArrow || key == KeyCode.DownArrow)
+			if ((key is KeyCode.Tab or KeyCode.UpArrow or KeyCode.DownArrow)
 					&& this.completionManager.GetCompletionCount() > 0) {
 				this.currentInputMode = CommandInputMode.CyclingCompletions;
 				this.HandleCompletion(key);
-			} else if ((key == KeyCode.UpArrow || key == KeyCode.DownArrow) && this.history.Any() && this.eligibleForHistoryCycling) {
-				this.currentInputMode = CommandInputMode.CyclingHistory;
-				this.HandleHistory(key);
 			}
 		}
 
 		private void HandleCompletion(KeyCode key) {
-			if (key == KeyCode.DownArrow) {
+			if (key is KeyCode.DownArrow) {
 				this.HighlightCompletion(this.completionManager.SelectNext());
-			} else if (key == KeyCode.UpArrow) {
+			} else if (key is KeyCode.UpArrow) {
 				this.HighlightCompletion(this.completionManager.SelectPrevious());
-			} else if (key == KeyCode.Tab) {
+			} else if (key is KeyCode.Tab) {
 				this.InsertCompletion(this.completionManager.GetSelected());
 			}
 		}
 
 		private void HandleHistory(KeyCode key) {
-			if (key == KeyCode.UpArrow) {
+			if (key is KeyCode.UpArrow) {
 				this.historyIndex--;
 				if (this.historyIndex < 0) this.historyIndex = this.history.Count - 1;
 				this.InsertHistory();
-			} else if (key == KeyCode.DownArrow) {
+			} else if (key is KeyCode.DownArrow) {
 				this.historyIndex = (this.historyIndex + 1) % this.history.Count;
 				this.InsertHistory();
 			}
-		}
-
-		private void TextChanged(ChangeEvent<string> evt) {
-			string value = evt.newValue;
-
-			if (!this.hasEnteredText) this.hasEnteredText = value.Length > 1;
-			if (value.Equals("")) this.hasEnteredText = false;
-
-			this.eligibleForHistoryCycling = !this.hasEnteredText || this.currentInputMode == CommandInputMode.CyclingHistory;
-			if (!this.eligibleForHistoryCycling) this.currentInputMode = CommandInputMode.Typing;
 		}
 
 		private void SubmitCommand(string command) {
@@ -221,7 +212,6 @@ namespace SoulboundEngine.Client.Debug {
 		}
 
 		public void Dispose() {
-			this.textField.UnregisterValueChangedCallback(this.TextChanged);
 			this.textField.UnregisterCallback<KeyDownEvent>(this.HandleKeyEvent, TrickleDown.TrickleDown);
 			this.completionList.itemsChosen -= this.OnCompletionChosen;
 		}
