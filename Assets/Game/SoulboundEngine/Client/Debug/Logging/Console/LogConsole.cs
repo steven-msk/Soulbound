@@ -50,7 +50,7 @@ namespace SoulboundEngine.Client.Debug.Logging.Console {
 			} else if (this.errorLogs.Contains(index)) {
 				label.style.color = Color.red;
 			} else if (this.fatalLogs.Contains(index)) {
-				label.style.color = Color.darkRed;
+				label.style.color = Color.red;
 				label.style.unityFontStyleAndWeight = FontStyle.Bold;
 			}
 		}
