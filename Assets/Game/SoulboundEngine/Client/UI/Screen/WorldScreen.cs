@@ -1,3 +1,4 @@
+using SoulboundEngine.Client.Debug;
 using SoulboundEngine.Client.Input;
 using SoulboundEngine.Client.ItemSystem;
 using SoulboundEngine.Client.ItemSystem.Container;
@@ -7,11 +8,15 @@ using SoulboundEngine.Core.Assets;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
+using InputEvent = SoulboundEngine.Client.Input.InputEvent;
 
 namespace SoulboundEngine.Client.UI.Screen {
 	public sealed class WorldScreen : UxmlScreen, IItemContainerScope, IInputEventHandler {
+		int IInputEventHandler.priority => 5005;
 		private readonly Player player;
+		private readonly CommandLine commandLine;
 		private readonly ItemRenderManager itemRenderManager;
 		private PlayerInventoryHandle inventoryHandle;
 		private readonly HashSet<IItemContainer> openContainers = new();
@@ -20,15 +25,21 @@ namespace SoulboundEngine.Client.UI.Screen {
 		private Vector2 pointerPosition;
 		private bool isActive;
 
-		public WorldScreen(ItemRenderManager itemRenderManager, Player player) 
+		public WorldScreen(ItemRenderManager itemRenderManager, Player player, CommandLine commandLine) 
 			: base(AssetManager.Resolve<VisualTreeAsset>(new AssetKey("WorldScreen"))) {
 			this.itemRenderManager = itemRenderManager;
 			this.player = player;
+			this.commandLine = commandLine;
 		}
 
 		public override bool ReturnWithEscape => false;
 
 		protected override void OnBind(VisualElement root) {
+			this.BindInventory(root);
+			this.BindDebug(root);
+		}
+
+		private void BindInventory(VisualElement root) {
 			this.inventoryHandle = new PlayerInventoryHandle(this.player.GetInventory(), this.itemRenderManager, this);
 			this.inventoryHandle.OnBind(root.Q<VisualElement>("Inventory"));
 
@@ -37,6 +48,10 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 			// inventory is open at init
 			this.inventoryHandle.Close(this.player);
+		}
+
+		private void BindDebug(VisualElement root) {
+			this.commandLine.OnBind(root.Q<VisualElement>("CommandLine"));
 		}
 
 		public override void OnDispose(IScreenHandle handle) {
@@ -111,6 +126,20 @@ namespace SoulboundEngine.Client.UI.Screen {
 				Vector2 converted = new(this.pointerPosition.x, UnityEngine.Device.Screen.height - this.pointerPosition.y);
 				this.transitStack.SetPointerPosition(converted);
 			});
+
+			InputEventListener GetCommandLineKeyListener(InputToken token, Key key) {
+				return new(token, InputEvent.Phase.Any, _ => {
+					return this.commandLine.HandleKey(key)
+						? InputHandleResult.Consume
+						: InputHandleResult.Pass;
+				}, priority: int.MaxValue);
+			}
+
+			yield return GetCommandLineKeyListener(InputTokens.Keyboard.TAB, Key.Tab);
+			yield return GetCommandLineKeyListener(InputTokens.Keyboard.ARROW_UP, Key.UpArrow);
+			yield return GetCommandLineKeyListener(InputTokens.Keyboard.ARROW_DOWN, Key.DownArrow);
+			yield return GetCommandLineKeyListener(InputTokens.Keyboard.ESC, Key.Escape);
+			yield return GetCommandLineKeyListener(InputTokens.Keyboard.BACKSPACE, Key.Backspace);
 		}
 
 		void IItemContainerScope.AddContainer(IItemContainer container) {

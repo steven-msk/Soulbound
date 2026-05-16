@@ -74,7 +74,6 @@ namespace SoulboundEngine.Client {
 			this.commandProcessor = new CommandProcessor(this.runtimeDataProvider, this.runtimeExecutionServices);
 			this.debugOverlayManager = new DebugOverlayManager(this);
 			this.commandLine = new CommandLine(this.commandProcessor, this.debugOverlayManager);
-			this.inputManager.AddHandler(this.commandLine);
 			this.metricsHud = new MetricsHUD(ctx.debugMetricsService);
 			this.console = new DebugConsole();
 
@@ -152,7 +151,7 @@ namespace SoulboundEngine.Client {
 				this.activeWorldSession = session;
 				//this.uiHandler.SetCanvas(session.canvas);
 				this.uiHandler.SetUIDocument(session.uiDocument);
-				this.uiHandler.SetScreen(new WorldScreen(this.itemRenderManager, session.player));
+				this.uiHandler.SetScreen(new WorldScreen(this.itemRenderManager, session.player, this.commandLine));
 				this.debugOverlayManager.Clear();
 				this.inputManager.AddHandler(session.levelManager);
 
@@ -252,9 +251,9 @@ namespace SoulboundEngine.Client {
 
 				onOverlayChanged += (prev, next) => {
 					if (client.activeWorldSession is { } session) {
-						if (client.commandLine.IsVisible() || next == DebugOverlayFeature.CommandLine) {
+						if (client.commandLine.isVisible || next == DebugOverlayFeature.CommandLine) {
 							client.inputManager.RemoveHandler(session.player);
-						} else if (!client.commandLine.IsVisible() && prev == DebugOverlayFeature.CommandLine) {
+						} else if (!client.commandLine.isVisible && prev == DebugOverlayFeature.CommandLine) {
 							client.inputManager.AddHandler(session.player);
 						}
 					}

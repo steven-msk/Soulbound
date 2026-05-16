@@ -1,0 +1,5 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="" style="flex-grow: 1;">
+        <ui:TextField label="" placeholder-text="" value="/" name="TextField" hide-placeholder-on-focus="false" style="background-color: rgb(51, 51, 51); font-size: 14px; -unity-font-definition: url(&quot;project://database/Assets/Game/Content/UI/Fonts/Josefin_Sans/static/JosefinSans-SemiBold.ttf?fileID=12800000&amp;guid=72a51e1885304a14099c209e065bb2b7&amp;type=3#JosefinSans-SemiBold&quot;);"/>
+    </ui:VisualElement>
+</ui:UXML>

@@ -33,7 +33,6 @@ namespace SoulboundEngine.Client.UI.Screen {
 				this.AddWorldToList(save.name, save.seed, slot, i++);
 			}
 
-
 			root.Q<Button>("CreateWorld").clicked += () => {
 				TextField nameField = root.Q<TextField>("NameField");
 				TextField seedField = root.Q<TextField>("SeedField");
