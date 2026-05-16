@@ -16,8 +16,13 @@ namespace SoulboundEngine.Client.Render.Item {
 			GetColorFromHex("#808080")		// left
 		};
 
-		public HotbarSlotHandle(VisualElement visualElement, IItemSlot slot, ItemRenderManager itemRenderManager) 
-			: base(visualElement, slot, itemRenderManager) {
+		public HotbarSlotHandle(IItemSlot slot, ItemRenderManager itemRenderManager) 
+			: base(slot, itemRenderManager) {
+		}
+
+		public override void OnBind(VisualElement root) {
+			base.OnBind(root);
+			root.Q<Label>("SlotIndex").text = (this.slot.GetIndex() + 1).ToString();
 		}
 
 		public override void SetAsMainSlot() {

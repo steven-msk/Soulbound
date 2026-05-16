@@ -34,7 +34,8 @@ namespace SoulboundEngine.Client.Render.Item {
 				IItemSlot slot = this.inventory.GetSlot(slotIndex);
 				VisualElement slotElement = this.GetPopup()[slotIndex - Inventory.HOTBAR_SIZE];
 
-				UIToolkitItemSlotHandle handle = new(slotElement, slot, this.itemRenderManager);
+				UIToolkitItemSlotHandle handle = new(slot, this.itemRenderManager);
+				handle.OnBind(slotElement);
 				this.slots[slotIndex] = handle;
 				this.AddPointerListeners(slotElement, handle, slot);
 			}
@@ -43,7 +44,8 @@ namespace SoulboundEngine.Client.Render.Item {
 				IItemSlot slot = this.inventory.GetSlot(slotIndex);
 				VisualElement slotElement = this.GetHotbar()[slotIndex];
 
-				HotbarSlotHandle handle = new(slotElement, slot, this.itemRenderManager);
+				HotbarSlotHandle handle = new(slot, this.itemRenderManager);
+				handle.OnBind(slotElement);
 				this.slots[slotIndex] = handle;
 				this.AddPointerListeners(slotElement, handle, slot);
 			}

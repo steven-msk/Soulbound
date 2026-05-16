@@ -7,30 +7,31 @@ using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.Render.Item {
 	public class UIToolkitItemSlotHandle : IDisposable {
-		protected readonly VisualElement root;
+		protected VisualElement root = null!;
 		protected readonly IItemSlot slot;
 		private readonly ItemRenderManager itemRenderManager;
 		private readonly ItemRenderHandle renderHandle;
 		protected ItemStack? stack;
-		private IItemView? view;
 		public event Action<PointerDownEvent>? onPointerDown;
 		public event Action<PointerUpEvent>? onPointerUp;
 		public event Action<PointerEnterEvent>? onPointerEnter;
 		public event Action<PointerLeaveEvent>? onPointerLeave;
 
-		public UIToolkitItemSlotHandle(VisualElement visualElement, IItemSlot slot, ItemRenderManager itemRenderManager) {
-			this.root = visualElement;
+		public UIToolkitItemSlotHandle(IItemSlot slot, ItemRenderManager itemRenderManager) {
 			this.slot = slot;
 			this.itemRenderManager = itemRenderManager;
 			this.renderHandle = new ItemRenderHandle(this);
 
 			slot.stackChanged += this.StackChanged;
 			this.SetStack(slot.GetStack());
+		}
 
-			visualElement.RegisterCallback<PointerDownEvent>(this.OnPointerDown);
-			visualElement.RegisterCallback<PointerUpEvent>(this.OnPointerUp);
-			visualElement.RegisterCallback<PointerEnterEvent>(this.OnPointerEnter);
-			visualElement.RegisterCallback<PointerLeaveEvent>(this.OnPointerLeave);
+		public virtual void OnBind(VisualElement root) {
+			this.root = root;
+			root.RegisterCallback<PointerDownEvent>(this.OnPointerDown);
+			root.RegisterCallback<PointerUpEvent>(this.OnPointerUp);
+			root.RegisterCallback<PointerEnterEvent>(this.OnPointerEnter);
+			root.RegisterCallback<PointerLeaveEvent>(this.OnPointerLeave);
 		}
 
 		private void StackChanged(ItemStack? oldStack, ItemStack? newStack) => this.SetStack(newStack);
@@ -63,7 +64,7 @@ namespace SoulboundEngine.Client.Render.Item {
 				return;
 			}
 
-			this.view = this.itemRenderManager.Render(this.renderHandle, this.stack, this.RenderContext);
+			this.itemRenderManager.Render(this.renderHandle, this.stack, this.RenderContext);
 		}
 
 		public void Dispose() {
