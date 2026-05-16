@@ -13,7 +13,7 @@ namespace SoulboundEngine.Client.Debug.Commands.View {
 	public sealed class CommandLineHandler : MonoBehaviour, ICommandLineHandler {
 		private CommandLineInputField inputField;
 		private CommandProcessor commandProcessor;
-		private readonly CommandCompletion completionQueue = new();
+		private readonly CompletionManager completionQueue = new();
 		private List<string> history;
 		private VerticalLayoutGroup completionPanel;
 		private int historyIndex;
@@ -39,29 +39,29 @@ namespace SoulboundEngine.Client.Debug.Commands.View {
 				inputField.SetTextWithoutNotify("/");
 				inputField.ForceLabelUpdate();
 				inputField.onValueChanged.AddListener(value => {
-					if (!hasEnteredText) hasEnteredText = value.Length > 1;
-					if (value.Equals("")) hasEnteredText = false;
-					eligibleForHistoryCycling = !hasEnteredText || currentInputMode == CommandInputMode.CyclingHistory;
-					if (!eligibleForHistoryCycling) currentInputMode = CommandInputMode.Typing;
+					if (!this.hasEnteredText) this.hasEnteredText = value.Length > 1;
+					if (value.Equals("")) this.hasEnteredText = false;
+					this.eligibleForHistoryCycling = !this.hasEnteredText || this.currentInputMode == CommandInputMode.CyclingHistory;
+					if (!this.eligibleForHistoryCycling) this.currentInputMode = CommandInputMode.Typing;
 				});
-				SetCaretToEnd();
-				if (history.Any()) currentInputMode = CommandInputMode.CyclingHistory;
-				hasEnteredText = false;
+				this.SetCaretToEnd();
+				if (history.Any()) this.currentInputMode = CommandInputMode.CyclingHistory;
+				this.hasEnteredText = false;
 			});
 		}
 
 		private void Update() {
-			if (lastCaretPos != inputField.caretPosition) {
-				ShowCompletions(inputField.text);
+			if (this.lastCaretPos != this.inputField.caretPosition) {
+				this.ShowCompletions(this.inputField.text);
 			}
-			lastCaretPos = inputField.caretPosition;
+			this.lastCaretPos = this.inputField.caretPosition;
 		}
 
 		private void SetCaretToEnd() {
-			int end = inputField.text.Length;
-			inputField.caretPosition = end;
-			inputField.selectionAnchorPosition = end;
-			inputField.selectionFocusPosition = end;
+			int end = this.inputField.text.Length;
+			this.inputField.caretPosition = end;
+			this.inputField.selectionAnchorPosition = end;
+			this.inputField.selectionFocusPosition = end;
 		}
 
 		// TODO: refactor command line handler logic
@@ -70,134 +70,137 @@ namespace SoulboundEngine.Client.Debug.Commands.View {
 				shouldCloseCommandLine();
 				return;
 			}
-			if (key != Key.Tab && key != Key.UpArrow && key != Key.DownArrow) currentInputMode = CommandInputMode.Typing;
-			switch (currentInputMode) {
-				case CommandInputMode.Typing: HandleTyping(key);
+			if (key != Key.Tab && key != Key.UpArrow && key != Key.DownArrow) this.currentInputMode = CommandInputMode.Typing;
+			switch (this.currentInputMode) {
+				case CommandInputMode.Typing:
+					this.HandleTyping(key);
 					break;
-				case CommandInputMode.CyclingCompletions: HandleCompletion(key);
+				case CommandInputMode.CyclingCompletions:
+					this.HandleCompletion(key);
 					break;
-				case CommandInputMode.CyclingHistory: HandleHistory(key);
+				case CommandInputMode.CyclingHistory:
+					this.HandleHistory(key);
 					break;
 			}
 		}
 
 		private void HandleTyping(Key key) {
 			if ((key == Key.Tab || key == Key.UpArrow || key == Key.DownArrow)
-					&& completionQueue.GetCompletionCount() > 0) {
-				currentInputMode = CommandInputMode.CyclingCompletions;
-				HandleCompletion(key);
-			} else if ((key == Key.UpArrow || key == Key.DownArrow) && history.Any() && eligibleForHistoryCycling) {
-				currentInputMode = CommandInputMode.CyclingHistory;
-				HandleHistory(key);
+					&& this.completionQueue.GetCompletionCount() > 0) {
+				this.currentInputMode = CommandInputMode.CyclingCompletions;
+				this.HandleCompletion(key);
+			} else if ((key == Key.UpArrow || key == Key.DownArrow) && this.history.Any() && this.eligibleForHistoryCycling) {
+				this.currentInputMode = CommandInputMode.CyclingHistory;
+				this.HandleHistory(key);
 			}
 		}
 
 		private void HandleCompletion(Key key) {
 			if (key == Key.DownArrow) {
-				HighlightCompletion(completionQueue.SelectNext());
+				this.HighlightCompletion(this.completionQueue.SelectNext());
 			} else if (key == Key.UpArrow) {
-				HighlightCompletion(completionQueue.SelectPrevious());
+				this.HighlightCompletion(this.completionQueue.SelectPrevious());
 			} else if (key == Key.Tab) {
-				InsertCompletion();
+				this.InsertCompletion();
 			} 
 		}
 
 		private void HandleHistory(Key key) {
 			if (key == Key.UpArrow) {
-				historyIndex--;
-				if (historyIndex < 0) historyIndex = history.Count - 1;
-				InsertHistory();
+				this.historyIndex--;
+				if (this.historyIndex < 0) this.historyIndex = this.history.Count - 1;
+				this.InsertHistory();
 			} else if (key == Key.DownArrow) {
-				historyIndex = (historyIndex + 1) % history.Count;
-				InsertHistory();
+				this.historyIndex = (this.historyIndex + 1) % this.history.Count;
+				this.InsertHistory();
 			}
 		}
 
 		public void InsertCompletion()	{
-			if (completionQueue.GetCompletionCount() == 0) return;
+			if (this.completionQueue.GetCompletionCount() == 0) return;
 
-			Suggestion suggestion = completionQueue.GetSelected();
+			Suggestion suggestion = this.completionQueue.GetSelected();
 
-			string withoutLeadingSlash = inputField.text[1..];
-			inputField.text = $"/{suggestion.Apply(withoutLeadingSlash)}";
+			string withoutLeadingSlash = this.inputField.text[1..];
+			this.inputField.text = $"/{suggestion.Apply(withoutLeadingSlash)}";
 
 			int newCaret = suggestion.Range.Start + 1 + suggestion.Text.Length;
-			inputField.caretPosition = newCaret;
-			inputField.selectionAnchorPosition = newCaret;
-			inputField.selectionFocusPosition = newCaret;
+			this.inputField.caretPosition = newCaret;
+			this.inputField.selectionAnchorPosition = newCaret;
+			this.inputField.selectionFocusPosition = newCaret;
 		}
 
 		private void InsertHistory() {
-			inputField.text = history[historyIndex];
-			SetCaretToEnd();
+			this.inputField.text = this.history[this.historyIndex];
+			this.SetCaretToEnd();
 		}
 
 		private void ExitHistory() {
-			currentInputMode = CommandInputMode.Typing;
+			this.currentInputMode = CommandInputMode.Typing;
 		}
 
 		public void ShowCompletions(string value) {
-			if (completionPanel == null) completionPanel = CreateCompletionPanel();
+			if (this.completionPanel == null) this.completionPanel = this.CreateCompletionPanel();
 
-			int caretPos = inputField.caretPosition;
+			int caretPos = this.inputField.caretPosition;
 
-			commandProcessor.GetCompletions(value, caretPos)
+			this.commandProcessor.GetCompletions(value, caretPos)
 				.ContinueWith(suggestions => {
 					if (suggestions.List.Any()) {
-						completionPanel.gameObject.SetActive(true);
-						foreach (var component in completionPanel.GetComponentsInChildren<TextMeshProUGUI>()) {
+						this.completionPanel.gameObject.SetActive(true);
+						foreach (var component in this.completionPanel.GetComponentsInChildren<TextMeshProUGUI>()) {
 							component.gameObject.SetActive(false);
 						}
-					} else completionPanel.gameObject.SetActive(false);
+					} else this.completionPanel.gameObject.SetActive(false);
 
-					currentCompletions = completionPanel.GetComponentsInChildren<TextMeshProUGUI>(true);
-					completionQueue.SetCompletions(suggestions.List);
+					this.currentCompletions = this.completionPanel.GetComponentsInChildren<TextMeshProUGUI>(true);
+					this.completionQueue.SetCompletions(suggestions.List);
 
 					int i = 0;
-					for (; i < currentCompletions.Length && i < suggestions.List.Count; i++) {
-						currentCompletions[i].gameObject.SetActive(true);
-						currentCompletions[i].text = suggestions.List[i].Text;
-						currentCompletions[i].Rebuild(CanvasUpdate.LatePreRender);
+					for (; i < this.currentCompletions.Length && i < suggestions.List.Count; i++) {
+						this.currentCompletions[i].gameObject.SetActive(true);
+						this.currentCompletions[i].text = suggestions.List[i].Text;
+						this.currentCompletions[i].Rebuild(CanvasUpdate.LatePreRender);
 					}
 
 					for (; i < suggestions.List.Count; i++) {
-						CreateCompletionComponent(suggestions.List[i].Text);
+						this.CreateCompletionComponent(suggestions.List[i].Text);
 					}
-					currentCompletions = completionPanel.GetComponentsInChildren<TextMeshProUGUI>(true);
-					HighlightCompletion(completionQueue.GetSelectedIndex());
+					this.currentCompletions = this.completionPanel.GetComponentsInChildren<TextMeshProUGUI>(true);
+					this.HighlightCompletion(this.completionQueue.GetSelectedIndex());
 				}).Forget(e => {
-					completionQueue.SetCompletions(Array.Empty<Suggestion>().ToList());
-					completionPanel.gameObject.SetActive(false);
+					this.completionQueue.SetCompletions(Array.Empty<Suggestion>().ToList());
+					this.completionPanel.gameObject.SetActive(false);
 					Logger.LogFatal(e);
 				});
 
 		}
 
 		private void HighlightCompletion(int index) {
-			if (InvalidCompletionPanel()) return;
-			for (int i = 0; i < currentCompletions.Length; i++) {
-				RevokeSelectedLayout(currentCompletions[i]);
+			if (this.InvalidCompletionPanel()) return;
+			for (int i = 0; i < this.currentCompletions.Length; i++) {
+				this.RevokeSelectedLayout(this.currentCompletions[i]);
 			}
-			if (index != -1) ApplySelectedLayout(currentCompletions[index]);
-			RebuildPanelLayout();
+			if (index != -1) this.ApplySelectedLayout(this.currentCompletions[index]);
+			this.RebuildPanelLayout();
 		}
 
 		private bool InvalidCompletionPanel() {
-			return completionPanel == null
-				|| (completionPanel != null && !completionPanel.gameObject.activeSelf);
+			return this.completionPanel == null
+				|| (this.completionPanel != null && !this.completionPanel.gameObject.activeSelf);
 		}
 
 		private void RebuildPanelLayout() {
-			if (!InvalidCompletionPanel()) {
+			if (!this.InvalidCompletionPanel()) {
 				LayoutRebuilder.ForceRebuildLayoutImmediate(
-					completionPanel.GetComponent<RectTransform>()
+					this.completionPanel.GetComponent<RectTransform>()
 				);
 			}
 		}
 
 		private VerticalLayoutGroup CreateCompletionPanel() {
 			GameObject obj = new("Completion Panel", typeof(RectTransform));
-			obj.transform.SetParent(transform, false);
+			obj.transform.SetParent(this.transform, false);
 
 			RectTransform rect = obj.GetComponent<RectTransform>();
 			rect.anchorMin = rect.anchorMax = new Vector2(0f, 1f);
@@ -218,7 +221,7 @@ namespace SoulboundEngine.Client.Debug.Commands.View {
 
 		private void CreateCompletionComponent(string completion) {
 			GameObject obj = new("Completion", typeof(RectTransform));
-			obj.transform.SetParent(completionPanel.transform, false);
+			obj.transform.SetParent(this.completionPanel.transform, false);
 
 			TextMeshProUGUI text = obj.AddComponent<TextMeshProUGUI>();
 			text.fontSize = 15f;

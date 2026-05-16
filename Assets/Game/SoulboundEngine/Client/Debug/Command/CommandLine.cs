@@ -12,9 +12,10 @@ namespace SoulboundEngine.Client.Debug {
 	public sealed class CommandLine : IDisposable {
 		private VisualElement root;
 		private TextField textField;
+		private ListView completionList;
 		private readonly CommandProcessor commandProcessor;
 		private readonly List<string> history = new();
-		private readonly CommandCompletion completionQueue = new();
+		private readonly CompletionManager completionManager = new();
 		private readonly SoulboundClient.DebugOverlayManager debugOverlayManager;
 		private CommandInputMode currentInputMode;
 		private int historyIndex;
@@ -38,6 +39,13 @@ namespace SoulboundEngine.Client.Debug {
 				this.ShowCompletions(command, caret);
 			});
 			this.textField.RegisterCallback<KeyDownEvent>(this.HandleKeyEvent, TrickleDown.TrickleDown);
+
+			this.completionList = root.Q<ListView>("CompletionList");
+			this.completionList.bindItem = (element, index) => {
+				Suggestion suggestion = this.completionManager.Get(index);
+				element.Q<Label>("SuggestionText").text = suggestion.Text;
+			};
+			this.completionList.itemsChosen += this.OnCompletionChosen;
 		}
 
 		private void RegisterCaretChanged(Action<int> callback) {
@@ -62,10 +70,8 @@ namespace SoulboundEngine.Client.Debug {
 			this.root.style.display = DisplayStyle.Flex;
 			this.textField.value = "/";
 
-			this.textField.schedule.Execute(() => {
-				this.textField.Focus();
-				this.SetCaretToEnd();
-			});
+			this.GrabFocus();
+			this.SetCaretToEnd();
 		}
 
 		public void Hide() {
@@ -79,19 +85,19 @@ namespace SoulboundEngine.Client.Debug {
 
 		private void HandleKeyEvent(KeyDownEvent evt) => this.HandleKey(evt.keyCode);
 
-		private bool HandleKey(KeyCode key) {
-			if (!this.isVisible) return false;
+		private void HandleKey(KeyCode key) {
+			if (!this.isVisible) return;
 
 			if (key == KeyCode.Escape) {
 				this.Hide();
-				return true;
+				return;
 			}
 
 			if (key == KeyCode.Return) {
 				string command = this.textField.value;
 				this.SubmitCommand(command);
 				this.Hide();
-				return true;
+				return;
 			}
 
 			if (key != KeyCode.Tab && key != KeyCode.UpArrow && key != KeyCode.DownArrow) { 
@@ -99,55 +105,47 @@ namespace SoulboundEngine.Client.Debug {
 			}
 
 			switch (this.currentInputMode) {
-				case CommandInputMode.Typing: return this.HandleTyping(key);
-				case CommandInputMode.CyclingCompletions: return this.HandleCompletion(key);
-				case CommandInputMode.CyclingHistory: return this.HandleHistory(key);
-				default: break;
+				case CommandInputMode.Typing: this.HandleTyping(key);
+					break;
+				case CommandInputMode.CyclingCompletions: this.HandleCompletion(key); 
+					break;
+				case CommandInputMode.CyclingHistory: this.HandleHistory(key);
+					break;
+				default:
+					break;
 			}
-
-			return false;
 		}
 
-		private bool HandleTyping(KeyCode key) {
+		private void HandleTyping(KeyCode key) {
 			if ((key == KeyCode.Tab || key == KeyCode.UpArrow || key == KeyCode.DownArrow)
-					&& this.completionQueue.GetCompletionCount() > 0) {
+					&& this.completionManager.GetCompletionCount() > 0) {
 				this.currentInputMode = CommandInputMode.CyclingCompletions;
 				this.HandleCompletion(key);
-				return true;
 			} else if ((key == KeyCode.UpArrow || key == KeyCode.DownArrow) && this.history.Any() && this.eligibleForHistoryCycling) {
 				this.currentInputMode = CommandInputMode.CyclingHistory;
 				this.HandleHistory(key);
-				return true;
 			}
-			return false;
 		}
 
-		private bool HandleCompletion(KeyCode key) {
+		private void HandleCompletion(KeyCode key) {
 			if (key == KeyCode.DownArrow) {
-				this.HighlightCompletion(this.completionQueue.SelectNext());
-				return true;
+				this.HighlightCompletion(this.completionManager.SelectNext());
 			} else if (key == KeyCode.UpArrow) {
-				this.HighlightCompletion(this.completionQueue.SelectPrevious());
-				return true;
+				this.HighlightCompletion(this.completionManager.SelectPrevious());
 			} else if (key == KeyCode.Tab) {
-				this.InsertCompletion();
-				return true;
+				this.InsertCompletion(this.completionManager.GetSelected());
 			}
-			return false;
 		}
 
-		private bool HandleHistory(KeyCode key) {
+		private void HandleHistory(KeyCode key) {
 			if (key == KeyCode.UpArrow) {
 				this.historyIndex--;
 				if (this.historyIndex < 0) this.historyIndex = this.history.Count - 1;
 				this.InsertHistory();
-				return true;
 			} else if (key == KeyCode.DownArrow) {
 				this.historyIndex = (this.historyIndex + 1) % this.history.Count;
 				this.InsertHistory();
-				return true;
 			}
-			return false;
 		}
 
 		private void TextChanged(ChangeEvent<string> evt) {
@@ -168,71 +166,46 @@ namespace SoulboundEngine.Client.Debug {
 		public void ShowCompletions(string value, int caretPos) {
 			this.commandProcessor.GetCompletions(value, caretPos)
 				.ContinueWith(suggestions => {
-					this.completionQueue.SetCompletions(suggestions.List);
+					this.completionManager.SetCompletions(suggestions.List);
+					this.completionList.itemsSource = suggestions.List;
+					this.completionList.RefreshItems();
+					this.HighlightCompletion(0);
 				})
 			.Forget(e => {
-				this.completionQueue.SetCompletions(Array.Empty<Suggestion>().ToList());
+				this.completionManager.SetCompletions(Array.Empty<Suggestion>().ToList());
 				Logger.LogFatal(e);
 			});
-
-
-			//commandProcessor.GetCompletions(value, caretPos)
-			//	.ContinueWith(suggestions => {
-			//		if (suggestions.List.Any()) {
-			//			completionPanel.gameObject.SetActive(true);
-			//			foreach (var component in completionPanel.GetComponentsInChildren<TextMeshProUGUI>()) {
-			//				component.gameObject.SetActive(false);
-			//			}
-			//		} else completionPanel.gameObject.SetActive(false);
-
-			//		currentCompletions = completionPanel.GetComponentsInChildren<TextMeshProUGUI>(true);
-			//		completionQueue.SetCompletions(suggestions.List);
-
-			//		int i = 0;
-			//		for (; i < currentCompletions.Length && i < suggestions.List.Count; i++) {
-			//			currentCompletions[i].gameObject.SetActive(true);
-			//			currentCompletions[i].text = suggestions.List[i].Text;
-			//			currentCompletions[i].Rebuild(CanvasUpdate.LatePreRender);
-			//		}
-
-			//		for (; i < suggestions.List.Count; i++) {
-			//			CreateCompletionComponent(suggestions.List[i].Text);
-			//		}
-			//		currentCompletions = completionPanel.GetComponentsInChildren<TextMeshProUGUI>(true);
-			//		HighlightCompletion(completionQueue.GetSelectedIndex());
-			//	}).Forget(e => {
-			//		completionQueue.SetCompletions(Array.Empty<Suggestion>().ToList());
-			//		completionPanel.gameObject.SetActive(false);
-			//		Logger.LogFatal(e);
-			//	});
-
 		}
 
-		private void InsertCompletion() {
-			if (this.completionQueue.GetCompletionCount() == 0) return;
+		private void OnCompletionChosen(IEnumerable<object> objects) {
+			this.InsertCompletion((Suggestion)objects.First());
+		}
 
-			Suggestion suggestion = this.completionQueue.GetSelected();
-
+		private void InsertCompletion(Suggestion suggestion) {
 			string withoutLeadingSlash = this.textField.value[1..];
-			this.textField.value = $"/{suggestion.Apply(withoutLeadingSlash)}";
+			string completed = $"/{suggestion.Apply(withoutLeadingSlash)}";
+			this.textField.SetValueWithoutNotify(completed);
 
 			int newCaret = suggestion.Range.Start + 1 + suggestion.Text.Length;
-			this.textField.cursorIndex = newCaret;
-			this.textField.selectIndex = newCaret;
+			this.textField.schedule.Execute(() => {
+				this.textField.Focus();
+				this.textField.selectIndex = newCaret;
+				this.textField.cursorIndex = newCaret;
+			});
 		}
 
 		private void HighlightCompletion(int index) {
-			//if (InvalidCompletionPanel()) return;
-			//for (int i = 0; i < currentCompletions.Length; i++) {
-			//	RevokeSelectedLayout(currentCompletions[i]);
-			//}
-			//if (index != -1) ApplySelectedLayout(currentCompletions[index]);
-			//RebuildPanelLayout();
+			this.completionList.selectedIndex = index;
+			this.completionList.ScrollToItem(index);
 		}
 
 		private void InsertHistory() {
 			this.textField.value = this.history[this.historyIndex];
 			this.SetCaretToEnd();
+		}
+
+		private void GrabFocus() {
+			this.textField.schedule.Execute(this.textField.Focus);
 		}
 
 		private void SetCaretToEnd() {
@@ -243,6 +216,8 @@ namespace SoulboundEngine.Client.Debug {
 
 		public void Dispose() {
 			this.textField.UnregisterValueChangedCallback(this.TextChanged);
+			this.textField.UnregisterCallback<KeyDownEvent>(this.HandleKeyEvent, TrickleDown.TrickleDown);
+			this.completionList.itemsChosen -= this.OnCompletionChosen;
 		}
 	}
 }

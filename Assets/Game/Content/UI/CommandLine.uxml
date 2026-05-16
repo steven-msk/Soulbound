@@ -1,5 +1,8 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:VisualElement name="" style="flex-grow: 1;">
-        <ui:TextField label="" placeholder-text="" value="/" name="TextField" hide-placeholder-on-focus="false" style="background-color: rgb(51, 51, 51); font-size: 14px; -unity-font-definition: url(&quot;project://database/Assets/Game/Content/UI/Fonts/Josefin_Sans/static/JosefinSans-SemiBold.ttf?fileID=12800000&amp;guid=72a51e1885304a14099c209e065bb2b7&amp;type=3#JosefinSans-SemiBold&quot;);"/>
+    <ui:VisualElement name="" style="flex-grow: 1; top: auto; left: 0; right: 0; bottom: 0; position: absolute;">
+        <ui:VisualElement name="" style="flex-grow: 1;">
+            <ui:ListView name="CompletionList" item-template="project://database/Assets/Game/Content/UI/CommandSuggestion.uxml?fileID=9197481963319205126&amp;guid=a963c1128bddfd24d81a9e3afba50937&amp;type=3#CommandSuggestion" virtualization-method="DynamicHeight"/>
+        </ui:VisualElement>
+        <ui:TextField label="" placeholder-text="" value="/" name="TextField" hide-placeholder-on-focus="false" select-all-on-focus="false" select-all-on-mouse-up="false" select-line-by-triple-click="false" emoji-fallback-support="false" select-word-by-double-click="false" usage-hints="None" style="background-color: rgb(51, 51, 51); font-size: 14px; -unity-font-definition: url(&quot;project://database/Assets/Game/Content/UI/Fonts/Josefin_Sans/static/JosefinSans-SemiBold.ttf?fileID=12800000&amp;guid=72a51e1885304a14099c209e065bb2b7&amp;type=3#JosefinSans-SemiBold&quot;);"/>
     </ui:VisualElement>
 </ui:UXML>
