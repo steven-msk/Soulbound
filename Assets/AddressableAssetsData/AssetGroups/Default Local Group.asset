@@ -21,6 +21,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0f702f1205f9812489c70ebd4b6cda17
+    m_Address: GamePausedScreen
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0f932da0be6fbc34fa244d63edae9ef8
     m_Address: click
     m_ReadOnly: 0
