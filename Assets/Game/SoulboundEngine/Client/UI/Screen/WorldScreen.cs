@@ -140,6 +140,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 			yield return GetCommandLineKeyListener(InputTokens.Keyboard.ARROW_DOWN, Key.DownArrow);
 			yield return GetCommandLineKeyListener(InputTokens.Keyboard.ESC, Key.Escape);
 			yield return GetCommandLineKeyListener(InputTokens.Keyboard.BACKSPACE, Key.Backspace);
+			yield return GetCommandLineKeyListener(InputTokens.Keyboard.ENTER, Key.Enter);
 		}
 
 		void IItemContainerScope.AddContainer(IItemContainer container) {
