@@ -84,7 +84,12 @@ namespace SoulboundEngine.Client.Debug {
 			this.debugOverlayManager.Hide(SoulboundClient.DebugOverlayFeature.CommandLine);
 		}
 
-		private void HandleKeyEvent(KeyDownEvent evt) => this.HandleKey(evt.keyCode);
+		private void HandleKeyEvent(KeyDownEvent evt) {
+			if (evt.keyCode is KeyCode.UpArrow or KeyCode.DownArrow or KeyCode.Tab) {
+				evt.StopImmediatePropagation();
+			}
+			this.HandleKey(evt.keyCode);
+		}
 
 		private void HandleKey(KeyCode key) {
 			if (!this.isVisible) return;
