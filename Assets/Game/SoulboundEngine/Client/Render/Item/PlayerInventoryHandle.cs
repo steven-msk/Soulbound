@@ -1,14 +1,12 @@
 ﻿using SoulboundEngine.Client.ItemSystem.Container;
 using SoulboundEngine.Client.Players;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.Render.Item {
 	public sealed class PlayerInventoryHandle : IDisposable {
-		private readonly List<UIToolkitItemSlotHandle> popupHandles = new();
-		private readonly List<HotbarSlotHandle> hotbarHandles = new();
+		private readonly UIToolkitItemSlotHandle[] slots;
 		private readonly Inventory inventory;
 		private readonly ItemRenderManager itemRenderManager;
 		private readonly IItemContainerScope scope;
@@ -24,6 +22,7 @@ namespace SoulboundEngine.Client.Render.Item {
 			this.inventory = inventory;
 			this.itemRenderManager = itemRenderManager;
 			this.scope = scope;
+			this.slots = new UIToolkitItemSlotHandle[inventory.GetSize()];
 		}
 
 		public bool isOpen { get; private set; }
@@ -36,7 +35,7 @@ namespace SoulboundEngine.Client.Render.Item {
 				VisualElement slotElement = this.GetPopup()[slotIndex - Inventory.HOTBAR_SIZE];
 
 				UIToolkitItemSlotHandle handle = new(slotElement, slot, this.itemRenderManager);
-				this.popupHandles.Add(handle);
+				this.slots[slotIndex] = handle;
 				this.AddPointerListeners(slotElement, handle, slot);
 			}
 
@@ -45,9 +44,12 @@ namespace SoulboundEngine.Client.Render.Item {
 				VisualElement slotElement = this.GetHotbar()[slotIndex];
 
 				HotbarSlotHandle handle = new(slotElement, slot, this.itemRenderManager);
-				this.hotbarHandles.Add(handle);
+				this.slots[slotIndex] = handle;
 				this.AddPointerListeners(slotElement, handle, slot);
 			}
+
+			this.inventory.mainSlotChanged += this.OnMainSlotChanged;
+			this.SetAsMainSlot(this.inventory.GetMainSlot());
 		}
 
 		public void Open(Player player) {
@@ -63,6 +65,14 @@ namespace SoulboundEngine.Client.Render.Item {
 			this.inventory.OnClosed(player);
 			this.isOpen = false;
 		}
+
+		private void OnMainSlotChanged(int oldIndex, int newIndex) {
+			this.UnsetMainSlot(oldIndex);
+			this.SetAsMainSlot(newIndex);
+		}
+
+		private void SetAsMainSlot(int slot) => this.slots[slot].SetAsMainSlot();
+		private void UnsetMainSlot(int slot) => this.slots[slot].UnsetMainSlot();
 
 		private void AddPointerListeners(VisualElement visualElement, UIToolkitItemSlotHandle handle, IItemSlot slot) {
 			handle.onPointerDown += evt => this.OnPointerDown(slot, visualElement, evt);
@@ -152,14 +162,11 @@ namespace SoulboundEngine.Client.Render.Item {
 		private VisualElement GetHotbar() => this.root.Q<VisualElement>("Hotbar");
 
 		public void Dispose() {
-			foreach (var slotHandle in this.popupHandles) {
-				slotHandle.Dispose();
+			for (int i = 0; i < this.slots.Length; i++) {
+				this.slots[i].Dispose();
+				this.slots[i] = null;
 			}
-			this.popupHandles.Clear();
-			foreach (var slotHandle in this.hotbarHandles) {
-				slotHandle.Dispose();
-			}
-			this.hotbarHandles.Clear();
+			this.inventory.mainSlotChanged -= this.OnMainSlotChanged;
 		}
 	}
 }

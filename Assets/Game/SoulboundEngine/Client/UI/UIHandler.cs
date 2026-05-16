@@ -2,7 +2,6 @@ using SoulboundEngine.Client.Input;
 using SoulboundEngine.Client.UI.Screen;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
 
@@ -14,11 +13,10 @@ namespace SoulboundEngine.Client.UI {
 		private readonly GUI gui;
 		private ScreenManager screenManager;
 		private UIToolkitScreenRoot screenRoot;
-		private readonly List<UIOverlayNode> overlays = new();
 
-		public UIHandler(UIDocument uIDocument) {
+		public UIHandler(UIDocument uiDocument) {
 			this.gui = new GUI();
-			this.screenRoot = new UIToolkitScreenRoot(uIDocument);
+			this.screenRoot = new UIToolkitScreenRoot(uiDocument);
 			this.screenManager = new ScreenManager(this.screenRoot);
 		}
 
@@ -27,20 +25,6 @@ namespace SoulboundEngine.Client.UI {
 			this.screenManager.Flush();
 			this.screenManager = new ScreenManager(this.screenRoot);
 		}
-
-		[Obsolete]
-		public void SetCanvas(Canvas canvas) {
-			//UIOverlayNode[] nodes = this.overlays.ToArray();
-			//for (int i = 0; i < nodes.Length; i++) nodes[i].Destroy();
-			//this.overlays.Clear();
-
-			//this.canvas = canvas;
-			//this.screenRoot = new ScreenRoot(canvas.transform);
-			//this.screenManager = new ScreenManager(this.screenRoot);
-		}
-
-		[Obsolete]
-		public Canvas GetCanvas() => null;
 
 		[Obsolete]
 		public void AddOverlay(UIOverlayNode overlayNode) {

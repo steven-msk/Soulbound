@@ -29,7 +29,6 @@ namespace SoulboundEngine.Client {
 	using UnityEngine.SceneManagement;
 	using UnityEngine.UIElements;
 	using Application = UnityEngine.Application;
-	using Canvas = UnityEngine.Canvas;
 	using Object = UnityEngine.Object;
 	using Time = UnityEngine.Time;
 
@@ -179,7 +178,7 @@ namespace SoulboundEngine.Client {
 			SceneManager.LoadSceneAsync(this.config.unity.mainScene).ToUniTask()
 				.ContinueWith(() => {
 					this.activeWorldSession = null;
-					this.uiHandler.SetCanvas(Object.FindFirstObjectByType<Canvas>());
+					this.uiHandler.SetUIDocument(Object.FindFirstObjectByType<UIDocument>());
 					this.uiHandler.SetScreen(new TitleScreen(this));
 					this.debugOverlayManager.Clear();
 
@@ -218,11 +217,10 @@ namespace SoulboundEngine.Client {
 				}),
 
 				InputEventListener.ConsumePerformed(InputTokens.Debug.enterCommand, _ => {
-					this.commandProcessor.SubmitCommand("/give soulbound:dirt");
-					//if (this.debugOverlayManager.TryShow(DebugOverlayFeature.CommandLine)) {
-					//	this.commandLine.Show();
-					//	this.activeWorldSession?.player.StopHorizontalMovement();
-					//}
+					if (this.debugOverlayManager.TryShow(DebugOverlayFeature.CommandLine)) {
+						this.commandLine.Show();
+						this.activeWorldSession?.player.StopHorizontalMovement();
+					}
 				}),
 				InputEventListener.ConsumePerformed(InputTokens.Debug.toggleConsole, _ => {
 					if (!this.console.IsVisible() && this.debugOverlayManager.TryShow(DebugOverlayFeature.Console)) {

@@ -7,11 +7,11 @@ using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.Render.Item {
 	public class UIToolkitItemSlotHandle : IDisposable {
-		private readonly VisualElement root;
-		private readonly IItemSlot slot;
+		protected readonly VisualElement root;
+		protected readonly IItemSlot slot;
 		private readonly ItemRenderManager itemRenderManager;
 		private readonly ItemRenderHandle renderHandle;
-		private ItemStack? stack;
+		protected ItemStack? stack;
 		private IItemView? view;
 		public event Action<PointerDownEvent>? onPointerDown;
 		public event Action<PointerUpEvent>? onPointerUp;
@@ -81,6 +81,14 @@ namespace SoulboundEngine.Client.Render.Item {
 			this.root.UnregisterCallback<PointerUpEvent>(this.OnPointerUp);
 			this.root.UnregisterCallback<PointerEnterEvent>(this.OnPointerEnter);
 			this.root.UnregisterCallback<PointerLeaveEvent>(this.OnPointerLeave);
+		}
+
+		public virtual void SetAsMainSlot() {
+
+		}
+
+		public virtual void UnsetMainSlot() {
+
 		}
 
 		private void OnPointerDown(PointerDownEvent evt) => onPointerDown?.Invoke(evt);
