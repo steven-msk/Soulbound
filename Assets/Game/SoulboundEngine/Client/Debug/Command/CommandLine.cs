@@ -57,10 +57,10 @@ namespace SoulboundEngine.Client.Debug {
 				lastCursor = this.textField.cursorIndex;
 				callback(lastCursor);
 			}
-			this.textField.RegisterCallback<KeyDownEvent>(_ => this.textField.schedule.Execute(CheckCaret));
-			this.textField.RegisterCallback<PointerUpEvent>(_ => this.textField.schedule.Execute(CheckCaret));
-			this.textField.RegisterCallback<FocusInEvent>(_ => this.textField.schedule.Execute(CheckCaret));
-			this.textField.RegisterCallback<ChangeEvent<string>>(_ => this.textField.schedule.Execute(CheckCaret));
+			this.textField.RegisterCallback<KeyDownEvent>(_ => this.textField.schedule.Execute(CheckCaret), TrickleDown.TrickleDown);
+			this.textField.RegisterCallback<PointerUpEvent>(_ => this.textField.schedule.Execute(CheckCaret), TrickleDown.TrickleDown);
+			this.textField.RegisterCallback<FocusInEvent>(_ => this.textField.schedule.Execute(CheckCaret), TrickleDown.TrickleDown);
+			this.textField.RegisterCallback<ChangeEvent<string>>(_ => this.textField.schedule.Execute(CheckCaret), TrickleDown.TrickleDown);
 		}
 
 		public void Show() {
