@@ -1,5 +1,7 @@
 using SoulboundEngine.Client.UI;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -40,19 +42,53 @@ namespace SoulboundEngine.Client.Debug.Logging.Console {
 		private void OnLogAdded(VisualElement element, int index) {
 			LogEntry entry = this.displayedLogs[index];
 			Label label = element.Q<Label>("LogLabel");
-			label.text = entry.condition;
+			label.text = entry.condition + this.AddStackTrace(entry);
 			label.style.unityFontStyleAndWeight = FontStyle.Normal;
 
-			if (this.normalLogs.Contains(index)) {
-				label.style.color = Color.white;
-			} else if (this.warningLogs.Contains(index)) {
-				label.style.color = Color.yellow;
-			} else if (this.errorLogs.Contains(index)) {
-				label.style.color = Color.red;
-			} else if (this.fatalLogs.Contains(index)) {
-				label.style.color = Color.red;
-				label.style.unityFontStyleAndWeight = FontStyle.Bold;
+			switch (entry.logType) {
+				case LogType.Log:
+					label.style.color = Color.white;
+					break;
+				case LogType.Warning:
+					label.style.color = Color.yellow;
+					break;
+				case LogType.Error:
+					label.style.color = Color.red;
+					break;
+				case LogType.Exception:
+					label.style.color = Color.red;
+					label.style.unityFontStyleAndWeight = FontStyle.Bold;
+					break;
+				default:
+					label.style.color = Color.white;
+					break;
 			}
+		}
+
+		private string AddStackTrace(LogEntry entry) {
+			if (entry.logType is not (LogType.Error or LogType.Exception)) return "";
+
+			int logSkips = entry.logType == LogType.Error ? 4 : 0;
+			string stackTrace = this.FormatStackTrace(entry.stackTrace, logSkips);
+			return string.IsNullOrEmpty(stackTrace) ? "" : $"\n{stackTrace}";
+		}
+
+		private string FormatStackTrace(string stackTrace, int skipCount) {
+			if (string.IsNullOrEmpty(stackTrace)) return stackTrace;
+
+			IEnumerable<string> lines = stackTrace.Split("\n").Skip(skipCount);
+			if (!lines.Any()) return string.Empty;
+
+			var builder = new StringBuilder();
+
+			foreach (var line in lines) {
+				if (string.IsNullOrWhiteSpace(line)) continue;
+
+				builder.Append('\t');
+				builder.AppendLine(line.TrimStart());
+			}
+
+			return builder.ToString();
 		}
 
 		public void Update() {
