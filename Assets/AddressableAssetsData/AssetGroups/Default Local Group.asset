@@ -195,6 +195,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e97c1c3954a6faa4da45ed9eef7f1918
+    m_Address: missingTile
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: f10baa890a05f7d4e95dd8f94a06742f
     m_Address: TickBlockOn
     m_ReadOnly: 0

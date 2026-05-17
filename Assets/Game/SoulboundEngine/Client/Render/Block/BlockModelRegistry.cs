@@ -12,6 +12,7 @@ namespace SoulboundEngine.Client.Render.Block {
 
 	public static class BlockModelRegistry {
 		private static readonly Dictionary<Block, BlockModel.IFactory> MODEL_FACTORIES = new();
+		public static BlockModel MISSING = new(ResolveTile(new AssetKey("missingTile")));
 
 		static BlockModelRegistry() {
 			Register(Blocks.AIR, _ => BlockModel.AIR);
@@ -65,7 +66,7 @@ namespace SoulboundEngine.Client.Render.Block {
 			foreach (var block in blocks) {
 				if (!MODEL_FACTORIES.TryGetValue(block, out BlockModel.IFactory factory)) {
 					Logger.LogError("Block model factory not found: {}", Blocks.GetIdentifier(block));
-					factory = BlockModel.IFactory.Of(_ => BlockModel.AIR);
+					factory = BlockModel.IFactory.Of(_ => MISSING);
 				}
 
 				foreach (var blockState in block.StateManager.GetStates()) {
