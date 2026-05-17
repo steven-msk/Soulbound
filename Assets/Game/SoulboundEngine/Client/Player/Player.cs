@@ -197,6 +197,19 @@ namespace SoulboundEngine.Client.Player {
 
 		bool IItemContainerScope.InDragState() => this.dragState != null;
 
+		public void OpenInventory(Inventory inventory) {
+			((IItemContainerScope)this).AddContainer(inventory);
+			inventory.OnOpened(this);
+		}
+
+		public void CloseInventory(Inventory inventory) {
+			((IItemContainerScope)this).RemoveContainer(inventory);
+			inventory.OnClosed(this);
+		}
+
+		public void OpenInventory() => this.OpenInventory(this.inventory);
+		public void CloseInventory() => this.CloseInventory(this.inventory);
+
 		private Dictionary<SlotRef, int> CreateQuantitySnapshots() {
 			Dictionary<SlotRef, int> snapshots = new();
 

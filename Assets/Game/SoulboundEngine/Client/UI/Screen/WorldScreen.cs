@@ -47,7 +47,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 			this.player.SetTransitStackSource(this.transitStack);
 
 			// inventory is open at init
-			this.inventoryHandle.Close(this.player);
+			this.inventoryHandle.Close();
 		}
 
 		private void BindDebug(VisualElement root) {
@@ -63,8 +63,13 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 		IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {
 			yield return InputEventListener.ConsumePerformed(InputTokens.Player.toggleInventory, _ => {
-				if (!this.inventoryHandle.isOpen) this.inventoryHandle.Open(this.player);
-				else this.inventoryHandle.Close(this.player);
+				if (!this.inventoryHandle.isOpen) {
+					this.inventoryHandle.Open();
+					this.player.OpenInventory();
+				} else { 
+					this.inventoryHandle.Close();
+					this.player.CloseInventory();
+				}
 			});
 			
 			yield return InputEventListener.ObserveAny(InputTokens.Mouse.position, inputEvent => {

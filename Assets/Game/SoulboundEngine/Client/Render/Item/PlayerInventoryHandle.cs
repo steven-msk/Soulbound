@@ -6,8 +6,6 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.Render.Item {
-	using Player = Player.Player;
-
 	public sealed class PlayerInventoryHandle : UxmlWidget, IDisposable {
 		private readonly UIToolkitItemSlotHandle[] slots;
 		private readonly PlayerInventory inventory;
@@ -56,17 +54,13 @@ namespace SoulboundEngine.Client.Render.Item {
 			this.SetAsMainSlot(this.inventory.GetMainSlot());
 		}
 
-		public void Open(Player player) {
+		public void Open() {
 			this.GetPopup().style.display = DisplayStyle.Flex;
-			this.scope.AddContainer(this.inventory);
-			this.inventory.OnOpened(player);
 			this.isOpen = true;
 		}
 
-		public void Close(Player player) {
+		public void Close() {
 			this.GetPopup().style.display = DisplayStyle.None;
-			this.scope.RemoveContainer(this.inventory);
-			this.inventory.OnClosed(player);
 			this.isOpen = false;
 		}
 
