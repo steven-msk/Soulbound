@@ -1,7 +1,7 @@
 using SoulboundEngine.Client.Interaction;
 
 namespace SoulboundEngine.Client.ItemSystem {
-	public interface IItemInteractionListener {
+	public interface IInteractableItem {
 		bool ValidateTrigger(InteractionTrigger trigger);
 
 		// pass in a context param if number of params grows
