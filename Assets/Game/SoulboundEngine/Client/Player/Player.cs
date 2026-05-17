@@ -4,9 +4,11 @@ using SoulboundEngine.Client.ItemSystem;
 using SoulboundEngine.Client.ItemSystem.Container;
 using SoulboundEngine.Client.World.BlockSystem;
 using SoulboundEngine.Client.World.BlockSystem.States;
+using SoulboundEngine.Client.World.BlockSystem.TileEntities;
 using SoulboundEngine.Client.World.EntitySystem;
 using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Core.Event;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -16,8 +18,9 @@ using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 namespace SoulboundEngine.Client.Player {
 	public class Player : Entity, IItemContainerScope, IInputEventHandler, IInteractionHandler<ItemInteraction>, IInteractionHandler<BlockInteraction> {
-		public static readonly EntityDescriptor<Player> DESCRIPTOR = EntityDescriptor.Of<Player>((_, level) => new Player(level));
+		public static readonly EntityDescriptor<Player> DESCRIPTOR = EntityDescriptor.Of<Player>((_, level) => throw new InvalidOperationException());
 		const float MAX_BLOCK_REACH = 5f;
+		private readonly SoulboundClient client;
 		private readonly PlayerInventory inventory;
 		private readonly InteractionResolver interactionResolver;
 		private Vector2 screenPointerPos;
@@ -33,8 +36,9 @@ namespace SoulboundEngine.Client.Player {
 		// TODO: fix gameplay input overlaps
 		private bool leftClickBlockBreakGuard;
 
-		public Player(Level level)
+		public Player(SoulboundClient client, Level level)
 			: base(DESCRIPTOR, level) {
+			this.client = client;
 			this.transformAdapter = new PlayerTransformAdapter(this);
 			this.inventory = new PlayerInventory();
 			this.interactionResolver = new InteractionResolver();
@@ -205,6 +209,19 @@ namespace SoulboundEngine.Client.Player {
 		public void CloseInventory(Inventory inventory) {
 			((IItemContainerScope)this).RemoveContainer(inventory);
 			inventory.OnClosed(this);
+		}
+
+
+		/// <summary>
+		/// Opens the inventory with the given <paramref name="tileEntitySource"/>.
+		/// This will forward inventory's UI rendering to <see cref="SoulboundClient.OpenInventory(ChestTileEntity)"/>
+		/// </summary>
+		/// <param name="inventory"></param>
+		/// <param name="tileEntitySource"><b>Note: this parameter will be generic 
+		/// once a container tile entity abstraction exists</b></param>
+		public void OpenInventory(Inventory inventory, ChestTileEntity tileEntitySource) {
+			this.OpenInventory(inventory);
+			this.client.OpenInventory(tileEntitySource);
 		}
 
 		public void OpenInventory() => this.OpenInventory(this.inventory);

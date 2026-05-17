@@ -50,7 +50,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 		}
 
 		public void StartSession() {
-			this.level.StartSession(new Player(this.level));
+			this.level.StartSession(new Player(this.client, this.level));
 			this.sessionRunning = true;
 
 			UniTask.Post(this.LevelFrameLoop);

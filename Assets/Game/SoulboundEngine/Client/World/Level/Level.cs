@@ -326,7 +326,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 			return chunk?.GetBlockState(blockPos.ToChunkPos());
 		}
 
-		public TileEntity? TileEntityAt(BlockPos blockPos) {
+		public TileEntity? GetTileEntity(BlockPos blockPos) {
 			WorldChunk? chunk = this.ChunkAt(blockPos);
 			return chunk?.TileEntityAt(blockPos);
 		}

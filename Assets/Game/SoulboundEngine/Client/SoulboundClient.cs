@@ -23,6 +23,7 @@ namespace SoulboundEngine.Client {
 	using SoulboundEngine.Client.Render.Entity;
 	using SoulboundEngine.Client.Render.Item;
 	using SoulboundEngine.Client.UI.Screen;
+	using SoulboundEngine.Client.World.BlockSystem.TileEntities;
 	using SoulboundEngine.Core.Registry;
 	using SoulboundEngine.Core.Render.Sprite;
 	using System.Collections.Generic;
@@ -232,6 +233,10 @@ namespace SoulboundEngine.Client {
 					}
 				})
 			};
+		}
+
+		public void OpenInventory(ChestTileEntity tileEntitySource) {
+			Logger.LogFatal(new NotImplementedException("UI Inventory opening not implemented"));
 		}
 
 		private IWorldSaveStrategy GetWorldSaveStrategy() {
