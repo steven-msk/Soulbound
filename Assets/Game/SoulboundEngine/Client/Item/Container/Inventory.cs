@@ -8,13 +8,13 @@ using System.Linq;
 namespace SoulboundEngine.Client.ItemSystem.Container {
 	using Player = Player.Player;
 
-	public abstract class Inventory : IItemContainer, IEnumerable<ItemStack?> {
+	public class Inventory : IItemContainer, IEnumerable<ItemStack?> {
 		protected readonly ItemSlot[] slots;
 		private readonly HashSet<Item> uniqueItems = new();
 		public event Action<Item>? onItemAdded;
 		public event Action<Item>? onItemRemoved;
 
-		protected Inventory(int size) {
+		public Inventory(int size) {
 			this.slots = new ItemSlot[size];
 
 			for (int i = 0; i < size; i++) {

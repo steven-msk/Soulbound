@@ -33,6 +33,7 @@ namespace SoulboundEngine.Client.ItemSystem {
 		public static readonly BlockBreakerItem blockBreakerItem = Register("block_breaker_item", new BlockBreakerItem(
 			Item.Settings.Of("Block Breaker Item").NonStackable()
 		));
+		public static readonly Item CHEST = Register(Blocks.CHEST, Item.Settings.Of("Chest"));
 
 		public static TItem Register<TItem>(string id, TItem item) where TItem : Item {
 			return Registry<Item>.Register<TItem>(Registries.ITEMS, KeyOf(id), item);

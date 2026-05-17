@@ -16,6 +16,7 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 		public static readonly SelfDestructBlock SELF_DESTRUCT_BLOCK = Register("self_destruct_block", new SelfDestructBlock(Block.Settings.Of("Self Destruct Block")));
 		public static readonly MovingTickingBlock MOVING_TICKING_BLOCK = Register("moving_ticking_block", new MovingTickingBlock(Block.Settings.Of("Moving Ticking Block")));
 		public static readonly AreaTriggerBlock AREA_TRIGGER_BLOCK = Register("area_trigger_block", new AreaTriggerBlock(Block.Settings.Of("Area Trigger Block")));
+		public static readonly ChestBlock CHEST = Register("chest", new ChestBlock(Block.Settings.Of("Chest")));
 
 		public static TBlock Register<TBlock>(string id, TBlock block) where TBlock : Block {
 			return Registry<Block>.Register(Registries.BLOCKS, KeyOf(id), block);
