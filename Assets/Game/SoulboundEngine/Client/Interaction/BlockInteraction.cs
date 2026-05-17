@@ -1,5 +1,4 @@
 using SoulboundEngine.Client.ItemSystem;
-using SoulboundEngine.Client.World;
 using SoulboundEngine.Client.World.BlockSystem;
 using SoulboundEngine.Client.World.BlockSystem.States;
 using SoulboundEngine.Client.World.LevelDomain;
@@ -7,6 +6,8 @@ using SoulboundEngine.Client.World.LevelDomain;
 #nullable enable
 
 namespace SoulboundEngine.Client.Interaction {
+	using Player = Player.Player;
+
 	public struct BlockInteraction : IInteractionContext {
 		// note: the implementation might change
 		// as more features are introduced during prod
@@ -16,8 +17,9 @@ namespace SoulboundEngine.Client.Interaction {
 		public BlockState blockState;
 		public ItemStack? itemStack;
 		public InteractionTrigger trigger;
+		public Player? player;
 
-		public readonly Level GetLevel() => level;
-		public readonly InteractionTrigger GetTrigger() => trigger;
+		public readonly Level GetLevel() => this.level;
+		public readonly InteractionTrigger GetTrigger() => this.trigger;
 	}
 }

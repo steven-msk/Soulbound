@@ -8,34 +8,36 @@ using SoulboundEngine.Client.World.EntitySystem;
 using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Core.Event;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 #nullable enable
 
 namespace SoulboundEngine.Client.Player {
-	public class Player : Entity, IInputEventHandler, IInteractionHandler<ItemInteraction>, IInteractionHandler<BlockInteraction> {
+	public class Player : Entity, IItemContainerScope, IInputEventHandler, IInteractionHandler<ItemInteraction>, IInteractionHandler<BlockInteraction> {
 		public static readonly EntityDescriptor<Player> DESCRIPTOR = EntityDescriptor.Of<Player>((_, level) => new Player(level));
-		private readonly PlayerInventory inventory;
-		private ITransitStackSource tranistStackSource = null!;
-
-		// TODO: interaction resolver shouldnt be created by the player
-		private readonly InteractionResolver interactionResolver = new();
-
 		const float MAX_BLOCK_REACH = 5f;
-
+		private readonly PlayerInventory inventory;
+		private readonly InteractionResolver interactionResolver;
 		private Vector2 screenPointerPos;
 		private bool isHoldingLeftClick;
 		private bool isHoldingRightClick;
 		private bool isHoldingCtrl;
 		private new readonly PlayerTransformAdapter transformAdapter;
+		private readonly HashSet<IItemContainer> openContainers = new();
+		private TransitStack? transitStack;
+		private SlotDragState? dragState;
 
 		// provisory guard for not breaking the block instantly after it was placed
+		// TODO: fix gameplay input overlaps
 		private bool leftClickBlockBreakGuard;
 
 		public Player(Level level)
 			: base(DESCRIPTOR, level) {
 			this.transformAdapter = new PlayerTransformAdapter(this);
 			this.inventory = new PlayerInventory();
+			this.interactionResolver = new InteractionResolver();
 
 			this.interactionResolver.RegisterHandler<ItemInteraction>(this);
 			this.interactionResolver.RegisterHandler<BlockInteraction>(this);
@@ -151,6 +153,70 @@ namespace SoulboundEngine.Client.Player {
 			this.ResolveItemOrBlockInteraction(InteractionTrigger.RightRelease);
 		}
 
+		bool IItemContainerScope.TryBeginDrag(ItemStack stack, SlotRef slotRef, int button) {
+			if (((IItemContainerScope)this).InDragState() || stack == null) return false;
+
+			HashSet<SlotRef> draggedSlots = new(new SlotRef.EqualityComparer()) { slotRef };
+
+			this.dragState = new SlotDragState(slotRef.container) {
+				stack = stack.Clone(),
+				origin = slotRef,
+				draggedSlots = draggedSlots,
+				button = button,
+				quantitySnapshots = this.CreateQuantitySnapshots(),
+			};
+			return true;
+		}
+
+		public IEnumerable<IItemContainer> GetOpenContainers() => this.openContainers;
+
+		void IItemContainerScope.AddContainer(IItemContainer container) {
+			this.openContainers.Add(container);
+		}
+
+		void IItemContainerScope.RemoveContainer(IItemContainer container) {
+			this.openContainers.Remove(container);
+		}
+
+		ItemStack? ITransitStackSource.GetTransitStack() => this.transitStack?.GetStack();
+
+		bool ITransitStackSource.HasTransitStack() => this.transitStack?.HasStack() ?? false;
+
+		void ITransitStackSource.SetTransitStack(ItemStack? itemStack) {
+			if (itemStack == null) this.transitStack?.Destroy();
+			else this.transitStack?.SetStack(itemStack);
+		}
+
+		SlotDragState? IItemContainerScope.GetDragState() => this.dragState;
+
+		void IItemContainerScope.EndDrag() => this.dragState = null;
+
+		void IItemContainerScope.ExtendDrag(SlotRef slotRef) {
+			this.dragState?.ExtendDrag(slotRef);
+		}
+
+		bool IItemContainerScope.InDragState() => this.dragState != null;
+
+		private Dictionary<SlotRef, int> CreateQuantitySnapshots() {
+			Dictionary<SlotRef, int> snapshots = new();
+
+			foreach (var container in this.openContainers) {
+				Dictionary<int, int> quantities = this.GetQuantitySnapshotForContainer(container);
+
+				foreach (var kvp in quantities) {
+					SlotRef slotRef = new(container, kvp.Key);
+					snapshots[slotRef] = kvp.Value;
+				}
+			}
+			return snapshots;
+		}
+
+		private Dictionary<int, int> GetQuantitySnapshotForContainer(IItemContainer container) {
+			return container.GetAllSlots()
+					.Where(i => container.GetSlot(i).GetStack()?.quantity > 0)
+					.ToDictionary(i => i, i => container.GetSlot(i).GetStack()!.quantity);
+		}
+
 		private bool ResolveItemOrBlockInteraction(InteractionTrigger trigger) {
 			ItemInteraction itemInteraction = this.GetItemInteraction(trigger);
 			if (this.interactionResolver.Resolve(itemInteraction)) {
@@ -176,7 +242,8 @@ namespace SoulboundEngine.Client.Player {
 				blockPos = blockPos,
 				blockState = this.level.GetBlockState(blockPos),
 				itemStack = this.GetMainHandStack(),
-				level = this.level
+				level = this.level,
+				player = this
 			};
 		}
 
@@ -288,7 +355,7 @@ namespace SoulboundEngine.Client.Player {
 		public PlayerInventory GetInventory() => this.inventory;
 
 		public ItemStack? GetMainHandStack() {
-			ItemStack? transitStack = this.tranistStackSource?.GetTransitStack();
+			ItemStack? transitStack = this.transitStack?.GetStack();
 			return transitStack ?? this.inventory.GetMainStack();
 		}
 
@@ -313,10 +380,11 @@ namespace SoulboundEngine.Client.Player {
 			return Camera.main.ScreenToWorldPoint(screenPos);
 		}
 
-		public void SetTransitStackSource(ITransitStackSource source) {
-			this.tranistStackSource = source;
+		public void SetTransitStackSource(TransitStack transitStack) {
+			this.transitStack = transitStack;
+			Logger.LogInfo("Player transit stack source has been set");
 		}
-		
+
 		public void SetTransformHandle(IPlayerTransformHandle playerTransformHandle) {
 			this.transformAdapter.SetHandle(playerTransformHandle);
 		}
