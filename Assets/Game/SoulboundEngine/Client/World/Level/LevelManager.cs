@@ -1,6 +1,5 @@
 using Cysharp.Threading.Tasks;
 using SoulboundEngine.Client.Input;
-using SoulboundEngine.Client.Players;
 using SoulboundEngine.Client.Render.Entity;
 using SoulboundEngine.Client.UI.Screen;
 using SoulboundEngine.Client.World.Generation;
@@ -14,6 +13,8 @@ using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 #nullable enable
 
 namespace SoulboundEngine.Client.World.LevelDomain {
+	using Player = Player.Player;
+
 	/// <summary>
 	/// Manages Level lifecycles
 	/// </summary>

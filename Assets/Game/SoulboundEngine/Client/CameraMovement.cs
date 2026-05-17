@@ -1,4 +1,4 @@
-using SoulboundEngine.Client.Players;
+using SoulboundEngine.Client.Player;
 using UnityEngine;
 
 namespace SoulboundEngine.Client {

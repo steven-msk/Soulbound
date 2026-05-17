@@ -3,7 +3,7 @@ using SoulboundEngine.Common;
 
 namespace SoulboundEngine.Client.ItemSystem {
 	[PROTOTYPICAL]
-	public sealed class SpawnEntityItem : Item, IItemInteractionListener {
+	public sealed class SpawnEntityItem : Item, IInteractableItem {
 		public SpawnEntityItem(Settings settings) : base(settings) {
 		}
 

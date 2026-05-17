@@ -1,5 +1,4 @@
 using SoulboundEngine.Client.ItemSystem.Container;
-using SoulboundEngine.Client.Players;
 using SoulboundEngine.Client.World.EntitySystem;
 using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Core.Registry;
@@ -11,25 +10,27 @@ using UnityEngine;
 #nullable enable
 
 namespace SoulboundEngine.Client.Runtime.Services {
+	using Player = Player.Player;
+
 	public sealed class RuntimeDataProvider : IRuntimeDataProvider {
 		private IRuntimePlayerDataProvider? _player;
 		private IRuntimeEntityDataProvider? _entities;
 
 		public IRuntimePlayerDataProvider Player {
-			get => _player ?? throw new InvalidOperationException("Runtime player data is only available within a world session");
+			get => this._player ?? throw new InvalidOperationException("Runtime player data is only available within a world session");
 		}
 		public IRuntimeEntityDataProvider Entities {
-			get => _entities ?? throw new InvalidOperationException("Runtime entity data is only available within a world session");
+			get => this._entities ?? throw new InvalidOperationException("Runtime entity data is only available within a world session");
 		}
 
 		public void SetWorldSessionState(WorldSession session) {
-			_player = new RuntimePlayerDataProvider(session.player);
-			_entities = new RuntimeEntityDataProvider(session.level);
+			this._player = new RuntimePlayerDataProvider(session.player);
+			this._entities = new RuntimeEntityDataProvider(session.level);
 		}
 
 		public void ExitWorldSessionState() {
-			_player = null;
-			_entities = null;
+			this._player = null;
+			this._entities = null;
 		}
 	}
 
@@ -40,14 +41,14 @@ namespace SoulboundEngine.Client.Runtime.Services {
 			this.player = player;
 		}
 
-		public Guid GetGuid() => player.guid;
+		public Guid GetGuid() => this.player.guid;
 
-		public Identifier GetIdentifier() => EntityDescriptor.GetIdentifier(player.GetDescriptor());
+		public Identifier GetIdentifier() => EntityDescriptor.GetIdentifier(this.player.GetDescriptor());
 
-		public Vector2 GetPos() => player.GetPosition();
+		public Vector2 GetPos() => this.player.GetPosition();
 
 		public InventoryData GetInventory() {
-			Inventory inventory = player.GetInventory();
+			Inventory inventory = this.player.GetInventory();
 			IEnumerable<int> slots = inventory.GetAllSlots();
 
 			return new InventoryData {
@@ -67,13 +68,13 @@ namespace SoulboundEngine.Client.Runtime.Services {
 		}
 
 		public IEnumerable<IEntityView> GetAllEntities() {
-			foreach (var entity in entityManager.GetAllEntities()) {
+			foreach (var entity in this.entityManager.GetAllEntities()) {
 				yield return new EntityView(entity);
 			}
 		}
 
 		public bool TryGetEntity(Guid guid, out IEntityView entity) {
-			bool found = entityManager.TryGetEntity(guid, out Entity result);
+			bool found = this.entityManager.TryGetEntity(guid, out Entity result);
 			entity = found
 				? new EntityView(result)
 				: default;
@@ -87,14 +88,14 @@ namespace SoulboundEngine.Client.Runtime.Services {
 				this.entity = entity;
 			}
 
-			public Guid GetGuid() => entity.guid;
+			public Guid GetGuid() => this.entity.guid;
 
-			public Identifier GetIdentifier() => EntityDescriptor.GetIdentifier(entity.GetDescriptor());
+			public Identifier GetIdentifier() => EntityDescriptor.GetIdentifier(this.entity.GetDescriptor());
 
-			public Vector2 GetPos() => entity.GetPosition();
+			public Vector2 GetPos() => this.entity.GetPosition();
 
 			public override string ToString() {
-				return $"entity:{GetIdentifier()}/{GetGuid()}";
+				return $"entity:{this.GetIdentifier()}/{this.GetGuid()}";
 			}
 		}
 	}

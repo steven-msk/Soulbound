@@ -1,9 +1,10 @@
-using SoulboundEngine.Client.Players;
 using SoulboundEngine.Client.World.Serialization;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.World.LevelDomain {
+	using Player = Player.Player;
+
 	public struct WorldSession {
 		public WorldDump? deserializationData;
 		public Player player;

@@ -12,10 +12,10 @@ using UnityEngine;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.Players {
+namespace SoulboundEngine.Client.Player {
 	public class Player : Entity, IInputEventHandler, IInteractionHandler<ItemInteraction>, IInteractionHandler<BlockInteraction> {
 		public static readonly EntityDescriptor<Player> DESCRIPTOR = EntityDescriptor.Of<Player>((_, level) => new Player(level));
-		private readonly Inventory inventory;
+		private readonly PlayerInventory inventory;
 		private ITransitStackSource tranistStackSource = null!;
 
 		// TODO: interaction resolver shouldnt be created by the player
@@ -35,7 +35,7 @@ namespace SoulboundEngine.Client.Players {
 		public Player(Level level)
 			: base(DESCRIPTOR, level) {
 			this.transformAdapter = new PlayerTransformAdapter(this);
-			this.inventory = new Inventory();
+			this.inventory = new PlayerInventory();
 
 			this.interactionResolver.RegisterHandler<ItemInteraction>(this);
 			this.interactionResolver.RegisterHandler<BlockInteraction>(this);
@@ -53,8 +53,8 @@ namespace SoulboundEngine.Client.Players {
 					float scrollDelta = inputEvent.context.ReadValue<float>();
 					int nextSlot = this.inventory.GetMainSlot() - (int)scrollDelta;
 
-					if (nextSlot < 0) nextSlot += Inventory.HOTBAR_SIZE;
-					nextSlot %= Inventory.HOTBAR_SIZE;
+					if (nextSlot < 0) nextSlot += PlayerInventory.HOTBAR_SIZE;
+					nextSlot %= PlayerInventory.HOTBAR_SIZE;
 					this.inventory.SetMainSlot(nextSlot);
 				}),
 				InputEventListener.ObserveAny(InputTokens.Mouse.position, inputEvent => {
@@ -185,17 +185,17 @@ namespace SoulboundEngine.Client.Players {
 
 		bool IInteractionHandler<ItemInteraction>.CanHandle(in ItemInteraction ctx) {
 			Item? item = ctx.itemStack?.item;
-			if (item is not IItemInteractionListener listener) return false;
+			if (item is not IInteractableItem interactable) return false;
 
-			if (!listener.ValidateTrigger(ctx.trigger)) return false;
+			if (!interactable.ValidateTrigger(ctx.trigger)) return false;
 
-			return listener.CanExecute(ctx.itemStack, in ctx);
+			return interactable.CanExecute(ctx.itemStack, in ctx);
 		}
 
 		bool IInteractionHandler<ItemInteraction>.Handle(in ItemInteraction ctx) {
 			ItemStack stack = ctx.itemStack;
-			IItemInteractionListener listener = (IItemInteractionListener)stack.item;
-			return listener.TryExecute(stack, in ctx);
+			IInteractableItem interactable = (IInteractableItem)stack.item;
+			return interactable.TryExecute(stack, in ctx);
 		}
 
 		int IInteractionHandler<BlockInteraction>.priority => 0;
@@ -210,16 +210,16 @@ namespace SoulboundEngine.Client.Players {
 			bool isInReach = this.IsInBlockReach((Vector2)ctx.blockPos);
 			if (!isInReach) return false;
 
-			if (ctx.blockState.block is not IBlockInteractionListener listener) return false;
+			if (ctx.blockState.block is not IInteractableBlock interactable) return false;
 
-			if (!listener.ValidateTrigger(ctx.trigger)) return false;
+			if (!interactable.ValidateTrigger(ctx.trigger)) return false;
 
-			return listener.CanInteract(in ctx);
+			return interactable.CanInteract(in ctx);
 		}
 
 		bool IInteractionHandler<BlockInteraction>.Handle(in BlockInteraction ctx) {
-			IBlockInteractionListener listener = (IBlockInteractionListener)ctx.blockState.block;
-			listener.OnInteract(in ctx);
+			IInteractableBlock interactable = (IInteractableBlock)ctx.blockState.block;
+			interactable.OnInteract(in ctx);
 			return true;
 		}
 
@@ -285,7 +285,7 @@ namespace SoulboundEngine.Client.Players {
 						 .Contains((BlockPos)worldPos);
 		}
 
-		public Inventory GetInventory() => this.inventory;
+		public PlayerInventory GetInventory() => this.inventory;
 
 		public ItemStack? GetMainHandStack() {
 			ItemStack? transitStack = this.tranistStackSource?.GetTransitStack();

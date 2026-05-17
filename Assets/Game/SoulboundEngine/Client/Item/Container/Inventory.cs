@@ -1,29 +1,29 @@
-using SoulboundEngine.Client.Players;
 using System;
+using System.Collections;
 using System.Collections.Generic;
-
+using System.Linq;
 
 #nullable enable
 
 namespace SoulboundEngine.Client.ItemSystem.Container {
-	public sealed class Inventory : IItemContainer {
-		public const int HOTBAR_SIZE = 9;
-		public const int COLUMNS = 9;
-		public const int ROWS = 3;
-		private readonly ItemSlot[] slots = new ItemSlot[ROWS * COLUMNS + HOTBAR_SIZE];
-		private int mainSlot = 0;
+	using Player = Player.Player;
+
+	public abstract class Inventory : IItemContainer, IEnumerable<ItemStack?> {
+		protected readonly ItemSlot[] slots;
 		private readonly HashSet<Item> uniqueItems = new();
 		public event Action<Item>? onItemAdded;
 		public event Action<Item>? onItemRemoved;
-		public event Action<int, int>? mainSlotChanged;
 
-		public Inventory() {
-			for (int i = 0; i < this.slots.Length; i++) {
-				ItemSlot slot = new(this, i);
+		protected Inventory(int size) {
+			this.slots = new ItemSlot[size];
+
+			for (int i = 0; i < size; i++) {
+				ItemSlot slot = this.CreateSlot(i);
 				this.slots[i] = slot;
 
 				slot.stackChanged += this.UpdateUniqueItems;
 			}
+
 			onItemAdded += item => {
 				foreach (var uniqueItem in this.uniqueItems) {
 					if (uniqueItem is IContainerItemListener containerListener) {
@@ -40,23 +40,13 @@ namespace SoulboundEngine.Client.ItemSystem.Container {
 			};
 		}
 
+		protected virtual ItemSlot CreateSlot(int index) => new(this, index);
+
 		public IItemSlot GetSlot(int index) => this.slots[index];
 
-		public IReadOnlyList<int> GetAllSlots() {
+		public IEnumerable<int> GetAllSlots() {
 			List<int> list = new();
 			for (int i = 0; i < this.slots.Length; i++) list.Add(i);
-			return list;
-		}
-
-		public IReadOnlyList<int> GetPopupSlots() {
-			List<int> list = new();
-			for (int i = 0; i < ROWS * COLUMNS; i++) list.Add(HOTBAR_SIZE + i);
-			return list;
-		}
-
-		public IReadOnlyList<int> GetHotbarSlots() {
-			List<int> list = new();
-			for (int i = 0; i < HOTBAR_SIZE; i++) list.Add(i);
 			return list;
 		}
 
@@ -80,24 +70,18 @@ namespace SoulboundEngine.Client.ItemSystem.Container {
 			}
 		}
 
-		public void OnOpened(Player player) {
+		public virtual void OnOpened(Player player) {
 		}
 
-		public void OnClosed(Player player) {
-		}
-
-		public int GetMainSlot() => this.mainSlot;
-
-		public void SetMainSlot(int slot) {
-			int previous = this.mainSlot;
-			this.mainSlot = slot;
-			mainSlotChanged?.Invoke(previous, slot);
-		}
-
-		public ItemStack? GetMainStack() {
-			return this.slots[this.mainSlot].GetStack();
+		public virtual void OnClosed(Player player) {
 		}
 
 		public int GetSize() => this.slots.Length;
+
+		public IEnumerator<ItemStack?> GetEnumerator() {
+			return this.slots.Select(s => s.GetStack()).GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 	}
 }

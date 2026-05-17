@@ -4,7 +4,6 @@ using SoulboundEngine.Client.Debug.Metrics.View;
 using SoulboundEngine.Client.Input;
 using SoulboundEngine.Client.ItemSystem;
 using SoulboundEngine.Client.ItemSystem.Container;
-using SoulboundEngine.Client.Players;
 using SoulboundEngine.Client.Render.Item;
 using SoulboundEngine.Core.Assets;
 using System.Collections.Generic;
@@ -13,6 +12,8 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.UI.Screen {
+	using Player = Player.Player;
+
 	public sealed class WorldScreen : UxmlScreen, IItemContainerScope, IInputEventHandler {
 		int IInputEventHandler.priority => 5005;
 		private readonly Player player;

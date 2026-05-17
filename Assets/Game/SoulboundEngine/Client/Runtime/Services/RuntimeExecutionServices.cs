@@ -1,7 +1,5 @@
 using SoulboundEngine.Client.ItemSystem;
 using SoulboundEngine.Client.ItemSystem.Container;
-using SoulboundEngine.Client.Players;
-using SoulboundEngine.Client.World;
 using SoulboundEngine.Client.World.EntitySystem;
 using SoulboundEngine.Client.World.LevelDomain;
 using System;
@@ -10,47 +8,49 @@ using UnityEngine;
 #nullable enable
 
 namespace SoulboundEngine.Client.Runtime.Services {
+	using Player = Player.Player;
+
 	public class RuntimeExecutionServices : IRuntimeExecutionServices {
 		private IPlayerExecutionService? _player;
 		private IEntityExecutionService? _entity;
 		private ILevelExecutionService? _level;
 
 		public IPlayerExecutionService Player {
-			get => _player ?? throw new InvalidOperationException("Runtime player execution only available within world session");
+			get => this._player ?? throw new InvalidOperationException("Runtime player execution only available within world session");
 		}
 		public IEntityExecutionService Entity {
-			get => _entity ?? throw new InvalidOperationException("Runtime entity execution only available within world session");
+			get => this._entity ?? throw new InvalidOperationException("Runtime entity execution only available within world session");
 		}
 		public ILevelExecutionService Level {
-			get => _level ?? throw new InvalidOperationException("Runtime level execution only available within world session");
+			get => this._level ?? throw new InvalidOperationException("Runtime level execution only available within world session");
 		}
 
 		public void SetWorldSessionState(WorldSession session) {
-			_player = new RuntimePlayerExecutionService(session.player);
-			_entity = new RuntimeEntityExecutionService(session.level);
-			_level = session.level;
+			this._player = new RuntimePlayerExecutionService(session.player);
+			this._entity = new RuntimeEntityExecutionService(session.level);
+			this._level = session.level;
 		}
 
 		public void ExitWorldSessionState() {
-			_player = null;
-			_entity = null;
-			_level = null;
+			this._player = null;
+			this._entity = null;
+			this._level = null;
 		}
 	}
 
 	public class RuntimePlayerExecutionService : IPlayerExecutionService {
 		public readonly Player player;
 		private readonly IInventoryExecutionService _inventory;
-		public IInventoryExecutionService Inventory => _inventory;
+		public IInventoryExecutionService Inventory => this._inventory;
 
 		public RuntimePlayerExecutionService(Player player) {
 			this.player = player;
-			_inventory = new RuntimeInventoryExecutionService(player.GetInventory());
+			this._inventory = new RuntimeInventoryExecutionService(player.GetInventory());
 		}
 
-		public void SetPos(Vector2 pos) => player.SetPosition(pos);
+		public void SetPos(Vector2 pos) => this.player.SetPosition(pos);
 
-		public bool TryAddItemStack(ItemStack itemStack) => player.TryAddItemStack(itemStack);
+		public bool TryAddItemStack(ItemStack itemStack) => this.player.TryAddItemStack(itemStack);
 	}
 
 	public class RuntimeInventoryExecutionService : IInventoryExecutionService {
@@ -61,7 +61,7 @@ namespace SoulboundEngine.Client.Runtime.Services {
 		}
 
 		public void SetStack(int slotIndex, ItemStack? stack) {
-			inventory.GetSlot(slotIndex).SetStack(stack);
+			this.inventory.GetSlot(slotIndex).SetStack(stack);
 		}
 	}
 
@@ -73,11 +73,11 @@ namespace SoulboundEngine.Client.Runtime.Services {
 		}
 
 		public void AddEntity(Entity entity) {
-			entityManager.AddEntity(entity);
+			this.entityManager.AddEntity(entity);
 		}
 
 		public void SetPos(Guid entityGuid, Vector2 pos) {
-			if (entityManager.TryGetEntity(entityGuid, out Entity entity)) {
+			if (this.entityManager.TryGetEntity(entityGuid, out Entity entity)) {
 				entity.SetPosition(pos);
 			}
 		}

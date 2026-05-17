@@ -4,7 +4,7 @@ using SoulboundEngine.Common;
 
 namespace SoulboundEngine.Client.ItemSystem {
 	[PROTOTYPICAL]
-	public sealed class ChargeableItem : Item, IItemInteractionListener {
+	public sealed class ChargeableItem : Item, IInteractableItem {
 		public ChargeableItem(Settings settings) : base(settings) {
 		}
 

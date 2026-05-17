@@ -3,7 +3,7 @@ using SoulboundEngine.Common;
 
 namespace SoulboundEngine.Client.ItemSystem {
 	[PROTOTYPICAL]
-	public sealed class TeleportPlayerItem : Item, IItemInteractionListener {
+	public sealed class TeleportPlayerItem : Item, IInteractableItem {
 		public TeleportPlayerItem(Settings settings) : base(settings) {
 		}
 

@@ -1,14 +1,16 @@
 ﻿using SoulboundEngine.Client.ItemSystem.Container;
-using SoulboundEngine.Client.Players;
+using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.UI;
 using System;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.Render.Item {
+	using Player = Player.Player;
+
 	public sealed class PlayerInventoryHandle : UxmlWidget, IDisposable {
 		private readonly UIToolkitItemSlotHandle[] slots;
-		private readonly Inventory inventory;
+		private readonly PlayerInventory inventory;
 		private readonly ItemRenderManager itemRenderManager;
 		private readonly IItemContainerScope scope;
 		private int lastClickedSlot;
@@ -18,7 +20,7 @@ namespace SoulboundEngine.Client.Render.Item {
 		const int MIDDLE_BUTTON = 2;
 		const int RIGHT_BUTTON = 1;
 
-		public PlayerInventoryHandle(Inventory inventory, ItemRenderManager itemRenderManager, IItemContainerScope scope) {
+		public PlayerInventoryHandle(PlayerInventory inventory, ItemRenderManager itemRenderManager, IItemContainerScope scope) {
 			this.inventory = inventory;
 			this.itemRenderManager = itemRenderManager;
 			this.scope = scope;
@@ -30,9 +32,9 @@ namespace SoulboundEngine.Client.Render.Item {
 		public override void OnBind(VisualElement root) {
 			this.root = root;
 
-			foreach (var slotIndex in this.inventory.GetPopupSlots()) {
+			foreach (var slotIndex in this.inventory.GetPopup()) {
 				IItemSlot slot = this.inventory.GetSlot(slotIndex);
-				VisualElement slotElement = this.GetPopup()[slotIndex - Inventory.HOTBAR_SIZE];
+				VisualElement slotElement = this.GetPopup()[slotIndex - PlayerInventory.HOTBAR_SIZE];
 
 				UIToolkitItemSlotHandle handle = new(slot, this.itemRenderManager);
 				handle.OnBind(slotElement);
@@ -40,7 +42,7 @@ namespace SoulboundEngine.Client.Render.Item {
 				this.AddPointerListeners(slotElement, handle, slot);
 			}
 
-			foreach (var slotIndex in this.inventory.GetHotbarSlots()) {
+			foreach (var slotIndex in this.inventory.GetHotbar()) {
 				IItemSlot slot = this.inventory.GetSlot(slotIndex);
 				VisualElement slotElement = this.GetHotbar()[slotIndex];
 

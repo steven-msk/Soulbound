@@ -1,4 +1,3 @@
-using SoulboundEngine.Client.Players;
 using SoulboundEngine.Client.Render.Entity;
 using SoulboundEngine.Client.Runtime.Services;
 using SoulboundEngine.Client.World.BlockSystem;
@@ -20,6 +19,8 @@ using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 #nullable enable
 
 namespace SoulboundEngine.Client.World.LevelDomain {
+	using Player = Player.Player;
+
 	public sealed class Level : ILevelExecutionService, IEntityManager {
 		public delegate void OnChunkGenerated(ChunkGenData genData);
 		public const int CHUNK_LENGTH = 32;

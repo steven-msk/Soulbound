@@ -4,7 +4,7 @@ using SoulboundEngine.Client.World.BlockSystem.States;
 using SoulboundEngine.Core.States;
 
 namespace SoulboundEngine.Client.World.BlockSystem {
-	public sealed class ToggleBlock : Block, IBlockInteractionListener {
+	public sealed class ToggleBlock : Block, IInteractableBlock {
 		public static readonly Property<bool> on = BoolProperty.Of("on");
 
 		public ToggleBlock(Settings settings) 
