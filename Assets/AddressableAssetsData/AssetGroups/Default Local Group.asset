@@ -147,6 +147,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8e629b0885125a34883e50cc5e04f964
+    m_Address: ChestContainer
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 9270827d9dd361140a7264d2052a621d
     m_Address: wood
     m_ReadOnly: 0

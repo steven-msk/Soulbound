@@ -10,7 +10,7 @@ namespace SoulboundEngine.Client.Render.Item {
 		private readonly UIToolkitItemSlotHandle[] slots;
 		private readonly PlayerInventory inventory;
 		private readonly ItemRenderManager itemRenderManager;
-		private readonly IItemContainerScope scope;
+		private readonly IInventoryScope scope;
 		private int lastClickedSlot;
 		private float lastClickTime;
 		const float DOUBLE_CLICK_THRESHOLD = 0.15f;
@@ -18,7 +18,7 @@ namespace SoulboundEngine.Client.Render.Item {
 		const int MIDDLE_BUTTON = 2;
 		const int RIGHT_BUTTON = 1;
 
-		public PlayerInventoryHandle(PlayerInventory inventory, ItemRenderManager itemRenderManager, IItemContainerScope scope) {
+		public PlayerInventoryHandle(PlayerInventory inventory, ItemRenderManager itemRenderManager, IInventoryScope scope) {
 			this.inventory = inventory;
 			this.itemRenderManager = itemRenderManager;
 			this.scope = scope;

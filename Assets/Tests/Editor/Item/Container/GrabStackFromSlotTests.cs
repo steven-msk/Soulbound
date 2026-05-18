@@ -10,7 +10,7 @@ using System.Collections.Generic;
 
 namespace ItemTests.Container.Operations {
 	internal class GrabStackFromSlotTests : SingleSlotOperationTests<GrabStackFromSlot> {
-		protected override GrabStackFromSlot GetOperation(IItemContainer container, int slotIndex, IItemContainerScope scope) {
+		protected override GrabStackFromSlot GetOperation(IItemContainer container, int slotIndex, IInventoryScope scope) {
 			return new GrabStackFromSlot(container, slotIndex, scope);
 		}
 

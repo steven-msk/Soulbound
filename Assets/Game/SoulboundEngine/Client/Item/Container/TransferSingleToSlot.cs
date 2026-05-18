@@ -3,7 +3,7 @@ using SoulboundEngine.Client.ItemSystem;
 
 namespace SoulboundEngine.Client.ItemSystem.Container {
 	public sealed class TransferSingleToSlot : SingleSlotOperation {
-		public TransferSingleToSlot(IItemContainer container, int slotIndex, IItemContainerScope scope)
+		public TransferSingleToSlot(IItemContainer container, int slotIndex, IInventoryScope scope)
 			: base(container, slotIndex, scope) {
 		}
 

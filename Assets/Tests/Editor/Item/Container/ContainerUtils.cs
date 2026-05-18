@@ -4,9 +4,6 @@ using SoulboundEngine.Client.ItemSystem.Container;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static UnityEngine.CullingGroup;
 
 
 #nullable enable
@@ -31,7 +28,7 @@ internal static class ContainerUtils {
 		return container;
 	}
 
-	public static IItemContainer NewEmptyContainer(IItemContainerScope? scope) {
+	public static IItemContainer NewEmptyContainer(IInventoryScope? scope) {
 		IItemContainer container = Substitute.For<IItemContainer>();
 		IReadOnlyList<int> slots = Array.Empty<int>();
 
@@ -75,7 +72,7 @@ internal static class ContainerUtils {
 		container.GetSize().Returns(newIndices.Count);
 	}
 
-	public static void SubstituteTransit(ItemStack? stack, IItemContainerScope scope) {
+	public static void SubstituteTransit(ItemStack? stack, IInventoryScope scope) {
 		SubstitutedItemSlot superficialSlot = Substitute.For<SubstitutedItemSlot>(stack);
 
 		scope.GetTransitStack().Returns(stack);

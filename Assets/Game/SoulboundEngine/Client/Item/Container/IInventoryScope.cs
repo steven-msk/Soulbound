@@ -3,10 +3,11 @@ using System.Collections.Generic;
 #nullable enable
 
 namespace SoulboundEngine.Client.ItemSystem.Container {
-	public interface IItemContainerScope : ITransitStackSource {
+	public interface IInventoryScope : ITransitStackSource {
 		IEnumerable<IItemContainer> GetOpenContainers();
-		void AddContainer(IItemContainer container);
-		void RemoveContainer(IItemContainer container);
+		void AddInventory(Inventory inventory);
+		void RemoveInventory(Inventory inventory);
+		bool IsOpened(Inventory inventory);
 
 		bool InDragState();
 		SlotDragState? GetDragState();

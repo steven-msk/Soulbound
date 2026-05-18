@@ -5,7 +5,7 @@ using SoulboundEngine.Client.ItemSystem.Container;
 
 namespace ItemTests.Container.Operations {
 	internal class TransferSingleToSlotTests : SingleSlotOperationTests<TransferSingleToSlot> {
-		protected override TransferSingleToSlot GetOperation(IItemContainer container, int slotIndex, IItemContainerScope scope) {
+		protected override TransferSingleToSlot GetOperation(IItemContainer container, int slotIndex, IInventoryScope scope) {
 			return new TransferSingleToSlot(container, slotIndex, scope);
 		}
 

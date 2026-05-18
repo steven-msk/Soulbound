@@ -7,9 +7,9 @@ using SoulboundEngine.Client.Debug.Logging;
 namespace SoulboundEngine.Client.ItemSystem.Container {
 	public abstract class SingleSlotOperation : ISlotOperation {
 		protected readonly IItemSlot slot;
-		protected readonly IItemContainerScope scope;
+		protected readonly IInventoryScope scope;
 
-		public SingleSlotOperation(IItemContainer container, int slotIndex, IItemContainerScope scope) {
+		public SingleSlotOperation(IItemContainer container, int slotIndex, IInventoryScope scope) {
 			this.slot = container.GetSlot(slotIndex);
 			this.scope = scope;
 		}

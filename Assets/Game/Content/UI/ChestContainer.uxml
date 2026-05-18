@@ -1,0 +1,14 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="Slot" src="project://database/Assets/Game/Content/UI/Slot.uxml?fileID=9197481963319205126&amp;guid=c25992c4a89227d4586f253b5c251934&amp;type=3#Slot"/>
+    <ui:VisualElement style="flex-grow: 1; top: 0; right: 0; position: absolute; bottom: 0; left: 0; flex-direction: row; align-items: flex-end; align-self: auto; justify-content: flex-end; align-content: auto; flex-wrap: nowrap;">
+        <ui:Instance template="Slot"/>
+        <ui:Instance template="Slot"/>
+        <ui:Instance template="Slot"/>
+        <ui:Instance template="Slot"/>
+        <ui:Instance template="Slot"/>
+        <ui:Instance template="Slot"/>
+        <ui:Instance template="Slot"/>
+        <ui:Instance template="Slot"/>
+        <ui:Instance template="Slot"/>
+    </ui:VisualElement>
+</ui:UXML>

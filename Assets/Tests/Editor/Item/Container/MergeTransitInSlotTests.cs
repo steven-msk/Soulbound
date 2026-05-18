@@ -5,7 +5,7 @@ using SoulboundEngine.Client.ItemSystem.Container;
 
 namespace ItemTests.Container.Operations {
 	internal class MergeTransitInSlotTests : SingleSlotOperationTests<MergeTransitInSlot> {
-		protected override MergeTransitInSlot GetOperation(IItemContainer container, int slotIndex, IItemContainerScope scope) {
+		protected override MergeTransitInSlot GetOperation(IItemContainer container, int slotIndex, IInventoryScope scope) {
 			return new MergeTransitInSlot(container, slotIndex, scope);
 		}
 

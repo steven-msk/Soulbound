@@ -6,7 +6,7 @@ using SoulboundEngine.Client.ItemSystem.Container;
 
 namespace ItemTests.Container.Operations {
 	internal class ReleaseTransitInEmptySlotTests : SingleSlotOperationTests<ReleaseTransitInEmptySlot> {
-		protected override ReleaseTransitInEmptySlot GetOperation(IItemContainer container, int slotIndex, IItemContainerScope scope) {
+		protected override ReleaseTransitInEmptySlot GetOperation(IItemContainer container, int slotIndex, IInventoryScope scope) {
 			return new ReleaseTransitInEmptySlot(container, slotIndex, scope);
 		}
 

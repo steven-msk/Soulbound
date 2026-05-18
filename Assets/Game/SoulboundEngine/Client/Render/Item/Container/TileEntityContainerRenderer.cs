@@ -13,7 +13,11 @@ namespace SoulboundEngine.Client.Render.Item.Container {
 		public VisualElement Render(TileEntityType tileEntityType) {
 			VisualTreeAsset asset = this.assetFactory(tileEntityType);
 			if (asset == null) return null;
-			return asset.Instantiate();
+
+			TemplateContainer element = asset.Instantiate();
+			element.style.position = Position.Absolute;
+			element.style.top = element.style.right = element.style.bottom = element.style.left = 0;
+			return element;
 		}
 	}
 }

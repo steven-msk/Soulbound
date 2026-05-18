@@ -17,7 +17,7 @@ using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 #nullable enable
 
 namespace SoulboundEngine.Client.Player {
-	public class Player : Entity, IItemContainerScope, IInputEventHandler, IInteractionHandler<ItemInteraction>, IInteractionHandler<BlockInteraction> {
+	public class Player : Entity, IInventoryScope, IInputEventHandler, IInteractionHandler<ItemInteraction>, IInteractionHandler<BlockInteraction> {
 		public static readonly EntityDescriptor<Player> DESCRIPTOR = EntityDescriptor.Of<Player>((_, level) => throw new InvalidOperationException());
 		const float MAX_BLOCK_REACH = 5f;
 		private readonly SoulboundClient client;
@@ -28,7 +28,7 @@ namespace SoulboundEngine.Client.Player {
 		private bool isHoldingRightClick;
 		private bool isHoldingCtrl;
 		private new readonly PlayerTransformAdapter transformAdapter;
-		private readonly HashSet<IItemContainer> openContainers = new();
+		private readonly HashSet<Inventory> openInventories = new();
 		private TransitStack? transitStack;
 		private SlotDragState? dragState;
 
@@ -157,8 +157,8 @@ namespace SoulboundEngine.Client.Player {
 			this.ResolveItemOrBlockInteraction(InteractionTrigger.RightRelease);
 		}
 
-		bool IItemContainerScope.TryBeginDrag(ItemStack stack, SlotRef slotRef, int button) {
-			if (((IItemContainerScope)this).InDragState() || stack == null) return false;
+		bool IInventoryScope.TryBeginDrag(ItemStack stack, SlotRef slotRef, int button) {
+			if (((IInventoryScope)this).InDragState() || stack == null) return false;
 
 			HashSet<SlotRef> draggedSlots = new(new SlotRef.EqualityComparer()) { slotRef };
 
@@ -172,14 +172,14 @@ namespace SoulboundEngine.Client.Player {
 			return true;
 		}
 
-		public IEnumerable<IItemContainer> GetOpenContainers() => this.openContainers;
+		public IEnumerable<IItemContainer> GetOpenContainers() => this.openInventories;
 
-		void IItemContainerScope.AddContainer(IItemContainer container) {
-			this.openContainers.Add(container);
+		void IInventoryScope.AddInventory(Inventory inventory) {
+			this.openInventories.Add(inventory);
 		}
 
-		void IItemContainerScope.RemoveContainer(IItemContainer container) {
-			this.openContainers.Remove(container);
+		void IInventoryScope.RemoveInventory(Inventory inventory) {
+			this.openInventories.Remove(inventory);
 		}
 
 		ItemStack? ITransitStackSource.GetTransitStack() => this.transitStack?.GetStack();
@@ -191,23 +191,27 @@ namespace SoulboundEngine.Client.Player {
 			else this.transitStack?.SetStack(itemStack);
 		}
 
-		SlotDragState? IItemContainerScope.GetDragState() => this.dragState;
+		SlotDragState? IInventoryScope.GetDragState() => this.dragState;
 
-		void IItemContainerScope.EndDrag() => this.dragState = null;
+		void IInventoryScope.EndDrag() => this.dragState = null;
 
-		void IItemContainerScope.ExtendDrag(SlotRef slotRef) {
+		void IInventoryScope.ExtendDrag(SlotRef slotRef) {
 			this.dragState?.ExtendDrag(slotRef);
 		}
 
-		bool IItemContainerScope.InDragState() => this.dragState != null;
+		bool IInventoryScope.InDragState() => this.dragState != null;
 
 		public void OpenInventory(Inventory inventory) {
-			((IItemContainerScope)this).AddContainer(inventory);
+			if (!this.IsOpened(inventory)) return;
+
+			((IInventoryScope)this).AddInventory(inventory);
 			inventory.OnOpened(this);
 		}
 
 		public void CloseInventory(Inventory inventory) {
-			((IItemContainerScope)this).RemoveContainer(inventory);
+			if (!this.IsOpened(inventory)) return;
+
+			((IInventoryScope)this).RemoveInventory(inventory);
 			inventory.OnClosed(this);
 		}
 
@@ -220,6 +224,8 @@ namespace SoulboundEngine.Client.Player {
 		/// <param name="tileEntitySource"><b>Note: this parameter will be generic 
 		/// once a container tile entity abstraction exists</b></param>
 		public void OpenInventory(Inventory inventory, ChestTileEntity tileEntitySource) {
+			if (this.IsOpened(inventory)) return;
+
 			this.OpenInventory(inventory);
 			this.client.OpenInventory(tileEntitySource);
 		}
@@ -227,10 +233,12 @@ namespace SoulboundEngine.Client.Player {
 		public void OpenInventory() => this.OpenInventory(this.inventory);
 		public void CloseInventory() => this.CloseInventory(this.inventory);
 
+		public bool IsOpened(Inventory inventory) => this.openInventories.Contains(inventory);
+
 		private Dictionary<SlotRef, int> CreateQuantitySnapshots() {
 			Dictionary<SlotRef, int> snapshots = new();
 
-			foreach (var container in this.openContainers) {
+			foreach (var container in this.openInventories) {
 				Dictionary<int, int> quantities = this.GetQuantitySnapshotForContainer(container);
 
 				foreach (var kvp in quantities) {
@@ -241,10 +249,10 @@ namespace SoulboundEngine.Client.Player {
 			return snapshots;
 		}
 
-		private Dictionary<int, int> GetQuantitySnapshotForContainer(IItemContainer container) {
-			return container.GetAllSlots()
-					.Where(i => container.GetSlot(i).GetStack()?.quantity > 0)
-					.ToDictionary(i => i, i => container.GetSlot(i).GetStack()!.quantity);
+		private Dictionary<int, int> GetQuantitySnapshotForContainer(Inventory inventory) {
+			return inventory.GetAllSlots()
+					.Where(i => inventory.GetSlot(i).GetStack()?.quantity > 0)
+					.ToDictionary(i => i, i => inventory.GetSlot(i).GetStack()!.quantity);
 		}
 
 		private bool ResolveItemOrBlockInteraction(InteractionTrigger trigger) {
