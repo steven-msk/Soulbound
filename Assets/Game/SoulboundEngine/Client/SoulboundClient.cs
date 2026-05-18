@@ -22,6 +22,7 @@ namespace SoulboundEngine.Client {
 	using SoulboundEngine.Client.Render.Block;
 	using SoulboundEngine.Client.Render.Entity;
 	using SoulboundEngine.Client.Render.Item;
+	using SoulboundEngine.Client.Render.Item.Container;
 	using SoulboundEngine.Client.UI.Screen;
 	using SoulboundEngine.Client.World.BlockSystem.TileEntities;
 	using SoulboundEngine.Core.Registry;
@@ -57,6 +58,7 @@ namespace SoulboundEngine.Client {
 		private readonly ISpriteResolver<AtlasSpriteRef> spriteResolver;
 		private readonly EntityRenderManager entityRenderManager;
 		private readonly BlockRenderManager blockRenderManager;
+		private readonly TileEntityContainerRenderer tileEntityContainerRenderer;
 
 		int IInputEventHandler.priority => int.MaxValue;
 
@@ -98,6 +100,7 @@ namespace SoulboundEngine.Client {
 			this.itemRenderManager = new ItemRenderManager(Registries.ITEMS.ToList(), this.spriteResolver);
 			this.entityRenderManager = new EntityRenderManager(Registries.ENTITIES.ToList(), this.itemRenderManager);
 			this.blockRenderManager = new BlockRenderManager(Registries.BLOCKS.ToList());
+			this.tileEntityContainerRenderer = new TileEntityContainerRenderer(this.GetContainerAssetFactory());
 		}
 
 		/// <summary>
@@ -236,7 +239,13 @@ namespace SoulboundEngine.Client {
 		}
 
 		public void OpenInventory(ChestTileEntity tileEntitySource) {
-			Logger.LogFatal(new NotImplementedException("UI Inventory opening not implemented"));
+			VisualElement element = this.tileEntityContainerRenderer.Render(tileEntitySource.GetTileEntityType());
+			this.uiHandler.AddOverlay(element);
+		}
+
+		private Func<TileEntityType, VisualTreeAsset> GetContainerAssetFactory() {
+			HashSet<TileEntityType> tileEntityTypes = Registries.TILE_ENTITIES.ToHashSet();
+			return TileEntityContainerRegistry.GetAssetFactory(tileEntityTypes);
 		}
 
 		private IWorldSaveStrategy GetWorldSaveStrategy() {

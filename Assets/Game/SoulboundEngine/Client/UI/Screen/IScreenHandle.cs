@@ -8,5 +8,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		void Hide();
 		void Dispose();
 		Screen GetScreen();
+
+		void AddOverlay(VisualElement element);
 	}
 }

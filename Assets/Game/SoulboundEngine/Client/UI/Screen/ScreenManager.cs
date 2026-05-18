@@ -55,6 +55,12 @@ namespace SoulboundEngine.Client.UI.Screen {
 			this.PushScreen(screen);
 		}
 
+		public void AddOverlay(VisualElement element) {
+			if (this.stack.TryPeek(out ScreenEntry activeEntry)) {
+				activeEntry.obj.AddOverlay(element);
+			}
+		}
+
 		public Screen? GetActiveScreen() {
 			return this.stack.TryPeek(out ScreenEntry activeEntry)
 				? activeEntry.screen

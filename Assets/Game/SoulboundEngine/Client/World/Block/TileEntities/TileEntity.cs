@@ -13,5 +13,7 @@ namespace SoulboundEngine.Client.World.BlockSystem.TileEntities {
 		}
 
 		public virtual void OnDispose() { }
+
+		public TileEntityType GetTileEntityType() => tileEntityType;
 	}
 }

@@ -27,6 +27,10 @@ namespace SoulboundEngine.Client.UI {
 
 		public void FlushScreens() => this.screenManager.Flush();
 
+		public void AddOverlay(VisualElement element) {
+			this.screenManager.AddOverlay(element);
+		}
+
 		public IScreenNavigator GetScreenNavigator() => this.screenManager;
 
 		IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {

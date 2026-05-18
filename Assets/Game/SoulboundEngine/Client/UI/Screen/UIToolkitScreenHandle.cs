@@ -26,5 +26,9 @@ namespace SoulboundEngine.Client.UI.Screen {
 		}
 
 		public Screen GetScreen() => this.screen;
+
+		public void AddOverlay(VisualElement element) {
+			this.Root.Add(element);
+		}
 	}
 }
