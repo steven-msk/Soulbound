@@ -26,7 +26,7 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 		}
 
 		public override TileEntity GetTileEntity(Level level, BlockPos blockPos) {
-			ObjectTileEntity tileEntity = new(level, blockPos);
+			ObjectTileEntity tileEntity = new(TileEntityTypes.OBJECT, level, blockPos);
 
 			tileEntity.onTriggerEnter += player => this.OnAreaEnter(level, blockPos, player);
 			tileEntity.onTriggerExit += player => this.OnAreaExit(level, blockPos, player);

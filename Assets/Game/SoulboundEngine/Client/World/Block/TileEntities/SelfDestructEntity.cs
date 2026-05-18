@@ -8,8 +8,8 @@ namespace SoulboundEngine.Client.World.BlockSystem.TileEntities {
 		const int TICKS_UNTIL_DESTRUCT = 300;
 		private int timer = TICKS_UNTIL_DESTRUCT;
 
-		public SelfDestructEntity(Level level, BlockPos blockPos)
-			: base(level, blockPos) {
+		public SelfDestructEntity(TileEntityType<SelfDestructEntity> tileEntityType, Level level, BlockPos blockPos)
+			: base(tileEntityType, level, blockPos) {
 		}
 
 		public void Tick() {

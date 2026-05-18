@@ -18,8 +18,8 @@ namespace SoulboundEngine.Client.World.BlockSystem.TileEntities {
 		public event Action onDestroyed;
 		private readonly GameObject gameObject;
 
-		public ObjectTileEntity(Level level, BlockPos blockPos)
-			: base(level, blockPos) {
+		public ObjectTileEntity(TileEntityType<ObjectTileEntity> tileEntityType, Level level, BlockPos blockPos)
+			: base(tileEntityType, level, blockPos) {
 			this.gameObject = new GameObject("Object Tile Entity");
 			this.gameObject.transform.position = blockPos.GetCenter();
 

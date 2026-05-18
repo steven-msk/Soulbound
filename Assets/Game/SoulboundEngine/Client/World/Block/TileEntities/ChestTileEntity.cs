@@ -5,8 +5,8 @@ namespace SoulboundEngine.Client.World.BlockSystem.TileEntities {
 	public class ChestTileEntity : TileEntity {
 		private readonly Inventory inventory;
 
-		public ChestTileEntity(Inventory inventory, Level level, BlockPos blockPos) 
-			: base(level, blockPos) {
+		public ChestTileEntity(TileEntityType<ChestTileEntity> tileEntityType, Inventory inventory, Level level, BlockPos blockPos) 
+			: base(tileEntityType, level, blockPos) {
 			this.inventory = inventory;
 		}
 

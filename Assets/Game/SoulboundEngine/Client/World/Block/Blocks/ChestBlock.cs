@@ -17,7 +17,7 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 		}
 
 		public override TileEntity GetTileEntity(Level level, BlockPos blockPos) {
-			return new ChestTileEntity(this.GetInventory(), level, blockPos);
+			return new ChestTileEntity(TileEntityTypes.CHEST, this.GetInventory(), level, blockPos);
 		}
 
 		private Inventory GetInventory() => new(INVENTORY_SIZE);
