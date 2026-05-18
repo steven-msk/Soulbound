@@ -32,7 +32,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 			this.logConsole = logConsole;
 		}
 
-		public override bool ReturnWithEscape => false;
+		public override bool EscapeReturn => false;
 
 		protected override void OnBind(VisualElement root) {
 			this.BindInventory(root);

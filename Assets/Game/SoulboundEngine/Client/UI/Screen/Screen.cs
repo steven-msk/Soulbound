@@ -10,7 +10,8 @@ namespace SoulboundEngine.Client.UI.Screen {
 			this.OnBuild(screenHandle);
 		}
 
-		public virtual bool ReturnWithEscape => true;
+		public virtual bool EscapeReturn => true;
+		public virtual bool IsOpaque => true;
 
 		protected abstract void OnBuild(IScreenHandle handle);
 

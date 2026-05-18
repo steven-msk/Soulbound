@@ -1,4 +1,5 @@
-﻿using UnityEngine.UIElements;
+﻿using System;
+using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.UI.Screen {
 	public interface IScreenHandle {
@@ -9,6 +10,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		void Dispose();
 		Screen GetScreen();
 
+		[Obsolete]
 		void AddOverlay(VisualElement element);
 	}
 }

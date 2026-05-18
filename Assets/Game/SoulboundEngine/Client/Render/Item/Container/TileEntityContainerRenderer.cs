@@ -14,7 +14,7 @@ namespace SoulboundEngine.Client.Render.Item.Container {
 			VisualTreeAsset asset = this.assetFactory(tileEntityType);
 			if (asset == null) return null;
 
-			TemplateContainer element = asset.Instantiate();
+			TemplateContainer element = asset.CloneTree();
 			element.style.position = Position.Absolute;
 			element.style.top = element.style.right = element.style.bottom = element.style.left = 0;
 			return element;

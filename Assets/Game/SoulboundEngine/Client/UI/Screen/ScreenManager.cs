@@ -14,10 +14,6 @@ namespace SoulboundEngine.Client.UI.Screen {
 		}
 
 		public void PushScreen(Screen screen) {
-			if (this.stack.TryPeek(out ScreenEntry activeEntry)) {
-				activeEntry.obj.Hide();
-			}
-
 			VisualElement root = this.CreateScreenRoot();
 			
 			IScreenHandle handle = new UIToolkitScreenHandle(screen, root);
@@ -26,7 +22,22 @@ namespace SoulboundEngine.Client.UI.Screen {
 			this.screenRoot.Attach(root);
 
 			this.stack.Push(new ScreenEntry(handle));
-			handle.Show();
+			this.Render();
+		}
+
+		private void Render() {
+			List<ScreenEntry> buffer = new();
+
+			foreach (var entry in this.stack.Reverse()) {
+				if (entry.screen.IsOpaque) {
+					buffer.ForEach(e => e.handle.Hide());
+					buffer.Clear();
+				}
+
+				buffer.Insert(0, entry);
+			}
+
+			buffer.ForEach(e => e.handle.Show());
 		}
 
 		private VisualElement CreateScreenRoot() {
@@ -34,18 +45,18 @@ namespace SoulboundEngine.Client.UI.Screen {
 				name = "ScreenRoot",
 			};
 			root.style.flexGrow = 1;
+			root.style.position = Position.Absolute;
+			root.style.top = root.style.right = root.style.bottom = root.style.left = 0;
 			return root;
 		}
 
 		public bool PopScreen() {
 			if (this.stack.TryPop(out ScreenEntry activeEntry)) {
-				activeEntry.obj.Hide();
-				activeEntry.obj.Dispose();
+				activeEntry.handle.Hide();
+				activeEntry.handle.Dispose();
 			}
 
-			if (this.stack.TryPeek(out activeEntry)) {
-				activeEntry.obj.Show();
-			}
+			this.Render();
 
 			return this.stack.Any();
 		}
@@ -57,7 +68,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 		public void AddOverlay(VisualElement element) {
 			if (this.stack.TryPeek(out ScreenEntry activeEntry)) {
-				activeEntry.obj.AddOverlay(element);
+				activeEntry.handle.AddOverlay(element);
 			}
 		}
 
@@ -75,13 +86,13 @@ namespace SoulboundEngine.Client.UI.Screen {
 		public void Flush() {
 			while (this.stack.Count > 0) {
 				var screenObject = this.stack.Pop();
-				screenObject.obj.Hide();
-				screenObject.obj.Dispose();
+				screenObject.handle.Hide();
+				screenObject.handle.Dispose();
 			}
 		}
 	}
 
-	sealed record ScreenEntry(IScreenHandle obj) {
-		public Screen screen => this.obj.GetScreen();
+	sealed record ScreenEntry(IScreenHandle handle) {
+		public Screen screen => this.handle.GetScreen();
 	}
 }
