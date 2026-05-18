@@ -1,9 +1,11 @@
+using SoulboundEngine.Client.Debug.Logging;
 using SoulboundEngine.Client.ItemSystem;
 using SoulboundEngine.Client.World.BlockSystem;
 using SoulboundEngine.Client.World.BlockSystem.TileEntities;
 using SoulboundEngine.Client.World.EntitySystem;
 using SoulboundEngine.Client.World.EntitySystem.Attribute;
 using System;
+using System.Linq;
 
 namespace SoulboundEngine.Core.Registry {
 	public static class Registries {
@@ -40,6 +42,7 @@ namespace SoulboundEngine.Core.Registry {
 
 		public static void Freeze() {
 			freezed = true;
+			Logger.LogInfo("Freezing {} registries", ROOT.Count());
 
 			foreach (var registry in ROOT) {
 				registry.Freeze();

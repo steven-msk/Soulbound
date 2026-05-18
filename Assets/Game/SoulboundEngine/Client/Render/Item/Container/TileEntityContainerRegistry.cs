@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.Render.Item.Container {
 	public static class TileEntityContainerRegistry {
-		private static Dictionary<TileEntityType, VisualTreeAsset> ASSETS = new();
+		private static readonly Dictionary<TileEntityType, VisualTreeAsset> ASSETS = new();
 
 		static TileEntityContainerRegistry() {
 			Register(TileEntityTypes.CHEST, ResolveAsset("ChestContainer"));
