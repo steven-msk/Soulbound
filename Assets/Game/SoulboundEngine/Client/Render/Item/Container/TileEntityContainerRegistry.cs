@@ -1,15 +1,34 @@
 ﻿using SoulboundEngine.Client.World.BlockSystem.TileEntities;
-using SoulboundEngine.Core.Registry;
+using SoulboundEngine.Core.Assets;
+using System;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.Render.Item.Container {
 	public static class TileEntityContainerRegistry {
-		private static Dictionary<RegistryKey<TileEntityType>, VisualTreeAsset> ASSETS = new();
+		private static Dictionary<TileEntityType, VisualTreeAsset> ASSETS = new();
 
-		public static void Register(RegistryKey<TileEntityType> key, VisualTreeAsset asset) {
+		static TileEntityContainerRegistry() {
+			Register(TileEntityTypes.CHEST, ResolveAsset("ChestContainer"));
+		}
+
+		// needs to be generic on TileEntityType
+		// generic type must be container entity compatible
+		// TODO: make tile entity container registration generic
+		public static void Register(TileEntityType key, VisualTreeAsset asset) {
 			ASSETS.Add(key, asset);
 		}
 
+		public static Func<TileEntityType, VisualTreeAsset> GetAssetFactory(HashSet<TileEntityType> tileEntityTypes) {
+			Dictionary<TileEntityType, VisualTreeAsset> mappings = new();
+			foreach (var tileEntityType in tileEntityTypes) {
+				mappings.Add(tileEntityType, ASSETS[tileEntityType]);
+			}
+			return tileEntityType => mappings[tileEntityType];
+		}
+
+		private static VisualTreeAsset ResolveAsset(string assetKey) {
+			return AssetManager.Resolve<VisualTreeAsset>(new AssetKey(assetKey));
+		}
 	}
 }
