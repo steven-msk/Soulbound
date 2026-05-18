@@ -34,5 +34,8 @@ namespace SoulboundEngine.Client.World.BlockSystem.TileEntities {
 		public static Identifier GetIdentifier<TET>(TET tileEntityType) where TET : TileEntityType {
 			return Registries.TILE_ENTITIES.GetIdentifier(tileEntityType);
 		}
-	}
+
+		public static void Init() {
+		}
+ 	}
 }

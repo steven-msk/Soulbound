@@ -1,4 +1,5 @@
-﻿using SoulboundEngine.Client.World.BlockSystem.TileEntities;
+﻿using SoulboundEngine.Client.Debug.Logging;
+using SoulboundEngine.Client.World.BlockSystem.TileEntities;
 using SoulboundEngine.Core.Assets;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,11 @@ namespace SoulboundEngine.Client.Render.Item.Container {
 		public static Func<TileEntityType, VisualTreeAsset> GetAssetFactory(HashSet<TileEntityType> tileEntityTypes) {
 			Dictionary<TileEntityType, VisualTreeAsset> mappings = new();
 			foreach (var tileEntityType in tileEntityTypes) {
-				mappings.Add(tileEntityType, ASSETS[tileEntityType]);
+				if (!ASSETS.TryGetValue(tileEntityType, out VisualTreeAsset asset)) {
+					Logger.LogError("Tile entity container asset not found: {}", TileEntityTypes.GetIdentifier(tileEntityType));
+					continue;
+				}
+				mappings.Add(tileEntityType, asset);
 			}
 			return tileEntityType => mappings[tileEntityType];
 		}

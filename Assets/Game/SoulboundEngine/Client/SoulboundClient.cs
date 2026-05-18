@@ -243,8 +243,9 @@ namespace SoulboundEngine.Client {
 			this.uiHandler.AddOverlay(element);
 		}
 
+		[Obsolete]
 		private Func<TileEntityType, VisualTreeAsset> GetContainerAssetFactory() {
-			HashSet<TileEntityType> tileEntityTypes = Registries.TILE_ENTITIES.ToHashSet();
+			HashSet<TileEntityType> tileEntityTypes = new() { TileEntityTypes.CHEST };
 			return TileEntityContainerRegistry.GetAssetFactory(tileEntityTypes);
 		}
 

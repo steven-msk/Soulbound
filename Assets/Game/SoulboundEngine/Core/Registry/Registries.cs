@@ -35,6 +35,7 @@ namespace SoulboundEngine.Core.Registry {
 			Items.Init();
 			EntityType.Init();
 			AttributeTypes.Init();
+			TileEntityTypes.Init();
 		}
 
 		public static void Freeze() {
