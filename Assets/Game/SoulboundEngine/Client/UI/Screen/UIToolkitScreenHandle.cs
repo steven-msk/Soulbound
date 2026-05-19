@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine.UIElements;
+﻿using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.UI.Screen {
 	public sealed class UIToolkitScreenHandle : IScreenHandle {
@@ -36,9 +35,5 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 		public Screen GetScreen() => this.screen;
 
-		[Obsolete]
-		public void AddOverlay(VisualElement element) {
-			this.Root.Add(element);
-		}
 	}
 }

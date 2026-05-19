@@ -60,6 +60,7 @@ namespace SoulboundEngine.Client {
 		private readonly BlockRenderManager blockRenderManager;
 		private readonly TileEntityContainerRenderer tileEntityContainerRenderer;
 		private WorldScreen activeWorldScreen;
+		private IScreenHandle activeInventoryScreenHandle;
 
 		int IInputEventHandler.priority => int.MaxValue;
 
@@ -243,17 +244,21 @@ namespace SoulboundEngine.Client {
 
 		public void ShowInventoryScreen(Player.Player player) {
 			this.activeWorldScreen?.SetHotbarVisible(false);
-			this.uiHandler.PushScreen(new InventoryContextScreen(this.itemRenderManager, player));
+			this.activeInventoryScreenHandle = this.uiHandler.PushScreen(new InventoryContextScreen(this.itemRenderManager, player));
 		}
 
 		public void HideInventoryScreen() {
 			this.activeWorldScreen?.SetHotbarVisible(true);
-			this.uiHandler.PopScreen();
+			if (this.activeInventoryScreenHandle != null) {
+				this.uiHandler.PopScreen(this.activeInventoryScreenHandle);
+				this.activeInventoryScreenHandle = null;
+			}
 		}
 
+		[Obsolete]
 		public void OpenInventory(ChestTileEntity tileEntitySource) {
-			VisualElement element = this.tileEntityContainerRenderer.Render(tileEntitySource.GetTileEntityType());
-			this.uiHandler.AddOverlay(element);
+			//VisualElement element = this.tileEntityContainerRenderer.Render(tileEntitySource.GetTileEntityType());
+			//this.uiHandler.AddOverlay(element);
 		}
 
 		[Obsolete]

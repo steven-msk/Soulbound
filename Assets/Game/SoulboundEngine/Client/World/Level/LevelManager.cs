@@ -142,7 +142,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 		public void UnpauseGame() {
 			this.paused = false;
 			Time.timeScale = 1f;
-			this.client.UIHandler.GetScreenNavigator().PopScreen();
+			this.client.UIHandler.GetScreenNavigator().PopTopScreen();
 			this.client.InputManager.AddHandler(this.level.GetPlayer());
 		}
 

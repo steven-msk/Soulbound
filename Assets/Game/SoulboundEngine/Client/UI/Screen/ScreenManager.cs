@@ -1,3 +1,4 @@
+using SoulboundEngine.Client.Debug.Logging;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.UIElements;
@@ -6,14 +7,14 @@ using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.UI.Screen {
 	public sealed class ScreenManager : IScreenNavigator {
-		private readonly Stack<ScreenEntry> stack = new();
+		private readonly List<ScreenEntry> stack = new();
 		private readonly UIToolkitScreenRoot screenRoot;
 
 		public ScreenManager(UIToolkitScreenRoot screenRoot) {
 			this.screenRoot = screenRoot;
 		}
 
-		public void PushScreen(Screen screen) {
+		public IScreenHandle PushScreen(Screen screen) {
 			VisualElement root = this.CreateScreenRoot();
 			
 			IScreenHandle handle = new UIToolkitScreenHandle(screen, root);
@@ -21,14 +22,16 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 			this.screenRoot.Attach(root);
 
-			this.stack.Push(new ScreenEntry(handle));
+			this.stack.Insert(0, new ScreenEntry(handle));
 			this.Render();
+
+			return handle;
 		}
 
 		private void Render() {
 			List<ScreenEntry> buffer = new();
 
-			foreach (var entry in this.stack.Reverse()) {
+			foreach (var entry in this.stack.Reverse<ScreenEntry>()) {
 				if (entry.screen.IsOpaque) {
 					buffer.ForEach(e => e.handle.Hide());
 					buffer.Clear();
@@ -50,10 +53,12 @@ namespace SoulboundEngine.Client.UI.Screen {
 			return root;
 		}
 
-		public bool PopScreen() {
-			if (this.stack.TryPop(out ScreenEntry activeEntry)) {
-				activeEntry.handle.Hide();
-				activeEntry.handle.Dispose();
+		public bool PopTopScreen() {
+			ScreenEntry? topEntry = this.GetTopEntry();
+			if (topEntry == null) return false;
+
+			if (this.stack.Remove(topEntry)) {
+				this.HideAndDispose(topEntry);
 			}
 
 			this.Render();
@@ -61,22 +66,25 @@ namespace SoulboundEngine.Client.UI.Screen {
 			return this.stack.Any();
 		}
 
+		public void PopScreen(IScreenHandle handle) {
+			ScreenEntry entry = this.stack.FirstOrDefault(e => e.handle == handle);
+			if (entry == null) {
+				Logger.LogError("Could not find screen handle");
+				return;
+			}
+			this.stack.Remove(entry);
+			this.HideAndDispose(entry);
+			this.Render();
+		}
+
 		public void ReplaceScreen(Screen screen) {
-			this.PopScreen();
+			this.PopTopScreen();
 			this.PushScreen(screen);
 		}
 
-		public void AddOverlay(VisualElement element) {
-			if (this.stack.TryPeek(out ScreenEntry activeEntry)) {
-				activeEntry.handle.AddOverlay(element);
-			}
-		}
+		public Screen? GetActiveScreen() => this.GetTopEntry()?.screen;
 
-		public Screen? GetActiveScreen() {
-			return this.stack.TryPeek(out ScreenEntry activeEntry)
-				? activeEntry.screen
-				: null;
-		}
+		private ScreenEntry? GetTopEntry() => this.stack.First();
 
 		public void IssueRebuild(Screen screen) {
 			if (this.GetActiveScreen() != screen) return;
@@ -84,11 +92,15 @@ namespace SoulboundEngine.Client.UI.Screen {
 		}
 
 		public void Flush() {
-			while (this.stack.Count > 0) {
-				var screenObject = this.stack.Pop();
-				screenObject.handle.Hide();
-				screenObject.handle.Dispose();
+			foreach (var entry in this.stack) {
+				this.HideAndDispose(entry);
 			}
+			this.stack.Clear();
+		}
+
+		private void HideAndDispose(ScreenEntry entry) {
+			entry.handle.Hide();
+			entry.handle.Dispose();
 		}
 	}
 

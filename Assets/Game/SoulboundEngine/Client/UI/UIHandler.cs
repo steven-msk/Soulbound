@@ -23,14 +23,10 @@ namespace SoulboundEngine.Client.UI {
 			this.screenManager = new ScreenManager(this.screenRoot);
 		}
 
-		public void PushScreen(Screen.Screen screen) => this.screenManager.PushScreen(screen);
-		public void PopScreen() => this.screenManager.PopScreen();
+		public IScreenHandle PushScreen(Screen.Screen screen) => this.screenManager.PushScreen(screen);
+		public void PopScreen(IScreenHandle handle) => this.screenManager.PopScreen(handle);
 
 		public void FlushScreens() => this.screenManager.Flush();
-
-		public void AddOverlay(VisualElement element) {
-			this.screenManager.AddOverlay(element);
-		}
 
 		public IScreenNavigator GetScreenNavigator() => this.screenManager;
 
@@ -50,7 +46,7 @@ namespace SoulboundEngine.Client.UI {
 
 				InputEventListener.ConsumePerformed(InputTokens.Keyboard.ESC, _ => {
 					if (this.screenManager.GetActiveScreen()?.EscapeReturn ?? false) {
-						this.screenManager.PopScreen();
+						this.screenManager.PopTopScreen();
 					}
 				})
 			};
