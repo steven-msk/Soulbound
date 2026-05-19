@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.Render.Item {
-	public sealed class HotbarSlotHandle : UIToolkitItemSlotHandle {
+	public sealed class HotbarSlotHandle : InteractableUIToolkitSlotDisplay {
 		private bool isMainSlot;
 		private static readonly Color[] mainSlotBorders = {
 			Color.white, Color.white, Color.white, Color.white

@@ -20,7 +20,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		const int LEFT_BUTTON = 0;
 		const int MIDDLE_BUTTON = 2;
 		const int RIGHT_BUTTON = 1;
-		private readonly Dictionary<Inventory, UIToolkitItemSlotHandle[]> slotHandlesByInventory = new();
+		private readonly Dictionary<Inventory, InteractableUIToolkitSlotDisplay[]> slotDisplaysByInventory = new();
 		private readonly ItemRenderManager itemRenderManager;
 		private readonly Player player;
 		private readonly HashSet<Inventory> openInventories = new();
@@ -44,16 +44,16 @@ namespace SoulboundEngine.Client.UI.Screen {
 		}
 
 		private void AddPlayerInventory(PlayerInventory playerInventory, VisualElement inventoryRoot) {
-			this.slotHandlesByInventory[playerInventory] = new UIToolkitItemSlotHandle[playerInventory.GetSize()];
+			this.slotDisplaysByInventory[playerInventory] = new InteractableUIToolkitSlotDisplay[playerInventory.GetSize()];
 
 			foreach (var slotIndex in playerInventory.GetPopup()) {
 				IItemSlot slot = playerInventory.GetSlot(slotIndex);
 				VisualElement slotElement = this.GetPopup(inventoryRoot)[slotIndex - PlayerInventory.HOTBAR_SIZE];
 
-				UIToolkitItemSlotHandle handle = new(slot, this.itemRenderManager);
-				handle.OnBind(slotElement);
-				this.slotHandlesByInventory[playerInventory][slotIndex] = handle;
-				this.AddPointerListeners(slotElement, handle, slot, playerInventory);
+				InteractableUIToolkitSlotDisplay display = new(slot, this.itemRenderManager);
+				display.OnBind(slotElement);
+				this.slotDisplaysByInventory[playerInventory][slotIndex] = display;
+				this.AddPointerListeners(slotElement, display, slot, playerInventory);
 			}
 
 			foreach (var slotIndex in playerInventory.GetHotbar()) {
@@ -62,7 +62,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 				HotbarSlotHandle handle = new(slot, this.itemRenderManager);
 				handle.OnBind(slotElement);
-				this.slotHandlesByInventory[playerInventory][slotIndex] = handle;
+				this.slotDisplaysByInventory[playerInventory][slotIndex] = handle;
 				this.AddPointerListeners(slotElement, handle, slot, playerInventory);
 			}
 
@@ -76,11 +76,11 @@ namespace SoulboundEngine.Client.UI.Screen {
 		}
 
 		private void SetAsMainSlotVisual(int slot) {
-			this.slotHandlesByInventory[this.player.GetInventory()][slot].SetAsMainSlot();
+			this.slotDisplaysByInventory[this.player.GetInventory()][slot].SetAsMainSlot();
 		}
 
 		private void UnsetMainSlotVisual(int slot) {
-			this.slotHandlesByInventory[this.player.GetInventory()][slot].UnsetMainSlot();
+			this.slotDisplaysByInventory[this.player.GetInventory()][slot].UnsetMainSlot();
 		}
 
 		private VisualElement GetPopup(VisualElement playerInventoryRoot) {
@@ -99,11 +99,11 @@ namespace SoulboundEngine.Client.UI.Screen {
 			});
 		}
 
-		private void AddPointerListeners(VisualElement visualElement, UIToolkitItemSlotHandle handle, IItemSlot slot, Inventory inventory) {
-			handle.onPointerDown += evt => this.OnPointerDown(slot, inventory, visualElement, evt);
-			handle.onPointerUp += evt => this.OnPointerUp(slot, inventory, visualElement, evt);
-			handle.onPointerEnter += evt => this.OnPointerEnter(slot, inventory, visualElement, evt);
-			handle.onPointerLeave += evt => this.OnPointerLeave(slot, inventory, visualElement, evt);
+		private void AddPointerListeners(VisualElement visualElement, InteractableUIToolkitSlotDisplay display, IItemSlot slot, Inventory inventory) {
+			display.onPointerDown += evt => this.OnPointerDown(slot, inventory, visualElement, evt);
+			display.onPointerUp += evt => this.OnPointerUp(slot, inventory, visualElement, evt);
+			display.onPointerEnter += evt => this.OnPointerEnter(slot, inventory, visualElement, evt);
+			display.onPointerLeave += evt => this.OnPointerLeave(slot, inventory, visualElement, evt);
 		}
 
 		private void OnPointerDown(IItemSlot slot, Inventory inventory, VisualElement visualElement, PointerDownEvent evt) {
@@ -258,8 +258,8 @@ namespace SoulboundEngine.Client.UI.Screen {
 		}
 
 		public override void OnDispose(IScreenHandle handle) {
-			foreach (var slot in this.slotHandlesByInventory.SelectMany(kvp => kvp.Value).ToList()) {
-				slot.Dispose();
+			foreach (var slotDisplay in this.slotDisplaysByInventory.SelectMany(kvp => kvp.Value).ToList()) {
+				slotDisplay.Dispose();
 			}
 			this.player.GetInventory().mainSlotChanged -= this.OnMainSlotChanged;
 		}
