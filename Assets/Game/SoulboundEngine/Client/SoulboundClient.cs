@@ -59,6 +59,7 @@ namespace SoulboundEngine.Client {
 		private readonly EntityRenderManager entityRenderManager;
 		private readonly BlockRenderManager blockRenderManager;
 		private readonly TileEntityContainerRenderer tileEntityContainerRenderer;
+		private WorldScreen activeWorldScreen;
 
 		int IInputEventHandler.priority => int.MaxValue;
 
@@ -157,7 +158,8 @@ namespace SoulboundEngine.Client {
 				this.activeWorldSession = session;
 				//this.uiHandler.SetCanvas(session.canvas);
 				this.uiHandler.SetUIDocument(session.uiDocument);
-				this.uiHandler.PushScreen(new WorldScreen(this.commandLine, this.metricsHud, this.logConsole));
+				this.activeWorldScreen = new WorldScreen(session.player.GetInventory(), this.commandLine, this.metricsHud, this.logConsole, this.itemRenderManager);
+				this.uiHandler.PushScreen(this.activeWorldScreen);
 				this.debugOverlayManager.Clear();
 				this.inputManager.AddHandler(session.levelManager);
 
@@ -184,6 +186,7 @@ namespace SoulboundEngine.Client {
 				.ContinueWith(() => {
 					this.activeWorldSession = null;
 					this.uiHandler.SetUIDocument(Object.FindFirstObjectByType<UIDocument>());
+					this.activeWorldScreen = null;
 					this.uiHandler.PushScreen(new TitleScreen(this));
 					this.debugOverlayManager.Clear();
 
@@ -239,10 +242,12 @@ namespace SoulboundEngine.Client {
 		}
 
 		public void ShowInventoryScreen(Player.Player player) {
+			this.activeWorldScreen?.SetHotbarVisible(false);
 			this.uiHandler.PushScreen(new InventoryContextScreen(this.itemRenderManager, player));
 		}
 
 		public void HideInventoryScreen() {
+			this.activeWorldScreen?.SetHotbarVisible(true);
 			this.uiHandler.PopScreen();
 		}
 

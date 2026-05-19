@@ -1,19 +1,18 @@
 ﻿using SoulboundEngine.Client.ItemSystem;
 using SoulboundEngine.Client.ItemSystem.Container;
 using SoulboundEngine.Client.UI;
-using System;
 using UnityEngine.UIElements;
 
 #nullable enable
 
 namespace SoulboundEngine.Client.Render.Item {
-	public class UIToolkitItemSlotDisplay : UxmlWidget, IDisposable {
+	public abstract class UIToolkitItemSlotDisplay : UxmlWidget, IUIToolkitSlotDisplay {
 		protected readonly IItemSlot slot;
 		protected readonly ItemRenderManager itemRenderManager;
 		protected readonly ItemRenderHandle renderHandle;
 		protected ItemStack? stack;
 
-		public UIToolkitItemSlotDisplay(IItemSlot slot, ItemRenderManager itemRenderManager) {
+		protected UIToolkitItemSlotDisplay(IItemSlot slot, ItemRenderManager itemRenderManager) {
 			this.slot = slot;
 			this.itemRenderManager = itemRenderManager;
 			this.renderHandle = new ItemRenderHandle(this);

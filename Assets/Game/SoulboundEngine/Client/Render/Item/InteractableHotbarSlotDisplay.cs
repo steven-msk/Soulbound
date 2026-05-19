@@ -2,16 +2,14 @@
 using System;
 using UnityEngine.UIElements;
 
-#nullable enable
-
 namespace SoulboundEngine.Client.Render.Item {
-	public class InteractableUIToolkitSlotDisplay : UIToolkitItemSlotDisplay, IDisposable, IInteractableUIToolkitSlotDisplay {
-		public event Action<PointerDownEvent>? onPointerDown;
-		public event Action<PointerUpEvent>? onPointerUp;
-		public event Action<PointerEnterEvent>? onPointerEnter;
-		public event Action<PointerLeaveEvent>? onPointerLeave;
+	public class InteractableHotbarSlotDisplay : HotbarSlotDisplay, IInteractableUIToolkitSlotDisplay {
+		public event Action<PointerDownEvent> onPointerDown;
+		public event Action<PointerEnterEvent> onPointerEnter;
+		public event Action<PointerLeaveEvent> onPointerLeave;
+		public event Action<PointerUpEvent> onPointerUp;
 
-		public InteractableUIToolkitSlotDisplay(IItemSlot slot, ItemRenderManager itemRenderManager)
+		public InteractableHotbarSlotDisplay(IItemSlot slot, ItemRenderManager itemRenderManager) 
 			: base(slot, itemRenderManager) {
 		}
 

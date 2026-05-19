@@ -20,7 +20,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		const int LEFT_BUTTON = 0;
 		const int MIDDLE_BUTTON = 2;
 		const int RIGHT_BUTTON = 1;
-		private readonly Dictionary<Inventory, InteractableUIToolkitSlotDisplay[]> slotDisplaysByInventory = new();
+		private readonly Dictionary<Inventory, IInteractableUIToolkitSlotDisplay[]> slotDisplaysByInventory = new();
 		private readonly ItemRenderManager itemRenderManager;
 		private readonly Player player;
 		private readonly HashSet<Inventory> openInventories = new();
@@ -44,7 +44,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		}
 
 		private void AddPlayerInventory(PlayerInventory playerInventory, VisualElement inventoryRoot) {
-			this.slotDisplaysByInventory[playerInventory] = new InteractableUIToolkitSlotDisplay[playerInventory.GetSize()];
+			this.slotDisplaysByInventory[playerInventory] = new IInteractableUIToolkitSlotDisplay[playerInventory.GetSize()];
 
 			foreach (var slotIndex in playerInventory.GetPopup()) {
 				IItemSlot slot = playerInventory.GetSlot(slotIndex);
@@ -60,7 +60,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 				IItemSlot slot = playerInventory.GetSlot(slotIndex);
 				VisualElement slotElement = this.GetHotbar(inventoryRoot)[slotIndex];
 
-				HotbarSlotHandle handle = new(slot, this.itemRenderManager);
+				InteractableHotbarSlotDisplay handle = new(slot, this.itemRenderManager);
 				handle.OnBind(slotElement);
 				this.slotDisplaysByInventory[playerInventory][slotIndex] = handle;
 				this.AddPointerListeners(slotElement, handle, slot, playerInventory);
@@ -99,7 +99,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 			});
 		}
 
-		private void AddPointerListeners(VisualElement visualElement, InteractableUIToolkitSlotDisplay display, IItemSlot slot, Inventory inventory) {
+		private void AddPointerListeners(VisualElement visualElement, IInteractableUIToolkitSlotDisplay display, IItemSlot slot, Inventory inventory) {
 			display.onPointerDown += evt => this.OnPointerDown(slot, inventory, visualElement, evt);
 			display.onPointerUp += evt => this.OnPointerUp(slot, inventory, visualElement, evt);
 			display.onPointerEnter += evt => this.OnPointerEnter(slot, inventory, visualElement, evt);
