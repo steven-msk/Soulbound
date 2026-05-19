@@ -1,21 +1,31 @@
 ﻿using SoulboundEngine.Client.Input;
+using SoulboundEngine.Client.ItemSystem;
 using SoulboundEngine.Client.ItemSystem.Container;
 using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.Render.Item;
 using SoulboundEngine.Core.Assets;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.UI.Screen {
 	using Player = Player.Player;
 
-	public class InventoryContextScreen : UxmlScreen, IInputEventHandler {
+	public class InventoryContextScreen : UxmlScreen, IInputEventHandler, IInventoryScope {
 		int IInputEventHandler.priority => 5005;
+		private int lastClickedSlot;
+		private float lastClickTime;
+		const float DOUBLE_CLICK_THRESHOLD = 0.15f;
+		const int LEFT_BUTTON = 0;
+		const int MIDDLE_BUTTON = 2;
+		const int RIGHT_BUTTON = 1;
+		private readonly Dictionary<Inventory, UIToolkitItemSlotHandle[]> slotHandlesByInventory = new();
 		private readonly ItemRenderManager itemRenderManager;
 		private readonly Player player;
-		private PlayerInventoryHandle inventoryHandle;
+		private readonly HashSet<Inventory> openInventories = new();
 		private TransitStack transitStack;
+		private SlotDragState dragState;
 		private Vector2 pointerPosition;
 
 		public InventoryContextScreen(ItemRenderManager itemRenderManager, Player player) 
@@ -27,17 +37,58 @@ namespace SoulboundEngine.Client.UI.Screen {
 		public override bool IsOpaque => false;
 
 		protected override void OnBind(VisualElement root) {
-			this.inventoryHandle = new PlayerInventoryHandle(this.player.GetInventory(), this.itemRenderManager, this.player);
-			this.inventoryHandle.OnBind(root.Q<VisualElement>("PlayerInventorySpace"));
-
 			this.transitStack = new TransitStack(this.itemRenderManager, root.Q<VisualElement>("TransitStack"));
 			this.player.SetTransitStackSource(this.transitStack);
 
-			this.AddPlayerInventory(this.player.GetInventory());
+			this.AddPlayerInventory(this.player.GetInventory(), root.Q<VisualElement>("PlayerInventorySpace"));
 		}
 
-		private void AddPlayerInventory(PlayerInventory playerInventory) {
+		private void AddPlayerInventory(PlayerInventory playerInventory, VisualElement inventoryRoot) {
+			this.slotHandlesByInventory[playerInventory] = new UIToolkitItemSlotHandle[playerInventory.GetSize()];
 
+			foreach (var slotIndex in playerInventory.GetPopup()) {
+				IItemSlot slot = playerInventory.GetSlot(slotIndex);
+				VisualElement slotElement = this.GetPopup(inventoryRoot)[slotIndex - PlayerInventory.HOTBAR_SIZE];
+
+				UIToolkitItemSlotHandle handle = new(slot, this.itemRenderManager);
+				handle.OnBind(slotElement);
+				this.slotHandlesByInventory[playerInventory][slotIndex] = handle;
+				this.AddPointerListeners(slotElement, handle, slot, playerInventory);
+			}
+
+			foreach (var slotIndex in playerInventory.GetHotbar()) {
+				IItemSlot slot = playerInventory.GetSlot(slotIndex);
+				VisualElement slotElement = this.GetHotbar(inventoryRoot)[slotIndex];
+
+				HotbarSlotHandle handle = new(slot, this.itemRenderManager);
+				handle.OnBind(slotElement);
+				this.slotHandlesByInventory[playerInventory][slotIndex] = handle;
+				this.AddPointerListeners(slotElement, handle, slot, playerInventory);
+			}
+
+			playerInventory.mainSlotChanged += this.OnMainSlotChanged;
+			this.SetAsMainSlotVisual(playerInventory.GetMainSlot());
+		}
+
+		private void OnMainSlotChanged(int oldIndex, int newIndex) {
+			this.UnsetMainSlotVisual(oldIndex);
+			this.SetAsMainSlotVisual(newIndex);
+		}
+
+		private void SetAsMainSlotVisual(int slot) {
+			this.slotHandlesByInventory[this.player.GetInventory()][slot].SetAsMainSlot();
+		}
+
+		private void UnsetMainSlotVisual(int slot) {
+			this.slotHandlesByInventory[this.player.GetInventory()][slot].UnsetMainSlot();
+		}
+
+		private VisualElement GetPopup(VisualElement playerInventoryRoot) {
+			return playerInventoryRoot.Q<VisualElement>("Popup");
+		}
+
+		private VisualElement GetHotbar(VisualElement playerInventoryRoot) {
+			return playerInventoryRoot.Q<VisualElement>("Hotbar");
 		}
 
 		IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {
@@ -48,14 +99,169 @@ namespace SoulboundEngine.Client.UI.Screen {
 			});
 		}
 
+		private void AddPointerListeners(VisualElement visualElement, UIToolkitItemSlotHandle handle, IItemSlot slot, Inventory inventory) {
+			handle.onPointerDown += evt => this.OnPointerDown(slot, inventory, visualElement, evt);
+			handle.onPointerUp += evt => this.OnPointerUp(slot, inventory, visualElement, evt);
+			handle.onPointerEnter += evt => this.OnPointerEnter(slot, inventory, visualElement, evt);
+			handle.onPointerLeave += evt => this.OnPointerLeave(slot, inventory, visualElement, evt);
+		}
+
+		private void OnPointerDown(IItemSlot slot, Inventory inventory, VisualElement visualElement, PointerDownEvent evt) {
+			float time = Time.time;
+			bool doubleClick = this.lastClickedSlot == slot.GetIndex() && (time - this.lastClickTime) <= DOUBLE_CLICK_THRESHOLD;
+			this.lastClickTime = time;
+			this.lastClickedSlot = slot.GetIndex();
+
+			int clickButton = evt.button;
+			ISlotOperation operation = this.GetClick(slot.GetIndex(), inventory, clickButton, doubleClick);
+			if (operation is NoSlotOperation) return;
+
+			this.TryBeginDrag(
+				this.HasTransitStack()
+					? this.GetTransitStack()
+					: inventory.GetSlot(slot.GetIndex()).GetStack(),
+				new SlotRef(inventory, slot.GetIndex()),
+				clickButton
+			);
+			operation.Execute();
+		}
+
+		private void OnPointerUp(IItemSlot slot, Inventory inventory, VisualElement visualElement, PointerUpEvent evt) {
+			this.EndDrag();
+		}
+
+		private void OnPointerEnter(IItemSlot slot, Inventory inventory, VisualElement visualElement, PointerEnterEvent evt) {
+			if (!this.InDragState()) return;
+
+			int dragButton = this.GetDragState().button;
+			ISlotOperation operation = this.GetDrag(slot.GetIndex(), inventory, dragButton);
+			if (operation is NoSlotOperation) return;
+
+			operation.Execute();
+		}
+
+		private void OnPointerLeave(IItemSlot slot, Inventory inventory, VisualElement visualElement, PointerLeaveEvent evt) {
+		}
+
+		private ISlotOperation GetClick(int slotIndex, Inventory inventory, int clickButton, bool doubleClick) {
+			if (clickButton < 0) return new NoSlotOperation();
+
+			if (clickButton == LEFT_BUTTON) {
+				CollectAllItemsToTransit collectToTransit = new(this);
+
+				return doubleClick && collectToTransit.CanExecute()
+					? collectToTransit
+					: new TransferTransit(inventory, slotIndex, this);
+			}
+
+			if (clickButton == RIGHT_BUTTON) {
+				TransferSingleToSlot transferSingleToSlot = new(inventory, slotIndex, this);
+				HalveStackFromSlot halveStackFromSlot = new(inventory, slotIndex, this);
+
+				if (transferSingleToSlot.CanExecute()) return transferSingleToSlot;
+				if (halveStackFromSlot.CanExecute()) return halveStackFromSlot;
+
+				return new NoSlotOperation();
+			}
+			return new NoSlotOperation();
+		}
+
+		private ISlotOperation GetDrag(int slotIndex, Inventory inventory, int button) {
+			if (button == LEFT_BUTTON) {
+				return new SplitDistributeToDraggedSlot(new SlotRef(inventory, slotIndex), this);
+			}
+			if (button == RIGHT_BUTTON) {
+				TransferSingleToSlot transferSingleToSlot = new(inventory, slotIndex, this);
+
+				if (transferSingleToSlot.CanExecute()) {
+					this.ExtendDrag(new SlotRef(inventory, slotIndex));
+					return transferSingleToSlot;
+				}
+
+				return new NoSlotOperation();
+			}
+			return new NoSlotOperation();
+		}
+
+		public bool TryBeginDrag(ItemStack stack, SlotRef slotRef, int button) {
+			if (((IInventoryScope)this).InDragState() || stack == null) return false;
+
+			HashSet<SlotRef> draggedSlots = new(new SlotRef.EqualityComparer()) { slotRef };
+
+			this.dragState = new SlotDragState(slotRef.container) {
+				stack = stack.Clone(),
+				origin = slotRef,
+				draggedSlots = draggedSlots,
+				button = button,
+				quantitySnapshots = this.CreateQuantitySnapshots(),
+			};
+			return true;
+		}
+
+		private Dictionary<SlotRef, int> CreateQuantitySnapshots() {
+			Dictionary<SlotRef, int> snapshots = new();
+
+			foreach (var container in this.openInventories) {
+				Dictionary<int, int> quantities = this.GetQuantitySnapshotForContainer(container);
+
+				foreach (var kvp in quantities) {
+					SlotRef slotRef = new(container, kvp.Key);
+					snapshots[slotRef] = kvp.Value;
+				}
+			}
+			return snapshots;
+		}
+
+		private Dictionary<int, int> GetQuantitySnapshotForContainer(Inventory inventory) {
+			return inventory.GetAllSlots()
+					.Where(i => inventory.GetSlot(i).GetStack()?.quantity > 0)
+					.ToDictionary(i => i, i => inventory.GetSlot(i).GetStack()!.quantity);
+		}
+
+		void IInventoryScope.AddInventory(Inventory inventory) {
+			this.openInventories.Add(inventory);
+		}
+
+		void IInventoryScope.RemoveInventory(Inventory inventory) {
+			this.openInventories.Remove(inventory);
+		}
+
+		public ItemStack GetTransitStack() => this.transitStack?.GetStack();
+
+		public bool HasTransitStack() => this.transitStack?.HasStack() ?? false;
+
+		void ITransitStackSource.SetTransitStack(ItemStack itemStack) {
+			if (itemStack == null) this.transitStack?.Destroy();
+			else this.transitStack?.SetStack(itemStack);
+		}
+
+		public SlotDragState GetDragState() => this.dragState;
+
+		public void EndDrag() => this.dragState = null;
+
+		public void ExtendDrag(SlotRef slotRef) {
+			this.dragState?.ExtendDrag(slotRef);
+		}
+
+		public bool InDragState() => this.dragState != null;
+
+		public IEnumerable<IItemContainer> GetOpenContainers() => this.openInventories;
+
+		public bool IsOpened(Inventory inventory) => this.openInventories.Contains(inventory);
+
 		public override void OnHide(IScreenHandle handle) {
 			SoulboundClient.Instance.InputManager.RemoveHandler(this);
 		}
 
 		public override void OnShow(IScreenHandle handle) {
 			SoulboundClient.Instance.InputManager.AddHandler(this);
+		}
 
-			
+		public override void OnDispose(IScreenHandle handle) {
+			foreach (var slot in this.slotHandlesByInventory.SelectMany(kvp => kvp.Value).ToList()) {
+				slot.Dispose();
+			}
+			this.player.GetInventory().mainSlotChanged -= this.OnMainSlotChanged;
 		}
 	}
 }

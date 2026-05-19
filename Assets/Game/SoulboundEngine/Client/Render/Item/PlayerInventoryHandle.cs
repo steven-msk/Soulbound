@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.Render.Item {
+	[Obsolete]
 	public sealed class PlayerInventoryHandle : UxmlWidget, IDisposable {
 		private readonly UIToolkitItemSlotHandle[] slots;
 		private readonly PlayerInventory inventory;
