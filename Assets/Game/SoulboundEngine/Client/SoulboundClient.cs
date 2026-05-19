@@ -242,6 +242,10 @@ namespace SoulboundEngine.Client {
 			this.uiHandler.PushScreen(new InventoryContextScreen(this.itemRenderManager, player));
 		}
 
+		public void HideInventoryScreen() {
+			this.uiHandler.PopScreen();
+		}
+
 		public void OpenInventory(ChestTileEntity tileEntitySource) {
 			VisualElement element = this.tileEntityContainerRenderer.Render(tileEntitySource.GetTileEntityType());
 			this.uiHandler.AddOverlay(element);

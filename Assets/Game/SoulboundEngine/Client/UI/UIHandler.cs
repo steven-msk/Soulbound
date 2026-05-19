@@ -24,6 +24,7 @@ namespace SoulboundEngine.Client.UI {
 		}
 
 		public void PushScreen(Screen.Screen screen) => this.screenManager.PushScreen(screen);
+		public void PopScreen() => this.screenManager.PopScreen();
 
 		public void FlushScreens() => this.screenManager.Flush();
 

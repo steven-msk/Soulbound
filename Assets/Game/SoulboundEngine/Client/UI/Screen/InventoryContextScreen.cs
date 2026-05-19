@@ -34,16 +34,6 @@ namespace SoulboundEngine.Client.UI.Screen {
 		}
 
 		IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {
-			yield return InputEventListener.ConsumePerformed(InputTokens.Player.toggleInventory, _ => {
-				//if (!this.inventoryHandle.isOpen) {
-				//	this.inventoryHandle.Open();
-				//	this.player.OpenInventory();
-				//} else {
-				//	this.inventoryHandle.Close();
-				//	this.player.CloseInventory();
-				//}
-			});
-
 			yield return InputEventListener.ObserveAny(InputTokens.Mouse.position, inputEvent => {
 				this.pointerPosition = inputEvent.context.ReadValue<Vector2>();
 				Vector2 converted = new(this.pointerPosition.x, UnityEngine.Device.Screen.height - this.pointerPosition.y);

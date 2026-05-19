@@ -22,6 +22,7 @@ namespace SoulboundEngine.Client.Player {
 		const float MAX_BLOCK_REACH = 5f;
 		private readonly SoulboundClient client;
 		private readonly PlayerInventory inventory;
+		private bool isInventoryOpen;
 		private readonly InteractionResolver interactionResolver;
 		private Vector2 screenPointerPos;
 		private bool isHoldingLeftClick;
@@ -104,7 +105,13 @@ namespace SoulboundEngine.Client.Player {
 					return InputHandleResult.Consume;
 				}),
 				InputEventListener.ConsumePerformed(InputTokens.Player.toggleInventory, _ => {
-					this.client.ShowInventoryScreen(this);
+					this.isInventoryOpen = !this.isInventoryOpen;
+					if (this.isInventoryOpen) {
+						this.client.ShowInventoryScreen(this);
+					} else {
+						Logger.LogInfo("closing inv");
+						this.client.HideInventoryScreen();
+					}
 				})
 			};
 		}
