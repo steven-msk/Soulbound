@@ -25,8 +25,6 @@ namespace SoulboundEngine.Client.Render.Item {
 			this.slots = new UIToolkitItemSlotHandle[inventory.GetSize()];
 		}
 
-		public bool isOpen { get; private set; }
-
 		public override void OnBind(VisualElement root) {
 			this.root = root;
 
@@ -52,16 +50,6 @@ namespace SoulboundEngine.Client.Render.Item {
 
 			this.inventory.mainSlotChanged += this.OnMainSlotChanged;
 			this.SetAsMainSlot(this.inventory.GetMainSlot());
-		}
-
-		public void Open() {
-			this.GetPopup().style.display = DisplayStyle.Flex;
-			this.isOpen = true;
-		}
-
-		public void Close() {
-			this.GetPopup().style.display = DisplayStyle.None;
-			this.isOpen = false;
 		}
 
 		private void OnMainSlotChanged(int oldIndex, int newIndex) {

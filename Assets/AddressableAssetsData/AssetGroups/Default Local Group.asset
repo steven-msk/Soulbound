@@ -33,6 +33,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 17a1cc01d5a67154f931385a6b7d83e4
+    m_Address: InventoryContextScreen
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 1b6a0acceb53f9a42b1c3987563d2414
     m_Address: WhiteSquareTile
     m_ReadOnly: 0

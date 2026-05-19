@@ -107,7 +107,7 @@ namespace SoulboundEngine.Client {
 		/// called once when the game is launched
 		/// </summary>
 		public void Start() {
-			this.uiHandler.SetScreen(new TitleScreen(this));
+			this.uiHandler.PushScreen(new TitleScreen(this));
 			this.inputManager.AddHandler(this);
 		}
 
@@ -157,7 +157,7 @@ namespace SoulboundEngine.Client {
 				this.activeWorldSession = session;
 				//this.uiHandler.SetCanvas(session.canvas);
 				this.uiHandler.SetUIDocument(session.uiDocument);
-				this.uiHandler.SetScreen(new WorldScreen(this.itemRenderManager, session.player, this.commandLine, this.metricsHud, this.logConsole));
+				this.uiHandler.PushScreen(new WorldScreen(this.commandLine, this.metricsHud, this.logConsole));
 				this.debugOverlayManager.Clear();
 				this.inputManager.AddHandler(session.levelManager);
 
@@ -184,7 +184,7 @@ namespace SoulboundEngine.Client {
 				.ContinueWith(() => {
 					this.activeWorldSession = null;
 					this.uiHandler.SetUIDocument(Object.FindFirstObjectByType<UIDocument>());
-					this.uiHandler.SetScreen(new TitleScreen(this));
+					this.uiHandler.PushScreen(new TitleScreen(this));
 					this.debugOverlayManager.Clear();
 
 					this.runtimeDataProvider.ExitWorldSessionState();
@@ -236,6 +236,10 @@ namespace SoulboundEngine.Client {
 					}
 				})
 			};
+		}
+
+		public void ShowInventoryScreen(Player.Player player) {
+			this.uiHandler.PushScreen(new InventoryContextScreen(this.itemRenderManager, player));
 		}
 
 		public void OpenInventory(ChestTileEntity tileEntitySource) {

@@ -23,7 +23,7 @@ namespace SoulboundEngine.Client.UI {
 			this.screenManager = new ScreenManager(this.screenRoot);
 		}
 
-		public void SetScreen(Screen.Screen screen) => this.screenManager.PushScreen(screen);
+		public void PushScreen(Screen.Screen screen) => this.screenManager.PushScreen(screen);
 
 		public void FlushScreens() => this.screenManager.Flush();
 

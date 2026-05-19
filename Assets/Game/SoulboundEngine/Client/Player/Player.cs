@@ -102,6 +102,9 @@ namespace SoulboundEngine.Client.Player {
 				new(InputTokens.Keyboard.CTRL, InputEvent.Phase.Performed | InputEvent.Phase.Canceled, inputEvent => {
 					this.isHoldingCtrl = inputEvent.phase == InputEvent.Phase.Performed;
 					return InputHandleResult.Consume;
+				}),
+				InputEventListener.ConsumePerformed(InputTokens.Player.toggleInventory, _ => {
+					this.client.ShowInventoryScreen(this);
 				})
 			};
 		}
