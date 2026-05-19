@@ -21,17 +21,18 @@ namespace SoulboundEngine.Client.Render.Item {
 			this.slot = slot;
 			this.itemRenderManager = itemRenderManager;
 			this.renderHandle = new ItemRenderHandle(this);
-
-			slot.stackChanged += this.StackChanged;
-			this.SetStack(slot.GetStack());
 		}
 
 		public override void OnBind(VisualElement root) {
 			this.root = root;
+
 			root.RegisterCallback<PointerDownEvent>(this.OnPointerDown);
 			root.RegisterCallback<PointerUpEvent>(this.OnPointerUp);
 			root.RegisterCallback<PointerEnterEvent>(this.OnPointerEnter);
 			root.RegisterCallback<PointerLeaveEvent>(this.OnPointerLeave);
+
+			this.slot.stackChanged += this.StackChanged;
+			this.SetStack(this.slot.GetStack());
 		}
 
 		private void StackChanged(ItemStack? oldStack, ItemStack? newStack) => this.SetStack(newStack);

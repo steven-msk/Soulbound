@@ -1,5 +1,6 @@
 ﻿using SoulboundEngine.Client.Input;
 using SoulboundEngine.Client.ItemSystem.Container;
+using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.Render.Item;
 using SoulboundEngine.Core.Assets;
 using System.Collections.Generic;
@@ -31,6 +32,12 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 			this.transitStack = new TransitStack(this.itemRenderManager, root.Q<VisualElement>("TransitStack"));
 			this.player.SetTransitStackSource(this.transitStack);
+
+			this.AddPlayerInventory(this.player.GetInventory());
+		}
+
+		private void AddPlayerInventory(PlayerInventory playerInventory) {
+
 		}
 
 		IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {

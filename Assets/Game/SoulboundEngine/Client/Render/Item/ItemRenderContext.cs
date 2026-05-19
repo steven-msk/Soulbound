@@ -13,7 +13,10 @@ namespace SoulboundEngine.Client.Render.Item {
 		public sealed class UIToolkit : ItemRenderContext {
 			public VisualElement root;
 
-			public VisualElement GetItemDisplay() => this.root.Q<VisualElement>("ItemDisplay");
+			public VisualElement GetItemDisplay() { 
+				return this.root.Q<VisualElement>("ItemDisplay");
+			}
+
 			public Label GetStackCount() => this.root.Q<Label>("StackCount");
 		}
 
