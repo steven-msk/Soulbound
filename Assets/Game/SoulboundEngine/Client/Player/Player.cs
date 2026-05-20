@@ -26,8 +26,8 @@ namespace SoulboundEngine.Client.Player {
 		private bool isHoldingLeftClick;
 		private bool isHoldingRightClick;
 		private bool isHoldingCtrl;
+		private BlockPos? openedInventoryBlockPos;
 		private new readonly PlayerTransformAdapter transformAdapter;
-		private readonly HashSet<Inventory> openInventories = new();
 		private TransitStack? transitStack;
 
 		// provisory guard for not breaking the block instantly after it was placed
@@ -124,6 +124,11 @@ namespace SoulboundEngine.Client.Player {
 			base.FrameUpdate();
 			if (this.isHoldingLeftClick) this.OnLeftHold();
 			if (this.isHoldingRightClick) this.OnRightHold();
+
+			if (this.openedInventoryBlockPos is { } blockPos) {
+				float distance = Vector2.Distance(blockPos.GetCenter(), this.GetPosition());
+				if (distance > MAX_BLOCK_REACH) this.CloseInventory();
+			}
 		}
 
 		private void OnLeftClick() {
@@ -172,11 +177,13 @@ namespace SoulboundEngine.Client.Player {
 			if (!this.isInventoryOpen) return;
 			this.isInventoryOpen = false;
 			this.client.HideInventoryScreen();
+			this.openedInventoryBlockPos = null;
 		}
 
 		public void OpenInventory(Inventory inventory, ChestTileEntity tileEntitySource) {
 			this.OpenInventory();
 			this.client.OpenExternalInventory(inventory, tileEntitySource.GetInventoryLayout());
+			this.openedInventoryBlockPos = tileEntitySource.blockPos;
 		}
 
 		private bool ResolveItemOrBlockInteraction(InteractionTrigger trigger) {
