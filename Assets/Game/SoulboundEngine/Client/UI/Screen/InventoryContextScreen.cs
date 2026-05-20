@@ -51,6 +51,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 		private void BindPlayerInventory(PlayerInventory playerInventory, VisualElement inventoryRoot) {
 			this.playerSlotDisplays = new IInteractableUIToolkitSlotDisplay[playerInventory.GetSize()];
+			this.openInventories.Add(playerInventory);
 
 			foreach (var slotIndex in playerInventory.GetPopup()) {
 				IItemSlot slot = playerInventory.GetSlot(slotIndex);
@@ -78,6 +79,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 		public void AddExternalInventory(Inventory inventory, IInventoryLayout layout) {
 			this.externalSlotDisplays = new InteractableUIToolkitSlotDisplay[inventory.GetSize()];
+			this.openInventories.Add(inventory);
 
 			foreach (var slotIndex in inventory.GetAllSlots()) {
 				IItemSlot slot = inventory.GetSlot(slotIndex);
@@ -245,14 +247,6 @@ namespace SoulboundEngine.Client.UI.Screen {
 					.ToDictionary(i => i, i => inventory.GetSlot(i).GetStack()!.quantity);
 		}
 
-		void IInventoryScope.AddInventory(Inventory inventory) {
-			this.openInventories.Add(inventory);
-		}
-
-		void IInventoryScope.RemoveInventory(Inventory inventory) {
-			this.openInventories.Remove(inventory);
-		}
-
 		public ItemStack GetTransitStack() => this.transitStack?.GetStack();
 
 		public bool HasTransitStack() => this.transitStack?.HasStack() ?? false;
@@ -273,8 +267,6 @@ namespace SoulboundEngine.Client.UI.Screen {
 		public bool InDragState() => this.dragState != null;
 
 		public IEnumerable<IItemContainer> GetOpenContainers() => this.openInventories;
-
-		public bool IsOpened(Inventory inventory) => this.openInventories.Contains(inventory);
 
 		public override void OnHide(IScreenHandle handle) {
 			SoulboundClient.Instance.InputManager.RemoveHandler(this);

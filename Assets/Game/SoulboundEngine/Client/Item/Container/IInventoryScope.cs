@@ -5,9 +5,6 @@ using System.Collections.Generic;
 namespace SoulboundEngine.Client.ItemSystem.Container {
 	public interface IInventoryScope : ITransitStackSource {
 		IEnumerable<IItemContainer> GetOpenContainers();
-		void AddInventory(Inventory inventory);
-		void RemoveInventory(Inventory inventory);
-		bool IsOpened(Inventory inventory);
 
 		bool InDragState();
 		SlotDragState? GetDragState();
