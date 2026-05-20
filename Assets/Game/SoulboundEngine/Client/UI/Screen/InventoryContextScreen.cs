@@ -24,6 +24,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		const int SLOT_MARGIN_PX = 4;
 		private readonly VisualTreeAsset slotAsset;
 		private IInteractableUIToolkitSlotDisplay[] playerSlotDisplays;
+		private Inventory currentExternalInventory;
 		private InteractableUIToolkitSlotDisplay[] externalSlotDisplays;
 		private readonly ItemRenderManager itemRenderManager;
 		private readonly Player player;
@@ -81,11 +82,17 @@ namespace SoulboundEngine.Client.UI.Screen {
 			this.SetMainSlotVisual(playerInventory.GetMainSlot());
 		}
 
-		public void AddExternalInventory(Inventory inventory, IInventoryLayout layout, IEnumerable<int> slots) {
-			if (this.openInventories.Contains(inventory)) return;
+		public void SetExternalInventory(Inventory inventory, IInventoryLayout layout, IEnumerable<int> slots) {
+			if (this.currentExternalInventory == inventory) return;
+
+			if (this.currentExternalInventory != null) {
+				this.openInventories.Remove(this.currentExternalInventory);
+				this.DisposeExternalContainer();
+			}
 
 			this.externalSlotDisplays = new InteractableUIToolkitSlotDisplay[inventory.GetSize()];
 			this.openInventories.Add(inventory);
+			this.currentExternalInventory = inventory;
 
 			foreach (var slotIndex in slots) {
 				IItemSlot slot = inventory.GetSlot(slotIndex);
@@ -296,6 +303,11 @@ namespace SoulboundEngine.Client.UI.Screen {
 			for (int i = 0; i < this.playerSlotDisplays.Length; i++) {
 				this.playerSlotDisplays[i].Dispose();
 			}
+			this.DisposeExternalContainer();
+			this.player.GetInventory().mainSlotChanged -= this.OnMainSlotChanged;
+		}
+
+		private void DisposeExternalContainer() {
 			if (this.externalSlotDisplays != null) {
 				for (int i = 0; i < this.externalSlotDisplays.Length; i++) {
 					this.externalSlotDisplays[i].Dispose();
@@ -303,7 +315,6 @@ namespace SoulboundEngine.Client.UI.Screen {
 				}
 				this.externalSlotDisplays = null;
 			}
-			this.player.GetInventory().mainSlotChanged -= this.OnMainSlotChanged;
 		}
 	}
 }

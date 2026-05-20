@@ -182,7 +182,7 @@ namespace SoulboundEngine.Client.Player {
 
 		public void OpenInventory(Inventory inventory, ChestTileEntity tileEntitySource) {
 			this.OpenInventory();
-			this.client.OpenExternalInventory(inventory, tileEntitySource.GetInventoryLayout());
+			this.client.SetExternalInventory(inventory, tileEntitySource.GetInventoryLayout());
 			this.openedInventoryBlockPos = tileEntitySource.blockPos;
 		}
 

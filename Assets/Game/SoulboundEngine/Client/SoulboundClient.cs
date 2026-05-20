@@ -252,9 +252,9 @@ namespace SoulboundEngine.Client {
 			}
 		}
 
-		public void OpenExternalInventory(Inventory inventory, IInventoryLayout layout) {
+		public void SetExternalInventory(Inventory inventory, IInventoryLayout layout) {
 			InventoryContextScreen inventoryContextScreen = (InventoryContextScreen)this.activeInventoryScreenHandle.GetScreen();
-			inventoryContextScreen.AddExternalInventory(inventory, layout, inventory.GetAllSlots());
+			inventoryContextScreen.SetExternalInventory(inventory, layout, inventory.GetAllSlots());
 		}
 
 		private IWorldSaveStrategy GetWorldSaveStrategy() {
