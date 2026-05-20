@@ -2,9 +2,11 @@
     <ui:Template name="Hotbar" src="project://database/Assets/Game/Content/UI/Hotbar.uxml?fileID=9197481963319205126&amp;guid=ed08df87e99e44d428c348c8977151d7&amp;type=3#Hotbar"/>
     <ui:Template name="PlayerInventory" src="project://database/Assets/Game/Content/UI/PlayerInventory.uxml?fileID=9197481963319205126&amp;guid=5fb502a4ef30a954d901962876e3adc0&amp;type=3#PlayerInventory"/>
     <ui:VisualElement style="flex-grow: 1;">
-        <ui:VisualElement name="ExternalInventorySpace" picking-mode="Ignore" style="flex-grow: 0; flex-direction: row;"/>
-        <ui:VisualElement name="PlayerInventorySpace" picking-mode="Ignore" style="flex-grow: 1; align-items: flex-start; align-self: flex-start; justify-content: flex-end;">
-            <ui:Instance template="PlayerInventory" name=""/>
+        <ui:VisualElement style="flex-grow: 1; top: auto; bottom: auto; left: auto; right: auto; flex-direction: column-reverse; padding-bottom: 15px;">
+            <ui:VisualElement name="ExternalInventorySpace" picking-mode="Ignore" style="flex-grow: 0; flex-direction: row;"/>
+        </ui:VisualElement>
+        <ui:VisualElement name="PlayerInventorySpace" picking-mode="Ignore" style="flex-grow: 0; align-items: flex-start; align-self: flex-start; justify-content: flex-end;">
+            <ui:Instance template="PlayerInventory" name="" style="bottom: 4px;"/>
             <ui:Instance template="Hotbar" name="" style="display: flex; visibility: visible;"/>
         </ui:VisualElement>
         <ui:VisualElement name="TransitStack" template="Slot" picking-mode="Ignore" style="visibility: visible; display: flex; position: absolute; color: rgba(27, 27, 27, 0); background-color: rgba(0, 0, 0, 0);">

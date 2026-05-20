@@ -20,6 +20,8 @@ namespace SoulboundEngine.Client.UI.Screen {
 		const int LEFT_BUTTON = 0;
 		const int MIDDLE_BUTTON = 2;
 		const int RIGHT_BUTTON = 1;
+		const int SLOT_SIZE_PX = 64;
+		const int SLOT_MARGIN_PX = 4;
 		private readonly VisualTreeAsset slotAsset;
 		private IInteractableUIToolkitSlotDisplay[] playerSlotDisplays;
 		private InteractableUIToolkitSlotDisplay[] externalSlotDisplays;
@@ -79,15 +81,16 @@ namespace SoulboundEngine.Client.UI.Screen {
 			this.SetMainSlotVisual(playerInventory.GetMainSlot());
 		}
 
-		public void AddExternalInventory(Inventory inventory, IInventoryLayout layout) {
+		public void AddExternalInventory(Inventory inventory, IInventoryLayout layout, IEnumerable<int> slots) {
 			if (this.openInventories.Contains(inventory)) return;
 
 			this.externalSlotDisplays = new InteractableUIToolkitSlotDisplay[inventory.GetSize()];
 			this.openInventories.Add(inventory);
 
-			foreach (var slotIndex in inventory.GetAllSlots()) {
+			foreach (var slotIndex in slots) {
 				IItemSlot slot = inventory.GetSlot(slotIndex);
-				VisualElement slotElement = this.CreateExternalSlot(this.externalInventoryRoot);
+				Vector2 coordinates = layout.GetCoordinates(slotIndex);
+				VisualElement slotElement = this.CreateExternalSlot(this.externalInventoryRoot, coordinates);
 
 				InteractableUIToolkitSlotDisplay handle = new(slot, this.itemRenderManager);
 				handle.OnBind(slotElement);
@@ -117,10 +120,17 @@ namespace SoulboundEngine.Client.UI.Screen {
 			return playerInventoryRoot.Q<VisualElement>("Hotbar");
 		}
 
-		private VisualElement CreateExternalSlot(VisualElement root) {
+		private VisualElement CreateExternalSlot(VisualElement root, Vector2 coordinates) {
 			VisualElement element = this.slotAsset.Instantiate();
 			element.AddToClassList("slot-offset");
 			root.Add(element);
+
+			element.style.position = Position.Absolute;
+			float xpos = coordinates.x * (SLOT_SIZE_PX + SLOT_MARGIN_PX) + SLOT_MARGIN_PX;
+			float ypos = coordinates.y * (SLOT_SIZE_PX + SLOT_MARGIN_PX) + SLOT_MARGIN_PX;
+			element.style.left = xpos;
+			element.style.bottom = ypos;
+
 			return element;
 		}
 

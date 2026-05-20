@@ -6,7 +6,7 @@ using SoulboundEngine.Client.World.LevelDomain;
 
 namespace SoulboundEngine.Client.World.BlockSystem {
 	public class ChestBlock : Block, IInteractableBlock {
-		public const int INVENTORY_SIZE = 9;
+		public const int INVENTORY_SIZE = 27;
 
 		public ChestBlock(Settings settings)
 			: base(settings) {
