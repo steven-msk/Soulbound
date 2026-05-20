@@ -115,7 +115,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 			VisualElement element = this.slotAsset.Instantiate();
 			element.AddToClassList("slot-offset");
 			root.Add(element);
-			return this.slotAsset.Instantiate();
+			return element;
 		}
 
 		IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {
