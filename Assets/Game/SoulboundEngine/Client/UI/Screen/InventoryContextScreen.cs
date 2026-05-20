@@ -47,6 +47,8 @@ namespace SoulboundEngine.Client.UI.Screen {
 			this.externalInventoryRoot = root.Q<VisualElement>("ExternalInventorySpace");
 
 			this.BindPlayerInventory(this.player.GetInventory(), root.Q<VisualElement>("PlayerInventorySpace"));
+
+			root.RegisterCallback<PointerUpEvent>(this.RootOnPointerUp);
 		}
 
 		private void BindPlayerInventory(PlayerInventory playerInventory, VisualElement inventoryRoot) {
@@ -134,6 +136,8 @@ namespace SoulboundEngine.Client.UI.Screen {
 			display.onPointerEnter += evt => this.OnPointerEnter(slot, inventory, visualElement, evt);
 			display.onPointerLeave += evt => this.OnPointerLeave(slot, inventory, visualElement, evt);
 		}
+
+		private void RootOnPointerUp(PointerUpEvent evt) => this.EndDrag();
 
 		private void OnPointerDown(IItemSlot slot, Inventory inventory, VisualElement visualElement, PointerDownEvent evt) {
 			float time = Time.time;
