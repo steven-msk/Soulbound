@@ -69,10 +69,11 @@ namespace SoulboundEngine.Client.Render.Item {
 							GameObject obj = new("Item");
 							obj.SetActive(false);
 							obj.transform.position = world.position;
-							obj.transform.localScale = model.GetScaleTo(ItemRenderers.TILE_SIZE);
+							obj.transform.localScale = model.GetScaleToWorldSize(Vector2.one);
 
+							Sprite sprite = model.GetSprite();
 							SpriteRenderer spriteRenderer = obj.AddComponent<SpriteRenderer>();
-							spriteRenderer.sprite = model.GetSprite();
+							spriteRenderer.sprite = sprite;
 
 							Rigidbody2D rigidbody = obj.AddComponent<Rigidbody2D>();
 							rigidbody.sleepMode = RigidbodySleepMode2D.NeverSleep;
