@@ -75,6 +75,8 @@ namespace SoulboundEngine.Client.Render.Item {
 		public virtual void UnsetMainSlot() {
 		}
 
+		public void RemoveFromHierarchy() => this.root.RemoveFromHierarchy();
+
 		protected ItemRenderContext RenderContext => new ItemRenderContext.UIToolkit { root = this.root };
 	}
 }

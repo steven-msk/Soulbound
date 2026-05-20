@@ -177,6 +177,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c25992c4a89227d4586f253b5c251934
+    m_Address: Slot
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: c50f0d493e76e5a429e1630de1dd0778
     m_Address: TitleScreen
     m_ReadOnly: 0

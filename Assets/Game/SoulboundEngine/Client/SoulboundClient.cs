@@ -19,6 +19,7 @@ using System;
 using System.Linq;
 
 namespace SoulboundEngine.Client {
+	using SoulboundEngine.Client.ItemSystem.Container;
 	using SoulboundEngine.Client.Render.Block;
 	using SoulboundEngine.Client.Render.Entity;
 	using SoulboundEngine.Client.Render.Item;
@@ -255,10 +256,9 @@ namespace SoulboundEngine.Client {
 			}
 		}
 
-		[Obsolete]
-		public void OpenInventory(ChestTileEntity tileEntitySource) {
-			//VisualElement element = this.tileEntityContainerRenderer.Render(tileEntitySource.GetTileEntityType());
-			//this.uiHandler.AddOverlay(element);
+		public void OpenExternalInventory(Inventory inventory, IInventoryLayout layout) {
+			InventoryContextScreen inventoryContextScreen = (InventoryContextScreen)this.activeInventoryScreenHandle.GetScreen();
+			inventoryContextScreen.AddExternalInventory(inventory, layout);
 		}
 
 		[Obsolete]

@@ -20,18 +20,22 @@ namespace SoulboundEngine.Client.UI.Screen {
 		const int LEFT_BUTTON = 0;
 		const int MIDDLE_BUTTON = 2;
 		const int RIGHT_BUTTON = 1;
-		private readonly Dictionary<Inventory, IInteractableUIToolkitSlotDisplay[]> slotDisplaysByInventory = new();
+		private readonly VisualTreeAsset slotAsset;
+		private IInteractableUIToolkitSlotDisplay[] playerSlotDisplays;
+		private InteractableUIToolkitSlotDisplay[] externalSlotDisplays;
 		private readonly ItemRenderManager itemRenderManager;
 		private readonly Player player;
 		private readonly HashSet<Inventory> openInventories = new();
 		private TransitStack transitStack;
 		private SlotDragState dragState;
 		private Vector2 pointerPosition;
+		private VisualElement externalInventoryRoot;
 
 		public InventoryContextScreen(ItemRenderManager itemRenderManager, Player player) 
 			: base(AssetManager.Resolve<VisualTreeAsset>(new AssetKey("InventoryContextScreen"))) {
 			this.itemRenderManager = itemRenderManager;
 			this.player = player;
+			this.slotAsset = AssetManager.Resolve<VisualTreeAsset>(new AssetKey("Slot"));
 		}
 
 		public override bool IsOpaque => false;
@@ -40,11 +44,13 @@ namespace SoulboundEngine.Client.UI.Screen {
 			this.transitStack = new TransitStack(this.itemRenderManager, root.Q<VisualElement>("TransitStack"));
 			this.player.SetTransitStackSource(this.transitStack);
 
-			this.AddPlayerInventory(this.player.GetInventory(), root.Q<VisualElement>("PlayerInventorySpace"));
+			this.externalInventoryRoot = root.Q<VisualElement>("ExternalInventorySpace");
+
+			this.BindPlayerInventory(this.player.GetInventory(), root.Q<VisualElement>("PlayerInventorySpace"));
 		}
 
-		private void AddPlayerInventory(PlayerInventory playerInventory, VisualElement inventoryRoot) {
-			this.slotDisplaysByInventory[playerInventory] = new IInteractableUIToolkitSlotDisplay[playerInventory.GetSize()];
+		private void BindPlayerInventory(PlayerInventory playerInventory, VisualElement inventoryRoot) {
+			this.playerSlotDisplays = new IInteractableUIToolkitSlotDisplay[playerInventory.GetSize()];
 
 			foreach (var slotIndex in playerInventory.GetPopup()) {
 				IItemSlot slot = playerInventory.GetSlot(slotIndex);
@@ -52,7 +58,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 				InteractableUIToolkitSlotDisplay display = new(slot, this.itemRenderManager);
 				display.OnBind(slotElement);
-				this.slotDisplaysByInventory[playerInventory][slotIndex] = display;
+				this.playerSlotDisplays[slotIndex] = display;
 				this.AddPointerListeners(slotElement, display, slot, playerInventory);
 			}
 
@@ -62,25 +68,39 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 				InteractableHotbarSlotDisplay handle = new(slot, this.itemRenderManager);
 				handle.OnBind(slotElement);
-				this.slotDisplaysByInventory[playerInventory][slotIndex] = handle;
+				this.playerSlotDisplays[slotIndex] = handle;
 				this.AddPointerListeners(slotElement, handle, slot, playerInventory);
 			}
 
 			playerInventory.mainSlotChanged += this.OnMainSlotChanged;
-			this.SetAsMainSlotVisual(playerInventory.GetMainSlot());
+			this.SetMainSlotVisual(playerInventory.GetMainSlot());
+		}
+
+		public void AddExternalInventory(Inventory inventory, IInventoryLayout layout) {
+			this.externalSlotDisplays = new InteractableUIToolkitSlotDisplay[inventory.GetSize()];
+
+			foreach (var slotIndex in inventory.GetAllSlots()) {
+				IItemSlot slot = inventory.GetSlot(slotIndex);
+				VisualElement slotElement = this.CreateExternalSlot(this.externalInventoryRoot);
+
+				InteractableUIToolkitSlotDisplay handle = new(slot, this.itemRenderManager);
+				handle.OnBind(slotElement);
+				this.externalSlotDisplays[slotIndex] = handle;
+				this.AddPointerListeners(slotElement, handle, slot, inventory);
+			}
 		}
 
 		private void OnMainSlotChanged(int oldIndex, int newIndex) {
 			this.UnsetMainSlotVisual(oldIndex);
-			this.SetAsMainSlotVisual(newIndex);
+			this.SetMainSlotVisual(newIndex);
 		}
 
-		private void SetAsMainSlotVisual(int slot) {
-			this.slotDisplaysByInventory[this.player.GetInventory()][slot].SetAsMainSlot();
+		private void SetMainSlotVisual(int slot) {
+			this.playerSlotDisplays[slot].SetAsMainSlot();
 		}
 
 		private void UnsetMainSlotVisual(int slot) {
-			this.slotDisplaysByInventory[this.player.GetInventory()][slot].UnsetMainSlot();
+			this.playerSlotDisplays[slot].UnsetMainSlot();
 		}
 
 		private VisualElement GetPopup(VisualElement playerInventoryRoot) {
@@ -89,6 +109,13 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 		private VisualElement GetHotbar(VisualElement playerInventoryRoot) {
 			return playerInventoryRoot.Q<VisualElement>("Hotbar");
+		}
+
+		private VisualElement CreateExternalSlot(VisualElement root) {
+			VisualElement element = this.slotAsset.Instantiate();
+			element.AddToClassList("slot-offset");
+			root.Add(element);
+			return this.slotAsset.Instantiate();
 		}
 
 		IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {
@@ -258,8 +285,15 @@ namespace SoulboundEngine.Client.UI.Screen {
 		}
 
 		public override void OnDispose(IScreenHandle handle) {
-			foreach (var slotDisplay in this.slotDisplaysByInventory.SelectMany(kvp => kvp.Value).ToList()) {
-				slotDisplay.Dispose();
+			for (int i = 0; i < this.playerSlotDisplays.Length; i++) {
+				this.playerSlotDisplays[i].Dispose();
+			}
+			if (this.externalSlotDisplays != null) {
+				for (int i = 0; i < this.externalSlotDisplays.Length; i++) {
+					this.externalSlotDisplays[i].Dispose();
+					this.externalSlotDisplays[i].RemoveFromHierarchy();
+				}
+				this.externalSlotDisplays = null;
 			}
 			this.player.GetInventory().mainSlotChanged -= this.OnMainSlotChanged;
 		}

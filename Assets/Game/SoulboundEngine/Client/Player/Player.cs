@@ -102,11 +102,10 @@ namespace SoulboundEngine.Client.Player {
 					return InputHandleResult.Consume;
 				}),
 				InputEventListener.ConsumePerformed(InputTokens.Player.toggleInventory, _ => {
-					this.isInventoryOpen = !this.isInventoryOpen;
-					if (this.isInventoryOpen) {
-						this.client.ShowInventoryScreen(this);
+					if (!this.isInventoryOpen) {
+						this.OpenInventory();
 					} else {
-						this.client.HideInventoryScreen();
+						this.CloseInventory();
 					}
 				})
 			};
@@ -163,27 +162,21 @@ namespace SoulboundEngine.Client.Player {
 			this.ResolveItemOrBlockInteraction(InteractionTrigger.RightRelease);
 		}
 
-		[Obsolete]
-		public void OpenInventory(Inventory inventory) {
-			//inventory.OnOpened(this);
+		public void OpenInventory() {
+			if (this.isInventoryOpen) return;
+			this.isInventoryOpen = true;
+			this.client.ShowInventoryScreen(this);
 		}
 
-		[Obsolete]
-		public void CloseInventory(Inventory inventory) {
-			//inventory.OnClosed(this);
+		public void CloseInventory() {
+			if (!this.isInventoryOpen) return;
+			this.isInventoryOpen = false;
+			this.client.HideInventoryScreen();
 		}
 
-		/// <summary>
-		/// Opens the inventory with the given <paramref name="tileEntitySource"/>.
-		/// This will forward inventory's UI rendering to <see cref="SoulboundClient.OpenInventory(ChestTileEntity)"/>
-		/// </summary>
-		/// <param name="inventory"></param>
-		/// <param name="tileEntitySource"><b>Note: this parameter will be generic 
-		/// once a container tile entity abstraction exists</b></param>
-		[Obsolete]
 		public void OpenInventory(Inventory inventory, ChestTileEntity tileEntitySource) {
-			//this.OpenInventory(inventory);
-			//this.client.OpenInventory(tileEntitySource);
+			this.OpenInventory();
+			this.client.OpenExternalInventory(inventory, tileEntitySource.GetInventoryLayout());
 		}
 
 		private bool ResolveItemOrBlockInteraction(InteractionTrigger trigger) {
