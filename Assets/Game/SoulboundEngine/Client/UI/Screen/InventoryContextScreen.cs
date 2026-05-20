@@ -80,6 +80,8 @@ namespace SoulboundEngine.Client.UI.Screen {
 		}
 
 		public void AddExternalInventory(Inventory inventory, IInventoryLayout layout) {
+			if (this.openInventories.Contains(inventory)) return;
+
 			this.externalSlotDisplays = new InteractableUIToolkitSlotDisplay[inventory.GetSize()];
 			this.openInventories.Add(inventory);
 
