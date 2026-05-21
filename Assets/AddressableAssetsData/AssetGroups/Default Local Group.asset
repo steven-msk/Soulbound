@@ -15,6 +15,12 @@ MonoBehaviour:
   m_GroupName: Default Local Group
   m_GUID: 3d327a7b6104f6046a101be5265ddafd
   m_SerializeEntries:
+  - m_GUID: 00964385620f60d4e9ed1233d9caf529
+    m_Address: chest
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0e5905e25c892a748a09d8c6fd3c396a
     m_Address: WorldScreen
     m_ReadOnly: 0

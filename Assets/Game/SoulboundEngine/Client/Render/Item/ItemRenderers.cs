@@ -20,6 +20,7 @@ namespace SoulboundEngine.Client.Render.Item {
 			Register(Items.STONE, DefaultResolverFactory("stone"));
 			Register(Items.WOOD, DefaultResolverFactory("wood"));
 			Register(Items.LEAVES, DefaultResolverFactory("leaves"));
+			Register(Items.CHEST, DefaultResolverFactory("chest"));
 
 			Register(Items.placeableItem, DefaultResolverFactory("bluething"));
 			Register(Items.teleportPlayerItem, DefaultResolverFactory("bluething"));
