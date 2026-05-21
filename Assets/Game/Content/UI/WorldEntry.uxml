@@ -1,0 +1,12 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Game/Content/UI/WorldEntry.uss?fileID=7433441132597879392&amp;guid=ef880cdd1905aa74b98f5e020125c419&amp;type=3#WorldEntry"/>
+    <ui:VisualElement name="VisualElement" style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: flex-start;">
+        <ui:Button text="" name="EnterWorld" class="textColor font background" style="flex-direction: row; align-items: flex-start; flex-shrink: 1; flex-wrap: wrap; width: 350px;">
+            <ui:VisualElement style="flex-grow: 1; align-items: flex-start;">
+                <ui:Label text="World 1 - a world" name="WorldName" style="height: 11px; font-size: 16px;"/>
+                <ui:Label text="Seed: 3157851431" name="WorldSeed" style="font-size: 10px; height: 8px;"/>
+            </ui:VisualElement>
+            <ui:Button text="Delete" name="DeleteWorld" class="background font textColor" style="font-size: 12px;"/>
+        </ui:Button>
+    </ui:VisualElement>
+</ui:UXML>

@@ -4,38 +4,42 @@ using SoulboundEngine.Client.ItemSystem;
 using SoulboundEngine.Client.ItemSystem.Container;
 using SoulboundEngine.Client.World.BlockSystem;
 using SoulboundEngine.Client.World.BlockSystem.States;
+using SoulboundEngine.Client.World.BlockSystem.TileEntities;
 using SoulboundEngine.Client.World.EntitySystem;
 using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Core.Event;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.Players {
+namespace SoulboundEngine.Client.Player {
 	public class Player : Entity, IInputEventHandler, IInteractionHandler<ItemInteraction>, IInteractionHandler<BlockInteraction> {
-		public static readonly EntityDescriptor<Player> DESCRIPTOR = EntityDescriptor.Of<Player>((_, level) => new Player(level));
-		private readonly Inventory inventory;
-		private ITransitStackSource tranistStackSource = null!;
-
-		// TODO: interaction resolver shouldnt be created by the player
-		private readonly InteractionResolver interactionResolver = new();
-
+		public static readonly EntityDescriptor<Player> DESCRIPTOR = EntityDescriptor.Of<Player>((_, level) => throw new InvalidOperationException());
 		const float MAX_BLOCK_REACH = 5f;
-
+		private readonly SoulboundClient client;
+		private readonly PlayerInventory inventory;
+		private bool isInventoryOpen;
+		private readonly InteractionResolver interactionResolver;
 		private Vector2 screenPointerPos;
 		private bool isHoldingLeftClick;
 		private bool isHoldingRightClick;
 		private bool isHoldingCtrl;
+		private BlockPos? openedInventoryBlockPos;
 		private new readonly PlayerTransformAdapter transformAdapter;
+		private TransitStack? transitStack;
 
 		// provisory guard for not breaking the block instantly after it was placed
+		// TODO: fix gameplay input overlaps
 		private bool leftClickBlockBreakGuard;
 
-		public Player(Level level)
+		public Player(SoulboundClient client, Level level)
 			: base(DESCRIPTOR, level) {
+			this.client = client;
 			this.transformAdapter = new PlayerTransformAdapter(this);
-			this.inventory = new Inventory();
+			this.inventory = new PlayerInventory();
+			this.interactionResolver = new InteractionResolver();
 
 			this.interactionResolver.RegisterHandler<ItemInteraction>(this);
 			this.interactionResolver.RegisterHandler<BlockInteraction>(this);
@@ -45,7 +49,6 @@ namespace SoulboundEngine.Client.Players {
 
 		IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {
 			return new InputEventListener[] {
-				InputEventListener.ConsumePerformed(InputTokens.Player.toggleInventory, _ => this.inventory.Toggle()),
 				InputEventListener.ConsumePerformed(InputTokens.Player.changeHotbarSlot, inputEvent => {
 					int slotIndex = int.Parse(inputEvent.context.control.name) - 1;
 					this.inventory.SetMainSlot(slotIndex);
@@ -54,8 +57,8 @@ namespace SoulboundEngine.Client.Players {
 					float scrollDelta = inputEvent.context.ReadValue<float>();
 					int nextSlot = this.inventory.GetMainSlot() - (int)scrollDelta;
 
-					if (nextSlot < 0) nextSlot += Inventory.HOTBAR_SIZE;
-					nextSlot %= Inventory.HOTBAR_SIZE;
+					if (nextSlot < 0) nextSlot += PlayerInventory.HOTBAR_SIZE;
+					nextSlot %= PlayerInventory.HOTBAR_SIZE;
 					this.inventory.SetMainSlot(nextSlot);
 				}),
 				InputEventListener.ObserveAny(InputTokens.Mouse.position, inputEvent => {
@@ -97,6 +100,13 @@ namespace SoulboundEngine.Client.Players {
 				new(InputTokens.Keyboard.CTRL, InputEvent.Phase.Performed | InputEvent.Phase.Canceled, inputEvent => {
 					this.isHoldingCtrl = inputEvent.phase == InputEvent.Phase.Performed;
 					return InputHandleResult.Consume;
+				}),
+				InputEventListener.ConsumePerformed(InputTokens.Player.toggleInventory, _ => {
+					if (!this.isInventoryOpen) {
+						this.OpenInventory();
+					} else {
+						this.CloseInventory();
+					}
 				})
 			};
 		}
@@ -114,6 +124,11 @@ namespace SoulboundEngine.Client.Players {
 			base.FrameUpdate();
 			if (this.isHoldingLeftClick) this.OnLeftHold();
 			if (this.isHoldingRightClick) this.OnRightHold();
+
+			if (this.openedInventoryBlockPos is { } blockPos) {
+				float distance = Vector2.Distance(blockPos.GetCenter(), this.GetPosition());
+				if (distance > MAX_BLOCK_REACH) this.CloseInventory();
+			}
 		}
 
 		private void OnLeftClick() {
@@ -152,6 +167,25 @@ namespace SoulboundEngine.Client.Players {
 			this.ResolveItemOrBlockInteraction(InteractionTrigger.RightRelease);
 		}
 
+		public void OpenInventory() {
+			if (this.isInventoryOpen) return;
+			this.isInventoryOpen = true;
+			this.client.ShowInventoryScreen(this);
+		}
+
+		public void CloseInventory() {
+			if (!this.isInventoryOpen) return;
+			this.isInventoryOpen = false;
+			this.client.HideInventoryScreen();
+			this.openedInventoryBlockPos = null;
+		}
+
+		public void OpenInventory(Inventory inventory, ChestTileEntity tileEntitySource) {
+			this.OpenInventory();
+			this.client.SetExternalInventory(inventory, tileEntitySource.GetInventoryLayout());
+			this.openedInventoryBlockPos = tileEntitySource.blockPos;
+		}
+
 		private bool ResolveItemOrBlockInteraction(InteractionTrigger trigger) {
 			ItemInteraction itemInteraction = this.GetItemInteraction(trigger);
 			if (this.interactionResolver.Resolve(itemInteraction)) {
@@ -177,7 +211,8 @@ namespace SoulboundEngine.Client.Players {
 				blockPos = blockPos,
 				blockState = this.level.GetBlockState(blockPos),
 				itemStack = this.GetMainHandStack(),
-				level = this.level
+				level = this.level,
+				player = this
 			};
 		}
 
@@ -186,17 +221,17 @@ namespace SoulboundEngine.Client.Players {
 
 		bool IInteractionHandler<ItemInteraction>.CanHandle(in ItemInteraction ctx) {
 			Item? item = ctx.itemStack?.item;
-			if (item is not IItemInteractionListener listener) return false;
+			if (item is not IInteractableItem interactable) return false;
 
-			if (!listener.ValidateTrigger(ctx.trigger)) return false;
+			if (!interactable.ValidateTrigger(ctx.trigger)) return false;
 
-			return listener.CanExecute(ctx.itemStack, in ctx);
+			return interactable.CanExecute(ctx.itemStack, in ctx);
 		}
 
 		bool IInteractionHandler<ItemInteraction>.Handle(in ItemInteraction ctx) {
 			ItemStack stack = ctx.itemStack;
-			IItemInteractionListener listener = (IItemInteractionListener)stack.item;
-			return listener.TryExecute(stack, in ctx);
+			IInteractableItem interactable = (IInteractableItem)stack.item;
+			return interactable.TryExecute(stack, in ctx);
 		}
 
 		int IInteractionHandler<BlockInteraction>.priority => 0;
@@ -211,16 +246,16 @@ namespace SoulboundEngine.Client.Players {
 			bool isInReach = this.IsInBlockReach((Vector2)ctx.blockPos);
 			if (!isInReach) return false;
 
-			if (ctx.blockState.block is not IBlockInteractionListener listener) return false;
+			if (ctx.blockState.block is not IInteractableBlock interactable) return false;
 
-			if (!listener.ValidateTrigger(ctx.trigger)) return false;
+			if (!interactable.ValidateTrigger(ctx.trigger)) return false;
 
-			return listener.CanInteract(in ctx);
+			return interactable.CanInteract(in ctx);
 		}
 
 		bool IInteractionHandler<BlockInteraction>.Handle(in BlockInteraction ctx) {
-			IBlockInteractionListener listener = (IBlockInteractionListener)ctx.blockState.block;
-			listener.OnInteract(in ctx);
+			IInteractableBlock interactable = (IInteractableBlock)ctx.blockState.block;
+			interactable.OnInteract(in ctx);
 			return true;
 		}
 
@@ -286,10 +321,10 @@ namespace SoulboundEngine.Client.Players {
 						 .Contains((BlockPos)worldPos);
 		}
 
-		public Inventory GetInventory() => this.inventory;
+		public PlayerInventory GetInventory() => this.inventory;
 
 		public ItemStack? GetMainHandStack() {
-			ItemStack? transitStack = this.tranistStackSource?.GetTransitStack();
+			ItemStack? transitStack = this.transitStack?.GetStack();
 			return transitStack ?? this.inventory.GetMainStack();
 		}
 
@@ -300,24 +335,24 @@ namespace SoulboundEngine.Client.Players {
 		public Vector2 GetWorldPointerPos() {
 			Vector3 screenPos = this.screenPointerPos;
 
-			Canvas canvas = SoulboundClient.Instance.UIHandler.GetCanvas();
-			RectTransform rootTransform = canvas.GetComponent<RectTransform>();
-			bool inWorldPoint = RectTransformUtility.ScreenPointToWorldPointInRectangle(
-				rootTransform,
-				screenPos,
-				Camera.main,
-				out var worldPoint
-			);
-			if (inWorldPoint) return worldPoint;
+			//Canvas canvas = SoulboundClient.Instance.UIHandler.GetCanvas();
+			//RectTransform rootTransform = canvas.GetComponent<RectTransform>();
+			//bool inWorldPoint = RectTransformUtility.ScreenPointToWorldPointInRectangle(
+			//	rootTransform,
+			//	screenPos,
+			//	Camera.main,
+			//	out var worldPoint
+			//);
+			//if (inWorldPoint) return worldPoint;
 
 			screenPos.z = -Camera.main.transform.position.z;
 			return Camera.main.ScreenToWorldPoint(screenPos);
 		}
 
-		public void SetTransitStackSource(ITransitStackSource source) {
-			this.tranistStackSource = source;
+		public void SetTransitStackSource(TransitStack transitStack) {
+			this.transitStack = transitStack;
 		}
-		
+
 		public void SetTransformHandle(IPlayerTransformHandle playerTransformHandle) {
 			this.transformAdapter.SetHandle(playerTransformHandle);
 		}

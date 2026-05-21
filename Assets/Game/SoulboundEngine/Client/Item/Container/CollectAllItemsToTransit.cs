@@ -5,9 +5,9 @@ using System.Linq;
 
 namespace SoulboundEngine.Client.ItemSystem.Container {
 	public sealed class CollectAllItemsToTransit : ISlotOperation {
-		private readonly IItemContainerScope scope;
+		private readonly IInventoryScope scope;
 
-		public CollectAllItemsToTransit(IItemContainerScope scope) {
+		public CollectAllItemsToTransit(IInventoryScope scope) {
 			this.scope = scope;
 		}
 

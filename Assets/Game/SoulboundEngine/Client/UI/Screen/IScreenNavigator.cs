@@ -1,8 +1,9 @@
-namespace SoulboundEngine.Client.UI.Screens {
+namespace SoulboundEngine.Client.UI.Screen {
 	public interface IScreenNavigator {
-		void PushScreen(Screen screen);
+		IScreenHandle PushScreen(Screen screen);
 		void ReplaceScreen(Screen screen);
-		bool PopScreen();
+		bool PopTopScreen();
 		void IssueRebuild(Screen screen);
+		void PopScreen(IScreenHandle handle);
 	}
 }

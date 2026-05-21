@@ -5,7 +5,7 @@ namespace SoulboundEngine.Client.ItemSystem.Container {
 		private readonly IItemContainer container;
 		private readonly int slotIndex;
 
-		public TransferTransit(IItemContainer container, int slotIndex, IItemContainerScope scope)
+		public TransferTransit(IItemContainer container, int slotIndex, IInventoryScope scope)
 			: base(container, slotIndex, scope) {
 			this.container = container;
 			this.slotIndex = slotIndex;

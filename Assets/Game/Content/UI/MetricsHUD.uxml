@@ -1,0 +1,11 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Game/Content/UI/MetricInfo.uss?fileID=7433441132597879392&amp;guid=f642d1f425e63ee4989b1f5c4e34c05b&amp;type=3#MetricInfo"/>
+    <ui:VisualElement style="flex-grow: 1; position: absolute; bottom: 0; left: 0; top: 0; right: 0; margin-top: 5px; margin-right: 5px; margin-bottom: 5px; margin-left: 5px;">
+        <ui:Label text="FPS: 99999999" name="FPS" class="metric-label"/>
+        <ui:Label text="Frame time: 41745ms" name="FrameTime" class="metric-label"/>
+        <ui:Label text="Fixed update time: 537ms" name="FixedUpdateTime" class="metric-label"/>
+        <ui:Label text="Total memory: 1000MB / 1000MB " name="TotalMemory" class="metric-label"/>
+        <ui:Label text="GPU memory: 1000MB / 1000MB" name="GPUMemory" class="metric-label"/>
+        <ui:Label text="GC alloc: 32109B" name="GCAlloc" class="metric-label"/>
+    </ui:VisualElement>
+</ui:UXML>

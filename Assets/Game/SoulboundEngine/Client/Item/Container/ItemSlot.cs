@@ -1,12 +1,4 @@
-using SoulboundEngine.Client.ItemSystem;
-using SoulboundEngine.Client.Debug.Logging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 #nullable enable
 
@@ -15,6 +7,7 @@ namespace SoulboundEngine.Client.ItemSystem.Container {
 		private readonly IItemContainer container;
 		private readonly int index;
 		private ItemStack? stack;
+		[Obsolete]
 		public event Action<ItemStack?>? setStack;
 		public event Action<ItemStack?, ItemStack?>? stackChanged;
 		public event Action<ItemStack, int, int>? quantityChanged;
@@ -27,39 +20,32 @@ namespace SoulboundEngine.Client.ItemSystem.Container {
 		public void SetStack(ItemStack? stack) {
 			ItemStack? oldStack = this.stack;
 			if (oldStack != null) {
-				oldStack.onQuantityChanged -= OnQuantityChanged;
+				oldStack.onQuantityChanged -= this.OnQuantityChanged;
 			}
 			this.stack = stack;
-			AssertSetStack();
 			setStack?.Invoke(stack);
 
 			if (stack != null) {
-				stack.onQuantityChanged += OnQuantityChanged;
+				stack.onQuantityChanged += this.OnQuantityChanged;
 			}
 			stackChanged?.Invoke(oldStack, stack);
 		}
 
 		public bool IsNullOrEmpty() {
-			ItemStack? stack = GetStack();
+			ItemStack? stack = this.GetStack();
 			return stack == null || stack.IsEmpty();
 		}
 
 		private void OnQuantityChanged(int old, int @new) {
-			if (stack != null) {
-				quantityChanged?.Invoke(stack, old, @new);
-				if (@new <= 0) SetStack(null);
+			if (this.stack != null) {
+				quantityChanged?.Invoke(this.stack, old, @new);
+				if (@new <= 0) this.SetStack(null);
 			}
 		}
 
-		public ItemStack? GetStack() => stack;
+		public ItemStack? GetStack() => this.stack;
 
-		public int GetIndex() => index;
-		public IItemContainer GetContainer() => container;
-
-		private void AssertSetStack() {
-			if (setStack == null) {
-				Logger.LogError(new OperationCanceledException("SetStack is null"));
-			}
-		}
+		public int GetIndex() => this.index;
+		public IItemContainer GetContainer() => this.container;
 	}
 }

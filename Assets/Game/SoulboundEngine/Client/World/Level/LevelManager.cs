@@ -1,8 +1,7 @@
 using Cysharp.Threading.Tasks;
 using SoulboundEngine.Client.Input;
-using SoulboundEngine.Client.Players;
 using SoulboundEngine.Client.Render.Entity;
-using SoulboundEngine.Client.UI.Screens;
+using SoulboundEngine.Client.UI.Screen;
 using SoulboundEngine.Client.World.Generation;
 using SoulboundEngine.Client.World.Render;
 using System;
@@ -14,6 +13,8 @@ using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 #nullable enable
 
 namespace SoulboundEngine.Client.World.LevelDomain {
+	using Player = Player.Player;
+
 	/// <summary>
 	/// Manages Level lifecycles
 	/// </summary>
@@ -49,7 +50,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 		}
 
 		public void StartSession() {
-			this.level.StartSession(new Player(this.level));
+			this.level.StartSession(new Player(this.client, this.level));
 			this.sessionRunning = true;
 
 			UniTask.Post(this.LevelFrameLoop);
@@ -141,7 +142,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 		public void UnpauseGame() {
 			this.paused = false;
 			Time.timeScale = 1f;
-			this.client.UIHandler.GetScreenNavigator().PopScreen();
+			this.client.UIHandler.GetScreenNavigator().PopTopScreen();
 			this.client.InputManager.AddHandler(this.level.GetPlayer());
 		}
 

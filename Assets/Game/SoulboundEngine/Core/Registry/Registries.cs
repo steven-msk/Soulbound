@@ -1,8 +1,11 @@
+using SoulboundEngine.Client.Debug.Logging;
 using SoulboundEngine.Client.ItemSystem;
 using SoulboundEngine.Client.World.BlockSystem;
+using SoulboundEngine.Client.World.BlockSystem.TileEntities;
 using SoulboundEngine.Client.World.EntitySystem;
 using SoulboundEngine.Client.World.EntitySystem.Attribute;
 using System;
+using System.Linq;
 
 namespace SoulboundEngine.Core.Registry {
 	public static class Registries {
@@ -14,6 +17,7 @@ namespace SoulboundEngine.Core.Registry {
 		public static readonly Registry<Item> ITEMS = Create<Item>(Identifier.Of("item"));
 		public static readonly Registry<EntityDescriptor> ENTITIES = Create<EntityDescriptor>(Identifier.Of("entity"));
 		public static readonly Registry<EntityAttribute> ATTRIBUTES = Create<EntityAttribute>(Identifier.Of("attribute"));
+		public static readonly Registry<TileEntityType> TILE_ENTITIES = Create<TileEntityType>(Identifier.Of("tile_entity")); 
 
 		private static Registry<T> Create<T>(Identifier id) {
 			if (freezed) throw new InvalidOperationException("Registries already freezed");
@@ -33,10 +37,12 @@ namespace SoulboundEngine.Core.Registry {
 			Items.Init();
 			EntityType.Init();
 			AttributeTypes.Init();
+			TileEntityTypes.Init();
 		}
 
 		public static void Freeze() {
 			freezed = true;
+			Logger.LogInfo("Freezing {} registries", ROOT.Count());
 
 			foreach (var registry in ROOT) {
 				registry.Freeze();

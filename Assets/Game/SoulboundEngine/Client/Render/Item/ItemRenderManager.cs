@@ -18,7 +18,7 @@ namespace SoulboundEngine.Client.Render.Item {
 
 		public IItemView Render(ItemRenderHandle handle, ItemStack stack, ItemRenderContext context) {
 			if (this.rendered.ContainsKey(handle)) {
-				this.Destroy(handle);
+				this.Destroy(handle, context);
 			}
 
 			ItemRenderer renderer = this.renderers[stack.item];
@@ -38,9 +38,9 @@ namespace SoulboundEngine.Client.Render.Item {
 			this.GetRenderer(entry.item).UpdateViewBoxed(entry.state, entry.view, entry.context);
 		}
 
-		public void Destroy(ItemRenderHandle handle) {
+		public void Destroy(ItemRenderHandle handle, ItemRenderContext context) {
 			if (!this.rendered.Remove(handle, out RenderedItem entry)) return;
-			this.GetRenderer(entry.item).DestroyView(entry.view);
+			this.GetRenderer(entry.item).DestroyView(entry.view, context);
 		}
 
 		public ItemRenderer GetRenderer(Item item) {

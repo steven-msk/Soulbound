@@ -1,3 +1,4 @@
+using SoulboundEngine.Client.Debug.Logging;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -51,7 +52,10 @@ namespace SoulboundEngine.Core.Registry {
 		public bool Contains(RegistryKey<T> key) => this.keyToEntry.ContainsKey(key);
 		public bool ContainsId(Identifier id) => this.idToEntry.ContainsKey(id);
 
-		void IRegistry.Freeze() => this.freezed = true;
+		void IRegistry.Freeze() {
+			this.freezed = true;
+			Logger.LogInfo("Freezed registry {} with {} entries", this.key.value, this.idToEntry.Count);
+		}
 
 		public bool TryGet(RegistryKey<T> key, out T value) {
 			RegistryEntry<T>? entry = this.keyToEntry.GetValueOrDefault(key);

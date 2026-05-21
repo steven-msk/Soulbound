@@ -1,36 +1,27 @@
-using SoulboundEngine.Client.UI.Containers;
-using SoulboundEngine.Client.UI.Layouts;
 using SoulboundEngine.Client.World;
 using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Common;
+using SoulboundEngine.Core.Assets;
+using UnityEngine.UIElements;
 
-namespace SoulboundEngine.Client.UI.Screens {
+namespace SoulboundEngine.Client.UI.Screen {
 	[PROTOTYPICAL]
-	public sealed class GamePausedScreen : Screen {
+	public sealed class GamePausedScreen : UxmlScreen {
 		private readonly IWorldAccessor worldAccessor;
 		private readonly LevelManager levelManager;
 		
-		public GamePausedScreen(IWorldAccessor worldAccessor, LevelManager levelManager) {
+		public GamePausedScreen(IWorldAccessor worldAccessor, LevelManager levelManager) 
+			: base(AssetManager.Resolve<VisualTreeAsset>(new AssetKey("GamePausedScreen"))) {
 			this.worldAccessor = worldAccessor;
 			this.levelManager = levelManager;
-			this.supportsEscapePop = false;
 		}
 
-		protected override void OnBuild(IScreenObject screenObject) {
-			IUIElementContainer container = GUI.Container(
-				GUI.Frame.Stretch(),
-				GUI.Layout.Vertical()
-					.Align(UIAlignment.Center)
-					.ControlChildSize(true)
-			).Build(screenObject);
+		public override bool IsOpaque => false;
+		public override bool EscapeReturn => false;
 
-			GUI.Button.Label().Text("Resume")
-				.OnClick(this.levelManager.UnpauseGame)
-				.Build(container);
-
-			GUI.Button.Label().Text("Quit To Title Screen")
-				.OnClick(this.worldAccessor.QuitActiveWorld)
-				.Build(container);
+		protected override void OnBind(VisualElement root) {
+			root.Q<Button>("Resume").clicked += this.levelManager.UnpauseGame;
+			root.Q<Button>("Quit").clicked += this.worldAccessor.QuitActiveWorld;
 		}
 	}
 }

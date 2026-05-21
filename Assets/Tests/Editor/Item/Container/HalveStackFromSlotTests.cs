@@ -5,7 +5,7 @@ using SoulboundEngine.Client.ItemSystem.Container;
 
 namespace ItemTests.Container.Operations {
 	internal class HalveStackFromSlotTests : SingleSlotOperationTests<HalveStackFromSlot> {
-		protected override HalveStackFromSlot GetOperation(IItemContainer container, int slotIndex, IItemContainerScope scope) {
+		protected override HalveStackFromSlot GetOperation(IItemContainer container, int slotIndex, IInventoryScope scope) {
 			return new HalveStackFromSlot(container, slotIndex, scope);
 		}
 

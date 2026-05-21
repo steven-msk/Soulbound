@@ -1,0 +1,4 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Game/Content/UI/LogEntry.uss?fileID=7433441132597879392&amp;guid=864800570a46cf446a2fd33d206f40c4&amp;type=3#LogEntry"/>
+    <ui:ListView virtualization-method="DynamicHeight" selection-type="None" name="LogList" item-template="project://database/Assets/Game/Content/UI/LogEntry.uxml?fileID=9197481963319205126&amp;guid=fac28411c2da504439205f2742b62031&amp;type=3#LogEntry" style="flex-grow: 1; position: absolute; left: 0; bottom: 0; right: 0; top: 0;"/>
+</ui:UXML>

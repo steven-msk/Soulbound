@@ -1,4 +1,4 @@
-using SoulboundEngine.Client.Players;
+using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Common;
 using UnityEngine;

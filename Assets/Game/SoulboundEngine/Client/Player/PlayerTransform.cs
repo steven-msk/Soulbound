@@ -7,7 +7,7 @@ using IEntityView = SoulboundEngine.Client.Render.Entity.IEntityView;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.Players {
+namespace SoulboundEngine.Client.Player {
 	[RequireComponent(typeof(Rigidbody2D))]
 	[RequireComponent(typeof(CapsuleCollider2D))]
 	public class PlayerTransform : MonoBehaviour, IEntityView, Entity.IPhysicsHandle, Entity.IBoundingBoxHandle, Player.IPlayerTransformHandle, IItemCollector {

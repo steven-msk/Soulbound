@@ -4,7 +4,7 @@ using SoulboundEngine.Common;
 
 namespace SoulboundEngine.Client.ItemSystem {
 	[PROTOTYPICAL]
-	public sealed class DebugPointerItem : Item, IItemInteractionListener {
+	public sealed class DebugPointerItem : Item, IInteractableItem {
 		public DebugPointerItem(Settings settings) : base(settings) {
 		}
 

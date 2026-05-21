@@ -1,10 +1,11 @@
-using SoulboundEngine.Client.Players;
 using SoulboundEngine.Common;
 
 #nullable enable
 
 namespace SoulboundEngine.Client.World.BlockSystem {
-    public abstract record BreakSource {
+	using Player = Player.Player;
+
+	public abstract record BreakSource {
         public abstract bool fromPlayer { get; }
     }
 
@@ -14,6 +15,6 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 
     [PROTOTYPICAL]
     public record TreeCollapseBreakSource(BreakSource origin) : BreakSource {
-        public override bool fromPlayer => origin.fromPlayer;
+        public override bool fromPlayer => this.origin.fromPlayer;
     }
 }

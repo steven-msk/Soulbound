@@ -45,6 +45,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 				levelManager = levelManager,
 				player = level.GetPlayer(),
 				canvas = sceneRoot.canvas,
+				uiDocument = sceneRoot.UIDocument
 			};
 		}
 

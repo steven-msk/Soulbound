@@ -1,27 +1,67 @@
-﻿using UnityEngine;
+using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.Render.Item {
 	public interface IItemView {
-		GameObject GetGameObject();
 		void SetVisible(bool visible);
 		void Destroy();
-
-		public bool IsValid() => this.GetGameObject() != null;
+		bool IsValid();
+		void SetPosition(Vector2 pos);
 
 		public static IItemView Of(GameObject gameObject) {
-			return new Impl(gameObject);
+			return new GameObjectImpl(gameObject);
 		}
 
-		private sealed class Impl : IItemView {
+		public static IItemView Of(VisualElement visualElement) {
+			return new VisualElementImpl(visualElement);
+		}
+
+		public sealed class GameObjectImpl : IItemView {
 			private readonly GameObject gameObject;
 
-			public Impl(GameObject gameObject) {
+			public GameObjectImpl(GameObject gameObject) {
 				this.gameObject = gameObject;
 			}
 
-			void IItemView.Destroy() => GameObject.Destroy(this.gameObject);
-			GameObject IItemView.GetGameObject() => this.gameObject;
-			void IItemView.SetVisible(bool visible) => this.gameObject.SetActive(visible);
+			public void Destroy() {
+				if (this.gameObject != null) GameObject.Destroy(this.gameObject);
+			}
+
+			bool IItemView.IsValid() => this.gameObject != null;
+
+			public void SetVisible(bool visible) {
+				if (this.gameObject != null) this.gameObject.SetActive(visible);
+			}
+
+			void IItemView.SetPosition(Vector2 pos) {
+				this.gameObject.transform.position = pos;
+			}
+
+			public GameObject GetGameObject() => this.gameObject;
+		}
+
+		public sealed class VisualElementImpl : IItemView {
+			private readonly VisualElement visualElement;
+
+			public VisualElementImpl(VisualElement visualElement) {
+				this.visualElement = visualElement;
+			}
+
+			void IItemView.Destroy() => this.visualElement?.RemoveFromHierarchy();
+
+			bool IItemView.IsValid() => this.visualElement != null;
+
+			void IItemView.SetVisible(bool visible) {
+				if (this.visualElement != null) {
+					this.visualElement.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
+				}
+			}
+
+			void IItemView.SetPosition(Vector2 pos) {
+				if (this.visualElement != null) {
+					this.visualElement.style.translate = pos;
+				}
+			}
 		}
 	}
 }

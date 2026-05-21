@@ -15,14 +15,44 @@ MonoBehaviour:
   m_GroupName: Default Local Group
   m_GUID: 3d327a7b6104f6046a101be5265ddafd
   m_SerializeEntries:
+  - m_GUID: 00964385620f60d4e9ed1233d9caf529
+    m_Address: chest
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0e5905e25c892a748a09d8c6fd3c396a
+    m_Address: WorldScreen
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0f702f1205f9812489c70ebd4b6cda17
+    m_Address: GamePausedScreen
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0f932da0be6fbc34fa244d63edae9ef8
     m_Address: click
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 17a1cc01d5a67154f931385a6b7d83e4
+    m_Address: InventoryContextScreen
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 1b6a0acceb53f9a42b1c3987563d2414
     m_Address: WhiteSquareTile
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1c35bcb58bc9c9a4badb701f7ccbc99b
+    m_Address: WorldEntry
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload
@@ -63,14 +93,14 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 54e2b68901269854bbafd631afa1b635
-    m_Address: Items
+  - m_GUID: 54dccd926a3bbd84f963d8b242907aa2
+    m_Address: WorldListScreen
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 565fe1640666a874298849ae50107d82
-    m_Address: Slot
+  - m_GUID: 54e2b68901269854bbafd631afa1b635
+    m_Address: Items
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload
@@ -129,6 +159,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8e629b0885125a34883e50cc5e04f964
+    m_Address: ChestContainer
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 9270827d9dd361140a7264d2052a621d
     m_Address: wood
     m_ReadOnly: 0
@@ -137,6 +173,24 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b13141476e8f6134eb600bd09d0d9792
     m_Address: RedSquareTile
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b50d4da87d0a01543bf58c788d1f5922
+    m_Address: PanelSettings
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c25992c4a89227d4586f253b5c251934
+    m_Address: Slot
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c50f0d493e76e5a429e1630de1dd0778
+    m_Address: TitleScreen
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload
@@ -161,6 +215,12 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e2f0d8709740fce438a7d4dae2c8e55c
     m_Address: ToggleOnTile
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e97c1c3954a6faa4da45ed9eef7f1918
+    m_Address: missingTile
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload

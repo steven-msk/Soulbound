@@ -3,33 +3,32 @@ using SoulboundEngine.Core.Assets;
 using SoulboundEngine.Core.Render.Sprite;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace SoulboundEngine.Client.Render.Item {
 	using Item = ItemSystem.Item;
 
 	public static class ItemRenderers {
 		private static readonly AssetKey ITEM_SPRITE_ATLAS = new("Items");
+		private const string MISSING = "missingItem";
 		private static readonly Dictionary<Item, IItemModelResolver.Factory> MODEL_RESOLVER_FACTORIES = new();
 		private static readonly Dictionary<Item, ItemRenderer.Factory> RENDERER_FACTORIES = new();
-		public static readonly Vector2 TILE_SIZE = new(8f, 8f);
-		public static readonly Vector2 DEFAULT_SPRITE_SIZE = new(32f, 32f);
 
 		static ItemRenderers() {
-			Register(Items.AIR, DefaultResolverFactory("air", TILE_SIZE), () => new AirItemRenderer());
-			Register(Items.GRASS, DefaultResolverFactory("grass_top", TILE_SIZE));
-			Register(Items.DIRT, DefaultResolverFactory("dirt", TILE_SIZE));
-			Register(Items.STONE, DefaultResolverFactory("stone", TILE_SIZE));
-			Register(Items.WOOD, DefaultResolverFactory("wood", TILE_SIZE));
-			Register(Items.LEAVES, DefaultResolverFactory("leaves", TILE_SIZE));
+			Register(Items.AIR, DefaultResolverFactory("air"), () => new AirItemRenderer());
+			Register(Items.GRASS, DefaultResolverFactory("grass_top"));
+			Register(Items.DIRT, DefaultResolverFactory("dirt"));
+			Register(Items.STONE, DefaultResolverFactory("stone"));
+			Register(Items.WOOD, DefaultResolverFactory("wood"));
+			Register(Items.LEAVES, DefaultResolverFactory("leaves"));
+			Register(Items.CHEST, DefaultResolverFactory("chest"));
 
-			Register(Items.placeableItem, DefaultResolverFactory("bluething", DEFAULT_SPRITE_SIZE));
-			Register(Items.teleportPlayerItem, DefaultResolverFactory("bluething", DEFAULT_SPRITE_SIZE));
-			Register(Items.spawnEntityItem, DefaultResolverFactory("bluething", DEFAULT_SPRITE_SIZE));
-			Register(Items.chargeableItem, DefaultResolverFactory("bluething", DEFAULT_SPRITE_SIZE));
-			Register(Items.debugPointer, DefaultResolverFactory("debugPointer", DEFAULT_SPRITE_SIZE));
-			Register(Items.inventoryListenerItem, DefaultResolverFactory("bluething", DEFAULT_SPRITE_SIZE));
-			Register(Items.blockBreakerItem, DefaultResolverFactory("bluething", DEFAULT_SPRITE_SIZE));
+			Register(Items.placeableItem, DefaultResolverFactory("bluething"));
+			Register(Items.teleportPlayerItem, DefaultResolverFactory("bluething"));
+			Register(Items.spawnEntityItem, DefaultResolverFactory("bluething"));
+			Register(Items.chargeableItem, DefaultResolverFactory("bluething"));
+			Register(Items.debugPointer, DefaultResolverFactory("debugPointer"));
+			Register(Items.inventoryListenerItem, DefaultResolverFactory("bluething"));
+			Register(Items.blockBreakerItem, DefaultResolverFactory("bluething"));
 		}
 
 		public static void Register(Item item, IItemModelResolver.Factory modelResolverFactory) {
@@ -55,12 +54,12 @@ namespace SoulboundEngine.Client.Render.Item {
 		public static Func<Item, IItemModelResolver> GetModelResolverFactory(ISpriteResolver<AtlasSpriteRef> spriteResolver) {
 			return item => MODEL_RESOLVER_FACTORIES.TryGetValue(item, out IItemModelResolver.Factory resolverFactory)
 				? resolverFactory(spriteResolver) 
-				: DefaultResolverFactory("missingItem", new Vector2(32f, 32f))(spriteResolver);
+				: DefaultResolverFactory(MISSING)(spriteResolver);
 		}
 
-		private static IItemModelResolver.Factory DefaultResolverFactory(string spriteKey, Vector2 referenceSize) {
+		private static IItemModelResolver.Factory DefaultResolverFactory(string spriteKey) {
 			AtlasSpriteRef spriteRef = new(ITEM_SPRITE_ATLAS, spriteKey);
-			return spriteResolver => new IItemModelResolver.Default(spriteResolver, spriteRef, referenceSize);
+			return spriteResolver => new IItemModelResolver.Default(spriteResolver, spriteRef);
 		}
 
 		private static ItemRenderer GetDefaultRenderer() {

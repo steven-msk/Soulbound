@@ -3,7 +3,7 @@ using SoulboundEngine.Client.ItemSystem;
 
 namespace SoulboundEngine.Client.ItemSystem.Container {
 	public sealed class SwapTransit : SingleSlotOperation {
-		public SwapTransit(IItemContainer container, int slotIndex, IItemContainerScope scope)
+		public SwapTransit(IItemContainer container, int slotIndex, IInventoryScope scope)
 			: base(container, slotIndex, scope) {
 		}
 

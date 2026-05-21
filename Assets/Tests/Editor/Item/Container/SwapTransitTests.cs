@@ -10,12 +10,12 @@ namespace ItemTests.Container.Operations {
 
 		[SetUp]
 		public new void Setup() {
-			this.scope = Substitute.For<IItemContainerScope>();
+			this.scope = Substitute.For<IInventoryScope>();
 			this.fakeItemA = new FakeItem(DEFAULT_FULL_STACK);
 			this.fakeItemB = new FakeItem(DEFAULT_FULL_STACK);
 		}
 
-		protected override SwapTransit GetOperation(IItemContainer container, int slotIndex, IItemContainerScope scope) {
+		protected override SwapTransit GetOperation(IItemContainer container, int slotIndex, IInventoryScope scope) {
 			return new SwapTransit(container, slotIndex, scope);
 		}
 

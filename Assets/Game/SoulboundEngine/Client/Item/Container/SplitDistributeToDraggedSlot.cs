@@ -8,9 +8,9 @@ namespace SoulboundEngine.Client.ItemSystem.Container {
 	public sealed class SplitDistributeToDraggedSlot : ISlotOperation {
 		private readonly SlotRef slotRef;
 		private readonly IItemSlot slot;
-		private readonly IItemContainerScope scope;
+		private readonly IInventoryScope scope;
 
-		public SplitDistributeToDraggedSlot(SlotRef slotRef, IItemContainerScope scope) {
+		public SplitDistributeToDraggedSlot(SlotRef slotRef, IInventoryScope scope) {
 			this.slotRef = slotRef;
 			this.slot = slotRef.GetSlot();
 			this.scope = scope;

@@ -1,4 +1,4 @@
-using SoulboundEngine.Client.Players;
+using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.World.LevelDomain;
 using SoulboundEngine.Common;
 using SoulboundEngine.Common.Unity;
@@ -7,6 +7,8 @@ using System;
 using UnityEngine;
 
 namespace SoulboundEngine.Client.World.BlockSystem.TileEntities {
+	using Player = Player.Player;
+
 	[PROTOTYPICAL]
 	public class ObjectTileEntity : TileEntity {
 		// made to work with AreaTriggerBlock
@@ -16,19 +18,19 @@ namespace SoulboundEngine.Client.World.BlockSystem.TileEntities {
 		public event Action onDestroyed;
 		private readonly GameObject gameObject;
 
-		public ObjectTileEntity(Level level, BlockPos blockPos)
-			: base(level, blockPos) {
-			gameObject = new GameObject("Object Tile Entity");
-			gameObject.transform.position = blockPos.GetCenter();
+		public ObjectTileEntity(TileEntityType<ObjectTileEntity> tileEntityType, Level level, BlockPos blockPos)
+			: base(tileEntityType, level, blockPos) {
+			this.gameObject = new GameObject("Object Tile Entity");
+			this.gameObject.transform.position = blockPos.GetCenter();
 
-			CircleCollider2D collider = gameObject.AddComponent<CircleCollider2D>();
+			CircleCollider2D collider = this.gameObject.AddComponent<CircleCollider2D>();
 			collider.isTrigger = true;
 			collider.excludeLayers = ~LayerMask.GetMask(Layers.EntityCharacter);
 			collider.radius = 2.5f;
 
-			TriggerCollisionListener triggerListener = gameObject.AddComponent<TriggerCollisionListener>();
-			triggerListener.onTriggerEnter += OnTriggerEnter;
-			triggerListener.onTriggerExit += OnTriggerExit;
+			TriggerCollisionListener triggerListener = this.gameObject.AddComponent<TriggerCollisionListener>();
+			triggerListener.onTriggerEnter += this.OnTriggerEnter;
+			triggerListener.onTriggerExit += this.OnTriggerExit;
 		}
 
 		private void OnTriggerEnter(Collider2D collider) {
@@ -45,7 +47,7 @@ namespace SoulboundEngine.Client.World.BlockSystem.TileEntities {
 
 		public override void OnDispose() {
 			onDestroyed?.Invoke();
-			GameObject.Destroy(gameObject);
+			GameObject.Destroy(this.gameObject);
 		}
 	}
 }

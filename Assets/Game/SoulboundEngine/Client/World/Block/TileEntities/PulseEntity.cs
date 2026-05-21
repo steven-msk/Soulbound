@@ -9,8 +9,8 @@ namespace SoulboundEngine.Client.World.BlockSystem.TileEntities {
 		const int PULSE_THRESHOLD = PULSE_INTERVAL - 1;
 		private int timer;
 
-		public PulseEntity(Level level, BlockPos blockPos)
-			: base(level, blockPos) {
+		public PulseEntity(TileEntityType<PulseEntity> tileEntityType, Level level, BlockPos blockPos)
+			: base(tileEntityType, level, blockPos) {
 		}
 
 		public void Tick() {

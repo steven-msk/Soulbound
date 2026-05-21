@@ -19,7 +19,7 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 		}
 
 		public override TileEntity GetTileEntity(Level level, BlockPos blockPos) {
-			return new PulseEntity(level, blockPos);
+			return new PulseEntity(TileEntityTypes.PULSE, level, blockPos);
 		}
 
 		public override bool HasTileEntity(Level level, BlockPos blockPos, BlockState blockState) {

@@ -21,5 +21,5 @@ internal abstract class SingleSlotOperationTests<TOperation> : SlotOperationTest
 		operation = GetOperation(container, slot.GetIndex(), scope);
 	}
 
-	protected abstract TOperation GetOperation(IItemContainer container, int slotIndex, IItemContainerScope scope);
+	protected abstract TOperation GetOperation(IItemContainer container, int slotIndex, IInventoryScope scope);
 }

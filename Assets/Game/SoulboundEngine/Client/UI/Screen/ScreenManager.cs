@@ -1,52 +1,90 @@
+using SoulboundEngine.Client.Debug.Logging;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
+using UnityEngine.UIElements;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.UI.Screens {
-	public sealed class ScreenManager : IScreenObjectFactory, IScreenNavigator {
-		private readonly Stack<ScreenEntry> stack = new();
-		private readonly IScreenRoot root;
+namespace SoulboundEngine.Client.UI.Screen {
+	public sealed class ScreenManager : IScreenNavigator {
+		private readonly List<ScreenEntry> stack = new();
+		private readonly UIToolkitScreenRoot screenRoot;
 
-		public ScreenManager(IScreenRoot root) {
-			this.root = root;
+		public ScreenManager(UIToolkitScreenRoot screenRoot) {
+			this.screenRoot = screenRoot;
 		}
 
-		public void PushScreen(Screen screen) {
-			if (this.stack.TryPeek(out ScreenEntry activeEntry)) {
-				activeEntry.obj.Hide();
-			}
+		public IScreenHandle PushScreen(Screen screen) {
+			VisualElement root = this.CreateScreenRoot();
+			
+			IScreenHandle handle = new UIToolkitScreenHandle(screen, root);
+			screen.Init(this, handle);
 
-			screen.Init(this);
-			IScreenObject obj = screen.BuildObject(this);
-			this.stack.Push(new ScreenEntry(obj));
-			obj.Show();
+			this.screenRoot.Attach(root);
+
+			this.stack.Insert(0, new ScreenEntry(handle));
+			this.Render();
+
+			return handle;
 		}
 
-		public bool PopScreen() {
-			if (this.stack.TryPop(out ScreenEntry activeEntry)) {
-				activeEntry.obj.Hide();
-				activeEntry.obj.Dispose();
+		private void Render() {
+			List<ScreenEntry> buffer = new();
+
+			foreach (var entry in this.stack.Reverse<ScreenEntry>()) {
+				if (entry.screen.IsOpaque) {
+					buffer.ForEach(e => e.handle.Hide());
+					buffer.Clear();
+				}
+
+				buffer.Insert(0, entry);
 			}
 
-			if (this.stack.TryPeek(out activeEntry)) {
-				activeEntry.obj.Show();
+			buffer.ForEach(e => e.handle.Show());
+		}
+
+		private VisualElement CreateScreenRoot() {
+			VisualElement root = new() {
+				name = "ScreenRoot",
+			};
+			root.style.flexGrow = 1;
+			root.style.position = Position.Absolute;
+			root.style.top = root.style.right = root.style.bottom = root.style.left = 0;
+			return root;
+		}
+
+		public bool PopTopScreen() {
+			ScreenEntry? topEntry = this.GetTopEntry();
+			if (topEntry == null) return false;
+
+			if (this.stack.Remove(topEntry)) {
+				this.HideAndDispose(topEntry);
 			}
+
+			this.Render();
 
 			return this.stack.Any();
 		}
 
+		public void PopScreen(IScreenHandle handle) {
+			ScreenEntry entry = this.stack.FirstOrDefault(e => e.handle == handle);
+			if (entry == null) {
+				Logger.LogError("Could not find screen handle");
+				return;
+			}
+			this.stack.Remove(entry);
+			this.HideAndDispose(entry);
+			this.Render();
+		}
+
 		public void ReplaceScreen(Screen screen) {
-			this.PopScreen();
+			this.PopTopScreen();
 			this.PushScreen(screen);
 		}
 
-		public Screen? GetActiveScreen() {
-			return this.stack.TryPeek(out ScreenEntry activeEntry)
-				? activeEntry.screen
-				: null;
-		}
+		public Screen? GetActiveScreen() => this.GetTopEntry()?.screen;
+
+		private ScreenEntry? GetTopEntry() => this.stack.First();
 
 		public void IssueRebuild(Screen screen) {
 			if (this.GetActiveScreen() != screen) return;
@@ -54,37 +92,19 @@ namespace SoulboundEngine.Client.UI.Screens {
 		}
 
 		public void Flush() {
-			while (this.stack.Count > 0) {
-				var screenObject = this.stack.Pop();
-				screenObject.obj.Hide();
-				screenObject.obj.Dispose();
+			foreach (var entry in this.stack) {
+				this.HideAndDispose(entry);
 			}
+			this.stack.Clear();
 		}
 
-		GameObject IScreenObjectFactory.CreateGameObject() {
-			GameObject obj = new("Screen Object", typeof(RectTransform));
-			this.root.AttachScreenObject(obj);
-
-			// default screen layout
-			RectTransform rectTransform = obj.GetComponent<RectTransform>();
-			rectTransform.anchorMin = Vector2.zero;
-			rectTransform.anchorMax = Vector2.one;
-			rectTransform.pivot		= new Vector2(0.5f, 0.5f);
-			rectTransform.offsetMin = Vector2.zero;
-			rectTransform.offsetMax = Vector2.zero;
-			rectTransform.sizeDelta = Vector2.zero;
-
-			return obj;
-		}
-
-		IScreenObject IScreenObjectFactory.CreateSceneObject(Screen screen, GameObject gameObject) {
-			ScreenObject screenObject = gameObject.AddComponent<ScreenObject>();
-			screenObject.Init(screen);
-			return screenObject;
+		private void HideAndDispose(ScreenEntry entry) {
+			entry.handle.Hide();
+			entry.handle.Dispose();
 		}
 	}
 
-	sealed record ScreenEntry(IScreenObject obj) {
-		public Screen screen => this.obj.GetInstance();
+	sealed record ScreenEntry(IScreenHandle handle) {
+		public Screen screen => this.handle.GetScreen();
 	}
 }

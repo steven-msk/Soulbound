@@ -1,0 +1,6 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement style="flex-grow: 1; align-items: center; justify-content: center;">
+        <ui:Button text="Play" name="PlayButton" style="-unity-font-definition: url(&quot;project://database/Assets/Game/Content/UI/Fonts/Josefin_Sans/static/JosefinSans-SemiBold.ttf?fileID=12800000&amp;guid=72a51e1885304a14099c209e065bb2b7&amp;type=3#JosefinSans-SemiBold&quot;); font-size: 28px; -unity-background-scale-mode: stretch-to-fill;"/>
+        <ui:Button text="Exit" name="ExitButton" style="-unity-font-definition: url(&quot;project://database/Assets/Game/Content/UI/Fonts/Josefin_Sans/static/JosefinSans-SemiBold.ttf?fileID=12800000&amp;guid=72a51e1885304a14099c209e065bb2b7&amp;type=3#JosefinSans-SemiBold&quot;); font-size: 28px; -unity-background-scale-mode: stretch-to-fill;"/>
+    </ui:VisualElement>
+</ui:UXML>

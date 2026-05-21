@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using SoulboundEngine.Client;
+using SoulboundEngine.Client.Debug.Logging.Console;
 using SoulboundEngine.Client.Debug.Metrics;
 using SoulboundEngine.Common.Json;
 using SoulboundEngine.Core.Assets;
@@ -30,12 +31,14 @@ namespace SoulboundEngine.Core {
 		private readonly GameConfig config;
 		private readonly PerformanceMetrics performanceMetrics;
 		private readonly DebugMetricsService debugMetricsService;
+		private readonly LogConsole logConsole;
 
 		public Soulbound(GameConfig config) {
 			instance = this;
 			this.config = config;
 			GameStateManager.SetBootstrapping();
 
+			this.logConsole = new LogConsole();
 #if !UNITY_EDITOR
 			Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
 			Application.SetStackTraceLogType(LogType.Warning, StackTraceLogType.None);
@@ -52,7 +55,8 @@ namespace SoulboundEngine.Core {
 			Registries.Freeze();
 
 			this.client = new SoulboundClient(config, new ClientInit {
-				debugMetricsService = this.debugMetricsService
+				debugMetricsService = this.debugMetricsService,
+				logConsole = this.logConsole
 			});
 
 			GameStateManager.SetInitialized();
@@ -106,16 +110,17 @@ namespace SoulboundEngine.Core {
 		}
 
 		void IDebugMetricsSource.CollectDebugData(ref DebugMetricsBuilder builder) {
-			builder.Add("fps", this.performanceMetrics.InstantFps);
-			builder.Add("frameTime", this.performanceMetrics.FrameTime);
-			builder.Add("fixedUpdateTime", this.performanceMetrics.FixedUpdateTime);
-			builder.Add("totalManagedMemory", this.performanceMetrics.TotalManagedMemoryMB);
-			builder.Add("totalUnityReservedMemory", this.performanceMetrics.TotalUnityReservedMemoryMB);
-			builder.Add("monoHeap", this.performanceMetrics.MonoHeapMB);
-			builder.Add("monoUsed", this.performanceMetrics.MonoUsedMB);
-			builder.Add("gpuManagedMemory", this.performanceMetrics.GPUManagedMemoryMB);
-			builder.Add("gpuReservedMemory", this.performanceMetrics.GPUReservedMemoryMB);
-			builder.Add("gcAlloc", this.performanceMetrics.GcAllocBytesThisFrame);
+			PerformanceMetrics metrics = this.performanceMetrics;
+			builder.Add(DebugMetricId.Fps, metrics.InstantFps);
+			builder.Add(DebugMetricId.FrameTime, metrics.FrameTime);
+			builder.Add(DebugMetricId.FixedUpdateTime, metrics.FixedUpdateTime);
+			builder.Add(DebugMetricId.TotalManagedMemory, metrics.TotalManagedMemoryMB);
+			builder.Add(DebugMetricId.TotalUnityReservedMemory, metrics.TotalUnityReservedMemoryMB);
+			builder.Add(DebugMetricId.MonoHeap, metrics.MonoHeapMB);
+			builder.Add(DebugMetricId.MonoUsed, metrics.MonoUsedMB);
+			builder.Add(DebugMetricId.GpuManagedMemory, metrics.GPUManagedMemoryMB);
+			builder.Add(DebugMetricId.GpuReservedMemory, metrics.GPUReservedMemoryMB);
+			builder.Add(DebugMetricId.GcAlloc, metrics.GcAllocBytesThisFrame);
 		}
 
 		public PerformanceMetrics GetPerformanceMetrics() => this.performanceMetrics;

@@ -11,6 +11,7 @@ namespace SoulboundEngine.Client.ItemSystem {
 		public static readonly Item STONE = Register(Blocks.STONE, Item.Settings.Of("Stone Block"));
 		public static readonly Item WOOD = Register(Blocks.WOOD, Item.Settings.Of("Wood Block"));
 		public static readonly Item LEAVES = Register(Blocks.LEAVES, Item.Settings.Of("Leaves Block"));
+		public static readonly Item CHEST = Register(Blocks.CHEST, Item.Settings.Of("Chest"));
 
 		public static readonly Item placeableItem = Register(Blocks.MOVING_TICKING_BLOCK, 
 			Item.Settings.Of("Placeable Item")

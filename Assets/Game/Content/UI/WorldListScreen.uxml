@@ -1,0 +1,12 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement style="flex-grow: 1; align-items: center; justify-content: flex-start; margin-top: 25px; margin-right: 25px; margin-bottom: 25px; margin-left: 25px; align-content: flex-start; align-self: center;">
+        <ui:VisualElement name="WorldList" style="flex-grow: 1; align-items: stretch; justify-content: flex-start; flex-shrink: 0;"/>
+        <ui:VisualElement name="" style="flex-grow: 0; flex-direction: row; align-items: center; justify-content: center; flex-shrink: 0;">
+            <ui:VisualElement style="flex-grow: 0; justify-content: center; align-items: center; flex-direction: column;">
+                <ui:TextField label="" placeholder-text="World name..." hide-placeholder-on-focus="true" name="NameField" style="flex-grow: 0; flex-shrink: 0; flex-direction: row; width: 450px; -unity-font-definition: url(&quot;project://database/Assets/Game/Content/UI/Fonts/Josefin_Sans/static/JosefinSans-Italic.ttf?fileID=12800000&amp;guid=f030f3652dde41549a335432cc10397b&amp;type=3#JosefinSans-Italic&quot;);"/>
+                <ui:TextField label="" placeholder-text="World seed... (leave empty for random)" hide-placeholder-on-focus="true" name="SeedField" style="flex-grow: 0; flex-shrink: 0; flex-direction: row; width: 450px; -unity-text-outline-color: rgb(0, 0, 0); background-color: rgba(0, 0, 0, 0); border-left-color: rgba(0, 0, 0, 0); border-right-color: rgba(0, 0, 0, 0); border-top-color: rgba(0, 0, 0, 0); border-bottom-color: rgba(0, 0, 0, 0); -unity-background-scale-mode: stretch-to-fill; -unity-font-definition: url(&quot;project://database/Assets/Game/Content/UI/Fonts/Josefin_Sans/static/JosefinSans-Italic.ttf?fileID=12800000&amp;guid=f030f3652dde41549a335432cc10397b&amp;type=3#JosefinSans-Italic&quot;);"/>
+            </ui:VisualElement>
+            <ui:Button text="Create new world" name="CreateWorld" style="-unity-font-definition: url(&quot;project://database/Assets/Game/Content/UI/Fonts/Josefin_Sans/static/JosefinSans-SemiBold.ttf?fileID=12800000&amp;guid=72a51e1885304a14099c209e065bb2b7&amp;type=3#JosefinSans-SemiBold&quot;);"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

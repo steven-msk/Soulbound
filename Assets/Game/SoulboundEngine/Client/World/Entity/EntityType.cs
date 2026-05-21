@@ -1,9 +1,10 @@
-using SoulboundEngine.Client.Players;
 using SoulboundEngine.Core.Registry;
 
 #nullable enable
 
 namespace SoulboundEngine.Client.World.EntitySystem {
+	using Player = Player.Player;
+
 	public static class EntityType {
 
 		// TODO: move out transform supplier logic into Unity adapters layer
