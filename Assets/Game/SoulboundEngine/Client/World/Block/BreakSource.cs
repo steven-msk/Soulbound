@@ -3,13 +3,13 @@ using SoulboundEngine.Common;
 #nullable enable
 
 namespace SoulboundEngine.Client.World.Block {
-	using Player = Player.Player;
+	using PlayerEntity = Player.PlayerEntity;
 
 	public abstract record BreakSource {
         public abstract bool fromPlayer { get; }
     }
 
-    public record PlayerToolBreakSource(Player player) : BreakSource {
+    public record PlayerToolBreakSource(PlayerEntity player) : BreakSource {
         public override bool fromPlayer => true;
     }
 

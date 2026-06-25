@@ -1,5 +1,6 @@
 using SoulboundEngine.Client.Debug.Logging;
 using SoulboundEngine.Client.Item;
+using SoulboundEngine.Client.UI.Screen;
 using SoulboundEngine.Client.World.Block;
 using SoulboundEngine.Client.World.Block.TileEntity;
 using SoulboundEngine.Client.World.Entity;
@@ -17,7 +18,8 @@ namespace SoulboundEngine.Core.Registry {
 		public static readonly Registry<Item> ITEMS = Create<Item>(Identifier.Of("item"));
 		public static readonly Registry<EntityDescriptor> ENTITIES = Create<EntityDescriptor>(Identifier.Of("entity"));
 		public static readonly Registry<EntityAttribute> ATTRIBUTES = Create<EntityAttribute>(Identifier.Of("attribute"));
-		public static readonly Registry<TileEntityType> TILE_ENTITIES = Create<TileEntityType>(Identifier.Of("tile_entity")); 
+		public static readonly Registry<TileEntityType> TILE_ENTITIES = Create<TileEntityType>(Identifier.Of("tile_entity"));
+		public static readonly Registry<InventoryScreenHandlerType> INVENTORY_SCREEN_HANDLES = Create<InventoryScreenHandlerType>(Identifier.Of("inventory_screen_handle"));
 
 		private static Registry<T> Create<T>(Identifier id) {
 			if (freezed) throw new InvalidOperationException("Registries already freezed");
@@ -38,6 +40,7 @@ namespace SoulboundEngine.Core.Registry {
 			EntityType.Init();
 			AttributeTypes.Init();
 			TileEntityTypes.Init();
+			_ = new InventoryScreens();
 		}
 
 		public static void Freeze() {

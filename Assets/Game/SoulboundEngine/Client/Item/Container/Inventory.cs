@@ -6,8 +6,6 @@ using System.Linq;
 #nullable enable
 
 namespace SoulboundEngine.Client.Item.Container {
-	using Player = Player.Player;
-
 	public class Inventory : IItemContainer, IEnumerable<ItemStack?> {
 		protected readonly ItemSlot[] slots;
 		private readonly HashSet<Item> uniqueItems = new();
@@ -68,12 +66,6 @@ namespace SoulboundEngine.Client.Item.Container {
 					onItemRemoved?.Invoke(oldStack.item);
 				}
 			}
-		}
-
-		public virtual void OnOpened(Player player) {
-		}
-
-		public virtual void OnClosed(Player player) {
 		}
 
 		public int GetSize() => this.slots.Length;

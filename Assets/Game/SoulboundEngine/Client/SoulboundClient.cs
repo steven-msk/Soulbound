@@ -7,7 +7,6 @@ using SoulboundEngine.Client.Debug.Logging.Console;
 using SoulboundEngine.Client.Debug.Metrics.View;
 using SoulboundEngine.Client.Input;
 using SoulboundEngine.Client.Runtime.Services;
-using SoulboundEngine.Client.Settings;
 using SoulboundEngine.Client.UI;
 using SoulboundEngine.Client.World;
 using SoulboundEngine.Client.World.Level;
@@ -19,7 +18,6 @@ using System;
 using System.Linq;
 
 namespace SoulboundEngine.Client {
-	using SoulboundEngine.Client.Item.Container;
 	using SoulboundEngine.Client.Render.Block;
 	using SoulboundEngine.Client.Render.Entity;
 	using SoulboundEngine.Client.Render.Item;
@@ -58,7 +56,6 @@ namespace SoulboundEngine.Client {
 		private readonly EntityRenderManager entityRenderManager;
 		private readonly BlockRenderManager blockRenderManager;
 		private WorldScreen activeWorldScreen;
-		private IScreenHandle activeInventoryScreenHandle;
 
 		int IInputEventHandler.priority => int.MaxValue;
 
@@ -126,6 +123,14 @@ namespace SoulboundEngine.Client {
 			this.activeWorldSession?.levelManager.StopSession();
 			this.settings.Save();
 			this.inputActions.Dispose();
+		}
+
+		public IScreenHandle OpenScreen(Screen screen) {
+			return this.uiHandler.PushScreen(screen);
+		}
+
+		public void CloseScreen(IScreenHandle handle) {
+			this.uiHandler.PopScreen(handle);
 		}
 
 		public void CreateNewWorld(string world, int seed) {
@@ -237,24 +242,6 @@ namespace SoulboundEngine.Client {
 					}
 				})
 			};
-		}
-
-		public void ShowInventoryScreen(Player.Player player) {
-			this.activeWorldScreen?.SetHotbarVisible(false);
-			this.activeInventoryScreenHandle = this.uiHandler.PushScreen(new InventoryContextScreen(this.itemRenderManager, player));
-		}
-
-		public void HideInventoryScreen() {
-			this.activeWorldScreen?.SetHotbarVisible(true);
-			if (this.activeInventoryScreenHandle != null) {
-				this.uiHandler.PopScreen(this.activeInventoryScreenHandle);
-				this.activeInventoryScreenHandle = null;
-			}
-		}
-
-		public void SetExternalInventory(Inventory inventory, IInventoryLayout layout) {
-			InventoryContextScreen inventoryContextScreen = (InventoryContextScreen)this.activeInventoryScreenHandle.GetScreen();
-			inventoryContextScreen.SetExternalInventory(inventory, layout, inventory.GetAllSlots());
 		}
 
 		private IWorldSaveStrategy GetWorldSaveStrategy() {

@@ -13,10 +13,10 @@ namespace SoulboundEngine.Client.UI.Screen {
 			this.worldAccessor = worldAccessor;
 		}
 
-		public override bool EscapeReturn => false;
+		public override bool CloseOnEsc => false;
 
 		protected override void OnBind(VisualElement root) {
-			root.Q<Button>("PlayButton").clicked += () => this.screenManager.PushScreen(new WorldListScreen(this.worldAccessor));
+			root.Q<Button>("PlayButton").clicked += () => this.ScreenManager.PushScreen(new WorldListScreen(this.worldAccessor));
 			root.Q<Button>("ExitButton").clicked += Soulbound.Instance.CloseGame;
 		}
 	}

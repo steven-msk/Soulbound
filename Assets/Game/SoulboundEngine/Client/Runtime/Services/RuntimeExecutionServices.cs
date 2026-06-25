@@ -8,7 +8,7 @@ using UnityEngine;
 #nullable enable
 
 namespace SoulboundEngine.Client.Runtime.Services {
-	using Player = Player.Player;
+	using PlayerEntity = Player.PlayerEntity;
 
 	public class RuntimeExecutionServices : IRuntimeExecutionServices {
 		private IPlayerExecutionService? _player;
@@ -39,11 +39,11 @@ namespace SoulboundEngine.Client.Runtime.Services {
 	}
 
 	public class RuntimePlayerExecutionService : IPlayerExecutionService {
-		public readonly Player player;
+		public readonly PlayerEntity player;
 		private readonly IInventoryExecutionService _inventory;
 		public IInventoryExecutionService Inventory => this._inventory;
 
-		public RuntimePlayerExecutionService(Player player) {
+		public RuntimePlayerExecutionService(PlayerEntity player) {
 			this.player = player;
 			this._inventory = new RuntimeInventoryExecutionService(player.GetInventory());
 		}

@@ -4,14 +4,14 @@ using SoulboundEngine.Client.Item.Container;
 using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.Render.Item;
 using SoulboundEngine.Core.Assets;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.UI.Screen {
-	using Player = Player.Player;
-
+	[Obsolete]
 	public class InventoryContextScreen : UxmlScreen, IInputEventHandler, IInventoryScope {
 		int IInputEventHandler.priority => 5005;
 		private int lastClickedSlot;
@@ -27,14 +27,14 @@ namespace SoulboundEngine.Client.UI.Screen {
 		private Inventory currentExternalInventory;
 		private InteractableUIToolkitSlotDisplay[] externalSlotDisplays;
 		private readonly ItemRenderManager itemRenderManager;
-		private readonly Player player;
+		private readonly PlayerEntity player;
 		private readonly HashSet<Inventory> openInventories = new();
-		private TransitStack transitStack;
+		private TransitStackHandler transitStack;
 		private SlotDragState dragState;
 		private Vector2 pointerPosition;
 		private VisualElement externalInventoryRoot;
 
-		public InventoryContextScreen(ItemRenderManager itemRenderManager, Player player) 
+		public InventoryContextScreen(ItemRenderManager itemRenderManager, PlayerEntity player) 
 			: base(AssetManager.Resolve<VisualTreeAsset>(new AssetKey("InventoryContextScreen"))) {
 			this.itemRenderManager = itemRenderManager;
 			this.player = player;
@@ -44,7 +44,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		public override bool IsOpaque => false;
 
 		protected override void OnBind(VisualElement root) {
-			this.transitStack = new TransitStack(this.itemRenderManager, root.Q<VisualElement>("TransitStack"));
+			this.transitStack = new TransitStackHandler(this.itemRenderManager, root.Q<VisualElement>("TransitStack"));
 			this.player.SetTransitStackSource(this.transitStack);
 
 			this.externalInventoryRoot = root.Q<VisualElement>("ExternalInventorySpace");

@@ -7,14 +7,14 @@ using System;
 using UnityEngine;
 
 namespace SoulboundEngine.Client.World.Block.TileEntity {
-	using Player = Player.Player;
+	using PlayerEntity = Player.PlayerEntity;
 
 	[PROTOTYPICAL]
 	public class ObjectTileEntity : TileEntity {
 		// made to work with AreaTriggerBlock
 
-		public event Action<Player> onTriggerEnter;
-		public event Action<Player> onTriggerExit;
+		public event Action<PlayerEntity> onTriggerEnter;
+		public event Action<PlayerEntity> onTriggerExit;
 		public event Action onDestroyed;
 		private readonly GameObject gameObject;
 

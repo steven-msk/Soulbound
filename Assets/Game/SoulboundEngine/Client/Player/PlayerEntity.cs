@@ -2,9 +2,9 @@ using SoulboundEngine.Client.Input;
 using SoulboundEngine.Client.Interaction;
 using SoulboundEngine.Client.Item;
 using SoulboundEngine.Client.Item.Container;
+using SoulboundEngine.Client.UI.Screen;
 using SoulboundEngine.Client.World.Block;
 using SoulboundEngine.Client.World.Block.State;
-using SoulboundEngine.Client.World.Block.TileEntity;
 using SoulboundEngine.Client.World.Entity;
 using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Core.Event;
@@ -17,8 +17,8 @@ using UnityEngine;
 namespace SoulboundEngine.Client.Player {
 	using Item = Item.Item;
 
-	public class Player : Entity, IInputEventHandler, IInteractionHandler<ItemInteraction>, IInteractionHandler<BlockInteraction> {
-		public static readonly EntityDescriptor<Player> DESCRIPTOR = EntityDescriptor.Of<Player>((_, level) => throw new InvalidOperationException());
+	public class PlayerEntity : Entity, IInputEventHandler, IInteractionHandler<ItemInteraction>, IInteractionHandler<BlockInteraction> {
+		public static readonly EntityDescriptor<PlayerEntity> DESCRIPTOR = EntityDescriptor.Of<PlayerEntity>((_, level) => throw new InvalidOperationException());
 		const float MAX_BLOCK_REACH = 5f;
 		private readonly SoulboundClient client;
 		private readonly PlayerInventory inventory;
@@ -28,15 +28,16 @@ namespace SoulboundEngine.Client.Player {
 		private bool isHoldingLeftClick;
 		private bool isHoldingRightClick;
 		private bool isHoldingCtrl;
-		private BlockPos? openedInventoryBlockPos;
+		private InventoryScreenHandler? activeInventoryScreenHandler;
+		private IScreenHandle? activeInventoryScreen;
 		private new readonly PlayerTransformAdapter transformAdapter;
-		private TransitStack? transitStack;
+		private TransitStackHandler? transitStack;
 
 		// provisory guard for not breaking the block instantly after it was placed
 		// TODO: fix gameplay input overlaps
 		private bool leftClickBlockBreakGuard;
 
-		public Player(SoulboundClient client, Level level)
+		public PlayerEntity(SoulboundClient client, Level level)
 			: base(DESCRIPTOR, level) {
 			this.client = client;
 			this.transformAdapter = new PlayerTransformAdapter(this);
@@ -105,9 +106,9 @@ namespace SoulboundEngine.Client.Player {
 				}),
 				InputEventListener.ConsumePerformed(InputTokens.Player.toggleInventory, _ => {
 					if (!this.isInventoryOpen) {
-						this.OpenInventory();
+						this.OpenInventoryScreen(new SimpleInventoryScreenHandlerFactory((_, _) => InventoryScreenHandlerType.DEFAULT_INVENTORY.Create()));
 					} else {
-						this.CloseInventory();
+						this.CloseInventoryScreen();
 					}
 				})
 			};
@@ -127,9 +128,10 @@ namespace SoulboundEngine.Client.Player {
 			if (this.isHoldingLeftClick) this.OnLeftHold();
 			if (this.isHoldingRightClick) this.OnRightHold();
 
-			if (this.openedInventoryBlockPos is { } blockPos) {
-				float distance = Vector2.Distance(blockPos.GetCenter(), this.GetPosition());
-				if (distance > MAX_BLOCK_REACH) this.CloseInventory();
+			if (this.activeInventoryScreenHandler != null) {
+				if (!this.activeInventoryScreenHandler.CanUse(this)) {
+					this.CloseInventoryScreen();
+				}
 			}
 		}
 
@@ -169,23 +171,20 @@ namespace SoulboundEngine.Client.Player {
 			this.ResolveItemOrBlockInteraction(InteractionTrigger.RightRelease);
 		}
 
-		public void OpenInventory() {
-			if (this.isInventoryOpen) return;
+		public void OpenInventoryScreen(IInventoryScreenHandlerFactory handlerFactory) {
+			if (this.activeInventoryScreen != null) return;
+			InventoryScreenHandler handler = handlerFactory.Create(this.inventory, this);
+			this.activeInventoryScreenHandler = handler;
+			this.activeInventoryScreen = InventoryScreens.Open(handler, this.client, this.inventory);
 			this.isInventoryOpen = true;
-			this.client.ShowInventoryScreen(this);
 		}
 
-		public void CloseInventory() {
-			if (!this.isInventoryOpen) return;
+		public void CloseInventoryScreen() {
+			if (this.activeInventoryScreen == null) return;
+			this.client.CloseScreen(this.activeInventoryScreen);
+			this.activeInventoryScreen = null;
+			this.activeInventoryScreenHandler = null;
 			this.isInventoryOpen = false;
-			this.client.HideInventoryScreen();
-			this.openedInventoryBlockPos = null;
-		}
-
-		public void OpenInventory(Inventory inventory, ChestTileEntity tileEntitySource) {
-			this.OpenInventory();
-			this.client.SetExternalInventory(inventory, tileEntitySource.GetInventoryLayout());
-			this.openedInventoryBlockPos = tileEntitySource.blockPos;
 		}
 
 		private bool ResolveItemOrBlockInteraction(InteractionTrigger trigger) {
@@ -351,7 +350,7 @@ namespace SoulboundEngine.Client.Player {
 			return Camera.main.ScreenToWorldPoint(screenPos);
 		}
 
-		public void SetTransitStackSource(TransitStack transitStack) {
+		public void SetTransitStackSource(TransitStackHandler transitStack) {
 			this.transitStack = transitStack;
 		}
 
@@ -362,7 +361,7 @@ namespace SoulboundEngine.Client.Player {
 		private sealed class PlayerTransformAdapter : TransformAdapter {
 			private IPlayerTransformHandle? transformHandle;
 
-			public PlayerTransformAdapter(Player player)
+			public PlayerTransformAdapter(PlayerEntity player)
 				: base(player) {
 			}
 

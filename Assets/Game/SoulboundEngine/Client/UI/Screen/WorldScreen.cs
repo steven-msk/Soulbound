@@ -26,7 +26,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 			this.itemRenderManager = itemRenderManager;
 		}
 
-		public override bool EscapeReturn => false;
+		public override bool CloseOnEsc => false;
 
 		protected override void OnBind(VisualElement root) {
 			this.commandLine.OnBind(root.Q<VisualElement>("CommandLine"));

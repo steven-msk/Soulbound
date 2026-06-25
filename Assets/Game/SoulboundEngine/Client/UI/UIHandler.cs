@@ -45,7 +45,7 @@ namespace SoulboundEngine.Client.UI {
 				ConsumeWhenOverGameObject(InputTokens.Mouse.position),
 
 				InputEventListener.ConsumePerformed(InputTokens.Keyboard.ESC, _ => {
-					if (this.screenManager.GetActiveScreen()?.EscapeReturn ?? false) {
+					if (this.screenManager.GetActiveScreen()?.CloseOnEsc ?? false) {
 						this.screenManager.PopTopScreen();
 					}
 				})

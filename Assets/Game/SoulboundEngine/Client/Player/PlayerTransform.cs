@@ -10,8 +10,8 @@ using IEntityView = SoulboundEngine.Client.Render.Entity.IEntityView;
 namespace SoulboundEngine.Client.Player {
 	[RequireComponent(typeof(Rigidbody2D))]
 	[RequireComponent(typeof(CapsuleCollider2D))]
-	public class PlayerTransform : MonoBehaviour, IEntityView, Entity.IPhysicsHandle, Entity.IBoundingBoxHandle, Player.IPlayerTransformHandle, IItemCollector {
-		private Player player = null!;
+	public class PlayerTransform : MonoBehaviour, IEntityView, Entity.IPhysicsHandle, Entity.IBoundingBoxHandle, PlayerEntity.IPlayerTransformHandle, IItemCollector {
+		private PlayerEntity player = null!;
 		private Rigidbody2D rb = null!;
 		new private CapsuleCollider2D collider = null!;
 		public CapsuleCollider2D Collider => this.collider;
@@ -26,9 +26,9 @@ namespace SoulboundEngine.Client.Player {
 		[SerializeField] private float speed = 1f;
 		[SerializeField] private float jumpForce = 1f;
 
-		public Player GetEntity() => this.player;
+		public PlayerEntity GetEntity() => this.player;
 
-		public void Init(Player player) {
+		public void Init(PlayerEntity player) {
 			this.player = player;
 			this.rb = this.GetComponent<Rigidbody2D>();
 			this.collider = this.GetComponent<CapsuleCollider2D>();

@@ -2,17 +2,17 @@
 using UnityEngine;
 
 namespace SoulboundEngine.Client.Render.Entity {
-	using Player = Player.Player;
+	using PlayerEntity = Player.PlayerEntity;
 
-	public sealed class PlayerEntityRenderer : EntityRenderer<Player, PlayerRenderState, PlayerModel> {
+	public sealed class PlayerEntityRenderer : EntityRenderer<PlayerEntity, PlayerRenderState, PlayerModel> {
 		public PlayerEntityRenderer(FactoryContext context)
 			: base(context) {
 		}
 
-		public override PlayerRenderState CreateRenderState(Player entity) {
+		public override PlayerRenderState CreateRenderState(PlayerEntity entity) {
 			return new PlayerRenderState {
 				entity = entity,
-				descriptor = Player.DESCRIPTOR
+				descriptor = PlayerEntity.DESCRIPTOR
 			};
 		}
 

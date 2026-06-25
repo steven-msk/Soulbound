@@ -2,7 +2,6 @@
 using SoulboundEngine.Client.Item.Container;
 using SoulboundEngine.Client.World.Block.State;
 using SoulboundEngine.Client.World.Block.TileEntity;
-using SoulboundEngine.Client.World.Level;
 
 namespace SoulboundEngine.Client.World.Block {
 	public class ChestBlock : Block, IInteractableBlock {
@@ -30,7 +29,6 @@ namespace SoulboundEngine.Client.World.Block {
 
 		public void OnInteract(in BlockInteraction ctx) {
 			ChestTileEntity chestTileEntity = (ChestTileEntity)ctx.level.GetTileEntity(ctx.blockPos);
-			ctx.player?.OpenInventory(chestTileEntity.GetInventory(), chestTileEntity);
 		}
 	}
 }

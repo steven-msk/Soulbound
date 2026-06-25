@@ -6,7 +6,7 @@ using SoulboundEngine.Core.States;
 using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 namespace SoulboundEngine.Client.World.Block {
-	using Player = Player.Player;
+	using PlayerEntity = Player.PlayerEntity;
 
 	[PROTOTYPICAL]
 	public sealed class AreaTriggerBlock : Block {
@@ -34,12 +34,12 @@ namespace SoulboundEngine.Client.World.Block {
 			return tileEntity;
 		}
 
-		private void OnAreaEnter(Level.Level level, BlockPos selfPos, Player player) {
+		private void OnAreaEnter(Level.Level level, BlockPos selfPos, PlayerEntity player) {
 			Logger.LogInfo("onAreaEnter");
 			level.SetBlockState(selfPos, this.DefaultState.With(inArea, true));
 		}
 
-		private void OnAreaExit(Level.Level level, BlockPos selfPos, Player player) {
+		private void OnAreaExit(Level.Level level, BlockPos selfPos, PlayerEntity player) {
 			Logger.LogInfo("onAreaExit");
 			level.SetBlockState(selfPos, this.DefaultState.With(inArea, false));
 		}

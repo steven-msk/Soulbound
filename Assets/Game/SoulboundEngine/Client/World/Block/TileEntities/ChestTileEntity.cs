@@ -1,5 +1,4 @@
 ﻿using SoulboundEngine.Client.Item.Container;
-using SoulboundEngine.Client.World.Level;
 
 namespace SoulboundEngine.Client.World.Block.TileEntity {
 	public class ChestTileEntity : TileEntity {

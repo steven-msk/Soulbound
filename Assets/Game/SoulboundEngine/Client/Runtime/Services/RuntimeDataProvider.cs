@@ -10,7 +10,7 @@ using UnityEngine;
 #nullable enable
 
 namespace SoulboundEngine.Client.Runtime.Services {
-	using Player = Player.Player;
+	using PlayerEntity = Player.PlayerEntity;
 
 	public sealed class RuntimeDataProvider : IRuntimeDataProvider {
 		private IRuntimePlayerDataProvider? _player;
@@ -35,9 +35,9 @@ namespace SoulboundEngine.Client.Runtime.Services {
 	}
 
 	public class RuntimePlayerDataProvider : IRuntimePlayerDataProvider {
-		public readonly Player player;
+		public readonly PlayerEntity player;
 
-		public RuntimePlayerDataProvider(Player player) {
+		public RuntimePlayerDataProvider(PlayerEntity player) {
 			this.player = player;
 		}
 

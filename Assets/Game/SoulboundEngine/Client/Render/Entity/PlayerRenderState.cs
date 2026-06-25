@@ -1,6 +1,6 @@
 ﻿namespace SoulboundEngine.Client.Render.Entity {
-	using Player = Player.Player;
+	using PlayerEntity = Player.PlayerEntity;
 
-	public sealed class PlayerRenderState : EntityRenderState<Player> {
+	public sealed class PlayerRenderState : EntityRenderState<PlayerEntity> {
 	}
 }

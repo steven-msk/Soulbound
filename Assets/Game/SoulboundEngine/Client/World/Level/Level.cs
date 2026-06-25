@@ -19,7 +19,7 @@ using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 #nullable enable
 
 namespace SoulboundEngine.Client.World.Level {
-	using Player = Player.Player;
+	using PlayerEntity = Player.PlayerEntity;
 
 	public sealed class Level : ILevelExecutionService, IEntityManager {
 		public delegate void OnChunkGenerated(ChunkGenData genData);
@@ -38,7 +38,7 @@ namespace SoulboundEngine.Client.World.Level {
 		private readonly Dictionary<int, ChunkGenData> chunkGenData = new();
 		private readonly WorldRenderer worldRenderer;
 		private readonly EntityRenderManager entityRenderManager;
-		private Player player;
+		private PlayerEntity player;
 
 		private readonly BiomeMap biomeMap;
 		private readonly Heightmap heightmap;
@@ -68,7 +68,7 @@ namespace SoulboundEngine.Client.World.Level {
 		}
 
 		// known issue: player creation assumes block placement is finished
-		public void StartSession(Player player) {
+		public void StartSession(PlayerEntity player) {
 			this.player = player;
 			this.AddEntity(player);
 			SoulboundClient.Instance.InputManager.AddHandler(player);
@@ -389,7 +389,7 @@ namespace SoulboundEngine.Client.World.Level {
 			return coveredTiles;
 		}
 
-		public Player GetPlayer() => this.player;
+		public PlayerEntity GetPlayer() => this.player;
 
 	}
 }

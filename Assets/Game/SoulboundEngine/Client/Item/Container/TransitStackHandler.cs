@@ -6,7 +6,7 @@ using UnityEngine.UIElements;
 #nullable enable
 
 namespace SoulboundEngine.Client.Item.Container {
-	public sealed class TransitStack {
+	public sealed class TransitStackHandler {
 		private readonly VisualElement root;
 		private Vector2 pointerPosition;
 		private ItemStack? itemStack;
@@ -14,9 +14,9 @@ namespace SoulboundEngine.Client.Item.Container {
 		private readonly ItemRenderManager itemRenderManager;
 		private readonly ItemRenderHandle renderHandle;
 
-		public TransitStack(ItemRenderManager itemRenderManager, VisualElement slot) {
+		public TransitStackHandler(ItemRenderManager itemRenderManager, VisualElement root) {
 			this.itemRenderManager = itemRenderManager;
-			this.root = slot;
+			this.root = root;
 			this.renderHandle = new ItemRenderHandle(this);
 		}
 

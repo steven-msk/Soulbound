@@ -6,7 +6,7 @@ using SoulboundEngine.Client.World.Level;
 #nullable enable
 
 namespace SoulboundEngine.Client.Interaction {
-	using Player = Player.Player;
+	using PlayerEntity = Player.PlayerEntity;
 
 	public struct BlockInteraction : IInteractionContext {
 		// note: the implementation might change
@@ -17,7 +17,7 @@ namespace SoulboundEngine.Client.Interaction {
 		public BlockState blockState;
 		public ItemStack? itemStack;
 		public InteractionTrigger trigger;
-		public Player? player;
+		public PlayerEntity? player;
 
 		public readonly Level GetLevel() => this.level;
 		public readonly InteractionTrigger GetTrigger() => this.trigger;

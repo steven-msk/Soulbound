@@ -17,7 +17,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		}
 
 		public override bool IsOpaque => false;
-		public override bool EscapeReturn => false;
+		public override bool CloseOnEsc => false;
 
 		protected override void OnBind(VisualElement root) {
 			root.Q<Button>("Resume").clicked += this.levelManager.UnpauseGame;
