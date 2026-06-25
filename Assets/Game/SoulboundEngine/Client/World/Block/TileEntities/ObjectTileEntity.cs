@@ -1,12 +1,12 @@
 using SoulboundEngine.Client.Player;
-using SoulboundEngine.Client.World.LevelDomain;
+using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Common;
 using SoulboundEngine.Common.Unity;
 using SoulboundEngine.Core;
 using System;
 using UnityEngine;
 
-namespace SoulboundEngine.Client.World.BlockSystem.TileEntities {
+namespace SoulboundEngine.Client.World.Block.TileEntity {
 	using Player = Player.Player;
 
 	[PROTOTYPICAL]
@@ -18,7 +18,7 @@ namespace SoulboundEngine.Client.World.BlockSystem.TileEntities {
 		public event Action onDestroyed;
 		private readonly GameObject gameObject;
 
-		public ObjectTileEntity(TileEntityType<ObjectTileEntity> tileEntityType, Level level, BlockPos blockPos)
+		public ObjectTileEntity(TileEntityType<ObjectTileEntity> tileEntityType, Level.Level level, BlockPos blockPos)
 			: base(tileEntityType, level, blockPos) {
 			this.gameObject = new GameObject("Object Tile Entity");
 			this.gameObject.transform.position = blockPos.GetCenter();

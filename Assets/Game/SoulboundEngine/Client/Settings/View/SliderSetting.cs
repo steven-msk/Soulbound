@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SoulboundEngine.Client.SettingSystem.View {
+namespace SoulboundEngine.Client.Settings.View {
 	[PROTOTYPICAL]
 	public class SliderSetting : SettingVisual<float> {
 		[SerializeField] private Slider _slider;

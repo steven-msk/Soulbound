@@ -1,4 +1,4 @@
-namespace SoulboundEngine.Client.ItemSystem.Container {
+namespace SoulboundEngine.Client.Item.Container {
 	public interface ISlotOperation {
 		bool CanExecute();
 		bool Execute();

@@ -1,9 +1,9 @@
-using SoulboundEngine.Client.ItemSystem;
+using SoulboundEngine.Client.Item;
 using System.Collections.Generic;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.ItemSystem.Container {
+namespace SoulboundEngine.Client.Item.Container {
 	public static class ItemContainerUtils {
 		public static bool TryAddStack(this IItemContainer container, ItemStack itemStack) {
 			foreach (var slot in container.GetSlotsContaining(itemStack.item)) {

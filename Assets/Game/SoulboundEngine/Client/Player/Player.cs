@@ -1,12 +1,12 @@
 using SoulboundEngine.Client.Input;
 using SoulboundEngine.Client.Interaction;
-using SoulboundEngine.Client.ItemSystem;
-using SoulboundEngine.Client.ItemSystem.Container;
-using SoulboundEngine.Client.World.BlockSystem;
-using SoulboundEngine.Client.World.BlockSystem.States;
-using SoulboundEngine.Client.World.BlockSystem.TileEntities;
-using SoulboundEngine.Client.World.EntitySystem;
-using SoulboundEngine.Client.World.LevelDomain;
+using SoulboundEngine.Client.Item;
+using SoulboundEngine.Client.Item.Container;
+using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.Client.World.Block.State;
+using SoulboundEngine.Client.World.Block.TileEntity;
+using SoulboundEngine.Client.World.Entity;
+using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Core.Event;
 using System;
 using System.Collections.Generic;
@@ -15,6 +15,8 @@ using UnityEngine;
 #nullable enable
 
 namespace SoulboundEngine.Client.Player {
+	using Item = Item.Item;
+
 	public class Player : Entity, IInputEventHandler, IInteractionHandler<ItemInteraction>, IInteractionHandler<BlockInteraction> {
 		public static readonly EntityDescriptor<Player> DESCRIPTOR = EntityDescriptor.Of<Player>((_, level) => throw new InvalidOperationException());
 		const float MAX_BLOCK_REACH = 5f;

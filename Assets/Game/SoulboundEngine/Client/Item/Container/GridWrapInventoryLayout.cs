@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SoulboundEngine.Client.ItemSystem.Container {
+namespace SoulboundEngine.Client.Item.Container {
 	public class GridWrapInventoryLayout : IInventoryLayout {
 		private readonly int wrapWidth;
 

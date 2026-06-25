@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SoulboundEngine.Client.ItemSystem.Container {
+namespace SoulboundEngine.Client.Item.Container {
 	public readonly struct SlotRef : IEquatable<SlotRef> {
 		public readonly IItemContainer container;
 		public readonly int index;

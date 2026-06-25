@@ -1,7 +1,7 @@
 using SoulboundEngine.Client.Debug;
 using SoulboundEngine.Client.Debug.Logging.Console;
 using SoulboundEngine.Client.Debug.Metrics.View;
-using SoulboundEngine.Client.ItemSystem.Container;
+using SoulboundEngine.Client.Item.Container;
 using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.Render.Item;
 using SoulboundEngine.Core.Assets;

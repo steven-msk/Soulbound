@@ -1,5 +1,5 @@
 using SoulboundEngine.Client.World;
-using SoulboundEngine.Client.World.LevelDomain;
+using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Common;
 using SoulboundEngine.Core.Assets;
 using UnityEngine.UIElements;

@@ -1,4 +1,4 @@
-using SoulboundEngine.Client.ItemSystem;
+using SoulboundEngine.Client.Item;
 using SoulboundEngine.Common;
 using SoulboundEngine.Core;
 using System;
@@ -7,7 +7,7 @@ using UnityEngine.EventSystems;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.ItemSystem.Container {
+namespace SoulboundEngine.Client.Item.Container {
 	public interface IItemSlot {
 		event Action<ItemStack?> setStack;
 		event Action<ItemStack?, ItemStack?>? stackChanged;

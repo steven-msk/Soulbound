@@ -1,4 +1,4 @@
-﻿using SoulboundEngine.Client.ItemSystem.Container;
+﻿using SoulboundEngine.Client.Item.Container;
 using System;
 using UnityEngine;
 using UnityEngine.UIElements;

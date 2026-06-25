@@ -6,7 +6,7 @@ using SoulboundEngine.Client.World.Render;
 using System;
 using UnityEngine.ResourceManagement.Exceptions;
 
-namespace SoulboundEngine.Client.World.LevelDomain {
+namespace SoulboundEngine.Client.World.Level {
 	public sealed class WorldLoader {
 		private readonly SoulboundClient client;
 		private readonly ISeedProvider seedProvider;

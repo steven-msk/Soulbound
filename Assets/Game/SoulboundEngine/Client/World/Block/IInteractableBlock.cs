@@ -1,6 +1,6 @@
 using SoulboundEngine.Client.Interaction;
 
-namespace SoulboundEngine.Client.World.BlockSystem {
+namespace SoulboundEngine.Client.World.Block {
 	public interface IInteractableBlock {
 		bool CanInteract(in BlockInteraction ctx);
 		bool ValidateTrigger(InteractionTrigger trigger);

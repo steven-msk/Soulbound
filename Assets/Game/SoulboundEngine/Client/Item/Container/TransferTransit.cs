@@ -1,6 +1,6 @@
 
 
-namespace SoulboundEngine.Client.ItemSystem.Container {
+namespace SoulboundEngine.Client.Item.Container {
 	public sealed class TransferTransit : SingleSlotOperation {
 		private readonly IItemContainer container;
 		private readonly int slotIndex;

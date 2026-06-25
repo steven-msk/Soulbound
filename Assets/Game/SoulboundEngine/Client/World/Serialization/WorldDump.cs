@@ -1,5 +1,5 @@
 using SoulboundEngine.Client.World.Chunk;
-using SoulboundEngine.Client.World.EntitySystem;
+using SoulboundEngine.Client.World.Entity;
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;

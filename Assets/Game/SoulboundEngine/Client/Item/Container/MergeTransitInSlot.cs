@@ -1,7 +1,7 @@
-using SoulboundEngine.Client.ItemSystem;
+using SoulboundEngine.Client.Item;
 using System;
 
-namespace SoulboundEngine.Client.ItemSystem.Container {
+namespace SoulboundEngine.Client.Item.Container {
 	public sealed class MergeTransitInSlot : SingleSlotOperation {
 		private readonly IItemContainer container;
 		private readonly int slotIndex;

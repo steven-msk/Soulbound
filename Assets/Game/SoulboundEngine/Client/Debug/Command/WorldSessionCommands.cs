@@ -1,9 +1,9 @@
 using Brigadier.NET;
 using Brigadier.NET.Builder;
 using Brigadier.NET.Context;
-using SoulboundEngine.Client.ItemSystem;
-using SoulboundEngine.Client.World.BlockSystem;
-using SoulboundEngine.Client.World.EntitySystem;
+using SoulboundEngine.Client.Item;
+using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.Client.World.Entity;
 using System;
 using UnityEngine;
 using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
@@ -11,6 +11,8 @@ using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 #nullable enable
 
 namespace SoulboundEngine.Client.Debug.Commands {
+	using Item = Item.Item;
+
 	public sealed class WorldSessionCommands : ICommandProvider {
 		void ICommandProvider.RegisterCommands(CommandDispatcher<RuntimeCommandSource> dispatcher) {
 			dispatcher.Register(c => c.Literal("setblock")

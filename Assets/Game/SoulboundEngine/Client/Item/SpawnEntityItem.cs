@@ -1,7 +1,7 @@
 using SoulboundEngine.Client.Interaction;
 using SoulboundEngine.Common;
 
-namespace SoulboundEngine.Client.ItemSystem {
+namespace SoulboundEngine.Client.Item {
 	[PROTOTYPICAL]
 	public sealed class SpawnEntityItem : Item, IInteractableItem {
 		public SpawnEntityItem(Settings settings) : base(settings) {

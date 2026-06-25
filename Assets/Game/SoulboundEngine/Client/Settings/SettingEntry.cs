@@ -1,4 +1,4 @@
-using SoulboundEngine.Client.SettingSystem.View;
+using SoulboundEngine.Client.Settings.View;
 using SoulboundEngine.Common;
 using SoulboundEngine.Core;
 using System;
@@ -10,7 +10,7 @@ using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.SettingSystem {
+namespace SoulboundEngine.Client.Settings {
 	public abstract class SettingEntry {
 		public readonly string displayName;
 		public readonly string id;

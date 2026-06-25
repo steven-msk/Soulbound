@@ -1,9 +1,9 @@
-using SoulboundEngine.Client.ItemSystem;
+using SoulboundEngine.Client.Item;
 using UnityEngine;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.EntitySystem {
+namespace SoulboundEngine.Client.World.Entity {
 
 	[RequireComponent(typeof(Rigidbody2D))]
 	public class ItemEntityTransform : MonoBehaviour, Client.Render.Entity.IEntityView {

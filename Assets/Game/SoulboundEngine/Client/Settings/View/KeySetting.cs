@@ -8,7 +8,7 @@ using UnityEngine.InputSystem.Controls;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.SettingSystem.View {
+namespace SoulboundEngine.Client.Settings.View {
 	[PROTOTYPICAL]
 	public class KeySetting : SettingVisual<KeyControl>, IInputEventHandler {
 		int IInputEventHandler.priority => 100; 

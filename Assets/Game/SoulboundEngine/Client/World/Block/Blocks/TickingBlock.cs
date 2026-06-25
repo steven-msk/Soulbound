@@ -1,10 +1,10 @@
-using SoulboundEngine.Client.World.BlockSystem.States;
-using SoulboundEngine.Client.World.LevelDomain;
+using SoulboundEngine.Client.World.Block.State;
+using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Common;
 using SoulboundEngine.Core.State;
 using SoulboundEngine.Core.States;
 
-namespace SoulboundEngine.Client.World.BlockSystem {
+namespace SoulboundEngine.Client.World.Block {
 	[PROTOTYPICAL]
 	public sealed class TickingBlock : Block, ITickingBlock {
 		public static readonly Property<bool> on = BoolProperty.Of("on");
@@ -19,7 +19,7 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 			builder.Add(on, tickCount);
 		}
 
-		public void Tick(Level level, BlockPos blockPos, BlockState blockState) {
+		public void Tick(Level.Level level, BlockPos blockPos, BlockState blockState) {
 			int counter = blockState.Get(tickCount);
 			counter++;
 			

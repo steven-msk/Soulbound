@@ -12,7 +12,7 @@ using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.LevelDomain {
+namespace SoulboundEngine.Client.World.Level {
 	using Player = Player.Player;
 
 	/// <summary>

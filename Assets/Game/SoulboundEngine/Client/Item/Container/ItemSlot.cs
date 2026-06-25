@@ -2,7 +2,7 @@ using System;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.ItemSystem.Container {
+namespace SoulboundEngine.Client.Item.Container {
 	public class ItemSlot : IItemSlot {
 		private readonly IItemContainer container;
 		private readonly int index;

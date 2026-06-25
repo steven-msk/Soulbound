@@ -1,7 +1,7 @@
-using SoulboundEngine.Client.World.BlockSystem.States;
+using SoulboundEngine.Client.World.Block.State;
 using SoulboundEngine.Core.States;
 
-namespace SoulboundEngine.Client.World.BlockSystem {
+namespace SoulboundEngine.Client.World.Block {
 	public class LeafBlock : Block {
 		public static readonly Property<bool> persistent = BoolProperty.Of("persistent");
 

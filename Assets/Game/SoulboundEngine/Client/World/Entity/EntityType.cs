@@ -2,7 +2,7 @@ using SoulboundEngine.Core.Registry;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.EntitySystem {
+namespace SoulboundEngine.Client.World.Entity {
 	using Player = Player.Player;
 
 	public static class EntityType {

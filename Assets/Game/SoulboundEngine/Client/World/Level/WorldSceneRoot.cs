@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.UIElements;
 
-namespace SoulboundEngine.Client.World.LevelDomain {
+namespace SoulboundEngine.Client.World.Level {
 	public sealed class WorldSceneRoot : MonoBehaviour, IWorldSceneRoot {
 		[SerializeField] Grid _grid;
 		[SerializeField] Tilemap _tilemap;

@@ -1,5 +1,5 @@
 using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.Client.World.LevelDomain;
+using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Client.World.Serialization;
 using System;
 using System.Collections.Generic;

@@ -1,5 +1,5 @@
 using SoulboundEngine.Client.World.Chunk;
-using SoulboundEngine.Client.World.LevelDomain;
+using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Common;
 using SoulboundEngine.Core.Assets;
 using System.Collections.Generic;
@@ -15,9 +15,9 @@ namespace SoulboundEngine.Client.World.Render {
 			LineRenderer renderer = obj.GetComponent<LineRenderer>();
 			outlines[chunk] = renderer;
 
-			int startX = chunk.xpos * Level.CHUNK_LENGTH;
-			int height = Level.WORLD_HEIGHT;
-			int width = Level.CHUNK_LENGTH;
+			int startX = chunk.xpos * Level.Level.CHUNK_LENGTH;
+			int height = Level.Level.WORLD_HEIGHT;
+			int width = Level.Level.CHUNK_LENGTH;
 			Vector3[] points = new Vector3[5] {
 				new Vector3(startX, WorldChunk.minY, 0),
 				new Vector3(startX, WorldChunk.minY + height, 0),

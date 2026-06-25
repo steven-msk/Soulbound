@@ -1,4 +1,4 @@
-namespace SoulboundEngine.Client.World.BlockSystem.States {
+namespace SoulboundEngine.Client.World.Block.State {
 	public static class StateHasher {
 		private const uint FnvOffset = 2166136261;
 		private const uint FnvPrime = 16777619;

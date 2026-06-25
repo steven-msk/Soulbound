@@ -1,6 +1,6 @@
 using SoulboundEngine.Client.Interaction;
 
-namespace SoulboundEngine.Client.ItemSystem {
+namespace SoulboundEngine.Client.Item {
 	public interface IInteractableItem {
 		bool ValidateTrigger(InteractionTrigger trigger);
 

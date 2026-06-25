@@ -1,4 +1,4 @@
-﻿namespace SoulboundEngine.Client.World.BlockSystem.TileEntities {
+﻿namespace SoulboundEngine.Client.World.Block.TileEntity {
 	public abstract class TileEntityType {
 	}
 

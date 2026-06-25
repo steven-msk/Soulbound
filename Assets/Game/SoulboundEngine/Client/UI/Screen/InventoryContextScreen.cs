@@ -1,6 +1,6 @@
 ﻿using SoulboundEngine.Client.Input;
-using SoulboundEngine.Client.ItemSystem;
-using SoulboundEngine.Client.ItemSystem.Container;
+using SoulboundEngine.Client.Item;
+using SoulboundEngine.Client.Item.Container;
 using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.Render.Item;
 using SoulboundEngine.Core.Assets;

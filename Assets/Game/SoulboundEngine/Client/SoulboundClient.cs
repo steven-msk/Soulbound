@@ -7,10 +7,10 @@ using SoulboundEngine.Client.Debug.Logging.Console;
 using SoulboundEngine.Client.Debug.Metrics.View;
 using SoulboundEngine.Client.Input;
 using SoulboundEngine.Client.Runtime.Services;
-using SoulboundEngine.Client.SettingSystem;
+using SoulboundEngine.Client.Settings;
 using SoulboundEngine.Client.UI;
 using SoulboundEngine.Client.World;
-using SoulboundEngine.Client.World.LevelDomain;
+using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Client.World.Serialization;
 using SoulboundEngine.Core;
 using SoulboundEngine.Core.Audio;
@@ -19,7 +19,7 @@ using System;
 using System.Linq;
 
 namespace SoulboundEngine.Client {
-	using SoulboundEngine.Client.ItemSystem.Container;
+	using SoulboundEngine.Client.Item.Container;
 	using SoulboundEngine.Client.Render.Block;
 	using SoulboundEngine.Client.Render.Entity;
 	using SoulboundEngine.Client.Render.Item;
@@ -39,7 +39,7 @@ namespace SoulboundEngine.Client {
 		private readonly GameConfig config;
 		private readonly PlayerInputActions inputActions;
 		private readonly InputManager inputManager;
-		private readonly Settings settings;
+		private readonly Settings.Settings settings;
 		private readonly LogConsole logConsole;
 		private readonly CommandLine commandLine;
 		private readonly MetricsHUD metricsHud;
@@ -69,7 +69,7 @@ namespace SoulboundEngine.Client {
 			this.inputActions = new PlayerInputActions();
 			this.inputManager = new InputManager(INPUT_QUEUE_BUFFER_CAPACITY, this.inputActions.asset);
 			InputTokens.Register(this.inputActions.asset);
-			this.settings = new Settings();
+			this.settings = new Settings.Settings();
 
 			this.runtimeDataProvider = new RuntimeDataProvider();
 			this.runtimeExecutionServices = new RuntimeExecutionServices();

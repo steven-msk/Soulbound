@@ -1,5 +1,5 @@
 
-namespace SoulboundEngine.Client.ItemSystem.Container {
+namespace SoulboundEngine.Client.Item.Container {
 	public sealed class ReleaseTransitInEmptySlot : SingleSlotOperation {
 		public ReleaseTransitInEmptySlot(IItemContainer container, int slotIndex, IInventoryScope scope)
 			: base(container, slotIndex, scope) {

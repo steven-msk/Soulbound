@@ -3,11 +3,13 @@ using Brigadier.NET.ArgumentTypes;
 using Brigadier.NET.Context;
 using Brigadier.NET.Exceptions;
 using Brigadier.NET.Suggestion;
-using SoulboundEngine.Client.ItemSystem;
+using SoulboundEngine.Client.Item;
 using SoulboundEngine.Core.Registry;
 using System.Threading.Tasks;
 
 namespace SoulboundEngine.Client.Debug.Commands {
+	using Item = Item.Item;
+
 	public class ItemArgumentType : ArgumentType<Item> {
 		public override Task<Suggestions> ListSuggestions<TSource>(CommandContext<TSource> context, SuggestionsBuilder builder) {
 			string remaining = builder.RemainingLowerCase;

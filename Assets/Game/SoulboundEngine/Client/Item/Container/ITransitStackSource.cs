@@ -1,8 +1,8 @@
-using SoulboundEngine.Client.ItemSystem;
+using SoulboundEngine.Client.Item;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.ItemSystem.Container {
+namespace SoulboundEngine.Client.Item.Container {
 	public interface ITransitStackSource {
 		ItemStack? GetTransitStack();
 		bool HasTransitStack();

@@ -6,7 +6,7 @@ using UnityEngine;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.ItemSystem {
+namespace SoulboundEngine.Client.Item {
 	public class ItemStack {
 		public event Action<int, int>? onQuantityChanged;
 		public readonly Item item;

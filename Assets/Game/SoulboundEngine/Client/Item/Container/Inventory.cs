@@ -5,7 +5,7 @@ using System.Linq;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.ItemSystem.Container {
+namespace SoulboundEngine.Client.Item.Container {
 	using Player = Player.Player;
 
 	public class Inventory : IItemContainer, IEnumerable<ItemStack?> {

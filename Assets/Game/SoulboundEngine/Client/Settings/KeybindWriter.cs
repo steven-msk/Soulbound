@@ -1,6 +1,6 @@
 using UnityEngine.InputSystem.Controls;
 
-namespace SoulboundEngine.Client.SettingSystem {
+namespace SoulboundEngine.Client.Settings {
 	public sealed class KeybindWriter : IKeybindProcessor {
 		private readonly SettingWriter writer;
 

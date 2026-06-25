@@ -1,11 +1,11 @@
-using SoulboundEngine.Client.World.BlockSystem.States;
-using SoulboundEngine.Client.World.BlockSystem.TileEntities;
-using SoulboundEngine.Client.World.LevelDomain;
+using SoulboundEngine.Client.World.Block.State;
+using SoulboundEngine.Client.World.Block.TileEntity;
+using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Common;
 using SoulboundEngine.Core.States;
 using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
-namespace SoulboundEngine.Client.World.BlockSystem {
+namespace SoulboundEngine.Client.World.Block {
 	using Player = Player.Player;
 
 	[PROTOTYPICAL]
@@ -21,11 +21,11 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 			builder.Add(inArea);
 		}
 
-		public override bool HasTileEntity(Level level, BlockPos blockPos, BlockState blockState) {
+		public override bool HasTileEntity(Level.Level level, BlockPos blockPos, BlockState blockState) {
 			return true;
 		}
 
-		public override TileEntity GetTileEntity(Level level, BlockPos blockPos) {
+		public override TileEntity.TileEntity GetTileEntity(Level.Level level, BlockPos blockPos) {
 			ObjectTileEntity tileEntity = new(TileEntityTypes.OBJECT, level, blockPos);
 
 			tileEntity.onTriggerEnter += player => this.OnAreaEnter(level, blockPos, player);
@@ -34,12 +34,12 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 			return tileEntity;
 		}
 
-		private void OnAreaEnter(Level level, BlockPos selfPos, Player player) {
+		private void OnAreaEnter(Level.Level level, BlockPos selfPos, Player player) {
 			Logger.LogInfo("onAreaEnter");
 			level.SetBlockState(selfPos, this.DefaultState.With(inArea, true));
 		}
 
-		private void OnAreaExit(Level level, BlockPos selfPos, Player player) {
+		private void OnAreaExit(Level.Level level, BlockPos selfPos, Player player) {
 			Logger.LogInfo("onAreaExit");
 			level.SetBlockState(selfPos, this.DefaultState.With(inArea, false));
 		}

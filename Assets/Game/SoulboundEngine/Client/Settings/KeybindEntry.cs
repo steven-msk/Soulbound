@@ -1,4 +1,4 @@
-using SoulboundEngine.Client.SettingSystem.View;
+using SoulboundEngine.Client.Settings.View;
 using System;
 using System.Linq;
 using TMPro;
@@ -10,7 +10,7 @@ using UnityEngine.UI;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.SettingSystem {
+namespace SoulboundEngine.Client.Settings {
 	public class KeybindEntry : SettingEntry<KeyControl> {
 		public KeybindEntry(string displayName, string id, Key defaultKey) 
 			: base(displayName, $"keybind.{id}", Keyboard.current[defaultKey], new KeyboardValueSet()) {

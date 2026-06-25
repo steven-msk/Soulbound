@@ -1,20 +1,20 @@
-using SoulboundEngine.Client.ItemSystem;
-using SoulboundEngine.Client.World.LevelDomain;
+using SoulboundEngine.Client.Item;
+using SoulboundEngine.Client.World.Level;
 using System;
 using UnityEngine;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.EntitySystem {
+namespace SoulboundEngine.Client.World.Entity {
 	public abstract class Entity {
 		public Guid guid { get; private set; }
 		private readonly EntityDescriptor descriptor;
-		protected Level level;
+		protected Level.Level level;
 		private Vector2 pos;
 		protected bool isAlive;
 		protected readonly TransformAdapter transformAdapter;
 
-		protected Entity(EntityDescriptor descriptor, Level level) {
+		protected Entity(EntityDescriptor descriptor, Level.Level level) {
 			this.transformAdapter = new TransformAdapter(this);
 			this.descriptor = descriptor;
 			this.level = level;
@@ -36,11 +36,11 @@ namespace SoulboundEngine.Client.World.EntitySystem {
 			this.transformAdapter?.SetPosition(pos);
 		}
 
-		public ItemEntity DropItem(Level level, IItemConvertible item) {
+		public ItemEntity DropItem(Level.Level level, IItemConvertible item) {
 			return this.DropStack(level, item.AsItem().CreateStack(1));
 		}
 
-		public ItemEntity DropStack(Level level, ItemStack stack) {
+		public ItemEntity DropStack(Level.Level level, ItemStack stack) {
 			ItemEntity entity = new(this, stack, level);
 			entity.SetPosition(this.GetPosition());
 			return entity;

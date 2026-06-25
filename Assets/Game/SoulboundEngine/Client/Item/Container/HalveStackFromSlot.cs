@@ -1,4 +1,4 @@
-namespace SoulboundEngine.Client.ItemSystem.Container {
+namespace SoulboundEngine.Client.Item.Container {
 	public sealed class HalveStackFromSlot : SingleSlotOperation {
 		public HalveStackFromSlot(IItemContainer container, int slotIndex, IInventoryScope scope)
 			: base(container, slotIndex, scope) {

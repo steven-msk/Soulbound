@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace SoulboundEngine.Client.SettingSystem.View {
+namespace SoulboundEngine.Client.Settings.View {
 	[PROTOTYPICAL]
 	public abstract class SettingVisual<T> : MonoBehaviour {
 		protected SettingEntry<T> settingEntry;

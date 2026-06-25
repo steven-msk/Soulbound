@@ -1,8 +1,8 @@
 
 using NSubstitute;
 using NUnit.Framework;
-using SoulboundEngine.Client.ItemSystem;
-using SoulboundEngine.Client.ItemSystem.Container;
+using SoulboundEngine.Client.Item;
+using SoulboundEngine.Client.Item.Container;
 
 namespace ItemTests.Container.Operations {
 	internal class ReleaseTransitInEmptySlotTests : SingleSlotOperationTests<ReleaseTransitInEmptySlot> {

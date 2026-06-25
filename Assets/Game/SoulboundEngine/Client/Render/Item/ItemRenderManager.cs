@@ -1,10 +1,10 @@
-﻿using SoulboundEngine.Client.ItemSystem;
+﻿using SoulboundEngine.Client.Item;
 using SoulboundEngine.Core.Render.Sprite;
 using System;
 using System.Collections.Generic;
 
 namespace SoulboundEngine.Client.Render.Item {
-	using Item = ItemSystem.Item;
+	using Item = Client.Item.Item;
 
 	public sealed class ItemRenderManager {
 		private readonly Dictionary<Item, ItemRenderer> renderers;

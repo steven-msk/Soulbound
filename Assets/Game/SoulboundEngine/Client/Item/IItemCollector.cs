@@ -1,6 +1,6 @@
-using SoulboundEngine.Client.World.EntitySystem;
+using SoulboundEngine.Client.World.Entity;
 
-namespace SoulboundEngine.Client.ItemSystem {
+namespace SoulboundEngine.Client.Item {
 	public interface IItemCollector {
 		Entity GetEntity();
 		bool TryPickupStack(ItemStack itemStack);

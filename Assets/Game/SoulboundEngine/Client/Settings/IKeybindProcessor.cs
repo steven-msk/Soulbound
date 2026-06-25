@@ -7,7 +7,7 @@ using UnityEngine.InputSystem.Controls;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.SettingSystem {
+namespace SoulboundEngine.Client.Settings {
 	public interface IKeybindProcessor : ISettingProcessor {
 		int ISettingProcessor.Process(SettingEntry<int> entry) => throw NotImplemented(typeof(int));
 		double ISettingProcessor.Process(SettingEntry<double> entry) => throw NotImplemented(typeof(double));

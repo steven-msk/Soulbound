@@ -1,7 +1,7 @@
-using SoulboundEngine.Client.World.BlockSystem;
-using SoulboundEngine.Client.World.BlockSystem.States;
+using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.Client.World.Block.State;
 
-namespace SoulboundEngine.Client.ItemSystem {
+namespace SoulboundEngine.Client.Item {
 	public class BlockItem : Item, IPlaceableItem {
 		private readonly Block block;
 

@@ -4,7 +4,7 @@
 
 using SoulboundEngine.Client.Debug.Logging;
 
-namespace SoulboundEngine.Client.ItemSystem.Container {
+namespace SoulboundEngine.Client.Item.Container {
 	public abstract class SingleSlotOperation : ISlotOperation {
 		protected readonly IItemSlot slot;
 		protected readonly IInventoryScope scope;

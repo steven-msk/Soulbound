@@ -1,6 +1,6 @@
 using NSubstitute;
 using NUnit.Framework;
-using SoulboundEngine.Client.ItemSystem.Container;
+using SoulboundEngine.Client.Item.Container;
 
 [TestFixture]
 internal abstract class SlotOperationTest {

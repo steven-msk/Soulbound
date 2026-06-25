@@ -1,6 +1,6 @@
 using SoulboundEngine.Common;
 
-namespace SoulboundEngine.Client.ItemSystem {
+namespace SoulboundEngine.Client.Item {
 	[PROTOTYPICAL]
 	public sealed class BlockBreakerItem : Item, IBlockBreakerItem {
 		public BlockBreakerItem(Settings settings) : base(settings) {

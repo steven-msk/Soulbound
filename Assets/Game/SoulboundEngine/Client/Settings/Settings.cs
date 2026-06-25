@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine.InputSystem;
 
-namespace SoulboundEngine.Client.SettingSystem {
+namespace SoulboundEngine.Client.Settings {
 	public sealed class Settings {
 		public const string settingsFile = "settings.txt";
 		public static readonly Keybinds keybinds = new();

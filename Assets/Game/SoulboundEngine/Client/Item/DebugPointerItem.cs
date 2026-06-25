@@ -2,7 +2,7 @@ using SoulboundEngine.Client.Debug.Logging;
 using SoulboundEngine.Client.Interaction;
 using SoulboundEngine.Common;
 
-namespace SoulboundEngine.Client.ItemSystem {
+namespace SoulboundEngine.Client.Item {
 	[PROTOTYPICAL]
 	public sealed class DebugPointerItem : Item, IInteractableItem {
 		public DebugPointerItem(Settings settings) : base(settings) {

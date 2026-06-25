@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using static UnityEngine.UI.ContentSizeFitter;
 
-namespace SoulboundEngine.Client.SettingSystem.View {
+namespace SoulboundEngine.Client.Settings.View {
 	[PROTOTYPICAL]
 	public class SettingContainerBuilder {
 		public const float DEFAULT_HORIZONTAL_SPACING = 8f;

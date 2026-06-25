@@ -1,7 +1,7 @@
-using SoulboundEngine.Client.ItemSystem;
-using SoulboundEngine.Client.World.BlockSystem;
-using SoulboundEngine.Client.World.BlockSystem.States;
-using SoulboundEngine.Client.World.LevelDomain;
+using SoulboundEngine.Client.Item;
+using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.Client.World.Block.State;
+using SoulboundEngine.Client.World.Level;
 
 #nullable enable
 

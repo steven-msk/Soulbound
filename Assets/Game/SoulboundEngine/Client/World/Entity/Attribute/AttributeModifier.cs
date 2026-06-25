@@ -2,7 +2,7 @@ using SoulboundEngine.Core.Registry;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
+namespace SoulboundEngine.Client.World.Entity.Attribute {
 	public record AttributeModifier(Identifier identifier, double value, IOperation operation, IModifierTarget? target) {
 		public void Apply(double? effectiveOverride, ref double targetValue) {
 			operation.Apply(effectiveOverride ?? this.value, ref targetValue);

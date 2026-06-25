@@ -1,5 +1,5 @@
-﻿using SoulboundEngine.Client.ItemSystem;
-using SoulboundEngine.Client.World.EntitySystem;
+﻿using SoulboundEngine.Client.Item;
+using SoulboundEngine.Client.World.Entity;
 
 namespace SoulboundEngine.Client.Render.Entity {
 	public sealed class ItemEntityRenderState : EntityRenderState<ItemEntity> {

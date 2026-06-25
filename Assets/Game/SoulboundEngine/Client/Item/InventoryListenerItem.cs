@@ -1,8 +1,8 @@
 using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.Client.ItemSystem.Container;
+using SoulboundEngine.Client.Item.Container;
 using SoulboundEngine.Common;
 
-namespace SoulboundEngine.Client.ItemSystem {
+namespace SoulboundEngine.Client.Item {
 	[PROTOTYPICAL]
 	public sealed class InventoryListenerItem : Item, IContainerItemListener {
 		public InventoryListenerItem(Settings settings) : base(settings) {

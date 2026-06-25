@@ -1,5 +1,5 @@
-using SoulboundEngine.Client.World.BlockSystem;
-using SoulboundEngine.Client.World.BlockSystem.States;
+using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.Client.World.Block.State;
 using SoulboundEngine.Core.Noise;
 using UnityEngine;
 

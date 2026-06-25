@@ -1,5 +1,5 @@
-using SoulboundEngine.Client.ItemSystem;
-using SoulboundEngine.Client.World.LevelDomain;
+using SoulboundEngine.Client.Item;
+using SoulboundEngine.Client.World.Level;
 
 namespace SoulboundEngine.Client.Interaction {
 	using Player = Player.Player;

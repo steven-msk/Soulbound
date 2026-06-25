@@ -6,7 +6,7 @@ using System.Linq;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
+namespace SoulboundEngine.Client.World.Entity.Attribute {
 	public sealed class AttributeInstance {
 		private readonly Dictionary<Identifier, AttributeModifier> idToModifier = new();
 		private readonly Dictionary<Identifier, AttributeModifier> persistentModifiers = new();

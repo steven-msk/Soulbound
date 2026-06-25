@@ -1,4 +1,4 @@
-namespace SoulboundEngine.Client.ItemSystem.Container {
+namespace SoulboundEngine.Client.Item.Container {
 	public sealed class GrabStackFromSlot : SingleSlotOperation {
 		public GrabStackFromSlot(IItemContainer container, int slotIndex, IInventoryScope scope)
 			: base(container, slotIndex, scope) {

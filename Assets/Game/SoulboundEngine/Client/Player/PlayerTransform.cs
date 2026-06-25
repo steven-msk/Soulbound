@@ -1,5 +1,5 @@
-using SoulboundEngine.Client.ItemSystem;
-using SoulboundEngine.Client.World.EntitySystem;
+using SoulboundEngine.Client.Item;
+using SoulboundEngine.Client.World.Entity;
 using SoulboundEngine.Core;
 using SoulboundEngine.Core.Event;
 using UnityEngine;

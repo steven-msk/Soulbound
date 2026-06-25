@@ -1,6 +1,6 @@
 #nullable enable
 
-namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
+namespace SoulboundEngine.Client.World.Entity.Attribute {
 	public interface IValueRule {
 		void Apply(ref double value);
 

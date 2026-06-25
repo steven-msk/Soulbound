@@ -8,7 +8,7 @@ using UnityEngine.InputSystem.Controls;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.SettingSystem {
+namespace SoulboundEngine.Client.Settings {
 	public sealed class KeybindReader : IKeybindProcessor {
 		private readonly SettingReader reader;
 

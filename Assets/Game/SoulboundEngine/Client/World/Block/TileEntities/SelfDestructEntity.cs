@@ -1,14 +1,14 @@
-using SoulboundEngine.Client.World.LevelDomain;
+using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Common;
 using SoulboundEngine.Core;
 
-namespace SoulboundEngine.Client.World.BlockSystem.TileEntities {
+namespace SoulboundEngine.Client.World.Block.TileEntity {
 	[PROTOTYPICAL]
 	public sealed class SelfDestructEntity : TileEntity, ITickable {
 		const int TICKS_UNTIL_DESTRUCT = 300;
 		private int timer = TICKS_UNTIL_DESTRUCT;
 
-		public SelfDestructEntity(TileEntityType<SelfDestructEntity> tileEntityType, Level level, BlockPos blockPos)
+		public SelfDestructEntity(TileEntityType<SelfDestructEntity> tileEntityType, Level.Level level, BlockPos blockPos)
 			: base(tileEntityType, level, blockPos) {
 		}
 

@@ -1,8 +1,8 @@
 using NSubstitute;
 using NUnit.Framework;
 using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.Client.ItemSystem;
-using SoulboundEngine.Client.ItemSystem.Container;
+using SoulboundEngine.Client.Item;
+using SoulboundEngine.Client.Item.Container;
 using System;
 using System.Collections.Generic;
 

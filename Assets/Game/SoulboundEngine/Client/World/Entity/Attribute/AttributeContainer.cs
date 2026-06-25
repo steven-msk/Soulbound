@@ -4,7 +4,7 @@ using System.Linq;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
+namespace SoulboundEngine.Client.World.Entity.Attribute {
 	public sealed class AttributeContainer {
 		private readonly Dictionary<RegistryEntry<EntityAttribute>, AttributeInstance> instances = new();
 		private readonly DefaultAttributeContainer defaults;

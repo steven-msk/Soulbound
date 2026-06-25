@@ -5,7 +5,7 @@ using UnityEngine.UIElements;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.ItemSystem.Container {
+namespace SoulboundEngine.Client.Item.Container {
 	public sealed class TransitStack {
 		private readonly VisualElement root;
 		private Vector2 pointerPosition;

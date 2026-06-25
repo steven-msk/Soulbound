@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace SoulboundEngine.Client.World.EntitySystem.Attribute {
+namespace SoulboundEngine.Client.World.Entity.Attribute {
 
 	[Serializable]
 	public class AttributeValueRuleViolationException : Exception {

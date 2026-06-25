@@ -1,5 +1,5 @@
-﻿using SoulboundEngine.Client.World.BlockSystem;
-using SoulboundEngine.Client.World.BlockSystem.States;
+﻿using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.Client.World.Block.State;
 using SoulboundEngine.Core.Assets;
 using System;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 
 namespace SoulboundEngine.Client.Render.Block {
-	using Block = World.BlockSystem.Block;
+	using Block = World.Block.Block;
 	using Logger = Debug.Logging.Logger;
 
 	public static class BlockModelRegistry {

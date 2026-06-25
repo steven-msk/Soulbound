@@ -2,7 +2,7 @@ using SoulboundEngine.Common;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.BlockSystem {
+namespace SoulboundEngine.Client.World.Block {
 	using Player = Player.Player;
 
 	public abstract record BreakSource {

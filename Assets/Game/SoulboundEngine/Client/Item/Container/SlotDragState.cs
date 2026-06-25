@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace SoulboundEngine.Client.ItemSystem.Container {
+namespace SoulboundEngine.Client.Item.Container {
 	public sealed class SlotDragState {
 		private readonly IItemContainer originContainer;
 		public ItemStack stack { get; init; }

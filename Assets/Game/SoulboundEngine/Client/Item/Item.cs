@@ -1,10 +1,10 @@
-using SoulboundEngine.Client.World.BlockSystem;
+using SoulboundEngine.Client.World.Block;
 using System.Collections.Generic;
 using UnityEngine;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.ItemSystem {
+namespace SoulboundEngine.Client.Item {
 	public class Item {
 		public const int DEFAULT_FULL_STACK = 256;
 		public static readonly Dictionary<Block, Item> blockItems = new();

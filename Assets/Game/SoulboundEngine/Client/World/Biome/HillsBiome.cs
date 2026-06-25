@@ -1,7 +1,7 @@
-using SoulboundEngine.Client.World.BlockSystem;
-using SoulboundEngine.Client.World.BlockSystem.States;
+using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.Client.World.Block.State;
 using SoulboundEngine.Client.World.Chunk;
-using SoulboundEngine.Client.World.LevelDomain;
+using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Core.Noise;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,7 +53,7 @@ namespace SoulboundEngine.Client.World.Generation {
 			return Blocks.STONE.DefaultState;
 		}
 
-		void PlaceTree(int originX, int originY, WorldChunk chunk, Level level) {
+		void PlaceTree(int originX, int originY, WorldChunk chunk, Level.Level level) {
 			const int crownRadius = 2;
 			const int trunkHeightMin = 5;
 			const int trunkHeightMax = 20;
@@ -90,7 +90,7 @@ namespace SoulboundEngine.Client.World.Generation {
 
 		}
 
-		void IBiome.PostProcess(ChunkGenData genData, WorldChunk chunk, Level level, int partitionStartX, int partitionLimitX) {
+		void IBiome.PostProcess(ChunkGenData genData, WorldChunk chunk, Level.Level level, int partitionStartX, int partitionLimitX) {
 			const float chanceMin = 0.05f;
 			const float chanceMax = 0.25f;
 			const float threshold = 0.45f;

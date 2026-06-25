@@ -1,5 +1,5 @@
-using SoulboundEngine.Client.World.BlockSystem;
-using SoulboundEngine.Client.World.LevelDomain;
+using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Core;
 using UnityEngine;
 
@@ -16,13 +16,13 @@ namespace SoulboundEngine.Client.World.Chunk {
 		}
 
         public static ChunkWorldPos FromBlockPos(BlockPos blockPos) {
-			int chunkX = Mathf.FloorToInt((float)blockPos.x / Level.CHUNK_LENGTH);
-			float localX = blockPos.x - chunkX * Level.CHUNK_LENGTH;
+			int chunkX = Mathf.FloorToInt((float)blockPos.x / Level.Level.CHUNK_LENGTH);
+			float localX = blockPos.x - chunkX * Level.Level.CHUNK_LENGTH;
 			return new ChunkWorldPos(localX, blockPos.y, chunkX);
 		}
 
 		public static ChunkWorldPos FromWorld(Vector2 position) {
-			int chunkX = Mathf.FloorToInt(position.x / Level.CHUNK_LENGTH);
+			int chunkX = Mathf.FloorToInt(position.x / Level.Level.CHUNK_LENGTH);
 			return new ChunkWorldPos(position.x, position.y, chunkX);
 		}
 
@@ -35,7 +35,7 @@ namespace SoulboundEngine.Client.World.Chunk {
 		public override readonly string ToString() => $"cwx:{x}, cwy:{y}, c:{chunkX}";
 
 		public readonly BlockPos ToWorldBlockPos() {
-			Vector2 pos = new(x + chunkX * Level.CHUNK_LENGTH, y);
+			Vector2 pos = new(this.x + this.chunkX * Level.Level.CHUNK_LENGTH, this.y);
 			return (BlockPos)pos;
 		}
 

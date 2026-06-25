@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.ItemSystem.Container {
+namespace SoulboundEngine.Client.Item.Container {
 	public interface IItemContainer {
 		IItemSlot GetSlot(int index);
 		IEnumerable<int> GetAllSlots();

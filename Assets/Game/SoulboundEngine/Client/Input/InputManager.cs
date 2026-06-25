@@ -1,4 +1,4 @@
-using SoulboundEngine.Client.SettingSystem;
+using SoulboundEngine.Client.Settings;
 using SoulboundEngine.Common.Collections;
 using System;
 using System.Collections.Generic;

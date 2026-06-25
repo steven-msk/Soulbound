@@ -1,10 +1,10 @@
 using SoulboundEngine.Client.Render.Entity;
 using SoulboundEngine.Client.Runtime.Services;
-using SoulboundEngine.Client.World.BlockSystem;
-using SoulboundEngine.Client.World.BlockSystem.States;
-using SoulboundEngine.Client.World.BlockSystem.TileEntities;
+using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.Client.World.Block.State;
+using SoulboundEngine.Client.World.Block.TileEntity;
 using SoulboundEngine.Client.World.Chunk;
-using SoulboundEngine.Client.World.EntitySystem;
+using SoulboundEngine.Client.World.Entity;
 using SoulboundEngine.Client.World.Generation;
 using SoulboundEngine.Client.World.Render;
 using SoulboundEngine.Common;
@@ -18,7 +18,7 @@ using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.LevelDomain {
+namespace SoulboundEngine.Client.World.Level {
 	using Player = Player.Player;
 
 	public sealed class Level : ILevelExecutionService, IEntityManager {
@@ -45,7 +45,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 		private readonly Cavemap cavemap;
 
 		private readonly HashSet<BlockPos> tickingBlocks = new();
-		private readonly Dictionary<Guid, Entity> entities = new();
+		private readonly Dictionary<Guid, Entity.Entity> entities = new();
 		private readonly List<ITickingEntity> tickingEntities = new();
 
 		public Level(WorldRenderer worldRenderer, EntityRenderManager entityRenderManager, int seed) {
@@ -87,7 +87,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 			}
 
 			foreach (var entity in this.tickingEntities.ToArray()) {
-				if (simulationRect.Contains(Vector2Int.FloorToInt(((Entity)entity).GetPosition()))) {
+				if (simulationRect.Contains(Vector2Int.FloorToInt(((Entity.Entity)entity).GetPosition()))) {
 					entity.Tick();
 				}
 			}
@@ -107,7 +107,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 			this.UnloadDistantChunks(pivotChunkX, RENDER_DISTANCE);
 			this.UpdateLoadedChunks(pivotChunkX);
 
-			Entity[] entities = this.GetAllEntities().ToArray();
+			Entity.Entity[] entities = this.GetAllEntities().ToArray();
 			foreach (var entity in entities) {
 				entity.FrameUpdate();
 			}
@@ -215,7 +215,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 				if (chunk == null) return;
 
 				BlockState? blockState = this.GetBlockState(neighborPos);
-				Block block = blockState?.block ?? Blocks.AIR;
+				Block.Block block = blockState?.block ?? Blocks.AIR;
 
 				if (block is INeighborUpdateHandler neighborUpdateHandler) {
 					neighborUpdateHandler.OnNeighborChanged(this, neighborPos, blockPos);
@@ -223,7 +223,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 			}
 		}
 
-		public void AddEntity(Entity entity) {
+		public void AddEntity(Entity.Entity entity) {
 			Guid guid = Guid.NewGuid();
 			entity.OnAdd(guid);
 			this.entities[guid] = entity;
@@ -234,7 +234,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 			this.entityRenderManager.Render(entity);
 		}
 
-		public void RemoveEntity(Entity entity) {
+		public void RemoveEntity(Entity.Entity entity) {
 			if (!this.entities.ContainsKey(entity.guid)) return;
 
 			this.entities.Remove(entity.guid);
@@ -246,7 +246,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 			this.entityRenderManager.Destroy(entity);
 		}
 
-		public void SpawnEntity<E>(EntityDescriptor<E> descriptor, Vector2 pos) where E : Entity {
+		public void SpawnEntity<E>(EntityDescriptor<E> descriptor, Vector2 pos) where E : Entity.Entity {
 			descriptor.Create(this, pos);
 		}
 
@@ -254,11 +254,11 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 			descriptor.CreateBoxed(this, pos);
 		}
 
-		public bool TryGetEntity(Guid guid, out Entity entity) {
+		public bool TryGetEntity(Guid guid, out Entity.Entity entity) {
 			return this.entities.TryGetValue(guid, out entity);
 		}
 
-		public IEnumerable<Entity> GetAllEntities() => this.entities.Values;
+		public IEnumerable<Entity.Entity> GetAllEntities() => this.entities.Values;
 
 		public void UnloadDistantChunks(int pivotChunkX, int viewDistance) {
 			List<WorldChunk> toRemove = new();
@@ -331,7 +331,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 			return chunk?.TileEntityAt(blockPos);
 		}
 
-		public Block? GetBlock(BlockPos blockPos) {
+		public Block.Block? GetBlock(BlockPos blockPos) {
 			BlockState? blockState = this.GetBlockState(blockPos);
 			return blockState?.block;
 		}

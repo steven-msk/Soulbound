@@ -2,7 +2,7 @@ using SoulboundEngine.Client.World.Serialization;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace SoulboundEngine.Client.World.LevelDomain {
+namespace SoulboundEngine.Client.World.Level {
 	using Player = Player.Player;
 
 	public struct WorldSession {

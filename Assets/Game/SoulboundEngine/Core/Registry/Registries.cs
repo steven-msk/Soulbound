@@ -1,9 +1,9 @@
 using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.Client.ItemSystem;
-using SoulboundEngine.Client.World.BlockSystem;
-using SoulboundEngine.Client.World.BlockSystem.TileEntities;
-using SoulboundEngine.Client.World.EntitySystem;
-using SoulboundEngine.Client.World.EntitySystem.Attribute;
+using SoulboundEngine.Client.Item;
+using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.Client.World.Block.TileEntity;
+using SoulboundEngine.Client.World.Entity;
+using SoulboundEngine.Client.World.Entity.Attribute;
 using System;
 using System.Linq;
 

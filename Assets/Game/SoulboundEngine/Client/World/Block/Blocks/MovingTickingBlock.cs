@@ -1,10 +1,10 @@
-using SoulboundEngine.Client.World.BlockSystem.States;
-using SoulboundEngine.Client.World.LevelDomain;
+using SoulboundEngine.Client.World.Block.State;
+using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Common;
 using SoulboundEngine.Common.Math;
 using SoulboundEngine.Core.States;
 
-namespace SoulboundEngine.Client.World.BlockSystem {
+namespace SoulboundEngine.Client.World.Block {
 	[PROTOTYPICAL]
 	public sealed class MovingTickingBlock : Block, ITickingBlock, INeighborUpdateHandler {
 		public static readonly Property<bool> moving = BoolProperty.Of("canMove");
@@ -22,7 +22,7 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 			builder.Add(moving);
 		}
 
-		void ITickingBlock.Tick(Level level, BlockPos blockPos, BlockState blockState) {
+		void ITickingBlock.Tick(Level.Level level, BlockPos blockPos, BlockState blockState) {
 			if (!blockState.Get(moving)) return;
 
 			BlockPos nextPos = this.GetNextPos(blockPos);
@@ -34,7 +34,7 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 			}
 		}
 
-		void INeighborUpdateHandler.OnNeighborChanged(Level level, BlockPos selfPos, BlockPos neighborPos) {
+		void INeighborUpdateHandler.OnNeighborChanged(Level.Level level, BlockPos selfPos, BlockPos neighborPos) {
 			BlockPos nextPos = this.GetNextPos(selfPos);
 			if (nextPos != neighborPos) return;
 

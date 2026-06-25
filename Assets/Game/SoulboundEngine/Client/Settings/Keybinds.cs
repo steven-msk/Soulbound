@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.SettingSystem {
+namespace SoulboundEngine.Client.Settings {
 	public sealed class Keybinds {
 		public static readonly KeybindEntry backtrackScreen = new("Screen Backtrack", "screen.backtrack", Key.Escape);
 		public static readonly KeybindEntry jump = new("Jump", "player.jump", Key.Space);

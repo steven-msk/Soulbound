@@ -1,9 +1,9 @@
-using SoulboundEngine.Client.World.BlockSystem;
+using SoulboundEngine.Client.World.Block;
 using SoulboundEngine.Core.Registry;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.ItemSystem {
+namespace SoulboundEngine.Client.Item {
 	public partial class Items {
 		public static readonly Item AIR = Register(Blocks.AIR, Item.Settings.Air());
 		public static readonly Item GRASS = Register(Blocks.GRASS, Item.Settings.Of("Grass Block"));

@@ -1,10 +1,10 @@
-using SoulboundEngine.Client.ItemSystem;
+using SoulboundEngine.Client.Item;
 
 using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 
-namespace SoulboundEngine.Client.ItemSystem.Container {
+namespace SoulboundEngine.Client.Item.Container {
 	public sealed class SplitDistributeToDraggedSlot : ISlotOperation {
 		private readonly SlotRef slotRef;
 		private readonly IItemSlot slot;
