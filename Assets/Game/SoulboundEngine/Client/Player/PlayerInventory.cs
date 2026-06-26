@@ -37,7 +37,7 @@ namespace SoulboundEngine.Client.Player {
 			mainSlotChanged?.Invoke(previous, slot);
 		}
 
-		public ItemStack? GetMainStack() {
+		public ItemStack GetMainStack() {
 			return this.slots[this.mainSlot].GetStack();
 		}
 	}

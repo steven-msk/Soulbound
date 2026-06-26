@@ -45,7 +45,7 @@ namespace SoulboundEngine.Client.Render.Item {
 							itemImage.raycastTarget = false;
 
 							TextMeshProUGUI stackText = this.CreateStackText(rect);
-							stackText.text = state.stack.quantity.ToString();
+							stackText.text = state.stack.count.ToString();
 							stackText.enabled = state.showStackCount;
 
 							obj.SetActive(true);
@@ -56,7 +56,7 @@ namespace SoulboundEngine.Client.Render.Item {
 							Label stackText = uiToolkit.GetStackCount();
 
 							display.style.backgroundImage = new StyleBackground(model.GetSprite());
-							stackText.text = state.stack.quantity.ToString();
+							stackText.text = state.stack.count.ToString();
 							stackText.style.display = state.showStackCount ? DisplayStyle.Flex : DisplayStyle.None;
 
 							display.pickingMode = PickingMode.Ignore;

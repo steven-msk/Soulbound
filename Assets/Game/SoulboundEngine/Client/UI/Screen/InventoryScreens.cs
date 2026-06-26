@@ -1,7 +1,10 @@
 ﻿using SoulboundEngine.Client.Debug.Logging;
 using SoulboundEngine.Client.Player;
+using SoulboundEngine.Client.Render.Item;
+using SoulboundEngine.Core.Assets;
 using System;
 using System.Collections.Generic;
+using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.UI.Screen {
 	public class InventoryScreens {
@@ -9,8 +12,43 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 		public InventoryScreens() {
 			Register(InventoryScreenHandlerType.DEFAULT_INVENTORY, IProvider<DefaultInventoryScreenHandler, DefaultInventoryScreen>.Of(
-				(handler, playerInventory) => new DefaultInventoryScreen(handler, playerInventory)
+				(ctx) => new DefaultInventoryScreen(CreateContext(ctx, AssetManager.Resolve<VisualTreeAsset>(new AssetKey("InventoryContextScreen"))))
 			));
+		}
+
+		private static InventoryScreen<THandler>.Context CreateContext<THandler>(THandler handler, PlayerInventory playerInventory, PlayerEntity player, ItemRenderManager itemRenderManager)
+				where THandler : InventoryScreenHandler {
+			return CreateContext(handler, playerInventory, player, default, itemRenderManager);
+		}
+
+		private static InventoryScreen<THandler>.Context CreateContext<THandler>(THandler handler, PlayerInventory playerInventory, PlayerEntity player, VisualTreeAsset asset, ItemRenderManager itemRenderManager)
+				where THandler : InventoryScreenHandler {
+			return new InventoryScreen<THandler>.Context {
+				asset = asset,
+				handler = handler,
+				player = player,
+				playerInventory = playerInventory,
+				itemRenderManager = itemRenderManager
+			};
+		}
+
+		private static InventoryScreen<THandler>.Context CreateContext<THandler>(InventoryScreen<THandler>.Context ctx, VisualTreeAsset asset)
+				where THandler : InventoryScreenHandler {
+			ctx.asset = asset;
+			return ctx;
+		}
+
+		private static ProviderContext CreateProviderContext(InventoryScreenHandler handler, PlayerInventory playerInventory, PlayerEntity player, ItemRenderManager itemRenderManager) {
+			return new ProviderContext {
+				handler = handler,
+				itemRenderManager = itemRenderManager,
+				player = player,
+				playerInventory = playerInventory
+			};
+		}
+
+		private static InventoryScreen<THandler>.Context FromProvider<THandler>(ProviderContext ctx) where THandler : InventoryScreenHandler {
+			return CreateContext((THandler)ctx.handler, ctx.playerInventory, ctx.player, ctx.itemRenderManager);
 		}
 
 		private static void Register<THandler, TScreen>(InventoryScreenHandlerType<THandler> type, IProvider<THandler, TScreen> provider)
@@ -25,44 +63,58 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 		private static IProviderBase GetProvider(InventoryScreenHandlerType type) => providers[type];
 
-		public static IScreenHandle Open(InventoryScreenHandler handler, SoulboundClient client, PlayerInventory playerInventory) {
+		public static IScreenHandle Open(InventoryScreenHandler handler, SoulboundClient client, PlayerInventory playerInventory, PlayerEntity player) {
 			try {
-				return client.OpenScreen(GetProvider(handler.GetHandlerType()).Create(handler, playerInventory));
+				ProviderContext ctx = CreateProviderContext(handler, playerInventory, player, client.ItemRenderManager);
+				return client.OpenScreen(GetProvider(handler.GetHandlerType()).Create(ctx));
 			} catch (Exception e) {
 				Logger.LogFatal(e);
-				throw;
+				return null;
 			}
 		}
 
-		public static IScreenHandle Open<THandler>(InventoryScreenHandlerType<THandler> type, SoulboundClient client, PlayerInventory playerInventory) where THandler : InventoryScreenHandler {
+		public static IScreenHandle Open<THandler>(InventoryScreenHandlerType<THandler> type, SoulboundClient client, PlayerInventory playerInventory, PlayerEntity player) 
+				where THandler : InventoryScreenHandler {
 			try {
-				return client.OpenScreen(GetProvider(type).Create(type.Create(), playerInventory));
+				ProviderContext ctx = CreateProviderContext(type.Create(playerInventory), playerInventory, player, client.ItemRenderManager);
+				return client.OpenScreen(GetProvider(type).Create(ctx));
 			} catch (Exception e) {
 				Logger.LogFatal(e);
-				throw;
+				return null;
 			}
 		}
 
 		private interface IProviderBase {
-			Screen Create(InventoryScreenHandler handler, PlayerInventory playerInventory);
+			Screen Create(ProviderContext ctx);
 		}
 
 		private interface IProvider<THandler, TScreen> : IProviderBase where THandler : InventoryScreenHandler where TScreen : Screen, InventoryScreenHandlerProvider<THandler> {
-			TScreen Create(THandler handler, PlayerInventory playerInventory);
+			TScreen Create(InventoryScreen<THandler>.Context ctx);
 
-			Screen IProviderBase.Create(InventoryScreenHandler handler, PlayerInventory playerInventory) => this.Create((THandler)handler, playerInventory);
+			Screen IProviderBase.Create(ProviderContext ctx) {
+				return this.Create(FromProvider<THandler>(ctx));
+			}
 
-			public static IProvider<THandler, TScreen> Of(Func<THandler, PlayerInventory, TScreen> func) => new Impl(func);
+			public static IProvider<THandler, TScreen> Of(Func<InventoryScreen<THandler>.Context, TScreen> func) => new Impl(func);
 
 			private sealed class Impl : IProvider<THandler, TScreen> {
-				private Func<THandler, PlayerInventory,  TScreen> func;
+				private readonly Func<InventoryScreen<THandler>.Context, TScreen> func;
 
-				public Impl(Func<THandler, PlayerInventory, TScreen> func) {
+				public Impl(Func<InventoryScreen<THandler>.Context, TScreen> func) {
 					this.func = func;
 				}
 
-				public TScreen Create(THandler handler, PlayerInventory playerInventory) => this.func(handler, playerInventory);
+				public TScreen Create(InventoryScreen<THandler>.Context ctx) {
+					return this.func(ctx);
+				}
 			}
+		}
+
+		private struct ProviderContext {
+			public InventoryScreenHandler handler;
+			public PlayerInventory playerInventory;
+			public PlayerEntity player;
+			public ItemRenderManager itemRenderManager;
 		}
 	}
 }

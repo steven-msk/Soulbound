@@ -26,6 +26,10 @@ namespace SoulboundEngine.Client.Item {
 			return new ItemStack(this, Mathf.Clamp(quantity, 0, this.fullStackSize));
 		}
 
+		public override string ToString() {
+			return Items.GetIdentifier(this)?.ToString() ?? base.ToString();
+		}
+
 		public sealed class Settings {
 			public string name { get; private set; }
 			public int fullStackSize { get; private set; } = DEFAULT_FULL_STACK;

@@ -11,13 +11,13 @@ namespace SoulboundEngine.Client.Item {
 			return trigger == InteractionTrigger.LeftHold || trigger == InteractionTrigger.LeftClick;
 		}
 
-		bool IInteractableItem.CanExecute(ItemStack itemStack, in ItemInteraction ctx) {
+		bool IInteractableItem.CanExecute(in ItemStack itemStack, in ItemInteraction ctx) {
 			BlockPos blockPos = (BlockPos)ctx.player.GetWorldPointerPos();
 			return ctx.player.CanPlaceBlockAt(blockPos);
 		}
 
-		bool IInteractableItem.TryExecute(ItemStack itemStack, in ItemInteraction ctx) {
-			BlockState blockState = GetBlockState(itemStack);
+		bool IInteractableItem.TryExecute(ref ItemStack itemStack, in ItemInteraction ctx) {
+			BlockState blockState = this.GetBlockState(itemStack);
 			BlockPos blockPos = (BlockPos)ctx.player.GetWorldPointerPos();
 
 			ctx.level.SetBlockState(blockPos, blockState);

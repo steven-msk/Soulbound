@@ -1,14 +1,21 @@
-﻿using SoulboundEngine.Client.Player;
-using SoulboundEngine.Core.Assets;
-using UnityEngine.UIElements;
+﻿using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.UI.Screen {
 	public class DefaultInventoryScreen : InventoryScreen<DefaultInventoryScreenHandler> {
-		public DefaultInventoryScreen(DefaultInventoryScreenHandler handler, PlayerInventory playerInventory) 
-			: base(handler, playerInventory, AssetManager.Resolve<VisualTreeAsset>(new AssetKey("InventoryContextScreen"))) {
+		public DefaultInventoryScreen(Context ctx) 
+			: base(ctx) {
 		}
 
-		protected override void OnBind(VisualElement root) {
+		protected override VisualElement GetPlayerHotbar(VisualElement inventoryRoot) {
+			return inventoryRoot.Q<VisualElement>("Hotbar");
+		}
+
+		protected override VisualElement GetPlayerPopup(VisualElement inventoryRoot) {
+			return inventoryRoot.Q<VisualElement>("Popup");
+		}
+
+		protected override VisualElement GetPlayerInventoryRoot(VisualElement screenRoot) {
+			return screenRoot.Q<VisualElement>("PlayerInventorySpace");
 		}
 	}
 }

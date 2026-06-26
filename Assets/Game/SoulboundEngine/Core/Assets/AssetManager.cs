@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,6 +43,7 @@ namespace SoulboundEngine.Core.Assets {
 			}
 		}
 
+		[Obsolete]
 		public static T Resolve<T>(AssetKey key) where T : UnityEngine.Object {
 			if (!assets.TryGetValue(key, out var handle)) {
 				Logger.LogError("Could not find asset with key {}", key);

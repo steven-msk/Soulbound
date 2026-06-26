@@ -1,10 +1,5 @@
-
-using SoulboundEngine.Common;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SoulboundEngine.Client.Item.Container {
 	public readonly struct SlotRef : IEquatable<SlotRef> {
@@ -16,15 +11,19 @@ namespace SoulboundEngine.Client.Item.Container {
 			this.index = index;
 		}
 
-		public IItemSlot GetSlot() => container.GetSlot(index);
+		public IItemSlot GetSlot() => this.container.GetSlot(this.index);
+
+		public override string ToString() {
+			return $"slot[{this.container}/{this.index}]";
+		}
 
 		public bool Equals(SlotRef other) {
-			return ReferenceEquals(container, other.container)
-				&& index == other.index;
+			return ReferenceEquals(this.container, other.container)
+				&& this.index == other.index;
 		}
 
 		public override int GetHashCode() {
-			return HashCode.Combine(container, index);
+			return HashCode.Combine(this.container, this.index);
 		}
 
 		public sealed class Comparer : IComparer<SlotRef> {

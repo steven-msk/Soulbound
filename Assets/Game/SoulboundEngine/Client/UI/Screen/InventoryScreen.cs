@@ -1,17 +1,209 @@
-﻿using SoulboundEngine.Client.Player;
+﻿using SoulboundEngine.Client.Item;
+using SoulboundEngine.Client.Item.Container;
+using SoulboundEngine.Client.Player;
+using SoulboundEngine.Client.Render.Item;
+using SoulboundEngine.Client.UI.Screen.Slot;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UIElements;
+using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 namespace SoulboundEngine.Client.UI.Screen {
 	public abstract class InventoryScreen<THandler> : UxmlScreen, InventoryScreenHandlerProvider<THandler> where THandler : InventoryScreenHandler {
+		const float DOUBLE_CLICK_THRESHOLD = 0.15f;
+		const int LEFT_BUTTON = 0;
+		const int MIDDLE_BUTTON = 2;
+		const int RIGHT_BUTTON = 1;
 		protected readonly THandler handler;
+		protected readonly ItemRenderManager itemRenderManager;
+		protected readonly PlayerInventory playerInventory;
+		protected readonly HashSet<Inventory> openInventories = new();
+		protected readonly PlayerEntity player;
+		private readonly List<IInteractableUIToolkitSlotDisplay> playerSlotDisplays = new();
+		private TransitStackHandler transitStackHandler;
+		private int lastClickedSlot;
+		private float lastClickTime;
+		private bool dragging;
+		private int dragButton;
 
-		protected InventoryScreen(THandler handler, PlayerInventory playerInventory, VisualTreeAsset asset)
-			: base(asset) {
-			this.handler = handler;
+		protected InventoryScreen(Context ctx)
+			: base(ctx.asset) {
+			this.handler = ctx.handler;
+			this.itemRenderManager = ctx.itemRenderManager;
+			this.playerInventory = ctx.playerInventory;
+			this.player = ctx.player;
 		}
 
-		protected abstract override void OnBind(VisualElement root);
+		protected sealed override void OnBind(VisualElement root) {
+			this.transitStackHandler = TransitStackHandler.Create(root, this.itemRenderManager);
+			this.OnBindInventory(root);
+			root.RegisterCallback<PointerUpEvent>(this.RootOnPointerUp);
+		}
+
+		protected virtual void OnBindInventory(VisualElement root) {
+			this.BindPlayerInventory(this.playerInventory, this.GetPlayerInventoryRoot(root));
+		}
+
+		protected void BindPlayerInventory(PlayerInventory playerInventory, VisualElement inventoryRoot) {
+			this.openInventories.Add(playerInventory);
+
+			// order matters here as hotbar slots need to be indexed first
+			this.BindPlayerHotbar(playerInventory, inventoryRoot);
+			this.BindPlayerPopup(playerInventory, inventoryRoot);
+
+			playerInventory.mainSlotChanged += this.OnMainSlotChanged;
+			this.SetMainSlotVisual(playerInventory.GetMainSlot());
+		}
+
+		protected abstract VisualElement GetPlayerPopup(VisualElement inventoryRoot);
+
+		protected abstract VisualElement GetPlayerHotbar(VisualElement inventoryRoot);
+
+		protected abstract VisualElement GetPlayerInventoryRoot(VisualElement screenRoot);
+
+		private void OnMainSlotChanged(int oldValue, int newValue) {
+			this.UnsetMainSlotVisual(oldValue);
+			this.SetMainSlotVisual(newValue);
+		}
+
+		protected void BindPlayerPopup(PlayerInventory playerInventory, VisualElement inventoryRoot) {
+			foreach (var slotIndex in playerInventory.GetPopup()) {
+				IItemSlot slot = playerInventory.GetSlot(slotIndex);
+				VisualElement slotElement = this.GetPlayerPopup(inventoryRoot)[slotIndex - PlayerInventory.HOTBAR_SIZE];
+
+				InteractableUIToolkitSlotDisplay display = new(slot, this.itemRenderManager);
+				display.OnBind(slotElement);
+				this.playerSlotDisplays.Add(display);
+				this.AddPointerListeners(slotElement, display, slot, playerInventory);
+			}
+		}
+
+		protected void BindPlayerHotbar(PlayerInventory playerInventory, VisualElement inventoryRoot) {
+			foreach (var slotIndex in playerInventory.GetHotbar()) {
+				IItemSlot slot = playerInventory.GetSlot(slotIndex);
+				VisualElement slotElement = this.GetPlayerHotbar(inventoryRoot)[slotIndex];
+
+				InteractableHotbarSlotDisplay display = new(slot, this.itemRenderManager);
+				display.OnBind(slotElement);
+				this.playerSlotDisplays.Add(display);
+				this.AddPointerListeners(slotElement, display, slot, playerInventory);
+			}
+		}
+
+		private void SetMainSlotVisual(int slot) {
+			this.playerSlotDisplays[slot].SetAsMainSlot();
+		}
+
+		private void UnsetMainSlotVisual(int slot) {
+			this.playerSlotDisplays[slot].UnsetMainSlot();
+		}
+
+		private void AddPointerListeners(VisualElement visualElement, IInteractableUIToolkitSlotDisplay display, IItemSlot slot, Inventory inventory) {
+			display.onPointerDown += evt => this.OnPointerDown(slot, inventory, visualElement, evt);
+			display.onPointerUp += evt => this.OnPointerUp(slot, inventory, visualElement, evt);
+			display.onPointerEnter += evt => this.OnPointerEnter(slot, inventory, visualElement, evt);
+			display.onPointerLeave += evt => this.OnPointerLeave(slot, inventory, visualElement, evt);
+		}
+
+		private void RootOnPointerUp(PointerUpEvent evt) {
+			this.EndDrag();
+		}
+
+		private void OnPointerUp(IItemSlot slot, Inventory inventory, VisualElement visualElement, PointerUpEvent evt) {
+			this.EndDrag();
+		}
+
+		protected void EndDrag() {
+			if (!this.dragging) return;
+			this.dragging = false;
+			this.handler.EndDrag();
+		}
+
+		private void OnPointerDown(IItemSlot slot, Inventory inventory, VisualElement visualElement, PointerDownEvent evt) {
+			float time = Time.time;
+			bool doubleClick = this.lastClickedSlot == slot.GetIndex() && (time - this.lastClickTime) <= DOUBLE_CLICK_THRESHOLD;
+			this.lastClickTime = time;
+			this.lastClickedSlot = slot.GetIndex();
+
+			int clickButton = evt.button;
+			int slotIndex = slot.GetIndex();
+			try {
+				if (this.dragging) this.EndDrag();
+
+				SlotActionType actionType = this.GetClick(slotIndex, inventory, clickButton, doubleClick);
+				this.handler.OnSlotAction(slot.GetRef(), clickButton, this.player, actionType);
+
+				ItemStack transitStack = this.handler.GetTransitStack();
+				bool stackFromOriginSlot = transitStack.IsEmpty();
+				ItemStack dragStack = stackFromOriginSlot ? slot.GetStack() : transitStack;
+				if (this.handler.TryStartDrag(dragStack, slot.GetRef(), clickButton, stackFromOriginSlot)) {
+					this.dragging = true;
+					this.dragButton = clickButton;
+				}
+
+				this.transitStackHandler.SetStack(this.handler.GetTransitStack());
+			} catch (Exception e) {
+				Logger.LogFatal(e);
+			}
+		}
+
+		protected virtual SlotActionType GetClick(int slotIndex, Inventory inventory, int clickButton, bool doubleClick) {
+			switch (clickButton) {
+				case LEFT_BUTTON: {
+						return this.handler.CanCollectAll() && doubleClick
+							? SlotActionType.COLLECT_ALL 
+							: SlotActionType.PICKUP;
+					}
+				case RIGHT_BUTTON: {
+						return SlotActionType.PICKUP;
+					}
+				case MIDDLE_BUTTON: {
+						return SlotActionType.CLONE;
+					}
+				default: throw new InvalidOperationException("Unknown slot action button");
+			}
+		}
+
+		protected virtual SlotDragActionType GetDrag(int slotIndex, Inventory inventory, int clickButton) {
+			switch (clickButton) {
+				case LEFT_BUTTON: {
+						return SlotDragActionType.SPLIT;
+					}
+				case MIDDLE_BUTTON: {
+						return SlotDragActionType.CLONE;
+					}
+				case RIGHT_BUTTON: {
+						return SlotDragActionType.INSERT;
+					}
+				default: throw new InvalidOperationException("Unknown slot action button");
+			}
+		}
+
+		private void OnPointerEnter(IItemSlot slot, Inventory inventory, VisualElement visualElement, PointerEnterEvent evt) {
+			if (this.dragging) {
+				try {
+					SlotDragActionType slotDragActionType = this.GetDrag(slot.GetIndex(), inventory, this.dragButton);
+					this.handler.OnSlotDrag(slot.GetRef(), this.dragButton, this.player, slotDragActionType);
+					this.transitStackHandler.SetStack(this.handler.GetTransitStack());
+				} catch (Exception e) {
+					Logger.LogFatal(e);
+				}
+			}
+		}
+
+		private void OnPointerLeave(IItemSlot slot, Inventory inventory, VisualElement visualElement, PointerLeaveEvent evt) {
+		}
 
 		public THandler GetScreenHandler() => this.handler;
+
+		public struct Context {
+			public THandler handler;
+			public PlayerInventory playerInventory;
+			public PlayerEntity player;
+			public VisualTreeAsset asset;
+			public ItemRenderManager itemRenderManager;
+		}
 	}
+
 }

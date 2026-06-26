@@ -11,11 +11,11 @@ namespace SoulboundEngine.Client.Item {
 			return trigger == InteractionTrigger.LeftHold || trigger == InteractionTrigger.LeftClick;
 		}
 
-		public bool CanExecute(ItemStack itemStack, in ItemInteraction ctx) {
+		public bool CanExecute(in ItemStack itemStack, in ItemInteraction ctx) {
 			return true;
 		}
 
-		public bool TryExecute(ItemStack itemStack, in ItemInteraction ctx) {
+		public bool TryExecute(ref ItemStack itemStack, in ItemInteraction ctx) {
 			//EntityType.MOVING_ENTITY.Create(ctx.level, ctx.player.GetWorldPointerPos());
 			itemStack.Decrement();
 			return true;

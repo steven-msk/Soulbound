@@ -201,6 +201,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ced63e50cee7ab94894ce3933a476a0d
+    m_Address: TransitStack
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d863461c1411eba4b9a64e81eecfc1ca
     m_Address: TickBlockOff
     m_ReadOnly: 0

@@ -10,7 +10,7 @@ namespace SoulboundEngine.Client.Render.Item {
 		protected readonly IItemSlot slot;
 		protected readonly ItemRenderManager itemRenderManager;
 		protected readonly ItemRenderHandle renderHandle;
-		protected ItemStack? stack;
+		protected ItemStack stack;
 
 		protected UIToolkitItemSlotDisplay(IItemSlot slot, ItemRenderManager itemRenderManager) {
 			this.slot = slot;
@@ -24,32 +24,15 @@ namespace SoulboundEngine.Client.Render.Item {
 			this.SetStack(this.slot.GetStack());
 		}
 
-		protected void StackChanged(ItemStack? oldStack, ItemStack? newStack) => this.SetStack(newStack);
+		protected void StackChanged(ItemStack oldStack, ItemStack newStack) => this.SetStack(newStack);
 
-		protected void SetStack(ItemStack? stack) {
-			if (this.stack != null) {
-				this.stack.onQuantityChanged -= this.OnStackQuantityChanged;
-			}
-
-			if (stack != null) {
-				stack.onQuantityChanged += this.OnStackQuantityChanged;
-			}
-
+		protected void SetStack(ItemStack stack) {
 			this.stack = stack;
 			this.Render();
 		}
 
-		protected void OnStackQuantityChanged(int oldCount, int newCount) {
-			if (newCount <= 0) {
-				this.itemRenderManager.Destroy(this.renderHandle, this.RenderContext);
-				return;
-			}
-
-			this.Render();
-		}
-
 		protected void Render() {
-			if (this.stack == null || this.stack.item == Items.AIR) {
+			if (this.stack.IsEmpty()) {
 				this.itemRenderManager.Destroy(this.renderHandle, this.RenderContext);
 				return;
 			}
@@ -59,14 +42,7 @@ namespace SoulboundEngine.Client.Render.Item {
 
 		public void Dispose() {
 			this.itemRenderManager.Destroy(this.renderHandle, this.RenderContext);
-
 			this.slot.stackChanged -= this.StackChanged;
-
-			if (this.stack != null) {
-				this.stack.onQuantityChanged -= this.OnStackQuantityChanged;
-			}
-
-			this.stack = null;
 		}
 
 		public virtual void SetAsMainSlot() {

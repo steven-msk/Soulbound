@@ -60,7 +60,7 @@ namespace SoulboundEngine.Client.Runtime.Services {
 			this.inventory = inventory;
 		}
 
-		public void SetStack(int slotIndex, ItemStack? stack) {
+		public void SetStack(int slotIndex, ItemStack stack) {
 			this.inventory.GetSlot(slotIndex).SetStack(stack);
 		}
 	}

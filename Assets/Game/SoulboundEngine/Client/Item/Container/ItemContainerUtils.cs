@@ -1,4 +1,3 @@
-using SoulboundEngine.Client.Item;
 using System.Collections.Generic;
 
 #nullable enable
@@ -7,7 +6,9 @@ namespace SoulboundEngine.Client.Item.Container {
 	public static class ItemContainerUtils {
 		public static bool TryAddStack(this IItemContainer container, ItemStack itemStack) {
 			foreach (var slot in container.GetSlotsContaining(itemStack.item)) {
-				slot.GetStack()!.FillFrom(itemStack);
+				ItemStack slotStack = slot.GetStack();
+				slotStack.FillFrom(ref itemStack);
+				slot.SetStack(slotStack);
 				if (itemStack.IsEmpty()) return true;
 			}
 			if (TryGetFirstEmptySlot(container, out IItemSlot emptySlot)) {
@@ -21,7 +22,7 @@ namespace SoulboundEngine.Client.Item.Container {
 			foreach (var slotIndex in container.GetAllSlots()) {
 				IItemSlot slot = container.GetSlot(slotIndex);
 
-				if (slot.GetStack()?.item == item) {
+				if (slot.GetStack().IsOf(item!)) {
 					yield return slot;
 				}
 			}

@@ -1,5 +1,5 @@
 using SoulboundEngine.Client.Render.Item;
-using System;
+using SoulboundEngine.Core.Assets;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -7,9 +7,10 @@ using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.Item.Container {
 	public sealed class TransitStackHandler {
+		const float ITEM_DISPLAY_SIZE = 48f;
 		private readonly VisualElement root;
 		private Vector2 pointerPosition;
-		private ItemStack? itemStack;
+		private ItemStack itemStack;
 		private IItemView? itemView;
 		private readonly ItemRenderManager itemRenderManager;
 		private readonly ItemRenderHandle renderHandle;
@@ -20,25 +21,49 @@ namespace SoulboundEngine.Client.Item.Container {
 			this.renderHandle = new ItemRenderHandle(this);
 		}
 
+		public static TransitStackHandler Create(VisualElement screenRoot, ItemRenderManager itemRenderManager) {
+			return new TransitStackHandler(itemRenderManager, CreateVisualElement(screenRoot));
+		}
+
+		private static VisualElement CreateVisualElement(VisualElement screenRoot) {
+			// TODO: this is so fucking bad
+			VisualTreeAsset asset = AssetManager.Resolve<VisualTreeAsset>(new AssetKey("TransitStack"));
+			asset.CloneTree(screenRoot);
+			return screenRoot.Q<VisualElement>("TransitStack");
+
+			//VisualElement root = new() {
+			//	name = "TransitStack",
+			//	pickingMode = PickingMode.Ignore,
+			//};
+			//root.style.position = Position.Absolute;
+			//screenRoot.Add(root);
+
+			//VisualElement itemDisplay = new() {
+			//	name = "ItemDisplay",
+			//	pickingMode = PickingMode.Ignore
+			//};
+			//itemDisplay.style.flexShrink = 0f;
+			//itemDisplay.style.width = itemDisplay.style.height = ITEM_DISPLAY_SIZE;
+			//root.Add(itemDisplay);
+
+			//Label stackCount = new() {
+			//	name = "StackCount",
+			//	pickingMode = PickingMode.Ignore
+			//};
+			//stackCount.style.right = 2f;
+			//stackCount.style.width = ITEM_DISPLAY_SIZE;
+
+			//return root;
+		}
+
 		public void SetStack(ItemStack itemStack) {
-			if (itemStack == null) {
-				UnityEngine.Debug.LogException(new ArgumentException("TransitStack cannot be set to null. Call Release() instead"));
+			if (itemStack.IsEmpty()) {
+				this.Destroy();
 				return;
 			}
 
-			if (this.itemStack != null) {
-				this.itemStack.onQuantityChanged -= this.OnStackQuantityChanged;
-			}
-
 			this.itemStack = itemStack;
-			itemStack.onQuantityChanged += this.OnStackQuantityChanged;
-
 			this.Render(itemStack);
-		}
-
-		private void OnStackQuantityChanged(int old, int @new) {
-			if (@new <= 0) this.Destroy();
-			else if (this.itemStack != null && this.itemView != null) this.Render(this.itemStack);
 		}
 
 		private void Render(ItemStack itemStack) {
@@ -47,17 +72,14 @@ namespace SoulboundEngine.Client.Item.Container {
 		}
 
 		public bool HasStack() => this.itemView != null;
-		public ItemStack? GetStack() => this.itemStack;
+		public ItemStack GetStack() => this.itemStack;
 
 		public void Destroy() {
 			if (this.itemView == null) return;
 
 			this.itemRenderManager.Destroy(this.renderHandle, this.RenderContext);
-			if (this.itemStack != null) {
-				this.itemStack.onQuantityChanged -= this.OnStackQuantityChanged;
-			}
 			this.itemView = null;
-			this.itemStack = null;
+			this.itemStack = ItemStack.EMPTY;
 		}
 
 		public void SetPointerPosition(Vector2 position) {

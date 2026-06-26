@@ -248,11 +248,13 @@ namespace SoulboundEngine.Client {
 			return new WorldSaveStrategy(this.config.file.savesFolder, Application.persistentDataPath);
 		}
 
+
 		public static SoulboundClient Instance => instance;
 		[Obsolete]
 		public InputManager InputManager => this.inputManager;
 		[Obsolete]
 		public UIHandler UIHandler => this.uiHandler;
+		public ItemRenderManager ItemRenderManager => this.itemRenderManager;
 
 		public sealed class DebugOverlayManager {
 			private readonly Stack<DebugOverlayFeature> overlayStack = new();

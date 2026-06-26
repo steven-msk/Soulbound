@@ -6,7 +6,7 @@ using System.Linq;
 #nullable enable
 
 namespace SoulboundEngine.Client.Item.Container {
-	public class Inventory : IItemContainer, IEnumerable<ItemStack?> {
+	public class Inventory : IItemContainer, IEnumerable<ItemStack> {
 		protected readonly ItemSlot[] slots;
 		private readonly HashSet<Item> uniqueItems = new();
 		public event Action<Item>? onItemAdded;
@@ -48,15 +48,15 @@ namespace SoulboundEngine.Client.Item.Container {
 			return list;
 		}
 
-		private void UpdateUniqueItems(ItemStack? oldStack, ItemStack? newStack) {
-			if (newStack != null && !this.uniqueItems.Contains(newStack.item)) {
+		private void UpdateUniqueItems(ItemStack oldStack, ItemStack newStack) {
+			if (!newStack.IsEmpty() && !this.uniqueItems.Contains(newStack.item)) {
 				this.uniqueItems.Add(newStack.item);
 				onItemAdded?.Invoke(newStack.item);
 			}
-			if (oldStack != null) {
+			if (!oldStack.IsEmpty()) {
 				bool stillExists = false;
 				foreach (var slot in this.slots) {
-					if (slot.GetStack()?.item == oldStack.item) {
+					if (slot.GetStack().IsOf(oldStack.item)) {
 						stillExists = true;
 						break;
 					}
@@ -70,7 +70,7 @@ namespace SoulboundEngine.Client.Item.Container {
 
 		public int GetSize() => this.slots.Length;
 
-		public IEnumerator<ItemStack?> GetEnumerator() {
+		public IEnumerator<ItemStack> GetEnumerator() {
 			return this.slots.Select(s => s.GetStack()).GetEnumerator();
 		}
 

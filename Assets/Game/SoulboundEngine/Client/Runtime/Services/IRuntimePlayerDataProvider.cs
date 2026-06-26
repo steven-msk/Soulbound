@@ -10,7 +10,7 @@ namespace SoulboundEngine.Client.Runtime.Services {
 	}
 
 	public struct InventoryData {
-		public Dictionary<int, ItemStack?> stacks;
+		public Dictionary<int, ItemStack> stacks;
 		public IEnumerable<int> slots;
 	}
 }

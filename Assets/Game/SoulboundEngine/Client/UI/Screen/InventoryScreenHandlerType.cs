@@ -1,10 +1,13 @@
-﻿using SoulboundEngine.Core.Registry;
+﻿using SoulboundEngine.Client.Player;
+using SoulboundEngine.Core.Registry;
 
 namespace SoulboundEngine.Client.UI.Screen {
 	public abstract class InventoryScreenHandlerType {
-		public delegate THandler Factory<THandler>() where THandler : InventoryScreenHandler;
+		public delegate THandler Factory<THandler>(PlayerInventory playerInventory) where THandler : InventoryScreenHandler;
 
-		public static InventoryScreenHandlerType<DefaultInventoryScreenHandler> DEFAULT_INVENTORY = Register("default_inventory", () => new DefaultInventoryScreenHandler());
+		public static InventoryScreenHandlerType<DefaultInventoryScreenHandler> DEFAULT_INVENTORY = Register("default_inventory", 
+			playerInventory => new DefaultInventoryScreenHandler(playerInventory)
+		);
 
 		private static InventoryScreenHandlerType<THandler> Register<THandler>(string id, Factory<THandler> factory) where THandler : InventoryScreenHandler {
 			return Registry<InventoryScreenHandlerType>.Register(
@@ -22,8 +25,8 @@ namespace SoulboundEngine.Client.UI.Screen {
 			this.factory = factory;
 		}
 
-		public THandler Create() {
-			return this.factory();
+		public THandler Create(PlayerInventory playerInventory) {
+			return this.factory(playerInventory);
 		}
 	}
 }

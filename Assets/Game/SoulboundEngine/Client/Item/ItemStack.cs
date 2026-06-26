@@ -1,91 +1,95 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 
 #nullable enable
 
 namespace SoulboundEngine.Client.Item {
-	public class ItemStack {
-		public event Action<int, int>? onQuantityChanged;
+	public struct ItemStack {
+		public static readonly ItemStack EMPTY = Empty();
 		public readonly Item item;
-		private readonly Dictionary<Type, IItemStackData> data = new();
-		public int quantity { get; private set; }
+		public int count { get; private set; }
 
-		internal ItemStack(Item item, int quantity) {
+		internal ItemStack(Item item, int count) {
 			this.item = item;
-			this.quantity = Mathf.Clamp(quantity, 0, item.fullStackSize);
+			this.count = count;
+			this.CapCount(item.fullStackSize);
 		}
 
-		private ItemStack(Item item, int quantity, Dictionary<Type, IItemStackData> data)
-			: this(item, quantity) {
-			this.data = data;
+		private static ItemStack Empty() {
+			return new ItemStack() { count = 0 };
 		}
 
-		public bool IsFull() => quantity >= item.fullStackSize;
-		public bool IsEmpty() => quantity <= 0;
+		public readonly bool IsFull() => this.count >= this.item.fullStackSize;
+		public readonly bool IsEmpty() => this.count <= 0 || this.IsOf(null);
 
-		public void SetQuantity(int amount) {
-			int oldQuantity = quantity;
-			quantity = Mathf.Clamp(amount, 0, item.fullStackSize);
-			OnQuantityChanged(oldQuantity, quantity);
-		}
+		public readonly bool IsFullSize(int count) => count >= this.item.fullStackSize;
 
-		// Try to add items, return how many were actually added
+		/// <summary>
+		/// Try to add items. Returns how may were actually added.
+		/// </summary>
 		public int Increment(int amount = 1) {
 			if (amount <= 0) return 0;
 
-			int added = Mathf.Min(GetSpaceLeft(), amount);
-			quantity += added;
-			OnQuantityChanged(quantity - added, quantity);
+			int added = Mathf.Min(this.GetSpaceLeft(), amount);
+			this.count += added;
 			return added;
 		}
-
-		// Try to remove items, returns how many were actually removed
+		
+		/// <summary>
+		/// Try to remove items. Returns how many were actually removed
+		/// </summary>
 		public int Decrement(int amount = 1) {
 			if (amount <= 0) return 0;
 
-			int removed = Mathf.Min(quantity, amount);
-			quantity -= removed;
-			OnQuantityChanged(quantity + removed, quantity);
+			int removed = Mathf.Min(this.count, amount);
+			this.count -= removed;
 			return removed;
 		}
 
-		private void OnQuantityChanged(int old, int @new) {
-			onQuantityChanged?.Invoke(old, @new);
+		public readonly int GetSpaceLeft() => this.item.fullStackSize - this.count;
+
+		public readonly bool IsOf(Item? item) => Equals(item, this.item);
+
+		public static bool AreEqual(ItemStack a, ItemStack b) {
+			return AreItemsEqual(a, b) && a.count == b.count;
 		}
 
-		// FEATUREIMPL: dropped item stacks converging to avoid lag
-
-		public int GetSpaceLeft() => item.fullStackSize - quantity;
-
-		public bool IsStackableWith(ItemStack? itemStack) {
-			return itemStack?.item == item
-				&& GetData().SequenceEqual(itemStack.GetData());
+		public static bool AreItemsEqual(ItemStack a, ItemStack b) {
+			return a.IsOf(b.item) && b.IsOf(a.item);
 		}
 
-		public void FillFrom(ItemStack itemStack) {
-			if (!IsStackableWith(itemStack)) return;
+		public void FillFrom(ref ItemStack itemStack) {
+			if (!AreItemsEqual(itemStack, this)) return;
 
-			int added = itemStack.Decrement(GetSpaceLeft());
+			int added = itemStack.Decrement(this.GetSpaceLeft());
 			this.Increment(added);
 		}
-
-		public T GetData<T>() where T : IItemStackData {
-			return (T)data[typeof(T)];
-		}
-
-		public void SetData<T>(T data) where T : IItemStackData {
-			this.data[typeof(T)] = data;
-		}
-
-		public IEnumerable<IItemStackData> GetData() => data.Values;
 	
-		public ItemStack Clone(int newQuantity) {
-			return new ItemStack(item, newQuantity, data);
+		public readonly ItemStack CopyWithCount(int newCount) {
+			return new ItemStack(this.item, newCount);
 		}
 
-		public ItemStack Clone() => Clone(quantity);
+		public readonly ItemStack Copy() => this.CopyWithCount(this.count);
+
+		public readonly ItemStack CopyFullStack() {
+			return this.CopyWithCount(this.item.fullStackSize);
+		}
+
+		public void CapCount(int maxCount) {
+			this.count = Mathf.Clamp(this.count, 0, maxCount);
+		}
+
+		[Obsolete("Cannot compare two item stacks with Equals", true)]
+		public override bool Equals(object obj) {
+			throw new NotSupportedException("Cannot compare two item stacks with Equals");
+		}
+
+		public readonly override int GetHashCode() {
+			return HashCode.Combine(this.item, this.count);
+		}
+
+		public readonly override string ToString() {
+			return $"stack[{this.item}:{this.count}]";
+		}
 	}
 }

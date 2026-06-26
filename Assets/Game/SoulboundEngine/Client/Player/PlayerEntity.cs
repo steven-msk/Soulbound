@@ -106,7 +106,9 @@ namespace SoulboundEngine.Client.Player {
 				}),
 				InputEventListener.ConsumePerformed(InputTokens.Player.toggleInventory, _ => {
 					if (!this.isInventoryOpen) {
-						this.OpenInventoryScreen(new SimpleInventoryScreenHandlerFactory((_, _) => InventoryScreenHandlerType.DEFAULT_INVENTORY.Create()));
+						this.OpenInventoryScreen(new SimpleInventoryScreenHandlerFactory(
+							(playerInventory, _) => InventoryScreenHandlerType.DEFAULT_INVENTORY.Create(playerInventory)
+						));
 					} else {
 						this.CloseInventoryScreen();
 					}
@@ -175,7 +177,7 @@ namespace SoulboundEngine.Client.Player {
 			if (this.activeInventoryScreen != null) return;
 			InventoryScreenHandler handler = handlerFactory.Create(this.inventory, this);
 			this.activeInventoryScreenHandler = handler;
-			this.activeInventoryScreen = InventoryScreens.Open(handler, this.client, this.inventory);
+			this.activeInventoryScreen = InventoryScreens.Open(handler, this.client, this.inventory, this);
 			this.isInventoryOpen = true;
 		}
 
@@ -190,7 +192,7 @@ namespace SoulboundEngine.Client.Player {
 		private bool ResolveItemOrBlockInteraction(InteractionTrigger trigger) {
 			ItemInteraction itemInteraction = this.GetItemInteraction(trigger);
 			if (this.interactionResolver.Resolve(itemInteraction)) {
-				this.leftClickBlockBreakGuard = itemInteraction.itemStack?.item is IPlaceableItem;
+				this.leftClickBlockBreakGuard = itemInteraction.itemStack.item is IPlaceableItem;
 				return true;
 			}
 			return this.interactionResolver.Resolve(this.GetBlockInteraction(trigger));
@@ -217,22 +219,25 @@ namespace SoulboundEngine.Client.Player {
 			};
 		}
 
+		// TODO: rework interaction design
+		
 		// provisory priority
 		int IInteractionHandler<ItemInteraction>.priority => 0;
 
 		bool IInteractionHandler<ItemInteraction>.CanHandle(in ItemInteraction ctx) {
-			Item? item = ctx.itemStack?.item;
+			Item item = ctx.itemStack.item;
+			if (ctx.itemStack.IsEmpty()) return false;
 			if (item is not IInteractableItem interactable) return false;
 
 			if (!interactable.ValidateTrigger(ctx.trigger)) return false;
 
-			return interactable.CanExecute(ctx.itemStack, in ctx);
+			return interactable.CanExecute(in ctx.itemStack, in ctx);
 		}
 
 		bool IInteractionHandler<ItemInteraction>.Handle(in ItemInteraction ctx) {
 			ItemStack stack = ctx.itemStack;
 			IInteractableItem interactable = (IInteractableItem)stack.item;
-			return interactable.TryExecute(stack, in ctx);
+			return interactable.TryExecute(ref stack, in ctx);
 		}
 
 		int IInteractionHandler<BlockInteraction>.priority => 0;
@@ -276,10 +281,10 @@ namespace SoulboundEngine.Client.Player {
 		}
 
 		private int GetMainHandItemBreakLevel() {
-			ItemStack? mainHandStack = this.GetMainHandStack();
-			Item? item = mainHandStack?.item;
+			ItemStack mainHandStack = this.GetMainHandStack();
+			Item item = mainHandStack.item;
 
-			if (item == null) return 0;
+			if (mainHandStack.IsEmpty()) return 0;
 
 			if (item is IBlockBreakerItem breaker) {
 				return breaker.GetBreakLevel(mainHandStack);
@@ -288,11 +293,11 @@ namespace SoulboundEngine.Client.Player {
 		}
 
 		private void ThrowFromMainHand(bool ctrl) {
-			ItemStack? mainHandStack = this.GetMainHandStack();
-			if (mainHandStack == null) return;
+			ItemStack mainHandStack = this.GetMainHandStack();
+			if (mainHandStack.IsEmpty()) return;
 
-			int throwAmount = ctrl ? mainHandStack.quantity : 1;
-			ItemStack thrownStack = mainHandStack.Clone(throwAmount);
+			int throwAmount = ctrl ? mainHandStack.count : 1;
+			ItemStack thrownStack = mainHandStack.CopyWithCount(throwAmount);
 			mainHandStack.Decrement(throwAmount);
 
 			ItemEntity itemEntity = this.DropStack(this.level, thrownStack);
@@ -324,9 +329,9 @@ namespace SoulboundEngine.Client.Player {
 
 		public PlayerInventory GetInventory() => this.inventory;
 
-		public ItemStack? GetMainHandStack() {
-			ItemStack? transitStack = this.transitStack?.GetStack();
-			return transitStack ?? this.inventory.GetMainStack();
+		public ItemStack GetMainHandStack() {
+			ItemStack transitStack = this.transitStack?.GetStack() ?? ItemStack.EMPTY;
+			return transitStack.IsEmpty() ? this.inventory.GetMainStack() : transitStack;
 		}
 
 		public bool IsHoldingLeftClick() => this.isHoldingLeftClick;
