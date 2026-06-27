@@ -12,10 +12,10 @@ namespace SoulboundEngine.Client.Item.Container {
 		void SetStack(ItemStack stack);
 
 		int GetIndex();
-		IItemContainer GetContainer();
+		IInventory GetInventory();
 
 		public bool HasStack() => !this.GetStack().IsEmpty();
 
-		public SlotRef GetRef() => new(this.GetContainer(), this.GetIndex());
+		public SlotRef GetRef() => new(this.GetInventory(), this.GetIndex());
 	}
 }

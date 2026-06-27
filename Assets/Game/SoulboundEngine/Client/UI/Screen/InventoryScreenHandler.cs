@@ -45,8 +45,8 @@ namespace SoulboundEngine.Client.UI.Screen {
 			return slotRef;
 		}
 
-		static List<SlotRef> GetRefs(IEnumerable<int> slots, IItemContainer container) {
-			return slots.Select(s => new SlotRef(container, s)).ToList();
+		static List<SlotRef> GetRefs(IEnumerable<int> slots, IInventory inventory) {
+			return slots.Select(s => new SlotRef(inventory, s)).ToList();
 		}
 
 		/// <summary>
@@ -151,7 +151,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 			HashSet<SlotRef> draggedSlots = new(new SlotRef.EqualityComparer()) { originSlot };
 
-			this.dragState = new SlotDragState(originSlot.container) {
+			this.dragState = new SlotDragState {
 				stack = originStack.Copy(),
 				origin = originSlot,
 				draggedSlots = draggedSlots,

@@ -4,15 +4,15 @@ using System;
 
 namespace SoulboundEngine.Client.Item.Container {
 	public class ItemSlot : IItemSlot {
-		private readonly IItemContainer container;
+		private readonly IInventory inventory;
 		private readonly int index;
 		private ItemStack stack;
 		[Obsolete]
 		public event Action<ItemStack>? setStack;
 		public event Action<ItemStack, ItemStack>? stackChanged;
 
-		public ItemSlot(IItemContainer container, int index) {
-			this.container = container;
+		public ItemSlot(IInventory inventory, int index) {
+			this.inventory = inventory;
 			this.index = index;
 		}
 
@@ -32,6 +32,6 @@ namespace SoulboundEngine.Client.Item.Container {
 		public ItemStack GetStack() => this.stack;
 
 		public int GetIndex() => this.index;
-		public IItemContainer GetContainer() => this.container;
+		public IInventory GetInventory() => this.inventory;
 	}
 }
