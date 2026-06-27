@@ -2,19 +2,27 @@
 using SoulboundEngine.Client.Item.Container;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+
 
 #nullable enable
 
 namespace SoulboundEngine.Client.Player {
-	public sealed class PlayerInventory : Inventory {
+	public sealed class PlayerInventory : IInventory {
 		public const int HOTBAR_SIZE = 9;
 		public const int POPUP_COLUMNS = 9;
 		public const int POPUP_ROWS = 3;
 		private int mainSlot = 0;
+		private readonly ItemSlot[] slots;
 		public event Action<int, int>? mainSlotChanged;
 
-		public PlayerInventory() 
-			: base(POPUP_COLUMNS * POPUP_ROWS + HOTBAR_SIZE) {
+		public PlayerInventory() {
+			this.slots = new ItemSlot[this.GetSize()];
+
+			for (int i = 0; i < this.GetSize(); i++) {
+				ItemSlot slot = new(this, i);
+				this.slots[i] = slot;
+			}
 		}
 
 		public IEnumerable<int> GetPopup() {
@@ -40,5 +48,13 @@ namespace SoulboundEngine.Client.Player {
 		public ItemStack GetMainStack() {
 			return this.slots[this.mainSlot].GetStack();
 		}
+
+		public IItemSlot GetSlot(int index) => this.slots[index];
+
+		public IEnumerable<int> GetSlots() => this.slots.Select(s => s.GetIndex());
+
+		public int GetSize() => HOTBAR_SIZE + POPUP_COLUMNS * POPUP_ROWS;
+
+		public bool CanPlayerUse(PlayerEntity player) => true;
 	}
 }

@@ -9,12 +9,12 @@ namespace SoulboundEngine.Client.Item {
 		}
 
 		public void OnItemAdded(Item item, IItemContainer container) {
-			if (container is not Inventory _) return;
+			if (container is not IInventory _) return;
 			Logger.LogInfo("listener item added to inventory");
 		}
 
 		public void OnItemRemoved(Item item, IItemContainer container) {
-			if (container is not Inventory _) return;
+			if (container is not IInventory _) return;
 			Logger.LogInfo("listener item removed from inventory");
 		}
 

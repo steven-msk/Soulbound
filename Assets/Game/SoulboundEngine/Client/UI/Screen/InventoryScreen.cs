@@ -18,7 +18,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		protected readonly THandler handler;
 		protected readonly ItemRenderManager itemRenderManager;
 		protected readonly PlayerInventory playerInventory;
-		protected readonly HashSet<Inventory> openInventories = new();
+		protected readonly HashSet<IInventory> openInventories = new();
 		protected readonly PlayerEntity player;
 		private readonly List<IInteractableUIToolkitSlotDisplay> playerSlotDisplays = new();
 		private TransitStackHandler transitStackHandler;
@@ -100,7 +100,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 			this.playerSlotDisplays[slot].UnsetMainSlot();
 		}
 
-		private void AddPointerListeners(VisualElement visualElement, IInteractableUIToolkitSlotDisplay display, IItemSlot slot, Inventory inventory) {
+		private void AddPointerListeners(VisualElement visualElement, IInteractableUIToolkitSlotDisplay display, IItemSlot slot, IInventory inventory) {
 			display.onPointerDown += evt => this.OnPointerDown(slot, inventory, visualElement, evt);
 			display.onPointerUp += evt => this.OnPointerUp(slot, inventory, visualElement, evt);
 			display.onPointerEnter += evt => this.OnPointerEnter(slot, inventory, visualElement, evt);
@@ -111,7 +111,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 			this.EndDrag();
 		}
 
-		private void OnPointerUp(IItemSlot slot, Inventory inventory, VisualElement visualElement, PointerUpEvent evt) {
+		private void OnPointerUp(IItemSlot slot, IInventory inventory, VisualElement visualElement, PointerUpEvent evt) {
 			this.EndDrag();
 		}
 
@@ -121,7 +121,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 			this.handler.EndDrag();
 		}
 
-		private void OnPointerDown(IItemSlot slot, Inventory inventory, VisualElement visualElement, PointerDownEvent evt) {
+		private void OnPointerDown(IItemSlot slot, IInventory inventory, VisualElement visualElement, PointerDownEvent evt) {
 			float time = Time.time;
 			bool doubleClick = this.lastClickedSlot == slot.GetIndex() && (time - this.lastClickTime) <= DOUBLE_CLICK_THRESHOLD;
 			this.lastClickTime = time;
@@ -152,7 +152,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 			}
 		}
 
-		private void OnPointerEnter(IItemSlot slot, Inventory inventory, VisualElement visualElement, PointerEnterEvent evt) {
+		private void OnPointerEnter(IItemSlot slot, IInventory inventory, VisualElement visualElement, PointerEnterEvent evt) {
 			if (this.dragging) {
 				try {
 					// Known issue: immediate drag modifiers are unavailable due to PointerEnterEvent.modifiers being event payload
@@ -167,10 +167,10 @@ namespace SoulboundEngine.Client.UI.Screen {
 			}
 		}
 
-		private void OnPointerLeave(IItemSlot slot, Inventory inventory, VisualElement visualElement, PointerLeaveEvent evt) {
+		private void OnPointerLeave(IItemSlot slot, IInventory inventory, VisualElement visualElement, PointerLeaveEvent evt) {
 		}
 
-		protected virtual SlotActionType GetClick(int slotIndex, Inventory inventory, int clickButton, bool doubleClick, EventModifiers modifiers) {
+		protected virtual SlotActionType GetClick(int slotIndex, IInventory inventory, int clickButton, bool doubleClick, EventModifiers modifiers) {
 			switch (clickButton) {
 				case LEFT_BUTTON: {
 						if (modifiers.HasFlag(EventModifiers.Shift)) {
@@ -190,7 +190,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 			}
 		}
 
-		protected virtual SlotDragActionType GetDrag(int slotIndex, Inventory inventory, int clickButton, EventModifiers modifiers) {
+		protected virtual SlotDragActionType GetDrag(int slotIndex, IInventory inventory, int clickButton, EventModifiers modifiers) {
 			switch (clickButton) {
 				case LEFT_BUTTON: {
 						return modifiers.HasFlag(EventModifiers.Shift) 

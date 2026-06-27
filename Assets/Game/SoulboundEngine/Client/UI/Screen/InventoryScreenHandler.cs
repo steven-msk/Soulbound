@@ -151,7 +151,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 			HashSet<SlotRef> draggedSlots = new(new SlotRef.EqualityComparer()) { originSlot };
 
-			this.dragState = new SlotDragState(originSlot.container) {
+			this.dragState = new SlotDragState(originSlot.inventory) {
 				stack = originStack.Copy(),
 				origin = originSlot,
 				draggedSlots = draggedSlots,

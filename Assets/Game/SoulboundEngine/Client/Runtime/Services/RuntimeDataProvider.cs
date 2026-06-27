@@ -48,7 +48,7 @@ namespace SoulboundEngine.Client.Runtime.Services {
 		public Vector2 GetPos() => this.player.GetPosition();
 
 		public InventoryData GetInventory() {
-			Inventory inventory = this.player.GetInventory();
+			IInventory inventory = this.player.GetInventory();
 			IEnumerable<int> slots = inventory.GetAllSlots();
 
 			return new InventoryData {

@@ -54,9 +54,9 @@ namespace SoulboundEngine.Client.Runtime.Services {
 	}
 
 	public class RuntimeInventoryExecutionService : IInventoryExecutionService {
-		private readonly Inventory inventory;
+		private readonly IInventory inventory;
 
-		public RuntimeInventoryExecutionService(Inventory inventory) {
+		public RuntimeInventoryExecutionService(IInventory inventory) {
 			this.inventory = inventory;
 		}
 

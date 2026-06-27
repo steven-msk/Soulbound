@@ -19,7 +19,7 @@ namespace SoulboundEngine.Client.World.Block {
 			return new ChestTileEntity(TileEntityTypes.CHEST, this.GetInventory(), level, blockPos);
 		}
 
-		private Inventory GetInventory() => new(INVENTORY_SIZE);
+		private IInventory GetInventory() => new(INVENTORY_SIZE);
 
 		public bool CanInteract(in BlockInteraction ctx) => true;
 
