@@ -4,9 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-
-#nullable enable
-
 namespace SoulboundEngine.Client.Player {
 	public sealed class PlayerInventory : IInventory {
 		public const int HOTBAR_SIZE = 9;
@@ -14,26 +11,25 @@ namespace SoulboundEngine.Client.Player {
 		public const int POPUP_ROWS = 3;
 		private int mainSlot = 0;
 		private readonly ItemSlot[] slots;
-		public event Action<int, int>? mainSlotChanged;
+		public event Action<int, int> mainSlotChanged;
 
 		public PlayerInventory() {
-			this.slots = new ItemSlot[this.GetSize()];
-
-			for (int i = 0; i < this.GetSize(); i++) {
-				ItemSlot slot = new(this, i);
-				this.slots[i] = slot;
-			}
+			IInventory.CreateSimple(this, ref this.slots);
 		}
 
 		public IEnumerable<int> GetPopup() {
 			List<int> list = new();
-			for (int i = 0; i < POPUP_ROWS * POPUP_COLUMNS; i++) list.Add(HOTBAR_SIZE + i);
+			for (int i = 0; i < POPUP_ROWS * POPUP_COLUMNS; i++) {
+				list.Add(HOTBAR_SIZE + i);
+			}
 			return list;
 		}
 
 		public IEnumerable<int> GetHotbar() {
 			List<int> list = new();
-			for (int i = 0; i < HOTBAR_SIZE; i++) list.Add(i);
+			for (int i = 0; i < HOTBAR_SIZE; i++) {
+				list.Add(i);
+			}
 			return list;
 		}
 

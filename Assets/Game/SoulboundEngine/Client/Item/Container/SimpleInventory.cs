@@ -4,14 +4,11 @@ using System.Collections.Generic;
 namespace SoulboundEngine.Client.Item.Container {
 	public sealed class SimpleInventory : IInventory {
 		private readonly ItemSlot[] slots;
+		private readonly int size;
 
 		public SimpleInventory(int size) {
-			this.slots = new ItemSlot[size];
-
-			for (int i = 0; i < size; i++) {
-				ItemSlot slot = this.CreateSlot(i);
-				this.slots[i] = slot;
-			}
+			this.size = size;
+			IInventory.CreateSimple(this, ref this.slots);
 		}
 		private ItemSlot CreateSlot(int index) => new(this, index);
 
@@ -23,7 +20,7 @@ namespace SoulboundEngine.Client.Item.Container {
 
 		public IItemSlot GetSlot(int index) => this.slots[index];
 
-		public int GetSize() => this.slots.Length;
+		public int GetSize() => this.size;
 
 		public bool CanPlayerUse(PlayerEntity player) => true;
 	}
