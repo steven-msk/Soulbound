@@ -21,7 +21,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 			List<IItemSlot> popupSlots = this.playerInventory.GetPopup().Select(i => this.playerInventory.GetSlot(i)).ToList();
 
 			ItemStack slotStack = slot.GetStack();
-			ItemContainerUtils.TryAddStack(hotbarSlots.Contains(slot) ? popupSlots : hotbarSlots, ref slotStack);
+			InventoryUtils.TryAddStack(hotbarSlots.Contains(slot) ? popupSlots : hotbarSlots, ref slotStack);
 			slot.SetStack(slotStack);
 		}
 	}

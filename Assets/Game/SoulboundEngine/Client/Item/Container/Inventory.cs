@@ -1,3 +1,4 @@
+using SoulboundEngine.Client.Player;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -37,6 +38,8 @@ namespace SoulboundEngine.Client.Item.Container {
 				}
 			};
 		}
+
+		public virtual bool CanPlayerUse(PlayerEntity player) => true;
 
 		protected virtual ItemSlot CreateSlot(int index) => new(this, index);
 

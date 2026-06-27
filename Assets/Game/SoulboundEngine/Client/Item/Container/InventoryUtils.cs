@@ -4,7 +4,7 @@ using System.Linq;
 #nullable enable
 
 namespace SoulboundEngine.Client.Item.Container {
-	public static class ItemContainerUtils {
+	public static class InventoryUtils {
 		public static bool TryAddStack(this IItemContainer container, ref ItemStack itemStack) {
 			return TryAddStack(container.GetAllSlots().Select(i => container.GetSlot(i)), ref itemStack);
 		}
