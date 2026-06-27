@@ -46,7 +46,10 @@ namespace SoulboundEngine.Client.Item {
 			return removed;
 		}
 
-		public readonly int GetSpaceLeft() => this.item.fullStackSize - this.count;
+		public readonly int GetSpaceLeft() {
+			if (this.IsOf(null)) return 0;
+			return this.item.fullStackSize - this.count;
+		}
 
 		public readonly bool IsOf(Item? item) => Equals(item, this.item);
 
@@ -66,12 +69,14 @@ namespace SoulboundEngine.Client.Item {
 		}
 	
 		public readonly ItemStack CopyWithCount(int newCount) {
+			if (this.IsOf(null)) return EMPTY;
 			return new ItemStack(this.item, newCount);
 		}
 
 		public readonly ItemStack Copy() => this.CopyWithCount(this.count);
 
 		public readonly ItemStack CopyFullStack() {
+			if (this.IsOf(null)) return EMPTY;
 			return this.CopyWithCount(this.item.fullStackSize);
 		}
 

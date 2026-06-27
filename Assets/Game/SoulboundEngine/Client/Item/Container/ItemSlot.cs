@@ -17,6 +17,7 @@ namespace SoulboundEngine.Client.Item.Container {
 		}
 
 		public void SetStack(ItemStack stack) {
+			if (stack.IsEmpty()) stack = ItemStack.EMPTY;
 			ItemStack oldStack = this.stack;
 			this.stack = stack;
 			setStack?.Invoke(stack);

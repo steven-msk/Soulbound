@@ -13,6 +13,11 @@
 		/// <summary>
 		/// Inserts one item into each dragged slot
 		/// </summary>
-		INSERT
+		INSERT,
+
+		/// <summary>
+		/// Similar to <seealso cref="SlotActionType.QUICK_MOVE"/>
+		/// </summary>
+		QUICK_MOVE
 	}
 }

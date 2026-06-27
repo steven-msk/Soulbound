@@ -17,5 +17,10 @@
 		/// or swapping the slot stack with the transit stack if they can't merge.
 		/// </summary>
 		PICKUP,
+
+		/// <summary>
+		/// Quick moves the stack to an available slot in another inventory
+		/// </summary>
+		QUICK_MOVE
 	}
 }

@@ -305,7 +305,7 @@ namespace SoulboundEngine.Client.Player {
 		}
 
 		public bool TryAddItemStack(ItemStack itemStack) {
-			return this.inventory.TryAddStack(itemStack);
+			return this.inventory.TryAddStack(ref itemStack);
 		}
 
 		public bool CanPlaceBlockAt(BlockPos blockPos) {

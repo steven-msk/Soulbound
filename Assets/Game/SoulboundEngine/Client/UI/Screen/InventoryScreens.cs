@@ -12,30 +12,18 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 		public InventoryScreens() {
 			Register(InventoryScreenHandlerType.DEFAULT_INVENTORY, IProvider<DefaultInventoryScreenHandler, DefaultInventoryScreen>.Of(
-				(ctx) => new DefaultInventoryScreen(CreateContext(ctx, AssetManager.Resolve<VisualTreeAsset>(new AssetKey("InventoryContextScreen"))))
+				(ctx) => new DefaultInventoryScreen(ctx, AssetManager.Resolve<VisualTreeAsset>(new AssetKey("InventoryContextScreen")))
 			));
 		}
 
 		private static InventoryScreen<THandler>.Context CreateContext<THandler>(THandler handler, PlayerInventory playerInventory, PlayerEntity player, ItemRenderManager itemRenderManager)
 				where THandler : InventoryScreenHandler {
-			return CreateContext(handler, playerInventory, player, default, itemRenderManager);
-		}
-
-		private static InventoryScreen<THandler>.Context CreateContext<THandler>(THandler handler, PlayerInventory playerInventory, PlayerEntity player, VisualTreeAsset asset, ItemRenderManager itemRenderManager)
-				where THandler : InventoryScreenHandler {
 			return new InventoryScreen<THandler>.Context {
-				asset = asset,
 				handler = handler,
 				player = player,
 				playerInventory = playerInventory,
 				itemRenderManager = itemRenderManager
 			};
-		}
-
-		private static InventoryScreen<THandler>.Context CreateContext<THandler>(InventoryScreen<THandler>.Context ctx, VisualTreeAsset asset)
-				where THandler : InventoryScreenHandler {
-			ctx.asset = asset;
-			return ctx;
 		}
 
 		private static ProviderContext CreateProviderContext(InventoryScreenHandler handler, PlayerInventory playerInventory, PlayerEntity player, ItemRenderManager itemRenderManager) {

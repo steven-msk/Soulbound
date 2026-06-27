@@ -26,9 +26,10 @@ namespace SoulboundEngine.Client.UI.Screen {
 		private float lastClickTime;
 		private bool dragging;
 		private int dragButton;
+		private EventModifiers dragModifiers;
 
-		protected InventoryScreen(Context ctx)
-			: base(ctx.asset) {
+		protected InventoryScreen(Context ctx, VisualTreeAsset asset)
+			: base(asset) {
 			this.handler = ctx.handler;
 			this.itemRenderManager = ctx.itemRenderManager;
 			this.playerInventory = ctx.playerInventory;
@@ -127,11 +128,13 @@ namespace SoulboundEngine.Client.UI.Screen {
 			this.lastClickedSlot = slot.GetIndex();
 
 			int clickButton = evt.button;
+			EventModifiers modifiers = evt.modifiers;
 			int slotIndex = slot.GetIndex();
 			try {
 				if (this.dragging) this.EndDrag();
 
-				SlotActionType actionType = this.GetClick(slotIndex, inventory, clickButton, doubleClick);
+				ItemStack originStack = slot.GetStack();
+				SlotActionType actionType = this.GetClick(slotIndex, inventory, clickButton, doubleClick, modifiers);
 				this.handler.OnSlotAction(slot.GetRef(), clickButton, this.player, actionType);
 
 				ItemStack transitStack = this.handler.GetTransitStack();
@@ -140,6 +143,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 				if (this.handler.TryStartDrag(dragStack, slot.GetRef(), clickButton, stackFromOriginSlot)) {
 					this.dragging = true;
 					this.dragButton = clickButton;
+					this.dragModifiers = modifiers;
 				}
 
 				this.transitStackHandler.SetStack(this.handler.GetTransitStack());
@@ -148,9 +152,30 @@ namespace SoulboundEngine.Client.UI.Screen {
 			}
 		}
 
-		protected virtual SlotActionType GetClick(int slotIndex, Inventory inventory, int clickButton, bool doubleClick) {
+		private void OnPointerEnter(IItemSlot slot, Inventory inventory, VisualElement visualElement, PointerEnterEvent evt) {
+			if (this.dragging) {
+				try {
+					// Known issue: immediate drag modifiers are unavailable due to PointerEnterEvent.modifiers being event payload
+					// The current workaround uses stored dragModifiers when the drag starts
+					SlotDragActionType slotDragActionType = this.GetDrag(slot.GetIndex(), inventory, this.dragButton, this.dragModifiers);
+
+					this.handler.OnSlotDrag(slot.GetRef(), this.dragButton, this.player, slotDragActionType);
+					this.transitStackHandler.SetStack(this.handler.GetTransitStack());
+				} catch (Exception e) {
+					Logger.LogFatal(e);
+				}
+			}
+		}
+
+		private void OnPointerLeave(IItemSlot slot, Inventory inventory, VisualElement visualElement, PointerLeaveEvent evt) {
+		}
+
+		protected virtual SlotActionType GetClick(int slotIndex, Inventory inventory, int clickButton, bool doubleClick, EventModifiers modifiers) {
 			switch (clickButton) {
 				case LEFT_BUTTON: {
+						if (modifiers.HasFlag(EventModifiers.Shift)) {
+							return SlotActionType.QUICK_MOVE;
+						}
 						return this.handler.CanCollectAll() && doubleClick
 							? SlotActionType.COLLECT_ALL 
 							: SlotActionType.PICKUP;
@@ -165,10 +190,12 @@ namespace SoulboundEngine.Client.UI.Screen {
 			}
 		}
 
-		protected virtual SlotDragActionType GetDrag(int slotIndex, Inventory inventory, int clickButton) {
+		protected virtual SlotDragActionType GetDrag(int slotIndex, Inventory inventory, int clickButton, EventModifiers modifiers) {
 			switch (clickButton) {
 				case LEFT_BUTTON: {
-						return SlotDragActionType.SPLIT;
+						return modifiers.HasFlag(EventModifiers.Shift) 
+							? SlotDragActionType.QUICK_MOVE 
+							: SlotDragActionType.SPLIT;
 					}
 				case MIDDLE_BUTTON: {
 						return SlotDragActionType.CLONE;
@@ -180,28 +207,12 @@ namespace SoulboundEngine.Client.UI.Screen {
 			}
 		}
 
-		private void OnPointerEnter(IItemSlot slot, Inventory inventory, VisualElement visualElement, PointerEnterEvent evt) {
-			if (this.dragging) {
-				try {
-					SlotDragActionType slotDragActionType = this.GetDrag(slot.GetIndex(), inventory, this.dragButton);
-					this.handler.OnSlotDrag(slot.GetRef(), this.dragButton, this.player, slotDragActionType);
-					this.transitStackHandler.SetStack(this.handler.GetTransitStack());
-				} catch (Exception e) {
-					Logger.LogFatal(e);
-				}
-			}
-		}
-
-		private void OnPointerLeave(IItemSlot slot, Inventory inventory, VisualElement visualElement, PointerLeaveEvent evt) {
-		}
-
 		public THandler GetScreenHandler() => this.handler;
 
 		public struct Context {
 			public THandler handler;
 			public PlayerInventory playerInventory;
 			public PlayerEntity player;
-			public VisualTreeAsset asset;
 			public ItemRenderManager itemRenderManager;
 		}
 	}

@@ -2,8 +2,8 @@
 
 namespace SoulboundEngine.Client.UI.Screen {
 	public class DefaultInventoryScreen : InventoryScreen<DefaultInventoryScreenHandler> {
-		public DefaultInventoryScreen(Context ctx) 
-			: base(ctx) {
+		public DefaultInventoryScreen(Context ctx, VisualTreeAsset asset) 
+			: base(ctx, asset) {
 		}
 
 		protected override VisualElement GetPlayerHotbar(VisualElement inventoryRoot) {

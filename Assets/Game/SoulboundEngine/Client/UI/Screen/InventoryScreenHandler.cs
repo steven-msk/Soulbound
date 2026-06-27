@@ -65,6 +65,9 @@ namespace SoulboundEngine.Client.UI.Screen {
 			}
 		}
 
+		// Implementation note:
+		// The current implementation is subject to change. 
+		// As the game evolves, more QOL features will be available, and this includes inventory management features
 		private void InternalSlotAction(SlotRef slotRef, int button, PlayerEntity player, SlotActionType actionType) {
 			IItemSlot slot = slotRef.GetSlot();
 			ItemStack slotStack = slot.GetStack();
@@ -78,9 +81,21 @@ namespace SoulboundEngine.Client.UI.Screen {
 				case SlotActionType.CLONE:
 					this.HandleClone(slot, slotStack);
 					break;
+				case SlotActionType.QUICK_MOVE:
+					this.HandleQuickMove(player, slot);
+					break;
 			}
-			Logger.LogInfo("slot clicked: {}, {}, {}", slotRef, actionType, button);
 		}
+
+		private void HandleQuickMove(PlayerEntity player, IItemSlot slot) {
+			this.QuickMove(player, slot);
+		}
+
+		/// <summary>
+		/// Quick moves the stack in slot to other slots of the inventory screen handler. <br/>
+		/// The target slots may belong to another inventory or a section of the same inventory
+		/// </summary>
+		protected abstract void QuickMove(PlayerEntity player, IItemSlot slot);
 
 		private void HandlePickup(IItemSlot slot, ItemStack slotStack, int button) {
 			bool hasTransitStack = !this.transitStack.IsEmpty();
@@ -132,7 +147,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		}
 
 		public bool TryStartDrag(ItemStack originStack, SlotRef originSlot, int button, bool stackFromOriginSlot = false) {
-			if (this.IsDragging() || originStack.IsEmpty()) return false;
+			if (this.IsDragging()) return false;
 
 			HashSet<SlotRef> draggedSlots = new(new SlotRef.EqualityComparer()) { originSlot };
 
@@ -173,6 +188,9 @@ namespace SoulboundEngine.Client.UI.Screen {
 						}
 					}
 					break;
+				case SlotDragActionType.QUICK_MOVE:
+					this.HandleQuickMove(player, slot);
+					break;
 				default: throw new NotSupportedException("Drag button not supported: " + this.dragState.button);
 			}
 		}
@@ -183,7 +201,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 		public bool IsDragging() => this.dragState != null;
 
-		private Dictionary<SlotRef, int> CreateCountSnapshot() {
+		protected Dictionary<SlotRef, int> CreateCountSnapshot() {
 			Dictionary<SlotRef, int> snapshots = new();
 			foreach (var slot in this.slots) {
 				ItemStack stack = slot.GetSlot().GetStack();
