@@ -20,7 +20,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		protected readonly PlayerInventory playerInventory;
 		protected readonly HashSet<IInventory> openInventories = new();
 		protected readonly PlayerEntity player;
-		private readonly List<IInteractableUIToolkitSlotDisplay> playerSlotDisplays = new();
+		private readonly List<IInteractableUIToolkitSlotDisplay> playerHotbarSlotDisplays = new();
 		private readonly List<IInteractableUIToolkitSlotDisplay> slotDisplays = new();
 		private TransitStackHandler transitStackHandler;
 		private int lastClickedSlot;
@@ -74,7 +74,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 				IItemSlot slot = playerInventory.GetSlot(slotIndex);
 				VisualElement slotElement = this.GetPlayerPopup(inventoryRoot)[slotIndex - PlayerInventory.HOTBAR_SIZE];
 
-				this.playerSlotDisplays.Add(this.BindSlot(slotElement, slot, playerInventory));
+				this.BindSlot(slotElement, slot, playerInventory);
 			}
 		}
 
@@ -83,7 +83,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 				IItemSlot slot = playerInventory.GetSlot(slotIndex);
 				VisualElement slotElement = this.GetPlayerHotbar(inventoryRoot)[slotIndex];
 
-				this.playerSlotDisplays.Add(this.BindSlot(slotElement, slot, playerInventory));
+				this.playerHotbarSlotDisplays.Add(this.BindSlot(slotElement, slot, playerInventory));
 			}
 		}
 
@@ -96,11 +96,11 @@ namespace SoulboundEngine.Client.UI.Screen {
 		}
 
 		private void SetMainSlotVisual(int slot) {
-			this.playerSlotDisplays[slot].SetAsMainSlot();
+			this.playerHotbarSlotDisplays[slot].SetAsMainSlot();
 		}
 
 		private void UnsetMainSlotVisual(int slot) {
-			this.playerSlotDisplays[slot].UnsetMainSlot();
+			this.playerHotbarSlotDisplays[slot].UnsetMainSlot();
 		}
 
 		private void AddPointerListeners(VisualElement visualElement, IInteractableUIToolkitSlotDisplay display, IItemSlot slot, IInventory inventory) {
@@ -216,9 +216,10 @@ namespace SoulboundEngine.Client.UI.Screen {
 			foreach (var slotDisplay in this.slotDisplays) {
 				slotDisplay.Dispose();
 			}
-			this.playerSlotDisplays.Clear();
+			this.playerHotbarSlotDisplays.Clear();
 			this.slotDisplays.Clear();
 			this.transitStackHandler.Destroy();
+			this.playerInventory.mainSlotChanged -= this.OnMainSlotChanged;
 		}
 
 		public struct Context {
