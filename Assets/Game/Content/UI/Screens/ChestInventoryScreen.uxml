@@ -1,0 +1,51 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="Hotbar" src="project://database/Assets/Game/Content/UI/Hotbar.uxml?fileID=9197481963319205126&amp;guid=ed08df87e99e44d428c348c8977151d7&amp;type=3#Hotbar"/>
+    <ui:Template name="PlayerInventory" src="project://database/Assets/Game/Content/UI/PlayerInventory.uxml?fileID=9197481963319205126&amp;guid=5fb502a4ef30a954d901962876e3adc0&amp;type=3#PlayerInventory"/>
+    <ui:Template name="Slot" src="project://database/Assets/Game/Content/UI/Slot.uxml?fileID=9197481963319205126&amp;guid=c25992c4a89227d4586f253b5c251934&amp;type=3#Slot"/>
+    <ui:VisualElement style="flex-grow: 1;">
+        <ui:VisualElement style="flex-grow: 1; top: auto; bottom: auto; left: auto; right: auto; flex-direction: column-reverse; padding-bottom: 15px;">
+            <ui:VisualElement name="ExternalInventorySpace" picking-mode="Ignore" style="flex-grow: 0; flex-direction: row;"/>
+        </ui:VisualElement>
+        <ui:VisualElement>
+            <ui:VisualElement template="PlayerInventory" name="ChestSpace" style="margin-bottom: 20px;">
+                <Style src="project://database/Assets/Game/Content/UI/Styles/Slot.uss?fileID=7433441132597879392&amp;guid=3c695142df27d314eb16e841ce896c57&amp;type=3#Slot"/>
+                <Style src="project://database/Assets/Game/Content/UI/Styles/Inventory.uss?fileID=7433441132597879392&amp;guid=b1ece437886e26b49939a3b01ec226ef&amp;type=3#Inventory"/>
+                <ui:VisualElement style="align-items: flex-start; align-content: auto; align-self: flex-start; justify-content: flex-start; flex-grow: 0;">
+                    <ui:VisualElement name="" style="flex-grow: 0; flex-direction: row; flex-wrap: wrap-reverse; align-content: auto; flex-shrink: 0; flex-basis: auto; justify-content: flex-start; width: 648px; align-items: stretch; align-self: auto; display: flex; visibility: visible;">
+                        <ui:Instance template="Slot" name="Slot" class="slot-offset"/>
+                        <ui:Instance template="Slot" name="Slot" class="slot-offset"/>
+                        <ui:Instance template="Slot" name="Slot" class="slot-offset"/>
+                        <ui:Instance template="Slot" name="Slot" class="slot-offset"/>
+                        <ui:Instance template="Slot" name="Slot" class="slot-offset"/>
+                        <ui:Instance template="Slot" name="Slot" class="slot-offset"/>
+                        <ui:Instance template="Slot" name="Slot" class="slot-offset"/>
+                        <ui:Instance template="Slot" name="Slot" class="slot-offset"/>
+                        <ui:Instance template="Slot" name="Slot" class="slot-offset"/>
+                        <ui:Instance template="Slot" name="Slot" class="slot-offset"/>
+                        <ui:Instance template="Slot" name="Slot" class="slot-offset"/>
+                        <ui:Instance template="Slot" name="Slot" class="slot-offset"/>
+                        <ui:Instance template="Slot" name="Slot" class="slot-offset"/>
+                        <ui:Instance template="Slot" name="Slot" class="slot-offset"/>
+                        <ui:Instance template="Slot" name="Slot" class="slot-offset"/>
+                        <ui:Instance template="Slot" name="Slot" class="slot-offset"/>
+                        <ui:Instance template="Slot" name="Slot" class="slot-offset"/>
+                        <ui:Instance template="Slot" name="Slot" class="slot-offset"/>
+                        <ui:Instance template="Slot" name="Slot" class="slot-offset"/>
+                        <ui:Instance template="Slot" name="Slot" class="slot-offset"/>
+                        <ui:Instance template="Slot" name="Slot" class="slot-offset"/>
+                        <ui:Instance template="Slot" name="Slot" class="slot-offset"/>
+                        <ui:Instance template="Slot" name="Slot" class="slot-offset"/>
+                        <ui:Instance template="Slot" name="Slot" class="slot-offset"/>
+                        <ui:Instance template="Slot" name="Slot" class="slot-offset"/>
+                        <ui:Instance template="Slot" name="Slot" class="slot-offset"/>
+                        <ui:Instance template="Slot" name="Slot" class="slot-offset"/>
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="PlayerInventorySpace" picking-mode="Ignore" style="flex-grow: 0; align-items: flex-start; align-self: flex-start; justify-content: flex-end;">
+                <ui:Instance template="PlayerInventory" name="" style="bottom: 4px;"/>
+                <ui:Instance template="Hotbar" name="" style="display: flex; visibility: visible;"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

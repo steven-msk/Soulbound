@@ -171,6 +171,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9b45f61e3a085404fa4c9b7672b7f76e
+    m_Address: ChestInventoryScreen
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b13141476e8f6134eb600bd09d0d9792
     m_Address: RedSquareTile
     m_ReadOnly: 0

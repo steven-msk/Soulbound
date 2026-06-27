@@ -29,6 +29,7 @@ namespace SoulboundEngine.Client.World.Block {
 
 		public void OnInteract(in BlockInteraction ctx) {
 			ChestTileEntity chestTileEntity = (ChestTileEntity)ctx.level.GetTileEntity(ctx.blockPos);
+			ctx.player.OpenInventoryScreen(chestTileEntity);
 		}
 	}
 }
