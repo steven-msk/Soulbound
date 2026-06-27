@@ -20,8 +20,8 @@ namespace SoulboundEngine.Client.UI.Screen {
 		protected readonly PlayerInventory playerInventory;
 		protected readonly HashSet<IInventory> openInventories = new();
 		protected readonly PlayerEntity player;
-		private readonly List<IInteractableUIToolkitSlotDisplay> playerHotbarSlotDisplays = new();
-		private readonly List<IInteractableUIToolkitSlotDisplay> slotDisplays = new();
+		private readonly List<InteractableHotbarSlotDisplay> playerHotbarSlotDisplays = new();
+		private readonly List<IUIToolkitSlotDisplay> slotDisplays = new();
 		private TransitStackHandler transitStackHandler;
 		private int lastClickedSlot;
 		private float lastClickTime;
@@ -83,7 +83,11 @@ namespace SoulboundEngine.Client.UI.Screen {
 				IItemSlot slot = playerInventory.GetSlot(slotIndex);
 				VisualElement slotElement = this.GetPlayerHotbar(inventoryRoot)[slotIndex];
 
-				this.playerHotbarSlotDisplays.Add(this.BindSlot(slotElement, slot, playerInventory));
+				InteractableHotbarSlotDisplay display = new(slot, this.itemRenderManager);
+				display.OnBind(slotElement);
+				this.slotDisplays.Add(display);
+				this.AddPointerListeners(slotElement, display, slot, playerInventory);
+				this.playerHotbarSlotDisplays.Add(display);
 			}
 		}
 
