@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using SoulboundEngine.Client.Player;
+using System.Collections.Generic;
 
 namespace SoulboundEngine.Client.Item.Container {
 	public sealed class SimpleInventory : IInventory {
@@ -23,5 +24,7 @@ namespace SoulboundEngine.Client.Item.Container {
 		public IItemSlot GetSlot(int index) => this.slots[index];
 
 		public int GetSize() => this.slots.Length;
+
+		public bool CanPlayerUse(PlayerEntity player) => true;
 	}
 }

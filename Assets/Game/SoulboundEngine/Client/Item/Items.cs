@@ -28,9 +28,6 @@ namespace SoulboundEngine.Client.Item {
 		public static readonly DebugPointerItem debugPointer = Register("debug_pointer", new DebugPointerItem(
 			Item.Settings.Of("Debug Pointer").NonStackable()
 		));
-		public static readonly InventoryListenerItem inventoryListenerItem = Register("inventory_listener_item", new InventoryListenerItem(
-			Item.Settings.Of("Inventory Listener Item")
-		));
 		public static readonly BlockBreakerItem blockBreakerItem = Register("block_breaker_item", new BlockBreakerItem(
 			Item.Settings.Of("Block Breaker Item").NonStackable()
 		));

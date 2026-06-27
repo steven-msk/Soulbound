@@ -49,7 +49,7 @@ namespace SoulboundEngine.Client.Runtime.Services {
 
 		public InventoryData GetInventory() {
 			IInventory inventory = this.player.GetInventory();
-			IEnumerable<int> slots = inventory.GetAllSlots();
+			IEnumerable<int> slots = inventory.GetSlots();
 
 			return new InventoryData {
 				slots = slots,
