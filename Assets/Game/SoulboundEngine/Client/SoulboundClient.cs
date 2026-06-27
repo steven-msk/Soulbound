@@ -97,6 +97,7 @@ namespace SoulboundEngine.Client {
 			this.itemRenderManager = new ItemRenderManager(Registries.ITEMS.ToList(), this.spriteResolver);
 			this.entityRenderManager = new EntityRenderManager(Registries.ENTITIES.ToList(), this.itemRenderManager);
 			this.blockRenderManager = new BlockRenderManager(Registries.BLOCKS.ToList());
+			_ = new InventoryScreens();
 		}
 
 		/// <summary>

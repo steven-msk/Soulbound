@@ -16,6 +16,8 @@ namespace SoulboundEngine.Client.UI.Screen {
 				value: new InventoryScreenHandlerType<THandler>(factory)
 			);
 		}
+
+		public static void Init() { }
 	}
 
 	public class InventoryScreenHandlerType<THandler> : InventoryScreenHandlerType where THandler : InventoryScreenHandler {

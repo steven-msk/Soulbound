@@ -40,7 +40,7 @@ namespace SoulboundEngine.Core.Registry {
 			EntityType.Init();
 			AttributeTypes.Init();
 			TileEntityTypes.Init();
-			_ = new InventoryScreens();
+			InventoryScreenHandlerType.Init();
 		}
 
 		public static void Freeze() {
