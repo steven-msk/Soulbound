@@ -40,7 +40,7 @@ MonoBehaviour:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 17a1cc01d5a67154f931385a6b7d83e4
-    m_Address: InventoryContextScreen
+    m_Address: DefaultInventoryScreen
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload

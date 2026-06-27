@@ -12,7 +12,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 		public InventoryScreens() {
 			Register(InventoryScreenHandlerType.DEFAULT_INVENTORY, IProvider<DefaultInventoryScreenHandler, DefaultInventoryScreen>.Of(
-				(ctx) => new DefaultInventoryScreen(ctx, AssetManager.Resolve<VisualTreeAsset>(new AssetKey("InventoryContextScreen")))
+				(ctx) => new DefaultInventoryScreen(ctx, AssetManager.Resolve<VisualTreeAsset>(new AssetKey("DefaultInventoryScreen")))
 			));
 		}
 
