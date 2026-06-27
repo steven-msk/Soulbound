@@ -21,6 +21,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		protected readonly HashSet<IInventory> openInventories = new();
 		protected readonly PlayerEntity player;
 		private readonly List<IInteractableUIToolkitSlotDisplay> playerSlotDisplays = new();
+		private readonly List<IInteractableUIToolkitSlotDisplay> slotDisplays = new();
 		private TransitStackHandler transitStackHandler;
 		private int lastClickedSlot;
 		private float lastClickTime;
@@ -73,10 +74,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 				IItemSlot slot = playerInventory.GetSlot(slotIndex);
 				VisualElement slotElement = this.GetPlayerPopup(inventoryRoot)[slotIndex - PlayerInventory.HOTBAR_SIZE];
 
-				InteractableUIToolkitSlotDisplay display = new(slot, this.itemRenderManager);
-				display.OnBind(slotElement);
-				this.playerSlotDisplays.Add(display);
-				this.AddPointerListeners(slotElement, display, slot, playerInventory);
+				this.playerSlotDisplays.Add(this.BindSlot(slotElement, slot, playerInventory));
 			}
 		}
 
@@ -85,11 +83,16 @@ namespace SoulboundEngine.Client.UI.Screen {
 				IItemSlot slot = playerInventory.GetSlot(slotIndex);
 				VisualElement slotElement = this.GetPlayerHotbar(inventoryRoot)[slotIndex];
 
-				InteractableHotbarSlotDisplay display = new(slot, this.itemRenderManager);
-				display.OnBind(slotElement);
-				this.playerSlotDisplays.Add(display);
-				this.AddPointerListeners(slotElement, display, slot, playerInventory);
+				this.playerSlotDisplays.Add(this.BindSlot(slotElement, slot, playerInventory));
 			}
+		}
+
+		protected IInteractableUIToolkitSlotDisplay BindSlot(VisualElement slotElement, IItemSlot slot, IInventory inventory) {
+			InteractableUIToolkitSlotDisplay display = new(slot, this.itemRenderManager);
+			display.OnBind(slotElement);
+			this.slotDisplays.Add(display);
+			this.AddPointerListeners(slotElement, display, slot, inventory);
+			return display;
 		}
 
 		private void SetMainSlotVisual(int slot) {
@@ -208,6 +211,15 @@ namespace SoulboundEngine.Client.UI.Screen {
 		}
 
 		public THandler GetScreenHandler() => this.handler;
+
+		public override void OnDispose(IScreenHandle handle) {
+			foreach (var slotDisplay in this.slotDisplays) {
+				slotDisplay.Dispose();
+			}
+			this.playerSlotDisplays.Clear();
+			this.slotDisplays.Clear();
+			this.transitStackHandler.Destroy();
+		}
 
 		public struct Context {
 			public THandler handler;

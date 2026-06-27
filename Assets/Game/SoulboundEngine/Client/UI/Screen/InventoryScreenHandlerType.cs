@@ -6,7 +6,10 @@ namespace SoulboundEngine.Client.UI.Screen {
 		public delegate THandler Factory<THandler>(PlayerInventory playerInventory) where THandler : InventoryScreenHandler;
 
 		public static InventoryScreenHandlerType<DefaultInventoryScreenHandler> DEFAULT_INVENTORY = Register("default_inventory", 
-			playerInventory => new DefaultInventoryScreenHandler(playerInventory)
+			playerInventory => new DefaultInventoryScreenHandler(DEFAULT_INVENTORY, playerInventory)
+		);
+		public static InventoryScreenHandlerType<ChestInventoryScreenHandler> CHEST = Register("chest",
+			playerInventory => new ChestInventoryScreenHandler(CHEST, playerInventory)
 		);
 
 		private static InventoryScreenHandlerType<THandler> Register<THandler>(string id, Factory<THandler> factory) where THandler : InventoryScreenHandler {

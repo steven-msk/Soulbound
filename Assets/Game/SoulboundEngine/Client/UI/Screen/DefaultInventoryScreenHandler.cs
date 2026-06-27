@@ -8,8 +8,8 @@ namespace SoulboundEngine.Client.UI.Screen {
 	public class DefaultInventoryScreenHandler : InventoryScreenHandler {
 		private readonly PlayerInventory playerInventory;
 
-		public DefaultInventoryScreenHandler(PlayerInventory playerInventory) 
-			: base(InventoryScreenHandlerType.DEFAULT_INVENTORY) {
+		public DefaultInventoryScreenHandler(InventoryScreenHandlerType<DefaultInventoryScreenHandler> type, PlayerInventory playerInventory) 
+			: base(type) {
 			this.AddPlayerSlots(playerInventory);
 			this.playerInventory = playerInventory;
 		}

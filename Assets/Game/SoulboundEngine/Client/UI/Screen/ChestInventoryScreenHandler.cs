@@ -1,6 +1,7 @@
 ﻿using SoulboundEngine.Client.Item;
 using SoulboundEngine.Client.Item.Container;
 using SoulboundEngine.Client.Player;
+using SoulboundEngine.Client.World.Block.TileEntity;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,7 +10,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		private readonly IInventory chestInventory;
 		private readonly PlayerInventory playerInventory;
 
-		public ChestInventoryScreenHandler(InventoryScreenHandlerType type, PlayerInventory playerInventory, IInventory chestInventory)
+		public ChestInventoryScreenHandler(InventoryScreenHandlerType<ChestInventoryScreenHandler> type, PlayerInventory playerInventory, IInventory chestInventory)
 			: base(type) {
 			this.chestInventory = chestInventory;
 			this.playerInventory = playerInventory;
@@ -17,6 +18,10 @@ namespace SoulboundEngine.Client.UI.Screen {
 			foreach (var slot in chestInventory.GetAllSlots()) {
 				this.AddSlot(slot);
 			}
+		}
+
+		public ChestInventoryScreenHandler(InventoryScreenHandlerType<ChestInventoryScreenHandler> type, PlayerInventory playerInventory)
+			: this(type, playerInventory, CreateInventory()) {
 		}
 
 		public override bool CanUse(PlayerEntity player) {
@@ -27,8 +32,16 @@ namespace SoulboundEngine.Client.UI.Screen {
 			List<IItemSlot> playerSlots = this.playerInventory.GetAllSlots().ToList();
 
 			ItemStack slotStack = slot.GetStack();
-			InventoryUtils.TryAddStack(playerSlots.Contains(slot) ? this.chestInventory : this.playerInventory, ref slotStack);
+			IInventory targetInventory = playerSlots.Contains(slot) ? this.chestInventory : this.playerInventory;
+			InventoryUtils.TryAddStack(targetInventory, ref slotStack);
 			slot.SetStack(slotStack);
 		}
+
+		public IInventory GetChestInventory() => this.chestInventory;
+
+		private static IInventory CreateInventory() {
+			return new SimpleInventory(ChestTileEntity.SIZE);
+		}
+
 	}
 }

@@ -1,7 +1,6 @@
 ﻿using SoulboundEngine.Client.Item.Container;
 using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.UI.Screen;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -24,7 +23,7 @@ namespace SoulboundEngine.Client.World.Block.TileEntity {
 		}
 
 		public InventoryScreenHandler Create(PlayerInventory playerInventory, PlayerEntity player) {
-			throw new NotImplementedException();
+			return new ChestInventoryScreenHandler(InventoryScreenHandlerType.CHEST, playerInventory, this);
 		}
 
 		public int GetSize() => SIZE;
