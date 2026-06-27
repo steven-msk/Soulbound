@@ -1,6 +1,6 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <ui:Template name="HotbarSlot" src="project://database/Assets/Game/Content/UI/HotbarSlot.uxml?fileID=9197481963319205126&amp;guid=9f462f66b91de1241b68dc8b9085693d&amp;type=3#HotbarSlot"/>
-    <Style src="project://database/Assets/Game/Content/UI/Inventory.uss?fileID=7433441132597879392&amp;guid=b1ece437886e26b49939a3b01ec226ef&amp;type=3#Inventory"/>
+    <Style src="project://database/Assets/Game/Content/UI/Styles/Inventory.uss?fileID=7433441132597879392&amp;guid=b1ece437886e26b49939a3b01ec226ef&amp;type=3#Inventory"/>
     <ui:VisualElement name="Hotbar" style="flex-grow: 0; flex-direction: row; width: auto; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; align-self: flex-start; align-items: flex-start;">
         <ui:Instance template="HotbarSlot" name="HotbarSlot" class="slot-offset"/>
         <ui:Instance template="HotbarSlot" name="HotbarSlot" class="slot-offset"/>

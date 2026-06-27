@@ -1,5 +1,5 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/Game/Content/UI/Slot.uss?fileID=7433441132597879392&amp;guid=3c695142df27d314eb16e841ce896c57&amp;type=3#Slot"/>
+    <Style src="project://database/Assets/Game/Content/UI/Styles/Slot.uss?fileID=7433441132597879392&amp;guid=3c695142df27d314eb16e841ce896c57&amp;type=3#Slot"/>
     <ui:VisualElement name="DisplayArea" class="hotbar-slot" style="flex-grow: 0; border-right-color: rgb(102, 102, 102); border-bottom-color: rgb(102, 102, 102); background-image: url(&quot;project://database/Assets/Game/Content/Shared/Textures/slot_bg_dark.png?fileID=2800000&amp;guid=1dde65b749f47744b9bc8507939c1600&amp;type=3#slot_bg_dark&quot;);">
         <ui:VisualElement style="flex-grow: 1; align-items: center; justify-content: center;">
             <ui:VisualElement name="ItemDisplay" style="flex-grow: 0; background-image: none; width: 48px; height: 48px; flex-shrink: 0; align-self: auto; align-items: stretch; justify-content: flex-end;">
