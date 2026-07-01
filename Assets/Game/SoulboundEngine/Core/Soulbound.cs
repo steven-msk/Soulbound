@@ -49,7 +49,7 @@ namespace SoulboundEngine.Core {
 			this.performanceMetrics = new PerformanceMetrics();
 			this.RegisterDebugMetricsSource(this);
 
-			AssetManager.PreloadAll();
+			AssetManager.LoadAllWithPreloadLabel();
 
 			Registries.Init();
 			Registries.Freeze();

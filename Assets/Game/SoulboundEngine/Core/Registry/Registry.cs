@@ -95,6 +95,10 @@ namespace SoulboundEngine.Core.Registry {
 
 		public RegistryKey<Registry<T>> GetKey() => this.key;
 
+		public IEnumerable<RegistryKey<T>> GetAllKeys() {
+			return this.keyToEntry.Keys;
+		}
+
 		IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 
 		bool IRegistryEntryOwner<T>.OwnerEquals(IRegistryEntryOwner<T> other) {

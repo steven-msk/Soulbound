@@ -13,13 +13,13 @@ namespace SoulboundEngine.Core.Registry {
 
 			public abstract bool Contains(RegistryEntry<T> entry);
 
-			public int size => entries.Count;
+			public int size => this.entries.Count;
 
-			public RegistryEntry<T> Get(int index) => entries[index];
+			public RegistryEntry<T> Get(int index) => this.entries[index];
 
-			public IEnumerator<RegistryEntry<T>> GetEnumerator() => entries.GetEnumerator();
+			public IEnumerator<RegistryEntry<T>> GetEnumerator() => this.entries.GetEnumerator();
 
-			IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+			IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 		}
 
 		public sealed class Direct : ListBacked {
@@ -33,13 +33,13 @@ namespace SoulboundEngine.Core.Registry {
 			}
 
 			public override bool Contains(RegistryEntry<T> entry) {
-				return entrySet.Contains(entry);
+				return this.entrySet.Contains(entry);
 			}
 
-			public override int GetHashCode() => HashCode.Combine(entries);
+			public override int GetHashCode() => HashCode.Combine(this.entries);
 
 			public override string ToString() {
-				return $"direct[{string.Join(", ", entries)}]";
+				return $"[{string.Join(", ", this.entries)}]";
 			}
 		}
 	}

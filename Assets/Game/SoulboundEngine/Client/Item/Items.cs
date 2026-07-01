@@ -1,5 +1,6 @@
 using SoulboundEngine.Client.World.Block;
 using SoulboundEngine.Core.Registry;
+using System;
 
 #nullable enable
 
@@ -47,7 +48,11 @@ namespace SoulboundEngine.Client.Item {
 		}
 
 		public static Identifier GetIdentifier(Item item) {
-			return Registries.ITEMS.GetIdentifier(item);
+			return Registries.ITEMS.GetIdentifier(item) ?? throw new NotSupportedException("Items not initialized");
+		}
+
+		public static RegistryEntry<Item> GetEntry(Item item) {
+			return Registries.ITEMS.GetEntry(item) ?? throw new NotSupportedException("Items not initialized");
 		}
 
 		private static RegistryKey<Item> KeyOf(string id) {
