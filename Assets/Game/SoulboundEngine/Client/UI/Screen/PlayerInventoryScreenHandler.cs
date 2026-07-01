@@ -5,10 +5,10 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace SoulboundEngine.Client.UI.Screen {
-	public class DefaultInventoryScreenHandler : InventoryScreenHandler {
+	public class PlayerInventoryScreenHandler : InventoryScreenHandler {
 		private readonly PlayerInventory playerInventory;
 
-		public DefaultInventoryScreenHandler(InventoryScreenHandlerType<DefaultInventoryScreenHandler> type, PlayerInventory playerInventory) 
+		public PlayerInventoryScreenHandler(InventoryScreenHandlerType<PlayerInventoryScreenHandler> type, PlayerInventory playerInventory) 
 			: base(type) {
 			this.AddPlayerSlots(playerInventory);
 			this.playerInventory = playerInventory;

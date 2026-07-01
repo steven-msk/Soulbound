@@ -107,7 +107,7 @@ namespace SoulboundEngine.Client.Player {
 				InputEventListener.ConsumePerformed(InputTokens.Player.toggleInventory, _ => {
 					if (!this.isInventoryOpen) {
 						this.OpenInventoryScreen(new SimpleInventoryScreenHandlerFactory(
-							(playerInventory, _) => InventoryScreenHandlerType.DEFAULT_INVENTORY.Create(playerInventory)
+							(playerInventory, _) => InventoryScreenHandlerType.PLAYER_INVENTORY.Create(playerInventory)
 						));
 					} else {
 						this.CloseInventoryScreen();

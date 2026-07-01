@@ -1,8 +1,8 @@
 ﻿using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.UI.Screen {
-	public class DefaultInventoryScreen : InventoryScreen<DefaultInventoryScreenHandler> {
-		public DefaultInventoryScreen(Context ctx, VisualTreeAsset asset) 
+	public class PlayerInventoryScreen : InventoryScreen<PlayerInventoryScreenHandler> {
+		public PlayerInventoryScreen(Context ctx, VisualTreeAsset asset) 
 			: base(ctx, asset) {
 		}
 

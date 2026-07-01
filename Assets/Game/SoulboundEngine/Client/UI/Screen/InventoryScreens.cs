@@ -11,8 +11,8 @@ namespace SoulboundEngine.Client.UI.Screen {
 		private static readonly Dictionary<InventoryScreenHandlerType, IProviderBase> providers = new();
 
 		public InventoryScreens() {
-			Register(InventoryScreenHandlerType.DEFAULT_INVENTORY, IProvider<DefaultInventoryScreenHandler, DefaultInventoryScreen>.Of(
-				(ctx) => new DefaultInventoryScreen(ctx, AssetManager.Resolve<VisualTreeAsset>(new AssetKey("DefaultInventoryScreen")))
+			Register(InventoryScreenHandlerType.PLAYER_INVENTORY, IProvider<PlayerInventoryScreenHandler, PlayerInventoryScreen>.Of(
+				(ctx) => new PlayerInventoryScreen(ctx, AssetManager.Resolve<VisualTreeAsset>(new AssetKey("PlayerInventoryScreen")))
 			));
 			Register(InventoryScreenHandlerType.CHEST, IProvider<ChestInventoryScreenHandler, ChestInventoryScreen>.Of(
 				(ctx) => new ChestInventoryScreen(ctx, AssetManager.Resolve<VisualTreeAsset>(new AssetKey("ChestInventoryScreen")))
