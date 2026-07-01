@@ -9,9 +9,11 @@ namespace SoulboundEngine.Client.Item.Container {
 		public int button { get; init; }
 		public Dictionary<SlotRef, int> countSnapshot { get; init; }
 		public bool stackFromOriginSlot { get; init; }
+		public HashSet<IInventory> inventories { get; private set; } = new();
 
 		public void ExtendDrag(SlotRef slotRef) {
 			this.draggedSlots.Add(slotRef);
+			this.inventories.Add(slotRef.inventory);
 		}
 
 		public bool IsSlotDragged(SlotRef slotRef) => this.draggedSlots.Contains(slotRef);
@@ -34,5 +36,6 @@ namespace SoulboundEngine.Client.Item.Container {
 			}
 			return 0;
 		}
+
 	}
 }

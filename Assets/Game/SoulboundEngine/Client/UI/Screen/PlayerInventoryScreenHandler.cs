@@ -1,7 +1,7 @@
-﻿using SoulboundEngine.Client.Item;
+﻿using SoulboundEngine.Client.Debug.Logging;
+using SoulboundEngine.Client.Item;
 using SoulboundEngine.Client.Item.Container;
 using SoulboundEngine.Client.Player;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace SoulboundEngine.Client.UI.Screen {
@@ -17,12 +17,16 @@ namespace SoulboundEngine.Client.UI.Screen {
 		public override bool CanUse(PlayerEntity player) => true;
 
 		protected override void QuickMove(PlayerEntity player, IItemSlot slot) {
-			List<IItemSlot> hotbarSlots = this.playerInventory.GetHotbar().Select(i => this.playerInventory.GetSlot(i)).ToList();
-			List<IItemSlot> popupSlots = this.playerInventory.GetPopup().Select(i => this.playerInventory.GetSlot(i)).ToList();
+			IItemSlot[] hotbarSlots = this.playerInventory.GetHotbar().Select(this.playerInventory.GetSlot).ToArray();
+			IItemSlot[] popupSlots = this.playerInventory.GetPopup().Select(this.playerInventory.GetSlot).ToArray();
 
 			ItemStack slotStack = slot.GetStack();
-			InventoryUtils.TryAddStack(hotbarSlots.Contains(slot) ? popupSlots : hotbarSlots, ref slotStack);
+			this.InsertItem(ref slotStack, hotbarSlots.Contains(slot) ? popupSlots : hotbarSlots, false);
 			slot.SetStack(slotStack);
+		}
+
+		public override void OnContentChanged(IInventory inventory) {
+			Logger.LogInfo("changed");
 		}
 	}
 }

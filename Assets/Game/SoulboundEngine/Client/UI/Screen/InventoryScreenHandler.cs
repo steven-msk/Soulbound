@@ -45,7 +45,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 			return slotRef;
 		}
 
-		static List<SlotRef> GetRefs(IEnumerable<int> slots, IInventory inventory) {
+		public static List<SlotRef> GetRefs(IEnumerable<int> slots, IInventory inventory) {
 			return slots.Select(s => new SlotRef(inventory, s)).ToList();
 		}
 
@@ -57,7 +57,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		/// </summary>
 		public abstract bool CanUse(PlayerEntity player);
 
-		public void OnSlotAction(SlotRef slotRef, int button, PlayerEntity player, SlotActionType actionType) {
+		public virtual void OnSlotAction(SlotRef slotRef, int button, PlayerEntity player, SlotActionType actionType) {
 			try {
 				this.InternalSlotAction(slotRef, button, player, actionType);
 			} catch (Exception e) {
@@ -87,13 +87,22 @@ namespace SoulboundEngine.Client.UI.Screen {
 			}
 		}
 
+		/// <summary>
+		/// Called when a slot's content has changed.
+		/// </summary>
+		public virtual void OnContentChanged(IInventory inventory) {
+		}
+
 		private void HandleQuickMove(PlayerEntity player, IItemSlot slot) {
 			this.QuickMove(player, slot);
+			this.OnContentChanged(slot.GetInventory());
 		}
 
 		/// <summary>
 		/// Quick moves the stack in slot to other slots of the inventory screen handler. <br/>
-		/// The target slots may belong to another inventory or a section of the same inventory
+		/// The target slots may belong to another inventory or a section of the same inventory. <br/>
+		/// Subclasses should call <seealso cref="InsertItem"/> and set the stack of the used slot 
+		/// as the passed stack reference.
 		/// </summary>
 		protected abstract void QuickMove(PlayerEntity player, IItemSlot slot);
 
@@ -143,6 +152,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 				this.transitStack = slotStack.CopyFullStack();
 			} else if (this.CanInsertIntoSlot(slot)) {
 				slot.SetStack(this.transitStack.CopyFullStack());
+				this.OnContentChanged(slot.GetInventory());
 			}
 		}
 
@@ -185,6 +195,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 						if (this.CanInsertIntoSlot(this.dragState.stack, slot) && !this.dragState.IsSlotDragged(slotRef)) {
 							slot.SetStack(this.dragState.stack.CopyFullStack());
 							this.dragState.ExtendDrag(slotRef);
+							this.OnContentChanged(slot.GetInventory());
 						}
 					}
 					break;
@@ -215,6 +226,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		protected void SplitDistributeToDragged(SlotRef draggedSlotRef) {
 			if (this.dragState == null) return;
 			if (!this.dragState.IsEligible(draggedSlotRef)) return;
+			if (!this.CanInsertIntoSlot(this.dragState.stack, draggedSlotRef.GetSlot())) return;
 
 			int toSplit = this.dragState.stack.count;
 			this.dragState.ExtendDrag(draggedSlotRef);
@@ -246,22 +258,33 @@ namespace SoulboundEngine.Client.UI.Screen {
 			}
 
 			this.transitStack = this.dragState.stack.CopyWithCount(toSplit - inserted);
+			foreach (var inventory in this.dragState.inventories) {
+				this.OnContentChanged(inventory);
+			}
 		}
 
 		protected void SwapTransitWithSlot(IItemSlot slot) {
 			ItemStack temp = this.transitStack;
 			this.transitStack = slot.GetStack();
 			slot.SetStack(temp);
+
+			this.OnContentChanged(slot.GetInventory());
 		}
 
 		protected void CollectAll(Item item) {
 			List<IItemSlot> slots = this.GetSlotsContaining(item);
 			if (slots == null || slots.Count == 0) return;
+			HashSet<IInventory> contentUpdates = new();
 
 			foreach (var slot in slots) {
 				ItemStack stack = slot.GetStack();
 				this.transitStack.FillFrom(ref stack);
+				contentUpdates.Add(slot.GetInventory());
 				slot.SetStack(stack);
+			}
+
+			foreach (var inventory in contentUpdates) {
+				this.OnContentChanged(inventory);
 			}
 		}
 
@@ -275,6 +298,8 @@ namespace SoulboundEngine.Client.UI.Screen {
 			slotStack.Decrement(transfer);
 			slot.SetStack(slotStack);
 			this.transitStack = halvedTransit;
+
+			this.OnContentChanged(slot.GetInventory());
 		}
 
 		protected void InsertSingle(IItemSlot slot) => this.InsertSingle(ref this.transitStack, slot);
@@ -284,6 +309,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 				ItemStack cloned = stack.CopyWithCount(1);
 				stack.Decrement();
 				slot.SetStack(cloned);
+				this.OnContentChanged(slot.GetInventory());
 				return;
 			}
 
@@ -294,12 +320,14 @@ namespace SoulboundEngine.Client.UI.Screen {
 				slot.SetStack(slotStack);
 			}
 
+			this.OnContentChanged(slot.GetInventory());
 		}
 
 		protected void InsertInSlot(IItemSlot slot) {
 			if (!slot.HasStack()) {
 				slot.SetStack(this.transitStack);
 				this.transitStack = ItemStack.EMPTY;
+				this.OnContentChanged(slot.GetInventory());
 				return;
 			}
 			int space = slot.GetStack().GetSpaceLeft();
@@ -311,6 +339,28 @@ namespace SoulboundEngine.Client.UI.Screen {
 			slotStack.Increment(transfer);
 			slot.SetStack(slotStack);
 			this.transitStack.Decrement(transfer);
+
+			this.OnContentChanged(slot.GetInventory());
+		}
+
+		/// <summary>
+		/// Tries to consume stack by inserting to <paramref name="slots"/> 
+		/// until the entire stack is used.
+		/// </summary>
+		/// <returns>Whether the stack was fully consumed</returns>
+		protected bool InsertItem(ref ItemStack stack, IItemSlot[] slots, bool reverse) {
+			HashSet<IInventory> contentUpdates = new();
+
+			ItemStack copyOfStack = stack;
+			IEnumerable<IItemSlot> targetSlots = slots.Where(s => this.CanInsertIntoSlot(copyOfStack, s));
+			if (reverse) targetSlots = targetSlots.Reverse();
+			bool consumed = InventoryUtils.TryAddStack(targetSlots, ref stack);
+
+			foreach (var inventory in contentUpdates) {
+				this.OnContentChanged(inventory);
+			}
+
+			return consumed;
 		}
 
 		public bool CanInsertIntoSlot(IItemSlot slot) {
