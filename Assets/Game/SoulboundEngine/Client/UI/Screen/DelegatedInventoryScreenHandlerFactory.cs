@@ -2,10 +2,10 @@
 using System;
 
 namespace SoulboundEngine.Client.UI.Screen {
-	public class SimpleInventoryScreenHandlerFactory : IInventoryScreenHandlerFactory {
+	public class DelegatedInventoryScreenHandlerFactory : IInventoryScreenHandlerFactory {
 		private readonly Func<PlayerInventory, PlayerEntity, InventoryScreenHandler> factory;
 
-		public SimpleInventoryScreenHandlerFactory(Func<PlayerInventory, PlayerEntity, InventoryScreenHandler> factory) {
+		public DelegatedInventoryScreenHandlerFactory(Func<PlayerInventory, PlayerEntity, InventoryScreenHandler> factory) {
 			this.factory = factory;
 		}
 

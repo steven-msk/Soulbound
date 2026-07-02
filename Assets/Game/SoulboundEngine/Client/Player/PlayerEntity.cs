@@ -106,8 +106,11 @@ namespace SoulboundEngine.Client.Player {
 				}),
 				InputEventListener.ConsumePerformed(InputTokens.Player.toggleInventory, _ => {
 					if (!this.isInventoryOpen) {
-						this.OpenInventoryScreen(new SimpleInventoryScreenHandlerFactory(
-							(playerInventory, _) => InventoryScreenHandlerType.PLAYER_INVENTORY.Create(playerInventory)
+						this.OpenInventoryScreen(new DelegatedInventoryScreenHandlerFactory(
+							(inventory, _) => {
+								InventoryScreenHandlerContext context = InventoryScreenHandlerContext.Of(this.client, (BlockPos)this.GetPosition(), this.level);
+								return new PlayerInventoryScreenHandler(InventoryScreenHandlerType.PLAYER_INVENTORY, inventory, context);
+							}
 						));
 					} else {
 						this.CloseInventoryScreen();

@@ -7,11 +7,17 @@ using System.Linq;
 namespace SoulboundEngine.Client.UI.Screen {
 	public class PlayerInventoryScreenHandler : InventoryScreenHandler {
 		private readonly PlayerInventory playerInventory;
+		private readonly InventoryScreenHandlerContext context;
 
-		public PlayerInventoryScreenHandler(InventoryScreenHandlerType<PlayerInventoryScreenHandler> type, PlayerInventory playerInventory) 
+		public PlayerInventoryScreenHandler(InventoryScreenHandlerType<PlayerInventoryScreenHandler> type, PlayerInventory playerInventory)
+			: this(type, playerInventory, InventoryScreenHandlerContext.EMPTY) {
+		}
+
+		public PlayerInventoryScreenHandler(InventoryScreenHandlerType<PlayerInventoryScreenHandler> type, PlayerInventory playerInventory, InventoryScreenHandlerContext context) 
 			: base(type) {
 			this.AddPlayerSlots(playerInventory);
 			this.playerInventory = playerInventory;
+			this.context = context;
 		}
 
 		public override bool CanUse(PlayerEntity player) => true;
@@ -26,7 +32,9 @@ namespace SoulboundEngine.Client.UI.Screen {
 		}
 
 		public override void OnContentChanged(IInventory inventory) {
-			Logger.LogInfo("changed");
+			this.context.Run((_, _, _) => {
+				Logger.LogInfo("changed");
+			});
 		}
 	}
 }
