@@ -7,6 +7,10 @@ using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.UI.Screen {
 	public class PlayerInventoryScreen : InventoryScreen<PlayerInventoryScreenHandler> {
+		private const string HOTBAR_ELEMENT = "Hotbar";
+		private const string POPUP_ELEMENT = "Popup";
+		private const string PLAYER_INVENTORY_SPACE_ELEMENT = "PlayerInventorySpace";
+		private const string CRAFTING_ELEMENT = "Crafting";
 		private IEnumerable<RecipeView<StationlessCraftingRecipe>> currentRecipes;
 		private readonly List<RecipePreviewElement> craftingResultPreviews = new();
 		private VisualElement craftingRoot;
@@ -26,15 +30,15 @@ namespace SoulboundEngine.Client.UI.Screen {
 		}
 
 		protected override VisualElement GetPlayerHotbar(VisualElement inventoryRoot) {
-			return inventoryRoot.Q<VisualElement>("Hotbar");
+			return inventoryRoot.Q<VisualElement>(HOTBAR_ELEMENT);
 		}
 
 		protected override VisualElement GetPlayerPopup(VisualElement inventoryRoot) {
-			return inventoryRoot.Q<VisualElement>("Popup");
+			return inventoryRoot.Q<VisualElement>(POPUP_ELEMENT);
 		}
 
 		protected override VisualElement GetPlayerInventoryRoot(VisualElement screenRoot) {
-			return screenRoot.Q<VisualElement>("PlayerInventorySpace");
+			return screenRoot.Q<VisualElement>(PLAYER_INVENTORY_SPACE_ELEMENT);
 		}
 
 		private void BindCrafting(VisualElement screenRoot) {
@@ -73,7 +77,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		}
 
 		private VisualElement GetCraftingPreviewParent(VisualElement screenRoot) {
-			return screenRoot.Q<VisualElement>("Crafting");
+			return screenRoot.Q<VisualElement>(CRAFTING_ELEMENT);
 		}
 
 		public override void OnDispose(IScreenHandle handle) {

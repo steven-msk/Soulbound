@@ -4,10 +4,11 @@ using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.UI.Screen {
 	public sealed class UIToolkitScreenRoot : IScreenRoot {
+		public const string ROOT_LAYER_ELEMENT = "RootLayer";
 		public readonly VisualElement root;
 
 		public UIToolkitScreenRoot(UIDocument document) {
-			this.root = document.rootVisualElement.Q<VisualElement>("RootLayer");
+			this.root = document.rootVisualElement.Q<VisualElement>(ROOT_LAYER_ELEMENT);
 		}
 
 		public void Attach(VisualElement screenRoot) {

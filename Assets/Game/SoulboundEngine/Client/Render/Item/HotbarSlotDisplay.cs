@@ -5,6 +5,8 @@ using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.Render.Item {
 	public class HotbarSlotDisplay : UIToolkitItemSlotDisplay {
+		public const string DISPLAY_AREA_ELEMENT = "DisplayArea";
+		private const string SLOT_INDEX_ELEMENT = "SlotIndex";
 		private bool isMainSlot;
 		private static readonly Color[] mainSlotBorders = {
 			Color.white, Color.white, Color.white, Color.white
@@ -22,7 +24,7 @@ namespace SoulboundEngine.Client.Render.Item {
 
 		public override void OnBind(VisualElement root) {
 			base.OnBind(root);
-			root.Q<Label>("SlotIndex").text = (this.slot.GetIndex() + 1).ToString();
+			root.Q<Label>(SLOT_INDEX_ELEMENT).text = (this.slot.GetIndex() + 1).ToString();
 		}
 
 		public override void SetAsMainSlot() {
@@ -38,7 +40,7 @@ namespace SoulboundEngine.Client.Render.Item {
 		}
 
 		private void SetBorders(Color[] borders) {
-			VisualElement displayArea = this.root.Q<VisualElement>("DisplayArea");
+			VisualElement displayArea = this.root.Q<VisualElement>(DISPLAY_AREA_ELEMENT);
 			displayArea.style.borderTopColor = borders[0];
 			displayArea.style.borderRightColor = borders[1];
 			displayArea.style.borderBottomColor = borders[2];

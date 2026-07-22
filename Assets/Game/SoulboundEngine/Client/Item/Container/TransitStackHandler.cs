@@ -7,6 +7,7 @@ using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.Item.Container {
 	public sealed class TransitStackHandler {
+		public const string TRANSIT_STACK_ELEMENT = "TransitStack";
 		const float ITEM_DISPLAY_SIZE = 48f;
 		private readonly VisualElement root;
 		private Vector2 pointerPosition;
@@ -29,7 +30,7 @@ namespace SoulboundEngine.Client.Item.Container {
 			// TODO: this is so fucking bad
 			VisualTreeAsset asset = AssetManager.Resolve<VisualTreeAsset>(new AssetKey("TransitStack"));
 			asset.CloneTree(screenRoot);
-			return screenRoot.Q<VisualElement>("TransitStack");
+			return screenRoot.Q<VisualElement>(TRANSIT_STACK_ELEMENT);
 
 			//VisualElement root = new() {
 			//	name = "TransitStack",

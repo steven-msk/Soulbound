@@ -8,6 +8,14 @@ using UnityEngine.UIElements;
 namespace SoulboundEngine.Client.UI.Screen {
 	public sealed class WorldListScreen : UxmlScreen {
 		public const int MAX_WORLDS = 10;
+		private const string WORLD_LIST_ELEMENT = "WorldList";
+		private const string CREATE_WORLD_ELEMENT = "CreateWorld";
+		private const string NAME_FIELD_ELEMENT = "NameField";
+		private const string SEED_FIELD_ELEMENT = "SeedField";
+		private const string WORLD_NAME_FIELD_ELEMENT = "WorldName";
+		private const string WORLD_SEED_FIELD_ELEMENT = "WorldSeed";
+		private const string ENTER_WORLD_ELEMENT = "EnterWorld";
+		private const string DELETE_WORLD_ELEMENT = "DeleteWorld";
 		private readonly IWorldAccessor worldAccessor;
 		private readonly VisualTreeAsset worldEntryAsset;
 		private int nextWorldIndex;
@@ -21,7 +29,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		}
 
 		protected override void OnBind(VisualElement root) {
-			VisualElement worldList = root.Q<VisualElement>("WorldList");
+			VisualElement worldList = root.Q<VisualElement>(WORLD_LIST_ELEMENT);
 			this.CreateSlots(worldList);
 			this.nextWorldIndex = 0;
 			int i = 0;
@@ -33,9 +41,9 @@ namespace SoulboundEngine.Client.UI.Screen {
 				this.AddWorldToList(save.name, save.seed, slot, i++);
 			}
 
-			root.Q<Button>("CreateWorld").clicked += () => {
-				TextField nameField = root.Q<TextField>("NameField");
-				TextField seedField = root.Q<TextField>("SeedField");
+			root.Q<Button>(CREATE_WORLD_ELEMENT).clicked += () => {
+				TextField nameField = root.Q<TextField>(NAME_FIELD_ELEMENT);
+				TextField seedField = root.Q<TextField>(SEED_FIELD_ELEMENT);
 
 				if (!string.IsNullOrEmpty(nameField.value) && this.SpaceAvailable() > 0) {
 					int seed = WorldManager.GetRandomSeed();
@@ -50,7 +58,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 					this.worldAccessor.CreateNewWorld(nameField.value, seed);
 
-					VisualElement listRoot = root.Q<VisualElement>("WorldList");
+					VisualElement listRoot = root.Q<VisualElement>(WORLD_LIST_ELEMENT);
 					VisualElement slot = this.GetNextSlot(listRoot);
 					int index = listRoot.hierarchy.IndexOf(slot);
 					this.AddWorldToList(nameField.value, seed, slot, index);
@@ -112,11 +120,11 @@ namespace SoulboundEngine.Client.UI.Screen {
 			seed.style.display = DisplayStyle.None;
 		}
 
-		private Label GetName(VisualElement slot) => slot.Q<Label>("WorldName");
-		private Label GetSeed(VisualElement slot) => slot.Q<Label>("WorldSeed");
+		private Label GetName(VisualElement slot) => slot.Q<Label>(WORLD_NAME_FIELD_ELEMENT);
+		private Label GetSeed(VisualElement slot) => slot.Q<Label>(WORLD_SEED_FIELD_ELEMENT);
 
-		private Button GetEnterButton(VisualElement slot) => slot.Q<Button>("EnterWorld");
-		private Button GetDeleteButton(VisualElement slot) => slot.Q<Button>("DeleteWorld");
+		private Button GetEnterButton(VisualElement slot) => slot.Q<Button>(ENTER_WORLD_ELEMENT);
+		private Button GetDeleteButton(VisualElement slot) => slot.Q<Button>(DELETE_WORLD_ELEMENT);
 
 		private VisualElement GetNextSlot(VisualElement listRoot) {
 			if (this.removedSlots.Any()) {
