@@ -4,10 +4,10 @@ using System;
 namespace SoulboundEngine.Core.Registry {
 	public sealed class Identifier : IEquatable<Identifier> {
 		public const string DEFAULT_NAMESPACE = "soulbound";
+		public const char NAMESPACE_SEPARATOR = ':';
+		public const char PATH_SEPARATOR = '/';
 		private const string ALLOWED_PATH_CHARACTERS = "abcdefghijklmnopqrstuvwxyz1234567890-_./";
 		private const string ALLOWED_NAMESPACE_CHARACTERS = "abcdefghijklmnopqrstuvwxyz1234567890-_";
-		private const char NAMESPACE_SEPARATOR = ':';
-		private const char PATH_SEPARATOR = '/';
 
 		private readonly string _namespace;
 		private readonly string path;
@@ -78,7 +78,7 @@ namespace SoulboundEngine.Core.Registry {
 			}
 		}
 
-		private static bool IsValid(string id) {
+		public static bool IsValid(string id) {
 			if (string.IsNullOrEmpty(id)) return false;
 
 			string[] colonSplit = id.Split(NAMESPACE_SEPARATOR);
@@ -99,14 +99,14 @@ namespace SoulboundEngine.Core.Registry {
 			return true;
 		}
 
-		private static bool IsNamespaceValid(string _namespace) {
+		public static bool IsNamespaceValid(string _namespace) {
 			foreach (char c in _namespace) {
 				if (!IsNamespaceCharacterValid(c)) return false;
 			}
 			return true;
 		}
 
-		private static bool IsPathValid(string path) {
+		public static bool IsPathValid(string path) {
 			if (string.IsNullOrEmpty(path)) return false;
 
 			foreach (char c in path) {
@@ -124,28 +124,32 @@ namespace SoulboundEngine.Core.Registry {
 		}
 
 		public override string ToString() {
-			return string.Concat(GetNamespace(), NAMESPACE_SEPARATOR, GetPath());
+			return string.Concat(this.GetNamespace(), NAMESPACE_SEPARATOR, this.GetPath());
 		}
 
 		public string GetNamespace() {
-			return string.IsNullOrEmpty(_namespace)
+			return string.IsNullOrEmpty(this._namespace)
 				? DEFAULT_NAMESPACE
-				: _namespace;
+				: this._namespace;
 		}
 
-		public string GetPath() => path;
+		public string GetPath() => this.path;
+
+		public string[] SplitPath() {
+			return this.path.Split(PATH_SEPARATOR);
+		}
 
 		public bool Equals(Identifier other) {
-			return other.GetNamespace() == GetNamespace()
-				&& other.GetPath() == GetPath();
+			return other.GetNamespace() == this.GetNamespace()
+				&& other.GetPath() == this.GetPath();
 		}
 
 		public override bool Equals(object obj) {
-			return obj is Identifier other && Equals(other);
+			return obj is Identifier other && this.Equals(other);
 		}
 
 		public override int GetHashCode() {
-			return HashCode.Combine(GetNamespace(), GetPath());
+			return HashCode.Combine(this.GetNamespace(), this.GetPath());
 		}
 
 		[Obsolete("Identifier instances should not be compared with ==. Compare with .Equals instead.", true)]

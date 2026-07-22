@@ -4,15 +4,17 @@ using SoulboundEngine.Client.Debug.Metrics.View;
 using SoulboundEngine.Client.Item.Container;
 using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.Render.Item;
+using SoulboundEngine.Client.UI.UXMLBindings;
 using SoulboundEngine.Core.Assets;
+using SoulboundEngine.Core.Registry;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.UI.Screen {
 	public sealed class WorldScreen : UxmlScreen {
-		public const string COMMAND_LINE_ELEMENT = "CommandLine";
-		public const string METRICS_HUD_ELEMENT = "MetricsHUD";
-		public const string LOG_CONSOLE_ELEMENT = "LogConsole";
-		public const string HOTBAR_ELEMENT = "Hotbar";
+		private static readonly Identifier COMMAND_LINE_ELEMENT = Identifier.Of("soulbound:world_screen/command_line");
+		private static readonly Identifier METRICS_HUD_ELEMENT = Identifier.Of("soulbound:world_screen/metrics_hud");
+		private static readonly Identifier LOG_CONSOLE_ELEMENT = Identifier.Of("soulbound:world_screen/log_console");
+		private static readonly Identifier HOTBAR_ELEMENT = Identifier.Of("soulbound:hotbar/hotbar");
 		private readonly ItemRenderManager itemRenderManager;
 		private readonly CommandLine commandLine;
 		private readonly MetricsHUD metricsHUD;
@@ -33,11 +35,11 @@ namespace SoulboundEngine.Client.UI.Screen {
 		public override bool CloseOnEsc => false;
 
 		protected override void OnBind(VisualElement root) {
-			this.commandLine.OnBind(root.Q<VisualElement>(COMMAND_LINE_ELEMENT));
-			this.metricsHUD.OnBind(root.Q<VisualElement>(METRICS_HUD_ELEMENT));
-			this.logConsole.OnBind(root.Q<VisualElement>(LOG_CONSOLE_ELEMENT));
+			this.commandLine.OnBind(root.Get<VisualElement>(COMMAND_LINE_ELEMENT));
+			this.metricsHUD.OnBind(root.Get<VisualElement>(METRICS_HUD_ELEMENT));
+			this.logConsole.OnBind(root.Get<VisualElement>(LOG_CONSOLE_ELEMENT));
 
-			this.hotbarRoot = root.Q<VisualElement>(HOTBAR_ELEMENT);
+			this.hotbarRoot = root.Get<VisualElement>(HOTBAR_ELEMENT);
 			this.BindHotbar(this.hotbarRoot);
 		}
 

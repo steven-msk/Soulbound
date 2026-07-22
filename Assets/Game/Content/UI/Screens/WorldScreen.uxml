@@ -7,8 +7,8 @@
         <ui:VisualElement style="flex-grow: 1; align-items: flex-start; justify-content: flex-end; align-self: flex-start; align-content: auto; flex-direction: column;">
             <ui:Instance template="Hotbar" name=""/>
         </ui:VisualElement>
-        <ui:Instance template="CommandLine" enabled="true" picking-mode="Ignore" name="CommandLine" style="position: absolute; visibility: visible; display: none; overflow: visible; background-color: rgba(0, 0, 0, 0); top: auto; left: 0; bottom: 0; right: 0; flex-grow: 1; flex-direction: column;"/>
-        <ui:Instance template="MetricsHUD" name="MetricsHUD" style="position: absolute; flex-grow: 1; top: 0; left: 0; bottom: 0; right: 0; display: none; visibility: visible;"/>
-        <ui:Instance template="LogConsole" name="LogConsole" style="position: absolute; top: 0; left: 0; bottom: 0; right: 0; display: none;"/>
+        <ui:Instance template="CommandLine" enabled="true" picking-mode="Ignore" name="command_line" style="position: absolute; visibility: visible; display: none; overflow: visible; background-color: rgba(0, 0, 0, 0); top: auto; left: 0; bottom: 0; right: 0; flex-grow: 1; flex-direction: column;"/>
+        <ui:Instance template="MetricsHUD" name="metrics_hud" style="position: absolute; flex-grow: 1; top: 0; left: 0; bottom: 0; right: 0; display: none; visibility: visible;"/>
+        <ui:Instance template="LogConsole" name="log_console" style="position: absolute; top: 0; left: 0; bottom: 0; right: 0; display: none;"/>
     </ui:VisualElement>
 </ui:UXML>

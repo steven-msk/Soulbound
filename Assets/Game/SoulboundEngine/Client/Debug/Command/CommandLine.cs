@@ -2,6 +2,8 @@ using Brigadier.NET.Suggestion;
 using Cysharp.Threading.Tasks;
 using SoulboundEngine.Client.Debug.Commands;
 using SoulboundEngine.Client.UI;
+using SoulboundEngine.Client.UI.UXMLBindings;
+using SoulboundEngine.Core.Registry;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,9 +13,9 @@ using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 namespace SoulboundEngine.Client.Debug {
 	public sealed class CommandLine : UxmlWidget, IDisposable {
-		public const string TEXT_FIELD_ELEMENT = "TextField";
-		public const string COMPLETION_LIST_ELEMENT = "CompletionList";
-		public const string SUGGESTION_TEXT_ELEMENT = "SuggestionText";
+		private static readonly Identifier TEXT_FIELD_ELEMENT = Identifier.Of("soulbound:command_line/text_field");
+		private static readonly Identifier COMPLETION_LIST_ELEMENT = Identifier.Of("soulbound:command_line/completion_list");
+		private static readonly Identifier SUGGESTION_TEXT_ELEMENT = Identifier.Of("soulbound:command_suggestion/suggestion_text");
 		private TextField textField;
 		private ListView completionList;
 		private readonly CommandProcessor commandProcessor;
@@ -31,17 +33,17 @@ namespace SoulboundEngine.Client.Debug {
 		public override void OnBind(VisualElement root) {
 			base.OnBind(root);
 
-			this.textField = root.Q<TextField>(TEXT_FIELD_ELEMENT);
+			this.textField = root.Get<TextField>(TEXT_FIELD_ELEMENT);
 			this.RegisterCaretChanged((caret) => {
 				string command = this.textField.value;
 				this.ShowCompletions(command, caret);
 			});
 			this.textField.RegisterCallback<KeyDownEvent>(this.HandleKeyEvent, TrickleDown.TrickleDown);
 
-			this.completionList = root.Q<ListView>(COMPLETION_LIST_ELEMENT);
+			this.completionList = root.Get<ListView>(COMPLETION_LIST_ELEMENT);
 			this.completionList.bindItem = (element, index) => {
 				Suggestion suggestion = this.completionManager.Get(index);
-				element.Q<Label>(SUGGESTION_TEXT_ELEMENT).text = suggestion.Text;
+				element.Get<Label>(SUGGESTION_TEXT_ELEMENT).text = suggestion.Text;
 			};
 			this.completionList.makeNoneElement = () => new VisualElement();
 			this.completionList.itemsChosen += this.OnCompletionChosen;

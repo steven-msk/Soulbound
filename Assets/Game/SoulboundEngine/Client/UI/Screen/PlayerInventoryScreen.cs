@@ -1,16 +1,18 @@
 ﻿using SoulboundEngine.Client.Item;
 using SoulboundEngine.Client.Recipe;
 using SoulboundEngine.Client.Render.Item;
+using SoulboundEngine.Client.UI.UXMLBindings;
 using SoulboundEngine.Core.Assets;
+using SoulboundEngine.Core.Registry;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.UI.Screen {
 	public class PlayerInventoryScreen : InventoryScreen<PlayerInventoryScreenHandler> {
-		private const string HOTBAR_ELEMENT = "Hotbar";
-		private const string POPUP_ELEMENT = "Popup";
-		private const string PLAYER_INVENTORY_SPACE_ELEMENT = "PlayerInventorySpace";
-		private const string CRAFTING_ELEMENT = "Crafting";
+		private static readonly Identifier HOTBAR_ELEMENT = Identifier.Of("soulbound:hotbar/hotbar");
+		private static readonly Identifier POPUP_ELEMENT = Identifier.Of("soulbound:player_inventory/popup");
+		private static readonly Identifier PLAYER_INVENTORY_SPACE_ELEMENT = Identifier.Of("soulbound:player_inventory_screen/player_inventory_space");
+		private static readonly Identifier CRAFTING_ELEMENT = Identifier.Of("soulbound:player_inventory_screen/crafting");
 		private IEnumerable<RecipeView<StationlessCraftingRecipe>> currentRecipes;
 		private readonly List<RecipePreviewElement> craftingResultPreviews = new();
 		private VisualElement craftingRoot;
@@ -30,15 +32,15 @@ namespace SoulboundEngine.Client.UI.Screen {
 		}
 
 		protected override VisualElement GetPlayerHotbar(VisualElement inventoryRoot) {
-			return inventoryRoot.Q<VisualElement>(HOTBAR_ELEMENT);
+			return inventoryRoot.Get<VisualElement>(HOTBAR_ELEMENT);
 		}
 
 		protected override VisualElement GetPlayerPopup(VisualElement inventoryRoot) {
-			return inventoryRoot.Q<VisualElement>(POPUP_ELEMENT);
+			return inventoryRoot.Get<VisualElement>(POPUP_ELEMENT);
 		}
 
 		protected override VisualElement GetPlayerInventoryRoot(VisualElement screenRoot) {
-			return screenRoot.Q<VisualElement>(PLAYER_INVENTORY_SPACE_ELEMENT);
+			return screenRoot.Get<VisualElement>(PLAYER_INVENTORY_SPACE_ELEMENT);
 		}
 
 		private void BindCrafting(VisualElement screenRoot) {
@@ -77,7 +79,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		}
 
 		private VisualElement GetCraftingPreviewParent(VisualElement screenRoot) {
-			return screenRoot.Q<VisualElement>(CRAFTING_ELEMENT);
+			return screenRoot.Get<VisualElement>(CRAFTING_ELEMENT);
 		}
 
 		public override void OnDispose(IScreenHandle handle) {
@@ -96,6 +98,8 @@ namespace SoulboundEngine.Client.UI.Screen {
 	}
 
 	class RecipePreviewElement {
+		private static readonly Identifier ITEM_DISPLAY_ELEMENT = Identifier.Of("soulbound:slot/item_display");
+		private static readonly Identifier STACK_COUNT_ELEMENT = Identifier.Of("soulbound:slot/stack_count");
 		private readonly ItemRenderManager itemRenderManager;
 		private readonly VisualElement visualElement;
 		private readonly EventCallback<ClickEvent, RecipePreviewElement> onClick;
@@ -107,7 +111,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 			this.visualElement = visualElement;
 			this.onClick = onClick;
 			this.renderHandle = new ItemRenderHandle(this);
-			this.renderContext = new ItemRenderContext.UIToolkit { root = visualElement };
+			this.renderContext = new ItemRenderContext.UIToolkit(visualElement, ITEM_DISPLAY_ELEMENT, STACK_COUNT_ELEMENT);
 		}
 
 		public RecipeEntry<StationlessCraftingRecipe> recipe { get; private set; }

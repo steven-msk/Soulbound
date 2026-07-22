@@ -1,12 +1,15 @@
 ﻿using SoulboundEngine.Client.Item;
 using SoulboundEngine.Client.Item.Container;
 using SoulboundEngine.Client.UI;
+using SoulboundEngine.Core.Registry;
 using UnityEngine.UIElements;
 
 #nullable enable
 
 namespace SoulboundEngine.Client.Render.Item {
 	public abstract class UIToolkitItemSlotDisplay : UxmlWidget, IUIToolkitSlotDisplay {
+		private static readonly Identifier ITEM_DISPLAY_ELEMENT = Identifier.Of("soulbound:slot/item_display");
+		private static readonly Identifier STACK_COUNT_ELEMENT = Identifier.Of("soulbound:slot/stack_count");
 		protected readonly IItemSlot slot;
 		protected readonly ItemRenderManager itemRenderManager;
 		protected readonly ItemRenderHandle renderHandle;
@@ -53,6 +56,6 @@ namespace SoulboundEngine.Client.Render.Item {
 
 		public void RemoveFromHierarchy() => this.root.RemoveFromHierarchy();
 
-		protected ItemRenderContext RenderContext => new ItemRenderContext.UIToolkit { root = this.root };
+		protected ItemRenderContext RenderContext => new ItemRenderContext.UIToolkit(this.root, ITEM_DISPLAY_ELEMENT, STACK_COUNT_ELEMENT);
 	}
 }

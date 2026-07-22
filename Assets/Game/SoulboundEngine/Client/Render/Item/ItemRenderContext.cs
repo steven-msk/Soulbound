@@ -1,3 +1,5 @@
+using SoulboundEngine.Client.UI.UXMLBindings;
+using SoulboundEngine.Core.Registry;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -11,15 +13,21 @@ namespace SoulboundEngine.Client.Render.Item {
 		}
 
 		public sealed class UIToolkit : ItemRenderContext {
-			public const string ITEM_DISPLAY_ELEMENT = "ItemDisplay";
-			public const string STACK_COUNT_ELEMENT = "StackCount";
-			public VisualElement root;
+			public readonly Identifier itemDisplayElement;
+			public readonly Identifier stackCountElement;
+			public readonly VisualElement root;
 
-			public VisualElement GetItemDisplay() { 
-				return this.root.Q<VisualElement>(ITEM_DISPLAY_ELEMENT);
+			public UIToolkit(VisualElement root, Identifier itemDisplayElement, Identifier stackCountElement) {
+				this.root = root;
+				this.itemDisplayElement = itemDisplayElement;
+				this.stackCountElement = stackCountElement;
 			}
 
-			public Label GetStackCount() => this.root.Q<Label>(STACK_COUNT_ELEMENT);
+			public VisualElement GetItemDisplay() { 
+				return this.root.Get<VisualElement>(this.itemDisplayElement);
+			}
+
+			public Label GetStackCount() => this.root.Get<Label>(this.stackCountElement);
 		}
 
 		public sealed class World : ItemRenderContext {

@@ -1,13 +1,15 @@
 ﻿using SoulboundEngine.Client.Item.Container;
 using SoulboundEngine.Client.UI.Screen;
+using SoulboundEngine.Client.UI.UXMLBindings;
+using SoulboundEngine.Core.Registry;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.UI {
 	public class ChestInventoryScreen : InventoryScreen<ChestInventoryScreenHandler> {
-		public const string CHEST_SPACE_ELEMENT = "ChestSpace";
-		public const string HOTBAR_ELEMENT = "Hotbar";
-		public const string POPUP_ELEMENT = "Popup";
-		public const string PLAYER_INVENTORY_SPACE_ELEMENT = "PlayerInventorySpace";
+		private static readonly Identifier CHEST_SPACE_ELEMENT = Identifier.Of("soulbound:chest_inventory_screen/chest_space");
+		private static readonly Identifier HOTBAR_ELEMENT = Identifier.Of("soulbound:hotbar/hotbar");
+		private static readonly Identifier POPUP_ELEMENT = Identifier.Of("soulbound:player_inventory/popup");
+		private static readonly Identifier PLAYER_INVENTORY_SPACE_ELEMENT = Identifier.Of("soulbound:chest_inventory_screen/player_inventory_space");
 
 		public ChestInventoryScreen(Context ctx, VisualTreeAsset asset) 
 			: base(ctx, asset) {
@@ -28,19 +30,19 @@ namespace SoulboundEngine.Client.UI {
 		}
 
 		private VisualElement GetChestRoot(VisualElement inventoryRoot) {
-			return inventoryRoot.Q<VisualElement>(CHEST_SPACE_ELEMENT);
+			return inventoryRoot.Get<VisualElement>(CHEST_SPACE_ELEMENT);
 		} 
 
 		protected override VisualElement GetPlayerHotbar(VisualElement inventoryRoot) {
-			return inventoryRoot.Q<VisualElement>(HOTBAR_ELEMENT);
+			return inventoryRoot.Get<VisualElement>(HOTBAR_ELEMENT);
 		}
 
 		protected override VisualElement GetPlayerPopup(VisualElement inventoryRoot) {
-			return inventoryRoot.Q<VisualElement>(POPUP_ELEMENT);
+			return inventoryRoot.Get<VisualElement>(POPUP_ELEMENT);
 		}
 
 		protected override VisualElement GetPlayerInventoryRoot(VisualElement screenRoot) {
-			return screenRoot.Q<VisualElement>(PLAYER_INVENTORY_SPACE_ELEMENT);
+			return screenRoot.Get<VisualElement>(PLAYER_INVENTORY_SPACE_ELEMENT);
 		}
 	}
 }

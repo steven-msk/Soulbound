@@ -3,8 +3,8 @@
     <ui:Template name="PlayerInventory" src="project://database/Assets/Game/Content/UI/PlayerInventory.uxml?fileID=9197481963319205126&amp;guid=5fb502a4ef30a954d901962876e3adc0&amp;type=3#PlayerInventory"/>
     <ui:VisualElement style="flex-grow: 1;">
         <ui:VisualElement style="flex-grow: 1; top: auto; bottom: auto; left: auto; right: auto; flex-direction: column-reverse; padding-bottom: 15px;"/>
-        <ui:VisualElement name="Crafting" style="flex-grow: 0; flex-direction: row; margin-top: 4px; margin-right: 4px; margin-bottom: 4px; margin-left: 4px; padding-bottom: 16px;"/>
-        <ui:VisualElement name="PlayerInventorySpace" picking-mode="Ignore" style="flex-grow: 0; align-items: flex-start; align-self: flex-start; justify-content: flex-end;">
+        <ui:VisualElement name="crafting" style="flex-grow: 0; flex-direction: row; margin-top: 4px; margin-right: 4px; margin-bottom: 4px; margin-left: 4px; padding-bottom: 16px;"/>
+        <ui:VisualElement name="player_inventory_space" picking-mode="Ignore" style="flex-grow: 0; align-items: flex-start; align-self: flex-start; justify-content: flex-end;">
             <ui:Instance template="PlayerInventory" name="" style="bottom: 4px;"/>
             <ui:Instance template="Hotbar" name="" style="display: flex; visibility: visible;"/>
         </ui:VisualElement>

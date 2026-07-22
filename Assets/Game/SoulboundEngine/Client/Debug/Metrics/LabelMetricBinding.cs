@@ -1,4 +1,6 @@
 ﻿using SoulboundEngine.Client.Debug.Metrics.View;
+using SoulboundEngine.Client.UI.UXMLBindings;
+using SoulboundEngine.Core.Registry;
 using System;
 using UnityEngine.UIElements;
 
@@ -11,8 +13,8 @@ namespace SoulboundEngine.Client.Debug.Metrics {
 			this.output = output;
 		}
 
-		public LabelMetricBinding(VisualElement root, string labelName, Func<DebugMetricsSnapshot, string> format) 
-			: this(root.Q<Label>(labelName), format) {
+		public LabelMetricBinding(VisualElement root, Identifier labelId, Func<DebugMetricsSnapshot, string> format) 
+			: this(root.Get<Label>(labelId), format) {
 		}
 
 		public override void Refresh(DebugMetricsSnapshot data) {

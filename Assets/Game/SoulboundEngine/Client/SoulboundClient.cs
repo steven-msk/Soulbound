@@ -6,29 +6,30 @@ using SoulboundEngine.Client.Debug.Logging;
 using SoulboundEngine.Client.Debug.Logging.Console;
 using SoulboundEngine.Client.Debug.Metrics.View;
 using SoulboundEngine.Client.Input;
+using SoulboundEngine.Client.Recipe;
+using SoulboundEngine.Client.Recipe.Asset;
+using SoulboundEngine.Client.Render.Block;
+using SoulboundEngine.Client.Render.Entity;
+using SoulboundEngine.Client.Render.Item;
 using SoulboundEngine.Client.Runtime.Services;
 using SoulboundEngine.Client.UI;
+using SoulboundEngine.Client.UI.Screen;
+using SoulboundEngine.Client.UI.UXMLBindings;
 using SoulboundEngine.Client.World;
 using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Client.World.Serialization;
 using SoulboundEngine.Core;
 using SoulboundEngine.Core.Audio;
+using SoulboundEngine.Core.Registry;
+using SoulboundEngine.Core.Render.Sprite;
 using SoulboundEngine.Core.Serialization;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client {
-	using SoulboundEngine.Client.Recipe;
-	using SoulboundEngine.Client.Recipe.Asset;
-	using SoulboundEngine.Client.Render.Block;
-	using SoulboundEngine.Client.Render.Entity;
-	using SoulboundEngine.Client.Render.Item;
-	using SoulboundEngine.Client.UI.Screen;
-	using SoulboundEngine.Core.Registry;
-	using SoulboundEngine.Core.Render.Sprite;
-	using System.Collections.Generic;
-	using UnityEngine.SceneManagement;
-	using UnityEngine.UIElements;
 	using Application = UnityEngine.Application;
 	using Object = UnityEngine.Object;
 	using Time = UnityEngine.Time;
@@ -65,6 +66,7 @@ namespace SoulboundEngine.Client {
 		public SoulboundClient(GameConfig config, ClientInit ctx) {
 			instance = this;
 			this.config = config;
+			UXMLSchema_Generated.RegisterAll();
 
 			this.inputActions = new PlayerInputActions();
 			this.inputManager = new InputManager(INPUT_QUEUE_BUFFER_CAPACITY, this.inputActions.asset);
@@ -150,7 +152,7 @@ namespace SoulboundEngine.Client {
 
 		public void EnterWorld(string world) {
 			if (this.IsWorldSessionActive()) return;
-			
+
 			WorldSave? save = this.worldManager.ListSaves().FirstOrDefault(s => s.name == world);
 			if (save == null) {
 				throw new ArgumentException($"World not found: '{world}'");

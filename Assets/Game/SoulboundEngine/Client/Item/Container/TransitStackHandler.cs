@@ -1,5 +1,7 @@
 using SoulboundEngine.Client.Render.Item;
+using SoulboundEngine.Client.UI.UXMLBindings;
 using SoulboundEngine.Core.Assets;
+using SoulboundEngine.Core.Registry;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -7,7 +9,9 @@ using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.Item.Container {
 	public sealed class TransitStackHandler {
-		public const string TRANSIT_STACK_ELEMENT = "TransitStack";
+		private static readonly Identifier TRANSIT_STACK_ELEMENT = Identifier.Of("soulbound:transit_stack/transit_stack");
+		private static readonly Identifier ITEM_DISPLAY_ELEMENT = Identifier.Of("soulbound:transit_stack/item_display");
+		private static readonly Identifier STACK_COUNT_ELEMENT = Identifier.Of("soulbound:transit_stack/stack_count");
 		const float ITEM_DISPLAY_SIZE = 48f;
 		private readonly VisualElement root;
 		private Vector2 pointerPosition;
@@ -15,11 +19,13 @@ namespace SoulboundEngine.Client.Item.Container {
 		private IItemView? itemView;
 		private readonly ItemRenderManager itemRenderManager;
 		private readonly ItemRenderHandle renderHandle;
+		private readonly ItemRenderContext renderContext;
 
 		public TransitStackHandler(ItemRenderManager itemRenderManager, VisualElement root) {
 			this.itemRenderManager = itemRenderManager;
 			this.root = root;
 			this.renderHandle = new ItemRenderHandle(this);
+			this.renderContext = new ItemRenderContext.UIToolkit(this.root, ITEM_DISPLAY_ELEMENT, STACK_COUNT_ELEMENT);
 		}
 
 		public static TransitStackHandler Create(VisualElement screenRoot, ItemRenderManager itemRenderManager) {
@@ -30,7 +36,7 @@ namespace SoulboundEngine.Client.Item.Container {
 			// TODO: this is so fucking bad
 			VisualTreeAsset asset = AssetManager.Resolve<VisualTreeAsset>(new AssetKey("TransitStack"));
 			asset.CloneTree(screenRoot);
-			return screenRoot.Q<VisualElement>(TRANSIT_STACK_ELEMENT);
+			return screenRoot.Get<VisualElement>(TRANSIT_STACK_ELEMENT);
 
 			//VisualElement root = new() {
 			//	name = "TransitStack",
@@ -68,7 +74,7 @@ namespace SoulboundEngine.Client.Item.Container {
 		}
 
 		private void Render(ItemStack itemStack) {
-			this.itemView = this.itemRenderManager.Render(this.renderHandle, itemStack, this.RenderContext);
+			this.itemView = this.itemRenderManager.Render(this.renderHandle, itemStack, this.renderContext);
 			this.UpdateViewPosition();
 		}
 
@@ -78,7 +84,7 @@ namespace SoulboundEngine.Client.Item.Container {
 		public void Destroy() {
 			if (this.itemView == null) return;
 
-			this.itemRenderManager.Destroy(this.renderHandle, this.RenderContext);
+			this.itemRenderManager.Destroy(this.renderHandle, this.renderContext);
 			this.itemView = null;
 			this.itemStack = ItemStack.EMPTY;
 		}
@@ -100,7 +106,5 @@ namespace SoulboundEngine.Client.Item.Container {
 			Vector2 pos = this.pointerPosition - size / 2f;
 			this.itemView?.SetPosition(pos);
 		}
-
-		private ItemRenderContext RenderContext => new ItemRenderContext.UIToolkit { root = this.root };
 	}
 }

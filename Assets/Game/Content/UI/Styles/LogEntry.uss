@@ -1,12 +1,12 @@
 :root {
 }
 
-#LogList .unity-list-view__item,
-#LogList .unity-list-view__item:hover,
-#LogList .unity-list-view__item--selected,
-#LogList .unity-collection-view__item,
-#LogList .unity-collection-view__item:hover,
-#LogList .unity-collection-view__item--selected {
+#log_list .unity-list-view__item,
+#log_list .unity-list-view__item:hover,
+#log_list .unity-list-view__item--selected,
+#log_list .unity-collection-view__item,
+#log_list .unity-collection-view__item:hover,
+#log_list .unity-collection-view__item--selected {
     background-color: rgba(0, 0, 0, 0);
 }
 
