@@ -18,6 +18,8 @@ using System;
 using System.Linq;
 
 namespace SoulboundEngine.Client {
+	using SoulboundEngine.Client.Recipe;
+	using SoulboundEngine.Client.Recipe.Asset;
 	using SoulboundEngine.Client.Render.Block;
 	using SoulboundEngine.Client.Render.Entity;
 	using SoulboundEngine.Client.Render.Item;
@@ -55,6 +57,7 @@ namespace SoulboundEngine.Client {
 		private readonly ISpriteResolver<AtlasSpriteRef> spriteResolver;
 		private readonly EntityRenderManager entityRenderManager;
 		private readonly BlockRenderManager blockRenderManager;
+		private readonly RecipeManager recipeManager;
 		private WorldScreen activeWorldScreen;
 
 		int IInputEventHandler.priority => int.MaxValue;
@@ -98,6 +101,9 @@ namespace SoulboundEngine.Client {
 			this.entityRenderManager = new EntityRenderManager(Registries.ENTITIES.ToList(), this.itemRenderManager);
 			this.blockRenderManager = new BlockRenderManager(Registries.BLOCKS.ToList());
 			_ = new InventoryScreens();
+
+			Registry<RecipeIngredientIndex> ingredientIndexRegistry = new(RecipeIngredientIndex.REGISTRY);
+			this.recipeManager = new RecipeManager(ingredientIndexRegistry, new RecipeAssetResolver());
 		}
 
 		/// <summary>
@@ -256,6 +262,7 @@ namespace SoulboundEngine.Client {
 		[Obsolete]
 		public UIHandler UIHandler => this.uiHandler;
 		public ItemRenderManager ItemRenderManager => this.itemRenderManager;
+		public RecipeManager RecipeManager => this.recipeManager;
 
 		public sealed class DebugOverlayManager {
 			private readonly Stack<DebugOverlayFeature> overlayStack = new();

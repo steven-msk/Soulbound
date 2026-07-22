@@ -47,16 +47,21 @@ namespace SoulboundEngine.Client.Item {
 			return item;
 		}
 
+		private static RegistryKey<Item> KeyOf(string id) {
+			return RegistryKey<Item>.Of(Registries.ITEMS.GetKey(), Identifier.Of(id));
+		}
+
 		public static Identifier GetIdentifier(Item item) {
 			return Registries.ITEMS.GetIdentifier(item) ?? throw new NotSupportedException("Items not initialized");
 		}
 
-		public static RegistryEntry<Item> GetEntry(Item item) {
+		public static RegistryEntry<Item> GetEntry(Item? item) {
+			if (item == null) return GetEntry(AIR);
 			return Registries.ITEMS.GetEntry(item) ?? throw new NotSupportedException("Items not initialized");
 		}
 
-		private static RegistryKey<Item> KeyOf(string id) {
-			return RegistryKey<Item>.Of(Registries.ITEMS.GetKey(), Identifier.Of(id));
+		public static Item Get(Identifier id) {
+			return Registries.ITEMS.Get(id);
 		}
 
 		public static void Init() { }

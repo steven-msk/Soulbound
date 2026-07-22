@@ -5,6 +5,7 @@ namespace SoulboundEngine.Client.Recipe {
 	public abstract class RecipeType {
 		protected static readonly Dictionary<Identifier, RecipeType> typeById = new();
 
+		public static RecipeType<StationlessCraftingRecipe> STATIONLESS = new("stationless");
 
 		public string id { get; }
 

@@ -21,6 +21,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 04bbc3a7aa4ddbc44ac6c78fb3ecda94
+    m_Address: StationaryCraftingResultPreview
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0e5905e25c892a748a09d8c6fd3c396a
     m_Address: WorldScreen
     m_ReadOnly: 0
@@ -40,7 +46,7 @@ MonoBehaviour:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 17a1cc01d5a67154f931385a6b7d83e4
-    m_Address: DefaultInventoryScreen
+    m_Address: PlayerInventoryScreen
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload
@@ -56,6 +62,12 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2052768fc90321c4c8ef963e26a3d1f0
+    m_Address: TestRecipe2
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - recipe
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 22de33d73f0feda4e9a52553b3394a28
     m_Address: grass
@@ -116,6 +128,12 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6efedd66d5f1dd0479f24cd8f1ad1e92
+    m_Address: TestRecipe
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - recipe
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 714a27d172464694bbafd67b6569eace
     m_Address: ReactInactiveTile

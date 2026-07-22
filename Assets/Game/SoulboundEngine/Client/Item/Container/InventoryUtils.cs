@@ -4,10 +4,18 @@ using System.Collections.Generic;
 
 namespace SoulboundEngine.Client.Item.Container {
 	public static class InventoryUtils {
+		/// <summary>
+		/// Tries to add the stack into the inventory.
+		/// Returns whether the stack was fully consumed.
+		/// </summary>
 		public static bool TryAddStack(this IInventory inventory, ref ItemStack itemStack) {
 			return TryAddStack(inventory.GetAllSlots(), ref itemStack);
 		}
 
+		/// <summary>
+		/// Tries to add the stack into the slots.
+		/// Returns whether the stack was fully consumed.
+		/// </summary>
 		public static bool TryAddStack(IEnumerable<IItemSlot> slots, ref ItemStack itemStack) {
 			foreach (var slot in FilterContaining(slots, itemStack.item)) {
 				ItemStack slotStack = slot.GetStack();

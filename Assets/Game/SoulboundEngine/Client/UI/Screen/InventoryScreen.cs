@@ -153,10 +153,14 @@ namespace SoulboundEngine.Client.UI.Screen {
 					this.dragModifiers = modifiers;
 				}
 
-				this.transitStackHandler.SetStack(this.handler.GetTransitStack());
+				this.SyncTransitStack();
 			} catch (Exception e) {
 				Logger.LogFatal(e);
 			}
+		}
+
+		public void SyncTransitStack() {
+			this.transitStackHandler.SetStack(this.handler.GetTransitStack());
 		}
 
 		private void OnPointerEnter(IItemSlot slot, IInventory inventory, VisualElement visualElement, PointerEnterEvent evt) {

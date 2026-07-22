@@ -1,23 +1,21 @@
-﻿using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.Client.Item;
+﻿using SoulboundEngine.Client.Item;
 using SoulboundEngine.Client.Item.Container;
 using SoulboundEngine.Client.Player;
+using SoulboundEngine.Client.Recipe;
+using System;
 using System.Linq;
 
-namespace SoulboundEngine.Client.UI.Screen {
-	public class PlayerInventoryScreenHandler : InventoryScreenHandler {
-		private readonly PlayerInventory playerInventory;
-		private readonly InventoryScreenHandlerContext context;
+#nullable enable
 
+namespace SoulboundEngine.Client.UI.Screen {
+	public class PlayerInventoryScreenHandler : AbstractRecipeInventoryScreenHandler<StationlessCraftingRecipe, InventoryRecipeInput> {
 		public PlayerInventoryScreenHandler(InventoryScreenHandlerType<PlayerInventoryScreenHandler> type, PlayerInventory playerInventory)
 			: this(type, playerInventory, InventoryScreenHandlerContext.EMPTY) {
 		}
 
 		public PlayerInventoryScreenHandler(InventoryScreenHandlerType<PlayerInventoryScreenHandler> type, PlayerInventory playerInventory, InventoryScreenHandlerContext context) 
-			: base(type) {
+			: base(type, playerInventory, context, RecipeType.STATIONLESS) {
 			this.AddPlayerSlots(playerInventory);
-			this.playerInventory = playerInventory;
-			this.context = context;
 		}
 
 		public override bool CanUse(PlayerEntity player) => true;
@@ -31,10 +29,14 @@ namespace SoulboundEngine.Client.UI.Screen {
 			slot.SetStack(slotStack);
 		}
 
-		public override void OnContentChanged(IInventory inventory) {
-			this.context.Run((_, _, _) => {
-				Logger.LogInfo("changed");
-			});
+		public override InventoryRecipeInput GetInput() {
+			return new InventoryRecipeInput(this.GetInputSlots());
+		}
+
+		public override IItemSlot[] GetInputSlots() {
+			return Enumerable.Range(0, this.playerInventory.GetSize())
+				.Select(this.playerInventory.GetSlot)
+				.ToArray();
 		}
 	}
 }

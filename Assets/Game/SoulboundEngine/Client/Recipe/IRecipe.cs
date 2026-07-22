@@ -1,4 +1,5 @@
 ﻿using SoulboundEngine.Client.Item;
+using System.Collections.Generic;
 
 namespace SoulboundEngine.Client.Recipe {
 	/// <summary>
@@ -24,5 +25,7 @@ namespace SoulboundEngine.Client.Recipe {
 		/// Returns whether this recipe applies to the given <paramref name="input"/>.
 		/// </summary>
 		bool Matches(TInput input);
+
+		IReadOnlyList<Ingredient> Ingredients { get; }
 	}
 }

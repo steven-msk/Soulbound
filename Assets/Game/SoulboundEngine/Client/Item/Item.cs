@@ -5,7 +5,7 @@ using UnityEngine;
 #nullable enable
 
 namespace SoulboundEngine.Client.Item {
-	public class Item {
+	public class Item : IItemConvertible {
 		public const int DEFAULT_FULL_STACK = 256;
 		public static readonly Dictionary<Block, Item> blockItems = new();
 		private readonly Settings settings;
@@ -29,6 +29,8 @@ namespace SoulboundEngine.Client.Item {
 		public override string ToString() {
 			return Items.GetIdentifier(this)?.ToString() ?? base.ToString();
 		}
+
+		public Item AsItem() => this;
 
 		public sealed class Settings {
 			public string name { get; private set; }

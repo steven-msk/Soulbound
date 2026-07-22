@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceLocations;
@@ -22,7 +21,7 @@ namespace SoulboundEngine.Core.Assets {
 
 		public static IEnumerable<AssetKey> LoadAllWithLabel(string label) {
 			IList<IResourceLocation> locations = LoadLocations(label);
-			Logger.LogInfo("Loading assets with label '{}' from {} locations", locations.Count(), label);
+			Logger.LogInfo("Loading assets with label '{}' from {} locations", label, locations.Count);
 			List<AssetKey> loadedKeys = new();
 
 			foreach (var location in locations) {

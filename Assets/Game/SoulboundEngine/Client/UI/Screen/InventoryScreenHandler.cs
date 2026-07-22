@@ -14,8 +14,8 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 	public abstract class InventoryScreenHandler {
 		private readonly List<SlotRef> slots = new();
-		private readonly InventoryScreenHandlerType type;
-		private ItemStack transitStack;
+		protected readonly InventoryScreenHandlerType type;
+		protected ItemStack transitStack;
 		private SlotDragState? dragState;
 
 		protected InventoryScreenHandler(InventoryScreenHandlerType type) {
@@ -300,6 +300,23 @@ namespace SoulboundEngine.Client.UI.Screen {
 			this.transitStack = halvedTransit;
 
 			this.OnContentChanged(slot.GetInventory());
+		}
+
+		/// <summary>
+		/// Tries to append <c>itemStack</c> to transit.
+		/// Returns the remaining stack, or <c>ItemStack.EMPTY</c> otherwise.
+		/// </summary>
+		protected ItemStack Pickup(ItemStack itemStack) {
+			if (!itemStack.IsOf(this.transitStack.item) && !this.transitStack.IsEmpty()) {
+				return itemStack;
+			}
+			if (this.transitStack.IsEmpty()) {
+				this.transitStack = itemStack;
+				itemStack = ItemStack.EMPTY;
+			} else {
+				this.transitStack.FillFrom(ref itemStack);
+			}
+			return itemStack;
 		}
 
 		protected void InsertSingle(IItemSlot slot) => this.InsertSingle(ref this.transitStack, slot);

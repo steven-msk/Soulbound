@@ -8,10 +8,10 @@ using System.Linq;
 namespace SoulboundEngine.Client.Recipe {
 	using Item = Item.Item;
 
-	public sealed class Ingredient {
-		private readonly IRegistryEntryList<Item> entries;
+	public class Ingredient {
+		protected readonly IRegistryEntryList<Item> entries;
 
-		private Ingredient(IRegistryEntryList<Item> entries) {
+		protected Ingredient(IRegistryEntryList<Item> entries) {
 			this.entries = entries;
 		}
 
@@ -27,16 +27,25 @@ namespace SoulboundEngine.Client.Recipe {
 			return new Ingredient(entryList);
 		}
 
-		public bool AcceptsItem(RegistryEntry<Item> entry) {
-			return this.entries.Contains(entry);
+		public bool AcceptsItem(RegistryEntry<Item> item) => this.entries.Contains(item);
+
+		public bool AcceptsItem(RegistryEntry<Item> item, int count) {
+			ItemStack stack = new(item, count);
+			return this.AcceptsStack(stack);
 		}
+
+		public bool AcceptsStack(ItemStack stack) {
+			return this.AcceptsItem(Items.GetEntry(stack.item)) && stack.count >= this.GetCount();
+		}
+
+		public virtual int GetCount() => 1;
 
 		public IEnumerable<RegistryEntry<Item>> GetMatchingItems() => this.entries;
 
 		public static bool Matches(Ingredient? ingredient, ItemStack stack) {
 			if (ingredient == null) return false;
 
-			return ingredient.AcceptsItem(Items.GetEntry(stack.item));
+			return ingredient.AcceptsStack(stack);
 		}
 	}
 }

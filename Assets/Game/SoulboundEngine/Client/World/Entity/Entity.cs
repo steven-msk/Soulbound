@@ -1,5 +1,4 @@
 using SoulboundEngine.Client.Item;
-using SoulboundEngine.Client.World.Level;
 using System;
 using UnityEngine;
 
@@ -43,6 +42,7 @@ namespace SoulboundEngine.Client.World.Entity {
 		public ItemEntity DropStack(Level.Level level, ItemStack stack) {
 			ItemEntity entity = new(this, stack, level);
 			entity.SetPosition(this.GetPosition());
+			level.AddEntity(entity);
 			return entity;
 		}
 

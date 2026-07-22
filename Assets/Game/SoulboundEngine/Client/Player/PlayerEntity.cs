@@ -303,12 +303,13 @@ namespace SoulboundEngine.Client.Player {
 			ItemStack thrownStack = mainHandStack.CopyWithCount(throwAmount);
 			mainHandStack.Decrement(throwAmount);
 
-			ItemEntity itemEntity = this.DropStack(this.level, thrownStack);
-			this.level.AddEntity(itemEntity);
+			this.DropStack(this.level, thrownStack);
 		}
 
 		public bool TryAddItemStack(ItemStack itemStack) {
-			return this.inventory.TryAddStack(ref itemStack);
+			bool consumed = this.inventory.TryAddStack(ref itemStack);
+			this.activeInventoryScreenHandler?.OnContentChanged(this.inventory);
+			return consumed;
 		}
 
 		public bool CanPlaceBlockAt(BlockPos blockPos) {

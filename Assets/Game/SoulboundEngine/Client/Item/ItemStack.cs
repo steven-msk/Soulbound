@@ -1,3 +1,4 @@
+using SoulboundEngine.Core.Registry;
 using System;
 using UnityEngine;
 
@@ -5,7 +6,7 @@ using UnityEngine;
 
 namespace SoulboundEngine.Client.Item {
 	public struct ItemStack {
-		public static readonly ItemStack EMPTY = Empty();
+		public static readonly ItemStack EMPTY = new();
 		public readonly Item item;
 		public int count { get; private set; }
 
@@ -15,8 +16,8 @@ namespace SoulboundEngine.Client.Item {
 			this.CapCount(item.fullStackSize);
 		}
 
-		private static ItemStack Empty() {
-			return new ItemStack() { count = 0 };
+		internal ItemStack(RegistryEntry<Item> item, int count) 
+			: this(item.GetValue(), count) {
 		}
 
 		public readonly bool IsFull() => this.count >= this.item.fullStackSize;
@@ -66,6 +67,7 @@ namespace SoulboundEngine.Client.Item {
 
 			int added = itemStack.Decrement(this.GetSpaceLeft());
 			this.Increment(added);
+			if (itemStack.IsEmpty()) itemStack = EMPTY;
 		}
 	
 		public readonly ItemStack CopyWithCount(int newCount) {
@@ -94,7 +96,7 @@ namespace SoulboundEngine.Client.Item {
 		}
 
 		public readonly override string ToString() {
-			return $"stack[{this.item}:{this.count}]";
+			return this.IsEmpty() ? "EMPTY" : $"{this.item}:{this.count}";
 		}
 	}
 }
