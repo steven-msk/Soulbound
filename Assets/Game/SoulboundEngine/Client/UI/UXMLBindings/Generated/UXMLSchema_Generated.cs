@@ -42,6 +42,7 @@ namespace SoulboundEngine.Client.UI.UXMLBindings {
             UXMLSchema.Register(Identifier.Of("soulbound:world_screen/log_console"), typeof(TemplateContainer));
             UXMLSchema.Register(Identifier.Of("soulbound:slot/item_display"), typeof(VisualElement));
             UXMLSchema.Register(Identifier.Of("soulbound:slot/stack_count"), typeof(Label));
+            UXMLSchema.Register(Identifier.Of("soulbound:tooltip/text"), typeof(Label));
             UXMLSchema.Register(Identifier.Of("soulbound:transit_stack/transit_stack"), typeof(VisualElement));
             UXMLSchema.Register(Identifier.Of("soulbound:transit_stack/item_display"), typeof(VisualElement));
             UXMLSchema.Register(Identifier.Of("soulbound:transit_stack/stack_count"), typeof(Label));

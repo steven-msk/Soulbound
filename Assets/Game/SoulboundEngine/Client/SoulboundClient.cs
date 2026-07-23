@@ -187,7 +187,6 @@ namespace SoulboundEngine.Client {
 				Object.FindFirstObjectByType<WorldSceneRoot>
 			).ContinueWith(session => {
 				this.activeWorldSession = session;
-				//this.uiHandler.SetCanvas(session.canvas);
 				this.uiHandler.SetUIDocument(session.uiDocument);
 				this.activeWorldScreen = new WorldScreen(session.player.GetInventory(), this.commandLine, this.metricsHud, this.logConsole, this.itemRenderManager);
 				this.uiHandler.PushScreen(this.activeWorldScreen);

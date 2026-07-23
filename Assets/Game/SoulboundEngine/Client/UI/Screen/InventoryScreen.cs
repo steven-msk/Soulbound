@@ -10,7 +10,7 @@ using UnityEngine.UIElements;
 using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 namespace SoulboundEngine.Client.UI.Screen {
-	public abstract class InventoryScreen<THandler> : UxmlScreen, InventoryScreenHandlerProvider<THandler> where THandler : InventoryScreenHandler {
+	public abstract class InventoryScreen<THandler> : UXMLScreen, InventoryScreenHandlerProvider<THandler> where THandler : InventoryScreenHandler {
 		const float DOUBLE_CLICK_THRESHOLD = 0.15f;
 		const int LEFT_BUTTON = 0;
 		const int MIDDLE_BUTTON = 2;
@@ -20,8 +20,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		protected readonly PlayerInventory playerInventory;
 		protected readonly HashSet<IInventory> openInventories = new();
 		protected readonly PlayerEntity player;
-		private readonly List<InteractableHotbarSlotDisplay> playerHotbarSlotDisplays = new();
-		private readonly List<IUIToolkitSlotDisplay> slotDisplays = new();
+		private readonly List<UXMLHotbarSlotDisplay> playerHotbarSlotDisplays = new();
 		private TransitStackHandler transitStackHandler;
 		private int lastClickedSlot;
 		private float lastClickTime;
@@ -50,7 +49,6 @@ namespace SoulboundEngine.Client.UI.Screen {
 		protected void BindPlayerInventory(PlayerInventory playerInventory, VisualElement inventoryRoot) {
 			this.openInventories.Add(playerInventory);
 
-			// order matters here as hotbar slots need to be indexed first
 			this.BindPlayerHotbar(playerInventory, inventoryRoot);
 			this.BindPlayerPopup(playerInventory, inventoryRoot);
 
@@ -69,32 +67,32 @@ namespace SoulboundEngine.Client.UI.Screen {
 			this.SetMainSlotVisual(newValue);
 		}
 
-		protected void BindPlayerPopup(PlayerInventory playerInventory, VisualElement inventoryRoot) {
+		protected void BindPlayerPopup(PlayerInventory playerInventory, VisualElement inventoryRoot, bool interactable = true) {
 			foreach (var slotIndex in playerInventory.GetPopup()) {
 				IItemSlot slot = playerInventory.GetSlot(slotIndex);
 				VisualElement slotElement = this.GetPlayerPopup(inventoryRoot)[slotIndex - PlayerInventory.HOTBAR_SIZE];
 
-				this.BindSlot(slotElement, slot, playerInventory);
+				this.BindSlot(slotElement, slot, playerInventory, interactable);
 			}
 		}
 
-		protected void BindPlayerHotbar(PlayerInventory playerInventory, VisualElement inventoryRoot) {
+		protected void BindPlayerHotbar(PlayerInventory playerInventory, VisualElement inventoryRoot, bool interactable = true) {
 			foreach (var slotIndex in playerInventory.GetHotbar()) {
 				IItemSlot slot = playerInventory.GetSlot(slotIndex);
 				VisualElement slotElement = this.GetPlayerHotbar(inventoryRoot)[slotIndex];
 
-				InteractableHotbarSlotDisplay display = new(slot, this.itemRenderManager);
+				UXMLHotbarSlotDisplay display = new(slot, this.itemRenderManager, interactable);
 				display.OnBind(slotElement);
-				this.slotDisplays.Add(display);
+				this.AddWidget(display);
 				this.AddPointerListeners(slotElement, display, slot, playerInventory);
 				this.playerHotbarSlotDisplays.Add(display);
 			}
 		}
 
-		protected IInteractableUIToolkitSlotDisplay BindSlot(VisualElement slotElement, IItemSlot slot, IInventory inventory) {
-			InteractableUIToolkitSlotDisplay display = new(slot, this.itemRenderManager);
+		protected UXMLItemSlotDisplay BindSlot(VisualElement slotElement, IItemSlot slot, IInventory inventory, bool interactable) {
+			UXMLItemSlotDisplay display = new(slot, this.itemRenderManager, interactable);
 			display.OnBind(slotElement);
-			this.slotDisplays.Add(display);
+			this.AddWidget(display);
 			this.AddPointerListeners(slotElement, display, slot, inventory);
 			return display;
 		}
@@ -107,7 +105,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 			this.playerHotbarSlotDisplays[slot].UnsetMainSlot();
 		}
 
-		private void AddPointerListeners(VisualElement visualElement, IInteractableUIToolkitSlotDisplay display, IItemSlot slot, IInventory inventory) {
+		private void AddPointerListeners(VisualElement visualElement, UXMLItemSlotDisplay display, IItemSlot slot, IInventory inventory) {
 			display.onPointerDown += evt => this.OnPointerDown(slot, inventory, visualElement, evt);
 			display.onPointerUp += evt => this.OnPointerUp(slot, inventory, visualElement, evt);
 			display.onPointerEnter += evt => this.OnPointerEnter(slot, inventory, visualElement, evt);
@@ -221,11 +219,8 @@ namespace SoulboundEngine.Client.UI.Screen {
 		public THandler GetScreenHandler() => this.handler;
 
 		public override void OnDispose(IScreenHandle handle) {
-			foreach (var slotDisplay in this.slotDisplays) {
-				slotDisplay.Dispose();
-			}
+			base.OnDispose(handle);
 			this.playerHotbarSlotDisplays.Clear();
-			this.slotDisplays.Clear();
 			this.transitStackHandler.Destroy();
 			this.playerInventory.mainSlotChanged -= this.OnMainSlotChanged;
 		}

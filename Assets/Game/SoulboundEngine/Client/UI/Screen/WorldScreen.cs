@@ -10,7 +10,7 @@ using SoulboundEngine.Core.Registry;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.UI.Screen {
-	public sealed class WorldScreen : UxmlScreen {
+	public sealed class WorldScreen : UXMLScreen {
 		private static readonly Identifier COMMAND_LINE_ELEMENT = Identifier.Of("soulbound:world_screen/command_line");
 		private static readonly Identifier METRICS_HUD_ELEMENT = Identifier.Of("soulbound:world_screen/metrics_hud");
 		private static readonly Identifier LOG_CONSOLE_ELEMENT = Identifier.Of("soulbound:world_screen/log_console");
@@ -20,7 +20,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		private readonly MetricsHUD metricsHUD;
 		private readonly LogConsole logConsole;
 		private readonly PlayerInventory playerInventory;
-		private HotbarSlotDisplay[] hotbarDisplays;
+		private UXMLHotbarSlotDisplay[] hotbarDisplays;
 		private VisualElement hotbarRoot;
 
 		public WorldScreen(PlayerInventory playerInventory, CommandLine commandLine, MetricsHUD metricsHUD, LogConsole logConsole, ItemRenderManager itemRenderManager)
@@ -44,14 +44,15 @@ namespace SoulboundEngine.Client.UI.Screen {
 		}
 
 		private void BindHotbar(VisualElement hotbarRoot) {
-			this.hotbarDisplays = new HotbarSlotDisplay[PlayerInventory.HOTBAR_SIZE];
+			this.hotbarDisplays = new UXMLHotbarSlotDisplay[PlayerInventory.HOTBAR_SIZE];
 
 			foreach (var slotIndex in this.playerInventory.GetHotbar()) {
 				IItemSlot slot = this.playerInventory.GetSlot(slotIndex);
 				VisualElement slotElement = hotbarRoot[slotIndex];
 
-				HotbarSlotDisplay display = new(slot, this.itemRenderManager);
+				UXMLHotbarSlotDisplay display = new(slot, this.itemRenderManager, false);
 				display.OnBind(slotElement);
+				this.AddWidget(display);
 				this.hotbarDisplays[slotIndex] = display;
 			}
 

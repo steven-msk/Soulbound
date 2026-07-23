@@ -25,7 +25,7 @@ namespace SoulboundEngine.Client.UI {
 				IItemSlot slot = chestInventory.GetSlot(slotIndex);
 				VisualElement slotElement = chestRoot[slotIndex];
 
-				this.BindSlot(slotElement, slot, chestInventory);
+				this.BindSlot(slotElement, slot, chestInventory, true);
 			}
 		}
 

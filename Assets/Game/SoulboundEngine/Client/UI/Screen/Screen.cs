@@ -1,3 +1,4 @@
+using SoulboundEngine.Common;
 using System;
 
 namespace SoulboundEngine.Client.UI.Screen {
@@ -20,5 +21,8 @@ namespace SoulboundEngine.Client.UI.Screen {
 		public virtual void OnHide(IScreenHandle handle) { }
 
 		public virtual void OnDispose(IScreenHandle handle) { }
+
+		[PROTOTYPICAL] public abstract void SetTooltip(string text);
+		[PROTOTYPICAL] public abstract void ClearTooltip();
 	}
 }

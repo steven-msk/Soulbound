@@ -4,7 +4,7 @@ using System;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.Debug.Metrics.View {
-	public sealed class MetricsHUD : UxmlWidget {
+	public sealed class MetricsHUD : UXMLWidget {
 		private static readonly Identifier FPS_ELEMENT = Identifier.Of("soulbound:metrics_hud/fps");
 		private static readonly Identifier FRAME_TIME_ELEMENT = Identifier.Of("soulbound:metrics_hud/frame_time");
 		private static readonly Identifier FIXED_UPDATE_TIME_ELEMENT = Identifier.Of("soulbound:metrics_hud/fixed_update_time");

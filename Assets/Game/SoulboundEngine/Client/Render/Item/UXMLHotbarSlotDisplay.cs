@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.Render.Item {
-	public class HotbarSlotDisplay : UIToolkitItemSlotDisplay {
+	public class UXMLHotbarSlotDisplay : UXMLItemSlotDisplay {
 		private static readonly Identifier DISPLAY_AREA_ELEMENT = Identifier.Of("soulbound:hotbar_slot/display_area");
 		private static readonly Identifier SLOT_INDEX_ELEMENT = Identifier.Of("soulbound:hotbar_slot/slot_index");
 		private bool isMainSlot;
@@ -20,8 +20,8 @@ namespace SoulboundEngine.Client.Render.Item {
 			GetColorFromHex("#808080")		// left
 		};
 
-		public HotbarSlotDisplay(IItemSlot slot, ItemRenderManager itemRenderManager) 
-			: base(slot, itemRenderManager) {
+		public UXMLHotbarSlotDisplay(IItemSlot slot, ItemRenderManager itemRenderManager, bool interactable) 
+			: base(slot, itemRenderManager, interactable) {
 		}
 
 		public override void OnBind(VisualElement root) {

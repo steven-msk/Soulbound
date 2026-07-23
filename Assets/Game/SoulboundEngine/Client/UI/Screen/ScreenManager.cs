@@ -17,7 +17,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		public IScreenHandle PushScreen(Screen screen) {
 			VisualElement root = this.CreateScreenRoot();
 			
-			IScreenHandle handle = new UIToolkitScreenHandle(screen, root);
+			IScreenHandle handle = new UXMLScreenHandle(screen, root);
 			screen.Init(this, handle);
 
 			this.screenRoot.Attach(root);

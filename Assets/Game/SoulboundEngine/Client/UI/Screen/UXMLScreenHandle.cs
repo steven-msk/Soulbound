@@ -1,12 +1,12 @@
 ﻿using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.UI.Screen {
-	public sealed class UIToolkitScreenHandle : IScreenHandle {
+	public sealed class UXMLScreenHandle : IScreenHandle {
 		public VisualElement Root { get; }
 		private readonly Screen screen;
 		private bool isVisible;
 
-		public UIToolkitScreenHandle(Screen screen, VisualElement root) {
+		public UXMLScreenHandle(Screen screen, VisualElement root) {
 			this.screen = screen;
 			this.Root = root;
 		}

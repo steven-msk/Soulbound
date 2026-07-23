@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.UI.Screen {
 	[PROTOTYPICAL]
-	public sealed class GamePausedScreen : UxmlScreen {
+	public sealed class GamePausedScreen : UXMLScreen {
 		private static readonly Identifier RESUME_ELEMENT = Identifier.Of("soulbound:game_paused_screen/resume");
 		private static readonly Identifier QUIT_ELEMENT = Identifier.Of("soulbound:game_paused_screen/quit");
 		private readonly IWorldAccessor worldAccessor;

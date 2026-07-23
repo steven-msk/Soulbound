@@ -8,7 +8,7 @@ using System.Linq;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.UI.Screen {
-	public sealed class WorldListScreen : UxmlScreen {
+	public sealed class WorldListScreen : UXMLScreen {
 		public const int MAX_WORLDS = 10;
 		private static readonly Identifier WORLD_LIST_ELEMENT = Identifier.Of("soulbound:world_list_screen/world_list");
 		private static readonly Identifier CREATE_WORLD_ELEMENT = Identifier.Of("soulbound:world_list_screen/create_world");

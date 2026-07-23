@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.Debug.Logging.Console {
-	public sealed class LogConsole : UxmlWidget {
+	public sealed class LogConsole : UXMLWidget {
 		private static readonly Identifier LOG_LIST_ELEMENT = Identifier.Of("soulbound:log_console/log_list");
 		private static readonly Identifier LOG_LABEL_ELEMENT = Identifier.Of("soulbound:log_entry/log_label");
 		private const int NEW_LOG_ENTRIES_PER_FRAME = 3;

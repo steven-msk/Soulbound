@@ -6,7 +6,7 @@ using SoulboundEngine.Core.Registry;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.UI.Screen {
-	public class TitleScreen : UxmlScreen {
+	public class TitleScreen : UXMLScreen {
 		private static readonly Identifier PLAY_BUTTON_ELEMENT = Identifier.Of("soulbound:title_screen/play_button");
 		private static readonly Identifier EXIT_BUTTON_ELEMENT = Identifier.Of("soulbound:title_screen/exit_button");
 		private readonly IWorldAccessor worldAccessor;

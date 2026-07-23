@@ -72,17 +72,16 @@ namespace SoulboundUnityEditor {
 					Type resolvedType = ResolveClrType(element.Name.LocalName);
 					if (resolvedType == null) continue;
 
-					if (!seenInThisDoc.Add(leaf)) {
-						Debug.LogError($"[UXMLSchemaGenerator] Duplicate name '{leaf}' in '{path}': " 
-							+ $"Q<T>(\"{leaf}\") on this document's root is ambiguous. Rename one of them.");
-						continue;
-					}
-
 					// note: the default namespace is only used for .uxml filed found in the game's Assets files.
 					// when modding support is added, keep in mind that the namespace will match the mod namespace
 					string id = $"\"{DEFAULT_NAMESPACE}:{documentId}/{leaf}\"";
 					if (!Identifier.IsValid(leaf)) {
 						Debug.LogWarning($"[UXMLSchemaGenerator] Found invalid UXML schema element identifier: {id}, skipping");
+						continue;
+					}
+					if (!seenInThisDoc.Add(leaf)) {
+						Debug.LogError($"[UXMLSchemaGenerator] Duplicate name '{leaf}' in '{path}': "
+							+ $"Q<T>(\"{leaf}\") on this document's root is ambiguous. Rename one of them.");
 						continue;
 					}
 					stringBuilder.AppendLine(

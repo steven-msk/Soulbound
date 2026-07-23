@@ -75,6 +75,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 253de1a1aa29af742823420f891d4bd1
+    m_Address: Tooltip
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 266b90b32eeb1ec4e9de7f3921f2d5e6
     m_Address: AreaTriggerTile
     m_ReadOnly: 0
@@ -209,12 +215,6 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: c50f0d493e76e5a429e1630de1dd0778
     m_Address: TitleScreen
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: cbf0dfe6112d8e84c849d454f1474d8f
-    m_Address: JosefinSans-Medium SDF
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload
