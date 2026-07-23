@@ -1,14 +1,8 @@
 using SoulboundEngine.Client.Debug.Logging;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine.InputSystem;
 
 namespace SoulboundEngine.Client.Settings {
-	public sealed class Settings {
+	public sealed class SettingsManager {
 		public const string settingsFile = "settings.txt";
 		public static readonly Keybinds keybinds = new();
 		public static readonly SettingEntry<int> masterVolume = new("Master Volume", "master_volume", 100, new IntRange(0, 100));
@@ -16,17 +10,17 @@ namespace SoulboundEngine.Client.Settings {
 		public static readonly SettingEntry<float> floatSetting = new("Float Setting", "float_setting", 10f, new FloatRange(0f, 50f));
 		public static readonly SettingEntry<float> floatSetting_2 = new("Float Setting 2", "float_setting_2", 100f, new FloatRange(50f, 1000f));
 
-		public Settings() => LoadEntries();
+		public SettingsManager() => this.LoadEntries();
 
 		private void LoadEntries() {
 			try {
-				string savePath = GetSavePath();
+				string savePath = this.GetSavePath();
 				FileStream fileStream = File.Open(savePath, FileMode.Open, FileAccess.Read);
 
 				using (StreamReader reader = new(fileStream)) {
 					var settingReader = new SettingReader(reader);
 
-					ProcessSettings(settingReader);
+					this.ProcessSettings(settingReader);
 					keybinds.ProcessMappings(new KeybindReader(settingReader));
 				};
 			} catch (FileNotFoundException) {
@@ -35,12 +29,12 @@ namespace SoulboundEngine.Client.Settings {
 		}
 
 		public void Save() {
-			string savePath = GetSavePath();
+			string savePath = this.GetSavePath();
 
 			using (StreamWriter writer = new(savePath, append: false)) {
 				var settingWriter = new SettingWriter(writer);
 
-				ProcessSettings(settingWriter);
+				this.ProcessSettings(settingWriter);
 				keybinds.ProcessMappings(new KeybindWriter(settingWriter));
 			};
 		}

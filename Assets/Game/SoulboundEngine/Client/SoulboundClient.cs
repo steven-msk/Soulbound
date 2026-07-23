@@ -1,9 +1,9 @@
 using Cysharp.Threading.Tasks;
-using SoulboundBackend.Client.Input;
 using SoulboundEngine.Client.Debug;
 using SoulboundEngine.Client.Debug.Commands;
 using SoulboundEngine.Client.Debug.Logging;
 using SoulboundEngine.Client.Debug.Logging.Console;
+using SoulboundEngine.Client.Debug.Metrics;
 using SoulboundEngine.Client.Debug.Metrics.View;
 using SoulboundEngine.Client.Input;
 using SoulboundEngine.Client.Recipe;
@@ -12,6 +12,7 @@ using SoulboundEngine.Client.Render.Block;
 using SoulboundEngine.Client.Render.Entity;
 using SoulboundEngine.Client.Render.Item;
 using SoulboundEngine.Client.Runtime.Services;
+using SoulboundEngine.Client.Settings;
 using SoulboundEngine.Client.UI;
 using SoulboundEngine.Client.UI.Screen;
 using SoulboundEngine.Client.UI.UXMLBindings;
@@ -33,14 +34,18 @@ namespace SoulboundEngine.Client {
 	using Application = UnityEngine.Application;
 	using Object = UnityEngine.Object;
 	using Time = UnityEngine.Time;
+#if !UNITY_EDITOR
+	using LogType = UnityEngine.LogType;
+	using StackTraceLogType = UnityEngine.StackTraceLogType;
+#endif
 
-	public sealed class SoulboundClient : IInputEventHandler, IWorldAccessor {
+	public sealed class SoulboundClient : IInputEventHandler, IWorldAccessor, IDebugMetricsSource {
 		const int INPUT_QUEUE_BUFFER_CAPACITY = 128;
 		private static SoulboundClient instance;
 		private readonly GameConfig config;
 		private readonly PlayerInputActions inputActions;
 		private readonly InputManager inputManager;
-		private readonly Settings.Settings settings;
+		private readonly SettingsManager settings;
 		private readonly LogConsole logConsole;
 		private readonly CommandLine commandLine;
 		private readonly MetricsHUD metricsHud;
@@ -59,11 +64,13 @@ namespace SoulboundEngine.Client {
 		private readonly EntityRenderManager entityRenderManager;
 		private readonly BlockRenderManager blockRenderManager;
 		private readonly RecipeManager recipeManager;
+		private readonly PerformanceMetrics performanceMetrics;
+		private readonly DebugMetricsService debugMetricsService;
 		private WorldScreen activeWorldScreen;
 
 		int IInputEventHandler.priority => int.MaxValue;
 
-		public SoulboundClient(GameConfig config, ClientInit ctx) {
+		public SoulboundClient(GameConfig config) {
 			instance = this;
 			this.config = config;
 			UXMLSchema_Generated.RegisterAll();
@@ -71,16 +78,26 @@ namespace SoulboundEngine.Client {
 			this.inputActions = new PlayerInputActions();
 			this.inputManager = new InputManager(INPUT_QUEUE_BUFFER_CAPACITY, this.inputActions.asset);
 			InputTokens.Register(this.inputActions.asset);
-			this.settings = new Settings.Settings();
+			this.settings = new SettingsManager();
 
+			this.debugMetricsService = new DebugMetricsService();
+			this.performanceMetrics = new PerformanceMetrics();
+			this.RegisterDebugMetricsSource(this);
 			this.runtimeDataProvider = new RuntimeDataProvider();
 			this.runtimeExecutionServices = new RuntimeExecutionServices();
 			this.worldSessionCommands = new WorldSessionCommands();
 			this.commandProcessor = new CommandProcessor(this.runtimeDataProvider, this.runtimeExecutionServices);
 			this.debugOverlayManager = new DebugOverlayManager(this);
 			this.commandLine = new CommandLine(this.commandProcessor, this.debugOverlayManager);
-			this.metricsHud = new MetricsHUD(ctx.debugMetricsService);
-			this.logConsole = ctx.logConsole;
+			this.metricsHud = new MetricsHUD(this.debugMetricsService);
+			this.logConsole = new LogConsole();
+#if !UNITY_EDITOR
+			Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
+			Application.SetStackTraceLogType(LogType.Warning, StackTraceLogType.None);
+			Application.SetStackTraceLogType(LogType.Error, StackTraceLogType.None);
+			Application.SetStackTraceLogType(LogType.Exception, StackTraceLogType.ScriptOnly);
+			Application.SetStackTraceLogType(LogType.Assert, StackTraceLogType.None);
+#endif
 
 			// prototypical; will not pass to alpha prod
 			var worldSerializer = new JsonSerializer<WorldDump>(Soulbound.globalJsonSettings);
@@ -120,9 +137,11 @@ namespace SoulboundEngine.Client {
 		/// called once every frame
 		/// </summary>
 		public void Update() {
-			this.inputManager.DispatchInputs();
-			this.metricsHud.Refresh();
+			this.performanceMetrics.Tick();
 			this.logConsole.Update();
+			this.metricsHud.Refresh();
+
+			this.inputManager.DispatchInputs();
 		}
 
 		/// <summary>
@@ -257,6 +276,26 @@ namespace SoulboundEngine.Client {
 			return new WorldSaveStrategy(this.config.file.savesFolder, Application.persistentDataPath);
 		}
 
+		void IDebugMetricsSource.CollectDebugData(ref DebugMetricsBuilder builder) {
+			PerformanceMetrics metrics = this.performanceMetrics;
+			builder.Add(DebugMetricId.Fps, metrics.InstantFps);
+			builder.Add(DebugMetricId.FrameTime, metrics.FrameTime);
+			builder.Add(DebugMetricId.FixedUpdateTime, metrics.FixedUpdateTime);
+			builder.Add(DebugMetricId.TotalManagedMemory, metrics.TotalManagedMemoryMB);
+			builder.Add(DebugMetricId.TotalUnityReservedMemory, metrics.TotalUnityReservedMemoryMB);
+			builder.Add(DebugMetricId.MonoHeap, metrics.MonoHeapMB);
+			builder.Add(DebugMetricId.MonoUsed, metrics.MonoUsedMB);
+			builder.Add(DebugMetricId.GpuManagedMemory, metrics.GPUManagedMemoryMB);
+			builder.Add(DebugMetricId.GpuReservedMemory, metrics.GPUReservedMemoryMB);
+			builder.Add(DebugMetricId.GcAlloc, metrics.GcAllocBytesThisFrame);
+		}
+
+		public void RegisterDebugMetricsSource(IDebugMetricsSource source) {
+			this.debugMetricsService.RegisterSource(source);
+		}
+		public void UnregisterDebugMetricsSource(IDebugMetricsSource source) {
+			this.debugMetricsService.UnregisterSource(source);
+		}
 
 		public static SoulboundClient Instance => instance;
 		[Obsolete]
@@ -265,6 +304,7 @@ namespace SoulboundEngine.Client {
 		public UIHandler UIHandler => this.uiHandler;
 		public ItemRenderManager ItemRenderManager => this.itemRenderManager;
 		public RecipeManager RecipeManager => this.recipeManager;
+		public PerformanceMetrics PerformanceMetrics => this.performanceMetrics;
 
 		public sealed class DebugOverlayManager {
 			private readonly Stack<DebugOverlayFeature> overlayStack = new();
