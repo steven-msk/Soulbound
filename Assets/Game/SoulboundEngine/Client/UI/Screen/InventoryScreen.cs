@@ -216,6 +216,11 @@ namespace SoulboundEngine.Client.UI.Screen {
 			}
 		}
 
+		protected override void OnMouseMoved(MouseMoveEvent evt) {
+			base.OnMouseMoved(evt);
+			this.transitStackHandler.SetPointerPosition(this.mousePos);
+		}
+
 		public THandler GetScreenHandler() => this.handler;
 
 		public override void OnDispose(IScreenHandle handle) {

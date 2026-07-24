@@ -33,7 +33,7 @@ namespace SoulboundEngine.Client.Item.Container {
 		}
 
 		private static VisualElement CreateVisualElement(VisualElement screenRoot) {
-			// TODO: this is so fucking bad
+			// TODO: rework UI asset resolution
 			VisualTreeAsset asset = AssetManager.Resolve<VisualTreeAsset>(new AssetKey("TransitStack"));
 			asset.CloneTree(screenRoot);
 			return screenRoot.Get<VisualElement>(TRANSIT_STACK_ELEMENT);

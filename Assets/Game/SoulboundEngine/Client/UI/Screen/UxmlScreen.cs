@@ -13,7 +13,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		private readonly List<UXMLWidget> widgets = new();
 		private VisualElement root;
 		private TemplateContainer tooltip;
-		private Vector2 mousePos;
+		public Vector2 mousePos { get; private set; }
 
 		protected UXMLScreen(VisualTreeAsset asset) {
 			this.asset = asset;
@@ -38,6 +38,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		}
 
 		public sealed override void SetTooltip(string text) {
+			this.ClearTooltip();
 			VisualTreeAsset tooltipAsset = AssetManager.Resolve<VisualTreeAsset>(new AssetKey("Tooltip"));
 			TemplateContainer tooltipRoot = tooltipAsset.Instantiate();
 			this.tooltip = tooltipRoot;
@@ -53,7 +54,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 			this.tooltip = null;
 		}
 
-		private void OnMouseMoved(MouseMoveEvent evt) {
+		protected virtual void OnMouseMoved(MouseMoveEvent evt) {
 			this.mousePos = evt.mousePosition;
 			this.SetTooltipPosition(this.mousePos);
 		}
@@ -69,6 +70,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 			foreach (var widget in this.widgets) {
 				widget.Dispose();
 			}
+			this.root.UnregisterCallback<MouseMoveEvent>(this.OnMouseMoved, TrickleDown.TrickleDown);
 		}
 
 	}

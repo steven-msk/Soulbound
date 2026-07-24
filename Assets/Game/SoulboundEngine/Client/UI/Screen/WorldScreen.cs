@@ -80,6 +80,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		}
 
 		public override void OnDispose(IScreenHandle handle) {
+			base.OnDispose(handle);
 			this.commandLine.Dispose();
 
 			for (int i = 0; i < this.hotbarDisplays.Length; i++) {
