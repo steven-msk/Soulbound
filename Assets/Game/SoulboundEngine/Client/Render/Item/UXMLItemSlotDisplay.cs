@@ -106,7 +106,7 @@ namespace SoulboundEngine.Client.Render.Item {
 		public virtual void UnsetMainSlot() {
 		}
 
-		protected virtual ItemRenderContext RenderContext => new ItemRenderContext.UIToolkit(this.root, ITEM_DISPLAY_ELEMENT, STACK_COUNT_ELEMENT);
+		protected virtual ItemRenderContext RenderContext => new ItemRenderContext.UXML(this.root, ITEM_DISPLAY_ELEMENT, STACK_COUNT_ELEMENT);
 
 		private void OnPointerEnter(PointerEnterEvent evt) {
 			onPointerEnter?.Invoke(evt);

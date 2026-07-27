@@ -8,16 +8,16 @@ using UnityEngine.UIElements;
 namespace SoulboundEngine.Client.Render.Item {
 	public abstract class ItemRenderContext {
 
-		public sealed class GUI : ItemRenderContext {
+		public sealed class UGUI : ItemRenderContext {
 			public RectTransform? parent;
 		}
 
-		public sealed class UIToolkit : ItemRenderContext {
+		public sealed class UXML : ItemRenderContext {
 			public readonly Identifier itemDisplayElement;
 			public readonly Identifier stackCountElement;
 			public readonly VisualElement root;
 
-			public UIToolkit(VisualElement root, Identifier itemDisplayElement, Identifier stackCountElement) {
+			public UXML(VisualElement root, Identifier itemDisplayElement, Identifier stackCountElement) {
 				this.root = root;
 				this.itemDisplayElement = itemDisplayElement;
 				this.stackCountElement = stackCountElement;

@@ -25,7 +25,7 @@ namespace SoulboundEngine.Client.Item.Container {
 			this.itemRenderManager = itemRenderManager;
 			this.root = root;
 			this.renderHandle = new ItemRenderHandle(this);
-			this.renderContext = new ItemRenderContext.UIToolkit(this.root, ITEM_DISPLAY_ELEMENT, STACK_COUNT_ELEMENT);
+			this.renderContext = new ItemRenderContext.UXML(this.root, ITEM_DISPLAY_ELEMENT, STACK_COUNT_ELEMENT);
 		}
 
 		public static TransitStackHandler Create(VisualElement screenRoot, ItemRenderManager itemRenderManager) {

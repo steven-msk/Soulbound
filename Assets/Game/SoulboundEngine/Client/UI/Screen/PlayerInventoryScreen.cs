@@ -104,14 +104,14 @@ namespace SoulboundEngine.Client.UI.Screen {
 		private readonly VisualElement visualElement;
 		private readonly EventCallback<ClickEvent, RecipePreviewElement> onClick;
 		private readonly ItemRenderHandle renderHandle;
-		private readonly ItemRenderContext.UIToolkit renderContext;
+		private readonly ItemRenderContext.UXML renderContext;
 
 		public RecipePreviewElement(ItemRenderManager itemRenderManager, VisualElement visualElement, EventCallback<ClickEvent, RecipePreviewElement> onClick) {
 			this.itemRenderManager = itemRenderManager;
 			this.visualElement = visualElement;
 			this.onClick = onClick;
 			this.renderHandle = new ItemRenderHandle(this);
-			this.renderContext = new ItemRenderContext.UIToolkit(visualElement, ITEM_DISPLAY_ELEMENT, STACK_COUNT_ELEMENT);
+			this.renderContext = new ItemRenderContext.UXML(visualElement, ITEM_DISPLAY_ELEMENT, STACK_COUNT_ELEMENT);
 		}
 
 		public RecipeEntry<StationlessCraftingRecipe> recipe { get; private set; }

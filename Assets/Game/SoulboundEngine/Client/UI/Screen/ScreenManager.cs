@@ -8,9 +8,9 @@ using UnityEngine.UIElements;
 namespace SoulboundEngine.Client.UI.Screen {
 	public sealed class ScreenManager : IScreenNavigator {
 		private readonly List<ScreenEntry> stack = new();
-		private readonly UIToolkitScreenRoot screenRoot;
+		private readonly UXMLScreenRoot screenRoot;
 
-		public ScreenManager(UIToolkitScreenRoot screenRoot) {
+		public ScreenManager(UXMLScreenRoot screenRoot) {
 			this.screenRoot = screenRoot;
 		}
 

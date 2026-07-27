@@ -5,11 +5,11 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.UI.Screen {
-	public sealed class UIToolkitScreenRoot : IScreenRoot {
+	public sealed class UXMLScreenRoot : IScreenRoot {
 		private static readonly Identifier ROOT_LAYER_ELEMENT = Identifier.Of("soulbound:screen_root_layer/root_layer");
 		public readonly VisualElement root;
 
-		public UIToolkitScreenRoot(UIDocument document) {
+		public UXMLScreenRoot(UIDocument document) {
 			this.root = document.rootVisualElement.Get<VisualElement>(ROOT_LAYER_ELEMENT);
 		}
 
