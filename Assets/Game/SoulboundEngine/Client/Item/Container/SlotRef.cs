@@ -1,36 +1,35 @@
-
-using SoulboundEngine.Common;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace SoulboundEngine.Client.ItemSystem.Container {
+namespace SoulboundEngine.Client.Item.Container {
 	public readonly struct SlotRef : IEquatable<SlotRef> {
-		public readonly IItemContainer container;
+		public readonly IInventory inventory;
 		public readonly int index;
 
-		public SlotRef(IItemContainer container, int index) {
-			this.container = container;
+		public SlotRef(IInventory container, int index) {
+			this.inventory = container;
 			this.index = index;
 		}
 
-		public IItemSlot GetSlot() => container.GetSlot(index);
+		public IItemSlot GetSlot() => this.inventory.GetSlot(this.index);
+
+		public override string ToString() {
+			return $"slot[{this.inventory}/{this.index}]";
+		}
 
 		public bool Equals(SlotRef other) {
-			return ReferenceEquals(container, other.container)
-				&& index == other.index;
+			return ReferenceEquals(this.inventory, other.inventory)
+				&& this.index == other.index;
 		}
 
 		public override int GetHashCode() {
-			return HashCode.Combine(container, index);
+			return HashCode.Combine(this.inventory, this.index);
 		}
 
 		public sealed class Comparer : IComparer<SlotRef> {
 			public int Compare(SlotRef x, SlotRef y) {
-				if (!ReferenceEquals(x.container, y.container)) {
-					return x.container.GetHashCode().CompareTo(y.container.GetHashCode());
+				if (!ReferenceEquals(x.inventory, y.inventory)) {
+					return x.inventory.GetHashCode().CompareTo(y.inventory.GetHashCode());
 				}
 				return x.index.CompareTo(y.index);
 			}

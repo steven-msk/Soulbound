@@ -1,14 +1,8 @@
-using SoulboundEngine.Client.SettingSystem;
 using SoulboundEngine.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SoulboundEngine.Client.SettingSystem.View {
+namespace SoulboundEngine.Client.Settings.View {
 	[PROTOTYPICAL]
 	public static class SliderFactory {
 		public static Slider CreateSlider(Transform parent) {

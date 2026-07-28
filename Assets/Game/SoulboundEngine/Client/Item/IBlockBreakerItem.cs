@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SoulboundEngine.Client.ItemSystem {
+namespace SoulboundEngine.Client.Item {
 
 	// might be renamed to something more appropiate
 	public interface IBlockBreakerItem {

@@ -56,6 +56,7 @@ namespace SoulboundEngine.Client.Render.Entity {
 			}
 		}
 
+		// TODO: fix resource leaks in ScriptedEntityModelManager
 		public void Dispose() {
 			this.locationsHandle.Release();
 			foreach (var handle in this.handles) {

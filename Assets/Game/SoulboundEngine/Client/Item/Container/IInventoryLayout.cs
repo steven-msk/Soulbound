@@ -1,6 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
-namespace SoulboundEngine.Client.ItemSystem.Container {
+namespace SoulboundEngine.Client.Item.Container {
+	[Obsolete]
 	public interface IInventoryLayout {
 		Vector2Int GetCoordinates(int index);
 	}

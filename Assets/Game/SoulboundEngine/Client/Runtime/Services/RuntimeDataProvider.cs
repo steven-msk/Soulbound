@@ -1,6 +1,6 @@
-using SoulboundEngine.Client.ItemSystem.Container;
-using SoulboundEngine.Client.World.EntitySystem;
-using SoulboundEngine.Client.World.LevelDomain;
+using SoulboundEngine.Client.Item.Container;
+using SoulboundEngine.Client.World.Entity;
+using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Core.Registry;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using UnityEngine;
 #nullable enable
 
 namespace SoulboundEngine.Client.Runtime.Services {
-	using Player = Player.Player;
+	using PlayerEntity = Player.PlayerEntity;
 
 	public sealed class RuntimeDataProvider : IRuntimeDataProvider {
 		private IRuntimePlayerDataProvider? _player;
@@ -35,9 +35,9 @@ namespace SoulboundEngine.Client.Runtime.Services {
 	}
 
 	public class RuntimePlayerDataProvider : IRuntimePlayerDataProvider {
-		public readonly Player player;
+		public readonly PlayerEntity player;
 
-		public RuntimePlayerDataProvider(Player player) {
+		public RuntimePlayerDataProvider(PlayerEntity player) {
 			this.player = player;
 		}
 
@@ -48,8 +48,8 @@ namespace SoulboundEngine.Client.Runtime.Services {
 		public Vector2 GetPos() => this.player.GetPosition();
 
 		public InventoryData GetInventory() {
-			Inventory inventory = this.player.GetInventory();
-			IEnumerable<int> slots = inventory.GetAllSlots();
+			IInventory inventory = this.player.GetInventory();
+			IEnumerable<int> slots = inventory.GetSlots();
 
 			return new InventoryData {
 				slots = slots,

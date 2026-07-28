@@ -1,7 +1,7 @@
 using SoulboundEngine.Client.Render.Block;
-using SoulboundEngine.Client.World.BlockSystem;
-using SoulboundEngine.Client.World.BlockSystem.States;
-using SoulboundEngine.Client.World.LevelDomain;
+using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.Client.World.Block.State;
+using SoulboundEngine.Client.World.Level;
 using System;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -40,7 +40,7 @@ namespace SoulboundEngine.Client.World.Render {
 			pos = currentView.allPositionsWithin;
 			while (pos.MoveNext()) {
 				BlockPos blockPos = (BlockPos)pos.Current;
-				if (!Level.IsInBounds(blockPos) || lastView.Contains(pos.Current)) {
+				if (!Level.Level.IsInBounds(blockPos) || lastView.Contains(pos.Current)) {
 					continue;
 				}
 

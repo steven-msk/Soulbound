@@ -3,7 +3,7 @@ using Brigadier.NET.ArgumentTypes;
 using Brigadier.NET.Context;
 using Brigadier.NET.Exceptions;
 using Brigadier.NET.Suggestion;
-using SoulboundEngine.Client.World.EntitySystem;
+using SoulboundEngine.Client.World.Entity;
 using SoulboundEngine.Core.Registry;
 using System.Threading.Tasks;
 

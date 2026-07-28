@@ -1,14 +1,14 @@
-using SoulboundEngine.Client.ItemSystem;
-using SoulboundEngine.Client.ItemSystem.Container;
-using SoulboundEngine.Client.World.EntitySystem;
-using SoulboundEngine.Client.World.LevelDomain;
+using SoulboundEngine.Client.Item;
+using SoulboundEngine.Client.Item.Container;
+using SoulboundEngine.Client.World.Entity;
+using SoulboundEngine.Client.World.Level;
 using System;
 using UnityEngine;
 
 #nullable enable
 
 namespace SoulboundEngine.Client.Runtime.Services {
-	using Player = Player.Player;
+	using PlayerEntity = Player.PlayerEntity;
 
 	public class RuntimeExecutionServices : IRuntimeExecutionServices {
 		private IPlayerExecutionService? _player;
@@ -39,11 +39,11 @@ namespace SoulboundEngine.Client.Runtime.Services {
 	}
 
 	public class RuntimePlayerExecutionService : IPlayerExecutionService {
-		public readonly Player player;
+		public readonly PlayerEntity player;
 		private readonly IInventoryExecutionService _inventory;
 		public IInventoryExecutionService Inventory => this._inventory;
 
-		public RuntimePlayerExecutionService(Player player) {
+		public RuntimePlayerExecutionService(PlayerEntity player) {
 			this.player = player;
 			this._inventory = new RuntimeInventoryExecutionService(player.GetInventory());
 		}
@@ -54,13 +54,13 @@ namespace SoulboundEngine.Client.Runtime.Services {
 	}
 
 	public class RuntimeInventoryExecutionService : IInventoryExecutionService {
-		private readonly Inventory inventory;
+		private readonly IInventory inventory;
 
-		public RuntimeInventoryExecutionService(Inventory inventory) {
+		public RuntimeInventoryExecutionService(IInventory inventory) {
 			this.inventory = inventory;
 		}
 
-		public void SetStack(int slotIndex, ItemStack? stack) {
+		public void SetStack(int slotIndex, ItemStack stack) {
 			this.inventory.GetSlot(slotIndex).SetStack(stack);
 		}
 	}

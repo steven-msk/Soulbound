@@ -1,10 +1,8 @@
 ﻿using SoulboundEngine.Client.Interaction;
-using SoulboundEngine.Client.ItemSystem.Container;
-using SoulboundEngine.Client.World.BlockSystem.States;
-using SoulboundEngine.Client.World.BlockSystem.TileEntities;
-using SoulboundEngine.Client.World.LevelDomain;
+using SoulboundEngine.Client.World.Block.State;
+using SoulboundEngine.Client.World.Block.TileEntity;
 
-namespace SoulboundEngine.Client.World.BlockSystem {
+namespace SoulboundEngine.Client.World.Block {
 	public class ChestBlock : Block, IInteractableBlock {
 		public const int INVENTORY_SIZE = 27;
 
@@ -12,15 +10,13 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 			: base(settings) {
 		}
 
-		public override bool HasTileEntity(Level level, BlockPos blockPos, BlockState blockState) {
+		public override bool HasTileEntity(Level.Level level, BlockPos blockPos, BlockState blockState) {
 			return true;
 		}
 
-		public override TileEntity GetTileEntity(Level level, BlockPos blockPos) {
-			return new ChestTileEntity(TileEntityTypes.CHEST, this.GetInventory(), level, blockPos);
+		public override TileEntity.TileEntity GetTileEntity(Level.Level level, BlockPos blockPos) {
+			return new ChestTileEntity(TileEntityTypes.CHEST, level, blockPos);
 		}
-
-		private Inventory GetInventory() => new(INVENTORY_SIZE);
 
 		public bool CanInteract(in BlockInteraction ctx) => true;
 
@@ -30,7 +26,8 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 
 		public void OnInteract(in BlockInteraction ctx) {
 			ChestTileEntity chestTileEntity = (ChestTileEntity)ctx.level.GetTileEntity(ctx.blockPos);
-			ctx.player?.OpenInventory(chestTileEntity.GetInventory(), chestTileEntity);
+			ctx.player.OpenInventoryScreen(chestTileEntity);
+			chestTileEntity.OnOpened(ctx.player);
 		}
 	}
 }

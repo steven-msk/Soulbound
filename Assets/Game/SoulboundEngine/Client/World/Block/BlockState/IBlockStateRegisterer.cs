@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SoulboundEngine.Client.World.BlockSystem.States {
+namespace SoulboundEngine.Client.World.Block.State {
 	public interface IBlockStateRegisterer {
 		BlockState AddWithProperties(BlockPropertyEntries properties);
 		BlockState Add(BlockState state);

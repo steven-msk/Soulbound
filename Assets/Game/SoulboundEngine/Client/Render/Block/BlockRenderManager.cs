@@ -1,11 +1,11 @@
-﻿using SoulboundEngine.Client.World.BlockSystem;
-using SoulboundEngine.Client.World.BlockSystem.States;
+﻿using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.Client.World.Block.State;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
 namespace SoulboundEngine.Client.Render.Block {
-	using Block = World.BlockSystem.Block;
+	using Block = World.Block.Block;
 
 	public sealed class BlockRenderManager {
 		private readonly BlockModels blockModels;

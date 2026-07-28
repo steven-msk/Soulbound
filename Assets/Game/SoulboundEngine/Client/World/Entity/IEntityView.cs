@@ -2,7 +2,7 @@ using SoulboundEngine.Core.Registry;
 using System;
 using UnityEngine;
 
-namespace SoulboundEngine.Client.World.EntitySystem {
+namespace SoulboundEngine.Client.World.Entity {
 	public interface IEntityView {
 		Guid GetGuid();
 		Identifier GetIdentifier();

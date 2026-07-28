@@ -1,45 +1,51 @@
 using Cysharp.Threading.Tasks;
-using SoulboundBackend.Client.Input;
 using SoulboundEngine.Client.Debug;
 using SoulboundEngine.Client.Debug.Commands;
 using SoulboundEngine.Client.Debug.Logging;
 using SoulboundEngine.Client.Debug.Logging.Console;
+using SoulboundEngine.Client.Debug.Metrics;
 using SoulboundEngine.Client.Debug.Metrics.View;
 using SoulboundEngine.Client.Input;
+using SoulboundEngine.Client.Recipe;
+using SoulboundEngine.Client.Recipe.Asset;
+using SoulboundEngine.Client.Render.Block;
+using SoulboundEngine.Client.Render.Entity;
+using SoulboundEngine.Client.Render.Item;
 using SoulboundEngine.Client.Runtime.Services;
-using SoulboundEngine.Client.SettingSystem;
+using SoulboundEngine.Client.Settings;
 using SoulboundEngine.Client.UI;
+using SoulboundEngine.Client.UI.Screen;
+using SoulboundEngine.Client.UI.UXMLBindings;
 using SoulboundEngine.Client.World;
-using SoulboundEngine.Client.World.LevelDomain;
+using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Client.World.Serialization;
 using SoulboundEngine.Core;
 using SoulboundEngine.Core.Audio;
+using SoulboundEngine.Core.Registry;
+using SoulboundEngine.Core.Render.Sprite;
 using SoulboundEngine.Core.Serialization;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.SceneManagement;
+using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client {
-	using SoulboundEngine.Client.ItemSystem.Container;
-	using SoulboundEngine.Client.Render.Block;
-	using SoulboundEngine.Client.Render.Entity;
-	using SoulboundEngine.Client.Render.Item;
-	using SoulboundEngine.Client.UI.Screen;
-	using SoulboundEngine.Core.Registry;
-	using SoulboundEngine.Core.Render.Sprite;
-	using System.Collections.Generic;
-	using UnityEngine.SceneManagement;
-	using UnityEngine.UIElements;
 	using Application = UnityEngine.Application;
 	using Object = UnityEngine.Object;
 	using Time = UnityEngine.Time;
+#if !UNITY_EDITOR
+	using LogType = UnityEngine.LogType;
+	using StackTraceLogType = UnityEngine.StackTraceLogType;
+#endif
 
-	public sealed class SoulboundClient : IInputEventHandler, IWorldAccessor {
+	public sealed class SoulboundClient : IInputEventHandler, IWorldAccessor, IDebugMetricsSource {
 		const int INPUT_QUEUE_BUFFER_CAPACITY = 128;
 		private static SoulboundClient instance;
 		private readonly GameConfig config;
 		private readonly PlayerInputActions inputActions;
 		private readonly InputManager inputManager;
-		private readonly Settings settings;
+		private readonly SettingsManager settings;
 		private readonly LogConsole logConsole;
 		private readonly CommandLine commandLine;
 		private readonly MetricsHUD metricsHud;
@@ -57,28 +63,41 @@ namespace SoulboundEngine.Client {
 		private readonly ISpriteResolver<AtlasSpriteRef> spriteResolver;
 		private readonly EntityRenderManager entityRenderManager;
 		private readonly BlockRenderManager blockRenderManager;
+		private readonly RecipeManager recipeManager;
+		private readonly PerformanceMetrics performanceMetrics;
+		private readonly DebugMetricsService debugMetricsService;
 		private WorldScreen activeWorldScreen;
-		private IScreenHandle activeInventoryScreenHandle;
 
 		int IInputEventHandler.priority => int.MaxValue;
 
-		public SoulboundClient(GameConfig config, ClientInit ctx) {
+		public SoulboundClient(GameConfig config) {
 			instance = this;
 			this.config = config;
+			UXMLSchema_Generated.RegisterAll();
 
 			this.inputActions = new PlayerInputActions();
 			this.inputManager = new InputManager(INPUT_QUEUE_BUFFER_CAPACITY, this.inputActions.asset);
 			InputTokens.Register(this.inputActions.asset);
-			this.settings = new Settings();
+			this.settings = new SettingsManager();
 
+			this.debugMetricsService = new DebugMetricsService();
+			this.performanceMetrics = new PerformanceMetrics();
+			this.RegisterDebugMetricsSource(this);
 			this.runtimeDataProvider = new RuntimeDataProvider();
 			this.runtimeExecutionServices = new RuntimeExecutionServices();
 			this.worldSessionCommands = new WorldSessionCommands();
 			this.commandProcessor = new CommandProcessor(this.runtimeDataProvider, this.runtimeExecutionServices);
 			this.debugOverlayManager = new DebugOverlayManager(this);
 			this.commandLine = new CommandLine(this.commandProcessor, this.debugOverlayManager);
-			this.metricsHud = new MetricsHUD(ctx.debugMetricsService);
-			this.logConsole = ctx.logConsole;
+			this.metricsHud = new MetricsHUD(this.debugMetricsService);
+			this.logConsole = new LogConsole();
+#if !UNITY_EDITOR
+			Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
+			Application.SetStackTraceLogType(LogType.Warning, StackTraceLogType.None);
+			Application.SetStackTraceLogType(LogType.Error, StackTraceLogType.None);
+			Application.SetStackTraceLogType(LogType.Exception, StackTraceLogType.ScriptOnly);
+			Application.SetStackTraceLogType(LogType.Assert, StackTraceLogType.None);
+#endif
 
 			// prototypical; will not pass to alpha prod
 			var worldSerializer = new JsonSerializer<WorldDump>(Soulbound.globalJsonSettings);
@@ -100,6 +119,10 @@ namespace SoulboundEngine.Client {
 			this.itemRenderManager = new ItemRenderManager(Registries.ITEMS.ToList(), this.spriteResolver);
 			this.entityRenderManager = new EntityRenderManager(Registries.ENTITIES.ToList(), this.itemRenderManager);
 			this.blockRenderManager = new BlockRenderManager(Registries.BLOCKS.ToList());
+			_ = new InventoryScreens();
+
+			Registry<RecipeIngredientIndex> ingredientIndexRegistry = new(RecipeIngredientIndex.REGISTRY);
+			this.recipeManager = new RecipeManager(ingredientIndexRegistry, new RecipeAssetResolver());
 		}
 
 		/// <summary>
@@ -114,9 +137,11 @@ namespace SoulboundEngine.Client {
 		/// called once every frame
 		/// </summary>
 		public void Update() {
-			this.inputManager.DispatchInputs();
-			this.metricsHud.Refresh();
+			this.performanceMetrics.Tick();
 			this.logConsole.Update();
+			this.metricsHud.Refresh();
+
+			this.inputManager.DispatchInputs();
 		}
 
 		/// <summary>
@@ -126,6 +151,14 @@ namespace SoulboundEngine.Client {
 			this.activeWorldSession?.levelManager.StopSession();
 			this.settings.Save();
 			this.inputActions.Dispose();
+		}
+
+		public IScreenHandle OpenScreen(Screen screen) {
+			return this.uiHandler.PushScreen(screen);
+		}
+
+		public void CloseScreen(IScreenHandle handle) {
+			this.uiHandler.PopScreen(handle);
 		}
 
 		public void CreateNewWorld(string world, int seed) {
@@ -138,7 +171,7 @@ namespace SoulboundEngine.Client {
 
 		public void EnterWorld(string world) {
 			if (this.IsWorldSessionActive()) return;
-			
+
 			WorldSave? save = this.worldManager.ListSaves().FirstOrDefault(s => s.name == world);
 			if (save == null) {
 				throw new ArgumentException($"World not found: '{world}'");
@@ -154,7 +187,6 @@ namespace SoulboundEngine.Client {
 				Object.FindFirstObjectByType<WorldSceneRoot>
 			).ContinueWith(session => {
 				this.activeWorldSession = session;
-				//this.uiHandler.SetCanvas(session.canvas);
 				this.uiHandler.SetUIDocument(session.uiDocument);
 				this.activeWorldScreen = new WorldScreen(session.player.GetInventory(), this.commandLine, this.metricsHud, this.logConsole, this.itemRenderManager);
 				this.uiHandler.PushScreen(this.activeWorldScreen);
@@ -239,26 +271,29 @@ namespace SoulboundEngine.Client {
 			};
 		}
 
-		public void ShowInventoryScreen(Player.Player player) {
-			this.activeWorldScreen?.SetHotbarVisible(false);
-			this.activeInventoryScreenHandle = this.uiHandler.PushScreen(new InventoryContextScreen(this.itemRenderManager, player));
-		}
-
-		public void HideInventoryScreen() {
-			this.activeWorldScreen?.SetHotbarVisible(true);
-			if (this.activeInventoryScreenHandle != null) {
-				this.uiHandler.PopScreen(this.activeInventoryScreenHandle);
-				this.activeInventoryScreenHandle = null;
-			}
-		}
-
-		public void SetExternalInventory(Inventory inventory, IInventoryLayout layout) {
-			InventoryContextScreen inventoryContextScreen = (InventoryContextScreen)this.activeInventoryScreenHandle.GetScreen();
-			inventoryContextScreen.SetExternalInventory(inventory, layout, inventory.GetAllSlots());
-		}
-
 		private IWorldSaveStrategy GetWorldSaveStrategy() {
 			return new WorldSaveStrategy(this.config.file.savesFolder, Application.persistentDataPath);
+		}
+
+		void IDebugMetricsSource.CollectDebugData(ref DebugMetricsBuilder builder) {
+			PerformanceMetrics metrics = this.performanceMetrics;
+			builder.Add(DebugMetricId.Fps, metrics.InstantFps);
+			builder.Add(DebugMetricId.FrameTime, metrics.FrameTime);
+			builder.Add(DebugMetricId.FixedUpdateTime, metrics.FixedUpdateTime);
+			builder.Add(DebugMetricId.TotalManagedMemory, metrics.TotalManagedMemoryMB);
+			builder.Add(DebugMetricId.TotalUnityReservedMemory, metrics.TotalUnityReservedMemoryMB);
+			builder.Add(DebugMetricId.MonoHeap, metrics.MonoHeapMB);
+			builder.Add(DebugMetricId.MonoUsed, metrics.MonoUsedMB);
+			builder.Add(DebugMetricId.GpuManagedMemory, metrics.GPUManagedMemoryMB);
+			builder.Add(DebugMetricId.GpuReservedMemory, metrics.GPUReservedMemoryMB);
+			builder.Add(DebugMetricId.GcAlloc, metrics.GcAllocBytesThisFrame);
+		}
+
+		public void RegisterDebugMetricsSource(IDebugMetricsSource source) {
+			this.debugMetricsService.RegisterSource(source);
+		}
+		public void UnregisterDebugMetricsSource(IDebugMetricsSource source) {
+			this.debugMetricsService.UnregisterSource(source);
 		}
 
 		public static SoulboundClient Instance => instance;
@@ -266,6 +301,9 @@ namespace SoulboundEngine.Client {
 		public InputManager InputManager => this.inputManager;
 		[Obsolete]
 		public UIHandler UIHandler => this.uiHandler;
+		public ItemRenderManager ItemRenderManager => this.itemRenderManager;
+		public RecipeManager RecipeManager => this.recipeManager;
+		public PerformanceMetrics PerformanceMetrics => this.performanceMetrics;
 
 		public sealed class DebugOverlayManager {
 			private readonly Stack<DebugOverlayFeature> overlayStack = new();

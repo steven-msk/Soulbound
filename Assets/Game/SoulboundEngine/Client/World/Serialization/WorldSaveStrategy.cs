@@ -1,5 +1,5 @@
 using Newtonsoft.Json;
-using SoulboundEngine.Client.World.LevelDomain;
+using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Core;
 using System;
 using System.Collections.Generic;

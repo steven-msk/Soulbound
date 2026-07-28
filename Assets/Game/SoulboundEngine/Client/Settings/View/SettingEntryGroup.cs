@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 
-namespace SoulboundEngine.Client.SettingSystem.View {
+namespace SoulboundEngine.Client.Settings.View {
 	[PROTOTYPICAL]
 	public class SettingEntryGroup : MonoBehaviour {
 		private List<GameObject> toDestroy = new();

@@ -1,3 +1,5 @@
+using SoulboundEngine.Client.UI.UXMLBindings;
+using SoulboundEngine.Core.Registry;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -6,18 +8,26 @@ using UnityEngine.UIElements;
 namespace SoulboundEngine.Client.Render.Item {
 	public abstract class ItemRenderContext {
 
-		public sealed class GUI : ItemRenderContext {
+		public sealed class UGUI : ItemRenderContext {
 			public RectTransform? parent;
 		}
 
-		public sealed class UIToolkit : ItemRenderContext {
-			public VisualElement root;
+		public sealed class UXML : ItemRenderContext {
+			public readonly Identifier itemDisplayElement;
+			public readonly Identifier stackCountElement;
+			public readonly VisualElement root;
 
-			public VisualElement GetItemDisplay() { 
-				return this.root.Q<VisualElement>("ItemDisplay");
+			public UXML(VisualElement root, Identifier itemDisplayElement, Identifier stackCountElement) {
+				this.root = root;
+				this.itemDisplayElement = itemDisplayElement;
+				this.stackCountElement = stackCountElement;
 			}
 
-			public Label GetStackCount() => this.root.Q<Label>("StackCount");
+			public VisualElement GetItemDisplay() { 
+				return this.root.Get<VisualElement>(this.itemDisplayElement);
+			}
+
+			public Label GetStackCount() => this.root.Get<Label>(this.stackCountElement);
 		}
 
 		public sealed class World : ItemRenderContext {

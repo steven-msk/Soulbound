@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace SoulboundEngine.Client.World.EntitySystem.Transform {
+namespace SoulboundEngine.Client.World.Entity.Transform {
 	public interface IEntityTransform {
 
 		// TODO: generalize entity transform fields such as physics and collisions

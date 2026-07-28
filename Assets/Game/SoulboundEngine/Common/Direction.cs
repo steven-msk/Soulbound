@@ -1,5 +1,5 @@
 using SoulboundEngine.Client.World;
-using SoulboundEngine.Client.World.BlockSystem;
+using SoulboundEngine.Client.World.Block;
 using System;
 using System.Collections;
 using System.Collections.Generic;

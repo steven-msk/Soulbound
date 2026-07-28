@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 namespace SoulboundEngine.Client.Render.Entity {
-	using Entity = World.EntitySystem.Entity;
+	using Entity = World.Entity.Entity;
 
 	public sealed class EmptyEntityRenderer<E> : EntityRenderer<E, EntityRenderState<E>, EntityModel> where E : Entity {
 		public EmptyEntityRenderer(FactoryContext context) 

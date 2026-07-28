@@ -1,10 +1,9 @@
 using SoulboundEngine.Client.World.Chunk;
-using SoulboundEngine.Client.World.LevelDomain;
-using SoulboundEngine.Core;
+using SoulboundEngine.Client.World.Level;
 using System;
 using UnityEngine;
 
-namespace SoulboundEngine.Client.World.BlockSystem {
+namespace SoulboundEngine.Client.World.Block {
     public struct BlockPos {
         public int x;
         public int y;
@@ -17,8 +16,8 @@ namespace SoulboundEngine.Client.World.BlockSystem {
         public override readonly string ToString() => $"bx:{x}, by:{y}";
 
         public readonly ChunkBlockPos ToChunkPos() {
-            int cx = Level.ToChunkX(x);
-            int chunkX = Level.ChunkXAt(x);
+            int cx = Level.Level.ToChunkX(this.x);
+            int chunkX = Level.Level.ChunkXAt(this.x);
             return new ChunkBlockPos(cx, this.y, chunkX);
         }
 

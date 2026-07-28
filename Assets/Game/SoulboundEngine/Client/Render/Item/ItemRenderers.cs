@@ -1,11 +1,11 @@
-﻿using SoulboundEngine.Client.ItemSystem;
+﻿using SoulboundEngine.Client.Item;
 using SoulboundEngine.Core.Assets;
 using SoulboundEngine.Core.Render.Sprite;
 using System;
 using System.Collections.Generic;
 
 namespace SoulboundEngine.Client.Render.Item {
-	using Item = ItemSystem.Item;
+	using Item = Client.Item.Item;
 
 	public static class ItemRenderers {
 		private static readonly AssetKey ITEM_SPRITE_ATLAS = new("Items");
@@ -27,7 +27,6 @@ namespace SoulboundEngine.Client.Render.Item {
 			Register(Items.spawnEntityItem, DefaultResolverFactory("bluething"));
 			Register(Items.chargeableItem, DefaultResolverFactory("bluething"));
 			Register(Items.debugPointer, DefaultResolverFactory("debugPointer"));
-			Register(Items.inventoryListenerItem, DefaultResolverFactory("bluething"));
 			Register(Items.blockBreakerItem, DefaultResolverFactory("bluething"));
 		}
 

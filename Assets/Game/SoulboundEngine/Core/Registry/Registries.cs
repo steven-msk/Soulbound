@@ -1,9 +1,12 @@
 using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.Client.ItemSystem;
-using SoulboundEngine.Client.World.BlockSystem;
-using SoulboundEngine.Client.World.BlockSystem.TileEntities;
-using SoulboundEngine.Client.World.EntitySystem;
-using SoulboundEngine.Client.World.EntitySystem.Attribute;
+using SoulboundEngine.Client.Item;
+using SoulboundEngine.Client.Loot;
+using SoulboundEngine.Client.Recipe;
+using SoulboundEngine.Client.UI.Screen;
+using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.Client.World.Block.TileEntity;
+using SoulboundEngine.Client.World.Entity;
+using SoulboundEngine.Client.World.Entity.Attribute;
 using System;
 using System.Linq;
 
@@ -17,13 +20,18 @@ namespace SoulboundEngine.Core.Registry {
 		public static readonly Registry<Item> ITEMS = Create<Item>(Identifier.Of("item"));
 		public static readonly Registry<EntityDescriptor> ENTITIES = Create<EntityDescriptor>(Identifier.Of("entity"));
 		public static readonly Registry<EntityAttribute> ATTRIBUTES = Create<EntityAttribute>(Identifier.Of("attribute"));
-		public static readonly Registry<TileEntityType> TILE_ENTITIES = Create<TileEntityType>(Identifier.Of("tile_entity")); 
+		public static readonly Registry<TileEntityType> TILE_ENTITIES = Create<TileEntityType>(Identifier.Of("tile_entity"));
+		public static readonly Registry<InventoryScreenHandlerType> INVENTORY_SCREEN_HANDLES = Create<InventoryScreenHandlerType>(Identifier.Of("inventory_screen_handle"));
+		public static readonly Registry<RecipeType> RECIPE_TYPE = Create<RecipeType>(Identifier.Of("recipe_type"));
+
+		// temporary, see LootTables
+		public static readonly Registry<LootTable> LOOT_TABLES = Create<LootTable>(Identifier.Of("loot_table"));
 
 		private static Registry<T> Create<T>(Identifier id) {
 			if (freezed) throw new InvalidOperationException("Registries already freezed");
 
 			RegistryKey<Registry<T>> registryKey = RegistryKey<T>.OfRegistry(id);
-			Registry<T> registry = Registry<IRegistry>.Register(ROOT, registryKey, new Registry<T>(registryKey));
+			Registry<T> registry = Registry<IRegistry>.RegisterVariant(ROOT, registryKey, new Registry<T>(registryKey));
 
 			return registry;
 		}
@@ -38,6 +46,9 @@ namespace SoulboundEngine.Core.Registry {
 			EntityType.Init();
 			AttributeTypes.Init();
 			TileEntityTypes.Init();
+			InventoryScreenHandlerType.Init();
+			RecipeType.Init();
+			LootTables.Init();
 		}
 
 		public static void Freeze() {

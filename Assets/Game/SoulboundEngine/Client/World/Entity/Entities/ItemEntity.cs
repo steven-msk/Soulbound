@@ -1,21 +1,20 @@
-using SoulboundEngine.Client.ItemSystem;
-using SoulboundEngine.Client.World.LevelDomain;
+using SoulboundEngine.Client.Item;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.EntitySystem {
+namespace SoulboundEngine.Client.World.Entity {
 	public class ItemEntity : Entity {
 		public const float CANNOT_PICK_UP_DELAY_SEC = 2;
-		public static readonly EntityDescriptor<ItemEntity> DESCRIPTOR = EntityDescriptor.Of<ItemEntity>((_, level) => new ItemEntity(null, level));
+		public static readonly EntityDescriptor<ItemEntity> DESCRIPTOR = EntityDescriptor.Of<ItemEntity>((_, level) => new ItemEntity(ItemStack.EMPTY, level));
 
 		private readonly Entity? owner;
 		private readonly ItemStack itemStack;
 
-		public ItemEntity(ItemStack itemStack, Level level)
+		public ItemEntity(ItemStack itemStack, Level.Level level)
 			: this(null, itemStack, level) {
 		}
 
-		public ItemEntity(Entity? owner, ItemStack itemStack, Level level)
+		public ItemEntity(Entity? owner, ItemStack itemStack, Level.Level level)
 			: base(DESCRIPTOR, level) {
 			this.itemStack = itemStack;
 			this.owner = owner;

@@ -1,11 +1,11 @@
-using SoulboundEngine.Client.ItemSystem;
+using SoulboundEngine.Client.Item;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SoulboundEngine.Client.World.BlockSystem {
+namespace SoulboundEngine.Client.World.Block {
     public class BreakRequirement {
         public int minBreakPower;
         public int explosionResistance;

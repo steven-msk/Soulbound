@@ -1,5 +1,5 @@
 namespace SoulboundEngine.Client.Render.Item {
-	using SoulboundEngine.Client.ItemSystem;
+	using SoulboundEngine.Client.Item;
 	using SoulboundEngine.Core;
 	using System;
 	using TMPro;
@@ -21,7 +21,7 @@ namespace SoulboundEngine.Client.Render.Item {
 		public sealed class Default : ItemRenderer<ItemRenderState> {
 			public override ItemRenderState CreateRenderState(ItemStack stack, ItemRenderContext context) {
 				return new ItemRenderState {
-					showStackCount = (context is ItemRenderContext.GUI || context is ItemRenderContext.UIToolkit)
+					showStackCount = (context is ItemRenderContext.UGUI || context is ItemRenderContext.UXML)
 						&& stack.item.IsStackable(),
 					stack = stack
 				};
@@ -29,7 +29,7 @@ namespace SoulboundEngine.Client.Render.Item {
 
 			public override IItemView CreateView(ItemRenderState state, ItemModel model, ItemRenderContext context) {
 				switch (context) {
-					case ItemRenderContext.GUI gui: {
+					case ItemRenderContext.UGUI gui: {
 							GameObject obj = new("UI Item", typeof(RectTransform));
 							obj.SetActive(false);
 							obj.transform.SetParent(gui.parent, false);
@@ -45,18 +45,18 @@ namespace SoulboundEngine.Client.Render.Item {
 							itemImage.raycastTarget = false;
 
 							TextMeshProUGUI stackText = this.CreateStackText(rect);
-							stackText.text = state.stack.quantity.ToString();
+							stackText.text = state.stack.count.ToString();
 							stackText.enabled = state.showStackCount;
 
 							obj.SetActive(true);
 							return IItemView.Of(obj);
 						}
-					case ItemRenderContext.UIToolkit uiToolkit: {
+					case ItemRenderContext.UXML uiToolkit: {
 							VisualElement display = uiToolkit.GetItemDisplay();
 							Label stackText = uiToolkit.GetStackCount();
 
 							display.style.backgroundImage = new StyleBackground(model.GetSprite());
-							stackText.text = state.stack.quantity.ToString();
+							stackText.text = state.stack.count.ToString();
 							stackText.style.display = state.showStackCount ? DisplayStyle.Flex : DisplayStyle.None;
 
 							display.pickingMode = PickingMode.Ignore;
@@ -93,7 +93,7 @@ namespace SoulboundEngine.Client.Render.Item {
 			}
 
 			public override void DestroyView(IItemView view, ItemRenderContext context) {
-				if (context is ItemRenderContext.UIToolkit uiToolkit) {
+				if (context is ItemRenderContext.UXML uiToolkit) {
 					VisualElement display = uiToolkit.GetItemDisplay();
 					Label stackText = uiToolkit.GetStackCount();
 

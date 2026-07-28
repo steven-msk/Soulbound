@@ -1,4 +1,4 @@
-using SoulboundEngine.Client.World.BlockSystem;
+using SoulboundEngine.Client.World.Block;
 using System;
 using System.Collections.Generic;
 using System.Linq;

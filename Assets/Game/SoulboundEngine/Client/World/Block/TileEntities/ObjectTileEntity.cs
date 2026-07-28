@@ -1,24 +1,24 @@
 using SoulboundEngine.Client.Player;
-using SoulboundEngine.Client.World.LevelDomain;
+using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Common;
 using SoulboundEngine.Common.Unity;
 using SoulboundEngine.Core;
 using System;
 using UnityEngine;
 
-namespace SoulboundEngine.Client.World.BlockSystem.TileEntities {
-	using Player = Player.Player;
+namespace SoulboundEngine.Client.World.Block.TileEntity {
+	using PlayerEntity = Player.PlayerEntity;
 
 	[PROTOTYPICAL]
 	public class ObjectTileEntity : TileEntity {
 		// made to work with AreaTriggerBlock
 
-		public event Action<Player> onTriggerEnter;
-		public event Action<Player> onTriggerExit;
+		public event Action<PlayerEntity> onTriggerEnter;
+		public event Action<PlayerEntity> onTriggerExit;
 		public event Action onDestroyed;
 		private readonly GameObject gameObject;
 
-		public ObjectTileEntity(TileEntityType<ObjectTileEntity> tileEntityType, Level level, BlockPos blockPos)
+		public ObjectTileEntity(TileEntityType<ObjectTileEntity> tileEntityType, Level.Level level, BlockPos blockPos)
 			: base(tileEntityType, level, blockPos) {
 			this.gameObject = new GameObject("Object Tile Entity");
 			this.gameObject.transform.position = blockPos.GetCenter();

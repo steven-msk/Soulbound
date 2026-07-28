@@ -2,7 +2,7 @@ using SoulboundEngine.Client.Debug.Logging;
 using SoulboundEngine.Client.Interaction;
 using SoulboundEngine.Common;
 
-namespace SoulboundEngine.Client.ItemSystem {
+namespace SoulboundEngine.Client.Item {
 	[PROTOTYPICAL]
 	public sealed class DebugPointerItem : Item, IInteractableItem {
 		public DebugPointerItem(Settings settings) : base(settings) {
@@ -12,11 +12,11 @@ namespace SoulboundEngine.Client.ItemSystem {
 			return trigger == InteractionTrigger.LeftClick;
 		}
 
-		public bool CanExecute(ItemStack itemStack, in ItemInteraction ctx) {
+		public bool CanExecute(in ItemStack itemStack, in ItemInteraction ctx) {
 			return true;
 		}
 
-		public bool TryExecute(ItemStack itemStack, in ItemInteraction ctx) {
+		public bool TryExecute(ref ItemStack itemStack, in ItemInteraction ctx) {
 			Logger.LogInfo("Pointer: {}", ctx.player.GetWorldPointerPos());
 			return true;
 		}

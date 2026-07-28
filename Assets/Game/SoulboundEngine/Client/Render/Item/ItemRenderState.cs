@@ -1,4 +1,4 @@
-﻿using SoulboundEngine.Client.ItemSystem;
+﻿using SoulboundEngine.Client.Item;
 
 namespace SoulboundEngine.Client.Render.Item {
 	public class ItemRenderState {

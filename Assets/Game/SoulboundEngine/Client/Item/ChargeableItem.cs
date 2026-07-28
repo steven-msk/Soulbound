@@ -2,7 +2,7 @@ using SoulboundEngine.Client.Debug.Logging;
 using SoulboundEngine.Client.Interaction;
 using SoulboundEngine.Common;
 
-namespace SoulboundEngine.Client.ItemSystem {
+namespace SoulboundEngine.Client.Item {
 	[PROTOTYPICAL]
 	public sealed class ChargeableItem : Item, IInteractableItem {
 		public ChargeableItem(Settings settings) : base(settings) {
@@ -14,11 +14,11 @@ namespace SoulboundEngine.Client.ItemSystem {
 				|| trigger == InteractionTrigger.LeftRelease;
 		}
 
-		public bool CanExecute(ItemStack itemStack, in ItemInteraction ctx) {
+		public bool CanExecute(in ItemStack itemStack, in ItemInteraction ctx) {
 			return true;
 		}
 
-		public bool TryExecute(ItemStack itemStack, in ItemInteraction ctx) {
+		public bool TryExecute(ref ItemStack itemStack, in ItemInteraction ctx) {
 			if (ctx.trigger == InteractionTrigger.LeftClick) {
 				Logger.LogInfo("Start charge");
 			} else if (ctx.trigger == InteractionTrigger.LeftHold) {

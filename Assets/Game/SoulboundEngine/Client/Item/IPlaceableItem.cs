@@ -1,9 +1,9 @@
 using SoulboundEngine.Client.Interaction;
-using SoulboundEngine.Client.World.BlockSystem;
-using SoulboundEngine.Client.World.BlockSystem.States;
+using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.Client.World.Block.State;
 using SoulboundEngine.Core.Event;
 
-namespace SoulboundEngine.Client.ItemSystem {
+namespace SoulboundEngine.Client.Item {
 	public interface IPlaceableItem : IInteractableItem {
 		BlockState GetBlockState(ItemStack itemStack);
 
@@ -11,13 +11,13 @@ namespace SoulboundEngine.Client.ItemSystem {
 			return trigger == InteractionTrigger.LeftHold || trigger == InteractionTrigger.LeftClick;
 		}
 
-		bool IInteractableItem.CanExecute(ItemStack itemStack, in ItemInteraction ctx) {
+		bool IInteractableItem.CanExecute(in ItemStack itemStack, in ItemInteraction ctx) {
 			BlockPos blockPos = (BlockPos)ctx.player.GetWorldPointerPos();
 			return ctx.player.CanPlaceBlockAt(blockPos);
 		}
 
-		bool IInteractableItem.TryExecute(ItemStack itemStack, in ItemInteraction ctx) {
-			BlockState blockState = GetBlockState(itemStack);
+		bool IInteractableItem.TryExecute(ref ItemStack itemStack, in ItemInteraction ctx) {
+			BlockState blockState = this.GetBlockState(itemStack);
 			BlockPos blockPos = (BlockPos)ctx.player.GetWorldPointerPos();
 
 			ctx.level.SetBlockState(blockPos, blockState);

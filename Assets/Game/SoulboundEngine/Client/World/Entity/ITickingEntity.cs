@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SoulboundEngine.Client.World.EntitySystem {
+namespace SoulboundEngine.Client.World.Entity {
 	public interface ITickingEntity {
 		void Tick();
 	}

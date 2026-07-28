@@ -1,14 +1,16 @@
+using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.Render.Entity;
 using SoulboundEngine.Client.Runtime.Services;
-using SoulboundEngine.Client.World.BlockSystem;
-using SoulboundEngine.Client.World.BlockSystem.States;
-using SoulboundEngine.Client.World.BlockSystem.TileEntities;
+using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.Client.World.Block.State;
+using SoulboundEngine.Client.World.Block.TileEntity;
 using SoulboundEngine.Client.World.Chunk;
-using SoulboundEngine.Client.World.EntitySystem;
+using SoulboundEngine.Client.World.Entity;
 using SoulboundEngine.Client.World.Generation;
 using SoulboundEngine.Client.World.Render;
 using SoulboundEngine.Common;
 using SoulboundEngine.Common.Math;
+using SoulboundEngine.Common.Math.Random;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -18,8 +20,8 @@ using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.LevelDomain {
-	using Player = Player.Player;
+namespace SoulboundEngine.Client.World.Level {
+	using Entity = Entity.Entity;
 
 	public sealed class Level : ILevelExecutionService, IEntityManager {
 		public delegate void OnChunkGenerated(ChunkGenData genData);
@@ -36,9 +38,10 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 		private bool showingChunkFeatures = false;
 		[Obsolete] private readonly ConcurrentDictionary<int, List<OnChunkGenerated>> deferredGenerations = new();
 		private readonly Dictionary<int, ChunkGenData> chunkGenData = new();
+		private readonly RandomSequences randomSequences;
 		private readonly WorldRenderer worldRenderer;
 		private readonly EntityRenderManager entityRenderManager;
-		private Player player;
+		private PlayerEntity player;
 
 		private readonly BiomeMap biomeMap;
 		private readonly Heightmap heightmap;
@@ -52,6 +55,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 			this.seed = seed;
 			this.worldRenderer = worldRenderer;
 			this.entityRenderManager = entityRenderManager;
+			this.randomSequences = new RandomSequences(seed);
 
 			var biome1 = new PlainsBiome(seed);
 			var biome2 = new HillsBiome(seed);
@@ -68,7 +72,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 		}
 
 		// known issue: player creation assumes block placement is finished
-		public void StartSession(Player player) {
+		public void StartSession(PlayerEntity player) {
 			this.player = player;
 			this.AddEntity(player);
 			SoulboundClient.Instance.InputManager.AddHandler(player);
@@ -215,7 +219,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 				if (chunk == null) return;
 
 				BlockState? blockState = this.GetBlockState(neighborPos);
-				Block block = blockState?.block ?? Blocks.AIR;
+				Block.Block block = blockState?.block ?? Blocks.AIR;
 
 				if (block is INeighborUpdateHandler neighborUpdateHandler) {
 					neighborUpdateHandler.OnNeighborChanged(this, neighborPos, blockPos);
@@ -331,7 +335,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 			return chunk?.TileEntityAt(blockPos);
 		}
 
-		public Block? GetBlock(BlockPos blockPos) {
+		public Block.Block? GetBlock(BlockPos blockPos) {
 			BlockState? blockState = this.GetBlockState(blockPos);
 			return blockState?.block;
 		}
@@ -389,7 +393,8 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 			return coveredTiles;
 		}
 
-		public Player GetPlayer() => this.player;
+		public PlayerEntity GetPlayer() => this.player;
 
+		public RandomSequences RandomSequences => this.randomSequences;
 	}
 }

@@ -1,9 +1,9 @@
 using SoulboundEngine.Client.Debug.Logging;
 using SoulboundEngine.Client.Interaction;
-using SoulboundEngine.Client.World.BlockSystem.States;
+using SoulboundEngine.Client.World.Block.State;
 using SoulboundEngine.Core.States;
 
-namespace SoulboundEngine.Client.World.BlockSystem {
+namespace SoulboundEngine.Client.World.Block {
 	public sealed class ToggleBlock : Block, IInteractableBlock {
 		public static readonly Property<bool> on = BoolProperty.Of("on");
 

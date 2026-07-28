@@ -1,10 +1,10 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using SoulboundEngine.Client.World.BlockSystem;
-using SoulboundEngine.Client.World.BlockSystem.States;
-using SoulboundEngine.Client.World.BlockSystem.TileEntities;
+using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.Client.World.Block.State;
+using SoulboundEngine.Client.World.Block.TileEntity;
 using SoulboundEngine.Client.World.Generation;
-using SoulboundEngine.Client.World.LevelDomain;
+using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Core;
 using System;
 using System.Collections;
@@ -18,25 +18,25 @@ using UnityEngine;
 namespace SoulboundEngine.Client.World.Chunk {
 	[JsonConverter(typeof(WorldChunk.Serializer))]
 	public class WorldChunk : ITickable {
-		public const int minY = -Level.WORLD_HEIGHT / 2;
-		public const int maxY = Level.WORLD_HEIGHT / 2;
+		public const int minY = -Level.Level.WORLD_HEIGHT / 2;
+		public const int maxY = Level.Level.WORLD_HEIGHT / 2;
 		public const float HEIGHT_SPREAD = 0.01f;
 		public const float SURFACE_HEIGHT_RANGE = 50f;
 		public const float UNDERGROUND_HEIGHT_RANGE = 20f;
 
-		private readonly int[][] blockStateIDs = new int[Level.CHUNK_LENGTH][];
+		private readonly int[][] blockStateIDs = new int[Level.Level.CHUNK_LENGTH][];
 		private readonly Dictionary<BlockPos, TileEntity> tileEntities = new();
 		private readonly TileEntityTickManager tickManager = new();
-		private readonly Level level;
+		private readonly Level.Level level;
 		private readonly int cx;
 		public int xpos => this.cx;
 
-		public WorldChunk(Level level, int cx) { 
+		public WorldChunk(Level.Level level, int cx) { 
 			this.level = level;
 			this.cx = cx;
 
-			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
-				this.blockStateIDs[x] = new int[Level.WORLD_HEIGHT];
+			for (int x = 0; x < Level.Level.CHUNK_LENGTH; x++) {
+				this.blockStateIDs[x] = new int[Level.Level.WORLD_HEIGHT];
 			}
 		}
 
@@ -46,18 +46,18 @@ namespace SoulboundEngine.Client.World.Chunk {
 		public void Generate(BiomeMap biomeMap, Heightmap heightmap, Cavemap cavemap, out ChunkGenData genData) {
 			genData = new ChunkGenData {
 				chunk = this,
-				genContexts = new BlockGenContext[Level.CHUNK_LENGTH][],
-				surfacePoints = new int[Level.CHUNK_LENGTH],
-				biomeWeights = new IEnumerable<BiomeWeight>[Level.CHUNK_LENGTH],
+				genContexts = new BlockGenContext[Level.Level.CHUNK_LENGTH][],
+				surfacePoints = new int[Level.Level.CHUNK_LENGTH],
+				biomeWeights = new IEnumerable<BiomeWeight>[Level.Level.CHUNK_LENGTH],
 				biomePartition = new ChunkBiomePartition(),
-				caveDensities = new float[Level.CHUNK_LENGTH][],
-				caveMask = new BitArray[Level.CHUNK_LENGTH]
+				caveDensities = new float[Level.Level.CHUNK_LENGTH][],
+				caveMask = new BitArray[Level.Level.CHUNK_LENGTH]
 			};
 
-			for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
-				genData.caveDensities[cx] = new float[Level.WORLD_HEIGHT];
-				genData.caveMask[cx] = new BitArray(Level.WORLD_HEIGHT);
-				genData.genContexts[cx] = new BlockGenContext[Level.WORLD_HEIGHT];
+			for (int cx = 0; cx < Level.Level.CHUNK_LENGTH; cx++) {
+				genData.caveDensities[cx] = new float[Level.Level.WORLD_HEIGHT];
+				genData.caveMask[cx] = new BitArray(Level.Level.WORLD_HEIGHT);
+				genData.genContexts[cx] = new BlockGenContext[Level.Level.WORLD_HEIGHT];
 				int x = this.ChunkXToWorldX(cx);
 
 				var weights = biomeMap.ResolveWeights(x);
@@ -72,7 +72,7 @@ namespace SoulboundEngine.Client.World.Chunk {
 
 				BlockResolver blockResolver = new(primary.biome, secondary?.biome);
 
-				for (int y = 0; y < Level.WORLD_HEIGHT; y++) {
+				for (int y = 0; y < Level.Level.WORLD_HEIGHT; y++) {
 					BlockPos blockPos = new(x, IndexToWorldY(y));
 					float caveDensity = cavemap.SampleDensity(x, blockPos.y, surfaceY, primary, secondary);
 					bool isCave = cavemap.IsCave(caveDensity);
@@ -110,13 +110,13 @@ namespace SoulboundEngine.Client.World.Chunk {
 		}
 
 		[Obsolete]
-		public void PostProcess(ChunkGenData genData, Level level) {
+		public void PostProcess(ChunkGenData genData, Level.Level level) {
 			IBiome primary = genData.biomePartition.primary;
 			IBiome? secondary = genData.biomePartition.secondary;
 
 			int splitX = genData.biomePartition.splitX;
 			int chunkStartX = this.ChunkXToWorldX(0);
-			int chunkEndX = this.ChunkXToWorldX(Level.CHUNK_LENGTH - 1);
+			int chunkEndX = this.ChunkXToWorldX(Level.Level.CHUNK_LENGTH - 1);
 
 			int partitionStartX = chunkStartX;
 			int partitionLimitX = secondary == null ? chunkEndX : splitX;
@@ -134,9 +134,9 @@ namespace SoulboundEngine.Client.World.Chunk {
 
 		public static int IndexToWorldY(int yIndex) => yIndex + minY;
 
-		public int WorldXToChunkX(int x) => x - this.xpos * Level.CHUNK_LENGTH;
+		public int WorldXToChunkX(int x) => x - this.xpos * Level.Level.CHUNK_LENGTH;
 
-		public int ChunkXToWorldX(int cx) => cx + this.xpos * Level.CHUNK_LENGTH;
+		public int ChunkXToWorldX(int cx) => cx + this.xpos * Level.Level.CHUNK_LENGTH;
 
 		public void SetBlockState(BlockPos blockPos, BlockState? blockState) {
 			blockState ??= Blocks.AIR.DefaultState;
@@ -144,10 +144,10 @@ namespace SoulboundEngine.Client.World.Chunk {
 			ChunkBlockPos chunkPos = blockPos.ToChunkPos();
 			int yIndex = WorldYToIndex(chunkPos.y);
 			BlockState oldState = this.GetBlockState(chunkPos) ?? Blocks.AIR.DefaultState;
-			Block oldBlock = oldState.block;
-			Block newBlock = blockState.block;
+			Block.Block oldBlock = oldState.block;
+			Block.Block newBlock = blockState.block;
 
-			this.blockStateIDs[chunkPos.x][yIndex] = Block.GetRawID(blockState);
+			this.blockStateIDs[chunkPos.x][yIndex] = Block.Block.GetRawID(blockState);
 
 			// tile entities only change when blocks differ in type
 			// however some blocks may handle tile entity persistence differently
@@ -183,10 +183,10 @@ namespace SoulboundEngine.Client.World.Chunk {
 		}
 
 		public BlockState? GetBlockState(ChunkBlockPos chunkPos) {
-			if (!Level.IsInBounds(chunkPos.ToBlock())) return null;
+			if (!Level.Level.IsInBounds(chunkPos.ToBlock())) return null;
 
 			int stateID = this.blockStateIDs[chunkPos.x][WorldYToIndex(chunkPos.y)];
-			return Block.GetState(stateID);
+			return Block.Block.GetState(stateID);
 		}
 
 		public TileEntity? TileEntityAt(BlockPos blockPos) {
@@ -196,7 +196,7 @@ namespace SoulboundEngine.Client.World.Chunk {
 		}
 
 		private void ParseDeserialized(int[][] blockStateIDs) {
-			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
+			for (int x = 0; x < Level.Level.CHUNK_LENGTH; x++) {
 				for (int y = minY; y < maxY; y++) {
 					int yIndex = WorldYToIndex(y);
 

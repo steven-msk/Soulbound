@@ -11,4 +11,4 @@ ScriptedImporter:
   generateWrapperCode: 1
   wrapperCodePath: Assets/Game/SoulboundEngine/Client/Input/PlayerInputActions.cs
   wrapperClassName: 
-  wrapperCodeNamespace: SoulboundBackend.Client.Input
+  wrapperCodeNamespace: SoulboundEngine.Client.Input

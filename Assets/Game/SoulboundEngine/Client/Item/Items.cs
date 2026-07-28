@@ -1,9 +1,10 @@
-using SoulboundEngine.Client.World.BlockSystem;
+using SoulboundEngine.Client.World.Block;
 using SoulboundEngine.Core.Registry;
+using System;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.ItemSystem {
+namespace SoulboundEngine.Client.Item {
 	public partial class Items {
 		public static readonly Item AIR = Register(Blocks.AIR, Item.Settings.Air());
 		public static readonly Item GRASS = Register(Blocks.GRASS, Item.Settings.Of("Grass Block"));
@@ -28,9 +29,6 @@ namespace SoulboundEngine.Client.ItemSystem {
 		public static readonly DebugPointerItem debugPointer = Register("debug_pointer", new DebugPointerItem(
 			Item.Settings.Of("Debug Pointer").NonStackable()
 		));
-		public static readonly InventoryListenerItem inventoryListenerItem = Register("inventory_listener_item", new InventoryListenerItem(
-			Item.Settings.Of("Inventory Listener Item")
-		));
 		public static readonly BlockBreakerItem blockBreakerItem = Register("block_breaker_item", new BlockBreakerItem(
 			Item.Settings.Of("Block Breaker Item").NonStackable()
 		));
@@ -49,12 +47,21 @@ namespace SoulboundEngine.Client.ItemSystem {
 			return item;
 		}
 
-		public static Identifier GetIdentifier(Item item) {
-			return Registries.ITEMS.GetIdentifier(item);
-		}
-
 		private static RegistryKey<Item> KeyOf(string id) {
 			return RegistryKey<Item>.Of(Registries.ITEMS.GetKey(), Identifier.Of(id));
+		}
+
+		public static Identifier GetIdentifier(Item item) {
+			return Registries.ITEMS.GetIdentifier(item) ?? throw new NotSupportedException("Items not initialized");
+		}
+
+		public static RegistryEntry<Item> GetEntry(Item? item) {
+			if (item == null) return GetEntry(AIR);
+			return Registries.ITEMS.GetEntry(item) ?? throw new NotSupportedException("Items not initialized");
+		}
+
+		public static Item Get(Identifier id) {
+			return Registries.ITEMS.Get(id);
 		}
 
 		public static void Init() { }

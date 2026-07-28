@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using SoulboundEngine.Client.SettingSystem;
+using SoulboundEngine.Client.Settings;
 using System;
 using System.Collections.Generic;
 using System.IO;

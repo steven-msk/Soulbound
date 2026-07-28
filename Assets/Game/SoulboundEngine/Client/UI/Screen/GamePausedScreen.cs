@@ -1,12 +1,16 @@
+using SoulboundEngine.Client.UI.UXMLBindings;
 using SoulboundEngine.Client.World;
-using SoulboundEngine.Client.World.LevelDomain;
+using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Common;
 using SoulboundEngine.Core.Assets;
+using SoulboundEngine.Core.Registry;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.UI.Screen {
 	[PROTOTYPICAL]
-	public sealed class GamePausedScreen : UxmlScreen {
+	public sealed class GamePausedScreen : UXMLScreen {
+		private static readonly Identifier RESUME_ELEMENT = Identifier.Of("soulbound:game_paused_screen/resume");
+		private static readonly Identifier QUIT_ELEMENT = Identifier.Of("soulbound:game_paused_screen/quit");
 		private readonly IWorldAccessor worldAccessor;
 		private readonly LevelManager levelManager;
 		
@@ -17,11 +21,11 @@ namespace SoulboundEngine.Client.UI.Screen {
 		}
 
 		public override bool IsOpaque => false;
-		public override bool EscapeReturn => false;
+		public override bool CloseOnEsc => false;
 
 		protected override void OnBind(VisualElement root) {
-			root.Q<Button>("Resume").clicked += this.levelManager.UnpauseGame;
-			root.Q<Button>("Quit").clicked += this.worldAccessor.QuitActiveWorld;
+			root.Get<Button>(RESUME_ELEMENT).clicked += this.levelManager.UnpauseGame;
+			root.Get<Button>(QUIT_ELEMENT).clicked += this.worldAccessor.QuitActiveWorld;
 		}
 	}
 }

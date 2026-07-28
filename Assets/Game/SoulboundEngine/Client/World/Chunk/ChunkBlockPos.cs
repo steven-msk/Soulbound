@@ -1,8 +1,8 @@
 using SoulboundEngine.Common.Json;
 using Newtonsoft.Json;
 using UnityEngine;
-using SoulboundEngine.Client.World.LevelDomain;
-using SoulboundEngine.Client.World.BlockSystem;
+using SoulboundEngine.Client.World.Level;
+using SoulboundEngine.Client.World.Block;
 
 namespace SoulboundEngine.Client.World.Chunk {
 	[JsonConverter(typeof(ChunkBlockPosJsonConverter))]
@@ -17,11 +17,11 @@ namespace SoulboundEngine.Client.World.Chunk {
 			this.chunkX = chunkX;
 		}
 
-        public WorldChunk UnderlyingChunk(Level level) => level.ChunkAt(this.ToBlock());
+        public WorldChunk UnderlyingChunk(Level.Level level) => level.ChunkAt(this.ToBlock());
 
         public static ChunkBlockPos FromBlockPos(BlockPos blockPos) {
-			int chunkX = Level.ChunkXAt(blockPos.x);
-			int localX = Level.ToChunkX(blockPos.x);
+			int chunkX = Level.Level.ChunkXAt(blockPos.x);
+			int localX = Level.Level.ToChunkX(blockPos.x);
 			return new ChunkBlockPos(localX, blockPos.y, chunkX);
 		}
 
@@ -39,7 +39,7 @@ namespace SoulboundEngine.Client.World.Chunk {
 
 		public override string ToString() => $"cx:{x}, cy:{y}, c:{chunkX}";
 
-		public BlockPos ToBlock() => new BlockPos(this.x + this.chunkX * Level.CHUNK_LENGTH, this.y);
+		public BlockPos ToBlock() => new BlockPos(this.x + this.chunkX * Level.Level.CHUNK_LENGTH, this.y);
 
 		public int WorldYToIndex() => WorldYToIndex(this.y);
 

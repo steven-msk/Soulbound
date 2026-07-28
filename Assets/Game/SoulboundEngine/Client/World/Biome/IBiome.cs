@@ -1,8 +1,8 @@
 
-using SoulboundEngine.Client.World.BlockSystem;
-using SoulboundEngine.Client.World.BlockSystem.States;
+using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.Client.World.Block.State;
 using SoulboundEngine.Client.World.Chunk;
-using SoulboundEngine.Client.World.LevelDomain;
+using SoulboundEngine.Client.World.Level;
 
 namespace SoulboundEngine.Client.World.Generation {
 
@@ -12,7 +12,7 @@ namespace SoulboundEngine.Client.World.Generation {
 		CaveModulation SampleCave(int blockX, int blockY);
 
 		BlockState ResolveBlock(BlockGenContext ctx);
-		void PostProcess(ChunkGenData genData, WorldChunk chunk, Level level, int partitionStartX, int partitionLimitX) {
+		void PostProcess(ChunkGenData genData, WorldChunk chunk, Level.Level level, int partitionStartX, int partitionLimitX) {
 		}
 
 		BlockState ResolveCaveBlock(BlockPos pos, float density) {

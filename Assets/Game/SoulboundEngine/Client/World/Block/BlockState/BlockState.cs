@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.BlockSystem.States {
+namespace SoulboundEngine.Client.World.Block.State {
 	public class BlockState : Block.AbstractBlockState {
 		public Block block { get; }
 

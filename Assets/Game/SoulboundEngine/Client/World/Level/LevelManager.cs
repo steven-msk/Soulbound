@@ -12,8 +12,8 @@ using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.LevelDomain {
-	using Player = Player.Player;
+namespace SoulboundEngine.Client.World.Level {
+	using PlayerEntity = Player.PlayerEntity;
 
 	/// <summary>
 	/// Manages Level lifecycles
@@ -50,7 +50,7 @@ namespace SoulboundEngine.Client.World.LevelDomain {
 		}
 
 		public void StartSession() {
-			this.level.StartSession(new Player(this.client, this.level));
+			this.level.StartSession(new PlayerEntity(this.client, this.level));
 			this.sessionRunning = true;
 
 			UniTask.Post(this.LevelFrameLoop);

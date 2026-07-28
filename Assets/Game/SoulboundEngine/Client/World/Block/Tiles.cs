@@ -3,7 +3,7 @@ using SoulboundEngine.Core.Assets;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-namespace SoulboundEngine.Client.World.BlockSystem {
+namespace SoulboundEngine.Client.World.Block {
 	public class Tiles : IResourceModule {
 		public static Tile air => GetTile<Tile>(new AssetKey("air"));
 		public static RuleTile grass => GetTile<RuleTile>(new AssetKey("grass"));

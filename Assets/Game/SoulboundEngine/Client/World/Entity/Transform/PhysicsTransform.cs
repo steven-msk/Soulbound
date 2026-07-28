@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace SoulboundEngine.Client.World.EntitySystem.Transform {
+namespace SoulboundEngine.Client.World.Entity.Transform {
 	[RequireComponent(typeof(Rigidbody2D))]
 	[Obsolete]
 	public class PhysicsTransform : MonoBehaviour, IEntityTransform {

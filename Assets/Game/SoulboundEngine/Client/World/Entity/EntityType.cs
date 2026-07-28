@@ -2,14 +2,14 @@ using SoulboundEngine.Core.Registry;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.EntitySystem {
-	using Player = Player.Player;
+namespace SoulboundEngine.Client.World.Entity {
+	using PlayerEntity = Player.PlayerEntity;
 
 	public static class EntityType {
 
 		// TODO: move out transform supplier logic into Unity adapters layer
 
-		public static readonly EntityDescriptor<Player> PLAYER = Register("player", Player.DESCRIPTOR);
+		public static readonly EntityDescriptor<PlayerEntity> PLAYER = Register("player", PlayerEntity.DESCRIPTOR);
 		public static readonly EntityDescriptor<ItemEntity> ITEM = Register("item", ItemEntity.DESCRIPTOR);
 
 		//public static readonly EntityDescriptor<MovingEntity> MOVING_ENTITY = Register(

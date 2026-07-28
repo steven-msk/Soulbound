@@ -1,6 +1,6 @@
 ﻿using SoulboundEngine.Core.Registry;
 
-namespace SoulboundEngine.Client.World.BlockSystem.TileEntities {
+namespace SoulboundEngine.Client.World.Block.TileEntity {
 	public static class TileEntityTypes {
 		public static readonly TileEntityType<ChestTileEntity> CHEST = Register(Blocks.CHEST, new TileEntityType<ChestTileEntity>());
 		public static readonly TileEntityType<SelfDestructEntity> SELF_DESTRUCT_BLOCK = Register(Blocks.SELF_DESTRUCT_BLOCK, new TileEntityType<SelfDestructEntity>());

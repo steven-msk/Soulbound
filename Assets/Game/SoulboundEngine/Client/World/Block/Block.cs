@@ -1,15 +1,15 @@
-using SoulboundEngine.Client.ItemSystem;
-using SoulboundEngine.Client.World.BlockSystem.States;
-using SoulboundEngine.Client.World.BlockSystem.TileEntities;
-using SoulboundEngine.Client.World.EntitySystem;
-using SoulboundEngine.Client.World.LevelDomain;
+using SoulboundEngine.Client.Item;
+using SoulboundEngine.Client.World.Block.State;
+using SoulboundEngine.Client.World.Entity;
 using SoulboundEngine.Core.States;
 using System;
 using System.Collections.Generic;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.BlockSystem {
+namespace SoulboundEngine.Client.World.Block {
+	using Item = Item.Item;
+
 	public class Block : IItemConvertible {
 		private static readonly List<BlockState> statesByID = new();
 		private readonly Settings settings;
@@ -43,8 +43,8 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 
 		public StateManager<Block, BlockState> StateManager => this.stateManager;
 
-		public virtual bool HasTileEntity(Level level, BlockPos blockPos, BlockState blockState) => false;
-		public virtual TileEntity? GetTileEntity(Level level, BlockPos blockPos) {
+		public virtual bool HasTileEntity(Level.Level level, BlockPos blockPos, BlockState blockState) => false;
+		public virtual TileEntity.TileEntity? GetTileEntity(Level.Level level, BlockPos blockPos) {
 			return null;
 		}
 
@@ -59,7 +59,7 @@ namespace SoulboundEngine.Client.World.BlockSystem {
 				: Blocks.AIR;
 		}
 
-		public static void DropStacks(BlockState blockState, Level level, BlockPos blockPos, Entity? owner) {
+		public static void DropStacks(BlockState blockState, Level.Level level, BlockPos blockPos, Entity.Entity? owner) {
 			List<ItemStack> droppedStacks = GetDroppedStacks(blockState);
 
 			foreach (var stack in droppedStacks) {
