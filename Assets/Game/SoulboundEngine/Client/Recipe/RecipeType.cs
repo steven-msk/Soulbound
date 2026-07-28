@@ -12,8 +12,11 @@ namespace SoulboundEngine.Client.Recipe {
 		protected RecipeType(string id) {
 			this.id = id;
 			typeById.Add(Identifier.Of(id), this);
+			Registry<RecipeType>.Register(Registries.RECIPE_TYPE, id, this);
 		}
 
+		public static void Init() {
+		}
 	}
 
 	public class RecipeType<TRecipe> : RecipeType where TRecipe : IRecipe {
