@@ -1,5 +1,6 @@
 using SoulboundEngine.Client.Debug.Logging;
 using SoulboundEngine.Client.Item;
+using SoulboundEngine.Client.Loot;
 using SoulboundEngine.Client.UI.Screen;
 using SoulboundEngine.Client.World.Block;
 using SoulboundEngine.Client.World.Block.TileEntity;
@@ -21,11 +22,14 @@ namespace SoulboundEngine.Core.Registry {
 		public static readonly Registry<TileEntityType> TILE_ENTITIES = Create<TileEntityType>(Identifier.Of("tile_entity"));
 		public static readonly Registry<InventoryScreenHandlerType> INVENTORY_SCREEN_HANDLES = Create<InventoryScreenHandlerType>(Identifier.Of("inventory_screen_handle"));
 
+		// temporary, see LootTables
+		public static readonly Registry<LootTable> LOOT_TABLES = Create<LootTable>(Identifier.Of("loot_table"));
+
 		private static Registry<T> Create<T>(Identifier id) {
 			if (freezed) throw new InvalidOperationException("Registries already freezed");
 
 			RegistryKey<Registry<T>> registryKey = RegistryKey<T>.OfRegistry(id);
-			Registry<T> registry = Registry<IRegistry>.Register(ROOT, registryKey, new Registry<T>(registryKey));
+			Registry<T> registry = Registry<IRegistry>.RegisterVariant(ROOT, registryKey, new Registry<T>(registryKey));
 
 			return registry;
 		}
@@ -41,6 +45,7 @@ namespace SoulboundEngine.Core.Registry {
 			AttributeTypes.Init();
 			TileEntityTypes.Init();
 			InventoryScreenHandlerType.Init();
+			LootTables.Init();
 		}
 
 		public static void Freeze() {

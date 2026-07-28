@@ -406,6 +406,10 @@ namespace SoulboundEngine.Client.UI.Screen {
 			return !this.transitStack.IsEmpty();
 		}
 
+		public virtual void OnClosed(PlayerEntity player) {
+			
+		}
+
 		public ItemStack GetTransitStack() => this.transitStack;
 
 		public InventoryScreenHandlerType GetHandlerType() => this.type;

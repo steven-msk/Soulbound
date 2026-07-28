@@ -21,7 +21,7 @@ namespace SoulboundEngine.Client.Item {
 		}
 
 		public readonly bool IsFull() => this.count >= this.item.fullStackSize;
-		public readonly bool IsEmpty() => this.count <= 0 || this.IsOf(null);
+		public readonly bool IsEmpty() => this.count <= 0 || this.item == null;
 
 		public readonly bool IsFullSize(int count) => count >= this.item.fullStackSize;
 
@@ -52,7 +52,10 @@ namespace SoulboundEngine.Client.Item {
 			return this.item.fullStackSize - this.count;
 		}
 
-		public readonly bool IsOf(Item? item) => Equals(item, this.item);
+		public readonly bool IsOf(Item? item) {
+			if (item == null) return this.IsEmpty();
+			return Equals(item, this.item);
+		}
 
 		public static bool AreEqual(ItemStack a, ItemStack b) {
 			return AreItemsEqual(a, b) && a.count == b.count;
@@ -68,6 +71,12 @@ namespace SoulboundEngine.Client.Item {
 			int added = itemStack.Decrement(this.GetSpaceLeft());
 			this.Increment(added);
 			if (itemStack.IsEmpty()) itemStack = EMPTY;
+		}
+
+		public ItemStack Split(int amount) {
+			int actualAmount = this.Decrement(amount);
+			if (actualAmount <= 0) return EMPTY;
+			return this.CopyWithCount(amount);
 		}
 	
 		public readonly ItemStack CopyWithCount(int newCount) {

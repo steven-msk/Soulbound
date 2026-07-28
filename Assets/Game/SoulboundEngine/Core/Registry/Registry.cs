@@ -20,7 +20,7 @@ namespace SoulboundEngine.Core.Registry {
 			return (V)RegisterEntry(registry, key, value).GetValue();
 		}
 
-		public static V Register<V>(Registry<T> registry, RegistryKey<V> key, V value) where V : T {
+		public static V RegisterVariant<V>(Registry<T> registry, RegistryKey<V> key, V value) where V : T {
 			return (V)registry.CreateEntry(key, value).GetValue();
 		}
 

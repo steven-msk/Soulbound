@@ -75,5 +75,9 @@ namespace SoulboundEngine.Client.Item.Container {
 			slot = null!;
 			return false;
 		}
+
+		public static IEnumerable<IItemSlot> GetFreeSlots(this IInventory inventory) {
+			return inventory.GetSlotsContaining(null);
+		}
 	}
 }

@@ -67,7 +67,7 @@ namespace SoulboundEngine.Core {
 						Logger.LogFatal(e);
 #if UNITY_EDITOR
 						EditorApplication.isPlaying = false;
-#else                       
+#else
 						Environment.FailFast("Uncaught exception in update loop", e);
 #endif
 					}

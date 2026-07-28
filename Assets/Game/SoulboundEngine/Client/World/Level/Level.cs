@@ -10,6 +10,7 @@ using SoulboundEngine.Client.World.Generation;
 using SoulboundEngine.Client.World.Render;
 using SoulboundEngine.Common;
 using SoulboundEngine.Common.Math;
+using SoulboundEngine.Common.Math.Random;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -37,6 +38,7 @@ namespace SoulboundEngine.Client.World.Level {
 		private bool showingChunkFeatures = false;
 		[Obsolete] private readonly ConcurrentDictionary<int, List<OnChunkGenerated>> deferredGenerations = new();
 		private readonly Dictionary<int, ChunkGenData> chunkGenData = new();
+		private readonly RandomSequences randomSequences;
 		private readonly WorldRenderer worldRenderer;
 		private readonly EntityRenderManager entityRenderManager;
 		private PlayerEntity player;
@@ -53,6 +55,7 @@ namespace SoulboundEngine.Client.World.Level {
 			this.seed = seed;
 			this.worldRenderer = worldRenderer;
 			this.entityRenderManager = entityRenderManager;
+			this.randomSequences = new RandomSequences(seed);
 
 			var biome1 = new PlainsBiome(seed);
 			var biome2 = new HillsBiome(seed);
@@ -392,5 +395,6 @@ namespace SoulboundEngine.Client.World.Level {
 
 		public PlayerEntity GetPlayer() => this.player;
 
+		public RandomSequences RandomSequences => this.randomSequences;
 	}
 }

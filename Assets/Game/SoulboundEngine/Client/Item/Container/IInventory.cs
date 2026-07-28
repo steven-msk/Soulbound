@@ -19,6 +19,12 @@ namespace SoulboundEngine.Client.Item.Container {
 			return this.GetSlots().Select(i => this.GetSlot(i));
 		}
 
+		virtual void OnOpened(PlayerEntity player) {
+		}
+
+		virtual void OnClosed(PlayerEntity player) {
+		}
+
 		IEnumerator<ItemStack> IEnumerable<ItemStack>.GetEnumerator() {
 			return this.GetAllSlots().Select(s => s.GetStack()).GetEnumerator();
 		}

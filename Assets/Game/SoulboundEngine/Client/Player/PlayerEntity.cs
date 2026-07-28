@@ -178,15 +178,20 @@ namespace SoulboundEngine.Client.Player {
 
 		public void OpenInventoryScreen(IInventoryScreenHandlerFactory handlerFactory) {
 			if (this.activeInventoryScreen != null) return;
+
 			InventoryScreenHandler handler = handlerFactory.Create(this.inventory, this);
 			this.activeInventoryScreenHandler = handler;
+
 			this.activeInventoryScreen = InventoryScreens.Open(handler, this.client, this.inventory, this);
 			this.isInventoryOpen = true;
 		}
 
 		public void CloseInventoryScreen() {
 			if (this.activeInventoryScreen == null) return;
+
 			this.client.CloseScreen(this.activeInventoryScreen);
+			this.activeInventoryScreenHandler!.OnClosed(this);
+
 			this.activeInventoryScreen = null;
 			this.activeInventoryScreenHandler = null;
 			this.isInventoryOpen = false;
@@ -332,6 +337,9 @@ namespace SoulboundEngine.Client.Player {
 		}
 
 		public PlayerInventory GetInventory() => this.inventory;
+
+		// temporary loot table implementation
+		public float GetLuck() => 0f;
 
 		public ItemStack GetMainHandStack() {
 			ItemStack transitStack = this.transitStack?.GetStack() ?? ItemStack.EMPTY;

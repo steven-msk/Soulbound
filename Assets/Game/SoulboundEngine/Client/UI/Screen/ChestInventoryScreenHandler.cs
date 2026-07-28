@@ -43,5 +43,8 @@ namespace SoulboundEngine.Client.UI.Screen {
 			return new SimpleInventory(ChestTileEntity.SIZE);
 		}
 
+		public override void OnClosed(PlayerEntity player) {
+			this.chestInventory.OnClosed(player);
+		}
 	}
 }

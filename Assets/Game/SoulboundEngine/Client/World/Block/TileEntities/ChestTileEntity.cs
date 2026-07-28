@@ -1,14 +1,14 @@
 ﻿using SoulboundEngine.Client.Item.Container;
+using SoulboundEngine.Client.Loot;
 using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.UI.Screen;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 namespace SoulboundEngine.Client.World.Block.TileEntity {
 	using Level = Level.Level;
 
-	public class ChestTileEntity : TileEntity, IInventoryScreenHandlerFactory, IInventory {
+	public class ChestTileEntity : LootableContainerTileEntity {
 		public const int SIZE = 9 * 3;
 		public const float MIN_DISTANCE = 5f;
 		private readonly ItemSlot[] slots;
@@ -16,20 +16,26 @@ namespace SoulboundEngine.Client.World.Block.TileEntity {
 		public ChestTileEntity(TileEntityType<ChestTileEntity> tileEntityType, Level level, BlockPos blockPos) 
 			: base(tileEntityType, level, blockPos) {
 			IInventory.CreateSimple(this, ref this.slots);
+
+			// PROTOTYPICAL
+			static long Mix(long a, long b) {
+				ulong x = unchecked((ulong)(a ^ b) + 0x9E3779B97F4A7C15UL);
+				x = (x ^ (x >> 30)) * 0xBF58476D1CE4E5B9UL;
+				x = (x ^ (x >> 27)) * 0x94D049BB133111EBUL;
+				return unchecked((long)(x ^ (x >> 31)));
+			}
+			long chestSeed = Mix(level.seed, blockPos.GetHashCode());
+			this.SetLootTable(LootTables.CHEST_TEST, chestSeed);
 		}
 
-		public bool CanPlayerUse(PlayerEntity player) {
-			return Vector2.Distance(player.GetPosition(), (Vector2)this.blockPos) <= MIN_DISTANCE;
-		}
-
-		public InventoryScreenHandler Create(PlayerInventory playerInventory, PlayerEntity player) {
+		protected override InventoryScreenHandler CreateScreenHandler(PlayerInventory playerInventory, PlayerEntity player) {
 			return new ChestInventoryScreenHandler(InventoryScreenHandlerType.CHEST, playerInventory, this);
 		}
 
-		public int GetSize() => SIZE;
+		public override int GetSize() => SIZE;
 
-		public IItemSlot GetSlot(int index) => this.slots[index];
+		public override IItemSlot GetSlot(int index) => this.slots[index];
 
-		public IEnumerable<int> GetSlots() => this.slots.Select(s => s.GetIndex());
+		public override IEnumerable<int> GetSlots() => this.slots.Select(s => s.GetIndex());
 	}
 }
