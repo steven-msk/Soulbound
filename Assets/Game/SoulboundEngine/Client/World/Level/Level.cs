@@ -3,7 +3,7 @@ using SoulboundEngine.Client.Render.Entity;
 using SoulboundEngine.Client.Runtime.Services;
 using SoulboundEngine.Client.World.Block;
 using SoulboundEngine.Client.World.Block.State;
-using SoulboundEngine.Client.World.Block.TileEntity;
+using SoulboundEngine.Client.World.Block.Entity;
 using SoulboundEngine.Client.World.Chunk;
 using SoulboundEngine.Client.World.Entity;
 using SoulboundEngine.Client.World.Generation;

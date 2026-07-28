@@ -1,12 +1,12 @@
 using SoulboundEngine.Client.Player;
-using SoulboundEngine.Client.World.Level;
+using SoulboundEngine.Client.World.Block.State;
 using SoulboundEngine.Common;
 using SoulboundEngine.Common.Unity;
 using SoulboundEngine.Core;
 using System;
 using UnityEngine;
 
-namespace SoulboundEngine.Client.World.Block.TileEntity {
+namespace SoulboundEngine.Client.World.Block.Entity {
 	using PlayerEntity = Player.PlayerEntity;
 
 	[PROTOTYPICAL]
@@ -18,8 +18,8 @@ namespace SoulboundEngine.Client.World.Block.TileEntity {
 		public event Action onDestroyed;
 		private readonly GameObject gameObject;
 
-		public ObjectTileEntity(TileEntityType<ObjectTileEntity> tileEntityType, Level.Level level, BlockPos blockPos)
-			: base(tileEntityType, level, blockPos) {
+		public ObjectTileEntity(TileEntityType<ObjectTileEntity> tileEntityType, BlockPos blockPos, BlockState blockState)
+			: base(tileEntityType, blockPos, blockState) {
 			this.gameObject = new GameObject("Object Tile Entity");
 			this.gameObject.transform.position = blockPos.GetCenter();
 
@@ -31,6 +31,10 @@ namespace SoulboundEngine.Client.World.Block.TileEntity {
 			TriggerCollisionListener triggerListener = this.gameObject.AddComponent<TriggerCollisionListener>();
 			triggerListener.onTriggerEnter += this.OnTriggerEnter;
 			triggerListener.onTriggerExit += this.OnTriggerExit;
+		}
+
+		public static ObjectTileEntity Create(BlockPos blockPos, BlockState blockState) {
+			return new ObjectTileEntity(TileEntityType.OBJECT, blockPos, blockState);
 		}
 
 		private void OnTriggerEnter(Collider2D collider) {

@@ -4,7 +4,7 @@ using SoulboundEngine.Client.Loot;
 using SoulboundEngine.Client.Recipe;
 using SoulboundEngine.Client.UI.Screen;
 using SoulboundEngine.Client.World.Block;
-using SoulboundEngine.Client.World.Block.TileEntity;
+using SoulboundEngine.Client.World.Block.Entity;
 using SoulboundEngine.Client.World.Entity;
 using SoulboundEngine.Client.World.Entity.Attribute;
 using System;
@@ -45,7 +45,7 @@ namespace SoulboundEngine.Core.Registry {
 			Items.Init();
 			EntityType.Init();
 			AttributeTypes.Init();
-			TileEntityTypes.Init();
+			TileEntityType.Init();
 			InventoryScreenHandlerType.Init();
 			RecipeType.Init();
 			LootTables.Init();

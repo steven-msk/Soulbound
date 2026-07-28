@@ -1,7 +1,7 @@
 ﻿using SoulboundEngine.Client.Item;
 using SoulboundEngine.Client.Item.Container;
 using SoulboundEngine.Client.Player;
-using SoulboundEngine.Client.World.Block.TileEntity;
+using SoulboundEngine.Client.World.Block.Entity;
 using System.Collections.Generic;
 using System.Linq;
 

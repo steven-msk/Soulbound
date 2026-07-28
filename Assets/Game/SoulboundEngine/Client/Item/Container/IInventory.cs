@@ -1,4 +1,5 @@
 using SoulboundEngine.Client.Player;
+using SoulboundEngine.Common;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +7,7 @@ using System.Linq;
 #nullable enable
 
 namespace SoulboundEngine.Client.Item.Container {
-	public interface IInventory : IEnumerable<ItemStack> {
+	public interface IInventory : IEnumerable<ItemStack>, IClearable {
 		IItemSlot GetSlot(int index);
 
 		IEnumerable<int> GetSlots();
@@ -37,6 +38,12 @@ namespace SoulboundEngine.Client.Item.Container {
 			for (int i = 0; i < inventory.GetSize(); i++) {
 				ItemSlot slot = new(inventory, i);
 				slots[i] = slot;
+			}
+		}
+
+		void IClearable.Clear() {
+			foreach (var index in this.GetSlots()) {
+				this.GetSlot(index).SetStack(ItemStack.EMPTY);
 			}
 		}
 	}

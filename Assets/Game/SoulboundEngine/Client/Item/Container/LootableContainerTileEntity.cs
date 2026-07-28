@@ -2,8 +2,8 @@
 using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.UI.Screen;
 using SoulboundEngine.Client.World.Block;
-using SoulboundEngine.Client.World.Block.TileEntity;
-using SoulboundEngine.Client.World.Level;
+using SoulboundEngine.Client.World.Block.Entity;
+using SoulboundEngine.Client.World.Block.State;
 using SoulboundEngine.Core.Registry;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,8 +16,8 @@ namespace SoulboundEngine.Client.Item.Container {
 		protected RegistryKey<LootTable>? lootTable;
 		protected long lootTableSeed;
 
-		protected LootableContainerTileEntity(TileEntityType tileEntityType, Level level, BlockPos blockPos)
-			: base(tileEntityType, level, blockPos) {
+		protected LootableContainerTileEntity(TileEntityType tileEntityType, BlockPos blockPos, BlockState blockState)
+			: base(tileEntityType, blockPos, blockState) {
 		}
 
 		public virtual bool CanPlayerUse(PlayerEntity player) {
@@ -39,9 +39,6 @@ namespace SoulboundEngine.Client.Item.Container {
 
 		public void SetLootTable(RegistryKey<LootTable>? lootTable) => this.lootTable = lootTable;
 		public RegistryKey<LootTable>? GetLootTable() => this.lootTable;
-
-		public Level? GetLevel() => this.level;
-		public BlockPos GetBlockPos() => this.blockPos;
 
 		public virtual void OnOpened(PlayerEntity player) {
 			if (this.lootTable != null) {

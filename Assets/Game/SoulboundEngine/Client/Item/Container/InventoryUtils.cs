@@ -79,5 +79,9 @@ namespace SoulboundEngine.Client.Item.Container {
 		public static IEnumerable<IItemSlot> GetFreeSlots(this IInventory inventory) {
 			return inventory.GetSlotsContaining(null);
 		}
+
+		public static void Clear(this IInventory inventory) {
+			inventory.Clear();
+		}
 	}
 }

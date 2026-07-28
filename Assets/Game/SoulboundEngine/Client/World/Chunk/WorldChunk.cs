@@ -1,10 +1,9 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.Client.World.Block.Entity;
 using SoulboundEngine.Client.World.Block.State;
-using SoulboundEngine.Client.World.Block.TileEntity;
 using SoulboundEngine.Client.World.Generation;
-using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Core;
 using System;
 using System.Collections;
@@ -153,21 +152,27 @@ namespace SoulboundEngine.Client.World.Chunk {
 			// however some blocks may handle tile entity persistence differently
 			// when oldBlock and newBlock are the same
 			if (newBlock != oldBlock) {
-				bool oldHasTileEntity = oldBlock.HasTileEntity(this.level, blockPos, oldState);
-				bool newHasTileEntity = blockState.block.HasTileEntity(this.level, blockPos, blockState);
+				bool oldHasTileEntity = oldBlock is ITileEntityProvider;
+				bool newHasTileEntity = blockState.block is ITileEntityProvider;
 
 				if (oldHasTileEntity && this.tileEntities.ContainsKey(blockPos)) {
 					TileEntity tileEntity = this.tileEntities[blockPos];
 
 					this.tickManager.RemoveTileEntity(tileEntity);
 					this.tileEntities.Remove(blockPos);
+					tileEntity.SetLevel(null);
 					tileEntity.OnDispose();
 				}
 				if (newHasTileEntity) {
-					TileEntity tileEntity = newBlock.GetTileEntity(this.level, blockPos);
+					ITileEntityProvider tileEntityProvider = (ITileEntityProvider)newBlock;
+					TileEntity? tileEntity = tileEntityProvider.CreateTileEntity(blockPos, blockState);
 
-					this.tileEntities[blockPos] = tileEntity;
-					this.tickManager.AddTileEntity(tileEntity);
+					if (tileEntity != null && tileEntity.GetTileEntityType().Supports(blockState)) {
+						tileEntity.SetLevel(this.level);
+						this.tileEntities[blockPos] = tileEntity;
+						this.tickManager.AddTileEntity(tileEntity);
+					}
+
 				}
 			}
 		}
