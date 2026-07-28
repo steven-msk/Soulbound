@@ -103,6 +103,7 @@ MonoBehaviour:
     m_LabelNames:
     - preload
     - entity_model
+    - recipe
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: 4be1354cc87471c4c806bda238443e56, type: 2}

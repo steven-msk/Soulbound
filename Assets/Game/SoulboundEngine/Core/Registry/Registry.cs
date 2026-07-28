@@ -20,7 +20,7 @@ namespace SoulboundEngine.Core.Registry {
 			return (V)RegisterEntry(registry, key, value).GetValue();
 		}
 
-		public static V Register<V>(Registry<T> registry, RegistryKey<V> key, V value) where V : T {
+		public static V RegisterVariant<V>(Registry<T> registry, RegistryKey<V> key, V value) where V : T {
 			return (V)registry.CreateEntry(key, value).GetValue();
 		}
 
@@ -94,6 +94,10 @@ namespace SoulboundEngine.Core.Registry {
 		public HashSet<Identifier> GetIdentifiers() => this.idToEntry.Keys.ToHashSet();
 
 		public RegistryKey<Registry<T>> GetKey() => this.key;
+
+		public IEnumerable<RegistryKey<T>> GetAllKeys() {
+			return this.keyToEntry.Keys;
+		}
 
 		IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 

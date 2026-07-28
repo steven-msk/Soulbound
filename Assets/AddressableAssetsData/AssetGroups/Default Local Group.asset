@@ -21,6 +21,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 04bbc3a7aa4ddbc44ac6c78fb3ecda94
+    m_Address: StationaryCraftingResultPreview
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0e5905e25c892a748a09d8c6fd3c396a
     m_Address: WorldScreen
     m_ReadOnly: 0
@@ -40,7 +46,7 @@ MonoBehaviour:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 17a1cc01d5a67154f931385a6b7d83e4
-    m_Address: InventoryContextScreen
+    m_Address: PlayerInventoryScreen
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload
@@ -57,8 +63,20 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2052768fc90321c4c8ef963e26a3d1f0
+    m_Address: TestRecipe2
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - recipe
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 22de33d73f0feda4e9a52553b3394a28
     m_Address: grass
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 253de1a1aa29af742823420f891d4bd1
+    m_Address: Tooltip
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload
@@ -117,6 +135,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6efedd66d5f1dd0479f24cd8f1ad1e92
+    m_Address: TestRecipe
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - recipe
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 714a27d172464694bbafd67b6569eace
     m_Address: ReactInactiveTile
     m_ReadOnly: 0
@@ -171,6 +195,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9b45f61e3a085404fa4c9b7672b7f76e
+    m_Address: ChestInventoryScreen
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b13141476e8f6134eb600bd09d0d9792
     m_Address: RedSquareTile
     m_ReadOnly: 0
@@ -183,20 +213,14 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: c25992c4a89227d4586f253b5c251934
-    m_Address: Slot
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: c50f0d493e76e5a429e1630de1dd0778
     m_Address: TitleScreen
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: cbf0dfe6112d8e84c849d454f1474d8f
-    m_Address: JosefinSans-Medium SDF
+  - m_GUID: ced63e50cee7ab94894ce3933a476a0d
+    m_Address: TransitStack
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload

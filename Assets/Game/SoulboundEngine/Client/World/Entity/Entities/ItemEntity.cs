@@ -1,12 +1,11 @@
 using SoulboundEngine.Client.Item;
-using SoulboundEngine.Client.World.Level;
 
 #nullable enable
 
 namespace SoulboundEngine.Client.World.Entity {
 	public class ItemEntity : Entity {
 		public const float CANNOT_PICK_UP_DELAY_SEC = 2;
-		public static readonly EntityDescriptor<ItemEntity> DESCRIPTOR = EntityDescriptor.Of<ItemEntity>((_, level) => new ItemEntity(null, level));
+		public static readonly EntityDescriptor<ItemEntity> DESCRIPTOR = EntityDescriptor.Of<ItemEntity>((_, level) => new ItemEntity(ItemStack.EMPTY, level));
 
 		private readonly Entity? owner;
 		private readonly ItemStack itemStack;

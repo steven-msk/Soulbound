@@ -1,4 +1,6 @@
 using SoulboundEngine.Client.UI;
+using SoulboundEngine.Client.UI.UXMLBindings;
+using SoulboundEngine.Core.Registry;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +8,9 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.Debug.Logging.Console {
-	public sealed class LogConsole : UxmlWidget {
+	public sealed class LogConsole : UXMLWidget {
+		private static readonly Identifier LOG_LIST_ELEMENT = Identifier.Of("soulbound:log_console/log_list");
+		private static readonly Identifier LOG_LABEL_ELEMENT = Identifier.Of("soulbound:log_entry/log_label");
 		private const int NEW_LOG_ENTRIES_PER_FRAME = 3;
 		private readonly List<LogEntry> displayedLogs = new();
 		private readonly HashSet<int> normalLogs = new();
@@ -27,7 +31,7 @@ namespace SoulboundEngine.Client.Debug.Logging.Console {
 		public override void OnBind(VisualElement root) {
 			base.OnBind(root);
 
-			this.logList = root.Q<ListView>("LogList");
+			this.logList = root.Get<ListView>(LOG_LIST_ELEMENT);
 			this.logList.bindItem = this.OnLogAdded;
 			this.logList.itemsSource = this.displayedLogs;
 		}
@@ -41,7 +45,7 @@ namespace SoulboundEngine.Client.Debug.Logging.Console {
 
 		private void OnLogAdded(VisualElement element, int index) {
 			LogEntry entry = this.displayedLogs[index];
-			Label label = element.Q<Label>("LogLabel");
+			Label label = element.Get<Label>(LOG_LABEL_ELEMENT);
 			label.text = entry.condition + this.AddStackTrace(entry);
 			label.style.unityFontStyleAndWeight = FontStyle.Normal;
 

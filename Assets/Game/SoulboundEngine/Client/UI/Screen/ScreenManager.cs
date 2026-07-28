@@ -8,16 +8,16 @@ using UnityEngine.UIElements;
 namespace SoulboundEngine.Client.UI.Screen {
 	public sealed class ScreenManager : IScreenNavigator {
 		private readonly List<ScreenEntry> stack = new();
-		private readonly UIToolkitScreenRoot screenRoot;
+		private readonly UXMLScreenRoot screenRoot;
 
-		public ScreenManager(UIToolkitScreenRoot screenRoot) {
+		public ScreenManager(UXMLScreenRoot screenRoot) {
 			this.screenRoot = screenRoot;
 		}
 
 		public IScreenHandle PushScreen(Screen screen) {
 			VisualElement root = this.CreateScreenRoot();
 			
-			IScreenHandle handle = new UIToolkitScreenHandle(screen, root);
+			IScreenHandle handle = new UXMLScreenHandle(screen, root);
 			screen.Init(this, handle);
 
 			this.screenRoot.Attach(root);

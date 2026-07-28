@@ -10,15 +10,15 @@ namespace SoulboundEngine.Client.UI {
 	public sealed class UIHandler : IInputEventHandler {
 		int IInputEventHandler.priority => 1000;
 		private ScreenManager screenManager;
-		private UIToolkitScreenRoot screenRoot;
+		private UXMLScreenRoot screenRoot;
 
 		public UIHandler(UIDocument uiDocument) {
-			this.screenRoot = new UIToolkitScreenRoot(uiDocument);
+			this.screenRoot = new UXMLScreenRoot(uiDocument);
 			this.screenManager = new ScreenManager(this.screenRoot);
 		}
 
 		public void SetUIDocument(UIDocument uiDocument) {
-			this.screenRoot = new UIToolkitScreenRoot(uiDocument);
+			this.screenRoot = new UXMLScreenRoot(uiDocument);
 			this.screenManager.Flush();
 			this.screenManager = new ScreenManager(this.screenRoot);
 		}
