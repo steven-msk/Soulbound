@@ -1,3 +1,4 @@
+using Newtonsoft.Json.Linq;
 using SoulboundEngine.Client.World.Block.State;
 
 #nullable enable
@@ -26,6 +27,14 @@ namespace SoulboundEngine.Client.World.Block.Entity {
 
 		public BlockPos GetBlockPos() => this.blockPos;
 
+		public BlockState GetBlockState() => this.blockState;
+
 		public bool HasLevel() => this.level != null;
+
+		public virtual void Write(JObject json) {
+		}
+
+		public virtual void Read(JToken json) {
+		}
 	}
 }

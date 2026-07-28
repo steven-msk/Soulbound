@@ -2,8 +2,8 @@ using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.Render.Entity;
 using SoulboundEngine.Client.Runtime.Services;
 using SoulboundEngine.Client.World.Block;
-using SoulboundEngine.Client.World.Block.State;
 using SoulboundEngine.Client.World.Block.Entity;
+using SoulboundEngine.Client.World.Block.State;
 using SoulboundEngine.Client.World.Chunk;
 using SoulboundEngine.Client.World.Entity;
 using SoulboundEngine.Client.World.Generation;
@@ -77,6 +77,11 @@ namespace SoulboundEngine.Client.World.Level {
 			this.AddEntity(player);
 			SoulboundClient.Instance.InputManager.AddHandler(player);
 			player.SetPosition(this.GetWorldSpawnPoint() + Vector2.up * 2f);
+
+			// TEMPORARY
+			List<TileEntity> tileEntities = TileEntitySerializer.ReadAll().ToList();
+			string formatted = string.Join("\n", tileEntities.Select(e => string.Format("\t\t-{0}: {1}", TileEntityType.GetId(e.GetTileEntityType()), e.GetBlockPos())));
+			Logger.LogInfo("Deserialized {} tile entities. No replenishing due to unavailable BlockState serialization\n{}", tileEntities.Count, formatted);
 		}
 
 		// known issue: inconsistent world update loop design
@@ -323,6 +328,10 @@ namespace SoulboundEngine.Client.World.Level {
 
 		public void OnSessionStop() {
 			SoulboundClient.Instance.InputManager.RemoveHandler(this.player);
+
+			// TEMPORARY
+			IEnumerable<TileEntity> tileEntities = this.loadedChunks.Values.SelectMany(c => c.GetTileEntities());
+			TileEntitySerializer.WriteAll(tileEntities);
 		}
 
 		public BlockState? GetBlockState(BlockPos blockPos) {

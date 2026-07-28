@@ -200,6 +200,8 @@ namespace SoulboundEngine.Client.World.Chunk {
 				: null;
 		}
 
+		public IEnumerable<TileEntity> GetTileEntities() => this.tileEntities.Values;
+
 		private void ParseDeserialized(int[][] blockStateIDs) {
 			for (int x = 0; x < Level.Level.CHUNK_LENGTH; x++) {
 				for (int y = minY; y < maxY; y++) {

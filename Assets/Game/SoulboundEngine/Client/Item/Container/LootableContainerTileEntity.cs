@@ -1,4 +1,5 @@
-﻿using SoulboundEngine.Client.Loot;
+﻿using Newtonsoft.Json.Linq;
+using SoulboundEngine.Client.Loot;
 using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.UI.Screen;
 using SoulboundEngine.Client.World.Block;
@@ -7,6 +8,7 @@ using SoulboundEngine.Client.World.Block.State;
 using SoulboundEngine.Core.Registry;
 using System.Collections.Generic;
 using UnityEngine;
+using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 #nullable enable
 
@@ -48,6 +50,26 @@ namespace SoulboundEngine.Client.Item.Container {
 		}
 
 		public virtual void OnClosed(PlayerEntity player) {
+		}
+
+		public override void Write(JObject json) {
+			base.Write(json);
+			if (this.lootTable != null) {
+				json["lootTable"] = this.lootTable.value.ToString();
+				json["lootTableSeed"] = this.lootTableSeed;
+			}
+		}
+
+		public override void Read(JToken json) {
+			base.Read(json);
+			string lootTableKey = ((string?)json["lootTable"]) ?? string.Empty;
+			long lootTableSeed = (long?)json["lootTableSeed"] ?? 0;
+
+			if (!string.IsNullOrEmpty(lootTableKey)) {
+				RegistryKey<LootTable> key = LootTables.Get(lootTableKey);
+				this.SetLootTable(key, lootTableSeed);
+				Logger.LogInfo("Deserializing lootable container: {}, {}", key, lootTableSeed);
+			}
 		}
 	}
 }

@@ -49,5 +49,20 @@ namespace SoulboundEngine.Client.World.Block.Entity {
 
 			base.OnOpened(player);
 		}
+
+		public override void OnClosed(PlayerEntity player) {
+
+			// PROTOTYPICAL
+			static long Mix(long a, long b) {
+				ulong x = unchecked((ulong)(a ^ b) + 0x9E3779B97F4A7C15UL);
+				x = (x ^ (x >> 30)) * 0xBF58476D1CE4E5B9UL;
+				x = (x ^ (x >> 27)) * 0x94D049BB133111EBUL;
+				return unchecked((long)(x ^ (x >> 31)));
+			}
+			long chestSeed = Mix(this.GetLevel().seed, this.blockPos.GetHashCode());
+			this.SetLootTable(LootTables.CHEST_TEST, chestSeed);
+
+			base.OnClosed(player);
+		}
 	}
 }
