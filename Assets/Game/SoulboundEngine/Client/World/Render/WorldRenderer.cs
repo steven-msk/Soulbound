@@ -2,6 +2,7 @@ using SoulboundEngine.Client.Render.Block;
 using SoulboundEngine.Client.Render.Entity;
 using SoulboundEngine.Client.World.Block;
 using SoulboundEngine.Client.World.Block.State;
+using SoulboundEngine.Client.World.Chunk;
 using System;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -11,20 +12,22 @@ using UnityEngine.Tilemaps;
 namespace SoulboundEngine.Client.World.Render {
 	using Entity = Entity.Entity;
 	using Level = Level.Level;
-	using Logger = Debug.Logging.Logger;
 
 	public sealed class WorldRenderer {
 		private readonly BlockRenderManager blockRenderManager;
 		private readonly EntityRenderManager entityRenderManager;
+		private readonly ChunkOutlineRenderer chunkOutlineRenderer;
 		private Vector2Int lastPivot;
 		private readonly RectInt renderView;
 		private Tilemap? tilemap;
 		private Level? level;
+		private bool showingChunkFeatures;
 
 		public WorldRenderer(RectInt renderView, BlockRenderManager blockRenderManager, EntityRenderManager entityRenderManager) {
 			this.renderView = renderView;
 			this.blockRenderManager = blockRenderManager;
 			this.entityRenderManager = entityRenderManager;
+			this.chunkOutlineRenderer = new ChunkOutlineRenderer();
 		}
 
 		// NOTE: current implementation relies on single tilemap rendering (one tilemap for the entire render view)
@@ -79,11 +82,6 @@ namespace SoulboundEngine.Client.World.Render {
 			this.blockRenderManager.Render(this.tilemap, blockPos, blockState);
 		}
 
-		private void BlockStateChanged(BlockPos blockPos, BlockState? oldState, BlockState? newState) {
-			if (!this.IsInRenderView(blockPos)) return;
-			this.RenderBlock(blockPos, newState);
-		}
-
 		private RectInt ToRect(Vector2Int pivot) {
 			return new(
 				Mathf.FloorToInt(pivot.x) + this.renderView.x,
@@ -97,13 +95,40 @@ namespace SoulboundEngine.Client.World.Render {
 			return this.ToRect(this.lastPivot).Contains((Vector2Int)blockPos);
 		}
 
+		private void BlockStateChanged(BlockPos blockPos, BlockState? oldState, BlockState? newState) {
+			if (!this.IsInRenderView(blockPos)) return;
+			this.RenderBlock(blockPos, newState);
+		}
+
 		private void EntityAdded(Entity entity) {
-			Logger.LogInfo("entity added: {}", entity);
 			this.entityRenderManager.Render(entity);
 		}
 
 		private void EntityRemoved(Entity entity) {
 			this.entityRenderManager.Destroy(entity);
+		}
+
+		private void OnChunkLoaded(WorldChunk chunk) {
+			if (this.showingChunkFeatures) {
+				this.chunkOutlineRenderer.ShowOutline(chunk);
+			}
+		}
+
+		private void OnChunkUnloaded(WorldChunk chunk) {
+			this.chunkOutlineRenderer.HideOutline(chunk);
+		}
+
+		public void ShowChunkFeatures() {
+			this.showingChunkFeatures = true;
+			if (this.level == null) return;
+			foreach (var chunk in this.level.GetLoadedChunks()) {
+				this.chunkOutlineRenderer.ShowOutline(chunk);
+			}
+		}
+
+		public void HideChunkFeatures() {
+			this.showingChunkFeatures = false;
+			this.chunkOutlineRenderer.Clear();
 		}
 
 		public void SetLevel(Level? level) {
@@ -117,6 +142,8 @@ namespace SoulboundEngine.Client.World.Render {
 			this.level.blockStateChanged += this.BlockStateChanged;
 			this.level.entityAdded += this.EntityAdded;
 			this.level.entityRemoved += this.EntityRemoved;
+			this.level.chunkLoaded += this.OnChunkLoaded;
+			this.level.chunkUnloaded += this.OnChunkUnloaded;
 		}
 
 		private void RemoveLevelEvents() {
@@ -124,6 +151,8 @@ namespace SoulboundEngine.Client.World.Render {
 			this.level.blockStateChanged -= this.BlockStateChanged;
 			this.level.entityAdded -= this.EntityAdded;
 			this.level.entityRemoved -= this.EntityRemoved;
+			this.level.chunkLoaded -= this.OnChunkLoaded;
+			this.level.chunkUnloaded -= this.OnChunkUnloaded;
 		}
 
 		public void SetTilemap(Tilemap tilemap) {

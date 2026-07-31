@@ -34,7 +34,6 @@ namespace SoulboundEngine.Client.World.Level {
 		private readonly Dictionary<int, WorldChunk> loadedChunks = new();
 		private readonly Dictionary<int, WorldChunk> generatedChunks = new(); 
 		private readonly ChunkOutlineRenderer chunkOutlineRenderer = new();
-		private bool showingChunkFeatures = false;
 		[Obsolete] private readonly ConcurrentDictionary<int, List<OnChunkGenerated>> deferredGenerations = new();
 		private readonly Dictionary<int, ChunkGenData> chunkGenData = new();
 		private readonly RandomSequences randomSequences;
@@ -42,6 +41,8 @@ namespace SoulboundEngine.Client.World.Level {
 		public event Action<BlockPos, BlockState?, BlockState?>? blockStateChanged;
 		public event Action<Entity>? entityAdded;
 		public event Action<Entity>? entityRemoved;
+		public event Action<WorldChunk> chunkLoaded;
+		public event Action<WorldChunk> chunkUnloaded;
 
 		private readonly BiomeMap biomeMap;
 		private readonly Heightmap heightmap;
@@ -291,25 +292,11 @@ namespace SoulboundEngine.Client.World.Level {
 		}
 
 		private void OnChunkLoaded(WorldChunk chunk) {
-			if (this.showingChunkFeatures) {
-				this.chunkOutlineRenderer.ShowOutline(chunk);
-			}
+			this.chunkLoaded?.Invoke(chunk);
 		}
 
 		private void OnChunkUnloaded(WorldChunk chunk) {
-			this.chunkOutlineRenderer.HideOutline(chunk);
-		}
-
-		public void ShowChunkFeatures() {
-			this.showingChunkFeatures = true;
-			foreach (var chunk in this.loadedChunks.Values) {
-				this.chunkOutlineRenderer.ShowOutline(chunk);
-			}
-		}
-
-		public void HideChunkFeatures() {
-			this.showingChunkFeatures = false;
-			this.chunkOutlineRenderer.Clear();
+			this.chunkUnloaded?.Invoke(chunk);
 		}
 
 		public void OnSessionStop() {
@@ -352,6 +339,14 @@ namespace SoulboundEngine.Client.World.Level {
 				return chunk;
 			}
 			return null;
+		}
+
+		public IEnumerable<WorldChunk> GetLoadedChunks() {
+			return this.loadedChunks.Values.ToList();
+		}
+
+		public IEnumerable<WorldChunk> GetGeneratedChunks() {
+			return this.generatedChunks.Values.ToList();
 		}
 
 		public static bool IsInBounds(BlockPos pos) {

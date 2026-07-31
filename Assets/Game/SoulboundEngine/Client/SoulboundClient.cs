@@ -259,10 +259,10 @@ namespace SoulboundEngine.Client {
 				InputEventListener.ConsumePerformed(InputTokens.Debug.toggleMetrics, _ => {
 					if (!this.metricsHud.isVisible && this.debugOverlayManager.TryShow(DebugOverlayFeature.MetricsHUD)) {
 						this.metricsHud.Show();
-						this.activeWorldSession?.level.ShowChunkFeatures();
+						this.worldRenderer.ShowChunkFeatures();
 					} else if (this.metricsHud.isVisible) {
 						this.metricsHud.Hide();
-						this.activeWorldSession?.level.HideChunkFeatures();
+						this.worldRenderer.HideChunkFeatures();
 						this.debugOverlayManager.Hide(DebugOverlayFeature.MetricsHUD);
 					}
 				}),
