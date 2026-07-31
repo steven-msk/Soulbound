@@ -63,7 +63,7 @@ namespace SoulboundEngine.Client.World.Level {
 			this.cavemap = new Cavemap(seed);
 		}
 
-		// known issue: world architecture design is poorly designed
+		// known issue: current chunk generation takes way too long (60-65ms per chunk in one tick)
 		public void GenerateTerrain() {
 			for (int cx = -RENDER_DISTANCE; cx <= RENDER_DISTANCE; cx++) {
 				this.GenerateNewChunk(cx);
@@ -86,6 +86,7 @@ namespace SoulboundEngine.Client.World.Level {
 		// known issue: inconsistent world update loop design
 		public void Tick(RectInt simulationRect) {
 			int pivotChunkX = ChunkXAt(this.player.GetPosition());
+			// known issue: current chunk generation takes way too long (60-65ms per chunk in one tick)
 			this.UnloadDistantChunks(pivotChunkX, RENDER_DISTANCE);
 			this.UpdateLoadedChunks(pivotChunkX);
 

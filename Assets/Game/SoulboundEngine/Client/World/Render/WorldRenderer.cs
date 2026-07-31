@@ -4,6 +4,7 @@ using SoulboundEngine.Client.World.Block;
 using SoulboundEngine.Client.World.Block.State;
 using SoulboundEngine.Client.World.Chunk;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -17,6 +18,7 @@ namespace SoulboundEngine.Client.World.Render {
 		private readonly BlockRenderManager blockRenderManager;
 		private readonly EntityRenderManager entityRenderManager;
 		private readonly ChunkOutlineRenderer chunkOutlineRenderer;
+		private readonly Queue<(BlockPos pos, BlockState? state)> stateChangedQueue = new();
 		private Vector2Int lastPivot;
 		private readonly RectInt renderView;
 		private Tilemap? tilemap;
@@ -38,6 +40,10 @@ namespace SoulboundEngine.Client.World.Render {
 
 			this.RenderBlocks(this.level);
 			this.RenderEntities(this.level);
+
+			this.ResolveQueue(this.stateChangedQueue, value => {
+				this.RenderBlock(value.pos, value.state);
+			});
 		}
 
 		private void RenderBlocks(Level level) {
@@ -95,9 +101,15 @@ namespace SoulboundEngine.Client.World.Render {
 			return this.ToRect(this.lastPivot).Contains((Vector2Int)blockPos);
 		}
 
+		private void ResolveQueue<T>(Queue<T> queue, Action<T> action) {
+			if (queue.TryDequeue(out T value)) {
+				action(value);
+			}
+		}
+
 		private void BlockStateChanged(BlockPos blockPos, BlockState? oldState, BlockState? newState) {
 			if (!this.IsInRenderView(blockPos)) return;
-			this.RenderBlock(blockPos, newState);
+			this.stateChangedQueue.Enqueue((blockPos, newState));
 		}
 
 		private void EntityAdded(Entity entity) {
