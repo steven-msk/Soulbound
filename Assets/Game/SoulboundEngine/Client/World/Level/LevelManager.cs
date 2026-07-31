@@ -81,6 +81,8 @@ namespace SoulboundEngine.Client.World.Level {
 
 		public void StopSession() {
 			this.sessionRunning = false;
+			this.paused = false;
+			Time.timeScale = 1f;
 			this.level.OnSessionStop();
 		}
 

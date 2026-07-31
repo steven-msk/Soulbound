@@ -185,6 +185,7 @@ namespace SoulboundEngine.Client {
 			}
 
 			this.uiHandler.FlushScreens();
+			this.worldRenderer.Reset();
 
 			SeedProvider seedProvider = new(save.GetValueOrDefault());
 			WorldLoader worldLoader = new(this, seedProvider);

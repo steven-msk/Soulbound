@@ -13,6 +13,7 @@ using UnityEngine.Tilemaps;
 namespace SoulboundEngine.Client.World.Render {
 	using Entity = Entity.Entity;
 	using Level = Level.Level;
+	using Logger = Debug.Logging.Logger;
 
 	public sealed class WorldRenderer {
 		private readonly BlockRenderManager blockRenderManager;
@@ -39,7 +40,7 @@ namespace SoulboundEngine.Client.World.Render {
 			if (this.level == null) return;
 
 			this.RenderBlocks(this.level);
-			this.RenderEntities(this.level);
+			this.UpdateEntities(this.level);
 
 			this.ResolveQueue(this.stateChangedQueue, value => {
 				this.RenderBlock(value.pos, value.state);
@@ -71,14 +72,6 @@ namespace SoulboundEngine.Client.World.Render {
 				BlockState? blockState = level.GetBlockState(blockPos);
 				this.RenderBlock(blockPos, blockState);
 			}
-		}
-
-		private void RenderEntities(Level level) {
-			foreach (var entity in level.GetAllEntities()) {
-				this.entityRenderManager.Update(entity);
-			}
-			// temporary hook
-			level.GetPlayer().FrameUpdate();
 		}
 
 		private void RenderBlock(BlockPos blockPos, BlockState? blockState) {
@@ -113,11 +106,44 @@ namespace SoulboundEngine.Client.World.Render {
 		}
 
 		private void EntityAdded(Entity entity) {
-			this.entityRenderManager.Render(entity);
+			this.RenderEntity(entity);
 		}
 
 		private void EntityRemoved(Entity entity) {
+			this.DestroyEntity(entity);
+		}
+
+		private void RenderEntities(Level level) {
+			foreach (var entity in level.GetAllEntities()) {
+				this.RenderEntity(entity);
+			}
+		}
+
+		private void DestroyEntities(Level level) {
+			foreach (var entity in level.GetAllEntities()) {
+				this.DestroyEntity(entity);
+			}
+		}
+
+		private void UpdateEntities(Level level) {
+			foreach (var entity in level.GetAllEntities()) {
+				this.UpdateEntity(entity);
+			}
+			// temporary hook
+			level.GetPlayer().FrameUpdate();
+			Logger.LogInfo("update player.GetPosition(): {}", level.GetPlayer().GetPosition());
+		}
+
+		private void RenderEntity(Entity entity) {
+			this.entityRenderManager.Render(entity);
+		}
+
+		private void DestroyEntity(Entity entity) {
 			this.entityRenderManager.Destroy(entity);
+		}
+
+		private void UpdateEntity(Entity entity) {
+			this.entityRenderManager.Update(entity);
 		}
 
 		private void OnChunkLoaded(WorldChunk chunk) {
@@ -145,8 +171,17 @@ namespace SoulboundEngine.Client.World.Render {
 
 		public void SetLevel(Level? level) {
 			this.RemoveLevelEvents();
+			if (this.level != null) this.DestroyEntities(this.level);
 			this.level = level;
+			if (level != null) this.RenderEntities(level);
 			this.AddLevelEvents();
+		}
+
+		public void Reset() {
+			this.lastPivot = Vector2Int.zero;
+			if (this.level != null) this.DestroyEntities(this.level);
+			if (this.tilemap != null) this.tilemap.ClearAllTiles();
+			this.showingChunkFeatures = false;
 		}
 
 		private void AddLevelEvents() {

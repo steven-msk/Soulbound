@@ -76,6 +76,8 @@ namespace SoulboundEngine.Client.World.Level {
 			this.AddEntity(player);
 			SoulboundClient.Instance.InputManager.AddHandler(player);
 			player.SetPosition(this.GetWorldSpawnPoint() + Vector2.up * 2f);
+			Logger.LogInfo("set by start session player.GetPosition(): {}", player.GetPosition());
+
 
 			// TEMPORARY
 			List<TileEntity> tileEntities = TileEntitySerializer.ReadAll().ToList();
