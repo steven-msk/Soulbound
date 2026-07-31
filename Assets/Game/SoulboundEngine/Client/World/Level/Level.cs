@@ -1,5 +1,4 @@
 using SoulboundEngine.Client.Player;
-using SoulboundEngine.Client.Render.Entity;
 using SoulboundEngine.Client.Runtime.Services;
 using SoulboundEngine.Client.World.Block;
 using SoulboundEngine.Client.World.Block.Entity;
@@ -39,9 +38,10 @@ namespace SoulboundEngine.Client.World.Level {
 		[Obsolete] private readonly ConcurrentDictionary<int, List<OnChunkGenerated>> deferredGenerations = new();
 		private readonly Dictionary<int, ChunkGenData> chunkGenData = new();
 		private readonly RandomSequences randomSequences;
-		private readonly WorldRenderer worldRenderer;
-		private readonly EntityRenderManager entityRenderManager;
 		private PlayerEntity player;
+		public event Action<BlockPos, BlockState?, BlockState?>? blockStateChanged;
+		public event Action<Entity>? entityAdded;
+		public event Action<Entity>? entityRemoved;
 
 		private readonly BiomeMap biomeMap;
 		private readonly Heightmap heightmap;
@@ -51,10 +51,8 @@ namespace SoulboundEngine.Client.World.Level {
 		private readonly Dictionary<Guid, Entity> entities = new();
 		private readonly List<ITickingEntity> tickingEntities = new();
 
-		public Level(WorldRenderer worldRenderer, EntityRenderManager entityRenderManager, int seed) {
+		public Level(int seed) {
 			this.seed = seed;
-			this.worldRenderer = worldRenderer;
-			this.entityRenderManager = entityRenderManager;
 			this.randomSequences = new RandomSequences(seed);
 
 			var biome1 = new PlainsBiome(seed);
@@ -86,6 +84,10 @@ namespace SoulboundEngine.Client.World.Level {
 
 		// known issue: inconsistent world update loop design
 		public void Tick(RectInt simulationRect) {
+			int pivotChunkX = ChunkXAt(this.player.GetPosition());
+			this.UnloadDistantChunks(pivotChunkX, RENDER_DISTANCE);
+			this.UpdateLoadedChunks(pivotChunkX);
+
 			foreach (var pos in this.tickingBlocks.ToArray()) {
 				if (!simulationRect.Contains((Vector2Int)pos)) continue;
 
@@ -95,8 +97,8 @@ namespace SoulboundEngine.Client.World.Level {
 				((ITickingBlock)blockState.block).Tick(this, pos, blockState);
 			}
 
-			foreach (var entity in this.tickingEntities.ToArray()) {
-				if (simulationRect.Contains(Vector2Int.FloorToInt(((Entity)entity).GetPosition()))) {
+			foreach (var entity in this.GetAllEntities()) {
+				if (simulationRect.Contains(Vector2Int.FloorToInt(entity.GetPosition()))) {
 					entity.Tick();
 				}
 			}
@@ -108,21 +110,6 @@ namespace SoulboundEngine.Client.World.Level {
 
 		public Vector2 GetWorldSpawnPoint() {
 			return new Vector2(0f, this.GetSurfaceAirY(0));
-		}
-
-		// known issue: inconsistent world update loop design
-		public void FrameUpdate() {
-			int pivotChunkX = ChunkXAt(this.player.GetPosition());
-			this.UnloadDistantChunks(pivotChunkX, RENDER_DISTANCE);
-			this.UpdateLoadedChunks(pivotChunkX);
-
-			Entity[] entities = this.GetAllEntities().ToArray();
-			foreach (var entity in entities) {
-				entity.FrameUpdate();
-			}
-			foreach (var entity in entities) {
-				this.entityRenderManager.Update(entity);
-			}
 		}
 
 		private WorldChunk GenerateNewChunk(int chunkX) {
@@ -139,7 +126,6 @@ namespace SoulboundEngine.Client.World.Level {
 
 			return chunk;
 		}
-
 
 		[Obsolete]
 		void BlendBiomeBorder(ChunkBiomePartition partition) {
@@ -201,7 +187,7 @@ namespace SoulboundEngine.Client.World.Level {
 			}
 
 			chunk.SetBlockState(blockPos, blockState);
-			this.worldRenderer.UpdateModel(blockPos, blockState);
+			blockStateChanged?.Invoke(blockPos, oldState, blockState);
 
 			bool oldTicks = oldState?.block is ITickingBlock;
 			bool newTicks = blockState?.block is ITickingBlock;
@@ -240,7 +226,7 @@ namespace SoulboundEngine.Client.World.Level {
 			if (entity is ITickingEntity ticking) {
 				this.tickingEntities.Add(ticking);
 			}
-			this.entityRenderManager.Render(entity);
+			entityAdded?.Invoke(entity);
 		}
 
 		public void RemoveEntity(Entity entity) {
@@ -252,7 +238,7 @@ namespace SoulboundEngine.Client.World.Level {
 			if  (entity is ITickingEntity ticking) {
 				this.tickingEntities.Remove(ticking);
 			}
-			this.entityRenderManager.Destroy(entity);
+			entityRemoved?.Invoke(entity);
 		}
 
 		public void SpawnEntity<E>(EntityDescriptor<E> descriptor, Vector2 pos) where E : Entity {
@@ -267,7 +253,7 @@ namespace SoulboundEngine.Client.World.Level {
 			return this.entities.TryGetValue(guid, out entity);
 		}
 
-		public IEnumerable<Entity> GetAllEntities() => this.entities.Values;
+		public IEnumerable<Entity> GetAllEntities() => this.entities.Values.ToList();
 
 		public void UnloadDistantChunks(int pivotChunkX, int viewDistance) {
 			List<WorldChunk> toRemove = new();

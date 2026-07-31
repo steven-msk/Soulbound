@@ -23,8 +23,8 @@ namespace SoulboundEngine.Client.Runtime.Services {
 			get => this._entities ?? throw new InvalidOperationException("Runtime entity data is only available within a world session");
 		}
 
-		public void SetWorldSessionState(WorldSession session) {
-			this._player = new RuntimePlayerDataProvider(session.player);
+		public void SetWorldSessionState(WorldSession session, PlayerEntity player) {
+			this._player = new RuntimePlayerDataProvider(player);
 			this._entities = new RuntimeEntityDataProvider(session.level);
 		}
 

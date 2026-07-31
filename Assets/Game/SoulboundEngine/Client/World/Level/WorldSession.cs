@@ -1,16 +1,16 @@
 using SoulboundEngine.Client.World.Serialization;
+using System;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.World.Level {
-	using PlayerEntity = Player.PlayerEntity;
-
 	public struct WorldSession {
 		public WorldDump? deserializationData;
-		public PlayerEntity player;
 		public LevelManager levelManager;
 		public Level level;
-		public Canvas canvas;
+		[Obsolete] public Canvas canvas;
 		public UIDocument uiDocument;
+		public Tilemap tilemap;
 	}
 }

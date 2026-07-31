@@ -27,20 +27,20 @@ namespace SoulboundEngine.Client.World.Block.Entity {
 
 		public static IEnumerable<TileEntity> ReadAll() {
 			List<TileEntity> tileEntities = new();
-			string json = string.Empty;
 			try {
-				json = File.ReadAllText(GetFilePath());
-			} catch (FileNotFoundException) {
+				string json = File.ReadAllText(GetFilePath());
+				JArray objArray = JArray.Parse(json);
+
+				foreach (var token in objArray) {
+					TileEntity entity = Read(token);
+					tileEntities.Add(entity);
+				}
+
+				return tileEntities;
+			} catch (FileNotFoundException e) {
+				Logger.LogError(e);
 				return Enumerable.Empty<TileEntity>().ToList();
 			}
-			JArray objArray = JArray.Parse(json);
-
-			foreach (var token in objArray) {
-				TileEntity entity = Read(token);
-				tileEntities.Add(entity);
-			}
-
-			return tileEntities;
 		}
 
 		public static JObject Write(TileEntity entity) {

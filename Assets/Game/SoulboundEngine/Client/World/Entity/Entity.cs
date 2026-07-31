@@ -28,7 +28,7 @@ namespace SoulboundEngine.Client.World.Entity {
 			this.isAlive = true;
 		}
 
-		public virtual void FrameUpdate() {
+		public virtual void Tick() {
 		}
 
 		public virtual Vector2 GetPosition() => this.pos;

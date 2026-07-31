@@ -1,9 +1,7 @@
 using Cysharp.Threading.Tasks;
 using SoulboundEngine.Client.Input;
-using SoulboundEngine.Client.Render.Entity;
 using SoulboundEngine.Client.UI.Screen;
 using SoulboundEngine.Client.World.Generation;
-using SoulboundEngine.Client.World.Render;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -21,13 +19,10 @@ namespace SoulboundEngine.Client.World.Level {
 	public class LevelManager : IInputEventHandler {
 		public const float tickRate = 0.02f;        // 50 tps
 		private float tickStartTime;
-		private float frameStartTime;
 		public bool paused { get; private set; } = false;
 		private bool sessionRunning;
 
-		private readonly WorldRenderer worldRenderer;
 		private readonly SoulboundClient client;
-		private readonly EntityRenderManager entityRenderManager;
 
 		// 'readonly' means no multiple dimensions
 		// this is for one dimension only
@@ -35,13 +30,10 @@ namespace SoulboundEngine.Client.World.Level {
 
 		public const string worldDump = "worldDump.json";
 		public static readonly RectInt simulationView = new(-128, -76, 256, 156);
-		public static readonly RectInt renderRect = new(-32, -19, 65, 39);
 
 		// known issue: scattered Level and LevelManager dependencies
-		public LevelManager(SoulboundClient client, ISeedProvider seedProvider, WorldRenderer worldRenderer, EntityRenderManager entityRenderManager) {
-			this.worldRenderer = worldRenderer;
-			this.entityRenderManager = entityRenderManager;
-			this.level = new Level(this.worldRenderer, entityRenderManager, seedProvider.GetSeed());
+		public LevelManager(SoulboundClient client, ISeedProvider seedProvider) {
+			this.level = new Level(seedProvider.GetSeed());
 			this.client = client;
 		}
 
@@ -49,31 +41,13 @@ namespace SoulboundEngine.Client.World.Level {
 			yield return InputEventListener.ConsumePerformed(InputTokens.Keyboard.ESC, _ => this.TogglePause());
 		}
 
-		public void StartSession() {
-			this.level.StartSession(new PlayerEntity(this.client, this.level));
+		public PlayerEntity StartSession() {
+			PlayerEntity player = new(this.client, this.level);
+			this.level.StartSession(player);
 			this.sessionRunning = true;
 
-			UniTask.Post(this.LevelFrameLoop);
 			UniTask.Post(this.LevelTickLoop);
-		}
-
-		private async void LevelFrameLoop() {
-			while (this.sessionRunning) {
-				if (!this.paused) {
-					this.StartFrame();
-
-					try {
-						Vector2 pivotPos = this.level.GetPlayer()?.GetPosition() ?? this.level.GetWorldSpawnPoint();
-						this.level.FrameUpdate();
-						this.worldRenderer.RenderView(pivotPos);
-					} catch (Exception e) {
-						Logger.LogFatal(e);
-					}
-
-					this.EndFrame();
-				}
-				await UniTask.NextFrame();
-			}
+			return player;
 		}
 
 		private async void LevelTickLoop() {
@@ -92,14 +66,6 @@ namespace SoulboundEngine.Client.World.Level {
 				}
 				await UniTask.WaitForSeconds(tickRate, true);
 			}
-		}
-
-		private void StartFrame() {
-			this.frameStartTime = Time.realtimeSinceStartup;
-		}
-
-		private void EndFrame() {
-			float fps = 1f / (Time.realtimeSinceStartup - this.frameStartTime);
 		}
 
 		private void StartTick() {

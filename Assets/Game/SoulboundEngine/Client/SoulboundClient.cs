@@ -6,6 +6,7 @@ using SoulboundEngine.Client.Debug.Logging.Console;
 using SoulboundEngine.Client.Debug.Metrics;
 using SoulboundEngine.Client.Debug.Metrics.View;
 using SoulboundEngine.Client.Input;
+using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.Recipe;
 using SoulboundEngine.Client.Recipe.Asset;
 using SoulboundEngine.Client.Render.Block;
@@ -18,6 +19,7 @@ using SoulboundEngine.Client.UI.Screen;
 using SoulboundEngine.Client.UI.UXMLBindings;
 using SoulboundEngine.Client.World;
 using SoulboundEngine.Client.World.Level;
+using SoulboundEngine.Client.World.Render;
 using SoulboundEngine.Client.World.Serialization;
 using SoulboundEngine.Core;
 using SoulboundEngine.Core.Audio;
@@ -33,7 +35,7 @@ using UnityEngine.UIElements;
 namespace SoulboundEngine.Client {
 	using Application = UnityEngine.Application;
 	using Object = UnityEngine.Object;
-	using Time = UnityEngine.Time;
+	using RectInt = UnityEngine.RectInt;
 #if !UNITY_EDITOR
 	using LogType = UnityEngine.LogType;
 	using StackTraceLogType = UnityEngine.StackTraceLogType;
@@ -58,15 +60,18 @@ namespace SoulboundEngine.Client {
 		private readonly UIAudioEventBank uiAudioEventBank;
 		private readonly WorldAudioEventBank worldAudioEventBank;
 		private readonly DebugOverlayManager debugOverlayManager;
-		private WorldSession? activeWorldSession;
 		private readonly ItemRenderManager itemRenderManager;
 		private readonly ISpriteResolver<AtlasSpriteRef> spriteResolver;
 		private readonly EntityRenderManager entityRenderManager;
 		private readonly BlockRenderManager blockRenderManager;
+		private readonly WorldRenderer worldRenderer;
+		public static readonly RectInt RENDER_RECT = new(-32, -19, 65, 39);
 		private readonly RecipeManager recipeManager;
 		private readonly PerformanceMetrics performanceMetrics;
 		private readonly DebugMetricsService debugMetricsService;
 		private WorldScreen activeWorldScreen;
+		private PlayerEntity player;
+		private WorldSession? activeWorldSession;
 
 		int IInputEventHandler.priority => int.MaxValue;
 
@@ -119,6 +124,7 @@ namespace SoulboundEngine.Client {
 			this.itemRenderManager = new ItemRenderManager(Registries.ITEMS.ToList(), this.spriteResolver);
 			this.entityRenderManager = new EntityRenderManager(Registries.ENTITIES.ToList(), this.itemRenderManager);
 			this.blockRenderManager = new BlockRenderManager(Registries.BLOCKS.ToList());
+			this.worldRenderer = new WorldRenderer(RENDER_RECT, this.blockRenderManager, this.entityRenderManager);
 			_ = new InventoryScreens();
 
 			Registry<RecipeIngredientIndex> ingredientIndexRegistry = new(RecipeIngredientIndex.REGISTRY);
@@ -142,6 +148,7 @@ namespace SoulboundEngine.Client {
 			this.metricsHud.Refresh();
 
 			this.inputManager.DispatchInputs();
+			this.worldRenderer.Render();
 		}
 
 		/// <summary>
@@ -180,21 +187,26 @@ namespace SoulboundEngine.Client {
 			this.uiHandler.FlushScreens();
 
 			SeedProvider seedProvider = new(save.GetValueOrDefault());
-			WorldLoader worldLoader = new(this, this.entityRenderManager, this.blockRenderManager, seedProvider);
+			WorldLoader worldLoader = new(this, seedProvider);
 
 			worldLoader.LoadWorld(
 				SceneManager.LoadSceneAsync(this.config.unity.worldScene).ToUniTask(),
 				Object.FindFirstObjectByType<WorldSceneRoot>
 			).ContinueWith(session => {
+				this.worldRenderer.SetLevel(session.level);
+				this.worldRenderer.SetTilemap(session.tilemap);
+
+				this.player = session.levelManager.StartSession();
+
 				this.activeWorldSession = session;
 				this.uiHandler.SetUIDocument(session.uiDocument);
-				this.activeWorldScreen = new WorldScreen(session.player.GetInventory(), this.commandLine, this.metricsHud, this.logConsole, this.itemRenderManager);
+				this.activeWorldScreen = new WorldScreen(this.player.GetInventory(), this.commandLine, this.metricsHud, this.logConsole, this.itemRenderManager);
 				this.uiHandler.PushScreen(this.activeWorldScreen);
 				this.debugOverlayManager.Clear();
 				this.inputManager.AddHandler(session.levelManager);
 
-				this.runtimeDataProvider.SetWorldSessionState(session);
-				this.runtimeExecutionServices.SetWorldSessionState(session);
+				this.runtimeDataProvider.SetWorldSessionState(session, this.player);
+				this.runtimeExecutionServices.SetWorldSessionState(session, this.player);
 				this.commandProcessor.RegisterProvider(this.worldSessionCommands);
 
 				// PROTOTYPICAL
@@ -208,9 +220,10 @@ namespace SoulboundEngine.Client {
 
 			LevelManager levelManager = this.activeWorldSession?.levelManager!;
 			levelManager.StopSession();
+			this.player = null;
+			this.worldRenderer.SetLevel(null);
 			this.inputManager.RemoveHandler(levelManager);
 			this.uiHandler.FlushScreens();
-			Time.timeScale = 1f;
 
 			SceneManager.LoadSceneAsync(this.config.unity.mainScene).ToUniTask()
 				.ContinueWith(() => {
@@ -257,7 +270,7 @@ namespace SoulboundEngine.Client {
 				InputEventListener.ConsumePerformed(InputTokens.Debug.enterCommand, _ => {
 					if (this.debugOverlayManager.TryShow(DebugOverlayFeature.CommandLine)) {
 						this.commandLine.Show();
-						this.activeWorldSession?.player.StopHorizontalMovement();
+						this.player?.StopHorizontalMovement();
 					}
 				}),
 				InputEventListener.ConsumePerformed(InputTokens.Debug.toggleConsole, _ => {
@@ -315,9 +328,9 @@ namespace SoulboundEngine.Client {
 				onOverlayChanged += (prev, next) => {
 					if (client.activeWorldSession is { } session) {
 						if (client.commandLine.isVisible || next == DebugOverlayFeature.CommandLine) {
-							client.inputManager.RemoveHandler(session.player);
+							client.inputManager.RemoveHandler(client.player);
 						} else if (!client.commandLine.isVisible && prev == DebugOverlayFeature.CommandLine) {
-							client.inputManager.AddHandler(session.player);
+							client.inputManager.AddHandler(client.player);
 						}
 					}
 				};
