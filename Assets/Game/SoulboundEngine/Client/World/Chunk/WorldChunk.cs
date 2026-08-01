@@ -1,63 +1,65 @@
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.Client.World.Block.Entity;
 using SoulboundEngine.Client.World.Block.State;
-using SoulboundEngine.Client.World.Block.TileEntity;
 using SoulboundEngine.Client.World.Generation;
-using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Core;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
-
+using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 #nullable enable
 
 namespace SoulboundEngine.Client.World.Chunk {
-	[JsonConverter(typeof(WorldChunk.Serializer))]
+	using Block = Block.Block;
+	using Level = Level.Level;
+
 	public class WorldChunk : ITickable {
-		public const int minY = -Level.Level.WORLD_HEIGHT / 2;
-		public const int maxY = Level.Level.WORLD_HEIGHT / 2;
+		public const int minY = -Level.WORLD_HEIGHT / 2;
+		public const int maxY = Level.WORLD_HEIGHT / 2;
 		public const float HEIGHT_SPREAD = 0.01f;
 		public const float SURFACE_HEIGHT_RANGE = 50f;
 		public const float UNDERGROUND_HEIGHT_RANGE = 20f;
 
-		private readonly int[][] blockStateIDs = new int[Level.Level.CHUNK_LENGTH][];
+		private readonly int[][] blockStateIDs = default!;
 		private readonly Dictionary<BlockPos, TileEntity> tileEntities = new();
 		private readonly TileEntityTickManager tickManager = new();
-		private readonly Level.Level level;
+		private readonly Level level;
 		private readonly int cx;
 		public int xpos => this.cx;
 
-		public WorldChunk(Level.Level level, int cx) { 
+		public WorldChunk(Level level, int cx) { 
 			this.level = level;
 			this.cx = cx;
+			CreateBlockArray(ref this.blockStateIDs);
+		}
 
-			for (int x = 0; x < Level.Level.CHUNK_LENGTH; x++) {
-				this.blockStateIDs[x] = new int[Level.Level.WORLD_HEIGHT];
+		public static void CreateBlockArray(ref int[][] array) {
+			array = new int[Level.CHUNK_LENGTH][];
+			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
+				array[x] = new int[Level.WORLD_HEIGHT];
 			}
 		}
 
 		public void Tick() => this.tickManager.Tick();
 
 		[Obsolete("known issue: world architecture design is poorly designed")]
-		public void Generate(BiomeMap biomeMap, Heightmap heightmap, Cavemap cavemap, out ChunkGenData genData) {
+		public void Generate(BiomeMap biomeMap, Heightmap heightmap, Cavemap cavemap, bool placeBlocks, out ChunkGenData genData) {
 			genData = new ChunkGenData {
 				chunk = this,
-				genContexts = new BlockGenContext[Level.Level.CHUNK_LENGTH][],
-				surfacePoints = new int[Level.Level.CHUNK_LENGTH],
-				biomeWeights = new IEnumerable<BiomeWeight>[Level.Level.CHUNK_LENGTH],
+				genContexts = new BlockGenContext[Level.CHUNK_LENGTH][],
+				surfacePoints = new int[Level.CHUNK_LENGTH],
+				biomeWeights = new IEnumerable<BiomeWeight>[Level.CHUNK_LENGTH],
 				biomePartition = new ChunkBiomePartition(),
-				caveDensities = new float[Level.Level.CHUNK_LENGTH][],
-				caveMask = new BitArray[Level.Level.CHUNK_LENGTH]
+				caveDensities = new float[Level.CHUNK_LENGTH][],
+				caveMask = new BitArray[Level.CHUNK_LENGTH]
 			};
 
-			for (int cx = 0; cx < Level.Level.CHUNK_LENGTH; cx++) {
-				genData.caveDensities[cx] = new float[Level.Level.WORLD_HEIGHT];
-				genData.caveMask[cx] = new BitArray(Level.Level.WORLD_HEIGHT);
-				genData.genContexts[cx] = new BlockGenContext[Level.Level.WORLD_HEIGHT];
+			for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
+				genData.caveDensities[cx] = new float[Level.WORLD_HEIGHT];
+				genData.caveMask[cx] = new BitArray(Level.WORLD_HEIGHT);
+				genData.genContexts[cx] = new BlockGenContext[Level.WORLD_HEIGHT];
 				int x = this.ChunkXToWorldX(cx);
 
 				var weights = biomeMap.ResolveWeights(x);
@@ -72,7 +74,7 @@ namespace SoulboundEngine.Client.World.Chunk {
 
 				BlockResolver blockResolver = new(primary.biome, secondary?.biome);
 
-				for (int y = 0; y < Level.Level.WORLD_HEIGHT; y++) {
+				for (int y = 0; y < Level.WORLD_HEIGHT; y++) {
 					BlockPos blockPos = new(x, IndexToWorldY(y));
 					float caveDensity = cavemap.SampleDensity(x, blockPos.y, surfaceY, primary, secondary);
 					bool isCave = cavemap.IsCave(caveDensity);
@@ -89,11 +91,12 @@ namespace SoulboundEngine.Client.World.Chunk {
 					genData.caveMask[cx][y] = isCave;
 					genData.surfacePoints[cx] = ctx.surfaceY;
 
-					BlockState blockState = blockResolver.ResolveBlock(ctx);
-					this.SetBlock(cx, y, blockState);
+					if (placeBlocks) {
+						BlockState blockState = blockResolver.ResolveBlock(ctx);
+						this.SetBlock(cx, y, blockState);
+					}
 				}
 			}
-
 		}
 
 		[Obsolete]
@@ -110,13 +113,13 @@ namespace SoulboundEngine.Client.World.Chunk {
 		}
 
 		[Obsolete]
-		public void PostProcess(ChunkGenData genData, Level.Level level) {
+		public void PostProcess(ChunkGenData genData, Level level) {
 			IBiome primary = genData.biomePartition.primary;
 			IBiome? secondary = genData.biomePartition.secondary;
 
 			int splitX = genData.biomePartition.splitX;
 			int chunkStartX = this.ChunkXToWorldX(0);
-			int chunkEndX = this.ChunkXToWorldX(Level.Level.CHUNK_LENGTH - 1);
+			int chunkEndX = this.ChunkXToWorldX(Level.CHUNK_LENGTH - 1);
 
 			int partitionStartX = chunkStartX;
 			int partitionLimitX = secondary == null ? chunkEndX : splitX;
@@ -134,9 +137,9 @@ namespace SoulboundEngine.Client.World.Chunk {
 
 		public static int IndexToWorldY(int yIndex) => yIndex + minY;
 
-		public int WorldXToChunkX(int x) => x - this.xpos * Level.Level.CHUNK_LENGTH;
+		public int WorldXToChunkX(int x) => x - this.xpos * Level.CHUNK_LENGTH;
 
-		public int ChunkXToWorldX(int cx) => cx + this.xpos * Level.Level.CHUNK_LENGTH;
+		public int ChunkXToWorldX(int cx) => cx + this.xpos * Level.CHUNK_LENGTH;
 
 		public void SetBlockState(BlockPos blockPos, BlockState? blockState) {
 			blockState ??= Blocks.AIR.DefaultState;
@@ -144,30 +147,36 @@ namespace SoulboundEngine.Client.World.Chunk {
 			ChunkBlockPos chunkPos = blockPos.ToChunkPos();
 			int yIndex = WorldYToIndex(chunkPos.y);
 			BlockState oldState = this.GetBlockState(chunkPos) ?? Blocks.AIR.DefaultState;
-			Block.Block oldBlock = oldState.block;
-			Block.Block newBlock = blockState.block;
+			Block oldBlock = oldState.block;
+			Block newBlock = blockState.block;
 
-			this.blockStateIDs[chunkPos.x][yIndex] = Block.Block.GetRawID(blockState);
+			this.blockStateIDs[chunkPos.x][yIndex] = Block.GetRawID(blockState);
 
 			// tile entities only change when blocks differ in type
 			// however some blocks may handle tile entity persistence differently
 			// when oldBlock and newBlock are the same
 			if (newBlock != oldBlock) {
-				bool oldHasTileEntity = oldBlock.HasTileEntity(this.level, blockPos, oldState);
-				bool newHasTileEntity = blockState.block.HasTileEntity(this.level, blockPos, blockState);
+				bool oldHasTileEntity = oldBlock is ITileEntityProvider;
+				bool newHasTileEntity = blockState.block is ITileEntityProvider;
 
 				if (oldHasTileEntity && this.tileEntities.ContainsKey(blockPos)) {
 					TileEntity tileEntity = this.tileEntities[blockPos];
 
 					this.tickManager.RemoveTileEntity(tileEntity);
 					this.tileEntities.Remove(blockPos);
+					tileEntity.SetLevel(null);
 					tileEntity.OnDispose();
 				}
 				if (newHasTileEntity) {
-					TileEntity tileEntity = newBlock.GetTileEntity(this.level, blockPos);
+					ITileEntityProvider tileEntityProvider = (ITileEntityProvider)newBlock;
+					TileEntity? tileEntity = tileEntityProvider.CreateTileEntity(blockPos, blockState);
 
-					this.tileEntities[blockPos] = tileEntity;
-					this.tickManager.AddTileEntity(tileEntity);
+					if (tileEntity != null && tileEntity.GetTileEntityType().Supports(blockState)) {
+						tileEntity.SetLevel(this.level);
+						this.tileEntities[blockPos] = tileEntity;
+						this.tickManager.AddTileEntity(tileEntity);
+					}
+
 				}
 			}
 		}
@@ -182,11 +191,92 @@ namespace SoulboundEngine.Client.World.Chunk {
 			this.SetBlockState(new BlockPos(this.ChunkXToWorldX(cx), IndexToWorldY(yIndex)), blockState);
 		}
 
+		public void SetAllBlocks(int[][] stateIDs) {
+			Array.Copy(stateIDs, this.blockStateIDs, stateIDs.Length);
+		}
+
+		/// <summary>
+		/// Trust boundary on deserialized input. 
+		/// This checks whether the tileEntity claims to belong to a block that matches the expected outcome.
+		/// </summary>
+		public bool ValidateTileEntity(TileEntity tileEntity) {
+			ChunkBlockPos chunkPos = tileEntity.blockPos.ToChunkPos();
+			BlockState? stateInChunk = this.GetBlockState(chunkPos);
+
+			if (tileEntity.GetBlockState() != stateInChunk) {
+				if (stateInChunk != null) {
+					Logger.LogError("Block state in tile entity does not match the one in chunk: {} at {}, expected {} but was {}",
+						tileEntity, chunkPos, tileEntity.GetBlockState(), stateInChunk!);
+				} else {
+					Logger.LogError("Deserialized TileEntity {} at {} is out of world bounds", tileEntity, chunkPos);
+				}
+				return false;
+			}
+			if (stateInChunk.block is not ITileEntityProvider) {
+				Logger.LogError("Block state in chunk is not of type ITileEntityProvider, " +
+					"but a TileEntity was associated with it: {} at {}, block in chunk: {}",
+					tileEntity, chunkPos, stateInChunk);
+				return false;
+			}
+			return true;
+		}
+
+		public void AddTileEntityValidated(TileEntity tileEntity) {
+			if (this.tileEntities.TryGetValue(tileEntity.blockPos, out TileEntity existing)) {
+				Logger.LogWarning("Validated TileEntity already exists: attempted to add {} at {} but {} was already there",
+					tileEntity, tileEntity.blockPos, existing);
+				return;
+			}
+			this.tileEntities.Add(tileEntity.blockPos, tileEntity);
+		}
+
+		/// <summary>
+		/// Consistency check after deserialized tile entities are applied and validated.
+		/// This makes sure every provider block is backed by a tile entity.
+		/// </summary>
+		public void SyncBlocksWithTileEntities() {
+			for (int x = 0; x < this.blockStateIDs.Length; x++) {
+				for (int y = 0; y < this.blockStateIDs[x].Length; y++) {
+					BlockState blockState = Block.GetState(this.blockStateIDs[x][y]);
+					BlockPos blockPos = new(x, IndexToWorldY(y));
+
+					TileEntity? tileEntityAtBlock = this.TileEntityAt(blockPos);
+					if (blockState.block is ITileEntityProvider tileEntityProvider && tileEntityAtBlock == null) {
+						// a TileEntity rejected by ValidateTileEntity should not vanish silently
+						// instead, a fresh TileEntity is created from the provider
+						Logger.LogWarning("Found missing tile entity for block {} at {}. This may be the result of broken serialization data", 
+							Blocks.GetIdentifier(blockState.block), blockPos);
+
+						TileEntity? tileEntity = tileEntityProvider.CreateTileEntity(blockPos, blockState);
+						if (tileEntity != null && tileEntity.GetTileEntityType().Supports(blockState)) {
+							tileEntity.SetLevel(this.level);
+							this.tileEntities[blockPos] = tileEntity;
+							this.tickManager.AddTileEntity(tileEntity);
+							Logger.LogInfo("Added fresh TileEntity since it was missing: {} at {}", tileEntity, blockPos);
+						} else {
+							Logger.LogError("Failed to replenish missing TileEntity for block {} at {}",
+								Blocks.GetIdentifier(blockState.block), blockPos);
+							this.tileEntities.Remove(blockPos);
+						}
+					} else if (blockState.block is not ITileEntityProvider && tileEntityAtBlock != null) {
+						// branch kept for consistency with ValidateTileEntity and defense against other code paths
+						// to avoid stale tile entities remaining in the dictionary.
+						// should be unreachable given a pass to ValidateTileEntity before calling this
+						Logger.LogWarning("Found TileEntity for block that doesnt provide tile entities: {} at {}", tileEntityAtBlock, blockPos);
+						this.tileEntities.Remove(blockPos);
+					} else if (tileEntityAtBlock != null) {
+						tileEntityAtBlock.SetLevel(this.level);
+						this.tickManager.AddTileEntity(tileEntityAtBlock);
+					}
+				}
+			}
+		}
+
 		public BlockState? GetBlockState(ChunkBlockPos chunkPos) {
-			if (!Level.Level.IsInBounds(chunkPos.ToBlock())) return null;
+			if (!Level.IsInBounds(chunkPos.ToBlock())) return null;
 
 			int stateID = this.blockStateIDs[chunkPos.x][WorldYToIndex(chunkPos.y)];
-			return Block.Block.GetState(stateID);
+			return Block.GetState(stateID);
 		}
 
 		public TileEntity? TileEntityAt(BlockPos blockPos) {
@@ -195,79 +285,8 @@ namespace SoulboundEngine.Client.World.Chunk {
 				: null;
 		}
 
-		private void ParseDeserialized(int[][] blockStateIDs) {
-			for (int x = 0; x < Level.Level.CHUNK_LENGTH; x++) {
-				for (int y = minY; y < maxY; y++) {
-					int yIndex = WorldYToIndex(y);
+		public int[][] GetBlocks() => this.blockStateIDs;
 
-					this.blockStateIDs[x][yIndex] = blockStateIDs[x][yIndex];
-				}
-			}
-		}
-
-
-		public sealed class Serializer : JsonConverter<WorldChunk> {
-			public override WorldChunk ReadJson(
-					JsonReader reader,
-					Type objectType, 
-					WorldChunk existingValue, 
-					bool hasExistingValue,
-					JsonSerializer serializer
-				) {
-				if (reader.TokenType == JsonToken.Null) {
-					return null;
-				}
-
-				JObject obj = JObject.Load(reader);
-				int xpos = obj["xpos"].Value<int>();
-				JArray rows = (JArray)obj["blockStates"];
-				int[][] stateHashes = new int[rows.Count][];
-
-				for (int x = 0; x < rows.Count; x++) {
-					JArray row = (JArray)rows[x];
-					stateHashes[x] = new int[row.Count];
-
-					for (int y = 0; y < row.Count; y++) {
-						int hash = row[y].Value<int>();
-						stateHashes[x][y] = hash;
-					}
-				}
-
-				WorldChunk chunk = new(null, xpos);
-				chunk.ParseDeserialized(stateHashes);
-				return chunk;
-			}
-
-			public override void WriteJson(JsonWriter writer, WorldChunk value, JsonSerializer serializer) {
-				if (value == null) {
-					writer.WriteNull();
-					return;
-				}
-				writer.WriteStartObject();
-				writer.WritePropertyName("xpos");
-				serializer.Serialize(writer, value.xpos);
-
-				writer.WritePropertyName("blockStates");
-				writer.WriteStartArray();
-				foreach (var row in value.blockStateIDs) {
-					writer.WriteStartArray();
-					foreach (var stateID in row) {
-						writer.WriteValue(stateID);
-					}
-					writer.WriteEndArray();
-				}
-				writer.WriteEndArray();
-
-				writer.WriteEndObject();
-			}
-
-			public static void WriteBinary(BinaryWriter writer, WorldChunk chunk) {
-				throw new NotImplementedException();
-			}
-
-			public static WorldChunk ReadBinary(BinaryReader reader) {
-				throw new NotImplementedException();
-			}
-		}
+		public IEnumerable<TileEntity> GetTileEntities() => this.tileEntities.Values;
 	}
 }

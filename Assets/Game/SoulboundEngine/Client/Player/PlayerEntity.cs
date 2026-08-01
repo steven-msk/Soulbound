@@ -128,8 +128,8 @@ namespace SoulboundEngine.Client.Player {
 			this.SetNormalVelocityX(0f);
 		}
 
-		public override void FrameUpdate() {
-			base.FrameUpdate();
+		// temporary hook from WorldRenderer
+		public void FrameUpdate() {
 			if (this.isHoldingLeftClick) this.OnLeftHold();
 			if (this.isHoldingRightClick) this.OnRightHold();
 

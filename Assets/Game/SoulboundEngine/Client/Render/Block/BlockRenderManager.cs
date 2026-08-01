@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+#nullable enable
+
 namespace SoulboundEngine.Client.Render.Block {
 	using Block = World.Block.Block;
 
@@ -14,10 +16,16 @@ namespace SoulboundEngine.Client.Render.Block {
 			this.blockModels = BlockModelRegistry.BuildModels(blocks);
 		}
 
-		public void Render(Tilemap tilemap, BlockPos blockPos, BlockState blockState) {
-			BlockModel model = this.blockModels.Resolve(blockState);
+		public void Render(Tilemap tilemap, BlockPos blockPos, BlockState? blockState) {
 			Vector3Int position = this.ToTilemapPos(blockPos);
 
+			if (blockState == null) {
+				tilemap.SetTile(position, null);
+				tilemap.SetColor(position, Color.white);
+				return;
+			}
+
+			BlockModel model = this.blockModels.Resolve(blockState);
 			tilemap.SetTile(position, model.tile);
 			tilemap.SetColor(position, model.color);
 		}

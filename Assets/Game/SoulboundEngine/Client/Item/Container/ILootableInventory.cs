@@ -31,6 +31,8 @@ namespace SoulboundEngine.Client.Item.Container {
 
 			LootTable lootTable = Registries.LOOT_TABLES.Get(tableKey).GetValue();
 			LootWorldContext worldContext = new(lootableInventory.GetLevel(), player.GetLuck());
+
+			lootableInventory.Clear();
 			lootTable.SupplyInventory(lootableInventory, worldContext, lootableInventory.GetLootTableSeed());
 		}
 	}

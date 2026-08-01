@@ -43,11 +43,6 @@ namespace SoulboundEngine.Client.World.Block {
 
 		public StateManager<Block, BlockState> StateManager => this.stateManager;
 
-		public virtual bool HasTileEntity(Level.Level level, BlockPos blockPos, BlockState blockState) => false;
-		public virtual TileEntity.TileEntity? GetTileEntity(Level.Level level, BlockPos blockPos) {
-			return null;
-		}
-
 		public Item AsItem() {
 			return Item.blockItems.TryGetValue(this, out Item item) ? item : Items.AIR;
 		}
@@ -59,7 +54,7 @@ namespace SoulboundEngine.Client.World.Block {
 				: Blocks.AIR;
 		}
 
-		public static void DropStacks(BlockState blockState, Level.Level level, BlockPos blockPos, Entity.Entity? owner) {
+		public static void DropStacks(BlockState blockState, Level.Level level, BlockPos blockPos, World.Entity.Entity? owner) {
 			List<ItemStack> droppedStacks = GetDroppedStacks(blockState);
 
 			foreach (var stack in droppedStacks) {

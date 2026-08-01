@@ -1,8 +1,6 @@
 using Cysharp.Threading.Tasks;
-using SoulboundEngine.Client.Render.Block;
-using SoulboundEngine.Client.Render.Entity;
 using SoulboundEngine.Client.World.Generation;
-using SoulboundEngine.Client.World.Render;
+using SoulboundEngine.Client.World.Serialization;
 using System;
 using UnityEngine.ResourceManagement.Exceptions;
 
@@ -10,14 +8,14 @@ namespace SoulboundEngine.Client.World.Level {
 	public sealed class WorldLoader {
 		private readonly SoulboundClient client;
 		private readonly ISeedProvider seedProvider;
-		private readonly EntityRenderManager entityRenderManager;
-		private readonly BlockRenderManager blockRenderManager;
+		private readonly WorldSerializer worldSerializer;
+		private readonly WorldSave save;
 
-		public WorldLoader(SoulboundClient client, EntityRenderManager entityRenderManager, BlockRenderManager blockRenderManager, ISeedProvider seedProvider) {
+		public WorldLoader(SoulboundClient client, ISeedProvider seedProvider, WorldSave save, WorldSerializer worldSerializer) {
 			this.client = client;
 			this.seedProvider = seedProvider;
-			this.entityRenderManager = entityRenderManager;
-			this.blockRenderManager = blockRenderManager;
+			this.save = save;
+			this.worldSerializer = worldSerializer;
 		}
 
 		public async UniTask<WorldSession> LoadWorld(UniTask sceneLoadTask, Func<IWorldSceneRoot> rootProvider) {
@@ -25,27 +23,25 @@ namespace SoulboundEngine.Client.World.Level {
 
 			IWorldSceneRoot sceneRoot = rootProvider() ?? throw new OperationException("Root provider returned null");
 
-			WorldRenderer worldRenderer = new(LevelManager.simulationView, this.blockRenderManager, sceneRoot.tilemap);
-			LevelManager levelManager = new(this.client, this.seedProvider, worldRenderer, this.entityRenderManager);
+			LevelManager levelManager = new(this.client, this.seedProvider);
 
 			// single level for now
 			// multiple dimensions not supported yet
 			Level level = levelManager.GetLevel();
-			worldRenderer.SetBlockStateSupplier(level.GetBlockState);
 
-			// no deserialization just yet
-			// only generation currently
-			level.GenerateTerrain();
-
-			levelManager.StartSession();
+			bool shouldPlaceGeneratedBlocks = this.save.isNew;
+			level.GenerateInitialTerrain(shouldPlaceGeneratedBlocks);
+			if (!this.save.isNew) {
+				this.worldSerializer.Deserialize(levelManager, this.save.saveFolder);
+			}
 
 			return new WorldSession {
-				deserializationData = null,
+				save = this.save,
 				level = level,
 				levelManager = levelManager,
-				player = level.GetPlayer(),
 				canvas = sceneRoot.canvas,
-				uiDocument = sceneRoot.UIDocument
+				uiDocument = sceneRoot.UIDocument,
+				tilemap = sceneRoot.tilemap
 			};
 		}
 

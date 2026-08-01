@@ -1,5 +1,4 @@
 using SoulboundEngine.Client.World.Chunk;
-using SoulboundEngine.Client.World.Level;
 using System;
 using UnityEngine;
 
@@ -13,7 +12,7 @@ namespace SoulboundEngine.Client.World.Block {
             this.y = y;
         }
 
-        public override readonly string ToString() => $"bx:{x}, by:{y}";
+        public override readonly string ToString() => $"bx:{this.x},by:{this.y}";
 
         public readonly ChunkBlockPos ToChunkPos() {
             int cx = Level.Level.ToChunkX(this.x);
@@ -60,7 +59,7 @@ namespace SoulboundEngine.Client.World.Block {
             return new BlockPos(pos.x / scalar, pos.y / scalar);
         }
 
-        public readonly Vector2 GetCenter() => new(x + 0.5f, y + 0.5f);
+        public readonly Vector2 GetCenter() => new(this.x + 0.5f, this.y + 0.5f);
 
 		public override readonly bool Equals(object obj) {
             if (obj is BlockPos other) {
@@ -69,11 +68,27 @@ namespace SoulboundEngine.Client.World.Block {
             return false;
         }
 
+		public static BlockPos Parse(string s) {
+			string[] coords = s.Split(',');
+			if (coords.Length != 2) throw ParseException(s);
+
+			string bx = coords[0].Replace("bx:", string.Empty);
+			string by = coords[1].Replace("by:", string.Empty);
+
+			int x = int.Parse(bx);
+			int y = int.Parse(by);
+			return new BlockPos(x, y);
+		}
+
+		private static ArgumentException ParseException(string s) {
+			return new ArgumentException("Could not parse BlockPos: " + s);
+		}
+
         public override readonly int GetHashCode() {
             unchecked {
                 int hash = 17;
-                hash = hash * 31 + x;
-                hash = hash * 31 + y;
+                hash = hash * 31 + this.x;
+                hash = hash * 31 + this.y;
                 return hash;
             }
         }

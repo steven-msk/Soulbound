@@ -5,15 +5,17 @@ using UnityEngine;
 #nullable enable
 
 namespace SoulboundEngine.Client.World.Entity {
+	using Level = Level.Level;
+
 	public abstract class Entity {
 		public Guid guid { get; private set; }
 		private readonly EntityDescriptor descriptor;
-		protected Level.Level level;
+		protected Level level;
 		private Vector2 pos;
 		protected bool isAlive;
 		protected readonly TransformAdapter transformAdapter;
 
-		protected Entity(EntityDescriptor descriptor, Level.Level level) {
+		protected Entity(EntityDescriptor descriptor, Level level) {
 			this.transformAdapter = new TransformAdapter(this);
 			this.descriptor = descriptor;
 			this.level = level;
@@ -26,7 +28,7 @@ namespace SoulboundEngine.Client.World.Entity {
 			this.isAlive = true;
 		}
 
-		public virtual void FrameUpdate() {
+		public virtual void Tick() {
 		}
 
 		public virtual Vector2 GetPosition() => this.pos;
@@ -35,11 +37,13 @@ namespace SoulboundEngine.Client.World.Entity {
 			this.transformAdapter?.SetPosition(pos);
 		}
 
-		public ItemEntity DropItem(Level.Level level, IItemConvertible item) {
+		public Level GetLevel() => this.level;
+
+		public ItemEntity DropItem(Level level, IItemConvertible item) {
 			return this.DropStack(level, item.AsItem().CreateStack(1));
 		}
 
-		public ItemEntity DropStack(Level.Level level, ItemStack stack) {
+		public ItemEntity DropStack(Level level, ItemStack stack) {
 			ItemEntity entity = new(this, stack, level);
 			entity.SetPosition(this.GetPosition());
 			level.AddEntity(entity);
