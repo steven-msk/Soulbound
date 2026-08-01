@@ -1,3 +1,4 @@
+using SoulboundEngine.Client.Component;
 using SoulboundEngine.Core.Registry;
 using System;
 using UnityEngine;
@@ -5,19 +6,62 @@ using UnityEngine;
 #nullable enable
 
 namespace SoulboundEngine.Client.Item {
-	public struct ItemStack {
+	public struct ItemStack : IComponentHolder {
 		public static readonly ItemStack EMPTY = new();
+		private readonly MergedComponentMap components;
 		public readonly Item item;
 		public int count { get; private set; }
 
-		internal ItemStack(Item item, int count) {
-			this.item = item;
-			this.count = count;
-			this.CapCount(item.fullStackSize);
+		public ItemStack(IItemConvertible item)
+			: this(item, 1) {
 		}
 
-		internal ItemStack(RegistryEntry<Item> item, int count) 
+		public ItemStack(IItemConvertible item, int count)
+			: this(item, count, ComponentChanges.EMPTY){
+		}
+
+		public ItemStack(IItemConvertible item, int count, ComponentChanges componentChanges)
+			: this (item, count, MergedComponentMap.Create(item.AsItem().GetComponents(), componentChanges)) {
+		}
+
+		public ItemStack(RegistryEntry<Item> item) 
+			: this(item, 1) {
+		}
+
+		public ItemStack(RegistryEntry<Item> item, int count) 
 			: this(item.GetValue(), count) {
+		}
+
+		private ItemStack(IItemConvertible item, int count, MergedComponentMap components) {
+			this.item = item.AsItem();
+			this.count = count;
+			this.components = components;
+		}
+
+		public readonly IComponentMap GetComponents() => this.components;
+
+		public readonly ComponentChanges GetComponentChanges() => this.components.AsPatch();
+
+		public readonly IComponentMap GetDefaultComponents() => this.item?.GetComponents() ?? IComponentMap.EMPTY;
+
+		public readonly void ApplyChanges(ComponentChanges changes) {
+			this.components.SetChanges(changes);
+		}
+
+		public readonly void SetComponentsFrom(IComponentMap map) {
+			this.components.SetAll(map);
+		}
+
+		public readonly void Set<T>(ComponentType<T> type, T defaultValue, Func<T, T> applier) {
+			this.components.Set(type, applier(this.components.GetOrDefault(type, defaultValue)));
+		}
+
+		public readonly void Set<T, U>(ComponentType<T> type, T defaultValue, U change, Func<T, U, T> applier) {
+			this.components.Set(type, applier(this.components.GetOrDefault(type, defaultValue), change));
+		}
+
+		public readonly void ResetToDefaultComponents() {
+			this.components.ClearChanges();
 		}
 
 		public readonly bool IsFull() => this.count >= this.item.fullStackSize;
@@ -57,12 +101,16 @@ namespace SoulboundEngine.Client.Item {
 			return Equals(item, this.item);
 		}
 
-		public static bool AreEqual(ItemStack a, ItemStack b) {
-			return AreItemsEqual(a, b) && a.count == b.count;
-		}
-
 		public static bool AreItemsEqual(ItemStack a, ItemStack b) {
 			return a.IsOf(b.item) && b.IsOf(a.item);
+		}
+
+		public static bool AreItemsAndComponentsEqual(ItemStack a, ItemStack b) {
+			return AreItemsEqual(a, b) && a.components.Equals(b.components);
+		}
+
+		public static bool AreEqual(ItemStack a, ItemStack b) {
+			return AreItemsEqual(a, b) && a.count == b.count && AreItemsAndComponentsEqual(a, b);
 		}
 
 		public void FillFrom(ref ItemStack itemStack) {
@@ -81,7 +129,7 @@ namespace SoulboundEngine.Client.Item {
 	
 		public readonly ItemStack CopyWithCount(int newCount) {
 			if (this.IsOf(null)) return EMPTY;
-			return new ItemStack(this.item, newCount);
+			return new ItemStack(this.item, newCount, this.components.Copy());
 		}
 
 		public readonly ItemStack Copy() => this.CopyWithCount(this.count);
@@ -91,9 +139,35 @@ namespace SoulboundEngine.Client.Item {
 			return this.CopyWithCount(this.item.fullStackSize);
 		}
 
+		public ItemStack CopyAndEmpty() {
+			ItemStack stack = this;
+			this.count = 0;
+			return stack;
+		}
+
+		public readonly ItemStack CopyComponentsToNewStack(IItemConvertible item, int count) {
+			return new ItemStack(item, count, this.components.Copy());
+		}
+
+		public readonly void Copy<T>(ComponentType<T> type, IComponentsAccess from) {
+			this.components.Set(type, from.Get(type));
+		}
+
+		public T Set<T>(ComponentType<T> type, T? value) {
+			if (value == null) return this.Remove(type);
+			this.components.Set(type, value);
+			return value;
+		}
+
+		public T Remove<T>(ComponentType<T> type) {
+			return this.components.Remove(type);
+		}
+
 		public void CapCount(int maxCount) {
 			this.count = Mathf.Clamp(this.count, 0, maxCount);
 		}
+
+#pragma warning disable CS0809 // Obsolete member overrides non-obsolete member
 
 		[Obsolete("Cannot compare two item stacks with Equals", true)]
 		public override bool Equals(object obj) {
