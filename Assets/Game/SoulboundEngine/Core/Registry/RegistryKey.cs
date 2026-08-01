@@ -18,16 +18,16 @@ namespace SoulboundEngine.Core.Registry {
 			return new RegistryKey<T>(registry, value);
 		}
 
-		public RegistryKey<Registry<T>> GetRegistryRef() => OfRegistry(registry);
+		public RegistryKey<Registry<T>> GetRegistryRef() => OfRegistry(this.registry);
 
 		public static RegistryKey<Registry<T>> OfRegistry(Identifier registry) {
 			return new(Registries.ROOT_IDENTIFIER, registry);
 		}
 
-		public override int GetHashCode() => HashCode.Combine(registry, value);
+		public override int GetHashCode() => HashCode.Combine(this.registry, this.value);
 
 		public override string ToString() {
-			return $"registry_key[registry:\"{GetRegistryRef()}\", id:\"{value}\"]";
+			return $"registry_key[registry:\"{this.registry}\", id:\"{this.value}\"]";
 		}
 	}
 }

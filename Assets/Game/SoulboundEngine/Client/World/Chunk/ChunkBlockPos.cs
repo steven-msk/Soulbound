@@ -1,10 +1,11 @@
-using SoulboundEngine.Common.Json;
 using Newtonsoft.Json;
-using UnityEngine;
-using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.Common.Json;
+using UnityEngine;
 
 namespace SoulboundEngine.Client.World.Chunk {
+	using Level = Level.Level;
+
 	[JsonConverter(typeof(ChunkBlockPosJsonConverter))]
 	public struct ChunkBlockPos {
 		public int x;
@@ -17,11 +18,11 @@ namespace SoulboundEngine.Client.World.Chunk {
 			this.chunkX = chunkX;
 		}
 
-        public WorldChunk UnderlyingChunk(Level.Level level) => level.ChunkAt(this.ToBlock());
+        public readonly WorldChunk UnderlyingChunk(Level level) => level.ChunkAt(this.ToBlock());
 
         public static ChunkBlockPos FromBlockPos(BlockPos blockPos) {
-			int chunkX = Level.Level.ChunkXAt(blockPos.x);
-			int localX = Level.Level.ToChunkX(blockPos.x);
+			int chunkX = Level.ChunkXAt(blockPos.x);
+			int localX = Level.ToChunkX(blockPos.x);
 			return new ChunkBlockPos(localX, blockPos.y, chunkX);
 		}
 
@@ -35,31 +36,31 @@ namespace SoulboundEngine.Client.World.Chunk {
 			return pos1.x == pos2.x && pos1.y == pos2.y && pos1.chunkX == pos2.chunkX;
 		}
 
-		public static explicit operator Vector2Int(ChunkBlockPos pos) => new Vector2Int(pos.x, pos.y);
+		public static explicit operator Vector2Int(ChunkBlockPos pos) => new(pos.x, pos.y);
 
-		public override string ToString() => $"cx:{x}, cy:{y}, c:{chunkX}";
+		public readonly override string ToString() => $"cx:{this.x}, cy:{this.y}, c:{this.chunkX}";
 
-		public BlockPos ToBlock() => new BlockPos(this.x + this.chunkX * Level.Level.CHUNK_LENGTH, this.y);
+		public readonly BlockPos ToBlock() => new(this.x + this.chunkX * Level.CHUNK_LENGTH, this.y);
 
-		public int WorldYToIndex() => WorldYToIndex(this.y);
+		public readonly int WorldYToIndex() => WorldYToIndex(this.y);
 
 		public static int WorldYToIndex(int worldY) => worldY - WorldChunk.maxY;
 
 
-		public override bool Equals(object obj) {
-			if (!(obj is ChunkBlockPos)) {
+		public readonly override bool Equals(object obj) {
+			if (obj is not ChunkBlockPos) {
 				return false;
 			}
 			var other = (ChunkBlockPos)obj;
 			return this == other;
 		}
 
-		public override int GetHashCode() {
+		public readonly override int GetHashCode() {
 			unchecked {
 				int hash = 17;
-				hash = hash * 31 + x;
-				hash = hash * 31 + y;
-				hash = hash * 31 + chunkX;
+				hash = hash * 31 + this.x;
+				hash = hash * 31 + this.y;
+				hash = hash * 31 + this.chunkX;
 				return hash;
 			}
 		}

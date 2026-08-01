@@ -1,29 +1,54 @@
 using SoulboundEngine.Client.Render.Block;
+using SoulboundEngine.Client.Render.Entity;
 using SoulboundEngine.Client.World.Block;
 using SoulboundEngine.Client.World.Block.State;
-using SoulboundEngine.Client.World.Level;
+using SoulboundEngine.Client.World.Chunk;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
 #nullable enable
 
 namespace SoulboundEngine.Client.World.Render {
+	using Entity = Entity.Entity;
+	using Level = Level.Level;
+	using Logger = Debug.Logging.Logger;
+
 	public sealed class WorldRenderer {
 		private readonly BlockRenderManager blockRenderManager;
+		private readonly EntityRenderManager entityRenderManager;
+		private readonly ChunkOutlineRenderer chunkOutlineRenderer;
+		private readonly Queue<(BlockPos pos, BlockState? state)> stateChangedQueue = new();
 		private Vector2Int lastPivot;
 		private readonly RectInt renderView;
-		private Func<BlockPos, BlockState> blockStateSupplier = null!;
-		private readonly Tilemap tilemap;
+		private Tilemap? tilemap;
+		private Level? level;
+		private bool showingChunkFeatures;
 
-		public WorldRenderer(RectInt renderView, BlockRenderManager blockRenderManager, Tilemap tilemap) {
+		public WorldRenderer(RectInt renderView, BlockRenderManager blockRenderManager, EntityRenderManager entityRenderManager) {
 			this.renderView = renderView;
 			this.blockRenderManager = blockRenderManager;
-			this.tilemap = tilemap;
+			this.entityRenderManager = entityRenderManager;
+			this.chunkOutlineRenderer = new ChunkOutlineRenderer();
 		}
 
-		public void RenderView(Vector2 pivot) {
-			Vector2Int currentPivot = Vector2Int.FloorToInt(pivot);
+		// NOTE: current implementation relies on single tilemap rendering (one tilemap for the entire render view)
+		// later optimizations can replace this with tilemap render buffers or per-chunk tilemap meshes
+
+		public void Render() {
+			if (this.level == null) return;
+
+			this.RenderBlocks(this.level);
+			this.UpdateEntities(this.level);
+
+			this.ResolveQueue(this.stateChangedQueue, value => {
+				this.RenderBlock(value.pos, value.state);
+			});
+		}
+
+		private void RenderBlocks(Level level) {
+			Vector2Int currentPivot = Vector2Int.FloorToInt(level.GetPlayer().GetPosition());
 			if (this.lastPivot == currentPivot) return;
 
 			RectInt lastView = this.ToRect(this.lastPivot);
@@ -40,25 +65,20 @@ namespace SoulboundEngine.Client.World.Render {
 			pos = currentView.allPositionsWithin;
 			while (pos.MoveNext()) {
 				BlockPos blockPos = (BlockPos)pos.Current;
-				if (!Level.Level.IsInBounds(blockPos) || lastView.Contains(pos.Current)) {
+				if (!Level.IsInBounds(blockPos) || lastView.Contains(pos.Current)) {
 					continue;
 				}
 
-				BlockState? blockState = this.blockStateSupplier(blockPos);
+				BlockState? blockState = level.GetBlockState(blockPos);
 				this.RenderBlock(blockPos, blockState);
 			}
 		}
 
-		private void RenderBlock(BlockPos blockPos, BlockState blockState) {
+		private void RenderBlock(BlockPos blockPos, BlockState? blockState) {
+			if (this.tilemap == null) {
+				throw new InvalidOperationException("Cannot render block: tilemap is null");
+			}
 			this.blockRenderManager.Render(this.tilemap, blockPos, blockState);
-		}
-
-		public void UpdateModel(BlockPos blockPos, BlockState? blockState) {
-			blockState ??= Blocks.AIR.DefaultState;
-			this.RenderBlock(blockPos, this.IsInRenderView(blockPos)
-				? blockState
-				: Blocks.AIR.DefaultState
-			);
 		}
 
 		private RectInt ToRect(Vector2Int pivot) {
@@ -74,8 +94,118 @@ namespace SoulboundEngine.Client.World.Render {
 			return this.ToRect(this.lastPivot).Contains((Vector2Int)blockPos);
 		}
 
-		public void SetBlockStateSupplier(Func<BlockPos, BlockState> blockStateSupplier) {
-			this.blockStateSupplier = blockStateSupplier;
+		private void ResolveQueue<T>(Queue<T> queue, Action<T> action) {
+			if (queue.TryDequeue(out T value)) {
+				action(value);
+			}
+		}
+
+		private void BlockStateChanged(BlockPos blockPos, BlockState? oldState, BlockState? newState) {
+			if (!this.IsInRenderView(blockPos)) return;
+			this.stateChangedQueue.Enqueue((blockPos, newState));
+		}
+
+		private void EntityAdded(Entity entity) {
+			this.RenderEntity(entity);
+		}
+
+		private void EntityRemoved(Entity entity) {
+			this.DestroyEntity(entity);
+		}
+
+		private void RenderEntities(Level level) {
+			foreach (var entity in level.GetAllEntities()) {
+				this.RenderEntity(entity);
+			}
+		}
+
+		private void DestroyEntities(Level level) {
+			foreach (var entity in level.GetAllEntities()) {
+				this.DestroyEntity(entity);
+			}
+		}
+
+		private void UpdateEntities(Level level) {
+			foreach (var entity in level.GetAllEntities()) {
+				this.UpdateEntity(entity);
+			}
+			// temporary hook
+			level.GetPlayer().FrameUpdate();
+		}
+
+		private void RenderEntity(Entity entity) {
+			this.entityRenderManager.Render(entity);
+		}
+
+		private void DestroyEntity(Entity entity) {
+			this.entityRenderManager.Destroy(entity);
+		}
+
+		private void UpdateEntity(Entity entity) {
+			this.entityRenderManager.Update(entity);
+		}
+
+		private void OnChunkLoaded(WorldChunk chunk) {
+			if (this.showingChunkFeatures) {
+				this.chunkOutlineRenderer.ShowOutline(chunk);
+			}
+		}
+
+		private void OnChunkUnloaded(WorldChunk chunk) {
+			this.chunkOutlineRenderer.HideOutline(chunk);
+		}
+
+		public void ShowChunkFeatures() {
+			this.showingChunkFeatures = true;
+			if (this.level == null) return;
+			foreach (var chunk in this.level.GetLoadedChunks()) {
+				this.chunkOutlineRenderer.ShowOutline(chunk);
+			}
+		}
+
+		public void HideChunkFeatures() {
+			this.showingChunkFeatures = false;
+			this.chunkOutlineRenderer.Clear();
+		}
+
+		public void SetLevel(Level? level) {
+			this.RemoveLevelEvents();
+			if (this.level != null) this.DestroyEntities(this.level);
+			this.level = level;
+			if (level != null) this.RenderEntities(level);
+			this.AddLevelEvents();
+		}
+
+		public void Reset() {
+			this.lastPivot = Vector2Int.zero;
+			if (this.level != null) this.DestroyEntities(this.level);
+			if (this.tilemap != null) this.tilemap.ClearAllTiles();
+			this.showingChunkFeatures = false;
+		}
+
+		private void AddLevelEvents() {
+			if (this.level == null) return;
+			this.level.blockStateChanged += this.BlockStateChanged;
+			this.level.entityAdded += this.EntityAdded;
+			this.level.entityRemoved += this.EntityRemoved;
+			this.level.chunkLoaded += this.OnChunkLoaded;
+			this.level.chunkUnloaded += this.OnChunkUnloaded;
+		}
+
+		private void RemoveLevelEvents() {
+			if (this.level == null) return;
+			this.level.blockStateChanged -= this.BlockStateChanged;
+			this.level.entityAdded -= this.EntityAdded;
+			this.level.entityRemoved -= this.EntityRemoved;
+			this.level.chunkLoaded -= this.OnChunkLoaded;
+			this.level.chunkUnloaded -= this.OnChunkUnloaded;
+		}
+
+		public void SetTilemap(Tilemap tilemap) {
+			if (this.tilemap != null) {
+				this.tilemap.ClearAllTiles();
+			}
+			this.tilemap = tilemap;
 		}
 	}
 }

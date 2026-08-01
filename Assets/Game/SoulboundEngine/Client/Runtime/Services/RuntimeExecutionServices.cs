@@ -25,8 +25,8 @@ namespace SoulboundEngine.Client.Runtime.Services {
 			get => this._level ?? throw new InvalidOperationException("Runtime level execution only available within world session");
 		}
 
-		public void SetWorldSessionState(WorldSession session) {
-			this._player = new RuntimePlayerExecutionService(session.player);
+		public void SetWorldSessionState(WorldSession session, PlayerEntity player) {
+			this._player = new RuntimePlayerExecutionService(player);
 			this._entity = new RuntimeEntityExecutionService(session.level);
 			this._level = session.level;
 		}

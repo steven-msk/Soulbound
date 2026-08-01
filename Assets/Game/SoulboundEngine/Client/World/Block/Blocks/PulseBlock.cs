@@ -1,12 +1,11 @@
+using SoulboundEngine.Client.World.Block.Entity;
 using SoulboundEngine.Client.World.Block.State;
-using SoulboundEngine.Client.World.Block.TileEntity;
-using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Common;
 using SoulboundEngine.Core.States;
 
 namespace SoulboundEngine.Client.World.Block {
 	[PROTOTYPICAL]
-	public sealed class PulseBlock : Block {
+	public sealed class PulseBlock : Block, ITileEntityProvider {
 		public static readonly Property<bool> on = BoolProperty.Of("on");
 
 		public PulseBlock(Settings settings) 
@@ -18,13 +17,8 @@ namespace SoulboundEngine.Client.World.Block {
 			builder.Add(on);
 		}
 
-		public override TileEntity.TileEntity GetTileEntity(Level.Level level, BlockPos blockPos) {
-			return new PulseEntity(TileEntityTypes.PULSE, level, blockPos);
+		public TileEntity CreateTileEntity(BlockPos pos, BlockState state) {
+			return PulseEntity.Create(pos, state);
 		}
-
-		public override bool HasTileEntity(Level.Level level, BlockPos blockPos, BlockState blockState) {
-			return true;
-		}
-
 	}
 }

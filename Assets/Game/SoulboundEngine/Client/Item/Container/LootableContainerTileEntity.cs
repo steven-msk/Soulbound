@@ -1,9 +1,10 @@
-﻿using SoulboundEngine.Client.Loot;
+﻿using Newtonsoft.Json.Linq;
+using SoulboundEngine.Client.Loot;
 using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.UI.Screen;
 using SoulboundEngine.Client.World.Block;
-using SoulboundEngine.Client.World.Block.TileEntity;
-using SoulboundEngine.Client.World.Level;
+using SoulboundEngine.Client.World.Block.Entity;
+using SoulboundEngine.Client.World.Block.State;
 using SoulboundEngine.Core.Registry;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,8 +17,8 @@ namespace SoulboundEngine.Client.Item.Container {
 		protected RegistryKey<LootTable>? lootTable;
 		protected long lootTableSeed;
 
-		protected LootableContainerTileEntity(TileEntityType tileEntityType, Level level, BlockPos blockPos)
-			: base(tileEntityType, level, blockPos) {
+		protected LootableContainerTileEntity(TileEntityType tileEntityType, BlockPos blockPos, BlockState blockState)
+			: base(tileEntityType, blockPos, blockState) {
 		}
 
 		public virtual bool CanPlayerUse(PlayerEntity player) {
@@ -40,9 +41,6 @@ namespace SoulboundEngine.Client.Item.Container {
 		public void SetLootTable(RegistryKey<LootTable>? lootTable) => this.lootTable = lootTable;
 		public RegistryKey<LootTable>? GetLootTable() => this.lootTable;
 
-		public Level? GetLevel() => this.level;
-		public BlockPos GetBlockPos() => this.blockPos;
-
 		public virtual void OnOpened(PlayerEntity player) {
 			if (this.lootTable != null) {
 				this.GenerateLoot(player);
@@ -51,6 +49,25 @@ namespace SoulboundEngine.Client.Item.Container {
 		}
 
 		public virtual void OnClosed(PlayerEntity player) {
+		}
+
+		public override void Write(JObject json) {
+			base.Write(json);
+			if (this.lootTable != null) {
+				json["lootTable"] = this.lootTable.value.ToString();
+				json["lootTableSeed"] = this.lootTableSeed;
+			}
+		}
+
+		public override void Read(JToken json) {
+			base.Read(json);
+			string lootTableKey = ((string?)json["lootTable"]) ?? string.Empty;
+			long lootTableSeed = (long?)json["lootTableSeed"] ?? 0;
+
+			if (!string.IsNullOrEmpty(lootTableKey)) {
+				RegistryKey<LootTable> key = LootTables.Get(lootTableKey);
+				this.SetLootTable(key, lootTableSeed);
+			}
 		}
 	}
 }

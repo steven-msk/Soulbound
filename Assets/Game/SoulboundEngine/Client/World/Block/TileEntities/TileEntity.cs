@@ -1,19 +1,45 @@
-using SoulboundEngine.Client.World.Level;
+using Newtonsoft.Json.Linq;
+using SoulboundEngine.Client.World.Block.State;
 
-namespace SoulboundEngine.Client.World.Block.TileEntity {
+#nullable enable
+
+namespace SoulboundEngine.Client.World.Block.Entity {
+	using Level = Level.Level;
+
 	public abstract class TileEntity {
-		protected readonly Level.Level level;
+		protected Level? level;
 		public readonly BlockPos blockPos;
 		protected readonly TileEntityType tileEntityType;
+		protected readonly BlockState blockState;
 
-		public TileEntity(TileEntityType tileEntityType, Level.Level level, BlockPos blockPos) {
+		public TileEntity(TileEntityType tileEntityType, BlockPos blockPos, BlockState blockState) {
 			this.tileEntityType = tileEntityType;
-			this.level = level;
 			this.blockPos = blockPos;
+			this.blockState = blockState;
 		}
 
 		public virtual void OnDispose() { }
 
-		public TileEntityType GetTileEntityType() => tileEntityType;
+		public TileEntityType GetTileEntityType() => this.tileEntityType;
+
+		public void SetLevel(Level? level) => this.level = level;
+		public Level? GetLevel() => this.level;
+
+
+		public BlockPos GetBlockPos() => this.blockPos;
+
+		public BlockState GetBlockState() => this.blockState;
+
+		public bool HasLevel() => this.level != null;
+
+		public virtual void Write(JObject json) {
+		}
+
+		public virtual void Read(JToken json) {
+		}
+
+		public override string ToString() {
+			return TileEntityType.GetId(this.tileEntityType)?.ToString() ?? "null";
+		}
 	}
 }

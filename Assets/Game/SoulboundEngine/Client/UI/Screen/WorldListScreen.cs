@@ -48,7 +48,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 				TextField seedField = root.Get<TextField>(SEED_FIELD_ELEMENT);
 
 				if (!string.IsNullOrEmpty(nameField.value) && this.SpaceAvailable() > 0) {
-					int seed = WorldManager.GetRandomSeed();
+					int seed = SoulboundClient.GetRandomWorldSeed();
 					string seedText = seedField.value;
 					
 					if (!string.IsNullOrEmpty(seedText)) {
