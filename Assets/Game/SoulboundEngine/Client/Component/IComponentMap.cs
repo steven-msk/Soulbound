@@ -5,6 +5,8 @@ using System.Linq;
 
 namespace SoulboundEngine.Client.Component {
 	public interface IComponentMap : IEnumerable<Component>, IComponentsAccess {
+		public static IComponentMap EMPTY = Create().Build();
+
 		ISet<ComponentType> GetTypes();
 
 		public static Builder Create() => new();
@@ -73,7 +75,7 @@ namespace SoulboundEngine.Client.Component {
 		}
 
 		public static bool IsEmpty(this IComponentMap map) {
-			return map.GetTypes().Count > 0;
+			return map.GetTypes().Count == 0;
 		}
 
 		public static int Size(this IComponentMap map) {

@@ -18,7 +18,13 @@ namespace SoulboundEngine.Client.Component {
 			this.changedComponents = changedComponents;
 		}
 
-		public void ApplyChanges(ComponentChanges changes) {
+		public static MergedComponentMap Create(IComponentMap baseMap, ComponentChanges changes) {
+			MergedComponentMap map = new(baseMap);
+			map.SetChanges(changes);
+			return map;
+		}
+
+		public void SetChanges(ComponentChanges changes) {
 			this.changedComponents = new Dictionary<ComponentType, object>(changes.GetChanges());
 		}
 
@@ -62,11 +68,23 @@ namespace SoulboundEngine.Client.Component {
 			return old;
 		}
 
-		public void Clear() {
+		public void ClearChanges() {
 			this.changedComponents.Clear();
 		}
 
-		public bool IsEmpty() => this.changedComponents.Count == 0;
+		public bool HasAnyChanges() => this.changedComponents.Count == 0;
+
+		public bool HasChanged(ComponentType type) {
+			return this.changedComponents.ContainsKey(type);
+		}
+
+		public void SetAll(IComponentMap components) {
+			foreach (var component in components) {
+				ComponentType type = component.boxedType;
+				object value = component.boxedValue;
+				this.changedComponents[type] = value;
+			}
+		}
 
 		public ISet<ComponentType> GetTypes() {
 			HashSet<ComponentType> types = new(this.baseMap.GetTypes());
