@@ -37,6 +37,7 @@ namespace SoulboundEngine.Client {
 	using Object = UnityEngine.Object;
 	using RectInt = UnityEngine.RectInt;
 #if !UNITY_EDITOR
+	using Application = UnityEngine.Application;
 	using LogType = UnityEngine.LogType;
 	using StackTraceLogType = UnityEngine.StackTraceLogType;
 #endif
