@@ -1,3 +1,4 @@
+using SoulboundEngine.Client.Component;
 using SoulboundEngine.Client.World.Block;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,9 +10,11 @@ namespace SoulboundEngine.Client.Item {
 		public const int DEFAULT_FULL_STACK = 256;
 		public static readonly Dictionary<Block, Item> blockItems = new();
 		private readonly Settings settings;
+		private readonly IComponentMap components;
 
 		public Item(Settings settings) {
 			this.settings = settings;
+			this.components = settings.components.Build();
 		}
 
 		public string name => this.settings.name;
@@ -22,8 +25,8 @@ namespace SoulboundEngine.Client.Item {
 			blockItems.Add(block, this);
 		}
 
-		public virtual ItemStack CreateStack(int quantity = 1) {
-			return new ItemStack(this, Mathf.Clamp(quantity, 0, this.fullStackSize));
+		public virtual ItemStack GetDefaultStack(int count = 1) {
+			return new ItemStack(this, Mathf.Clamp(count, 0, this.fullStackSize));
 		}
 
 		public override string ToString() {
@@ -32,7 +35,10 @@ namespace SoulboundEngine.Client.Item {
 
 		public Item AsItem() => this;
 
+		public IComponentMap GetComponents() => this.components;
+
 		public sealed class Settings {
+			public readonly IComponentMap.Builder components = IComponentMap.Create();
 			public string name { get; private set; }
 			public int fullStackSize { get; private set; } = DEFAULT_FULL_STACK;
 
@@ -52,6 +58,11 @@ namespace SoulboundEngine.Client.Item {
 
 			public Settings StackUpTo(int count) {
 				this.fullStackSize = count;
+				return this;
+			}
+
+			public Settings Component<T>(ComponentType<T> component, T value) {
+				this.components.Add(component, value);
 				return this;
 			}
 

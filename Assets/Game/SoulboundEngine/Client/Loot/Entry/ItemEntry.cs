@@ -24,7 +24,7 @@ namespace SoulboundEngine.Client.Loot.Entry {
 		}
 
 		protected override void GenerateLoot(Action<ItemStack> lootConsumer, LootContext context) {
-			ItemStack stack = this.item.GetValue().CreateStack();
+			ItemStack stack = this.item.GetValue().GetDefaultStack();
 			lootConsumer.Invoke(stack);
 		}
 	}

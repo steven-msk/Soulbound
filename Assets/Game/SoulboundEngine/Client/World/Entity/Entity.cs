@@ -40,7 +40,7 @@ namespace SoulboundEngine.Client.World.Entity {
 		public Level GetLevel() => this.level;
 
 		public ItemEntity DropItem(Level level, IItemConvertible item) {
-			return this.DropStack(level, item.AsItem().CreateStack(1));
+			return this.DropStack(level, item.AsItem().GetDefaultStack(1));
 		}
 
 		public ItemEntity DropStack(Level level, ItemStack stack) {

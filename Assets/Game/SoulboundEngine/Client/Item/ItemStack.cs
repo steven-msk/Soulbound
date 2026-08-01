@@ -21,7 +21,7 @@ namespace SoulboundEngine.Client.Item {
 		}
 
 		public ItemStack(IItemConvertible item, int count, ComponentChanges componentChanges)
-			: this (item, count, MergedComponentMap.Create(IComponentMap.EMPTY, componentChanges)) {
+			: this (item, count, MergedComponentMap.Create(item.AsItem().GetComponents(), componentChanges)) {
 		}
 
 		public ItemStack(RegistryEntry<Item> item) 
@@ -42,6 +42,8 @@ namespace SoulboundEngine.Client.Item {
 
 		public readonly ComponentChanges GetComponentChanges() => this.components.AsPatch();
 
+		public readonly IComponentMap GetDefaultComponents() => this.item?.GetComponents() ?? IComponentMap.EMPTY;
+
 		public readonly void ApplyChanges(ComponentChanges changes) {
 			this.components.SetChanges(changes);
 		}
@@ -56,6 +58,10 @@ namespace SoulboundEngine.Client.Item {
 
 		public readonly void Set<T, U>(ComponentType<T> type, T defaultValue, U change, Func<T, U, T> applier) {
 			this.components.Set(type, applier(this.components.GetOrDefault(type, defaultValue), change));
+		}
+
+		public readonly void ResetToDefaultComponents() {
+			this.components.ClearChanges();
 		}
 
 		public readonly bool IsFull() => this.count >= this.item.fullStackSize;
@@ -143,13 +149,15 @@ namespace SoulboundEngine.Client.Item {
 			return new ItemStack(item, count, this.components.Copy());
 		}
 
-		public void Copy<T>(ComponentType<T> type, IComponentsAccess from) {
+		public readonly void Copy<T>(ComponentType<T> type, IComponentsAccess from) {
 			this.components.Set(type, from.Get(type));
 		}
 
 		public void CapCount(int maxCount) {
 			this.count = Mathf.Clamp(this.count, 0, maxCount);
 		}
+
+#pragma warning disable CS0809 // Obsolete member overrides non-obsolete member
 
 		[Obsolete("Cannot compare two item stacks with Equals", true)]
 		public override bool Equals(object obj) {

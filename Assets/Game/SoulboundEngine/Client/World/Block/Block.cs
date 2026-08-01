@@ -69,7 +69,7 @@ namespace SoulboundEngine.Client.World.Block {
 		}
 
 		private static Func<BlockState, List<ItemStack>> DropSingle() => blockState => {
-			return new List<ItemStack>() { blockState.block.AsItem().CreateStack(1) };
+			return new List<ItemStack>() { blockState.block.AsItem().GetDefaultStack(1) };
 		};
 
 		private static Func<BlockState, List<ItemStack>> DropAir() => _ => {

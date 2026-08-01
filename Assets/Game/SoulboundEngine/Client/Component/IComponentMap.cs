@@ -32,12 +32,23 @@ namespace SoulboundEngine.Client.Component {
 
 			IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 
-			public override int GetHashCode() {
-				return HashCode.Combine(this.map);
+			public override bool Equals(object obj) {
+				if (obj is not DictionaryBackedComponentMap other) return false;
+				if (this.map.Count != other.map.Count) return false;
+				foreach (var (key, value) in this.map) {
+					if (!other.map.TryGetValue(key, out var otherValue) || !Equals(value, otherValue)) {
+						return false;
+					}
+				}
+				return true;
 			}
 
-			public override bool Equals(object obj) {
-				return obj is DictionaryBackedComponentMap other && other.map.Equals(this.map);
+			public override int GetHashCode() {
+				int hash = 0;
+				foreach (var kvp in this.map.OrderBy(k => k.Key.GetHashCode())) {
+					hash = HashCode.Combine(hash, kvp.Key, kvp.Value);
+				}
+				return hash;
 			}
 		}
 
@@ -47,7 +58,7 @@ namespace SoulboundEngine.Client.Component {
 			public IComponentMap Build() => Build(this.map);
 
 			private static IComponentMap Build(Dictionary<ComponentType, object> map) {
-				return new DictionaryBackedComponentMap(map);
+				return new DictionaryBackedComponentMap(new Dictionary<ComponentType, object>(map));
 			}
 
 			public Builder Add<T>(ComponentType<T> type, T value) {

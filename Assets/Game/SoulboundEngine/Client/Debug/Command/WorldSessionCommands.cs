@@ -103,9 +103,9 @@ namespace SoulboundEngine.Client.Debug.Commands {
 				ItemStack[] stacks = new ItemStack[stackCount];
 				int i;
 				for (i = 0; i < fullStacks; i++) {
-					stacks[i] = item.CreateStack(item.fullStackSize);
+					stacks[i] = item.GetDefaultStack(item.fullStackSize);
 				}
-				if (remainder > 0) stacks[i] = item.CreateStack(remainder);
+				if (remainder > 0) stacks[i] = item.GetDefaultStack(remainder);
 
 				for (int j = 0; j < stacks.Length; j++) {
 					ctx.Source.execServices.Player.TryAddItemStack(stacks[j]);
