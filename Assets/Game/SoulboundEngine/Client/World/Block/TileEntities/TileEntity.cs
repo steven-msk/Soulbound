@@ -25,6 +25,7 @@ namespace SoulboundEngine.Client.World.Block.Entity {
 		public void SetLevel(Level? level) => this.level = level;
 		public Level? GetLevel() => this.level;
 
+
 		public BlockPos GetBlockPos() => this.blockPos;
 
 		public BlockState GetBlockState() => this.blockState;
@@ -35,6 +36,10 @@ namespace SoulboundEngine.Client.World.Block.Entity {
 		}
 
 		public virtual void Read(JToken json) {
+		}
+
+		public override string ToString() {
+			return TileEntityType.GetId(this.tileEntityType)?.ToString() ?? "null";
 		}
 	}
 }

@@ -6,7 +6,6 @@ using SoulboundEngine.Client.World.Block.State;
 using SoulboundEngine.Client.World.Chunk;
 using SoulboundEngine.Client.World.Entity;
 using SoulboundEngine.Client.World.Generation;
-using SoulboundEngine.Client.World.Render;
 using SoulboundEngine.Common;
 using SoulboundEngine.Common.Math;
 using SoulboundEngine.Common.Math.Random;
@@ -20,6 +19,7 @@ using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 #nullable enable
 
 namespace SoulboundEngine.Client.World.Level {
+	using Block = Block.Block;
 	using Entity = Entity.Entity;
 
 	public sealed class Level : ILevelExecutionService, IEntityManager {
@@ -33,7 +33,6 @@ namespace SoulboundEngine.Client.World.Level {
 		public readonly int seed;
 		private readonly Dictionary<int, WorldChunk> loadedChunks = new();
 		private readonly Dictionary<int, WorldChunk> generatedChunks = new(); 
-		private readonly ChunkOutlineRenderer chunkOutlineRenderer = new();
 		[Obsolete] private readonly ConcurrentDictionary<int, List<OnChunkGenerated>> deferredGenerations = new();
 		private readonly Dictionary<int, ChunkGenData> chunkGenData = new();
 		private readonly RandomSequences randomSequences;
@@ -41,8 +40,8 @@ namespace SoulboundEngine.Client.World.Level {
 		public event Action<BlockPos, BlockState?, BlockState?>? blockStateChanged;
 		public event Action<Entity>? entityAdded;
 		public event Action<Entity>? entityRemoved;
-		public event Action<WorldChunk> chunkLoaded;
-		public event Action<WorldChunk> chunkUnloaded;
+		public event Action<WorldChunk>? chunkLoaded;
+		public event Action<WorldChunk>? chunkUnloaded;
 
 		private readonly BiomeMap biomeMap;
 		private readonly Heightmap heightmap;
@@ -64,9 +63,42 @@ namespace SoulboundEngine.Client.World.Level {
 		}
 
 		// known issue: current chunk generation takes way too long (60-65ms per chunk in one tick)
-		public void GenerateTerrain() {
+		public void GenerateInitialTerrain(bool placeBlocks) {
+			Logger.LogInfo("Generating terrain with seed {}", this.seed);
 			for (int cx = -RENDER_DISTANCE; cx <= RENDER_DISTANCE; cx++) {
-				this.GenerateNewChunk(cx);
+				this.GenerateNewChunk(cx, placeBlocks);
+			}
+		}
+
+		public void ApplyDeserializedBlocks(Dictionary<int, int[][]> stateIDsByChunk) {
+			foreach (var (chunkX, stateIDs) in stateIDsByChunk) {
+				if (!this.generatedChunks.TryGetValue(chunkX, out WorldChunk chunk)) {
+					chunk = this.GenerateNewChunk(chunkX, false);
+					this.generatedChunks[chunkX] = chunk;
+				}
+				chunk.SetAllBlocks(stateIDs);
+			}
+		}
+
+		public void ApplyDeserializedTileEntities(IEnumerable<TileEntity> tileEntities) {
+			foreach (var tileEntity in tileEntities) {
+				BlockPos blockPos = tileEntity.GetBlockPos();
+				ChunkBlockPos chunkPos = blockPos.ToChunkPos();
+				WorldChunk? chunk = this.GetChunk(chunkPos.chunkX);
+				if (chunk == null) {
+					Logger.LogError("Chunk {} is not generated, yet a TileEntity was deserialized in it: {} at {}",
+						chunkPos.x, tileEntity, blockPos);
+					continue;
+				}
+
+				if (!chunk.ValidateTileEntity(tileEntity)) continue;
+				chunk.AddTileEntityValidated(tileEntity);
+			}
+		}
+
+		public void SyncBlocksWithTileEntities() {
+			foreach (var chunk in this.generatedChunks.Values) {
+				chunk.SyncBlocksWithTileEntities();
 			}
 		}
 
@@ -76,13 +108,6 @@ namespace SoulboundEngine.Client.World.Level {
 			this.AddEntity(player);
 			SoulboundClient.Instance.InputManager.AddHandler(player);
 			player.SetPosition(this.GetWorldSpawnPoint() + Vector2.up * 2f);
-			Logger.LogInfo("set by start session player.GetPosition(): {}", player.GetPosition());
-
-
-			// TEMPORARY
-			List<TileEntity> tileEntities = TileEntitySerializer.ReadAll().ToList();
-			string formatted = string.Join("\n", tileEntities.Select(e => string.Format("\t\t-{0}: {1}", TileEntityType.GetId(e.GetTileEntityType()), e.GetBlockPos())));
-			Logger.LogInfo("Deserialized {} tile entities. No replenishing due to unavailable BlockState serialization\n{}", tileEntities.Count, formatted);
 		}
 
 		// known issue: inconsistent world update loop design
@@ -116,17 +141,17 @@ namespace SoulboundEngine.Client.World.Level {
 			return new Vector2(0f, this.GetSurfaceAirY(0));
 		}
 
-		private WorldChunk GenerateNewChunk(int chunkX) {
+		private WorldChunk GenerateNewChunk(int chunkX, bool placeBlocks) {
 			WorldChunk chunk = new(this, chunkX);
 			this.generatedChunks[chunkX] = chunk;
 
-			chunk.Generate(this.biomeMap, this.heightmap, this.cavemap, out ChunkGenData genData);
+			chunk.Generate(this.biomeMap, this.heightmap, this.cavemap, placeBlocks, out ChunkGenData genData);
 			this.chunkGenData[chunkX] = genData;
 
-			this.BlendBiomeBorder(genData.biomePartition);
+			if (placeBlocks) this.BlendBiomeBorder(genData.biomePartition);
 
 			this.HandleOnChunkGenerated(chunkX);
-			chunk.PostProcess(genData, this);
+			if (placeBlocks) chunk.PostProcess(genData, this);
 
 			return chunk;
 		}
@@ -184,7 +209,7 @@ namespace SoulboundEngine.Client.World.Level {
 		[PROTOTYPICAL]
 		public void SetBlockState(BlockPos blockPos, BlockState? blockState) {
 			BlockState? oldState = this.GetBlockState(blockPos);
-			WorldChunk chunk = this.ChunkAt(blockPos);
+			WorldChunk? chunk = this.ChunkAt(blockPos);
 			if (chunk == null) {
 				Logger.LogError("Block pos not valid: " + blockPos);
 				return;
@@ -214,7 +239,7 @@ namespace SoulboundEngine.Client.World.Level {
 				if (chunk == null) return;
 
 				BlockState? blockState = this.GetBlockState(neighborPos);
-				Block.Block block = blockState?.block ?? Blocks.AIR;
+				Block block = blockState?.block ?? Blocks.AIR;
 
 				if (block is INeighborUpdateHandler neighborUpdateHandler) {
 					neighborUpdateHandler.OnNeighborChanged(this, neighborPos, blockPos);
@@ -282,7 +307,7 @@ namespace SoulboundEngine.Client.World.Level {
 					WorldChunk chunk;
 
 					if (!this.generatedChunks.ContainsKey(chunkX)) {
-						chunk = this.GenerateNewChunk(chunkX);
+						chunk = this.GenerateNewChunk(chunkX, true);
 						this.generatedChunks[chunkX] = chunk;
 					} else {
 						chunk = this.generatedChunks[chunkX];
@@ -304,10 +329,6 @@ namespace SoulboundEngine.Client.World.Level {
 
 		public void OnSessionStop() {
 			SoulboundClient.Instance.InputManager.RemoveHandler(this.player);
-
-			// TEMPORARY
-			IEnumerable<TileEntity> tileEntities = this.loadedChunks.Values.SelectMany(c => c.GetTileEntities());
-			TileEntitySerializer.WriteAll(tileEntities);
 		}
 
 		public BlockState? GetBlockState(BlockPos blockPos) {
@@ -320,7 +341,7 @@ namespace SoulboundEngine.Client.World.Level {
 			return chunk?.TileEntityAt(blockPos);
 		}
 
-		public Block.Block? GetBlock(BlockPos blockPos) {
+		public Block? GetBlock(BlockPos blockPos) {
 			BlockState? blockState = this.GetBlockState(blockPos);
 			return blockState?.block;
 		}

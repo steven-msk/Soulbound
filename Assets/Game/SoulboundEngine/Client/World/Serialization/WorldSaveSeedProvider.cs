@@ -1,10 +1,10 @@
 ﻿using SoulboundEngine.Client.World.Generation;
 
 namespace SoulboundEngine.Client.World {
-	public sealed class SeedProvider : ISeedProvider {
+	public sealed class WorldSaveSeedProvider : ISeedProvider {
 		private readonly WorldSave worldSave;
 
-		public SeedProvider(WorldSave save) {
+		public WorldSaveSeedProvider(WorldSave save) {
 			this.worldSave = save;
 		}
 

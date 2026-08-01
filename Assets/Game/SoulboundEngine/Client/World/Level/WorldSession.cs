@@ -1,4 +1,3 @@
-using SoulboundEngine.Client.World.Serialization;
 using System;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -6,7 +5,7 @@ using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.World.Level {
 	public struct WorldSession {
-		public WorldDump? deserializationData;
+		public WorldSave save;
 		public LevelManager levelManager;
 		public Level level;
 		[Obsolete] public Canvas canvas;

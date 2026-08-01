@@ -6,6 +6,7 @@ using SoulboundEngine.Client.Debug.Logging.Console;
 using SoulboundEngine.Client.Debug.Metrics;
 using SoulboundEngine.Client.Debug.Metrics.View;
 using SoulboundEngine.Client.Input;
+using SoulboundEngine.Client.IO;
 using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.Recipe;
 using SoulboundEngine.Client.Recipe.Asset;
@@ -33,7 +34,6 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client {
-	using Application = UnityEngine.Application;
 	using Object = UnityEngine.Object;
 	using RectInt = UnityEngine.RectInt;
 #if !UNITY_EDITOR
@@ -43,6 +43,7 @@ namespace SoulboundEngine.Client {
 
 	public sealed class SoulboundClient : IInputEventHandler, IWorldAccessor, IDebugMetricsSource {
 		const int INPUT_QUEUE_BUFFER_CAPACITY = 128;
+		const string SAVES_ROOT_FOLDER = "saves";
 		private static SoulboundClient instance;
 		private readonly GameConfig config;
 		private readonly PlayerInputActions inputActions;
@@ -55,7 +56,8 @@ namespace SoulboundEngine.Client {
 		private readonly WorldSessionCommands worldSessionCommands;
 		private readonly RuntimeDataProvider runtimeDataProvider;
 		private readonly RuntimeExecutionServices runtimeExecutionServices;
-		private readonly WorldManager worldManager;
+		private readonly WorldSavesManager worldSavesManager;
+		private readonly WorldSerializer worldSerializer;
 		private readonly UIHandler uiHandler;
 		private readonly UIAudioEventBank uiAudioEventBank;
 		private readonly WorldAudioEventBank worldAudioEventBank;
@@ -104,11 +106,9 @@ namespace SoulboundEngine.Client {
 			Application.SetStackTraceLogType(LogType.Assert, StackTraceLogType.None);
 #endif
 
-			// prototypical; will not pass to alpha prod
-			var worldSerializer = new JsonSerializer<WorldDump>(Soulbound.globalJsonSettings);
-			var worldSerializationPipeline = new SerializationPipeline<WorldDump>(worldSerializer);
-			var service = new WorldSerializationService(this.GetWorldSaveStrategy(), worldSerializationPipeline);
-			this.worldManager = new WorldManager(service);
+			File savesFile = UnityPaths.PersistentDataRoot.Combine(SAVES_ROOT_FOLDER);
+			this.worldSavesManager = new WorldSavesManager(savesFile, WorldSerializer.SEED_FILE_NAME);
+			this.worldSerializer = new WorldSerializer();
 
 			// scene may not be available at this time
 			// TODO: change UIHandler init
@@ -173,22 +173,19 @@ namespace SoulboundEngine.Client {
 				seed = this.config.dev.seed;
 				world = this.config.dev.devWorld;
 			}
-			this.worldManager.CreateNewWorld(world, seed);
+			this.worldSavesManager.CreateNewWorld(world, seed, this.worldSerializer);
 		}
 
 		public void EnterWorld(string world) {
 			if (this.IsWorldSessionActive()) return;
 
-			WorldSave? save = this.worldManager.ListSaves().FirstOrDefault(s => s.name == world);
-			if (save == null) {
-				throw new ArgumentException($"World not found: '{world}'");
-			}
+			WorldSave save = this.worldSavesManager.GetSave(world, this.worldSerializer);
+			WorldSaveSeedProvider seedProvider = new(save);
+			WorldLoader worldLoader = new(this, seedProvider, save, this.worldSerializer);
 
+			this.worldSavesManager.OnWorldEntered(world);
 			this.uiHandler.FlushScreens();
 			this.worldRenderer.Reset();
-
-			SeedProvider seedProvider = new(save.GetValueOrDefault());
-			WorldLoader worldLoader = new(this, seedProvider);
 
 			worldLoader.LoadWorld(
 				SceneManager.LoadSceneAsync(this.config.unity.worldScene).ToUniTask(),
@@ -219,8 +216,10 @@ namespace SoulboundEngine.Client {
 		public void QuitActiveWorld() {
 			if (!this.IsWorldSessionActive()) return;
 
-			LevelManager levelManager = this.activeWorldSession?.levelManager!;
+			WorldSession session = this.activeWorldSession.Value;
+			LevelManager levelManager = session.levelManager;
 			levelManager.StopSession();
+			this.worldSerializer.Serialize(levelManager, this.worldSavesManager.ToSaveDirectory(session.save));
 			this.player = null;
 			this.worldRenderer.SetLevel(null);
 			this.inputManager.RemoveHandler(levelManager);
@@ -246,11 +245,11 @@ namespace SoulboundEngine.Client {
 		}
 
 		public IEnumerable<WorldSave> ListWorldSaves() {
-			return this.worldManager.ListSaves();
+			return this.worldSavesManager.ListSaves(this.worldSerializer);
 		}
 
 		public void DeleteWorld(string world) {
-			this.worldManager.DeleteWorld(world);
+			this.worldSavesManager.DeleteWorld(world);
 		}
 
 		public bool IsWorldSessionActive() => this.activeWorldSession != null;
@@ -285,10 +284,6 @@ namespace SoulboundEngine.Client {
 			};
 		}
 
-		private IWorldSaveStrategy GetWorldSaveStrategy() {
-			return new WorldSaveStrategy(this.config.file.savesFolder, Application.persistentDataPath);
-		}
-
 		void IDebugMetricsSource.CollectDebugData(ref DebugMetricsBuilder builder) {
 			PerformanceMetrics metrics = this.performanceMetrics;
 			builder.Add(DebugMetricId.Fps, metrics.InstantFps);
@@ -308,6 +303,10 @@ namespace SoulboundEngine.Client {
 		}
 		public void UnregisterDebugMetricsSource(IDebugMetricsSource source) {
 			this.debugMetricsService.UnregisterSource(source);
+		}
+
+		public static int GetRandomWorldSeed() {
+			return UnityEngine.Random.Range(int.MinValue, int.MaxValue);
 		}
 
 		public static SoulboundClient Instance => instance;

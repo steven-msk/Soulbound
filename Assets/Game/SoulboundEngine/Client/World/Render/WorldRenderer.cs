@@ -131,7 +131,6 @@ namespace SoulboundEngine.Client.World.Render {
 			}
 			// temporary hook
 			level.GetPlayer().FrameUpdate();
-			Logger.LogInfo("update player.GetPosition(): {}", level.GetPlayer().GetPosition());
 		}
 
 		private void RenderEntity(Entity entity) {

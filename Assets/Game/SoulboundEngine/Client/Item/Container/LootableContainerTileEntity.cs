@@ -8,7 +8,6 @@ using SoulboundEngine.Client.World.Block.State;
 using SoulboundEngine.Core.Registry;
 using System.Collections.Generic;
 using UnityEngine;
-using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 #nullable enable
 
@@ -68,7 +67,6 @@ namespace SoulboundEngine.Client.Item.Container {
 			if (!string.IsNullOrEmpty(lootTableKey)) {
 				RegistryKey<LootTable> key = LootTables.Get(lootTableKey);
 				this.SetLootTable(key, lootTableSeed);
-				Logger.LogInfo("Deserializing lootable container: {}, {}", key, lootTableSeed);
 			}
 		}
 	}
