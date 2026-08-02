@@ -1,5 +1,9 @@
 using SoulboundEngine.Client.Component;
+using SoulboundEngine.Client.Interaction;
+using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.Client.World.Entity;
+using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Core.Registry;
 using System;
 using System.Collections.Generic;
@@ -30,6 +34,10 @@ namespace SoulboundEngine.Client.Item {
 
 		public bool IsStackable() => this.GetMaxCount() > 1;
 
+		public Item AsItem() => this;
+
+		public IComponentMap GetComponents() => this.components;
+
 		protected void AppendToBlock(Block block) {
 			blockItems.Add(block, this);
 		}
@@ -42,9 +50,50 @@ namespace SoulboundEngine.Client.Item {
 			return this.registryEntry.GetIdAsString();
 		}
 
-		public Item AsItem() => this;
+		/// <summary> 
+		/// Called when the player starts using the item (left click).
+		/// This method is called last in the entity -> block -> air dispatch order,
+		/// which means if this method was called then both <see cref="OnPrimaryUseOnBlock(BlockInteractionResult)"/>
+		/// and <see cref="OnPrimaryUseOnEntity(ItemStack, PlayerEntity, Entity)"/> have passed, or the interaction was made directly in air.
+		/// </summary>
+		public virtual IActionResult OnPrimaryUse(ItemStack stack, Level level, PlayerEntity player) => IActionResult.PASS;
 
-		public IComponentMap GetComponents() => this.components;
+		/// <summary>
+		/// Called when the player starts using the item (left click) if targeting a block.
+		/// If this method was called, it means that the interaction was made directly on a block, or 
+		/// <see cref="OnPrimaryUseOnEntity(ItemStack, PlayerEntity, Entity)"/> has passed.
+		/// </summary>
+		public virtual IActionResult OnPrimaryUseOnBlock(BlockInteractionResult result) => IActionResult.PASS;
+
+		/// <summary>
+		/// Called when the player starts using the item (left click) if targeting an entity.
+		/// This is always the first call in the entity -> block -> air dispatch order.
+		/// If this passes, then <see cref="OnPrimaryUseOnBlock(BlockInteractionResult)"/> is called.
+		/// </summary>
+		public virtual IActionResult OnPrimaryUseOnEntity(ItemStack stack, PlayerEntity player, Entity target) => IActionResult.PASS;
+
+		/// <summary> 
+		/// Called when the player starts using the item (right click)
+		/// This method is called last in the entity -> block -> air dispatch order,
+		/// which means if this method was called then both <see cref="OnSecondaryUseOnBlock(BlockInteractionResult)"/>
+		/// and <see cref="OnSecondaryUseOnEntity(ItemStack, PlayerEntity, Entity)"/> have passed, or the interaction was made directly in air.
+		/// </summary>
+		public virtual IActionResult OnSecondaryUse(Level level, PlayerEntity player) => IActionResult.PASS;
+
+		/// <summary> 
+		/// Called when the player starts using the item (right click) targeting a block 
+		/// If this method was called, it means that the interaction was made directly on a block, or 
+		/// <see cref="OnSecondaryUseOnEntity(ItemStack, PlayerEntity, Entity)"/> has passed.
+		/// </summary>
+		public virtual IActionResult OnSecondaryUseOnBlock(BlockInteractionResult result) => IActionResult.PASS;
+
+		/// <summary> 
+		/// Called when the player starts using the item (right click) targeting an entity.
+		/// This is always the first call in the entity -> block -> air dispatch order.
+		/// If this passes, then <see cref="OnSecondaryUseOnBlock(BlockInteractionResult)"/> is called.
+		/// </summary>
+		/// </summary>
+		public virtual IActionResult OnSecondaryUseOnEntity(ItemStack stack, PlayerEntity player, Entity target) => IActionResult.PASS;
 
 		public sealed class Settings {
 			private readonly IComponentMap.Builder components = IComponentMap.Create().AddAll(ItemComponents.DEFAULT_COMPONENTS);

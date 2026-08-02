@@ -1,5 +1,4 @@
 using SoulboundEngine.Client.Input;
-using SoulboundEngine.Client.Interaction;
 using SoulboundEngine.Client.Item;
 using SoulboundEngine.Client.Item.Container;
 using SoulboundEngine.Client.UI.Screen;
@@ -7,7 +6,6 @@ using SoulboundEngine.Client.World.Block;
 using SoulboundEngine.Client.World.Block.State;
 using SoulboundEngine.Client.World.Entity;
 using SoulboundEngine.Client.World.Level;
-using SoulboundEngine.Core.Event;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,13 +15,13 @@ using UnityEngine;
 namespace SoulboundEngine.Client.Player {
 	using Item = Item.Item;
 
-	public class PlayerEntity : Entity, IInputEventHandler, IInteractionHandler<ItemInteraction>, IInteractionHandler<BlockInteraction> {
+	public class PlayerEntity : Entity, IInputEventHandler {
 		public static readonly EntityDescriptor<PlayerEntity> DESCRIPTOR = EntityDescriptor.Of<PlayerEntity>((_, level) => throw new InvalidOperationException());
 		const float MAX_BLOCK_REACH = 5f;
 		private readonly SoulboundClient client;
 		private readonly PlayerInventory inventory;
 		private bool isInventoryOpen;
-		[Obsolete] private readonly InteractionResolver interactionResolver;
+		//[Obsolete] private readonly InteractionResolver interactionResolver;
 		private Vector2 screenPointerPos;
 		private bool isHoldingLeftClick;
 		private bool isHoldingRightClick;
@@ -42,10 +40,10 @@ namespace SoulboundEngine.Client.Player {
 			this.client = client;
 			this.transformAdapter = new PlayerTransformAdapter(this);
 			this.inventory = new PlayerInventory();
-			this.interactionResolver = new InteractionResolver();
+			//this.interactionResolver = new InteractionResolver();
 
-			this.interactionResolver.RegisterHandler<ItemInteraction>(this);
-			this.interactionResolver.RegisterHandler<BlockInteraction>(this);
+			//this.interactionResolver.RegisterHandler<ItemInteraction>(this);
+			//this.interactionResolver.RegisterHandler<BlockInteraction>(this);
 		}
 
 		public bool isJumping { get; private set; }
@@ -141,39 +139,39 @@ namespace SoulboundEngine.Client.Player {
 		}
 
 		private void OnLeftClick() {
-			if (!this.ResolveItemOrBlockInteraction(InteractionTrigger.LeftClick)) {
+			//if (!this.ResolveItemOrBlockInteraction(InteractionTrigger.LeftClick)) {
 
-				// PROTOTYPICAL
-				BlockPos blockPos = (BlockPos)this.GetWorldPointerPos();
-				if (this.TryBreakBlock(blockPos)) {
-					EventBus.Publish(new BlockBrokenEvent(blockPos, this.level));
-				}
-			}
+			//	// PROTOTYPICAL
+			//	BlockPos blockPos = (BlockPos)this.GetWorldPointerPos();
+			//	if (this.TryBreakBlock(blockPos)) {
+			//		EventBus.Publish(new BlockBrokenEvent(blockPos, this.level));
+			//	}
+			//}
 		}
 		private void OnRightClick() {
-			this.ResolveItemOrBlockInteraction(InteractionTrigger.RightClick);
+			//this.ResolveItemOrBlockInteraction(InteractionTrigger.RightClick);
 		}
 
 		private void OnLeftHold() {
-			if (!this.ResolveItemOrBlockInteraction(InteractionTrigger.LeftHold)) {
+			//if (!this.ResolveItemOrBlockInteraction(InteractionTrigger.LeftHold)) {
 
-				// PROTOTYPICAL
-				BlockPos blockPos = (BlockPos)this.GetWorldPointerPos();
-				if (this.TryBreakBlock(blockPos)) {
-					EventBus.Publish(new BlockBrokenEvent(blockPos, this.level));
-				}
-			}
+			//	// PROTOTYPICAL
+			//	BlockPos blockPos = (BlockPos)this.GetWorldPointerPos();
+			//	if (this.TryBreakBlock(blockPos)) {
+			//		EventBus.Publish(new BlockBrokenEvent(blockPos, this.level));
+			//	}
+			//}
 		}
 		private void OnRightHold() {
-			this.ResolveItemOrBlockInteraction(InteractionTrigger.RightHold);
+			//this.ResolveItemOrBlockInteraction(InteractionTrigger.RightHold);
 		}
 
 		private void OnLeftRelease() {
-			this.ResolveItemOrBlockInteraction(InteractionTrigger.LeftRelease);
-			this.leftClickBlockBreakGuard = false;
+			//this.ResolveItemOrBlockInteraction(InteractionTrigger.LeftRelease);
+			//this.leftClickBlockBreakGuard = false;
 		}
 		private void OnRightRelease() {
-			this.ResolveItemOrBlockInteraction(InteractionTrigger.RightRelease);
+			//this.ResolveItemOrBlockInteraction(InteractionTrigger.RightRelease);
 		}
 
 		public void OpenInventoryScreen(IInventoryScreenHandlerFactory handlerFactory) {
@@ -197,81 +195,81 @@ namespace SoulboundEngine.Client.Player {
 			this.isInventoryOpen = false;
 		}
 
-		private bool ResolveItemOrBlockInteraction(InteractionTrigger trigger) {
-			ItemInteraction itemInteraction = this.GetItemInteraction(trigger);
-			if (this.interactionResolver.Resolve(itemInteraction)) {
-				this.leftClickBlockBreakGuard = itemInteraction.itemStack.item is IPlaceableItem;
-				return true;
-			}
-			return this.interactionResolver.Resolve(this.GetBlockInteraction(trigger));
-		}
+		//private bool ResolveItemOrBlockInteraction(InteractionTrigger trigger) {
+			//ItemInteraction itemInteraction = this.GetItemInteraction(trigger);
+			//if (this.interactionResolver.Resolve(itemInteraction)) {
+			//	this.leftClickBlockBreakGuard = itemInteraction.itemStack.item is IPlaceableItem;
+			//	return true;
+			//}
+			//return this.interactionResolver.Resolve(this.GetBlockInteraction(trigger));
+		//}
 
-		private ItemInteraction GetItemInteraction(InteractionTrigger trigger) {
-			return new ItemInteraction {
-				itemStack = this.GetMainHandStack(),
-				player = this,
-				level = this.level,
-				trigger = trigger
-			};
-		}
+		//private ItemInteraction GetItemInteraction(InteractionTrigger trigger) {
+		//	return new ItemInteraction {
+		//		itemStack = this.GetMainHandStack(),
+		//		player = this,
+		//		level = this.level,
+		//		trigger = trigger
+		//	};
+		//}
 
-		private BlockInteraction GetBlockInteraction(InteractionTrigger trigger) {
-			BlockPos blockPos = (BlockPos)this.GetWorldPointerPos();
-			return new BlockInteraction {
-				trigger = trigger,
-				blockPos = blockPos,
-				blockState = this.level.GetBlockState(blockPos),
-				itemStack = this.GetMainHandStack(),
-				level = this.level,
-				player = this
-			};
-		}
+		//private BlockInteraction GetBlockInteraction(InteractionTrigger trigger) {
+		//	BlockPos blockPos = (BlockPos)this.GetWorldPointerPos();
+		//	return new BlockInteraction {
+		//		trigger = trigger,
+		//		blockPos = blockPos,
+		//		blockState = this.level.GetBlockState(blockPos),
+		//		itemStack = this.GetMainHandStack(),
+		//		level = this.level,
+		//		player = this
+		//	};
+		//}
 
 		// TODO: rework interaction design
-		
+
 		// provisory priority
-		int IInteractionHandler<ItemInteraction>.priority => 0;
+		//int IInteractionHandler<ItemInteraction>.priority => 0;
 
-		bool IInteractionHandler<ItemInteraction>.CanHandle(in ItemInteraction ctx) {
-			Item item = ctx.itemStack.item;
-			if (ctx.itemStack.IsEmpty()) return false;
-			if (item is not IInteractableItem interactable) return false;
+		//bool IInteractionHandler<ItemInteraction>.CanHandle(in ItemInteraction ctx) {
+		//	Item item = ctx.itemStack.item;
+		//	if (ctx.itemStack.IsEmpty()) return false;
+		//	if (item is not IInteractableItem interactable) return false;
 
-			if (!interactable.ValidateTrigger(ctx.trigger)) return false;
+		//	if (!interactable.ValidateTrigger(ctx.trigger)) return false;
 
-			return interactable.CanExecute(in ctx.itemStack, in ctx);
-		}
+		//	return interactable.CanExecute(in ctx.itemStack, in ctx);
+		//}
 
-		bool IInteractionHandler<ItemInteraction>.Handle(in ItemInteraction ctx) {
-			ItemStack stack = ctx.itemStack;
-			IInteractableItem interactable = (IInteractableItem)stack.item;
-			return interactable.TryExecute(ref stack, in ctx);
-		}
+		//bool IInteractionHandler<ItemInteraction>.Handle(in ItemInteraction ctx) {
+		//	ItemStack stack = ctx.itemStack;
+		//	IInteractableItem interactable = (IInteractableItem)stack.item;
+		//	return interactable.TryExecute(ref stack, in ctx);
+		//}
 
-		int IInteractionHandler<BlockInteraction>.priority => 0;
+		//int IInteractionHandler<BlockInteraction>.priority => 0;
 
-		bool IInteractionHandler<BlockInteraction>.CanHandle(in BlockInteraction ctx) {
+		//bool IInteractionHandler<BlockInteraction>.CanHandle(in BlockInteraction ctx) {
 
-			// interaction handler shouldnt guard block interactions only inside the player reach
-			// some blocks may be interactable even if theyre out of reach, though this is a false assumption for pre-prod
-			// CanInteract will need to explicitly check if the player is in range if it requires it
-			// for this case the handler is implemented in Player so the this CanHandle guards it
-			// but keep this in mind for future implementations
-			bool isInReach = this.IsInBlockReach((Vector2)ctx.blockPos);
-			if (!isInReach) return false;
+		// interaction handler shouldnt guard block interactions only inside the player reach
+		// some blocks may be interactable even if theyre out of reach, though this is a false assumption for pre-prod
+		// CanInteract will need to explicitly check if the player is in range if it requires it
+		// for this case the handler is implemented in Player so the this CanHandle guards it
+		// but keep this in mind for future implementations
+		//	bool isInReach = this.IsInBlockReach((Vector2)ctx.blockPos);
+		//	if (!isInReach) return false;
 
-			if (ctx.blockState.block is not IInteractableBlock interactable) return false;
+		//	if (ctx.blockState.block is not IInteractableBlock interactable) return false;
 
-			if (!interactable.ValidateTrigger(ctx.trigger)) return false;
+		//	if (!interactable.ValidateTrigger(ctx.trigger)) return false;
 
-			return interactable.CanInteract(in ctx);
-		}
+		//	return interactable.CanInteract(in ctx);
+		//}
 
-		bool IInteractionHandler<BlockInteraction>.Handle(in BlockInteraction ctx) {
-			IInteractableBlock interactable = (IInteractableBlock)ctx.blockState.block;
-			interactable.OnInteract(in ctx);
-			return true;
-		}
+		//bool IInteractionHandler<BlockInteraction>.Handle(in BlockInteraction ctx) {
+		//	IInteractableBlock interactable = (IInteractableBlock)ctx.blockState.block;
+		//	interactable.OnInteract(in ctx);
+		//	return true;
+		//}
 
 		private bool TryBreakBlock(BlockPos blockPos) {
 			if (!this.IsInBlockReach((Vector2)blockPos) || this.leftClickBlockBreakGuard) return false;

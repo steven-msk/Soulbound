@@ -12,13 +12,13 @@ namespace SoulboundEngine.Client.World.Block {
 			: base(settings) {
 		}
 
-		public bool CanInteract(in BlockInteraction ctx) => true;
+		public bool CanInteract(in BlockInteractionResult ctx) => true;
 
 		public bool ValidateTrigger(InteractionTrigger trigger) {
 			return trigger is InteractionTrigger.RightClick;
 		}
 
-		public void OnInteract(in BlockInteraction ctx) {
+		public void OnInteract(in BlockInteractionResult ctx) {
 			ChestTileEntity chestTileEntity = (ChestTileEntity)ctx.level.GetTileEntity(ctx.blockPos);
 			ctx.player.OpenInventoryScreen(chestTileEntity);
 			chestTileEntity.OnOpened(ctx.player);

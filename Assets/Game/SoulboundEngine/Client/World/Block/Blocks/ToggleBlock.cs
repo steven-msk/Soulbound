@@ -16,14 +16,14 @@ namespace SoulboundEngine.Client.World.Block {
 			builder.Add(on);
 		}
 
-		public void OnInteract(in BlockInteraction ctx) {
+		public void OnInteract(in BlockInteractionResult ctx) {
 			bool isOn = ctx.blockState.Get(on);
 			isOn = !isOn;
 			ctx.level.SetBlockState(ctx.blockPos, this.DefaultState.With(on, isOn));
 			Logger.LogInfo("block at {} is now {}", ctx.blockPos, isOn ? "off" : "on");
 		}
 
-		public bool CanInteract(in BlockInteraction ctx) => true;
+		public bool CanInteract(in BlockInteractionResult ctx) => true;
 
 		public bool ValidateTrigger(InteractionTrigger trigger) {
 			return trigger == InteractionTrigger.RightClick;
