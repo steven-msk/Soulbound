@@ -58,7 +58,7 @@ namespace SoulboundEngine.Client.Item {
 		/// which means if this method was called then both <see cref="OnPrimaryUseOnBlock(BlockInteractionResult)"/>
 		/// and <see cref="OnPrimaryUseOnEntity(ItemStack, PlayerEntity, Entity)"/> have passed, or the interaction was made directly in air.
 		/// </summary>
-		public virtual IActionResult OnPrimaryUse(ItemStack stack, Level level, PlayerEntity player) => IActionResult.PASS;
+		public virtual IActionResult OnPrimaryUse(ItemStack stack, Level level, PlayerEntity player, BlockPos blockPos) => IActionResult.PASS;
 
 		/// <summary>
 		/// Called when the player starts using the item (left click) if targeting a block.
@@ -80,7 +80,7 @@ namespace SoulboundEngine.Client.Item {
 		/// which means if this method was called then both <see cref="OnSecondaryUseOnBlock(BlockInteractionResult)"/>
 		/// and <see cref="OnSecondaryUseOnEntity(ItemStack, PlayerEntity, Entity)"/> have passed, or the interaction was made directly in air.
 		/// </summary>
-		public virtual IActionResult OnSecondaryUse(Level level, PlayerEntity player) => IActionResult.PASS;
+		public virtual IActionResult OnSecondaryUse(ItemStack stack, Level level, PlayerEntity player, BlockPos blockPos) => IActionResult.PASS;
 
 		/// <summary> 
 		/// Called when the player starts using the item (right click) targeting a block 

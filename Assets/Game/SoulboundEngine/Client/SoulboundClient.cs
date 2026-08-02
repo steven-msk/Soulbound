@@ -30,14 +30,15 @@ using SoulboundEngine.Core.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client {
+	using Camera = UnityEngine.Camera;
 	using Object = UnityEngine.Object;
 	using RectInt = UnityEngine.RectInt;
 	using Vector2 = UnityEngine.Vector2;
+	using Vector3 = UnityEngine.Vector3;
 #if !UNITY_EDITOR
 	using Application = UnityEngine.Application;
 	using LogType = UnityEngine.LogType;

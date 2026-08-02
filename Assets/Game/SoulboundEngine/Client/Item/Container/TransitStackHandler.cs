@@ -21,7 +21,7 @@ namespace SoulboundEngine.Client.Item.Container {
 		private readonly ItemRenderHandle renderHandle;
 		private readonly ItemRenderContext renderContext;
 
-		public TransitStackHandler(ItemRenderManager itemRenderManager, VisualElement root) {
+		private TransitStackHandler(ItemRenderManager itemRenderManager, VisualElement root) {
 			this.itemRenderManager = itemRenderManager;
 			this.root = root;
 			this.renderHandle = new ItemRenderHandle(this);

@@ -1,4 +1,9 @@
 using SoulboundEngine.Client.Component;
+using SoulboundEngine.Client.Interaction;
+using SoulboundEngine.Client.Player;
+using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.Client.World.Entity;
+using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Core.Registry;
 using System;
 using UnityEngine;
@@ -167,6 +172,25 @@ namespace SoulboundEngine.Client.Item {
 			this.count = Mathf.Clamp(this.count, 0, maxCount);
 		}
 
+		public static IActionResult OnPrimaryUse(ItemStack stack, Level level, PlayerEntity player, BlockPos blockPos) {
+			return stack.item?.OnPrimaryUse(stack, level, player, blockPos) ?? throw new NotSupportedException("Primary interaction with null item");
+		}
+		public static IActionResult OnPrimaryUseOnBlock(ItemStack stack, BlockInteractionResult result) {
+			return stack.item?.OnPrimaryUseOnBlock(result) ?? throw new NotSupportedException("Primary interaction on block with null item");
+		}
+		public static IActionResult OnPrimaryUseOnEntity(ItemStack stack, PlayerEntity player, Entity target) {
+			return stack.item?.OnPrimaryUseOnEntity(stack, player, target) ?? throw new NotSupportedException("Primary interaction on entity with null item");
+		}
+		public static IActionResult OnSecondaryUse(ItemStack stack, Level level, PlayerEntity player, BlockPos blockPos) {
+			return stack.item?.OnSecondaryUse(stack, level, player, blockPos) ?? throw new NotSupportedException("Secondary interaction with null item");
+		}
+		public static IActionResult OnSecondaryUseOnBlock(ItemStack stack, BlockInteractionResult result) {
+			return stack.item?.OnSecondaryUseOnBlock(result) ?? throw new NotSupportedException("Secondary interaction on block with null item");
+		}
+		public static IActionResult OnSecondaryUseOnEntity(ItemStack stack, PlayerEntity player, Entity target) {
+			return stack.item?.OnSecondaryUseOnEntity(stack, player, target) ?? throw new NotSupportedException("Secondary interaction on entity with null item");
+		}
+
 #pragma warning disable CS0809 // Obsolete member overrides non-obsolete member
 
 		[Obsolete("Cannot compare two item stacks with Equals", true)]
@@ -179,7 +203,7 @@ namespace SoulboundEngine.Client.Item {
 		}
 
 		public readonly override string ToString() {
-			return this.IsEmpty() ? "EMPTY" : $"{this.item}:{this.count}";
+			return this.IsEmpty() ? "EMPTY" : $"{this.item}[{this.count}]";
 		}
 	}
 }
