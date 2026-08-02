@@ -282,6 +282,27 @@ namespace SoulboundEngine.Client.World.Level {
 			return this.entities.TryGetValue(guid, out entity);
 		}
 
+		/// <summary> Tries to get the closest entity at <c>worldPos</c> </summary>
+		public bool TryGetEntityAt(Vector2 worldPos, out Entity entity) {
+			entity = null!;
+			float closestDist = float.MaxValue;
+
+			// linear scan over the entire entity list is fine to start
+			// if entity counts start becoming a bottleneck, switch to spatial hash or quadtree
+			// but for now its too much of a premature abstraction
+			foreach (var ent in this.entities.Values) {
+				if (!ent.GetBoundingBox().Contains(worldPos)) continue;
+
+				float dist = Vector2.Distance(worldPos, entity.GetCenter());
+				if (dist < closestDist) {
+					entity = ent;
+					closestDist = dist;
+				}
+			}
+
+			return entity != null;
+		}
+
 		public IEnumerable<Entity> GetAllEntities() => this.entities.Values.ToList();
 
 		public void UnloadDistantChunks(int pivotChunkX, int viewDistance) {

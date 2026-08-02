@@ -349,20 +349,7 @@ namespace SoulboundEngine.Client.Player {
 
 		public Vector2 GetScreenPointerPos() => this.screenPointerPos;
 		public Vector2 GetWorldPointerPos() {
-			Vector3 screenPos = this.screenPointerPos;
-
-			//Canvas canvas = SoulboundClient.Instance.UIHandler.GetCanvas();
-			//RectTransform rootTransform = canvas.GetComponent<RectTransform>();
-			//bool inWorldPoint = RectTransformUtility.ScreenPointToWorldPointInRectangle(
-			//	rootTransform,
-			//	screenPos,
-			//	Camera.main,
-			//	out var worldPoint
-			//);
-			//if (inWorldPoint) return worldPoint;
-
-			screenPos.z = -Camera.main.transform.position.z;
-			return Camera.main.ScreenToWorldPoint(screenPos);
+			return this.client.ScreenToWorldPoint(this.screenPointerPos);
 		}
 
 		public void SetTransitStackSource(TransitStackHandler transitStack) {
