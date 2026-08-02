@@ -11,13 +11,13 @@ namespace SoulboundEngine.Client.Item {
 	public class Item : IItemConvertible {
 		public const int DEFAULT_FULL_STACK = 256;
 		public static readonly Dictionary<Block, Item> blockItems = new();
-		private readonly RegistryEntry<Item> registryEntry;
+		private readonly RegistryKey<Item> registryKey;
 		private readonly IComponentMap components;
 
 		protected Item(Settings settings) {
 			// localization not supported yet
 			this.components = settings.Build(settings.GetTranslationKey());
-			this.registryEntry = Items.GetEntry(settings.registryKey ?? throw new NotSupportedException("Item is not added to a registry"));
+			this.registryKey = settings.registryKey ?? throw new NotSupportedException("Item is not added to a registry");
 		}
 
 		public static Item Create(Settings settings) {
@@ -38,8 +38,10 @@ namespace SoulboundEngine.Client.Item {
 			return new ItemStack(this, Mathf.Clamp(count, 0, this.GetMaxCount()));
 		}
 
+		public RegistryEntry<Item> GetRegistryEntry() => Items.GetEntry(this.registryKey);
+
 		public override string ToString() {
-			return this.registryEntry.GetIdAsString();
+			return this.GetRegistryEntry().GetIdAsString();
 		}
 
 		public Item AsItem() => this;
