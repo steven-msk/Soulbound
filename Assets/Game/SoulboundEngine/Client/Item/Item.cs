@@ -1,5 +1,7 @@
 using SoulboundEngine.Client.Component;
 using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.Core.Registry;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,28 +11,35 @@ namespace SoulboundEngine.Client.Item {
 	public class Item : IItemConvertible {
 		public const int DEFAULT_FULL_STACK = 256;
 		public static readonly Dictionary<Block, Item> blockItems = new();
-		private readonly Settings settings;
+		private readonly RegistryEntry<Item> registryEntry;
 		private readonly IComponentMap components;
 
-		public Item(Settings settings) {
-			this.settings = settings;
-			this.components = settings.components.Build();
+		protected Item(Settings settings) {
+			// localization not supported yet
+			this.components = settings.Build(settings.GetTranslationKey());
+			this.registryEntry = Items.GetEntry(settings.registryKey ?? throw new NotSupportedException("Item is not added to a registry"));
 		}
 
-		public string name => this.settings.name;
-		public int fullStackSize => this.settings.fullStackSize;
-		public bool IsStackable() => this.settings.IsStackable();
+		public static Item Create(Settings settings) {
+			return new Item(settings);
+		}
 
-		public void AppendToBlock(Block block) {
+		public string GetName() => this.components.Get(ItemComponents.NAME);
+
+		public int GetMaxCount() => this.components.Get(ItemComponents.MAX_STACK_COUNT);
+
+		public bool IsStackable() => this.GetMaxCount() > 1;
+
+		protected void AppendToBlock(Block block) {
 			blockItems.Add(block, this);
 		}
 
 		public virtual ItemStack GetDefaultStack(int count = 1) {
-			return new ItemStack(this, Mathf.Clamp(count, 0, this.fullStackSize));
+			return new ItemStack(this, Mathf.Clamp(count, 0, this.GetMaxCount()));
 		}
 
 		public override string ToString() {
-			return Items.GetIdentifier(this)?.ToString() ?? base.ToString();
+			return this.registryEntry.GetIdAsString();
 		}
 
 		public Item AsItem() => this;
@@ -38,26 +47,18 @@ namespace SoulboundEngine.Client.Item {
 		public IComponentMap GetComponents() => this.components;
 
 		public sealed class Settings {
-			public readonly IComponentMap.Builder components = IComponentMap.Create();
-			public string name { get; private set; }
-			public int fullStackSize { get; private set; } = DEFAULT_FULL_STACK;
+			private readonly IComponentMap.Builder components = IComponentMap.Create().AddAll(ItemComponents.DEFAULT_COMPONENTS);
+			internal RegistryKey<Item>? registryKey;
 
-			private Settings(string name, int fullStackSize) {
-				this.name = name;
-				this.fullStackSize = fullStackSize;
+			public IComponentMap Build(string name) {
+				this.components.Add(ItemComponents.NAME, name);
+				return this.components.Build();
 			}
 
-			public static Settings Of(string name) {
-				return new Settings(name, DEFAULT_FULL_STACK);
-			}
-
-			public Settings NonStackable() {
-				this.fullStackSize = 1;
-				return this;
-			}
+			public Settings NonStackable() => this.StackUpTo(1);
 
 			public Settings StackUpTo(int count) {
-				this.fullStackSize = count;
+				this.components.Add(ItemComponents.MAX_STACK_COUNT, count);
 				return this;
 			}
 
@@ -66,11 +67,22 @@ namespace SoulboundEngine.Client.Item {
 				return this;
 			}
 
-			public static Settings Air() {
-				return new("Air", 1);
+			public Settings RegistryKey(RegistryKey<Item> key) {
+				this.registryKey = key;
+				return this;
 			}
 
-			public bool IsStackable() => this.fullStackSize > 1;
+			/// <summary>
+			/// Must be called after setting the registry key
+			/// </summary>
+			/// <exception cref="InvalidOperationException"></exception>
+			internal string GetTranslationKey() {
+				if (this.registryKey is null) {
+					throw new InvalidOperationException("Cannot derive item name: RegistryKey was not set before Build() was called.");
+				}
+
+				return $"item.{this.registryKey.value.GetNamespace()}.{this.registryKey.value.GetPath()}";
+			}
 		}
 	}
 }

@@ -96,14 +96,14 @@ namespace SoulboundEngine.Client.Debug.Commands {
 			static int GiveItem(int quantity, CommandContext<RuntimeCommandSource> ctx) {
 				Item item = ctx.GetArgument<Item>("item");
 
-				int fullStacks = quantity / item.fullStackSize;
-				int remainder = quantity % item.fullStackSize;
+				int fullStacks = quantity / item.GetMaxCount();
+				int remainder = quantity % item.GetMaxCount();
 
 				int stackCount = fullStacks + (remainder > 0 ? 1 : 0);
 				ItemStack[] stacks = new ItemStack[stackCount];
 				int i;
 				for (i = 0; i < fullStacks; i++) {
-					stacks[i] = item.GetDefaultStack(item.fullStackSize);
+					stacks[i] = item.GetDefaultStack(item.GetMaxCount());
 				}
 				if (remainder > 0) stacks[i] = item.GetDefaultStack(remainder);
 

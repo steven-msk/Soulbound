@@ -1,3 +1,4 @@
+using SoulboundEngine.Client.Component;
 using SoulboundEngine.Client.Debug.Logging;
 using SoulboundEngine.Client.Item;
 using SoulboundEngine.Client.Loot;
@@ -23,6 +24,7 @@ namespace SoulboundEngine.Core.Registry {
 		public static readonly Registry<TileEntityType> TILE_ENTITIES = Create<TileEntityType>(Identifier.Of("tile_entity"));
 		public static readonly Registry<InventoryScreenHandlerType> INVENTORY_SCREEN_HANDLES = Create<InventoryScreenHandlerType>(Identifier.Of("inventory_screen_handle"));
 		public static readonly Registry<RecipeType> RECIPE_TYPE = Create<RecipeType>(Identifier.Of("recipe_type"));
+		public static readonly Registry<ComponentType> COMPONENT_TYPE = Create<ComponentType>(Identifier.Of("component_type"));
 
 		// temporary, see LootTables
 		public static readonly Registry<LootTable> LOOT_TABLES = Create<LootTable>(Identifier.Of("loot_table"));

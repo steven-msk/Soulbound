@@ -64,10 +64,10 @@ namespace SoulboundEngine.Client.Item {
 			this.components.ClearChanges();
 		}
 
-		public readonly bool IsFull() => this.count >= this.item.fullStackSize;
+		public readonly bool IsFull() => this.count >= this.item.GetMaxCount();
 		public readonly bool IsEmpty() => this.count <= 0 || this.item == null;
 
-		public readonly bool IsFullSize(int count) => count >= this.item.fullStackSize;
+		public readonly bool IsFullSize(int count) => count >= this.item.GetMaxCount();
 
 		/// <summary>
 		/// Try to add items. Returns how may were actually added.
@@ -93,7 +93,7 @@ namespace SoulboundEngine.Client.Item {
 
 		public readonly int GetSpaceLeft() {
 			if (this.IsOf(null)) return 0;
-			return this.item.fullStackSize - this.count;
+			return this.item.GetMaxCount() - this.count;
 		}
 
 		public readonly bool IsOf(Item? item) {
@@ -136,7 +136,7 @@ namespace SoulboundEngine.Client.Item {
 
 		public readonly ItemStack CopyFullStack() {
 			if (this.IsOf(null)) return EMPTY;
-			return this.CopyWithCount(this.item.fullStackSize);
+			return this.CopyWithCount(this.item.GetMaxCount());
 		}
 
 		public ItemStack CopyAndEmpty() {

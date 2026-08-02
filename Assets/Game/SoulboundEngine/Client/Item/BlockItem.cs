@@ -8,6 +8,7 @@ namespace SoulboundEngine.Client.Item {
 		public BlockItem(Block block, Settings settings) 
 			: base(settings) {
 			this.block = block;
+			this.AppendToBlock(block);
 		}
 
 		public Block GetBlock() => this.block;

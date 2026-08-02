@@ -6,58 +6,97 @@ using System;
 
 namespace SoulboundEngine.Client.Item {
 	public partial class Items {
-		public static readonly Item AIR = Register(Blocks.AIR, Item.Settings.Air());
-		public static readonly Item GRASS = Register(Blocks.GRASS, Item.Settings.Of("Grass Block"));
-		public static readonly Item DIRT = Register(Blocks.DIRT, Item.Settings.Of("Dirt Block"));
-		public static readonly Item STONE = Register(Blocks.STONE, Item.Settings.Of("Stone Block"));
-		public static readonly Item WOOD = Register(Blocks.WOOD, Item.Settings.Of("Wood Block"));
-		public static readonly Item LEAVES = Register(Blocks.LEAVES, Item.Settings.Of("Leaves Block"));
-		public static readonly Item CHEST = Register(Blocks.CHEST, Item.Settings.Of("Chest"));
+		public static readonly Item AIR = Register("air");
+		public static readonly Item GRASS = Register(Blocks.GRASS);
+		public static readonly Item DIRT = Register(Blocks.DIRT);
+		public static readonly Item STONE = Register(Blocks.STONE);
+		public static readonly Item WOOD = Register(Blocks.WOOD);
+		public static readonly Item LEAVES = Register(Blocks.LEAVES);
+		public static readonly Item CHEST = Register(Blocks.CHEST);
 
-		public static readonly Item placeableItem = Register(Blocks.MOVING_TICKING_BLOCK, 
-			Item.Settings.Of("Placeable Item")
+		public static readonly Item placeableItem = Register(Blocks.MOVING_TICKING_BLOCK);
+		public static readonly Item teleportPlayerItem = Register("teleport_player_item", settings => new TeleportPlayerItem(settings),
+			settings => settings.NonStackable()
 		);
-		public static readonly TeleportPlayerItem teleportPlayerItem = Register("teleport_player_item", new TeleportPlayerItem(
-			Item.Settings.Of("Move Player Item").NonStackable()
-		));
-		public static readonly SpawnEntityItem spawnEntityItem = Register("spawn_entity_item", new SpawnEntityItem(
-			Item.Settings.Of("Spawn Entity Item")
-		));
-		public static readonly ChargeableItem chargeableItem = Register("chargeable_item", new ChargeableItem(
-			Item.Settings.Of("Chargeable Item").NonStackable()
-		));
-		public static readonly DebugPointerItem debugPointer = Register("debug_pointer", new DebugPointerItem(
-			Item.Settings.Of("Debug Pointer").NonStackable()
-		));
-		public static readonly BlockBreakerItem blockBreakerItem = Register("block_breaker_item", new BlockBreakerItem(
-			Item.Settings.Of("Block Breaker Item").NonStackable()
-		));
+		public static readonly Item spawnEntityItem = Register("spawn_entity_item", settings => new SpawnEntityItem(settings));
+		public static readonly Item chargeableItem = Register("chargeable_item", settings => new ChargeableItem(settings),
+			settings => settings.NonStackable()
+		);
+		public static readonly Item debugPointer = Register("debug_pointer", settings => new DebugPointerItem(settings),
+			settings => settings.NonStackable()
+		);
+		public static readonly Item blockBreakerItem = Register("block_breaker_item", settings => new BlockBreakerItem(settings),
+			settings => settings.NonStackable()
+		);
 
-		public static TItem Register<TItem>(string id, TItem item) where TItem : Item {
-			return Registry<Item>.Register<TItem>(Registries.ITEMS, KeyOf(id), item);
+		public static Item Register(string id) {
+			return Register(id, Item.Create, new Item.Settings());
 		}
 
-		public static TItem Register<TItem>(Identifier id, TItem item) where TItem : Item {
-			return Registry<Item>.Register(Registries.ITEMS, KeyOf(id.ToString()), item);
+		public static Item Register(string id, Item.Settings settings) {
+			return Register(id, Item.Create, settings);
+		}
+
+		public static Item Register(string id, Func<Item.Settings, Item.Settings> settingsFactory) {
+			return Register(id, settingsFactory(new Item.Settings()));
+		}
+
+		public static Item Register(string id, Func<Item.Settings, Item> factory) {
+			return Register(id, factory, new Item.Settings());
+		}
+
+		public static Item Register(string id, Func<Item.Settings, Item> factory, Item.Settings settings) {
+			return Register(KeyOf(id), factory, settings);
+		}
+
+		public static Item Register(string id, Func<Item.Settings, Item> factory, Func<Item.Settings, Item.Settings> settingsFactory) {
+			return Register(KeyOf(id), factory, settingsFactory(new Item.Settings()));
+		}
+
+		public static Item Register(Block block) {
+			return Register(block, new Item.Settings());
 		}
 
 		public static Item Register(Block block, Item.Settings settings) {
-			Item item = Register(Blocks.GetIdentifier(block), new BlockItem(block, settings));
-			item.AppendToBlock(block);
-			return item;
+			return Register(KeyOf(Registries.BLOCKS.GetKey(block)), CreateBlockItem(block), settings);
+		}
+
+		public static Item Register(Block block, Func<Block, Item.Settings, Item> factory, Item.Settings settings) {
+			return Register(KeyOf(Registries.BLOCKS.GetKey(block)), settings => factory(block, settings), settings);
+		}
+
+		public static Item Register(RegistryKey<Item> key, Func<Item.Settings, Item> factory) {
+			return Register(key, factory, new Item.Settings());
+		}
+
+		public static Item Register(RegistryKey<Item> key, Func<Item.Settings, Item> factory, Item.Settings settings) {
+			settings.RegistryKey(key);
+			return Registry<Item>.Register(Registries.ITEMS, key, factory(settings));
+		}
+
+		private static Func<Item.Settings, Item> CreateBlockItem(Block block) {
+			return settings => new BlockItem(block, settings);
 		}
 
 		private static RegistryKey<Item> KeyOf(string id) {
 			return RegistryKey<Item>.Of(Registries.ITEMS.GetKey(), Identifier.Of(id));
 		}
 
+		private static RegistryKey<Item> KeyOf(RegistryKey<Block> blockKey) {
+			return RegistryKey<Item>.Of(Registries.ITEMS.GetKey(), blockKey.value);
+		}
+
 		public static Identifier GetIdentifier(Item item) {
-			return Registries.ITEMS.GetIdentifier(item) ?? throw new NotSupportedException("Items not initialized");
+			return Registries.ITEMS.GetIdentifier(item) ?? throw new ArgumentException("Items not initialized");
 		}
 
 		public static RegistryEntry<Item> GetEntry(Item? item) {
 			if (item == null) return GetEntry(AIR);
-			return Registries.ITEMS.GetEntry(item) ?? throw new NotSupportedException("Items not initialized");
+			return Registries.ITEMS.GetEntry(item) ?? throw new ArgumentException("Items not initialized");
+		}
+
+		public static RegistryEntry<Item> GetEntry(RegistryKey<Item> key) {
+			return Registries.ITEMS.GetEntry(key.value) ?? throw new ArgumentException("Could not find item " + key);
 		}
 
 		public static Item Get(Identifier id) {

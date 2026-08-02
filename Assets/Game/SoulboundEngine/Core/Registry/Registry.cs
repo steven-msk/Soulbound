@@ -76,6 +76,8 @@ namespace SoulboundEngine.Core.Registry {
 
 		public RegistryEntry<T>? Get(RegistryKey<T> key) => this.keyToEntry.GetValueOrDefault(key);
 
+		public RegistryKey<T>? GetKey(T value) => this.GetEntry(value)?.GetKey();
+
 		public HashSet<KeyValuePair<RegistryKey<T>, T>> GetEntrySet() {
 			return this.keyToEntry
 				.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.GetValue())

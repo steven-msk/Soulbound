@@ -23,7 +23,7 @@ namespace SoulboundEngine.Client.Item.Container {
 		}
 
 		public bool IsEligible(SlotRef slotRef) {
-			return this.GetBaseCount(slotRef) < this.stack.item.fullStackSize;
+			return this.GetBaseCount(slotRef) < this.stack.item.GetMaxCount();
 		}
 
 		public int GetBaseCount(SlotRef slotRef) {

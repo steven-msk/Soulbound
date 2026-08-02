@@ -246,7 +246,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 				IItemSlot draggedSlot = slotRef.GetSlot();
 				int amount = splitAmount + (i < remainder ? 1 : 0);
 				int baseCount = this.dragState.GetBaseCount(slotRef);
-				int finalCount = Math.Min(baseCount + amount, this.dragState.stack.item.fullStackSize);
+				int finalCount = Math.Min(baseCount + amount, this.dragState.stack.item.GetMaxCount());
 
 				if (baseCount <= 0) {
 					draggedSlot.SetStack(this.dragState.stack.item.GetDefaultStack(finalCount));

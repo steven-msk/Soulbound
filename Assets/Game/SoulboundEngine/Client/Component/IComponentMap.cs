@@ -62,7 +62,7 @@ namespace SoulboundEngine.Client.Component {
 			}
 
 			public Builder Add<T>(ComponentType<T> type, T value) {
-				this.map.Add(type, value);
+				this.map[type] = value;
 				return this;
 			}
 			
@@ -75,7 +75,7 @@ namespace SoulboundEngine.Client.Component {
 			}
 
 			internal void Add(Component component) {
-				this.map.Add(component.boxedType, component.boxedValue);
+				this.map[component.boxedType] = component.boxedValue;
 			}
 		}
 	}
