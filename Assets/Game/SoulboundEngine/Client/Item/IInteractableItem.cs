@@ -1,6 +1,8 @@
 using SoulboundEngine.Client.Interaction;
+using System;
 
 namespace SoulboundEngine.Client.Item {
+	[Obsolete]
 	public interface IInteractableItem {
 		bool ValidateTrigger(InteractionTrigger trigger);
 

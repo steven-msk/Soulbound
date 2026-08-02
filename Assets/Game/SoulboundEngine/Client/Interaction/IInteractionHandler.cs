@@ -1,10 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SoulboundEngine.Client.Interaction {
+	[Obsolete]
 	public interface IInteractionHandler<TContext> where TContext : struct, IInteractionContext {
 		int priority { get; }
 		bool CanHandle(in TContext ctx);

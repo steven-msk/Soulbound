@@ -23,7 +23,7 @@ namespace SoulboundEngine.Client.Player {
 		private readonly SoulboundClient client;
 		private readonly PlayerInventory inventory;
 		private bool isInventoryOpen;
-		private readonly InteractionResolver interactionResolver;
+		[Obsolete] private readonly InteractionResolver interactionResolver;
 		private Vector2 screenPointerPos;
 		private bool isHoldingLeftClick;
 		private bool isHoldingRightClick;

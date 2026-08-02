@@ -2,8 +2,10 @@ using SoulboundEngine.Client.Interaction;
 using SoulboundEngine.Client.World.Block;
 using SoulboundEngine.Client.World.Block.State;
 using SoulboundEngine.Core.Event;
+using System;
 
 namespace SoulboundEngine.Client.Item {
+	[Obsolete]
 	public interface IPlaceableItem : IInteractableItem {
 		BlockState GetBlockState(ItemStack itemStack);
 
