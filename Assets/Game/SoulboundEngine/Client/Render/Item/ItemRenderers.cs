@@ -24,7 +24,6 @@ namespace SoulboundEngine.Client.Render.Item {
 
 			Register(Items.placeableItem, DefaultResolverFactory("bluething"));
 			Register(Items.teleportPlayerItem, DefaultResolverFactory("bluething"));
-			Register(Items.spawnEntityItem, DefaultResolverFactory("bluething"));
 			Register(Items.chargeableItem, DefaultResolverFactory("bluething"));
 			Register(Items.debugPointer, DefaultResolverFactory("debugPointer"));
 			Register(Items.blockBreakerItem, DefaultResolverFactory("bluething"));

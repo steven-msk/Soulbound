@@ -102,5 +102,9 @@ namespace SoulboundEngine.Client.World.Block {
 		public static BlockState GetState(int id) {
 			return statesByID[id];
 		}
+
+		public override string ToString() {
+			return this.registryKey.value.ToString();
+		}
 	}
 }

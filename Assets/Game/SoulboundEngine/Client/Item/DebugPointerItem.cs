@@ -1,3 +1,9 @@
+using SoulboundEngine.Client.Debug.Logging;
+using SoulboundEngine.Client.Interaction;
+using SoulboundEngine.Client.Player;
+using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.Client.World.Entity;
+using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Common;
 
 namespace SoulboundEngine.Client.Item {
@@ -6,17 +12,11 @@ namespace SoulboundEngine.Client.Item {
 		public DebugPointerItem(Settings settings) : base(settings) {
 		}
 
-		//public bool ValidateTrigger(InteractionTrigger trigger) {
-		//	return trigger == InteractionTrigger.LeftClick;
-		//}
-
-		//public bool CanExecute(in ItemStack itemStack, in ItemInteraction ctx) {
-		//	return true;
-		//}
-
-		//public bool TryExecute(ref ItemStack itemStack, in ItemInteraction ctx) {
-		//	Logger.LogInfo("Pointer: {}", ctx.player.GetWorldPointerPos());
-		//	return true;
-		//}
+		public override IActionResult OnPrimaryUse(ItemStack stack, Level level, PlayerEntity player, BlockPos blockPos) {
+			level.TryGetEntityAt(player.GetWorldPointerPos(), out Entity entity);
+			Logger.LogInfo("Pointer: {}, BlockPos: {}, BlockState: {}, Entity: {}",
+				player.GetWorldPointerPos(), blockPos, level.GetBlockState(blockPos), entity);
+			return IActionResult.SUCCESS;
+		}
 	}
 }

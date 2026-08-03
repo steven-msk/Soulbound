@@ -18,7 +18,6 @@ namespace SoulboundEngine.Client.Item {
 		public static readonly Item teleportPlayerItem = Register("teleport_player_item", settings => new TeleportPlayerItem(settings),
 			settings => settings.NonStackable()
 		);
-		public static readonly Item spawnEntityItem = Register("spawn_entity_item", settings => new SpawnEntityItem(settings));
 		public static readonly Item chargeableItem = Register("chargeable_item", settings => new ChargeableItem(settings),
 			settings => settings.NonStackable()
 		);

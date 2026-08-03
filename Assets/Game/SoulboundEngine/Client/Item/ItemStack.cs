@@ -108,6 +108,19 @@ namespace SoulboundEngine.Client.Item {
 			return removed;
 		}
 
+		/// <summary> 
+		/// Returns a copy of this item stack with the count decremented by amount,
+		/// EMPTY if the new stack is empty, or a copy of this stack if the amount is less or equal to 0.
+		/// </summary>
+		public readonly ItemStack DecrementBy(int amount) {
+			if (amount <= 0) return this;
+
+			int newCount = Mathf.Max(0, this.count - amount);
+			if (newCount <= 0) return EMPTY;
+
+			return this.CopyWithCount(newCount);
+		}
+
 		public readonly int GetSpaceLeft() {
 			if (this.IsOf(null)) return 0;
 			return this.item.GetMaxCount() - this.count;
