@@ -237,6 +237,10 @@ namespace SoulboundEngine.Client.Item {
 			return this.GetItem().GetUseTime(this, type, level, user);
 		}
 
+		public readonly bool ShouldContinueUse(InteractionType type, Level level, PlayerEntity player, BlockPos blockPos) {
+			return this.IsEmpty() || this.GetItem().ShouldContinueUse(this, type, level, player, blockPos);
+		} 
+
 		private readonly void AssertComponentMutationNotOnEmpty() {
 			if (this.IsEmpty()) throw new NotSupportedException("Cannot mutate components on empty stack");
 		}

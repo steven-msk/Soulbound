@@ -160,10 +160,10 @@ namespace SoulboundEngine.Client.Player {
 		}
 
 		private void OnLeftHoldTick() {
-			if (this.activeItemUse?.type == InteractionType.Primary) this.HandleUseTick();
+			this.HandleInteractTick(InteractionType.Primary);
 		}
 		private void OnRightHoldTick() {
-			if (this.activeItemUse?.type == InteractionType.Secondary) this.HandleUseTick();
+			this.HandleInteractTick(InteractionType.Secondary);
 		}
 
 		[Obsolete]
@@ -171,6 +171,21 @@ namespace SoulboundEngine.Client.Player {
 		}
 		[Obsolete]
 		private void OnRightRelease() {
+		}
+
+		private void HandleInteractTick(InteractionType type) {
+			Action getInteractAction(InteractionType type) {
+				return type switch {
+					InteractionType.Primary => this.PrimaryInteract,
+					InteractionType.Secondary => this.SecondaryInteract,
+					_ => throw new ArgumentException()
+				};
+			}
+			BlockPos blockPos = (BlockPos)this.GetWorldPointerPos();
+			if (this.activeItemUse?.type == type) this.HandleUseTick();
+			else if (this.activeItemUse == null && this.GetMainHandStack().ShouldContinueUse(type, this.level, this, blockPos)) {
+				getInteractAction(type)();
+			}
 		}
 
 		private void PrimaryInteract() {

@@ -28,32 +28,32 @@ namespace SoulboundEngine.Client.Item {
 
 		public virtual IActionResult Place(ItemPlacementContext context) {
 			if (context.player == null) return IActionResult.PASS;
+			if (!context.player.IsInBlockReach(context.blockPos.GetCenter())) return IActionResult.PASS;
 
-			if (context.player.IsInBlockReach(context.blockPos.GetCenter())) {
-				BlockState? placementState = this.GetPlacementState(context);
+			BlockState? placementState = this.GetPlacementState(context);
 
-				if (placementState == null) return IActionResult.FAIL;
-				if (!this.CanPlace(context, placementState)) return IActionResult.FAIL;
-
-				context.level.SetBlockState(context.blockPos, placementState);
-				ItemStack stack = context.stack;
-				stack.Decrement();
-				return new IActionResult.Success(new IActionResult.ItemContext(stack));
-			} else {
-				return IActionResult.PASS;
+			if (placementState == null || !this.CanPlace(context, placementState)) {
+				return IActionResult.FAIL;
 			}
+
+			context.level.SetBlockState(context.blockPos, placementState);
+			ItemStack stack = context.stack;
+			stack.Decrement();
+			return new IActionResult.Success(new IActionResult.ItemContext(stack));
 		}
 
 		protected virtual bool CanPlace(ItemPlacementContext context, BlockState blockState) {
-			return true;
+			return blockState.CanPlaceAt(context.level, context.blockPos);
 		}
 
 		protected virtual BlockState? GetPlacementState(ItemPlacementContext context) {
 			return this.block.DefaultState;
 		}
 
-		public override bool ShouldContinueUse(ItemStack stack, InteractionType type, Level level, PlayerEntity player) {
-			return true;
+		public override bool ShouldContinueUse(ItemStack stack, InteractionType type, Level level, PlayerEntity player, BlockPos blockPos) {
+			ItemPlacementContext context = new(player, stack, blockPos);
+			BlockState? placementState = this.GetPlacementState(context);
+			return placementState != null && this.CanPlace(context, placementState);
 		}
 	}
 }

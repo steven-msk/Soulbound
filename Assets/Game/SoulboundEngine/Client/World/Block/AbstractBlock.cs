@@ -2,6 +2,7 @@
 using SoulboundEngine.Client.Item;
 using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.World.Block.State;
+using SoulboundEngine.Common.Math;
 using SoulboundEngine.Core.Registry;
 using SoulboundEngine.Core.States;
 using System;
@@ -17,7 +18,14 @@ namespace SoulboundEngine.Client.World.Block {
 
 		public abstract RegistryKey<Block> GetKey();
 
-		protected virtual bool CanPlaceAt(BlockState blockState, Level level, BlockPos blockPos) => true;
+		protected virtual bool CanPlaceAt(BlockState blockState, Level level, BlockPos blockPos) {
+			if (level.GetBlock(blockPos) != Blocks.AIR) return false;
+
+			foreach (var pos in blockPos.GetCardinalNeighbors()) {
+				if (level.GetBlock(pos) != Blocks.AIR) return true;
+			}
+			return false;
+		}
 
 		/// <summary> 
 		/// Called when the player interacts with this block (left click).

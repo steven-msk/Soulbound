@@ -130,6 +130,12 @@ namespace SoulboundEngine.Client.Item {
 		/// </summary>
 		public virtual ItemStack OnUseCanceledOrFinished(ItemStack stack, InteractionType type, Level level, Entity user, int remainingTicks) => stack;
 
+		/// <summary>
+		/// Returns whether the player can continue using this item the tick after this item has been used. 
+		/// This is false by default.
+		/// </summary>
+		public virtual bool ShouldContinueUse(ItemStack stack, InteractionType type, Level level, PlayerEntity player, BlockPos blockPos) => false;
+
 		public sealed class Settings {
 			private readonly IComponentMap.Builder components = IComponentMap.Create().AddAll(ItemComponents.DEFAULT_COMPONENTS);
 			internal RegistryKey<Item>? registryKey;
