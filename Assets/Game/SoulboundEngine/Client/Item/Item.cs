@@ -99,6 +99,37 @@ namespace SoulboundEngine.Client.Item {
 		/// </summary>
 		public virtual IActionResult OnSecondaryUseOnEntity(ItemStack stack, PlayerEntity player, Entity target) => IActionResult.PASS;
 
+		/// <summary> Called when the use timer reached 0 </summary>
+		public virtual ItemStack OnUseFinished(ItemStack stack, InteractionType type, Level level, Entity user) => stack;
+
+		/// <summary> Called when the player finished using this item. This is immediately after any of the OnPrimary/OnSecondaryUse methods. </summary>
+		public virtual ItemStack OnItemUsed(ItemStack stack, InteractionType type, Level level, Entity user) => stack;
+
+		/// <summary> Returns how many ticks this item's interaction spans. </summary>
+		public virtual int GetUseTime(ItemStack stack, InteractionType type, Level level, Entity user) => 0;
+
+		/// <summary> 
+		/// Called every tick while this item is being used.
+		/// Should return the stack that should replace the current one, or <c>stack</c> if there is no change
+		/// </summary>
+		public virtual ItemStack OnUseTick(ItemStack stack, InteractionType type, Level level, Entity user, int remainingTicks) => stack;
+
+		/// <summary> 
+		/// Called when the player has stopped using this item for various reasons before reaching the target use time.
+		/// Should return the stack that should replace the current one, or <c>stack</c> if there is no change.
+		/// Interactions can be canceled from any source that overwrites the in-progress stack. 
+		/// If this is the case, then the stack returned by this may be immediately replaced by the other incoming stack.
+		/// </summary>
+		public virtual ItemStack OnUseCanceled(ItemStack stack, InteractionType type, Level level, Entity user, int remainingTicks) => stack;
+
+		/// <summary> 
+		/// Called when the item use is canceled or the interaction is finished. 
+		/// The resulting stack is a byproduct of the returned stack and the one from either OnUseCanceled or OnUseFinished, 
+		/// depending on which one was called, so <paramref name="stack"/> is the ItemStack returned by those methods.
+		/// If OnUseFinished was called, <paramref name="remainingTicks"/> is equal to <c>0</c>.
+		/// </summary>
+		public virtual ItemStack OnUseCanceledOrFinished(ItemStack stack, InteractionType type, Level level, Entity user, int remainingTicks) => stack;
+
 		public sealed class Settings {
 			private readonly IComponentMap.Builder components = IComponentMap.Create().AddAll(ItemComponents.DEFAULT_COMPONENTS);
 			internal RegistryKey<Item>? registryKey;

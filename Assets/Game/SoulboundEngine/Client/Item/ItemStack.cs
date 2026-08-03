@@ -215,6 +215,28 @@ namespace SoulboundEngine.Client.Item {
 			return stack.GetItem().OnSecondaryUseOnEntity(stack, player, target);
 		}
 
+		public readonly ItemStack OnItemUsed(InteractionType type, Level level, Entity user) {
+			return this.GetItem().OnItemUsed(this, type, level, user);
+		}
+
+		public readonly ItemStack OnUseCanceled(InteractionType type, Level level, Entity user, int remainingTicks) {
+			ItemStack stack = this.GetItem().OnUseCanceled(this, type, level, user, remainingTicks);
+			return this.GetItem().OnUseCanceledOrFinished(stack, type, level, user, remainingTicks);
+		}
+
+		public readonly ItemStack OnUseTick(InteractionType type, Level level, Entity user, int remainingTicks) {
+			return this.GetItem().OnUseTick(this, type, level, user, remainingTicks);
+		}
+
+		public readonly ItemStack OnUseFinished(InteractionType type, Level level, Entity user) {
+			ItemStack stack = this.GetItem().OnUseFinished(this, type, level, user);
+			return this.GetItem().OnUseCanceledOrFinished(stack, type, level, user, 0);
+		}
+
+		public readonly int GetUseTime(InteractionType type, Level level, Entity user) {
+			return this.GetItem().GetUseTime(this, type, level, user);
+		}
+
 		private readonly void AssertComponentMutationNotOnEmpty() {
 			if (this.IsEmpty()) throw new NotSupportedException("Cannot mutate components on empty stack");
 		}

@@ -30,6 +30,7 @@ namespace SoulboundEngine.Client.Player {
 		private IScreenHandle? activeInventoryScreen;
 		private new readonly PlayerTransformAdapter transformAdapter;
 		private TransitStackHandler? transitStack;
+		private ActiveUseContext? activeItemUse;
 
 		public PlayerEntity(SoulboundClient client, Level level)
 			: base(DESCRIPTOR, level) {
@@ -119,8 +120,9 @@ namespace SoulboundEngine.Client.Player {
 		}
 
 		public override void Tick() {
-			if (this.isHoldingLeftClick) this.OnLeftHold();
-			if (this.isHoldingRightClick) this.OnRightHold();
+			this.CheckItemUse();
+			if (this.isHoldingLeftClick) this.OnLeftHoldTick();
+			if (this.isHoldingRightClick) this.OnRightHoldTick();
 
 			if (this.activeInventoryScreenHandler != null) {
 				if (!this.activeInventoryScreenHandler.CanUse(this)) {
@@ -151,25 +153,17 @@ namespace SoulboundEngine.Client.Player {
 		}
 
 		private void OnLeftClick() {
-			if (!this.Interact(
-					ItemStack.OnPrimaryUseOnEntity, ItemStack.OnPrimaryUseOnBlock, ItemStack.OnPrimaryUse,
-					AbstractBlock.AbstractBlockState.OnPrimaryUse, AbstractBlock.AbstractBlockState.OnPrimaryUseWithItem
-				)) {
-				this.TryBreakBlock((BlockPos)this.GetWorldPointerPos());
-			}
+			this.PrimaryInteract();
 		}
 		private void OnRightClick() {
-			this.Interact(
-				ItemStack.OnSecondaryUseOnEntity, ItemStack.OnSecondaryUseOnBlock, ItemStack.OnSecondaryUse,
-				AbstractBlock.AbstractBlockState.OnSecondaryUse, AbstractBlock.AbstractBlockState.OnSecondaryUseWithItem
-			);
+			this.SecondaryInteract();
 		}
 
-		[Obsolete]
-		private void OnLeftHold() {
+		private void OnLeftHoldTick() {
+			if (this.activeItemUse?.type == InteractionType.Primary) this.HandleUseTick();
 		}
-		[Obsolete]
-		private void OnRightHold() {
+		private void OnRightHoldTick() {
+			if (this.activeItemUse?.type == InteractionType.Secondary) this.HandleUseTick();
 		}
 
 		[Obsolete]
@@ -179,18 +173,68 @@ namespace SoulboundEngine.Client.Player {
 		private void OnRightRelease() {
 		}
 
+		private void PrimaryInteract() {
+			if (!this.Interact(InteractionType.Primary,
+					ItemStack.OnPrimaryUseOnEntity, ItemStack.OnPrimaryUseOnBlock, ItemStack.OnPrimaryUse,
+					AbstractBlock.AbstractBlockState.OnPrimaryUse, AbstractBlock.AbstractBlockState.OnPrimaryUseWithItem
+				)) {
+				this.TryBreakBlock((BlockPos)this.GetWorldPointerPos());
+			}
+		}
+
+		private void SecondaryInteract() {
+			this.Interact(InteractionType.Secondary,
+				ItemStack.OnSecondaryUseOnEntity, ItemStack.OnSecondaryUseOnBlock, ItemStack.OnSecondaryUse,
+				AbstractBlock.AbstractBlockState.OnSecondaryUse, AbstractBlock.AbstractBlockState.OnSecondaryUseWithItem
+			);
+		}
+
+		private void HandleUseTick() {
+			if (this.activeItemUse == null) return;
+			this.activeItemUse = this.activeItemUse.Tick(finishedStack => {
+				this.SetMainHandStackInternal(finishedStack);
+				return null;
+			}, this.SetMainHandStackInternal);
+		}
+
+		public void CancelItemUse() {
+			this.activeItemUse?.Cancel(this.SetMainHandStackInternal);
+			this.activeItemUse = null;
+		}
+
+		private void CheckItemUse() {
+			if (!this.IsUsingItem()) return;
+			if ((this.activeItemUse!.type == InteractionType.Primary && !this.isHoldingLeftClick)
+					|| (this.activeItemUse!.type == InteractionType.Secondary && !this.isHoldingRightClick)) {
+				this.CancelItemUse();
+			}
+		}
+
 		private bool Interact(
+				InteractionType type,
 				Func<ItemStack, PlayerEntity, Entity, IActionResult> itemOnEntity,
 				Func<ItemStack, BlockInteractionResult, IActionResult> itemOnBlock,
 				Func<ItemStack, Level, PlayerEntity, BlockPos, IActionResult> itemInAir,
 				Func<BlockState, Level, PlayerEntity, BlockPos, IActionResult> blockUse,
 				Func<BlockState, ItemStack, Level, PlayerEntity, BlockPos, IActionResult> blockUseWithItem
 			) {
+			this.CancelItemUse();
+
 			Vector2 interactionPoint = this.GetWorldPointerPos();
 			ItemStack stack = this.GetMainHandStack();
 
 			bool itemInteracted = ItemInteract(interactionPoint, stack, this, itemOnEntity, itemOnBlock, itemInAir);
-			if (itemInteracted) return true;
+			if (itemInteracted) {
+				ItemStack usedStack = stack.OnItemUsed(type, this.level, this);
+				this.SetMainHandStack(usedStack);
+
+				int useTime = usedStack.GetUseTime(type, this.level, this);
+				if (useTime > 0) {
+					ActiveUseContext useContext = new(usedStack, type, this.level, this, useTime, useTime);
+					this.activeItemUse = useContext;
+				}
+				return true;
+			}
 
 			BlockPos blockPos = (BlockPos)interactionPoint;
 			BlockState? blockState = this.level.GetBlockState(blockPos);
@@ -344,11 +388,18 @@ namespace SoulboundEngine.Client.Player {
 			return transitStack.IsEmpty() ? this.inventory.GetMainStack() : transitStack;
 		}
 
-		// TODO: implement PlayerEntity.SetMainHandStack
+		
+		public void SetMainHandStack(ItemStack stack) {
+			this.CancelItemUse();
+			this.SetMainHandStackInternal(stack);
+		}
+
+		// TODO: implement PlayerEntity.SetMainHandStackInternal
 		// this requires transit stack sync which isnt supported yet
 		// calling transitStack.SetStack right now will desync inventory screen handlers' transit stack
-		public void SetMainHandStack(ItemStack newStack) {
-			Logger.LogInfo("set main hand stack: {}", newStack);
+		private void SetMainHandStackInternal(ItemStack stack) {
+			if (ItemStack.AreEqual(stack, this.GetMainHandStack())) return;
+			Logger.LogInfo("set main hand stack: {}", stack);
 		}
 
 		public bool IsHoldingLeftClick() => this.isHoldingLeftClick;
@@ -360,6 +411,8 @@ namespace SoulboundEngine.Client.Player {
 			// keep in mind PlayerEntity is at core layer, independent of UnityEngine
 			return this.client.ScreenToWorldPoint(this.screenPointerPos);
 		}
+
+		public bool IsUsingItem() => this.activeItemUse != null;
 
 		public void SetTransitStackSource(TransitStackHandler transitStack) {
 			this.transitStack = transitStack;

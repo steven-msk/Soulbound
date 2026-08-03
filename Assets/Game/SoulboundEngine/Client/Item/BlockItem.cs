@@ -51,5 +51,9 @@ namespace SoulboundEngine.Client.Item {
 		protected virtual BlockState? GetPlacementState(ItemPlacementContext context) {
 			return this.block.DefaultState;
 		}
+
+		public override bool ShouldContinueUse(ItemStack stack, InteractionType type, Level level, PlayerEntity player) {
+			return true;
+		}
 	}
 }

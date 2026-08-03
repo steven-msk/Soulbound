@@ -1,32 +1,43 @@
 using SoulboundEngine.Client.Debug.Logging;
 using SoulboundEngine.Client.Interaction;
+using SoulboundEngine.Client.Player;
+using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.Client.World.Entity;
+using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Common;
 
 namespace SoulboundEngine.Client.Item {
 	[PROTOTYPICAL]
-	public sealed class ChargeableItem : Item, IInteractableItem {
+	public sealed class ChargeableItem : Item {
 		public ChargeableItem(Settings settings) : base(settings) {
 		}
 
-		public bool ValidateTrigger(InteractionTrigger trigger) {
-			return trigger == InteractionTrigger.LeftHold
-				|| trigger == InteractionTrigger.LeftClick
-				|| trigger == InteractionTrigger.LeftRelease;
+		public override IActionResult OnPrimaryUse(ItemStack stack, Level level, PlayerEntity player, BlockPos blockPos) {
+			return IActionResult.SUCCESS;
 		}
 
-		public bool CanExecute(in ItemStack itemStack, in ItemInteraction ctx) {
-			return true;
+		public override int GetUseTime(ItemStack stack, InteractionType type, Level level, Entity user) {
+			return 5;
 		}
 
-		public bool TryExecute(ref ItemStack itemStack, in ItemInteraction ctx) {
-			if (ctx.trigger == InteractionTrigger.LeftClick) {
-				Logger.LogInfo("Start charge");
-			} else if (ctx.trigger == InteractionTrigger.LeftHold) {
-				Logger.LogInfo("Charging..........");
-			} else {
-				Logger.LogInfo("Released charge");
-			}
-			return true;
+		public override ItemStack OnItemUsed(ItemStack stack, InteractionType type, Level level, Entity user) {
+			Logger.LogInfo("Chargeable item used");
+			return stack;
+		}
+
+		public override ItemStack OnUseCanceled(ItemStack stack, InteractionType type, Level level, Entity user, int remainingTicks) {
+			Logger.LogInfo("Chargeable item use canceled");
+			return stack;
+		}
+
+		public override ItemStack OnUseFinished(ItemStack stack, InteractionType type, Level level, Entity user) {
+			Logger.LogInfo("Chargeable item use finished");
+			return stack;
+		}
+
+		public override ItemStack OnUseTick(ItemStack stack, InteractionType type, Level level, Entity user, int remainingTicks) {
+			Logger.LogInfo("Chargeable item use tick. remaining ticks: {}", remainingTicks);
+			return stack;
 		}
 
 	}
