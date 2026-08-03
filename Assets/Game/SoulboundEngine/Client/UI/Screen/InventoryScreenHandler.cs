@@ -17,6 +17,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		protected readonly InventoryScreenHandlerType type;
 		protected ItemStack transitStack;
 		private SlotDragState? dragState;
+		public event Action<ItemStack>? externalTransitStackChange;
 
 		protected InventoryScreenHandler(InventoryScreenHandlerType type) {
 			this.type = type;
@@ -407,10 +408,18 @@ namespace SoulboundEngine.Client.UI.Screen {
 		}
 
 		public virtual void OnClosed(PlayerEntity player) {
-			
 		}
 
 		public ItemStack GetTransitStack() => this.transitStack;
+
+		public void SetTransitStack(ItemStack stack) {
+			this.transitStack = stack;
+			externalTransitStackChange?.Invoke(stack);
+		}
+
+		public StackReference GetTransitStackReference() {
+			return new StackReference(this.SetTransitStack, this.GetTransitStack);
+		}
 
 		public InventoryScreenHandlerType GetHandlerType() => this.type;
 	}

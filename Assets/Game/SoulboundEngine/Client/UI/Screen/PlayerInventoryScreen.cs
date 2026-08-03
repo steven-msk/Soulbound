@@ -75,7 +75,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 		private void OnCraftingPreviewClicked(ClickEvent evt, RecipePreviewElement preview) {
 			this.handler.CraftRecipe(preview.recipe);
-			this.SyncTransitStack();
+			this.SyncTransitStack(this.handler.GetTransitStack());
 		}
 
 		private VisualElement GetCraftingPreviewParent(VisualElement screenRoot) {

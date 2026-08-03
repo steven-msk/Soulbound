@@ -45,6 +45,10 @@ namespace SoulboundEngine.Client.Player {
 			return this.slots[this.mainSlot].GetStack();
 		}
 
+		public void SetMainStack(ItemStack stack) {
+			this.slots[this.mainSlot].SetStack(stack);
+		}
+
 		public IItemSlot GetSlot(int index) => this.slots[index];
 
 		public IEnumerable<int> GetSlots() => this.slots.Select(s => s.GetIndex());

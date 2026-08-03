@@ -14,8 +14,6 @@ using UnityEngine;
 #nullable enable
 
 namespace SoulboundEngine.Client.Player {
-	using Logger = Debug.Logging.Logger;
-
 	public class PlayerEntity : Entity, IInputEventHandler {
 		public static readonly EntityDescriptor<PlayerEntity> DESCRIPTOR = EntityDescriptor.Of<PlayerEntity>((_, level) => throw new InvalidOperationException());
 		const float MAX_BLOCK_REACH = 5f;
@@ -29,7 +27,6 @@ namespace SoulboundEngine.Client.Player {
 		private InventoryScreenHandler? activeInventoryScreenHandler;
 		private IScreenHandle? activeInventoryScreen;
 		private new readonly PlayerTransformAdapter transformAdapter;
-		private TransitStackHandler? transitStack;
 		private ActiveUseContext? activeItemUse;
 
 		public PlayerEntity(SoulboundClient client, Level level)
@@ -236,12 +233,11 @@ namespace SoulboundEngine.Client.Player {
 			this.CancelItemUse();
 
 			Vector2 interactionPoint = this.GetWorldPointerPos();
-			ItemStack stack = this.GetMainHandStack();
 
-			bool itemInteracted = ItemInteract(interactionPoint, stack, this, itemOnEntity, itemOnBlock, itemInAir);
+			bool itemInteracted = ItemInteract(interactionPoint, this.GetMainHandStack(), this, itemOnEntity, itemOnBlock, itemInAir);
 			if (itemInteracted) {
-				ItemStack usedStack = stack.OnItemUsed(type, this.level, this);
-				this.SetMainHandStack(usedStack);
+				ItemStack usedStack = this.GetMainHandStack().OnItemUsed(type, this.level, this);
+				this.SetMainHandStackInternal(usedStack);
 
 				int useTime = usedStack.GetUseTime(type, this.level, this);
 				if (useTime > 0) {
@@ -254,7 +250,7 @@ namespace SoulboundEngine.Client.Player {
 			BlockPos blockPos = (BlockPos)interactionPoint;
 			BlockState? blockState = this.level.GetBlockState(blockPos);
 			if (blockState == null) return false;
-			return BlockInteract(blockState, blockPos, stack, this, blockUse, blockUseWithItem);
+			return BlockInteract(blockState, blockPos, this.GetMainHandStack(), this, blockUse, blockUseWithItem);
 		}
 
 		private static bool ItemInteract(
@@ -272,7 +268,6 @@ namespace SoulboundEngine.Client.Player {
 				if (actionResult is IActionResult.PassToBlockAction) return false;
 				if (HandleActionResult(actionResult, player)) return true;
 			}
-			Logger.LogInfo(stack);
 
 			if (player.CanInteractWithBlockAt(interactionPoint, out BlockState blockState, out BlockPos blockPos)) {
 				BlockInteractionResult blockInteractionResult = new(player.level, blockPos, blockState, stack, player);
@@ -401,11 +396,12 @@ namespace SoulboundEngine.Client.Player {
 		public float GetLuck() => 0f;
 
 		public ItemStack GetMainHandStack() {
-			ItemStack transitStack = this.transitStack?.GetStack() ?? ItemStack.EMPTY;
+			ItemStack transitStack = this.GetTransitStack() ?? ItemStack.EMPTY;
 			return transitStack.IsEmpty() ? this.inventory.GetMainStack() : transitStack;
 		}
-
 		
+		public ItemStack? GetTransitStack() => this.activeInventoryScreenHandler?.GetTransitStack();
+
 		public void SetMainHandStack(ItemStack stack) {
 			this.CancelItemUse();
 			this.SetMainHandStackInternal(stack);
@@ -416,7 +412,11 @@ namespace SoulboundEngine.Client.Player {
 		// calling transitStack.SetStack right now will desync inventory screen handlers' transit stack
 		private void SetMainHandStackInternal(ItemStack stack) {
 			if (ItemStack.AreEqual(stack, this.GetMainHandStack())) return;
-			Logger.LogInfo("set main hand stack: {}", stack);
+			if (this.activeInventoryScreenHandler == null) {
+				this.inventory.SetMainStack(stack);
+			} else {
+				this.activeInventoryScreenHandler.SetTransitStack(stack);
+			}
 		}
 
 		public bool IsHoldingLeftClick() => this.isHoldingLeftClick;
@@ -430,10 +430,6 @@ namespace SoulboundEngine.Client.Player {
 		}
 
 		public bool IsUsingItem() => this.activeItemUse != null;
-
-		public void SetTransitStackSource(TransitStackHandler transitStack) {
-			this.transitStack = transitStack;
-		}
 
 		public void SetTransformHandle(IPlayerTransformHandle playerTransformHandle) {
 			this.transformAdapter.SetHandle(playerTransformHandle);
