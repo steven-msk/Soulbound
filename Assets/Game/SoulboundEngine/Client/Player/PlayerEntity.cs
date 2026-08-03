@@ -272,6 +272,7 @@ namespace SoulboundEngine.Client.Player {
 				if (actionResult is IActionResult.PassToBlockAction) return false;
 				if (HandleActionResult(actionResult, player)) return true;
 			}
+			Logger.LogInfo(stack);
 
 			if (player.CanInteractWithBlockAt(interactionPoint, out BlockState blockState, out BlockPos blockPos)) {
 				BlockInteractionResult blockInteractionResult = new(player.level, blockPos, blockState, stack, player);
@@ -317,10 +318,11 @@ namespace SoulboundEngine.Client.Player {
 		}
 
 		public bool CanInteractWithEntityAt(Vector2 pos, out Entity entity) {
-			if (this.level.TryGetEntityAt(pos, out entity)) {
-				if (!this.IsInBlockReach(pos)) return false;
+			if (!this.IsInBlockReach(pos)) {
+				entity = null!;
+				return false;
 			}
-			return true;
+			return this.level.TryGetEntityAt(pos, out entity);
 		}
 
 		public bool CanInteractWithBlockAt(Vector2 pos, out BlockState blockState, out BlockPos blockPos) {

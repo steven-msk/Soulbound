@@ -5,6 +5,7 @@ namespace SoulboundEngine.Client.Interaction {
 		public static readonly Fail FAIL = new();
 		public static readonly Success SUCCESS = new(new ItemContext(null));
 		public static readonly Pass PASS = new();
+		public static readonly PassToBlockAction PASS_TO_BLOCK_ACTION = new();
 
 		public virtual bool IsAccepted() => false;
 
