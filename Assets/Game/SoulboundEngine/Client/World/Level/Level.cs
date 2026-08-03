@@ -293,7 +293,7 @@ namespace SoulboundEngine.Client.World.Level {
 			foreach (var ent in this.entities.Values) {
 				if (!ent.GetBoundingBox().Contains(worldPos)) continue;
 
-				float dist = Vector2.Distance(worldPos, entity.GetCenter());
+				float dist = Vector2.Distance(worldPos, ent.GetCenter());
 				if (dist < closestDist) {
 					entity = ent;
 					closestDist = dist;
