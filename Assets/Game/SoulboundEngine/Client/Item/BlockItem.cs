@@ -22,13 +22,17 @@ namespace SoulboundEngine.Client.Item {
 			return this.Place(new ItemPlacementContext(player, stack, blockPos));
 		}
 
+		public sealed override IActionResult OnPrimaryUseOnBlock(BlockInteractionResult result) {
+			return IActionResult.FAIL;
+		}
+
 		public virtual IActionResult Place(ItemPlacementContext context) {
 			if (context.player == null) return IActionResult.PASS;
 
 			if (context.player.IsInBlockReach(context.blockPos.GetCenter())) {
 				BlockState? placementState = this.GetPlacementState(context);
-				placementState ??= Blocks.AIR.DefaultState;
 
+				if (placementState == null) return IActionResult.FAIL;
 				if (!this.CanPlace(context, placementState)) return IActionResult.FAIL;
 
 				context.level.SetBlockState(context.blockPos, placementState);

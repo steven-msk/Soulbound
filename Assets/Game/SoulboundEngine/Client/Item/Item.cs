@@ -52,6 +52,8 @@ namespace SoulboundEngine.Client.Item {
 			return this.GetRegistryEntry().GetIdAsString();
 		}
 
+		public int GetBreakLevel() => this.components.GetOrDefault(ItemComponents.BREAK_LEVEL, 0);
+
 		/// <summary> 
 		/// Called when the player starts using the item (left click).
 		/// This method is called last in the entity -> block -> air dispatch order,
@@ -121,6 +123,10 @@ namespace SoulboundEngine.Client.Item {
 			public Settings RegistryKey(RegistryKey<Item> key) {
 				this.registryKey = key;
 				return this;
+			}
+
+			public Settings BreakLevel(int breakLevel) {
+				return this.Component(ItemComponents.BREAK_LEVEL, breakLevel);
 			}
 
 			/// <summary>

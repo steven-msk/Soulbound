@@ -14,7 +14,6 @@ using UnityEngine;
 #nullable enable
 
 namespace SoulboundEngine.Client.Player {
-	using Item = Item.Item;
 	using Logger = Debug.Logging.Logger;
 
 	public class PlayerEntity : Entity, IInputEventHandler {
@@ -261,14 +260,7 @@ namespace SoulboundEngine.Client.Player {
 
 		private int GetMainHandItemBreakLevel() {
 			ItemStack mainHandStack = this.GetMainHandStack();
-			Item item = mainHandStack.item;
-
-			if (mainHandStack.IsEmpty()) return 0;
-
-			if (item is IBlockBreakerItem breaker) {
-				return breaker.GetBreakLevel(mainHandStack);
-			}
-			return -1;
+			return mainHandStack.GetBreakLevel();
 		}
 
 		private void ThrowFromMainHand(bool ctrl) {

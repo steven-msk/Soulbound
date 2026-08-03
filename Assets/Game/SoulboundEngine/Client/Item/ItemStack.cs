@@ -12,10 +12,17 @@ using UnityEngine;
 
 namespace SoulboundEngine.Client.Item {
 	public struct ItemStack : IComponentHolder {
+		private static MergedComponentMap cachedEmptyComponents = null!;
+		private static MergedComponentMap CachedEmptyComponents => cachedEmptyComponents ??= MergedComponentMap.Create(Items.AIR.GetComponents(), ComponentChanges.EMPTY);
 		public static readonly ItemStack EMPTY = new();
 		private readonly MergedComponentMap components;
-		public readonly Item item;
+		private readonly Item item;
 		public int count { get; private set; }
+
+		// components are null on a default(ItemStack) instance
+		// to guard against this, read this instead of this.components directly
+		// if AssertComponentChangesNotOnEmpty is called, then its safe to use this.components
+		private readonly MergedComponentMap ComponentsNonNull => this.components ?? CachedEmptyComponents;
 
 		public ItemStack(IItemConvertible item)
 			: this(item, 1) {
@@ -43,29 +50,34 @@ namespace SoulboundEngine.Client.Item {
 			this.components = components;
 		}
 
-		public readonly IComponentMap GetComponents() => this.components;
+		public readonly IComponentMap GetComponents() => this.ComponentsNonNull;
 
-		public readonly ComponentChanges GetComponentChanges() => this.components.AsPatch();
+		public readonly ComponentChanges GetComponentChanges() => this.ComponentsNonNull.AsPatch();
 
-		public readonly IComponentMap GetDefaultComponents() => this.item?.GetComponents() ?? IComponentMap.EMPTY;
+		public readonly IComponentMap GetDefaultComponents() => this.GetItem().GetComponents();
 
 		public readonly void ApplyChanges(ComponentChanges changes) {
+			this.AssertComponentMutationNotOnEmpty();
 			this.components.SetChanges(changes);
 		}
 
 		public readonly void SetComponentsFrom(IComponentMap map) {
+			this.AssertComponentMutationNotOnEmpty();
 			this.components.SetAll(map);
 		}
 
 		public readonly void Set<T>(ComponentType<T> type, T defaultValue, Func<T, T> applier) {
+			this.AssertComponentMutationNotOnEmpty();
 			this.components.Set(type, applier(this.components.GetOrDefault(type, defaultValue)));
 		}
 
 		public readonly void Set<T, U>(ComponentType<T> type, T defaultValue, U change, Func<T, U, T> applier) {
+			this.AssertComponentMutationNotOnEmpty();
 			this.components.Set(type, applier(this.components.GetOrDefault(type, defaultValue), change));
 		}
 
 		public readonly void ResetToDefaultComponents() {
+			this.AssertComponentMutationNotOnEmpty();
 			this.components.ClearChanges();
 		}
 
@@ -111,7 +123,7 @@ namespace SoulboundEngine.Client.Item {
 		}
 
 		public static bool AreItemsAndComponentsEqual(ItemStack a, ItemStack b) {
-			return AreItemsEqual(a, b) && a.components.Equals(b.components);
+			return AreItemsEqual(a, b) && a.ComponentsNonNull.Equals(b.ComponentsNonNull);
 		}
 
 		public static bool AreEqual(ItemStack a, ItemStack b) {
@@ -151,20 +163,24 @@ namespace SoulboundEngine.Client.Item {
 		}
 
 		public readonly ItemStack CopyComponentsToNewStack(IItemConvertible item, int count) {
+			this.AssertComponentMutationNotOnEmpty();
 			return new ItemStack(item, count, this.components.Copy());
 		}
 
 		public readonly void Copy<T>(ComponentType<T> type, IComponentsAccess from) {
+			this.AssertComponentMutationNotOnEmpty();
 			this.components.Set(type, from.Get(type));
 		}
 
-		public T Set<T>(ComponentType<T> type, T? value) {
+		public readonly T Set<T>(ComponentType<T> type, T? value) {
+			this.AssertComponentMutationNotOnEmpty();
 			if (value == null) return this.Remove(type);
 			this.components.Set(type, value);
 			return value;
 		}
 
-		public T Remove<T>(ComponentType<T> type) {
+		public readonly T Remove<T>(ComponentType<T> type) {
+			this.AssertComponentMutationNotOnEmpty();
 			return this.components.Remove(type);
 		}
 
@@ -172,23 +188,35 @@ namespace SoulboundEngine.Client.Item {
 			this.count = Mathf.Clamp(this.count, 0, maxCount);
 		}
 
+		public readonly Item GetItem() => this.item ?? Items.AIR;
+
+		public readonly int GetMaxCount() => this.GetItem().GetMaxCount();
+
+		public readonly int GetBreakLevel() {
+			return this.ComponentsNonNull.GetOrDefault(ItemComponents.BREAK_LEVEL, this.GetItem().GetBreakLevel());
+		}
+
 		public static IActionResult OnPrimaryUse(ItemStack stack, Level level, PlayerEntity player, BlockPos blockPos) {
-			return stack.item?.OnPrimaryUse(stack, level, player, blockPos) ?? throw new NotSupportedException("Primary interaction with null item");
+			return stack.GetItem().OnPrimaryUse(stack, level, player, blockPos);
 		}
 		public static IActionResult OnPrimaryUseOnBlock(ItemStack stack, BlockInteractionResult result) {
-			return stack.item?.OnPrimaryUseOnBlock(result) ?? throw new NotSupportedException("Primary interaction on block with null item");
+			return stack.GetItem().OnPrimaryUseOnBlock(result);
 		}
 		public static IActionResult OnPrimaryUseOnEntity(ItemStack stack, PlayerEntity player, Entity target) {
-			return stack.item?.OnPrimaryUseOnEntity(stack, player, target) ?? throw new NotSupportedException("Primary interaction on entity with null item");
+			return stack.GetItem().OnPrimaryUseOnEntity(stack, player, target);
 		}
 		public static IActionResult OnSecondaryUse(ItemStack stack, Level level, PlayerEntity player, BlockPos blockPos) {
-			return stack.item?.OnSecondaryUse(stack, level, player, blockPos) ?? throw new NotSupportedException("Secondary interaction with null item");
+			return stack.GetItem().OnSecondaryUse(stack, level, player, blockPos);
 		}
 		public static IActionResult OnSecondaryUseOnBlock(ItemStack stack, BlockInteractionResult result) {
-			return stack.item?.OnSecondaryUseOnBlock(result) ?? throw new NotSupportedException("Secondary interaction on block with null item");
+			return stack.GetItem().OnSecondaryUseOnBlock(result);
 		}
 		public static IActionResult OnSecondaryUseOnEntity(ItemStack stack, PlayerEntity player, Entity target) {
-			return stack.item?.OnSecondaryUseOnEntity(stack, player, target) ?? throw new NotSupportedException("Secondary interaction on entity with null item");
+			return stack.GetItem().OnSecondaryUseOnEntity(stack, player, target);
+		}
+
+		private readonly void AssertComponentMutationNotOnEmpty() {
+			if (this.IsEmpty()) throw new NotSupportedException("Cannot mutate components on empty stack");
 		}
 
 #pragma warning disable CS0809 // Obsolete member overrides non-obsolete member

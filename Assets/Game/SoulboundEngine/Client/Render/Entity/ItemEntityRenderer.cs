@@ -20,7 +20,7 @@ namespace SoulboundEngine.Client.Render.Entity {
 		}
 
 		public override IEntityView CreateView(ItemEntityRenderState state, ItemEntityModel model) {
-			ItemRenderer itemRenderer = this.itemRenderManager.GetRenderer(state.stack.item);
+			ItemRenderer itemRenderer = this.itemRenderManager.GetRenderer(state.stack.GetItem());
 			ItemModel itemModel = this.itemRenderManager.GetModel(state.stack);
 
 			ItemRenderContext renderContext = new ItemRenderContext.World { position = state.entity.GetPosition() };

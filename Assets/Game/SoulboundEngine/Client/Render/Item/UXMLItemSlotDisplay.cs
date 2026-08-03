@@ -123,7 +123,7 @@ namespace SoulboundEngine.Client.Render.Item {
 		private void UpdateTooltip() {
 			if (!this.showTooltip) return;
 			if (this.isHovering && !this.stack.IsEmpty()) {
-				this.Screen.SetTooltip(this.stack.item.GetName());
+				this.Screen.SetTooltip(this.stack.GetItem().GetName());
 				this.isTooltipVisible = true;
 			} else {
 				this.Screen.ClearTooltip();
