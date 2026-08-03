@@ -151,12 +151,18 @@ namespace SoulboundEngine.Client.Player {
 		}
 
 		private void OnLeftClick() {
-			if (!this.Interact(ItemStack.OnPrimaryUseOnEntity, ItemStack.OnPrimaryUseOnBlock, ItemStack.OnPrimaryUse)) {
+			if (!this.Interact(
+					ItemStack.OnPrimaryUseOnEntity, ItemStack.OnPrimaryUseOnBlock, ItemStack.OnPrimaryUse,
+					AbstractBlock.AbstractBlockState.OnPrimaryUse, AbstractBlock.AbstractBlockState.OnPrimaryUseWithItem
+				)) {
 				this.TryBreakBlock((BlockPos)this.GetWorldPointerPos());
 			}
 		}
 		private void OnRightClick() {
-			this.Interact(ItemStack.OnSecondaryUseOnEntity, ItemStack.OnSecondaryUseOnBlock, ItemStack.OnSecondaryUse);
+			this.Interact(
+				ItemStack.OnSecondaryUseOnEntity, ItemStack.OnSecondaryUseOnBlock, ItemStack.OnSecondaryUse,
+				AbstractBlock.AbstractBlockState.OnSecondaryUse, AbstractBlock.AbstractBlockState.OnSecondaryUseWithItem
+			);
 		}
 
 		[Obsolete]
@@ -174,38 +180,67 @@ namespace SoulboundEngine.Client.Player {
 		}
 
 		private bool Interact(
-				Func<ItemStack, PlayerEntity, Entity, IActionResult> entityUse,
-				Func<ItemStack, BlockInteractionResult, IActionResult> blockUse,
-				Func<ItemStack, Level, PlayerEntity, BlockPos, IActionResult> normalUse
+				Func<ItemStack, PlayerEntity, Entity, IActionResult> itemOnEntity,
+				Func<ItemStack, BlockInteractionResult, IActionResult> itemOnBlock,
+				Func<ItemStack, Level, PlayerEntity, BlockPos, IActionResult> itemInAir,
+				Func<BlockState, Level, PlayerEntity, BlockPos, IActionResult> blockUse,
+				Func<BlockState, ItemStack, Level, PlayerEntity, BlockPos, IActionResult> blockUseWithItem
 			) {
 			Vector2 interactionPoint = this.GetWorldPointerPos();
 			ItemStack stack = this.GetMainHandStack();
-			return Interact(interactionPoint, stack, this, entityUse, blockUse, normalUse);
+
+			bool itemInteracted = ItemInteract(interactionPoint, stack, this, itemOnEntity, itemOnBlock, itemInAir);
+			if (itemInteracted) return true;
+
+			BlockPos blockPos = (BlockPos)interactionPoint;
+			BlockState? blockState = this.level.GetBlockState(blockPos);
+			if (blockState == null) return false;
+			return BlockInteract(blockState, blockPos, stack, this, blockUse, blockUseWithItem);
 		}
 
-		private static bool Interact(
+		private static bool ItemInteract(
 				Vector2 interactionPoint, 
 				ItemStack stack, 
 				PlayerEntity player,
-				Func<ItemStack, PlayerEntity, Entity, IActionResult> entityUse,
-				Func<ItemStack, BlockInteractionResult, IActionResult> blockUse,
-				Func<ItemStack, Level, PlayerEntity, BlockPos, IActionResult> normalUse
+				Func<ItemStack, PlayerEntity, Entity, IActionResult> onEntity,
+				Func<ItemStack, BlockInteractionResult, IActionResult> onBlock,
+				Func<ItemStack, Level, PlayerEntity, BlockPos, IActionResult> inAir
 			) {
 			if (stack.IsEmpty()) return false;
 
 			if (player.CanInteractWithEntityAt(interactionPoint, out Entity targetEntity)) {
-				IActionResult actionResult = entityUse(stack, player, targetEntity);
+				IActionResult actionResult = onEntity(stack, player, targetEntity);
+				if (actionResult is IActionResult.PassToBlockAction) return false;
 				if (HandleActionResult(actionResult, player)) return true;
 			}
 
 			if (player.CanInteractWithBlockAt(interactionPoint, out BlockState blockState, out BlockPos blockPos)) {
 				BlockInteractionResult blockInteractionResult = new(player.level, blockPos, blockState, stack, player);
-				IActionResult actionResult = blockUse(stack, blockInteractionResult);
+				IActionResult actionResult = onBlock(stack, blockInteractionResult);
+				if (actionResult is IActionResult.PassToBlockAction) return false;
 				if (HandleActionResult(actionResult, player)) return true;
 			}
 
 			blockPos = (BlockPos)interactionPoint;
-			IActionResult result = normalUse(stack, player.level, player, blockPos);
+			IActionResult result = inAir(stack, player.level, player, blockPos);
+			if (result is IActionResult.PassToBlockAction) return false;
+			return HandleActionResult(result, player);
+		}
+
+		private static bool BlockInteract(
+			BlockState blockState, BlockPos blockPos, ItemStack stack, PlayerEntity player,
+			Func<BlockState, Level, PlayerEntity, BlockPos, IActionResult> normalUse,
+			Func<BlockState, ItemStack, Level, PlayerEntity, BlockPos, IActionResult> withItem
+		) {
+			if (!blockState.IsInteractable(player.level, blockPos)) return false;
+			if (!player.IsInBlockReach(blockPos.GetCenter())) return false;
+
+			if (!stack.IsEmpty()) {
+				IActionResult actionResult = withItem(blockState, stack, player.level, player, blockPos);
+				if (HandleActionResult(actionResult, player)) return true;
+			}
+
+			IActionResult result = normalUse(blockState, player.level, player, blockPos);
 			return HandleActionResult(result, player);
 		}
 
@@ -244,15 +279,16 @@ namespace SoulboundEngine.Client.Player {
 
 		private bool TryBreakBlock(BlockPos blockPos) {
 			if (!this.IsInBlockReach((Vector2)blockPos)) return false;
+			if (!Level.IsInBounds(blockPos)) return false;
 
 			BlockState blockState = this.level.GetBlockState(blockPos) ?? Blocks.AIR.DefaultState;
 			if (blockState.block == Blocks.AIR) return false;
 
 			int itemBreakLevel = this.GetMainHandItemBreakLevel();
-			int minBreakLevel = blockState.block.minBreakLevel;
+			int minBreakLevel = blockState.block.MinBreakLevel;
 			if (itemBreakLevel < minBreakLevel) return false;
 
-			this.level.SetBlockState(blockPos, Blocks.AIR.DefaultState);
+			this.level.SetBlockState(blockPos, blockState.block.OnBreak(this.level, blockPos, blockState, this));
 			Block.DropStacks(blockState, this.level, blockPos, null);
 			return true;
 		}

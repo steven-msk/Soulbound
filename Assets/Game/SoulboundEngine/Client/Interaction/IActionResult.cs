@@ -17,5 +17,7 @@ namespace SoulboundEngine.Client.Interaction {
 		public sealed record Fail : IActionResult;
 
 		public sealed record Pass : IActionResult;
+
+		public sealed record PassToBlockAction : IActionResult;
 	}
 }

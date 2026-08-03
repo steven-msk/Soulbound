@@ -1,25 +1,49 @@
 using SoulboundEngine.Core.Registry;
+using System;
 
 namespace SoulboundEngine.Client.World.Block {
 	public partial class Blocks {
-		public static readonly Block AIR = Register("air", new Block(Block.Settings.Of("Air")));
-		public static readonly Block GRASS = Register("grass", new Block(Block.Settings.Of("Grass Block")));
-		public static readonly Block DIRT = Register("dirt", new Block(Block.Settings.Of("Dirt Block")));
-		public static readonly Block STONE = Register("stone", new Block(Block.Settings.Of("Stone Block").MinBreakLevel(1)));
-		public static readonly Block WOOD = Register("wood", new Block(Block.Settings.Of("Wood")));
-		public static readonly Block LEAVES = Register("leaves", new LeafBlock(Block.Settings.Of("Leaves")));
+		public static readonly Block AIR = Register("air");
+		public static readonly Block GRASS = Register("grass");
+		public static readonly Block DIRT = Register("dirt");
+		public static readonly Block STONE = Register("stone", settings => settings.MinBreakLevel(1));
+		public static readonly Block WOOD = Register("wood");
+		public static readonly Block LEAVES = Register("leaves", settings => new LeafBlock(settings));
+		public static readonly Block CHEST = Register("chest", settings => new ChestBlock(settings));
 
-		public static readonly ToggleBlock TOGGLE_BLOCK = Register("toggle_block", new ToggleBlock(Block.Settings.Of("Toggle Block")));
-		public static readonly NeighborReactiveBlock NEIGHBOR_REACTIVE_BLOCK = Register("neighbor_reactive_block", new NeighborReactiveBlock(Block.Settings.Of("Neighbor Reactive Block")));
-		public static readonly TickingBlock TICKING_BLOCK = Register("ticking_block", new TickingBlock(Block.Settings.Of("Ticking Block")));
-		public static readonly PulseBlock PULSE_BLOCK = Register("pulse_block", new PulseBlock(Block.Settings.Of("Pulse Block")));
-		public static readonly SelfDestructBlock SELF_DESTRUCT_BLOCK = Register("self_destruct_block", new SelfDestructBlock(Block.Settings.Of("Self Destruct Block")));
-		public static readonly MovingTickingBlock MOVING_TICKING_BLOCK = Register("moving_ticking_block", new MovingTickingBlock(Block.Settings.Of("Moving Ticking Block")));
-		public static readonly AreaTriggerBlock AREA_TRIGGER_BLOCK = Register("area_trigger_block", new AreaTriggerBlock(Block.Settings.Of("Area Trigger Block")));
-		public static readonly ChestBlock CHEST = Register("chest", new ChestBlock(Block.Settings.Of("Chest")));
+		// PROTOTYPICAL
+		public static readonly Block TOGGLE_BLOCK = Register("toggle_block", settings => new ToggleBlock(settings));
+		public static readonly Block NEIGHBOR_REACTIVE_BLOCK = Register("neighbor_reactive_block", settings => new NeighborReactiveBlock(settings));
+		public static readonly Block TICKING_BLOCK = Register("ticking_block", settings => new TickingBlock(settings));
+		public static readonly Block PULSE_BLOCK = Register("pulse_block", settings => new PulseBlock(settings));
+		public static readonly Block SELF_DESTRUCT_BLOCK = Register("self_destruct_block", settings => new SelfDestructBlock(settings));
+		public static readonly Block MOVING_TICKING_BLOCK = Register("moving_ticking_block", settings => new MovingTickingBlock(settings));
+		public static readonly Block AREA_TRIGGER_BLOCK = Register("area_trigger_block", settings => new AreaTriggerBlock(settings));
 
-		public static TBlock Register<TBlock>(string id, TBlock block) where TBlock : Block {
-			return Registry<Block>.Register(Registries.BLOCKS, KeyOf(id), block);
+		private static Block Register(string id) {
+			return Register(id, Block.Create);
+		}
+
+		private static Block Register(string id, Func<AbstractBlock.Settings, Block> factory, Func<AbstractBlock.Settings, AbstractBlock.Settings> settingsFactory) {
+			return Register(id, factory, settingsFactory(new AbstractBlock.Settings()));
+		}
+
+		private static Block Register(string id, Func<AbstractBlock.Settings, AbstractBlock.Settings> settingsFactory) {
+			return Register(id, settingsFactory, new AbstractBlock.Settings());
+		}
+
+		private static Block Register(string id, Func<AbstractBlock.Settings, AbstractBlock.Settings> settingsFactory, AbstractBlock.Settings settings) {
+			return Register(id, Block.Create, settingsFactory(settings));
+		}
+
+		private static Block Register(string id, Func<AbstractBlock.Settings, Block> factory) {
+			return Register(id, factory, new AbstractBlock.Settings());
+		}
+
+		private static Block Register(string id, Func<AbstractBlock.Settings, Block> factory, AbstractBlock.Settings settings) {
+			RegistryKey<Block> key = KeyOf(id);
+			settings.RegistryKey(key);
+			return Registry<Block>.Register(Registries.BLOCKS, key, factory(settings));
 		}
 
 		public static Identifier GetIdentifier(Block block) {

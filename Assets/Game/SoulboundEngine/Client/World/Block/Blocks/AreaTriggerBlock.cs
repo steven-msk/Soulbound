@@ -11,7 +11,7 @@ namespace SoulboundEngine.Client.World.Block {
 	public sealed class AreaTriggerBlock : Block, ITileEntityProvider {
 		public static readonly Property<bool> inArea = BoolProperty.Of("inArea");
 
-		public AreaTriggerBlock(Settings settings) 
+		public AreaTriggerBlock(AbstractBlock.Settings settings) 
 			: base(settings) {
 			this.SetDefaultState(this.DefaultState.With(inArea, false));
 		}

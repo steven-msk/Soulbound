@@ -137,8 +137,7 @@ namespace SoulboundEngine.Client.Item {
 				if (this.registryKey is null) {
 					throw new InvalidOperationException("Cannot derive item name: RegistryKey was not set before Build() was called.");
 				}
-
-				return $"item.{this.registryKey.value.GetNamespace()}.{this.registryKey.value.GetPath()}";
+				return this.registryKey.value.ToTranslationKey("item");
 			}
 		}
 	}

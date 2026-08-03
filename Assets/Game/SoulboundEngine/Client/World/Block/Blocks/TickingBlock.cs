@@ -1,5 +1,4 @@
 using SoulboundEngine.Client.World.Block.State;
-using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Common;
 using SoulboundEngine.Core.State;
 using SoulboundEngine.Core.States;
@@ -10,7 +9,7 @@ namespace SoulboundEngine.Client.World.Block {
 		public static readonly Property<bool> on = BoolProperty.Of("on");
 		public static readonly Property<int> tickCount = IntProperty.OfRange("tickCount", 0, 19);
 
-		public TickingBlock(Settings settings) 
+		public TickingBlock(AbstractBlock.Settings settings) 
 			: base(settings) {
 			this.SetDefaultState(this.DefaultState.With(on, false).With(tickCount, 0));
 		}
