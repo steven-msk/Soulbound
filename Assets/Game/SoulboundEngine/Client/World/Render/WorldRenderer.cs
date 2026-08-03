@@ -13,7 +13,6 @@ using UnityEngine.Tilemaps;
 namespace SoulboundEngine.Client.World.Render {
 	using Entity = Entity.Entity;
 	using Level = Level.Level;
-	using Logger = Debug.Logging.Logger;
 
 	public sealed class WorldRenderer {
 		private readonly BlockRenderManager blockRenderManager;
@@ -129,8 +128,6 @@ namespace SoulboundEngine.Client.World.Render {
 			foreach (var entity in level.GetAllEntities()) {
 				this.UpdateEntity(entity);
 			}
-			// temporary hook
-			level.GetPlayer().FrameUpdate();
 		}
 
 		private void RenderEntity(Entity entity) {

@@ -34,8 +34,11 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client {
+	using Camera = UnityEngine.Camera;
 	using Object = UnityEngine.Object;
 	using RectInt = UnityEngine.RectInt;
+	using Vector2 = UnityEngine.Vector2;
+	using Vector3 = UnityEngine.Vector3;
 #if !UNITY_EDITOR
 	using Application = UnityEngine.Application;
 	using LogType = UnityEngine.LogType;
@@ -308,6 +311,22 @@ namespace SoulboundEngine.Client {
 
 		public static int GetRandomWorldSeed() {
 			return UnityEngine.Random.Range(int.MinValue, int.MaxValue);
+		}
+
+		public Vector2 ScreenToWorldPoint(Vector2 screenPoint) {
+			//Canvas canvas = SoulboundClient.Instance.UIHandler.GetCanvas();
+			//RectTransform rootTransform = canvas.GetComponent<RectTransform>();
+			//bool inWorldPoint = RectTransformUtility.ScreenPointToWorldPointInRectangle(
+			//	rootTransform,
+			//	screenPos,
+			//	Camera.main,
+			//	out var worldPoint
+			//);
+			//if (inWorldPoint) return worldPoint;
+
+			Vector3 pos = screenPoint;
+			pos.z = -Camera.main.transform.position.z;
+			return Camera.main.ScreenToWorldPoint(pos);
 		}
 
 		public static SoulboundClient Instance => instance;

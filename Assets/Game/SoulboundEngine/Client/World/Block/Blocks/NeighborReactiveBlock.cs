@@ -1,5 +1,4 @@
 using SoulboundEngine.Client.World.Block.State;
-using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Common;
 using SoulboundEngine.Common.Math;
 using SoulboundEngine.Core.States;
@@ -11,7 +10,7 @@ namespace SoulboundEngine.Client.World.Block {
 		private readonly BlockState active;
 		private readonly BlockState inactive;
 
-		public NeighborReactiveBlock(Settings settings) 
+		public NeighborReactiveBlock(AbstractBlock.Settings settings) 
 			: base(settings) {
 			this.SetDefaultState(this.DefaultState.With(on, false));
 			this.inactive = this.DefaultState;

@@ -82,7 +82,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 				if (remaining <= 0) break;
 
 				ItemStack stack = slot.GetStack();
-				if (stack.IsEmpty() || !ingredient.AcceptsItem(Items.GetEntry(stack.item))) continue;
+				if (stack.IsEmpty() || !ingredient.AcceptsItem(Items.GetEntry(stack.GetItem()))) continue;
 
 				int take = Math.Min(remaining, stack.count);
 				stack.Decrement(take);

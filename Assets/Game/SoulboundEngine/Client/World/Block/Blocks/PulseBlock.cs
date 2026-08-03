@@ -8,7 +8,7 @@ namespace SoulboundEngine.Client.World.Block {
 	public sealed class PulseBlock : Block, ITileEntityProvider {
 		public static readonly Property<bool> on = BoolProperty.Of("on");
 
-		public PulseBlock(Settings settings) 
+		public PulseBlock(AbstractBlock.Settings settings) 
 			: base(settings) {
 			this.SetDefaultState(this.DefaultState.With(on, false));
 		}

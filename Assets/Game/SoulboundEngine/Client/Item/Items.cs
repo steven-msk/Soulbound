@@ -6,7 +6,7 @@ using System;
 
 namespace SoulboundEngine.Client.Item {
 	public partial class Items {
-		public static readonly Item AIR = Register("air");
+		public static readonly Item AIR = Register("air", settings => settings.StackUpTo(0));
 		public static readonly Item GRASS = Register(Blocks.GRASS);
 		public static readonly Item DIRT = Register(Blocks.DIRT);
 		public static readonly Item STONE = Register(Blocks.STONE);
@@ -18,16 +18,13 @@ namespace SoulboundEngine.Client.Item {
 		public static readonly Item teleportPlayerItem = Register("teleport_player_item", settings => new TeleportPlayerItem(settings),
 			settings => settings.NonStackable()
 		);
-		public static readonly Item spawnEntityItem = Register("spawn_entity_item", settings => new SpawnEntityItem(settings));
 		public static readonly Item chargeableItem = Register("chargeable_item", settings => new ChargeableItem(settings),
 			settings => settings.NonStackable()
 		);
 		public static readonly Item debugPointer = Register("debug_pointer", settings => new DebugPointerItem(settings),
 			settings => settings.NonStackable()
 		);
-		public static readonly Item blockBreakerItem = Register("block_breaker_item", settings => new BlockBreakerItem(settings),
-			settings => settings.NonStackable()
-		);
+		public static readonly Item blockBreakerItem = Register("block_breaker_item", settings => settings.NonStackable().BreakLevel(1));
 
 		public static Item Register(string id) {
 			return Register(id, Item.Create, new Item.Settings());
