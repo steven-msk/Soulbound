@@ -1,9 +1,9 @@
-﻿using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.Client.Interaction;
+﻿using SoulboundEngine.Client.Interaction;
 using SoulboundEngine.Client.Item;
 using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.World.Block.Entity;
 using SoulboundEngine.Client.World.Block.State;
+using SoulboundEngine.Client.World.Widget;
 
 namespace SoulboundEngine.Client.World.Block {
 	using Level = Level.Level;
@@ -18,15 +18,20 @@ namespace SoulboundEngine.Client.World.Block {
 		}
 
 		protected override void OnHoverEnter(BlockState state, ItemStack stack, Level level, PlayerEntity player, BlockPos pos) {
-			Logger.LogInfo("sign hover enter: {}", pos);
+			SignTileEntity tileEntity = (SignTileEntity)level.GetTileEntity(pos);
+			tileEntity.widgetHandle = player.ShowWorldWidget(WorldWidgetType.SIGN, new SignWidget.Context() { 
+				blockPos = pos, text = tileEntity.GetText()
+			});
 		}
 
 		protected override void OnHoverLeave(BlockState state, ItemStack stack, Level level, PlayerEntity player, BlockPos pos) {
-			Logger.LogInfo("sign hover leave: {}", pos);
+			SignTileEntity tileEntity = (SignTileEntity)level.GetTileEntity(pos);
+			if (tileEntity.widgetHandle == null) return;
+			player.DestroyWorldWidget(tileEntity.widgetHandle);
+			tileEntity.widgetHandle = null;
 		}
 
 		protected override IActionResult OnSecondaryUse(BlockState state, Level level, PlayerEntity player, BlockPos pos) {
-			Logger.LogInfo("sign set text triggered");
 			return IActionResult.SUCCESS;
 		}
 	}

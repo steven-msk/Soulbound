@@ -50,6 +50,7 @@ namespace SoulboundEngine.Client.UI.UXMLBindings {
             UXMLSchema.Register(Identifier.Of("soulbound:world_entry/world_name"), typeof(Label));
             UXMLSchema.Register(Identifier.Of("soulbound:world_entry/world_seed"), typeof(Label));
             UXMLSchema.Register(Identifier.Of("soulbound:world_entry/delete_world"), typeof(Button));
+            UXMLSchema.Register(Identifier.Of("soulbound:sign_text/text"), typeof(Label));
         }
     }
 }

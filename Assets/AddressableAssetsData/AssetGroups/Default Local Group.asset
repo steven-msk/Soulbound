@@ -225,6 +225,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ce290aa8113118248a6a5dd32ad8898f
+    m_Address: WorldWidgetDocument
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: ced63e50cee7ab94894ce3933a476a0d
     m_Address: TransitStack
     m_ReadOnly: 0
@@ -251,6 +257,12 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e97c1c3954a6faa4da45ed9eef7f1918
     m_Address: missingTile
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ee83b68ec517d8549845f70f4e84eeec
+    m_Address: SignText
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload

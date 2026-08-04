@@ -7,6 +7,7 @@ using SoulboundEngine.Client.World.Block;
 using SoulboundEngine.Client.World.Block.State;
 using SoulboundEngine.Client.World.Entity;
 using SoulboundEngine.Client.World.Level;
+using SoulboundEngine.Client.World.Widget;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -369,6 +370,18 @@ namespace SoulboundEngine.Client.Player {
 		private int GetMainHandItemBreakLevel() {
 			ItemStack mainHandStack = this.GetMainHandStack();
 			return mainHandStack.GetBreakLevel();
+		}
+
+		public WorldWidgetHandle ShowWorldWidget<TContext>(WorldWidgetType<TContext> type, TContext context) where TContext : WorldWidgetContext {
+			return this.client.ShowWorldWidget(type, context);
+		}
+
+		public void UpdateWorldWidget<TContext>(WorldWidgetHandle handle, TContext context) where TContext : WorldWidgetContext {
+			this.client.UpdateWorldWidget(handle, context);
+		}
+
+		public void DestroyWorldWidget(WorldWidgetHandle handle) {
+			this.client.DestroyWorldWidget(handle);
 		}
 
 		private void ThrowFromMainHand(bool ctrl) {

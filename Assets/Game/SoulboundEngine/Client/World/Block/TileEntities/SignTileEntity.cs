@@ -1,9 +1,12 @@
 ﻿using Newtonsoft.Json.Linq;
 using SoulboundEngine.Client.World.Block.State;
+using SoulboundEngine.Client.World.Widget;
+
+#nullable enable
 
 namespace SoulboundEngine.Client.World.Block.Entity {
 	public class SignTileEntity : TileEntity {
-		private string text;
+		private string text = "a sign";
 
 		private SignTileEntity(TileEntityType tileEntityType, BlockPos blockPos, BlockState blockState) 
 			: base(tileEntityType, blockPos, blockState) {
@@ -17,8 +20,10 @@ namespace SoulboundEngine.Client.World.Block.Entity {
 			return new SignTileEntity(blockPos, state);
 		}
 
+		public WorldWidgetHandle? widgetHandle { get; set; }
+
 		public override void Read(JToken json) {
-			this.text = (string)json["text"];
+			this.text = (string)json["text"]!;
 		}
 
 		public override void Write(JObject json) {
