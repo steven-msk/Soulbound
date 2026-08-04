@@ -28,6 +28,7 @@ namespace SoulboundEngine.Client.Player {
 		private IScreenHandle? activeInventoryScreen;
 		private new readonly PlayerTransformAdapter transformAdapter;
 		private ActiveUseContext? activeItemUse;
+		private BlockPos previousPointerBlockPos;
 
 		public PlayerEntity(SoulboundClient client, Level level)
 			: base(DESCRIPTOR, level) {
@@ -117,6 +118,7 @@ namespace SoulboundEngine.Client.Player {
 		}
 
 		public override void Tick() {
+			this.DoBlockHover();
 			this.CheckItemUse();
 			if (this.isHoldingLeftClick) this.OnLeftHoldTick();
 			if (this.isHoldingRightClick) this.OnRightHoldTick();
@@ -168,6 +170,21 @@ namespace SoulboundEngine.Client.Player {
 		}
 		[Obsolete]
 		private void OnRightRelease() {
+		}
+
+		private void DoBlockHover() {
+			Vector2 pointerPos = this.GetWorldPointerPos();
+			BlockPos pointerBlockPos = (BlockPos)pointerPos;
+			BlockState? currentState = this.level.GetBlockState(pointerBlockPos);
+
+			if (pointerBlockPos == this.previousPointerBlockPos) {
+				currentState?.OnHoverTick(this.GetMainHandStack(), this.level, this, pointerBlockPos);
+			} else {
+				BlockState? previousState = this.level.GetBlockState(this.previousPointerBlockPos);
+				previousState?.OnHoverLeave(this.GetMainHandStack(), this.level, this, this.previousPointerBlockPos);
+				currentState?.OnHoverEnter(this.GetMainHandStack(), this.level, this, pointerBlockPos);
+			}
+			this.previousPointerBlockPos = pointerBlockPos;
 		}
 
 		private void HandleInteractTick(InteractionType type) {

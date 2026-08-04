@@ -22,6 +22,7 @@ namespace SoulboundEngine.Client.Render.Block {
 			Register(Blocks.WOOD, _ => new BlockModel(ResolveTile("wood")));
 			Register(Blocks.LEAVES, _ => new BlockModel(ResolveTile("leaves")));
 			Register(Blocks.CHEST, _ => new BlockModel(ResolveTile("chest")));
+			Register(Blocks.SIGN, _ => new BlockModel(ResolveTile("sign")));
 
 			Register(Blocks.TOGGLE_BLOCK, blockState => new BlockModel(ResolveTile(
 				blockState.Get(ToggleBlock.on)

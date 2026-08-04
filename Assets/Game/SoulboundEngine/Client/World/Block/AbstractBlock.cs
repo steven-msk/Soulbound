@@ -45,6 +45,18 @@ namespace SoulboundEngine.Client.World.Block {
 		/// <summary> Called when the player interacts with this block (right click) with an item </summary>
 		protected virtual IActionResult OnSecondaryUseWithItem(BlockState state, ItemStack stack, Level level, PlayerEntity player, BlockPos pos) => IActionResult.PASS;
 
+		/// <summary> Called when the player's pointer enters this block. </summary>
+		protected virtual void OnHoverEnter(BlockState state, ItemStack stack, Level level, PlayerEntity player, BlockPos pos) {
+		}
+
+		/// <summary> Called every tick while the player's pointer is over this block. </summary>
+		protected virtual void OnHoverTick(BlockState state, ItemStack stack, Level level, PlayerEntity player, BlockPos pos) {
+		}
+
+		/// <summary> Called when the player's pointer leaves this block. </summary>
+		protected virtual void OnHoverLeave(BlockState state, ItemStack stack, Level level, PlayerEntity player, BlockPos pos) {
+		}
+
 		protected virtual bool IsInteractable(BlockState blockState, Level level, BlockPos blockPos) => true;
 
 		public abstract class AbstractBlockState : State<Block, BlockState> {
@@ -79,6 +91,18 @@ namespace SoulboundEngine.Client.World.Block {
 
 			public static IActionResult OnSecondaryUseWithItem(BlockState state, ItemStack stack, Level level, PlayerEntity player, BlockPos pos) {
 				return state.owner.OnSecondaryUseWithItem(state, stack, level, player, pos);
+			}
+
+			public void OnHoverEnter(ItemStack stack, Level level, PlayerEntity player, BlockPos pos) {
+				this.owner.OnHoverEnter(this.AsBlockState(), stack, level, player, pos);
+			}
+
+			public void OnHoverTick(ItemStack stack, Level level, PlayerEntity player, BlockPos pos) {
+				this.owner.OnHoverTick(this.AsBlockState(), stack, level, player, pos);
+			}
+
+			public void OnHoverLeave(ItemStack stack, Level level, PlayerEntity player, BlockPos pos) {
+				this.owner.OnHoverLeave(this.AsBlockState(), stack, level, player, pos);
 			}
 
 			public Block GetBlock() => this.owner;

@@ -10,6 +10,7 @@ namespace SoulboundEngine.Client.World.Block {
 		public static readonly Block WOOD = Register("wood");
 		public static readonly Block LEAVES = Register("leaves", settings => new LeafBlock(settings));
 		public static readonly Block CHEST = Register("chest", settings => new ChestBlock(settings));
+		public static readonly Block SIGN = Register("sign", settings => new SignBlock(settings));
 
 		// PROTOTYPICAL
 		public static readonly Block TOGGLE_BLOCK = Register("toggle_block", settings => new ToggleBlock(settings));
