@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using SoulboundEngine.Client.UI.Screen;
 using SoulboundEngine.Client.World.Block.State;
 using SoulboundEngine.Client.World.Widget;
 
@@ -21,6 +22,7 @@ namespace SoulboundEngine.Client.World.Block.Entity {
 		}
 
 		public WorldWidgetHandle? widgetHandle { get; set; }
+		public IScreenHandle? screenHandle { get; set; }
 
 		public override void Read(JToken json) {
 			this.text = (string)json["text"]!;
@@ -31,5 +33,6 @@ namespace SoulboundEngine.Client.World.Block.Entity {
 		}
 
 		public string GetText() => this.text;
+		public void SetText(string text) => this.text = text;
 	}
 }

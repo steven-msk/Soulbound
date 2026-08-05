@@ -5,8 +5,8 @@ using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.World.Widget {
 	public abstract class WorldWidgetType {
-		public static readonly WorldWidgetType<SignWidget.Context> SIGN = Register<SignWidget, SignWidget.Context>("sign",
-			(manager, context) => new SignWidget(manager, context, AssetManager.Resolve<VisualTreeAsset>(new AssetKey("SignText")))
+		public static readonly WorldWidgetType<TextWidget.Context> TEXT = Register<TextWidget, TextWidget.Context>("text",
+			(manager, context) => new TextWidget(manager, context, AssetManager.Resolve<VisualTreeAsset>(new AssetKey("TextWidget")))
 		);
 
 		private static WorldWidgetType<TContext> Register<TWidget, TContext>(string id, Func<WorldWidgetManager, TContext, TWidget> factory)

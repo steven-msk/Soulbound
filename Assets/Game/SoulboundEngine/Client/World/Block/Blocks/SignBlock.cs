@@ -19,7 +19,7 @@ namespace SoulboundEngine.Client.World.Block {
 
 		protected override void OnHoverEnter(BlockState state, ItemStack stack, Level level, PlayerEntity player, BlockPos pos) {
 			SignTileEntity tileEntity = (SignTileEntity)level.GetTileEntity(pos);
-			tileEntity.widgetHandle = player.ShowWorldWidget(WorldWidgetType.SIGN, new SignWidget.Context() { 
+			tileEntity.widgetHandle = player.ShowWorldWidget(WorldWidgetType.TEXT, new TextWidget.Context() { 
 				blockPos = pos, text = tileEntity.GetText()
 			});
 		}
@@ -32,6 +32,10 @@ namespace SoulboundEngine.Client.World.Block {
 		}
 
 		protected override IActionResult OnSecondaryUse(BlockState state, Level level, PlayerEntity player, BlockPos pos) {
+			SignTileEntity tileEntity = (SignTileEntity)level.GetTileEntity(pos);
+			if (tileEntity.screenHandle != null) return IActionResult.FAIL;
+
+			player.OpenSignEditScreen(tileEntity);
 			return IActionResult.SUCCESS;
 		}
 	}

@@ -31,6 +31,9 @@ namespace SoulboundEngine.Client.UI.UXMLBindings {
             UXMLSchema.Register(Identifier.Of("soulbound:player_inventory_screen/crafting"), typeof(VisualElement));
             UXMLSchema.Register(Identifier.Of("soulbound:player_inventory_screen/player_inventory_space"), typeof(VisualElement));
             UXMLSchema.Register(Identifier.Of("soulbound:screen_root_layer/root_layer"), typeof(VisualElement));
+            UXMLSchema.Register(Identifier.Of("soulbound:sign_edit_screen/text_field"), typeof(TextField));
+            UXMLSchema.Register(Identifier.Of("soulbound:sign_edit_screen/cancel"), typeof(Button));
+            UXMLSchema.Register(Identifier.Of("soulbound:sign_edit_screen/done"), typeof(Button));
             UXMLSchema.Register(Identifier.Of("soulbound:title_screen/play_button"), typeof(Button));
             UXMLSchema.Register(Identifier.Of("soulbound:title_screen/exit_button"), typeof(Button));
             UXMLSchema.Register(Identifier.Of("soulbound:world_list_screen/world_list"), typeof(VisualElement));
@@ -50,7 +53,7 @@ namespace SoulboundEngine.Client.UI.UXMLBindings {
             UXMLSchema.Register(Identifier.Of("soulbound:world_entry/world_name"), typeof(Label));
             UXMLSchema.Register(Identifier.Of("soulbound:world_entry/world_seed"), typeof(Label));
             UXMLSchema.Register(Identifier.Of("soulbound:world_entry/delete_world"), typeof(Button));
-            UXMLSchema.Register(Identifier.Of("soulbound:sign_text/text"), typeof(Label));
+            UXMLSchema.Register(Identifier.Of("soulbound:text_widget/text"), typeof(Label));
         }
     }
 }

@@ -13,6 +13,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		private readonly List<UXMLWidget> widgets = new();
 		private VisualElement root;
 		private TemplateContainer tooltip;
+		protected IScreenHandle handle;
 		public Vector2 mousePos { get; private set; }
 
 		protected UXMLScreen(VisualTreeAsset asset) {
@@ -21,6 +22,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 		protected sealed override void OnBuild(IScreenHandle handle) {
 			this.root = handle.Root;
+			this.handle = handle;
 			this.asset.CloneTree(this.root);
 			this.OnBind(this.root);
 

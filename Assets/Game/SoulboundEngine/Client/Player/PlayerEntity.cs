@@ -4,6 +4,7 @@ using SoulboundEngine.Client.Item;
 using SoulboundEngine.Client.Item.Container;
 using SoulboundEngine.Client.UI.Screen;
 using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.Client.World.Block.Entity;
 using SoulboundEngine.Client.World.Block.State;
 using SoulboundEngine.Client.World.Entity;
 using SoulboundEngine.Client.World.Level;
@@ -382,6 +383,10 @@ namespace SoulboundEngine.Client.Player {
 
 		public void DestroyWorldWidget(WorldWidgetHandle handle) {
 			this.client.DestroyWorldWidget(handle);
+		}
+
+		public IScreenHandle OpenSignEditScreen(SignTileEntity signEntity) {
+			return this.client.OpenScreen(new SignEditScreen(signEntity));
 		}
 
 		private void ThrowFromMainHand(bool ctrl) {

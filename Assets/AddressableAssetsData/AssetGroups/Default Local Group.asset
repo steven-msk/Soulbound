@@ -27,6 +27,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0d48c66e54743c04b9db077f5145dda2
+    m_Address: SignEditScreen
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0e5905e25c892a748a09d8c6fd3c396a
     m_Address: WorldScreen
     m_ReadOnly: 0
@@ -262,7 +268,7 @@ MonoBehaviour:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: ee83b68ec517d8549845f70f4e84eeec
-    m_Address: SignText
+    m_Address: TextWidget
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload
