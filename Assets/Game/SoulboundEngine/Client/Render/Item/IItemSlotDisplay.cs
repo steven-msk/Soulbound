@@ -1,5 +1,5 @@
 ﻿namespace SoulboundEngine.Client.Render.Item {
-	public interface IUXMLItemSlotDisplay {
+	public interface IItemSlotDisplay {
 		public virtual void SetAsMainSlot() {
 		}
 

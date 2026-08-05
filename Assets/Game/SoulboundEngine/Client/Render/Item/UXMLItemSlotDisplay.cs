@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
 #nullable enable
 
 namespace SoulboundEngine.Client.Render.Item {
-	public class UXMLItemSlotDisplay : UXMLWidget, IUXMLItemSlotDisplay {
+	public class UXMLItemSlotDisplay : UXMLWidget, IItemSlotDisplay {
 		private static readonly Identifier ITEM_DISPLAY_ELEMENT = Identifier.Of("soulbound:slot/item_display");
 		private static readonly Identifier STACK_COUNT_ELEMENT = Identifier.Of("soulbound:slot/stack_count");
 		protected readonly IItemSlot slot;
