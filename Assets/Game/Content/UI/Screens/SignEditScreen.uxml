@@ -1,0 +1,11 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement style="flex-grow: 1; align-items: center; justify-content: center; align-self: auto;">
+        <ui:VisualElement style="flex-grow: 0; justify-content: center; align-items: center;">
+            <ui:TextField label="" placeholder-text="Type..." hide-placeholder-on-focus="false" language-direction="Inherit" keyboard-type="ASCIICapable" select-all-on-mouse-up="false" select-all-on-focus="false" select-word-by-double-click="false" select-line-by-triple-click="false" hide-soft-keyboard="false" auto-correction="false" multiline="true" name="text_field" max-length="100" class="signInputField" style="font-size: 25px; -unity-background-image-tint-color: rgba(0, 0, 0, 0); background-color: rgb(0, 0, 0);"/>
+            <ui:VisualElement style="flex-grow: 0; flex-direction: row;">
+                <ui:Button text="Cancel" name="cancel" style="font-size: 30px; margin-right: 19px;"/>
+                <ui:Button text="Done" name="done" style="font-size: 30px; margin-left: 19px;"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

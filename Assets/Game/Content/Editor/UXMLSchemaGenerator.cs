@@ -16,7 +16,7 @@ namespace SoulboundUnityEditor {
 		private const string OUTPUT_PATH = "Assets/Game/SoulboundEngine/Client/UI/UXMLBindings/Generated/" + OUTPUT_FILE;
 		private const string DEFAULT_NAMESPACE = "soulbound";
 		private static readonly string[] PROJECT_UXML_ROOTS = {
-			"Assets/Game/Content/UI/"
+			"Assets/Game/Content/"
 		};
 		private static readonly Dictionary<string, Type> BUILT_IN_TYPES = new() {
 			["VisualElement"] = typeof(VisualElement),

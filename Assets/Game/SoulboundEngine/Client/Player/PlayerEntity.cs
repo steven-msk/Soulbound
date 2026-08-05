@@ -4,9 +4,11 @@ using SoulboundEngine.Client.Item;
 using SoulboundEngine.Client.Item.Container;
 using SoulboundEngine.Client.UI.Screen;
 using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.Client.World.Block.Entity;
 using SoulboundEngine.Client.World.Block.State;
 using SoulboundEngine.Client.World.Entity;
 using SoulboundEngine.Client.World.Level;
+using SoulboundEngine.Client.World.Widget;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -28,6 +30,7 @@ namespace SoulboundEngine.Client.Player {
 		private IScreenHandle? activeInventoryScreen;
 		private new readonly PlayerTransformAdapter transformAdapter;
 		private ActiveUseContext? activeItemUse;
+		private BlockPos previousPointerBlockPos;
 
 		public PlayerEntity(SoulboundClient client, Level level)
 			: base(DESCRIPTOR, level) {
@@ -117,6 +120,7 @@ namespace SoulboundEngine.Client.Player {
 		}
 
 		public override void Tick() {
+			this.DoBlockHover();
 			this.CheckItemUse();
 			if (this.isHoldingLeftClick) this.OnLeftHoldTick();
 			if (this.isHoldingRightClick) this.OnRightHoldTick();
@@ -168,6 +172,21 @@ namespace SoulboundEngine.Client.Player {
 		}
 		[Obsolete]
 		private void OnRightRelease() {
+		}
+
+		private void DoBlockHover() {
+			Vector2 pointerPos = this.GetWorldPointerPos();
+			BlockPos pointerBlockPos = (BlockPos)pointerPos;
+			BlockState? currentState = this.level.GetBlockState(pointerBlockPos);
+
+			if (pointerBlockPos == this.previousPointerBlockPos) {
+				currentState?.OnHoverTick(this.GetMainHandStack(), this.level, this, pointerBlockPos);
+			} else {
+				BlockState? previousState = this.level.GetBlockState(this.previousPointerBlockPos);
+				previousState?.OnHoverLeave(this.GetMainHandStack(), this.level, this, this.previousPointerBlockPos);
+				currentState?.OnHoverEnter(this.GetMainHandStack(), this.level, this, pointerBlockPos);
+			}
+			this.previousPointerBlockPos = pointerBlockPos;
 		}
 
 		private void HandleInteractTick(InteractionType type) {
@@ -352,6 +371,22 @@ namespace SoulboundEngine.Client.Player {
 		private int GetMainHandItemBreakLevel() {
 			ItemStack mainHandStack = this.GetMainHandStack();
 			return mainHandStack.GetBreakLevel();
+		}
+
+		public WorldWidgetHandle ShowWorldWidget<TContext>(WorldWidgetType<TContext> type, TContext context) where TContext : WorldWidgetContext {
+			return this.client.ShowWorldWidget(type, context);
+		}
+
+		public void UpdateWorldWidget<TContext>(WorldWidgetHandle handle, TContext context) where TContext : WorldWidgetContext {
+			this.client.UpdateWorldWidget(handle, context);
+		}
+
+		public void DestroyWorldWidget(WorldWidgetHandle handle) {
+			this.client.DestroyWorldWidget(handle);
+		}
+
+		public IScreenHandle OpenSignEditScreen(SignTileEntity signEntity) {
+			return this.client.OpenScreen(new SignEditScreen(signEntity));
 		}
 
 		private void ThrowFromMainHand(bool ctrl) {

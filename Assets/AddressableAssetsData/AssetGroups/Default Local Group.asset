@@ -27,6 +27,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0d48c66e54743c04b9db077f5145dda2
+    m_Address: SignEditScreen
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0e5905e25c892a748a09d8c6fd3c396a
     m_Address: WorldScreen
     m_ReadOnly: 0
@@ -89,6 +95,12 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 3ddab628e43f7114c804ef2cf0dff34b
     m_Address: JosefinSans-Regular SDF
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 40e51d6c87d57254f98637e0447fbd3a
+    m_Address: sign
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload
@@ -219,6 +231,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ce290aa8113118248a6a5dd32ad8898f
+    m_Address: WorldWidgetDocument
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: ced63e50cee7ab94894ce3933a476a0d
     m_Address: TransitStack
     m_ReadOnly: 0
@@ -245,6 +263,12 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e97c1c3954a6faa4da45ed9eef7f1918
     m_Address: missingTile
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ee83b68ec517d8549845f70f4e84eeec
+    m_Address: TextWidget
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload

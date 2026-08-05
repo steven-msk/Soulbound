@@ -8,6 +8,7 @@ using SoulboundEngine.Client.World.Block;
 using SoulboundEngine.Client.World.Block.Entity;
 using SoulboundEngine.Client.World.Entity;
 using SoulboundEngine.Client.World.Entity.Attribute;
+using SoulboundEngine.Client.World.Widget;
 using System;
 using System.Linq;
 
@@ -25,6 +26,7 @@ namespace SoulboundEngine.Core.Registry {
 		public static readonly Registry<InventoryScreenHandlerType> INVENTORY_SCREEN_HANDLES = Create<InventoryScreenHandlerType>(Identifier.Of("inventory_screen_handle"));
 		public static readonly Registry<RecipeType> RECIPE_TYPE = Create<RecipeType>(Identifier.Of("recipe_type"));
 		public static readonly Registry<ComponentType> COMPONENT_TYPE = Create<ComponentType>(Identifier.Of("component_type"));
+		public static readonly Registry<WorldWidgetType> WORLD_WIDGET_TYPE = Create<WorldWidgetType>(Identifier.Of("world_widget"));
 
 		// temporary, see LootTables
 		public static readonly Registry<LootTable> LOOT_TABLES = Create<LootTable>(Identifier.Of("loot_table"));
@@ -51,6 +53,7 @@ namespace SoulboundEngine.Core.Registry {
 			InventoryScreenHandlerType.Init();
 			RecipeType.Init();
 			LootTables.Init();
+			WorldWidgetType.Init();
 		}
 
 		public static void Freeze() {

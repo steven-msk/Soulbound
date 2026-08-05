@@ -22,6 +22,7 @@ using SoulboundEngine.Client.World;
 using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Client.World.Render;
 using SoulboundEngine.Client.World.Serialization;
+using SoulboundEngine.Client.World.Widget;
 using SoulboundEngine.Core;
 using SoulboundEngine.Core.Audio;
 using SoulboundEngine.Core.Registry;
@@ -75,6 +76,7 @@ namespace SoulboundEngine.Client {
 		private readonly RecipeManager recipeManager;
 		private readonly PerformanceMetrics performanceMetrics;
 		private readonly DebugMetricsService debugMetricsService;
+		private readonly WorldWidgetManager worldWidgetManager;
 		private WorldScreen activeWorldScreen;
 		private PlayerEntity player;
 		private WorldSession? activeWorldSession;
@@ -130,6 +132,7 @@ namespace SoulboundEngine.Client {
 			this.blockRenderManager = new BlockRenderManager(Registries.BLOCKS.ToList());
 			this.worldRenderer = new WorldRenderer(RENDER_RECT, this.blockRenderManager, this.entityRenderManager);
 			_ = new InventoryScreens();
+			this.worldWidgetManager = new WorldWidgetManager();
 
 			Registry<RecipeIngredientIndex> ingredientIndexRegistry = new(RecipeIngredientIndex.REGISTRY);
 			this.recipeManager = new RecipeManager(ingredientIndexRegistry, new RecipeAssetResolver());
@@ -327,6 +330,18 @@ namespace SoulboundEngine.Client {
 			Vector3 pos = screenPoint;
 			pos.z = -Camera.main.transform.position.z;
 			return Camera.main.ScreenToWorldPoint(pos);
+		}
+
+		public WorldWidgetHandle ShowWorldWidget<TContext>(WorldWidgetType<TContext> type, TContext context) where TContext : WorldWidgetContext {
+			return this.worldWidgetManager.ShowWidget(type, context);
+		}
+
+		public void UpdateWorldWidget<TContext>(WorldWidgetHandle handle, TContext context) where TContext : WorldWidgetContext {
+			this.worldWidgetManager.UpdateWidget(handle, context);
+		}
+
+		public void DestroyWorldWidget(WorldWidgetHandle handle) {
+			this.worldWidgetManager.DestroyWidget(handle);
 		}
 
 		public static SoulboundClient Instance => instance;
