@@ -4,6 +4,7 @@ using SoulboundEngine.Client.Loot;
 using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.World.Block.Entity;
 using SoulboundEngine.Client.World.Block.State;
+using SoulboundEngine.Client.World.Entity;
 
 namespace SoulboundEngine.Client.World.Block {
 	using Level = Level.Level;
@@ -20,6 +21,15 @@ namespace SoulboundEngine.Client.World.Block {
 			player.OpenInventoryScreen(chestTileEntity);
 			chestTileEntity.OnOpened(player);
 			return IActionResult.SUCCESS;
+		}
+
+		protected override void OnStateReplaced(BlockState state, BlockPos pos, Level level) {
+			ChestTileEntity chestTileEntity = (ChestTileEntity)level.GetTileEntity(pos);
+			foreach (var stack in chestTileEntity) {
+				ItemEntity itemEntity = new(stack, level);
+				itemEntity.SetPosition(pos.GetCenter());
+				level.AddEntity(itemEntity);
+			}
 		}
 
 		public TileEntity CreateTileEntity(BlockPos pos, BlockState state) {

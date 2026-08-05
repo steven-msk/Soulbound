@@ -208,13 +208,14 @@ namespace SoulboundEngine.Client.World.Level {
 
 		[PROTOTYPICAL]
 		public void SetBlockState(BlockPos blockPos, BlockState? blockState) {
-			BlockState? oldState = this.GetBlockState(blockPos);
 			WorldChunk? chunk = this.ChunkAt(blockPos);
 			if (chunk == null) {
 				Logger.LogError("Block pos not valid: " + blockPos);
 				return;
 			}
+			BlockState? oldState = this.GetBlockState(blockPos);
 
+			oldState?.OnStateReplaced(blockPos, this);
 			chunk.SetBlockState(blockPos, blockState);
 			blockStateChanged?.Invoke(blockPos, oldState, blockState);
 

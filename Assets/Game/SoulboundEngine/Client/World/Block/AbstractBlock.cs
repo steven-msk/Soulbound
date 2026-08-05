@@ -18,6 +18,9 @@ namespace SoulboundEngine.Client.World.Block {
 
 		public abstract RegistryKey<Block> GetKey();
 
+		protected virtual void OnStateReplaced(BlockState state, BlockPos pos, Level level) {
+		}
+
 		protected virtual bool CanPlaceAt(BlockState blockState, Level level, BlockPos blockPos) {
 			if (level.GetBlock(blockPos) != Blocks.AIR) return false;
 
@@ -67,6 +70,10 @@ namespace SoulboundEngine.Client.World.Block {
 
 			public List<ItemStack> GetDroppedStacks() {
 				return Block.GetDroppedStacks(this.AsBlockState());
+			}
+
+			public void OnStateReplaced(BlockPos pos, Level level) {
+				this.owner.OnStateReplaced(this.AsBlockState(), pos, level);
 			}
 
 			public bool CanPlaceAt(Level level, BlockPos blockPos) {
