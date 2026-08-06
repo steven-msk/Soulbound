@@ -1,24 +1,20 @@
 using SoulboundEngine.Client.Interaction;
+using SoulboundEngine.Client.Player;
+using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Common;
 
 namespace SoulboundEngine.Client.Item {
 	[PROTOTYPICAL]
-	public sealed class TeleportPlayerItem : Item, IInteractableItem {
+	public sealed class TeleportPlayerItem : Item {
 		public TeleportPlayerItem(Settings settings) : base(settings) {
 		}
 
-		public bool ValidateTrigger(InteractionTrigger trigger) {
-			return trigger == InteractionTrigger.LeftClick;
-		}
+		public override IActionResult OnPrimaryUse(ItemStack stack, Level level, PlayerEntity player, BlockPos blockPos) {
+			if (level.GetBlock(blockPos) != Blocks.AIR) return IActionResult.PASS;
 
-		public bool CanExecute(in ItemStack itemStack, in ItemInteraction ctx) {
-			return true;
+			player.SetPosition(blockPos.GetCenter());
+			return IActionResult.SUCCESS;
 		}
-
-		public bool TryExecute(ref ItemStack itemStack, in ItemInteraction ctx) {
-			ctx.player.SetPosition(ctx.player.GetWorldPointerPos());
-			return true;
-		}
-
 	}
 }

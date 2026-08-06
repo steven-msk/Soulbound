@@ -1,27 +1,35 @@
 ﻿using SoulboundEngine.Client.Interaction;
 using SoulboundEngine.Client.Item.Container;
 using SoulboundEngine.Client.Loot;
+using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.World.Block.Entity;
 using SoulboundEngine.Client.World.Block.State;
+using SoulboundEngine.Client.World.Entity;
 
 namespace SoulboundEngine.Client.World.Block {
-	public class ChestBlock : Block, IInteractableBlock, ITileEntityProvider {
+	using Level = Level.Level;
+
+	public class ChestBlock : Block, ITileEntityProvider {
 		public const int INVENTORY_SIZE = 27;
 
-		public ChestBlock(Settings settings)
+		public ChestBlock(AbstractBlock.Settings settings)
 			: base(settings) {
 		}
 
-		public bool CanInteract(in BlockInteraction ctx) => true;
-
-		public bool ValidateTrigger(InteractionTrigger trigger) {
-			return trigger is InteractionTrigger.RightClick;
+		protected override IActionResult OnSecondaryUse(BlockState state, Level level, PlayerEntity player, BlockPos pos) {
+			ChestTileEntity chestTileEntity = (ChestTileEntity)level.GetTileEntity(pos);
+			player.OpenInventoryScreen(chestTileEntity);
+			chestTileEntity.OnOpened(player);
+			return IActionResult.SUCCESS;
 		}
 
-		public void OnInteract(in BlockInteraction ctx) {
-			ChestTileEntity chestTileEntity = (ChestTileEntity)ctx.level.GetTileEntity(ctx.blockPos);
-			ctx.player.OpenInventoryScreen(chestTileEntity);
-			chestTileEntity.OnOpened(ctx.player);
+		protected override void OnStateReplaced(BlockState state, BlockPos pos, Level level) {
+			ChestTileEntity chestTileEntity = (ChestTileEntity)level.GetTileEntity(pos);
+			foreach (var stack in chestTileEntity) {
+				ItemEntity itemEntity = new(stack, level);
+				itemEntity.SetPosition(pos.GetCenter());
+				level.AddEntity(itemEntity);
+			}
 		}
 
 		public TileEntity CreateTileEntity(BlockPos pos, BlockState state) {

@@ -1,13 +1,14 @@
 using SoulboundEngine.Client.Debug.Logging;
 using SoulboundEngine.Client.Interaction;
+using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.World.Block.State;
 using SoulboundEngine.Core.States;
 
 namespace SoulboundEngine.Client.World.Block {
-	public sealed class ToggleBlock : Block, IInteractableBlock {
+	public sealed class ToggleBlock : Block {
 		public static readonly Property<bool> on = BoolProperty.Of("on");
 
-		public ToggleBlock(Settings settings) 
+		public ToggleBlock(AbstractBlock.Settings settings) 
 			: base(settings) {
 			this.SetDefaultState(this.DefaultState.With(on, false));
 		}
@@ -16,17 +17,12 @@ namespace SoulboundEngine.Client.World.Block {
 			builder.Add(on);
 		}
 
-		public void OnInteract(in BlockInteraction ctx) {
-			bool isOn = ctx.blockState.Get(on);
+		protected override IActionResult OnSecondaryUse(BlockState state, Level.Level level, PlayerEntity player, BlockPos pos) {
+			bool isOn = state.Get(on);
 			isOn = !isOn;
-			ctx.level.SetBlockState(ctx.blockPos, this.DefaultState.With(on, isOn));
-			Logger.LogInfo("block at {} is now {}", ctx.blockPos, isOn ? "off" : "on");
-		}
-
-		public bool CanInteract(in BlockInteraction ctx) => true;
-
-		public bool ValidateTrigger(InteractionTrigger trigger) {
-			return trigger == InteractionTrigger.RightClick;
+			level.SetBlockState(pos, this.DefaultState.With(on, isOn));
+			Logger.LogInfo("block at {} is now {}", pos, isOn ? "off" : "on");
+			return IActionResult.SUCCESS;
 		}
 	}
 }

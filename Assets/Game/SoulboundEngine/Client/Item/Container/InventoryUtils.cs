@@ -17,7 +17,7 @@ namespace SoulboundEngine.Client.Item.Container {
 		/// Returns whether the stack was fully consumed.
 		/// </summary>
 		public static bool TryAddStack(IEnumerable<IItemSlot> slots, ref ItemStack itemStack) {
-			foreach (var slot in FilterContaining(slots, itemStack.item)) {
+			foreach (var slot in FilterContaining(slots, itemStack.GetItem())) {
 				ItemStack slotStack = slot.GetStack();
 				slotStack.FillFrom(ref itemStack);
 				slot.SetStack(slotStack);

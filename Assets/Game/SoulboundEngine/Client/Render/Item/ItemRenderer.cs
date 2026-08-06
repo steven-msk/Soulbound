@@ -22,7 +22,7 @@ namespace SoulboundEngine.Client.Render.Item {
 			public override ItemRenderState CreateRenderState(ItemStack stack, ItemRenderContext context) {
 				return new ItemRenderState {
 					showStackCount = (context is ItemRenderContext.UGUI || context is ItemRenderContext.UXML)
-						&& stack.item.IsStackable(),
+						&& stack.GetItem().IsStackable(),
 					stack = stack
 				};
 			}

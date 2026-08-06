@@ -12,22 +12,22 @@ namespace SoulboundEngine.Core.Registry {
 			this.value = value;
 		}
 
-		public RegistryKey<T> GetKey() => key;
-		public T GetValue() => value;
+		public RegistryKey<T> GetKey() => this.key;
+		public T GetValue() => this.value;
 
-		public string GetIdAsString() => GetKey()?.value.ToString() ?? "null";
+		public string GetIdAsString() => this.GetKey()?.value.ToString() ?? "null";
 
 		public bool MatchesId(Identifier id) {
-			return key.value.Equals(id);
+			return this.key.value.Equals(id);
 		}
 		public bool MatchesKey(RegistryKey<T> key) {
 			return this.key.value.Equals(key.value) && this.key.registry.Equals(key.registry);
 		}
 
-		public override int GetHashCode() => HashCode.Combine(owner, key, value);
+		public override int GetHashCode() => HashCode.Combine(this.owner, this.key, this.value);
 
 		public override string ToString() {
-			return $"registry_entry[key: {key}, value: {value}]";
+			return $"entry[key={this.key}, value={this.value}]";
 		}
 	}
 }

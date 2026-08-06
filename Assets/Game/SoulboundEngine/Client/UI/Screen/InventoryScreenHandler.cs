@@ -17,6 +17,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		protected readonly InventoryScreenHandlerType type;
 		protected ItemStack transitStack;
 		private SlotDragState? dragState;
+		public event Action<ItemStack>? externalTransitStackChange;
 
 		protected InventoryScreenHandler(InventoryScreenHandlerType type) {
 			this.type = type;
@@ -73,7 +74,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 			ItemStack slotStack = slot.GetStack();
 			switch (actionType) {
 				case SlotActionType.COLLECT_ALL:
-					this.CollectAll(this.transitStack.item);
+					this.CollectAll(this.transitStack.GetItem());
 					break;
 				case SlotActionType.PICKUP:
 					this.HandlePickup(slot, slotStack, button);
@@ -246,10 +247,10 @@ namespace SoulboundEngine.Client.UI.Screen {
 				IItemSlot draggedSlot = slotRef.GetSlot();
 				int amount = splitAmount + (i < remainder ? 1 : 0);
 				int baseCount = this.dragState.GetBaseCount(slotRef);
-				int finalCount = Math.Min(baseCount + amount, this.dragState.stack.item.fullStackSize);
+				int finalCount = Math.Min(baseCount + amount, this.dragState.stack.GetItem().GetMaxCount());
 
 				if (baseCount <= 0) {
-					draggedSlot.SetStack(this.dragState.stack.item.CreateStack(finalCount));
+					draggedSlot.SetStack(this.dragState.stack.GetItem().GetDefaultStack(finalCount));
 				} else {
 					draggedSlot.SetStack(this.dragState.stack.CopyWithCount(finalCount));
 				}
@@ -307,7 +308,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		/// Returns the remaining stack, or <c>ItemStack.EMPTY</c> otherwise.
 		/// </summary>
 		protected ItemStack Pickup(ItemStack itemStack) {
-			if (!itemStack.IsOf(this.transitStack.item) && !this.transitStack.IsEmpty()) {
+			if (!itemStack.IsOf(this.transitStack.GetItem()) && !this.transitStack.IsEmpty()) {
 				return itemStack;
 			}
 			if (this.transitStack.IsEmpty()) {
@@ -407,10 +408,18 @@ namespace SoulboundEngine.Client.UI.Screen {
 		}
 
 		public virtual void OnClosed(PlayerEntity player) {
-			
 		}
 
 		public ItemStack GetTransitStack() => this.transitStack;
+
+		public void SetTransitStack(ItemStack stack) {
+			this.transitStack = stack;
+			externalTransitStackChange?.Invoke(stack);
+		}
+
+		public StackReference GetTransitStackReference() {
+			return new StackReference(this.SetTransitStack, this.GetTransitStack);
+		}
 
 		public InventoryScreenHandlerType GetHandlerType() => this.type;
 	}

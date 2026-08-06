@@ -21,14 +21,14 @@ namespace SoulboundEngine.Client.Render.Item {
 				this.Destroy(handle, context);
 			}
 
-			ItemRenderer renderer = this.renderers[stack.item];
+			ItemRenderer renderer = this.renderers[stack.GetItem()];
 			ItemModel model = this.GetModel(stack);
 			object state = renderer.CreateRenderStateBoxed(stack, context);
 
 			IItemView view = renderer.CreateViewBoxed(state, model, context);
 			if (!view.IsValid()) return null;
 
-			this.rendered[handle] = new RenderedItem(stack.item, state, view, context);
+			this.rendered[handle] = new RenderedItem(stack.GetItem(), state, view, context);
 			return view;
 		}
 
@@ -48,7 +48,7 @@ namespace SoulboundEngine.Client.Render.Item {
 		}
 
 		public ItemModel GetModel(ItemStack stack) {
-			return this.modelResolverFactory(stack.item).Resolve(stack);
+			return this.modelResolverFactory(stack.GetItem()).Resolve(stack);
 		}
 
 		internal sealed record RenderedItem(Item item, object state, IItemView view, ItemRenderContext context);

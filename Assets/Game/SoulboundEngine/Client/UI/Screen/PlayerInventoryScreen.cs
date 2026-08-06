@@ -5,6 +5,7 @@ using SoulboundEngine.Client.UI.UXMLBindings;
 using SoulboundEngine.Core.Assets;
 using SoulboundEngine.Core.Registry;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.UI.Screen {
@@ -57,25 +58,27 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 		private void AddCraftingPreviews(IEnumerable<RecipeView<StationlessCraftingRecipe>> recipes) {
 			if (!this.isCraftingBound) return;
+			List<RecipeView<StationlessCraftingRecipe>> recipeList = recipes.ToList();
 
-			foreach (var recipe in recipes) {
-				RecipePreviewElement preview = this.AddCraftingPreview(recipe, this.craftingRoot);
+			for (int i = 0; i < recipeList.Count; i++) {
+				RecipePreviewElement preview = this.AddCraftingPreview(recipeList[i], this.craftingRoot, i);
 				this.craftingResultPreviews.Add(preview);
 			}
 		}
 
-		private RecipePreviewElement AddCraftingPreview(RecipeView<StationlessCraftingRecipe> recipe, VisualElement craftingRoot) {
+		private RecipePreviewElement AddCraftingPreview(RecipeView<StationlessCraftingRecipe> recipe, VisualElement craftingRoot, int index) {
 			TemplateContainer visualElement = this.recipeResultAsset.Instantiate();
 			craftingRoot.Add(visualElement);
 
 			RecipePreviewElement preview = new(this.itemRenderManager, visualElement, this.OnCraftingPreviewClicked);
+			this.AddWidget(preview);
 			preview.Bind(recipe.entry, recipe.resultPreview);
 			return preview;
 		}
 
 		private void OnCraftingPreviewClicked(ClickEvent evt, RecipePreviewElement preview) {
 			this.handler.CraftRecipe(preview.recipe);
-			this.SyncTransitStack();
+			this.SyncTransitStack(this.handler.GetTransitStack());
 		}
 
 		private VisualElement GetCraftingPreviewParent(VisualElement screenRoot) {
@@ -97,21 +100,14 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 	}
 
-	class RecipePreviewElement {
-		private static readonly Identifier ITEM_DISPLAY_ELEMENT = Identifier.Of("soulbound:slot/item_display");
-		private static readonly Identifier STACK_COUNT_ELEMENT = Identifier.Of("soulbound:slot/stack_count");
-		private readonly ItemRenderManager itemRenderManager;
+	class RecipePreviewElement : UXMLItemSlotDisplay {
 		private readonly VisualElement visualElement;
 		private readonly EventCallback<ClickEvent, RecipePreviewElement> onClick;
-		private readonly ItemRenderHandle renderHandle;
-		private readonly ItemRenderContext.UXML renderContext;
 
-		public RecipePreviewElement(ItemRenderManager itemRenderManager, VisualElement visualElement, EventCallback<ClickEvent, RecipePreviewElement> onClick) {
-			this.itemRenderManager = itemRenderManager;
+		public RecipePreviewElement(ItemRenderManager itemRenderManager, VisualElement visualElement, EventCallback<ClickEvent, RecipePreviewElement> onClick)
+			: base(itemRenderManager, true, true) {
 			this.visualElement = visualElement;
 			this.onClick = onClick;
-			this.renderHandle = new ItemRenderHandle(this);
-			this.renderContext = new ItemRenderContext.UXML(visualElement, ITEM_DISPLAY_ELEMENT, STACK_COUNT_ELEMENT);
 		}
 
 		public RecipeEntry<StationlessCraftingRecipe> recipe { get; private set; }
@@ -121,11 +117,11 @@ namespace SoulboundEngine.Client.UI.Screen {
 			this.recipe = recipe;
 			this.result = result;
 			this.visualElement.RegisterCallback(this.onClick, this);
-			this.itemRenderManager.Render(this.renderHandle, result, this.renderContext);
+			this.OnBind(this.visualElement, result);
 		}
 
-		public void Dispose() {
-			this.itemRenderManager.Destroy(this.renderHandle, this.renderContext);
+		public override void Dispose() {
+			base.Dispose();
 			this.visualElement.UnregisterCallback(this.onClick);
 			this.visualElement.RemoveFromHierarchy();
 		}

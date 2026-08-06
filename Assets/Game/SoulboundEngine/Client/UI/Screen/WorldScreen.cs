@@ -51,8 +51,8 @@ namespace SoulboundEngine.Client.UI.Screen {
 				VisualElement slotElement = hotbarRoot[slotIndex];
 
 				UXMLHotbarSlotDisplay display = new(slot, this.itemRenderManager, false);
-				display.OnBind(slotElement);
 				this.AddWidget(display);
+				display.OnBind(slotElement);
 				this.hotbarDisplays[slotIndex] = display;
 			}
 
