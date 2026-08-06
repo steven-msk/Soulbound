@@ -442,10 +442,10 @@ namespace SoulboundEngine.Client.Player {
 
 		private void SetMainHandStackInternal(ItemStack stack) {
 			if (ItemStack.AreEqual(stack, this.GetMainHandStack())) return;
-			if (this.activeInventoryScreenHandler == null) {
-				this.inventory.SetMainStack(stack);
-			} else {
+			if (this.activeInventoryScreenHandler != null && !this.activeInventoryScreenHandler.GetTransitStack().IsEmpty()) {
 				this.activeInventoryScreenHandler.SetTransitStack(stack);
+			} else {
+				this.inventory.SetMainStack(stack);
 			}
 		}
 
