@@ -16,51 +16,28 @@ namespace SoulboundEngine.Client.Item.Container {
 		private static readonly Identifier STACK_COUNT_ELEMENT = Identifier.Of("soulbound:transit_stack/stack_count");
 		private static readonly Identifier DURABILITY_BAR_ELEMENT = Identifier.Of("soulbound:transit_stack/durability_bar");
 		private Vector2 pointerPosition;
-		private IItemView? itemView;
 
 		private TransitStackHandler(ItemRenderManager itemRenderManager, VisualElement root) 
 			: base(itemRenderManager, false, false) {
-			this.slot = new ItemSlot(this, 0);
-			this.OnBind(root);
+			this.OnBind(root, new ItemSlot(this, 0));
 		}
 
 		public static TransitStackHandler Create(VisualElement screenRoot, ItemRenderManager itemRenderManager) {
 			return new TransitStackHandler(itemRenderManager, CreateVisualElement(screenRoot));
 		}
 
-		// TODO ASAP: refactor UXMLItemSlotDisplay
-
-		protected override ItemRenderContext RenderContext => new ItemRenderContext.UXML(this.root, ITEM_DISPLAY_ELEMENT, STACK_COUNT_ELEMENT);
-
+		protected override Identifier GetItemDisplayId() => ITEM_DISPLAY_ELEMENT;
+		protected override Identifier GetStackCountId() => STACK_COUNT_ELEMENT;
 		protected override Identifier GetDurabilityBarId() => DURABILITY_BAR_ELEMENT;
 
-		public override void SetStack(ItemStack itemStack) {
-			if (itemStack.IsEmpty()) {
-				this.Destroy();
-				return;
-			}
-
-			base.SetStack(itemStack);
-		}
-
-		protected override void Render() {
-			this.UpdateDurability();
-			if (this.stack.IsEmpty()) return;
-
-			this.itemView = this.itemRenderManager.Render(this.renderHandle, this.stack, this.RenderContext);
+		protected override void Render(ItemStack stack) {
+			base.Render(stack);
 			this.UpdateViewPosition();
 		}
 
-		public bool HasStack() => this.itemView != null;
-		public ItemStack GetStack() => this.stack;
-
 		public void Destroy() {
-			if (this.itemView == null) return;
 			this.Dispose();
-
-			this.itemRenderManager.Destroy(this.renderHandle, this.RenderContext);
-			this.itemView = null;
-			this.stack = ItemStack.EMPTY;
+			this.SetStackDontRender(ItemStack.EMPTY);
 		}
 
 		public void SetPointerPosition(Vector2 position) {
@@ -78,10 +55,10 @@ namespace SoulboundEngine.Client.Item.Container {
 		private void UpdateViewPosition() {
 			Vector2 size = this.root.worldBound.size;
 			Vector2 pos = this.pointerPosition - size / 2f;
-			this.itemView?.SetPosition(pos);
+			this.view?.SetPosition(pos);
 		}
 
-		IItemSlot IInventory.GetSlot(int index) => this.slot;
+		IItemSlot IInventory.GetSlot(int index) => this.slot!;
 
 		IEnumerable<int> IInventory.GetSlots() => new[] { 0 };
 

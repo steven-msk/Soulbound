@@ -83,8 +83,8 @@ namespace SoulboundEngine.Client.UI.Screen {
 				VisualElement slotElement = this.GetPlayerHotbar(inventoryRoot)[slotIndex];
 
 				UXMLHotbarSlotDisplay display = new(slot, this.itemRenderManager, interactable);
-				display.OnBind(slotElement);
 				this.AddWidget(display);
+				display.OnBind(slotElement);
 				this.AddPointerListeners(slotElement, display, slot, playerInventory);
 				this.playerHotbarSlotDisplays.Add(display);
 			}
@@ -92,8 +92,8 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 		protected UXMLItemSlotDisplay BindSlot(VisualElement slotElement, IItemSlot slot, IInventory inventory, bool interactable) {
 			UXMLItemSlotDisplay display = new(slot, this.itemRenderManager, interactable);
-			display.OnBind(slotElement);
 			this.AddWidget(display);
+			display.OnBind(slotElement);
 			this.AddPointerListeners(slotElement, display, slot, inventory);
 			return display;
 		}

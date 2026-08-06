@@ -25,9 +25,8 @@ namespace SoulboundEngine.Client.Render.Item {
 			: base(slot, itemRenderManager, interactable) {
 		}
 
-		public override void OnBind(VisualElement root) {
-			base.OnBind(root);
-			root.Get<Label>(SLOT_INDEX_ELEMENT).text = (this.slot.GetIndex() + 1).ToString();
+		protected override void Prepare() {
+			this.root.Get<Label>(SLOT_INDEX_ELEMENT).text = (this.slot.GetIndex() + 1).ToString();
 		}
 
 		protected override Identifier GetDurabilityBarId() => DURABILITY_BAR_ELEMENT;

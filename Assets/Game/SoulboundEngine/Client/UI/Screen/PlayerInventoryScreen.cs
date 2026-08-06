@@ -1,6 +1,4 @@
 ﻿using SoulboundEngine.Client.Item;
-using SoulboundEngine.Client.Item.Container;
-using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.Recipe;
 using SoulboundEngine.Client.Render.Item;
 using SoulboundEngine.Client.UI.UXMLBindings;
@@ -72,9 +70,9 @@ namespace SoulboundEngine.Client.UI.Screen {
 			TemplateContainer visualElement = this.recipeResultAsset.Instantiate();
 			craftingRoot.Add(visualElement);
 
-			RecipePreviewElement preview = new(this.playerInventory, index, this.itemRenderManager, visualElement, this.OnCraftingPreviewClicked);
-			preview.Bind(recipe.entry, recipe.resultPreview);
+			RecipePreviewElement preview = new(this.itemRenderManager, visualElement, this.OnCraftingPreviewClicked);
 			this.AddWidget(preview);
+			preview.Bind(recipe.entry, recipe.resultPreview);
 			return preview;
 		}
 
@@ -103,36 +101,23 @@ namespace SoulboundEngine.Client.UI.Screen {
 	}
 
 	class RecipePreviewElement : UXMLItemSlotDisplay {
-		private static readonly Identifier ITEM_DISPLAY_ELEMENT = Identifier.Of("soulbound:slot/item_display");
-		private static readonly Identifier STACK_COUNT_ELEMENT = Identifier.Of("soulbound:slot/stack_count");
 		private readonly VisualElement visualElement;
 		private readonly EventCallback<ClickEvent, RecipePreviewElement> onClick;
-		private readonly PlayerInventory playerInventory;
-		private readonly int index;
-		private readonly ItemRenderContext.UXML renderContext;
 
-		public RecipePreviewElement(PlayerInventory inventory, int index, ItemRenderManager itemRenderManager, VisualElement visualElement, EventCallback<ClickEvent, RecipePreviewElement> onClick)
+		public RecipePreviewElement(ItemRenderManager itemRenderManager, VisualElement visualElement, EventCallback<ClickEvent, RecipePreviewElement> onClick)
 			: base(itemRenderManager, true, true) {
-			this.playerInventory = inventory;
-			this.index = index;
 			this.visualElement = visualElement;
 			this.onClick = onClick;
-			this.renderContext = new ItemRenderContext.UXML(visualElement, ITEM_DISPLAY_ELEMENT, STACK_COUNT_ELEMENT);
 		}
-
-		protected override ItemRenderContext RenderContext => this.renderContext;
 
 		public RecipeEntry<StationlessCraftingRecipe> recipe { get; private set; }
 		public ItemStack result { get; private set; }
 
 		public void Bind(RecipeEntry<StationlessCraftingRecipe> recipe, ItemStack result) {
-			this.slot = new ItemSlot(this.playerInventory, this.index);
-			this.slot.SetStack(result);
-
-			base.OnBind(this.visualElement);
 			this.recipe = recipe;
 			this.result = result;
 			this.visualElement.RegisterCallback(this.onClick, this);
+			this.OnBind(this.visualElement, result);
 		}
 
 		public override void Dispose() {
