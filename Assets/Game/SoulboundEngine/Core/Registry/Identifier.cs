@@ -135,6 +135,14 @@ namespace SoulboundEngine.Core.Registry {
 
 		public string GetPath() => this.path;
 
+		public string ToTranslationKey(string prefix) {
+			return $"{prefix}.{this.GetNamespace()}.{this.GetPath()}";
+		}
+
+		public string ToTranslationKey(string prefix, string s) {
+			return $"{prefix}.{s}.{this.GetNamespace()}.{this.GetPath()}";
+		}
+
 		public string[] SplitPath() {
 			return this.path.Split(PATH_SEPARATOR);
 		}

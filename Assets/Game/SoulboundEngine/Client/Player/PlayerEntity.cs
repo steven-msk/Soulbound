@@ -4,10 +4,11 @@ using SoulboundEngine.Client.Item;
 using SoulboundEngine.Client.Item.Container;
 using SoulboundEngine.Client.UI.Screen;
 using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.Client.World.Block.Entity;
 using SoulboundEngine.Client.World.Block.State;
 using SoulboundEngine.Client.World.Entity;
 using SoulboundEngine.Client.World.Level;
-using SoulboundEngine.Core.Event;
+using SoulboundEngine.Client.World.Widget;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -15,15 +16,12 @@ using UnityEngine;
 #nullable enable
 
 namespace SoulboundEngine.Client.Player {
-	using Item = Item.Item;
-
-	public class PlayerEntity : Entity, IInputEventHandler, IInteractionHandler<ItemInteraction>, IInteractionHandler<BlockInteraction> {
+	public class PlayerEntity : Entity, IInputEventHandler {
 		public static readonly EntityDescriptor<PlayerEntity> DESCRIPTOR = EntityDescriptor.Of<PlayerEntity>((_, level) => throw new InvalidOperationException());
 		const float MAX_BLOCK_REACH = 5f;
 		private readonly SoulboundClient client;
 		private readonly PlayerInventory inventory;
 		private bool isInventoryOpen;
-		private readonly InteractionResolver interactionResolver;
 		private Vector2 screenPointerPos;
 		private bool isHoldingLeftClick;
 		private bool isHoldingRightClick;
@@ -31,21 +29,14 @@ namespace SoulboundEngine.Client.Player {
 		private InventoryScreenHandler? activeInventoryScreenHandler;
 		private IScreenHandle? activeInventoryScreen;
 		private new readonly PlayerTransformAdapter transformAdapter;
-		private TransitStackHandler? transitStack;
-
-		// provisory guard for not breaking the block instantly after it was placed
-		// TODO: fix gameplay input overlaps
-		private bool leftClickBlockBreakGuard;
+		private ActiveUseContext? activeItemUse;
+		private BlockPos previousPointerBlockPos;
 
 		public PlayerEntity(SoulboundClient client, Level level)
 			: base(DESCRIPTOR, level) {
 			this.client = client;
 			this.transformAdapter = new PlayerTransformAdapter(this);
 			this.inventory = new PlayerInventory();
-			this.interactionResolver = new InteractionResolver();
-
-			this.interactionResolver.RegisterHandler<ItemInteraction>(this);
-			this.interactionResolver.RegisterHandler<BlockInteraction>(this);
 		}
 
 		public bool isJumping { get; private set; }
@@ -128,52 +119,17 @@ namespace SoulboundEngine.Client.Player {
 			this.SetNormalVelocityX(0f);
 		}
 
-		// temporary hook from WorldRenderer
-		public void FrameUpdate() {
-			if (this.isHoldingLeftClick) this.OnLeftHold();
-			if (this.isHoldingRightClick) this.OnRightHold();
+		public override void Tick() {
+			this.DoBlockHover();
+			this.CheckItemUse();
+			if (this.isHoldingLeftClick) this.OnLeftHoldTick();
+			if (this.isHoldingRightClick) this.OnRightHoldTick();
 
 			if (this.activeInventoryScreenHandler != null) {
 				if (!this.activeInventoryScreenHandler.CanUse(this)) {
 					this.CloseInventoryScreen();
 				}
 			}
-		}
-
-		private void OnLeftClick() {
-			if (!this.ResolveItemOrBlockInteraction(InteractionTrigger.LeftClick)) {
-
-				// PROTOTYPICAL
-				BlockPos blockPos = (BlockPos)this.GetWorldPointerPos();
-				if (this.TryBreakBlock(blockPos)) {
-					EventBus.Publish(new BlockBrokenEvent(blockPos, this.level));
-				}
-			}
-		}
-		private void OnRightClick() {
-			this.ResolveItemOrBlockInteraction(InteractionTrigger.RightClick);
-		}
-
-		private void OnLeftHold() {
-			if (!this.ResolveItemOrBlockInteraction(InteractionTrigger.LeftHold)) {
-
-				// PROTOTYPICAL
-				BlockPos blockPos = (BlockPos)this.GetWorldPointerPos();
-				if (this.TryBreakBlock(blockPos)) {
-					EventBus.Publish(new BlockBrokenEvent(blockPos, this.level));
-				}
-			}
-		}
-		private void OnRightHold() {
-			this.ResolveItemOrBlockInteraction(InteractionTrigger.RightHold);
-		}
-
-		private void OnLeftRelease() {
-			this.ResolveItemOrBlockInteraction(InteractionTrigger.LeftRelease);
-			this.leftClickBlockBreakGuard = false;
-		}
-		private void OnRightRelease() {
-			this.ResolveItemOrBlockInteraction(InteractionTrigger.RightRelease);
 		}
 
 		public void OpenInventoryScreen(IInventoryScreenHandlerFactory handlerFactory) {
@@ -197,107 +153,238 @@ namespace SoulboundEngine.Client.Player {
 			this.isInventoryOpen = false;
 		}
 
-		private bool ResolveItemOrBlockInteraction(InteractionTrigger trigger) {
-			ItemInteraction itemInteraction = this.GetItemInteraction(trigger);
-			if (this.interactionResolver.Resolve(itemInteraction)) {
-				this.leftClickBlockBreakGuard = itemInteraction.itemStack.item is IPlaceableItem;
+		private void OnLeftClick() {
+			this.PrimaryInteract();
+		}
+		private void OnRightClick() {
+			this.SecondaryInteract();
+		}
+
+		private void OnLeftHoldTick() {
+			this.HandleInteractTick(InteractionType.Primary);
+		}
+		private void OnRightHoldTick() {
+			this.HandleInteractTick(InteractionType.Secondary);
+		}
+
+		[Obsolete]
+		private void OnLeftRelease() {
+		}
+		[Obsolete]
+		private void OnRightRelease() {
+		}
+
+		private void DoBlockHover() {
+			Vector2 pointerPos = this.GetWorldPointerPos();
+			BlockPos pointerBlockPos = (BlockPos)pointerPos;
+			BlockState? currentState = this.level.GetBlockState(pointerBlockPos);
+
+			if (pointerBlockPos == this.previousPointerBlockPos) {
+				currentState?.OnHoverTick(this.GetMainHandStack(), this.level, this, pointerBlockPos);
+			} else {
+				BlockState? previousState = this.level.GetBlockState(this.previousPointerBlockPos);
+				previousState?.OnHoverLeave(this.GetMainHandStack(), this.level, this, this.previousPointerBlockPos);
+				currentState?.OnHoverEnter(this.GetMainHandStack(), this.level, this, pointerBlockPos);
+			}
+			this.previousPointerBlockPos = pointerBlockPos;
+		}
+
+		private void HandleInteractTick(InteractionType type) {
+			Action getInteractAction(InteractionType type) {
+				return type switch {
+					InteractionType.Primary => this.PrimaryInteract,
+					InteractionType.Secondary => this.SecondaryInteract,
+					_ => throw new ArgumentException()
+				};
+			}
+			BlockPos blockPos = (BlockPos)this.GetWorldPointerPos();
+			if (this.activeItemUse?.type == type) this.HandleUseTick();
+			else if (this.activeItemUse == null && this.GetMainHandStack().ShouldContinueUse(type, this.level, this, blockPos)) {
+				getInteractAction(type)();
+			}
+		}
+
+		private void PrimaryInteract() {
+			if (!this.Interact(InteractionType.Primary,
+					ItemStack.OnPrimaryUseOnEntity, ItemStack.OnPrimaryUseOnBlock, ItemStack.OnPrimaryUse,
+					AbstractBlock.AbstractBlockState.OnPrimaryUse, AbstractBlock.AbstractBlockState.OnPrimaryUseWithItem
+				)) {
+				this.TryBreakBlock((BlockPos)this.GetWorldPointerPos());
+			}
+		}
+
+		private void SecondaryInteract() {
+			this.Interact(InteractionType.Secondary,
+				ItemStack.OnSecondaryUseOnEntity, ItemStack.OnSecondaryUseOnBlock, ItemStack.OnSecondaryUse,
+				AbstractBlock.AbstractBlockState.OnSecondaryUse, AbstractBlock.AbstractBlockState.OnSecondaryUseWithItem
+			);
+		}
+
+		private void HandleUseTick() {
+			if (this.activeItemUse == null) return;
+			this.activeItemUse = this.activeItemUse.Tick(finishedStack => {
+				this.SetMainHandStackInternal(finishedStack);
+				return null;
+			}, this.SetMainHandStackInternal);
+		}
+
+		public void CancelItemUse() {
+			this.activeItemUse?.Cancel(this.SetMainHandStackInternal);
+			this.activeItemUse = null;
+		}
+
+		private void CheckItemUse() {
+			if (!this.IsUsingItem()) return;
+			if ((this.activeItemUse!.type == InteractionType.Primary && !this.isHoldingLeftClick)
+					|| (this.activeItemUse!.type == InteractionType.Secondary && !this.isHoldingRightClick)) {
+				this.CancelItemUse();
+			}
+		}
+
+		private bool Interact(
+				InteractionType type,
+				Func<ItemStack, PlayerEntity, Entity, IActionResult> itemOnEntity,
+				Func<ItemStack, BlockInteractionResult, IActionResult> itemOnBlock,
+				Func<ItemStack, Level, PlayerEntity, BlockPos, IActionResult> itemInAir,
+				Func<BlockState, Level, PlayerEntity, BlockPos, IActionResult> blockUse,
+				Func<BlockState, ItemStack, Level, PlayerEntity, BlockPos, IActionResult> blockUseWithItem
+			) {
+			this.CancelItemUse();
+
+			Vector2 interactionPoint = this.GetWorldPointerPos();
+
+			bool itemInteracted = ItemInteract(interactionPoint, this.GetMainHandStack(), this, itemOnEntity, itemOnBlock, itemInAir);
+			if (itemInteracted) {
+				ItemStack usedStack = this.GetMainHandStack().OnItemUsed(type, this.level, this);
+				this.SetMainHandStackInternal(usedStack);
+
+				int useTime = usedStack.GetUseTime(type, this.level, this);
+				if (useTime > 0) {
+					ActiveUseContext useContext = new(usedStack, type, this.level, this, useTime, useTime);
+					this.activeItemUse = useContext;
+				}
 				return true;
 			}
-			return this.interactionResolver.Resolve(this.GetBlockInteraction(trigger));
+
+			BlockPos blockPos = (BlockPos)interactionPoint;
+			BlockState? blockState = this.level.GetBlockState(blockPos);
+			if (blockState == null) return false;
+			return BlockInteract(blockState, blockPos, this.GetMainHandStack(), this, blockUse, blockUseWithItem);
 		}
 
-		private ItemInteraction GetItemInteraction(InteractionTrigger trigger) {
-			return new ItemInteraction {
-				itemStack = this.GetMainHandStack(),
-				player = this,
-				level = this.level,
-				trigger = trigger
-			};
+		private static bool ItemInteract(
+				Vector2 interactionPoint, 
+				ItemStack stack, 
+				PlayerEntity player,
+				Func<ItemStack, PlayerEntity, Entity, IActionResult> onEntity,
+				Func<ItemStack, BlockInteractionResult, IActionResult> onBlock,
+				Func<ItemStack, Level, PlayerEntity, BlockPos, IActionResult> inAir
+			) {
+			if (stack.IsEmpty()) return false;
+
+			if (player.CanInteractWithEntityAt(interactionPoint, out Entity targetEntity)) {
+				IActionResult actionResult = onEntity(stack, player, targetEntity);
+				if (actionResult is IActionResult.PassToBlockAction) return false;
+				if (HandleActionResult(actionResult, player)) return true;
+			}
+
+			if (player.CanInteractWithBlockAt(interactionPoint, out BlockState blockState, out BlockPos blockPos)) {
+				BlockInteractionResult blockInteractionResult = new(player.level, blockPos, blockState, stack, player);
+				IActionResult actionResult = onBlock(stack, blockInteractionResult);
+				if (actionResult is IActionResult.PassToBlockAction) return false;
+				if (HandleActionResult(actionResult, player)) return true;
+			}
+
+			blockPos = (BlockPos)interactionPoint;
+			IActionResult result = inAir(stack, player.level, player, blockPos);
+			if (result is IActionResult.PassToBlockAction) return false;
+			return HandleActionResult(result, player);
 		}
 
-		private BlockInteraction GetBlockInteraction(InteractionTrigger trigger) {
-			BlockPos blockPos = (BlockPos)this.GetWorldPointerPos();
-			return new BlockInteraction {
-				trigger = trigger,
-				blockPos = blockPos,
-				blockState = this.level.GetBlockState(blockPos),
-				itemStack = this.GetMainHandStack(),
-				level = this.level,
-				player = this
-			};
+		private static bool BlockInteract(
+			BlockState blockState, BlockPos blockPos, ItemStack stack, PlayerEntity player,
+			Func<BlockState, Level, PlayerEntity, BlockPos, IActionResult> normalUse,
+			Func<BlockState, ItemStack, Level, PlayerEntity, BlockPos, IActionResult> withItem
+		) {
+			if (!blockState.IsInteractable(player.level, blockPos)) return false;
+			if (!player.IsInBlockReach(blockPos.GetCenter())) return false;
+
+			if (!stack.IsEmpty()) {
+				IActionResult actionResult = withItem(blockState, stack, player.level, player, blockPos);
+				if (HandleActionResult(actionResult, player)) return true;
+			}
+
+			IActionResult result = normalUse(blockState, player.level, player, blockPos);
+			return HandleActionResult(result, player);
 		}
 
-		// TODO: rework interaction design
-		
-		// provisory priority
-		int IInteractionHandler<ItemInteraction>.priority => 0;
-
-		bool IInteractionHandler<ItemInteraction>.CanHandle(in ItemInteraction ctx) {
-			Item item = ctx.itemStack.item;
-			if (ctx.itemStack.IsEmpty()) return false;
-			if (item is not IInteractableItem interactable) return false;
-
-			if (!interactable.ValidateTrigger(ctx.trigger)) return false;
-
-			return interactable.CanExecute(in ctx.itemStack, in ctx);
+		private static bool HandleActionResult(IActionResult result, PlayerEntity player) {
+			if (result is IActionResult.Success success) {
+				IActionResult.ItemContext context = success.itemContext;
+				ItemStack? newHandStack = context.newHandStack;
+				ItemStack stack = newHandStack.GetValueOrDefault(player.GetMainHandStack()).Copy();
+				if (context.damageItem) stack = stack.Damage(1);
+				player.SetMainHandStack(stack);
+				return true;
+			} else if (result is IActionResult.Fail) {
+				return true;
+			}
+			return false;
 		}
 
-		bool IInteractionHandler<ItemInteraction>.Handle(in ItemInteraction ctx) {
-			ItemStack stack = ctx.itemStack;
-			IInteractableItem interactable = (IInteractableItem)stack.item;
-			return interactable.TryExecute(ref stack, in ctx);
+		public bool CanInteractWithEntityAt(Vector2 pos, out Entity entity) {
+			if (!this.IsInBlockReach(pos)) {
+				entity = null!;
+				return false;
+			}
+			return this.level.TryGetEntityAt(pos, out entity);
 		}
 
-		int IInteractionHandler<BlockInteraction>.priority => 0;
+		public bool CanInteractWithBlockAt(Vector2 pos, out BlockState blockState, out BlockPos blockPos) {
+			blockPos = (BlockPos)pos;
+			BlockState? state = this.level.GetBlockState(blockPos);
+			if (state == null) {
+				blockState = null!;
+				return false;
+			}
 
-		bool IInteractionHandler<BlockInteraction>.CanHandle(in BlockInteraction ctx) {
-
-			// interaction handler shouldnt guard block interactions only inside the player reach
-			// some blocks may be interactable even if theyre out of reach, though this is a false assumption for pre-prod
-			// CanInteract will need to explicitly check if the player is in range if it requires it
-			// for this case the handler is implemented in Player so the this CanHandle guards it
-			// but keep this in mind for future implementations
-			bool isInReach = this.IsInBlockReach((Vector2)ctx.blockPos);
-			if (!isInReach) return false;
-
-			if (ctx.blockState.block is not IInteractableBlock interactable) return false;
-
-			if (!interactable.ValidateTrigger(ctx.trigger)) return false;
-
-			return interactable.CanInteract(in ctx);
-		}
-
-		bool IInteractionHandler<BlockInteraction>.Handle(in BlockInteraction ctx) {
-			IInteractableBlock interactable = (IInteractableBlock)ctx.blockState.block;
-			interactable.OnInteract(in ctx);
-			return true;
+			blockState = state;
+			if (blockState == Blocks.AIR.DefaultState) return false;
+			return this.IsInBlockReach(blockPos.GetCenter());
 		}
 
 		private bool TryBreakBlock(BlockPos blockPos) {
-			if (!this.IsInBlockReach((Vector2)blockPos) || this.leftClickBlockBreakGuard) return false;
+			if (!this.IsInBlockReach((Vector2)blockPos)) return false;
+			if (!Level.IsInBounds(blockPos)) return false;
 
 			BlockState blockState = this.level.GetBlockState(blockPos) ?? Blocks.AIR.DefaultState;
 			if (blockState.block == Blocks.AIR) return false;
 
-			int itemBreakLevel = this.GetMainHandItemBreakLevel();
-			int minBreakLevel = blockState.block.minBreakLevel;
+			ItemStack stack = this.GetMainHandStack();
+			int itemBreakLevel = stack.GetBreakLevel();
+			int minBreakLevel = blockState.block.MinBreakLevel;
 			if (itemBreakLevel < minBreakLevel) return false;
 
-			this.level.SetBlockState(blockPos, Blocks.AIR.DefaultState);
+			this.level.SetBlockState(blockPos, blockState.block.OnBreak(this.level, blockPos, blockState, this));
 			Block.DropStacks(blockState, this.level, blockPos, null);
+			stack.Damage(1);
 			return true;
 		}
 
-		private int GetMainHandItemBreakLevel() {
-			ItemStack mainHandStack = this.GetMainHandStack();
-			Item item = mainHandStack.item;
+		public WorldWidgetHandle ShowWorldWidget<TContext>(WorldWidgetType<TContext> type, TContext context) where TContext : WorldWidgetContext {
+			return this.client.ShowWorldWidget(type, context);
+		}
 
-			if (mainHandStack.IsEmpty()) return 0;
+		public void UpdateWorldWidget<TContext>(WorldWidgetHandle handle, TContext context) where TContext : WorldWidgetContext {
+			this.client.UpdateWorldWidget(handle, context);
+		}
 
-			if (item is IBlockBreakerItem breaker) {
-				return breaker.GetBreakLevel(mainHandStack);
-			}
-			return -1;
+		public void DestroyWorldWidget(WorldWidgetHandle handle) {
+			this.client.DestroyWorldWidget(handle);
+		}
+
+		public IScreenHandle OpenSignEditScreen(SignTileEntity signEntity) {
+			return this.client.OpenScreen(new SignEditScreen(signEntity));
 		}
 
 		private void ThrowFromMainHand(bool ctrl) {
@@ -342,8 +429,24 @@ namespace SoulboundEngine.Client.Player {
 		public float GetLuck() => 0f;
 
 		public ItemStack GetMainHandStack() {
-			ItemStack transitStack = this.transitStack?.GetStack() ?? ItemStack.EMPTY;
+			ItemStack transitStack = this.GetTransitStack() ?? ItemStack.EMPTY;
 			return transitStack.IsEmpty() ? this.inventory.GetMainStack() : transitStack;
+		}
+		
+		public ItemStack? GetTransitStack() => this.activeInventoryScreenHandler?.GetTransitStack();
+
+		public void SetMainHandStack(ItemStack stack) {
+			this.CancelItemUse();
+			this.SetMainHandStackInternal(stack);
+		}
+
+		private void SetMainHandStackInternal(ItemStack stack) {
+			if (ItemStack.AreEqual(stack, this.GetMainHandStack())) return;
+			if (this.activeInventoryScreenHandler != null && !this.activeInventoryScreenHandler.GetTransitStack().IsEmpty()) {
+				this.activeInventoryScreenHandler.SetTransitStack(stack);
+			} else {
+				this.inventory.SetMainStack(stack);
+			}
 		}
 
 		public bool IsHoldingLeftClick() => this.isHoldingLeftClick;
@@ -351,25 +454,12 @@ namespace SoulboundEngine.Client.Player {
 
 		public Vector2 GetScreenPointerPos() => this.screenPointerPos;
 		public Vector2 GetWorldPointerPos() {
-			Vector3 screenPos = this.screenPointerPos;
-
-			//Canvas canvas = SoulboundClient.Instance.UIHandler.GetCanvas();
-			//RectTransform rootTransform = canvas.GetComponent<RectTransform>();
-			//bool inWorldPoint = RectTransformUtility.ScreenPointToWorldPointInRectangle(
-			//	rootTransform,
-			//	screenPos,
-			//	Camera.main,
-			//	out var worldPoint
-			//);
-			//if (inWorldPoint) return worldPoint;
-
-			screenPos.z = -Camera.main.transform.position.z;
-			return Camera.main.ScreenToWorldPoint(screenPos);
+			// still "depends" on Unity internals, just hidden behind the client layer
+			// keep in mind PlayerEntity is at core layer, independent of UnityEngine
+			return this.client.ScreenToWorldPoint(this.screenPointerPos);
 		}
 
-		public void SetTransitStackSource(TransitStackHandler transitStack) {
-			this.transitStack = transitStack;
-		}
+		public bool IsUsingItem() => this.activeItemUse != null;
 
 		public void SetTransformHandle(IPlayerTransformHandle playerTransformHandle) {
 			this.transformAdapter.SetHandle(playerTransformHandle);

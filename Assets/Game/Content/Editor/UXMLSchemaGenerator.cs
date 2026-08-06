@@ -16,7 +16,7 @@ namespace SoulboundUnityEditor {
 		private const string OUTPUT_PATH = "Assets/Game/SoulboundEngine/Client/UI/UXMLBindings/Generated/" + OUTPUT_FILE;
 		private const string DEFAULT_NAMESPACE = "soulbound";
 		private static readonly string[] PROJECT_UXML_ROOTS = {
-			"Assets/Game/Content/UI/"
+			"Assets/Game/Content/"
 		};
 		private static readonly Dictionary<string, Type> BUILT_IN_TYPES = new() {
 			["VisualElement"] = typeof(VisualElement),
@@ -62,6 +62,10 @@ namespace SoulboundUnityEditor {
 
 			foreach (var path in allUXML) {
 				string documentId = ToSnakeCase(Path.GetFileNameWithoutExtension(path));
+				string renameMessage = AssetDatabase.RenameAsset(path, documentId);
+				if (!string.IsNullOrEmpty(renameMessage)) {
+					Debug.LogError("[UXMLSchemaGenerator] Failed to rename asset: " + renameMessage);
+				}
 				XDocument document = XDocument.Load(path);
 				HashSet<string> seenInThisDoc = new();
 
@@ -102,7 +106,7 @@ namespace SoulboundUnityEditor {
 		private static string ToSnakeCase(string s) {
 			if (string.IsNullOrEmpty(s)) return s;
 
-			var sb = new StringBuilder();
+			StringBuilder sb = new();
 			for (int i = 0; i < s.Length; i++) {
 				char c = s[i];
 				if (char.IsUpper(c)) {

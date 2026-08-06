@@ -34,6 +34,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 			this.itemRenderManager = ctx.itemRenderManager;
 			this.playerInventory = ctx.playerInventory;
 			this.player = ctx.player;
+			this.handler.externalTransitStackChange += this.SyncTransitStack;
 		}
 
 		protected sealed override void OnBind(VisualElement root) {
@@ -82,8 +83,8 @@ namespace SoulboundEngine.Client.UI.Screen {
 				VisualElement slotElement = this.GetPlayerHotbar(inventoryRoot)[slotIndex];
 
 				UXMLHotbarSlotDisplay display = new(slot, this.itemRenderManager, interactable);
-				display.OnBind(slotElement);
 				this.AddWidget(display);
+				display.OnBind(slotElement);
 				this.AddPointerListeners(slotElement, display, slot, playerInventory);
 				this.playerHotbarSlotDisplays.Add(display);
 			}
@@ -91,8 +92,8 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 		protected UXMLItemSlotDisplay BindSlot(VisualElement slotElement, IItemSlot slot, IInventory inventory, bool interactable) {
 			UXMLItemSlotDisplay display = new(slot, this.itemRenderManager, interactable);
-			display.OnBind(slotElement);
 			this.AddWidget(display);
+			display.OnBind(slotElement);
 			this.AddPointerListeners(slotElement, display, slot, inventory);
 			return display;
 		}
@@ -151,14 +152,14 @@ namespace SoulboundEngine.Client.UI.Screen {
 					this.dragModifiers = modifiers;
 				}
 
-				this.SyncTransitStack();
+				this.SyncTransitStack(this.handler.GetTransitStack());
 			} catch (Exception e) {
 				Logger.LogFatal(e);
 			}
 		}
 
-		public void SyncTransitStack() {
-			this.transitStackHandler.SetStack(this.handler.GetTransitStack());
+		public void SyncTransitStack(ItemStack stack) {
+			this.transitStackHandler.SetStack(stack);
 		}
 
 		private void OnPointerEnter(IItemSlot slot, IInventory inventory, VisualElement visualElement, PointerEnterEvent evt) {
@@ -228,6 +229,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 			this.playerHotbarSlotDisplays.Clear();
 			this.transitStackHandler.Destroy();
 			this.playerInventory.mainSlotChanged -= this.OnMainSlotChanged;
+			this.handler.externalTransitStackChange -= this.SyncTransitStack;
 		}
 
 		public struct Context {

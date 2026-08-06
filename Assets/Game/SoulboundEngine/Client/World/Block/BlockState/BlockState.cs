@@ -4,7 +4,7 @@ using System.Collections.Generic;
 #nullable enable
 
 namespace SoulboundEngine.Client.World.Block.State {
-	public class BlockState : Block.AbstractBlockState {
+	public class BlockState : AbstractBlock.AbstractBlockState {
 		public Block block { get; }
 
 		public BlockState(Block owner, IDictionary<Property, object> entries) 
@@ -15,7 +15,7 @@ namespace SoulboundEngine.Client.World.Block.State {
 		protected override BlockState AsBlockState() => this;
 
 		public override string ToString() {
-			return $"[block={this.block}, properties={this.GetEntries()}]";
+			return $"block[{this.block}, properties={this.GetEntries()}]";
 		}
 	}
 }

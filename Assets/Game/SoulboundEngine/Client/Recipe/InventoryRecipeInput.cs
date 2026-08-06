@@ -25,10 +25,10 @@ namespace SoulboundEngine.Client.Recipe {
 			this.itemCounts.Clear();
 			foreach (var stack in this.GetStacks()) {
 				if (stack.IsEmpty()) continue;
-				if (this.itemCounts.TryGetValue(stack.item, out int count)) {
-					this.itemCounts[stack.item] = count + stack.count;
+				if (this.itemCounts.TryGetValue(stack.GetItem(), out int count)) {
+					this.itemCounts[stack.GetItem()] = count + stack.count;
 				} else {
-					this.itemCounts[stack.item] = stack.count;
+					this.itemCounts[stack.GetItem()] = stack.count;
 				}
 			}
 		}

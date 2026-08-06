@@ -1,36 +1,70 @@
+using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.Render.Item;
 using SoulboundEngine.Client.UI.UXMLBindings;
 using SoulboundEngine.Core.Assets;
 using SoulboundEngine.Core.Registry;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 #nullable enable
 
 namespace SoulboundEngine.Client.Item.Container {
-	public sealed class TransitStackHandler {
+	public sealed class TransitStackHandler : UXMLItemSlotDisplay, IInventory {
 		private static readonly Identifier TRANSIT_STACK_ELEMENT = Identifier.Of("soulbound:transit_stack/transit_stack");
 		private static readonly Identifier ITEM_DISPLAY_ELEMENT = Identifier.Of("soulbound:transit_stack/item_display");
 		private static readonly Identifier STACK_COUNT_ELEMENT = Identifier.Of("soulbound:transit_stack/stack_count");
-		const float ITEM_DISPLAY_SIZE = 48f;
-		private readonly VisualElement root;
+		private static readonly Identifier DURABILITY_BAR_ELEMENT = Identifier.Of("soulbound:transit_stack/durability_bar");
 		private Vector2 pointerPosition;
-		private ItemStack itemStack;
-		private IItemView? itemView;
-		private readonly ItemRenderManager itemRenderManager;
-		private readonly ItemRenderHandle renderHandle;
-		private readonly ItemRenderContext renderContext;
 
-		public TransitStackHandler(ItemRenderManager itemRenderManager, VisualElement root) {
-			this.itemRenderManager = itemRenderManager;
-			this.root = root;
-			this.renderHandle = new ItemRenderHandle(this);
-			this.renderContext = new ItemRenderContext.UXML(this.root, ITEM_DISPLAY_ELEMENT, STACK_COUNT_ELEMENT);
+		private TransitStackHandler(ItemRenderManager itemRenderManager, VisualElement root) 
+			: base(itemRenderManager, false, false) {
+			this.OnBind(root, new ItemSlot(this, 0));
 		}
 
 		public static TransitStackHandler Create(VisualElement screenRoot, ItemRenderManager itemRenderManager) {
 			return new TransitStackHandler(itemRenderManager, CreateVisualElement(screenRoot));
 		}
+
+		protected override Identifier GetItemDisplayId() => ITEM_DISPLAY_ELEMENT;
+		protected override Identifier GetStackCountId() => STACK_COUNT_ELEMENT;
+		protected override Identifier GetDurabilityBarId() => DURABILITY_BAR_ELEMENT;
+
+		protected override void Render(ItemStack stack) {
+			base.Render(stack);
+			this.UpdateViewPosition();
+		}
+
+		public void Destroy() {
+			this.Dispose();
+			this.SetStackDontRender(ItemStack.EMPTY);
+		}
+
+		public void SetPointerPosition(Vector2 position) {
+			Vector2 panelPosition = this.root.panel != null
+				? RuntimePanelUtils.ScreenToPanel(this.root.panel, position)
+				: position;
+
+			this.pointerPosition = this.root.parent != null
+				? this.root.parent.WorldToLocal(panelPosition)
+				: panelPosition;
+
+			this.UpdateViewPosition();
+		}
+
+		private void UpdateViewPosition() {
+			Vector2 size = this.root.worldBound.size;
+			Vector2 pos = this.pointerPosition - size / 2f;
+			this.view?.SetPosition(pos);
+		}
+
+		IItemSlot IInventory.GetSlot(int index) => this.slot!;
+
+		IEnumerable<int> IInventory.GetSlots() => new[] { 0 };
+
+		int IInventory.GetSize() => 1;
+
+		bool IInventory.CanPlayerUse(PlayerEntity player) => true;
 
 		private static VisualElement CreateVisualElement(VisualElement screenRoot) {
 			// TODO: rework UI asset resolution
@@ -61,50 +95,6 @@ namespace SoulboundEngine.Client.Item.Container {
 			//stackCount.style.width = ITEM_DISPLAY_SIZE;
 
 			//return root;
-		}
-
-		public void SetStack(ItemStack itemStack) {
-			if (itemStack.IsEmpty()) {
-				this.Destroy();
-				return;
-			}
-
-			this.itemStack = itemStack;
-			this.Render(itemStack);
-		}
-
-		private void Render(ItemStack itemStack) {
-			this.itemView = this.itemRenderManager.Render(this.renderHandle, itemStack, this.renderContext);
-			this.UpdateViewPosition();
-		}
-
-		public bool HasStack() => this.itemView != null;
-		public ItemStack GetStack() => this.itemStack;
-
-		public void Destroy() {
-			if (this.itemView == null) return;
-
-			this.itemRenderManager.Destroy(this.renderHandle, this.renderContext);
-			this.itemView = null;
-			this.itemStack = ItemStack.EMPTY;
-		}
-
-		public void SetPointerPosition(Vector2 position) {
-			Vector2 panelPosition = this.root.panel != null
-				? RuntimePanelUtils.ScreenToPanel(this.root.panel, position)
-				: position;
-
-			this.pointerPosition = this.root.parent != null
-				? this.root.parent.WorldToLocal(panelPosition)
-				: panelPosition;
-
-			this.UpdateViewPosition();
-		}
-
-		private void UpdateViewPosition() {
-			Vector2 size = this.root.worldBound.size;
-			Vector2 pos = this.pointerPosition - size / 2f;
-			this.itemView?.SetPosition(pos);
 		}
 	}
 }

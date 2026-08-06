@@ -35,7 +35,7 @@ namespace SoulboundEngine.Client.Recipe {
 		}
 
 		public bool AcceptsStack(ItemStack stack) {
-			return this.AcceptsItem(Items.GetEntry(stack.item)) && stack.count >= this.GetCount();
+			return this.AcceptsItem(Items.GetEntry(stack.GetItem())) && stack.count >= this.GetCount();
 		}
 
 		public virtual int GetCount() => 1;

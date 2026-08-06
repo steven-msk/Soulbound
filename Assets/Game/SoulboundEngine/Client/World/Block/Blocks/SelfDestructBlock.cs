@@ -5,7 +5,7 @@ using SoulboundEngine.Common;
 namespace SoulboundEngine.Client.World.Block {
 	[PROTOTYPICAL]
 	public sealed class SelfDestructBlock : Block, ITileEntityProvider {
-		public SelfDestructBlock(Settings settings) 
+		public SelfDestructBlock(AbstractBlock.Settings settings) 
 			: base(settings) {
 		}
 

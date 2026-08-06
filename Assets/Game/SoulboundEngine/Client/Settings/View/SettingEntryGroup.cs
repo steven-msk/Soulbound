@@ -5,6 +5,8 @@ using System.Reflection;
 using UnityEngine;
 
 namespace SoulboundEngine.Client.Settings.View {
+	using Component = UnityEngine.Component;
+
 	[PROTOTYPICAL]
 	public class SettingEntryGroup : MonoBehaviour {
 		private List<GameObject> toDestroy = new();
@@ -12,9 +14,9 @@ namespace SoulboundEngine.Client.Settings.View {
 		public SettingContainerBuilder AddEntry<T>(SettingEntry<T> entry) {
 			SettingContainerBuilder containerBuilder = new(this, entry);
 			GameObject container = containerBuilder.ConstructContainer();
-			toDestroy.Add(container);
+			this.toDestroy.Add(container);
 
-			SettingVisual<T> visual = entry.valueSet.GetVisual(transform);
+			SettingVisual<T> visual = entry.valueSet.GetVisual(this.transform);
 			visual.transform.SetParent(container.transform, false);
 			visual.Show(entry);
 
@@ -32,12 +34,12 @@ namespace SoulboundEngine.Client.Settings.View {
 			object valueSet = valueSetField.GetValue(entry);
 
 			MethodInfo getVisualMethod = valueSet.GetType().GetMethod("GetVisual", bindingFlags);
-			object visual = getVisualMethod.Invoke(valueSet, new object[] { transform });
+			object visual = getVisualMethod.Invoke(valueSet, new object[] { this.transform });
 
 			SettingContainerBuilder containerBuilder = new(this, entry);
 			GameObject container = containerBuilder.ConstructContainer();
 			(visual as Component).transform.SetParent(container.transform);
-			toDestroy.Add(container);
+			this.toDestroy.Add(container);
 
 			MethodInfo bindMethod = visual.GetType().GetMethod("Show", bindingFlags);
 			bindMethod.Invoke(visual, new object[] { entry });
@@ -48,13 +50,13 @@ namespace SoulboundEngine.Client.Settings.View {
 			return containerBuilder;
 		}
 
-		private void OnDisable() => DestroyVisuals();
+		private void OnDisable() => this.DestroyVisuals();
 
 		public void DestroyVisuals() {
-			foreach (var obj in toDestroy) {
+			foreach (var obj in this.toDestroy) {
 				GameObject.Destroy(obj);
 			}
-			toDestroy.Clear();
+			this.toDestroy.Clear();
 		}
 	}
 }

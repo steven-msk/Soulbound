@@ -1,6 +1,8 @@
 using SoulboundEngine.Client.Item;
+using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.World.Block.State;
 using SoulboundEngine.Client.World.Entity;
+using SoulboundEngine.Core.Registry;
 using SoulboundEngine.Core.States;
 using System;
 using System.Collections.Generic;
@@ -9,15 +11,18 @@ using System.Collections.Generic;
 
 namespace SoulboundEngine.Client.World.Block {
 	using Item = Item.Item;
+	using Level = Level.Level;
 
-	public class Block : IItemConvertible {
+	public class Block : AbstractBlock {
 		private static readonly List<BlockState> statesByID = new();
-		private readonly Settings settings;
+		private readonly RegistryKey<Block> registryKey;
+		private readonly AbstractBlock.Settings settings;
 		private BlockState defaultState;
 		protected StateManager<Block, BlockState> stateManager;
 
-		public Block(Settings settings) {
+		protected Block(AbstractBlock.Settings settings) {
 			this.settings = settings;
+			this.registryKey = settings.registryKey ?? throw new NotSupportedException("Block is not added to a registry");
 
 			StateManager<Block, BlockState>.Builder builder = new(this);
 			this.AppendProperties(builder);
@@ -32,6 +37,8 @@ namespace SoulboundEngine.Client.World.Block {
 			this.defaultState = this.stateManager.defaultState;
 		}
 
+		public static Block Create(AbstractBlock.Settings settings) => new(settings);
+
 		protected virtual void AppendProperties(StateManager<Block, BlockState>.Builder builder) {
 		}
 
@@ -43,8 +50,16 @@ namespace SoulboundEngine.Client.World.Block {
 
 		public StateManager<Block, BlockState> StateManager => this.stateManager;
 
-		public Item AsItem() {
+		public sealed override Item AsItem() {
 			return Item.blockItems.TryGetValue(this, out Item item) ? item : Items.AIR;
+		}
+
+		protected sealed override Block AsBlock() => this;
+
+		public override RegistryKey<Block> GetKey() => this.registryKey;
+
+		public virtual BlockState OnBreak(Level level, BlockPos blockPos, BlockState blockState, PlayerEntity player) {
+			return Blocks.AIR.DefaultState;
 		}
 
 		public static Block GetBlockFrom(Item? item) {
@@ -54,7 +69,7 @@ namespace SoulboundEngine.Client.World.Block {
 				: Blocks.AIR;
 		}
 
-		public static void DropStacks(BlockState blockState, Level.Level level, BlockPos blockPos, World.Entity.Entity? owner) {
+		public static void DropStacks(BlockState blockState, Level level, BlockPos blockPos, World.Entity.Entity? owner) {
 			List<ItemStack> droppedStacks = GetDroppedStacks(blockState);
 
 			foreach (var stack in droppedStacks) {
@@ -68,16 +83,17 @@ namespace SoulboundEngine.Client.World.Block {
 			return blockState.block.settings.droppedStacks(blockState);
 		}
 
-		private static Func<BlockState, List<ItemStack>> DropSingle() => blockState => {
-			return new List<ItemStack>() { blockState.block.AsItem().CreateStack(1) };
+		internal protected static Func<BlockState, List<ItemStack>> DropSingle() => blockState => {
+			return new List<ItemStack>() { blockState.block.AsItem().GetDefaultStack(1) };
 		};
 
-		private static Func<BlockState, List<ItemStack>> DropAir() => _ => {
+		internal protected static Func<BlockState, List<ItemStack>> DropAir() => _ => {
 			return new List<ItemStack>();
 		};
 
-		public string name => this.settings.name;
-		public int minBreakLevel => this.settings.minBreakLevel;
+		public int MinBreakLevel => this.settings.minBreakLevel;
+
+		public string GetTranslationKey() => this.settings.GetTranslationKey();
 
 		public static int GetRawID(BlockState state) {
 			return statesByID.IndexOf(state);
@@ -87,44 +103,8 @@ namespace SoulboundEngine.Client.World.Block {
 			return statesByID[id];
 		}
 
-		public abstract class AbstractBlockState : State<Block, BlockState> {
-			protected AbstractBlockState(Block owner, Entries entries) : base(owner, entries) {
-			}
-
-			protected abstract BlockState AsBlockState();
-
-			public List<ItemStack> GetDroppedStacks() {
-				return Block.GetDroppedStacks(this.AsBlockState());
-			}
-		}
-
-		public sealed class Settings {
-			public string name { get; private set; }
-			public int minBreakLevel { get; private set; } = 0;
-			public Func<BlockState, List<ItemStack>> droppedStacks { get; private set; } = DropSingle();
-
-			private Settings(string name) {
-				this.name = name;
-			}
-
-			public static Settings Of(string name) {
-				return new Settings(name);
-			}
-
-			public Settings MinBreakLevel(int minBreakLevel) {
-				this.minBreakLevel = minBreakLevel;
-				return this;
-			}
-
-			public Settings Drops(Func<BlockState, List<ItemStack>> droppedStacks) {
-				this.droppedStacks = droppedStacks;
-				return this;
-			}
-
-			public Settings DropsAir() {
-				this.droppedStacks = DropAir();
-				return this;
-			}
+		public override string ToString() {
+			return this.registryKey.value.ToString();
 		}
 	}
 }
