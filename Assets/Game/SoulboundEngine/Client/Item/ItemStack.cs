@@ -6,6 +6,7 @@ using SoulboundEngine.Client.World.Entity;
 using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Core.Registry;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 #nullable enable
@@ -79,6 +80,17 @@ namespace SoulboundEngine.Client.Item {
 		public readonly void ResetToDefaultComponents() {
 			this.AssertComponentMutationNotOnEmpty();
 			this.components.ClearChanges();
+		}
+
+		public readonly void AppendTooltip(List<string> tooltips) {
+			Item item = this.GetItem();
+			MergedComponentMap components = this.ComponentsNonNull;
+			tooltips.Add(item.GetName());
+
+			if (components.Contains(ItemComponents.DURABILITY)) {
+				int durability = components.Get(ItemComponents.DURABILITY);
+				tooltips.Add($"Durability: {durability}");
+			}
 		}
 
 		public readonly bool IsFull() => this.count >= this.item.GetMaxCount();

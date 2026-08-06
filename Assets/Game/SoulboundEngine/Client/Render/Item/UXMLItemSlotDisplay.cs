@@ -4,6 +4,7 @@ using SoulboundEngine.Client.UI;
 using SoulboundEngine.Client.UI.UXMLBindings;
 using SoulboundEngine.Core.Registry;
 using System;
+using System.Collections.Generic;
 using UnityEngine.UIElements;
 
 #nullable enable
@@ -135,11 +136,17 @@ namespace SoulboundEngine.Client.Render.Item {
 		protected void UpdateTooltip() {
 			if (!this.showTooltip) return;
 			if (this.isHovering && !this.stack.IsEmpty()) {
-				this.Screen.SetTooltip(this.stack.GetItem().GetName());
+				this.Screen.SetTooltip(this.GetTooltip(this.stack));
 				this.isTooltipVisible = true;
 			} else {
 				this.Screen.ClearTooltip();
 			}
+		}
+
+		protected virtual string GetTooltip(ItemStack stack) {
+			List<string> tooltips = new();
+			stack.AppendTooltip(tooltips);
+			return string.Join('\n', tooltips);
 		}
 
 		protected void UpdateDurability() {
