@@ -10,11 +10,13 @@ namespace SoulboundEngine.Client.UI.UXMLBindings {
             UXMLSchema.Register(Identifier.Of("soulbound:command_line/completion_list"), typeof(ListView));
             UXMLSchema.Register(Identifier.Of("soulbound:command_line/text_field"), typeof(TextField));
             UXMLSchema.Register(Identifier.Of("soulbound:command_suggestion/suggestion_text"), typeof(Label));
+            UXMLSchema.Register(Identifier.Of("soulbound:durability_bar/durability_bar"), typeof(ProgressBar));
             UXMLSchema.Register(Identifier.Of("soulbound:hotbar/hotbar"), typeof(VisualElement));
             UXMLSchema.Register(Identifier.Of("soulbound:hotbar_slot/display_area"), typeof(VisualElement));
             UXMLSchema.Register(Identifier.Of("soulbound:hotbar_slot/item_display"), typeof(VisualElement));
             UXMLSchema.Register(Identifier.Of("soulbound:hotbar_slot/stack_count"), typeof(Label));
             UXMLSchema.Register(Identifier.Of("soulbound:hotbar_slot/slot_index"), typeof(Label));
+            UXMLSchema.Register(Identifier.Of("soulbound:hotbar_slot/durability_bar"), typeof(ProgressBar));
             UXMLSchema.Register(Identifier.Of("soulbound:log_console/log_list"), typeof(ListView));
             UXMLSchema.Register(Identifier.Of("soulbound:log_entry/log_label"), typeof(Label));
             UXMLSchema.Register(Identifier.Of("soulbound:metrics_hud/fps"), typeof(Label));
@@ -45,10 +47,12 @@ namespace SoulboundEngine.Client.UI.UXMLBindings {
             UXMLSchema.Register(Identifier.Of("soulbound:world_screen/log_console"), typeof(TemplateContainer));
             UXMLSchema.Register(Identifier.Of("soulbound:slot/item_display"), typeof(VisualElement));
             UXMLSchema.Register(Identifier.Of("soulbound:slot/stack_count"), typeof(Label));
+            UXMLSchema.Register(Identifier.Of("soulbound:slot/durability_bar"), typeof(ProgressBar));
             UXMLSchema.Register(Identifier.Of("soulbound:tooltip/text"), typeof(Label));
             UXMLSchema.Register(Identifier.Of("soulbound:transit_stack/transit_stack"), typeof(VisualElement));
             UXMLSchema.Register(Identifier.Of("soulbound:transit_stack/item_display"), typeof(VisualElement));
             UXMLSchema.Register(Identifier.Of("soulbound:transit_stack/stack_count"), typeof(Label));
+            UXMLSchema.Register(Identifier.Of("soulbound:transit_stack/durability_bar"), typeof(ProgressBar));
             UXMLSchema.Register(Identifier.Of("soulbound:world_entry/enter_world"), typeof(Button));
             UXMLSchema.Register(Identifier.Of("soulbound:world_entry/world_name"), typeof(Label));
             UXMLSchema.Register(Identifier.Of("soulbound:world_entry/world_seed"), typeof(Label));

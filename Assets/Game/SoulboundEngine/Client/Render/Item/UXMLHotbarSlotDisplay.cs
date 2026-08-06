@@ -9,6 +9,7 @@ namespace SoulboundEngine.Client.Render.Item {
 	public class UXMLHotbarSlotDisplay : UXMLItemSlotDisplay {
 		private static readonly Identifier DISPLAY_AREA_ELEMENT = Identifier.Of("soulbound:hotbar_slot/display_area");
 		private static readonly Identifier SLOT_INDEX_ELEMENT = Identifier.Of("soulbound:hotbar_slot/slot_index");
+		private static readonly Identifier DURABILITY_BAR_ELEMENT = Identifier.Of("soulbound:hotbar_slot/durability_bar");
 		private bool isMainSlot;
 		private static readonly Color[] mainSlotBorders = {
 			Color.white, Color.white, Color.white, Color.white
@@ -28,6 +29,8 @@ namespace SoulboundEngine.Client.Render.Item {
 			base.OnBind(root);
 			root.Get<Label>(SLOT_INDEX_ELEMENT).text = (this.slot.GetIndex() + 1).ToString();
 		}
+
+		protected override Identifier GetDurabilityBarId() => DURABILITY_BAR_ELEMENT;
 
 		public override void SetAsMainSlot() {
 			if (this.isMainSlot) return;

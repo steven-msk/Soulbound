@@ -37,7 +37,7 @@ namespace SoulboundEngine.Client.Item {
 			}
 
 			context.level.SetBlockState(context.blockPos, placementState);
-			return new IActionResult.Success(new IActionResult.ItemContext(context.stack.DecrementBy(1)));
+			return new IActionResult.Success(new IActionResult.ItemContext(context.stack.DecrementBy(1), false));
 		}
 
 		protected virtual bool CanPlace(ItemPlacementContext context, BlockState blockState) {

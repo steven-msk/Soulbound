@@ -320,10 +320,11 @@ namespace SoulboundEngine.Client.Player {
 
 		private static bool HandleActionResult(IActionResult result, PlayerEntity player) {
 			if (result is IActionResult.Success success) {
-				ItemStack? newHandStack = success.itemContext.newHandStack;
-				if (newHandStack is { } stack) {
-					player.SetMainHandStack(stack);
-				}
+				IActionResult.ItemContext context = success.itemContext;
+				ItemStack? newHandStack = context.newHandStack;
+				ItemStack stack = newHandStack.GetValueOrDefault(player.GetMainHandStack()).Copy();
+				if (context.damageItem) stack = stack.Damage(1);
+				player.SetMainHandStack(stack);
 				return true;
 			} else if (result is IActionResult.Fail) {
 				return true;
@@ -359,18 +360,15 @@ namespace SoulboundEngine.Client.Player {
 			BlockState blockState = this.level.GetBlockState(blockPos) ?? Blocks.AIR.DefaultState;
 			if (blockState.block == Blocks.AIR) return false;
 
-			int itemBreakLevel = this.GetMainHandItemBreakLevel();
+			ItemStack stack = this.GetMainHandStack();
+			int itemBreakLevel = stack.GetBreakLevel();
 			int minBreakLevel = blockState.block.MinBreakLevel;
 			if (itemBreakLevel < minBreakLevel) return false;
 
 			this.level.SetBlockState(blockPos, blockState.block.OnBreak(this.level, blockPos, blockState, this));
 			Block.DropStacks(blockState, this.level, blockPos, null);
+			stack.Damage(1);
 			return true;
-		}
-
-		private int GetMainHandItemBreakLevel() {
-			ItemStack mainHandStack = this.GetMainHandStack();
-			return mainHandStack.GetBreakLevel();
 		}
 
 		public WorldWidgetHandle ShowWorldWidget<TContext>(WorldWidgetType<TContext> type, TContext context) where TContext : WorldWidgetContext {
@@ -442,9 +440,6 @@ namespace SoulboundEngine.Client.Player {
 			this.SetMainHandStackInternal(stack);
 		}
 
-		// TODO: implement PlayerEntity.SetMainHandStackInternal
-		// this requires transit stack sync which isnt supported yet
-		// calling transitStack.SetStack right now will desync inventory screen handlers' transit stack
 		private void SetMainHandStackInternal(ItemStack stack) {
 			if (ItemStack.AreEqual(stack, this.GetMainHandStack())) return;
 			if (this.activeInventoryScreenHandler == null) {
