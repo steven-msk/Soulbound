@@ -79,6 +79,7 @@ namespace SoulboundEngine.Client.Render.Item {
 			onPointerLeave = null;
 			onPointerUp = null;
 			if (this.isTooltipVisible) this.Screen.ClearTooltip();
+			this.ClearDurabilityBar();
 		}
 
 		public bool IsInteractable() => this.interactable;
@@ -150,8 +151,7 @@ namespace SoulboundEngine.Client.Render.Item {
 		}
 
 		protected void UpdateDurability() {
-			this.durabilityBar.highValue = 100;
-			this.durabilityBar.value = 0;
+			this.ClearDurabilityBar();
 
 			this.durabilityBar.style.display = !this.stack.HasDurability()
 				? DisplayStyle.None : DisplayStyle.Flex;
@@ -159,6 +159,11 @@ namespace SoulboundEngine.Client.Render.Item {
 
 			this.durabilityBar.highValue = this.stack.GetMaxDurability();
 			this.durabilityBar.value = this.stack.GetCurrentDurability();
+		}
+
+		protected void ClearDurabilityBar() {
+			this.durabilityBar.highValue = 0;
+			this.durabilityBar.value = 0;
 		}
 
 		private void OnPointerDown(PointerDownEvent evt) => onPointerDown?.Invoke(evt);
