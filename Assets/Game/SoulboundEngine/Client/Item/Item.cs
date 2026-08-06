@@ -136,6 +136,8 @@ namespace SoulboundEngine.Client.Item {
 		/// </summary>
 		public virtual bool ShouldContinueUse(ItemStack stack, InteractionType type, Level level, PlayerEntity player, BlockPos blockPos) => false;
 
+		public int GetDurability() => this.components.GetOrDefault(ItemComponents.DURABILITY, int.MaxValue);
+
 		public sealed class Settings {
 			private readonly IComponentMap.Builder components = IComponentMap.Create().AddAll(ItemComponents.DEFAULT_COMPONENTS);
 			internal RegistryKey<Item>? registryKey;
@@ -164,6 +166,10 @@ namespace SoulboundEngine.Client.Item {
 
 			public Settings BreakLevel(int breakLevel) {
 				return this.Component(ItemComponents.BREAK_LEVEL, breakLevel);
+			}
+
+			public Settings Durability(int durability) {
+				return this.Component(ItemComponents.DURABILITY, durability);
 			}
 
 			/// <summary>

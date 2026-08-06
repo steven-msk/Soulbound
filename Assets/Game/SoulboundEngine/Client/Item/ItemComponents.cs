@@ -7,6 +7,7 @@ namespace SoulboundEngine.Client.Item {
 		public static readonly ComponentType<string> NAME = Register<string>("name");
 		public static readonly ComponentType<int> MAX_STACK_COUNT = Register<int>("max_stack_count");
 		public static readonly ComponentType<int> BREAK_LEVEL = Register<int>("break_level");
+		public static readonly ComponentType<int> DURABILITY = Register<int>("durability");
 
 		public static readonly IComponentMap DEFAULT_COMPONENTS = IComponentMap.Create()
 			.Add(MAX_STACK_COUNT, Item.DEFAULT_FULL_STACK)

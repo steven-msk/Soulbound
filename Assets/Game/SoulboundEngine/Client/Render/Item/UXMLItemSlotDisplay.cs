@@ -1,6 +1,7 @@
 ﻿using SoulboundEngine.Client.Item;
 using SoulboundEngine.Client.Item.Container;
 using SoulboundEngine.Client.UI;
+using SoulboundEngine.Client.UI.UXMLBindings;
 using SoulboundEngine.Core.Registry;
 using System;
 using UnityEngine.UIElements;
@@ -11,7 +12,8 @@ namespace SoulboundEngine.Client.Render.Item {
 	public class UXMLItemSlotDisplay : UXMLWidget, IItemSlotDisplay {
 		private static readonly Identifier ITEM_DISPLAY_ELEMENT = Identifier.Of("soulbound:slot/item_display");
 		private static readonly Identifier STACK_COUNT_ELEMENT = Identifier.Of("soulbound:slot/stack_count");
-		protected readonly IItemSlot slot;
+		private static readonly Identifier DURABILITY_BAR_ELEMENT = Identifier.Of("soulbound:slot/durability_bar");
+		protected IItemSlot slot;
 		protected readonly ItemRenderManager itemRenderManager;
 		protected readonly ItemRenderHandle renderHandle;
 		protected ItemStack stack;
@@ -23,6 +25,7 @@ namespace SoulboundEngine.Client.Render.Item {
 		private bool interactable;
 		private bool isTooltipVisible;
 		private bool showTooltip;
+		private ProgressBar durabilityBar = null!;
 
 		public UXMLItemSlotDisplay(IItemSlot slot, ItemRenderManager itemRenderManager, bool interactable, bool showTooltip = true) {
 			this.interactable = interactable;
@@ -32,8 +35,13 @@ namespace SoulboundEngine.Client.Render.Item {
 			this.renderHandle = new ItemRenderHandle(this);
 		}
 
+		protected UXMLItemSlotDisplay(ItemRenderManager itemRenderManager, bool interactable, bool showTooltip)
+			: this(null!, itemRenderManager, interactable, showTooltip) {
+		}
+
 		public override void OnBind(VisualElement root) {
 			this.root = root;
+			this.durabilityBar = root.Get<ProgressBar>(this.GetDurabilityBarId());
 			this.stack = this.slot.GetStack();
 			this.slot.stackChanged += this.StackChanged;
 			if (this.interactable) this.RegisterPointerCallbacks();
@@ -41,15 +49,19 @@ namespace SoulboundEngine.Client.Render.Item {
 			this.Render();
 		}
 
+		protected virtual Identifier GetDurabilityBarId() => DURABILITY_BAR_ELEMENT;
+
 		protected void StackChanged(ItemStack oldStack, ItemStack newStack) => this.SetStack(newStack);
 
-		protected void SetStack(ItemStack stack) {
+		public virtual void SetStack(ItemStack stack) {
 			this.stack = stack;
 			this.Render();
 			this.UpdateTooltip();
 		}
 
-		protected void Render() {
+		protected virtual void Render() {
+			this.UpdateDurability();
+
 			if (this.stack.IsEmpty()) {
 				this.itemRenderManager.Destroy(this.renderHandle, this.RenderContext);
 				return;
@@ -120,7 +132,7 @@ namespace SoulboundEngine.Client.Render.Item {
 			this.UpdateTooltip();
 		}
 
-		private void UpdateTooltip() {
+		protected void UpdateTooltip() {
 			if (!this.showTooltip) return;
 			if (this.isHovering && !this.stack.IsEmpty()) {
 				this.Screen.SetTooltip(this.stack.GetItem().GetName());
@@ -128,6 +140,18 @@ namespace SoulboundEngine.Client.Render.Item {
 			} else {
 				this.Screen.ClearTooltip();
 			}
+		}
+
+		protected void UpdateDurability() {
+			this.durabilityBar.highValue = 100;
+			this.durabilityBar.value = 0;
+
+			this.durabilityBar.style.display = !this.stack.HasDurability()
+				? DisplayStyle.None : DisplayStyle.Flex;
+			if (this.durabilityBar.style.display.value == DisplayStyle.None) return;
+
+			this.durabilityBar.highValue = this.stack.GetMaxDurability();
+			this.durabilityBar.value = this.stack.GetCurrentDurability();
 		}
 
 		private void OnPointerDown(PointerDownEvent evt) => onPointerDown?.Invoke(evt);

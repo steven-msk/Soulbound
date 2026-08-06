@@ -16,7 +16,7 @@ namespace SoulboundEngine.Client.Item {
 
 		public static readonly Item placeableItem = Register(Blocks.MOVING_TICKING_BLOCK);
 		public static readonly Item teleportPlayerItem = Register("teleport_player_item", settings => new TeleportPlayerItem(settings),
-			settings => settings.NonStackable()
+			settings => settings.NonStackable().Durability(50)
 		);
 		public static readonly Item chargeableItem = Register("chargeable_item", settings => new ChargeableItem(settings),
 			settings => settings.NonStackable()

@@ -82,7 +82,7 @@ namespace SoulboundEngine.Client.Item {
 		}
 
 		public readonly bool IsFull() => this.count >= this.item.GetMaxCount();
-		public readonly bool IsEmpty() => this.count <= 0 || this.item == null;
+		public readonly bool IsEmpty() => this.count <= 0 || this.item == null || Equals(this.item, Items.AIR);
 
 		public readonly bool IsFullSize(int count) => count >= this.item.GetMaxCount();
 
@@ -140,7 +140,7 @@ namespace SoulboundEngine.Client.Item {
 		}
 
 		public static bool AreEqual(ItemStack a, ItemStack b) {
-			return AreItemsEqual(a, b) && a.count == b.count && AreItemsAndComponentsEqual(a, b);
+			return a.count == b.count && AreItemsAndComponentsEqual(a, b);
 		}
 
 		public void FillFrom(ref ItemStack itemStack) {
@@ -252,7 +252,46 @@ namespace SoulboundEngine.Client.Item {
 
 		public readonly bool ShouldContinueUse(InteractionType type, Level level, PlayerEntity player, BlockPos blockPos) {
 			return this.IsEmpty() || this.GetItem().ShouldContinueUse(this, type, level, player, blockPos);
-		} 
+		}
+
+		public readonly bool HasDurability() {
+			return this.ComponentsNonNull.Contains(ItemComponents.DURABILITY); 
+		}
+
+		public readonly bool IsDamaged() {
+			return this.HasDurability() && this.GetCurrentDurability() < this.GetMaxDurability(); 
+		}
+
+		public readonly int GetCurrentDurability() {
+			if (!this.HasDurability()) return int.MaxValue;
+			return this.ComponentsNonNull.Get(ItemComponents.DURABILITY);
+		}
+
+		public readonly int GetMaxDurability() {
+			if (!this.HasDurability()) return int.MaxValue;
+			return this.GetItem().GetDurability();
+		}
+
+		public readonly void SetDurability(int amount) {
+			this.AssertComponentMutationNotOnEmpty();
+			this.components.Set(ItemComponents.DURABILITY, amount);
+		}
+
+		public readonly bool ShouldBreak() => this.GetCurrentDurability() <= 0;
+
+		/// <summary>
+		/// Damages this item stack. This does not damage non-damageable stacks, returning the same stack.
+		/// If the stack's durability is less than 0, this will return <c>ItemStack.EMPTY</c>,
+		/// otherwise a copy of this stack with the decremented durability.
+		/// </summary>
+		public readonly ItemStack Damage(int amount) {
+			ItemStack stack = this;
+			if (!stack.HasDurability()) return stack;
+
+			stack.SetDurability(stack.GetCurrentDurability() - amount);
+			if (stack.ShouldBreak()) return EMPTY;
+			return stack;
+		}
 
 		private readonly void AssertComponentMutationNotOnEmpty() {
 			if (this.IsEmpty()) throw new NotSupportedException("Cannot mutate components on empty stack");
@@ -266,7 +305,7 @@ namespace SoulboundEngine.Client.Item {
 		}
 
 		public readonly override int GetHashCode() {
-			return HashCode.Combine(this.item, this.count);
+			return HashCode.Combine(this.item, this.count, this.components);
 		}
 
 		public readonly override string ToString() {
