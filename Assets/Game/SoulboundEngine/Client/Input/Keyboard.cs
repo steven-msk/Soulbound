@@ -44,16 +44,16 @@ namespace SoulboundEngine.Client.Input {
 			KeyControl keyControl = (KeyControl)ctx.control;
 			InputKey key = this.GetKey(keyControl);
 			key.SetPressed(true);
+			key.OnPressed();
 			KeyBinding.SetKeyPressed(key, true);
+			KeyBinding.KeyPressed(key);
 		}
 
 		private void KeyReleased(InputAction.CallbackContext ctx) {
 			KeyControl keyControl = (KeyControl)ctx.control;
 			InputKey key = this.GetKey(keyControl);
 			key.SetPressed(false);
-			key.OnPressed();
 			KeyBinding.SetKeyPressed(key, false);
-			KeyBinding.KeyPressed(key);
 		}
 
 		public InputKey GetKey(KeyControl control) {

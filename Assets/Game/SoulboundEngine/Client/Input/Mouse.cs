@@ -85,38 +85,38 @@ namespace SoulboundEngine.Client.Input {
 
 		private void OnLeftPressed(InputAction.CallbackContext ctx) {
 			this.isLeftPressed = true;
+			this.leftClicks++;
 		}
 
 		private void OnLeftReleased(InputAction.CallbackContext ctx) {
 			this.isLeftPressed = false;
-			this.leftClicks++;
 		}
 
 		private void OnRightPressed(InputAction.CallbackContext ctx) {
 			this.isRightPressed = true;
+			this.rightClicks++;
 		}
 
 		private void OnRightReleased(InputAction.CallbackContext ctx) {
 			this.isRightPressed = false;
-			this.rightClicks++;
 		}
 
 		private void OnForwardPressed(InputAction.CallbackContext ctx) {
 			this.isForwardPressed = true;
+			this.forwardClicks++;
 		}
 
 		private void OnForwardReleased(InputAction.CallbackContext ctx) {
 			this.isForwardPressed = false;
-			this.forwardClicks++;
 		}
 
 		private void OnBackPressed(InputAction.CallbackContext ctx) {
 			this.isBackPressed = true;
+			this.backClicks++;
 		}
 
 		private void OnBackReleased(InputAction.CallbackContext ctx) {
 			this.isBackPressed = false;
-			this.backClicks++;
 		}
 
 		private void MouseMoved(InputAction.CallbackContext ctx) {
