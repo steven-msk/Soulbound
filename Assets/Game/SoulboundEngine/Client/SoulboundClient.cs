@@ -1,7 +1,6 @@
 using Cysharp.Threading.Tasks;
 using SoulboundEngine.Client.Debug;
 using SoulboundEngine.Client.Debug.Commands;
-using SoulboundEngine.Client.Debug.Logging;
 using SoulboundEngine.Client.Debug.Logging.Console;
 using SoulboundEngine.Client.Debug.Metrics;
 using SoulboundEngine.Client.Debug.Metrics.View;
@@ -38,6 +37,7 @@ using UnityEngine.UIElements;
 namespace SoulboundEngine.Client {
 	using Camera = UnityEngine.Camera;
 	using Keyboard = Input.Keyboard;
+	using Logger = Debug.Logging.Logger;
 	using Object = UnityEngine.Object;
 	using RectInt = UnityEngine.RectInt;
 	using Vector2 = UnityEngine.Vector2;
@@ -162,9 +162,12 @@ namespace SoulboundEngine.Client {
 		internal void Tick() {
 			this.HandleInputTick();
 
+			if (this.activeWorldSession is { } session) {
+				session.levelManager.Tick();
+			}
+
 			// this must be called last, otherwise WasPressed always returns false
 			this.inputManager.Tick();
-			// TODO: fix desync between world tick and client tick
 		}
 
 		/// <summary>
@@ -206,6 +209,7 @@ namespace SoulboundEngine.Client {
 
 
 			// screen input prioritization goes here
+			// TODO: implement screen input rewiring
 
 			//IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {
 			//	static InputEventListener ConsumeWhenOverGameObject(InputToken token) {

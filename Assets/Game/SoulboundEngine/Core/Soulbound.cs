@@ -14,6 +14,7 @@ using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 namespace SoulboundEngine.Core {
 	public sealed class Soulbound {
+		public const float TICK_RATE = 1f / SharedConstants.TICKS_PER_SECOND;
 		private static Soulbound instance;
 		private static readonly Logger loggerInstance = new(UnityEngine.Debug.unityLogger);
 		public static readonly JsonSerializerSettings globalJsonSettings = new() {
@@ -26,6 +27,7 @@ namespace SoulboundEngine.Core {
 			},
 		};
 		private bool running;
+		private float tickStartTime;
 		private readonly SoulboundClient client;
 		public readonly GameConfig config;
 
@@ -55,16 +57,15 @@ namespace SoulboundEngine.Core {
 
 			Application.quitting += this.OnApplicationQuit;
 
-			UniTask.Post(this.StartUpdate);
-			UniTask.Post(this.StartTick);
-
 			this.running = true;
+			this.client.Start();
+			UniTask.Post(this.UpdateLoop);
+			UniTask.Post(this.TickLoop);
+
 			GameStateManager.SetRunning();
 		}
 
-		private async void StartUpdate() {
-			this.client.Start();
-
+		private async void UpdateLoop() {
 			while (this.running) {
 				try {
 					this.client.Update();
@@ -81,10 +82,12 @@ namespace SoulboundEngine.Core {
 			}
 		}
 
-		private async void StartTick() {
+		private async void TickLoop() {
 			while (this.running) {
 				try {
+					this.StartTick();
 					this.client.Tick();
+					this.EndTick();
 				} catch (Exception e) {
 					Logger.LogFatal(e);
 #if UNITY_EDITOR
@@ -93,7 +96,18 @@ namespace SoulboundEngine.Core {
 					Environment.FailFast("Uncaught exception in tick loop", e);
 #endif
 				}
-				await UniTask.WaitForSeconds(SharedConstants.TICKS_PER_SECOND, true);
+				await UniTask.WaitForSeconds(TICK_RATE, true);
+			}
+		}
+
+		private void StartTick() {
+			this.tickStartTime = Time.realtimeSinceStartup;
+		}
+
+		private void EndTick() {
+			float elapsed = Time.realtimeSinceStartup - this.tickStartTime;
+			if (elapsed > SharedConstants.TICKS_PER_SECOND) {
+				Logger.LogWarning($"Tick lag detected! Tick took {elapsed * 1000f:F1} ms");
 			}
 		}
 

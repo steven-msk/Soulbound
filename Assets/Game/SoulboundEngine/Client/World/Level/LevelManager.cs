@@ -1,4 +1,3 @@
-using Cysharp.Threading.Tasks;
 using SoulboundEngine.Client.UI.Screen;
 using SoulboundEngine.Client.World.Generation;
 using System;
@@ -11,25 +10,14 @@ using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 namespace SoulboundEngine.Client.World.Level {
 	using PlayerEntity = Player.PlayerEntity;
 
-	/// <summary>
-	/// Manages Level lifecycles
-	/// </summary>
 	public class LevelManager {
-		public const float TICK_RATE = 0.02f;        // 50 tps
-		private float tickStartTime;
-		public bool paused { get; private set; } = false;
-		private bool sessionRunning;
-
-		private readonly SoulboundClient client;
-
-		// 'readonly' means no multiple dimensions
-		// this is for one dimension only
-		private readonly Level level;
-
 		public const string worldDump = "worldDump.json";
 		public static readonly RectInt simulationView = new(-128, -76, 256, 156);
+		private readonly Level level;
+		private readonly SoulboundClient client;
+		public bool paused { get; private set; } = false;
+		private bool shouldTick;
 
-		// known issue: scattered Level and LevelManager dependencies
 		public LevelManager(SoulboundClient client, ISeedProvider seedProvider) {
 			this.level = new Level(seedProvider.GetSeed());
 			this.client = client;
@@ -38,43 +26,22 @@ namespace SoulboundEngine.Client.World.Level {
 		public PlayerEntity StartSession() {
 			PlayerEntity player = new(this.client, this.level);
 			this.level.StartSession(player);
-			this.sessionRunning = true;
-
-			UniTask.Post(this.LevelTickLoop);
+			this.shouldTick = true;
 			return player;
 		}
 
-		private async void LevelTickLoop() {
-			while (this.sessionRunning) {
-				if (!this.paused) {
-					this.StartTick();
+		public void Tick() {
+			if (!this.shouldTick || this.paused) return;
 
-					try {
-						Vector2 pivotPos = this.level.GetPlayer()?.GetPosition() ?? this.level.GetWorldSpawnPoint();
-						this.level.Tick(this.GetRelativeSimulationRect(pivotPos));
-					} catch (Exception e) {
-						Logger.LogFatal(e);
-					}
-
-					this.EndTick();
-				}
-				await UniTask.WaitForSeconds(TICK_RATE, true);
-			}
-		}
-
-		private void StartTick() {
-			this.tickStartTime = Time.realtimeSinceStartup;
-		}
-
-		private void EndTick() {
-			float elapsed = Time.realtimeSinceStartup - this.tickStartTime;
-			if (elapsed > TICK_RATE) {
-				Logger.LogWarning($"Tick lag detected! Tick took {elapsed * 1000f:F1} ms");
+			try {
+				Vector2 pivotPos = this.level.GetPlayer()?.GetPosition() ?? this.level.GetWorldSpawnPoint();
+				this.level.Tick(this.GetRelativeSimulationRect(pivotPos));
+			} catch (Exception e) {
+				Logger.LogFatal(e);
 			}
 		}
 
 		public void StopSession() {
-			this.sessionRunning = false;
 			this.paused = false;
 			Time.timeScale = 1f;
 			this.level.OnSessionStop();
