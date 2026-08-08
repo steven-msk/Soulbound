@@ -1,4 +1,3 @@
-using SoulboundEngine.Client.Input;
 using SoulboundEngine.Client.Interaction;
 using SoulboundEngine.Client.Item;
 using SoulboundEngine.Client.Item.Container;
@@ -10,27 +9,25 @@ using SoulboundEngine.Client.World.Entity;
 using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Client.World.Widget;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 #nullable enable
 
 namespace SoulboundEngine.Client.Player {
-	public class PlayerEntity : Entity, IInputEventHandler {
+	public class PlayerEntity : Entity {
 		public static readonly EntityDescriptor<PlayerEntity> DESCRIPTOR = EntityDescriptor.Of<PlayerEntity>((_, level) => throw new InvalidOperationException());
 		const float MAX_BLOCK_REACH = 5f;
 		private readonly SoulboundClient client;
 		private readonly PlayerInventory inventory;
-		private bool isInventoryOpen;
 		private Vector2 screenPointerPos;
-		private bool isHoldingLeftClick;
-		private bool isHoldingRightClick;
-		private bool isHoldingCtrl;
 		private InventoryScreenHandler? activeInventoryScreenHandler;
 		private IScreenHandle? activeInventoryScreen;
 		private new readonly PlayerTransformAdapter transformAdapter;
 		private ActiveUseContext? activeItemUse;
 		private BlockPos previousPointerBlockPos;
+		private bool isHoldingLeft;
+		private bool isHoldingRight;
+		private bool isInventoryOpen;
 
 		public PlayerEntity(SoulboundClient client, Level level)
 			: base(DESCRIPTOR, level) {
@@ -41,75 +38,6 @@ namespace SoulboundEngine.Client.Player {
 
 		public bool isJumping { get; private set; }
 
-		IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {
-			return new InputEventListener[] {
-				InputEventListener.ConsumePerformed(InputTokens.Player.changeHotbarSlot, inputEvent => {
-					int slotIndex = int.Parse(inputEvent.context.control.name) - 1;
-					this.inventory.SetMainSlot(slotIndex);
-				}),
-				InputEventListener.ConsumePerformed(InputTokens.Player.scrollHotbarSlot, inputEvent => {
-					float scrollDelta = inputEvent.context.ReadValue<float>();
-					int nextSlot = this.inventory.GetMainSlot() - (int)scrollDelta;
-
-					if (nextSlot < 0) nextSlot += PlayerInventory.HOTBAR_SIZE;
-					nextSlot %= PlayerInventory.HOTBAR_SIZE;
-					this.inventory.SetMainSlot(nextSlot);
-				}),
-				InputEventListener.ObserveAny(InputTokens.Mouse.position, inputEvent => {
-					this.screenPointerPos = inputEvent.context.ReadValue<Vector2>();
-				}),
-				new(InputTokens.Mouse.leftClick, InputEvent.Phase.Performed | InputEvent.Phase.Canceled, inputEvent => {
-					if (inputEvent.phase == InputEvent.Phase.Performed) {
-						this.OnLeftClick();
-						this.isHoldingLeftClick = true;
-					} else if (inputEvent.phase == InputEvent.Phase.Canceled) {
-						this.OnLeftRelease();
-						this.isHoldingLeftClick = false;
-					}
-					return InputHandleResult.Consume;
-				}),
-				new(InputTokens.Mouse.rightClick, InputEvent.Phase.Performed | InputEvent.Phase.Canceled, inputEvent => {
-					if (inputEvent.phase == InputEvent.Phase.Performed) {
-						this.OnRightClick();
-						this.isHoldingRightClick = true;
-					} else if (inputEvent.phase == InputEvent.Phase.Canceled) {
-						this.OnRightRelease();
-						this.isHoldingRightClick = false;
-					}
-					return InputHandleResult.Consume;
-				}),
-				new(InputTokens.Player.move, InputEvent.Phase.Performed | InputEvent.Phase.Canceled, inputEvent => {
-					this.SetNormalVelocityX(
-						inputEvent.phase == InputEvent.Phase.Performed
-							? inputEvent.context.ReadValue<Vector2>().x
-							: 0f
-					);
-					return InputHandleResult.Consume;
-				}),
-				new(InputTokens.Player.jump, InputEvent.Phase.Performed | InputEvent.Phase.Canceled, inputEvent => {
-					this.SetJumping(inputEvent.phase == InputEvent.Phase.Performed);
-					return InputHandleResult.Consume;
-				}),
-				InputEventListener.ConsumePerformed(InputTokens.Keyboard.Q, _ => this.ThrowFromMainHand(this.isHoldingCtrl)),
-				new(InputTokens.Keyboard.CTRL, InputEvent.Phase.Performed | InputEvent.Phase.Canceled, inputEvent => {
-					this.isHoldingCtrl = inputEvent.phase == InputEvent.Phase.Performed;
-					return InputHandleResult.Consume;
-				}),
-				InputEventListener.ConsumePerformed(InputTokens.Player.toggleInventory, _ => {
-					if (!this.isInventoryOpen) {
-						this.OpenInventoryScreen(new DelegatedInventoryScreenHandlerFactory(
-							(inventory, _) => {
-								InventoryScreenHandlerContext context = InventoryScreenHandlerContext.Of(this.client, (BlockPos)this.GetPosition(), this.level);
-								return new PlayerInventoryScreenHandler(InventoryScreenHandlerType.PLAYER_INVENTORY, inventory, context);
-							}
-						));
-					} else {
-						this.CloseInventoryScreen();
-					}
-				})
-			};
-		}
-
 		public void SetJumping(bool jumping) {
 			this.isJumping = jumping;
 			this.transformAdapter.SetJumping(jumping);
@@ -117,19 +45,6 @@ namespace SoulboundEngine.Client.Player {
 
 		public void StopHorizontalMovement() {
 			this.SetNormalVelocityX(0f);
-		}
-
-		public override void Tick() {
-			this.DoBlockHover();
-			this.CheckItemUse();
-			if (this.isHoldingLeftClick) this.OnLeftHoldTick();
-			if (this.isHoldingRightClick) this.OnRightHoldTick();
-
-			if (this.activeInventoryScreenHandler != null) {
-				if (!this.activeInventoryScreenHandler.CanUse(this)) {
-					this.CloseInventoryScreen();
-				}
-			}
 		}
 
 		public void OpenInventoryScreen(IInventoryScreenHandlerFactory handlerFactory) {
@@ -153,11 +68,28 @@ namespace SoulboundEngine.Client.Player {
 			this.isInventoryOpen = false;
 		}
 
-		private void OnLeftClick() {
-			this.PrimaryInteract();
+		public void ToggleInventory() {
+			if (!this.isInventoryOpen) {
+				this.OpenInventoryScreen(new DelegatedInventoryScreenHandlerFactory(
+					(inventory, _) => {
+						InventoryScreenHandlerContext context = InventoryScreenHandlerContext.Of(this.client, (BlockPos)this.GetPosition(), this.level);
+						return new PlayerInventoryScreenHandler(InventoryScreenHandlerType.PLAYER_INVENTORY, inventory, context);
+					}
+				));
+			} else {
+				this.CloseInventoryScreen();
+			}
 		}
-		private void OnRightClick() {
-			this.SecondaryInteract();
+
+		public override void Tick() {
+			this.DoBlockHover();
+			this.CheckItemUse();
+			if (this.isHoldingLeft) this.OnLeftHoldTick();
+			if (this.isHoldingRight) this.OnRightHoldTick();
+
+			if (this.activeInventoryScreenHandler != null && this.activeInventoryScreenHandler.CanUse(this)) {
+				this.CloseInventoryScreen();
+			}
 		}
 
 		private void OnLeftHoldTick() {
@@ -167,11 +99,15 @@ namespace SoulboundEngine.Client.Player {
 			this.HandleInteractTick(InteractionType.Secondary);
 		}
 
-		[Obsolete]
-		private void OnLeftRelease() {
+		public void SetHoldingLeft(bool holding) => this.isHoldingLeft = holding;
+		public void SetHoldingRight(bool holding) => this.isHoldingRight = holding;
+
+		public void OnLeftClick() {
+			this.PrimaryInteract();
 		}
-		[Obsolete]
-		private void OnRightRelease() {
+
+		public void OnRightClick() {
+			this.SecondaryInteract();
 		}
 
 		private void DoBlockHover() {
@@ -235,8 +171,8 @@ namespace SoulboundEngine.Client.Player {
 
 		private void CheckItemUse() {
 			if (!this.IsUsingItem()) return;
-			if ((this.activeItemUse!.type == InteractionType.Primary && !this.isHoldingLeftClick)
-					|| (this.activeItemUse!.type == InteractionType.Secondary && !this.isHoldingRightClick)) {
+			if ((this.activeItemUse!.type == InteractionType.Primary && !this.isHoldingLeft)
+					|| (this.activeItemUse!.type == InteractionType.Secondary && !this.isHoldingRight)) {
 				this.CancelItemUse();
 			}
 		}
@@ -273,8 +209,8 @@ namespace SoulboundEngine.Client.Player {
 		}
 
 		private static bool ItemInteract(
-				Vector2 interactionPoint, 
-				ItemStack stack, 
+				Vector2 interactionPoint,
+				ItemStack stack,
 				PlayerEntity player,
 				Func<ItemStack, PlayerEntity, Entity, IActionResult> onEntity,
 				Func<ItemStack, BlockInteractionResult, IActionResult> onBlock,
@@ -387,7 +323,7 @@ namespace SoulboundEngine.Client.Player {
 			return this.client.OpenScreen(new SignEditScreen(signEntity));
 		}
 
-		private void ThrowFromMainHand(bool ctrl) {
+		public void ThrowFromMainHand(bool ctrl) {
 			ItemStack mainHandStack = this.GetMainHandStack();
 			if (mainHandStack.IsEmpty()) return;
 
@@ -418,7 +354,7 @@ namespace SoulboundEngine.Client.Player {
 
 		public bool IsInBlockReach(Vector2 worldPos) {
 			float dist = Vector2.Distance(worldPos, this.GetCenter());
-			return dist <= MAX_BLOCK_REACH 
+			return dist <= MAX_BLOCK_REACH
 				&& !this.level.GetTilesCovered(this.GetBoundingBox())
 						 .Contains((BlockPos)worldPos);
 		}
@@ -432,7 +368,7 @@ namespace SoulboundEngine.Client.Player {
 			ItemStack transitStack = this.GetTransitStack() ?? ItemStack.EMPTY;
 			return transitStack.IsEmpty() ? this.inventory.GetMainStack() : transitStack;
 		}
-		
+
 		public ItemStack? GetTransitStack() => this.activeInventoryScreenHandler?.GetTransitStack();
 
 		public void SetMainHandStack(ItemStack stack) {
@@ -449,8 +385,10 @@ namespace SoulboundEngine.Client.Player {
 			}
 		}
 
-		public bool IsHoldingLeftClick() => this.isHoldingLeftClick;
-		public bool IsHoldingRightClick() => this.isHoldingRightClick;
+		public void SetMainSlot(int slot) => this.inventory.SetMainSlot(slot);
+		public int GetMainSlot() => this.inventory.GetMainSlot();
+
+		public void SetScreenPointerPos(Vector2 pos) => this.screenPointerPos = pos;
 
 		public Vector2 GetScreenPointerPos() => this.screenPointerPos;
 		public Vector2 GetWorldPointerPos() {

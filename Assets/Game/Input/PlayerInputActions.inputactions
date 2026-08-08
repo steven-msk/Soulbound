@@ -1,4 +1,5 @@
 {
+    "version": 1,
     "name": "PlayerInputActions",
     "maps": [
         {
@@ -1080,7 +1081,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "keypad_1",
+                    "name": "KEYPAD_1",
                     "type": "Button",
                     "id": "4030c561-ce04-4250-9144-1d6753d3d31c",
                     "expectedControlType": "",
@@ -1089,7 +1090,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "keypad_2",
+                    "name": "KEYPAD_2",
                     "type": "Button",
                     "id": "d73e2706-32b2-4b18-a1db-aec7db9e0b2f",
                     "expectedControlType": "",
@@ -1098,7 +1099,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "keypad_3",
+                    "name": "KEYPAD_3",
                     "type": "Button",
                     "id": "efaf131a-1c32-4769-b546-20856d64e886",
                     "expectedControlType": "",
@@ -1107,7 +1108,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "keypad_4",
+                    "name": "KEYPAD_4",
                     "type": "Button",
                     "id": "1001bfac-b738-465f-96f7-29dfbaff3ee0",
                     "expectedControlType": "",
@@ -1116,7 +1117,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "keypad_5",
+                    "name": "KEYPAD_5",
                     "type": "Button",
                     "id": "a4628bc8-b3f0-4973-bd87-c62b0a199cce",
                     "expectedControlType": "",
@@ -1125,7 +1126,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "keypad_6",
+                    "name": "KEYPAD_6",
                     "type": "Button",
                     "id": "a1e39a17-8d0e-43f6-8174-f4cd5036d4d6",
                     "expectedControlType": "",
@@ -1134,7 +1135,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "keypad_7",
+                    "name": "KEYPAD_7",
                     "type": "Button",
                     "id": "56c63de7-f57f-48fb-9912-7645489e7866",
                     "expectedControlType": "",
@@ -1143,7 +1144,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "keypad_8",
+                    "name": "KEYPAD_8",
                     "type": "Button",
                     "id": "b492cc34-620d-4f49-9126-d79b002a72db",
                     "expectedControlType": "",
@@ -1152,7 +1153,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "keypad_9",
+                    "name": "KEYPAD_9",
                     "type": "Button",
                     "id": "3c68f59e-ce42-45cb-adc7-8727c7199cb2",
                     "expectedControlType": "",
@@ -1161,7 +1162,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "keypad_0",
+                    "name": "KEYPAD_0",
                     "type": "Button",
                     "id": "4d747ade-f3f7-4bbc-a4aa-566fd77fce9e",
                     "expectedControlType": "",
@@ -1521,15 +1522,6 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "SHIFT",
-                    "type": "Button",
-                    "id": "c613e5ab-6499-4e88-8569-348979fc4e05",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "COMMA",
                     "type": "Button",
                     "id": "264e7397-bead-4ff4-9429-4838c227f327",
@@ -1557,6 +1549,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "LEFT_SHIFT",
+                    "type": "Button",
+                    "id": "c613e5ab-6499-4e88-8569-348979fc4e05",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "RIGHT_SHIFT",
                     "type": "Button",
                     "id": "2ab4c9e1-c58b-44d4-b2eb-d2119d58aaf1",
@@ -1566,7 +1567,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "CTRL",
+                    "name": "LEFT_CTRL",
                     "type": "Button",
                     "id": "edf0cf84-5e35-4cce-9ca9-9b289bcf2e10",
                     "expectedControlType": "",
@@ -1575,7 +1576,16 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "ALT",
+                    "name": "RIGHT_CTRL",
+                    "type": "Button",
+                    "id": "0194e4ad-b049-40bd-a626-f4d7cf79b47d",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "LEFT_ALT",
                     "type": "Button",
                     "id": "686ce6e2-5fc7-4717-9e25-5b8e879db4bc",
                     "expectedControlType": "",
@@ -1674,9 +1684,9 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "ANY",
+                    "name": "SPACE",
                     "type": "Button",
-                    "id": "9c91f3cd-42aa-4c12-8573-b768f5084ca3",
+                    "id": "896327e9-bf55-497e-b63a-0d6b7e2bfc06",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -1834,7 +1844,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "keypad_1",
+                    "action": "KEYPAD_1",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -1845,7 +1855,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "keypad_2",
+                    "action": "KEYPAD_2",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -1856,7 +1866,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "keypad_3",
+                    "action": "KEYPAD_3",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -1867,7 +1877,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "keypad_4",
+                    "action": "KEYPAD_4",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -1878,7 +1888,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "keypad_5",
+                    "action": "KEYPAD_5",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -1889,7 +1899,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "keypad_6",
+                    "action": "KEYPAD_6",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -1900,7 +1910,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "keypad_7",
+                    "action": "KEYPAD_7",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -1911,7 +1921,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "keypad_8",
+                    "action": "KEYPAD_8",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -1922,7 +1932,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "keypad_9",
+                    "action": "KEYPAD_9",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -1933,7 +1943,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "keypad_0",
+                    "action": "KEYPAD_0",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -2373,7 +2383,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "SHIFT",
+                    "action": "LEFT_SHIFT",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -2424,11 +2434,11 @@
                 {
                     "name": "",
                     "id": "e226c189-a3a4-4bd5-9f38-53ce9c445255",
-                    "path": "<Keyboard>/ctrl",
+                    "path": "<Keyboard>/leftCtrl",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "CTRL",
+                    "action": "LEFT_CTRL",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -2439,7 +2449,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "ALT",
+                    "action": "LEFT_ALT",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -2555,12 +2565,23 @@
                 },
                 {
                     "name": "",
-                    "id": "6df5ffdb-5ebf-4dcc-b180-e8e642ced577",
-                    "path": "<Keyboard>/anyKey",
+                    "id": "1ee83313-d45e-4332-8944-665ef1c97b84",
+                    "path": "<Keyboard>/rightCtrl",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "ANY",
+                    "action": "RIGHT_CTRL",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4f113240-5e72-4581-a4ea-403f86b16a7c",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SPACE",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
@@ -2623,6 +2644,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Scroll",
+                    "type": "Value",
+                    "id": "cacdbfab-9fbe-41a4-a984-294714d2c87d",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -2689,6 +2719,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Backward",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "2f5afb80-0952-4508-8c0f-9a308cdfec91",
+                    "path": "<Mouse>/scroll/y",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Scroll",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

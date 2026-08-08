@@ -106,7 +106,6 @@ namespace SoulboundEngine.Client.World.Level {
 		public void StartSession(PlayerEntity player) {
 			this.player = player;
 			this.AddEntity(player);
-			SoulboundClient.Instance.InputManager.AddHandler(player);
 			player.SetPosition(this.GetWorldSpawnPoint() + Vector2.up * 2f);
 		}
 
@@ -350,7 +349,6 @@ namespace SoulboundEngine.Client.World.Level {
 		}
 
 		public void OnSessionStop() {
-			SoulboundClient.Instance.InputManager.RemoveHandler(this.player);
 		}
 
 		public BlockState? GetBlockState(BlockPos blockPos) {

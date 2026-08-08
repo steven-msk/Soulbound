@@ -1,9 +1,7 @@
 using Cysharp.Threading.Tasks;
-using SoulboundEngine.Client.Input;
 using SoulboundEngine.Client.UI.Screen;
 using SoulboundEngine.Client.World.Generation;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
@@ -16,8 +14,8 @@ namespace SoulboundEngine.Client.World.Level {
 	/// <summary>
 	/// Manages Level lifecycles
 	/// </summary>
-	public class LevelManager : IInputEventHandler {
-		public const float tickRate = 0.02f;        // 50 tps
+	public class LevelManager {
+		public const float TICK_RATE = 0.02f;        // 50 tps
 		private float tickStartTime;
 		public bool paused { get; private set; } = false;
 		private bool sessionRunning;
@@ -35,10 +33,6 @@ namespace SoulboundEngine.Client.World.Level {
 		public LevelManager(SoulboundClient client, ISeedProvider seedProvider) {
 			this.level = new Level(seedProvider.GetSeed());
 			this.client = client;
-		}
-
-		IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {
-			yield return InputEventListener.ConsumePerformed(InputTokens.Keyboard.ESC, _ => this.TogglePause());
 		}
 
 		public PlayerEntity StartSession() {
@@ -64,7 +58,7 @@ namespace SoulboundEngine.Client.World.Level {
 
 					this.EndTick();
 				}
-				await UniTask.WaitForSeconds(tickRate, true);
+				await UniTask.WaitForSeconds(TICK_RATE, true);
 			}
 		}
 
@@ -74,7 +68,7 @@ namespace SoulboundEngine.Client.World.Level {
 
 		private void EndTick() {
 			float elapsed = Time.realtimeSinceStartup - this.tickStartTime;
-			if (elapsed > tickRate) {
+			if (elapsed > TICK_RATE) {
 				Logger.LogWarning($"Tick lag detected! Tick took {elapsed * 1000f:F1} ms");
 			}
 		}
@@ -95,7 +89,7 @@ namespace SoulboundEngine.Client.World.Level {
 			);
 		}
 
-		private void TogglePause() {
+		public void TogglePause() {
 			if (this.paused) this.UnpauseGame();
 			else this.PauseGame();
 		}
@@ -104,14 +98,12 @@ namespace SoulboundEngine.Client.World.Level {
 			this.paused = true;
 			Time.timeScale = 0f;
 			this.client.UIHandler.GetScreenNavigator().PushScreen(new GamePausedScreen(this.client, this));
-			this.client.InputManager.RemoveHandler(this.level.GetPlayer());
 		}
 
 		public void UnpauseGame() {
 			this.paused = false;
 			Time.timeScale = 1f;
 			this.client.UIHandler.GetScreenNavigator().PopTopScreen();
-			this.client.InputManager.AddHandler(this.level.GetPlayer());
 		}
 
 		public Level GetLevel() => this.level;

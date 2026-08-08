@@ -12,19 +12,17 @@ using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 namespace SoulboundEngine.Client.Settings {
 	public abstract class SettingEntry {
-		public readonly string displayName;
 		public readonly string id;
 		public abstract object boxedDefaultValue { get; }
 		public abstract object boxedValue { get; }
 		public abstract Type valueType { get; }
 
-		protected SettingEntry(string name, string id) {
-			this.displayName = name;
+		protected SettingEntry(string id) {
 			this.id = id;
 		}
 
 		public override string ToString() {
-			return $"{displayName}={boxedValue}";
+			return $"{this.id}={this.boxedValue}";
 		}
 	}
 
@@ -34,19 +32,19 @@ namespace SoulboundEngine.Client.Settings {
 		public event Action<T, T>? valueChanged;
 		public virtual T value { get; protected set; }
 
-		public override object boxedDefaultValue => defaultValue!;
-		public override object boxedValue => value!;
+		public override object boxedDefaultValue => this.defaultValue!;
+		public override object boxedValue => this.value!;
 		public override Type valueType => typeof(T);
 
-		public SettingEntry(string displayName, string id, T defaultValue, ValueSet<T> valueSet)
-			: base(displayName, id) {
+		public SettingEntry(string id, T defaultValue, ValueSet<T> valueSet)
+			: base(id) {
 			this.defaultValue = defaultValue;
 			this.valueSet = valueSet;
 			this.value = defaultValue;
 		}
 
-		public SettingEntry(string displayName, string id, T defaultValue, ValueSet<T> valueSet, Action<T, T> valueChanged)
-			: this(displayName, id, defaultValue, valueSet) {
+		public SettingEntry(string id, T defaultValue, ValueSet<T> valueSet, Action<T, T> valueChanged)
+			: this(id, defaultValue, valueSet) {
 			this.valueChanged += valueChanged;
 		}
 
@@ -54,11 +52,11 @@ namespace SoulboundEngine.Client.Settings {
 			if (value?.Equals(this.value) ?? true) return;
 			var oldValue = this.value;
 
-			if (valueSet.IsValid(value)) {
+			if (this.valueSet.IsValid(value)) {
 				this.value = value;
 				valueChanged?.Invoke(oldValue, this.value);
 			} else {
-				Logger.LogWarning("Attempted to set invalid value '{}' to setting '{}'", value!, id);
+				Logger.LogWarning("Attempted to set invalid value '{}' to setting '{}'", value!, this.id);
 			}
 		}
 	}
@@ -76,7 +74,7 @@ namespace SoulboundEngine.Client.Settings {
 		public override string Encode(T value) => value.ToString();
 
 		public override bool IsValid(T value) {
-			return acceptedValues.Contains(value);
+			return this.acceptedValues.Contains(value);
 		}
 
 		public override SettingVisual<T> GetVisual(Transform parent) {
@@ -90,7 +88,7 @@ namespace SoulboundEngine.Client.Settings {
 		public override string Encode(string? value) => value ?? string.Empty;
 
 		public override bool IsValid(string value) {
-			return acceptedValues.Contains(value);
+			return this.acceptedValues.Contains(value);
 		}
 
 		public override SettingVisual<string> GetVisual(Transform parent) {
@@ -100,7 +98,7 @@ namespace SoulboundEngine.Client.Settings {
 
 	public abstract record SlidableValueSet<T>(T minInclusive, T maxInclusive) : ValueSet<T> where T : struct, IComparable<T> {
 		public override bool IsValid(T value) {
-			return value.CompareTo(minInclusive) >= 0 && value.CompareTo(maxInclusive) <= 0;
+			return value.CompareTo(this.minInclusive) >= 0 && value.CompareTo(this.maxInclusive) <= 0;
 		}
 		public override string Encode(T value) => value.ToString();
 	}
@@ -139,8 +137,8 @@ namespace SoulboundEngine.Client.Settings {
 		[PROTOTYPICAL]
 		public override SettingVisual<float> GetVisual(Transform parent) {
 			Slider slider = SliderFactory.CreateSlider(parent);
-			slider.minValue = minInclusive;
-			slider.maxValue = maxInclusive;
+			slider.minValue = this.minInclusive;
+			slider.maxValue = this.maxInclusive;
 
 			SliderSetting sliderSetting = slider.gameObject.AddComponent<SliderSetting>();
 			sliderSetting.slider = slider;

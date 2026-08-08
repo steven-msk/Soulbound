@@ -1,14 +1,10 @@
-using SoulboundEngine.Client.Input;
 using SoulboundEngine.Client.UI.Screen;
-using System.Collections.Generic;
-using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
 
 #nullable enable
 
 namespace SoulboundEngine.Client.UI {
-	public sealed class UIHandler : IInputEventHandler {
-		int IInputEventHandler.priority => 1000;
+	public sealed class UIHandler {
 		private ScreenManager screenManager;
 		private UXMLScreenRoot screenRoot;
 
@@ -29,27 +25,5 @@ namespace SoulboundEngine.Client.UI {
 		public void FlushScreens() => this.screenManager.Flush();
 
 		public IScreenNavigator GetScreenNavigator() => this.screenManager;
-
-		IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {
-			static InputEventListener ConsumeWhenOverGameObject(InputToken token) {
-				return InputEventListener.Performed(token, _ => {
-					return EventSystem.current.IsPointerOverGameObject()
-						? InputHandleResult.Consume
-						: InputHandleResult.Pass;
-				});
-			}
-
-			return new InputEventListener[] {
-				ConsumeWhenOverGameObject(InputTokens.Mouse.leftClick),
-				ConsumeWhenOverGameObject(InputTokens.Mouse.rightClick),
-				ConsumeWhenOverGameObject(InputTokens.Mouse.position),
-
-				InputEventListener.ConsumePerformed(InputTokens.Keyboard.ESC, _ => {
-					if (this.screenManager.GetActiveScreen()?.CloseOnEsc ?? false) {
-						this.screenManager.PopTopScreen();
-					}
-				})
-			};
-		}
 	}
 }

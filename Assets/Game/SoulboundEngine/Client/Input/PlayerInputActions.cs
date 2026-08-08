@@ -1169,7 +1169,7 @@ namespace SoulboundEngine.Client.Input
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""keypad_1"",
+                    ""name"": ""KEYPAD_1"",
                     ""type"": ""Button"",
                     ""id"": ""4030c561-ce04-4250-9144-1d6753d3d31c"",
                     ""expectedControlType"": """",
@@ -1178,7 +1178,7 @@ namespace SoulboundEngine.Client.Input
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""keypad_2"",
+                    ""name"": ""KEYPAD_2"",
                     ""type"": ""Button"",
                     ""id"": ""d73e2706-32b2-4b18-a1db-aec7db9e0b2f"",
                     ""expectedControlType"": """",
@@ -1187,7 +1187,7 @@ namespace SoulboundEngine.Client.Input
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""keypad_3"",
+                    ""name"": ""KEYPAD_3"",
                     ""type"": ""Button"",
                     ""id"": ""efaf131a-1c32-4769-b546-20856d64e886"",
                     ""expectedControlType"": """",
@@ -1196,7 +1196,7 @@ namespace SoulboundEngine.Client.Input
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""keypad_4"",
+                    ""name"": ""KEYPAD_4"",
                     ""type"": ""Button"",
                     ""id"": ""1001bfac-b738-465f-96f7-29dfbaff3ee0"",
                     ""expectedControlType"": """",
@@ -1205,7 +1205,7 @@ namespace SoulboundEngine.Client.Input
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""keypad_5"",
+                    ""name"": ""KEYPAD_5"",
                     ""type"": ""Button"",
                     ""id"": ""a4628bc8-b3f0-4973-bd87-c62b0a199cce"",
                     ""expectedControlType"": """",
@@ -1214,7 +1214,7 @@ namespace SoulboundEngine.Client.Input
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""keypad_6"",
+                    ""name"": ""KEYPAD_6"",
                     ""type"": ""Button"",
                     ""id"": ""a1e39a17-8d0e-43f6-8174-f4cd5036d4d6"",
                     ""expectedControlType"": """",
@@ -1223,7 +1223,7 @@ namespace SoulboundEngine.Client.Input
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""keypad_7"",
+                    ""name"": ""KEYPAD_7"",
                     ""type"": ""Button"",
                     ""id"": ""56c63de7-f57f-48fb-9912-7645489e7866"",
                     ""expectedControlType"": """",
@@ -1232,7 +1232,7 @@ namespace SoulboundEngine.Client.Input
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""keypad_8"",
+                    ""name"": ""KEYPAD_8"",
                     ""type"": ""Button"",
                     ""id"": ""b492cc34-620d-4f49-9126-d79b002a72db"",
                     ""expectedControlType"": """",
@@ -1241,7 +1241,7 @@ namespace SoulboundEngine.Client.Input
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""keypad_9"",
+                    ""name"": ""KEYPAD_9"",
                     ""type"": ""Button"",
                     ""id"": ""3c68f59e-ce42-45cb-adc7-8727c7199cb2"",
                     ""expectedControlType"": """",
@@ -1250,7 +1250,7 @@ namespace SoulboundEngine.Client.Input
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""keypad_0"",
+                    ""name"": ""KEYPAD_0"",
                     ""type"": ""Button"",
                     ""id"": ""4d747ade-f3f7-4bbc-a4aa-566fd77fce9e"",
                     ""expectedControlType"": """",
@@ -1610,15 +1610,6 @@ namespace SoulboundEngine.Client.Input
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""SHIFT"",
-                    ""type"": ""Button"",
-                    ""id"": ""c613e5ab-6499-4e88-8569-348979fc4e05"",
-                    ""expectedControlType"": """",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
                     ""name"": ""COMMA"",
                     ""type"": ""Button"",
                     ""id"": ""264e7397-bead-4ff4-9429-4838c227f327"",
@@ -1646,6 +1637,15 @@ namespace SoulboundEngine.Client.Input
                     ""initialStateCheck"": false
                 },
                 {
+                    ""name"": ""LEFT_SHIFT"",
+                    ""type"": ""Button"",
+                    ""id"": ""c613e5ab-6499-4e88-8569-348979fc4e05"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""RIGHT_SHIFT"",
                     ""type"": ""Button"",
                     ""id"": ""2ab4c9e1-c58b-44d4-b2eb-d2119d58aaf1"",
@@ -1655,7 +1655,7 @@ namespace SoulboundEngine.Client.Input
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""CTRL"",
+                    ""name"": ""LEFT_CTRL"",
                     ""type"": ""Button"",
                     ""id"": ""edf0cf84-5e35-4cce-9ca9-9b289bcf2e10"",
                     ""expectedControlType"": """",
@@ -1664,7 +1664,16 @@ namespace SoulboundEngine.Client.Input
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""ALT"",
+                    ""name"": ""RIGHT_CTRL"",
+                    ""type"": ""Button"",
+                    ""id"": ""0194e4ad-b049-40bd-a626-f4d7cf79b47d"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""LEFT_ALT"",
                     ""type"": ""Button"",
                     ""id"": ""686ce6e2-5fc7-4717-9e25-5b8e879db4bc"",
                     ""expectedControlType"": """",
@@ -1763,9 +1772,9 @@ namespace SoulboundEngine.Client.Input
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""ANY"",
+                    ""name"": ""SPACE"",
                     ""type"": ""Button"",
-                    ""id"": ""9c91f3cd-42aa-4c12-8573-b768f5084ca3"",
+                    ""id"": ""896327e9-bf55-497e-b63a-0d6b7e2bfc06"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1923,7 +1932,7 @@ namespace SoulboundEngine.Client.Input
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""keypad_1"",
+                    ""action"": ""KEYPAD_1"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1934,7 +1943,7 @@ namespace SoulboundEngine.Client.Input
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""keypad_2"",
+                    ""action"": ""KEYPAD_2"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1945,7 +1954,7 @@ namespace SoulboundEngine.Client.Input
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""keypad_3"",
+                    ""action"": ""KEYPAD_3"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1956,7 +1965,7 @@ namespace SoulboundEngine.Client.Input
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""keypad_4"",
+                    ""action"": ""KEYPAD_4"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1967,7 +1976,7 @@ namespace SoulboundEngine.Client.Input
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""keypad_5"",
+                    ""action"": ""KEYPAD_5"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1978,7 +1987,7 @@ namespace SoulboundEngine.Client.Input
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""keypad_6"",
+                    ""action"": ""KEYPAD_6"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1989,7 +1998,7 @@ namespace SoulboundEngine.Client.Input
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""keypad_7"",
+                    ""action"": ""KEYPAD_7"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -2000,7 +2009,7 @@ namespace SoulboundEngine.Client.Input
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""keypad_8"",
+                    ""action"": ""KEYPAD_8"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -2011,7 +2020,7 @@ namespace SoulboundEngine.Client.Input
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""keypad_9"",
+                    ""action"": ""KEYPAD_9"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -2022,7 +2031,7 @@ namespace SoulboundEngine.Client.Input
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""keypad_0"",
+                    ""action"": ""KEYPAD_0"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -2462,7 +2471,7 @@ namespace SoulboundEngine.Client.Input
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""SHIFT"",
+                    ""action"": ""LEFT_SHIFT"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -2513,11 +2522,11 @@ namespace SoulboundEngine.Client.Input
                 {
                     ""name"": """",
                     ""id"": ""e226c189-a3a4-4bd5-9f38-53ce9c445255"",
-                    ""path"": ""<Keyboard>/ctrl"",
+                    ""path"": ""<Keyboard>/leftCtrl"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""CTRL"",
+                    ""action"": ""LEFT_CTRL"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -2528,7 +2537,7 @@ namespace SoulboundEngine.Client.Input
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""ALT"",
+                    ""action"": ""LEFT_ALT"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -2644,12 +2653,23 @@ namespace SoulboundEngine.Client.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""6df5ffdb-5ebf-4dcc-b180-e8e642ced577"",
-                    ""path"": ""<Keyboard>/anyKey"",
+                    ""id"": ""1ee83313-d45e-4332-8944-665ef1c97b84"",
+                    ""path"": ""<Keyboard>/rightCtrl"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""ANY"",
+                    ""action"": ""RIGHT_CTRL"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4f113240-5e72-4581-a4ea-403f86b16a7c"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""SPACE"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -2712,6 +2732,15 @@ namespace SoulboundEngine.Client.Input
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Scroll"",
+                    ""type"": ""Value"",
+                    ""id"": ""cacdbfab-9fbe-41a4-a984-294714d2c87d"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -2778,6 +2807,17 @@ namespace SoulboundEngine.Client.Input
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Backward"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""2f5afb80-0952-4508-8c0f-9a308cdfec91"",
+                    ""path"": ""<Mouse>/scroll/y"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Scroll"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -2891,16 +2931,16 @@ namespace SoulboundEngine.Client.Input
             m_Keyboard_F10 = m_Keyboard.FindAction("F10", throwIfNotFound: true);
             m_Keyboard_F11 = m_Keyboard.FindAction("F11", throwIfNotFound: true);
             m_Keyboard_F12 = m_Keyboard.FindAction("F12", throwIfNotFound: true);
-            m_Keyboard_keypad_1 = m_Keyboard.FindAction("keypad_1", throwIfNotFound: true);
-            m_Keyboard_keypad_2 = m_Keyboard.FindAction("keypad_2", throwIfNotFound: true);
-            m_Keyboard_keypad_3 = m_Keyboard.FindAction("keypad_3", throwIfNotFound: true);
-            m_Keyboard_keypad_4 = m_Keyboard.FindAction("keypad_4", throwIfNotFound: true);
-            m_Keyboard_keypad_5 = m_Keyboard.FindAction("keypad_5", throwIfNotFound: true);
-            m_Keyboard_keypad_6 = m_Keyboard.FindAction("keypad_6", throwIfNotFound: true);
-            m_Keyboard_keypad_7 = m_Keyboard.FindAction("keypad_7", throwIfNotFound: true);
-            m_Keyboard_keypad_8 = m_Keyboard.FindAction("keypad_8", throwIfNotFound: true);
-            m_Keyboard_keypad_9 = m_Keyboard.FindAction("keypad_9", throwIfNotFound: true);
-            m_Keyboard_keypad_0 = m_Keyboard.FindAction("keypad_0", throwIfNotFound: true);
+            m_Keyboard_KEYPAD_1 = m_Keyboard.FindAction("KEYPAD_1", throwIfNotFound: true);
+            m_Keyboard_KEYPAD_2 = m_Keyboard.FindAction("KEYPAD_2", throwIfNotFound: true);
+            m_Keyboard_KEYPAD_3 = m_Keyboard.FindAction("KEYPAD_3", throwIfNotFound: true);
+            m_Keyboard_KEYPAD_4 = m_Keyboard.FindAction("KEYPAD_4", throwIfNotFound: true);
+            m_Keyboard_KEYPAD_5 = m_Keyboard.FindAction("KEYPAD_5", throwIfNotFound: true);
+            m_Keyboard_KEYPAD_6 = m_Keyboard.FindAction("KEYPAD_6", throwIfNotFound: true);
+            m_Keyboard_KEYPAD_7 = m_Keyboard.FindAction("KEYPAD_7", throwIfNotFound: true);
+            m_Keyboard_KEYPAD_8 = m_Keyboard.FindAction("KEYPAD_8", throwIfNotFound: true);
+            m_Keyboard_KEYPAD_9 = m_Keyboard.FindAction("KEYPAD_9", throwIfNotFound: true);
+            m_Keyboard_KEYPAD_0 = m_Keyboard.FindAction("KEYPAD_0", throwIfNotFound: true);
             m_Keyboard_BACK_QUOTE = m_Keyboard.FindAction("BACK_QUOTE", throwIfNotFound: true);
             m_Keyboard_MINUS = m_Keyboard.FindAction("MINUS", throwIfNotFound: true);
             m_Keyboard_EQUALS = m_Keyboard.FindAction("EQUALS", throwIfNotFound: true);
@@ -2940,13 +2980,14 @@ namespace SoulboundEngine.Client.Input
             m_Keyboard_SEMICOLON = m_Keyboard.FindAction("SEMICOLON", throwIfNotFound: true);
             m_Keyboard_QUOTE = m_Keyboard.FindAction("QUOTE", throwIfNotFound: true);
             m_Keyboard_ENTER = m_Keyboard.FindAction("ENTER", throwIfNotFound: true);
-            m_Keyboard_SHIFT = m_Keyboard.FindAction("SHIFT", throwIfNotFound: true);
             m_Keyboard_COMMA = m_Keyboard.FindAction("COMMA", throwIfNotFound: true);
             m_Keyboard_PERIOD = m_Keyboard.FindAction("PERIOD", throwIfNotFound: true);
             m_Keyboard_SLASH = m_Keyboard.FindAction("SLASH", throwIfNotFound: true);
+            m_Keyboard_LEFT_SHIFT = m_Keyboard.FindAction("LEFT_SHIFT", throwIfNotFound: true);
             m_Keyboard_RIGHT_SHIFT = m_Keyboard.FindAction("RIGHT_SHIFT", throwIfNotFound: true);
-            m_Keyboard_CTRL = m_Keyboard.FindAction("CTRL", throwIfNotFound: true);
-            m_Keyboard_ALT = m_Keyboard.FindAction("ALT", throwIfNotFound: true);
+            m_Keyboard_LEFT_CTRL = m_Keyboard.FindAction("LEFT_CTRL", throwIfNotFound: true);
+            m_Keyboard_RIGHT_CTRL = m_Keyboard.FindAction("RIGHT_CTRL", throwIfNotFound: true);
+            m_Keyboard_LEFT_ALT = m_Keyboard.FindAction("LEFT_ALT", throwIfNotFound: true);
             m_Keyboard_RIGHT_ALT = m_Keyboard.FindAction("RIGHT_ALT", throwIfNotFound: true);
             m_Keyboard_ARROW_LEFT = m_Keyboard.FindAction("ARROW_LEFT", throwIfNotFound: true);
             m_Keyboard_ARROW_RIGHT = m_Keyboard.FindAction("ARROW_RIGHT", throwIfNotFound: true);
@@ -2957,7 +2998,7 @@ namespace SoulboundEngine.Client.Input
             m_Keyboard_PAGE_UP = m_Keyboard.FindAction("PAGE_UP", throwIfNotFound: true);
             m_Keyboard_PAGE_DOWN = m_Keyboard.FindAction("PAGE_DOWN", throwIfNotFound: true);
             m_Keyboard_PRINTSCREEN = m_Keyboard.FindAction("PRINTSCREEN", throwIfNotFound: true);
-            m_Keyboard_ANY = m_Keyboard.FindAction("ANY", throwIfNotFound: true);
+            m_Keyboard_SPACE = m_Keyboard.FindAction("SPACE", throwIfNotFound: true);
             // Mouse
             m_Mouse = asset.FindActionMap("Mouse", throwIfNotFound: true);
             m_Mouse_Position = m_Mouse.FindAction("Position", throwIfNotFound: true);
@@ -2966,6 +3007,7 @@ namespace SoulboundEngine.Client.Input
             m_Mouse_MiddleClick = m_Mouse.FindAction("MiddleClick", throwIfNotFound: true);
             m_Mouse_Forward = m_Mouse.FindAction("Forward", throwIfNotFound: true);
             m_Mouse_Backward = m_Mouse.FindAction("Backward", throwIfNotFound: true);
+            m_Mouse_Scroll = m_Mouse.FindAction("Scroll", throwIfNotFound: true);
         }
 
         ~@PlayerInputActions()
@@ -3571,16 +3613,16 @@ namespace SoulboundEngine.Client.Input
         private readonly InputAction m_Keyboard_F10;
         private readonly InputAction m_Keyboard_F11;
         private readonly InputAction m_Keyboard_F12;
-        private readonly InputAction m_Keyboard_keypad_1;
-        private readonly InputAction m_Keyboard_keypad_2;
-        private readonly InputAction m_Keyboard_keypad_3;
-        private readonly InputAction m_Keyboard_keypad_4;
-        private readonly InputAction m_Keyboard_keypad_5;
-        private readonly InputAction m_Keyboard_keypad_6;
-        private readonly InputAction m_Keyboard_keypad_7;
-        private readonly InputAction m_Keyboard_keypad_8;
-        private readonly InputAction m_Keyboard_keypad_9;
-        private readonly InputAction m_Keyboard_keypad_0;
+        private readonly InputAction m_Keyboard_KEYPAD_1;
+        private readonly InputAction m_Keyboard_KEYPAD_2;
+        private readonly InputAction m_Keyboard_KEYPAD_3;
+        private readonly InputAction m_Keyboard_KEYPAD_4;
+        private readonly InputAction m_Keyboard_KEYPAD_5;
+        private readonly InputAction m_Keyboard_KEYPAD_6;
+        private readonly InputAction m_Keyboard_KEYPAD_7;
+        private readonly InputAction m_Keyboard_KEYPAD_8;
+        private readonly InputAction m_Keyboard_KEYPAD_9;
+        private readonly InputAction m_Keyboard_KEYPAD_0;
         private readonly InputAction m_Keyboard_BACK_QUOTE;
         private readonly InputAction m_Keyboard_MINUS;
         private readonly InputAction m_Keyboard_EQUALS;
@@ -3620,13 +3662,14 @@ namespace SoulboundEngine.Client.Input
         private readonly InputAction m_Keyboard_SEMICOLON;
         private readonly InputAction m_Keyboard_QUOTE;
         private readonly InputAction m_Keyboard_ENTER;
-        private readonly InputAction m_Keyboard_SHIFT;
         private readonly InputAction m_Keyboard_COMMA;
         private readonly InputAction m_Keyboard_PERIOD;
         private readonly InputAction m_Keyboard_SLASH;
+        private readonly InputAction m_Keyboard_LEFT_SHIFT;
         private readonly InputAction m_Keyboard_RIGHT_SHIFT;
-        private readonly InputAction m_Keyboard_CTRL;
-        private readonly InputAction m_Keyboard_ALT;
+        private readonly InputAction m_Keyboard_LEFT_CTRL;
+        private readonly InputAction m_Keyboard_RIGHT_CTRL;
+        private readonly InputAction m_Keyboard_LEFT_ALT;
         private readonly InputAction m_Keyboard_RIGHT_ALT;
         private readonly InputAction m_Keyboard_ARROW_LEFT;
         private readonly InputAction m_Keyboard_ARROW_RIGHT;
@@ -3637,7 +3680,7 @@ namespace SoulboundEngine.Client.Input
         private readonly InputAction m_Keyboard_PAGE_UP;
         private readonly InputAction m_Keyboard_PAGE_DOWN;
         private readonly InputAction m_Keyboard_PRINTSCREEN;
-        private readonly InputAction m_Keyboard_ANY;
+        private readonly InputAction m_Keyboard_SPACE;
         /// <summary>
         /// Provides access to input actions defined in input action map "Keyboard".
         /// </summary>
@@ -3702,45 +3745,45 @@ namespace SoulboundEngine.Client.Input
             /// </summary>
             public InputAction @F12 => m_Wrapper.m_Keyboard_F12;
             /// <summary>
-            /// Provides access to the underlying input action "Keyboard/keypad_1".
+            /// Provides access to the underlying input action "Keyboard/KEYPAD_1".
             /// </summary>
-            public InputAction @keypad_1 => m_Wrapper.m_Keyboard_keypad_1;
+            public InputAction @KEYPAD_1 => m_Wrapper.m_Keyboard_KEYPAD_1;
             /// <summary>
-            /// Provides access to the underlying input action "Keyboard/keypad_2".
+            /// Provides access to the underlying input action "Keyboard/KEYPAD_2".
             /// </summary>
-            public InputAction @keypad_2 => m_Wrapper.m_Keyboard_keypad_2;
+            public InputAction @KEYPAD_2 => m_Wrapper.m_Keyboard_KEYPAD_2;
             /// <summary>
-            /// Provides access to the underlying input action "Keyboard/keypad_3".
+            /// Provides access to the underlying input action "Keyboard/KEYPAD_3".
             /// </summary>
-            public InputAction @keypad_3 => m_Wrapper.m_Keyboard_keypad_3;
+            public InputAction @KEYPAD_3 => m_Wrapper.m_Keyboard_KEYPAD_3;
             /// <summary>
-            /// Provides access to the underlying input action "Keyboard/keypad_4".
+            /// Provides access to the underlying input action "Keyboard/KEYPAD_4".
             /// </summary>
-            public InputAction @keypad_4 => m_Wrapper.m_Keyboard_keypad_4;
+            public InputAction @KEYPAD_4 => m_Wrapper.m_Keyboard_KEYPAD_4;
             /// <summary>
-            /// Provides access to the underlying input action "Keyboard/keypad_5".
+            /// Provides access to the underlying input action "Keyboard/KEYPAD_5".
             /// </summary>
-            public InputAction @keypad_5 => m_Wrapper.m_Keyboard_keypad_5;
+            public InputAction @KEYPAD_5 => m_Wrapper.m_Keyboard_KEYPAD_5;
             /// <summary>
-            /// Provides access to the underlying input action "Keyboard/keypad_6".
+            /// Provides access to the underlying input action "Keyboard/KEYPAD_6".
             /// </summary>
-            public InputAction @keypad_6 => m_Wrapper.m_Keyboard_keypad_6;
+            public InputAction @KEYPAD_6 => m_Wrapper.m_Keyboard_KEYPAD_6;
             /// <summary>
-            /// Provides access to the underlying input action "Keyboard/keypad_7".
+            /// Provides access to the underlying input action "Keyboard/KEYPAD_7".
             /// </summary>
-            public InputAction @keypad_7 => m_Wrapper.m_Keyboard_keypad_7;
+            public InputAction @KEYPAD_7 => m_Wrapper.m_Keyboard_KEYPAD_7;
             /// <summary>
-            /// Provides access to the underlying input action "Keyboard/keypad_8".
+            /// Provides access to the underlying input action "Keyboard/KEYPAD_8".
             /// </summary>
-            public InputAction @keypad_8 => m_Wrapper.m_Keyboard_keypad_8;
+            public InputAction @KEYPAD_8 => m_Wrapper.m_Keyboard_KEYPAD_8;
             /// <summary>
-            /// Provides access to the underlying input action "Keyboard/keypad_9".
+            /// Provides access to the underlying input action "Keyboard/KEYPAD_9".
             /// </summary>
-            public InputAction @keypad_9 => m_Wrapper.m_Keyboard_keypad_9;
+            public InputAction @KEYPAD_9 => m_Wrapper.m_Keyboard_KEYPAD_9;
             /// <summary>
-            /// Provides access to the underlying input action "Keyboard/keypad_0".
+            /// Provides access to the underlying input action "Keyboard/KEYPAD_0".
             /// </summary>
-            public InputAction @keypad_0 => m_Wrapper.m_Keyboard_keypad_0;
+            public InputAction @KEYPAD_0 => m_Wrapper.m_Keyboard_KEYPAD_0;
             /// <summary>
             /// Provides access to the underlying input action "Keyboard/BACK_QUOTE".
             /// </summary>
@@ -3898,10 +3941,6 @@ namespace SoulboundEngine.Client.Input
             /// </summary>
             public InputAction @ENTER => m_Wrapper.m_Keyboard_ENTER;
             /// <summary>
-            /// Provides access to the underlying input action "Keyboard/SHIFT".
-            /// </summary>
-            public InputAction @SHIFT => m_Wrapper.m_Keyboard_SHIFT;
-            /// <summary>
             /// Provides access to the underlying input action "Keyboard/COMMA".
             /// </summary>
             public InputAction @COMMA => m_Wrapper.m_Keyboard_COMMA;
@@ -3914,17 +3953,25 @@ namespace SoulboundEngine.Client.Input
             /// </summary>
             public InputAction @SLASH => m_Wrapper.m_Keyboard_SLASH;
             /// <summary>
+            /// Provides access to the underlying input action "Keyboard/LEFT_SHIFT".
+            /// </summary>
+            public InputAction @LEFT_SHIFT => m_Wrapper.m_Keyboard_LEFT_SHIFT;
+            /// <summary>
             /// Provides access to the underlying input action "Keyboard/RIGHT_SHIFT".
             /// </summary>
             public InputAction @RIGHT_SHIFT => m_Wrapper.m_Keyboard_RIGHT_SHIFT;
             /// <summary>
-            /// Provides access to the underlying input action "Keyboard/CTRL".
+            /// Provides access to the underlying input action "Keyboard/LEFT_CTRL".
             /// </summary>
-            public InputAction @CTRL => m_Wrapper.m_Keyboard_CTRL;
+            public InputAction @LEFT_CTRL => m_Wrapper.m_Keyboard_LEFT_CTRL;
             /// <summary>
-            /// Provides access to the underlying input action "Keyboard/ALT".
+            /// Provides access to the underlying input action "Keyboard/RIGHT_CTRL".
             /// </summary>
-            public InputAction @ALT => m_Wrapper.m_Keyboard_ALT;
+            public InputAction @RIGHT_CTRL => m_Wrapper.m_Keyboard_RIGHT_CTRL;
+            /// <summary>
+            /// Provides access to the underlying input action "Keyboard/LEFT_ALT".
+            /// </summary>
+            public InputAction @LEFT_ALT => m_Wrapper.m_Keyboard_LEFT_ALT;
             /// <summary>
             /// Provides access to the underlying input action "Keyboard/RIGHT_ALT".
             /// </summary>
@@ -3966,9 +4013,9 @@ namespace SoulboundEngine.Client.Input
             /// </summary>
             public InputAction @PRINTSCREEN => m_Wrapper.m_Keyboard_PRINTSCREEN;
             /// <summary>
-            /// Provides access to the underlying input action "Keyboard/ANY".
+            /// Provides access to the underlying input action "Keyboard/SPACE".
             /// </summary>
-            public InputAction @ANY => m_Wrapper.m_Keyboard_ANY;
+            public InputAction @SPACE => m_Wrapper.m_Keyboard_SPACE;
             /// <summary>
             /// Provides access to the underlying input action map instance.
             /// </summary>
@@ -4034,36 +4081,36 @@ namespace SoulboundEngine.Client.Input
                 @F12.started += instance.OnF12;
                 @F12.performed += instance.OnF12;
                 @F12.canceled += instance.OnF12;
-                @keypad_1.started += instance.OnKeypad_1;
-                @keypad_1.performed += instance.OnKeypad_1;
-                @keypad_1.canceled += instance.OnKeypad_1;
-                @keypad_2.started += instance.OnKeypad_2;
-                @keypad_2.performed += instance.OnKeypad_2;
-                @keypad_2.canceled += instance.OnKeypad_2;
-                @keypad_3.started += instance.OnKeypad_3;
-                @keypad_3.performed += instance.OnKeypad_3;
-                @keypad_3.canceled += instance.OnKeypad_3;
-                @keypad_4.started += instance.OnKeypad_4;
-                @keypad_4.performed += instance.OnKeypad_4;
-                @keypad_4.canceled += instance.OnKeypad_4;
-                @keypad_5.started += instance.OnKeypad_5;
-                @keypad_5.performed += instance.OnKeypad_5;
-                @keypad_5.canceled += instance.OnKeypad_5;
-                @keypad_6.started += instance.OnKeypad_6;
-                @keypad_6.performed += instance.OnKeypad_6;
-                @keypad_6.canceled += instance.OnKeypad_6;
-                @keypad_7.started += instance.OnKeypad_7;
-                @keypad_7.performed += instance.OnKeypad_7;
-                @keypad_7.canceled += instance.OnKeypad_7;
-                @keypad_8.started += instance.OnKeypad_8;
-                @keypad_8.performed += instance.OnKeypad_8;
-                @keypad_8.canceled += instance.OnKeypad_8;
-                @keypad_9.started += instance.OnKeypad_9;
-                @keypad_9.performed += instance.OnKeypad_9;
-                @keypad_9.canceled += instance.OnKeypad_9;
-                @keypad_0.started += instance.OnKeypad_0;
-                @keypad_0.performed += instance.OnKeypad_0;
-                @keypad_0.canceled += instance.OnKeypad_0;
+                @KEYPAD_1.started += instance.OnKEYPAD_1;
+                @KEYPAD_1.performed += instance.OnKEYPAD_1;
+                @KEYPAD_1.canceled += instance.OnKEYPAD_1;
+                @KEYPAD_2.started += instance.OnKEYPAD_2;
+                @KEYPAD_2.performed += instance.OnKEYPAD_2;
+                @KEYPAD_2.canceled += instance.OnKEYPAD_2;
+                @KEYPAD_3.started += instance.OnKEYPAD_3;
+                @KEYPAD_3.performed += instance.OnKEYPAD_3;
+                @KEYPAD_3.canceled += instance.OnKEYPAD_3;
+                @KEYPAD_4.started += instance.OnKEYPAD_4;
+                @KEYPAD_4.performed += instance.OnKEYPAD_4;
+                @KEYPAD_4.canceled += instance.OnKEYPAD_4;
+                @KEYPAD_5.started += instance.OnKEYPAD_5;
+                @KEYPAD_5.performed += instance.OnKEYPAD_5;
+                @KEYPAD_5.canceled += instance.OnKEYPAD_5;
+                @KEYPAD_6.started += instance.OnKEYPAD_6;
+                @KEYPAD_6.performed += instance.OnKEYPAD_6;
+                @KEYPAD_6.canceled += instance.OnKEYPAD_6;
+                @KEYPAD_7.started += instance.OnKEYPAD_7;
+                @KEYPAD_7.performed += instance.OnKEYPAD_7;
+                @KEYPAD_7.canceled += instance.OnKEYPAD_7;
+                @KEYPAD_8.started += instance.OnKEYPAD_8;
+                @KEYPAD_8.performed += instance.OnKEYPAD_8;
+                @KEYPAD_8.canceled += instance.OnKEYPAD_8;
+                @KEYPAD_9.started += instance.OnKEYPAD_9;
+                @KEYPAD_9.performed += instance.OnKEYPAD_9;
+                @KEYPAD_9.canceled += instance.OnKEYPAD_9;
+                @KEYPAD_0.started += instance.OnKEYPAD_0;
+                @KEYPAD_0.performed += instance.OnKEYPAD_0;
+                @KEYPAD_0.canceled += instance.OnKEYPAD_0;
                 @BACK_QUOTE.started += instance.OnBACK_QUOTE;
                 @BACK_QUOTE.performed += instance.OnBACK_QUOTE;
                 @BACK_QUOTE.canceled += instance.OnBACK_QUOTE;
@@ -4181,9 +4228,6 @@ namespace SoulboundEngine.Client.Input
                 @ENTER.started += instance.OnENTER;
                 @ENTER.performed += instance.OnENTER;
                 @ENTER.canceled += instance.OnENTER;
-                @SHIFT.started += instance.OnSHIFT;
-                @SHIFT.performed += instance.OnSHIFT;
-                @SHIFT.canceled += instance.OnSHIFT;
                 @COMMA.started += instance.OnCOMMA;
                 @COMMA.performed += instance.OnCOMMA;
                 @COMMA.canceled += instance.OnCOMMA;
@@ -4193,15 +4237,21 @@ namespace SoulboundEngine.Client.Input
                 @SLASH.started += instance.OnSLASH;
                 @SLASH.performed += instance.OnSLASH;
                 @SLASH.canceled += instance.OnSLASH;
+                @LEFT_SHIFT.started += instance.OnLEFT_SHIFT;
+                @LEFT_SHIFT.performed += instance.OnLEFT_SHIFT;
+                @LEFT_SHIFT.canceled += instance.OnLEFT_SHIFT;
                 @RIGHT_SHIFT.started += instance.OnRIGHT_SHIFT;
                 @RIGHT_SHIFT.performed += instance.OnRIGHT_SHIFT;
                 @RIGHT_SHIFT.canceled += instance.OnRIGHT_SHIFT;
-                @CTRL.started += instance.OnCTRL;
-                @CTRL.performed += instance.OnCTRL;
-                @CTRL.canceled += instance.OnCTRL;
-                @ALT.started += instance.OnALT;
-                @ALT.performed += instance.OnALT;
-                @ALT.canceled += instance.OnALT;
+                @LEFT_CTRL.started += instance.OnLEFT_CTRL;
+                @LEFT_CTRL.performed += instance.OnLEFT_CTRL;
+                @LEFT_CTRL.canceled += instance.OnLEFT_CTRL;
+                @RIGHT_CTRL.started += instance.OnRIGHT_CTRL;
+                @RIGHT_CTRL.performed += instance.OnRIGHT_CTRL;
+                @RIGHT_CTRL.canceled += instance.OnRIGHT_CTRL;
+                @LEFT_ALT.started += instance.OnLEFT_ALT;
+                @LEFT_ALT.performed += instance.OnLEFT_ALT;
+                @LEFT_ALT.canceled += instance.OnLEFT_ALT;
                 @RIGHT_ALT.started += instance.OnRIGHT_ALT;
                 @RIGHT_ALT.performed += instance.OnRIGHT_ALT;
                 @RIGHT_ALT.canceled += instance.OnRIGHT_ALT;
@@ -4232,9 +4282,9 @@ namespace SoulboundEngine.Client.Input
                 @PRINTSCREEN.started += instance.OnPRINTSCREEN;
                 @PRINTSCREEN.performed += instance.OnPRINTSCREEN;
                 @PRINTSCREEN.canceled += instance.OnPRINTSCREEN;
-                @ANY.started += instance.OnANY;
-                @ANY.performed += instance.OnANY;
-                @ANY.canceled += instance.OnANY;
+                @SPACE.started += instance.OnSPACE;
+                @SPACE.performed += instance.OnSPACE;
+                @SPACE.canceled += instance.OnSPACE;
             }
 
             /// <summary>
@@ -4285,36 +4335,36 @@ namespace SoulboundEngine.Client.Input
                 @F12.started -= instance.OnF12;
                 @F12.performed -= instance.OnF12;
                 @F12.canceled -= instance.OnF12;
-                @keypad_1.started -= instance.OnKeypad_1;
-                @keypad_1.performed -= instance.OnKeypad_1;
-                @keypad_1.canceled -= instance.OnKeypad_1;
-                @keypad_2.started -= instance.OnKeypad_2;
-                @keypad_2.performed -= instance.OnKeypad_2;
-                @keypad_2.canceled -= instance.OnKeypad_2;
-                @keypad_3.started -= instance.OnKeypad_3;
-                @keypad_3.performed -= instance.OnKeypad_3;
-                @keypad_3.canceled -= instance.OnKeypad_3;
-                @keypad_4.started -= instance.OnKeypad_4;
-                @keypad_4.performed -= instance.OnKeypad_4;
-                @keypad_4.canceled -= instance.OnKeypad_4;
-                @keypad_5.started -= instance.OnKeypad_5;
-                @keypad_5.performed -= instance.OnKeypad_5;
-                @keypad_5.canceled -= instance.OnKeypad_5;
-                @keypad_6.started -= instance.OnKeypad_6;
-                @keypad_6.performed -= instance.OnKeypad_6;
-                @keypad_6.canceled -= instance.OnKeypad_6;
-                @keypad_7.started -= instance.OnKeypad_7;
-                @keypad_7.performed -= instance.OnKeypad_7;
-                @keypad_7.canceled -= instance.OnKeypad_7;
-                @keypad_8.started -= instance.OnKeypad_8;
-                @keypad_8.performed -= instance.OnKeypad_8;
-                @keypad_8.canceled -= instance.OnKeypad_8;
-                @keypad_9.started -= instance.OnKeypad_9;
-                @keypad_9.performed -= instance.OnKeypad_9;
-                @keypad_9.canceled -= instance.OnKeypad_9;
-                @keypad_0.started -= instance.OnKeypad_0;
-                @keypad_0.performed -= instance.OnKeypad_0;
-                @keypad_0.canceled -= instance.OnKeypad_0;
+                @KEYPAD_1.started -= instance.OnKEYPAD_1;
+                @KEYPAD_1.performed -= instance.OnKEYPAD_1;
+                @KEYPAD_1.canceled -= instance.OnKEYPAD_1;
+                @KEYPAD_2.started -= instance.OnKEYPAD_2;
+                @KEYPAD_2.performed -= instance.OnKEYPAD_2;
+                @KEYPAD_2.canceled -= instance.OnKEYPAD_2;
+                @KEYPAD_3.started -= instance.OnKEYPAD_3;
+                @KEYPAD_3.performed -= instance.OnKEYPAD_3;
+                @KEYPAD_3.canceled -= instance.OnKEYPAD_3;
+                @KEYPAD_4.started -= instance.OnKEYPAD_4;
+                @KEYPAD_4.performed -= instance.OnKEYPAD_4;
+                @KEYPAD_4.canceled -= instance.OnKEYPAD_4;
+                @KEYPAD_5.started -= instance.OnKEYPAD_5;
+                @KEYPAD_5.performed -= instance.OnKEYPAD_5;
+                @KEYPAD_5.canceled -= instance.OnKEYPAD_5;
+                @KEYPAD_6.started -= instance.OnKEYPAD_6;
+                @KEYPAD_6.performed -= instance.OnKEYPAD_6;
+                @KEYPAD_6.canceled -= instance.OnKEYPAD_6;
+                @KEYPAD_7.started -= instance.OnKEYPAD_7;
+                @KEYPAD_7.performed -= instance.OnKEYPAD_7;
+                @KEYPAD_7.canceled -= instance.OnKEYPAD_7;
+                @KEYPAD_8.started -= instance.OnKEYPAD_8;
+                @KEYPAD_8.performed -= instance.OnKEYPAD_8;
+                @KEYPAD_8.canceled -= instance.OnKEYPAD_8;
+                @KEYPAD_9.started -= instance.OnKEYPAD_9;
+                @KEYPAD_9.performed -= instance.OnKEYPAD_9;
+                @KEYPAD_9.canceled -= instance.OnKEYPAD_9;
+                @KEYPAD_0.started -= instance.OnKEYPAD_0;
+                @KEYPAD_0.performed -= instance.OnKEYPAD_0;
+                @KEYPAD_0.canceled -= instance.OnKEYPAD_0;
                 @BACK_QUOTE.started -= instance.OnBACK_QUOTE;
                 @BACK_QUOTE.performed -= instance.OnBACK_QUOTE;
                 @BACK_QUOTE.canceled -= instance.OnBACK_QUOTE;
@@ -4432,9 +4482,6 @@ namespace SoulboundEngine.Client.Input
                 @ENTER.started -= instance.OnENTER;
                 @ENTER.performed -= instance.OnENTER;
                 @ENTER.canceled -= instance.OnENTER;
-                @SHIFT.started -= instance.OnSHIFT;
-                @SHIFT.performed -= instance.OnSHIFT;
-                @SHIFT.canceled -= instance.OnSHIFT;
                 @COMMA.started -= instance.OnCOMMA;
                 @COMMA.performed -= instance.OnCOMMA;
                 @COMMA.canceled -= instance.OnCOMMA;
@@ -4444,15 +4491,21 @@ namespace SoulboundEngine.Client.Input
                 @SLASH.started -= instance.OnSLASH;
                 @SLASH.performed -= instance.OnSLASH;
                 @SLASH.canceled -= instance.OnSLASH;
+                @LEFT_SHIFT.started -= instance.OnLEFT_SHIFT;
+                @LEFT_SHIFT.performed -= instance.OnLEFT_SHIFT;
+                @LEFT_SHIFT.canceled -= instance.OnLEFT_SHIFT;
                 @RIGHT_SHIFT.started -= instance.OnRIGHT_SHIFT;
                 @RIGHT_SHIFT.performed -= instance.OnRIGHT_SHIFT;
                 @RIGHT_SHIFT.canceled -= instance.OnRIGHT_SHIFT;
-                @CTRL.started -= instance.OnCTRL;
-                @CTRL.performed -= instance.OnCTRL;
-                @CTRL.canceled -= instance.OnCTRL;
-                @ALT.started -= instance.OnALT;
-                @ALT.performed -= instance.OnALT;
-                @ALT.canceled -= instance.OnALT;
+                @LEFT_CTRL.started -= instance.OnLEFT_CTRL;
+                @LEFT_CTRL.performed -= instance.OnLEFT_CTRL;
+                @LEFT_CTRL.canceled -= instance.OnLEFT_CTRL;
+                @RIGHT_CTRL.started -= instance.OnRIGHT_CTRL;
+                @RIGHT_CTRL.performed -= instance.OnRIGHT_CTRL;
+                @RIGHT_CTRL.canceled -= instance.OnRIGHT_CTRL;
+                @LEFT_ALT.started -= instance.OnLEFT_ALT;
+                @LEFT_ALT.performed -= instance.OnLEFT_ALT;
+                @LEFT_ALT.canceled -= instance.OnLEFT_ALT;
                 @RIGHT_ALT.started -= instance.OnRIGHT_ALT;
                 @RIGHT_ALT.performed -= instance.OnRIGHT_ALT;
                 @RIGHT_ALT.canceled -= instance.OnRIGHT_ALT;
@@ -4483,9 +4536,9 @@ namespace SoulboundEngine.Client.Input
                 @PRINTSCREEN.started -= instance.OnPRINTSCREEN;
                 @PRINTSCREEN.performed -= instance.OnPRINTSCREEN;
                 @PRINTSCREEN.canceled -= instance.OnPRINTSCREEN;
-                @ANY.started -= instance.OnANY;
-                @ANY.performed -= instance.OnANY;
-                @ANY.canceled -= instance.OnANY;
+                @SPACE.started -= instance.OnSPACE;
+                @SPACE.performed -= instance.OnSPACE;
+                @SPACE.canceled -= instance.OnSPACE;
             }
 
             /// <summary>
@@ -4529,6 +4582,7 @@ namespace SoulboundEngine.Client.Input
         private readonly InputAction m_Mouse_MiddleClick;
         private readonly InputAction m_Mouse_Forward;
         private readonly InputAction m_Mouse_Backward;
+        private readonly InputAction m_Mouse_Scroll;
         /// <summary>
         /// Provides access to input actions defined in input action map "Mouse".
         /// </summary>
@@ -4564,6 +4618,10 @@ namespace SoulboundEngine.Client.Input
             /// Provides access to the underlying input action "Mouse/Backward".
             /// </summary>
             public InputAction @Backward => m_Wrapper.m_Mouse_Backward;
+            /// <summary>
+            /// Provides access to the underlying input action "Mouse/Scroll".
+            /// </summary>
+            public InputAction @Scroll => m_Wrapper.m_Mouse_Scroll;
             /// <summary>
             /// Provides access to the underlying input action map instance.
             /// </summary>
@@ -4608,6 +4666,9 @@ namespace SoulboundEngine.Client.Input
                 @Backward.started += instance.OnBackward;
                 @Backward.performed += instance.OnBackward;
                 @Backward.canceled += instance.OnBackward;
+                @Scroll.started += instance.OnScroll;
+                @Scroll.performed += instance.OnScroll;
+                @Scroll.canceled += instance.OnScroll;
             }
 
             /// <summary>
@@ -4637,6 +4698,9 @@ namespace SoulboundEngine.Client.Input
                 @Backward.started -= instance.OnBackward;
                 @Backward.performed -= instance.OnBackward;
                 @Backward.canceled -= instance.OnBackward;
+                @Scroll.started -= instance.OnScroll;
+                @Scroll.performed -= instance.OnScroll;
+                @Scroll.canceled -= instance.OnScroll;
             }
 
             /// <summary>
@@ -5019,75 +5083,75 @@ namespace SoulboundEngine.Client.Input
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnF12(InputAction.CallbackContext context);
             /// <summary>
-            /// Method invoked when associated input action "keypad_1" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "KEYPAD_1" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-            void OnKeypad_1(InputAction.CallbackContext context);
+            void OnKEYPAD_1(InputAction.CallbackContext context);
             /// <summary>
-            /// Method invoked when associated input action "keypad_2" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "KEYPAD_2" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-            void OnKeypad_2(InputAction.CallbackContext context);
+            void OnKEYPAD_2(InputAction.CallbackContext context);
             /// <summary>
-            /// Method invoked when associated input action "keypad_3" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "KEYPAD_3" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-            void OnKeypad_3(InputAction.CallbackContext context);
+            void OnKEYPAD_3(InputAction.CallbackContext context);
             /// <summary>
-            /// Method invoked when associated input action "keypad_4" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "KEYPAD_4" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-            void OnKeypad_4(InputAction.CallbackContext context);
+            void OnKEYPAD_4(InputAction.CallbackContext context);
             /// <summary>
-            /// Method invoked when associated input action "keypad_5" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "KEYPAD_5" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-            void OnKeypad_5(InputAction.CallbackContext context);
+            void OnKEYPAD_5(InputAction.CallbackContext context);
             /// <summary>
-            /// Method invoked when associated input action "keypad_6" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "KEYPAD_6" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-            void OnKeypad_6(InputAction.CallbackContext context);
+            void OnKEYPAD_6(InputAction.CallbackContext context);
             /// <summary>
-            /// Method invoked when associated input action "keypad_7" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "KEYPAD_7" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-            void OnKeypad_7(InputAction.CallbackContext context);
+            void OnKEYPAD_7(InputAction.CallbackContext context);
             /// <summary>
-            /// Method invoked when associated input action "keypad_8" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "KEYPAD_8" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-            void OnKeypad_8(InputAction.CallbackContext context);
+            void OnKEYPAD_8(InputAction.CallbackContext context);
             /// <summary>
-            /// Method invoked when associated input action "keypad_9" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "KEYPAD_9" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-            void OnKeypad_9(InputAction.CallbackContext context);
+            void OnKEYPAD_9(InputAction.CallbackContext context);
             /// <summary>
-            /// Method invoked when associated input action "keypad_0" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "KEYPAD_0" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-            void OnKeypad_0(InputAction.CallbackContext context);
+            void OnKEYPAD_0(InputAction.CallbackContext context);
             /// <summary>
             /// Method invoked when associated input action "BACK_QUOTE" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
@@ -5362,13 +5426,6 @@ namespace SoulboundEngine.Client.Input
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnENTER(InputAction.CallbackContext context);
             /// <summary>
-            /// Method invoked when associated input action "SHIFT" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-            /// </summary>
-            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-            void OnSHIFT(InputAction.CallbackContext context);
-            /// <summary>
             /// Method invoked when associated input action "COMMA" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
@@ -5390,6 +5447,13 @@ namespace SoulboundEngine.Client.Input
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnSLASH(InputAction.CallbackContext context);
             /// <summary>
+            /// Method invoked when associated input action "LEFT_SHIFT" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnLEFT_SHIFT(InputAction.CallbackContext context);
+            /// <summary>
             /// Method invoked when associated input action "RIGHT_SHIFT" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
@@ -5397,19 +5461,26 @@ namespace SoulboundEngine.Client.Input
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnRIGHT_SHIFT(InputAction.CallbackContext context);
             /// <summary>
-            /// Method invoked when associated input action "CTRL" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "LEFT_CTRL" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-            void OnCTRL(InputAction.CallbackContext context);
+            void OnLEFT_CTRL(InputAction.CallbackContext context);
             /// <summary>
-            /// Method invoked when associated input action "ALT" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "RIGHT_CTRL" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-            void OnALT(InputAction.CallbackContext context);
+            void OnRIGHT_CTRL(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "LEFT_ALT" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnLEFT_ALT(InputAction.CallbackContext context);
             /// <summary>
             /// Method invoked when associated input action "RIGHT_ALT" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
@@ -5481,12 +5552,12 @@ namespace SoulboundEngine.Client.Input
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnPRINTSCREEN(InputAction.CallbackContext context);
             /// <summary>
-            /// Method invoked when associated input action "ANY" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "SPACE" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-            void OnANY(InputAction.CallbackContext context);
+            void OnSPACE(InputAction.CallbackContext context);
         }
         /// <summary>
         /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Mouse" which allows adding and removing callbacks.
@@ -5537,6 +5608,13 @@ namespace SoulboundEngine.Client.Input
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnBackward(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "Scroll" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnScroll(InputAction.CallbackContext context);
         }
     }
 }

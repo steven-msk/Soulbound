@@ -13,7 +13,7 @@ using UnityEngine;
 using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 namespace SoulboundEngine.Core {
-	public sealed class Soulbound : IApplicationController {
+	public sealed class Soulbound {
 		private static Soulbound instance;
 		private static readonly Logger loggerInstance = new(UnityEngine.Debug.unityLogger);
 		public static readonly JsonSerializerSettings globalJsonSettings = new() {
@@ -27,7 +27,7 @@ namespace SoulboundEngine.Core {
 		};
 		private bool running;
 		private readonly SoulboundClient client;
-		private readonly GameConfig config;
+		public readonly GameConfig config;
 
 		public Soulbound(GameConfig config) {
 			instance = this;
@@ -53,38 +53,53 @@ namespace SoulboundEngine.Core {
 			} catch (InvalidOperationException) {
 			}
 
-			Application.quitting += ((IApplicationController)this).OnApplicationQuit;
+			Application.quitting += this.OnApplicationQuit;
 
-			UniTask.Post(async () => {
-				this.client.Start();
-
-				while (this.running) {
-					await UniTask.NextFrame();
-					try {
-						this.Update();
-					} catch (Exception e) {
-						// TODO: custom crash handling
-						Logger.LogFatal(e);
-#if UNITY_EDITOR
-						EditorApplication.isPlaying = false;
-#else
-						Environment.FailFast("Uncaught exception in update loop", e);
-#endif
-					}
-				}
-			});
+			UniTask.Post(this.StartUpdate);
+			UniTask.Post(this.StartTick);
 
 			this.running = true;
 			GameStateManager.SetRunning();
 		}
 
-		public void Update() {
-			this.client.Update();
+		private async void StartUpdate() {
+			this.client.Start();
+
+			while (this.running) {
+				try {
+					this.client.Update();
+				} catch (Exception e) {
+					// TODO: custom crash handling
+					Logger.LogFatal(e);
+#if UNITY_EDITOR
+					EditorApplication.isPlaying = false;
+#else
+					Environment.FailFast("Uncaught exception in update loop", e);
+#endif
+				}
+				await UniTask.NextFrame();
+			}
+		}
+
+		private async void StartTick() {
+			while (this.running) {
+				try {
+					this.client.Tick();
+				} catch (Exception e) {
+					Logger.LogFatal(e);
+#if UNITY_EDITOR
+					EditorApplication.isPlaying = false;
+#else
+					Environment.FailFast("Uncaught exception in tick loop", e);
+#endif
+				}
+				await UniTask.WaitForSeconds(SharedConstants.TICKS_PER_SECOND, true);
+			}
 		}
 
 		public void CloseGame() => Application.Quit();
 
-		void IApplicationController.OnApplicationQuit() {
+		private void OnApplicationQuit() {
 			GameStateManager.SetShutdown();
 
 			this.client.Shutdown();
