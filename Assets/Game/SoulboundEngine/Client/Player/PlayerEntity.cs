@@ -87,7 +87,7 @@ namespace SoulboundEngine.Client.Player {
 			if (this.isHoldingLeft) this.OnLeftHoldTick();
 			if (this.isHoldingRight) this.OnRightHoldTick();
 
-			if (this.activeInventoryScreenHandler != null && this.activeInventoryScreenHandler.CanUse(this)) {
+			if (this.activeInventoryScreenHandler != null && !this.activeInventoryScreenHandler.CanUse(this)) {
 				this.CloseInventoryScreen();
 			}
 		}

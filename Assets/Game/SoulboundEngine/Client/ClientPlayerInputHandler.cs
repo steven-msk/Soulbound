@@ -12,6 +12,10 @@ namespace SoulboundEngine.Client {
 			[Key.Digit1] = 0, [Key.Digit2] = 1, [Key.Digit3] = 2, [Key.Digit4] = 3, [Key.Digit5] = 4,
 			[Key.Digit6] = 6, [Key.Digit7] = 6, [Key.Digit8] = 7, [Key.Digit9] = 8
 		};
+		private bool isHoldingLeft;
+		private bool isHoldingRight;
+		private bool startedHoldingLeftThisTick;
+		private bool startedHoldingRightThisTick;
 
 		public ClientPlayerInputHandler(SoulboundClient client) {
 			this.client = client;
@@ -52,8 +56,21 @@ namespace SoulboundEngine.Client {
 		}
 
 		private void HandleMouseClicks(PlayerEntity player) {
-			player.SetHoldingLeft(this.client.InputManager.mouse.isLeftPressed);
-			player.SetHoldingRight(this.client.InputManager.mouse.isRightPressed);
+			bool previouslyHoldingLeft = this.isHoldingLeft;
+			this.isHoldingLeft = this.client.InputManager.mouse.isLeftPressed;
+			this.startedHoldingLeftThisTick = !previouslyHoldingLeft && this.isHoldingLeft;
+			player.SetHoldingLeft(!this.startedHoldingLeftThisTick && this.isHoldingLeft);
+			if (this.startedHoldingLeftThisTick) {
+				player.OnLeftClick();
+			}
+
+			bool preivouslyHoldingRight = this.isHoldingRight;
+			this.isHoldingRight = this.client.InputManager.mouse.isRightPressed;
+			this.startedHoldingRightThisTick = !preivouslyHoldingRight && this.isHoldingRight;
+			player.SetHoldingRight(!this.startedHoldingRightThisTick && this.isHoldingRight);
+			if (this.startedHoldingRightThisTick) {
+				player.OnRightClick();
+			}
 		}
 
 		private void HandleMovement(PlayerEntity player) {
