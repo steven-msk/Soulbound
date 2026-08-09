@@ -180,23 +180,21 @@ namespace SoulboundEngine.Client {
 		}
 
 		private void HandleInputTick() {
+			if (this.activeWorldSession is { } worldSession) {
+				PlayerEntity player = worldSession.level.GetPlayer();
+				this.clientPlayerInputHandler.Handle(player,
+					shouldBlockKeyboardActions: this.uiHandler.HasKeyboardFocus(),
+					shouldBlockMouse: this.uiHandler.IsPointerOverUI()
+				);
+
+				if (!this.uiHandler.HasKeyboardFocus() && this.inputManager.keyboard.WasPressed(Keyboard.GetControl(Key.Escape))) {
+					worldSession.levelManager.TogglePause();
+				}
+			}
 			this.metricsHud.Tick();
 			this.commandLine.Tick();
 			this.logConsole.Tick();
 
-			// gate gameplay by current screen focus
-			if (this.uiHandler.HasKeyboardFocus()) {
-				return;
-			}
-
-			if (this.activeWorldSession is { } worldSession) {
-				PlayerEntity player = worldSession.level.GetPlayer();
-				this.clientPlayerInputHandler.Handle(player);
-
-				if (this.inputManager.keyboard.WasPressed(Keyboard.GetControl(Key.Escape))) {
-					worldSession.levelManager.TogglePause();
-				}
-			}
 		}
 
 		public IScreenHandle OpenScreen(Screen screen) {
@@ -207,13 +205,8 @@ namespace SoulboundEngine.Client {
 			this.uiHandler.PopScreen(handle);
 		}
 
-		public void SetInputFocus(IInputFocusable focus) {
-			this.uiHandler.SetInputFocus(focus);
-		}
-
-		public void ClearInputFocus() {
-			this.uiHandler.SetInputFocus(null);
-		}
+		public void PushInputFocus(IInputFocusable focus) => this.uiHandler.PushInputFocus(focus);
+		public void PopInputFocus(IInputFocusable focus) => this.uiHandler.PopInputFocus(focus);
 
 		public void CreateNewWorld(string world, int seed) {
 			if (this.config.dev.overrideSaves) {

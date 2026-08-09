@@ -55,7 +55,6 @@ namespace SoulboundEngine.Client.Debug {
 		internal void Tick() {
 			if (GameSettings.keybinds.enterCommand.WasPressed()) {
 				this.Show();
-				//this.player?.StopHorizontalMovement();
 			}
 			if (this.isVisible && this.client.InputManager.keyboard.WasPressed(Keyboard.GetControl(Key.Escape))) {
 				this.Hide();
@@ -81,7 +80,7 @@ namespace SoulboundEngine.Client.Debug {
 		public override void Show() {
 			base.Show();
 			this.textField.value = "/";
-			this.client.SetInputFocus(this);
+			this.client.PushInputFocus(this);
 
 			this.GrabFocus();
 			this.SetCaretToEnd();
@@ -93,7 +92,7 @@ namespace SoulboundEngine.Client.Debug {
 		public override void Hide() {
 			base.Hide();
 			this.textField.value = "/";
-			this.client.ClearInputFocus();
+			this.client.PopInputFocus(this);
 		}
 
 		private void HandleKeyEvent(KeyDownEvent evt) {
@@ -106,10 +105,7 @@ namespace SoulboundEngine.Client.Debug {
 		private void HandleKey(KeyCode key) {
 			if (!this.isVisible) return;
 
-			if (key is KeyCode.Escape) {
-				this.Hide();
-				return;
-			}
+			if (key is KeyCode.Escape) return;
 
 			if (key is KeyCode.Return or KeyCode.KeypadEnter) {
 				string command = this.textField.value;

@@ -25,9 +25,8 @@ namespace SoulboundEngine.Client.UI {
 		public bool HasKeyboardFocus() => this.screenManager.HasKeyboardFocus();
 		public bool IsPointerOverUI() => this.screenManager.IsPointerOverUI();
 
-		public void SetInputFocus(IInputFocusable? focus) {
-			this.screenManager.SetInputFocus(focus);
-		}
+		public void PushInputFocus(IInputFocusable focus) => this.screenManager.PushInputFocus(focus);
+		public void PopInputFocus(IInputFocusable focus) => this.screenManager.PopInputFocus(focus);
 
 		public void FlushScreens() => this.screenManager.Flush();
 	}

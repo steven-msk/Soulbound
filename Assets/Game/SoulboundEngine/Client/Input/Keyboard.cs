@@ -56,6 +56,13 @@ namespace SoulboundEngine.Client.Input {
 			KeyBinding.SetKeyPressed(key, false);
 		}
 
+		public static void ReleaseAll() {
+			foreach (var key in KEY_BY_CONTROL.Values) {
+				key.SetPressed(false);
+			}
+			KeyBinding.ReleaseAll();
+		}
+
 		public InputKey GetKey(KeyControl control) {
 			return KEY_BY_CONTROL[control];
 		}

@@ -43,10 +43,10 @@ namespace SoulboundEngine.Client.Debug.Logging.Console {
 			if (GameSettings.keybinds.toggleLogConsole.WasPressed()) {
 				if (!this.isVisible) {
 					this.Show();
-					this.client.SetInputFocus(this);
+					this.client.PushInputFocus(this);
 				} else {
 					this.Hide();
-					this.client.ClearInputFocus();
+					this.client.PopInputFocus(this);
 				}
 			}
 		}

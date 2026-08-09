@@ -1,4 +1,5 @@
 using SoulboundEngine.Client.Debug.Logging;
+using SoulboundEngine.Client.Input;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.UIElements;
@@ -9,7 +10,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 	public sealed class ScreenManager {
 		private readonly List<ScreenEntry> stack = new();
 		private readonly UXMLScreenRoot screenRoot;
-		private IInputFocusable? targetFocus;
+		private readonly Stack<IInputFocusable> focusStack = new();
 
 		public ScreenManager(UXMLScreenRoot screenRoot) {
 			this.screenRoot = screenRoot;
@@ -91,12 +92,23 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 		public bool IsPointerOverUI() => this.GetCurrentFocus()?.IsPointerOverUI() ?? false;
 
-		public IInputFocusable? GetCurrentFocus() {
-			return this.targetFocus ?? this.stack.FirstOrDefault()?.screen;
+		public void PopInputFocus(IInputFocusable focus) {
+			if (this.focusStack.TryPeek(out var top) && ReferenceEquals(top, focus)) {
+				this.focusStack.Pop();
+			} else {
+				IInputFocusable[] remaining = this.focusStack.Where(f => !ReferenceEquals(f, focus)).Reverse().ToArray();
+				this.focusStack.Clear();
+				foreach (var f in remaining) this.focusStack.Push(f);
+			}
 		}
 
-		public void SetInputFocus(IInputFocusable? focus) {
-			this.targetFocus = focus;
+		public void PushInputFocus(IInputFocusable focus) {
+			this.focusStack.Push(focus);
+			Keyboard.ReleaseAll();
+		}
+
+		public IInputFocusable? GetCurrentFocus() {
+			return this.focusStack.TryPeek(out var top) ? top : this.stack.FirstOrDefault()?.screen;
 		}
 
 		public void IssueRebuild(Screen screen) {

@@ -76,5 +76,11 @@ namespace SoulboundEngine.Client.Input {
 				binding.timesPressed = 0;
 			}
 		}
+
+		public static void ReleaseAll() {
+			foreach (var binding in ID_TO_BINDING.Values) {
+				binding.SetPressed(false);
+			}
+		}
 	}
 }

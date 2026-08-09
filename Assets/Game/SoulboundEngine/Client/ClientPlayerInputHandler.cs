@@ -21,14 +21,21 @@ namespace SoulboundEngine.Client {
 			this.client = client;
 		}
 
-		public void Handle(PlayerEntity player) {
-			this.CheckHotbarKeyPressed(player);
-			this.DoHotbarScroll(player);
+		public void Handle(PlayerEntity player, bool shouldBlockKeyboardActions, bool shouldBlockMouse) {
 			this.UpdateScreenPointerPos(player);
-			this.HandleMouseClicks(player);
-			this.HandleMovement(player);
-			this.HandleStackThrow(player);
-			this.HandleInventoryToggle(player);
+
+			if (!shouldBlockMouse) {
+				this.HandleMouseClicks(player);
+				this.DoHotbarScroll(player);
+			}
+
+			if (!shouldBlockKeyboardActions) {
+				this.HandleJump(player);
+				this.HandleMovement(player);
+				this.CheckHotbarKeyPressed(player);
+				this.HandleStackThrow(player);
+				this.HandleInventoryToggle(player);
+			}
 		}
 
 		private void CheckHotbarKeyPressed(PlayerEntity player) {
@@ -78,6 +85,9 @@ namespace SoulboundEngine.Client {
 			if (GameSettings.keybinds.moveLeft.IsPressed()) movementX -= 1f;
 			if (GameSettings.keybinds.moveRight.IsPressed()) movementX += 1f;
 			player.SetNormalVelocityX(movementX);
+		}
+
+		private void HandleJump(PlayerEntity player) {
 			player.SetJumping(GameSettings.keybinds.jump.IsPressed());
 		}
 
