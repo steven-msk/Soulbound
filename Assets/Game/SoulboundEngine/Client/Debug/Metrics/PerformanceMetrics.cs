@@ -20,7 +20,7 @@ namespace SoulboundEngine.Client.Debug.Metrics {
 		public float GPUManagedMemoryMB => Profiler.GetAllocatedMemoryForGraphicsDriver() / 1024f / 1024f;
 		public float GPUReservedMemoryMB => SystemInfo.graphicsMemorySize;
 
-		public void Tick() {
+		public void Update() {
 			InstantFps = 1f / Time.unscaledDeltaTime;
 			FrameTime = Time.unscaledDeltaTime * 1000f;
 			FixedUpdateTime = Time.fixedUnscaledDeltaTime * 1000f;

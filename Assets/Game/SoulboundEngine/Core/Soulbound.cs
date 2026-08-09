@@ -13,7 +13,8 @@ using UnityEngine;
 using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 namespace SoulboundEngine.Core {
-	public sealed class Soulbound : IApplicationController {
+	public sealed class Soulbound {
+		public const float TICK_RATE = 1f / SharedConstants.TICKS_PER_SECOND;
 		private static Soulbound instance;
 		private static readonly Logger loggerInstance = new(UnityEngine.Debug.unityLogger);
 		public static readonly JsonSerializerSettings globalJsonSettings = new() {
@@ -26,8 +27,9 @@ namespace SoulboundEngine.Core {
 			},
 		};
 		private bool running;
+		private float tickStartTime;
 		private readonly SoulboundClient client;
-		private readonly GameConfig config;
+		public readonly GameConfig config;
 
 		public Soulbound(GameConfig config) {
 			instance = this;
@@ -53,38 +55,65 @@ namespace SoulboundEngine.Core {
 			} catch (InvalidOperationException) {
 			}
 
-			Application.quitting += ((IApplicationController)this).OnApplicationQuit;
-
-			UniTask.Post(async () => {
-				this.client.Start();
-
-				while (this.running) {
-					await UniTask.NextFrame();
-					try {
-						this.Update();
-					} catch (Exception e) {
-						// TODO: custom crash handling
-						Logger.LogFatal(e);
-#if UNITY_EDITOR
-						EditorApplication.isPlaying = false;
-#else
-						Environment.FailFast("Uncaught exception in update loop", e);
-#endif
-					}
-				}
-			});
+			Application.quitting += this.OnApplicationQuit;
 
 			this.running = true;
+			this.client.Start();
+			UniTask.Post(this.UpdateLoop);
+			UniTask.Post(this.TickLoop);
+
 			GameStateManager.SetRunning();
 		}
 
-		public void Update() {
-			this.client.Update();
+		private async void UpdateLoop() {
+			while (this.running) {
+				try {
+					this.client.Update();
+				} catch (Exception e) {
+					// TODO: custom crash handling
+					Logger.LogFatal(e);
+#if UNITY_EDITOR
+					EditorApplication.isPlaying = false;
+#else
+					Environment.FailFast("Uncaught exception in update loop", e);
+#endif
+				}
+				await UniTask.NextFrame();
+			}
+		}
+
+		private async void TickLoop() {
+			while (this.running) {
+				try {
+					this.StartTick();
+					this.client.Tick();
+					this.EndTick();
+				} catch (Exception e) {
+					Logger.LogFatal(e);
+#if UNITY_EDITOR
+					EditorApplication.isPlaying = false;
+#else
+					Environment.FailFast("Uncaught exception in tick loop", e);
+#endif
+				}
+				await UniTask.WaitForSeconds(TICK_RATE, true);
+			}
+		}
+
+		private void StartTick() {
+			this.tickStartTime = Time.realtimeSinceStartup;
+		}
+
+		private void EndTick() {
+			float elapsed = Time.realtimeSinceStartup - this.tickStartTime;
+			if (elapsed > SharedConstants.TICKS_PER_SECOND) {
+				Logger.LogWarning($"Tick lag detected! Tick took {elapsed * 1000f:F1} ms");
+			}
 		}
 
 		public void CloseGame() => Application.Quit();
 
-		void IApplicationController.OnApplicationQuit() {
+		private void OnApplicationQuit() {
 			GameStateManager.SetShutdown();
 
 			this.client.Shutdown();

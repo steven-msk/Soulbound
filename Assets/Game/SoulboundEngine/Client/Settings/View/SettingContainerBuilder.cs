@@ -22,29 +22,29 @@ namespace SoulboundEngine.Client.Settings.View {
 		}
 
 		public GameObject ConstructContainer() {
-			if (container != null) {
-				throw new InvalidOperationException($"Setting container already constructed for setting '{entry}'");
+			if (this.container != null) {
+				throw new InvalidOperationException($"Setting container already constructed for setting '{this.entry}'");
 			}
 			this.container = new("Setting Container", typeof(RectTransform), typeof(HorizontalLayoutGroup), typeof(ContentSizeFitter));
-			container.transform.SetParent(group.transform, false);
-			var layout = container.GetComponent<HorizontalLayoutGroup>();
+			this.container.transform.SetParent(this.group.transform, false);
+			var layout = this.container.GetComponent<HorizontalLayoutGroup>();
 			layout.spacing = DEFAULT_HORIZONTAL_SPACING;
 			layout.childControlWidth = layout.childControlHeight = false;
 			layout.childForceExpandWidth = layout.childForceExpandHeight = false;
 			layout.childScaleWidth = layout.childScaleHeight = true;
 			layout.childAlignment = TextAnchor.MiddleLeft;
-			var sizeFitter = container.GetComponent<ContentSizeFitter>();
+			var sizeFitter = this.container.GetComponent<ContentSizeFitter>();
 			sizeFitter.horizontalFit = sizeFitter.verticalFit = DEFAULT_FIT_MODE;
 
 			this.nameObject = new("Name", typeof(RectTransform), typeof(TextMeshProUGUI));
-			nameObject.transform.SetParent(container.transform, false);
-			TextMeshProUGUI name = nameObject.GetComponent<TextMeshProUGUI>();
+			this.nameObject.transform.SetParent(this.container.transform, false);
+			TextMeshProUGUI name = this.nameObject.GetComponent<TextMeshProUGUI>();
 			name.fontSize = 15f;
 			name.alignment = TextAlignmentOptions.MidlineRight;
 			name.autoSizeTextContainer = true;
-			name.SetText($"{entry.displayName}:");
+			name.SetText($"{this.entry.id}:");
 
-			return container;
+			return this.container;
 		}
 	}
 }

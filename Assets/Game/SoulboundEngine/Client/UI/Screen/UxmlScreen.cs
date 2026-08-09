@@ -68,12 +68,15 @@ namespace SoulboundEngine.Client.UI.Screen {
 			this.tooltip.style.top = pos.y;
 		}
 
+		public override bool IsPointerOverUI() => false;
+
+		public override bool HasKeyboardFocus() => false;
+
 		public override void OnDispose(IScreenHandle handle) {
 			foreach (var widget in this.widgets) {
 				widget.Dispose();
 			}
 			this.root.UnregisterCallback<MouseMoveEvent>(this.OnMouseMoved, TrickleDown.TrickleDown);
 		}
-
 	}
 }

@@ -2,7 +2,7 @@ using SoulboundEngine.Common;
 using System;
 
 namespace SoulboundEngine.Client.UI.Screen {
-	public abstract class Screen {
+	public abstract class Screen : IInputFocusable {
 		private ScreenManager screenManager;
 		protected ScreenManager ScreenManager { get => this.screenManager ?? throw new InvalidOperationException("Screen is not initialized"); }
 
@@ -24,5 +24,11 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 		[PROTOTYPICAL] public abstract void SetTooltip(string text);
 		[PROTOTYPICAL] public abstract void ClearTooltip();
+
+		public abstract bool IsPointerOverUI();
+		public abstract bool HasKeyboardFocus();
+
+		public virtual void Tick() {
+		}
 	}
 }
