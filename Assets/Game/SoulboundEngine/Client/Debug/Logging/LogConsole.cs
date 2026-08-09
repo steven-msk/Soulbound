@@ -1,6 +1,7 @@
 using SoulboundEngine.Client.Settings;
 using SoulboundEngine.Client.UI;
 using SoulboundEngine.Client.UI.UXMLBindings;
+using SoulboundEngine.Core.Assets;
 using SoulboundEngine.Core.Registry;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +30,11 @@ namespace SoulboundEngine.Client.Debug.Logging.Console {
 			Application.logMessageReceivedThreaded += (condition, stackTrace, logType) => {
 				this.EnqueueLog(new LogEntry(condition, stackTrace, logType));
 			};
+		}
+
+		public static void CreateRoot(VisualElement parent) {
+			VisualTreeAsset asset = AssetManager.Resolve<VisualTreeAsset>(new AssetKey("LogConsole"));
+			asset.CloneTree(parent);
 		}
 
 		public override void OnBind(VisualElement root) {

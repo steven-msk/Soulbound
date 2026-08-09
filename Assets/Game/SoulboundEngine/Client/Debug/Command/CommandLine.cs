@@ -4,6 +4,7 @@ using SoulboundEngine.Client.Debug.Commands;
 using SoulboundEngine.Client.Settings;
 using SoulboundEngine.Client.UI;
 using SoulboundEngine.Client.UI.UXMLBindings;
+using SoulboundEngine.Core.Assets;
 using SoulboundEngine.Core.Registry;
 using System;
 using System.Collections.Generic;
@@ -31,6 +32,11 @@ namespace SoulboundEngine.Client.Debug {
 		public CommandLine(CommandProcessor commandProcessor, SoulboundClient client) {
 			this.client = client;
 			this.commandProcessor = commandProcessor;
+		}
+
+		public static void CreateRoot(VisualElement parent) {
+			VisualTreeAsset asset = AssetManager.Resolve<VisualTreeAsset>(new AssetKey("CommandLine"));
+			asset.CloneTree(parent);
 		}
 
 		public override void OnBind(VisualElement root) {

@@ -1,3 +1,6 @@
+using SoulboundEngine.Client.Debug;
+using SoulboundEngine.Client.Debug.Logging.Console;
+using SoulboundEngine.Client.Debug.Metrics.View;
 using SoulboundEngine.Client.UI.Screen;
 using UnityEngine.UIElements;
 
@@ -5,18 +8,42 @@ using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.UI {
 	public sealed class UIHandler {
-		private ScreenManager screenManager;
-		private UXMLScreenRoot screenRoot;
+		private ScreenManager screenManager = null!;
+		private UXMLScreenRoot screenRoot = null!;
+		private readonly CommandLine commandLine;
+		private readonly LogConsole logConsole;
+		private readonly MetricsHUD metricsHud;
 
-		public UIHandler(UIDocument uiDocument) {
-			this.screenRoot = new UXMLScreenRoot(uiDocument);
-			this.screenManager = new ScreenManager(this.screenRoot);
+		public UIHandler(CommandLine commandLine, LogConsole logConsole, MetricsHUD metricsHud) {
+			this.commandLine = commandLine;
+			this.logConsole = logConsole;
+			this.metricsHud = metricsHud;
 		}
 
 		public void SetUIDocument(UIDocument uiDocument) {
+			if (this.screenRoot != null) {
+				this.commandLine.Dispose();
+				this.logConsole.Dispose();
+				this.metricsHud.Dispose();
+				this.screenManager.Flush();
+			}
 			this.screenRoot = new UXMLScreenRoot(uiDocument);
-			this.screenManager.Flush();
 			this.screenManager = new ScreenManager(this.screenRoot);
+
+			VisualElement commandLineElement = this.screenManager.CreateScreenRoot();
+			CommandLine.CreateRoot(commandLineElement);
+			this.screenRoot.Attach(commandLineElement);
+			this.commandLine.OnBind(commandLineElement);
+
+			VisualElement logConsoleElement = this.screenManager.CreateScreenRoot();
+			LogConsole.CreateRoot(logConsoleElement);
+			this.screenRoot.Attach(logConsoleElement);
+			this.logConsole.OnBind(logConsoleElement);
+
+			VisualElement metricsHudElement = this.screenManager.CreateScreenRoot();
+			MetricsHUD.CreateRoot(metricsHudElement);
+			this.screenRoot.Attach(metricsHudElement);
+			this.metricsHud.OnBind(metricsHudElement);
 		}
 
 		public IScreenHandle PushScreen(Screen.Screen screen) => this.screenManager.PushScreen(screen);

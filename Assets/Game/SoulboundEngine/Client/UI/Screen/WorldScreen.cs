@@ -1,6 +1,3 @@
-using SoulboundEngine.Client.Debug;
-using SoulboundEngine.Client.Debug.Logging.Console;
-using SoulboundEngine.Client.Debug.Metrics.View;
 using SoulboundEngine.Client.Item.Container;
 using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.Render.Item;
@@ -11,23 +8,14 @@ using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.UI.Screen {
 	public sealed class WorldScreen : UXMLScreen {
-		private static readonly Identifier COMMAND_LINE_ELEMENT = Identifier.Of("soulbound:world_screen/command_line");
-		private static readonly Identifier METRICS_HUD_ELEMENT = Identifier.Of("soulbound:world_screen/metrics_hud");
-		private static readonly Identifier LOG_CONSOLE_ELEMENT = Identifier.Of("soulbound:world_screen/log_console");
 		private static readonly Identifier HOTBAR_ELEMENT = Identifier.Of("soulbound:hotbar/hotbar");
 		private readonly ItemRenderManager itemRenderManager;
-		private readonly CommandLine commandLine;
-		private readonly MetricsHUD metricsHUD;
-		private readonly LogConsole logConsole;
 		private readonly PlayerInventory playerInventory;
 		private UXMLHotbarSlotDisplay[] hotbarDisplays;
 		private VisualElement hotbarRoot;
 
-		public WorldScreen(PlayerInventory playerInventory, CommandLine commandLine, MetricsHUD metricsHUD, LogConsole logConsole, ItemRenderManager itemRenderManager)
+		public WorldScreen(PlayerInventory playerInventory, ItemRenderManager itemRenderManager)
 			: base(AssetManager.Resolve<VisualTreeAsset>(new AssetKey("WorldScreen"))) {
-			this.commandLine = commandLine;
-			this.metricsHUD = metricsHUD;
-			this.logConsole = logConsole;
 			this.playerInventory = playerInventory;
 			this.itemRenderManager = itemRenderManager;
 		}
@@ -35,10 +23,6 @@ namespace SoulboundEngine.Client.UI.Screen {
 		public override bool CloseOnEsc => false;
 
 		protected override void OnBind(VisualElement root) {
-			this.commandLine.OnBind(root.Get<VisualElement>(COMMAND_LINE_ELEMENT));
-			this.metricsHUD.OnBind(root.Get<VisualElement>(METRICS_HUD_ELEMENT));
-			this.logConsole.OnBind(root.Get<VisualElement>(LOG_CONSOLE_ELEMENT));
-
 			this.hotbarRoot = root.Get<VisualElement>(HOTBAR_ELEMENT);
 			this.BindHotbar(this.hotbarRoot);
 		}
@@ -81,7 +65,6 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 		public override void OnDispose(IScreenHandle handle) {
 			base.OnDispose(handle);
-			this.commandLine.Dispose();
 
 			for (int i = 0; i < this.hotbarDisplays.Length; i++) {
 				this.hotbarDisplays[i].Dispose();

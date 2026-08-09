@@ -13,8 +13,8 @@ namespace SoulboundEngine.Client.UI.Screen {
 			this.root = document.rootVisualElement.Get<VisualElement>(ROOT_LAYER_ELEMENT);
 		}
 
-		public void Attach(VisualElement screenRoot) {
-			this.root.Add(screenRoot);
+		public void Attach(VisualElement element) {
+			this.root.Add(element);
 		} 
 
 		void IScreenRoot.AttachScreenObject(GameObject screenObject) {

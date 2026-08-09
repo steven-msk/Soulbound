@@ -1,5 +1,6 @@
 using SoulboundEngine.Client.Settings;
 using SoulboundEngine.Client.UI;
+using SoulboundEngine.Core.Assets;
 using SoulboundEngine.Core.Registry;
 using System;
 using UnityEngine.UIElements;
@@ -21,6 +22,11 @@ namespace SoulboundEngine.Client.Debug.Metrics.View {
 		public MetricsHUD(DebugMetricsService metricsService, SoulboundClient client) {
 			this.metricsService = metricsService;
 			this.client = client;
+		}
+
+		public static void CreateRoot(VisualElement parent) {
+			VisualTreeAsset asset = AssetManager.Resolve<VisualTreeAsset>(new AssetKey("MetricsHUD"));
+			asset.CloneTree(parent);
 		}
 
 		public override void OnBind(VisualElement root) {

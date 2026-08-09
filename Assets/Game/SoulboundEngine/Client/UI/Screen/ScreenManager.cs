@@ -45,7 +45,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 			buffer.ForEach(e => e.handle.Show());
 		}
 
-		private VisualElement CreateScreenRoot() {
+		public VisualElement CreateScreenRoot() {
 			VisualElement root = new() {
 				name = "ScreenRoot",
 			};

@@ -94,6 +94,10 @@ namespace SoulboundEngine.Client {
 			this.clientPlayerInputHandler = new ClientPlayerInputHandler(this);
 			this.settings = new GameSettings();
 
+			File savesFile = UnityPaths.PersistentDataRoot.Combine(SAVES_ROOT_FOLDER);
+			this.worldSavesManager = new WorldSavesManager(savesFile, WorldSerializer.SEED_FILE_NAME);
+			this.worldSerializer = new WorldSerializer();
+
 			this.debugMetricsService = new DebugMetricsService();
 			this.performanceMetrics = new PerformanceMetrics();
 			this.RegisterDebugMetricsSource(this);
@@ -105,6 +109,7 @@ namespace SoulboundEngine.Client {
 			this.commandLine = new CommandLine(this.commandProcessor, this);
 			this.metricsHud = new MetricsHUD(this.debugMetricsService, this);
 			this.logConsole = new LogConsole(this);
+			this.uiHandler = new UIHandler(this.commandLine, this.logConsole, this.metricsHud);
 #if !UNITY_EDITOR
 			Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
 			Application.SetStackTraceLogType(LogType.Warning, StackTraceLogType.None);
@@ -112,14 +117,6 @@ namespace SoulboundEngine.Client {
 			Application.SetStackTraceLogType(LogType.Exception, StackTraceLogType.ScriptOnly);
 			Application.SetStackTraceLogType(LogType.Assert, StackTraceLogType.None);
 #endif
-
-			File savesFile = UnityPaths.PersistentDataRoot.Combine(SAVES_ROOT_FOLDER);
-			this.worldSavesManager = new WorldSavesManager(savesFile, WorldSerializer.SEED_FILE_NAME);
-			this.worldSerializer = new WorldSerializer();
-
-			// scene may not be available at this time
-			// TODO: change UIHandler init
-			this.uiHandler = new UIHandler(Object.FindFirstObjectByType<UIDocument>());
 
 			this.uiAudioEventBank = new UIAudioEventBank();
 			this.worldAudioEventBank = new WorldAudioEventBank();
@@ -142,6 +139,9 @@ namespace SoulboundEngine.Client {
 		/// Called once when the game is launched
 		/// </summary>
 		internal void Start() {
+			// not safe UIDocument resolution
+			// TODO: rework UIHandler init with UIDocument resolution
+			this.uiHandler.SetUIDocument(Object.FindFirstObjectByType<UIDocument>());
 			this.uiHandler.PushScreen(new TitleScreen(this));
 			this.inputManager.Enable();
 		}
@@ -238,7 +238,7 @@ namespace SoulboundEngine.Client {
 
 				this.activeWorldSession = session;
 				this.uiHandler.SetUIDocument(session.uiDocument);
-				this.activeWorldScreen = new WorldScreen(this.player.GetInventory(), this.commandLine, this.metricsHud, this.logConsole, this.itemRenderManager);
+				this.activeWorldScreen = new WorldScreen(this.player.GetInventory(), this.itemRenderManager);
 				this.uiHandler.PushScreen(this.activeWorldScreen);
 				this.debugOverlayManager.Clear();
 
