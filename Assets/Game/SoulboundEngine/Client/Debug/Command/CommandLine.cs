@@ -1,6 +1,7 @@
 using Brigadier.NET.Suggestion;
 using Cysharp.Threading.Tasks;
 using SoulboundEngine.Client.Debug.Commands;
+using SoulboundEngine.Client.Settings;
 using SoulboundEngine.Client.UI;
 using SoulboundEngine.Client.UI.UXMLBindings;
 using SoulboundEngine.Core.Registry;
@@ -8,11 +9,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
+using Keyboard = SoulboundEngine.Client.Input.Keyboard;
 using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 namespace SoulboundEngine.Client.Debug {
-	public sealed class CommandLine : UXMLWidget, IDisposable {
+	public sealed class CommandLine : UXMLWidget, IInputFocusable {
 		private static readonly Identifier TEXT_FIELD_ELEMENT = Identifier.Of("soulbound:command_line/text_field");
 		private static readonly Identifier COMPLETION_LIST_ELEMENT = Identifier.Of("soulbound:command_line/completion_list");
 		private static readonly Identifier SUGGESTION_TEXT_ELEMENT = Identifier.Of("soulbound:command_suggestion/suggestion_text");
@@ -21,12 +24,12 @@ namespace SoulboundEngine.Client.Debug {
 		private readonly CommandProcessor commandProcessor;
 		private readonly List<string> history = new();
 		private readonly CompletionManager completionManager = new();
-		private readonly SoulboundClient.DebugOverlayManager debugOverlayManager;
+		private readonly SoulboundClient client;
 		private CommandInputMode currentInputMode;
 		private int historyIndex;
 
-		public CommandLine(CommandProcessor commandProcessor, SoulboundClient.DebugOverlayManager debugOverlayManager) {
-			this.debugOverlayManager = debugOverlayManager;
+		public CommandLine(CommandProcessor commandProcessor, SoulboundClient client) {
+			this.client = client;
 			this.commandProcessor = commandProcessor;
 		}
 
@@ -49,6 +52,16 @@ namespace SoulboundEngine.Client.Debug {
 			this.completionList.itemsChosen += this.OnCompletionChosen;
 		}
 
+		internal void Tick() {
+			if (GameSettings.keybinds.enterCommand.WasPressed()) {
+				this.Show();
+				//this.player?.StopHorizontalMovement();
+			}
+			if (this.isVisible && this.client.InputManager.keyboard.WasPressed(Keyboard.GetControl(Key.Escape))) {
+				this.Hide();
+			}
+		}
+
 		private void RegisterCaretChanged(Action<int> callback) {
 			int lastCursor = this.textField.cursorIndex;
 
@@ -68,6 +81,7 @@ namespace SoulboundEngine.Client.Debug {
 		public override void Show() {
 			base.Show();
 			this.textField.value = "/";
+			this.client.SetInputFocus(this);
 
 			this.GrabFocus();
 			this.SetCaretToEnd();
@@ -79,7 +93,7 @@ namespace SoulboundEngine.Client.Debug {
 		public override void Hide() {
 			base.Hide();
 			this.textField.value = "/";
-			this.debugOverlayManager.Hide(SoulboundClient.DebugOverlayFeature.CommandLine);
+			this.client.ClearInputFocus();
 		}
 
 		private void HandleKeyEvent(KeyDownEvent evt) {
@@ -208,9 +222,12 @@ namespace SoulboundEngine.Client.Debug {
 			this.textField.selectIndex = end;
 		}
 
-		public void Dispose() {
+		public override void Dispose() {
 			this.textField.UnregisterCallback<KeyDownEvent>(this.HandleKeyEvent, TrickleDown.TrickleDown);
 			this.completionList.itemsChosen -= this.OnCompletionChosen;
 		}
+
+		bool IInputFocusable.HasKeyboardFocus() => true;
+		bool IInputFocusable.IsPointerOverUI() => true;
 	}
 }

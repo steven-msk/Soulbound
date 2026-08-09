@@ -102,9 +102,9 @@ namespace SoulboundEngine.Client {
 			this.worldSessionCommands = new WorldSessionCommands();
 			this.commandProcessor = new CommandProcessor(this.runtimeDataProvider, this.runtimeExecutionServices);
 			this.debugOverlayManager = new DebugOverlayManager(this);
-			this.commandLine = new CommandLine(this.commandProcessor, this.debugOverlayManager);
-			this.metricsHud = new MetricsHUD(this.debugMetricsService);
-			this.logConsole = new LogConsole();
+			this.commandLine = new CommandLine(this.commandProcessor, this);
+			this.metricsHud = new MetricsHUD(this.debugMetricsService, this);
+			this.logConsole = new LogConsole(this);
 #if !UNITY_EDITOR
 			Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
 			Application.SetStackTraceLogType(LogType.Warning, StackTraceLogType.None);
@@ -180,58 +180,14 @@ namespace SoulboundEngine.Client {
 		}
 
 		private void HandleInputTick() {
-			if (GameSettings.keybinds.toggleDebugMetrics.WasPressed()) {
-				if (!this.metricsHud.isVisible && this.debugOverlayManager.TryShow(DebugOverlayFeature.MetricsHUD)) {
-					this.metricsHud.Show();
-					this.worldRenderer.ShowChunkFeatures();
-				} else if (this.metricsHud.isVisible) {
-					this.metricsHud.Hide();
-					this.worldRenderer.HideChunkFeatures();
-					this.debugOverlayManager.Hide(DebugOverlayFeature.MetricsHUD);
-				}
+			this.metricsHud.Tick();
+			this.commandLine.Tick();
+			this.logConsole.Tick();
+
+			// gate gameplay by current screen focus
+			if (this.uiHandler.HasKeyboardFocus()) {
+				return;
 			}
-
-			if (GameSettings.keybinds.enterCommand.WasPressed()) {
-				if (this.debugOverlayManager.TryShow(DebugOverlayFeature.CommandLine)) {
-					this.commandLine.Show();
-					this.player?.StopHorizontalMovement();
-				}
-			}
-
-			if (GameSettings.keybinds.toggleLogConsole.WasPressed()) {
-				if (!this.logConsole.isVisible && this.debugOverlayManager.TryShow(DebugOverlayFeature.Console)) {
-					this.logConsole.Show();
-				} else if (this.logConsole.isVisible) {
-					this.logConsole.Hide();
-					this.debugOverlayManager.Hide(DebugOverlayFeature.Console);
-				}
-			}
-
-
-			// screen input prioritization goes here
-			// TODO: implement screen input rewiring
-
-			//IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {
-			//	static InputEventListener ConsumeWhenOverGameObject(InputToken token) {
-			//		return InputEventListener.Performed(token, _ => {
-			//			return EventSystem.current.IsPointerOverGameObject()
-			//				? InputHandleResult.Consume
-			//				: InputHandleResult.Pass;
-			//		});
-			//	}
-
-			//	return new InputEventListener[] {
-			//		ConsumeWhenOverGameObject(InputTokens.Mouse.leftClick),
-			//		ConsumeWhenOverGameObject(InputTokens.Mouse.rightClick),
-			//		ConsumeWhenOverGameObject(InputTokens.Mouse.position),
-
-			//		InputEventListener.ConsumePerformed(InputTokens.Keyboard.ESC, _ => {
-			//			if (this.screenManager.GetActiveScreen()?.CloseOnEsc ?? false) {
-			//				this.screenManager.PopTopScreen();
-			//			}
-			//		})
-			//	};
-			//}
 
 			if (this.activeWorldSession is { } worldSession) {
 				PlayerEntity player = worldSession.level.GetPlayer();
@@ -249,6 +205,14 @@ namespace SoulboundEngine.Client {
 
 		public void CloseScreen(IScreenHandle handle) {
 			this.uiHandler.PopScreen(handle);
+		}
+
+		public void SetInputFocus(IInputFocusable focus) {
+			this.uiHandler.SetInputFocus(focus);
+		}
+
+		public void ClearInputFocus() {
+			this.uiHandler.SetInputFocus(null);
 		}
 
 		public void CreateNewWorld(string world, int seed) {
@@ -335,6 +299,11 @@ namespace SoulboundEngine.Client {
 
 		public bool IsWorldSessionActive() => this.activeWorldSession != null;
 
+		public void ShowChunkFeatures(bool showChunkFeatures) {
+			if (showChunkFeatures) this.worldRenderer.ShowChunkFeatures();
+			else this.worldRenderer.HideChunkFeatures();
+		}
+
 		void IDebugMetricsSource.CollectDebugData(ref DebugMetricsBuilder builder) {
 			PerformanceMetrics metrics = this.performanceMetrics;
 			builder.Add(DebugMetricId.Fps, metrics.InstantFps);
@@ -390,8 +359,6 @@ namespace SoulboundEngine.Client {
 
 		public static SoulboundClient Instance => instance;
 		public InputManager InputManager => this.inputManager;
-		[Obsolete]
-		public UIHandler UIHandler => this.uiHandler;
 		public ItemRenderManager ItemRenderManager => this.itemRenderManager;
 		public RecipeManager RecipeManager => this.recipeManager;
 		public PerformanceMetrics PerformanceMetrics => this.performanceMetrics;

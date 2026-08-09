@@ -1,3 +1,4 @@
+using SoulboundEngine.Client.Settings;
 using SoulboundEngine.Client.UI;
 using SoulboundEngine.Core.Registry;
 using System;
@@ -15,14 +16,28 @@ namespace SoulboundEngine.Client.Debug.Metrics.View {
 		private readonly AverageFrameCounter fpsCounter = new(10);
 		private readonly AverageFrameCounter frameTimeCounter = new(10);
 		private MetricBinding[] metrics = Array.Empty<MetricBinding>();
+		private readonly SoulboundClient client;
 
-		public MetricsHUD(DebugMetricsService metricsService) {
+		public MetricsHUD(DebugMetricsService metricsService, SoulboundClient client) {
 			this.metricsService = metricsService;
+			this.client = client;
 		}
 
 		public override void OnBind(VisualElement root) {
 			base.OnBind(root);
 			this.metrics = this.CreateMetricBindings(root);
+		}
+
+		internal void Tick() {
+			if (GameSettings.keybinds.toggleDebugMetrics.WasPressed()) {
+				if (!this.isVisible) {
+					this.Show();
+					this.client.ShowChunkFeatures(true);
+				} else {
+					this.Hide();
+					this.client.ShowChunkFeatures(false);
+				}
+			}
 		}
 
 		private MetricBinding[] CreateMetricBindings(VisualElement root) {

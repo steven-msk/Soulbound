@@ -1,3 +1,4 @@
+using SoulboundEngine.Client.Settings;
 using SoulboundEngine.Client.UI;
 using SoulboundEngine.Client.UI.UXMLBindings;
 using SoulboundEngine.Core.Registry;
@@ -8,7 +9,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.Debug.Logging.Console {
-	public sealed class LogConsole : UXMLWidget {
+	public sealed class LogConsole : UXMLWidget, IInputFocusable {
 		private static readonly Identifier LOG_LIST_ELEMENT = Identifier.Of("soulbound:log_console/log_list");
 		private static readonly Identifier LOG_LABEL_ELEMENT = Identifier.Of("soulbound:log_entry/log_label");
 		private const int NEW_LOG_ENTRIES_PER_FRAME = 3;
@@ -19,10 +20,12 @@ namespace SoulboundEngine.Client.Debug.Logging.Console {
 		private readonly HashSet<int> fatalLogs = new();
 		private readonly Queue<LogEntry> pendingLogs = new();
 		private readonly object pendingLogsLock = new();
+		private readonly SoulboundClient client;
 		private bool dirty = false;
 		private ListView logList;
 
-		public LogConsole() {
+		public LogConsole(SoulboundClient client) {
+			this.client = client;
 			Application.logMessageReceivedThreaded += (condition, stackTrace, logType) => {
 				this.EnqueueLog(new LogEntry(condition, stackTrace, logType));
 			};
@@ -34,6 +37,18 @@ namespace SoulboundEngine.Client.Debug.Logging.Console {
 			this.logList = root.Get<ListView>(LOG_LIST_ELEMENT);
 			this.logList.bindItem = this.OnLogAdded;
 			this.logList.itemsSource = this.displayedLogs;
+		}
+
+		internal void Tick() {
+			if (GameSettings.keybinds.toggleLogConsole.WasPressed()) {
+				if (!this.isVisible) {
+					this.Show();
+					this.client.SetInputFocus(this);
+				} else {
+					this.Hide();
+					this.client.ClearInputFocus();
+				}
+			}
 		}
 
 		private void EnqueueLog(LogEntry entry) {
@@ -131,6 +146,10 @@ namespace SoulboundEngine.Client.Debug.Logging.Console {
 					break;
 			}
 		}
+
+		bool IInputFocusable.HasKeyboardFocus() => false;
+
+		bool IInputFocusable.IsPointerOverUI() => true;
 	}
 
 	public sealed record LogEntry(string condition, string stackTrace, LogType logType);

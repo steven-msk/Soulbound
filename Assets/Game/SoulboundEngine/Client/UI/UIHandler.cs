@@ -22,8 +22,13 @@ namespace SoulboundEngine.Client.UI {
 		public IScreenHandle PushScreen(Screen.Screen screen) => this.screenManager.PushScreen(screen);
 		public void PopScreen(IScreenHandle handle) => this.screenManager.PopScreen(handle);
 
-		public void FlushScreens() => this.screenManager.Flush();
+		public bool HasKeyboardFocus() => this.screenManager.HasKeyboardFocus();
+		public bool IsPointerOverUI() => this.screenManager.IsPointerOverUI();
 
-		public IScreenNavigator GetScreenNavigator() => this.screenManager;
+		public void SetInputFocus(IInputFocusable? focus) {
+			this.screenManager.SetInputFocus(focus);
+		}
+
+		public void FlushScreens() => this.screenManager.Flush();
 	}
 }

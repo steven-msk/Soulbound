@@ -6,9 +6,10 @@ using UnityEngine.UIElements;
 #nullable enable
 
 namespace SoulboundEngine.Client.UI.Screen {
-	public sealed class ScreenManager : IScreenNavigator {
+	public sealed class ScreenManager {
 		private readonly List<ScreenEntry> stack = new();
 		private readonly UXMLScreenRoot screenRoot;
+		private IInputFocusable? targetFocus;
 
 		public ScreenManager(UXMLScreenRoot screenRoot) {
 			this.screenRoot = screenRoot;
@@ -85,6 +86,18 @@ namespace SoulboundEngine.Client.UI.Screen {
 		public Screen? GetActiveScreen() => this.GetTopEntry()?.screen;
 
 		private ScreenEntry? GetTopEntry() => this.stack.First();
+
+		public bool HasKeyboardFocus() => this.GetCurrentFocus()?.HasKeyboardFocus() ?? false;
+
+		public bool IsPointerOverUI() => this.GetCurrentFocus()?.IsPointerOverUI() ?? false;
+
+		public IInputFocusable? GetCurrentFocus() {
+			return this.targetFocus ?? this.stack.FirstOrDefault()?.screen;
+		}
+
+		public void SetInputFocus(IInputFocusable? focus) {
+			this.targetFocus = focus;
+		}
 
 		public void IssueRebuild(Screen screen) {
 			if (this.GetActiveScreen() != screen) return;

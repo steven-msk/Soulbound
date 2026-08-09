@@ -17,6 +17,7 @@ namespace SoulboundEngine.Client.World.Level {
 		private readonly SoulboundClient client;
 		public bool paused { get; private set; } = false;
 		private bool shouldTick;
+		private IScreenHandle? pauseScreenHandle;
 
 		public LevelManager(SoulboundClient client, ISeedProvider seedProvider) {
 			this.level = new Level(seedProvider.GetSeed());
@@ -64,13 +65,14 @@ namespace SoulboundEngine.Client.World.Level {
 		public void PauseGame() {
 			this.paused = true;
 			Time.timeScale = 0f;
-			this.client.UIHandler.GetScreenNavigator().PushScreen(new GamePausedScreen(this.client, this));
+			this.pauseScreenHandle = this.client.OpenScreen(new GamePausedScreen(this.client, this));
 		}
 
 		public void UnpauseGame() {
 			this.paused = false;
 			Time.timeScale = 1f;
-			this.client.UIHandler.GetScreenNavigator().PopTopScreen();
+			this.client.CloseScreen(this.pauseScreenHandle);
+			this.pauseScreenHandle = null;
 		}
 
 		public Level GetLevel() => this.level;
