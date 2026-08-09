@@ -27,7 +27,6 @@ using SoulboundEngine.Core.Audio;
 using SoulboundEngine.Core.Registry;
 using SoulboundEngine.Core.Render.Sprite;
 using SoulboundEngine.Core.Serialization;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.InputSystem;
@@ -69,7 +68,6 @@ namespace SoulboundEngine.Client {
 		private readonly UIHandler uiHandler;
 		private readonly UIAudioEventBank uiAudioEventBank;
 		private readonly WorldAudioEventBank worldAudioEventBank;
-		private readonly DebugOverlayManager debugOverlayManager;
 		private readonly ItemRenderManager itemRenderManager;
 		private readonly ISpriteResolver<AtlasSpriteRef> spriteResolver;
 		private readonly EntityRenderManager entityRenderManager;
@@ -105,7 +103,6 @@ namespace SoulboundEngine.Client {
 			this.runtimeExecutionServices = new RuntimeExecutionServices();
 			this.worldSessionCommands = new WorldSessionCommands();
 			this.commandProcessor = new CommandProcessor(this.runtimeDataProvider, this.runtimeExecutionServices);
-			this.debugOverlayManager = new DebugOverlayManager(this);
 			this.commandLine = new CommandLine(this.commandProcessor, this);
 			this.metricsHud = new MetricsHUD(this.debugMetricsService, this);
 			this.logConsole = new LogConsole(this);
@@ -240,7 +237,6 @@ namespace SoulboundEngine.Client {
 				this.uiHandler.SetUIDocument(session.uiDocument);
 				this.activeWorldScreen = new WorldScreen(this.player.GetInventory(), this.itemRenderManager);
 				this.uiHandler.PushScreen(this.activeWorldScreen);
-				this.debugOverlayManager.Clear();
 
 				this.runtimeDataProvider.SetWorldSessionState(session, this.player);
 				this.runtimeExecutionServices.SetWorldSessionState(session, this.player);
@@ -269,7 +265,6 @@ namespace SoulboundEngine.Client {
 					this.uiHandler.SetUIDocument(Object.FindFirstObjectByType<UIDocument>());
 					this.activeWorldScreen = null;
 					this.uiHandler.PushScreen(new TitleScreen(this));
-					this.debugOverlayManager.Clear();
 
 					this.runtimeDataProvider.ExitWorldSessionState();
 					this.runtimeExecutionServices.ExitWorldSessionState();
@@ -355,57 +350,5 @@ namespace SoulboundEngine.Client {
 		public ItemRenderManager ItemRenderManager => this.itemRenderManager;
 		public RecipeManager RecipeManager => this.recipeManager;
 		public PerformanceMetrics PerformanceMetrics => this.performanceMetrics;
-
-		public sealed class DebugOverlayManager {
-			private readonly Stack<DebugOverlayFeature> overlayStack = new();
-			public event Action<DebugOverlayFeature, DebugOverlayFeature> onOverlayChanged;
-
-			public DebugOverlayManager(SoulboundClient client) {
-				this.overlayStack.Push(DebugOverlayFeature.None);
-			}
-
-			public bool TryShow(DebugOverlayFeature overlay) {
-				if (!this.CanShow(overlay)) return false;
-
-				DebugOverlayFeature prev = this.GetActiveOverlay();
-				this.overlayStack.Push(overlay);
-				onOverlayChanged?.Invoke(prev, this.GetActiveOverlay());
-				return true;
-			}
-
-			public void Hide(DebugOverlayFeature overlay) {
-				if (this.GetActiveOverlay() != overlay) return;
-				if (overlay == DebugOverlayFeature.None) return;
-
-				DebugOverlayFeature prev = this.GetActiveOverlay();
-				this.overlayStack.Pop();
-				onOverlayChanged?.Invoke(prev, this.GetActiveOverlay());
-			}
-
-			public void Clear() {
-				while (this.GetActiveOverlay() != DebugOverlayFeature.None) {
-					this.Hide(this.GetActiveOverlay());
-				}
-			}
-
-			public DebugOverlayFeature GetActiveOverlay() {
-				return this.overlayStack.Peek();
-			}
-
-			private bool CanShow(DebugOverlayFeature overlay) => overlay switch {
-				DebugOverlayFeature.MetricsHUD => this.GetActiveOverlay() == DebugOverlayFeature.None
-					|| this.GetActiveOverlay() == DebugOverlayFeature.CommandLine,
-				DebugOverlayFeature.Console => this.GetActiveOverlay() == DebugOverlayFeature.None,
-				DebugOverlayFeature.CommandLine => true,
-				_ => true
-			};
-		}
-
-		public enum DebugOverlayFeature {
-			None,
-			CommandLine,
-			MetricsHUD,
-			Console
-		}
 	}
 }
