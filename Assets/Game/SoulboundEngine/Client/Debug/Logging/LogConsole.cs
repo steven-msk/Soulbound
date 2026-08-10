@@ -46,8 +46,6 @@ namespace SoulboundEngine.Client.Debug.Logging.Console {
 
 		public override void OnBind(VisualElement root) {
 			base.OnBind(root);
-			root.style.display = DisplayStyle.Flex;
-			this.Hide();
 
 			this.logList = root.Get<ListView>(LOG_LIST_ELEMENT);
 			this.logList.bindItem = this.OnLogAdded;
@@ -64,16 +62,6 @@ namespace SoulboundEngine.Client.Debug.Logging.Console {
 					this.client.PopInputFocus(this);
 				}
 			}
-		}
-
-		public override void Hide() {
-			this.isVisible = false;
-			this.root.style.visibility = Visibility.Hidden;
-		}
-
-		public override void Show() {
-			this.isVisible = true;
-			this.root.style.visibility = Visibility.Visible;
 		}
 
 		private void EnqueueLog(LogEntry entry) {
