@@ -143,6 +143,10 @@ namespace SoulboundEngine.Core.Registry {
 			return $"{prefix}.{s}.{this.GetNamespace()}.{this.GetPath()}";
 		}
 
+		public static string GetTranslationKey(string prefix, string s) {
+			return $"{prefix}.{s}";
+		}
+
 		public string[] SplitPath() {
 			return this.path.Split(PATH_SEPARATOR);
 		}
