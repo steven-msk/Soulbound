@@ -93,6 +93,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2684061bf2e4df640af036ce4c3ac404
+    m_Address: LogConsole
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 3ddab628e43f7114c804ef2cf0dff34b
     m_Address: JosefinSans-Regular SDF
     m_ReadOnly: 0
@@ -255,8 +261,20 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e04ae0f2f4b119e4ca6025251e089a4f
+    m_Address: MetricsHUD
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e2f0d8709740fce438a7d4dae2c8e55c
     m_Address: ToggleOnTile
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e3f791d2bfaef504f98632e37fb8e122
+    m_Address: CommandLine
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload

@@ -1,5 +1,7 @@
+using SoulboundEngine.Client.Settings;
 using SoulboundEngine.Client.UI;
 using SoulboundEngine.Client.UI.UXMLBindings;
+using SoulboundEngine.Core.Assets;
 using SoulboundEngine.Core.Registry;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,10 +10,10 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.Debug.Logging.Console {
-	public sealed class LogConsole : UXMLWidget {
+	public sealed class LogConsole : UXMLWidget, IInputFocusable {
 		private static readonly Identifier LOG_LIST_ELEMENT = Identifier.Of("soulbound:log_console/log_list");
 		private static readonly Identifier LOG_LABEL_ELEMENT = Identifier.Of("soulbound:log_entry/log_label");
-		private const int NEW_LOG_ENTRIES_PER_FRAME = 3;
+		private const int MAX_ENTRIES_PER_FRAME = 3;
 		private readonly List<LogEntry> displayedLogs = new();
 		private readonly HashSet<int> normalLogs = new();
 		private readonly HashSet<int> warningLogs = new();
@@ -19,13 +21,27 @@ namespace SoulboundEngine.Client.Debug.Logging.Console {
 		private readonly HashSet<int> fatalLogs = new();
 		private readonly Queue<LogEntry> pendingLogs = new();
 		private readonly object pendingLogsLock = new();
+		private readonly SoulboundClient client;
 		private bool dirty = false;
 		private ListView logList;
 
-		public LogConsole() {
+		public LogConsole(SoulboundClient client) {
+			this.client = client;
 			Application.logMessageReceivedThreaded += (condition, stackTrace, logType) => {
 				this.EnqueueLog(new LogEntry(condition, stackTrace, logType));
 			};
+#if !UNITY_EDITOR
+			Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
+			Application.SetStackTraceLogType(LogType.Warning, StackTraceLogType.None);
+			Application.SetStackTraceLogType(LogType.Error, StackTraceLogType.None);
+			Application.SetStackTraceLogType(LogType.Exception, StackTraceLogType.ScriptOnly);
+			Application.SetStackTraceLogType(LogType.Assert, StackTraceLogType.None);
+#endif
+		}
+
+		public static void CreateRoot(VisualElement parent) {
+			VisualTreeAsset asset = AssetManager.Resolve<VisualTreeAsset>(new AssetKey("LogConsole"));
+			asset.CloneTree(parent);
 		}
 
 		public override void OnBind(VisualElement root) {
@@ -34,6 +50,18 @@ namespace SoulboundEngine.Client.Debug.Logging.Console {
 			this.logList = root.Get<ListView>(LOG_LIST_ELEMENT);
 			this.logList.bindItem = this.OnLogAdded;
 			this.logList.itemsSource = this.displayedLogs;
+		}
+
+		internal void Tick() {
+			if (GameSettings.keybinds.toggleLogConsole.WasPressed()) {
+				if (!this.isVisible) {
+					this.Show();
+					this.client.PushInputFocus(this);
+				} else {
+					this.Hide();
+					this.client.PopInputFocus(this);
+				}
+			}
 		}
 
 		private void EnqueueLog(LogEntry entry) {
@@ -98,7 +126,7 @@ namespace SoulboundEngine.Client.Debug.Logging.Console {
 		public void Update() {
 			if (!this.dirty || !this.isVisible) return;
 
-			int remainingLogs = NEW_LOG_ENTRIES_PER_FRAME;
+			int remainingLogs = MAX_ENTRIES_PER_FRAME;
 			lock (this.pendingLogsLock) {
 				while (this.pendingLogs.Count > 0 && remainingLogs-- > 0) {
 					this.AddToLogList(this.pendingLogs.Dequeue());
@@ -131,6 +159,10 @@ namespace SoulboundEngine.Client.Debug.Logging.Console {
 					break;
 			}
 		}
+
+		bool IInputFocusable.HasKeyboardFocus() => false;
+
+		bool IInputFocusable.IsPointerOverUI() => true;
 	}
 
 	public sealed record LogEntry(string condition, string stackTrace, LogType logType);

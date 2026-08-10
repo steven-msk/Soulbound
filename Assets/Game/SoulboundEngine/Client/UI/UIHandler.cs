@@ -1,55 +1,63 @@
-using SoulboundEngine.Client.Input;
+using SoulboundEngine.Client.Debug;
+using SoulboundEngine.Client.Debug.Logging.Console;
+using SoulboundEngine.Client.Debug.Metrics.View;
 using SoulboundEngine.Client.UI.Screen;
-using System.Collections.Generic;
-using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
 
 #nullable enable
 
 namespace SoulboundEngine.Client.UI {
-	public sealed class UIHandler : IInputEventHandler {
-		int IInputEventHandler.priority => 1000;
-		private ScreenManager screenManager;
-		private UXMLScreenRoot screenRoot;
+	public sealed class UIHandler {
+		private ScreenManager screenManager = null!;
+		private UXMLScreenRoot screenRoot = null!;
+		private readonly CommandLine commandLine;
+		private readonly LogConsole logConsole;
+		private readonly MetricsHUD metricsHud;
 
-		public UIHandler(UIDocument uiDocument) {
-			this.screenRoot = new UXMLScreenRoot(uiDocument);
-			this.screenManager = new ScreenManager(this.screenRoot);
+		public UIHandler(CommandLine commandLine, LogConsole logConsole, MetricsHUD metricsHud) {
+			this.commandLine = commandLine;
+			this.logConsole = logConsole;
+			this.metricsHud = metricsHud;
 		}
 
 		public void SetUIDocument(UIDocument uiDocument) {
+			if (this.screenRoot != null) {
+				this.commandLine.Dispose();
+				this.logConsole.Dispose();
+				this.metricsHud.Dispose();
+				this.screenManager.Flush();
+			}
 			this.screenRoot = new UXMLScreenRoot(uiDocument);
-			this.screenManager.Flush();
 			this.screenManager = new ScreenManager(this.screenRoot);
+
+			VisualElement metricsHudRoot = this.screenManager.CreateScreenRoot();
+			metricsHudRoot.pickingMode = PickingMode.Ignore;
+			MetricsHUD.CreateRoot(metricsHudRoot);
+			this.screenRoot.AttachPersistentOverlay(metricsHudRoot);
+			this.metricsHud.OnBind(metricsHudRoot);
+
+			VisualElement logConsoleRoot = this.screenManager.CreateScreenRoot();
+			logConsoleRoot.pickingMode = PickingMode.Ignore;
+			LogConsole.CreateRoot(logConsoleRoot);
+			this.screenRoot.AttachPersistentOverlay(logConsoleRoot);
+			this.logConsole.OnBind(logConsoleRoot);
+
+			VisualElement commandLineRoot = this.screenManager.CreateScreenRoot();
+			commandLineRoot.pickingMode = PickingMode.Ignore;
+			CommandLine.CreateRoot(commandLineRoot);
+			this.screenRoot.AttachPersistentOverlay(commandLineRoot);
+			this.commandLine.OnBind(commandLineRoot);
 		}
 
 		public IScreenHandle PushScreen(Screen.Screen screen) => this.screenManager.PushScreen(screen);
 		public void PopScreen(IScreenHandle handle) => this.screenManager.PopScreen(handle);
 
+		public bool HasKeyboardFocus() => this.screenManager.HasKeyboardFocus();
+		public bool IsPointerOverUI() => this.screenManager.IsPointerOverUI();
+
+		public void PushInputFocus(IInputFocusable focus) => this.screenManager.PushInputFocus(focus);
+		public void PopInputFocus(IInputFocusable focus) => this.screenManager.PopInputFocus(focus);
+
 		public void FlushScreens() => this.screenManager.Flush();
-
-		public IScreenNavigator GetScreenNavigator() => this.screenManager;
-
-		IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {
-			static InputEventListener ConsumeWhenOverGameObject(InputToken token) {
-				return InputEventListener.Performed(token, _ => {
-					return EventSystem.current.IsPointerOverGameObject()
-						? InputHandleResult.Consume
-						: InputHandleResult.Pass;
-				});
-			}
-
-			return new InputEventListener[] {
-				ConsumeWhenOverGameObject(InputTokens.Mouse.leftClick),
-				ConsumeWhenOverGameObject(InputTokens.Mouse.rightClick),
-				ConsumeWhenOverGameObject(InputTokens.Mouse.position),
-
-				InputEventListener.ConsumePerformed(InputTokens.Keyboard.ESC, _ => {
-					if (this.screenManager.GetActiveScreen()?.CloseOnEsc ?? false) {
-						this.screenManager.PopTopScreen();
-					}
-				})
-			};
-		}
 	}
 }

@@ -1,7 +1,6 @@
 using Cysharp.Threading.Tasks;
 using SoulboundEngine.Client.Debug;
 using SoulboundEngine.Client.Debug.Commands;
-using SoulboundEngine.Client.Debug.Logging;
 using SoulboundEngine.Client.Debug.Logging.Console;
 using SoulboundEngine.Client.Debug.Metrics;
 using SoulboundEngine.Client.Debug.Metrics.View;
@@ -28,14 +27,16 @@ using SoulboundEngine.Core.Audio;
 using SoulboundEngine.Core.Registry;
 using SoulboundEngine.Core.Render.Sprite;
 using SoulboundEngine.Core.Serialization;
-using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client {
 	using Camera = UnityEngine.Camera;
+	using Keyboard = Input.Keyboard;
+	using Logger = Debug.Logging.Logger;
 	using Object = UnityEngine.Object;
 	using RectInt = UnityEngine.RectInt;
 	using Vector2 = UnityEngine.Vector2;
@@ -46,14 +47,15 @@ namespace SoulboundEngine.Client {
 	using StackTraceLogType = UnityEngine.StackTraceLogType;
 #endif
 
-	public sealed class SoulboundClient : IInputEventHandler, IWorldAccessor, IDebugMetricsSource {
+	public sealed class SoulboundClient : IWorldAccessor, IDebugMetricsSource {
 		const int INPUT_QUEUE_BUFFER_CAPACITY = 128;
 		const string SAVES_ROOT_FOLDER = "saves";
 		private static SoulboundClient instance;
 		private readonly GameConfig config;
 		private readonly PlayerInputActions inputActions;
 		private readonly InputManager inputManager;
-		private readonly SettingsManager settings;
+		private readonly ClientPlayerInputHandler clientPlayerInputHandler;
+		private readonly GameSettings settings;
 		private readonly LogConsole logConsole;
 		private readonly CommandLine commandLine;
 		private readonly MetricsHUD metricsHud;
@@ -66,7 +68,6 @@ namespace SoulboundEngine.Client {
 		private readonly UIHandler uiHandler;
 		private readonly UIAudioEventBank uiAudioEventBank;
 		private readonly WorldAudioEventBank worldAudioEventBank;
-		private readonly DebugOverlayManager debugOverlayManager;
 		private readonly ItemRenderManager itemRenderManager;
 		private readonly ISpriteResolver<AtlasSpriteRef> spriteResolver;
 		private readonly EntityRenderManager entityRenderManager;
@@ -81,17 +82,19 @@ namespace SoulboundEngine.Client {
 		private PlayerEntity player;
 		private WorldSession? activeWorldSession;
 
-		int IInputEventHandler.priority => int.MaxValue;
-
 		public SoulboundClient(GameConfig config) {
 			instance = this;
 			this.config = config;
 			UXMLSchema_Generated.RegisterAll();
 
 			this.inputActions = new PlayerInputActions();
-			this.inputManager = new InputManager(INPUT_QUEUE_BUFFER_CAPACITY, this.inputActions.asset);
-			InputTokens.Register(this.inputActions.asset);
-			this.settings = new SettingsManager();
+			this.inputManager = new InputManager(this.inputActions.asset);
+			this.clientPlayerInputHandler = new ClientPlayerInputHandler(this);
+			this.settings = new GameSettings();
+
+			File savesFile = UnityPaths.PersistentDataRoot.Combine(SAVES_ROOT_FOLDER);
+			this.worldSavesManager = new WorldSavesManager(savesFile, WorldSerializer.SEED_FILE_NAME);
+			this.worldSerializer = new WorldSerializer();
 
 			this.debugMetricsService = new DebugMetricsService();
 			this.performanceMetrics = new PerformanceMetrics();
@@ -100,26 +103,10 @@ namespace SoulboundEngine.Client {
 			this.runtimeExecutionServices = new RuntimeExecutionServices();
 			this.worldSessionCommands = new WorldSessionCommands();
 			this.commandProcessor = new CommandProcessor(this.runtimeDataProvider, this.runtimeExecutionServices);
-			this.debugOverlayManager = new DebugOverlayManager(this);
-			this.commandLine = new CommandLine(this.commandProcessor, this.debugOverlayManager);
-			this.metricsHud = new MetricsHUD(this.debugMetricsService);
-			this.logConsole = new LogConsole();
-#if !UNITY_EDITOR
-			Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
-			Application.SetStackTraceLogType(LogType.Warning, StackTraceLogType.None);
-			Application.SetStackTraceLogType(LogType.Error, StackTraceLogType.None);
-			Application.SetStackTraceLogType(LogType.Exception, StackTraceLogType.ScriptOnly);
-			Application.SetStackTraceLogType(LogType.Assert, StackTraceLogType.None);
-#endif
-
-			File savesFile = UnityPaths.PersistentDataRoot.Combine(SAVES_ROOT_FOLDER);
-			this.worldSavesManager = new WorldSavesManager(savesFile, WorldSerializer.SEED_FILE_NAME);
-			this.worldSerializer = new WorldSerializer();
-
-			// scene may not be available at this time
-			// TODO: change UIHandler init
-			this.uiHandler = new UIHandler(Object.FindFirstObjectByType<UIDocument>());
-			this.inputManager.AddHandler(this.uiHandler);
+			this.commandLine = new CommandLine(this.commandProcessor, this);
+			this.metricsHud = new MetricsHUD(this.debugMetricsService, this);
+			this.logConsole = new LogConsole(this);
+			this.uiHandler = new UIHandler(this.commandLine, this.logConsole, this.metricsHud);
 
 			this.uiAudioEventBank = new UIAudioEventBank();
 			this.worldAudioEventBank = new WorldAudioEventBank();
@@ -139,32 +126,64 @@ namespace SoulboundEngine.Client {
 		}
 
 		/// <summary>
-		/// called once when the game is launched
+		/// Called once when the game is launched
 		/// </summary>
-		public void Start() {
+		internal void Start() {
+			// not safe UIDocument resolution
+			// TODO: rework UIHandler init with UIDocument resolution
+			this.uiHandler.SetUIDocument(Object.FindFirstObjectByType<UIDocument>());
 			this.uiHandler.PushScreen(new TitleScreen(this));
-			this.inputManager.AddHandler(this);
+			this.inputManager.Enable();
 		}
 
 		/// <summary>
-		/// called once every frame
+		/// Called once every frame
 		/// </summary>
-		public void Update() {
-			this.performanceMetrics.Tick();
+		internal void Update() {
+			this.performanceMetrics.Update();
 			this.logConsole.Update();
 			this.metricsHud.Refresh();
-
-			this.inputManager.DispatchInputs();
 			this.worldRenderer.Render();
 		}
 
 		/// <summary>
-		/// called once when the game is closed
+		/// Called every tick. See <seealso cref="SharedConstants.TICKS_PER_SECOND"/>
 		/// </summary>
-		public void Shutdown() {
+		internal void Tick() {
+			this.HandleInputTick();
+
+			if (this.activeWorldSession is { } session) {
+				session.levelManager.Tick();
+			}
+
+			// this must be called last, otherwise WasPressed always returns false
+			this.inputManager.Tick();
+		}
+
+		/// <summary>
+		/// Called once when the game is closed
+		/// </summary>
+		internal void Shutdown() {
 			this.activeWorldSession?.levelManager.StopSession();
 			this.settings.Save();
 			this.inputActions.Dispose();
+		}
+
+		private void HandleInputTick() {
+			if (this.activeWorldSession is { } worldSession) {
+				PlayerEntity player = worldSession.level.GetPlayer();
+				this.clientPlayerInputHandler.Handle(player,
+					shouldBlockKeyboardActions: this.uiHandler.HasKeyboardFocus(),
+					shouldBlockMouse: this.uiHandler.IsPointerOverUI()
+				);
+
+				if (!this.uiHandler.HasKeyboardFocus() && this.inputManager.keyboard.WasPressed(Keyboard.GetControl(Key.Escape))) {
+					worldSession.levelManager.TogglePause();
+				}
+			}
+			this.metricsHud.Tick();
+			this.commandLine.Tick();
+			this.logConsole.Tick();
 		}
 
 		public IScreenHandle OpenScreen(Screen screen) {
@@ -174,6 +193,9 @@ namespace SoulboundEngine.Client {
 		public void CloseScreen(IScreenHandle handle) {
 			this.uiHandler.PopScreen(handle);
 		}
+
+		public void PushInputFocus(IInputFocusable focus) => this.uiHandler.PushInputFocus(focus);
+		public void PopInputFocus(IInputFocusable focus) => this.uiHandler.PopInputFocus(focus);
 
 		public void CreateNewWorld(string world, int seed) {
 			if (this.config.dev.overrideSaves) {
@@ -205,10 +227,8 @@ namespace SoulboundEngine.Client {
 
 				this.activeWorldSession = session;
 				this.uiHandler.SetUIDocument(session.uiDocument);
-				this.activeWorldScreen = new WorldScreen(this.player.GetInventory(), this.commandLine, this.metricsHud, this.logConsole, this.itemRenderManager);
+				this.activeWorldScreen = new WorldScreen(this.player.GetInventory(), this.itemRenderManager);
 				this.uiHandler.PushScreen(this.activeWorldScreen);
-				this.debugOverlayManager.Clear();
-				this.inputManager.AddHandler(session.levelManager);
 
 				this.runtimeDataProvider.SetWorldSessionState(session, this.player);
 				this.runtimeExecutionServices.SetWorldSessionState(session, this.player);
@@ -229,7 +249,6 @@ namespace SoulboundEngine.Client {
 			this.worldSerializer.Serialize(levelManager, this.worldSavesManager.ToSaveDirectory(session.save));
 			this.player = null;
 			this.worldRenderer.SetLevel(null);
-			this.inputManager.RemoveHandler(levelManager);
 			this.uiHandler.FlushScreens();
 
 			SceneManager.LoadSceneAsync(this.config.unity.mainScene).ToUniTask()
@@ -238,7 +257,6 @@ namespace SoulboundEngine.Client {
 					this.uiHandler.SetUIDocument(Object.FindFirstObjectByType<UIDocument>());
 					this.activeWorldScreen = null;
 					this.uiHandler.PushScreen(new TitleScreen(this));
-					this.debugOverlayManager.Clear();
 
 					this.runtimeDataProvider.ExitWorldSessionState();
 					this.runtimeExecutionServices.ExitWorldSessionState();
@@ -261,34 +279,9 @@ namespace SoulboundEngine.Client {
 
 		public bool IsWorldSessionActive() => this.activeWorldSession != null;
 
-		IEnumerable<InputEventListener> IInputEventHandler.GetListeners() {
-			return new InputEventListener[] {
-				InputEventListener.ConsumePerformed(InputTokens.Debug.toggleMetrics, _ => {
-					if (!this.metricsHud.isVisible && this.debugOverlayManager.TryShow(DebugOverlayFeature.MetricsHUD)) {
-						this.metricsHud.Show();
-						this.worldRenderer.ShowChunkFeatures();
-					} else if (this.metricsHud.isVisible) {
-						this.metricsHud.Hide();
-						this.worldRenderer.HideChunkFeatures();
-						this.debugOverlayManager.Hide(DebugOverlayFeature.MetricsHUD);
-					}
-				}),
-
-				InputEventListener.ConsumePerformed(InputTokens.Debug.enterCommand, _ => {
-					if (this.debugOverlayManager.TryShow(DebugOverlayFeature.CommandLine)) {
-						this.commandLine.Show();
-						this.player?.StopHorizontalMovement();
-					}
-				}),
-				InputEventListener.ConsumePerformed(InputTokens.Debug.toggleConsole, _ => {
-					if (!this.logConsole.isVisible && this.debugOverlayManager.TryShow(DebugOverlayFeature.Console)) {
-						this.logConsole.Show();
-					} else if (this.logConsole.isVisible) {
-						this.logConsole.Hide();
-						this.debugOverlayManager.Hide(DebugOverlayFeature.Console);
-					}
-				})
-			};
+		public void ShowChunkFeatures(bool showChunkFeatures) {
+			if (showChunkFeatures) this.worldRenderer.ShowChunkFeatures();
+			else this.worldRenderer.HideChunkFeatures();
 		}
 
 		void IDebugMetricsSource.CollectDebugData(ref DebugMetricsBuilder builder) {
@@ -345,74 +338,9 @@ namespace SoulboundEngine.Client {
 		}
 
 		public static SoulboundClient Instance => instance;
-		[Obsolete]
 		public InputManager InputManager => this.inputManager;
-		[Obsolete]
-		public UIHandler UIHandler => this.uiHandler;
 		public ItemRenderManager ItemRenderManager => this.itemRenderManager;
 		public RecipeManager RecipeManager => this.recipeManager;
 		public PerformanceMetrics PerformanceMetrics => this.performanceMetrics;
-
-		public sealed class DebugOverlayManager {
-			private readonly Stack<DebugOverlayFeature> overlayStack = new();
-			public event Action<DebugOverlayFeature, DebugOverlayFeature> onOverlayChanged;
-
-			public DebugOverlayManager(SoulboundClient client) {
-				this.overlayStack.Push(DebugOverlayFeature.None);
-
-				onOverlayChanged += (prev, next) => {
-					if (client.activeWorldSession is { } session) {
-						if (client.commandLine.isVisible || next == DebugOverlayFeature.CommandLine) {
-							client.inputManager.RemoveHandler(client.player);
-						} else if (!client.commandLine.isVisible && prev == DebugOverlayFeature.CommandLine) {
-							client.inputManager.AddHandler(client.player);
-						}
-					}
-				};
-			}
-
-			public bool TryShow(DebugOverlayFeature overlay) {
-				if (!this.CanShow(overlay)) return false;
-
-				DebugOverlayFeature prev = this.GetActiveOverlay();
-				this.overlayStack.Push(overlay);
-				onOverlayChanged?.Invoke(prev, this.GetActiveOverlay());
-				return true;
-			}
-
-			public void Hide(DebugOverlayFeature overlay) {
-				if (this.GetActiveOverlay() != overlay) return;
-				if (overlay == DebugOverlayFeature.None) return;
-
-				DebugOverlayFeature prev = this.GetActiveOverlay();
-				this.overlayStack.Pop();
-				onOverlayChanged?.Invoke(prev, this.GetActiveOverlay());
-			}
-
-			public void Clear() {
-				while (this.GetActiveOverlay() != DebugOverlayFeature.None) {
-					this.Hide(this.GetActiveOverlay());
-				}
-			}
-
-			public DebugOverlayFeature GetActiveOverlay() {
-				return this.overlayStack.Peek();
-			}
-
-			private bool CanShow(DebugOverlayFeature overlay) => overlay switch {
-				DebugOverlayFeature.MetricsHUD => this.GetActiveOverlay() == DebugOverlayFeature.None
-					|| this.GetActiveOverlay() == DebugOverlayFeature.CommandLine,
-				DebugOverlayFeature.Console => this.GetActiveOverlay() == DebugOverlayFeature.None,
-				DebugOverlayFeature.CommandLine => true,
-				_ => true
-			};
-		}
-
-		public enum DebugOverlayFeature {
-			None,
-			CommandLine,
-			MetricsHUD,
-			Console
-		}
 	}
 }

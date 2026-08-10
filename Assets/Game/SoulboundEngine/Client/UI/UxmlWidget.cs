@@ -7,26 +7,22 @@ namespace SoulboundEngine.Client.UI {
 		protected VisualElement root;
 		private UXMLScreen screen;
 		public string tooltip { get; private set; }
-		public bool isVisible { get; private set; }
+		public bool isVisible { get; protected set; }
 		public UXMLScreen Screen => this.screen ?? throw new NotSupportedException("UXML widget has not been added to a screen, but you are trying to access it.");
 
 		public virtual void OnBind(VisualElement root) {
 			this.root = root;
-			this.root.style.display = this.isVisible ? DisplayStyle.Flex : DisplayStyle.None;
+			root.style.visibility = this.isVisible ? Visibility.Visible : Visibility.Hidden;
 		}
 
 		public virtual void Show() {
-			if (this.isVisible) return;
 			this.isVisible = true;
-
-			this.root.style.display = DisplayStyle.Flex;
+			this.root.style.visibility = Visibility.Visible;
 		}
 
 		public virtual void Hide() {
-			if (!this.isVisible) return;
 			this.isVisible = false;
-
-			this.root.style.display = DisplayStyle.None;
+			this.root.style.visibility = Visibility.Hidden;
 		}
 
 		public virtual void Dispose() {
