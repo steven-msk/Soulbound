@@ -30,20 +30,23 @@ namespace SoulboundEngine.Client.UI {
 			this.screenRoot = new UXMLScreenRoot(uiDocument);
 			this.screenManager = new ScreenManager(this.screenRoot);
 
-			VisualElement commandLineElement = this.screenManager.CreateScreenRoot();
-			CommandLine.CreateRoot(commandLineElement);
-			this.screenRoot.Attach(commandLineElement);
-			this.commandLine.OnBind(commandLineElement);
+			VisualElement metricsHudRoot = this.screenManager.CreateScreenRoot();
+			metricsHudRoot.pickingMode = PickingMode.Ignore;
+			MetricsHUD.CreateRoot(metricsHudRoot);
+			this.screenRoot.AttachPersistentOverlay(metricsHudRoot);
+			this.metricsHud.OnBind(metricsHudRoot);
 
-			VisualElement logConsoleElement = this.screenManager.CreateScreenRoot();
-			LogConsole.CreateRoot(logConsoleElement);
-			this.screenRoot.Attach(logConsoleElement);
-			this.logConsole.OnBind(logConsoleElement);
+			VisualElement logConsoleRoot = this.screenManager.CreateScreenRoot();
+			logConsoleRoot.pickingMode = PickingMode.Ignore;
+			LogConsole.CreateRoot(logConsoleRoot);
+			this.screenRoot.AttachPersistentOverlay(logConsoleRoot);
+			this.logConsole.OnBind(logConsoleRoot);
 
-			VisualElement metricsHudElement = this.screenManager.CreateScreenRoot();
-			MetricsHUD.CreateRoot(metricsHudElement);
-			this.screenRoot.Attach(metricsHudElement);
-			this.metricsHud.OnBind(metricsHudElement);
+			VisualElement commandLineRoot = this.screenManager.CreateScreenRoot();
+			commandLineRoot.pickingMode = PickingMode.Ignore;
+			CommandLine.CreateRoot(commandLineRoot);
+			this.screenRoot.AttachPersistentOverlay(commandLineRoot);
+			this.commandLine.OnBind(commandLineRoot);
 		}
 
 		public IScreenHandle PushScreen(Screen.Screen screen) => this.screenManager.PushScreen(screen);

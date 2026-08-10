@@ -107,13 +107,6 @@ namespace SoulboundEngine.Client {
 			this.metricsHud = new MetricsHUD(this.debugMetricsService, this);
 			this.logConsole = new LogConsole(this);
 			this.uiHandler = new UIHandler(this.commandLine, this.logConsole, this.metricsHud);
-#if !UNITY_EDITOR
-			Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
-			Application.SetStackTraceLogType(LogType.Warning, StackTraceLogType.None);
-			Application.SetStackTraceLogType(LogType.Error, StackTraceLogType.None);
-			Application.SetStackTraceLogType(LogType.Exception, StackTraceLogType.ScriptOnly);
-			Application.SetStackTraceLogType(LogType.Assert, StackTraceLogType.None);
-#endif
 
 			this.uiAudioEventBank = new UIAudioEventBank();
 			this.worldAudioEventBank = new WorldAudioEventBank();
@@ -191,7 +184,6 @@ namespace SoulboundEngine.Client {
 			this.metricsHud.Tick();
 			this.commandLine.Tick();
 			this.logConsole.Tick();
-
 		}
 
 		public IScreenHandle OpenScreen(Screen screen) {

@@ -7,7 +7,7 @@ namespace SoulboundEngine.Client.UI {
 		protected VisualElement root;
 		private UXMLScreen screen;
 		public string tooltip { get; private set; }
-		public bool isVisible { get; private set; }
+		public bool isVisible { get; protected set; }
 		public UXMLScreen Screen => this.screen ?? throw new NotSupportedException("UXML widget has not been added to a screen, but you are trying to access it.");
 
 		public virtual void OnBind(VisualElement root) {

@@ -13,7 +13,7 @@ namespace SoulboundEngine.Client.Debug.Logging.Console {
 	public sealed class LogConsole : UXMLWidget, IInputFocusable {
 		private static readonly Identifier LOG_LIST_ELEMENT = Identifier.Of("soulbound:log_console/log_list");
 		private static readonly Identifier LOG_LABEL_ELEMENT = Identifier.Of("soulbound:log_entry/log_label");
-		private const int NEW_LOG_ENTRIES_PER_FRAME = 3;
+		private const int MAX_ENTRIES_PER_FRAME = 3;
 		private readonly List<LogEntry> displayedLogs = new();
 		private readonly HashSet<int> normalLogs = new();
 		private readonly HashSet<int> warningLogs = new();
@@ -30,6 +30,13 @@ namespace SoulboundEngine.Client.Debug.Logging.Console {
 			Application.logMessageReceivedThreaded += (condition, stackTrace, logType) => {
 				this.EnqueueLog(new LogEntry(condition, stackTrace, logType));
 			};
+#if !UNITY_EDITOR
+			Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
+			Application.SetStackTraceLogType(LogType.Warning, StackTraceLogType.None);
+			Application.SetStackTraceLogType(LogType.Error, StackTraceLogType.None);
+			Application.SetStackTraceLogType(LogType.Exception, StackTraceLogType.ScriptOnly);
+			Application.SetStackTraceLogType(LogType.Assert, StackTraceLogType.None);
+#endif
 		}
 
 		public static void CreateRoot(VisualElement parent) {
@@ -39,6 +46,8 @@ namespace SoulboundEngine.Client.Debug.Logging.Console {
 
 		public override void OnBind(VisualElement root) {
 			base.OnBind(root);
+			root.style.display = DisplayStyle.Flex;
+			this.Hide();
 
 			this.logList = root.Get<ListView>(LOG_LIST_ELEMENT);
 			this.logList.bindItem = this.OnLogAdded;
@@ -55,6 +64,16 @@ namespace SoulboundEngine.Client.Debug.Logging.Console {
 					this.client.PopInputFocus(this);
 				}
 			}
+		}
+
+		public override void Hide() {
+			this.isVisible = false;
+			this.root.style.visibility = Visibility.Hidden;
+		}
+
+		public override void Show() {
+			this.isVisible = true;
+			this.root.style.visibility = Visibility.Visible;
 		}
 
 		private void EnqueueLog(LogEntry entry) {
@@ -119,7 +138,7 @@ namespace SoulboundEngine.Client.Debug.Logging.Console {
 		public void Update() {
 			if (!this.dirty || !this.isVisible) return;
 
-			int remainingLogs = NEW_LOG_ENTRIES_PER_FRAME;
+			int remainingLogs = MAX_ENTRIES_PER_FRAME;
 			lock (this.pendingLogsLock) {
 				while (this.pendingLogs.Count > 0 && remainingLogs-- > 0) {
 					this.AddToLogList(this.pendingLogs.Dequeue());

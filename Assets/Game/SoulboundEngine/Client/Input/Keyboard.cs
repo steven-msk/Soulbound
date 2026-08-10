@@ -75,6 +75,7 @@ namespace SoulboundEngine.Client.Input {
 			return this.GetKey(key).WasPressed();
 		}
 
+
 		public static InputKey GetKey(Key keyCode) {
 			return KEY_BY_CONTROL[CONTROL_BY_CODE[keyCode]];
 		}
