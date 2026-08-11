@@ -27,6 +27,7 @@ using SoulboundEngine.Core.Audio;
 using SoulboundEngine.Core.Registry;
 using SoulboundEngine.Core.Render.Sprite;
 using SoulboundEngine.Core.Serialization;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.InputSystem;
@@ -36,7 +37,6 @@ using UnityEngine.UIElements;
 namespace SoulboundEngine.Client {
 	using Camera = UnityEngine.Camera;
 	using Keyboard = Input.Keyboard;
-	using Logger = Debug.Logging.Logger;
 	using Object = UnityEngine.Object;
 	using RectInt = UnityEngine.RectInt;
 	using Vector2 = UnityEngine.Vector2;
@@ -210,34 +210,52 @@ namespace SoulboundEngine.Client {
 
 			WorldSave save = this.worldSavesManager.GetSave(world, this.worldSerializer);
 			WorldSaveSeedProvider seedProvider = new(save);
-			WorldLoader worldLoader = new(this, seedProvider, save, this.worldSerializer);
+			ClientWorldBootstrapper worldLoader = new(this, seedProvider, save, this.worldSerializer);
 
-			this.worldSavesManager.OnWorldEntered(world);
-			this.uiHandler.FlushScreens();
-			this.worldRenderer.Reset();
+			UniTask<WorldBootData> worldBootTask = worldLoader.LoadWorld();
+			UniTask sceneLoadTask = SceneManager.LoadSceneAsync(this.config.unity.worldScene, LoadSceneMode.Additive).ToUniTask();
 
-			worldLoader.LoadWorld(
-				SceneManager.LoadSceneAsync(this.config.unity.worldScene).ToUniTask(),
-				Object.FindFirstObjectByType<WorldSceneRoot>
-			).ContinueWith(session => {
-				this.worldRenderer.SetLevel(session.level);
-				this.worldRenderer.SetTilemap(session.tilemap);
+			UniTask.WhenAll(worldBootTask, sceneLoadTask)
+				.ContinueWith(() => {
+					WorldSceneRoot sceneRoot = Object.FindFirstObjectByType<WorldSceneRoot>();
+					if (!sceneRoot) {
+						throw new InvalidOperationException("Root provider does not exist");
+					}
+					this.worldSavesManager.OnWorldEntered(world);
+					this.uiHandler.FlushScreens();
+					this.worldRenderer.Reset();
 
-				this.player = session.levelManager.StartSession();
+					SceneManager.UnloadSceneAsync(this.config.unity.mainScene);
+					WorldBootData bootData = worldBootTask.GetAwaiter().GetResult();
 
-				this.activeWorldSession = session;
-				this.uiHandler.SetUIDocument(session.uiDocument);
-				this.activeWorldScreen = new WorldScreen(this.player.GetInventory(), this.itemRenderManager);
-				this.uiHandler.PushScreen(this.activeWorldScreen);
+					WorldSession session = new() {
+						save = save,
+						level = bootData.level,
+						levelManager = bootData.levelManager,
+						canvas = sceneRoot.canvas,
+						uiDocument = sceneRoot.UIDocument,
+						tilemap = sceneRoot.tilemap
+					};
 
-				this.runtimeDataProvider.SetWorldSessionState(session, this.player);
-				this.runtimeExecutionServices.SetWorldSessionState(session, this.player);
-				this.commandProcessor.RegisterProvider(this.worldSessionCommands);
+					this.worldRenderer.SetLevel(session.level);
+					this.worldRenderer.SetTilemap(session.tilemap);
 
-				// PROTOTYPICAL
-				AudioManager.RebuildPools();
-				this.worldAudioEventBank.Activate();
-			}).Forget(e => Logger.LogFatal(e));
+					this.player = session.levelManager.StartSession();
+
+					this.activeWorldSession = session;
+					this.uiHandler.SetUIDocument(session.uiDocument);
+					this.activeWorldScreen = new WorldScreen(this.player.GetInventory(), this.itemRenderManager);
+					this.uiHandler.PushScreen(this.activeWorldScreen);
+
+					this.runtimeDataProvider.SetWorldSessionState(session, this.player);
+					this.runtimeExecutionServices.SetWorldSessionState(session, this.player);
+					this.commandProcessor.RegisterProvider(this.worldSessionCommands);
+
+					// PROTOTYPICAL
+					AudioManager.RebuildPools();
+					this.worldAudioEventBank.Activate();
+				})
+			.Forget(e => throw e);
 		}
 
 		public void QuitActiveWorld() {
@@ -266,7 +284,7 @@ namespace SoulboundEngine.Client {
 					AudioManager.RebuildPools();
 					this.worldAudioEventBank.Deactivate();
 				})
-			.Forget(e => Logger.LogFatal(e));
+			.Forget(e => throw e);
 		}
 
 		public IEnumerable<WorldSave> ListWorldSaves() {
