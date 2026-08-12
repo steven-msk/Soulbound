@@ -49,7 +49,7 @@ namespace SoulboundEngine.Client.World.Serialization {
 			bool first = true;
 			foreach (var chunk in chunks) {
 				if (!first) indexWriter.Write(CHUNK_INDEX_SEPARATOR);
-				indexWriter.Write(chunk.xpos);
+				indexWriter.Write(chunk.chunkX);
 				first = false;
 				WriteChunk(chunk, saveFolder);
 			}
@@ -199,7 +199,7 @@ namespace SoulboundEngine.Client.World.Serialization {
 		}
 
 		private static File ToChunkFile(WorldChunk chunk, File saveFolder) {
-			return ToChunkFile(chunk.xpos, saveFolder);
+			return ToChunkFile(chunk.chunkX, saveFolder);
 		}
 
 		private static File ToChunkFile(int chunkX, File saveFolder) {

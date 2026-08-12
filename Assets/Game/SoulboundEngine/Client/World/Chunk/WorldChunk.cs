@@ -2,7 +2,6 @@ using SoulboundEngine.Client.World.Block;
 using SoulboundEngine.Client.World.Block.Entity;
 using SoulboundEngine.Client.World.Block.State;
 using SoulboundEngine.Client.World.Generation;
-using SoulboundEngine.Core;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -15,24 +14,22 @@ namespace SoulboundEngine.Client.World.Chunk {
 	using Block = Block.Block;
 	using Level = Level.Level;
 
-	public class WorldChunk : ITickable {
-		public const int minY = -Level.WORLD_HEIGHT / 2;
-		public const int maxY = Level.WORLD_HEIGHT / 2;
+	public class WorldChunk : Chunk {
 		public const float HEIGHT_SPREAD = 0.01f;
 		public const float SURFACE_HEIGHT_RANGE = 50f;
 		public const float UNDERGROUND_HEIGHT_RANGE = 20f;
-
-		private readonly int[][] blockStateIDs = default!;
-		private readonly Dictionary<BlockPos, TileEntity> tileEntities = new();
 		private readonly TileEntityTickManager tickManager = new();
 		private readonly Level level;
-		private readonly int cx;
-		public int xpos => this.cx;
+		public int chunkX => this.chunkPos.x;
 
-		public WorldChunk(Level level, int cx) { 
+		public WorldChunk(Level level, ChunkPos chunkPos) 
+			: this(level, chunkPos, null, level.BlockStateContainerFactory()) { 
 			this.level = level;
-			this.cx = cx;
-			CreateBlockArray(ref this.blockStateIDs);
+		}
+
+		public WorldChunk(Level level, ChunkPos chunkPos, ChunkSection[]? sections, Func<BlockStateContainer> containerFactory)
+			: base(chunkPos, sections, level, containerFactory) {
+			this.level = level;
 		}
 
 		public static void CreateBlockArray(ref int[][] array) {
@@ -133,54 +130,51 @@ namespace SoulboundEngine.Client.World.Chunk {
 			}
 		}
 
-		public static int WorldYToIndex(int worldY) => worldY - minY;
+		public static int WorldYToIndex(int worldY) => worldY - Level.MIN_Y;
 
-		public static int IndexToWorldY(int yIndex) => yIndex + minY;
+		public static int IndexToWorldY(int yIndex) => yIndex + Level.MIN_Y;
 
-		public int WorldXToChunkX(int x) => x - this.xpos * Level.CHUNK_LENGTH;
+		public int WorldXToChunkX(int x) => x - this.chunkX * Level.CHUNK_LENGTH;
 
-		public int ChunkXToWorldX(int cx) => cx + this.xpos * Level.CHUNK_LENGTH;
+		public int ChunkXToWorldX(int cx) => cx + this.chunkX * Level.CHUNK_LENGTH;
 
-		public void SetBlockState(BlockPos blockPos, BlockState? blockState) {
-			blockState ??= Blocks.AIR.DefaultState;
+		public override BlockState? SetBlockState(BlockPos blockPos, BlockState newState) {
+			ChunkSection section = this.GetSection(this.GetSectionIndexFromBlock(blockPos.y));
+			bool wasEmpty = section.HasOnlyAir;
+			if (wasEmpty && newState.IsAir()) return null;
 
-			ChunkBlockPos chunkPos = blockPos.ToChunkPos();
-			int yIndex = WorldYToIndex(chunkPos.y);
-			BlockState oldState = this.GetBlockState(chunkPos) ?? Blocks.AIR.DefaultState;
-			Block oldBlock = oldState.block;
-			Block newBlock = blockState.block;
+			ChunkSectionPos sectionPos = ChunkSection.ComputeLocalPos(blockPos.x, blockPos.y);
+			BlockState oldState = section.SetBlockState(sectionPos.x, sectionPos.y, newState);
+			if (oldState == newState) return null;
 
-			this.blockStateIDs[chunkPos.x][yIndex] = Block.GetRawID(blockState);
+			Block newBlock = newState.GetBlock();
+			bool blockChanged = !oldState.IsOf(newBlock);
+			if (blockChanged && oldState.HasTileEntity() && !newState.ShouldChangedStateKeepTileEntity(oldState)) {
+				this.RemoveTileEntity(blockPos);
+			}
 
-			// tile entities only change when blocks differ in type
-			// however some blocks may handle tile entity persistence differently
-			// when oldBlock and newBlock are the same
-			if (newBlock != oldBlock) {
-				bool oldHasTileEntity = oldBlock is ITileEntityProvider;
-				bool newHasTileEntity = blockState.block is ITileEntityProvider;
+			if (!section.GetBlockState(sectionPos.x, sectionPos.y).IsOf(newBlock)) return null;
+			newState.OnPlace(this.level, blockPos, oldState);
 
-				if (oldHasTileEntity && this.tileEntities.ContainsKey(blockPos)) {
-					TileEntity tileEntity = this.tileEntities[blockPos];
-
-					this.tickManager.RemoveTileEntity(tileEntity);
-					this.tileEntities.Remove(blockPos);
-					tileEntity.SetLevel(null);
-					tileEntity.OnDispose();
+			if (newState.HasTileEntity()) {
+				TileEntity? currentEntity = this.GetTileEntity(blockPos);
+				if (currentEntity != null && !currentEntity.IsValidBlockState(newState)) {
+					Logger.LogWarning("Found mismatched tile entity at {}: type = {}, state = {}",
+						blockPos, currentEntity.GetTileEntityType(), newState);
+					this.RemoveTileEntity(blockPos);
+					currentEntity = null;
 				}
-				if (newHasTileEntity) {
-					ITileEntityProvider tileEntityProvider = (ITileEntityProvider)newBlock;
-					TileEntity? tileEntity = tileEntityProvider.CreateTileEntity(blockPos, blockState);
 
-					if (tileEntity != null && tileEntity.GetTileEntityType().Supports(blockState)) {
-						tileEntity.SetLevel(this.level);
-						this.tileEntities[blockPos] = tileEntity;
-						this.tickManager.AddTileEntity(tileEntity);
-					}
-
+				if (currentEntity == null) {
+					currentEntity = ((ITileEntityProvider)newBlock).CreateTileEntity(blockPos, newState);
+					if (currentEntity != null) this.SetTileEntity(currentEntity);
+				} else {
+					currentEntity.SetBlockState(newState);
 				}
 			}
-		}
 
+			return oldState;
+		}
 
 		[Obsolete]
 		public void SetBlock(ChunkBlockPos chunkPos, BlockState blockState) {
@@ -240,11 +234,11 @@ namespace SoulboundEngine.Client.World.Chunk {
 					BlockState blockState = Block.GetState(this.blockStateIDs[x][y]);
 					BlockPos blockPos = new(x, IndexToWorldY(y));
 
-					TileEntity? tileEntityAtBlock = this.TileEntityAt(blockPos);
+					TileEntity? tileEntityAtBlock = this.GetTileEntity(blockPos);
 					if (blockState.block is ITileEntityProvider tileEntityProvider && tileEntityAtBlock == null) {
 						// a TileEntity rejected by ValidateTileEntity should not vanish silently
 						// instead, a fresh TileEntity is created from the provider
-						Logger.LogWarning("Found missing tile entity for block {} at {}. This may be the result of broken serialization data", 
+						Logger.LogWarning("Found missing tile entity for block {} at {}. This may be the result of broken serialization data",
 							Blocks.GetIdentifier(blockState.block), blockPos);
 
 						TileEntity? tileEntity = tileEntityProvider.CreateTileEntity(blockPos, blockState);
@@ -272,20 +266,59 @@ namespace SoulboundEngine.Client.World.Chunk {
 			}
 		}
 
-		public BlockState? GetBlockState(ChunkBlockPos chunkPos) {
-			if (!Level.IsInBounds(chunkPos.ToBlock())) return null;
+		public BlockState GetBlockState(ChunkBlockPos chunkPos) => this.GetBlockState(chunkPos.ToBlock());
 
-			int stateID = this.blockStateIDs[chunkPos.x][WorldYToIndex(chunkPos.y)];
-			return Block.GetState(stateID);
+		public BlockState GetBlockState(BlockPos blockPos) {
+			int sectionIndex = this.GetSectionIndexFromBlock(blockPos.y);
+			if (sectionIndex < 0 || sectionIndex >= this.sections.Length) return Blocks.AIR.DefaultState;
+
+			ChunkSection section = this.GetSection(sectionIndex);
+			if (section.HasOnlyAir) return Blocks.AIR.DefaultState;
+
+			ChunkSectionPos sectionPos = ChunkSection.ComputeLocalPos(blockPos.x, blockPos.y);
+			return section.GetBlockState(sectionPos.x, sectionPos.y);
 		}
 
-		public TileEntity? TileEntityAt(BlockPos blockPos) {
+		public TileEntity? GetTileEntity(BlockPos blockPos) {
 			return this.tileEntities.TryGetValue(blockPos, out TileEntity tileEntity)
 				? tileEntity
 				: null;
 		}
 
-		public int[][] GetBlocks() => this.blockStateIDs;
+		public override void SetTileEntity(TileEntity tileEntity) {
+			BlockPos blockPos = tileEntity.blockPos;
+			BlockState state = this.GetBlockState(blockPos);
+			BlockState cachedState = tileEntity.GetBlockState();
+			bool mismatchedState = state != cachedState && !tileEntity.GetTileEntityType().Supports(state);
+			if (!state.HasTileEntity() || mismatchedState) {
+				Logger.LogWarning("Trying to set tile entity {} at {}, but state {} does not allow it", tileEntity, blockPos, state);
+				return;
+			}
+
+			if (mismatchedState) {
+				if (state.GetBlock() != cachedState.GetBlock()) {
+					Logger.LogWarning("Block state mismatch on tile entity {} at {}, updating", tileEntity, blockPos);
+				}
+				tileEntity.SetBlockState(state);
+			}
+
+			if (this.tileEntities.TryGetValue(blockPos, out TileEntity previousEntity) && previousEntity != tileEntity) {
+				this.tickManager.RemoveTileEntity(previousEntity);
+				tileEntity.OnDispose();
+			}
+			tileEntity.SetLevel(this.level);
+			this.tickManager.AddTileEntity(tileEntity);
+			this.tileEntities[blockPos] = tileEntity;
+		}
+
+		public override void RemoveTileEntity(BlockPos blockPos) {
+			TileEntity? tileEntity = this.GetTileEntity(blockPos);
+			if (tileEntity == null) return;
+
+			this.tickManager.RemoveTileEntity(tileEntity);
+			this.tileEntities.Remove(blockPos);
+			tileEntity.OnDispose();
+		}
 
 		public IEnumerable<TileEntity> GetTileEntities() => this.tileEntities.Values;
 	}

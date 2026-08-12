@@ -76,7 +76,7 @@ public class ChunkBlockPosTests {
         int staticValue = ChunkBlockPos.WorldYToIndex(pos.y);
 
         Assert.That(instanceValue, Is.EqualTo(staticValue));
-        Assert.That(instanceValue, Is.EqualTo(pos.y - WorldChunk.maxY));
+        Assert.That(instanceValue, Is.EqualTo(pos.y - Level.MAX_Y));
     }
 
 	[Test]

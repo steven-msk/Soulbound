@@ -44,7 +44,7 @@ namespace SoulboundEngine.Client.World.Chunk {
 
 		public readonly int WorldYToIndex() => WorldYToIndex(this.y);
 
-		public static int WorldYToIndex(int worldY) => worldY - WorldChunk.maxY;
+		public static int WorldYToIndex(int worldY) => worldY - Level.MAX_Y;
 
 
 		public readonly override bool Equals(object obj) {

@@ -14,6 +14,10 @@ namespace SoulboundEngine.Client.World.Block.State {
 
 		protected override BlockState AsBlockState() => this;
 
+		public bool IsAir() => this.block == Blocks.AIR;
+
+		public bool IsOf(Block block) => this.block == block;
+
 		public override string ToString() {
 			return $"block[{this.block}, properties={this.GetEntries()}]";
 		}

@@ -9,6 +9,7 @@ using SoulboundEngine.Client.World.Generation;
 using SoulboundEngine.Common;
 using SoulboundEngine.Common.Math;
 using SoulboundEngine.Common.Math.Random;
+using SoulboundEngine.Core;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -22,10 +23,12 @@ namespace SoulboundEngine.Client.World.Level {
 	using Block = Block.Block;
 	using Entity = Entity.Entity;
 
-	public sealed class Level : ILevelExecutionService, IEntityManager {
+	public sealed class Level : IHeightLimitView, ILevelExecutionService, IEntityManager {
 		public delegate void OnChunkGenerated(ChunkGenData genData);
-		public const int CHUNK_LENGTH = 32;
+		public const int CHUNK_LENGTH = SharedConstants.CHUNK_WIDTH;
 		public const int WORLD_HEIGHT = 1024;
+		public const int MIN_Y = -WORLD_HEIGHT / 2;
+		public const int MAX_Y = WORLD_HEIGHT / 2;
 		public const int RENDER_DISTANCE = 8;
 		public const int TERRAIN_PLANE_Y = 0;
 		const int biomeBlendRange = 10;
@@ -141,7 +144,7 @@ namespace SoulboundEngine.Client.World.Level {
 		}
 
 		private WorldChunk GenerateNewChunk(int chunkX, bool placeBlocks) {
-			WorldChunk chunk = new(this, chunkX);
+			WorldChunk chunk = new(this, new ChunkPos(chunkX));
 			this.generatedChunks[chunkX] = chunk;
 
 			chunk.Generate(this.biomeMap, this.heightmap, this.cavemap, placeBlocks, out ChunkGenData genData);
@@ -315,7 +318,7 @@ namespace SoulboundEngine.Client.World.Level {
 			}
 
 			foreach (WorldChunk chunk in toRemove) {
-				this.loadedChunks.Remove(chunk.xpos);
+				this.loadedChunks.Remove(chunk.chunkX);
 				this.OnChunkUnloaded(chunk);
 			}
 		}
@@ -358,12 +361,16 @@ namespace SoulboundEngine.Client.World.Level {
 
 		public TileEntity? GetTileEntity(BlockPos blockPos) {
 			WorldChunk? chunk = this.ChunkAt(blockPos);
-			return chunk?.TileEntityAt(blockPos);
+			return chunk?.GetTileEntity(blockPos);
 		}
 
 		public Block? GetBlock(BlockPos blockPos) {
 			BlockState? blockState = this.GetBlockState(blockPos);
 			return blockState?.block;
+		}
+
+		public Func<BlockStateContainer> BlockStateContainerFactory() {
+			return () => new BlockStateContainer(ChunkSection.WIDTH, ChunkSection.HEIGHT);
 		}
 
 		public static int ChunkXAt(Vector2 worldPos) => ChunkXAt(worldPos.x);
@@ -377,6 +384,9 @@ namespace SoulboundEngine.Client.World.Level {
 		public WorldChunk? ChunkAt(BlockPos blockPos) { 
 			return this.generatedChunks!.GetValueOrDefault(ChunkXAt(blockPos.x), null);
 		}
+
+		public int GetBottomY() => MIN_Y;
+		public int GetHeight() => WORLD_HEIGHT;
 
 		public WorldChunk? GetChunk(int chunkX) {
 			if (this.generatedChunks.TryGetValue(chunkX, out var chunk)) {
@@ -394,7 +404,7 @@ namespace SoulboundEngine.Client.World.Level {
 		}
 
 		public static bool IsInBounds(BlockPos pos) {
-			return pos.y < WORLD_HEIGHT && pos.y >= WorldChunk.minY;
+			return pos.y < WORLD_HEIGHT && pos.y >= MIN_Y;
 		}
 
 		public int GetSurfaceY(int xpos) {

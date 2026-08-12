@@ -9,7 +9,5 @@ namespace SoulboundEngine.Client.World.Level {
 		Tilemap tilemap { get; }
 		[Obsolete] Canvas canvas { get; }
 		UIDocument UIDocument { get; }
-
-		public LevelGridContext GetGridContext() => new(this.grid, this.tilemap);
 	}
 }
