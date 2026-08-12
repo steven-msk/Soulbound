@@ -21,6 +21,7 @@ using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 namespace SoulboundEngine.Client.World.Level {
 	using Block = Block.Block;
+	using Chunk = Chunk.Chunk;
 	using Entity = Entity.Entity;
 
 	public sealed class Level : IHeightLimitView, ILevelExecutionService, IEntityManager {
@@ -34,8 +35,8 @@ namespace SoulboundEngine.Client.World.Level {
 		const int biomeBlendRange = 10;
 
 		public readonly int seed;
-		private readonly Dictionary<int, WorldChunk> loadedChunks = new();
-		private readonly Dictionary<int, WorldChunk> generatedChunks = new(); 
+		private readonly Dictionary<int, Chunk> loadedChunks = new();
+		private readonly Dictionary<int, Chunk> generatedChunks = new(); 
 		[Obsolete] private readonly ConcurrentDictionary<int, List<OnChunkGenerated>> deferredGenerations = new();
 		private readonly Dictionary<int, ChunkGenData> chunkGenData = new();
 		private readonly RandomSequences randomSequences;
@@ -43,8 +44,8 @@ namespace SoulboundEngine.Client.World.Level {
 		public event Action<BlockPos, BlockState?, BlockState?>? blockStateChanged;
 		public event Action<Entity>? entityAdded;
 		public event Action<Entity>? entityRemoved;
-		public event Action<WorldChunk>? chunkLoaded;
-		public event Action<WorldChunk>? chunkUnloaded;
+		public event Action<Chunk>? chunkLoaded;
+		public event Action<Chunk>? chunkUnloaded;
 
 		private readonly BiomeMap biomeMap;
 		private readonly Heightmap heightmap;
@@ -73,35 +74,9 @@ namespace SoulboundEngine.Client.World.Level {
 			}
 		}
 
-		public void ApplyDeserializedBlocks(Dictionary<int, int[][]> stateIDsByChunk) {
-			foreach (var (chunkX, stateIDs) in stateIDsByChunk) {
-				if (!this.generatedChunks.TryGetValue(chunkX, out WorldChunk chunk)) {
-					chunk = this.GenerateNewChunk(chunkX, false);
-					this.generatedChunks[chunkX] = chunk;
-				}
-				chunk.SetAllBlocks(stateIDs);
-			}
-		}
-
-		public void ApplyDeserializedTileEntities(IEnumerable<TileEntity> tileEntities) {
-			foreach (var tileEntity in tileEntities) {
-				BlockPos blockPos = tileEntity.GetBlockPos();
-				ChunkBlockPos chunkPos = blockPos.ToChunkPos();
-				WorldChunk? chunk = this.GetChunk(chunkPos.chunkX);
-				if (chunk == null) {
-					Logger.LogError("Chunk {} is not generated, yet a TileEntity was deserialized in it: {} at {}",
-						chunkPos.x, tileEntity, blockPos);
-					continue;
-				}
-
-				if (!chunk.ValidateTileEntity(tileEntity)) continue;
-				chunk.AddTileEntityValidated(tileEntity);
-			}
-		}
-
-		public void SyncBlocksWithTileEntities() {
-			foreach (var chunk in this.generatedChunks.Values) {
-				chunk.SyncBlocksWithTileEntities();
+		public void ReplaceGenerated(List<Chunk> chunks) {
+			foreach (var chunk in chunks) {
+				this.generatedChunks[chunk.GetPos().x] = chunk;
 			}
 		}
 
@@ -209,8 +184,8 @@ namespace SoulboundEngine.Client.World.Level {
 		}
 
 		[PROTOTYPICAL]
-		public void SetBlockState(BlockPos blockPos, BlockState? blockState) {
-			WorldChunk? chunk = this.ChunkAt(blockPos);
+		public void SetBlockState(BlockPos blockPos, BlockState blockState) {
+			Chunk? chunk = this.ChunkAt(blockPos);
 			if (chunk == null) {
 				Logger.LogError("Block pos not valid: " + blockPos);
 				return;
@@ -238,7 +213,7 @@ namespace SoulboundEngine.Client.World.Level {
 
 		private void NotifyNeighboringStates(BlockPos blockPos) {
 			foreach (var neighborPos in blockPos.GetCardinalNeighbors()) {
-				WorldChunk? chunk = this.ChunkAt(blockPos);
+				Chunk? chunk = this.ChunkAt(blockPos);
 				if (chunk == null) return;
 
 				BlockState? blockState = this.GetBlockState(neighborPos);
@@ -309,7 +284,7 @@ namespace SoulboundEngine.Client.World.Level {
 		public IEnumerable<Entity> GetAllEntities() => this.entities.Values.ToList();
 
 		public void UnloadDistantChunks(int pivotChunkX, int viewDistance) {
-			List<WorldChunk> toRemove = new();
+			List<Chunk> toRemove = new();
 
 			foreach (int chunkX in this.loadedChunks.Keys) {
 				if (Mathf.Abs(chunkX - pivotChunkX) > viewDistance) {
@@ -317,8 +292,8 @@ namespace SoulboundEngine.Client.World.Level {
 				}
 			}
 
-			foreach (WorldChunk chunk in toRemove) {
-				this.loadedChunks.Remove(chunk.chunkX);
+			foreach (Chunk chunk in toRemove) {
+				this.loadedChunks.Remove(chunk.GetPos().x);
 				this.OnChunkUnloaded(chunk);
 			}
 		}
@@ -328,7 +303,7 @@ namespace SoulboundEngine.Client.World.Level {
 				int chunkX = pivotChunkX + dx;
 
 				if (!this.loadedChunks.ContainsKey(chunkX)) {
-					WorldChunk chunk;
+					Chunk chunk;
 
 					if (!this.generatedChunks.ContainsKey(chunkX)) {
 						chunk = this.GenerateNewChunk(chunkX, true);
@@ -343,30 +318,32 @@ namespace SoulboundEngine.Client.World.Level {
 			}
 		}
 
-		private void OnChunkLoaded(WorldChunk chunk) {
+		private void OnChunkLoaded(Chunk chunk) {
 			this.chunkLoaded?.Invoke(chunk);
 		}
 
-		private void OnChunkUnloaded(WorldChunk chunk) {
+		private void OnChunkUnloaded(Chunk chunk) {
 			this.chunkUnloaded?.Invoke(chunk);
 		}
 
 		public void OnSessionStop() {
 		}
 
-		public BlockState? GetBlockState(BlockPos blockPos) {
-			WorldChunk? chunk = this.ChunkAt(blockPos);
-			return chunk?.GetBlockState(blockPos.ToChunkPos());
+		public BlockState GetBlockState(BlockPos blockPos) {
+			if (!this.IsInHeightLimit(blockPos.y)) return Blocks.AIR.DefaultState;
+
+			Chunk? chunk = this.ChunkAt(blockPos);
+			return chunk?.GetBlockState(blockPos) ?? Blocks.AIR.DefaultState;
 		}
 
 		public TileEntity? GetTileEntity(BlockPos blockPos) {
-			WorldChunk? chunk = this.ChunkAt(blockPos);
+			Chunk? chunk = this.ChunkAt(blockPos);
 			return chunk?.GetTileEntity(blockPos);
 		}
 
-		public Block? GetBlock(BlockPos blockPos) {
-			BlockState? blockState = this.GetBlockState(blockPos);
-			return blockState?.block;
+		public Block GetBlock(BlockPos blockPos) {
+			BlockState blockState = this.GetBlockState(blockPos);
+			return blockState.GetBlock();
 		}
 
 		public Func<BlockStateContainer> BlockStateContainerFactory() {
@@ -380,26 +357,26 @@ namespace SoulboundEngine.Client.World.Level {
 		public static int ToWorldX(int cx, int chunkX) => cx + chunkX * CHUNK_LENGTH;
 		public static int ToChunkX(int x) => x - ChunkXAt(x) * CHUNK_LENGTH;
 
-		public WorldChunk? ChunkAt(int xpos) => this.ChunkAt(new BlockPos(xpos, 0));
-		public WorldChunk? ChunkAt(BlockPos blockPos) { 
+		public Chunk? ChunkAt(int xpos) => this.ChunkAt(new BlockPos(xpos, 0));
+		public Chunk? ChunkAt(BlockPos blockPos) { 
 			return this.generatedChunks!.GetValueOrDefault(ChunkXAt(blockPos.x), null);
 		}
 
 		public int GetBottomY() => MIN_Y;
 		public int GetHeight() => WORLD_HEIGHT;
 
-		public WorldChunk? GetChunk(int chunkX) {
+		public Chunk? GetChunk(int chunkX) {
 			if (this.generatedChunks.TryGetValue(chunkX, out var chunk)) {
 				return chunk;
 			}
 			return null;
 		}
 
-		public IEnumerable<WorldChunk> GetLoadedChunks() {
+		public IEnumerable<Chunk> GetLoadedChunks() {
 			return this.loadedChunks.Values.ToList();
 		}
 
-		public IEnumerable<WorldChunk> GetGeneratedChunks() {
+		public IEnumerable<Chunk> GetGeneratedChunks() {
 			return this.generatedChunks.Values.ToList();
 		}
 

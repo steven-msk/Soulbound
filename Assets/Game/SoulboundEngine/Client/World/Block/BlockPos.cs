@@ -2,7 +2,7 @@ using SoulboundEngine.Client.World.Chunk;
 using System;
 using UnityEngine;
 
-namespace SoulboundEngine.Client.World.Block {
+namespace SoulboundEngine.Client.World {
     public struct BlockPos {
         public int x;
         public int y;

@@ -1,4 +1,5 @@
-﻿using SoulboundEngine.Client.World.Block;
+﻿using SoulboundEngine.Client.World;
+using SoulboundEngine.Client.World.Block;
 using SoulboundEngine.Client.World.Block.State;
 using System.Collections.Generic;
 using UnityEngine;

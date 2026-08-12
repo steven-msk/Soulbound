@@ -1,5 +1,5 @@
-﻿using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.Client.World.Block;
+﻿using Newtonsoft.Json.Linq;
+using SoulboundEngine.Client.Debug.Logging;
 using SoulboundEngine.Client.World.Block.Entity;
 using SoulboundEngine.Client.World.Block.State;
 using System;
@@ -9,7 +9,7 @@ using System.Linq;
 #nullable enable
 
 namespace SoulboundEngine.Client.World.Chunk {
-	public abstract class Chunk : IHeightLimitView {
+	public abstract class Chunk : IBlockGetter {
 		protected readonly Dictionary<BlockPos, TileEntity> tileEntities = new();
 		protected readonly IHeightLimitView heightLimitView;
 		protected readonly ChunkSection[] sections;
@@ -37,12 +37,18 @@ namespace SoulboundEngine.Client.World.Chunk {
 				}
 			}
 		}
+
+		public abstract void Tick();
 		
 		public abstract BlockState? SetBlockState(BlockPos blockPos, BlockState state);
+		public abstract BlockState GetBlockState(BlockPos blockPos);
+
 
 		public abstract void SetTileEntity(TileEntity tileEntity);
-
+		public abstract TileEntity? GetTileEntity(BlockPos blockPos);
 		public abstract void RemoveTileEntity(BlockPos blockPos);
+
+		public abstract JObject? GetTileEntityJsonForSaving(BlockPos blockPos);
 
 		public int GetBottomY() => this.heightLimitView.GetBottomY();
 
@@ -51,6 +57,10 @@ namespace SoulboundEngine.Client.World.Chunk {
 		public HashSet<BlockPos> GetTileEntityPositions() {
 			return this.tileEntities.Keys.ToHashSet();
 		}
+
+		public virtual bool CanBeSerialized() => true;
+
+		public ChunkPos GetPos() => this.chunkPos;
 
 		public ChunkSection[] GetSections() => this.sections;
 		public ChunkSection GetSection(int yIndex) => this.sections[yIndex];

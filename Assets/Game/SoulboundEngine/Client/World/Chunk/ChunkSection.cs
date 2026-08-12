@@ -8,6 +8,10 @@ namespace SoulboundEngine.Client.World.Chunk {
 		public const int WIDTH = Level.CHUNK_LENGTH;
 		private readonly BlockStateContainer blockStates;
 
+		private ChunkSection(ChunkSection original)
+			: this(original.blockStates.Copy()) {
+		}
+
 		public ChunkSection(BlockStateContainer blockStates) {
 			this.blockStates = blockStates;
 		}
@@ -24,12 +28,22 @@ namespace SoulboundEngine.Client.World.Chunk {
 
 		public bool HasOnlyAir => this.blockStates.HasOnlyAir;
 
-		public static ChunkSectionPos ComputeLocalPos(int x, int y) {
-			int sectionX = x / WIDTH;
-			int sectionY = y / HEIGHT;
+		public BlockStateContainer GetStatesImmutable() => this.blockStates.Copy();
+
+		public static SectionPos ComputeLocalPos(int x, int y) {
+			int sectionX = FloorDiv(x, WIDTH);
+			int sectionY = FloorDiv(y, HEIGHT);
 			int localX = x - sectionX * WIDTH;
 			int localY = y - sectionY * HEIGHT;
-			return new ChunkSectionPos(localX, localY, sectionX, sectionY);
+			return new SectionPos(localX, localY);
 		}
+
+		private static int FloorDiv(int a, int b) {
+			int q = a / b;
+			if ((a % b != 0) && ((a < 0) != (b < 0))) q--;
+			return q;
+		}
+
+		public ChunkSection Copy() => new(this);
 	}
 }

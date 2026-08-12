@@ -1,3 +1,4 @@
+using Newtonsoft.Json.Linq;
 using SoulboundEngine.Client.World.Block;
 using SoulboundEngine.Client.World.Block.Entity;
 using SoulboundEngine.Client.World.Block.State;
@@ -39,7 +40,7 @@ namespace SoulboundEngine.Client.World.Chunk {
 			}
 		}
 
-		public void Tick() => this.tickManager.Tick();
+		public override void Tick() => this.tickManager.Tick();
 
 		[Obsolete("known issue: world architecture design is poorly designed")]
 		public void Generate(BiomeMap biomeMap, Heightmap heightmap, Cavemap cavemap, bool placeBlocks, out ChunkGenData genData) {
@@ -143,7 +144,7 @@ namespace SoulboundEngine.Client.World.Chunk {
 			bool wasEmpty = section.HasOnlyAir;
 			if (wasEmpty && newState.IsAir()) return null;
 
-			ChunkSectionPos sectionPos = ChunkSection.ComputeLocalPos(blockPos.x, blockPos.y);
+			SectionPos sectionPos = ChunkSection.ComputeLocalPos(blockPos.x, blockPos.y);
 			BlockState oldState = section.SetBlockState(sectionPos.x, sectionPos.y, newState);
 			if (oldState == newState) return null;
 
@@ -185,101 +186,20 @@ namespace SoulboundEngine.Client.World.Chunk {
 			this.SetBlockState(new BlockPos(this.ChunkXToWorldX(cx), IndexToWorldY(yIndex)), blockState);
 		}
 
-		public void SetAllBlocks(int[][] stateIDs) {
-			Array.Copy(stateIDs, this.blockStateIDs, stateIDs.Length);
-		}
-
-		/// <summary>
-		/// Trust boundary on deserialized input. 
-		/// This checks whether the tileEntity claims to belong to a block that matches the expected outcome.
-		/// </summary>
-		public bool ValidateTileEntity(TileEntity tileEntity) {
-			ChunkBlockPos chunkPos = tileEntity.blockPos.ToChunkPos();
-			BlockState? stateInChunk = this.GetBlockState(chunkPos);
-
-			if (tileEntity.GetBlockState() != stateInChunk) {
-				if (stateInChunk != null) {
-					Logger.LogError("Block state in tile entity does not match the one in chunk: {} at {}, expected {} but was {}",
-						tileEntity, chunkPos, tileEntity.GetBlockState(), stateInChunk!);
-				} else {
-					Logger.LogError("Deserialized TileEntity {} at {} is out of world bounds", tileEntity, chunkPos);
-				}
-				return false;
-			}
-			if (stateInChunk.block is not ITileEntityProvider) {
-				Logger.LogError("Block state in chunk is not of type ITileEntityProvider, " +
-					"but a TileEntity was associated with it: {} at {}, block in chunk: {}",
-					tileEntity, chunkPos, stateInChunk);
-				return false;
-			}
-			return true;
-		}
-
-		public void AddTileEntityValidated(TileEntity tileEntity) {
-			if (this.tileEntities.TryGetValue(tileEntity.blockPos, out TileEntity existing)) {
-				Logger.LogWarning("Validated TileEntity already exists: attempted to add {} at {} but {} was already there",
-					tileEntity, tileEntity.blockPos, existing);
-				return;
-			}
-			this.tileEntities.Add(tileEntity.blockPos, tileEntity);
-		}
-
-		/// <summary>
-		/// Consistency check after deserialized tile entities are applied and validated.
-		/// This makes sure every provider block is backed by a tile entity.
-		/// </summary>
-		public void SyncBlocksWithTileEntities() {
-			for (int x = 0; x < this.blockStateIDs.Length; x++) {
-				for (int y = 0; y < this.blockStateIDs[x].Length; y++) {
-					BlockState blockState = Block.GetState(this.blockStateIDs[x][y]);
-					BlockPos blockPos = new(x, IndexToWorldY(y));
-
-					TileEntity? tileEntityAtBlock = this.GetTileEntity(blockPos);
-					if (blockState.block is ITileEntityProvider tileEntityProvider && tileEntityAtBlock == null) {
-						// a TileEntity rejected by ValidateTileEntity should not vanish silently
-						// instead, a fresh TileEntity is created from the provider
-						Logger.LogWarning("Found missing tile entity for block {} at {}. This may be the result of broken serialization data",
-							Blocks.GetIdentifier(blockState.block), blockPos);
-
-						TileEntity? tileEntity = tileEntityProvider.CreateTileEntity(blockPos, blockState);
-						if (tileEntity != null && tileEntity.GetTileEntityType().Supports(blockState)) {
-							tileEntity.SetLevel(this.level);
-							this.tileEntities[blockPos] = tileEntity;
-							this.tickManager.AddTileEntity(tileEntity);
-							Logger.LogInfo("Added fresh TileEntity since it was missing: {} at {}", tileEntity, blockPos);
-						} else {
-							Logger.LogError("Failed to replenish missing TileEntity for block {} at {}",
-								Blocks.GetIdentifier(blockState.block), blockPos);
-							this.tileEntities.Remove(blockPos);
-						}
-					} else if (blockState.block is not ITileEntityProvider && tileEntityAtBlock != null) {
-						// branch kept for consistency with ValidateTileEntity and defense against other code paths
-						// to avoid stale tile entities remaining in the dictionary.
-						// should be unreachable given a pass to ValidateTileEntity before calling this
-						Logger.LogWarning("Found TileEntity for block that doesnt provide tile entities: {} at {}", tileEntityAtBlock, blockPos);
-						this.tileEntities.Remove(blockPos);
-					} else if (tileEntityAtBlock != null) {
-						tileEntityAtBlock.SetLevel(this.level);
-						this.tickManager.AddTileEntity(tileEntityAtBlock);
-					}
-				}
-			}
-		}
-
 		public BlockState GetBlockState(ChunkBlockPos chunkPos) => this.GetBlockState(chunkPos.ToBlock());
 
-		public BlockState GetBlockState(BlockPos blockPos) {
+		public override BlockState GetBlockState(BlockPos blockPos) {
 			int sectionIndex = this.GetSectionIndexFromBlock(blockPos.y);
 			if (sectionIndex < 0 || sectionIndex >= this.sections.Length) return Blocks.AIR.DefaultState;
 
 			ChunkSection section = this.GetSection(sectionIndex);
 			if (section.HasOnlyAir) return Blocks.AIR.DefaultState;
 
-			ChunkSectionPos sectionPos = ChunkSection.ComputeLocalPos(blockPos.x, blockPos.y);
+			SectionPos sectionPos = ChunkSection.ComputeLocalPos(blockPos.x, blockPos.y);
 			return section.GetBlockState(sectionPos.x, sectionPos.y);
 		}
 
-		public TileEntity? GetTileEntity(BlockPos blockPos) {
+		public override TileEntity? GetTileEntity(BlockPos blockPos) {
 			return this.tileEntities.TryGetValue(blockPos, out TileEntity tileEntity)
 				? tileEntity
 				: null;
@@ -318,6 +238,18 @@ namespace SoulboundEngine.Client.World.Chunk {
 			this.tickManager.RemoveTileEntity(tileEntity);
 			this.tileEntities.Remove(blockPos);
 			tileEntity.OnDispose();
+		}
+
+		public override JObject? GetTileEntityJsonForSaving(BlockPos blockPos) {
+			TileEntity? tileEntity = this.GetTileEntity(blockPos);
+			if (tileEntity == null) return null;
+
+			JObject json = new() {
+				["type"] = TileEntityType.GetId(tileEntity.GetTileEntityType())!.ToString(),
+				["pos"] = tileEntity.blockPos.ToString(),
+			};
+			tileEntity.Write(json);
+			return json;
 		}
 
 		public IEnumerable<TileEntity> GetTileEntities() => this.tileEntities.Values;

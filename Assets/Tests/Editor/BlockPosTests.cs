@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.Client.World;
 using SoulboundEngine.Client.World.Level;
 using System;
 using UnityEngine;

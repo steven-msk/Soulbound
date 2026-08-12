@@ -1,5 +1,4 @@
 using Newtonsoft.Json;
-using SoulboundEngine.Client.World.Block;
 using SoulboundEngine.Common.Json;
 using UnityEngine;
 
@@ -18,7 +17,7 @@ namespace SoulboundEngine.Client.World.Chunk {
 			this.chunkX = chunkX;
 		}
 
-        public readonly WorldChunk UnderlyingChunk(Level level) => level.ChunkAt(this.ToBlock());
+        public readonly Chunk UnderlyingChunk(Level level) => level.ChunkAt(this.ToBlock());
 
         public static ChunkBlockPos FromBlockPos(BlockPos blockPos) {
 			int chunkX = Level.ChunkXAt(blockPos.x);

@@ -42,15 +42,15 @@ namespace SoulboundEngine.Client.World {
 		}
 
 		public static int GetBottomSectionY(this IHeightLimitView heightLimitView) {
-			return ChunkSectionPos.BlockToSectionY(heightLimitView.GetBottomY());
+			return SectionPos.BlockToSectionY(heightLimitView.GetBottomY());
 		}
 
 		public static int GetTopSectionY(this IHeightLimitView heightLimitView) {
-			return ChunkSectionPos.BlockToSectionY(heightLimitView.GetTopY());
+			return SectionPos.BlockToSectionY(heightLimitView.GetTopY());
 		}
 
 		public static int GetSectionIndexFromBlock(this IHeightLimitView heightLimitView, int blockY) {
-			return heightLimitView.GetSectionIndexFromSectionY(ChunkSectionPos.BlockToSectionY(blockY));
+			return heightLimitView.GetSectionIndexFromSectionY(SectionPos.BlockToSectionY(blockY));
 		}
 
 		public static int GetSectionIndexFromSectionY(this IHeightLimitView heightLimitView, int sectionY) {
