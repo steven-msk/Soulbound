@@ -2,11 +2,8 @@ using Newtonsoft.Json.Linq;
 using SoulboundEngine.Client.World.Block;
 using SoulboundEngine.Client.World.Block.Entity;
 using SoulboundEngine.Client.World.Block.State;
-using SoulboundEngine.Client.World.Generation;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 #nullable enable
@@ -33,103 +30,7 @@ namespace SoulboundEngine.Client.World.Chunk {
 			this.level = level;
 		}
 
-		public static void CreateBlockArray(ref int[][] array) {
-			array = new int[Level.CHUNK_LENGTH][];
-			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
-				array[x] = new int[Level.WORLD_HEIGHT];
-			}
-		}
-
 		public override void Tick() => this.tickManager.Tick();
-
-		[Obsolete("known issue: world architecture design is poorly designed")]
-		public void Generate(BiomeMap biomeMap, Heightmap heightmap, Cavemap cavemap, bool placeBlocks, out ChunkGenData genData) {
-			genData = new ChunkGenData {
-				chunk = this,
-				genContexts = new BlockGenContext[Level.CHUNK_LENGTH][],
-				surfacePoints = new int[Level.CHUNK_LENGTH],
-				biomeWeights = new IEnumerable<BiomeWeight>[Level.CHUNK_LENGTH],
-				biomePartition = new ChunkBiomePartition(),
-				caveDensities = new float[Level.CHUNK_LENGTH][],
-				caveMask = new BitArray[Level.CHUNK_LENGTH]
-			};
-
-			for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
-				genData.caveDensities[cx] = new float[Level.WORLD_HEIGHT];
-				genData.caveMask[cx] = new BitArray(Level.WORLD_HEIGHT);
-				genData.genContexts[cx] = new BlockGenContext[Level.WORLD_HEIGHT];
-				int x = this.ChunkXToWorldX(cx);
-
-				var weights = biomeMap.ResolveWeights(x);
-				biomeMap.ResolvePrimaryBiomes(weights, out var primary, out var secondary);
-				genData.biomeWeights[cx] = weights;
-
-				var partition = this.ProcessBiomePartition(x, primary.biome, genData.biomePartition);
-				genData.biomePartition = partition;
-
-				int height = Mathf.FloorToInt(heightmap.SampleHeight(x, primary, secondary));
-				float surfaceY = heightmap.ToYCoord(height);
-
-				BlockResolver blockResolver = new(primary.biome, secondary?.biome);
-
-				for (int y = 0; y < Level.WORLD_HEIGHT; y++) {
-					BlockPos blockPos = new(x, IndexToWorldY(y));
-					float caveDensity = cavemap.SampleDensity(x, blockPos.y, surfaceY, primary, secondary);
-					bool isCave = cavemap.IsCave(caveDensity);
-
-					var ctx = new BlockGenContext {
-						pos = blockPos,
-						surfaceY = heightmap.ToYCoord(height),
-						caveDensity = caveDensity,
-						isCave = isCave,
-					};
-
-					genData.genContexts[cx][y] = ctx;
-					genData.caveDensities[cx][y] = caveDensity;
-					genData.caveMask[cx][y] = isCave;
-					genData.surfacePoints[cx] = ctx.surfaceY;
-
-					if (placeBlocks) {
-						BlockState blockState = blockResolver.ResolveBlock(ctx);
-						this.SetBlock(cx, y, blockState);
-					}
-				}
-			}
-		}
-
-		[Obsolete]
-		ChunkBiomePartition ProcessBiomePartition(int x, IBiome primary, ChunkBiomePartition partition) {
-			if (partition.primary == null) {
-				partition.primary = primary;
-			}
-			
-			if (partition.primary != primary && partition.secondary == null) {
-				partition.secondary = primary;
-				partition.splitX = x;
-			}
-			return partition;
-		}
-
-		[Obsolete]
-		public void PostProcess(ChunkGenData genData, Level level) {
-			IBiome primary = genData.biomePartition.primary;
-			IBiome? secondary = genData.biomePartition.secondary;
-
-			int splitX = genData.biomePartition.splitX;
-			int chunkStartX = this.ChunkXToWorldX(0);
-			int chunkEndX = this.ChunkXToWorldX(Level.CHUNK_LENGTH - 1);
-
-			int partitionStartX = chunkStartX;
-			int partitionLimitX = secondary == null ? chunkEndX : splitX;
-			primary.PostProcess(genData, this, level, partitionStartX, partitionLimitX);
-
-			if (secondary != null) {
-				partitionStartX = splitX + 1;
-				partitionLimitX = chunkEndX;
-
-				secondary?.PostProcess(genData, this, level, partitionStartX, partitionLimitX);
-			}
-		}
 
 		public static int WorldYToIndex(int worldY) => worldY - Level.MIN_Y;
 
@@ -251,6 +152,8 @@ namespace SoulboundEngine.Client.World.Chunk {
 			tileEntity.Write(json);
 			return json;
 		}
+
+		public override bool IsEmpty() => false;
 
 		public IEnumerable<TileEntity> GetTileEntities() => this.tileEntities.Values;
 	}

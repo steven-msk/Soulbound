@@ -62,6 +62,8 @@ namespace SoulboundEngine.Client.World.Chunk {
 
 		public ChunkPos GetPos() => this.chunkPos;
 
+		public abstract bool IsEmpty();
+
 		public ChunkSection[] GetSections() => this.sections;
 		public ChunkSection GetSection(int yIndex) => this.sections[yIndex];
 	}

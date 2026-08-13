@@ -1,4 +1,5 @@
 ﻿using SoulboundEngine.Client.World.Block.State;
+using SoulboundEngine.Common.Math;
 
 namespace SoulboundEngine.Client.World.Chunk {
 	using Level = Level.Level;
@@ -31,17 +32,11 @@ namespace SoulboundEngine.Client.World.Chunk {
 		public BlockStateContainer GetStatesImmutable() => this.blockStates.Copy();
 
 		public static SectionPos ComputeLocalPos(int x, int y) {
-			int sectionX = FloorDiv(x, WIDTH);
-			int sectionY = FloorDiv(y, HEIGHT);
+			int sectionX = Maths.FloorDiv(x, WIDTH);
+			int sectionY = Maths.FloorDiv(y, HEIGHT);
 			int localX = x - sectionX * WIDTH;
 			int localY = y - sectionY * HEIGHT;
 			return new SectionPos(localX, localY);
-		}
-
-		private static int FloorDiv(int a, int b) {
-			int q = a / b;
-			if ((a % b != 0) && ((a < 0) != (b < 0))) q--;
-			return q;
 		}
 
 		public ChunkSection Copy() => new(this);

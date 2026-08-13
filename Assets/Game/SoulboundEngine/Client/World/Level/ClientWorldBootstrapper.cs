@@ -1,5 +1,5 @@
 using Cysharp.Threading.Tasks;
-using SoulboundEngine.Client.World.Generation;
+using SoulboundEngine.Client.World.Gen;
 using SoulboundEngine.Client.World.Serialization;
 
 namespace SoulboundEngine.Client.World.Level {
@@ -24,7 +24,7 @@ namespace SoulboundEngine.Client.World.Level {
 			Level level = levelManager.GetLevel();
 
 			bool shouldPlaceGeneratedBlocks = this.save.isNew;
-			level.GenerateInitialTerrain(shouldPlaceGeneratedBlocks);
+			level.GenerateSpawn(shouldPlaceGeneratedBlocks);
 			if (!this.save.isNew) {
 				this.worldSerializer.Deserialize(levelManager, this.save.saveFolder);
 			}

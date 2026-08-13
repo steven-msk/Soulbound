@@ -1,16 +1,10 @@
-
-using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.Client.World.Biome;
 using SoulboundEngine.Client.World.Block.State;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.Generation {
+namespace SoulboundEngine.Client.World.Gen {
 	public sealed class BlockResolver {
 		const int blendRange = 10;
 
@@ -23,13 +17,13 @@ namespace SoulboundEngine.Client.World.Generation {
 		}
 
 		public BlockState ResolveBlock(BlockGenContext ctx) {
-			return ResolveBlock(ctx, primary);
+			return this.ResolveBlock(ctx, this.primary);
 		}
 
 		private BlockState ResolveBlock(BlockGenContext ctx, IBiome biome) {
 			return ctx.isCave
-				? ResolveCaveBlock(ctx.pos, ctx.caveDensity, biome)
-				: ResolveTerrainBlock(ctx, biome);
+				? this.ResolveCaveBlock(ctx.pos, ctx.caveDensity, biome)
+				: this.ResolveTerrainBlock(ctx, biome);
 		}
 
 		private BlockState ResolveTerrainBlock(BlockGenContext ctx, IBiome biome) {
@@ -45,8 +39,8 @@ namespace SoulboundEngine.Client.World.Generation {
 			t = Mathf.Pow(t, 1.7f) + UnityEngine.Random.value;
 
 			return t > 0f && t < 1f
-				? ResolveBlock(ctx, primary)
-				: ResolveBlock(ctx, secondary);
+				? this.ResolveBlock(ctx, this.primary)
+				: this.ResolveBlock(ctx, this.secondary);
 		}
 	}
 }

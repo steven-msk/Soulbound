@@ -1,5 +1,6 @@
 using SoulboundEngine.Client.UI.Screen;
-using SoulboundEngine.Client.World.Generation;
+using SoulboundEngine.Client.World.Biome;
+using SoulboundEngine.Client.World.Gen;
 using System;
 using UnityEngine;
 using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
@@ -10,6 +11,8 @@ namespace SoulboundEngine.Client.World.Level {
 	using PlayerEntity = Player.PlayerEntity;
 
 	public class LevelManager {
+		public const int CHUNK_RADIUS = 2;
+		public const int TERRAIN_PLANE_Y = 0;
 		public const string worldDump = "worldDump.json";
 		public static readonly RectInt simulationView = new(-128, -76, 256, 156);
 		private readonly Level level;
@@ -19,7 +22,13 @@ namespace SoulboundEngine.Client.World.Level {
 		private IScreenHandle? pauseScreenHandle;
 
 		public LevelManager(SoulboundClient client, ISeedProvider seedProvider) {
-			this.level = new Level(seedProvider.GetSeed());
+			int seed = seedProvider.GetSeed();
+			PlainsBiome biome1 = new(seed);
+			var biome2 = new HillsBiome(seed);
+			BiomeMap biomeMap = new(new IBiome[] { biome1, biome2 });
+			Heightmap heightmap = new(TERRAIN_PLANE_Y);
+			Cavemap cavemap = new(seed);
+			this.level = new Level(seed, new NoiseLevelChunkGenerator(biomeMap, heightmap, cavemap), CHUNK_RADIUS);
 			this.client = client;
 		}
 

@@ -1,9 +1,10 @@
 using SoulboundEngine.Client.World.Block;
 using SoulboundEngine.Client.World.Block.State;
+using SoulboundEngine.Client.World.Gen;
 using SoulboundEngine.Core.Noise;
 using UnityEngine;
 
-namespace SoulboundEngine.Client.World.Generation {
+namespace SoulboundEngine.Client.World.Biome {
 	public class PlainsBiome : IBiome {
 		private readonly NoiseSampler largeNoise;
 		private readonly NoiseSampler mediumNoise;
