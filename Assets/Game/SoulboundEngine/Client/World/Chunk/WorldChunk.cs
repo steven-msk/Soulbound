@@ -30,6 +30,8 @@ namespace SoulboundEngine.Client.World.Chunk {
 			this.level = level;
 		}
 
+		public int[]? surfacePoints { get; set; }
+
 		public override void Tick() => this.tickManager.Tick();
 
 		public static int WorldYToIndex(int worldY) => worldY - Level.MIN_Y;

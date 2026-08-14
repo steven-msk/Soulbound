@@ -235,10 +235,10 @@ namespace SoulboundEngine.Client.World.Level {
 		public static int ToWorldX(int cx, int chunkX) => cx + chunkX * CHUNK_LENGTH;
 		public static int ToChunkX(int x) => x - ChunkXAt(x) * CHUNK_LENGTH;
 
-		public Chunk? ChunkAt(int worldX) => this.ChunkAt(ChunkXAt(worldX));
-		public Chunk? ChunkAt(BlockPos blockPos) {
-			return this.chunkManager.GetChunk(ChunkXAt(blockPos.x), false);
+		public Chunk? ChunkAt(int worldX) {
+			return this.chunkManager.GetChunk(ChunkXAt(worldX), false);
 		}
+		public Chunk? ChunkAt(BlockPos blockPos) => this.ChunkAt(blockPos.x);
 
 		public int GetBottomY() => MIN_Y;
 		public int GetHeight() => WORLD_HEIGHT;
@@ -254,12 +254,9 @@ namespace SoulboundEngine.Client.World.Level {
 		}
 
 		public int GetSurfaceY(int xpos) {
-			int chunkX = ChunkXAt(xpos);
+			Chunk? chunk = this.ChunkAt(xpos);
 			int cx = ToChunkX(xpos);
-
-			return this.chunkGenData.TryGetValue(chunkX, out var value)
-				? value.surfacePoints[cx]
-				: 0;
+			return (chunk as WorldChunk)?.surfacePoints?[cx] ?? 0;
 		}
 
 		public int GetSurfaceAirY(int xpos) => this.GetSurfaceY(xpos) + 1;
