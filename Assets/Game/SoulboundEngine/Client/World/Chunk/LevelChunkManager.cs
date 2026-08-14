@@ -101,10 +101,8 @@ namespace SoulboundEngine.Client.World.Chunk {
 		}
 
 		private WorldChunk GenerateChunk(int x, bool placeBlocks) {
-			if (this.chunkStorage.Read(this.level, x) is WorldChunk existing) {
-				return existing;
-			}
-			WorldChunk chunk = new(this.level, new ChunkPos(x));
+			ChunkPos pos = new(x);
+			WorldChunk chunk = (this.chunkStorage.Read(this.level, x) as WorldChunk) ?? new WorldChunk(this.level, pos);
 			this.chunkGenerator.Generate(this.level, chunk, placeBlocks);
 			return chunk;
 		}
