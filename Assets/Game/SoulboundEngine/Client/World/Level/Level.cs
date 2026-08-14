@@ -30,7 +30,7 @@ namespace SoulboundEngine.Client.World.Level {
 		public const int MIN_Y = -WORLD_HEIGHT / 2;
 		public const int MAX_Y = WORLD_HEIGHT / 2;
 		public const int RENDER_DISTANCE = 8;
-		private const int CHUNK_TICKS_TO_LIVE = 50;
+		private const int CHUNK_TICKS_TO_LIVE = 3000;
 
 		public readonly int seed;
 		private readonly ChunkStorage chunkStorage;
@@ -59,15 +59,6 @@ namespace SoulboundEngine.Client.World.Level {
 		public void GenerateSpawn(bool placeBlocks) {
 			Logger.LogInfo("Generating terrain with seed {}", this.seed);
 			this.chunkManager.InitialLoad(0, placeBlocks);
-		}
-
-		// TODO: rework chunk cache
-		[Obsolete("Chunk caching is underway")]
-		public void ReplaceGenerated(List<Chunk> chunks) {
-
-			//foreach (var chunk in chunks) {
-			//	this.generatedChunks[chunk.GetPos().x] = chunk;
-			//}
 		}
 
 		// known issue: player creation assumes block placement is finished
@@ -256,12 +247,6 @@ namespace SoulboundEngine.Client.World.Level {
 
 		public IEnumerable<Chunk> GetLoadedChunks() {
 			return this.chunkManager.GetLoadedChunks();
-		}
-
-		[Obsolete("Chunk caching is underway")]
-		public IEnumerable<Chunk> GetGeneratedChunks() {
-			return Enumerable.Empty<Chunk>();
-			//return this.generatedChunks.Values.ToList();
 		}
 
 		public static bool IsInBounds(BlockPos pos) {

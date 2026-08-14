@@ -9,40 +9,18 @@ namespace SoulboundEngine.Client.World {
 	using File = Core.Serialization.File;
 
 	public sealed class WorldSavesManager {
-		private readonly string seedFileName;
-		private readonly string chunksFolderName;
 		private readonly File root;
 		private readonly HashSet<string> newWorlds = new();
 
-		public WorldSavesManager(File root, string seedFileName, string chunksFolderName) {
+		public WorldSavesManager(File root) {
 			this.root = root.EnsureExists();
-			this.seedFileName = seedFileName;
-			this.chunksFolderName = chunksFolderName;
 		}
 
 		public IEnumerable<WorldSave> ListSaves(IWorldSaveValidator saveValidator) {
 			foreach (var file in this.root.ListFiles()) {
-				if (!saveValidator.IsValid(file)) continue;
-
-				File seedFile = file.Combine(this.seedFileName);
-				if (!seedFile.Exists) {
-					Logger.LogError("Seed file does not exist: {}", file);
-					continue;
+				if (saveValidator.Validate(file, out int seed, out string worldName, out File chunksFolder)) {
+					yield return new WorldSave(file, chunksFolder, worldName, seed, this.IsNew(worldName));
 				}
-
-				string worldName = file.Name;
-				int seed;
-				try {
-					string seedText = seedFile.ReadAllText();
-					seed = int.Parse(seedText);
-				} catch (Exception e) {
-					Logger.LogFatal(e, "Failed to parse seed");
-					continue;
-				}
-
-				File chunksFolder = file.Combine(this.chunksFolderName);
-				chunksFolder.Mkdir();
-				yield return new WorldSave(file, chunksFolder, worldName, seed, this.IsNew(worldName));
 			}
 		}
 

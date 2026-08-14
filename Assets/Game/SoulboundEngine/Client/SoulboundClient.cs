@@ -49,7 +49,6 @@ namespace SoulboundEngine.Client {
 
 	public sealed class SoulboundClient : IWorldAccessor, IDebugMetricsSource {
 		const int INPUT_QUEUE_BUFFER_CAPACITY = 128;
-		const string SAVES_ROOT_FOLDER = "saves";
 		private static SoulboundClient instance;
 		private readonly GameConfig config;
 		private readonly PlayerInputActions inputActions;
@@ -64,7 +63,7 @@ namespace SoulboundEngine.Client {
 		private readonly RuntimeDataProvider runtimeDataProvider;
 		private readonly RuntimeExecutionServices runtimeExecutionServices;
 		private readonly WorldSavesManager worldSavesManager;
-		private readonly WorldSerializer worldSerializer;
+		private readonly WorldSaveValidator worldSerializer;
 		private readonly UIHandler uiHandler;
 		private readonly UIAudioEventBank uiAudioEventBank;
 		private readonly WorldAudioEventBank worldAudioEventBank;
@@ -92,9 +91,9 @@ namespace SoulboundEngine.Client {
 			this.clientPlayerInputHandler = new ClientPlayerInputHandler(this);
 			this.settings = new GameSettings();
 
-			File savesFile = UnityPaths.PersistentDataRoot.Combine(SAVES_ROOT_FOLDER);
-			this.worldSavesManager = new WorldSavesManager(savesFile, WorldSerializer.SEED_FILE_NAME, "chunks");
-			this.worldSerializer = new WorldSerializer();
+			File savesFile = UnityPaths.PersistentDataRoot.Combine(config.file.savesRoot);
+			this.worldSavesManager = new WorldSavesManager(savesFile);
+			this.worldSerializer = new WorldSaveValidator(config.file.seedFile, config.file.chunksFolder);
 
 			this.debugMetricsService = new DebugMetricsService();
 			this.performanceMetrics = new PerformanceMetrics();
@@ -210,7 +209,7 @@ namespace SoulboundEngine.Client {
 
 			WorldSave save = this.worldSavesManager.GetSave(world, this.worldSerializer);
 			WorldSaveSeedProvider seedProvider = new(save);
-			ClientWorldBootstrapper worldLoader = new(this, seedProvider, save, this.worldSerializer);
+			ClientWorldBootstrapper worldLoader = new(this, seedProvider, save);
 
 			UniTask<WorldBootData> worldBootTask = worldLoader.LoadWorld();
 			UniTask sceneLoadTask = SceneManager.LoadSceneAsync(this.config.unity.worldScene, LoadSceneMode.Additive).ToUniTask();
@@ -264,7 +263,6 @@ namespace SoulboundEngine.Client {
 			WorldSession session = this.activeWorldSession.Value;
 			LevelManager levelManager = session.levelManager;
 			levelManager.StopSession();
-			this.worldSerializer.Serialize(levelManager, this.worldSavesManager.ToSaveDirectory(session.save));
 			this.player = null;
 			this.worldRenderer.SetLevel(null);
 			this.uiHandler.FlushScreens();

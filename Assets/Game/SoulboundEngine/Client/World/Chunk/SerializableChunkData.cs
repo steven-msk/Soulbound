@@ -136,7 +136,7 @@ namespace SoulboundEngine.Client.World.Chunk {
 				["sections"] = sections,
 				["tileEntities"] = tileEntities
 			};
-			return json.ToString(Formatting.Indented);
+			return json.ToString(Formatting.None);
 		}
 
 		public record SectionData(int y, ChunkSection? chunkSection);
