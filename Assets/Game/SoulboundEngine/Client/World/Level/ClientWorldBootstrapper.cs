@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using SoulboundEngine.Client.World.Chunk;
 using SoulboundEngine.Client.World.Gen;
 using SoulboundEngine.Client.World.Serialization;
 
@@ -17,7 +18,8 @@ namespace SoulboundEngine.Client.World.Level {
 		}
 
 		public async UniTask<WorldBootData> LoadWorld() {
-			LevelManager levelManager = new(this.client, this.seedProvider);
+			ChunkStorage chunkStorage = new(this.save.chunksFolder);
+			LevelManager levelManager = new(this.client, this.seedProvider, chunkStorage);
 
 			// single level for now
 			// multiple dimensions not supported yet

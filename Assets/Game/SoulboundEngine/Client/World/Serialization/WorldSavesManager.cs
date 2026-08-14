@@ -10,12 +10,14 @@ namespace SoulboundEngine.Client.World {
 
 	public sealed class WorldSavesManager {
 		private readonly string seedFileName;
+		private readonly string chunksFolderName;
 		private readonly File root;
 		private readonly HashSet<string> newWorlds = new();
 
-		public WorldSavesManager(File root, string seedFileName) {
+		public WorldSavesManager(File root, string seedFileName, string chunksFolderName) {
 			this.root = root.EnsureExists();
 			this.seedFileName = seedFileName;
+			this.chunksFolderName = chunksFolderName;
 		}
 
 		public IEnumerable<WorldSave> ListSaves(IWorldSaveValidator saveValidator) {
@@ -38,7 +40,9 @@ namespace SoulboundEngine.Client.World {
 					continue;
 				}
 
-				yield return new WorldSave(file, worldName, seed, this.IsNew(worldName));
+				File chunksFolder = file.Combine(this.chunksFolderName);
+				chunksFolder.Mkdir();
+				yield return new WorldSave(file, chunksFolder, worldName, seed, this.IsNew(worldName));
 			}
 		}
 

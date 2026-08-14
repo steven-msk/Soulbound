@@ -14,14 +14,18 @@ namespace SoulboundEngine.Client.World.Chunk {
 		private readonly EmptyWorldChunk emptyChunk;
 		private readonly ChunkGenerator chunkGenerator;
 		private readonly Level level;
+		private readonly IChunkCache chunkCache;
+		private readonly ChunkStorage chunkStorage;
 		private readonly int chunkRadius;
 		private readonly int loadRange;
 		private int centerX;
 
-		public LevelChunkManager(Level level, ChunkGenerator chunkGenerator, int chunkRadius) {
+		public LevelChunkManager(Level level, ChunkGenerator chunkGenerator, int chunkRadius, IChunkCache chunkCache, ChunkStorage chunkStorage) {
 			this.level = level;
 			this.chunkGenerator = chunkGenerator;
 			this.chunkRadius = chunkRadius;
+			this.chunkCache = chunkCache;
+			this.chunkStorage = chunkStorage;
 			this.loadRange = chunkRadius * 2 + 1;
 			this.emptyChunk = new EmptyWorldChunk(level, new ChunkPos(0));
 			this.loadedChunks = new WorldChunk?[this.loadRange];
@@ -64,6 +68,7 @@ namespace SoulboundEngine.Client.World.Chunk {
 				int chunkX = chunk.chunkX;
 				if (!this.IsInRange(chunkX)) {
 					this.loadedChunks[i] = null;
+					this.chunkCache.Return(chunk);
 					this.level.OnChunkUnloaded(chunk);
 				}
 			}
@@ -74,7 +79,9 @@ namespace SoulboundEngine.Client.World.Chunk {
 				WorldChunk? chunk = this.loadedChunks[index];
 				if (IsChunkValid(chunk, chunkX)) continue;
 
-				this.GenerateAndLoadChunk(index, chunkX, true);
+				WorldChunk newChunk = this.chunkCache.TryClaim(chunkX) ?? this.GenerateChunk(chunkX, true);
+				this.loadedChunks[index] = newChunk;
+				this.level.OnChunkLoaded(newChunk);
 			}
 		}
 
@@ -95,12 +102,14 @@ namespace SoulboundEngine.Client.World.Chunk {
 
 		private WorldChunk GenerateChunk(int x, bool placeBlocks) {
 			ChunkPos pos = new(x);
-			WorldChunk chunk = new(this.level, pos);
+			WorldChunk chunk = (this.chunkStorage.Read(this.level, x) as WorldChunk) ?? new WorldChunk(this.level, pos);
 			this.chunkGenerator.Generate(this.level, chunk, placeBlocks);
 			return chunk;
 		}
 
 		public override void Tick(bool tickChunks) {
+			this.chunkCache.Tick();
+
 			if (!tickChunks) return;
 
 			foreach (WorldChunk? chunk in this.loadedChunks) {
@@ -113,5 +122,13 @@ namespace SoulboundEngine.Client.World.Chunk {
 		public int GetCenterX() => this.centerX;
 
 		public IEnumerable<Chunk> GetLoadedChunks() => this.loadedChunks.Where(c => c != null)!;
+
+		public override void Dispose() {
+			this.chunkCache.Dispose();
+			this.chunkStorage.Dispose();
+			foreach (var chunk in this.loadedChunks) {
+				if (chunk != null) this.level.DropChunk(chunk);
+			}
+		}
 	}
 }

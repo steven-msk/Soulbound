@@ -1,5 +1,6 @@
 using SoulboundEngine.Client.UI.Screen;
 using SoulboundEngine.Client.World.Biome;
+using SoulboundEngine.Client.World.Chunk;
 using SoulboundEngine.Client.World.Gen;
 using System;
 using UnityEngine;
@@ -13,7 +14,6 @@ namespace SoulboundEngine.Client.World.Level {
 	public class LevelManager {
 		public const int CHUNK_RADIUS = 2;
 		public const int TERRAIN_PLANE_Y = 0;
-		public const string worldDump = "worldDump.json";
 		public static readonly RectInt simulationView = new(-128, -76, 256, 156);
 		private readonly Level level;
 		private readonly SoulboundClient client;
@@ -21,14 +21,14 @@ namespace SoulboundEngine.Client.World.Level {
 		private bool shouldTick;
 		private IScreenHandle? pauseScreenHandle;
 
-		public LevelManager(SoulboundClient client, ISeedProvider seedProvider) {
+		public LevelManager(SoulboundClient client, ISeedProvider seedProvider, ChunkStorage chunkStorage) {
 			int seed = seedProvider.GetSeed();
 			PlainsBiome biome1 = new(seed);
 			var biome2 = new HillsBiome(seed);
 			BiomeMap biomeMap = new(new IBiome[] { biome1, biome2 });
 			Heightmap heightmap = new(TERRAIN_PLANE_Y);
 			Cavemap cavemap = new(seed);
-			this.level = new Level(seed, new NoiseLevelChunkGenerator(biomeMap, heightmap, cavemap), CHUNK_RADIUS);
+			this.level = new Level(seed, new NoiseLevelChunkGenerator(biomeMap, heightmap, cavemap), CHUNK_RADIUS, chunkStorage);
 			this.client = client;
 		}
 

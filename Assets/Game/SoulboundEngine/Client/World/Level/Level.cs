@@ -30,10 +30,12 @@ namespace SoulboundEngine.Client.World.Level {
 		public const int MIN_Y = -WORLD_HEIGHT / 2;
 		public const int MAX_Y = WORLD_HEIGHT / 2;
 		public const int RENDER_DISTANCE = 8;
+		private const int CHUNK_TICKS_TO_LIVE = 50;
 
 		public readonly int seed;
-		private readonly Dictionary<int, ChunkGenData> chunkGenData = new();
+		private readonly ChunkStorage chunkStorage;
 		private readonly LevelChunkManager chunkManager;
+		private readonly Dictionary<int, ChunkGenData> chunkGenData = new();
 		private readonly RandomSequences randomSequences;
 		private PlayerEntity player = null!;
 		public event Action<BlockPos, BlockState?, BlockState?>? blockStateChanged;
@@ -46,16 +48,17 @@ namespace SoulboundEngine.Client.World.Level {
 		private readonly Dictionary<Guid, Entity> entities = new();
 		private readonly List<ITickingEntity> tickingEntities = new();
 
-		public Level(int seed, ChunkGenerator chunkGenerator, int chunkRadius) {
+		public Level(int seed, ChunkGenerator chunkGenerator, int chunkRadius, ChunkStorage chunkStorage) {
 			this.seed = seed;
+			this.chunkStorage = chunkStorage;
 			this.randomSequences = new RandomSequences(seed);
-			this.chunkManager = new LevelChunkManager(this, chunkGenerator, chunkRadius);
+			this.chunkManager = new LevelChunkManager(this, chunkGenerator, chunkRadius, new LevelChunkCache(this, CHUNK_TICKS_TO_LIVE), chunkStorage);
 		}
 
 		// known issue: current chunk generation takes way too long (60-65ms per chunk in one tick)
 		public void GenerateSpawn(bool placeBlocks) {
 			Logger.LogInfo("Generating terrain with seed {}", this.seed);
-			this.chunkManager.InitialLoad(0, true); // force block placement due to deserialization not being available
+			this.chunkManager.InitialLoad(0, placeBlocks);
 		}
 
 		// TODO: rework chunk cache
@@ -205,7 +208,12 @@ namespace SoulboundEngine.Client.World.Level {
 			this.chunkUnloaded?.Invoke(chunk);
 		}
 
+		public void DropChunk(Chunk chunk) {
+			this.chunkStorage.Save(this, chunk);
+		}
+
 		public void OnSessionStop() {
+			this.chunkManager.Dispose();
 		}
 
 		public BlockState GetBlockState(BlockPos blockPos) {

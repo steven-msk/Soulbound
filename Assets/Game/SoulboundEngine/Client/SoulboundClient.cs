@@ -93,7 +93,7 @@ namespace SoulboundEngine.Client {
 			this.settings = new GameSettings();
 
 			File savesFile = UnityPaths.PersistentDataRoot.Combine(SAVES_ROOT_FOLDER);
-			this.worldSavesManager = new WorldSavesManager(savesFile, WorldSerializer.SEED_FILE_NAME);
+			this.worldSavesManager = new WorldSavesManager(savesFile, WorldSerializer.SEED_FILE_NAME, "chunks");
 			this.worldSerializer = new WorldSerializer();
 
 			this.debugMetricsService = new DebugMetricsService();

@@ -18,10 +18,11 @@ namespace SoulboundEngine.Client.World.Serialization {
 		// the current implementation assumes there is only one Level at all times
 		// since multiple dimensions are planned, this will need a revisit
 
+		[Obsolete]
 		public void Serialize(LevelManager levelManager, File saveFolder) {
-			Level level = levelManager.GetLevel();
-			IEnumerable<Chunk> chunks = level.GetGeneratedChunks();
-			WriteChunks(level, chunks, saveFolder);
+			//Level level = levelManager.GetLevel();
+			//IEnumerable<Chunk> chunks = level.GetGeneratedChunks();
+			//WriteChunks(level, chunks, saveFolder);
 		}
 
 		private static void WriteChunks(Level level, IEnumerable<Chunk> chunks, File saveFolder) {
@@ -47,9 +48,10 @@ namespace SoulboundEngine.Client.World.Serialization {
 			writer.Write(data.Write());
 		}
 
+		[Obsolete]
 		public void Deserialize(LevelManager levelManager, File saveFolder) {
-			Level level = levelManager.GetLevel();
-			ReadChunks(level, saveFolder);
+			//Level level = levelManager.GetLevel();
+			//ReadChunks(level, saveFolder);
 		}
 
 		private static void ReadChunks(Level level, File saveFolder) {
