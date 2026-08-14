@@ -24,18 +24,16 @@ namespace SoulboundEngine.Client.World.Level {
 	using Entity = Entity.Entity;
 
 	public sealed class Level : IHeightLimitView, ILevelExecutionService, IEntityManager {
-		public delegate void OnChunkGenerated(ChunkGenData genData);
 		public const int CHUNK_LENGTH = SharedConstants.CHUNK_WIDTH;
 		public const int WORLD_HEIGHT = 1024;
 		public const int MIN_Y = -WORLD_HEIGHT / 2;
 		public const int MAX_Y = WORLD_HEIGHT / 2;
 		public const int RENDER_DISTANCE = 8;
-		private const int CHUNK_TICKS_TO_LIVE = 3000;
+		private const int CHUNK_TTL = 750;
 
 		public readonly int seed;
 		private readonly ChunkStorage chunkStorage;
 		private readonly LevelChunkManager chunkManager;
-		private readonly Dictionary<int, ChunkGenData> chunkGenData = new();
 		private readonly RandomSequences randomSequences;
 		private PlayerEntity player = null!;
 		public event Action<BlockPos, BlockState?, BlockState?>? blockStateChanged;
@@ -52,7 +50,7 @@ namespace SoulboundEngine.Client.World.Level {
 			this.seed = seed;
 			this.chunkStorage = chunkStorage;
 			this.randomSequences = new RandomSequences(seed);
-			this.chunkManager = new LevelChunkManager(this, chunkGenerator, chunkRadius, new LevelChunkCache(this, CHUNK_TICKS_TO_LIVE), chunkStorage);
+			this.chunkManager = new LevelChunkManager(this, chunkGenerator, chunkRadius, new LevelChunkCache(this, CHUNK_TTL), chunkStorage);
 		}
 
 		// known issue: current chunk generation takes way too long (60-65ms per chunk in one tick)
