@@ -18,7 +18,7 @@ namespace SoulboundEngine.Client.World.Chunk {
 		public const float UNDERGROUND_HEIGHT_RANGE = 20f;
 		private readonly TileEntityTickManager tickManager = new();
 		private readonly Level level;
-		public int chunkX => this.chunkPos.x;
+		public int ChunkX => this.chunkPos.x;
 
 		public WorldChunk(Level level, ChunkPos chunkPos) 
 			: this(level, chunkPos, null, level.BlockStateContainerFactory()) { 
@@ -36,9 +36,9 @@ namespace SoulboundEngine.Client.World.Chunk {
 
 		public static int IndexToWorldY(int yIndex) => yIndex + Level.MIN_Y;
 
-		public int WorldXToChunkX(int x) => x - this.chunkX * Level.CHUNK_LENGTH;
+		public int WorldXToChunkX(int x) => x - this.ChunkX * Level.CHUNK_LENGTH;
 
-		public int ChunkXToWorldX(int cx) => cx + this.chunkX * Level.CHUNK_LENGTH;
+		public int ChunkXToWorldX(int cx) => cx + this.ChunkX * Level.CHUNK_LENGTH;
 
 		public override BlockState? SetBlockState(BlockPos blockPos, BlockState newState) {
 			ChunkSection section = this.GetSection(this.GetSectionIndexFromBlock(blockPos.y));
