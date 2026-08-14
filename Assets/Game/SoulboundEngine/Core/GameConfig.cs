@@ -10,7 +10,9 @@ namespace SoulboundEngine.Core {
 
     [Serializable]
     public struct FileConfig {
-        public string savesFolder;
+        public string savesRoot;
+		public string seedFile;
+		public string chunksFolder;
     }
 
     [Serializable]

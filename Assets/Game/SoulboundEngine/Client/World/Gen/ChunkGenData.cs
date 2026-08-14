@@ -1,17 +1,15 @@
 
+using SoulboundEngine.Client.World.Biome;
 using SoulboundEngine.Client.World.Chunk;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.Generation {
+namespace SoulboundEngine.Client.World.Gen {
 	public struct ChunkGenData {
-		public WorldChunk chunk;
+		[Obsolete] public WorldChunk chunk;
 		public BlockGenContext[][] genContexts;
 		public int[] surfacePoints;
 		public IEnumerable<BiomeWeight>[] biomeWeights;

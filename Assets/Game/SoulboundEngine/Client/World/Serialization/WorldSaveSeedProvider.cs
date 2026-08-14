@@ -1,4 +1,4 @@
-﻿using SoulboundEngine.Client.World.Generation;
+﻿using SoulboundEngine.Client.World.Gen;
 
 namespace SoulboundEngine.Client.World {
 	public sealed class WorldSaveSeedProvider : ISeedProvider {

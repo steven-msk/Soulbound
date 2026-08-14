@@ -1,12 +1,9 @@
-using SoulboundEngine.Client.World.Chunk;
-using System;
+using SoulboundEngine.Client.World.Biome;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
-namespace SoulboundEngine.Client.World.Generation {
+namespace SoulboundEngine.Client.World.Gen {
 	public sealed class BiomeMap {
 		const float blendSharpness = 3f;
 		private readonly IEnumerable<IBiome> biomes;
@@ -19,7 +16,7 @@ namespace SoulboundEngine.Client.World.Generation {
 			List<(IBiome biome, float value)> densities = new();
 			float maxDensity = 0f;
 
-			foreach (var biome in biomes) {
+			foreach (var biome in this.biomes) {
 				float density = Mathf.Abs(biome.GetDensity(blockX));
 				maxDensity = Mathf.Max(maxDensity, density);
 

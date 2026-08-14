@@ -1,33 +1,26 @@
 using Cysharp.Threading.Tasks;
-using SoulboundEngine.Client.World.Generation;
-using SoulboundEngine.Client.World.Serialization;
+using SoulboundEngine.Client.World.Chunk;
+using SoulboundEngine.Client.World.Gen;
 
 namespace SoulboundEngine.Client.World.Level {
 	public sealed class ClientWorldBootstrapper {
 		private readonly SoulboundClient client;
 		private readonly ISeedProvider seedProvider;
-		private readonly WorldSerializer worldSerializer;
 		private readonly WorldSave save;
 
-		public ClientWorldBootstrapper(SoulboundClient client, ISeedProvider seedProvider, WorldSave save, WorldSerializer worldSerializer) {
+		public ClientWorldBootstrapper(SoulboundClient client, ISeedProvider seedProvider, WorldSave save) {
 			this.client = client;
 			this.seedProvider = seedProvider;
 			this.save = save;
-			this.worldSerializer = worldSerializer;
 		}
 
 		public async UniTask<WorldBootData> LoadWorld() {
-			LevelManager levelManager = new(this.client, this.seedProvider);
+			ChunkStorage chunkStorage = new(this.save.chunksFolder);
+			LevelManager levelManager = new(this.client, this.seedProvider, chunkStorage);
 
-			// single level for now
-			// multiple dimensions not supported yet
 			Level level = levelManager.GetLevel();
 
-			bool shouldPlaceGeneratedBlocks = this.save.isNew;
-			level.GenerateInitialTerrain(shouldPlaceGeneratedBlocks);
-			if (!this.save.isNew) {
-				this.worldSerializer.Deserialize(levelManager, this.save.saveFolder);
-			}
+			level.GenerateSpawn(this.save.isNew);
 
 			return new WorldBootData {
 				level = level,

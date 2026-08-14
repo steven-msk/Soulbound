@@ -1,13 +1,14 @@
 using SoulboundEngine.Client.World.Block;
 using SoulboundEngine.Client.World.Block.State;
-using SoulboundEngine.Client.World.Chunk;
-using SoulboundEngine.Client.World.Level;
+using SoulboundEngine.Client.World.Gen;
 using SoulboundEngine.Core.Noise;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace SoulboundEngine.Client.World.Generation {
+namespace SoulboundEngine.Client.World.Biome {
+	using Chunk = Chunk.Chunk;
+
 	public class HillsBiome : IBiome {
 		private readonly int seed;
 		private readonly Heightmap heightmap;
@@ -53,7 +54,7 @@ namespace SoulboundEngine.Client.World.Generation {
 			return Blocks.STONE.DefaultState;
 		}
 
-		void PlaceTree(int originX, int originY, WorldChunk chunk, Level.Level level) {
+		void PlaceTree(int originX, int originY, Chunk chunk, Level.Level level) {
 			const int crownRadius = 2;
 			const int trunkHeightMin = 5;
 			const int trunkHeightMax = 20;
@@ -62,7 +63,7 @@ namespace SoulboundEngine.Client.World.Generation {
 			int height = UnityEngine.Random.Range(trunkHeightMin, trunkHeightMax + 1);
 
 			for (int y = 0; y < height; y++) {
-				chunk.SetBlock(trunkPos.ToChunkPos(), Blocks.WOOD.DefaultState);
+				chunk.SetBlockState(trunkPos, Blocks.WOOD.DefaultState);
 				trunkPos.y++;
 			}
 
@@ -90,7 +91,7 @@ namespace SoulboundEngine.Client.World.Generation {
 
 		}
 
-		void IBiome.PostProcess(ChunkGenData genData, WorldChunk chunk, Level.Level level, int partitionStartX, int partitionLimitX) {
+		void IBiome.PostProcess(ChunkGenData genData, Chunk chunk, Level.Level level, int partitionStartX, int partitionLimitX) {
 			const float chanceMin = 0.05f;
 			const float chanceMax = 0.25f;
 			const float threshold = 0.45f;
@@ -112,7 +113,7 @@ namespace SoulboundEngine.Client.World.Generation {
 
 				float spawnChance = Mathf.Lerp(chanceMin, chanceMax, density);
 				if (UnityEngine.Random.value < spawnChance) {
-					this.PlaceTree(x, genData.surfacePoints[chunk.WorldXToChunkX(x)] + 1, chunk, level);
+					this.PlaceTree(x, genData.surfacePoints[chunk.GetPos().WorldXToChunkX(x)] + 1, chunk, level);
 					this.lastTreeX = x;
 				}
 			}
