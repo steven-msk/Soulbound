@@ -54,12 +54,7 @@ namespace SoulboundEngine.Client.World.Chunk {
 				return this.emptyChunk;
 			}
 
-			if (chunk != null) {
-				this.chunkCache.Return(chunk);
-				this.level.OnChunkUnloaded(chunk);
-			}
-
-			return this.ResolveAndLoad(index, x);
+			return this.GenerateChunk(x, true);			
 		}
 
 		public void SetCenterX(int centerX) {
@@ -70,7 +65,7 @@ namespace SoulboundEngine.Client.World.Chunk {
 				WorldChunk? chunk = this.loadedChunks[i];
 				if (chunk == null) continue;
 
-				int chunkX = chunk.ChunkX;
+				int chunkX = chunk.chunkX;
 				if (!this.IsInRange(chunkX)) {
 					this.loadedChunks[i] = null;
 					this.chunkCache.Return(chunk);
@@ -82,9 +77,11 @@ namespace SoulboundEngine.Client.World.Chunk {
 				int chunkX = centerX + dx;
 				int index = this.GetIndex(chunkX);
 				WorldChunk? chunk = this.loadedChunks[index];
-				if (!IsChunkValid(chunk, chunkX)) {
-					this.ResolveAndLoad(index, chunkX);
-				}
+				if (IsChunkValid(chunk, chunkX)) continue;
+
+				WorldChunk newChunk = this.chunkCache.TryClaim(chunkX) ?? this.GenerateChunk(chunkX, true);
+				this.loadedChunks[index] = newChunk;
+				this.level.OnChunkLoaded(newChunk);
 			}
 		}
 
@@ -110,13 +107,6 @@ namespace SoulboundEngine.Client.World.Chunk {
 			WorldChunk chunk = new(this.level, new ChunkPos(x));
 			this.chunkGenerator.Generate(this.level, chunk, placeBlocks);
 			return chunk;
-		}
-
-		private WorldChunk ResolveAndLoad(int index, int x) {
-			WorldChunk resolved = this.chunkCache.TryClaim(x) ?? this.GenerateChunk(x, true);
-			this.loadedChunks[index] = resolved;
-			this.level.OnChunkLoaded(resolved);
-			return resolved;
 		}
 
 		public override void Tick(bool tickChunks) {
