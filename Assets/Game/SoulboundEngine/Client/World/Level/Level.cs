@@ -41,6 +41,8 @@ namespace SoulboundEngine.Client.World.Level {
 		public event Action<Entity>? entityRemoved;
 		public event Action<Chunk>? chunkLoaded;
 		public event Action<Chunk>? chunkUnloaded;
+		private bool isLoaded;
+		private bool levelActive;
 
 		private readonly HashSet<BlockPos> tickingBlocks = new();
 		private readonly Dictionary<Guid, Entity> entities = new();
@@ -57,17 +59,24 @@ namespace SoulboundEngine.Client.World.Level {
 		public void GenerateSpawn(bool placeBlocks) {
 			Logger.LogInfo("Generating terrain with seed {}", this.seed);
 			this.chunkManager.InitialLoad(0, placeBlocks);
+			this.isLoaded = true;
 		}
 
 		// known issue: player creation assumes block placement is finished
 		public void StartSession(PlayerEntity player) {
+			if (!this.isLoaded) {
+				throw new InvalidOperationException("Cannot start world session without initial load");
+			}
 			this.player = player;
 			this.AddEntity(player);
 			player.SetPosition(this.GetWorldSpawnPoint() + Vector2.up * 2f);
+			this.levelActive = true;
 		}
 
 		// known issue: inconsistent world update loop design
 		public void Tick(RectInt simulationRect) {
+			if (!this.IsLevelActive()) throw new InvalidOperationException("Cannot tick without an active session");
+
 			foreach (var pos in this.tickingBlocks.ToArray()) {
 				if (!simulationRect.Contains((Vector2Int)pos)) continue;
 
@@ -132,6 +141,8 @@ namespace SoulboundEngine.Client.World.Level {
 		}
 
 		public void AddEntity(Entity entity) {
+			if (!this.IsLevelActive()) return;
+
 			Guid guid = Guid.NewGuid();
 			entity.OnAdd(guid);
 			this.entities[guid] = entity;
@@ -155,10 +166,12 @@ namespace SoulboundEngine.Client.World.Level {
 		}
 
 		public void SpawnEntity<E>(EntityDescriptor<E> descriptor, Vector2 pos) where E : Entity {
+			if (!this.IsLevelActive()) return;
 			descriptor.Create(this, pos);
 		}
 
 		void ILevelExecutionService.SpawnEntity(EntityDescriptor descriptor, Vector2 pos) {
+			if (!this.IsLevelActive()) return;
 			descriptor.CreateBoxed(this, pos);
 		}
 
@@ -271,6 +284,9 @@ namespace SoulboundEngine.Client.World.Level {
 			}
 			return coveredTiles;
 		}
+
+		public bool IsLevelActive() => this.levelActive;
+		public bool IsLoaded() => this.isLoaded;
 
 		public PlayerEntity GetPlayer() => this.player;
 
