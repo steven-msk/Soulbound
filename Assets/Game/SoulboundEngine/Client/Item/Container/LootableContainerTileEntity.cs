@@ -2,7 +2,7 @@
 using SoulboundEngine.Client.Loot;
 using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.UI.Screen;
-using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.Client.World;
 using SoulboundEngine.Client.World.Block.Entity;
 using SoulboundEngine.Client.World.Block.State;
 using SoulboundEngine.Core.Registry;

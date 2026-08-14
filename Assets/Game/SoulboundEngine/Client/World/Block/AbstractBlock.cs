@@ -62,6 +62,13 @@ namespace SoulboundEngine.Client.World.Block {
 
 		protected virtual bool IsInteractable(BlockState blockState, Level level, BlockPos blockPos) => true;
 
+		protected virtual bool ShouldChangedStateKeepTileEntity(BlockState oldState) {
+			return false;
+		}
+
+		protected void OnPlace(Level level, BlockPos blockPos, BlockState oldState) {
+		}
+
 		public abstract class AbstractBlockState : State<Block, BlockState> {
 			protected AbstractBlockState(Block owner, Entries entries) : base(owner, entries) {
 			}
@@ -113,6 +120,16 @@ namespace SoulboundEngine.Client.World.Block {
 			}
 
 			public Block GetBlock() => this.owner;
+
+			public bool HasTileEntity() => this.owner is ITileEntityProvider;
+
+			public bool ShouldChangedStateKeepTileEntity(BlockState oldState) {
+				return this.owner.ShouldChangedStateKeepTileEntity(oldState);
+			}
+
+			public void OnPlace(Level level, BlockPos blockPos, BlockState oldState) {
+				this.owner.OnPlace(level, blockPos, oldState);
+			}
 		}
 
 		public sealed class Settings {

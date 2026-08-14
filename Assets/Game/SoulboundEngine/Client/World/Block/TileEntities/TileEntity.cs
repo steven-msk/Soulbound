@@ -10,7 +10,7 @@ namespace SoulboundEngine.Client.World.Block.Entity {
 		protected Level? level;
 		public readonly BlockPos blockPos;
 		protected readonly TileEntityType tileEntityType;
-		protected readonly BlockState blockState;
+		protected BlockState blockState;
 
 		public TileEntity(TileEntityType tileEntityType, BlockPos blockPos, BlockState blockState) {
 			this.tileEntityType = tileEntityType;
@@ -25,10 +25,10 @@ namespace SoulboundEngine.Client.World.Block.Entity {
 		public void SetLevel(Level? level) => this.level = level;
 		public Level? GetLevel() => this.level;
 
-
 		public BlockPos GetBlockPos() => this.blockPos;
 
 		public BlockState GetBlockState() => this.blockState;
+		public void SetBlockState(BlockState blockState) => this.blockState = blockState;
 
 		public bool HasLevel() => this.level != null;
 
@@ -38,8 +38,10 @@ namespace SoulboundEngine.Client.World.Block.Entity {
 		public virtual void Read(JToken json) {
 		}
 
-		public override string ToString() {
-			return TileEntityType.GetId(this.tileEntityType)?.ToString() ?? "null";
+		public bool IsValidBlockState(BlockState blockState) {
+			return this.GetTileEntityType().Supports(blockState);
 		}
+
+		public override string ToString() => this.GetTileEntityType().ToString();
 	}
 }

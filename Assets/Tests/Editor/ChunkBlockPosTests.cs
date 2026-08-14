@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.Client.World;
 using SoulboundEngine.Client.World.Chunk;
 using SoulboundEngine.Client.World.Level;
 using UnityEngine;
@@ -76,7 +76,7 @@ public class ChunkBlockPosTests {
         int staticValue = ChunkBlockPos.WorldYToIndex(pos.y);
 
         Assert.That(instanceValue, Is.EqualTo(staticValue));
-        Assert.That(instanceValue, Is.EqualTo(pos.y - WorldChunk.maxY));
+        Assert.That(instanceValue, Is.EqualTo(pos.y - Level.MAX_Y));
     }
 
 	[Test]

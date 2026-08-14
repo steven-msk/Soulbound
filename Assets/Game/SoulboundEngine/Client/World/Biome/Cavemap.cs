@@ -1,8 +1,9 @@
-using SoulboundEngine.Client.World.Chunk;
 using SoulboundEngine.Core.Noise;
 using UnityEngine;
 
 namespace SoulboundEngine.Client.World.Generation {
+	using Level = Level.Level;
+
 	public sealed class Cavemap {
 		private readonly int seed;
 		private readonly NoiseSampler caveNoise;
@@ -74,7 +75,7 @@ namespace SoulboundEngine.Client.World.Generation {
 		private float GetBottomMask(int blockY, float b1, float? b2, float blendFactor) {
 			float bottomFalloff = Mathf.Lerp(b1, b2 ?? b1, blendFactor);
 			
-			float t = Mathf.InverseLerp(WorldChunk.minY, WorldChunk.minY + bottomFalloff, blockY);
+			float t = Mathf.InverseLerp(Level.MIN_Y, Level.MIN_Y + bottomFalloff, blockY);
 			return Mathf.SmoothStep(1f, 0f, t);
 		}
 

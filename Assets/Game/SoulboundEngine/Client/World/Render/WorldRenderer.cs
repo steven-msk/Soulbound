@@ -2,7 +2,6 @@ using SoulboundEngine.Client.Render.Block;
 using SoulboundEngine.Client.Render.Entity;
 using SoulboundEngine.Client.World.Block;
 using SoulboundEngine.Client.World.Block.State;
-using SoulboundEngine.Client.World.Chunk;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,6 +10,7 @@ using UnityEngine.Tilemaps;
 #nullable enable
 
 namespace SoulboundEngine.Client.World.Render {
+	using Chunk = Chunk.Chunk;
 	using Entity = Entity.Entity;
 	using Level = Level.Level;
 
@@ -142,13 +142,13 @@ namespace SoulboundEngine.Client.World.Render {
 			this.entityRenderManager.Update(entity);
 		}
 
-		private void OnChunkLoaded(WorldChunk chunk) {
+		private void OnChunkLoaded(Chunk chunk) {
 			if (this.showingChunkFeatures) {
 				this.chunkOutlineRenderer.ShowOutline(chunk);
 			}
 		}
 
-		private void OnChunkUnloaded(WorldChunk chunk) {
+		private void OnChunkUnloaded(Chunk chunk) {
 			this.chunkOutlineRenderer.HideOutline(chunk);
 		}
 

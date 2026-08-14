@@ -2,7 +2,6 @@ using SoulboundEngine.Client.UI.Screen;
 using SoulboundEngine.Client.World.Generation;
 using System;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 #nullable enable
@@ -77,6 +76,4 @@ namespace SoulboundEngine.Client.World.Level {
 
 		public Level GetLevel() => this.level;
 	}
-
-	public record LevelGridContext(Grid grid, Tilemap tilemap);
 }

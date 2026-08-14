@@ -16,11 +16,38 @@ namespace SoulboundEngine.Client.World.Block.Entity {
 		[PROTOTYPICAL] public static readonly TileEntityType<ObjectTileEntity> OBJECT = Register("soulbound:area_trigger_block", ITileEntityFactory.Of(ObjectTileEntity.Create), new[] { Blocks.AREA_TRIGGER_BLOCK });
 
 		private static TileEntityType<TE> Register<TE>(string id, ITileEntityFactory<TE> factory, Block[] blocks) where TE : TileEntity {
-			TileEntityType<TE> tileEntityType = new(factory, blocks.ToHashSet());
 			Identifier identifier = Identifier.Of(id);
 			RegistryKey<TileEntityType> key = RegistryKey<TileEntityType>.Of(Registries.TILE_ENTITIES.GetKey(), identifier);
+			TileEntityType<TE> tileEntityType = new(key, factory, blocks.ToHashSet());
 			return Registry<TileEntityType>.Register(Registries.TILE_ENTITIES, key, tileEntityType);
 		}
+
+		public static void Init() {
+		}
+
+		protected readonly RegistryKey<TileEntityType> key;
+		protected readonly ITileEntityFactory factory;
+		protected readonly HashSet<Block> blocks;
+
+		protected TileEntityType(RegistryKey<TileEntityType> key, ITileEntityFactory factory, HashSet<Block> blocks) {
+			this.key = key;
+			this.factory = factory;
+			this.blocks = blocks;
+		}
+
+		public bool Supports(BlockState blockState) {
+			return this.blocks.Contains(blockState.block);
+		}
+
+		public TileEntity Instantiate(BlockPos pos, BlockState state) {
+			return this.factory.Create(pos, state);
+		}
+
+		public static Identifier? GetId(TileEntityType type) {
+			return Registries.TILE_ENTITIES.GetIdentifier(type);
+		}
+
+		public override string ToString() => this.key.value.ToString();
 
 		public interface ITileEntityFactory {
 			TileEntity Create(BlockPos pos, BlockState blockState);
@@ -49,36 +76,13 @@ namespace SoulboundEngine.Client.World.Block.Entity {
 				}
 			}
 		}
-
-		protected readonly ITileEntityFactory factory;
-		protected readonly HashSet<Block> blocks;
-
-		protected TileEntityType(ITileEntityFactory factory, HashSet<Block> blocks) {
-			this.factory = factory;
-			this.blocks = blocks;
-		}
-
-		public bool Supports(BlockState blockState) {
-			return this.blocks.Contains(blockState.block);
-		}
-
-		public TileEntity Instantiate(BlockPos pos, BlockState state) {
-			return this.factory.Create(pos, state);
-		}
-
-		public static Identifier? GetId(TileEntityType type) {
-			return Registries.TILE_ENTITIES.GetIdentifier(type);
-		}
-
-		public static void Init() {
-		}
 	}
 
 	public class TileEntityType<TE> : TileEntityType where TE : TileEntity {
 		private new readonly ITileEntityFactory<TE> factory;
 
-		public TileEntityType(ITileEntityFactory<TE> factory, HashSet<Block> blocks) 
-			: base(factory, blocks) {
+		public TileEntityType(RegistryKey<TileEntityType> key, ITileEntityFactory<TE> factory, HashSet<Block> blocks) 
+			: base(key, factory, blocks) {
 			this.factory = factory;
 		}
 

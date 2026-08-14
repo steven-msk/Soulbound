@@ -1,5 +1,4 @@
 using Newtonsoft.Json;
-using SoulboundEngine.Client.World.Block;
 using SoulboundEngine.Common.Json;
 using UnityEngine;
 
@@ -18,7 +17,7 @@ namespace SoulboundEngine.Client.World.Chunk {
 			this.chunkX = chunkX;
 		}
 
-        public readonly WorldChunk UnderlyingChunk(Level level) => level.ChunkAt(this.ToBlock());
+        public readonly Chunk UnderlyingChunk(Level level) => level.ChunkAt(this.ToBlock());
 
         public static ChunkBlockPos FromBlockPos(BlockPos blockPos) {
 			int chunkX = Level.ChunkXAt(blockPos.x);
@@ -44,7 +43,7 @@ namespace SoulboundEngine.Client.World.Chunk {
 
 		public readonly int WorldYToIndex() => WorldYToIndex(this.y);
 
-		public static int WorldYToIndex(int worldY) => worldY - WorldChunk.maxY;
+		public static int WorldYToIndex(int worldY) => worldY - Level.MAX_Y;
 
 
 		public readonly override bool Equals(object obj) {
