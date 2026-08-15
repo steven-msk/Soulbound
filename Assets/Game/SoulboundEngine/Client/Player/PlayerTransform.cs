@@ -53,7 +53,7 @@ namespace SoulboundEngine.Client.Player {
 
 		public void Jump() {
 			this.rb.linearVelocity = new Vector2(this.rb.linearVelocityX, this.jumpForce);
-			// PROTOTYPICAL
+			// PROTOTYPICAL, Obsolete
 			this.isGrounded = false;
 			EventBus.Publish(new PlayerJumpedEvent(this.player));
 		}
