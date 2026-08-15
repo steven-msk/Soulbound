@@ -1,4 +1,4 @@
-using SoulboundEngine.Client.World.Entity;
+using SoulboundEngine.World.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;

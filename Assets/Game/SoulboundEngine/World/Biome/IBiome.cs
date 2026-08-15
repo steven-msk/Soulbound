@@ -1,12 +1,11 @@
-
-using SoulboundEngine.Client.World;
 using SoulboundEngine.World.Block;
 using SoulboundEngine.World.Block.State;
-using SoulboundEngine.Client.World.Chunk;
-using SoulboundEngine.Client.World.Gen;
-using SoulboundEngine.Client.World.Level;
+using SoulboundEngine.World.Gen;
 
 namespace SoulboundEngine.World.Biome {
+	using Chunk = Chunk.Chunk;
+	using Level = Level.Level;
+	
 	public interface IBiome {
 		float GetDensity(int blockX);
 		TerrainModulation SampleTerrain(int blockX);

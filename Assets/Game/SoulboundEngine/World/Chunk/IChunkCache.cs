@@ -2,7 +2,7 @@
 
 using System;
 
-namespace SoulboundEngine.Client.World.Chunk {
+namespace SoulboundEngine.World.Chunk {
 	public interface IChunkCache : IDisposable {
 		WorldChunk? TryClaim(int chunkX);
 

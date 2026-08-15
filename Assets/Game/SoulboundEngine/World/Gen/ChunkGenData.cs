@@ -1,13 +1,13 @@
 
 using SoulboundEngine.World.Biome;
-using SoulboundEngine.Client.World.Chunk;
+using SoulboundEngine.World.Chunk;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.Gen {
+namespace SoulboundEngine.World.Gen {
 	public struct ChunkGenData {
 		[Obsolete] public WorldChunk chunk;
 		public BlockGenContext[][] genContexts;

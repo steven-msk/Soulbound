@@ -1,4 +1,4 @@
-namespace SoulboundEngine.Client.World.Gen {
+namespace SoulboundEngine.World.Gen {
 	public interface ISeedProvider {
 		int GetSeed();
 	}

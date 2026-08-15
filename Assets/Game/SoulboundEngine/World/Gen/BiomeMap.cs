@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace SoulboundEngine.Client.World.Gen {
+namespace SoulboundEngine.World.Gen {
 	public sealed class BiomeMap {
 		const float blendSharpness = 3f;
 		private readonly IEnumerable<IBiome> biomes;

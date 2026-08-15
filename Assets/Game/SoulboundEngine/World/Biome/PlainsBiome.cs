@@ -1,6 +1,6 @@
 using SoulboundEngine.World.Block;
 using SoulboundEngine.World.Block.State;
-using SoulboundEngine.Client.World.Gen;
+using SoulboundEngine.World.Gen;
 using SoulboundEngine.Core.Noise;
 using UnityEngine;
 

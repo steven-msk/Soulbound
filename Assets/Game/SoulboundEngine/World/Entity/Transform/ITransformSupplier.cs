@@ -1,6 +1,6 @@
 using System;
 
-namespace SoulboundEngine.Client.World.Entity.Transform {
+namespace SoulboundEngine.World.Entity.Transform {
 	public interface ITransformSupplier<E> where E : Entity {
 		IEntityTransform GetTransform(E entity);
 

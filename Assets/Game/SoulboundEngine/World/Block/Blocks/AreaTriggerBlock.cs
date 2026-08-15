@@ -1,6 +1,4 @@
 using SoulboundEngine.Client.Player;
-using SoulboundEngine.Client.World;
-using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Common;
 using SoulboundEngine.Core.States;
 using SoulboundEngine.World.Block.Entity;
@@ -8,6 +6,8 @@ using SoulboundEngine.World.Block.State;
 using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 namespace SoulboundEngine.World.Block {
+	using Level = Level.Level;
+
 	[PROTOTYPICAL]
 	public sealed class AreaTriggerBlock : Block, ITileEntityProvider {
 		public static readonly Property<bool> inArea = BoolProperty.Of("inArea");

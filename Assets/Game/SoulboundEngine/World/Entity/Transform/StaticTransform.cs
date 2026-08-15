@@ -2,7 +2,7 @@ using SoulboundEngine.Common;
 using System;
 using UnityEngine;
 
-namespace SoulboundEngine.Client.World.Entity.Transform {
+namespace SoulboundEngine.World.Entity.Transform {
 	[PROTOTYPICAL]
 	[Obsolete]
 	internal class StaticTransform : MonoBehaviour, IEntityTransform {

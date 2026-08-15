@@ -1,8 +1,10 @@
 using Cysharp.Threading.Tasks;
-using SoulboundEngine.Client.World.Chunk;
-using SoulboundEngine.Client.World.Gen;
+using SoulboundEngine.Client;
+using SoulboundEngine.Client.World;
+using SoulboundEngine.World.Chunk;
+using SoulboundEngine.World.Gen;
 
-namespace SoulboundEngine.Client.World.Level {
+namespace SoulboundEngine.World.Level {
 	public sealed class ClientWorldBootstrapper {
 		private readonly SoulboundClient client;
 		private readonly ISeedProvider seedProvider;

@@ -1,6 +1,6 @@
-using SoulboundEngine.Client.World;
+using SoulboundEngine.World.Block;
 using SoulboundEngine.World.Block.State;
-using SoulboundEngine.Client.World.Entity;
+using SoulboundEngine.World.Entity;
 using UnityEngine;
 
 #nullable enable

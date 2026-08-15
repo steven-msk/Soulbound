@@ -1,6 +1,6 @@
-using SoulboundEngine.Client.World;
-using SoulboundEngine.Client.World.Level;
+using SoulboundEngine.World.Level;
 using SoulboundEngine.Core.Event;
+using SoulboundEngine.World.Block;
 
 namespace SoulboundEngine.Client {
 	public struct BlockBrokenEvent : IGameEvent {

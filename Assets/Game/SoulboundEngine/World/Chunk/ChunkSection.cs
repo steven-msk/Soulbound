@@ -1,7 +1,7 @@
-﻿using SoulboundEngine.World.Block.State;
-using SoulboundEngine.Common.Math;
+﻿using SoulboundEngine.Common.Math;
+using SoulboundEngine.World.Block.State;
 
-namespace SoulboundEngine.Client.World.Chunk {
+namespace SoulboundEngine.World.Chunk {
 	using Level = Level.Level;
 
 	public sealed class ChunkSection {

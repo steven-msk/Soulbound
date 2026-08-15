@@ -1,6 +1,6 @@
-﻿namespace SoulboundEngine.Client.World.Chunk {
+﻿namespace SoulboundEngine.World.Chunk {
+	using SoulboundEngine.World.Level;
 	using System;
-	using Level = Level.Level;
 
 	public readonly struct ChunkPos {
 		public static readonly ChunkPos ORIGIN = new(0);

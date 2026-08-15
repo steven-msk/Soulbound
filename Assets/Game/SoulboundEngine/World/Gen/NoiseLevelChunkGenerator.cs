@@ -1,6 +1,7 @@
 ﻿using SoulboundEngine.World.Biome;
+using SoulboundEngine.World.Block;
 using SoulboundEngine.World.Block.State;
-using SoulboundEngine.Client.World.Chunk;
+using SoulboundEngine.World.Chunk;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using UnityEngine;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.Gen {
+namespace SoulboundEngine.World.Gen {
 	using Chunk = Chunk.Chunk;
 	using Level = Level.Level;
 

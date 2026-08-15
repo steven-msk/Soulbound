@@ -7,7 +7,7 @@ using UnityEngine;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.Entity {
+namespace SoulboundEngine.World.Entity {
 	public struct EntityCollision {
 		public Entity self;
 		public Entity? other;

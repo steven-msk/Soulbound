@@ -1,9 +1,9 @@
 ﻿using SoulboundEngine.Client.Loot;
 using SoulboundEngine.Client.Loot.Context;
 using SoulboundEngine.Client.Player;
-using SoulboundEngine.Client.World;
-using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Core.Registry;
+using SoulboundEngine.World.Block;
+using SoulboundEngine.World.Level;
 
 #nullable enable
 

@@ -1,4 +1,4 @@
-﻿using SoulboundEngine.Client.World.Gen;
+﻿using SoulboundEngine.World.Gen;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +6,7 @@ using System.Linq;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.Chunk {
+namespace SoulboundEngine.World.Chunk {
 	using Level = Level.Level;
 
 	public class LevelChunkManager : ChunkManager {

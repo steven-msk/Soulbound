@@ -1,4 +1,4 @@
-﻿using SoulboundEngine.Client.World.Level;
+﻿using SoulboundEngine.World.Level;
 
 namespace SoulboundEngine.Client.Loot.Context {
 	public class LootWorldContext {

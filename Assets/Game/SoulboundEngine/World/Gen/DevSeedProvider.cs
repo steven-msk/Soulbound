@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SoulboundEngine.Client.World.Gen {
+namespace SoulboundEngine.World.Gen {
 	[PROTOTYPICAL]
 	public sealed class DevSeedProvider : ISeedProvider {
 		private readonly DevConfig devConfig;

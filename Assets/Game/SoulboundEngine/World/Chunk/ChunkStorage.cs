@@ -5,7 +5,7 @@ using System.IO;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.Chunk {
+namespace SoulboundEngine.World.Chunk {
 	using File = Core.Serialization.File;
 	using Level = Level.Level;
 

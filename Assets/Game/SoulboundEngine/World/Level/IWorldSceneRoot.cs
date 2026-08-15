@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.UIElements;
 
-namespace SoulboundEngine.Client.World.Level {
+namespace SoulboundEngine.World.Level {
 	public interface IWorldSceneRoot {
 		Grid grid { get; }
 		Tilemap tilemap { get; }

@@ -8,7 +8,8 @@ using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.Chunk {
+namespace SoulboundEngine.World.Chunk {
+	using Block = Block.Block;
 	using Level = Level.Level;
 
 	public class WorldChunk : Chunk {

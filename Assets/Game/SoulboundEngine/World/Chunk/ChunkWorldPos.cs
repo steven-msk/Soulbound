@@ -1,9 +1,9 @@
 using SoulboundEngine.World.Block;
-using SoulboundEngine.Client.World.Level;
-using SoulboundEngine.Core;
 using UnityEngine;
 
-namespace SoulboundEngine.Client.World.Chunk {
+namespace SoulboundEngine.World.Chunk {
+	using Level = Level.Level;
+
 	public struct ChunkWorldPos {
 		public float x;
 		public float y;
@@ -16,13 +16,13 @@ namespace SoulboundEngine.Client.World.Chunk {
 		}
 
         public static ChunkWorldPos FromBlockPos(BlockPos blockPos) {
-			int chunkX = Mathf.FloorToInt((float)blockPos.x / Level.Level.CHUNK_LENGTH);
-			float localX = blockPos.x - chunkX * Level.Level.CHUNK_LENGTH;
+			int chunkX = Mathf.FloorToInt((float)blockPos.x / Level.CHUNK_LENGTH);
+			float localX = blockPos.x - chunkX * Level.CHUNK_LENGTH;
 			return new ChunkWorldPos(localX, blockPos.y, chunkX);
 		}
 
 		public static ChunkWorldPos FromWorld(Vector2 position) {
-			int chunkX = Mathf.FloorToInt(position.x / Level.Level.CHUNK_LENGTH);
+			int chunkX = Mathf.FloorToInt(position.x / Level.CHUNK_LENGTH);
 			return new ChunkWorldPos(position.x, position.y, chunkX);
 		}
 
@@ -32,10 +32,10 @@ namespace SoulboundEngine.Client.World.Chunk {
 			return pos1.x == pos2.x && pos1.y == pos2.y && pos1.chunkX == pos2.chunkX;
 		}
 
-		public override readonly string ToString() => $"cwx:{x}, cwy:{y}, c:{chunkX}";
+		public override readonly string ToString() => $"cwx:{this.x}, cwy:{this.y}, c:{this.chunkX}";
 
 		public readonly BlockPos ToWorldBlockPos() {
-			Vector2 pos = new(this.x + this.chunkX * Level.Level.CHUNK_LENGTH, this.y);
+			Vector2 pos = new(this.x + this.chunkX * Level.CHUNK_LENGTH, this.y);
 			return (BlockPos)pos;
 		}
 
@@ -50,9 +50,9 @@ namespace SoulboundEngine.Client.World.Chunk {
 		public override readonly int GetHashCode() {
 			unchecked {
 				int hash = 17;
-				hash = hash * 31 + (int)x;
-				hash = hash * 31 + (int)y;
-				hash = hash * 31 + chunkX;
+				hash = hash * 31 + (int)this.x;
+				hash = hash * 31 + (int)this.y;
+				hash = hash * 31 + this.chunkX;
 				return hash;
 			}
 		}

@@ -1,12 +1,12 @@
 using SoulboundEngine.Client.Debug.Logging;
 using SoulboundEngine.Client.Player;
-using SoulboundEngine.Client.World;
-using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Core.States;
 using SoulboundEngine.Interaction;
 using SoulboundEngine.World.Block.State;
 
 namespace SoulboundEngine.World.Block {
+	using Level = Level.Level;
+
 	public sealed class ToggleBlock : Block {
 		public static readonly Property<bool> on = BoolProperty.Of("on");
 

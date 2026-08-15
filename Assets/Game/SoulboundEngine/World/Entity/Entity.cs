@@ -4,7 +4,7 @@ using UnityEngine;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.Entity {
+namespace SoulboundEngine.World.Entity {
 	using Level = Level.Level;
 
 	public abstract class Entity {

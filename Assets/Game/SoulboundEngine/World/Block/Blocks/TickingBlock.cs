@@ -1,11 +1,11 @@
-using SoulboundEngine.Client.World;
-using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Common;
 using SoulboundEngine.Core.State;
 using SoulboundEngine.Core.States;
 using SoulboundEngine.World.Block.State;
 
 namespace SoulboundEngine.World.Block {
+	using Level = Level.Level;
+
 	[PROTOTYPICAL]
 	public sealed class TickingBlock : Block, ITickingBlock {
 		public static readonly Property<bool> on = BoolProperty.Of("on");

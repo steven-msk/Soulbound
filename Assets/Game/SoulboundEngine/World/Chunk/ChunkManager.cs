@@ -3,7 +3,7 @@
 
 using System;
 
-namespace SoulboundEngine.Client.World.Chunk {
+namespace SoulboundEngine.World.Chunk {
 	public abstract class ChunkManager : IDisposable {
 
 		public abstract Chunk? GetChunk(int x, bool loadOrCreate);

@@ -1,4 +1,4 @@
-namespace SoulboundEngine.Client.World.Entity.Attribute {
+namespace SoulboundEngine.World.Entity.Attribute {
 	public enum OperationType {
 		Additive,				// + or -
 		AdditivePercent,		// +% or -%

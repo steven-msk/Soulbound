@@ -1,6 +1,6 @@
 ﻿using SoulboundEngine.Core.Serialization;
 
-namespace SoulboundEngine.Client.World.Serialization {
+namespace SoulboundEngine.World.Serialization {
 	public interface IWorldSaveValidator {
 		bool IsValid(File saveFolder);
 		void ValidateNewSave(File saveFolder, int seed);

@@ -1,4 +1,4 @@
-using SoulboundEngine.Client.World.Chunk;
+using SoulboundEngine.World.Chunk;
 using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;

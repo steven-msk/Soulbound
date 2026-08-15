@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using SoulboundEngine.Client.World;
+using System.Collections.Generic;
 
-namespace SoulboundEngine.Client.World {
+namespace SoulboundEngine.World {
 	public interface IWorldAccessor {
 		void EnterWorld(string world);
 		void QuitActiveWorld();

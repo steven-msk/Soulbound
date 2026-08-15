@@ -1,7 +1,7 @@
 using SoulboundEngine.Core.Noise;
 using UnityEngine;
 
-namespace SoulboundEngine.Client.World.Gen {
+namespace SoulboundEngine.World.Gen {
 	using Level = Level.Level;
 
 	public sealed class Cavemap {

@@ -11,15 +11,13 @@ using SoulboundEngine.Client.Recipe.Asset;
 using SoulboundEngine.Client.Render.Block;
 using SoulboundEngine.Client.Render.Entity;
 using SoulboundEngine.Client.Render.Item;
+using SoulboundEngine.Client.Render.World;
 using SoulboundEngine.Client.Runtime.Services;
 using SoulboundEngine.Client.Settings;
 using SoulboundEngine.Client.UI;
 using SoulboundEngine.Client.UI.Screen;
 using SoulboundEngine.Client.UI.UXMLBindings;
 using SoulboundEngine.Client.World;
-using SoulboundEngine.Client.World.Level;
-using SoulboundEngine.Client.World.Render;
-using SoulboundEngine.Client.World.Serialization;
 using SoulboundEngine.Client.World.Widget;
 using SoulboundEngine.Core;
 using SoulboundEngine.Core.Audio;
@@ -27,6 +25,9 @@ using SoulboundEngine.Core.Registry;
 using SoulboundEngine.Core.Render.Sprite;
 using SoulboundEngine.Core.Serialization;
 using SoulboundEngine.Recipe;
+using SoulboundEngine.World;
+using SoulboundEngine.World.Level;
+using SoulboundEngine.World.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,7 +49,6 @@ namespace SoulboundEngine.Client {
 #endif
 
 	public sealed class SoulboundClient : IWorldAccessor, IDebugMetricsSource {
-		const int INPUT_QUEUE_BUFFER_CAPACITY = 128;
 		private static SoulboundClient instance;
 		private readonly GameConfig config;
 		private readonly PlayerInputActions inputActions;

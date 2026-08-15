@@ -2,6 +2,8 @@ using SoulboundEngine.Client.Render.Block;
 using SoulboundEngine.Client.Render.Entity;
 using SoulboundEngine.World.Block;
 using SoulboundEngine.World.Block.State;
+using SoulboundEngine.World.Chunk;
+using SoulboundEngine.World.Level;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,10 +11,8 @@ using UnityEngine.Tilemaps;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.Render {
-	using Chunk = Chunk.Chunk;
-	using Entity = Entity.Entity;
-	using Level = Level.Level;
+namespace SoulboundEngine.Client.Render.World {
+	using Entity = SoulboundEngine.World.Entity.Entity;
 
 	public sealed class WorldRenderer {
 		private readonly BlockRenderManager blockRenderManager;

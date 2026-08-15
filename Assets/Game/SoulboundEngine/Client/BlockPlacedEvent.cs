@@ -1,7 +1,7 @@
-using SoulboundEngine.Client.World;
-using SoulboundEngine.World.Block.State;
-using SoulboundEngine.Client.World.Level;
+using SoulboundEngine.World.Level;
 using SoulboundEngine.Core.Event;
+using SoulboundEngine.World.Block;
+using SoulboundEngine.World.Block.State;
 
 namespace SoulboundEngine.Client {
 	public struct BlockPlacedEvent : IGameEvent {

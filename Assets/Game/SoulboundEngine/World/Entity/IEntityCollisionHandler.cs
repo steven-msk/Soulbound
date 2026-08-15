@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace SoulboundEngine.Client.World.Entity {
+namespace SoulboundEngine.World.Entity {
 	public interface IEntityCollisionHandler {
 		void OnCollisionEnter(EntityCollision collision);
 		void OnCollisionExit(EntityCollision collision);

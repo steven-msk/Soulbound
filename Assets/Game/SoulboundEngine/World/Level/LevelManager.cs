@@ -1,16 +1,16 @@
+using SoulboundEngine.Client;
+using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.UI.Screen;
 using SoulboundEngine.World.Biome;
-using SoulboundEngine.Client.World.Chunk;
-using SoulboundEngine.Client.World.Gen;
+using SoulboundEngine.World.Chunk;
+using SoulboundEngine.World.Gen;
 using System;
 using UnityEngine;
 using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.Level {
-	using PlayerEntity = Player.PlayerEntity;
-
+namespace SoulboundEngine.World.Level {
 	public class LevelManager {
 		public const int CHUNK_RADIUS = 2;
 		public const int TERRAIN_PLANE_Y = 0;

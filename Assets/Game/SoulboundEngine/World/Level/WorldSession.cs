@@ -1,9 +1,10 @@
+using SoulboundEngine.Client.World;
 using System;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.UIElements;
 
-namespace SoulboundEngine.Client.World.Level {
+namespace SoulboundEngine.World.Level {
 	public struct WorldSession {
 		public WorldSave save;
 		public LevelManager levelManager;

@@ -1,6 +1,4 @@
 ﻿using SoulboundEngine.Client.Player;
-using SoulboundEngine.Client.World;
-using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Common.Math;
 using SoulboundEngine.Core.Registry;
 using SoulboundEngine.Core.States;
@@ -12,6 +10,7 @@ using System.Collections.Generic;
 
 namespace SoulboundEngine.World.Block {
 	using Item = Item.Item;
+	using Level = Level.Level;
 
 	public abstract class AbstractBlock : IItemConvertible {
 		public abstract Item AsItem();

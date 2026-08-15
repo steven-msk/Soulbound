@@ -1,14 +1,14 @@
 using SoulboundEngine.Client.Player;
-using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Common;
 using UnityEngine;
+using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
-namespace SoulboundEngine.Client.World.Entity {
-	using Logger = Debug.Logging.Logger;
+namespace SoulboundEngine.World.Entity {
+	using Level = Level.Level;
 
 	[PROTOTYPICAL]
 	public sealed class AreaTriggerEntity : Entity {
-		public AreaTriggerEntity(EntityDescriptor<AreaTriggerEntity> descriptor, Level.Level level)
+		public AreaTriggerEntity(EntityDescriptor<AreaTriggerEntity> descriptor, Level level)
 			: base(descriptor, level) {
 		}
 

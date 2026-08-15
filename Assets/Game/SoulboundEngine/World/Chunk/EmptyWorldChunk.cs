@@ -2,7 +2,7 @@
 using SoulboundEngine.World.Block.Entity;
 using SoulboundEngine.World.Block.State;
 
-namespace SoulboundEngine.Client.World.Chunk {
+namespace SoulboundEngine.World.Chunk {
 	using Level = Level.Level;
 
 	public class EmptyWorldChunk : WorldChunk {

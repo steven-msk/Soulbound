@@ -1,10 +1,11 @@
 using SoulboundEngine.World.Biome;
+using SoulboundEngine.World.Block;
 using SoulboundEngine.World.Block.State;
 using UnityEngine;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.Gen {
+namespace SoulboundEngine.World.Gen {
 	public sealed class BlockResolver {
 		const int blendRange = 10;
 

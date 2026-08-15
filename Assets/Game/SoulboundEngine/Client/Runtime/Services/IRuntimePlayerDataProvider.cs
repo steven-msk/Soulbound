@@ -1,5 +1,5 @@
 using SoulboundEngine.Item;
-using SoulboundEngine.Client.World.Entity;
+using SoulboundEngine.World.Entity;
 using System.Collections.Generic;
 
 #nullable enable

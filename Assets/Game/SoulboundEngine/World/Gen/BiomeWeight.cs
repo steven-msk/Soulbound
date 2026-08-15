@@ -1,6 +1,6 @@
 using SoulboundEngine.World.Biome;
 
-namespace SoulboundEngine.Client.World.Gen {
+namespace SoulboundEngine.World.Gen {
 	public struct BiomeWeight {
 		public IBiome biome;
 		public float value;

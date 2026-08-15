@@ -1,4 +1,4 @@
-﻿using SoulboundEngine.Client.World.Entity;
+﻿using SoulboundEngine.World.Entity;
 using SoulboundEngine.Core.Registry;
 using System;
 using UnityEngine;

@@ -1,5 +1,5 @@
 ﻿using SoulboundEngine.Client.Player;
-using SoulboundEngine.Client.World;
+using SoulboundEngine.World.Block;
 
 namespace SoulboundEngine.Item {
 	public class ItemPlacementContext : ItemUsageContext {

@@ -1,5 +1,5 @@
 ﻿using SoulboundEngine.Client.Render.Item;
-using SoulboundEngine.Client.World.Entity;
+using SoulboundEngine.World.Entity;
 using UnityEngine;
 
 namespace SoulboundEngine.Client.Render.Entity {

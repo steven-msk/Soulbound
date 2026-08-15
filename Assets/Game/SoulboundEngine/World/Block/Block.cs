@@ -1,11 +1,9 @@
 using SoulboundEngine.Client.Player;
-using SoulboundEngine.Client.World;
-using SoulboundEngine.Client.World.Entity;
-using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Core.Registry;
 using SoulboundEngine.Core.States;
 using SoulboundEngine.Item;
 using SoulboundEngine.World.Block.State;
+using SoulboundEngine.World.Entity;
 using System;
 using System.Collections.Generic;
 
@@ -13,6 +11,7 @@ using System.Collections.Generic;
 
 namespace SoulboundEngine.World.Block {
 	using Item = Item.Item;
+	using Level = Level.Level;
 
 	public class Block : AbstractBlock {
 		private static readonly List<BlockState> statesByID = new();
@@ -70,7 +69,7 @@ namespace SoulboundEngine.World.Block {
 				: Blocks.AIR;
 		}
 
-		public static void DropStacks(BlockState blockState, Level level, BlockPos blockPos, Client.World.Entity.Entity? owner) {
+		public static void DropStacks(BlockState blockState, Level level, BlockPos blockPos, World.Entity.Entity? owner) {
 			List<ItemStack> droppedStacks = GetDroppedStacks(blockState);
 
 			foreach (var stack in droppedStacks) {

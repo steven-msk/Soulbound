@@ -1,4 +1,4 @@
-namespace SoulboundEngine.Client.World.Entity.Attribute {
+namespace SoulboundEngine.World.Entity.Attribute {
 	public class EntityAttribute {
 		public double DefaultValue { get; }
 		public IValueRule ValueRule { get; }

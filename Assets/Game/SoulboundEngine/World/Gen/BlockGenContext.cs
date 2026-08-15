@@ -1,6 +1,7 @@
+using SoulboundEngine.World.Block;
 using UnityEngine;
 
-namespace SoulboundEngine.Client.World.Gen {
+namespace SoulboundEngine.World.Gen {
 	public struct BlockGenContext {
 		public BlockPos pos;
 		public int surfaceY;

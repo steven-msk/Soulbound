@@ -2,10 +2,10 @@
 using SoulboundEngine.Client.Loot;
 using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.UI.Screen;
-using SoulboundEngine.Client.World;
+using SoulboundEngine.Core.Registry;
+using SoulboundEngine.World.Block;
 using SoulboundEngine.World.Block.Entity;
 using SoulboundEngine.World.Block.State;
-using SoulboundEngine.Core.Registry;
 using System.Collections.Generic;
 using UnityEngine;
 

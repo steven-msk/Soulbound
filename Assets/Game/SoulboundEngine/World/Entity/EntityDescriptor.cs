@@ -1,10 +1,10 @@
-using SoulboundEngine.Client.World.Level;
+using SoulboundEngine.World.Level;
 using SoulboundEngine.Core.Registry;
 using UnityEngine;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.Entity {
+namespace SoulboundEngine.World.Entity {
 	public abstract class EntityDescriptor {
 		public static EntityDescriptor<E> Of<E>(EntityDescriptor<E>.EntityFactory factory) where E : Entity {
 			return new EntityDescriptor<E>(factory);

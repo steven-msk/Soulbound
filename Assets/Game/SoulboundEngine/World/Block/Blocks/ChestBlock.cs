@@ -1,14 +1,14 @@
 ﻿using SoulboundEngine.Client.Loot;
 using SoulboundEngine.Client.Player;
-using SoulboundEngine.Client.World;
-using SoulboundEngine.Client.World.Entity;
-using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Interaction;
 using SoulboundEngine.Item.Container;
 using SoulboundEngine.World.Block.Entity;
 using SoulboundEngine.World.Block.State;
+using SoulboundEngine.World.Entity;
 
 namespace SoulboundEngine.World.Block {
+	using Level = Level.Level;
+
 	public class ChestBlock : Block, ITileEntityProvider {
 		public const int INVENTORY_SIZE = 27;
 

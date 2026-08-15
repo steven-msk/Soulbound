@@ -1,4 +1,4 @@
-﻿namespace SoulboundEngine.Client.World.Chunk {
+﻿namespace SoulboundEngine.World.Chunk {
 	public readonly struct SectionPos {
 		public readonly int x;
 		public readonly int y;

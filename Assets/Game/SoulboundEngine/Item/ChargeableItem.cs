@@ -1,10 +1,10 @@
 using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.Interaction;
 using SoulboundEngine.Client.Player;
-using SoulboundEngine.Client.World;
-using SoulboundEngine.Client.World.Entity;
-using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Common;
+using SoulboundEngine.Interaction;
+using SoulboundEngine.World.Block;
+using SoulboundEngine.World.Entity;
+using SoulboundEngine.World.Level;
 
 namespace SoulboundEngine.Item {
 	[PROTOTYPICAL]

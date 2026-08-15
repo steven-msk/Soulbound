@@ -1,8 +1,9 @@
 ﻿using SoulboundEngine.Common.Math;
+using SoulboundEngine.World.Block;
 using System;
 using System.Collections.Generic;
 
-namespace SoulboundEngine.Client.World.Physics {
+namespace SoulboundEngine.World.Physics {
 	public readonly struct AABB : IEquatable<AABB> {
 		private const double EPSILON = 1.0E-7;
 		public readonly double minX;

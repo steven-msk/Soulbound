@@ -1,8 +1,5 @@
 using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.Runtime.Services;
-using SoulboundEngine.Client.World.Chunk;
-using SoulboundEngine.Client.World.Entity;
-using SoulboundEngine.Client.World.Gen;
 using SoulboundEngine.Common;
 using SoulboundEngine.Common.Math;
 using SoulboundEngine.Common.Math.Random;
@@ -10,6 +7,9 @@ using SoulboundEngine.Core;
 using SoulboundEngine.World.Block;
 using SoulboundEngine.World.Block.Entity;
 using SoulboundEngine.World.Block.State;
+using SoulboundEngine.World.Chunk;
+using SoulboundEngine.World.Entity;
+using SoulboundEngine.World.Gen;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +18,8 @@ using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.Level {
+namespace SoulboundEngine.World.Level {
+	using Block = Block.Block;
 	using Chunk = Chunk.Chunk;
 	using Entity = Entity.Entity;
 

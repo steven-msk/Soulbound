@@ -1,6 +1,6 @@
 using SoulboundEngine.Core.Registry;
 
-namespace SoulboundEngine.Client.World.Entity.Attribute {
+namespace SoulboundEngine.World.Entity.Attribute {
 	public static class AttributeTypes {
 		public static readonly RegistryEntry<EntityAttribute> attribute = Register("attribute", new EntityAttribute(IValueRule.Ranged(-10d, 10d), 1d));
 

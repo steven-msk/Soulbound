@@ -1,15 +1,15 @@
-using SoulboundEngine.Client.World;
-using SoulboundEngine.Client.World.Chunk;
-using SoulboundEngine.Client.World.Gen;
-using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Core.Noise;
 using SoulboundEngine.World.Block;
 using SoulboundEngine.World.Block.State;
+using SoulboundEngine.World.Gen;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 namespace SoulboundEngine.World.Biome {
+	using Chunk = Chunk.Chunk;
+	using Level = Level.Level;
+
 	public class HillsBiome : IBiome {
 		private readonly int seed;
 		private readonly Heightmap heightmap;

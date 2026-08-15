@@ -1,4 +1,4 @@
-using SoulboundEngine.Client.World.Entity;
+using SoulboundEngine.World.Entity;
 
 namespace SoulboundEngine.Item {
 	public interface IItemCollector {

@@ -9,10 +9,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-
 #nullable enable
 
-namespace SoulboundEngine.Client.World.Chunk {
+namespace SoulboundEngine.World.Chunk {
+	using Block = Block.Block;
 	using Level = Level.Level;
 
 	public record SerializableChunkData(

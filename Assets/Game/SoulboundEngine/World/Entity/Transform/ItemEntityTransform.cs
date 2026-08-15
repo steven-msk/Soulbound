@@ -3,7 +3,7 @@ using UnityEngine;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.Entity {
+namespace SoulboundEngine.World.Entity {
 
 	[RequireComponent(typeof(Rigidbody2D))]
 	public class ItemEntityTransform : MonoBehaviour, Client.Render.Entity.IEntityView {

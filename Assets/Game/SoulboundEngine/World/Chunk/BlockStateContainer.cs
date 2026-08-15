@@ -1,12 +1,13 @@
-﻿using SoulboundEngine.World.Block;
-using SoulboundEngine.World.Block.State;
+﻿using SoulboundEngine.World.Block.State;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.Chunk {
+namespace SoulboundEngine.World.Chunk {
+	using Block = Block.Block;
+
 	public sealed class BlockStateContainer : IEnumerable<BlockState> {
 		private readonly List<int> palette = new() { 0 };
 		private readonly Dictionary<int, int> paletteLookup = new() { [0] = 0 };

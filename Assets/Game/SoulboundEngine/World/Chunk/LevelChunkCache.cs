@@ -2,7 +2,7 @@
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.Chunk {
+namespace SoulboundEngine.World.Chunk {
 	using Level = Level.Level;
 
 	public class LevelChunkCache : IChunkCache {

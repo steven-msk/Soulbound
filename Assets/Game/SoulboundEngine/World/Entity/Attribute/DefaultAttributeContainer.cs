@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.Entity.Attribute {
+namespace SoulboundEngine.World.Entity.Attribute {
 	public sealed class DefaultAttributeContainer {
 		private readonly Dictionary<RegistryEntry<EntityAttribute>, DefaultAttributeInstance> defaults = new();
 

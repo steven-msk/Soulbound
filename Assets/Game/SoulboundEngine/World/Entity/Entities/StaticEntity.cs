@@ -1,7 +1,7 @@
-using SoulboundEngine.Client.World.Level;
+using SoulboundEngine.World.Level;
 using SoulboundEngine.Common;
 
-namespace SoulboundEngine.Client.World.Entity {
+namespace SoulboundEngine.World.Entity {
 	[PROTOTYPICAL]
 	public sealed class StaticEntity : Entity {
 		public StaticEntity(EntityDescriptor<StaticEntity> descriptor, Level.Level level)

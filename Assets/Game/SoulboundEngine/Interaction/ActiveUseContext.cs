@@ -1,6 +1,6 @@
 ﻿using SoulboundEngine.Item;
-using SoulboundEngine.Client.World.Entity;
-using SoulboundEngine.Client.World.Level;
+using SoulboundEngine.World.Entity;
+using SoulboundEngine.World.Level;
 using System;
 
 namespace SoulboundEngine.Interaction {

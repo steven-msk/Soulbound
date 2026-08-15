@@ -3,7 +3,7 @@ using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.World;
 using SoulboundEngine.World.Block;
 using SoulboundEngine.World.Block.State;
-using SoulboundEngine.Client.World.Level;
+using SoulboundEngine.World.Level;
 
 #nullable enable
 
