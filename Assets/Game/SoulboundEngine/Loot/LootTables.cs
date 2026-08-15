@@ -1,7 +1,7 @@
 ﻿using SoulboundEngine.Item;
 using SoulboundEngine.Loot.Entry;
 using SoulboundEngine.Loot.Provider.Number;
-using SoulboundEngine.Core.Registry;
+using SoulboundEngine.Registry;
 using System.Collections.Generic;
 
 namespace SoulboundEngine.Loot {

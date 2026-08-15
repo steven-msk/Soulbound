@@ -1,6 +1,6 @@
 using SoulboundEngine.Component;
-using SoulboundEngine.Core.Registry;
 using SoulboundEngine.Interaction;
+using SoulboundEngine.Registry;
 using SoulboundEngine.World.Block;
 using SoulboundEngine.World.Entity;
 using SoulboundEngine.World.Level;

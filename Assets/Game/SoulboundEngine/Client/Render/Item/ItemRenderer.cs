@@ -1,6 +1,6 @@
 namespace SoulboundEngine.Client.Render.Item {
 	using SoulboundEngine.Item;
-	using SoulboundEngine.Core;
+	using SoulboundEngine;
 	using System;
 	using TMPro;
 	using UnityEngine;

@@ -1,4 +1,4 @@
-﻿using SoulboundEngine.Core.Serialization;
+﻿using SoulboundEngine.Serialization;
 
 namespace SoulboundEngine.World.Serialization {
 	public interface IWorldSaveValidator {

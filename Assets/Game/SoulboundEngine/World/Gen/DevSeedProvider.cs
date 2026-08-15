@@ -1,10 +1,4 @@
 using SoulboundEngine.Common;
-using SoulboundEngine.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SoulboundEngine.World.Gen {
 	[PROTOTYPICAL]
@@ -15,6 +9,6 @@ namespace SoulboundEngine.World.Gen {
 			this.devConfig = devConfig;
 		}
 
-		public int GetSeed() => devConfig.seed;
+		public int GetSeed() => this.devConfig.seed;
 	}
 }

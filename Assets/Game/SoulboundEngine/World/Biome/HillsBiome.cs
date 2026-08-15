@@ -1,4 +1,4 @@
-using SoulboundEngine.Core.Noise;
+using SoulboundEngine.Common.Math.Noise;
 using SoulboundEngine.World.Block;
 using SoulboundEngine.World.Block.State;
 using SoulboundEngine.World.Gen;

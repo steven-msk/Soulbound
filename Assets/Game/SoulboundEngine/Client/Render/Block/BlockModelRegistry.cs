@@ -1,4 +1,4 @@
-﻿using SoulboundEngine.Core.Assets;
+﻿using SoulboundEngine.Client.Assets;
 using SoulboundEngine.World.Block;
 using SoulboundEngine.World.Block.State;
 using System;

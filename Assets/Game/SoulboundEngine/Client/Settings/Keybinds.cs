@@ -1,5 +1,5 @@
 using SoulboundEngine.Client.Input;
-using SoulboundEngine.Core.Registry;
+using SoulboundEngine.Registry;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using Keyboard = SoulboundEngine.Client.Input.Keyboard;

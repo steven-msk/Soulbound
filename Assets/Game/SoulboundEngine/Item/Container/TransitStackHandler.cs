@@ -1,8 +1,8 @@
 using SoulboundEngine.World.Player;
 using SoulboundEngine.Client.Render.Item;
 using SoulboundEngine.Client.UI.UXMLBindings;
-using SoulboundEngine.Core.Assets;
-using SoulboundEngine.Core.Registry;
+using SoulboundEngine.Client.Assets;
+using SoulboundEngine.Registry;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;

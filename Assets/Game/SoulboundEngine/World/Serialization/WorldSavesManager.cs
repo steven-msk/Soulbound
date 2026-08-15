@@ -6,7 +6,7 @@ using System.Collections.Generic;
 #nullable enable
 
 namespace SoulboundEngine.Client.World {
-	using File = Core.Serialization.File;
+	using File = Serialization.File;
 
 	public sealed class WorldSavesManager {
 		private readonly File root;

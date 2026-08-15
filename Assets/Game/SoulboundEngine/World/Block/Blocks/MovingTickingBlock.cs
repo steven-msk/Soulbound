@@ -1,6 +1,6 @@
 using SoulboundEngine.Common;
 using SoulboundEngine.Common.Math;
-using SoulboundEngine.Core.States;
+using SoulboundEngine.States;
 using SoulboundEngine.World.Block.State;
 
 namespace SoulboundEngine.World.Block {

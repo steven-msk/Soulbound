@@ -1,4 +1,4 @@
-using SoulboundEngine.Core.Registry;
+using SoulboundEngine.Registry;
 using SoulboundEngine.World.Player;
 
 #nullable enable

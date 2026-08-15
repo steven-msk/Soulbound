@@ -1,5 +1,5 @@
-﻿using SoulboundEngine.Core.Registry;
-using SoulboundEngine.Recipe;
+﻿using SoulboundEngine.Recipe;
+using SoulboundEngine.Registry;
 
 namespace SoulboundEngine.Client.Recipe.Asset {
 	public interface IRecipeAsset {

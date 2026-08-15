@@ -1,6 +1,6 @@
-﻿using SoulboundEngine.Core.Assets;
-using SoulboundEngine.Core.Registry;
+﻿using SoulboundEngine.Client.Assets;
 using SoulboundEngine.Recipe;
+using SoulboundEngine.Registry;
 using System.Collections.Generic;
 
 namespace SoulboundEngine.Client.Recipe.Asset {

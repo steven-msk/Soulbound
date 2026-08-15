@@ -1,6 +1,6 @@
 using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.Core.States;
 using SoulboundEngine.Interaction;
+using SoulboundEngine.States;
 using SoulboundEngine.World.Block.State;
 using SoulboundEngine.World.Player;
 

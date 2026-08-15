@@ -2,7 +2,7 @@
 using SoulboundEngine.Loot.Condition;
 using SoulboundEngine.Loot.Context;
 using SoulboundEngine.Loot.Function;
-using SoulboundEngine.Core.Registry;
+using SoulboundEngine.Registry;
 using System;
 using System.Collections.Generic;
 

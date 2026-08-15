@@ -1,4 +1,4 @@
-using SoulboundEngine.Core.Assets;
+using SoulboundEngine.Client.Assets;
 
 using UnityEngine;
 using UnityEngine.Tilemaps;

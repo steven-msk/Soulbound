@@ -1,5 +1,5 @@
 ﻿using SoulboundEngine.Component;
-using SoulboundEngine.Core.Registry;
+using SoulboundEngine.Registry;
 using System;
 
 namespace SoulboundEngine.Item {

@@ -6,7 +6,7 @@ using System.IO;
 #nullable enable
 
 namespace SoulboundEngine.World.Chunk {
-	using File = Core.Serialization.File;
+	using File = SoulboundEngine.Serialization.File;
 	using Level = Level.Level;
 
 	public class ChunkStorage : IDisposable {

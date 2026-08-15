@@ -1,7 +1,7 @@
 using SoulboundEngine.World.Block;
 using SoulboundEngine.World.Block.State;
 using SoulboundEngine.World.Gen;
-using SoulboundEngine.Core.Noise;
+using SoulboundEngine.Common.Math.Noise;
 using UnityEngine;
 
 namespace SoulboundEngine.World.Biome {

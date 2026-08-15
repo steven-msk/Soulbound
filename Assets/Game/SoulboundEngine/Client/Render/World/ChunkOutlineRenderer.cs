@@ -1,5 +1,5 @@
+using SoulboundEngine.Client.Assets;
 using SoulboundEngine.Common;
-using SoulboundEngine.Core.Assets;
 using SoulboundEngine.World.Chunk;
 using SoulboundEngine.World.Level;
 using System.Collections.Generic;

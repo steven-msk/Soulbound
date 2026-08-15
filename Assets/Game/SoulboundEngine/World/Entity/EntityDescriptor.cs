@@ -1,5 +1,5 @@
 using SoulboundEngine.World.Level;
-using SoulboundEngine.Core.Registry;
+using SoulboundEngine.Registry;
 using UnityEngine;
 
 #nullable enable

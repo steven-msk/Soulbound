@@ -1,6 +1,5 @@
 using SoulboundEngine.Client;
-using SoulboundEngine.Core;
-using SoulboundEngine.Core.Event;
+using SoulboundEngine.Event;
 using SoulboundEngine.Item;
 using UnityEngine;
 using static SoulboundEngine.World.Entity.Entity;

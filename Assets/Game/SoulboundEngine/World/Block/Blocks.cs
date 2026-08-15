@@ -1,4 +1,4 @@
-using SoulboundEngine.Core.Registry;
+using SoulboundEngine.Registry;
 using System;
 
 namespace SoulboundEngine.World.Block {

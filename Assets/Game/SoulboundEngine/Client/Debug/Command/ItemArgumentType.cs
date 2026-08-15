@@ -4,7 +4,7 @@ using Brigadier.NET.Context;
 using Brigadier.NET.Exceptions;
 using Brigadier.NET.Suggestion;
 using SoulboundEngine.Item;
-using SoulboundEngine.Core.Registry;
+using SoulboundEngine.Registry;
 using System.Threading.Tasks;
 
 namespace SoulboundEngine.Client.Debug.Commands {

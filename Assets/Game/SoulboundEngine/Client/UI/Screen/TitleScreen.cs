@@ -1,7 +1,6 @@
+using SoulboundEngine.Client.Assets;
 using SoulboundEngine.Client.UI.UXMLBindings;
-using SoulboundEngine.Core;
-using SoulboundEngine.Core.Assets;
-using SoulboundEngine.Core.Registry;
+using SoulboundEngine.Registry;
 using SoulboundEngine.World;
 using UnityEngine.UIElements;
 

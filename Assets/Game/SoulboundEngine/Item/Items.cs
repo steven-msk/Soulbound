@@ -1,5 +1,5 @@
 using SoulboundEngine.World.Block;
-using SoulboundEngine.Core.Registry;
+using SoulboundEngine.Registry;
 using System;
 
 #nullable enable

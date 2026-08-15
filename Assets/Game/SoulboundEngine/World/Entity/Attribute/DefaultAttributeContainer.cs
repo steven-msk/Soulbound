@@ -1,4 +1,4 @@
-using SoulboundEngine.Core.Registry;
+using SoulboundEngine.Registry;
 using System;
 using System.Collections.Generic;
 
@@ -13,7 +13,7 @@ namespace SoulboundEngine.World.Entity.Attribute {
 		}
 
 		public AttributeInstance CreateInstance(RegistryEntry<EntityAttribute> attribute, IValueRule? ruleOverride = null) {
-			bool hasDefault = defaults.TryGetValue(attribute, out var defaultInstance);
+			bool hasDefault = this.defaults.TryGetValue(attribute, out var defaultInstance);
 
 			IValueRule? valueRule = ruleOverride ?? (hasDefault ? defaultInstance.ruleOverride : attribute.GetValue().ValueRule);
 			AttributeInstance overrideInstance = new(attribute, valueRule) {
@@ -23,7 +23,7 @@ namespace SoulboundEngine.World.Entity.Attribute {
 			return overrideInstance;
 		}
 
-		public IEnumerable<DefaultAttributeInstance> GetEntries() => defaults.Values;
+		public IEnumerable<DefaultAttributeInstance> GetEntries() => this.defaults.Values;
 
 		public static Builder NewBuilder() => new();
 
@@ -34,17 +34,17 @@ namespace SoulboundEngine.World.Entity.Attribute {
 			private bool unmodifiable;
 
 			public Builder Add(RegistryEntry<EntityAttribute> attribute, IValueRule? ruleOverride = null) {
-				if (unmodifiable) throw new InvalidOperationException();
+				if (this.unmodifiable) throw new InvalidOperationException();
 
-				defaults.Add(attribute, CheckedAdd(attribute, attribute.GetValue().DefaultValue, ruleOverride));
+				this.defaults.Add(attribute, this.CheckedAdd(attribute, attribute.GetValue().DefaultValue, ruleOverride));
 				return this;
 			}
 
 			public Builder Add(RegistryEntry<EntityAttribute> attribute, double baseValue, IValueRule? ruleOverride = null) {
-				if (unmodifiable) throw new InvalidOperationException();
+				if (this.unmodifiable) throw new InvalidOperationException();
 
-				DefaultAttributeInstance instance = CheckedAdd(attribute, baseValue, ruleOverride);
-				defaults.Add(attribute, instance);
+				DefaultAttributeInstance instance = this.CheckedAdd(attribute, baseValue, ruleOverride);
+				this.defaults.Add(attribute, instance);
 
 				return this;
 			}
@@ -55,8 +55,8 @@ namespace SoulboundEngine.World.Entity.Attribute {
 			}
 
 			public DefaultAttributeContainer Build() {
-				unmodifiable = true;
-				return new DefaultAttributeContainer(defaults);
+				this.unmodifiable = true;
+				return new DefaultAttributeContainer(this.defaults);
 			}
 		}
 	}

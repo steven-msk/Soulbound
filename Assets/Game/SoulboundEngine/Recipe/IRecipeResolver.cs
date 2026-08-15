@@ -1,4 +1,4 @@
-﻿using SoulboundEngine.Core.Registry;
+﻿using SoulboundEngine.Registry;
 
 namespace SoulboundEngine.Recipe {
 	public interface IRecipeResolver {

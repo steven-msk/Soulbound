@@ -1,6 +1,6 @@
 using System;
 
-namespace SoulboundEngine.Core.Registry {
+namespace SoulboundEngine.Registry {
 	/// <summary>
 	/// Throws when parsing or constructing an `Identifier` that contains an invalid character.
 	/// <b>This should not be caught.</b>

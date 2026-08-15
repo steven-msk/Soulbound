@@ -1,4 +1,4 @@
-using SoulboundEngine.Core.Noise;
+using SoulboundEngine.Common.Math.Noise;
 using UnityEngine;
 
 namespace SoulboundEngine.World.Gen {

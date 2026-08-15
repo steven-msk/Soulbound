@@ -1,4 +1,4 @@
-using SoulboundEngine.Core.States;
+using SoulboundEngine.States;
 using System.Collections.Generic;
 
 #nullable enable

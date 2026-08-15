@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using SoulboundEngine.Client.UI.Screen;
-using SoulboundEngine.Core.Registry;
 using SoulboundEngine.Loot;
+using SoulboundEngine.Registry;
 using SoulboundEngine.World.Block;
 using SoulboundEngine.World.Block.Entity;
 using SoulboundEngine.World.Block.State;

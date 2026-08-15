@@ -1,5 +1,5 @@
 using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.Core.Registry;
+using SoulboundEngine.Registry;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,60 +26,60 @@ namespace SoulboundEngine.World.Entity.Attribute {
 		public double baseValue { get; set; }
 
 		private void AddModifier(AttributeModifier modifier) {
-			idToModifier.Add(modifier.identifier, modifier);
-			dirty = true;
+			this.idToModifier.Add(modifier.identifier, modifier);
+			this.dirty = true;
 		}
 
 		public void AddPersistentModifier(AttributeModifier modifier) {
-			AddModifier(modifier);
-			persistentModifiers.Add(modifier.identifier, modifier);
+			this.AddModifier(modifier);
+			this.persistentModifiers.Add(modifier.identifier, modifier);
 		}
 		public void AddPredicateModifier(AttributeModifier modifier, Func<bool> predicate) {
-			AddPersistentModifier(modifier);
-			idToPredicate.Add(modifier.identifier, predicate);
+			this.AddPersistentModifier(modifier);
+			this.idToPredicate.Add(modifier.identifier, predicate);
 		}
 
 		public void AddPersistentModifiers(params AttributeModifier[] modifiers) {
 			foreach (var modifier in modifiers) {
-				AddPersistentModifier(modifier);
+				this.AddPersistentModifier(modifier);
 			}
 		}
 		public void AddPredicateModifiers(params (AttributeModifier modifier, Func<bool> predicate)[] modifiers) {
 			foreach (var (modifier, predicate) in modifiers) {
-				AddPredicateModifier(modifier, predicate);
+				this.AddPredicateModifier(modifier, predicate);
 			}
 		}
 
 		public void ClearModifiers() {
-			idToModifier.Clear();
-			persistentModifiers.Clear();
-			idToPredicate.Clear();
-			dirty = true;
+			this.idToModifier.Clear();
+			this.persistentModifiers.Clear();
+			this.idToPredicate.Clear();
+			this.dirty = true;
 		}
 
 		public void OnUpdate() {
-			if (HasPredicateModifiers()) {
+			if (this.HasPredicateModifiers()) {
 				bool anyChanged = false;
 
-				foreach (var id in idToPredicate.Keys) {
-					bool current = idToPredicate[id]();
-					if (current != lastPredicateState.GetValueOrDefault(id, !current)) {
+				foreach (var id in this.idToPredicate.Keys) {
+					bool current = this.idToPredicate[id]();
+					if (current != this.lastPredicateState.GetValueOrDefault(id, !current)) {
 						anyChanged = true;
 					}
-					lastPredicateState[id] = current;
+					this.lastPredicateState[id] = current;
 				}
 
-				if (anyChanged) dirty = true;
+				if (anyChanged) this.dirty = true;
 			}
 		}
 
 		private double ComputeValue() {
-			if (!dirty) return value;
+			if (!this.dirty) return this.value;
 
-			List<AttributeModifier> allModifiers = GetModifiers().ToList();
+			List<AttributeModifier> allModifiers = this.GetModifiers().ToList();
 
 			// filter targeting modifiers
-			IEnumerable<AttributeModifier> targeting = GetTargetingModifiers(allModifiers);
+			IEnumerable<AttributeModifier> targeting = this.GetTargetingModifiers(allModifiers);
 			allModifiers.RemoveAll(m => targeting.Contains(m));
 
 			Dictionary<AttributeModifier, List<AttributeModifier>> modifierToItsTargeters = new();
@@ -110,41 +110,41 @@ namespace SoulboundEngine.World.Entity.Attribute {
 			// TODO: fix unordered modifier graph lookup, which is dangerous for recursion
 			foreach (var target in modifierToItsTargeters.Keys) {
 				List<AttributeModifier> targeters = modifierToItsTargeters[target];
-				List<AttributeModifier> predicate_targeters = GetPredicateModifiers(targeters).ToList();
+				List<AttributeModifier> predicate_targeters = this.GetPredicateModifiers(targeters).ToList();
 				targeters.RemoveAll(m => predicate_targeters.Contains(m));
 
-				double effectiveOverride = CalculateModifiedValue(target.value, targeters, _ => null);
+				double effectiveOverride = this.CalculateModifiedValue(target.value, targeters, _ => null);
 
-				predicate_targeters.RemoveAll(m => !idToPredicate[m.identifier]());
-				effectiveOverride = CalculateModifiedValue(effectiveOverride, predicate_targeters, _ => null);
+				predicate_targeters.RemoveAll(m => !this.idToPredicate[m.identifier]());
+				effectiveOverride = this.CalculateModifiedValue(effectiveOverride, predicate_targeters, _ => null);
 
 				effectiveOverrides.Add(target, effectiveOverride);
 			}
 
 			// filter predicates
-			HashSet<AttributeModifier> predicateModifiers = GetPredicateModifiers(allModifiers).ToHashSet();
+			HashSet<AttributeModifier> predicateModifiers = this.GetPredicateModifiers(allModifiers).ToHashSet();
 			allModifiers.RemoveAll(m => predicateModifiers.Contains(m));
 			double? EffectiveOverrideSupplier(AttributeModifier attribute) {
 				return effectiveOverrides.TryGetValue(attribute, out double _override) ? _override : null;
 			}
-			double prePredicateResult = CalculateModifiedValue(this.baseValue, allModifiers, EffectiveOverrideSupplier);
+			double prePredicateResult = this.CalculateModifiedValue(this.baseValue, allModifiers, EffectiveOverrideSupplier);
 
-			predicateModifiers.RemoveWhere(m => !idToPredicate[m.identifier]());
-			double final = CalculateModifiedValue(prePredicateResult, predicateModifiers, EffectiveOverrideSupplier);
+			predicateModifiers.RemoveWhere(m => !this.idToPredicate[m.identifier]());
+			double final = this.CalculateModifiedValue(prePredicateResult, predicateModifiers, EffectiveOverrideSupplier);
 
 			// apply value rule
 			try {
-				IValueRule? valueRule = ruleOverride ?? type.GetValue().ValueRule;
+				IValueRule? valueRule = this.ruleOverride ?? this.type.GetValue().ValueRule;
 				valueRule?.Apply(ref final);
 			} catch (AttributeValueRuleViolationException e) {
 				Logger.LogFatal(e);
-				final = baseValue;
+				final = this.baseValue;
 			} finally {
-				value = final;
+				this.value = final;
 			}
 
-			dirty = false;
-			return value;
+			this.dirty = false;
+			return this.value;
 		}
 
 		// default numeric value computation:
@@ -152,7 +152,7 @@ namespace SoulboundEngine.World.Entity.Attribute {
 		// B = A * (1 + Σ%) (% of A)
 		// C = B * Π(multipliers)
 		private double CalculateModifiedValue(double baseValue, IEnumerable<AttributeModifier> modifiers, Func<AttributeModifier, double?> effectiveOverrideSupplier) {
-			FilterOperations(modifiers,
+			this.FilterOperations(modifiers,
 				out List<AttributeModifier> additive,
 				out List<AttributeModifier> additivePercent,
 				out List<AttributeModifier> multiplicative
@@ -201,69 +201,69 @@ namespace SoulboundEngine.World.Entity.Attribute {
 		}
 
 		public double GetValue() {
-			if (dirty) ComputeValue();
-			return value;
+			if (this.dirty) this.ComputeValue();
+			return this.value;
 		}
 
-		public IValueRule? GetValueRuleOverride() => ruleOverride;
+		public IValueRule? GetValueRuleOverride() => this.ruleOverride;
 
-		private bool IsPredicate(AttributeModifier modifier) => idToPredicate.ContainsKey(modifier.identifier);
+		private bool IsPredicate(AttributeModifier modifier) => this.idToPredicate.ContainsKey(modifier.identifier);
 
-		public RegistryEntry<EntityAttribute> GetAttribute() => type;
+		public RegistryEntry<EntityAttribute> GetAttribute() => this.type;
 
 		public bool TryGetModifier(Identifier identifier, out AttributeModifier modifier) {
-			return idToModifier.TryGetValue(identifier, out modifier);
+			return this.idToModifier.TryGetValue(identifier, out modifier);
 		}
 
-		public IEnumerable<AttributeModifier> GetModifiers() => idToModifier.Values.ToHashSet();
+		public IEnumerable<AttributeModifier> GetModifiers() => this.idToModifier.Values.ToHashSet();
 		public IReadOnlyDictionary<Identifier, AttributeModifier> GetModifiersByOperation(IOperation operation) {
-			return idToModifier
+			return this.idToModifier
 				.Where(kvp => kvp.Value.operation.Equals(operation))
 				.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 		}
-		public bool HasModifier(Identifier identifier) => idToModifier.ContainsKey(identifier);
-		public bool HasPredicateModifier(Identifier identifier) => idToPredicate.ContainsKey(identifier);
-		public IEnumerable<AttributeModifier> GetPersistentModifiers() => persistentModifiers.Values.ToHashSet();
+		public bool HasModifier(Identifier identifier) => this.idToModifier.ContainsKey(identifier);
+		public bool HasPredicateModifier(Identifier identifier) => this.idToPredicate.ContainsKey(identifier);
+		public IEnumerable<AttributeModifier> GetPersistentModifiers() => this.persistentModifiers.Values.ToHashSet();
 		private IEnumerable<AttributeModifier> GetTargetingModifiers(IEnumerable<AttributeModifier> modifiers) {
 			return modifiers
 				.Where(m => m.target != null);
 		}
 		private IEnumerable<AttributeModifier> GetPredicateModifiers(IEnumerable<AttributeModifier> modifiers) {
 			return modifiers
-				.Where(m => IsPredicate(m));
+				.Where(m => this.IsPredicate(m));
 		}
 		public IEnumerable<(AttributeModifier attribute, Func<bool> predicate)> GetPredicateModifiers() {
-			return idToPredicate.Keys
-				.Where(id => idToModifier.ContainsKey(id))
-				.Select(id => (idToModifier[id], idToPredicate[id]));
+			return this.idToPredicate.Keys
+				.Where(id => this.idToModifier.ContainsKey(id))
+				.Select(id => (this.idToModifier[id], this.idToPredicate[id]));
 		}
-		public bool HasPredicateModifiers() => idToPredicate.Any();
+		public bool HasPredicateModifiers() => this.idToPredicate.Any();
 
 		public void OverwritePersistentModifier(AttributeModifier modifier) {
-			if (!idToModifier.ContainsKey(modifier.identifier)) return;
+			if (!this.idToModifier.ContainsKey(modifier.identifier)) return;
 
-			idToModifier[modifier.identifier] = modifier;
-			persistentModifiers[modifier.identifier] = modifier;
-			idToPredicate.Remove(modifier.identifier);
+			this.idToModifier[modifier.identifier] = modifier;
+			this.persistentModifiers[modifier.identifier] = modifier;
+			this.idToPredicate.Remove(modifier.identifier);
 
-			dirty = true;
+			this.dirty = true;
 		}
 		public void OverwritePredicateModifier(AttributeModifier modifier, Func<bool> predicate) {
-			OverwritePersistentModifier(modifier);
-			idToPredicate.Add(modifier.identifier, predicate);
+			this.OverwritePersistentModifier(modifier);
+			this.idToPredicate.Add(modifier.identifier, predicate);
 		}
 		public void OverwritePredicate(Identifier identifier, Func<bool> predicate) {
-			if (idToPredicate.ContainsKey(identifier)) {
-				idToPredicate[identifier] = predicate;
+			if (this.idToPredicate.ContainsKey(identifier)) {
+				this.idToPredicate[identifier] = predicate;
 			}
 		}
 
-		public void RemoveModifier(AttributeModifier modifier) => RemoveModifier(modifier.identifier);
+		public void RemoveModifier(AttributeModifier modifier) => this.RemoveModifier(modifier.identifier);
 		public void RemoveModifier(Identifier identifier) {
-			idToModifier.Remove(identifier);
-			persistentModifiers.Remove(identifier);
-			idToPredicate.Remove(identifier);
-			dirty = true;
+			this.idToModifier.Remove(identifier);
+			this.persistentModifiers.Remove(identifier);
+			this.idToPredicate.Remove(identifier);
+			this.dirty = true;
 		}
 
 	}

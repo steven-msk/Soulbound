@@ -1,5 +1,5 @@
-﻿using SoulboundEngine.Core.Assets;
-using SoulboundEngine.Core.Render.Sprite;
+﻿using SoulboundEngine.Client.Assets;
+using SoulboundEngine.Client.Render.Sprite;
 using SoulboundEngine.Item;
 using System;
 using System.Collections.Generic;

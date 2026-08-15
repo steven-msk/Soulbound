@@ -2,7 +2,7 @@
 using System;
 
 namespace SoulboundEngine.World.Serialization {
-	using File = Core.Serialization.File;
+	using File = SoulboundEngine.Serialization.File;
 
 	public class WorldSaveValidator : IWorldSaveValidator {
 		private readonly string seedFileName;

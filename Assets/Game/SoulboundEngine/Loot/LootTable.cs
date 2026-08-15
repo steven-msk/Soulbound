@@ -4,7 +4,7 @@ using SoulboundEngine.Loot.Context;
 using SoulboundEngine.Loot.Function;
 using SoulboundEngine.Common;
 using SoulboundEngine.Common.Math.Random;
-using SoulboundEngine.Core.Registry;
+using SoulboundEngine.Registry;
 using System;
 using System.Collections.Generic;
 using System.Linq;

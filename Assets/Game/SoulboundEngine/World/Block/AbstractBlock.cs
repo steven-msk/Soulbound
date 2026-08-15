@@ -1,8 +1,8 @@
 ﻿using SoulboundEngine.Common.Math;
-using SoulboundEngine.Core.Registry;
-using SoulboundEngine.Core.States;
 using SoulboundEngine.Interaction;
 using SoulboundEngine.Item;
+using SoulboundEngine.Registry;
+using SoulboundEngine.States;
 using SoulboundEngine.World.Block.State;
 using SoulboundEngine.World.Player;
 using System;

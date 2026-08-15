@@ -1,6 +1,5 @@
-﻿using SoulboundEngine.Client.World;
-using SoulboundEngine.Common;
-using SoulboundEngine.Core.Registry;
+﻿using SoulboundEngine.Common;
+using SoulboundEngine.Registry;
 using SoulboundEngine.World.Block.State;
 using System;
 using System.Collections.Generic;

@@ -1,6 +1,6 @@
+using SoulboundEngine.Client;
 using SoulboundEngine.Common;
 using SoulboundEngine.Common.Unity;
-using SoulboundEngine.Core;
 using SoulboundEngine.World.Block.State;
 using SoulboundEngine.World.Player;
 using System;

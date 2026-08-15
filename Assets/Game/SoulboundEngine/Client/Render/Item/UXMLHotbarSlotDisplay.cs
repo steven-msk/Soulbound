@@ -1,6 +1,6 @@
 ﻿using SoulboundEngine.Item.Container;
 using SoulboundEngine.Client.UI.UXMLBindings;
-using SoulboundEngine.Core.Registry;
+using SoulboundEngine.Registry;
 using System;
 using UnityEngine;
 using UnityEngine.UIElements;
