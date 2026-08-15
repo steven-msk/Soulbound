@@ -1,4 +1,4 @@
-﻿namespace SoulboundEngine.Client.Interaction {
+﻿namespace SoulboundEngine.Interaction {
 	public enum InteractionType {
 		Primary,
 		Secondary

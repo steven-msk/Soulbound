@@ -1,6 +1,3 @@
-using SoulboundEngine.Client.Interaction;
-using SoulboundEngine.Item;
-using SoulboundEngine.Item.Container;
 using SoulboundEngine.Client.UI.Screen;
 using SoulboundEngine.Client.World;
 using SoulboundEngine.Client.World.Block;
@@ -9,6 +6,9 @@ using SoulboundEngine.Client.World.Block.State;
 using SoulboundEngine.Client.World.Entity;
 using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Client.World.Widget;
+using SoulboundEngine.Interaction;
+using SoulboundEngine.Item;
+using SoulboundEngine.Item.Container;
 using System;
 using UnityEngine;
 

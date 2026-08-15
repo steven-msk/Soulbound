@@ -2,7 +2,7 @@
 using SoulboundEngine.Item.Container;
 using System.Collections.Generic;
 
-namespace SoulboundEngine.Client.Recipe {
+namespace SoulboundEngine.Recipe {
 	using Item = Item.Item;
 
 	/// <summary>

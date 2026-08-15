@@ -1,5 +1,5 @@
 ﻿using SoulboundEngine.Item;
-using SoulboundEngine.Client.Recipe;
+using SoulboundEngine.Recipe;
 using SoulboundEngine.Client.Render.Item;
 using SoulboundEngine.Client.UI.UXMLBindings;
 using SoulboundEngine.Core.Assets;

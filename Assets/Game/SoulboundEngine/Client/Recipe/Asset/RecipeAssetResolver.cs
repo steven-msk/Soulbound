@@ -1,9 +1,10 @@
 ﻿using SoulboundEngine.Core.Assets;
 using SoulboundEngine.Core.Registry;
+using SoulboundEngine.Recipe;
 using System.Collections.Generic;
 
 namespace SoulboundEngine.Client.Recipe.Asset {
-	public sealed class RecipeAssetResolver : IRecipeAssetResolver {
+	public sealed class RecipeAssetResolver : IRecipeResolver {
 		private const string ASSET_LABEL = "recipe";
 		private readonly IEnumerable<AssetKey> assetKeys;
 

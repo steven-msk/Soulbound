@@ -1,7 +1,7 @@
 ﻿using SoulboundEngine.Item;
 using SoulboundEngine.Item.Container;
 using SoulboundEngine.Client.Player;
-using SoulboundEngine.Client.Recipe;
+using SoulboundEngine.Recipe;
 using System;
 using System.Collections.Generic;
 using System.Linq;

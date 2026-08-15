@@ -1,7 +1,7 @@
 using SoulboundEngine.Component;
 using SoulboundEngine.Client.Debug.Logging;
 using SoulboundEngine.Client.Loot;
-using SoulboundEngine.Client.Recipe;
+using SoulboundEngine.Recipe;
 using SoulboundEngine.Client.UI.Screen;
 using SoulboundEngine.Client.World.Block;
 using SoulboundEngine.Client.World.Block.Entity;

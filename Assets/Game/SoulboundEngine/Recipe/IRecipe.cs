@@ -1,7 +1,7 @@
 ﻿using SoulboundEngine.Item;
 using System.Collections.Generic;
 
-namespace SoulboundEngine.Client.Recipe {
+namespace SoulboundEngine.Recipe {
 	/// <summary>
 	/// Marker interface for all recipe types. Implementations have their own
 	/// <see cref="RecipeType"/> so untyped code can filter and dispatch by type

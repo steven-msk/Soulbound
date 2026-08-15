@@ -4,7 +4,7 @@ using System.Linq;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.Recipe {
+namespace SoulboundEngine.Recipe {
 	/// <summary>
 	/// Immutable snapshot of all recipes resolved at startup, indexed both by registry key
 	/// (for direct lookup) and by <see cref="RecipeType"/> (for type-scoped matching queries).

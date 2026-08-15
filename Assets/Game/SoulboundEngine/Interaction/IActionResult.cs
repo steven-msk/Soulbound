@@ -1,6 +1,6 @@
 ﻿using SoulboundEngine.Item;
 
-namespace SoulboundEngine.Client.Interaction {
+namespace SoulboundEngine.Interaction {
 	public interface IActionResult {
 		public static readonly Fail FAIL = new();
 		public static readonly Success SUCCESS = new(new ItemContext(null, true));

@@ -1,4 +1,4 @@
-﻿using SoulboundEngine.Client.Interaction;
+﻿using SoulboundEngine.Interaction;
 using SoulboundEngine.Item.Container;
 using SoulboundEngine.Client.Loot;
 using SoulboundEngine.Client.Player;

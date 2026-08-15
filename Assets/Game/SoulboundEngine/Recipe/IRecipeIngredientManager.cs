@@ -1,7 +1,7 @@
 ﻿using SoulboundEngine.Core.Registry;
 using System.Collections.Generic;
 
-namespace SoulboundEngine.Client.Recipe {
+namespace SoulboundEngine.Recipe {
 	public interface IRecipeIngredientManager {
 		RecipeIngredientIndex GetIngredientIndex(RegistryKey<RecipeIngredientIndex> key);
 

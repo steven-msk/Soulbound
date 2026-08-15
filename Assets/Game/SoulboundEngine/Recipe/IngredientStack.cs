@@ -5,7 +5,7 @@ using System.Linq;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.Recipe {
+namespace SoulboundEngine.Recipe {
 	using Item = Item.Item;
 
 	public class IngredientStack : Ingredient {

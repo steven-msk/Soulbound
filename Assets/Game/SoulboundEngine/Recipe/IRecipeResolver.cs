@@ -1,7 +1,7 @@
 ﻿using SoulboundEngine.Core.Registry;
 
-namespace SoulboundEngine.Client.Recipe.Asset {
-	public interface IRecipeAssetResolver {
+namespace SoulboundEngine.Recipe {
+	public interface IRecipeResolver {
 		ResolvedRecipes Resolve(RegistryKey<Registry<IRecipe>> registryKey);
 	}
 }

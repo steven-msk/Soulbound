@@ -3,7 +3,7 @@ using SoulboundEngine.Client.World.Entity;
 using SoulboundEngine.Client.World.Level;
 using System;
 
-namespace SoulboundEngine.Client.Interaction {
+namespace SoulboundEngine.Interaction {
 	public record ActiveUseContext(ItemStack stack, InteractionType type, Level level, Entity user, int useTime, int remainingTicks) {
 		public ActiveUseContext Tick(Func<ItemStack, ActiveUseContext> onFinish, Action<ItemStack> tickConsumer) {
 			ItemStack tickedStack = this.stack.OnUseTick(this.type, this.level, this.user, this.remainingTicks);

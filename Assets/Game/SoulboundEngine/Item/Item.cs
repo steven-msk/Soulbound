@@ -1,4 +1,3 @@
-using SoulboundEngine.Client.Interaction;
 using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.World;
 using SoulboundEngine.Client.World.Block;
@@ -6,6 +5,7 @@ using SoulboundEngine.Client.World.Entity;
 using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Component;
 using SoulboundEngine.Core.Registry;
+using SoulboundEngine.Interaction;
 using System;
 using System.Collections.Generic;
 using UnityEngine;

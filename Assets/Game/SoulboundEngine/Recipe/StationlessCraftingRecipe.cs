@@ -1,7 +1,7 @@
 ﻿using SoulboundEngine.Item;
 using System.Collections.Generic;
 
-namespace SoulboundEngine.Client.Recipe {
+namespace SoulboundEngine.Recipe {
 	public class StationlessCraftingRecipe : IRecipe<InventoryRecipeInput> {
 		private readonly List<Ingredient> ingredients;
 		private readonly ItemStack result;

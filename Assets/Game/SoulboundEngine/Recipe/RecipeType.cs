@@ -1,7 +1,7 @@
 ﻿using SoulboundEngine.Core.Registry;
 using System.Collections.Generic;
 
-namespace SoulboundEngine.Client.Recipe {
+namespace SoulboundEngine.Recipe {
 	public abstract class RecipeType {
 		protected static readonly Dictionary<Identifier, RecipeType> typeById = new();
 

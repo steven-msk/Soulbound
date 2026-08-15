@@ -1,6 +1,6 @@
 ﻿using SoulboundEngine.Core.Registry;
 
-namespace SoulboundEngine.Client.Recipe {
+namespace SoulboundEngine.Recipe {
 	/// <summary>
 	/// Base, untyped wrapper pairing a resolved recipe with its registry key.
 	/// </summary>

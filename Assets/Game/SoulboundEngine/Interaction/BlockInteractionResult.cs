@@ -6,6 +6,6 @@ using SoulboundEngine.Client.World.Level;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.Interaction {
+namespace SoulboundEngine.Interaction {
 	public sealed record BlockInteractionResult(Level level, BlockPos blockPos, BlockState blockState, ItemStack stack, PlayerEntity? player);
 }

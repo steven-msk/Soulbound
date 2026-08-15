@@ -1,6 +1,6 @@
 ﻿using SoulboundEngine.Item;
 
-namespace SoulboundEngine.Client.Recipe {
+namespace SoulboundEngine.Recipe {
 	/// <summary>
 	/// A generic slotted input source (e.g. a crafting grid) that recipes can be matched against.
 	/// </summary>

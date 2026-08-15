@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SoulboundEngine.Client.Recipe {
+namespace SoulboundEngine.Recipe {
 	public abstract record RecipeView(RecipeEntry recipeEntry, ItemStack resultPreview, IReadOnlyList<Ingredient> ingredients);
 
 	public sealed record RecipeView<T>(RecipeEntry<T> entry, ItemStack resultPreview, IReadOnlyList<Ingredient> ingredients)
