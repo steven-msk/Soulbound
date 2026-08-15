@@ -1,7 +1,7 @@
 ﻿using SoulboundEngine.Client.UI.UXMLBindings;
-using SoulboundEngine.Client.World.Block.Entity;
-using SoulboundEngine.Core.Assets;
-using SoulboundEngine.Core.Registry;
+using SoulboundEngine.World.Block.Entity;
+using SoulboundEngine.Client.Assets;
+using SoulboundEngine.Registry;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.UI.Screen {

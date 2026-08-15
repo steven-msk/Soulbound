@@ -1,6 +1,6 @@
 ﻿namespace SoulboundEngine.Client.Render.Entity {
 	using SoulboundEngine.Client.Render.Item;
-	using Entity = World.Entity.Entity;
+	using Entity = SoulboundEngine.World.Entity.Entity;
 
 	public abstract class EntityRenderer {
 		protected readonly EntityRenderManager entityRenderManager;

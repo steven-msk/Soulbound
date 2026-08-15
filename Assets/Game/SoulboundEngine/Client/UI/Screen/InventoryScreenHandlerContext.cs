@@ -1,5 +1,5 @@
-﻿using SoulboundEngine.Client.World;
-using SoulboundEngine.Client.World.Level;
+﻿using SoulboundEngine.World.Block;
+using SoulboundEngine.World.Level;
 using System;
 
 namespace SoulboundEngine.Client.UI.Screen {

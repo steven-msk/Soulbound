@@ -1,0 +1,17 @@
+using SoulboundEngine.Registry;
+
+namespace SoulboundEngine.World.Entity.Attribute {
+	public static class AttributeTypes {
+		public static readonly RegistryEntry<EntityAttribute> attribute = Register("attribute", new EntityAttribute(IValueRule.Ranged(-10d, 10d), 1d));
+
+		private static RegistryEntry<EntityAttribute> Register(string id, EntityAttribute attribute) {
+			return Registry<EntityAttribute>.RegisterEntry(Registries.ATTRIBUTES, KeyOf(id), attribute);
+		}
+
+		private static RegistryKey<EntityAttribute> KeyOf(string id) {
+			return RegistryKey<EntityAttribute>.Of(Registries.ATTRIBUTES.GetKey(), Identifier.Of(id));
+		}
+
+		public static void Init() { }
+	}
+}

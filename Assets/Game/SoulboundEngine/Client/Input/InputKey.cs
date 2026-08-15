@@ -1,4 +1,4 @@
-﻿using SoulboundEngine.Core.Registry;
+﻿using SoulboundEngine.Registry;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;

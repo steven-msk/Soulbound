@@ -1,10 +1,10 @@
 using Brigadier.NET;
 using Brigadier.NET.Builder;
 using Brigadier.NET.Context;
-using SoulboundEngine.Client.Item;
+using SoulboundEngine.Item;
 using SoulboundEngine.Client.World;
-using SoulboundEngine.Client.World.Block;
-using SoulboundEngine.Client.World.Entity;
+using SoulboundEngine.World.Block;
+using SoulboundEngine.World.Entity;
 using System;
 using UnityEngine;
 using Logger = SoulboundEngine.Client.Debug.Logging.Logger;

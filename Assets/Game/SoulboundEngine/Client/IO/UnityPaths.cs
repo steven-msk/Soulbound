@@ -1,4 +1,4 @@
-﻿using SoulboundEngine.Core.Serialization;
+﻿using SoulboundEngine.Serialization;
 using UnityEngine;
 
 namespace SoulboundEngine.Client.IO {

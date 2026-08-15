@@ -1,5 +1,5 @@
-﻿using SoulboundEngine.Client.Item;
-using SoulboundEngine.Core.Render.Sprite;
+﻿using SoulboundEngine.Item;
+using SoulboundEngine.Client.Render.Sprite;
 
 namespace SoulboundEngine.Client.Render.Item {
 	public interface IItemModelResolver {

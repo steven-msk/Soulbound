@@ -1,0 +1,30 @@
+using System;
+
+namespace SoulboundEngine {
+    [Serializable]
+    public struct GameConfig {
+        public FileConfig file;
+        public DevConfig dev;
+		public UnityConfig unity;
+    }
+
+    [Serializable]
+    public struct FileConfig {
+        public string savesRoot;
+		public string seedFile;
+		public string chunksFolder;
+    }
+
+    [Serializable]
+    public struct DevConfig {
+		public bool overrideSaves;
+		public string devWorld;
+		public int seed;
+    }
+
+	[Serializable]
+	public struct UnityConfig {
+		public string mainScene;
+		public string worldScene;
+	}
+}

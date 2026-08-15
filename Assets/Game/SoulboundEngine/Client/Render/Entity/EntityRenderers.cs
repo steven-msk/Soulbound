@@ -1,9 +1,9 @@
-﻿using SoulboundEngine.Client.World.Entity;
+﻿using SoulboundEngine.World.Entity;
 using System;
 using System.Collections.Generic;
 
 namespace SoulboundEngine.Client.Render.Entity {
-	using Entity = World.Entity.Entity;
+	using Entity = SoulboundEngine.World.Entity.Entity;
 	using Logger = Debug.Logging.Logger;
 
 	public static class EntityRenderers {

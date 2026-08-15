@@ -1,14 +1,7 @@
 using NUnit.Framework;
-using SoulboundEngine.Client.World;
-using SoulboundEngine.Client.World.Block;
-using SoulboundEngine.Client.World.Chunk;
-using SoulboundEngine.Client.World.Level;
-using SoulboundEngine.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SoulboundEngine.World.Block;
+using SoulboundEngine.World.Chunk;
+using SoulboundEngine.World.Level;
 using UnityEngine;
 
 public class ChunkWorldPosTests {

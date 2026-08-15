@@ -1,5 +1,5 @@
 ﻿using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.Core.Registry;
+using SoulboundEngine.Registry;
 using System;
 using System.Collections.Generic;
 using UnityEngine.AddressableAssets;

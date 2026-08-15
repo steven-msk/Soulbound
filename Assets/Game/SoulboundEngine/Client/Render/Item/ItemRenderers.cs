@@ -1,11 +1,11 @@
-﻿using SoulboundEngine.Client.Item;
-using SoulboundEngine.Core.Assets;
-using SoulboundEngine.Core.Render.Sprite;
+﻿using SoulboundEngine.Client.Assets;
+using SoulboundEngine.Client.Render.Sprite;
+using SoulboundEngine.Item;
 using System;
 using System.Collections.Generic;
 
 namespace SoulboundEngine.Client.Render.Item {
-	using Item = Client.Item.Item;
+	using Item = SoulboundEngine.Item.Item;
 
 	public static class ItemRenderers {
 		private static readonly AssetKey ITEM_SPRITE_ATLAS = new("Items");

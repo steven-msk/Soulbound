@@ -1,5 +1,5 @@
-﻿using SoulboundEngine.Client.World.Entity;
-using SoulboundEngine.Core.Registry;
+﻿using SoulboundEngine.World.Entity;
+using SoulboundEngine.Registry;
 using System;
 using UnityEngine;
 

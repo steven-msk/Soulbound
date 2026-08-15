@@ -1,6 +1,6 @@
 using NSubstitute;
 using NUnit.Framework;
-using SoulboundEngine.Core.Event;
+using SoulboundEngine.Event;
 
 internal class EventBusTests {
 	[TearDown]

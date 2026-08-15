@@ -1,8 +1,8 @@
-﻿using SoulboundEngine.Client.Item;
-using SoulboundEngine.Client.Item.Container;
+﻿using SoulboundEngine.Item;
+using SoulboundEngine.Item.Container;
 using SoulboundEngine.Client.UI;
 using SoulboundEngine.Client.UI.UXMLBindings;
-using SoulboundEngine.Core.Registry;
+using SoulboundEngine.Registry;
 using System;
 using System.Collections.Generic;
 using UnityEngine.UIElements;

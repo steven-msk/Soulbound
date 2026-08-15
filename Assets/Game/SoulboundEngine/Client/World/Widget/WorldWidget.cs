@@ -1,4 +1,4 @@
-﻿using SoulboundEngine.Client.World.Block;
+﻿using SoulboundEngine.World.Block;
 using UnityEngine;
 using UnityEngine.UIElements;
 
