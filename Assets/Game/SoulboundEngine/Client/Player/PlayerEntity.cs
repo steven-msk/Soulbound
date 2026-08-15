@@ -1,6 +1,6 @@
 using SoulboundEngine.Client.Interaction;
-using SoulboundEngine.Client.Item;
-using SoulboundEngine.Client.Item.Container;
+using SoulboundEngine.Item;
+using SoulboundEngine.Item.Container;
 using SoulboundEngine.Client.UI.Screen;
 using SoulboundEngine.Client.World;
 using SoulboundEngine.Client.World.Block;

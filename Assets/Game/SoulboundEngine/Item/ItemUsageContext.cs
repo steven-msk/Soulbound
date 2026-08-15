@@ -4,7 +4,7 @@ using SoulboundEngine.Client.World.Level;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.Item {
+namespace SoulboundEngine.Item {
 	public class ItemUsageContext {
 		public BlockPos blockPos { get; protected set; }
 		public Level level { get; protected set; }

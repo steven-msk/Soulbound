@@ -5,7 +5,7 @@ using SoulboundEngine.Client.World.Block;
 using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Common;
 
-namespace SoulboundEngine.Client.Item {
+namespace SoulboundEngine.Item {
 	[PROTOTYPICAL]
 	public sealed class TeleportPlayerItem : Item {
 		public TeleportPlayerItem(Settings settings) : base(settings) {

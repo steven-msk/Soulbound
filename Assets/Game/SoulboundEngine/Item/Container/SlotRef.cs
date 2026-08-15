@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SoulboundEngine.Client.Item.Container {
+namespace SoulboundEngine.Item.Container {
 	public readonly struct SlotRef : IEquatable<SlotRef> {
 		public readonly IInventory inventory;
 		public readonly int index;

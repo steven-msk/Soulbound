@@ -2,7 +2,7 @@ using System;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.Item.Container {
+namespace SoulboundEngine.Item.Container {
 	public interface IItemSlot {
 		[Obsolete]
 		event Action<ItemStack> setStack;

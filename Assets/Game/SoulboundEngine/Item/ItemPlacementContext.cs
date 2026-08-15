@@ -1,7 +1,7 @@
 ﻿using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.World;
 
-namespace SoulboundEngine.Client.Item {
+namespace SoulboundEngine.Item {
 	public class ItemPlacementContext : ItemUsageContext {
 		public bool shouldReplaceExisting { get; } = true;
 

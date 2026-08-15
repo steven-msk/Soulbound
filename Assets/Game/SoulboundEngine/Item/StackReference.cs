@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SoulboundEngine.Client.Item {
+namespace SoulboundEngine.Item {
 	public sealed class StackReference {
 		public static readonly StackReference EMPTY = new(stack => { }, () => ItemStack.EMPTY);
 		private readonly Action<ItemStack> setter;

@@ -1,6 +1,5 @@
 using SoulboundEngine.Client.Component;
 using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.Client.Item;
 using SoulboundEngine.Client.Loot;
 using SoulboundEngine.Client.Recipe;
 using SoulboundEngine.Client.UI.Screen;
@@ -9,10 +8,13 @@ using SoulboundEngine.Client.World.Block.Entity;
 using SoulboundEngine.Client.World.Entity;
 using SoulboundEngine.Client.World.Entity.Attribute;
 using SoulboundEngine.Client.World.Widget;
+using SoulboundEngine.Item;
 using System;
 using System.Linq;
 
 namespace SoulboundEngine.Core.Registry {
+	using Item = Item.Item;
+
 	public static class Registries {
 		private static bool freezed = false;
 		public static readonly Identifier ROOT_IDENTIFIER = Identifier.Of("root");

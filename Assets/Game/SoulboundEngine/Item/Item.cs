@@ -12,7 +12,7 @@ using UnityEngine;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.Item {
+namespace SoulboundEngine.Item {
 	public class Item : IItemConvertible {
 		public const int DEFAULT_FULL_STACK = 256;
 		public static readonly Dictionary<Block, Item> blockItems = new();

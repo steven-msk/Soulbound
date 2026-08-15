@@ -1,5 +1,5 @@
-using SoulboundEngine.Client.Item;
-using SoulboundEngine.Client.Item.Container;
+using SoulboundEngine.Item;
+using SoulboundEngine.Item.Container;
 using SoulboundEngine.Client.World.Entity;
 using SoulboundEngine.Client.World.Level;
 using System;

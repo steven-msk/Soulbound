@@ -1,4 +1,4 @@
-﻿using SoulboundEngine.Client.Item;
+﻿using SoulboundEngine.Item;
 
 namespace SoulboundEngine.Client.Recipe {
 	/// <summary>

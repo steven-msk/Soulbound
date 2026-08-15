@@ -1,7 +1,7 @@
-using SoulboundEngine.Client.Item;
 using SoulboundEngine.Client.World.Entity;
 using SoulboundEngine.Core;
 using SoulboundEngine.Core.Event;
+using SoulboundEngine.Item;
 using UnityEngine;
 using IEntityView = SoulboundEngine.Client.Render.Entity.IEntityView;
 

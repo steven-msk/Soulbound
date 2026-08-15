@@ -9,7 +9,7 @@ using UnityEngine.UIElements;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.Item.Container {
+namespace SoulboundEngine.Item.Container {
 	public sealed class TransitStackHandler : UXMLItemSlotDisplay, IInventory {
 		private static readonly Identifier TRANSIT_STACK_ELEMENT = Identifier.Of("soulbound:transit_stack/transit_stack");
 		private static readonly Identifier ITEM_DISPLAY_ELEMENT = Identifier.Of("soulbound:transit_stack/item_display");

@@ -11,7 +11,7 @@ using UnityEngine;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.Item.Container {
+namespace SoulboundEngine.Item.Container {
 	public abstract class LootableContainerTileEntity : TileEntity, IInventoryScreenHandlerFactory, ILootableInventory {
 		public const float MIN_USABLE_DISTANCE = 5f;
 		protected RegistryKey<LootTable>? lootTable;

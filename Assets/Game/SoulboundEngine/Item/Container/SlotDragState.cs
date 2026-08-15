@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SoulboundEngine.Client.Item.Container {
+namespace SoulboundEngine.Item.Container {
 	public sealed class SlotDragState {
 		public ItemStack stack { get; set; }
 		public SlotRef origin { get; init; }

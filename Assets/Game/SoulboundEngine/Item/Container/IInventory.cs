@@ -6,7 +6,7 @@ using System.Linq;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.Item.Container {
+namespace SoulboundEngine.Item.Container {
 	public interface IInventory : IEnumerable<ItemStack>, IClearable {
 		IItemSlot GetSlot(int index);
 

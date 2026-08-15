@@ -1,4 +1,4 @@
-using SoulboundEngine.Client.Item;
+using SoulboundEngine.Item;
 using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.World.Block.State;
 using SoulboundEngine.Client.World.Entity;

@@ -11,7 +11,7 @@ using UnityEngine;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.Item {
+namespace SoulboundEngine.Item {
 	public struct ItemStack : IComponentHolder {
 		private static MergedComponentMap cachedEmptyComponents = null!;
 		private static MergedComponentMap CachedEmptyComponents => cachedEmptyComponents ??= MergedComponentMap.Create(Items.AIR.GetComponents(), ComponentChanges.EMPTY);

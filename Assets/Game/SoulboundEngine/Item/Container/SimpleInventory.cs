@@ -1,7 +1,7 @@
 ﻿using SoulboundEngine.Client.Player;
 using System.Collections.Generic;
 
-namespace SoulboundEngine.Client.Item.Container {
+namespace SoulboundEngine.Item.Container {
 	public sealed class SimpleInventory : IInventory {
 		private readonly ItemSlot[] slots;
 		private readonly int size;

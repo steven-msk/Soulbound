@@ -1,4 +1,4 @@
-﻿using SoulboundEngine.Client.Item.Container;
+﻿using SoulboundEngine.Item.Container;
 using SoulboundEngine.Client.UI.Screen;
 using SoulboundEngine.Client.UI.UXMLBindings;
 using SoulboundEngine.Core.Registry;

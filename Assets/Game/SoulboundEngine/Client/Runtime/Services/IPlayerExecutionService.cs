@@ -1,4 +1,4 @@
-using SoulboundEngine.Client.Item;
+using SoulboundEngine.Item;
 using System;
 using System.Collections.Generic;
 using System.Linq;

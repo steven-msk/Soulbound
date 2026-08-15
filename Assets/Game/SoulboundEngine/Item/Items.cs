@@ -4,7 +4,7 @@ using System;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.Item {
+namespace SoulboundEngine.Item {
 	public partial class Items {
 		public static readonly Item AIR = Register("air", settings => settings.StackUpTo(0));
 		public static readonly Item GRASS = Register(Blocks.GRASS);

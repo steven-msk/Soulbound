@@ -7,7 +7,7 @@ using SoulboundEngine.Core.Registry;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.Item.Container {
+namespace SoulboundEngine.Item.Container {
 	public interface ILootableInventory : IInventory {
 		long GetLootTableSeed();
 		void SetLootTableSeed(long seed);

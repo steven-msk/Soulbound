@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.Item.Container {
+namespace SoulboundEngine.Item.Container {
 	public static class InventoryUtils {
 		/// <summary>
 		/// Tries to add the stack into the inventory.

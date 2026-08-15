@@ -1,5 +1,5 @@
 namespace SoulboundEngine.Client.Render.Item {
-	using SoulboundEngine.Client.Item;
+	using SoulboundEngine.Item;
 	using SoulboundEngine.Core;
 	using System;
 	using TMPro;

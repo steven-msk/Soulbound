@@ -1,6 +1,6 @@
 ﻿using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.Client.Item;
-using SoulboundEngine.Client.Item.Container;
+using SoulboundEngine.Item;
+using SoulboundEngine.Item.Container;
 using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.UI.Screen.Slot;
 using System;

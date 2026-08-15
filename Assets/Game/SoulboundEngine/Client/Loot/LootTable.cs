@@ -1,5 +1,5 @@
-﻿using SoulboundEngine.Client.Item;
-using SoulboundEngine.Client.Item.Container;
+﻿using SoulboundEngine.Item;
+using SoulboundEngine.Item.Container;
 using SoulboundEngine.Client.Loot.Context;
 using SoulboundEngine.Client.Loot.Function;
 using SoulboundEngine.Common;

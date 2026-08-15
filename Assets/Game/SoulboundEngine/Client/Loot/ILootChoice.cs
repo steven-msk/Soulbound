@@ -1,4 +1,4 @@
-﻿using SoulboundEngine.Client.Item;
+﻿using SoulboundEngine.Item;
 using SoulboundEngine.Client.Loot.Context;
 using System;
 

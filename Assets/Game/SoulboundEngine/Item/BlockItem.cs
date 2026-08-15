@@ -7,7 +7,7 @@ using SoulboundEngine.Client.World.Level;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.Item {
+namespace SoulboundEngine.Item {
 	public class BlockItem : Item {
 		private readonly Block block;
 

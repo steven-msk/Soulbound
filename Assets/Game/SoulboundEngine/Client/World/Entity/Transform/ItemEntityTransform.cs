@@ -1,4 +1,4 @@
-using SoulboundEngine.Client.Item;
+using SoulboundEngine.Item;
 using UnityEngine;
 
 #nullable enable

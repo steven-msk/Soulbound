@@ -1,4 +1,4 @@
-﻿using SoulboundEngine.Client.Item;
+﻿using SoulboundEngine.Item;
 using SoulboundEngine.Client.Loot.Entry;
 using SoulboundEngine.Client.Loot.Provider.Number;
 using SoulboundEngine.Core.Registry;

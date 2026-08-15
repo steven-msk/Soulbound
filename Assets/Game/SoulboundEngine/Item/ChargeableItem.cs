@@ -6,7 +6,7 @@ using SoulboundEngine.Client.World.Entity;
 using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Common;
 
-namespace SoulboundEngine.Client.Item {
+namespace SoulboundEngine.Item {
 	[PROTOTYPICAL]
 	public sealed class ChargeableItem : Item {
 		public ChargeableItem(Settings settings) : base(settings) {

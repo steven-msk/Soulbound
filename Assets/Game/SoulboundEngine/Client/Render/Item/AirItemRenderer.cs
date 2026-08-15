@@ -1,4 +1,4 @@
-﻿using SoulboundEngine.Client.Item;
+﻿using SoulboundEngine.Item;
 
 namespace SoulboundEngine.Client.Render.Item {
 	public sealed class AirItemRenderer : ItemRenderer<ItemRenderState> {

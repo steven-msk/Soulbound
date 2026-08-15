@@ -6,7 +6,7 @@ using SoulboundEngine.Client.World.Entity;
 using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Common;
 
-namespace SoulboundEngine.Client.Item {
+namespace SoulboundEngine.Item {
 	[PROTOTYPICAL]
 	public sealed class DebugPointerItem : Item {
 		public DebugPointerItem(Settings settings) : base(settings) {

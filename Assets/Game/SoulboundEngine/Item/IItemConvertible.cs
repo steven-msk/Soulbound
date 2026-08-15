@@ -1,4 +1,4 @@
-﻿namespace SoulboundEngine.Client.Item {
+﻿namespace SoulboundEngine.Item {
 	public interface IItemConvertible {
 		Item AsItem();
 	}

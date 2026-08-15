@@ -2,7 +2,7 @@
 using SoulboundEngine.Core.Registry;
 using System;
 
-namespace SoulboundEngine.Client.Item {
+namespace SoulboundEngine.Item {
 	public static class ItemComponents {
 		public static readonly ComponentType<string> NAME = Register<string>("name");
 		public static readonly ComponentType<int> MAX_STACK_COUNT = Register<int>("max_stack_count");
