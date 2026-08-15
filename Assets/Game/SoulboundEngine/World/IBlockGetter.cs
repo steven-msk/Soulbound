@@ -1,5 +1,5 @@
-﻿using SoulboundEngine.Client.World.Block.Entity;
-using SoulboundEngine.Client.World.Block.State;
+﻿using SoulboundEngine.World.Block.Entity;
+using SoulboundEngine.World.Block.State;
 
 #nullable enable
 

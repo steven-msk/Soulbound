@@ -1,9 +1,10 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.Client.World.Block.Entity;
-using SoulboundEngine.Client.World.Block.State;
 using SoulboundEngine.Core.Registry;
+using SoulboundEngine.World.Block;
+using SoulboundEngine.World.Block.Entity;
+using SoulboundEngine.World.Block.State;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,6 @@ using System.Linq;
 #nullable enable
 
 namespace SoulboundEngine.Client.World.Chunk {
-	using Block = Block.Block;
 	using Level = Level.Level;
 
 	public record SerializableChunkData(

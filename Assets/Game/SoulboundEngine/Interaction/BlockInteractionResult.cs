@@ -1,7 +1,7 @@
 using SoulboundEngine.Item;
 using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.World;
-using SoulboundEngine.Client.World.Block.State;
+using SoulboundEngine.World.Block.State;
 using SoulboundEngine.Client.World.Level;
 
 #nullable enable

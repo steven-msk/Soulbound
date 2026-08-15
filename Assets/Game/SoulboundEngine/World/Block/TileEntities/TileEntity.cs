@@ -1,11 +1,11 @@
 using Newtonsoft.Json.Linq;
-using SoulboundEngine.Client.World.Block.State;
+using SoulboundEngine.Client.World;
+using SoulboundEngine.Client.World.Level;
+using SoulboundEngine.World.Block.State;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.Block.Entity {
-	using Level = Level.Level;
-
+namespace SoulboundEngine.World.Block.Entity {
 	public abstract class TileEntity {
 		protected Level? level;
 		public readonly BlockPos blockPos;

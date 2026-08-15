@@ -1,12 +1,13 @@
-using SoulboundEngine.Client.World.Block.Entity;
-using SoulboundEngine.Client.World.Block.State;
+using SoulboundEngine.Client.Player;
+using SoulboundEngine.Client.World;
+using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Common;
 using SoulboundEngine.Core.States;
+using SoulboundEngine.World.Block.Entity;
+using SoulboundEngine.World.Block.State;
 using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
-namespace SoulboundEngine.Client.World.Block {
-	using PlayerEntity = Player.PlayerEntity;
-
+namespace SoulboundEngine.World.Block {
 	[PROTOTYPICAL]
 	public sealed class AreaTriggerBlock : Block, ITileEntityProvider {
 		public static readonly Property<bool> inArea = BoolProperty.Of("inArea");
@@ -20,12 +21,12 @@ namespace SoulboundEngine.Client.World.Block {
 			builder.Add(inArea);
 		}
 
-		private void OnAreaEnter(Level.Level level, BlockPos selfPos, PlayerEntity player) {
+		private void OnAreaEnter(Level level, BlockPos selfPos, PlayerEntity player) {
 			Logger.LogInfo("onAreaEnter");
 			level.SetBlockState(selfPos, this.DefaultState.With(inArea, true));
 		}
 
-		private void OnAreaExit(Level.Level level, BlockPos selfPos, PlayerEntity player) {
+		private void OnAreaExit(Level level, BlockPos selfPos, PlayerEntity player) {
 			Logger.LogInfo("onAreaExit");
 			level.SetBlockState(selfPos, this.DefaultState.With(inArea, false));
 		}

@@ -1,5 +1,5 @@
 using SoulboundEngine.Client.World;
-using SoulboundEngine.Client.World.Block.State;
+using SoulboundEngine.World.Block.State;
 using SoulboundEngine.Client.World.Entity;
 using UnityEngine;
 

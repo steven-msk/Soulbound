@@ -1,10 +1,9 @@
+using SoulboundEngine.Client.Player;
 using SoulboundEngine.Common;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.Block {
-	using PlayerEntity = Player.PlayerEntity;
-
+namespace SoulboundEngine.World.Block {
 	public abstract record BreakSource {
         public abstract bool fromPlayer { get; }
     }

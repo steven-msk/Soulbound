@@ -1,11 +1,12 @@
-﻿using SoulboundEngine.Item.Container;
-using SoulboundEngine.Client.Player;
+﻿using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.UI.Screen;
-using SoulboundEngine.Client.World.Block.State;
+using SoulboundEngine.Client.World;
+using SoulboundEngine.Item.Container;
+using SoulboundEngine.World.Block.State;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SoulboundEngine.Client.World.Block.Entity {
+namespace SoulboundEngine.World.Block.Entity {
 	public class ChestTileEntity : LootableContainerTileEntity {
 		public const int SIZE = 9 * 3;
 		public const float MIN_DISTANCE = 5f;

@@ -1,7 +1,7 @@
 using Newtonsoft.Json.Linq;
-using SoulboundEngine.Client.World.Block;
-using SoulboundEngine.Client.World.Block.Entity;
-using SoulboundEngine.Client.World.Block.State;
+using SoulboundEngine.World.Block;
+using SoulboundEngine.World.Block.Entity;
+using SoulboundEngine.World.Block.State;
 using System;
 using System.Collections.Generic;
 using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
@@ -9,7 +9,6 @@ using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 #nullable enable
 
 namespace SoulboundEngine.Client.World.Chunk {
-	using Block = Block.Block;
 	using Level = Level.Level;
 
 	public class WorldChunk : Chunk {

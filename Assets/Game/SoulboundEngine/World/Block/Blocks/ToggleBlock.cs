@@ -1,10 +1,12 @@
 using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.Interaction;
 using SoulboundEngine.Client.Player;
-using SoulboundEngine.Client.World.Block.State;
+using SoulboundEngine.Client.World;
+using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Core.States;
+using SoulboundEngine.Interaction;
+using SoulboundEngine.World.Block.State;
 
-namespace SoulboundEngine.Client.World.Block {
+namespace SoulboundEngine.World.Block {
 	public sealed class ToggleBlock : Block {
 		public static readonly Property<bool> on = BoolProperty.Of("on");
 
@@ -17,7 +19,7 @@ namespace SoulboundEngine.Client.World.Block {
 			builder.Add(on);
 		}
 
-		protected override IActionResult OnSecondaryUse(BlockState state, Level.Level level, PlayerEntity player, BlockPos pos) {
+		protected override IActionResult OnSecondaryUse(BlockState state, Level level, PlayerEntity player, BlockPos pos) {
 			bool isOn = state.Get(on);
 			isOn = !isOn;
 			level.SetBlockState(pos, this.DefaultState.With(on, isOn));

@@ -1,7 +1,7 @@
 using SoulboundEngine.Interaction;
 using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.World;
-using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.World.Block;
 using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Common;
 

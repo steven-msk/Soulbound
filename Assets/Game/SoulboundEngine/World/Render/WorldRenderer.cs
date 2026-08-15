@@ -1,7 +1,7 @@
 using SoulboundEngine.Client.Render.Block;
 using SoulboundEngine.Client.Render.Entity;
-using SoulboundEngine.Client.World.Block;
-using SoulboundEngine.Client.World.Block.State;
+using SoulboundEngine.World.Block;
+using SoulboundEngine.World.Block.State;
 using System;
 using System.Collections.Generic;
 using UnityEngine;

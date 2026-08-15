@@ -1,5 +1,5 @@
 ﻿using SoulboundEngine.Client.UI.UXMLBindings;
-using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.World.Block;
 using SoulboundEngine.Core.Registry;
 using UnityEngine;
 using UnityEngine.UIElements;

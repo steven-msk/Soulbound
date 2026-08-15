@@ -1,13 +1,13 @@
-﻿using SoulboundEngine.Interaction;
-using SoulboundEngine.Item;
-using SoulboundEngine.Client.Player;
-using SoulboundEngine.Client.World.Block.Entity;
-using SoulboundEngine.Client.World.Block.State;
+﻿using SoulboundEngine.Client.Player;
+using SoulboundEngine.Client.World;
+using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Client.World.Widget;
+using SoulboundEngine.Interaction;
+using SoulboundEngine.Item;
+using SoulboundEngine.World.Block.Entity;
+using SoulboundEngine.World.Block.State;
 
-namespace SoulboundEngine.Client.World.Block {
-	using Level = Level.Level;
-
+namespace SoulboundEngine.World.Block {
 	public class SignBlock : Block, ITileEntityProvider {
 		public SignBlock(Settings settings) 
 			: base(settings) {

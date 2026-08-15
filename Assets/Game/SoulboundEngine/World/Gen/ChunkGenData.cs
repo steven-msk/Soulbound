@@ -1,5 +1,5 @@
 
-using SoulboundEngine.Client.World.Biome;
+using SoulboundEngine.World.Biome;
 using SoulboundEngine.Client.World.Chunk;
 using System;
 using System.Collections;

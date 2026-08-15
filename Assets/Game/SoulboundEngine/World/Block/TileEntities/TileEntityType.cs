@@ -1,13 +1,14 @@
-﻿using SoulboundEngine.Client.World.Block.State;
+﻿using SoulboundEngine.Client.World;
 using SoulboundEngine.Common;
 using SoulboundEngine.Core.Registry;
+using SoulboundEngine.World.Block.State;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.World.Block.Entity {
+namespace SoulboundEngine.World.Block.Entity {
 	public abstract class TileEntityType {
 		public static readonly TileEntityType<ChestTileEntity> CHEST = Register("soulbound:chest", ITileEntityFactory.Of(ChestTileEntity.Create), new[] { Blocks.CHEST });
 		public static readonly TileEntityType<SignTileEntity> SIGN = Register("soulbound:sign", ITileEntityFactory.Of(SignTileEntity.Create), new[] { Blocks.SIGN });

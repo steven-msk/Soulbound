@@ -1,9 +1,11 @@
-using SoulboundEngine.Client.World.Block.State;
+using SoulboundEngine.Client.World;
+using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Common;
 using SoulboundEngine.Common.Math;
 using SoulboundEngine.Core.States;
+using SoulboundEngine.World.Block.State;
 
-namespace SoulboundEngine.Client.World.Block {
+namespace SoulboundEngine.World.Block {
 	[PROTOTYPICAL]
 	public sealed class NeighborReactiveBlock : Block, INeighborUpdateHandler {
 		public static readonly Property<bool> on = BoolProperty.Of("on");
@@ -21,7 +23,7 @@ namespace SoulboundEngine.Client.World.Block {
 			builder.Add(on);
 		}
 
-		public void OnNeighborChanged(Level.Level level, BlockPos selfPos, BlockPos neighborPos) {
+		public void OnNeighborChanged(Level level, BlockPos selfPos, BlockPos neighborPos) {
 			bool shouldActivate = false;
 
 			foreach (var pos in selfPos.GetCardinalNeighbors()) {

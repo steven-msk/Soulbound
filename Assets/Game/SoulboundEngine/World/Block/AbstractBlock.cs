@@ -1,16 +1,17 @@
-﻿using SoulboundEngine.Interaction;
-using SoulboundEngine.Item;
-using SoulboundEngine.Client.Player;
-using SoulboundEngine.Client.World.Block.State;
+﻿using SoulboundEngine.Client.Player;
+using SoulboundEngine.Client.World;
+using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Common.Math;
 using SoulboundEngine.Core.Registry;
 using SoulboundEngine.Core.States;
+using SoulboundEngine.Interaction;
+using SoulboundEngine.Item;
+using SoulboundEngine.World.Block.State;
 using System;
 using System.Collections.Generic;
 
-namespace SoulboundEngine.Client.World.Block {
+namespace SoulboundEngine.World.Block {
 	using Item = Item.Item;
-	using Level = Level.Level;
 
 	public abstract class AbstractBlock : IItemConvertible {
 		public abstract Item AsItem();

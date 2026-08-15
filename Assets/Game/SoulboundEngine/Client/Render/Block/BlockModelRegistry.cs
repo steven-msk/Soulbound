@@ -1,13 +1,13 @@
-﻿using SoulboundEngine.Client.World.Block;
-using SoulboundEngine.Client.World.Block.State;
-using SoulboundEngine.Core.Assets;
+﻿using SoulboundEngine.Core.Assets;
+using SoulboundEngine.World.Block;
+using SoulboundEngine.World.Block.State;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
 namespace SoulboundEngine.Client.Render.Block {
-	using Block = World.Block.Block;
+	using Block = SoulboundEngine.World.Block.Block;
 	using Logger = Debug.Logging.Logger;
 
 	public static class BlockModelRegistry {

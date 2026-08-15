@@ -1,7 +1,7 @@
 using SoulboundEngine.Core.Registry;
 using System;
 
-namespace SoulboundEngine.Client.World.Block {
+namespace SoulboundEngine.World.Block {
 	public partial class Blocks {
 		public static readonly Block AIR = Register("air");
 		public static readonly Block GRASS = Register("grass");

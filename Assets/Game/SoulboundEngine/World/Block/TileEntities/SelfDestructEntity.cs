@@ -1,8 +1,9 @@
-using SoulboundEngine.Client.World.Block.State;
+using SoulboundEngine.Client.World;
 using SoulboundEngine.Common;
 using SoulboundEngine.Core;
+using SoulboundEngine.World.Block.State;
 
-namespace SoulboundEngine.Client.World.Block.Entity {
+namespace SoulboundEngine.World.Block.Entity {
 	[PROTOTYPICAL]
 	public sealed class SelfDestructEntity : TileEntity, ITickable {
 		const int TICKS_UNTIL_DESTRUCT = 300;

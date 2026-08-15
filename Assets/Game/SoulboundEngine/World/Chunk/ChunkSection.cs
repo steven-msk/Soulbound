@@ -1,4 +1,4 @@
-﻿using SoulboundEngine.Client.World.Block.State;
+﻿using SoulboundEngine.World.Block.State;
 using SoulboundEngine.Common.Math;
 
 namespace SoulboundEngine.Client.World.Chunk {

@@ -1,4 +1,4 @@
-using SoulboundEngine.Client.World.Biome;
+using SoulboundEngine.World.Biome;
 
 namespace SoulboundEngine.Client.World.Gen {
 	public struct BiomeWeight {

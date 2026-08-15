@@ -1,6 +1,6 @@
-﻿using SoulboundEngine.Client.World.Block;
-using SoulboundEngine.Client.World.Block.Entity;
-using SoulboundEngine.Client.World.Block.State;
+﻿using SoulboundEngine.World.Block;
+using SoulboundEngine.World.Block.Entity;
+using SoulboundEngine.World.Block.State;
 
 namespace SoulboundEngine.Client.World.Chunk {
 	using Level = Level.Level;

@@ -1,13 +1,13 @@
 using SoulboundEngine.Client.Player;
-using SoulboundEngine.Client.World.Block.State;
+using SoulboundEngine.Client.World;
 using SoulboundEngine.Common;
 using SoulboundEngine.Common.Unity;
 using SoulboundEngine.Core;
+using SoulboundEngine.World.Block.State;
 using System;
 using UnityEngine;
 
-namespace SoulboundEngine.Client.World.Block.Entity {
-	using PlayerEntity = Player.PlayerEntity;
+namespace SoulboundEngine.World.Block.Entity {
 
 	[PROTOTYPICAL]
 	public class ObjectTileEntity : TileEntity {

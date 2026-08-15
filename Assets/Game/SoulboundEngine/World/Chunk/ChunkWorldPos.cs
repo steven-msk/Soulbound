@@ -1,4 +1,4 @@
-using SoulboundEngine.Client.World.Block;
+using SoulboundEngine.World.Block;
 using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Core;
 using UnityEngine;

@@ -1,8 +1,9 @@
-using SoulboundEngine.Client.World.Block.Entity;
-using SoulboundEngine.Client.World.Block.State;
+using SoulboundEngine.Client.World;
 using SoulboundEngine.Common;
+using SoulboundEngine.World.Block.Entity;
+using SoulboundEngine.World.Block.State;
 
-namespace SoulboundEngine.Client.World.Block {
+namespace SoulboundEngine.World.Block {
 	[PROTOTYPICAL]
 	public sealed class SelfDestructBlock : Block, ITileEntityProvider {
 		public SelfDestructBlock(AbstractBlock.Settings settings) 

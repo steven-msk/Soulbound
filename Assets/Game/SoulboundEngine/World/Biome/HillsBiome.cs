@@ -1,14 +1,15 @@
-using SoulboundEngine.Client.World.Block;
-using SoulboundEngine.Client.World.Block.State;
+using SoulboundEngine.Client.World;
+using SoulboundEngine.Client.World.Chunk;
 using SoulboundEngine.Client.World.Gen;
+using SoulboundEngine.Client.World.Level;
 using SoulboundEngine.Core.Noise;
+using SoulboundEngine.World.Block;
+using SoulboundEngine.World.Block.State;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace SoulboundEngine.Client.World.Biome {
-	using Chunk = Chunk.Chunk;
-
+namespace SoulboundEngine.World.Biome {
 	public class HillsBiome : IBiome {
 		private readonly int seed;
 		private readonly Heightmap heightmap;
@@ -54,7 +55,7 @@ namespace SoulboundEngine.Client.World.Biome {
 			return Blocks.STONE.DefaultState;
 		}
 
-		void PlaceTree(int originX, int originY, Chunk chunk, Level.Level level) {
+		void PlaceTree(int originX, int originY, Chunk chunk, Level level) {
 			const int crownRadius = 2;
 			const int trunkHeightMin = 5;
 			const int trunkHeightMax = 20;
@@ -91,7 +92,7 @@ namespace SoulboundEngine.Client.World.Biome {
 
 		}
 
-		void IBiome.PostProcess(ChunkGenData genData, Chunk chunk, Level.Level level, int partitionStartX, int partitionLimitX) {
+		void IBiome.PostProcess(ChunkGenData genData, Chunk chunk, Level level, int partitionStartX, int partitionLimitX) {
 			const float chanceMin = 0.05f;
 			const float chanceMax = 0.25f;
 			const float threshold = 0.45f;
