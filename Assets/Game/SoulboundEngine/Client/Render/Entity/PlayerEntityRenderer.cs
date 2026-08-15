@@ -1,9 +1,7 @@
-﻿using SoulboundEngine.Client.Player;
+﻿using SoulboundEngine.World.Player;
 using UnityEngine;
 
 namespace SoulboundEngine.Client.Render.Entity {
-	using PlayerEntity = Player.PlayerEntity;
-
 	public sealed class PlayerEntityRenderer : EntityRenderer<PlayerEntity, PlayerRenderState, PlayerModel> {
 		public PlayerEntityRenderer(FactoryContext context)
 			: base(context) {

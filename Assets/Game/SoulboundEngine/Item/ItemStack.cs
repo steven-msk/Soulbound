@@ -1,10 +1,10 @@
-using SoulboundEngine.Client.Player;
 using SoulboundEngine.Component;
 using SoulboundEngine.Core.Registry;
 using SoulboundEngine.Interaction;
 using SoulboundEngine.World.Block;
 using SoulboundEngine.World.Entity;
 using SoulboundEngine.World.Level;
+using SoulboundEngine.World.Player;
 using System;
 using System.Collections.Generic;
 using UnityEngine;

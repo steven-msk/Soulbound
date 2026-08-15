@@ -1,5 +1,5 @@
-using SoulboundEngine.Client.Player;
 using SoulboundEngine.Common;
+using SoulboundEngine.World.Player;
 using UnityEngine;
 using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 

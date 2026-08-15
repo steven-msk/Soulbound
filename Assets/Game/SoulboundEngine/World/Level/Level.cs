@@ -1,4 +1,3 @@
-using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.Runtime.Services;
 using SoulboundEngine.Common;
 using SoulboundEngine.Common.Math;
@@ -10,6 +9,7 @@ using SoulboundEngine.World.Block.State;
 using SoulboundEngine.World.Chunk;
 using SoulboundEngine.World.Entity;
 using SoulboundEngine.World.Gen;
+using SoulboundEngine.World.Player;
 using System;
 using System.Collections.Generic;
 using System.Linq;

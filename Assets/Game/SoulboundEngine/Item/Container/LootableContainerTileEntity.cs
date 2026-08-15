@@ -1,11 +1,11 @@
 ﻿using Newtonsoft.Json.Linq;
-using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.UI.Screen;
 using SoulboundEngine.Core.Registry;
 using SoulboundEngine.Loot;
 using SoulboundEngine.World.Block;
 using SoulboundEngine.World.Block.Entity;
 using SoulboundEngine.World.Block.State;
+using SoulboundEngine.World.Player;
 using System.Collections.Generic;
 using UnityEngine;
 

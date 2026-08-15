@@ -1,8 +1,7 @@
-﻿using SoulboundEngine.Client.Player;
-using SoulboundEngine.Client.UI.Screen;
-using SoulboundEngine.Client.World;
+﻿using SoulboundEngine.Client.UI.Screen;
 using SoulboundEngine.Item.Container;
 using SoulboundEngine.World.Block.State;
+using SoulboundEngine.World.Player;
 using System.Collections.Generic;
 using System.Linq;
 

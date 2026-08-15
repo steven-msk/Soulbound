@@ -1,9 +1,9 @@
 using SoulboundEngine.Client;
-using SoulboundEngine.Client.Player;
 using SoulboundEngine.Client.UI.Screen;
 using SoulboundEngine.World.Biome;
 using SoulboundEngine.World.Chunk;
 using SoulboundEngine.World.Gen;
+using SoulboundEngine.World.Player;
 using System;
 using UnityEngine;
 using Logger = SoulboundEngine.Client.Debug.Logging.Logger;

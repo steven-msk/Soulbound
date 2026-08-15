@@ -1,9 +1,9 @@
-using SoulboundEngine.Client.Player;
 using SoulboundEngine.Core.Registry;
 using SoulboundEngine.Core.States;
 using SoulboundEngine.Item;
 using SoulboundEngine.World.Block.State;
 using SoulboundEngine.World.Entity;
+using SoulboundEngine.World.Player;
 using System;
 using System.Collections.Generic;
 

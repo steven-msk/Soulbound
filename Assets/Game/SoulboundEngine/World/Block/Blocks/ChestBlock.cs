@@ -1,10 +1,10 @@
-﻿using SoulboundEngine.Client.Player;
-using SoulboundEngine.Interaction;
+﻿using SoulboundEngine.Interaction;
 using SoulboundEngine.Item.Container;
 using SoulboundEngine.Loot;
 using SoulboundEngine.World.Block.Entity;
 using SoulboundEngine.World.Block.State;
 using SoulboundEngine.World.Entity;
+using SoulboundEngine.World.Player;
 
 namespace SoulboundEngine.World.Block {
 	using Level = Level.Level;

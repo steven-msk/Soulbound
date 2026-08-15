@@ -1,16 +1,18 @@
+using SoulboundEngine.Client;
 using SoulboundEngine.Core;
 using SoulboundEngine.Core.Event;
 using SoulboundEngine.Item;
-using SoulboundEngine.World.Entity;
 using UnityEngine;
+using static SoulboundEngine.World.Entity.Entity;
 using IEntityView = SoulboundEngine.Client.Render.Entity.IEntityView;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.Player {
+namespace SoulboundEngine.World.Player {
+	using Entity = Entity.Entity;
 	[RequireComponent(typeof(Rigidbody2D))]
 	[RequireComponent(typeof(CapsuleCollider2D))]
-	public class PlayerTransform : MonoBehaviour, IEntityView, Entity.IPhysicsHandle, Entity.IBoundingBoxHandle, PlayerEntity.IPlayerTransformHandle, IItemCollector {
+	public class PlayerTransform : MonoBehaviour, IEntityView, IPhysicsHandle, IBoundingBoxHandle, PlayerEntity.IPlayerTransformHandle, IItemCollector {
 		private PlayerEntity player = null!;
 		private Rigidbody2D rb = null!;
 		new private CapsuleCollider2D collider = null!;

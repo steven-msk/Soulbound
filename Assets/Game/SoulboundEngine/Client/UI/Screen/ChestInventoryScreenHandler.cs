@@ -1,6 +1,6 @@
 ﻿using SoulboundEngine.Item;
 using SoulboundEngine.Item.Container;
-using SoulboundEngine.Client.Player;
+using SoulboundEngine.World.Player;
 using SoulboundEngine.World.Block.Entity;
 using System.Collections.Generic;
 using System.Linq;

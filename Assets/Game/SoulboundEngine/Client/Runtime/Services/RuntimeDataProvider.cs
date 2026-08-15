@@ -1,7 +1,8 @@
+using SoulboundEngine.Core.Registry;
 using SoulboundEngine.Item.Container;
 using SoulboundEngine.World.Entity;
 using SoulboundEngine.World.Level;
-using SoulboundEngine.Core.Registry;
+using SoulboundEngine.World.Player;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,8 +11,6 @@ using UnityEngine;
 #nullable enable
 
 namespace SoulboundEngine.Client.Runtime.Services {
-	using PlayerEntity = Player.PlayerEntity;
-
 	public sealed class RuntimeDataProvider : IRuntimeDataProvider {
 		private IRuntimePlayerDataProvider? _player;
 		private IRuntimeEntityDataProvider? _entities;

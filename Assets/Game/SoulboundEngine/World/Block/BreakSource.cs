@@ -1,5 +1,5 @@
-using SoulboundEngine.Client.Player;
 using SoulboundEngine.Common;
+using SoulboundEngine.World.Player;
 
 #nullable enable
 

@@ -1,8 +1,8 @@
 using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.Client.Player;
 using SoulboundEngine.Core.States;
 using SoulboundEngine.Interaction;
 using SoulboundEngine.World.Block.State;
+using SoulboundEngine.World.Player;
 
 namespace SoulboundEngine.World.Block {
 	using Level = Level.Level;

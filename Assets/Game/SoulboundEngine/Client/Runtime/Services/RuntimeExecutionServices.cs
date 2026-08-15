@@ -2,14 +2,13 @@ using SoulboundEngine.Item;
 using SoulboundEngine.Item.Container;
 using SoulboundEngine.World.Entity;
 using SoulboundEngine.World.Level;
+using SoulboundEngine.World.Player;
 using System;
 using UnityEngine;
 
 #nullable enable
 
 namespace SoulboundEngine.Client.Runtime.Services {
-	using PlayerEntity = Player.PlayerEntity;
-
 	public class RuntimeExecutionServices : IRuntimeExecutionServices {
 		private IPlayerExecutionService? _player;
 		private IEntityExecutionService? _entity;

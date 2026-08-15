@@ -1,4 +1,4 @@
-﻿using SoulboundEngine.Client.Player;
+﻿using SoulboundEngine.World.Player;
 using SoulboundEngine.Client.Settings;
 using System.Collections.Generic;
 using UnityEngine;

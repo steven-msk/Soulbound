@@ -1,3 +1,4 @@
+using SoulboundEngine.Client;
 using SoulboundEngine.Client.UI.Screen;
 using SoulboundEngine.Client.World.Widget;
 using SoulboundEngine.Interaction;
@@ -7,13 +8,16 @@ using SoulboundEngine.World.Block;
 using SoulboundEngine.World.Block.Entity;
 using SoulboundEngine.World.Block.State;
 using SoulboundEngine.World.Entity;
-using SoulboundEngine.World.Level;
 using System;
 using UnityEngine;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.Player {
+namespace SoulboundEngine.World.Player {
+	using Block = Block.Block;
+	using Entity = Entity.Entity;
+	using Level = Level.Level;
+
 	public class PlayerEntity : Entity {
 		public static readonly EntityDescriptor<PlayerEntity> DESCRIPTOR = EntityDescriptor.Of<PlayerEntity>((_, level) => throw new InvalidOperationException());
 		const float MAX_BLOCK_REACH = 5f;

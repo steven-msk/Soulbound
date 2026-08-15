@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SoulboundEngine.Client.Player {
+namespace SoulboundEngine.World.Player {
 	public sealed class PlayerInventory : IInventory {
 		public const int HOTBAR_SIZE = 9;
 		public const int POPUP_COLUMNS = 9;

@@ -1,8 +1,8 @@
-using SoulboundEngine.Client.Player;
 using SoulboundEngine.Common;
 using SoulboundEngine.Core.States;
 using SoulboundEngine.World.Block.Entity;
 using SoulboundEngine.World.Block.State;
+using SoulboundEngine.World.Player;
 using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 namespace SoulboundEngine.World.Block {

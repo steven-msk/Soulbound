@@ -1,10 +1,10 @@
-﻿using SoulboundEngine.Client.Player;
-using SoulboundEngine.Common.Math;
+﻿using SoulboundEngine.Common.Math;
 using SoulboundEngine.Core.Registry;
 using SoulboundEngine.Core.States;
 using SoulboundEngine.Interaction;
 using SoulboundEngine.Item;
 using SoulboundEngine.World.Block.State;
+using SoulboundEngine.World.Player;
 using System;
 using System.Collections.Generic;
 

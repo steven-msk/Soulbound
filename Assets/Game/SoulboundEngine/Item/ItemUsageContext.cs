@@ -1,6 +1,6 @@
-﻿using SoulboundEngine.Client.Player;
-using SoulboundEngine.World.Block;
+﻿using SoulboundEngine.World.Block;
 using SoulboundEngine.World.Level;
+using SoulboundEngine.World.Player;
 
 #nullable enable
 
