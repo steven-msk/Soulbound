@@ -1,7 +1,7 @@
 ﻿using SoulboundEngine.Item;
 using SoulboundEngine.Item.Container;
-using SoulboundEngine.Client.Loot.Context;
-using SoulboundEngine.Client.Loot.Function;
+using SoulboundEngine.Loot.Context;
+using SoulboundEngine.Loot.Function;
 using SoulboundEngine.Common;
 using SoulboundEngine.Common.Math.Random;
 using SoulboundEngine.Core.Registry;
@@ -11,7 +11,7 @@ using System.Linq;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.Loot {
+namespace SoulboundEngine.Loot {
 	public class LootTable {
 		private readonly List<LootPool> pools;
 		private readonly IFunction<ItemStack, LootContext, ItemStack> combinedFunction;

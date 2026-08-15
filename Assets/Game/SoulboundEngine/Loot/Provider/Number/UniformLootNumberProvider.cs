@@ -1,6 +1,6 @@
-﻿using SoulboundEngine.Client.Loot.Context;
+﻿using SoulboundEngine.Loot.Context;
 
-namespace SoulboundEngine.Client.Loot.Provider.Number {
+namespace SoulboundEngine.Loot.Provider.Number {
 	public record UniformLootNumberProvider(ILootNumberProvider min, ILootNumberProvider max) : ILootNumberProvider {
 		public float NextFloat(LootContext context) {
 			float min = this.min.NextFloat(context);

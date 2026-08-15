@@ -1,12 +1,12 @@
 ﻿using SoulboundEngine.Item;
-using SoulboundEngine.Client.Loot.Condition;
-using SoulboundEngine.Client.Loot.Context;
-using SoulboundEngine.Client.Loot.Function;
+using SoulboundEngine.Loot.Condition;
+using SoulboundEngine.Loot.Context;
+using SoulboundEngine.Loot.Function;
 using SoulboundEngine.Core.Registry;
 using System;
 using System.Collections.Generic;
 
-namespace SoulboundEngine.Client.Loot.Entry {
+namespace SoulboundEngine.Loot.Entry {
 	using Item = Item.Item;
 
 	public class ItemEntry : LeafEntry {

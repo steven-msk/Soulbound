@@ -1,15 +1,15 @@
 ﻿using SoulboundEngine.Item;
-using SoulboundEngine.Client.Loot.Condition;
-using SoulboundEngine.Client.Loot.Context;
-using SoulboundEngine.Client.Loot.Entry;
-using SoulboundEngine.Client.Loot.Function;
-using SoulboundEngine.Client.Loot.Provider.Number;
+using SoulboundEngine.Loot.Condition;
+using SoulboundEngine.Loot.Context;
+using SoulboundEngine.Loot.Entry;
+using SoulboundEngine.Loot.Function;
+using SoulboundEngine.Loot.Provider.Number;
 using SoulboundEngine.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SoulboundEngine.Client.Loot {
+namespace SoulboundEngine.Loot {
 	public class LootPool {
 		private readonly ILootNumberProvider rolls;
 		private readonly List<LootPoolEntry> entries;

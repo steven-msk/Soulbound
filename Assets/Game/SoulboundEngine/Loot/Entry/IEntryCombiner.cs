@@ -1,7 +1,7 @@
-﻿using SoulboundEngine.Client.Loot.Context;
+﻿using SoulboundEngine.Loot.Context;
 using System;
 
-namespace SoulboundEngine.Client.Loot.Entry {
+namespace SoulboundEngine.Loot.Entry {
 	public interface IEntryCombiner {
 		public static readonly IEntryCombiner ALWAYS_FALSE = new DelegateImpl((_, _) => false);
 		public static readonly IEntryCombiner ALWAYS_TRUE = new DelegateImpl((_, _) => true);

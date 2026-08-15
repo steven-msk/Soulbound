@@ -1,7 +1,7 @@
 ﻿using Game.SoulboundEngine.Common;
-using SoulboundEngine.Client.Loot.Context;
+using SoulboundEngine.Loot.Context;
 
-namespace SoulboundEngine.Client.Loot.Condition {
+namespace SoulboundEngine.Loot.Condition {
 	public interface ILootCondition : IPredicate<LootContext> {
 		public interface IBuilder {
 			ILootCondition Build();

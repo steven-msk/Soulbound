@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SoulboundEngine.Client.Loot.Function {
+namespace SoulboundEngine.Loot.Function {
 	public interface ILootFunctionConsumingBuilder<out T> where T : ILootFunctionConsumingBuilder<T> {
 		T Apply(ILootFunction.IBuilder builder);
 

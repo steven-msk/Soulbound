@@ -1,6 +1,6 @@
 ﻿using SoulboundEngine.Common.Math.Random;
 
-namespace SoulboundEngine.Client.Loot.Context {
+namespace SoulboundEngine.Loot.Context {
 	public class LootContext {
 		private readonly LootWorldContext worldContext;
 		public IRandom random { get; }

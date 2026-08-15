@@ -1,10 +1,10 @@
 ﻿using Game.SoulboundEngine.Common;
-using SoulboundEngine.Client.Loot.Context;
+using SoulboundEngine.Loot.Context;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SoulboundEngine.Client.Loot.Condition {
+namespace SoulboundEngine.Loot.Condition {
 	public abstract class AlternativeLootCondition : ILootCondition {
 		protected readonly List<ILootCondition> conditions;
 		private readonly IPredicate<LootContext> predicate;

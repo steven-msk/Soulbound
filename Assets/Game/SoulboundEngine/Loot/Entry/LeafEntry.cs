@@ -1,7 +1,7 @@
 ﻿using SoulboundEngine.Item;
-using SoulboundEngine.Client.Loot.Condition;
-using SoulboundEngine.Client.Loot.Context;
-using SoulboundEngine.Client.Loot.Function;
+using SoulboundEngine.Loot.Condition;
+using SoulboundEngine.Loot.Context;
+using SoulboundEngine.Loot.Function;
 using SoulboundEngine.Common;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Linq;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.Loot.Entry {
+namespace SoulboundEngine.Loot.Entry {
 	public abstract class LeafEntry : LootPoolEntry, ILootChoice {
 		public const int DEFAULT_QUALITY = 0;
 		public const int DEFAULT_WEIGHT = 1;

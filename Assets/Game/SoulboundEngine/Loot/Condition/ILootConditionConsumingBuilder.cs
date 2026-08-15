@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SoulboundEngine.Client.Loot.Condition {
+namespace SoulboundEngine.Loot.Condition {
 	public interface ILootConditionConsumingBuilder<out T> where T : ILootConditionConsumingBuilder<T> {
 		T Conditionally(ILootCondition.IBuilder condition);
 

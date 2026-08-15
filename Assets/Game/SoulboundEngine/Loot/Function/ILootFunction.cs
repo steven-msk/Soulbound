@@ -1,10 +1,10 @@
 ﻿using SoulboundEngine.Item;
-using SoulboundEngine.Client.Loot.Context;
+using SoulboundEngine.Loot.Context;
 using SoulboundEngine.Common;
 using System;
 using System.Collections.Generic;
 
-namespace SoulboundEngine.Client.Loot.Function {
+namespace SoulboundEngine.Loot.Function {
 	public interface ILootFunction : IFunction<ItemStack, LootContext, ItemStack> {
 		public static Action<ItemStack> Apply(IFunction<ItemStack, LootContext, ItemStack> itemApplier, Action<ItemStack> lootConsumer, LootContext context) {
 			return stack => lootConsumer(itemApplier.Apply(stack, context));

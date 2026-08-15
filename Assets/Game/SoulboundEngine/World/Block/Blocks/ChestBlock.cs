@@ -1,7 +1,7 @@
-﻿using SoulboundEngine.Client.Loot;
-using SoulboundEngine.Client.Player;
+﻿using SoulboundEngine.Client.Player;
 using SoulboundEngine.Interaction;
 using SoulboundEngine.Item.Container;
+using SoulboundEngine.Loot;
 using SoulboundEngine.World.Block.Entity;
 using SoulboundEngine.World.Block.State;
 using SoulboundEngine.World.Entity;

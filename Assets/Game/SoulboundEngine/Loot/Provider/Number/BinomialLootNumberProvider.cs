@@ -1,7 +1,7 @@
-﻿using SoulboundEngine.Client.Loot.Context;
+﻿using SoulboundEngine.Loot.Context;
 using System;
 
-namespace SoulboundEngine.Client.Loot.Provider.Number {
+namespace SoulboundEngine.Loot.Provider.Number {
 	public record BinomialLootNumberProvider(ILootNumberProvider trialProvider, ILootNumberProvider probabilityProvider) : ILootNumberProvider {
 		public float NextFloat(LootContext context) => this.Roll(context);
 

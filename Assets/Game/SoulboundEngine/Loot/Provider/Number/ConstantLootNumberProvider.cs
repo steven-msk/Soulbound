@@ -1,6 +1,6 @@
-﻿using SoulboundEngine.Client.Loot.Context;
+﻿using SoulboundEngine.Loot.Context;
 
-namespace SoulboundEngine.Client.Loot.Provider.Number {
+namespace SoulboundEngine.Loot.Provider.Number {
 	public record ConstantLootNumberProvider(float value) : ILootNumberProvider {
 		public float NextFloat(LootContext context) => this.value;
 

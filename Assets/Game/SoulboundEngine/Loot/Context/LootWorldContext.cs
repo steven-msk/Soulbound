@@ -1,6 +1,6 @@
 ﻿using SoulboundEngine.World.Level;
 
-namespace SoulboundEngine.Client.Loot.Context {
+namespace SoulboundEngine.Loot.Context {
 	public class LootWorldContext {
 		public Level level { get; }
 		public float luck { get; }

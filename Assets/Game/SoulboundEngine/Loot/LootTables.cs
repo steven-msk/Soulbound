@@ -1,10 +1,10 @@
 ﻿using SoulboundEngine.Item;
-using SoulboundEngine.Client.Loot.Entry;
-using SoulboundEngine.Client.Loot.Provider.Number;
+using SoulboundEngine.Loot.Entry;
+using SoulboundEngine.Loot.Provider.Number;
 using SoulboundEngine.Core.Registry;
 using System.Collections.Generic;
 
-namespace SoulboundEngine.Client.Loot {
+namespace SoulboundEngine.Loot {
 	// implementation made for simplicity convenience
 	public static class LootTables {
 		private static readonly Dictionary<string, RegistryKey<LootTable>> keyByString = new();
