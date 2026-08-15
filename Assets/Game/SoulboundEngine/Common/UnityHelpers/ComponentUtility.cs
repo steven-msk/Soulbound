@@ -3,6 +3,8 @@ using UnityEngine;
 #nullable enable
 
 namespace SoulboundEngine.Common.Unity {
+	using Component = Component.Component;
+
 	public static class ComponentUtility {
 		public static TComponent? GetComponent<TComponent>(this GameObject gameObject) where TComponent : Component {
 			return gameObject.GetComponent<TComponent>();

@@ -4,7 +4,7 @@ using System.Linq;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.Component {
+namespace SoulboundEngine.Component {
 	public sealed class ComponentChanges {
 		private readonly Dictionary<ComponentType, object> changedComponents;
 		public static readonly ComponentChanges EMPTY = new(new Dictionary<ComponentType, object>());

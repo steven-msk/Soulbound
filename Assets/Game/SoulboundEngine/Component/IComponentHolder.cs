@@ -1,4 +1,4 @@
-﻿namespace SoulboundEngine.Client.Component {
+﻿namespace SoulboundEngine.Component {
 	public interface IComponentHolder : IComponentsAccess {
 		IComponentMap GetComponents();
 

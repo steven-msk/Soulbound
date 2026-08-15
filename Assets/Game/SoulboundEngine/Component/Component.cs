@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SoulboundEngine.Client.Component {
+namespace SoulboundEngine.Component {
 	public record Component {
 		// Sentinel marking "this type is removed relative to baseMap", distinct from
 		// simply not having an entry in changedComponents (which means "defer to baseMap").

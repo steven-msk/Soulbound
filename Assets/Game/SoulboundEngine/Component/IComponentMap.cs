@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SoulboundEngine.Client.Component {
+namespace SoulboundEngine.Component {
 	public interface IComponentMap : IEnumerable<Component>, IComponentsAccess {
 		public static IComponentMap EMPTY = Create().Build();
 

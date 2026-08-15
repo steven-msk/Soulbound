@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SoulboundEngine.Client.Component {
+namespace SoulboundEngine.Component {
 	public sealed class MergedComponentMap : IComponentMap {
 		private readonly IComponentMap baseMap;
 		private Dictionary<ComponentType, object> changedComponents;

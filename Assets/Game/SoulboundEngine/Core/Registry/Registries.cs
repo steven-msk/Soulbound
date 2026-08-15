@@ -1,4 +1,4 @@
-using SoulboundEngine.Client.Component;
+using SoulboundEngine.Component;
 using SoulboundEngine.Client.Debug.Logging;
 using SoulboundEngine.Client.Loot;
 using SoulboundEngine.Client.Recipe;

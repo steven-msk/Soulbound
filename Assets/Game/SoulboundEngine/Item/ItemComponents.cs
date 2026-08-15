@@ -1,4 +1,4 @@
-﻿using SoulboundEngine.Client.Component;
+﻿using SoulboundEngine.Component;
 using SoulboundEngine.Core.Registry;
 using System;
 
