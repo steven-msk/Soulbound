@@ -10,7 +10,7 @@ namespace SoulboundEngine.Client {
 			if (SoulboundClient.Instance.GetActiveWorldSession() is { } session) {
 				PlayerEntity player = session.level.GetPlayer();
 				Vec2d playerPos = player.GetPosition();
-				Vector3 pos = new((float)playerPos.x, (float)playerPos.y);
+				Vector3 pos = new((float)playerPos.x, (float)playerPos.y, this.transform.position.z);
 				this.gameObject.transform.position = pos;
 			}
 		}

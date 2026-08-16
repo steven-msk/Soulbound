@@ -1,4 +1,6 @@
-﻿using Unity.VisualScripting;
+﻿using SoulboundEngine.Client.Util;
+using SoulboundEngine.Common.Math;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace SoulboundEngine.Client.Render.Entity {
@@ -27,6 +29,10 @@ namespace SoulboundEngine.Client.Render.Entity {
 
 		public void SetVisible(bool visible) {
 			this.gameObject.SetActive(visible);
+		}
+
+		public void SetPosition(Vec2d pos) {
+			this.GetComponent<Transform>().position = pos.ToVector2();
 		}
 	}
 }

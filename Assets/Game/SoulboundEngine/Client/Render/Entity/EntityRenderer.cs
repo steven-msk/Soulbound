@@ -53,11 +53,20 @@
 		}
 
 		internal sealed override EntityViewHandle Create(object state, EntityModel model) {
-			return this.Create((S)state, (M)model);
+			S s = (S)state;
+			EntityViewHandle handle = this.Create(s, (M)model);
+			this.UpdatePosition(s, in handle);
+			return handle;
 		}
 
 		internal sealed override void Update(object state, in EntityViewHandle handle) {
-			this.Update((S)state, in handle);
+			S s = (S)state;
+			this.UpdatePosition(s, in handle);
+			this.Update(s, in handle);
+		}
+
+		protected virtual void UpdatePosition(S state, in EntityViewHandle handle) {
+			handle.SetPosition(state.entity.GetPosition());
 		}
 
 		public override void Destroy(in EntityViewHandle handle) {

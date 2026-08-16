@@ -18,7 +18,6 @@ namespace SoulboundEngine.World.Player {
 	using Block = Block.Block;
 	using Entity = Entity.Entity;
 	using Level = Level.Level;
-	using Logger = Client.Debug.Logging.Logger;
 
 	public class PlayerEntity : Entity {
 		const float MAX_BLOCK_REACH = 5f;
@@ -83,7 +82,6 @@ namespace SoulboundEngine.World.Player {
 		public override void Tick() {
 			Vec2d movementInput = new(this.movementX, 0.0d);
 			this.Travel(movementInput);
-			Logger.LogInfo(this.GetPosition());
 
 			this.DoBlockHover();
 			this.CheckItemUse();
@@ -97,7 +95,7 @@ namespace SoulboundEngine.World.Player {
 
 		public override float GetSpeed() => 0.1f;
 
-		protected override double GetGravity() => 9.81d / SharedConstants.TICKS_PER_SECOND;
+		protected override double GetGravity() => 0.981d / SharedConstants.TICKS_PER_SECOND;
 
 		private void OnLeftHoldTick() {
 			this.HandleInteractTick(InteractionType.Primary);
