@@ -1,5 +1,6 @@
 ﻿using SoulboundEngine.Client.Render.Item;
 using SoulboundEngine.World.Entity;
+using System;
 using UnityEngine;
 
 namespace SoulboundEngine.Client.Render.Entity {
@@ -19,27 +20,20 @@ namespace SoulboundEngine.Client.Render.Entity {
 			};
 		}
 
-		public override IEntityView CreateView(ItemEntityRenderState state, ItemEntityModel model) {
+		public override EntityViewHandle Create(ItemEntityRenderState state, ItemEntityModel model) {
 			ItemRenderer itemRenderer = this.itemRenderManager.GetRenderer(state.stack.GetItem());
 			ItemModel itemModel = this.itemRenderManager.GetModel(state.stack);
 
 			ItemRenderContext renderContext = new ItemRenderContext.World { position = state.entity.GetPosition() };
 			object itemRenderState = itemRenderer.CreateRenderStateBoxed(state.stack, renderContext);
 			IItemView itemView = itemRenderer.CreateViewBoxed(itemRenderState, itemModel, renderContext);
-			if (!itemView.IsValid()) return IEntityView.Of(null);
+			if (!itemView.IsValid()) throw new InvalidOperationException("Cannot create entity view from invalid item view");
 
-			GameObject obj = ((IItemView.GameObjectImpl)itemView).GetGameObject();
-			ItemEntityTransform transform = obj.AddComponent<ItemEntityTransform>();
-			transform.Init(state.entity);
+			GameObject obj = ((IItemView.GameObjectBacked)itemView).GetGameObject();
+			//ItemEntityTransform transform = obj.AddComponent<ItemEntityTransform>();
+			//transform.Init(state.entity);
 
-			return transform;
-		}
-
-		public override void DestroyView(IEntityView view) {
-			view.Destroy();
-		}
-
-		public override void UpdateView(ItemEntityRenderState state, IEntityView view) {
+			return EntityViewHandle.Of(obj);
 		}
 	}
 }

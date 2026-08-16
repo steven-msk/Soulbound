@@ -1,6 +1,5 @@
 ﻿using SoulboundEngine.World.Entity;
 using SoulboundEngine.World.Player;
-using UnityEngine;
 
 namespace SoulboundEngine.Client.Render.Entity {
 	public sealed class PlayerEntityRenderer : EntityRenderer<PlayerEntity, PlayerRenderState, PlayerModel> {
@@ -15,14 +14,8 @@ namespace SoulboundEngine.Client.Render.Entity {
 			};
 		}
 
-		public override IEntityView CreateView(PlayerRenderState state, PlayerModel model) {
-			GameObject obj = GameObject.Instantiate(model.prefab);
-			//PlayerTransform transform = obj.GetComponent<PlayerTransform>();
-			//transform.Init(state.entity);
-			//state.entity.SetPhysicsHandle(transform);
-			//state.entity.SetBoundingBoxHandle(transform);
-			//state.entity.SetTransformHandle(transform);
-			return IEntityView.Of(obj);
+		public override EntityViewHandle Create(PlayerRenderState state, PlayerModel model) {
+			return EntityViewHandle.Instantiate(model.prefab);
 		}
 
 	}

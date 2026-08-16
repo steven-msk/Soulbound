@@ -1,5 +1,7 @@
 ﻿namespace SoulboundEngine.Client.Render.Entity {
 	using SoulboundEngine.Client.Render.Item;
+	using System;
+	using UnityEngine;
 	using Entity = SoulboundEngine.World.Entity.Entity;
 
 	public abstract class EntityRenderer {
@@ -9,61 +11,57 @@
 			this.entityRenderManager = context.entityRenderManager;
 		}
 
-		internal abstract object CreateRenderStateBoxed(Entity entity);
+		internal abstract object CreateRenderState(Entity entity);
 
-		internal abstract IEntityView CreateViewBoxed(object state, EntityModel model);
-		internal abstract void UpdateViewBoxed(object state, IEntityView view);
-		public abstract void DestroyView(IEntityView view);
+		internal abstract EntityViewHandle Create(object state, EntityModel model);
+
+		internal abstract void Update(object state, in EntityViewHandle handle);
+
+		public abstract void Destroy(in EntityViewHandle handle);
 
 		public sealed record FactoryContext(
 			EntityRenderManager entityRenderManager, 
 			ItemRenderManager itemRenderManager
 		);
 
-		public delegate EntityRenderer<E, S, M> Factory<E, S, M>(FactoryContext context) where E : Entity where S : EntityRenderState<E> where M : EntityModel;
-
-		public interface IFactory { 
-			EntityRenderer GetRenderer(FactoryContext context);
-
-			public static IFactory Of<E, S, M>(Factory<E, S, M> factory) where E : Entity where S : EntityRenderState<E> where M : EntityModel {
-				return new DelegateImpl<E, S, M>(factory);
+		public record Factory(Func<FactoryContext, EntityRenderer> function) {
+			public static Factory Of<E, S, M>(EntityRenderer<E, S, M>.Factory rendererFactory)
+					where E : Entity where S : EntityRenderState<E> where M : EntityModel {
+				return new Factory(context => rendererFactory(context));
 			}
 
-			private sealed class DelegateImpl<E, S, M> : IFactory where E : Entity where S : EntityRenderState<E> where M : EntityModel {
-				private readonly Factory<E, S, M> factory;
-
-				public DelegateImpl(Factory<E, S, M> factory) {
-					this.factory = factory;
-				}
-
-				public EntityRenderer GetRenderer(FactoryContext context) => this.factory(context);
-			}
+			public EntityRenderer Apply(FactoryContext context) => this.function(context);
 		}
 	}
 
 	public abstract class EntityRenderer<E, S, M> : EntityRenderer where E : Entity where S : EntityRenderState<E> where M : EntityModel {
+		public new delegate EntityRenderer<E, S, M> Factory(FactoryContext context);
+
 		protected EntityRenderer(FactoryContext context) 
 			: base(context) {
 		}
 
 		public abstract S CreateRenderState(E entity);
 
-		public abstract IEntityView CreateView(S state, M model);
-		public virtual void UpdateView(S state, IEntityView view) {
-			//state.entity.SyncPhysicalPosition();
-		}
-		public override void DestroyView(IEntityView view) {
-			view.Destroy();
+		public abstract EntityViewHandle Create(S state, M model);
+
+		public virtual void Update(S state, in EntityViewHandle handle) {
 		}
 
-		internal override object CreateRenderStateBoxed(Entity entity) {
+		internal sealed override object CreateRenderState(Entity entity) {
 			return this.CreateRenderState((E)entity);
 		}
-		internal override IEntityView CreateViewBoxed(object state, EntityModel model) {
-			return this.CreateView((S)state, (M)model);
+
+		internal sealed override EntityViewHandle Create(object state, EntityModel model) {
+			return this.Create((S)state, (M)model);
 		}
-		internal override void UpdateViewBoxed(object state, IEntityView view) {
-			this.UpdateView((S)state, view);
+
+		internal sealed override void Update(object state, in EntityViewHandle handle) {
+			this.Update((S)state, in handle);
+		}
+
+		public override void Destroy(in EntityViewHandle handle) {
+			GameObject.Destroy(handle.GetGameObject());
 		}
 	}
 }

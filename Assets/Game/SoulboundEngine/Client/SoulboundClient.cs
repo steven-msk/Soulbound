@@ -354,6 +354,8 @@ namespace SoulboundEngine.Client {
 			this.worldWidgetManager.DestroyWidget(handle);
 		}
 
+		[Obsolete] public WorldSession? GetActiveWorldSession() => this.activeWorldSession;
+
 		public static SoulboundClient Instance => instance;
 		public InputManager InputManager => this.inputManager;
 		public ItemRenderManager ItemRenderManager => this.itemRenderManager;
