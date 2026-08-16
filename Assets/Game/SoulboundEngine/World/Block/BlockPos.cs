@@ -1,6 +1,6 @@
+using SoulboundEngine.Common.Math;
 using SoulboundEngine.World.Chunk;
 using System;
-using UnityEngine;
 
 namespace SoulboundEngine.World.Block {
 	using Level = Level.Level;
@@ -14,7 +14,19 @@ namespace SoulboundEngine.World.Block {
             this.y = y;
         }
 
-        public override readonly string ToString() => $"bx:{this.x},by:{this.y}";
+		public static BlockPos From(Vec2d vec) {
+			Vec2i floor = vec.FloorToInt();
+			return new BlockPos(floor.x, floor.y);
+		}
+
+		public static BlockPos From(Vec2i vec) {
+			return new BlockPos(vec.x, vec.y);
+		}
+
+		public readonly Vec2d ToVec2d() => new(this.x, this.y);
+		public readonly Vec2i ToVec2i() => new(this.x, this.y);
+
+		public override readonly string ToString() => $"bx:{this.x},by:{this.y}";
 
         public readonly ChunkBlockPos ToChunkPos() {
             int cx = Level.ToChunkX(this.x);
@@ -28,27 +40,11 @@ namespace SoulboundEngine.World.Block {
             return pos1.x == pos2.x && pos1.y == pos2.y;
         }
 
-        public static explicit operator Vector2Int(BlockPos pos) => new(pos.x, pos.y);
-
-        public static explicit operator BlockPos(Vector2Int vec) => new(vec.x, vec.y);
-
-        public static explicit operator Vector2(BlockPos pos) => new(pos.x, pos.y);
-
-		public static explicit operator BlockPos(Vector2 vec) => new(Mathf.FloorToInt(vec.x), Mathf.FloorToInt(vec.y));
-
-		public static explicit operator Vector3(BlockPos pos) => new(pos.x, pos.y, 0f);
-
-		public static explicit operator BlockPos(Vector3 vec) => new(Mathf.FloorToInt(vec.x), Mathf.FloorToInt(vec.y));
-
-        public static explicit operator Vector3Int(BlockPos pos) => new(pos.x, pos.y, 0);
-
-		public static explicit operator BlockPos(Vector3Int vec) => new(vec.x, vec.y);
-
-        public static BlockPos operator +(BlockPos pos, Vector2Int vec) => new(pos.x + vec.x, pos.y + vec.y);
+        public static BlockPos operator +(BlockPos pos, Vec2i vec) => new(pos.x + vec.x, pos.y + vec.y);
 
         public static BlockPos operator +(BlockPos pos, (int x, int y) vec) => new(pos.x + vec.x, pos.y + vec.y);
 
-        public static BlockPos operator -(BlockPos pos, Vector2Int vec) => new(pos.x - vec.x, pos.y - vec.y);
+        public static BlockPos operator -(BlockPos pos, Vec2i vec) => new(pos.x - vec.x, pos.y - vec.y);
 
 		public static BlockPos operator -(BlockPos pos, (int x, int y) vec) => new(pos.x - vec.x, pos.y - vec.y);
 
@@ -61,7 +57,7 @@ namespace SoulboundEngine.World.Block {
             return new BlockPos(pos.x / scalar, pos.y / scalar);
         }
 
-        public readonly Vector2 GetCenter() => new(this.x + 0.5f, this.y + 0.5f);
+        public readonly Vec2d GetCenter() => new(this.x + 0.5f, this.y + 0.5f);
 
 		public override readonly bool Equals(object obj) {
             if (obj is BlockPos other) {

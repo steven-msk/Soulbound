@@ -357,6 +357,9 @@ namespace SoulboundEngine.Common.Math {
 			return a.Divide(b, ref rez);
 		}
 
+		public static bool operator ==(Vec2i a, Vec2i b) => a.Equals(b);
+		public static bool operator !=(Vec2i a, Vec2i b) => !a.Equals(b);
+
 		public readonly override int GetHashCode() {
 			const int prime = 31;
 			int result = 1;

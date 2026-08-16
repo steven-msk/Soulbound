@@ -74,7 +74,7 @@ namespace SoulboundEngine.World.Block {
 
 			foreach (var stack in droppedStacks) {
 				ItemEntity itemEntity = new(owner, stack, level);
-				itemEntity.SetPosition(blockPos.GetCenter());
+				itemEntity.SetPos(blockPos.GetCenter());
 				level.AddEntity(itemEntity);
 			}
 		}

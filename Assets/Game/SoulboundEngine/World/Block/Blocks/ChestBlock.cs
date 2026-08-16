@@ -27,7 +27,7 @@ namespace SoulboundEngine.World.Block {
 			ChestTileEntity chestTileEntity = (ChestTileEntity)level.GetTileEntity(pos);
 			foreach (var stack in chestTileEntity) {
 				ItemEntity itemEntity = new(stack, level);
-				itemEntity.SetPosition(pos.GetCenter());
+				itemEntity.SetPos(pos.GetCenter());
 				level.AddEntity(itemEntity);
 			}
 		}

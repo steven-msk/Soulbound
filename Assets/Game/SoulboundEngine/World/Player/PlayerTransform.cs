@@ -1,8 +1,8 @@
 using SoulboundEngine.Client;
 using SoulboundEngine.Event;
 using SoulboundEngine.Item;
+using System;
 using UnityEngine;
-using static SoulboundEngine.World.Entity.Entity;
 using IEntityView = SoulboundEngine.Client.Render.Entity.IEntityView;
 
 #nullable enable
@@ -11,7 +11,8 @@ namespace SoulboundEngine.World.Player {
 	using Entity = Entity.Entity;
 	[RequireComponent(typeof(Rigidbody2D))]
 	[RequireComponent(typeof(CapsuleCollider2D))]
-	public class PlayerTransform : MonoBehaviour, IEntityView, IPhysicsHandle, IBoundingBoxHandle, PlayerEntity.IPlayerTransformHandle, IItemCollector {
+	[Obsolete]
+	public class PlayerTransform : MonoBehaviour, IEntityView, IItemCollector {
 		private PlayerEntity player = null!;
 		private Rigidbody2D rb = null!;
 		new private CapsuleCollider2D collider = null!;

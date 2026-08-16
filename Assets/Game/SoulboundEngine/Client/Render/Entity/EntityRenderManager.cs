@@ -1,4 +1,5 @@
-﻿using SoulboundEngine.Client.Render.Item;
+﻿using SoulboundEngine.Client.Debug.Logging;
+using SoulboundEngine.Client.Render.Item;
 using SoulboundEngine.World.Entity;
 using System;
 using System.Collections.Generic;
@@ -42,7 +43,10 @@ namespace SoulboundEngine.Client.Render.Entity {
 		}
 
 		public void Update(Entity entity) {
-			if (!this.renderedEntities.TryGetValue(entity, out RenderedEntity renderedEntity)) return;
+			if (!this.renderedEntities.TryGetValue(entity, out RenderedEntity renderedEntity)) {
+				Logger.LogWarning("Cannot update entity {} because it has not been created. Please call Render(Entity) first", entity);
+				return;
+			}
 
 			this.GetRenderer(entity).UpdateViewBoxed(renderedEntity.state, renderedEntity.view);
 		}

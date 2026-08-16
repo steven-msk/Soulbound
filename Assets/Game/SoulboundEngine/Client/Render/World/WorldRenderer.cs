@@ -1,5 +1,6 @@
 using SoulboundEngine.Client.Render.Block;
 using SoulboundEngine.Client.Render.Entity;
+using SoulboundEngine.Common.Math;
 using SoulboundEngine.World.Block;
 using SoulboundEngine.World.Block.State;
 using SoulboundEngine.World.Chunk;
@@ -19,7 +20,7 @@ namespace SoulboundEngine.Client.Render.World {
 		private readonly EntityRenderManager entityRenderManager;
 		private readonly ChunkOutlineRenderer chunkOutlineRenderer;
 		private readonly Queue<(BlockPos pos, BlockState? state)> stateChangedQueue = new();
-		private Vector2Int lastPivot;
+		private Vec2i lastPivot;
 		private readonly RectInt renderView;
 		private Tilemap? tilemap;
 		private Level? level;
@@ -47,7 +48,7 @@ namespace SoulboundEngine.Client.Render.World {
 		}
 
 		private void RenderBlocks(Level level) {
-			Vector2Int currentPivot = Vector2Int.FloorToInt(level.GetPlayer().GetPosition());
+			Vec2i currentPivot = level.GetPlayer().GetPosition().FloorToInt();
 			if (this.lastPivot == currentPivot) return;
 
 			RectInt lastView = this.ToRect(this.lastPivot);
@@ -56,14 +57,14 @@ namespace SoulboundEngine.Client.Render.World {
 
 			RectInt.PositionEnumerator pos = lastView.allPositionsWithin;
 			while (pos.MoveNext()) {
-				if (currentView.Contains(pos.Current)) continue;
-
-				this.RenderBlock((BlockPos)pos.Current, Blocks.AIR.DefaultState);
+				if (!currentView.Contains(pos.Current)) {
+					this.RenderBlock(new BlockPos(pos.Current.x, pos.Current.y), Blocks.AIR.DefaultState);
+				}
 			}
 
 			pos = currentView.allPositionsWithin;
 			while (pos.MoveNext()) {
-				BlockPos blockPos = (BlockPos)pos.Current;
+				BlockPos blockPos = new(pos.Current.x, pos.Current.y);
 				if (!Level.IsInBounds(blockPos) || lastView.Contains(pos.Current)) {
 					continue;
 				}
@@ -80,7 +81,7 @@ namespace SoulboundEngine.Client.Render.World {
 			this.blockRenderManager.Render(this.tilemap, blockPos, blockState);
 		}
 
-		private RectInt ToRect(Vector2Int pivot) {
+		private RectInt ToRect(Vec2i pivot) {
 			return new(
 				Mathf.FloorToInt(pivot.x) + this.renderView.x,
 				Mathf.FloorToInt(pivot.y) + this.renderView.y,
@@ -90,7 +91,8 @@ namespace SoulboundEngine.Client.Render.World {
 		}
 
 		public bool IsInRenderView(BlockPos blockPos) {
-			return this.ToRect(this.lastPivot).Contains((Vector2Int)blockPos);
+			Vec2i pos = blockPos.ToVec2i();
+			return this.ToRect(this.lastPivot).Contains(new Vector2Int(pos.x, pos.y));
 		}
 
 		private void ResolveQueue<T>(Queue<T> queue, Action<T> action) {
@@ -174,7 +176,7 @@ namespace SoulboundEngine.Client.Render.World {
 		}
 
 		public void Reset() {
-			this.lastPivot = Vector2Int.zero;
+			this.lastPivot = Vec2i.ZERO;
 			if (this.level != null) this.DestroyEntities(this.level);
 			if (this.tilemap != null) this.tilemap.ClearAllTiles();
 			this.showingChunkFeatures = false;

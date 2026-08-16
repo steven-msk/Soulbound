@@ -1,10 +1,10 @@
 ﻿namespace SoulboundEngine.World.Chunk {
+	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Level;
 	using System;
 
 	public readonly struct ChunkPos {
 		public static readonly ChunkPos ORIGIN = new(0);
-
 		public readonly int x;
 
 		public ChunkPos(int x) {
@@ -18,6 +18,10 @@
 		public int WorldXToChunkX(int worldX) => worldX - this.x * Level.CHUNK_LENGTH;
 
 		public int ChunkXToWorldX(int chunkX) => chunkX + this.x * Level.CHUNK_LENGTH;
+
+		public static ChunkPos Containing(BlockPos pos) {
+			return new ChunkPos(SectionPos.BlockToSectionCoord(pos.x));
+		}
 
 		public static ChunkPos Parse(string s) {
 			if (!s.StartsWith("chunk[")) throw new ArgumentException("Cannot parse chunk pos: " + s);

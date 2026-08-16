@@ -15,21 +15,22 @@ namespace SoulboundEngine.World.Entity.Transform {
 
 		public void Bind(Entity entity) {
 			this.entity = entity;
-			body = GetComponent<Rigidbody2D>();
+			this.body = this.GetComponent<Rigidbody2D>();
 		}
 
-		public void Destroy() => Destroy(gameObject);
+		public void Destroy() => Destroy(this.gameObject);
 
-		public Vector2 GetPos() => body.position;
+		public Vector2 GetPos() => this.body.position;
 
 		public void SetPos(Vector2 position) {
-			body.position = position;
+			this.body.position = position;
 		}
 
-		public Entity GetEntity() => entity;
+		public Entity GetEntity() => this.entity;
 
+		[Obsolete]
 		private void FixedUpdate() {
-			entity.SetPosition(body.position);
+			//entity.SetPosition(body.position);
 		}
 
 		public void SetCollisionHandler(IEntityCollisionHandler collisionHandler) {
@@ -37,8 +38,8 @@ namespace SoulboundEngine.World.Entity.Transform {
 		}
 
 		private void OnCollisionEnter2D(Collision2D collision) {
-			collisionHandler?.OnCollisionEnter(new EntityCollision {
-				self = entity,
+			this.collisionHandler?.OnCollisionEnter(new EntityCollision {
+				self = this.entity,
 				other = collision.otherCollider.GetComponent<IEntityTransform>()?.GetEntity(),
 				point = collision.GetContact(0).point,
 				normal = collision.GetContact(0).normal,
@@ -47,8 +48,8 @@ namespace SoulboundEngine.World.Entity.Transform {
 		}
 
 		private void OnCollisionExit2D(Collision2D collision) {
-			collisionHandler?.OnCollisionExit(new EntityCollision {
-				self = entity,
+			this.collisionHandler?.OnCollisionExit(new EntityCollision {
+				self = this.entity,
 				other = collision.otherCollider.GetComponent<IEntityTransform>()?.GetEntity(),
 				otherObject = collision.otherCollider.gameObject
 			});

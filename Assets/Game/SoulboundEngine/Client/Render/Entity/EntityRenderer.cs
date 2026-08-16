@@ -50,7 +50,7 @@
 
 		public abstract IEntityView CreateView(S state, M model);
 		public virtual void UpdateView(S state, IEntityView view) {
-			state.entity.SyncPhysicalPosition();
+			//state.entity.SyncPhysicalPosition();
 		}
 		public override void DestroyView(IEntityView view) {
 			view.Destroy();

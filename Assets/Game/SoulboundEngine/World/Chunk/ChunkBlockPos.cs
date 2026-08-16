@@ -1,7 +1,7 @@
 using Newtonsoft.Json;
 using SoulboundEngine.Common.Json;
+using SoulboundEngine.Common.Math;
 using SoulboundEngine.World.Block;
-using UnityEngine;
 
 namespace SoulboundEngine.World.Chunk {
 	using Level = Level.Level;
@@ -26,8 +26,8 @@ namespace SoulboundEngine.World.Chunk {
 			return new ChunkBlockPos(localX, blockPos.y, chunkX);
 		}
 
-		public static ChunkBlockPos FromWorld(Vector2 worldPos) {
-			return ((BlockPos)worldPos).ToChunkPos();
+		public static ChunkBlockPos FromWorld(Vec2d worldPos) {
+			return BlockPos.From(worldPos).ToChunkPos();
 		}
 
 		public static bool operator !=(ChunkBlockPos pos1, ChunkBlockPos pos2) => !(pos1 == pos2);
@@ -36,8 +36,6 @@ namespace SoulboundEngine.World.Chunk {
 			return pos1.x == pos2.x && pos1.y == pos2.y && pos1.chunkX == pos2.chunkX;
 		}
 
-		public static explicit operator Vector2Int(ChunkBlockPos pos) => new(pos.x, pos.y);
-
 		public readonly override string ToString() => $"cx:{this.x}, cy:{this.y}, c:{this.chunkX}";
 
 		public readonly BlockPos ToBlock() => new(this.x + this.chunkX * Level.CHUNK_LENGTH, this.y);
@@ -45,7 +43,6 @@ namespace SoulboundEngine.World.Chunk {
 		public readonly int WorldYToIndex() => WorldYToIndex(this.y);
 
 		public static int WorldYToIndex(int worldY) => worldY - Level.MAX_Y;
-
 
 		public readonly override bool Equals(object obj) {
 			if (obj is not ChunkBlockPos) {

@@ -7,8 +7,6 @@ namespace SoulboundEngine.World.Entity {
 
 	public class ItemEntity : Entity {
 		public const float CANNOT_PICK_UP_DELAY_SEC = 2;
-		public static readonly EntityDescriptor<ItemEntity> DESCRIPTOR = EntityDescriptor.Of<ItemEntity>((_, level) => new ItemEntity(ItemStack.EMPTY, level));
-
 		private readonly Entity? owner;
 		private readonly ItemStack itemStack;
 
@@ -17,7 +15,7 @@ namespace SoulboundEngine.World.Entity {
 		}
 
 		public ItemEntity(Entity? owner, ItemStack itemStack, Level level)
-			: base(DESCRIPTOR, level) {
+			: base(EntityType.ITEM, level) {
 			this.itemStack = itemStack;
 			this.owner = owner;
 		}

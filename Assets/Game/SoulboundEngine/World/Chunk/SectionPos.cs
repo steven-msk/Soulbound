@@ -13,5 +13,7 @@
 		}
 
 		public static int BlockToSectionY(int blockY) => blockY / ChunkSection.HEIGHT;
+
+		public static int BlockToSectionCoord(int coord) => coord / ChunkSection.WIDTH;
 	}
 }

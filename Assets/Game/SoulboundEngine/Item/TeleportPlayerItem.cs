@@ -1,9 +1,8 @@
+using SoulboundEngine.Common;
 using SoulboundEngine.Interaction;
-using SoulboundEngine.World.Player;
-using SoulboundEngine.Client.World;
 using SoulboundEngine.World.Block;
 using SoulboundEngine.World.Level;
-using SoulboundEngine.Common;
+using SoulboundEngine.World.Player;
 
 namespace SoulboundEngine.Item {
 	[PROTOTYPICAL]
@@ -14,7 +13,7 @@ namespace SoulboundEngine.Item {
 		public override IActionResult OnPrimaryUse(ItemStack stack, Level level, PlayerEntity player, BlockPos blockPos) {
 			if (level.GetBlock(blockPos) != Blocks.AIR) return IActionResult.PASS;
 
-			player.SetPosition(blockPos.GetCenter());
+			player.SetPos(blockPos.GetCenter());
 			return IActionResult.SUCCESS;
 		}
 	}

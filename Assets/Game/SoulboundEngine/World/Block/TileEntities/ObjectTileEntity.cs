@@ -1,5 +1,6 @@
 using SoulboundEngine.Client;
 using SoulboundEngine.Common;
+using SoulboundEngine.Common.Math;
 using SoulboundEngine.Common.Unity;
 using SoulboundEngine.World.Block.State;
 using SoulboundEngine.World.Player;
@@ -20,7 +21,8 @@ namespace SoulboundEngine.World.Block.Entity {
 		public ObjectTileEntity(TileEntityType<ObjectTileEntity> tileEntityType, BlockPos blockPos, BlockState blockState)
 			: base(tileEntityType, blockPos, blockState) {
 			this.gameObject = new GameObject("Object Tile Entity");
-			this.gameObject.transform.position = blockPos.GetCenter();
+			Vec2d center = blockPos.GetCenter();
+			this.gameObject.transform.position = new Vector3((float)center.x, (float)center.y);
 
 			CircleCollider2D collider = this.gameObject.AddComponent<CircleCollider2D>();
 			collider.isTrigger = true;

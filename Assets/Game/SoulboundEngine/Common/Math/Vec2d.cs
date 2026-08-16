@@ -331,6 +331,14 @@ namespace SoulboundEngine.Common.Math {
 			return dx * dx + dy * dy;
 		}
 
+		public static double Distance(Vec2d a, Vec2d b) {
+			return a.Distance(b);
+		}
+
+		public static double SqrDistance(Vec2d a, Vec2d b) {
+			return a.SqrDistance(b);
+		}
+
 		public Vec2d Normalize() {
 			return this.Normalize(ref this);
 		}
@@ -435,6 +443,10 @@ namespace SoulboundEngine.Common.Math {
 
 		public Vec2d Floor() {
 			return this.Floor(ref this);
+		}
+
+		public Vec2i FloorToInt() {
+			return this.Floor().ToVec2i();
 		}
 
 		public readonly Vec2d Floor(ref Vec2d destination) {

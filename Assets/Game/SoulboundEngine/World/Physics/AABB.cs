@@ -276,8 +276,8 @@ namespace SoulboundEngine.World.Physics {
 			return Maths.LengthSqr(dx, dy);
 		}
 
-		public Vec2d GetMin() => new(this.minX, this.minY);
-		public Vec2d GetMax() => new(this.maxX, this.maxY);
+		public Vec2d Min => new(this.minX, this.minY);
+		public Vec2d Max => new(this.maxX, this.maxY);
 
 		public bool HasNaN() {
 			return double.IsNaN(this.minX)

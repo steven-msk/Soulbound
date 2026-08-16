@@ -1,6 +1,5 @@
 namespace SoulboundEngine.Client.Render.Item {
 	using SoulboundEngine.Item;
-	using SoulboundEngine;
 	using System;
 	using TMPro;
 	using UnityEngine;
@@ -68,7 +67,7 @@ namespace SoulboundEngine.Client.Render.Item {
 					case ItemRenderContext.World world: {
 							GameObject obj = new("Item");
 							obj.SetActive(false);
-							obj.transform.position = world.position;
+							obj.transform.position = new Vector3((float)world.position.x, (float)world.position.y);
 							obj.transform.localScale = model.GetScaleToWorldSize(Vector2.one);
 
 							Sprite sprite = model.GetSprite();

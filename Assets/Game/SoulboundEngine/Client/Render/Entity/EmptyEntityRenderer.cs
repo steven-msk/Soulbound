@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SoulboundEngine.Common.Math;
+using UnityEngine;
 
 namespace SoulboundEngine.Client.Render.Entity {
 	using Entity = SoulboundEngine.World.Entity.Entity;
@@ -14,7 +15,8 @@ namespace SoulboundEngine.Client.Render.Entity {
 
 		public override IEntityView CreateView(EntityRenderState<E> state, EntityModel model) {
 			GameObject obj = new("Entity");
-			obj.transform.position = state.entity.GetPosition();
+			Vec2d pos = state.entity.GetPosition();
+			obj.transform.position = new Vector3((float)pos.x, (float)pos.y);
 			return IEntityView.Of(obj);
 		}
 

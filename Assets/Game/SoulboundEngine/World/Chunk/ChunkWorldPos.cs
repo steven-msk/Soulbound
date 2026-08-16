@@ -1,3 +1,4 @@
+using SoulboundEngine.Common.Math;
 using SoulboundEngine.World.Block;
 using UnityEngine;
 
@@ -5,19 +6,19 @@ namespace SoulboundEngine.World.Chunk {
 	using Level = Level.Level;
 
 	public struct ChunkWorldPos {
-		public float x;
-		public float y;
+		public double x;
+		public double y;
 		public int chunkX;
 
-		public ChunkWorldPos(float x, float y, int chunkX) {
+		public ChunkWorldPos(double x, double y, int chunkX) {
 			this.x = x;
 			this.y = y;
 			this.chunkX = chunkX;
 		}
 
         public static ChunkWorldPos FromBlockPos(BlockPos blockPos) {
-			int chunkX = Mathf.FloorToInt((float)blockPos.x / Level.CHUNK_LENGTH);
-			float localX = blockPos.x - chunkX * Level.CHUNK_LENGTH;
+			int chunkX = Maths.FloorToInt((double)blockPos.x / Level.CHUNK_LENGTH);
+			double localX = blockPos.x - chunkX * Level.CHUNK_LENGTH;
 			return new ChunkWorldPos(localX, blockPos.y, chunkX);
 		}
 
@@ -34,9 +35,9 @@ namespace SoulboundEngine.World.Chunk {
 
 		public override readonly string ToString() => $"cwx:{this.x}, cwy:{this.y}, c:{this.chunkX}";
 
-		public readonly BlockPos ToWorldBlockPos() {
-			Vector2 pos = new(this.x + this.chunkX * Level.CHUNK_LENGTH, this.y);
-			return (BlockPos)pos;
+		public readonly BlockPos ToBlockPos() {
+			Vec2d pos = new(this.x + this.chunkX * Level.CHUNK_LENGTH, this.y);
+			return BlockPos.From(pos);
 		}
 
 		public override readonly bool Equals(object obj) {

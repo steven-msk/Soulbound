@@ -1,10 +1,10 @@
+using SoulboundEngine.Common.Math;
 using SoulboundEngine.Item;
 using SoulboundEngine.Item.Container;
 using SoulboundEngine.World.Entity;
 using SoulboundEngine.World.Level;
 using SoulboundEngine.World.Player;
 using System;
-using UnityEngine;
 
 #nullable enable
 
@@ -49,7 +49,7 @@ namespace SoulboundEngine.World.Services {
 			this._inventory = new RuntimeInventoryExecutionService(player.GetInventory());
 		}
 
-		public void SetPos(Vector2 pos) => this.player.SetPosition(pos);
+		public void SetPos(Vec2d pos) => this.player.SetPos(pos);
 
 		public bool TryAddItemStack(ItemStack itemStack) => this.player.TryAddItemStack(itemStack);
 	}
@@ -77,9 +77,9 @@ namespace SoulboundEngine.World.Services {
 			this.entityManager.AddEntity(entity);
 		}
 
-		public void SetPos(Guid entityGuid, Vector2 pos) {
+		public void SetPos(Guid entityGuid, Vec2d pos) {
 			if (this.entityManager.TryGetEntity(entityGuid, out Entity entity)) {
-				entity.SetPosition(pos);
+				entity.SetPos(pos);
 			}
 		}
 	}

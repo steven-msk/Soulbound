@@ -1,3 +1,4 @@
+using SoulboundEngine.Common.Math;
 using SoulboundEngine.Item.Container;
 using SoulboundEngine.Registry;
 using SoulboundEngine.World.Entity;
@@ -6,7 +7,6 @@ using SoulboundEngine.World.Player;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 #nullable enable
 
@@ -46,7 +46,7 @@ namespace SoulboundEngine.World.Services {
 
 		public Identifier GetIdentifier() => EntityDescriptor.GetIdentifier(this.player.GetDescriptor());
 
-		public Vector2 GetPos() => this.player.GetPosition();
+		public Vec2d GetPos() => this.player.GetPosition();
 
 		public InventoryData GetInventory() {
 			IInventory inventory = this.player.GetInventory();
@@ -93,7 +93,7 @@ namespace SoulboundEngine.World.Services {
 
 			public Identifier GetIdentifier() => EntityDescriptor.GetIdentifier(this.entity.GetDescriptor());
 
-			public Vector2 GetPos() => this.entity.GetPosition();
+			public Vec2d GetPos() => this.entity.GetPosition();
 
 			public override string ToString() {
 				return $"entity:{this.GetIdentifier()}/{this.GetGuid()}";

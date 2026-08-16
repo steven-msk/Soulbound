@@ -13,7 +13,7 @@ namespace SoulboundEngine.Client.Render.Entity {
 
 		public override ItemEntityRenderState CreateRenderState(ItemEntity entity) {
 			return new ItemEntityRenderState {
-				descriptor = ItemEntity.DESCRIPTOR,
+				descriptor = EntityType.ITEM,
 				entity = entity,
 				stack = entity.GetStack()
 			};

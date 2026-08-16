@@ -1,16 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace SoulboundEngine.Client.Debug.Commands {
 	public struct Coordinate {
 		public bool isRelative;
-		public float value;
+		public double value;
 
-		public readonly float GetPos(float relative) {
-			return isRelative ? relative + value : value;
+		public readonly double GetPos(double relative) {
+			return this.isRelative ? relative + this.value : this.value;
 		}
 	}
 }

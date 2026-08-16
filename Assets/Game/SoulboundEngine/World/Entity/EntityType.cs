@@ -5,11 +5,8 @@ using SoulboundEngine.World.Player;
 
 namespace SoulboundEngine.World.Entity {
 	public static class EntityType {
-
-		// TODO: move out transform supplier logic into Unity adapters layer
-
-		public static readonly EntityDescriptor<PlayerEntity> PLAYER = Register("player", PlayerEntity.DESCRIPTOR);
-		public static readonly EntityDescriptor<ItemEntity> ITEM = Register("item", ItemEntity.DESCRIPTOR);
+		public static readonly EntityDescriptor<PlayerEntity> PLAYER = Register("player", EntityDescriptor<PlayerEntity>.Builder.OfNothing());
+		public static readonly EntityDescriptor<ItemEntity> ITEM = Register("item", EntityDescriptor<ItemEntity>.Builder.OfNothing());
 
 		//public static readonly EntityDescriptor<MovingEntity> MOVING_ENTITY = Register(
 		//	"moving_entity",
@@ -54,12 +51,16 @@ namespace SoulboundEngine.World.Entity {
 		//	})
 		//);
 
-		private static EntityDescriptor<E> Register<E>(string id, EntityDescriptor<E> descriptor) where E : Entity {
-			return Registry<EntityDescriptor>.Register(Registries.ENTITIES, KeyOf(id), descriptor);
+		private static EntityDescriptor<E> Register<E>(string id, EntityDescriptor<E>.Builder builder) where E : Entity {
+			return Register(KeyOf(id), builder);
 		}
 
-		private static EntityDescriptor<E> Register<E>(string id, EntityDescriptor<E>.EntityFactory factory) where E : Entity {
-			return Register(id, EntityDescriptor.Of(factory));
+		private static EntityDescriptor<E> Register<E>(RegistryKey<EntityDescriptor> key, EntityDescriptor<E>.Builder builder) where E : Entity {
+			return Register(key, builder.Build());
+		}
+
+		private static EntityDescriptor<E> Register<E>(RegistryKey<EntityDescriptor> key, EntityDescriptor<E> descriptor) where E : Entity {
+			return Registry<EntityDescriptor>.Register(Registries.ENTITIES, key, descriptor);
 		}
 
 		private static RegistryKey<EntityDescriptor> KeyOf(string id) {

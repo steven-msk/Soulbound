@@ -1,4 +1,5 @@
 using SoulboundEngine.Client.UI.UXMLBindings;
+using SoulboundEngine.Common.Math;
 using SoulboundEngine.Registry;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -31,7 +32,7 @@ namespace SoulboundEngine.Client.Render.Item {
 		}
 
 		public sealed class World : ItemRenderContext {
-			public Vector3 position;
+			public Vec2d position;
 		}
 	}
 }
