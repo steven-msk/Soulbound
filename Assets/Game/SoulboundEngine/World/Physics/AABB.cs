@@ -96,8 +96,8 @@ namespace SoulboundEngine.World.Physics {
 			return new AABB(minX, minY, maxX, maxY);
 		}
 
-		public AABB Inflate(double amount) => this.Inflate(amount, amount);
-		public AABB Inflate(double xAdd, double yAdd) {
+		public AABB Stretch(double amount) => this.Stretch(amount, amount);
+		public AABB Stretch(double xAdd, double yAdd) {
 			double minX = this.minX - xAdd;
 			double minY = this.minY - yAdd;
 			double maxX = this.maxX + xAdd;
@@ -105,8 +105,8 @@ namespace SoulboundEngine.World.Physics {
 			return new AABB(minX, minY, maxX, maxY);
 		}
 
-		public AABB Deflate(double xSub, double ySub) => this.Inflate(-xSub, -ySub);
-		public AABB Deflate(double amount) => this.Inflate(-amount);
+		public AABB Shrink(double xSub, double ySub) => this.Stretch(-xSub, -ySub);
+		public AABB Shrink(double amount) => this.Stretch(-amount);
 
 		public AABB Intersect(AABB other) {
 			double minX = Math.Max(this.minX, other.minX);
@@ -164,11 +164,11 @@ namespace SoulboundEngine.World.Physics {
 		public double GetXSize() => this.maxX - this.minX;
 		public double GetYSize() => this.maxY - this.minY;
 
-		public Vec2d? Clip(Vec2d from, Vec2d to) {
-			return Clip(this.minX, this.minY, this.maxX, this.maxY, from, to);
+		public Vec2d? Raycast(Vec2d from, Vec2d to) {
+			return Raycast(this.minX, this.minY, this.maxX, this.maxY, from, to);
 		}
 
-		public static Vec2d? Clip(double minX, double minY, double maxX, double maxY, Vec2d from, Vec2d to) {
+		public static Vec2d? Raycast(double minX, double minY, double maxX, double maxY, Vec2d from, Vec2d to) {
 			double[] scaleReference = new double[] { 1.0d };
 			double dx = to.x - from.x;
 			double dy = to.y - from.y;
@@ -236,11 +236,11 @@ namespace SoulboundEngine.World.Physics {
 			Vec2d to = from.Add(vector);
 
 			foreach (var aabb in boxes) {
-				AABB inflated = aabb.Inflate(this.GetXSize() * 0.5d - EPSILON, this.GetYSize() * 0.5d - EPSILON);
+				AABB inflated = aabb.Stretch(this.GetXSize() * 0.5d - EPSILON, this.GetYSize() * 0.5d - EPSILON);
 				if (inflated.Contains(to) || inflated.Contains(from)) {
 					return true;
 				}
-				if (inflated.Clip(from, to).HasValue) {
+				if (inflated.Raycast(from, to).HasValue) {
 					return true;
 				}
 			}
