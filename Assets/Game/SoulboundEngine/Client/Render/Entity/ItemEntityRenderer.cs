@@ -1,7 +1,5 @@
 ﻿using SoulboundEngine.Client.Render.Item;
-using SoulboundEngine.Common.Math;
 using SoulboundEngine.World.Entity;
-using SoulboundEngine.World.Physics;
 using System;
 using UnityEngine;
 
@@ -33,10 +31,6 @@ namespace SoulboundEngine.Client.Render.Entity {
 
 			GameObject obj = ((IItemView.GameObjectBacked)itemView).GetGameObject();
 			return EntityViewHandle.Of(obj);
-		}
-
-		protected override Vec2d ResolveUnityPosition(Vec2d entityPos, AABB boundingBox) {
-			return entityPos;
 		}
 	}
 }

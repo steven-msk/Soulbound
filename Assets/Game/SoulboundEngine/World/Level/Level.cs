@@ -209,6 +209,34 @@ namespace SoulboundEngine.World.Level {
 			return new BlockCollisionResolver(this, testBox);
 		}
 
+		public IEnumerable<AABB> GetEntityCollisions(Entity? source, AABB testBox) {
+			if (testBox.GetSize() < 1.0E-7) return new List<AABB>();
+
+			Predicate<Entity> canCollide = source == null ? Entity.CAN_BE_COLLIDED_WITH : e => e.CanBeCollidedWith(source);
+			List<Entity> collidingEntities = this.GetEntities(source, testBox.Stretch(1.0E-7), canCollide);
+			if (collidingEntities.Count == 0) return new List<AABB>();
+
+			List<AABB> colliders = new();
+			foreach (Entity entity in collidingEntities) {
+				colliders.Add(entity.boundingBox);
+			}
+			return colliders;
+		}
+
+		public List<Entity> GetEntities(Entity? except, AABB box, Predicate<Entity> selector) {
+			return this.GetEntities(except, e => e.boundingBox.Intersects(box) && selector(e));
+		}
+
+		public List<Entity> GetEntities(Entity? except, Predicate<Entity> selector) {
+			List<Entity> output = new();
+			foreach (var entity in this.GetAllEntities()) {
+				if (entity != except && selector(entity)) {
+					output.Add(entity);
+				}
+			}
+			return output;
+		}
+
 		public void OnChunkLoaded(Chunk chunk) {
 			this.chunkLoaded?.Invoke(chunk);
 		}

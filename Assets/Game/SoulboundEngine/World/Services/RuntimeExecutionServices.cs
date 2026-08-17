@@ -51,7 +51,7 @@ namespace SoulboundEngine.World.Services {
 
 		public void SetPos(Vec2d pos) => this.player.SetPos(pos);
 
-		public bool TryAddItemStack(ItemStack itemStack) => this.player.TryAddItemStack(itemStack);
+		public bool TryAddItemStack(ItemStack itemStack) => this.player.Take(itemStack).IsEmpty();
 	}
 
 	public class RuntimeInventoryExecutionService : IInventoryExecutionService {

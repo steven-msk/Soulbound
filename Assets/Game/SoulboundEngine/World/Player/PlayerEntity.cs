@@ -9,7 +9,9 @@ using SoulboundEngine.World.Block;
 using SoulboundEngine.World.Block.Entity;
 using SoulboundEngine.World.Block.State;
 using SoulboundEngine.World.Entity;
+using SoulboundEngine.World.Physics;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 #nullable enable
@@ -21,6 +23,8 @@ namespace SoulboundEngine.World.Player {
 
 	public class PlayerEntity : Entity {
 		const float MAX_BLOCK_REACH = 5f;
+		private const double PICKUP_BOX_STRETCH_X = 2.0d;
+		private const double PICKUP_BOX_STRETCH_Y = 1.0d;
 		private readonly SoulboundClient client;
 		private readonly PlayerInventory inventory;
 		private Vector2 screenPointerPos;
@@ -91,6 +95,19 @@ namespace SoulboundEngine.World.Player {
 			if (this.activeInventoryScreenHandler != null && !this.activeInventoryScreenHandler.CanUse(this)) {
 				this.CloseInventoryScreen();
 			}
+
+			List<Entity> collidedEntities = this.level.GetEntities(this, this.GetPickupArea(), ALL);
+			foreach (Entity entity in collidedEntities) {
+				this.Touch(entity);
+			}
+		}
+
+		private AABB GetPickupArea() {
+			return this.boundingBox.Stretch(PICKUP_BOX_STRETCH_X, PICKUP_BOX_STRETCH_Y);
+		}
+
+		private void Touch(Entity entity) {
+			entity.PlayerTouch(this);
 		}
 
 		public override float GetSpeed() => 0.1f;
@@ -339,10 +356,12 @@ namespace SoulboundEngine.World.Player {
 			this.DropStack(this.level, thrownStack);
 		}
 
-		public bool TryAddItemStack(ItemStack itemStack) {
-			bool consumed = this.inventory.TryAddStack(ref itemStack);
-			this.activeInventoryScreenHandler?.OnContentChanged(this.inventory);
-			return consumed;
+		public ItemStack Take(ItemStack itemStack) {
+			ItemStack original = itemStack;
+			if (this.inventory.TryAddStack(ref itemStack) || original.count != itemStack.count) {
+				this.activeInventoryScreenHandler?.OnContentChanged(this.inventory);
+			}
+			return itemStack;
 		}
 
 		public bool CanPlaceBlockAt(BlockPos blockPos) {

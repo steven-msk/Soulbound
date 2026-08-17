@@ -4,9 +4,9 @@ using SoulboundEngine.World.Block;
 using SoulboundEngine.World.Block.State;
 using SoulboundEngine.World.Chunk;
 using SoulboundEngine.World.Physics;
+using SoulboundEngine.World.Player;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 #nullable enable
 
@@ -18,6 +18,8 @@ namespace SoulboundEngine.World.Entity {
 		public const double DEFAULT_BB_HEIGHT = 2.0d;
 		public const float DEFAULT_BLOCK_FRICTION = 0.6f;
 		public const float CONSTANT_DECELERATION = 0.91f;
+		public static readonly Predicate<Entity> CAN_BE_COLLIDED_WITH = e => e.CanBeCollidedWith(null);
+		public static readonly Predicate<Entity> ALL = _ => true;
 		private readonly EntityDescriptor descriptor;
 		private readonly EntityDimensions dimensions;
 		protected Level level;
@@ -152,6 +154,12 @@ namespace SoulboundEngine.World.Entity {
 			return movement;
 		}
 
+		public void ApplyGravity() {
+			double gravity = this.GetAppliedGravity();
+			if (gravity == 0.0d) return;
+			this.SetDeltaMovement(this.GetDeltaMovement().Add(0.0d, -gravity));
+		}
+
 		public void Move(Vec2d delta) {
 			if (this.noPhysics) {
 				this.SetPos(this.position.x + delta.x, this.position.y + delta.y);
@@ -183,10 +191,17 @@ namespace SoulboundEngine.World.Entity {
 			if (movement.lengthSqr < 1.0E-7) return movement;
 
 			AABB box = this.boundingBox;
-			List<AABB> colliders = this.level.GetBlockCollisionBoxes(box.ExpandBy(movement)).ToList();
+			List<AABB> colliders = CollectColliders(this, this.level, box.ExpandBy(movement));
 			if (colliders.Count == 0) return movement;
 
 			return CollideWithShapes(movement, box, colliders);
+		}
+
+		public static List<AABB> CollectColliders(Entity? entity, Level level, AABB box) {
+			List<AABB> list = new();
+			list.AddRange(level.GetBlockCollisionBoxes(box));
+			list.AddRange(level.GetEntityCollisions(entity, box));
+			return list;
 		}
 
 		private static Vec2d CollideWithShapes(Vec2d movement, AABB box, IEnumerable<AABB> colliders) {
@@ -229,8 +244,19 @@ namespace SoulboundEngine.World.Entity {
 			return delta;
 		}
 
+		public virtual void PlayerTouch(PlayerEntity player) {
+		}
+
 		public BlockState GetInBlockState() {
 			return this.inBlockState ??= this.level.GetBlockState(this.blockPosition);
+		}
+
+		public virtual bool CanCollideWith(Entity entity) {
+			return entity.CanBeCollidedWith(this);
+		}
+
+		public virtual bool CanBeCollidedWith(Entity? other) {
+			return false;
 		}
 
 		public void SetBoundingBox(AABB box) {

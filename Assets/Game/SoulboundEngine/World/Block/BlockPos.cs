@@ -57,7 +57,9 @@ namespace SoulboundEngine.World.Block {
             return new BlockPos(pos.x / scalar, pos.y / scalar);
         }
 
-        public readonly Vec2d GetCenter() => new(this.x + 0.5f, this.y + 0.5f);
+        public readonly Vec2d GetCenter() => new(this.x + 0.5d, this.y + 0.5d);
+
+		public readonly Vec2d GetBottomCenter() => new(this.x + 0.5d, this.y);
 
 		public override readonly bool Equals(object obj) {
             if (obj is BlockPos other) {

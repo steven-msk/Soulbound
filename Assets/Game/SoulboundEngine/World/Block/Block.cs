@@ -1,17 +1,17 @@
-using SoulboundEngine.Item;
-using SoulboundEngine.Registry;
-using SoulboundEngine.States;
-using SoulboundEngine.World.Block.State;
-using SoulboundEngine.World.Entity;
-using SoulboundEngine.World.Player;
-using System;
-using System.Collections.Generic;
 
-#nullable enable
 
 namespace SoulboundEngine.World.Block {
-	using Item = Item.Item;
-	using Level = Level.Level;
+	using SoulboundEngine.Item;
+	using SoulboundEngine.Registry;
+	using SoulboundEngine.States;
+	using SoulboundEngine.World.Block.State;
+	using SoulboundEngine.World.Entity;
+	using SoulboundEngine.World.Level;
+	using SoulboundEngine.World.Player;
+	using System;
+	using System.Collections.Generic;
+
+#nullable enable
 
 	public class Block : AbstractBlock {
 		private static readonly List<BlockState> statesByID = new();
@@ -78,7 +78,7 @@ namespace SoulboundEngine.World.Block {
 
 			foreach (var stack in droppedStacks) {
 				ItemEntity itemEntity = new(owner, stack, level);
-				itemEntity.SetPos(blockPos.GetCenter());
+				itemEntity.SetPos(blockPos.GetBottomCenter());
 				level.AddEntity(itemEntity);
 			}
 		}
