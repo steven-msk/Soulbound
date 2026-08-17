@@ -4,27 +4,22 @@ using UnityEngine.UIElements;
 namespace SoulboundEngine.Client.Render.Item {
 	public interface IItemView {
 		void SetVisible(bool visible);
-		void Destroy();
 		bool IsValid();
 		void SetPosition(Vector2 pos);
 
 		public static IItemView Of(GameObject gameObject) {
-			return new GameObjectImpl(gameObject);
+			return new GameObjectBacked(gameObject);
 		}
 
 		public static IItemView Of(VisualElement visualElement) {
-			return new VisualElementImpl(visualElement);
+			return new VisualElementBacked(visualElement);
 		}
 
-		public sealed class GameObjectImpl : IItemView {
+		public sealed class GameObjectBacked : IItemView {
 			private readonly GameObject gameObject;
 
-			public GameObjectImpl(GameObject gameObject) {
+			public GameObjectBacked(GameObject gameObject) {
 				this.gameObject = gameObject;
-			}
-
-			public void Destroy() {
-				if (this.gameObject != null) GameObject.Destroy(this.gameObject);
 			}
 
 			bool IItemView.IsValid() => this.gameObject != null;
@@ -40,14 +35,12 @@ namespace SoulboundEngine.Client.Render.Item {
 			public GameObject GetGameObject() => this.gameObject;
 		}
 
-		public sealed class VisualElementImpl : IItemView {
+		public sealed class VisualElementBacked : IItemView {
 			private readonly VisualElement visualElement;
 
-			public VisualElementImpl(VisualElement visualElement) {
+			public VisualElementBacked(VisualElement visualElement) {
 				this.visualElement = visualElement;
 			}
-
-			void IItemView.Destroy() => this.visualElement?.RemoveFromHierarchy();
 
 			bool IItemView.IsValid() => this.visualElement != null;
 

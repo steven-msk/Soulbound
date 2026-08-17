@@ -1,4 +1,6 @@
-﻿using SoulboundEngine.Interaction;
+﻿using SoulboundEngine.Common.Math;
+using SoulboundEngine.Common.Math.Random;
+using SoulboundEngine.Interaction;
 using SoulboundEngine.Item.Container;
 using SoulboundEngine.Loot;
 using SoulboundEngine.World.Block.Entity;
@@ -26,23 +28,20 @@ namespace SoulboundEngine.World.Block {
 		protected override void OnStateReplaced(BlockState state, BlockPos pos, Level level) {
 			ChestTileEntity chestTileEntity = (ChestTileEntity)level.GetTileEntity(pos);
 			foreach (var stack in chestTileEntity) {
-				ItemEntity itemEntity = new(stack, level);
-				itemEntity.SetPosition(pos.GetCenter());
+				Vec2d p = pos.GetCenter();
+				ItemEntity itemEntity = new(level, p.x, p.y, stack);
+				itemEntity.SetPos(pos.GetCenter());
 				level.AddEntity(itemEntity);
 			}
 		}
 
 		public TileEntity CreateTileEntity(BlockPos pos, BlockState state) {
-			// PROTOTYPICAL
 			ChestTileEntity tileEntity = ChestTileEntity.Create(pos, state);
-			static long Mix(long a, long b) {
-				ulong x = unchecked((ulong)(a ^ b) + 0x9E3779B97F4A7C15UL);
-				x = (x ^ (x >> 30)) * 0xBF58476D1CE4E5B9UL;
-				x = (x ^ (x >> 27)) * 0x94D049BB133111EBUL;
-				return unchecked((long)(x ^ (x >> 31)));
-			}
-			long chestSeed = Mix(143261890564893, pos.GetHashCode());
+
+			// PROTOTYPICAL
+			long chestSeed = RandomProvider.Mix(143261890564893, pos.GetHashCode());
 			tileEntity.SetLootTable(LootTables.CHEST_TEST, chestSeed);
+
 			return tileEntity;
 		}
 	}

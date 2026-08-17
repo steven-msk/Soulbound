@@ -52,9 +52,9 @@ namespace SoulboundEngine.Common.Math {
 			};
 		}
 
-		public static Vector2Int AsVector2Int(this Direction direction) {
-			var (x, y) = direction.AsVector();
-			return new Vector2Int(x, y);
+		public static Vec2i AsVec2i(this Direction direction) {
+			(int x, int y) = direction.AsVector();
+			return new Vec2i(x, y);
 		}
 
 		public static Direction FromVector(int x, int y) {
@@ -90,6 +90,6 @@ namespace SoulboundEngine.Common.Math {
 			return null;
 		}
 
-		public static BlockPos GetAdjacent(this BlockPos blockPos, Direction direction) => blockPos + direction.AsVector2Int();
+		public static BlockPos GetAdjacent(this BlockPos blockPos, Direction direction) => blockPos + direction.AsVec2i();
 	}
 }

@@ -7,6 +7,7 @@ using SoulboundEngine.World.Block.State;
 using SoulboundEngine.World.Chunk;
 using SoulboundEngine.World.Entity;
 using SoulboundEngine.World.Gen;
+using SoulboundEngine.World.Physics;
 using SoulboundEngine.World.Player;
 using SoulboundEngine.World.Services;
 using System;
@@ -66,10 +67,10 @@ namespace SoulboundEngine.World.Level {
 			if (!this.isLoaded) {
 				throw new InvalidOperationException("Cannot start world session without initial load");
 			}
+			this.levelActive = true;
 			this.player = player;
 			this.AddEntity(player);
-			player.SetPosition(this.GetWorldSpawnPoint() + Vector2.up * 2f);
-			this.levelActive = true;
+			player.SetPos(this.GetWorldSpawnPoint() + Vec2d.UNIT_Y * 2.0d);
 		}
 
 		// known issue: inconsistent world update loop design
@@ -77,14 +78,16 @@ namespace SoulboundEngine.World.Level {
 			if (!this.IsLevelActive()) throw new InvalidOperationException("Cannot tick without an active session");
 
 			foreach (var pos in this.tickingBlocks.ToArray()) {
-				if (!simulationRect.Contains((Vector2Int)pos)) continue;
+				Vector2Int p = new(pos.x, pos.y);
+				if (!simulationRect.Contains(p)) continue;
 
 				BlockState blockState = this.GetBlockState(pos);
 				((ITickingBlock)blockState.block).Tick(this, pos, blockState);
 			}
 
 			foreach (var entity in this.GetAllEntities()) {
-				if (simulationRect.Contains(Vector2Int.FloorToInt(entity.GetPosition()))) {
+				Vec2i p = entity.GetPosition().FloorToInt();
+				if (simulationRect.Contains(new Vector2Int(p.x, p.y))) {
 					entity.Tick();
 				}
 			}
@@ -93,8 +96,8 @@ namespace SoulboundEngine.World.Level {
 			this.chunkManager.Tick(true);
 		}
 
-		public Vector2 GetWorldSpawnPoint() {
-			return new Vector2(0f, this.GetSurfaceAirY(0));
+		public Vec2d GetWorldSpawnPoint() {
+			return new Vec2d(0f, this.GetSurfaceAirY(0));
 		}
 
 		[PROTOTYPICAL]
@@ -164,12 +167,12 @@ namespace SoulboundEngine.World.Level {
 			entityRemoved?.Invoke(entity);
 		}
 
-		public void SpawnEntity<E>(EntityDescriptor<E> descriptor, Vector2 pos) where E : Entity {
+		public void SpawnEntity<E>(EntityDescriptor<E> descriptor, Vec2d pos) where E : Entity {
 			if (!this.IsLevelActive()) return;
 			descriptor.Create(this, pos);
 		}
 
-		void ILevelExecutionService.SpawnEntity(EntityDescriptor descriptor, Vector2 pos) {
+		void ILevelExecutionService.SpawnEntity(EntityDescriptor descriptor, Vec2d pos) {
 			if (!this.IsLevelActive()) return;
 			descriptor.CreateBoxed(this, pos);
 		}
@@ -179,17 +182,17 @@ namespace SoulboundEngine.World.Level {
 		}
 
 		/// <summary> Tries to get the closest entity at <c>worldPos</c> </summary>
-		public bool TryGetEntityAt(Vector2 worldPos, out Entity entity) {
+		public bool TryGetEntityAt(Vec2d worldPos, out Entity entity) {
 			entity = null!;
-			float closestDist = float.MaxValue;
+			double closestDist = double.MaxValue;
 
 			// linear scan over the entire entity list is fine to start
 			// if entity counts start becoming a bottleneck, switch to spatial hash or quadtree
 			// but for now its too much of a premature abstraction
 			foreach (var ent in this.entities.Values) {
-				if (!ent.GetBoundingBox().Contains(worldPos)) continue;
+				if (!ent.boundingBox.Contains(worldPos)) continue;
 
-				float dist = Vector2.Distance(worldPos, ent.GetCenter());
+				double dist = Vec2d.Distance(worldPos, ent.boundingBox.GetCenter());
 				if (dist < closestDist) {
 					entity = ent;
 					closestDist = dist;
@@ -200,6 +203,39 @@ namespace SoulboundEngine.World.Level {
 		}
 
 		public IEnumerable<Entity> GetAllEntities() => this.entities.Values.ToList();
+
+		public IEnumerable<AABB> GetBlockCollisionBoxes(AABB testBox) {
+			if (testBox.GetSize() < 1.0E-7) return new List<AABB>();
+			return new BlockCollisionResolver(this, testBox);
+		}
+
+		public IEnumerable<AABB> GetEntityCollisions(Entity? source, AABB testBox) {
+			if (testBox.GetSize() < 1.0E-7) return new List<AABB>();
+
+			Predicate<Entity> canCollide = source == null ? Entity.CAN_BE_COLLIDED_WITH : e => e.CanBeCollidedWith(source);
+			List<Entity> collidingEntities = this.GetEntities(source, testBox.Stretch(1.0E-7), canCollide);
+			if (collidingEntities.Count == 0) return new List<AABB>();
+
+			List<AABB> colliders = new();
+			foreach (Entity entity in collidingEntities) {
+				colliders.Add(entity.boundingBox);
+			}
+			return colliders;
+		}
+
+		public List<Entity> GetEntities(Entity? except, AABB box, Predicate<Entity> selector) {
+			return this.GetEntities(except, e => e.boundingBox.Overlaps(box) && selector(e));
+		}
+
+		public List<Entity> GetEntities(Entity? except, Predicate<Entity> selector) {
+			List<Entity> output = new();
+			foreach (var entity in this.GetAllEntities()) {
+				if (entity != except && selector(entity)) {
+					output.Add(entity);
+				}
+			}
+			return output;
+		}
 
 		public void OnChunkLoaded(Chunk chunk) {
 			this.chunkLoaded?.Invoke(chunk);
@@ -238,9 +274,9 @@ namespace SoulboundEngine.World.Level {
 			return () => new BlockStateContainer(ChunkSection.WIDTH, ChunkSection.HEIGHT);
 		}
 
-		public static int ChunkXAt(Vector2 worldPos) => ChunkXAt(worldPos.x);
+		public static int ChunkXAt(Vec2d worldPos) => ChunkXAt(worldPos.x);
 		public static int ChunkXAt(int x) => ChunkXAt((float)x);
-		public static int ChunkXAt(float x) => Mathf.FloorToInt(x / CHUNK_LENGTH);
+		public static int ChunkXAt(double x) => Maths.FloorToInt(x / CHUNK_LENGTH);
 
 		public static int ToWorldX(int cx, int chunkX) => cx + chunkX * CHUNK_LENGTH;
 		public static int ToChunkX(int x) => x - ChunkXAt(x) * CHUNK_LENGTH;
@@ -271,10 +307,10 @@ namespace SoulboundEngine.World.Level {
 
 		public int GetSurfaceAirY(int xpos) => this.GetSurfaceY(xpos) + 1;
 
-		public List<BlockPos> GetTilesCovered(Bounds bounds) {
+		public List<BlockPos> GetTilesCovered(AABB bounds) {
 			List<BlockPos> coveredTiles = new();
-			Vector2Int min = Vector2Int.FloorToInt(bounds.min);
-			Vector2Int max = Vector2Int.FloorToInt(bounds.max);
+			Vec2i min = bounds.Min.FloorToInt();
+			Vec2i max = bounds.Max.FloorToInt();
 
 			for (int x = min.x; x <= max.x; x++) {
 				for (int y = min.y; y <= max.y; y++) {

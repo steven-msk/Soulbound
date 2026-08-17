@@ -1,4 +1,5 @@
-﻿using SoulboundEngine.Client.Render.Item;
+﻿using SoulboundEngine.Client.Debug.Logging;
+using SoulboundEngine.Client.Render.Item;
 using SoulboundEngine.World.Entity;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ namespace SoulboundEngine.Client.Render.Entity {
 			this.modelFactorySupplier = EntityRenderers.GetModelFactorySupplier();
 		}
 
-		public IEntityView Render(Entity entity) {
+		public void Render(Entity entity) {
 			if (this.renderedEntities.ContainsKey(entity)) {
 				this.Destroy(entity);
 			}
@@ -32,24 +33,30 @@ namespace SoulboundEngine.Client.Render.Entity {
 			IEntityModelFactory.Context modelFactoryContext = new(this.scriptedEntityModelManager);
 			
 			EntityModel model = modelFactory.GetModel(modelFactoryContext);
-			object state = renderer.CreateRenderStateBoxed(entity);
+			object state = renderer.CreateRenderState(entity);
 
-			IEntityView view = renderer.CreateViewBoxed(state, model);
-			if (!view.IsValid()) return null;
+			EntityViewHandle handle = renderer.Create(state, model);
+			if (!handle.IsValid()) {
+				throw new InvalidOperationException("An invalid entity view handle was created");
+			}
 
-			this.renderedEntities[entity] = new RenderedEntity(entity, state, view);
-			return view;
+			this.renderedEntities[entity] = new RenderedEntity(state, handle);
 		}
 
 		public void Update(Entity entity) {
-			if (!this.renderedEntities.TryGetValue(entity, out RenderedEntity renderedEntity)) return;
+			if (!this.renderedEntities.TryGetValue(entity, out RenderedEntity renderedEntity)) {
+				Logger.LogWarning("Cannot update entity {} because it has not been created. Please call Render(Entity) first", entity);
+				return;
+			}
 
-			this.GetRenderer(entity).UpdateViewBoxed(renderedEntity.state, renderedEntity.view);
+			EntityViewHandle handle = renderedEntity.handle;
+			this.GetRenderer(entity).Update(renderedEntity.state, handle);
 		}
 
 		public void Destroy(Entity entity) {
 			if (this.renderedEntities.Remove(entity, out RenderedEntity renderedEntity)) {
-				this.GetRenderer(entity).DestroyView(renderedEntity.view);
+				EntityViewHandle handle = renderedEntity.handle;
+				this.GetRenderer(entity).Destroy(in handle);
 			}
 		}
 
@@ -57,6 +64,6 @@ namespace SoulboundEngine.Client.Render.Entity {
 			return this.renderers[entity.GetDescriptor()];
 		}
 
-		internal sealed record RenderedEntity(Entity entity, object state, IEntityView view);
+		internal sealed record RenderedEntity(object state, in EntityViewHandle handle);
 	}
 }

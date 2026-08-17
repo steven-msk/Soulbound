@@ -19,6 +19,7 @@ using SoulboundEngine.Client.UI.Screen;
 using SoulboundEngine.Client.UI.UXMLBindings;
 using SoulboundEngine.Client.World;
 using SoulboundEngine.Client.World.Widget;
+using SoulboundEngine.Common.Math;
 using SoulboundEngine.Recipe;
 using SoulboundEngine.Registry;
 using SoulboundEngine.Serialization;
@@ -235,10 +236,10 @@ namespace SoulboundEngine.Client {
 						tilemap = sceneRoot.tilemap
 					};
 
+					this.player = session.levelManager.StartSession();
+
 					this.worldRenderer.SetLevel(session.level);
 					this.worldRenderer.SetTilemap(session.tilemap);
-
-					this.player = session.levelManager.StartSession();
 
 					this.activeWorldSession = session;
 					this.uiHandler.SetUIDocument(session.uiDocument);
@@ -324,7 +325,7 @@ namespace SoulboundEngine.Client {
 			return UnityEngine.Random.Range(int.MinValue, int.MaxValue);
 		}
 
-		public Vector2 ScreenToWorldPoint(Vector2 screenPoint) {
+		public Vec2d ScreenToWorldPoint(Vector2 screenPoint) {
 			//Canvas canvas = SoulboundClient.Instance.UIHandler.GetCanvas();
 			//RectTransform rootTransform = canvas.GetComponent<RectTransform>();
 			//bool inWorldPoint = RectTransformUtility.ScreenPointToWorldPointInRectangle(
@@ -337,7 +338,8 @@ namespace SoulboundEngine.Client {
 
 			Vector3 pos = screenPoint;
 			pos.z = -Camera.main.transform.position.z;
-			return Camera.main.ScreenToWorldPoint(pos);
+			pos = Camera.main.ScreenToWorldPoint(pos);
+			return new Vec2d(pos.x, pos.y);
 		}
 
 		public WorldWidgetHandle ShowWorldWidget<TContext>(WorldWidgetType<TContext> type, TContext context) where TContext : WorldWidgetContext {
@@ -351,6 +353,8 @@ namespace SoulboundEngine.Client {
 		public void DestroyWorldWidget(WorldWidgetHandle handle) {
 			this.worldWidgetManager.DestroyWidget(handle);
 		}
+
+		[Obsolete] public WorldSession? GetActiveWorldSession() => this.activeWorldSession;
 
 		public static SoulboundClient Instance => instance;
 		public InputManager InputManager => this.inputManager;

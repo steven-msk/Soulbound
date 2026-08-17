@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using SoulboundEngine.Common.Math;
 using SoulboundEngine.World.Block;
 using SoulboundEngine.World.Chunk;
 using SoulboundEngine.World.Level;
@@ -32,14 +33,6 @@ public class ChunkBlockPosTests {
     public void ToStringMethod_FormatsCorrectly() {
         var pos = new ChunkBlockPos(3, 4, 2);
         Assert.That(pos.ToString(), Is.EqualTo("cx:3, cy:4, c:2"));
-    }
-
-    [Test]
-    public void ConversionOperator_ToVector2Int_ReturnsCorrectValue() {
-        var pos = new ChunkBlockPos(7, 8, 0);
-        Vector2Int vec = (Vector2Int)pos;
-
-        Assert.That(vec, Is.EqualTo(new Vector2Int(7, 8)));
     }
 
     [Test]
@@ -81,10 +74,10 @@ public class ChunkBlockPosTests {
 
 	[Test]
 	public void FromWorldMethod_CalculatesValueCorrectly() {
-		var worldPos = new Vector2(18.5f, 6.2f);
+		var worldPos = new Vec2d(18.5d, 6.2d);
 		var chunkPos = ChunkBlockPos.FromWorld(worldPos);
 
-		Assert.That(chunkPos.y, Is.EqualTo(Mathf.FloorToInt(worldPos.y)));
+		Assert.That(chunkPos.y, Is.EqualTo(Maths.FloorToInt(worldPos.y)));
 		Assert.That(chunkPos.x, Is.EqualTo(18));
 		Assert.That(chunkPos.chunkX, Is.EqualTo(0));
 	}

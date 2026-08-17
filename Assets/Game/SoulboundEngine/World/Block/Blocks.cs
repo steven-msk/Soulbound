@@ -3,7 +3,7 @@ using System;
 
 namespace SoulboundEngine.World.Block {
 	public partial class Blocks {
-		public static readonly Block AIR = Register("air");
+		public static readonly Block AIR = Register("air", s => new AirBlock(s));
 		public static readonly Block GRASS = Register("grass");
 		public static readonly Block DIRT = Register("dirt");
 		public static readonly Block STONE = Register("stone", settings => settings.MinBreakLevel(1));
@@ -19,7 +19,6 @@ namespace SoulboundEngine.World.Block {
 		public static readonly Block PULSE_BLOCK = Register("pulse_block", settings => new PulseBlock(settings));
 		public static readonly Block SELF_DESTRUCT_BLOCK = Register("self_destruct_block", settings => new SelfDestructBlock(settings));
 		public static readonly Block MOVING_TICKING_BLOCK = Register("moving_ticking_block", settings => new MovingTickingBlock(settings));
-		public static readonly Block AREA_TRIGGER_BLOCK = Register("area_trigger_block", settings => new AreaTriggerBlock(settings));
 
 		private static Block Register(string id) {
 			return Register(id, Block.Create);

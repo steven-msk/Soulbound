@@ -1,43 +1,46 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-
 namespace SoulboundEngine.Common.Math {
+	using Math = System.Math;
+
 	public readonly struct Facing {
-		public readonly Vector2 direction;
-		public float x => direction.x;
-		public float y => direction.y;
-		public float angle => Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+		public static readonly Facing LEFT = new(-1.0d, 0.0d);
+		public static readonly Facing RIGHT = new(1.0d, 0.0d);
+		public static readonly Facing UP = new(0.0d, 1.0d);
+		public static readonly Facing DOWN = new(0.0d, -1.0d);
+		public readonly Vec2d direction;
 
-		public Facing(float x) {
-			direction = new Vector2(x, 0f).normalized;
+		public Facing(double x) {
+			this.direction = new Vec2d(x, 0f).Normalize();
 		}
 
-		public Facing(Vector2 direction) {
-			this.direction = direction.normalized;
+		public Facing(Vec2d vec) {
+			this.direction = vec.Normalize();
 		}
 
-		public Facing(float x, float y) {
-			this.direction = new Vector2(x, y).normalized;
+		public Facing(double x, double y) {
+			this.direction = new Vec2d(x, y).Normalize();
 		}
 
-		public static Facing FromAngle(float angleDeg) {
-			float rad = angleDeg * Mathf.Deg2Rad;
-			return new Facing(new Vector2(Mathf.Cos(rad), Mathf.Sin(rad)));
+		public static Facing FromAngle(double angleDeg) {
+			double rad = angleDeg * Maths.DEG_2_RAD;
+			return new Facing(new Vec2d(Math.Cos(rad), Math.Sin(rad)));
 		}
 
-		public static Facing FromScale(float signX) {
-			return new Facing(signX < 0 ? -1f : 0f, 0f);
+		public static Facing FromSignX(double x) {
+			return new Facing(Math.Sign(x), 0.0d);
 		}
 
-		public static Facing Left => new(-1f, 0f);
-		public static Facing Right => new(1f, 0f);
-		public static Facing Up => new(0f, 1f);
-		public static Facing Down => new(0f, -1f);
+		public static Facing FromSignY(double y) {
+			return new Facing(0.0d, Math.Sign(y));
+		}
 
-		public bool IsHorizontal => Mathf.Abs(direction.y) < 0.0001f;
+		public static Facing FromSign(double x, double y) {
+			return new Facing(Math.Sign(x), Math.Sign(y));
+		}
+
+		public double X => this.direction.x;
+		public double Y => this.direction.y;
+		public double AngleDeg => Math.Atan2(this.direction.y, this.direction.x) * Maths.RAD_2_DEG;
+		public double AngleRad => Math.Atan2(this.direction.y, this.direction.x);
+		public bool IsHorizontal => Math.Abs(this.direction.y) < 1.0E-5d;
 	}
 }

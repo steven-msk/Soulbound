@@ -1,6 +1,7 @@
 using SoulboundEngine.Client;
 using SoulboundEngine.Client.UI.Screen;
 using SoulboundEngine.Client.World.Widget;
+using SoulboundEngine.Common.Math;
 using SoulboundEngine.Interaction;
 using SoulboundEngine.Item;
 using SoulboundEngine.Item.Container;
@@ -8,7 +9,9 @@ using SoulboundEngine.World.Block;
 using SoulboundEngine.World.Block.Entity;
 using SoulboundEngine.World.Block.State;
 using SoulboundEngine.World.Entity;
+using SoulboundEngine.World.Physics;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 #nullable enable
@@ -19,14 +22,15 @@ namespace SoulboundEngine.World.Player {
 	using Level = Level.Level;
 
 	public class PlayerEntity : Entity {
-		public static readonly EntityDescriptor<PlayerEntity> DESCRIPTOR = EntityDescriptor.Of<PlayerEntity>((_, level) => throw new InvalidOperationException());
-		const float MAX_BLOCK_REACH = 5f;
+		private const double MAX_BLOCK_REACH = 5d;
+		private const double PICKUP_BOX_STRETCH_X = 1.5d;
+		private const double PICKUP_BOX_STRETCH_Y = 1.0d;
+		private const int DROP_PICKUP_DELAY = 75;
 		private readonly SoulboundClient client;
 		private readonly PlayerInventory inventory;
 		private Vector2 screenPointerPos;
 		private InventoryScreenHandler? activeInventoryScreenHandler;
 		private IScreenHandle? activeInventoryScreen;
-		private new readonly PlayerTransformAdapter transformAdapter;
 		private ActiveUseContext? activeItemUse;
 		private BlockPos previousPointerBlockPos;
 		private bool isHoldingLeft;
@@ -34,22 +38,13 @@ namespace SoulboundEngine.World.Player {
 		private bool isInventoryOpen;
 
 		public PlayerEntity(SoulboundClient client, Level level)
-			: base(DESCRIPTOR, level) {
+			: base(EntityType.PLAYER, level) {
 			this.client = client;
-			this.transformAdapter = new PlayerTransformAdapter(this);
 			this.inventory = new PlayerInventory();
 		}
 
 		public bool isJumping { get; private set; }
-
-		public void SetJumping(bool jumping) {
-			this.isJumping = jumping;
-			this.transformAdapter.SetJumping(jumping);
-		}
-
-		public void StopHorizontalMovement() {
-			this.SetNormalVelocityX(0f);
-		}
+		public float movementX { get; private set; }
 
 		public void OpenInventoryScreen(IInventoryScreenHandlerFactory handlerFactory) {
 			if (this.activeInventoryScreen != null) return;
@@ -76,7 +71,7 @@ namespace SoulboundEngine.World.Player {
 			if (!this.isInventoryOpen) {
 				this.OpenInventoryScreen(new DelegatedInventoryScreenHandlerFactory(
 					(inventory, _) => {
-						InventoryScreenHandlerContext context = InventoryScreenHandlerContext.Of(this.client, (BlockPos)this.GetPosition(), this.level);
+						InventoryScreenHandlerContext context = InventoryScreenHandlerContext.Of(this.client, BlockPos.From(this.GetPosition()), this.level);
 						return new PlayerInventoryScreenHandler(InventoryScreenHandlerType.PLAYER_INVENTORY, inventory, context);
 					}
 				));
@@ -86,6 +81,10 @@ namespace SoulboundEngine.World.Player {
 		}
 
 		public override void Tick() {
+			base.Tick();
+			Vec2d movementInput = new(this.movementX, 0.0d);
+			this.Travel(movementInput);
+
 			this.DoBlockHover();
 			this.CheckItemUse();
 			if (this.isHoldingLeft) this.OnLeftHoldTick();
@@ -94,7 +93,28 @@ namespace SoulboundEngine.World.Player {
 			if (this.activeInventoryScreenHandler != null && !this.activeInventoryScreenHandler.CanUse(this)) {
 				this.CloseInventoryScreen();
 			}
+
+			List<Entity> collidedEntities = this.level.GetEntities(this, this.GetPickupArea(), ALL);
+			foreach (Entity entity in collidedEntities) {
+				this.Touch(entity);
+			}
+
+			if (this.isJumping && this.IsOnGround()) {
+				this.JumpFromGround();
+			}
 		}
+
+		private AABB GetPickupArea() {
+			return this.boundingBox.Stretch(PICKUP_BOX_STRETCH_X, PICKUP_BOX_STRETCH_Y);
+		}
+
+		private void Touch(Entity entity) {
+			entity.PlayerTouch(this);
+		}
+
+		public override float GetSpeed() => 0.1f;
+
+		protected override double GetGravity() => 0.981d / SharedConstants.TICKS_PER_SECOND;
 
 		private void OnLeftHoldTick() {
 			this.HandleInteractTick(InteractionType.Primary);
@@ -115,8 +135,8 @@ namespace SoulboundEngine.World.Player {
 		}
 
 		private void DoBlockHover() {
-			Vector2 pointerPos = this.GetWorldPointerPos();
-			BlockPos pointerBlockPos = (BlockPos)pointerPos;
+			Vec2d pointerPos = this.GetWorldPointerPos();
+			BlockPos pointerBlockPos = BlockPos.From(pointerPos);
 			BlockState? currentState = this.level.GetBlockState(pointerBlockPos);
 
 			if (pointerBlockPos == this.previousPointerBlockPos) {
@@ -137,7 +157,7 @@ namespace SoulboundEngine.World.Player {
 					_ => throw new ArgumentException()
 				};
 			}
-			BlockPos blockPos = (BlockPos)this.GetWorldPointerPos();
+			BlockPos blockPos = BlockPos.From(this.GetWorldPointerPos());
 			if (this.activeItemUse?.type == type) this.HandleUseTick();
 			else if (this.activeItemUse == null && this.GetMainHandStack().ShouldContinueUse(type, this.level, this, blockPos)) {
 				getInteractAction(type)();
@@ -149,7 +169,7 @@ namespace SoulboundEngine.World.Player {
 					ItemStack.OnPrimaryUseOnEntity, ItemStack.OnPrimaryUseOnBlock, ItemStack.OnPrimaryUse,
 					AbstractBlock.AbstractBlockState.OnPrimaryUse, AbstractBlock.AbstractBlockState.OnPrimaryUseWithItem
 				)) {
-				this.TryBreakBlock((BlockPos)this.GetWorldPointerPos());
+				this.TryBreakBlock(BlockPos.From(this.GetWorldPointerPos()));
 			}
 		}
 
@@ -191,9 +211,9 @@ namespace SoulboundEngine.World.Player {
 			) {
 			this.CancelItemUse();
 
-			Vector2 interactionPoint = this.GetWorldPointerPos();
+			Vec2d interactionPoint = this.GetWorldPointerPos();
 
-			bool itemInteracted = ItemInteract(interactionPoint, this.GetMainHandStack(), this, itemOnEntity, itemOnBlock, itemInAir);
+			bool itemInteracted = ItemInteract(type, interactionPoint, this.GetMainHandStack(), this, itemOnEntity, itemOnBlock, itemInAir);
 			if (itemInteracted) {
 				ItemStack usedStack = this.GetMainHandStack().OnItemUsed(type, this.level, this);
 				this.SetMainHandStackInternal(usedStack);
@@ -206,14 +226,15 @@ namespace SoulboundEngine.World.Player {
 				return true;
 			}
 
-			BlockPos blockPos = (BlockPos)interactionPoint;
+			BlockPos blockPos = BlockPos.From(interactionPoint);
 			BlockState? blockState = this.level.GetBlockState(blockPos);
 			if (blockState == null) return false;
 			return BlockInteract(blockState, blockPos, this.GetMainHandStack(), this, blockUse, blockUseWithItem);
 		}
 
 		private static bool ItemInteract(
-				Vector2 interactionPoint,
+				InteractionType type,
+				Vec2d interactionPoint,
 				ItemStack stack,
 				PlayerEntity player,
 				Func<ItemStack, PlayerEntity, Entity, IActionResult> onEntity,
@@ -235,7 +256,7 @@ namespace SoulboundEngine.World.Player {
 				if (HandleActionResult(actionResult, player)) return true;
 			}
 
-			blockPos = (BlockPos)interactionPoint;
+			blockPos = BlockPos.From(interactionPoint);
 			IActionResult result = inAir(stack, player.level, player, blockPos);
 			if (result is IActionResult.PassToBlockAction) return false;
 			return HandleActionResult(result, player);
@@ -272,7 +293,7 @@ namespace SoulboundEngine.World.Player {
 			return false;
 		}
 
-		public bool CanInteractWithEntityAt(Vector2 pos, out Entity entity) {
+		public bool CanInteractWithEntityAt(Vec2d pos, out Entity entity) {
 			if (!this.IsInBlockReach(pos)) {
 				entity = null!;
 				return false;
@@ -280,8 +301,8 @@ namespace SoulboundEngine.World.Player {
 			return this.level.TryGetEntityAt(pos, out entity);
 		}
 
-		public bool CanInteractWithBlockAt(Vector2 pos, out BlockState blockState, out BlockPos blockPos) {
-			blockPos = (BlockPos)pos;
+		public bool CanInteractWithBlockAt(Vec2d pos, out BlockState blockState, out BlockPos blockPos) {
+			blockPos = BlockPos.From(pos);
 			BlockState? state = this.level.GetBlockState(blockPos);
 			if (state == null) {
 				blockState = null!;
@@ -294,8 +315,8 @@ namespace SoulboundEngine.World.Player {
 		}
 
 		private bool TryBreakBlock(BlockPos blockPos) {
-			if (!this.IsInBlockReach((Vector2)blockPos)) return false;
 			if (!Level.IsInBounds(blockPos)) return false;
+			if (!this.CanBreakBlockAt(blockPos)) return false;
 
 			BlockState blockState = this.level.GetBlockState(blockPos) ?? Blocks.AIR.DefaultState;
 			if (blockState.block == Blocks.AIR) return false;
@@ -309,6 +330,21 @@ namespace SoulboundEngine.World.Player {
 			Block.DropStacks(blockState, this.level, blockPos, null);
 			stack.Damage(1);
 			return true;
+		}
+
+		public void JumpFromGround() {
+			double jumpPower = this.GetJumpPower();
+			if (jumpPower > 1.0E-5) {
+				Vec2d movement = this.GetDeltaMovement();
+				this.SetDeltaMovement(movement.x, Math.Max(jumpPower, movement.y));
+			}
+			this.SetOnGround(false);
+		}
+
+		private double GetJumpPower() => 0.4d;
+
+		public void SetJumping(bool jumping) {
+			this.isJumping = jumping;
 		}
 
 		public WorldWidgetHandle ShowWorldWidget<TContext>(WorldWidgetType<TContext> type, TContext context) where TContext : WorldWidgetContext {
@@ -327,40 +363,41 @@ namespace SoulboundEngine.World.Player {
 			return this.client.OpenScreen(new SignEditScreen(signEntity));
 		}
 
-		public void ThrowFromMainHand(bool ctrl) {
+		public void DropMainHandItem(bool ctrl) {
 			ItemStack mainHandStack = this.GetMainHandStack();
 			if (mainHandStack.IsEmpty()) return;
 
 			int throwAmount = ctrl ? mainHandStack.count : 1;
 			ItemStack thrownStack = mainHandStack.CopyWithCount(throwAmount);
-			mainHandStack.Decrement(throwAmount);
+			this.SetMainHandStack(mainHandStack.DecrementBy(throwAmount));
 
-			this.DropStack(this.level, thrownStack);
+			ItemEntity itemEntity = this.DropStack(this.level, thrownStack);
+			itemEntity.SetPickupDelay(DROP_PICKUP_DELAY);
 		}
 
-		public bool TryAddItemStack(ItemStack itemStack) {
-			bool consumed = this.inventory.TryAddStack(ref itemStack);
-			this.activeInventoryScreenHandler?.OnContentChanged(this.inventory);
-			return consumed;
+		public ItemStack Take(ItemStack itemStack) {
+			ItemStack original = itemStack;
+			if (this.inventory.TryAddStack(ref itemStack) || original.count != itemStack.count) {
+				this.activeInventoryScreenHandler?.OnContentChanged(this.inventory);
+			}
+			return itemStack;
 		}
 
 		public bool CanPlaceBlockAt(BlockPos blockPos) {
-			Vector2 worldPos = (Vector2)blockPos;
+			Vec2d worldPos = blockPos.GetCenter();
 			return this.IsInBlockReach(worldPos)
-				   && this.level?.GetBlock(blockPos) == Blocks.AIR;
+				&& !this.boundingBox.Overlaps(blockPos)
+				&& this.level?.GetBlock(blockPos) == Blocks.AIR;
 		}
 
 		public bool CanBreakBlockAt(BlockPos blockPos) {
-			Vector2 worldPos = (Vector2)blockPos;
+			Vec2d worldPos = blockPos.GetCenter();
 			return this.IsInBlockReach(worldPos)
 				   && this.level?.GetBlock(blockPos) != Blocks.AIR;
 		}
 
-		public bool IsInBlockReach(Vector2 worldPos) {
-			float dist = Vector2.Distance(worldPos, this.GetCenter());
-			return dist <= MAX_BLOCK_REACH
-				&& !this.level.GetTilesCovered(this.GetBoundingBox())
-						 .Contains((BlockPos)worldPos);
+		public bool IsInBlockReach(Vec2d worldPos) {
+			return this.boundingBox.SqrDistanceTo(worldPos) <= MAX_BLOCK_REACH * MAX_BLOCK_REACH;
 		}
 
 		public PlayerInventory GetInventory() => this.inventory;
@@ -395,7 +432,7 @@ namespace SoulboundEngine.World.Player {
 		public void SetScreenPointerPos(Vector2 pos) => this.screenPointerPos = pos;
 
 		public Vector2 GetScreenPointerPos() => this.screenPointerPos;
-		public Vector2 GetWorldPointerPos() {
+		public Vec2d GetWorldPointerPos() {
 			// still "depends" on Unity internals, just hidden behind the client layer
 			// keep in mind PlayerEntity is at core layer, independent of UnityEngine
 			return this.client.ScreenToWorldPoint(this.screenPointerPos);
@@ -403,28 +440,8 @@ namespace SoulboundEngine.World.Player {
 
 		public bool IsUsingItem() => this.activeItemUse != null;
 
-		public void SetTransformHandle(IPlayerTransformHandle playerTransformHandle) {
-			this.transformAdapter.SetHandle(playerTransformHandle);
-		}
-
-		private sealed class PlayerTransformAdapter : TransformAdapter {
-			private IPlayerTransformHandle? transformHandle;
-
-			public PlayerTransformAdapter(PlayerEntity player)
-				: base(player) {
-			}
-
-			public void SetHandle(IPlayerTransformHandle? handle) {
-				this.transformHandle = handle;
-			}
-
-			public void SetJumping(bool jumping) {
-				this.transformHandle?.SetJumping(jumping);
-			}
-		}
-
-		public interface IPlayerTransformHandle {
-			void SetJumping(bool jumping);
+		public void SetMovementX(float movementX) {
+			this.movementX = movementX;
 		}
 	}
 }

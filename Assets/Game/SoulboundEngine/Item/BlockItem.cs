@@ -1,9 +1,8 @@
 using SoulboundEngine.Interaction;
-using SoulboundEngine.World.Player;
-using SoulboundEngine.Client.World;
 using SoulboundEngine.World.Block;
 using SoulboundEngine.World.Block.State;
 using SoulboundEngine.World.Level;
+using SoulboundEngine.World.Player;
 
 #nullable enable
 
@@ -28,11 +27,9 @@ namespace SoulboundEngine.Item {
 		}
 
 		public virtual IActionResult Place(ItemPlacementContext context) {
-			if (context.player == null) return IActionResult.PASS;
-			if (!context.player.IsInBlockReach(context.blockPos.GetCenter())) return IActionResult.PASS;
+			if (!context.player?.CanPlaceBlockAt(context.blockPos) ?? false) return IActionResult.PASS;
 
 			BlockState? placementState = this.GetPlacementState(context);
-
 			if (placementState == null || !this.CanPlace(context, placementState)) {
 				return IActionResult.FAIL;
 			}

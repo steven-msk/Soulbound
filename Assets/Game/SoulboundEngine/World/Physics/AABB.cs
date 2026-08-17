@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 namespace SoulboundEngine.World.Physics {
 	public readonly struct AABB : IEquatable<AABB> {
+		public static readonly AABB UNIT_SQUARE = UnitSquareFromLowerCorner(Vec2d.ZERO);
 		private const double EPSILON = 1.0E-7;
 		public readonly double minX;
 		public readonly double minY;
@@ -134,23 +135,29 @@ namespace SoulboundEngine.World.Physics {
 		public AABB Move(Vec2d pos) => this.Move(pos.x, pos.y);
 		public AABB Move(Vec2f pos) => this.Move(pos.x, pos.y);
 
-		public bool Intersects(AABB other) {
-			return this.Intersects(other.minX, other.minY, other.maxX, other.maxY);
+		public bool Overlaps(AABB other) {
+			return this.Overlaps(other.minX, other.minY, other.maxX, other.maxY);
 		}
-		public bool Intersects(double minX, double minY, double maxX, double maxY) {
+		public bool Overlaps(double minX, double minY, double maxX, double maxY) {
 			return this.minX < maxX && this.maxX > minX && this.minY < maxY && this.maxY > minY;
 		}
-		public bool Intersects(Vec2d min, Vec2d max) {
-			return this.Intersects(Math.Min(min.x, max.x), Math.Min(min.y, max.y), Math.Max(min.x, max.x), Math.Max(min.y, max.y));
+		public bool Overlaps(Vec2d min, Vec2d max) {
+			return this.Overlaps(Math.Min(min.x, max.x), Math.Min(min.y, max.y), Math.Max(min.x, max.x), Math.Max(min.y, max.y));
 		}
-		public bool Intersects(BlockPos pos) {
-			return this.Intersects(pos.x, pos.y, pos.x + 1, pos.y + 1);
+		public bool Overlaps(BlockPos pos) {
+			return this.Overlaps(pos.GetCorner(BlockPos.BOTTOM_LEFT_CORNER), pos.GetCorner(BlockPos.TOP_RIGHT_CORNER));
+		}
+
+		public bool OverlapsOnOtherAxis(Axis axis, AABB other) {
+			return axis.Is(Axis.X)
+				? this.minY < other.maxY && this.maxY > other.minY
+				: this.minX < other.maxX && this.maxX > other.minX;
 		}
 
 		public bool Contains(Vec2d pos) => this.Contains(pos.x, pos.y);
 		public bool Contains(Vec2f pos) => this.Contains(pos.x, pos.y);
 		public bool Contains(Vec2i pos) => this.Contains(pos.x, pos.y);
-		public bool Contains(BlockPos pos) => this.Contains(pos.x, pos.y);
+
 		public bool Contains(double x, double y) {
 			return x >= this.minX && x < this.maxX && y >= this.minY && y < this.maxY;
 		}
@@ -276,8 +283,8 @@ namespace SoulboundEngine.World.Physics {
 			return Maths.LengthSqr(dx, dy);
 		}
 
-		public Vec2d GetMin() => new(this.minX, this.minY);
-		public Vec2d GetMax() => new(this.maxX, this.maxY);
+		public Vec2d Min => new(this.minX, this.minY);
+		public Vec2d Max => new(this.maxX, this.maxY);
 
 		public bool HasNaN() {
 			return double.IsNaN(this.minX)

@@ -1,17 +1,18 @@
-using SoulboundEngine.Item;
-using SoulboundEngine.Registry;
-using SoulboundEngine.States;
-using SoulboundEngine.World.Block.State;
-using SoulboundEngine.World.Entity;
-using SoulboundEngine.World.Player;
-using System;
-using System.Collections.Generic;
 
-#nullable enable
 
 namespace SoulboundEngine.World.Block {
-	using Item = Item.Item;
-	using Level = Level.Level;
+	using SoulboundEngine.Common.Math;
+	using SoulboundEngine.Item;
+	using SoulboundEngine.Registry;
+	using SoulboundEngine.States;
+	using SoulboundEngine.World.Block.State;
+	using SoulboundEngine.World.Entity;
+	using SoulboundEngine.World.Level;
+	using SoulboundEngine.World.Player;
+	using System;
+	using System.Collections.Generic;
+
+#nullable enable
 
 	public class Block : AbstractBlock {
 		private static readonly List<BlockState> statesByID = new();
@@ -20,7 +21,7 @@ namespace SoulboundEngine.World.Block {
 		private BlockState defaultState;
 		protected StateManager<Block, BlockState> stateManager;
 
-		protected Block(AbstractBlock.Settings settings) {
+		public Block(AbstractBlock.Settings settings) {
 			this.settings = settings;
 			this.registryKey = settings.registryKey ?? throw new NotSupportedException("Block is not added to a registry");
 
@@ -58,6 +59,10 @@ namespace SoulboundEngine.World.Block {
 
 		public override RegistryKey<Block> GetKey() => this.registryKey;
 
+		protected override BlockShape GetShape(BlockState state, BlockPos blockPos, Level level) {
+			return BlockShape.FULL;
+		}
+
 		public virtual BlockState OnBreak(Level level, BlockPos blockPos, BlockState blockState, PlayerEntity player) {
 			return Blocks.AIR.DefaultState;
 		}
@@ -73,8 +78,9 @@ namespace SoulboundEngine.World.Block {
 			List<ItemStack> droppedStacks = GetDroppedStacks(blockState);
 
 			foreach (var stack in droppedStacks) {
-				ItemEntity itemEntity = new(owner, stack, level);
-				itemEntity.SetPosition(blockPos.GetCenter());
+				Vec2d pos = blockPos.GetBottomCenter();
+				ItemEntity itemEntity = new(level, pos.x, pos.y, stack);
+				if (owner != null) itemEntity.SetOwner(owner);
 				level.AddEntity(itemEntity);
 			}
 		}

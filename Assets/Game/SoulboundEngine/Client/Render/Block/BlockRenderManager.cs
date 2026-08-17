@@ -1,5 +1,4 @@
-﻿using SoulboundEngine.Client.World;
-using SoulboundEngine.World.Block;
+﻿using SoulboundEngine.World.Block;
 using SoulboundEngine.World.Block.State;
 using System.Collections.Generic;
 using UnityEngine;
@@ -35,6 +34,6 @@ namespace SoulboundEngine.Client.Render.Block {
 			this.Render(tilemap, blockPos, Blocks.AIR.DefaultState);
 		}
 
-		private Vector3Int ToTilemapPos(BlockPos blockPos) => (Vector3Int)blockPos;
+		private Vector3Int ToTilemapPos(BlockPos blockPos) => new(blockPos.x, blockPos.y);
 	}
 }

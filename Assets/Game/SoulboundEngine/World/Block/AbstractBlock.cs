@@ -18,6 +18,8 @@ namespace SoulboundEngine.World.Block {
 
 		public abstract RegistryKey<Block> GetKey();
 
+		protected abstract BlockShape GetShape(BlockState state, BlockPos blockPos, Level level);
+
 		protected virtual void OnStateReplaced(BlockState state, BlockPos pos, Level level) {
 		}
 
@@ -66,7 +68,7 @@ namespace SoulboundEngine.World.Block {
 			return false;
 		}
 
-		protected void OnPlace(Level level, BlockPos blockPos, BlockState oldState) {
+		protected virtual void OnPlace(Level level, BlockPos blockPos, BlockState oldState) {
 		}
 
 		public abstract class AbstractBlockState : State<Block, BlockState> {
@@ -74,6 +76,10 @@ namespace SoulboundEngine.World.Block {
 			}
 
 			protected abstract BlockState AsBlockState();
+
+			public BlockShape GetCollisionShape(BlockState state, Level level, BlockPos blockPos) {
+				return this.owner.GetShape(state, blockPos, level);
+			}
 
 			public List<ItemStack> GetDroppedStacks() {
 				return Block.GetDroppedStacks(this.AsBlockState());

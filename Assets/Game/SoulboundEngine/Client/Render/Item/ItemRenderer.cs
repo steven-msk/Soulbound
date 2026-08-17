@@ -1,6 +1,5 @@
 namespace SoulboundEngine.Client.Render.Item {
 	using SoulboundEngine.Item;
-	using SoulboundEngine;
 	using System;
 	using TMPro;
 	using UnityEngine;
@@ -21,7 +20,7 @@ namespace SoulboundEngine.Client.Render.Item {
 		public sealed class Default : ItemRenderer<ItemRenderState> {
 			public override ItemRenderState CreateRenderState(ItemStack stack, ItemRenderContext context) {
 				return new ItemRenderState {
-					showStackCount = (context is ItemRenderContext.UGUI || context is ItemRenderContext.UXML)
+					showStackCount = (context is ItemRenderContext.UGUI or ItemRenderContext.UXML)
 						&& stack.GetItem().IsStackable(),
 					stack = stack
 				};
@@ -68,22 +67,12 @@ namespace SoulboundEngine.Client.Render.Item {
 					case ItemRenderContext.World world: {
 							GameObject obj = new("Item");
 							obj.SetActive(false);
-							obj.transform.position = world.position;
+							obj.transform.position = new Vector3((float)world.position.x, (float)world.position.y);
 							obj.transform.localScale = model.GetScaleToWorldSize(Vector2.one);
 
 							Sprite sprite = model.GetSprite();
 							SpriteRenderer spriteRenderer = obj.AddComponent<SpriteRenderer>();
 							spriteRenderer.sprite = sprite;
-
-							Rigidbody2D rigidbody = obj.AddComponent<Rigidbody2D>();
-							rigidbody.sleepMode = RigidbodySleepMode2D.NeverSleep;
-							rigidbody.constraints = RigidbodyConstraints2D.FreezeRotation;
-
-							BoxCollider2D physicsCollider = obj.AddComponent<BoxCollider2D>();
-							physicsCollider.excludeLayers = LayerMask.GetMask(Layers.EntityCharacter);
-
-							BoxCollider2D pickupCollider = obj.AddComponent<BoxCollider2D>();
-							pickupCollider.isTrigger = true;
 
 							obj.SetActive(true);
 							return IItemView.Of(obj);
@@ -104,7 +93,10 @@ namespace SoulboundEngine.Client.Render.Item {
 					return;
 				}
 
-				view.Destroy();
+				if (context is ItemRenderContext.World or ItemRenderContext.UGUI) {
+					IItemView.GameObjectBacked objView = (IItemView.GameObjectBacked)view;
+					GameObject.Destroy(objView.GetGameObject());
+				}
 			}
 
 			public override void UpdateView(ItemRenderState state, IItemView view, ItemRenderContext context) {

@@ -1,5 +1,6 @@
 using SoulboundEngine.Client;
 using SoulboundEngine.Client.UI.Screen;
+using SoulboundEngine.Common.Math;
 using SoulboundEngine.World.Biome;
 using SoulboundEngine.World.Chunk;
 using SoulboundEngine.World.Gen;
@@ -43,7 +44,7 @@ namespace SoulboundEngine.World.Level {
 			if (!this.shouldTick || this.paused) return;
 
 			try {
-				Vector2 pivotPos = this.level.GetPlayer()?.GetPosition() ?? this.level.GetWorldSpawnPoint();
+				Vec2d pivotPos = this.level.GetPlayer()?.GetPosition() ?? this.level.GetWorldSpawnPoint();
 				this.level.Tick(this.GetRelativeSimulationRect(pivotPos));
 			} catch (Exception e) {
 				Logger.LogFatal(e);
@@ -56,10 +57,10 @@ namespace SoulboundEngine.World.Level {
 			this.level.OnSessionStop();
 		}
 
-		private RectInt GetRelativeSimulationRect(Vector2 pivot) {
+		private RectInt GetRelativeSimulationRect(Vec2d pivot) {
 			return new(
-				Mathf.FloorToInt(pivot.x) + simulationView.x,
-				Mathf.FloorToInt(pivot.y) + simulationView.y,
+				Maths.FloorToInt(pivot.x) + simulationView.x,
+				Maths.FloorToInt(pivot.y) + simulationView.y,
 				simulationView.width,
 				simulationView.height
 			);

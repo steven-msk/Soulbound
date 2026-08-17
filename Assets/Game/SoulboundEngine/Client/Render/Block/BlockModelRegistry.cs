@@ -3,7 +3,6 @@ using SoulboundEngine.World.Block;
 using SoulboundEngine.World.Block.State;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.Tilemaps;
 
 namespace SoulboundEngine.Client.Render.Block {
@@ -46,12 +45,6 @@ namespace SoulboundEngine.Client.Render.Block {
 			)));
 			Register(Blocks.SELF_DESTRUCT_BLOCK, _ => new BlockModel(ResolveTile("RedSquareTile")));
 			Register(Blocks.MOVING_TICKING_BLOCK, _ => new BlockModel(ResolveTile("WhiteSquareTile")));
-			Register(Blocks.AREA_TRIGGER_BLOCK, blockState => new BlockModel(
-				ResolveTile(new AssetKey("AreaTriggerTile")),
-				blockState.Get(AreaTriggerBlock.inArea)
-					? Color.red
-					: Color.green
-			));
 		}
 
 		public static void Register(Block block, Func<BlockState, BlockModel> factory) {

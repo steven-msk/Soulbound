@@ -1,5 +1,5 @@
-﻿using SoulboundEngine.World.Player;
-using SoulboundEngine.Client.Settings;
+﻿using SoulboundEngine.Client.Settings;
+using SoulboundEngine.World.Player;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -84,7 +84,7 @@ namespace SoulboundEngine.Client {
 			float movementX = 0f;
 			if (GameSettings.keybinds.moveLeft.IsPressed()) movementX -= 1f;
 			if (GameSettings.keybinds.moveRight.IsPressed()) movementX += 1f;
-			player.SetNormalVelocityX(movementX);
+			player.SetMovementX(movementX);
 		}
 
 		private void HandleJump(PlayerEntity player) {
@@ -95,7 +95,7 @@ namespace SoulboundEngine.Client {
 			// TODO: handle continuous item throw
 			while (GameSettings.keybinds.throwItem.WasPressed()) {
 				bool ctrl = this.client.InputManager.keyboard.IsPressed(Keyboard.GetControl(Key.LeftCtrl));
-				player.ThrowFromMainHand(ctrl);
+				player.DropMainHandItem(ctrl);
 			}
 		}
 

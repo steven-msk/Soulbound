@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using SoulboundEngine.Client.UI.Screen;
+using SoulboundEngine.Common.Math;
 using SoulboundEngine.Loot;
 using SoulboundEngine.Registry;
 using SoulboundEngine.World.Block;
@@ -7,7 +8,6 @@ using SoulboundEngine.World.Block.Entity;
 using SoulboundEngine.World.Block.State;
 using SoulboundEngine.World.Player;
 using System.Collections.Generic;
-using UnityEngine;
 
 #nullable enable
 
@@ -22,7 +22,7 @@ namespace SoulboundEngine.Item.Container {
 		}
 
 		public virtual bool CanPlayerUse(PlayerEntity player) {
-			return Vector2.Distance(player.GetPosition(), (Vector2)this.blockPos) <= MIN_USABLE_DISTANCE;
+			return Vec2d.Distance(player.GetPosition(), this.blockPos.GetCenter()) <= MIN_USABLE_DISTANCE;
 		}
 
 		protected abstract InventoryScreenHandler CreateScreenHandler(PlayerInventory playerInventory, PlayerEntity player);
