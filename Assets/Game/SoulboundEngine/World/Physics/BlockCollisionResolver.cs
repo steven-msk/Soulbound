@@ -35,8 +35,8 @@
 			while (this.cursor.Advance()) {
 				int x = this.cursor.NextX();
 				int y = this.cursor.NextY();
-				//int faceType = this.cursor.GetNextType();
-				//if (faceType == Cursor2D.CORNER || faceType == Cursor2D.EDGE) continue;
+				int faceType = this.cursor.GetNextType();
+				if (faceType == Cursor2D.CORNER || faceType == Cursor2D.EDGE) continue;
 
 				Chunk? chunk = this.level.ChunkAt(x);
 				if (chunk == null) continue;

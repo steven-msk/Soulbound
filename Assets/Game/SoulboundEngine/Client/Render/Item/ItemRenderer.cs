@@ -74,16 +74,6 @@ namespace SoulboundEngine.Client.Render.Item {
 							SpriteRenderer spriteRenderer = obj.AddComponent<SpriteRenderer>();
 							spriteRenderer.sprite = sprite;
 
-							Rigidbody2D rigidbody = obj.AddComponent<Rigidbody2D>();
-							rigidbody.sleepMode = RigidbodySleepMode2D.NeverSleep;
-							rigidbody.constraints = RigidbodyConstraints2D.FreezeRotation;
-
-							BoxCollider2D physicsCollider = obj.AddComponent<BoxCollider2D>();
-							physicsCollider.excludeLayers = LayerMask.GetMask(Layers.EntityCharacter);
-
-							BoxCollider2D pickupCollider = obj.AddComponent<BoxCollider2D>();
-							pickupCollider.isTrigger = true;
-
 							obj.SetActive(true);
 							return IItemView.Of(obj);
 						}
