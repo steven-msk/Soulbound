@@ -20,7 +20,7 @@ namespace SoulboundEngine.World.Block {
 		private BlockState defaultState;
 		protected StateManager<Block, BlockState> stateManager;
 
-		protected Block(AbstractBlock.Settings settings) {
+		public Block(AbstractBlock.Settings settings) {
 			this.settings = settings;
 			this.registryKey = settings.registryKey ?? throw new NotSupportedException("Block is not added to a registry");
 
@@ -57,6 +57,10 @@ namespace SoulboundEngine.World.Block {
 		protected sealed override Block AsBlock() => this;
 
 		public override RegistryKey<Block> GetKey() => this.registryKey;
+
+		protected override BlockShape GetShape(BlockState state, BlockPos blockPos, Level level) {
+			return BlockShape.FULL;
+		}
 
 		public virtual BlockState OnBreak(Level level, BlockPos blockPos, BlockState blockState, PlayerEntity player) {
 			return Blocks.AIR.DefaultState;

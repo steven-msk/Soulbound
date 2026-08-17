@@ -19,5 +19,9 @@
 		public bool Get(bool x, bool y) => this.isHorizontal ? x : y;
 
 		public double Get(double x, double y) => this.isHorizontal ? x : y;
+
+		public bool Is(Axis axis) {
+			return this.isHorizontal == axis.isHorizontal && this.positive == axis.positive;
+		}
 	}
 }

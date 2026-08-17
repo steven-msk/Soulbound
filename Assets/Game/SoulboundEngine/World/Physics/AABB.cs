@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 namespace SoulboundEngine.World.Physics {
 	public readonly struct AABB : IEquatable<AABB> {
+		public static readonly AABB UNIT_SQUARE = UnitSquareFromLowerCorner(Vec2d.ZERO);
 		private const double EPSILON = 1.0E-7;
 		public readonly double minX;
 		public readonly double minY;
@@ -122,6 +123,12 @@ namespace SoulboundEngine.World.Physics {
 			double maxX = Math.Max(this.maxX, other.maxX);
 			double maxY = Math.Max(this.maxY, other.maxY);
 			return new AABB(minX, minY, maxX, maxY);
+		}
+
+		public bool OverlapsOnOtherAxis(Axis axis, AABB other) {
+			return axis.Is(Axis.X)
+				? this.minY < other.maxY && this.maxY > other.minY
+				: this.minX < other.maxX && this.maxX > other.minX;
 		}
 
 		public AABB Move(double xa, double ya) {

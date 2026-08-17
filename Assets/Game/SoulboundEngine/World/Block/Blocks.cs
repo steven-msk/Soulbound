@@ -3,7 +3,7 @@ using System;
 
 namespace SoulboundEngine.World.Block {
 	public partial class Blocks {
-		public static readonly Block AIR = Register("air");
+		public static readonly Block AIR = Register("air", s => new AirBlock(s));
 		public static readonly Block GRASS = Register("grass");
 		public static readonly Block DIRT = Register("dirt");
 		public static readonly Block STONE = Register("stone", settings => settings.MinBreakLevel(1));

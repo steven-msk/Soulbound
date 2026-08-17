@@ -5,6 +5,8 @@ using SoulboundEngine.World.Block.State;
 using SoulboundEngine.World.Chunk;
 using SoulboundEngine.World.Physics;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 #nullable enable
 
@@ -177,12 +179,53 @@ namespace SoulboundEngine.World.Entity {
 			this.deltaMovement = new Vec2d(xCollision ? 0.0d : dm.x, yCollision ? 0.0d : dm.y);
 		}
 
-		// TODO: implement Entity.Collide(Vec2d)
 		private Vec2d Collide(Vec2d movement) {
-			return movement;
+			if (movement.lengthSqr < 1.0E-7) return movement;
+
+			AABB box = this.boundingBox;
+			List<AABB> colliders = this.level.GetBlockCollisionBoxes(box.ExpandBy(movement)).ToList();
+			if (colliders.Count == 0) return movement;
+
+			return CollideWithShapes(movement, box, colliders);
 		}
 
-		protected virtual Vec2d MaybeBackOffFromEdge(Vec2d delta) {
+		private static Vec2d CollideWithShapes(Vec2d movement, AABB box, IEnumerable<AABB> colliders) {
+			double resolvedX, resolvedY;
+			if (Math.Abs(movement.x) >= Math.Abs(movement.y)) {
+				resolvedX = ClampAxis(Axis.X, box, colliders, movement.x);
+				resolvedY = ClampAxis(Axis.Y, box.Move(resolvedX, 0.0d), colliders, movement.y);
+			} else {
+				resolvedY = ClampAxis(Axis.Y, box, colliders, movement.y);
+				resolvedX = ClampAxis(Axis.X, box.Move(0.0d, resolvedY), colliders, movement.x);
+			}
+			return new Vec2d(resolvedX, resolvedY);
+		}
+
+		private static double ClampAxis(Axis axis, AABB box, IEnumerable<AABB> colliders, double delta) {
+			if (Math.Abs(delta) < 1.0E-4) return 0.0d;
+
+			foreach (AABB collider in colliders) {
+				if (!box.OverlapsOnOtherAxis(axis, collider)) continue;
+				delta = axis.Is(Axis.X) ? ClampX(box, collider, delta) : ClampY(box, collider, delta);
+			}
+			return delta;
+		}
+
+		private static double ClampX(AABB box, AABB collider, double delta) {
+			if (delta > 0.0 && box.maxX <= collider.minX) {
+				delta = Math.Min(delta, collider.minX - box.maxX);
+			} else if (delta < 0.0 && box.minX >= collider.maxX) {
+				delta = Math.Max(delta, collider.maxX - box.minX);
+			}
+			return delta;
+		}
+
+		private static double ClampY(AABB box, AABB collider, double delta) {
+			if (delta > 0.0 && box.maxY <= collider.minY) {
+				delta = Math.Min(delta, collider.minY - box.maxY);
+			} else if (delta < 0.0 && box.minY >= collider.maxY) {
+				delta = Math.Max(delta, collider.maxY - box.minY);
+			}
 			return delta;
 		}
 

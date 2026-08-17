@@ -204,6 +204,11 @@ namespace SoulboundEngine.World.Level {
 
 		public IEnumerable<Entity> GetAllEntities() => this.entities.Values.ToList();
 
+		public IEnumerable<AABB> GetBlockCollisionBoxes(AABB testBox) {
+			if (testBox.GetSize() < 1.0E-7) return new List<AABB>();
+			return new BlockCollisionResolver(this, testBox);
+		}
+
 		public void OnChunkLoaded(Chunk chunk) {
 			this.chunkLoaded?.Invoke(chunk);
 		}
