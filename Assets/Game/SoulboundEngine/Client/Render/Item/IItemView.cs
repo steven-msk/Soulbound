@@ -4,7 +4,6 @@ using UnityEngine.UIElements;
 namespace SoulboundEngine.Client.Render.Item {
 	public interface IItemView {
 		void SetVisible(bool visible);
-		void Destroy();
 		bool IsValid();
 		void SetPosition(Vector2 pos);
 
@@ -21,10 +20,6 @@ namespace SoulboundEngine.Client.Render.Item {
 
 			public GameObjectBacked(GameObject gameObject) {
 				this.gameObject = gameObject;
-			}
-
-			public void Destroy() {
-				if (this.gameObject != null) GameObject.Destroy(this.gameObject);
 			}
 
 			bool IItemView.IsValid() => this.gameObject != null;
@@ -46,8 +41,6 @@ namespace SoulboundEngine.Client.Render.Item {
 			public VisualElementBacked(VisualElement visualElement) {
 				this.visualElement = visualElement;
 			}
-
-			void IItemView.Destroy() => this.visualElement?.RemoveFromHierarchy();
 
 			bool IItemView.IsValid() => this.visualElement != null;
 

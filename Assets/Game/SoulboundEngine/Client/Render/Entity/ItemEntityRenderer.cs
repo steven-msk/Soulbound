@@ -1,5 +1,7 @@
 ﻿using SoulboundEngine.Client.Render.Item;
+using SoulboundEngine.Common.Math;
 using SoulboundEngine.World.Entity;
+using SoulboundEngine.World.Physics;
 using System;
 using UnityEngine;
 
@@ -30,10 +32,11 @@ namespace SoulboundEngine.Client.Render.Entity {
 			if (!itemView.IsValid()) throw new InvalidOperationException("Cannot create entity view from invalid item view");
 
 			GameObject obj = ((IItemView.GameObjectBacked)itemView).GetGameObject();
-			//ItemEntityTransform transform = obj.AddComponent<ItemEntityTransform>();
-			//transform.Init(state.entity);
-
 			return EntityViewHandle.Of(obj);
+		}
+
+		protected override Vec2d ResolveUnityPosition(Vec2d entityPos, AABB boundingBox) {
+			return entityPos;
 		}
 	}
 }

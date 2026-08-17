@@ -20,7 +20,7 @@ namespace SoulboundEngine.Client.Render.Item {
 		public sealed class Default : ItemRenderer<ItemRenderState> {
 			public override ItemRenderState CreateRenderState(ItemStack stack, ItemRenderContext context) {
 				return new ItemRenderState {
-					showStackCount = (context is ItemRenderContext.UGUI || context is ItemRenderContext.UXML)
+					showStackCount = (context is ItemRenderContext.UGUI or ItemRenderContext.UXML)
 						&& stack.GetItem().IsStackable(),
 					stack = stack
 				};
@@ -93,7 +93,10 @@ namespace SoulboundEngine.Client.Render.Item {
 					return;
 				}
 
-				view.Destroy();
+				if (context is ItemRenderContext.World or ItemRenderContext.UGUI) {
+					IItemView.GameObjectBacked objView = (IItemView.GameObjectBacked)view;
+					GameObject.Destroy(objView.GetGameObject());
+				}
 			}
 
 			public override void UpdateView(ItemRenderState state, IItemView view, ItemRenderContext context) {

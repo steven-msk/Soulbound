@@ -6,7 +6,7 @@ using SoulboundEngine.World.Player;
 namespace SoulboundEngine.World.Entity {
 	public static class EntityType {
 		public static readonly EntityDescriptor<PlayerEntity> PLAYER = Register("player", EntityDescriptor<PlayerEntity>.Builder.OfNothing());
-		public static readonly EntityDescriptor<ItemEntity> ITEM = Register("item", EntityDescriptor<ItemEntity>.Builder.OfNothing());
+		public static readonly EntityDescriptor<ItemEntity> ITEM = Register("item", EntityDescriptor<ItemEntity>.Builder.OfNothing().Sized(1.0d, 1.0d));
 
 		//public static readonly EntityDescriptor<MovingEntity> MOVING_ENTITY = Register(
 		//	"moving_entity",
