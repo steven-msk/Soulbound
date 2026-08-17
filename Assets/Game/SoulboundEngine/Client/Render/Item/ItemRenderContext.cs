@@ -29,6 +29,10 @@ namespace SoulboundEngine.Client.Render.Item {
 			}
 
 			public Label GetStackCount() => this.root.Get<Label>(this.stackCountElement);
+
+			public void SetVisible(VisualElement visualElement, bool visible) {
+				visualElement.style.visibility = visible ? Visibility.Visible : Visibility.Hidden;
+			}
 		}
 
 		public sealed class World : ItemRenderContext {

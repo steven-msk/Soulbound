@@ -25,11 +25,11 @@ namespace SoulboundEngine.Client.Render.Entity {
 			ItemModel itemModel = this.itemRenderManager.GetModel(state.stack);
 
 			ItemRenderContext renderContext = new ItemRenderContext.World { position = state.entity.GetPosition() };
-			object itemRenderState = itemRenderer.CreateRenderStateBoxed(state.stack, renderContext);
-			IItemView itemView = itemRenderer.CreateViewBoxed(itemRenderState, itemModel, renderContext);
+			object itemRenderState = itemRenderer.InternalCreateRenderState(state.stack, renderContext);
+			ItemViewHandle itemView = itemRenderer.InternalCreate(itemRenderState, itemModel, renderContext);
 			if (!itemView.IsValid()) throw new InvalidOperationException("Cannot create entity view from invalid item view");
 
-			GameObject obj = ((IItemView.GameObjectBacked)itemView).GetGameObject();
+			GameObject obj = ((ItemViewHandle.GameObjectBacked)itemView).gameObject;
 			return EntityViewHandle.Of(obj);
 		}
 	}

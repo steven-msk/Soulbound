@@ -1,8 +1,9 @@
-using SoulboundEngine.World.Player;
+using SoulboundEngine.Client.Assets;
 using SoulboundEngine.Client.Render.Item;
 using SoulboundEngine.Client.UI.UXMLBindings;
-using SoulboundEngine.Client.Assets;
+using SoulboundEngine.Client.Util;
 using SoulboundEngine.Registry;
+using SoulboundEngine.World.Player;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -55,7 +56,7 @@ namespace SoulboundEngine.Item.Container {
 		private void UpdateViewPosition() {
 			Vector2 size = this.root.worldBound.size;
 			Vector2 pos = this.pointerPosition - size / 2f;
-			this.view?.SetPosition(pos);
+			this.view?.SetPosition(pos.ToVec2d());
 		}
 
 		IItemSlot IInventory.GetSlot(int index) => this.slot!;

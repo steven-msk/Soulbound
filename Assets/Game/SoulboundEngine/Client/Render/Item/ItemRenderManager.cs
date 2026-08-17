@@ -3,6 +3,8 @@ using SoulboundEngine.Item;
 using System;
 using System.Collections.Generic;
 
+#nullable enable
+
 namespace SoulboundEngine.Client.Render.Item {
 	using Item = SoulboundEngine.Item.Item;
 
@@ -16,17 +18,20 @@ namespace SoulboundEngine.Client.Render.Item {
 			this.renderers = ItemRenderers.LoadRenderers(items);
 		}
 
-		public IItemView Render(ItemRenderHandle handle, ItemStack stack, ItemRenderContext context) {
+		public ItemViewHandle? Render(ItemRenderHandle handle, ItemStack stack, ItemRenderContext context) {
 			if (this.rendered.ContainsKey(handle)) {
 				this.Destroy(handle, context);
 			}
 
 			ItemRenderer renderer = this.renderers[stack.GetItem()];
 			ItemModel model = this.GetModel(stack);
-			object state = renderer.CreateRenderStateBoxed(stack, context);
+			object state = renderer.InternalCreateRenderState(stack, context);
 
-			IItemView view = renderer.CreateViewBoxed(state, model, context);
-			if (!view.IsValid()) return null;
+			ItemViewHandle view = renderer.InternalCreate(state, model, context);
+			if (!view.IsValid()) {
+				renderer.Destroy(view, context);
+				return null;
+			}
 
 			this.rendered[handle] = new RenderedItem(stack.GetItem(), state, view, context);
 			return view;
@@ -34,13 +39,12 @@ namespace SoulboundEngine.Client.Render.Item {
 
 		public void Update(ItemRenderHandle handle) {
 			if (!this.rendered.TryGetValue(handle, out RenderedItem entry)) return;
-
-			this.GetRenderer(entry.item).UpdateViewBoxed(entry.state, entry.view, entry.context);
+			this.GetRenderer(entry.item).InternalUpdate(entry.state, entry.view, entry.context);
 		}
 
 		public void Destroy(ItemRenderHandle handle, ItemRenderContext context) {
 			if (!this.rendered.Remove(handle, out RenderedItem entry)) return;
-			this.GetRenderer(entry.item).DestroyView(entry.view, context);
+			this.GetRenderer(entry.item).Destroy(entry.view, context);
 		}
 
 		public ItemRenderer GetRenderer(Item item) {
@@ -51,6 +55,6 @@ namespace SoulboundEngine.Client.Render.Item {
 			return this.modelResolverFactory(stack.GetItem()).Resolve(stack);
 		}
 
-		internal sealed record RenderedItem(Item item, object state, IItemView view, ItemRenderContext context);
+		internal sealed record RenderedItem(Item item, object state, ItemViewHandle view, ItemRenderContext context);
 	}
 }
