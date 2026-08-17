@@ -12,19 +12,23 @@ namespace SoulboundEngine.World.Entity {
 		public const int LIFETIME = 6000;
 		public const int INFINITE_LIFETIME = -1;
 		public const int DEFAULT_AGE = 0;
-		private readonly Entity? owner;
+		private Entity? owner;
 		private ItemStack itemStack;
 		private int pickupDelay = DEFAULT_PICKUP_DELAY;
 		private int age = DEFAULT_AGE;
 
-		public ItemEntity(ItemStack itemStack, Level level)
-			: this(null, itemStack, level) {
+		public ItemEntity(Level level, double x, double y, ItemStack itemStack)
+			: base(EntityType.ITEM, level) {
+			this.SetPos(x, y);
+			this.SetStack(itemStack);
+			this.SetDeltaMovement(this.random.NextDouble() * 0.2d - 0.1d, 0.2d);
 		}
 
-		public ItemEntity(Entity? owner, ItemStack itemStack, Level level)
+		public ItemEntity(Level level, double x, double y, ItemStack itemStack, double deltaX, double deltaY)
 			: base(EntityType.ITEM, level) {
-			this.itemStack = itemStack;
-			this.owner = owner;
+			this.SetPos(x, y);
+			this.SetStack(itemStack);
+			this.SetDeltaMovement(deltaX, deltaY);
 		}
 
 		protected override double GetGravity() => 0.04d;
@@ -44,6 +48,7 @@ namespace SoulboundEngine.World.Entity {
 		}
 
 		public Entity? GetOwner() => this.owner;
+		public void SetOwner(Entity owner) => this.owner = owner;
 
 		public ItemStack GetStack() => this.itemStack;
 		public void SetStack(ItemStack stack) => this.itemStack = stack;
@@ -59,5 +64,7 @@ namespace SoulboundEngine.World.Entity {
 		public void Destroy() {
 			this.level.RemoveEntity(this);
 		}
+
+		public void SetPickupDelay(int delay) => this.pickupDelay = delay;
 	}
 }

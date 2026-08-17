@@ -1,4 +1,5 @@
 using SoulboundEngine.Common.Math;
+using SoulboundEngine.Common.Math.Random;
 using SoulboundEngine.Item;
 using SoulboundEngine.World.Block;
 using SoulboundEngine.World.Block.State;
@@ -22,6 +23,7 @@ namespace SoulboundEngine.World.Entity {
 		public static readonly Predicate<Entity> ALL = _ => true;
 		private readonly EntityDescriptor descriptor;
 		private readonly EntityDimensions dimensions;
+		protected readonly IRandom random = RandomProvider.CreateWithUniqueSeed();
 		protected Level level;
 		protected bool isAlive;
 		protected bool firstTick = true;
@@ -95,8 +97,9 @@ namespace SoulboundEngine.World.Entity {
 		}
 
 		public ItemEntity DropStack(Level level, ItemStack stack) {
-			ItemEntity entity = new(this, stack, level);
-			entity.SetPos(this.GetPosition());
+			Vec2d pos = this.GetPosition();
+			ItemEntity entity = new(level, pos.x, pos.y, stack);
+			entity.SetOwner(this);
 			level.AddEntity(entity);
 			return entity;
 		}

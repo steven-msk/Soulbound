@@ -22,9 +22,10 @@ namespace SoulboundEngine.World.Player {
 	using Level = Level.Level;
 
 	public class PlayerEntity : Entity {
-		const float MAX_BLOCK_REACH = 5f;
-		private const double PICKUP_BOX_STRETCH_X = 2.0d;
+		private const double MAX_BLOCK_REACH = 5d;
+		private const double PICKUP_BOX_STRETCH_X = 1.5d;
 		private const double PICKUP_BOX_STRETCH_Y = 1.0d;
+		private const int DROP_PICKUP_DELAY = 75;
 		private readonly SoulboundClient client;
 		private readonly PlayerInventory inventory;
 		private Vector2 screenPointerPos;
@@ -345,15 +346,16 @@ namespace SoulboundEngine.World.Player {
 			return this.client.OpenScreen(new SignEditScreen(signEntity));
 		}
 
-		public void ThrowFromMainHand(bool ctrl) {
+		public void DropMainHandItem(bool ctrl) {
 			ItemStack mainHandStack = this.GetMainHandStack();
 			if (mainHandStack.IsEmpty()) return;
 
 			int throwAmount = ctrl ? mainHandStack.count : 1;
 			ItemStack thrownStack = mainHandStack.CopyWithCount(throwAmount);
-			mainHandStack.Decrement(throwAmount);
+			this.SetMainHandStack(mainHandStack.DecrementBy(throwAmount));
 
-			this.DropStack(this.level, thrownStack);
+			ItemEntity itemEntity = this.DropStack(this.level, thrownStack);
+			itemEntity.SetPickupDelay(DROP_PICKUP_DELAY);
 		}
 
 		public ItemStack Take(ItemStack itemStack) {

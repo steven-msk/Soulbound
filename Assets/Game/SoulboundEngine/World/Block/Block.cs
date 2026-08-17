@@ -1,6 +1,7 @@
 
 
 namespace SoulboundEngine.World.Block {
+	using SoulboundEngine.Common.Math;
 	using SoulboundEngine.Item;
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.States;
@@ -77,8 +78,9 @@ namespace SoulboundEngine.World.Block {
 			List<ItemStack> droppedStacks = GetDroppedStacks(blockState);
 
 			foreach (var stack in droppedStacks) {
-				ItemEntity itemEntity = new(owner, stack, level);
-				itemEntity.SetPos(blockPos.GetBottomCenter());
+				Vec2d pos = blockPos.GetBottomCenter();
+				ItemEntity itemEntity = new(level, pos.x, pos.y, stack);
+				if (owner != null) itemEntity.SetOwner(owner);
 				level.AddEntity(itemEntity);
 			}
 		}

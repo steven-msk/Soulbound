@@ -95,7 +95,7 @@ namespace SoulboundEngine.Client {
 			// TODO: handle continuous item throw
 			while (GameSettings.keybinds.throwItem.WasPressed()) {
 				bool ctrl = this.client.InputManager.keyboard.IsPressed(Keyboard.GetControl(Key.LeftCtrl));
-				player.ThrowFromMainHand(ctrl);
+				player.DropMainHandItem(ctrl);
 			}
 		}
 
