@@ -358,10 +358,7 @@ namespace SoulboundEngine.World.Player {
 		}
 
 		public bool IsInBlockReach(Vec2d worldPos) {
-			double dist = Vec2d.Distance(worldPos, this.boundingBox.GetCenter());
-			return dist <= MAX_BLOCK_REACH
-				&& !this.level.GetTilesCovered(this.boundingBox)
-						 .Contains(BlockPos.From(worldPos));
+			return this.boundingBox.SqrDistanceTo(worldPos) <= MAX_BLOCK_REACH * MAX_BLOCK_REACH;
 		}
 
 		public PlayerInventory GetInventory() => this.inventory;
