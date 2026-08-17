@@ -35,6 +35,7 @@ namespace SoulboundEngine.World.Entity {
 		public bool verticalCollision;
 		public bool verticalCollisionBelow;
 		private Vec2d deltaMovement;
+		private bool isOnGround;
 		private float speed;
 
 		protected Entity(EntityDescriptor descriptor, Level level) {
@@ -185,6 +186,7 @@ namespace SoulboundEngine.World.Entity {
 			this.horizontalCollision = xCollision;
 			this.verticalCollision = yCollision;
 			this.verticalCollisionBelow = yCollision && delta.y < 0.0d;
+			this.isOnGround = this.verticalCollisionBelow;
 
 			Vec2d dm = this.deltaMovement;
 			this.deltaMovement = new Vec2d(xCollision ? 0.0d : dm.x, yCollision ? 0.0d : dm.y);
@@ -261,6 +263,9 @@ namespace SoulboundEngine.World.Entity {
 		public virtual bool CanBeCollidedWith(Entity? other) {
 			return false;
 		}
+
+		public bool IsOnGround() => this.isOnGround;
+		public void SetOnGround(bool onGround) => this.isOnGround = onGround;
 
 		public void SetBoundingBox(AABB box) {
 			this.boundingBox = box;

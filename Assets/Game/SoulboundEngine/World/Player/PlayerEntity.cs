@@ -46,10 +46,6 @@ namespace SoulboundEngine.World.Player {
 		public bool isJumping { get; private set; }
 		public float movementX { get; private set; }
 
-		public void SetJumping(bool jumping) {
-			this.isJumping = jumping;
-		}
-
 		public void OpenInventoryScreen(IInventoryScreenHandlerFactory handlerFactory) {
 			if (this.activeInventoryScreen != null) return;
 
@@ -85,6 +81,7 @@ namespace SoulboundEngine.World.Player {
 		}
 
 		public override void Tick() {
+			base.Tick();
 			Vec2d movementInput = new(this.movementX, 0.0d);
 			this.Travel(movementInput);
 
@@ -100,6 +97,10 @@ namespace SoulboundEngine.World.Player {
 			List<Entity> collidedEntities = this.level.GetEntities(this, this.GetPickupArea(), ALL);
 			foreach (Entity entity in collidedEntities) {
 				this.Touch(entity);
+			}
+
+			if (this.isJumping && this.IsOnGround()) {
+				this.JumpFromGround();
 			}
 		}
 
@@ -329,6 +330,21 @@ namespace SoulboundEngine.World.Player {
 			Block.DropStacks(blockState, this.level, blockPos, null);
 			stack.Damage(1);
 			return true;
+		}
+
+		public void JumpFromGround() {
+			double jumpPower = this.GetJumpPower();
+			if (jumpPower > 1.0E-5) {
+				Vec2d movement = this.GetDeltaMovement();
+				this.SetDeltaMovement(movement.x, Math.Max(jumpPower, movement.y));
+			}
+			this.SetOnGround(false);
+		}
+
+		private double GetJumpPower() => 0.4d;
+
+		public void SetJumping(bool jumping) {
+			this.isJumping = jumping;
 		}
 
 		public WorldWidgetHandle ShowWorldWidget<TContext>(WorldWidgetType<TContext> type, TContext context) where TContext : WorldWidgetContext {
