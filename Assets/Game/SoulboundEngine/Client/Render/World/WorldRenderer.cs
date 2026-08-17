@@ -1,10 +1,12 @@
 using SoulboundEngine.Client.Render.Block;
 using SoulboundEngine.Client.Render.Entity;
+using SoulboundEngine.Client.Util;
 using SoulboundEngine.Common.Math;
 using SoulboundEngine.World.Block;
 using SoulboundEngine.World.Block.State;
 using SoulboundEngine.World.Chunk;
 using SoulboundEngine.World.Level;
+using SoulboundEngine.World.Physics;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,6 +18,7 @@ namespace SoulboundEngine.Client.Render.World {
 	using Entity = SoulboundEngine.World.Entity.Entity;
 
 	public sealed class WorldRenderer {
+		private const int DEBUG_BLOCK_COLLIDER_PREVIEW_EXPAND = 5;
 		private readonly BlockRenderManager blockRenderManager;
 		private readonly EntityRenderManager entityRenderManager;
 		private readonly ChunkOutlineRenderer chunkOutlineRenderer;
@@ -45,6 +48,24 @@ namespace SoulboundEngine.Client.Render.World {
 			this.ResolveQueue(this.stateChangedQueue, value => {
 				this.RenderBlock(value.pos, value.state);
 			});
+
+			if (this.showingChunkFeatures) {
+				AABB stretched = this.level.GetPlayer().boundingBox.Stretch(DEBUG_BLOCK_COLLIDER_PREVIEW_EXPAND);
+				foreach (AABB box in this.level.GetBlockCollisionBoxes(stretched)) {
+					this.DrawDebugBox(box, Color.green);
+				}
+				AABB playerBox = this.level.GetPlayer().boundingBox;
+				this.DrawDebugBox(playerBox, Color.cyan);
+			}
+		}
+
+		private void DrawDebugBox(AABB box, Color color) {
+			Vector2 min = box.Min.ToVector2();
+			Vector2 max = box.Max.ToVector2();
+			UnityEngine.Debug.DrawLine(new Vector3(min.x, min.y), new Vector3(min.x, max.y), color);
+			UnityEngine.Debug.DrawLine(new Vector3(min.x, min.y), new Vector3(max.x, min.y), color);
+			UnityEngine.Debug.DrawLine(new Vector3(max.x, min.y), new Vector3(max.x, max.y), color);
+			UnityEngine.Debug.DrawLine(new Vector3(min.x, max.y), new Vector3(min.x, max.y), color);
 		}
 
 		private void RenderBlocks(Level level) {

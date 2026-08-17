@@ -1,5 +1,7 @@
 ﻿namespace SoulboundEngine.Client.Render.Entity {
 	using SoulboundEngine.Client.Render.Item;
+	using SoulboundEngine.Common.Math;
+	using SoulboundEngine.World.Physics;
 	using System;
 	using UnityEngine;
 	using Entity = SoulboundEngine.World.Entity.Entity;
@@ -66,7 +68,13 @@
 		}
 
 		protected virtual void UpdatePosition(S state, in EntityViewHandle handle) {
-			handle.SetPosition(state.entity.GetPosition());
+			AABB boundingBox = state.entity.boundingBox;
+			Vec2d entityPos = state.entity.GetPosition();
+			handle.SetPosition(this.ResolveUnityPosition(entityPos, boundingBox));
+		}
+
+		protected virtual Vec2d ResolveUnityPosition(Vec2d entityPos, AABB boundingBox) {
+			return entityPos.Add(0.0d, boundingBox.GetYSize() * 0.5d);
 		}
 
 		public override void Destroy(in EntityViewHandle handle) {
