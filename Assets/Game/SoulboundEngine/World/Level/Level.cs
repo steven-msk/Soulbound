@@ -224,7 +224,7 @@ namespace SoulboundEngine.World.Level {
 		}
 
 		public List<Entity> GetEntities(Entity? except, AABB box, Predicate<Entity> selector) {
-			return this.GetEntities(except, e => e.boundingBox.Intersects(box) && selector(e));
+			return this.GetEntities(except, e => e.boundingBox.Overlaps(box) && selector(e));
 		}
 
 		public List<Entity> GetEntities(Entity? except, Predicate<Entity> selector) {

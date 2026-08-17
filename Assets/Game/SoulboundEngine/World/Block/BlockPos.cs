@@ -6,6 +6,10 @@ namespace SoulboundEngine.World.Block {
 	using Level = Level.Level;
 
 	public struct BlockPos {
+		public const int BOTTOM_LEFT_CORNER = 0;
+		public const int BOTTOM_RIGHT_CORNER = 1;
+		public const int TOP_LEFT_CORNER = 2;
+		public const int TOP_RIGHT_CORNER = 3;
         public int x;
         public int y;
 
@@ -60,6 +64,22 @@ namespace SoulboundEngine.World.Block {
         public readonly Vec2d GetCenter() => new(this.x + 0.5d, this.y + 0.5d);
 
 		public readonly Vec2d GetBottomCenter() => new(this.x + 0.5d, this.y);
+
+		public readonly Vec2d GetCorner(int corner) {
+			return corner switch {
+				BOTTOM_LEFT_CORNER => new Vec2d(this.x, this.y),
+				BOTTOM_RIGHT_CORNER => new Vec2d(this.x + 1.0d, this.y),
+				TOP_LEFT_CORNER => new Vec2d(this.x, this.y + 1.0d),
+				TOP_RIGHT_CORNER => new Vec2d(this.x + 1.0d, this.y + 1.0d),
+				_ => throw new ArgumentException()
+			};
+		}
+
+		public double GetMinX() => this.x;
+		public double GetMaxX() => this.x + 1.0d;
+
+		public double GetMinY() => this.y;
+		public double GetMaxY() => this.y;
 
 		public override readonly bool Equals(object obj) {
             if (obj is BlockPos other) {

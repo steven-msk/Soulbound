@@ -58,7 +58,7 @@
 			count = 0;
 			foreach (var shapeBox in blockShape.boxes) {
 				AABB movedBox = shapeBox.Move(blockPos);
-				if (box.Intersects(movedBox)) {
+				if (box.Overlaps(movedBox)) {
 					intersecting[count++] = movedBox;
 				}
 			}

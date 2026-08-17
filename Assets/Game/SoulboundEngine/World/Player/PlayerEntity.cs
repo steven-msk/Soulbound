@@ -212,7 +212,7 @@ namespace SoulboundEngine.World.Player {
 
 			Vec2d interactionPoint = this.GetWorldPointerPos();
 
-			bool itemInteracted = ItemInteract(interactionPoint, this.GetMainHandStack(), this, itemOnEntity, itemOnBlock, itemInAir);
+			bool itemInteracted = ItemInteract(type, interactionPoint, this.GetMainHandStack(), this, itemOnEntity, itemOnBlock, itemInAir);
 			if (itemInteracted) {
 				ItemStack usedStack = this.GetMainHandStack().OnItemUsed(type, this.level, this);
 				this.SetMainHandStackInternal(usedStack);
@@ -232,6 +232,7 @@ namespace SoulboundEngine.World.Player {
 		}
 
 		private static bool ItemInteract(
+				InteractionType type,
 				Vec2d interactionPoint,
 				ItemStack stack,
 				PlayerEntity player,
@@ -313,8 +314,8 @@ namespace SoulboundEngine.World.Player {
 		}
 
 		private bool TryBreakBlock(BlockPos blockPos) {
-			if (!this.IsInBlockReach(blockPos.ToVec2d())) return false;
 			if (!Level.IsInBounds(blockPos)) return false;
+			if (!this.CanBreakBlockAt(blockPos)) return false;
 
 			BlockState blockState = this.level.GetBlockState(blockPos) ?? Blocks.AIR.DefaultState;
 			if (blockState.block == Blocks.AIR) return false;
@@ -367,13 +368,14 @@ namespace SoulboundEngine.World.Player {
 		}
 
 		public bool CanPlaceBlockAt(BlockPos blockPos) {
-			Vec2d worldPos = blockPos.ToVec2d();
+			Vec2d worldPos = blockPos.GetCenter();
 			return this.IsInBlockReach(worldPos)
-				   && this.level?.GetBlock(blockPos) == Blocks.AIR;
+				&& !this.boundingBox.Overlaps(blockPos)
+				&& this.level?.GetBlock(blockPos) == Blocks.AIR;
 		}
 
 		public bool CanBreakBlockAt(BlockPos blockPos) {
-			Vec2d worldPos = blockPos.ToVec2d();
+			Vec2d worldPos = blockPos.GetCenter();
 			return this.IsInBlockReach(worldPos)
 				   && this.level?.GetBlock(blockPos) != Blocks.AIR;
 		}
