@@ -5,6 +5,7 @@ namespace SoulboundEngine.Component {
 		// Sentinel marking "this type is removed relative to baseMap", distinct from
 		// simply not having an entry in changedComponents (which means "defer to baseMap").
 		public static readonly object REMOVED = new();
+		public static bool IsRemoved(object obj) => ReferenceEquals(obj, REMOVED);
 
 		public readonly ComponentType boxedType;
 		public readonly object boxedValue;
@@ -35,6 +36,7 @@ namespace SoulboundEngine.Component {
 		public override int GetHashCode() {
 			return HashCode.Combine(this.boxedType, this.boxedValue);
 		}
+
 	}
 
 	public sealed record Component<T>(ComponentType<T> type, T value) : Component(type, value), IEquatable<Component<T>> {

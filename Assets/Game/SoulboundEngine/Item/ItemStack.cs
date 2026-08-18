@@ -1,3 +1,5 @@
+using Newtonsoft.Json.Linq;
+using SoulboundEngine.Client.Debug.Logging;
 using SoulboundEngine.Component;
 using SoulboundEngine.Interaction;
 using SoulboundEngine.Registry;
@@ -7,7 +9,6 @@ using SoulboundEngine.World.Level;
 using SoulboundEngine.World.Player;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 #nullable enable
 
@@ -104,7 +105,7 @@ namespace SoulboundEngine.Item {
 		public int Increment(int amount = 1) {
 			if (amount <= 0) return 0;
 
-			int added = Mathf.Min(this.GetSpaceLeft(), amount);
+			int added = Math.Min(this.GetSpaceLeft(), amount);
 			this.count += added;
 			return added;
 		}
@@ -115,7 +116,7 @@ namespace SoulboundEngine.Item {
 		public int Decrement(int amount = 1) {
 			if (amount <= 0) return 0;
 
-			int removed = Mathf.Min(this.count, amount);
+			int removed = Math.Min(this.count, amount);
 			this.count -= removed;
 			return removed;
 		}
@@ -127,7 +128,7 @@ namespace SoulboundEngine.Item {
 		public readonly ItemStack DecrementBy(int amount) {
 			if (amount <= 0) return this;
 
-			int newCount = Mathf.Max(0, this.count - amount);
+			int newCount = Math.Max(0, this.count - amount);
 			if (newCount <= 0) return EMPTY;
 
 			return this.CopyWithCount(newCount);
@@ -210,7 +211,7 @@ namespace SoulboundEngine.Item {
 		}
 
 		public void CapCount(int maxCount) {
-			this.count = Mathf.Clamp(this.count, 0, maxCount);
+			this.count = Math.Clamp(this.count, 0, maxCount);
 		}
 
 		public readonly Item GetItem() => this.item ?? Items.AIR;
@@ -303,6 +304,47 @@ namespace SoulboundEngine.Item {
 			stack.SetDurability(stack.GetCurrentDurability() - amount);
 			if (stack.ShouldBreak()) return EMPTY;
 			return stack;
+		}
+
+		public static JToken ToJson(ItemStack stack) {
+			if (stack.IsEmpty()) return JValue.CreateNull();
+
+			return new JObject() {
+				["item"] = Items.GetIdentifier(stack.GetItem()).ToString(),
+				["count"] = stack.count,
+				["changes"] = ComponentChanges.ToJson(stack.GetComponentChanges())
+			};
+		}
+
+		public static ItemStack FromJson(JToken json) {
+			if (json.Type == JTokenType.Null) return EMPTY;
+			if (json.Type != JTokenType.Object) {
+				Logger.LogError("ItemStack json is not object: {}", json);
+				return EMPTY;
+			}
+
+			string? itemIdString = (string?)json["item"];
+			if (itemIdString == null) {
+				Logger.LogError("No item property in stack json: {}", json);
+				return EMPTY;
+			}
+
+			Identifier itemId = Identifier.Of(itemIdString);
+			Item? item = Items.Get(itemId);
+			if (item == null) {
+				Logger.LogError("Unknown item: {}", itemId);
+				return EMPTY;
+			}
+
+			int? count = (int?)json["count"];
+			if (count == null) {
+				Logger.LogError("No count property in stack json: {}", json);
+				return EMPTY;
+			}
+
+			JToken componentsToken = json["changes"] ?? JValue.CreateNull();
+			ComponentChanges components = ComponentChanges.FromJson(componentsToken);
+			return new ItemStack(item, count.Value, components);
 		}
 
 		private readonly void AssertComponentMutationNotOnEmpty() {

@@ -27,7 +27,7 @@ namespace SoulboundEngine.Registry {
 		public override int GetHashCode() => HashCode.Combine(this.registry, this.value);
 
 		public override string ToString() {
-			return $"registry_key[registry:\"{this.registry}\", id:\"{this.value}\"]";
+			return $"key[{this.registry}/{this.value}]";
 		}
 	}
 }

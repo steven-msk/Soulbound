@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using SoulboundEngine.Client.Debug.Logging;
+using SoulboundEngine.Registry;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -32,14 +36,14 @@ namespace SoulboundEngine.Component {
 			Builder builder = Create();
 			HashSet<ComponentType> seen = new();
 
-			foreach (var component in result) {
+			foreach (Component? component in result) {
 				seen.Add(component.boxedType);
 				if (!baseValues.TryGetValue(component.boxedType, out var baseValue)
 					|| !baseValue.Equals(component.boxedValue)) {
 					builder.AddRaw(component.boxedType, component.boxedValue);
 				}
 			}
-			foreach (var type in baseValues.Keys) {
+			foreach (ComponentType type in baseValues.Keys) {
 				if (!seen.Contains(type)) {
 					builder.Remove(type);
 				}
@@ -49,7 +53,7 @@ namespace SoulboundEngine.Component {
 
 		public ComponentChanges WithRemovedIf(Predicate<ComponentType> removedTypePredicate) {
 			Builder builder = Create();
-			foreach (var type in this.changedComponents.Keys) {
+			foreach (ComponentType type in this.changedComponents.Keys) {
 				if (removedTypePredicate(type)) {
 					builder.Remove(type);
 				} else {
@@ -63,8 +67,8 @@ namespace SoulboundEngine.Component {
 			Dictionary<ComponentType, object> addedComponents = new();
 			HashSet<ComponentType> removed = new();
 
-			foreach (var (type, value) in this.changedComponents) {
-				if (ReferenceEquals(value, Component.REMOVED)) {
+			foreach ((ComponentType type, object value) in this.changedComponents) {
+				if (Component.IsRemoved(value)) {
 					removed.Add(type);
 				} else {
 					addedComponents[type] = value;
@@ -79,10 +83,57 @@ namespace SoulboundEngine.Component {
 			return new AddedRemovedPairs(builder.Build(), removed);
 		}
 
+		public static JToken ToJson(ComponentChanges changes) {
+			if (changes.Equals(EMPTY)) return JValue.CreateNull();
+
+			JObject json = new();
+			foreach ((ComponentType type, object value) in changes.changedComponents) {
+				Identifier id = ComponentType.GetId(type);
+				json.Add(id.ToString(), Component.IsRemoved(value) ? null : type.ToJson(value));
+			}
+			return json;
+		}
+
+		public static ComponentChanges FromJson(JToken json) {
+			if (json.Type == JTokenType.Null) return EMPTY;
+			if (json.Type != JTokenType.Object) {
+				Logger.LogError("ComponentChanges json is not object: {}", json);
+				return EMPTY;
+			}
+
+			Builder builder = Create();
+			foreach (JProperty property in ((JObject)json).Properties()) {
+				Identifier typeId = Identifier.Of(property.Name);
+				ComponentType? type = ComponentType.Get(typeId);
+				if (type == null) {
+					Logger.LogError("Skipping unknown component type {}", typeId);
+					continue;
+				}
+
+				JToken token = property.Value;
+				if (token.Type == JTokenType.Null) {
+					builder.AddRaw(type, Component.REMOVED);
+					continue;
+				}
+
+				try {
+					object value = type.FromJson(token);
+					builder.AddRaw(type, value);
+				} catch (Exception e) {
+					Logger.LogFatal(e, "Unable to parse component value {} (component type: {})", token.ToString(Formatting.None), typeId);
+				}
+			}
+
+			return builder.Build();
+		}
+
 		public override bool Equals(object obj) {
-			if (obj is not ComponentChanges other) return false;
-			if (this.changedComponents.Count != other.changedComponents.Count) return false;
-			return this.changedComponents.All(kvp => other.changedComponents.TryGetValue(kvp.Key, out var v) && kvp.Value.Equals(v));
+			return obj is ComponentChanges other && this.Equals(other);
+		}
+
+		public bool Equals(ComponentChanges other) {
+			if (this.Size() != other.Size()) return false;
+			return this.changedComponents.All(kvp => other.changedComponents.TryGetValue(kvp.Key, out object v) && kvp.Value.Equals(v));
 		}
 
 		public override int GetHashCode() {
@@ -97,8 +148,8 @@ namespace SoulboundEngine.Component {
 
 		private static string ToString(Dictionary<ComponentType, object> changes) {
 			return "{" + string.Join(", ", changes.Select(kvp => {
-				string v = ReferenceEquals(kvp.Value, Component.REMOVED) ? "REMOVED" : kvp.Value.ToString();
-				return $"[type={kvp.Key},value={v}]";
+				string v = Component.IsRemoved(kvp.Value) ? "REMOVED" : kvp.Value.ToString();
+				return $"{kvp.Key}[{v}]";
 			})) + "}";
 		}
 
