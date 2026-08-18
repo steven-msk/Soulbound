@@ -94,14 +94,15 @@ namespace SoulboundEngine.Component {
 			return json;
 		}
 
-		public static ComponentChanges FromJson(JObject json) {
+		public static ComponentChanges FromJson(JToken json) {
 			if (json.Type == JTokenType.Null) return EMPTY;
 			if (json.Type != JTokenType.Object) {
-				throw new InvalidOperationException("ComponentChanges json is not object");
+				Logger.LogError("ComponentChanges json is not object: {}", json);
+				return EMPTY;
 			}
 
 			Builder builder = Create();
-			foreach (JProperty property in json.Properties()) {
+			foreach (JProperty property in ((JObject)json).Properties()) {
 				Identifier typeId = Identifier.Of(property.Name);
 				ComponentType? type = ComponentType.Get(typeId);
 				if (type == null) {
