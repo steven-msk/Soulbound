@@ -1,5 +1,5 @@
-using SoulboundEngine.World.Block;
 using SoulboundEngine.Registry;
+using SoulboundEngine.World.Block;
 using System;
 
 #nullable enable
@@ -84,19 +84,19 @@ namespace SoulboundEngine.Item {
 		}
 
 		public static Identifier GetIdentifier(Item item) {
-			return Registries.ITEMS.GetIdentifier(item) ?? throw new ArgumentException("Items not initialized");
+			return Registries.ITEMS.GetIdentifier(item) ?? throw new ArgumentException("Could not find item " + item.GetName());
 		}
 
 		public static RegistryEntry<Item> GetEntry(Item? item) {
 			if (item == null) return GetEntry(AIR);
-			return Registries.ITEMS.GetEntry(item) ?? throw new ArgumentException("Items not initialized");
+			return Registries.ITEMS.GetEntry(item) ?? throw new ArgumentException("Could not find item " + item.GetName());
 		}
 
 		public static RegistryEntry<Item> GetEntry(RegistryKey<Item> key) {
 			return Registries.ITEMS.GetEntry(key.value) ?? throw new ArgumentException("Could not find item " + key);
 		}
 
-		public static Item Get(Identifier id) {
+		public static Item? Get(Identifier id) {
 			return Registries.ITEMS.Get(id);
 		}
 
