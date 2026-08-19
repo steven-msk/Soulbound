@@ -1,5 +1,8 @@
+using Newtonsoft.Json.Linq;
+using SoulboundEngine.Client.Debug.Logging;
 using SoulboundEngine.Item;
 using SoulboundEngine.World.Player;
+using System;
 
 #nullable enable
 
@@ -12,7 +15,7 @@ namespace SoulboundEngine.World.Entity {
 		public const int LIFETIME = 6000;
 		public const int INFINITE_LIFETIME = -1;
 		public const int DEFAULT_AGE = 0;
-		private Entity? owner;
+		private Guid? owner;
 		private ItemStack itemStack;
 		private int pickupDelay = DEFAULT_PICKUP_DELAY;
 		private int age = DEFAULT_AGE;
@@ -31,6 +34,14 @@ namespace SoulboundEngine.World.Entity {
 			this.SetDeltaMovement(deltaX, deltaY);
 		}
 
+		private ItemEntity(EntityDescriptor<ItemEntity> descriptor, Level level) 
+			: base(descriptor, level) {
+		}
+
+		public static ItemEntity Create(EntityDescriptor<ItemEntity> descriptor, Level level) {
+			return new ItemEntity(descriptor, level);
+		}
+
 		protected override double GetGravity() => 0.04d;
 
 		public override void Tick() {
@@ -47,8 +58,9 @@ namespace SoulboundEngine.World.Entity {
 			if (this.age > LIFETIME) this.Destroy();
 		}
 
-		public Entity? GetOwner() => this.owner;
-		public void SetOwner(Entity owner) => this.owner = owner;
+		public Guid? GetOwner() => this.owner;
+		public void SetOwner(Guid? owner) => this.owner = owner;
+		public void SetOwner(Entity entity) => this.owner = entity.guid;
 
 		public ItemStack GetStack() => this.itemStack;
 		public void SetStack(ItemStack stack) => this.itemStack = stack;
@@ -66,5 +78,47 @@ namespace SoulboundEngine.World.Entity {
 		}
 
 		public void SetPickupDelay(int delay) => this.pickupDelay = delay;
+
+		public void SetAge(int age) => this.age = age;
+
+		protected override void SaveAdditional(JObject json) {
+			base.SaveAdditional(json);
+			json["age"] = this.age;
+			json["owner"] = this.owner == null ? JValue.CreateNull() : this.owner;
+			json["pickupDelay"] = this.pickupDelay;
+			json["stack"] = ItemStack.ToJson(this.itemStack);
+		}
+
+		protected override void LoadAdditional(JObject json) {
+			base.LoadAdditional(json);
+			int? age = (int?)json["age"];
+			if (age == null) Logger.LogError("No age property on ItemEntity json: {}", json);
+
+			int? pickupDelay = (int?)json["pickupDelay"];
+			if (pickupDelay == null) Logger.LogError("No pickupDelay property on ItemEntity json: {}", json);
+
+			JToken? stackToken = json["stack"];
+			if (stackToken == null) Logger.LogError("No stack property on ItemEntity json: {}", json);
+
+			JProperty? ownerProperty = json.Property("owner");
+			Guid? guid = null;
+			if (ownerProperty == null) {
+				Logger.LogError("No owner property on ItemEntity json: {}", json);
+			} else {
+				string? guidString = (string?)ownerProperty.Value;
+				if (guidString != null) {
+					if (Guid.TryParse(guidString, out Guid value)) {
+						guid = value;
+					} else {
+						Logger.LogError("Could not parse ItemEntity guid: {}", guidString);
+					}
+				}
+			}
+
+			this.SetOwner(guid);
+			this.SetAge(age.GetValueOrDefault(0));
+			this.SetPickupDelay(pickupDelay.GetValueOrDefault(0));
+			this.SetStack(stackToken != null ? ItemStack.FromJson(stackToken) : ItemStack.EMPTY);
+		}
 	}
 }

@@ -147,15 +147,11 @@ namespace SoulboundEngine.World.Level {
 		}
 
 		public void AddNewEntity(Entity entity) {
-			if (!this.IsLevelActive()) return;
-
 			Guid guid = Guid.NewGuid();
 			this.AddEntity(entity, guid);
 		}
 
 		public void AddEntity(Entity entity, Guid guid) {
-			if (!this.IsLevelActive()) return;
-
 			entity.OnAdd(guid);
 			entity.SetAlive(true);
 			this.entities[guid] = entity;
@@ -167,13 +163,12 @@ namespace SoulboundEngine.World.Level {
 		}
 
 		public void RemoveEntity(Entity entity) {
-			if (!this.IsLevelActive()) return;
 			if (!this.entities.ContainsKey(entity.guid)) return;
 
 			this.entities.Remove(entity.guid);
 			entity.Dispose();
 
-			if  (entity is ITickingEntity ticking) {
+			if (entity is ITickingEntity ticking) {
 				this.tickingEntities.Remove(ticking);
 			}
 			entityRemoved?.Invoke(entity);
@@ -185,7 +180,6 @@ namespace SoulboundEngine.World.Level {
 		}
 
 		void ILevelExecutionService.SpawnEntity(EntityDescriptor descriptor, Vec2d pos) {
-			if (!this.IsLevelActive()) return;
 			Entity? entity = descriptor.CreateBoxed(this, pos);
 			if (entity != null) this.AddNewEntity(entity);
 		}
