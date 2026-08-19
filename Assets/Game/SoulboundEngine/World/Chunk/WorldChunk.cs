@@ -143,16 +143,9 @@ namespace SoulboundEngine.World.Chunk {
 			tileEntity.OnDispose();
 		}
 
-		public override JObject? GetTileEntityJsonForSaving(BlockPos blockPos) {
+		public override JToken? GetTileEntityJsonForSaving(BlockPos blockPos) {
 			TileEntity? tileEntity = this.GetTileEntity(blockPos);
-			if (tileEntity == null) return null;
-
-			JObject json = new() {
-				["type"] = TileEntityType.GetId(tileEntity.GetTileEntityType())!.ToString(),
-				["pos"] = tileEntity.blockPos.ToString(),
-			};
-			tileEntity.Write(json);
-			return json;
+			return tileEntity?.Write();
 		}
 
 		public override bool IsEmpty() => false;

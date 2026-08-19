@@ -6,6 +6,7 @@ using System.Linq;
 
 namespace SoulboundEngine.Component {
 	public sealed class MergedComponentMap : IComponentMap {
+		public static readonly MergedComponentMap EMPTY = Create(IComponentMap.EMPTY, ComponentChanges.EMPTY);
 		private readonly IComponentMap baseMap;
 		private Dictionary<ComponentType, object> changedComponents;
 

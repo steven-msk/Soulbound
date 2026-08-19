@@ -49,7 +49,7 @@ namespace SoulboundEngine.World.Chunk {
 		public abstract TileEntity? GetTileEntity(BlockPos blockPos);
 		public abstract void RemoveTileEntity(BlockPos blockPos);
 
-		public abstract JObject? GetTileEntityJsonForSaving(BlockPos blockPos);
+		public abstract JToken? GetTileEntityJsonForSaving(BlockPos blockPos);
 
 		public int GetBottomY() => this.heightLimitView.GetBottomY();
 

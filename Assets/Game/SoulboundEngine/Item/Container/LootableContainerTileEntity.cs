@@ -51,16 +51,16 @@ namespace SoulboundEngine.Item.Container {
 		public virtual void OnClosed(PlayerEntity player) {
 		}
 
-		public override void Write(JObject json) {
-			base.Write(json);
+		public override void WriteAdditional(JObject json) {
+			base.WriteAdditional(json);
 			if (this.lootTable != null) {
 				json["lootTable"] = this.lootTable.value.ToString();
 				json["lootTableSeed"] = this.lootTableSeed;
 			}
 		}
 
-		public override void Read(JToken json) {
-			base.Read(json);
+		public override void ReadAdditional(JObject json) {
+			base.ReadAdditional(json);
 			string lootTableKey = ((string?)json["lootTable"]) ?? string.Empty;
 			long lootTableSeed = (long?)json["lootTableSeed"] ?? 0;
 

@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.Registry;
 using SoulboundEngine.World.Block;
 using SoulboundEngine.World.Block.Entity;
 using SoulboundEngine.World.Block.State;
@@ -18,7 +17,7 @@ namespace SoulboundEngine.World.Chunk {
 	public record SerializableChunkData(
 		ChunkPos chunkPos,
 		List<SerializableChunkData.SectionData> sectionData,
-		List<JObject> tileEntities
+		List<JToken> tileEntities
 	) {
 		public static SerializableChunkData Of(Level level, Chunk chunk) {
 			if (!chunk.CanBeSerialized()) {
@@ -37,9 +36,9 @@ namespace SoulboundEngine.World.Chunk {
 				}
 			}
 
-			List<JObject> tileEntities = new(chunk.GetTileEntityPositions().Count);
+			List<JToken> tileEntities = new(chunk.GetTileEntityPositions().Count);
 			foreach (var blockPos in chunk.GetTileEntityPositions()) {
-				JObject? json = chunk.GetTileEntityJsonForSaving(blockPos);
+				JToken? json = chunk.GetTileEntityJsonForSaving(blockPos);
 				if (json != null) tileEntities.Add(json);
 			}
 
@@ -68,10 +67,10 @@ namespace SoulboundEngine.World.Chunk {
 				sectionData.Add(new SectionData(sectionY, new ChunkSection(container)));
 			}
 
-			List<JObject> tileEntities = new();
+			List<JToken> tileEntities = new();
 			JArray tileEntitiesArray = (JArray)jsonObject["tileEntities"]!;
 			foreach (JToken token in tileEntitiesArray) {
-				tileEntities.Add((JObject)token);
+				tileEntities.Add(token);
 			}
 
 			return new SerializableChunkData(chunkPos, sectionData, tileEntities);
@@ -96,17 +95,18 @@ namespace SoulboundEngine.World.Chunk {
 
 			foreach (var token in this.tileEntities) {
 				try {
-					Identifier typeId = Identifier.Of((string)token["type"]!);
-					TileEntityType type = Registries.TILE_ENTITIES.Get(typeId);
-
-					BlockPos blockPos = BlockPos.Parse((string)token["pos"]!);
-					ChunkSection section = sections[level.GetSectionIndexFromBlock(blockPos.y)];
-					SectionPos sectionPos = ChunkSection.ComputeLocalPos(blockPos.x, blockPos.y);
+					BlockPos? blockPos = TileEntity.GetPosFromJson(token);
+					if (blockPos is not { } pos) {
+						Logger.LogError("Failed to parse TileEntity block pos: {}", token);
+						continue;
+					}
+					ChunkSection section = sections[level.GetSectionIndexFromBlock(pos.y)];
+					SectionPos sectionPos = ChunkSection.ComputeLocalPos(pos.x, pos.y);
 					BlockState state = section.GetBlockState(sectionPos.x, sectionPos.y);
-
-					TileEntity tileEntity = type.Instantiate(blockPos, state);
-					tileEntity.Read(token);
-					chunk.SetTileEntity(tileEntity);
+					TileEntity? tileEntity = TileEntity.FromJson(token, pos, state);
+					if (tileEntity != null) {
+						chunk.SetTileEntity(tileEntity);
+					}
 				} catch (Exception e) {
 					Logger.LogFatal(e);
 				}
