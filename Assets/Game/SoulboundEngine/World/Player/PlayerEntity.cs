@@ -1,25 +1,24 @@
-using SoulboundEngine.Client;
-using SoulboundEngine.Client.UI.Screen;
-using SoulboundEngine.Client.World.Widget;
-using SoulboundEngine.Common.Math;
-using SoulboundEngine.Interaction;
-using SoulboundEngine.Item;
-using SoulboundEngine.Item.Container;
-using SoulboundEngine.World.Block;
-using SoulboundEngine.World.Block.Entity;
-using SoulboundEngine.World.Block.State;
-using SoulboundEngine.World.Entity;
-using SoulboundEngine.World.Physics;
-using System;
-using System.Collections.Generic;
-using UnityEngine;
+namespace SoulboundEngine.World.Player {
+	using Newtonsoft.Json.Linq;
+	using SoulboundEngine.Client;
+	using SoulboundEngine.Client.UI.Screen;
+	using SoulboundEngine.Client.World.Widget;
+	using SoulboundEngine.Common.Math;
+	using SoulboundEngine.Interaction;
+	using SoulboundEngine.Item;
+	using SoulboundEngine.Item.Container;
+	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Block.Entity;
+	using SoulboundEngine.World.Block.State;
+	using SoulboundEngine.World.Entity;
+	using SoulboundEngine.World.Level;
+	using SoulboundEngine.World.Physics;
+	using System;
+	using System.Collections.Generic;
+	using UnityEngine;
+	using Logger = Client.Debug.Logging.Logger;
 
 #nullable enable
-
-namespace SoulboundEngine.World.Player {
-	using Block = Block.Block;
-	using Entity = Entity.Entity;
-	using Level = Level.Level;
 
 	public class PlayerEntity : Entity {
 		private const double MAX_BLOCK_REACH = 5d;
@@ -443,5 +442,29 @@ namespace SoulboundEngine.World.Player {
 		public void SetMovementX(float movementX) {
 			this.movementX = movementX;
 		}
+
+		protected override void SaveAdditional(JObject json) {
+			base.SaveAdditional(json);
+			json["inventory"] = this.inventory.Save();
+			json["mainSlot"] = this.inventory.GetMainSlot();
+		}
+
+		protected override void LoadAdditional(JObject json) {
+			base.LoadAdditional(json);
+			JToken? inventoryToken = json["inventory"];
+			if (inventoryToken == null) {
+				Logger.LogError("No inventory property on PlayerEntity json: {}", json);
+			} else {
+				this.inventory.Load(inventoryToken);
+			}
+
+			int? mainSlot = (int?)json["mainSlot"];
+			if (mainSlot == null) {
+				Logger.LogError("No mainSlot property on PlayerEntity json: {}", json);
+			} else {
+				this.inventory.SetMainSlot(mainSlot.Value);
+			}
+		}
+
 	}
 }

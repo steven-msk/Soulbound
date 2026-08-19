@@ -1,28 +1,24 @@
-using SoulboundEngine.Common;
-using SoulboundEngine.Common.Math;
-using SoulboundEngine.Common.Math.Random;
-using SoulboundEngine.World.Block;
-using SoulboundEngine.World.Block.Entity;
-using SoulboundEngine.World.Block.State;
-using SoulboundEngine.World.Chunk;
-using SoulboundEngine.World.Entity;
-using SoulboundEngine.World.Gen;
-using SoulboundEngine.World.Physics;
-using SoulboundEngine.World.Player;
-using SoulboundEngine.World.Serialization;
-using SoulboundEngine.World.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
+namespace SoulboundEngine.World.Level {
+	using SoulboundEngine.Common;
+	using SoulboundEngine.Common.Math;
+	using SoulboundEngine.Common.Math.Random;
+	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Block.Entity;
+	using SoulboundEngine.World.Block.State;
+	using SoulboundEngine.World.Chunk;
+	using SoulboundEngine.World.Entity;
+	using SoulboundEngine.World.Gen;
+	using SoulboundEngine.World.Physics;
+	using SoulboundEngine.World.Player;
+	using SoulboundEngine.World.Serialization;
+	using SoulboundEngine.World.Services;
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using UnityEngine;
+	using Logger = Client.Debug.Logging.Logger;
 
 #nullable enable
-
-namespace SoulboundEngine.World.Level {
-	using Block = Block.Block;
-	using Chunk = Chunk.Chunk;
-	using Entity = Entity.Entity;
 
 	public sealed class Level : IHeightLimitView, ILevelExecutionService, IEntityManager {
 		public const int CHUNK_LENGTH = SharedConstants.CHUNK_WIDTH;
