@@ -9,6 +9,7 @@ using SoulboundEngine.World.Entity;
 using SoulboundEngine.World.Gen;
 using SoulboundEngine.World.Physics;
 using SoulboundEngine.World.Player;
+using SoulboundEngine.World.Serialization;
 using SoulboundEngine.World.Services;
 using System;
 using System.Collections.Generic;
@@ -62,18 +63,21 @@ namespace SoulboundEngine.World.Level {
 			this.isLoaded = true;
 		}
 
-		// known issue: player creation assumes block placement is finished
+		public void DeserializeEntities(EntitySerializer entitySerializer) {
+			foreach (Entity entity in entitySerializer.LoadAll(this)) {
+				this.AddEntity(entity, entity.guid);
+			}
+		}
+
 		public void StartSession(PlayerEntity player) {
 			if (!this.isLoaded) {
 				throw new InvalidOperationException("Cannot start world session without initial load");
 			}
 			this.levelActive = true;
 			this.player = player;
-			this.AddEntity(player);
-			player.SetPos(this.GetWorldSpawnPoint() + Vec2d.UNIT_Y * 2.0d);
+			this.AddEntity(player, player.guid);
 		}
 
-		// known issue: inconsistent world update loop design
 		public void Tick(RectInt simulationRect) {
 			if (!this.IsLevelActive()) throw new InvalidOperationException("Cannot tick without an active session");
 
@@ -142,11 +146,18 @@ namespace SoulboundEngine.World.Level {
 			}
 		}
 
-		public void AddEntity(Entity entity) {
+		public void AddNewEntity(Entity entity) {
 			if (!this.IsLevelActive()) return;
 
 			Guid guid = Guid.NewGuid();
+			this.AddEntity(entity, guid);
+		}
+
+		public void AddEntity(Entity entity, Guid guid) {
+			if (!this.IsLevelActive()) return;
+
 			entity.OnAdd(guid);
+			entity.SetAlive(true);
 			this.entities[guid] = entity;
 
 			if (entity is ITickingEntity ticking) {
@@ -156,6 +167,7 @@ namespace SoulboundEngine.World.Level {
 		}
 
 		public void RemoveEntity(Entity entity) {
+			if (!this.IsLevelActive()) return;
 			if (!this.entities.ContainsKey(entity.guid)) return;
 
 			this.entities.Remove(entity.guid);
@@ -168,13 +180,14 @@ namespace SoulboundEngine.World.Level {
 		}
 
 		public void SpawnEntity<E>(EntityDescriptor<E> descriptor, Vec2d pos) where E : Entity {
-			if (!this.IsLevelActive()) return;
-			descriptor.Create(this, pos);
+			E? entity = descriptor.Create(this, pos);
+			if (entity != null) this.AddNewEntity(entity);
 		}
 
 		void ILevelExecutionService.SpawnEntity(EntityDescriptor descriptor, Vec2d pos) {
 			if (!this.IsLevelActive()) return;
-			descriptor.CreateBoxed(this, pos);
+			Entity? entity = descriptor.CreateBoxed(this, pos);
+			if (entity != null) this.AddNewEntity(entity);
 		}
 
 		public bool TryGetEntity(Guid guid, out Entity entity) {

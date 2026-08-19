@@ -3,6 +3,7 @@ using SoulboundEngine.Client;
 using SoulboundEngine.Client.World;
 using SoulboundEngine.World.Chunk;
 using SoulboundEngine.World.Gen;
+using SoulboundEngine.World.Serialization;
 
 namespace SoulboundEngine.World.Level {
 	public sealed class ClientWorldBootstrapper {
@@ -18,14 +19,11 @@ namespace SoulboundEngine.World.Level {
 
 		public async UniTask<WorldBootData> LoadWorld() {
 			ChunkStorage chunkStorage = new(this.save.chunksFolder);
-			LevelManager levelManager = new(this.client, this.seedProvider, chunkStorage);
-
-			Level level = levelManager.GetLevel();
-
-			level.GenerateSpawn(this.save.isNew);
+			EntitySerializer entitySerializer = new(this.save);
+			LevelManager levelManager = new(this.client, this.seedProvider, this.save, chunkStorage, entitySerializer);
 
 			return new WorldBootData {
-				level = level,
+				level = levelManager.Bootstrap(),
 				levelManager = levelManager,
 				save = this.save
 			};

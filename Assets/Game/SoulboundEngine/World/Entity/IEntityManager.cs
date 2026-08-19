@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SoulboundEngine.World.Entity {
 	public interface IEntityManager {
-		void AddEntity(Entity entity);
+		void AddNewEntity(Entity entity);
 		void RemoveEntity(Entity entity);
 		bool TryGetEntity(Guid guid, out Entity entity);
 		IEnumerable<Entity> GetAllEntities();

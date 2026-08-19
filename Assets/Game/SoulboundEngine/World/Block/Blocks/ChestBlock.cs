@@ -31,7 +31,7 @@ namespace SoulboundEngine.World.Block {
 				Vec2d p = pos.GetCenter();
 				ItemEntity itemEntity = new(level, p.x, p.y, stack);
 				itemEntity.SetPos(pos.GetCenter());
-				level.AddEntity(itemEntity);
+				level.AddNewEntity(itemEntity);
 			}
 		}
 

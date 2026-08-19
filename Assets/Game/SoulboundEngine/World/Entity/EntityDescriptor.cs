@@ -7,12 +7,20 @@ namespace SoulboundEngine.World.Entity {
 	using Level = Level.Level;
 
 	public abstract class EntityDescriptor {
-		public static Identifier GetIdentifier(EntityDescriptor descriptor) {
+		public static Identifier? GetIdentifier(EntityDescriptor descriptor) {
 			return Registries.ENTITIES.GetIdentifier(descriptor);
+		}
+
+		public static EntityDescriptor? Get(Identifier id) {
+			return Registries.ENTITIES.GetEntry(id)?.GetValue();
 		}
 
 		public abstract EntityDimensions GetDimensions();
 		public abstract Entity? CreateBoxed(Level level, Vec2d pos);
+
+		public Entity? Create(Level level) {
+			return this.CreateBoxed(level, Vec2d.ZERO);
+		}
 	}
 
 	public class EntityDescriptor<E> : EntityDescriptor where E : Entity {
@@ -30,7 +38,6 @@ namespace SoulboundEngine.World.Entity {
 			E? entity = this.factory(this, level);
 			if (entity == null) return null;
 
-			level.AddEntity(entity);
 			entity.SetPos(pos);
 			return entity;
 		}

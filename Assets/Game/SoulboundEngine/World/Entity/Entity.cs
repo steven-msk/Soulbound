@@ -1,6 +1,9 @@
+using Newtonsoft.Json.Linq;
+using SoulboundEngine.Client.Debug.Logging;
 using SoulboundEngine.Common.Math;
 using SoulboundEngine.Common.Math.Random;
 using SoulboundEngine.Item;
+using SoulboundEngine.Registry;
 using SoulboundEngine.World.Block;
 using SoulboundEngine.World.Block.State;
 using SoulboundEngine.World.Chunk;
@@ -52,11 +55,13 @@ namespace SoulboundEngine.World.Entity {
 		public BlockPos blockPosition { get; private set; }
 		public ChunkPos chunkPosition { get; private set; }
 
+		public void SetGuid(Guid guid) => this.guid = guid;
+
 		public void OnAdd(Guid guid) {
 			if (this.IsAlive()) throw new InvalidOperationException($"Entity already added: {guid}");
 
 			this.guid = guid;
-			this.isAlive = true;
+			this.SetAlive(true);
 		}
 
 		public virtual void Tick() {
@@ -79,10 +84,11 @@ namespace SoulboundEngine.World.Entity {
 
 		public void Dispose() {
 			this.OnDisposed();
-			this.isAlive = false;
+			this.SetAlive(false);
 		}
 
 		public bool IsAlive() => this.isAlive;
+		public void SetAlive(bool alive) => this.isAlive = alive;
 
 		protected void AssertAlive() {
 			if (!this.isAlive) throw new NotSupportedException("Entity is not alive.");
@@ -101,7 +107,7 @@ namespace SoulboundEngine.World.Entity {
 			Vec2d pos = this.GetPosition();
 			ItemEntity entity = new(level, pos.x, pos.y, stack);
 			entity.SetOwner(this);
-			level.AddEntity(entity);
+			level.AddNewEntity(entity);
 			return entity;
 		}
 
@@ -311,12 +317,115 @@ namespace SoulboundEngine.World.Entity {
 			this.deltaMovement = new Vec2d(x, y);
 		}
 
+		public void ReapplyPosition() {
+			this.lastKnownPos = null;
+			this.SetPos(this.position.x, this.position.y);
+		}
+
 		public Vec2d GetPosition() => this.position;
 		public double GetX() => this.position.x;
 		public double GetY() => this.position.y;
 
 		public void SetFacing(Facing facing) {
 			this.facing = facing;
+		}
+
+		public JToken Save() {
+			JObject json = new() {
+				["type"] = EntityDescriptor.GetIdentifier(this.descriptor).ToString(),
+				["id"] = this.guid.ToString(),
+				["x"] = this.GetX(),
+				["y"] = this.GetY(),
+				["motionX"] = this.GetDeltaMovement().x,
+				["motionY"] = this.GetDeltaMovement().y,
+				["onGround"] = this.isOnGround,
+			};
+			this.SaveAdditional(json);
+			return json;
+		}
+
+		protected virtual void SaveAdditional(JObject json) {
+		}
+
+		public void Load(JObject json) {
+			double? x = (double?)json["x"];
+			if (x == null) {
+				Logger.LogError("No x property found on Entity json: {}", json);
+				return;
+			}
+			double? y = (double?)json["y"];
+			if (y == null) {
+				Logger.LogError("No y property found on Entity json: {}", json);
+				return;
+			}
+
+			double? motionX = (double?)json["motionX"];
+			if (motionX == null) {
+				Logger.LogError("No motionX property found on Entity json: {}", json);
+				return;
+			}
+			double? motionY = (double?)json["motionY"];
+			if (motionY == null) {
+				Logger.LogError("No motionY property found on Entity json: {}", json);
+				return;
+			}
+
+			bool? onGround = (bool?)json["onGround"];
+			if (onGround == null) {
+				Logger.LogError("No onGround property found on Entity json: {}", json);
+				return;
+			}
+
+
+			this.SetPosRaw(x.GetValueOrDefault(0.0d), y.GetValueOrDefault(0.0d));
+			this.ReapplyPosition();
+			this.SetDeltaMovement(motionX.GetValueOrDefault(0.0d), motionY.GetValueOrDefault(0.0d));
+			this.SetOnGround(onGround.GetValueOrDefault(false));
+
+			string? guidString = (string?)json["id"];
+			if (guidString != null) {
+				if (!Guid.TryParse(guidString, out Guid guid)) {
+					Logger.LogError("Failed to parse entity guid: {}", guidString);
+				} else {
+					this.guid = guid;
+				}
+			}
+
+			this.LoadAdditional(json);
+		}
+
+		protected virtual void LoadAdditional(JObject json) {
+		}
+
+		public static Entity? Load(JToken json, Level level) {
+			if (json.Type != JTokenType.Object) {
+				Logger.LogError("Entity json is not object: {}", json);
+				return null;
+			}
+
+			string? typeIdString = (string?)json["type"];
+			if (typeIdString == null) {
+				Logger.LogError("No type property found on Entity json: {}", json);
+				return null;
+			}
+			if (!Identifier.TryParse(typeIdString, out Identifier typeId)) {
+				Logger.LogError("Could not parse Entity type id: {}", typeIdString);
+				return null;
+			}
+			EntityDescriptor? descriptor = EntityDescriptor.Get(typeId);
+			if (descriptor == null) {
+				Logger.LogError("Entity descriptor not found: {}", typeIdString);
+				return null;
+			}
+
+			Entity? entity = descriptor.Create(level);
+			if (entity == null) {
+				Logger.LogError("Cannot create entity: {}. Parsed data: {}", typeIdString, json);
+				return null;
+			}
+
+			entity.Load((JObject)json);
+			return entity;
 		}
 	}
 }

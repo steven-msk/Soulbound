@@ -74,7 +74,7 @@ namespace SoulboundEngine.World.Services {
 		}
 
 		public void AddEntity(Entity entity) {
-			this.entityManager.AddEntity(entity);
+			this.entityManager.AddNewEntity(entity);
 		}
 
 		public void SetPos(Guid entityGuid, Vec2d pos) {

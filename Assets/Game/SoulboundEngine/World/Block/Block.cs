@@ -81,7 +81,7 @@ namespace SoulboundEngine.World.Block {
 				Vec2d pos = blockPos.GetBottomCenter();
 				ItemEntity itemEntity = new(level, pos.x, pos.y, stack);
 				if (owner != null) itemEntity.SetOwner(owner);
-				level.AddEntity(itemEntity);
+				level.AddNewEntity(itemEntity);
 			}
 		}
 

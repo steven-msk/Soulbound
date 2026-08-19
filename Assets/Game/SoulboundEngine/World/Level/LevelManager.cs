@@ -1,28 +1,35 @@
-using SoulboundEngine.Client;
-using SoulboundEngine.Client.UI.Screen;
-using SoulboundEngine.Common.Math;
-using SoulboundEngine.World.Biome;
-using SoulboundEngine.World.Chunk;
-using SoulboundEngine.World.Gen;
-using SoulboundEngine.World.Player;
-using System;
-using UnityEngine;
-using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
+namespace SoulboundEngine.World.Level {
+	using SoulboundEngine.Client;
+	using SoulboundEngine.Client.UI.Screen;
+	using SoulboundEngine.Client.World;
+	using SoulboundEngine.Common.Math;
+	using SoulboundEngine.World.Biome;
+	using SoulboundEngine.World.Chunk;
+	using SoulboundEngine.World.Entity;
+	using SoulboundEngine.World.Gen;
+	using SoulboundEngine.World.Player;
+	using SoulboundEngine.World.Serialization;
+	using System;
+	using UnityEngine;
+	using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 #nullable enable
 
-namespace SoulboundEngine.World.Level {
 	public class LevelManager {
 		public const int CHUNK_RADIUS = 2;
 		public const int TERRAIN_PLANE_Y = 0;
 		public static readonly RectInt simulationView = new(-128, -76, 256, 156);
 		private readonly Level level;
 		private readonly SoulboundClient client;
+		private readonly WorldSave save;
+		private readonly EntitySerializer entitySerializer;
+		private bool isBootstrapped;
+
 		public bool paused { get; private set; } = false;
 		private bool shouldTick;
 		private IScreenHandle? pauseScreenHandle;
 
-		public LevelManager(SoulboundClient client, ISeedProvider seedProvider, ChunkStorage chunkStorage) {
+		public LevelManager(SoulboundClient client, ISeedProvider seedProvider, WorldSave save, ChunkStorage chunkStorage, EntitySerializer entitySerializer) {
 			int seed = seedProvider.GetSeed();
 			PlainsBiome biome1 = new(seed);
 			var biome2 = new HillsBiome(seed);
@@ -31,12 +38,33 @@ namespace SoulboundEngine.World.Level {
 			Cavemap cavemap = new(seed);
 			this.level = new Level(seed, new NoiseLevelChunkGenerator(biomeMap, heightmap, cavemap), CHUNK_RADIUS, chunkStorage);
 			this.client = client;
+			this.save = save;
+			this.entitySerializer = entitySerializer;
+		}
+
+		public Level Bootstrap() {
+			this.level.GenerateSpawn(this.save.isNew);
+			this.level.DeserializeEntities(this.entitySerializer);
+			this.isBootstrapped = true;
+			return this.level;
 		}
 
 		public PlayerEntity StartSession() {
+			if (!this.isBootstrapped) {
+				throw new InvalidOperationException("Cannot start session: Level is not bootstrapped");
+			}
 			PlayerEntity player = new(this.client, this.level);
+			// technically, player guid should match the client's guid
+			// but theres no proper way of making that guid persistent
+			// so fallback to unique guid per world save
+			if (!this.entitySerializer.LoadPlayer(player)) {
+				player.SetGuid(Guid.NewGuid());
+			}
 			this.level.StartSession(player);
 			this.shouldTick = true;
+			if (this.save.isNew) {
+				player.SetPos(this.level.GetWorldSpawnPoint());
+			}
 			return player;
 		}
 
@@ -55,6 +83,8 @@ namespace SoulboundEngine.World.Level {
 			this.paused = false;
 			Time.timeScale = 1f;
 			this.level.OnSessionStop();
+			this.entitySerializer.SaveAll(this.level.GetEntities(this.level.GetPlayer(), Entity.ALL));
+			this.entitySerializer.SavePlayer(this.level.GetPlayer());
 		}
 
 		private RectInt GetRelativeSimulationRect(Vec2d pivot) {
