@@ -1,12 +1,14 @@
-using SoulboundEngine.World.Player;
-using SoulboundEngine.Common;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+namespace SoulboundEngine.Item.Container {
+	using Newtonsoft.Json.Linq;
+	using SoulboundEngine.Client.Debug.Logging;
+	using SoulboundEngine.Common;
+	using SoulboundEngine.World.Player;
+	using System.Collections;
+	using System.Collections.Generic;
+	using System.Linq;
 
 #nullable enable
 
-namespace SoulboundEngine.Item.Container {
 	public interface IInventory : IEnumerable<ItemStack>, IClearable {
 		IItemSlot GetSlot(int index);
 
@@ -44,6 +46,29 @@ namespace SoulboundEngine.Item.Container {
 		void IClearable.Clear() {
 			foreach (var index in this.GetSlots()) {
 				this.GetSlot(index).SetStack(ItemStack.EMPTY);
+			}
+		}
+	}
+
+	public static class InventoryDefaults {
+		public static JToken Save(this IInventory inventory) {
+			JArray array = new();
+			for (int i = 0; i < inventory.GetSize(); i++) {
+				array[i] = ItemStack.ToJson(inventory.GetSlot(i).GetStack());
+			}
+			return array;
+		}
+
+		public static void Load(this IInventory inventory, JToken json) {
+			if (json.Type != JTokenType.Array) {
+				Logger.LogError("Inventory json is not array: {}", json);
+				return;
+			}
+
+			JArray array = (JArray)json;
+			foreach (var slotIndex in inventory.GetSlots()) {
+				ItemStack stack = ItemStack.FromJson(array[slotIndex]);
+				inventory.GetSlot(slotIndex).SetStack(stack);
 			}
 		}
 	}
