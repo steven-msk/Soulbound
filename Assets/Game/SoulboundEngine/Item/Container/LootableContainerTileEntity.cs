@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
+using SoulboundEngine.Client.Debug.Logging;
 using SoulboundEngine.Client.UI.Screen;
-using SoulboundEngine.Common.Math;
 using SoulboundEngine.Loot;
 using SoulboundEngine.Registry;
 using SoulboundEngine.World.Block;
@@ -13,7 +13,6 @@ using System.Collections.Generic;
 
 namespace SoulboundEngine.Item.Container {
 	public abstract class LootableContainerTileEntity : TileEntity, IInventoryScreenHandlerFactory, ILootableInventory {
-		public const float MIN_USABLE_DISTANCE = 5f;
 		protected RegistryKey<LootTable>? lootTable;
 		protected long lootTableSeed;
 
@@ -22,7 +21,7 @@ namespace SoulboundEngine.Item.Container {
 		}
 
 		public virtual bool CanPlayerUse(PlayerEntity player) {
-			return Vec2d.Distance(player.GetPosition(), this.blockPos.GetCenter()) <= MIN_USABLE_DISTANCE;
+			return true;
 		}
 
 		protected abstract InventoryScreenHandler CreateScreenHandler(PlayerInventory playerInventory, PlayerEntity player);
@@ -42,10 +41,7 @@ namespace SoulboundEngine.Item.Container {
 		public RegistryKey<LootTable>? GetLootTable() => this.lootTable;
 
 		public virtual void OnOpened(PlayerEntity player) {
-			if (this.lootTable != null) {
-				this.GenerateLoot(player);
-				this.SetLootTable(null);
-			}
+			this.UnpackLootTable(player);
 		}
 
 		public virtual void OnClosed(PlayerEntity player) {
@@ -53,21 +49,22 @@ namespace SoulboundEngine.Item.Container {
 
 		public override void WriteAdditional(JObject json) {
 			base.WriteAdditional(json);
-			if (this.lootTable != null) {
-				json["lootTable"] = this.lootTable.value.ToString();
-				json["lootTableSeed"] = this.lootTableSeed;
+			if (!this.TrySaveLootTable(json)) {
+				json["contents"] = this.Save();
 			}
 		}
 
 		public override void ReadAdditional(JObject json) {
 			base.ReadAdditional(json);
-			string lootTableKey = ((string?)json["lootTable"]) ?? string.Empty;
-			long lootTableSeed = (long?)json["lootTableSeed"] ?? 0;
-
-			if (!string.IsNullOrEmpty(lootTableKey)) {
-				RegistryKey<LootTable> key = LootTables.Get(lootTableKey);
-				this.SetLootTable(key, lootTableSeed);
+			if (!this.TryLoadLootTable(json)) {
+				JToken? contentsJson = json["contents"];
+				if (contentsJson == null) {
+					Logger.LogError("No contents property found on LootableContainerTileEntity json: {}", json);
+					return;
+				}
+				this.Load(contentsJson);
 			}
 		}
+
 	}
 }

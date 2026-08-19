@@ -54,7 +54,7 @@ namespace SoulboundEngine.Item.Container {
 		public static JToken Save(this IInventory inventory) {
 			JArray array = new();
 			for (int i = 0; i < inventory.GetSize(); i++) {
-				array[i] = ItemStack.ToJson(inventory.GetSlot(i).GetStack());
+				array.Add(ItemStack.ToJson(inventory.GetSlot(i).GetStack()));
 			}
 			return array;
 		}

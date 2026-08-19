@@ -1,9 +1,9 @@
-﻿using SoulboundEngine.Item;
+﻿using SoulboundEngine.Common;
+using SoulboundEngine.Common.Math.Random;
+using SoulboundEngine.Item;
 using SoulboundEngine.Item.Container;
 using SoulboundEngine.Loot.Context;
 using SoulboundEngine.Loot.Function;
-using SoulboundEngine.Common;
-using SoulboundEngine.Common.Math.Random;
 using SoulboundEngine.Registry;
 using System;
 using System.Collections.Generic;
@@ -65,6 +65,7 @@ namespace SoulboundEngine.Loot {
 		}
 
 		public void SupplyInventory(IInventory inventory, LootWorldContext context, long seed) {
+			inventory.Clear();
 			IRandom random = GetRandomSequence(context, seed, this.randomSequenceId);
 			ItemStack[] stacks = this.GenerateLoot(context, random);
 			this.SpreadStacks(stacks, random, inventory.GetFreeSlots());
