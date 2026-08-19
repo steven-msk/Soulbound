@@ -148,6 +148,45 @@ namespace SoulboundEngine.World.Chunk {
 			return tileEntity?.Write();
 		}
 
+		/// <summary>
+		/// Consistency check after deserialized tile entities are applied and validated.
+		/// This makes sure every provider block is backed by a tile entity.
+		/// </summary>
+		public void SyncBlocksWithTileEntities() {
+			for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
+				for (int y = this.GetBottomY(); y <= this.GetTopY(); y++) {
+					BlockPos blockPos = new(this.ChunkXToWorldX(cx), y);
+					BlockState blockState = this.GetBlockState(blockPos);
+					TileEntity? tileEntityAtBlock = this.GetTileEntity(blockPos);
+
+					if (blockState.block is ITileEntityProvider tileEntityProvider && tileEntityAtBlock == null) {
+						// a TileEntity rejected by ValidateTileEntity should not vanish silently
+						// instead, a fresh TileEntity is created from the provider
+						Logger.LogWarning("Found missing tile entity for block {} at {}. This may be the result of broken serialization data",
+							Blocks.GetIdentifier(blockState.block), blockPos);
+
+						TileEntity? tileEntity = tileEntityProvider.CreateTileEntity(blockPos, blockState);
+						if (tileEntity != null && tileEntity.GetTileEntityType().Supports(blockState)) {
+							tileEntity.SetLevel(this.level);
+							this.tileEntities[blockPos] = tileEntity;
+							this.tickManager.AddTileEntity(tileEntity);
+							Logger.LogInfo("Added fresh TileEntity since it was missing: {} at {}", tileEntity, blockPos);
+						} else {
+							Logger.LogError("Failed to replenish missing TileEntity for block {} at {}",
+								Blocks.GetIdentifier(blockState.block), blockPos);
+							this.tileEntities.Remove(blockPos);
+						}
+					} else if (blockState.block is not ITileEntityProvider && tileEntityAtBlock != null) {
+						Logger.LogWarning("Found TileEntity for block that doesnt provide tile entities: {} at {}", tileEntityAtBlock, blockPos);
+						this.tileEntities.Remove(blockPos);
+					} else if (tileEntityAtBlock != null) {
+						tileEntityAtBlock.SetLevel(this.level);
+						this.tickManager.AddTileEntity(tileEntityAtBlock);
+					}
+				}
+			}
+		}
+
 		public override bool IsEmpty() => false;
 
 		public IEnumerable<TileEntity> GetTileEntities() => this.tileEntities.Values;

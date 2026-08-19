@@ -91,7 +91,7 @@ namespace SoulboundEngine.World.Chunk {
 				}
 			}
 
-			Chunk chunk = new WorldChunk(level, chunkPos, sections, containerFactory);
+			WorldChunk chunk = new(level, chunkPos, sections, containerFactory);
 
 			foreach (var token in this.tileEntities) {
 				try {
@@ -111,6 +111,7 @@ namespace SoulboundEngine.World.Chunk {
 					Logger.LogFatal(e);
 				}
 			}
+			chunk.SyncBlocksWithTileEntities();
 
 			return chunk;
 		}
