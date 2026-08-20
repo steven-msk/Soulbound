@@ -1,12 +1,12 @@
-﻿using SoulboundEngine.Client.Util;
-using SoulboundEngine.Common.Math;
-using Unity.VisualScripting;
-using UnityEngine;
-using UnityEngine.UIElements;
+﻿
+namespace SoulboundEngine.Client.Render.Item {
+	using SoulboundEngine.Client.Util;
+	using SoulboundEngine.Common.Math;
+	using UnityEngine;
+	using UnityEngine.UIElements;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.Render.Item {
 	public abstract record ItemViewHandle {
 		public abstract void SetVisible(bool visible);
 
@@ -24,7 +24,7 @@ namespace SoulboundEngine.Client.Render.Item {
 
 		public sealed record GameObjectBacked(GameObject gameObject) : ItemViewHandle {
 			public override bool IsValid() {
-				return this.gameObject != null && !this.gameObject.IsDestroyed();
+				return this.gameObject;
 			}
 
 			public override void SetPosition(Vec2d position) {

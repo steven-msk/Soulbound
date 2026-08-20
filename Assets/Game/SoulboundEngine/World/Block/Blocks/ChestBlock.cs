@@ -1,15 +1,15 @@
-﻿using SoulboundEngine.Common.Math;
-using SoulboundEngine.Common.Math.Random;
-using SoulboundEngine.Interaction;
-using SoulboundEngine.Item.Container;
-using SoulboundEngine.Loot;
-using SoulboundEngine.World.Block.Entity;
-using SoulboundEngine.World.Block.State;
-using SoulboundEngine.World.Entity;
-using SoulboundEngine.World.Player;
-
-namespace SoulboundEngine.World.Block {
-	using Level = Level.Level;
+﻿namespace SoulboundEngine.World.Block {
+	using SoulboundEngine.Common.Math;
+	using SoulboundEngine.Common.Math.Random;
+	using SoulboundEngine.Interaction;
+	using SoulboundEngine.Item;
+	using SoulboundEngine.Item.Container;
+	using SoulboundEngine.Loot;
+	using SoulboundEngine.World.Block.Entity;
+	using SoulboundEngine.World.Block.State;
+	using SoulboundEngine.World.Entity;
+	using SoulboundEngine.World.Level;
+	using SoulboundEngine.World.Player;
 
 	public class ChestBlock : Block, ITileEntityProvider {
 		public const int INVENTORY_SIZE = 27;
@@ -27,7 +27,9 @@ namespace SoulboundEngine.World.Block {
 
 		protected override void OnStateReplaced(BlockState state, BlockPos pos, Level level) {
 			ChestTileEntity chestTileEntity = (ChestTileEntity)level.GetTileEntity(pos);
-			foreach (var stack in chestTileEntity) {
+			foreach (ItemStack stack in chestTileEntity) {
+				if (stack.IsEmpty()) continue;
+
 				Vec2d p = pos.GetCenter();
 				ItemEntity itemEntity = new(level, p.x, p.y, stack);
 				itemEntity.SetPos(pos.GetCenter());

@@ -133,7 +133,9 @@ namespace SoulboundEngine.Client.Render.Item {
 		public abstract void Update(S state, ItemViewHandle view, ItemRenderContext context);
 
 		internal override object InternalCreateRenderState(ItemStack stack, ItemRenderContext context) {
-			return this.CreateRenderState(stack, context);
+			return stack.IsEmpty()
+				? throw new InvalidOperationException("Creating an empty item render state is not allowed")
+				: this.CreateRenderState(stack, context);
 		}
 
 		internal override ItemViewHandle InternalCreate(object state, ItemModel model, ItemRenderContext context) {
