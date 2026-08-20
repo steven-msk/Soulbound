@@ -174,10 +174,12 @@ namespace SoulboundEngine.Client {
 			this.logConsole.Tick();
 
 			if (this.activeWorldSession is { } worldSession) {
+				bool isPaused = worldSession.levelManager.paused;
+
 				PlayerEntity player = worldSession.level.GetPlayer();
 				this.clientPlayerInputHandler.Handle(player,
-					shouldBlockKeyboardActions: this.uiHandler.HasKeyboardFocus(),
-					shouldBlockMouse: this.uiHandler.IsPointerOverUI()
+					shouldBlockKeyboardActions: this.uiHandler.HasKeyboardFocus() || isPaused,
+					shouldBlockMouse: this.uiHandler.IsPointerOverUI() || isPaused
 				);
 
 				if (!this.uiHandler.HasKeyboardFocus() && this.inputManager.keyboard.WasPressed(Keyboard.GetControl(Key.Escape))) {
