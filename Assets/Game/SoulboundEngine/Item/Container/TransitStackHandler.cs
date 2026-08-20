@@ -1,16 +1,15 @@
-using SoulboundEngine.Client.Assets;
-using SoulboundEngine.Client.Render.Item;
-using SoulboundEngine.Client.UI.UXMLBindings;
-using SoulboundEngine.Client.Util;
-using SoulboundEngine.Registry;
-using SoulboundEngine.World.Player;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UIElements;
+namespace SoulboundEngine.Item.Container {
+	using SoulboundEngine.Client.Assets;
+	using SoulboundEngine.Client.Render.Item;
+	using SoulboundEngine.Client.UI.UXMLBindings;
+	using SoulboundEngine.Registry;
+	using SoulboundEngine.World.Player;
+	using System.Collections.Generic;
+	using UnityEngine;
+	using UnityEngine.UIElements;
 
 #nullable enable
 
-namespace SoulboundEngine.Item.Container {
 	public sealed class TransitStackHandler : UXMLItemSlotDisplay, IInventory {
 		private static readonly Identifier TRANSIT_STACK_ELEMENT = Identifier.Of("soulbound:transit_stack/transit_stack");
 		private static readonly Identifier ITEM_DISPLAY_ELEMENT = Identifier.Of("soulbound:transit_stack/item_display");
@@ -56,7 +55,7 @@ namespace SoulboundEngine.Item.Container {
 		private void UpdateViewPosition() {
 			Vector2 size = this.root.worldBound.size;
 			Vector2 pos = this.pointerPosition - size / 2f;
-			this.view?.SetPosition(pos.ToVec2d());
+			this.root.style.translate = pos;
 		}
 
 		IItemSlot IInventory.GetSlot(int index) => this.slot!;
