@@ -1,5 +1,6 @@
 using SoulboundEngine.Client.Debug.Logging;
 using SoulboundEngine.Client.Input;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.UIElements;
@@ -33,7 +34,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		private void Render() {
 			List<ScreenEntry> buffer = new();
 
-			foreach (var entry in this.stack.Reverse<ScreenEntry>()) {
+			foreach (ScreenEntry entry in this.stack.Reverse<ScreenEntry>()) {
 				if (entry.screen.IsOpaque) {
 					buffer.ForEach(e => e.handle.Hide());
 					buffer.Clear();
@@ -88,17 +89,23 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 		private ScreenEntry? GetTopEntry() => this.stack.First();
 
-		public bool HasKeyboardFocus() => this.GetCurrentFocus()?.HasKeyboardFocus() ?? false;
+		public bool HasKeyboardFocus() => this.GetFocus(f => f.HasKeyboardFocus())?.HasKeyboardFocus() ?? false;
+		public bool IsPointerOverUI() => this.GetFocus(f => f.IsPointerOverUI())?.IsPointerOverUI() ?? false;
 
-		public bool IsPointerOverUI() => this.GetCurrentFocus()?.IsPointerOverUI() ?? false;
+		private IInputFocusable? GetFocus(Predicate<IInputFocusable> predicate) {
+			foreach (IInputFocusable focusable in this.focusStack.Reverse()) {
+				if (predicate(focusable)) return focusable;
+			}
+			return null;
+		}
 
 		public void PopInputFocus(IInputFocusable focus) {
-			if (this.focusStack.TryPeek(out var top) && ReferenceEquals(top, focus)) {
+			if (this.focusStack.TryPeek(out IInputFocusable? top) && ReferenceEquals(top, focus)) {
 				this.focusStack.Pop();
 			} else {
 				IInputFocusable[] remaining = this.focusStack.Where(f => !ReferenceEquals(f, focus)).Reverse().ToArray();
 				this.focusStack.Clear();
-				foreach (var f in remaining) this.focusStack.Push(f);
+				foreach (IInputFocusable f in remaining) this.focusStack.Push(f);
 			}
 		}
 
@@ -107,17 +114,13 @@ namespace SoulboundEngine.Client.UI.Screen {
 			Keyboard.ReleaseAll();
 		}
 
-		public IInputFocusable? GetCurrentFocus() {
-			return this.focusStack.TryPeek(out var top) ? top : this.stack.FirstOrDefault()?.screen;
-		}
-
 		public void IssueRebuild(Screen screen) {
 			if (this.GetActiveScreen() != screen) return;
 			this.ReplaceScreen(screen);
 		}
 
 		public void Flush() {
-			foreach (var entry in this.stack) {
+			foreach (ScreenEntry entry in this.stack) {
 				this.HideAndDispose(entry);
 			}
 			this.stack.Clear();

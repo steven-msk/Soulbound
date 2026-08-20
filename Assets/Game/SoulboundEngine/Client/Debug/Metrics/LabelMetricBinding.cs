@@ -1,6 +1,6 @@
 ﻿using SoulboundEngine.Client.Debug.Metrics.View;
 using SoulboundEngine.Client.UI.UXMLBindings;
-using SoulboundEngine.Core.Registry;
+using SoulboundEngine.Registry;
 using System;
 using UnityEngine.UIElements;
 

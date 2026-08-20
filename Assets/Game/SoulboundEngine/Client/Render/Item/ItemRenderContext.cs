@@ -1,5 +1,6 @@
 using SoulboundEngine.Client.UI.UXMLBindings;
-using SoulboundEngine.Core.Registry;
+using SoulboundEngine.Common.Math;
+using SoulboundEngine.Registry;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -28,10 +29,14 @@ namespace SoulboundEngine.Client.Render.Item {
 			}
 
 			public Label GetStackCount() => this.root.Get<Label>(this.stackCountElement);
+
+			public void SetVisible(VisualElement visualElement, bool visible) {
+				visualElement.style.visibility = visible ? Visibility.Visible : Visibility.Hidden;
+			}
 		}
 
 		public sealed class World : ItemRenderContext {
-			public Vector3 position;
+			public Vec2d position;
 		}
 	}
 }

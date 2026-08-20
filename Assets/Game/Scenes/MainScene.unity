@@ -366,7 +366,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameConfig:
     file:
-      savesFolder: saves
+      savesRoot: saves
+      seedFile: seed
+      chunksFolder: chunks
     dev:
       overrideSaves: 0
       devWorld: devWorld

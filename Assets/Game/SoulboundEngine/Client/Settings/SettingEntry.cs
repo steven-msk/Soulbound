@@ -1,6 +1,6 @@
 using SoulboundEngine.Client.Settings.View;
 using SoulboundEngine.Common;
-using SoulboundEngine.Core;
+using SoulboundEngine.Serialization;
 using System;
 using System.Linq;
 using Unity.VisualScripting;

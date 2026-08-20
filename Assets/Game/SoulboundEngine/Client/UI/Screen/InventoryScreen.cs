@@ -1,8 +1,8 @@
-﻿using SoulboundEngine.Client.Item;
-using SoulboundEngine.Client.Item.Container;
-using SoulboundEngine.Client.Player;
-using SoulboundEngine.Client.Render.Item;
+﻿using SoulboundEngine.Client.Render.Item;
 using SoulboundEngine.Client.UI.Screen.Slot;
+using SoulboundEngine.Item;
+using SoulboundEngine.Item.Container;
+using SoulboundEngine.World.Player;
 using System;
 using System.Collections.Generic;
 using UnityEngine;

@@ -1,6 +1,5 @@
 namespace SoulboundEngine.Client.Render.Item {
-	using SoulboundEngine.Client.Item;
-	using SoulboundEngine.Core;
+	using SoulboundEngine.Item;
 	using System;
 	using TMPro;
 	using UnityEngine;
@@ -13,21 +12,24 @@ namespace SoulboundEngine.Client.Render.Item {
 
 		public delegate ItemRenderer Factory();
 
-		internal abstract object CreateRenderStateBoxed(ItemStack stack, ItemRenderContext context);
-		internal abstract IItemView CreateViewBoxed(object state, ItemModel model, ItemRenderContext context);
-		internal abstract void UpdateViewBoxed(object state, IItemView view, ItemRenderContext context);
-		public abstract void DestroyView(IItemView view, ItemRenderContext context);
+		internal abstract object InternalCreateRenderState(ItemStack stack, ItemRenderContext context);
+
+		internal abstract ItemViewHandle InternalCreate(object state, ItemModel model, ItemRenderContext context);
+
+		internal abstract void InternalUpdate(object state, ItemViewHandle view, ItemRenderContext context);
+
+		public abstract void Destroy(ItemViewHandle view, ItemRenderContext context);
 
 		public sealed class Default : ItemRenderer<ItemRenderState> {
 			public override ItemRenderState CreateRenderState(ItemStack stack, ItemRenderContext context) {
 				return new ItemRenderState {
-					showStackCount = (context is ItemRenderContext.UGUI || context is ItemRenderContext.UXML)
+					showStackCount = (context is ItemRenderContext.UGUI or ItemRenderContext.UXML)
 						&& stack.GetItem().IsStackable(),
 					stack = stack
 				};
 			}
 
-			public override IItemView CreateView(ItemRenderState state, ItemModel model, ItemRenderContext context) {
+			public override ItemViewHandle Create(ItemRenderState state, ItemModel model, ItemRenderContext context) {
 				switch (context) {
 					case ItemRenderContext.UGUI gui: {
 							GameObject obj = new("UI Item", typeof(RectTransform));
@@ -49,65 +51,56 @@ namespace SoulboundEngine.Client.Render.Item {
 							stackText.enabled = state.showStackCount;
 
 							obj.SetActive(true);
-							return IItemView.Of(obj);
+							return ItemViewHandle.Of(obj);
 						}
-					case ItemRenderContext.UXML uiToolkit: {
-							VisualElement display = uiToolkit.GetItemDisplay();
-							Label stackText = uiToolkit.GetStackCount();
+					case ItemRenderContext.UXML uxmlContext: {
+							VisualElement display = uxmlContext.GetItemDisplay();
+							Label stackText = uxmlContext.GetStackCount();
 
 							display.style.backgroundImage = new StyleBackground(model.GetSprite());
+							uxmlContext.SetVisible(display, true);
+
 							stackText.text = state.stack.count.ToString();
-							stackText.style.display = state.showStackCount ? DisplayStyle.Flex : DisplayStyle.None;
+							uxmlContext.SetVisible(stackText, state.showStackCount);
 
 							display.pickingMode = PickingMode.Ignore;
 							stackText.pickingMode = PickingMode.Ignore;
 
-							uiToolkit.root.style.display = DisplayStyle.Flex;
-							return IItemView.Of(uiToolkit.root);
+							uxmlContext.SetVisible(uxmlContext.root, true);
+							return ItemViewHandle.Of(display);
 						}
 					case ItemRenderContext.World world: {
 							GameObject obj = new("Item");
 							obj.SetActive(false);
-							obj.transform.position = world.position;
+							obj.transform.position = new Vector3((float)world.position.x, (float)world.position.y);
 							obj.transform.localScale = model.GetScaleToWorldSize(Vector2.one);
 
 							Sprite sprite = model.GetSprite();
 							SpriteRenderer spriteRenderer = obj.AddComponent<SpriteRenderer>();
 							spriteRenderer.sprite = sprite;
 
-							Rigidbody2D rigidbody = obj.AddComponent<Rigidbody2D>();
-							rigidbody.sleepMode = RigidbodySleepMode2D.NeverSleep;
-							rigidbody.constraints = RigidbodyConstraints2D.FreezeRotation;
-
-							BoxCollider2D physicsCollider = obj.AddComponent<BoxCollider2D>();
-							physicsCollider.excludeLayers = LayerMask.GetMask(Layers.EntityCharacter);
-
-							BoxCollider2D pickupCollider = obj.AddComponent<BoxCollider2D>();
-							pickupCollider.isTrigger = true;
-
 							obj.SetActive(true);
-							return IItemView.Of(obj);
+							return ItemViewHandle.Of(obj);
 						}
 					default: throw new NotImplementedException();
 				}
 			}
 
-			public override void DestroyView(IItemView view, ItemRenderContext context) {
-				if (context is ItemRenderContext.UXML uiToolkit) {
-					VisualElement display = uiToolkit.GetItemDisplay();
-					Label stackText = uiToolkit.GetStackCount();
-
+			public override void Destroy(ItemViewHandle view, ItemRenderContext context) {
+				if (context is ItemRenderContext.UXML uxmlContext) {
+					VisualElement display = uxmlContext.GetItemDisplay();
 					display.style.backgroundImage = new StyleBackground((Sprite)null);
+					uxmlContext.SetVisible(display, false);
+					Label stackText = uxmlContext.GetStackCount();
 					stackText.text = "";
-					stackText.style.display = DisplayStyle.None;
-
-					return;
+					uxmlContext.SetVisible(stackText, false);
+				} else if (context is ItemRenderContext.World or ItemRenderContext.UGUI) {
+					ItemViewHandle.GameObjectBacked objView = (ItemViewHandle.GameObjectBacked)view;
+					GameObject.Destroy(objView.gameObject);
 				}
-
-				view.Destroy();
 			}
 
-			public override void UpdateView(ItemRenderState state, IItemView view, ItemRenderContext context) {
+			public override void Update(ItemRenderState state, ItemViewHandle view, ItemRenderContext context) {
 			}
 
 			private TextMeshProUGUI CreateStackText(RectTransform viewParent) {
@@ -135,19 +128,22 @@ namespace SoulboundEngine.Client.Render.Item {
 	public abstract class ItemRenderer<S> : ItemRenderer where S : ItemRenderState {
 		public abstract S CreateRenderState(ItemStack stack, ItemRenderContext context);
 
-		public abstract IItemView CreateView(S state, ItemModel model, ItemRenderContext context);
-		public abstract void UpdateView(S state, IItemView view, ItemRenderContext context);
+		public abstract ItemViewHandle Create(S state, ItemModel model, ItemRenderContext context);
 
-		internal override object CreateRenderStateBoxed(ItemStack stack, ItemRenderContext context) {
-			return this.CreateRenderState(stack, context);
+		public abstract void Update(S state, ItemViewHandle view, ItemRenderContext context);
+
+		internal override object InternalCreateRenderState(ItemStack stack, ItemRenderContext context) {
+			return stack.IsEmpty()
+				? throw new InvalidOperationException("Creating an empty item render state is not allowed")
+				: this.CreateRenderState(stack, context);
 		}
 
-		internal override IItemView CreateViewBoxed(object state, ItemModel model, ItemRenderContext context) {
-			return this.CreateView((S)state, model, context);
+		internal override ItemViewHandle InternalCreate(object state, ItemModel model, ItemRenderContext context) {
+			return this.Create((S)state, model, context);
 		}
 
-		internal override void UpdateViewBoxed(object state, IItemView view, ItemRenderContext context) {
-			this.UpdateView((S)state, view, context);
+		internal override void InternalUpdate(object state, ItemViewHandle view, ItemRenderContext context) {
+			this.Update((S)state, view, context);
 		}
 	}
 }

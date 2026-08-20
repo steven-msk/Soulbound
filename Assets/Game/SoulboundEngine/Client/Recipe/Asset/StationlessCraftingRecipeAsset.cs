@@ -1,5 +1,6 @@
-﻿using SoulboundEngine.Client.Item;
-using SoulboundEngine.Core.Registry;
+﻿using SoulboundEngine.Item;
+using SoulboundEngine.Recipe;
+using SoulboundEngine.Registry;
 using System.Collections.Generic;
 using UnityEngine;
 

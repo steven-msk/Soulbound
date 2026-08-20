@@ -3,7 +3,7 @@ using Brigadier.NET.Exceptions;
 using Brigadier.NET.Suggestion;
 using Cysharp.Threading.Tasks;
 using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.Client.Runtime.Services;
+using SoulboundEngine.World.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;

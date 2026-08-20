@@ -1,4 +1,4 @@
-﻿using SoulboundEngine.Core.Assets;
+﻿using SoulboundEngine.Client.Assets;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;

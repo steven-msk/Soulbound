@@ -1,5 +1,5 @@
-﻿using SoulboundEngine.Client.Player;
-using SoulboundEngine.Core.Registry;
+﻿using SoulboundEngine.World.Player;
+using SoulboundEngine.Registry;
 
 namespace SoulboundEngine.Client.UI.Screen {
 	public abstract class InventoryScreenHandlerType {

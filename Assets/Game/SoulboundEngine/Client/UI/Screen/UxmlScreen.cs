@@ -1,6 +1,6 @@
 ﻿using SoulboundEngine.Client.UI.UXMLBindings;
-using SoulboundEngine.Core.Assets;
-using SoulboundEngine.Core.Registry;
+using SoulboundEngine.Client.Assets;
+using SoulboundEngine.Registry;
 using System;
 using System.Collections.Generic;
 using UnityEngine;

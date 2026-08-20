@@ -1,7 +1,7 @@
 using SoulboundEngine.Client.Settings;
 using SoulboundEngine.Client.UI;
-using SoulboundEngine.Core.Assets;
-using SoulboundEngine.Core.Registry;
+using SoulboundEngine.Client.Assets;
+using SoulboundEngine.Registry;
 using System;
 using UnityEngine.UIElements;
 

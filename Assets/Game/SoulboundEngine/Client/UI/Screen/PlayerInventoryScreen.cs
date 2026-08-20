@@ -1,9 +1,9 @@
-﻿using SoulboundEngine.Client.Item;
-using SoulboundEngine.Client.Recipe;
+﻿using SoulboundEngine.Item;
+using SoulboundEngine.Recipe;
 using SoulboundEngine.Client.Render.Item;
 using SoulboundEngine.Client.UI.UXMLBindings;
-using SoulboundEngine.Core.Assets;
-using SoulboundEngine.Core.Registry;
+using SoulboundEngine.Client.Assets;
+using SoulboundEngine.Registry;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.UIElements;

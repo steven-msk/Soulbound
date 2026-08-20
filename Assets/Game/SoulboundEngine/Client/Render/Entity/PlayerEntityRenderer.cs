@@ -1,9 +1,7 @@
-﻿using SoulboundEngine.Client.Player;
-using UnityEngine;
+﻿using SoulboundEngine.World.Entity;
+using SoulboundEngine.World.Player;
 
 namespace SoulboundEngine.Client.Render.Entity {
-	using PlayerEntity = Player.PlayerEntity;
-
 	public sealed class PlayerEntityRenderer : EntityRenderer<PlayerEntity, PlayerRenderState, PlayerModel> {
 		public PlayerEntityRenderer(FactoryContext context)
 			: base(context) {
@@ -12,18 +10,12 @@ namespace SoulboundEngine.Client.Render.Entity {
 		public override PlayerRenderState CreateRenderState(PlayerEntity entity) {
 			return new PlayerRenderState {
 				entity = entity,
-				descriptor = PlayerEntity.DESCRIPTOR
+				descriptor = EntityType.PLAYER
 			};
 		}
 
-		public override IEntityView CreateView(PlayerRenderState state, PlayerModel model) {
-			GameObject obj = GameObject.Instantiate(model.prefab);
-			PlayerTransform transform = obj.GetComponent<PlayerTransform>();
-			transform.Init(state.entity);
-			state.entity.SetPhysicsHandle(transform);
-			state.entity.SetBoundingBoxHandle(transform);
-			state.entity.SetTransformHandle(transform);
-			return transform;
+		public override EntityViewHandle Create(PlayerRenderState state, PlayerModel model) {
+			return EntityViewHandle.Instantiate(model.prefab);
 		}
 
 	}

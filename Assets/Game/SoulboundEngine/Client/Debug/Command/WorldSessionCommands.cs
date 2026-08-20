@@ -1,11 +1,11 @@
 using Brigadier.NET;
 using Brigadier.NET.Builder;
 using Brigadier.NET.Context;
-using SoulboundEngine.Client.Item;
-using SoulboundEngine.Client.World.Block;
-using SoulboundEngine.Client.World.Entity;
+using SoulboundEngine.Common.Math;
+using SoulboundEngine.Item;
+using SoulboundEngine.World.Block;
+using SoulboundEngine.World.Entity;
 using System;
-using UnityEngine;
 using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 #nullable enable
@@ -21,10 +21,10 @@ namespace SoulboundEngine.Client.Debug.Commands {
 						.Then(c => c.Argument("block", new BlockArgumentType())
 							.Executes(ctx => {
 								Block block = ctx.GetArgument<Block>("block");
-								Vector2 playerPos = ctx.Source.data.Player.GetPos();
+								Vec2d playerPos = ctx.Source.data.Player.GetPos();
 								var blockPos = new BlockPos {
-									x = Mathf.FloorToInt(ctx.GetArgument<Coordinate>("x").GetPos(playerPos.x)),
-									y = Mathf.FloorToInt(ctx.GetArgument<Coordinate>("y").GetPos(playerPos.y))
+									x = Maths.FloorToInt(ctx.GetArgument<Coordinate>("x").GetPos(playerPos.x)),
+									y = Maths.FloorToInt(ctx.GetArgument<Coordinate>("y").GetPos(playerPos.y))
 								};
 								ctx.Source.execServices.Level.SetBlockState(blockPos, block.DefaultState);
 								Logger.LogInfo("Set block {} at {}", Blocks.GetIdentifier(block), blockPos);
@@ -53,11 +53,11 @@ namespace SoulboundEngine.Client.Debug.Commands {
 					return 0;
 				}
 
-				Vector2 pos = target.GetPos();
-				float x = ctx.GetArgument<Coordinate>("x").GetPos(pos.x);
-				float y = ctx.GetArgument<Coordinate>("y").GetPos(pos.y);
+				Vec2d pos = target.GetPos();
+				double x = ctx.GetArgument<Coordinate>("x").GetPos(pos.x);
+				double y = ctx.GetArgument<Coordinate>("y").GetPos(pos.y);
 
-				ctx.Source.execServices.Entity.SetPos(target.GetGuid(), new Vector2(x, y));
+				ctx.Source.execServices.Entity.SetPos(target.GetGuid(), new Vec2d(x, y));
 				Logger.LogInfo("teleported {} to x:{} y:{}", target, x, y);
 
 				return 1;
@@ -75,7 +75,7 @@ namespace SoulboundEngine.Client.Debug.Commands {
 			);
 			static int SpawnEntity(bool hasPos, CommandContext<RuntimeCommandSource> ctx) {
 				EntityDescriptor entityDescriptor = ctx.GetArgument<EntityDescriptor>("entityType");
-				Vector2 pos = ctx.Source.data.Player.GetPos();
+				Vec2d pos = ctx.Source.data.Player.GetPos();
 
 				if (hasPos) {
 					Coordinate x = ctx.GetArgument<Coordinate>("x");
