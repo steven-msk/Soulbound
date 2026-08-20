@@ -299,7 +299,11 @@ namespace SoulboundEngine.World.Level {
 		}
 
 		public static bool IsInBounds(BlockPos pos) {
-			return pos.y < WORLD_HEIGHT && pos.y >= MIN_Y;
+			return IsInBounds(pos.x, pos.y);
+		}
+
+		public static bool IsInBounds(int x, int y) {
+			return y <= MAX_Y && y >= MIN_Y;
 		}
 
 		public int GetSurfaceY(int xpos) {

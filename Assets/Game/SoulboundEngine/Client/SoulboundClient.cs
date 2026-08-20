@@ -210,6 +210,9 @@ namespace SoulboundEngine.Client {
 		public void EnterWorld(string world) {
 			if (this.IsWorldSessionActive()) return;
 
+			this.worldRenderer.Reset();
+			this.metricsHud.Hide();
+
 			WorldSave save = this.worldSavesManager.GetSave(world, this.worldSerializer);
 			WorldSaveSeedProvider seedProvider = new(save);
 			ClientWorldBootstrapper worldLoader = new(this, seedProvider, save);
@@ -268,6 +271,8 @@ namespace SoulboundEngine.Client {
 			levelManager.StopSession();
 			this.player = null;
 			this.worldRenderer.SetLevel(null);
+			this.ShowChunkFeatures(false);
+			this.metricsHud.Hide();
 			this.uiHandler.FlushScreens();
 
 			SceneManager.LoadSceneAsync(this.config.unity.mainScene).ToUniTask()
