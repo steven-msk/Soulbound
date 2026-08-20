@@ -1,12 +1,13 @@
 using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using SoulboundEngine.Client;
-using SoulboundEngine.Common.Json;
 using SoulboundEngine.Client.Assets;
+using SoulboundEngine.Common.Json;
 using SoulboundEngine.GameStates;
 using SoulboundEngine.Registry;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using UnityEditor;
 using UnityEngine;
@@ -30,6 +31,9 @@ namespace SoulboundEngine {
 		private float tickStartTime;
 		private readonly SoulboundClient client;
 		public readonly GameConfig config;
+		private readonly Stopwatch tickStopwatch = new();
+		private readonly Stopwatch tpsWindowStopwatch = new();
+		private int ticksThisSecond;
 
 		public Soulbound(GameConfig config) {
 			instance = this;
@@ -101,13 +105,24 @@ namespace SoulboundEngine {
 		}
 
 		private void StartTick() {
+			this.tickStopwatch.Restart();
 			this.tickStartTime = Time.realtimeSinceStartup;
 		}
 
 		private void EndTick() {
-			float elapsed = Time.realtimeSinceStartup - this.tickStartTime;
-			if (elapsed > SharedConstants.TICKS_PER_SECOND) {
-				Logger.LogWarning($"Tick lag detected! Tick took {elapsed * 1000f:F1} ms");
+			this.tickStopwatch.Stop();
+			double elapsedMs = this.tickStopwatch.Elapsed.TotalMilliseconds;
+			if (elapsedMs > TICK_RATE * 1000f * 1.5f) {
+				Logger.LogWarning($"Tick lag detected! Tick took {elapsedMs:F1}ms (target {TICK_RATE * 1000F}ms)");
+			}
+
+			this.ticksThisSecond++;
+			if (this.tpsWindowStopwatch.Elapsed.TotalSeconds >= 1.0d) {
+				if (this.ticksThisSecond < SharedConstants.TICKS_PER_SECOND - 1) {
+					Logger.LogWarning("Tick rate degraded: {} TPS (target {})", this.ticksThisSecond, SharedConstants.TICKS_PER_SECOND);
+				}
+				this.ticksThisSecond = 0;
+				this.tpsWindowStopwatch.Restart();
 			}
 		}
 
