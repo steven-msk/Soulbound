@@ -3,8 +3,8 @@ using Brigadier.NET.ArgumentTypes;
 using Brigadier.NET.Context;
 using Brigadier.NET.Exceptions;
 using Brigadier.NET.Suggestion;
-using SoulboundEngine.Client.World.Entity;
-using SoulboundEngine.Core.Registry;
+using SoulboundEngine.World.Entity;
+using SoulboundEngine.Registry;
 using System.Threading.Tasks;
 
 namespace SoulboundEngine.Client.Debug.Commands {

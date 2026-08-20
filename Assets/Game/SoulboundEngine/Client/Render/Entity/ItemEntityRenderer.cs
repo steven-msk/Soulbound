@@ -1,5 +1,6 @@
 ﻿using SoulboundEngine.Client.Render.Item;
-using SoulboundEngine.Client.World.Entity;
+using SoulboundEngine.World.Entity;
+using System;
 using UnityEngine;
 
 namespace SoulboundEngine.Client.Render.Entity {
@@ -13,33 +14,23 @@ namespace SoulboundEngine.Client.Render.Entity {
 
 		public override ItemEntityRenderState CreateRenderState(ItemEntity entity) {
 			return new ItemEntityRenderState {
-				descriptor = ItemEntity.DESCRIPTOR,
+				descriptor = EntityType.ITEM,
 				entity = entity,
 				stack = entity.GetStack()
 			};
 		}
 
-		public override IEntityView CreateView(ItemEntityRenderState state, ItemEntityModel model) {
+		public override EntityViewHandle Create(ItemEntityRenderState state, ItemEntityModel model) {
 			ItemRenderer itemRenderer = this.itemRenderManager.GetRenderer(state.stack.GetItem());
 			ItemModel itemModel = this.itemRenderManager.GetModel(state.stack);
 
 			ItemRenderContext renderContext = new ItemRenderContext.World { position = state.entity.GetPosition() };
-			object itemRenderState = itemRenderer.CreateRenderStateBoxed(state.stack, renderContext);
-			IItemView itemView = itemRenderer.CreateViewBoxed(itemRenderState, itemModel, renderContext);
-			if (!itemView.IsValid()) return IEntityView.Of(null);
+			object itemRenderState = itemRenderer.InternalCreateRenderState(state.stack, renderContext);
+			ItemViewHandle itemView = itemRenderer.InternalCreate(itemRenderState, itemModel, renderContext);
+			if (!itemView.IsValid()) throw new InvalidOperationException("Cannot create entity view from invalid item view");
 
-			GameObject obj = ((IItemView.GameObjectImpl)itemView).GetGameObject();
-			ItemEntityTransform transform = obj.AddComponent<ItemEntityTransform>();
-			transform.Init(state.entity);
-
-			return transform;
-		}
-
-		public override void DestroyView(IEntityView view) {
-			view.Destroy();
-		}
-
-		public override void UpdateView(ItemEntityRenderState state, IEntityView view) {
+			GameObject obj = ((ItemViewHandle.GameObjectBacked)itemView).gameObject;
+			return EntityViewHandle.Of(obj);
 		}
 	}
 }

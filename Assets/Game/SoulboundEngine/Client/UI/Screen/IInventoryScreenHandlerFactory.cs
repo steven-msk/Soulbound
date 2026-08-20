@@ -1,4 +1,4 @@
-﻿using SoulboundEngine.Client.Player;
+﻿using SoulboundEngine.World.Player;
 
 namespace SoulboundEngine.Client.UI.Screen {
 	public interface IInventoryScreenHandlerFactory {

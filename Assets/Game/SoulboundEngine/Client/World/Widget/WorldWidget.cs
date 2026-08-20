@@ -1,4 +1,5 @@
-﻿using SoulboundEngine.Client.World.Block;
+﻿using SoulboundEngine.Common.Math;
+using SoulboundEngine.World.Block;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -23,7 +24,7 @@ namespace SoulboundEngine.Client.World.Widget {
 
 		protected abstract void Bind(UIDocument uiDocument, WorldWidgetContext context);
 
-		protected abstract Vector2 GetElementPos(UIDocument document, BlockPos blockPos);
+		protected abstract Vec2d GetElementPos(UIDocument document, BlockPos blockPos);
 
 		public void Destroy() {
 			this.widgetManager.DestroyElement(this.document);
@@ -51,11 +52,11 @@ namespace SoulboundEngine.Client.World.Widget {
 		}
 
 		protected virtual void OnBind(UIDocument document, TContext context) {
-			Vector2 pos = this.GetElementPos(document, this.creationContext.blockPos);
-			this.document.transform.position = pos;
+			Vec2d pos = this.GetElementPos(document, this.creationContext.blockPos);
+			this.document.transform.position = new Vector2((float)pos.x, (float)pos.y);
 		}
 
-		protected override Vector2 GetElementPos(UIDocument document, BlockPos blockPos) {
+		protected override Vec2d GetElementPos(UIDocument document, BlockPos blockPos) {
 			return blockPos.GetCenter();
 		}
 	}

@@ -1,9 +1,9 @@
-using SoulboundEngine.Client.Item.Container;
-using SoulboundEngine.Client.Player;
+using SoulboundEngine.Item.Container;
+using SoulboundEngine.World.Player;
 using SoulboundEngine.Client.Render.Item;
 using SoulboundEngine.Client.UI.UXMLBindings;
-using SoulboundEngine.Core.Assets;
-using SoulboundEngine.Core.Registry;
+using SoulboundEngine.Client.Assets;
+using SoulboundEngine.Registry;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.UI.Screen {

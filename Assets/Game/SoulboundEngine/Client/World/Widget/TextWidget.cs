@@ -1,7 +1,7 @@
 ﻿using SoulboundEngine.Client.UI.UXMLBindings;
-using SoulboundEngine.Client.World.Block;
-using SoulboundEngine.Core.Registry;
-using UnityEngine;
+using SoulboundEngine.Common.Math;
+using SoulboundEngine.Registry;
+using SoulboundEngine.World.Block;
 using UnityEngine.UIElements;
 
 namespace SoulboundEngine.Client.World.Widget {
@@ -17,9 +17,9 @@ namespace SoulboundEngine.Client.World.Widget {
 			this.SetText(context.text);
 		}
 
-		protected override Vector2 GetElementPos(UIDocument document, BlockPos blockPos) {
-			Vector2 blockCenter = blockPos.GetCenter();
-			return blockCenter + Vector2.up;
+		protected override Vec2d GetElementPos(UIDocument document, BlockPos blockPos) {
+			Vec2d blockCenter = blockPos.GetCenter();
+			return blockCenter + Vec2d.UNIT_Y;
 		}
 
 		protected override void OnUpdate(Context context) {

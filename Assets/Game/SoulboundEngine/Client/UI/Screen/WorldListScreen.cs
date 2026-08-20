@@ -1,8 +1,8 @@
-﻿using SoulboundEngine.Client.Debug.Logging;
+﻿using SoulboundEngine.Client.Assets;
+using SoulboundEngine.Client.Debug.Logging;
 using SoulboundEngine.Client.UI.UXMLBindings;
-using SoulboundEngine.Client.World;
-using SoulboundEngine.Core.Assets;
-using SoulboundEngine.Core.Registry;
+using SoulboundEngine.Registry;
+using SoulboundEngine.World;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.UIElements;

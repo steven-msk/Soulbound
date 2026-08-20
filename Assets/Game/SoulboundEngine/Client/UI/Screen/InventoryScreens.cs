@@ -1,7 +1,7 @@
 ﻿using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.Client.Player;
+using SoulboundEngine.World.Player;
 using SoulboundEngine.Client.Render.Item;
-using SoulboundEngine.Core.Assets;
+using SoulboundEngine.Client.Assets;
 using System;
 using System.Collections.Generic;
 using UnityEngine.UIElements;

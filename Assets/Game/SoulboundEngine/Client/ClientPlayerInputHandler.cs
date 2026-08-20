@@ -1,5 +1,5 @@
-﻿using SoulboundEngine.Client.Player;
-using SoulboundEngine.Client.Settings;
+﻿using SoulboundEngine.Client.Settings;
+using SoulboundEngine.World.Player;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -30,16 +30,19 @@ namespace SoulboundEngine.Client {
 			}
 
 			if (!shouldBlockKeyboardActions) {
-				this.HandleJump(player);
 				this.HandleMovement(player);
+				this.HandleJump(player);
 				this.CheckHotbarKeyPressed(player);
 				this.HandleStackThrow(player);
 				this.HandleInventoryToggle(player);
+			} else {
+				player.SetMovementX(0f);
+				player.SetJumping(false);
 			}
 		}
 
 		private void CheckHotbarKeyPressed(PlayerEntity player) {
-			foreach (var (key, index) in HOTBAR_KEYS) {
+			foreach ((Key key, int index) in HOTBAR_KEYS) {
 				if (this.client.InputManager.keyboard.IsPressed(Keyboard.GetControl(key))) {
 					player.SetMainSlot(index);
 					return;
@@ -84,7 +87,7 @@ namespace SoulboundEngine.Client {
 			float movementX = 0f;
 			if (GameSettings.keybinds.moveLeft.IsPressed()) movementX -= 1f;
 			if (GameSettings.keybinds.moveRight.IsPressed()) movementX += 1f;
-			player.SetNormalVelocityX(movementX);
+			player.SetMovementX(movementX);
 		}
 
 		private void HandleJump(PlayerEntity player) {
@@ -95,7 +98,7 @@ namespace SoulboundEngine.Client {
 			// TODO: handle continuous item throw
 			while (GameSettings.keybinds.throwItem.WasPressed()) {
 				bool ctrl = this.client.InputManager.keyboard.IsPressed(Keyboard.GetControl(Key.LeftCtrl));
-				player.ThrowFromMainHand(ctrl);
+				player.DropMainHandItem(ctrl);
 			}
 		}
 

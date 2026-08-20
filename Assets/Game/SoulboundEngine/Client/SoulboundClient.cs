@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using SoulboundEngine.Client.Audio;
 using SoulboundEngine.Client.Debug;
 using SoulboundEngine.Client.Debug.Commands;
 using SoulboundEngine.Client.Debug.Logging.Console;
@@ -6,27 +7,28 @@ using SoulboundEngine.Client.Debug.Metrics;
 using SoulboundEngine.Client.Debug.Metrics.View;
 using SoulboundEngine.Client.Input;
 using SoulboundEngine.Client.IO;
-using SoulboundEngine.Client.Player;
-using SoulboundEngine.Client.Recipe;
 using SoulboundEngine.Client.Recipe.Asset;
 using SoulboundEngine.Client.Render.Block;
 using SoulboundEngine.Client.Render.Entity;
 using SoulboundEngine.Client.Render.Item;
-using SoulboundEngine.Client.Runtime.Services;
+using SoulboundEngine.Client.Render.Sprite;
+using SoulboundEngine.Client.Render.World;
 using SoulboundEngine.Client.Settings;
 using SoulboundEngine.Client.UI;
 using SoulboundEngine.Client.UI.Screen;
 using SoulboundEngine.Client.UI.UXMLBindings;
 using SoulboundEngine.Client.World;
-using SoulboundEngine.Client.World.Level;
-using SoulboundEngine.Client.World.Render;
-using SoulboundEngine.Client.World.Serialization;
 using SoulboundEngine.Client.World.Widget;
-using SoulboundEngine.Core;
-using SoulboundEngine.Core.Audio;
-using SoulboundEngine.Core.Registry;
-using SoulboundEngine.Core.Render.Sprite;
-using SoulboundEngine.Core.Serialization;
+using SoulboundEngine.Common.Math;
+using SoulboundEngine.Recipe;
+using SoulboundEngine.Registry;
+using SoulboundEngine.Serialization;
+using SoulboundEngine.World;
+using SoulboundEngine.World.Level;
+using SoulboundEngine.World.Player;
+using SoulboundEngine.World.Serialization;
+using SoulboundEngine.World.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.InputSystem;
@@ -36,7 +38,6 @@ using UnityEngine.UIElements;
 namespace SoulboundEngine.Client {
 	using Camera = UnityEngine.Camera;
 	using Keyboard = Input.Keyboard;
-	using Logger = Debug.Logging.Logger;
 	using Object = UnityEngine.Object;
 	using RectInt = UnityEngine.RectInt;
 	using Vector2 = UnityEngine.Vector2;
@@ -48,8 +49,6 @@ namespace SoulboundEngine.Client {
 #endif
 
 	public sealed class SoulboundClient : IWorldAccessor, IDebugMetricsSource {
-		const int INPUT_QUEUE_BUFFER_CAPACITY = 128;
-		const string SAVES_ROOT_FOLDER = "saves";
 		private static SoulboundClient instance;
 		private readonly GameConfig config;
 		private readonly PlayerInputActions inputActions;
@@ -64,7 +63,7 @@ namespace SoulboundEngine.Client {
 		private readonly RuntimeDataProvider runtimeDataProvider;
 		private readonly RuntimeExecutionServices runtimeExecutionServices;
 		private readonly WorldSavesManager worldSavesManager;
-		private readonly WorldSerializer worldSerializer;
+		private readonly WorldSaveValidator worldSerializer;
 		private readonly UIHandler uiHandler;
 		private readonly UIAudioEventBank uiAudioEventBank;
 		private readonly WorldAudioEventBank worldAudioEventBank;
@@ -92,9 +91,9 @@ namespace SoulboundEngine.Client {
 			this.clientPlayerInputHandler = new ClientPlayerInputHandler(this);
 			this.settings = new GameSettings();
 
-			File savesFile = UnityPaths.PersistentDataRoot.Combine(SAVES_ROOT_FOLDER);
-			this.worldSavesManager = new WorldSavesManager(savesFile, WorldSerializer.SEED_FILE_NAME);
-			this.worldSerializer = new WorldSerializer();
+			File savesFile = UnityPaths.PersistentDataRoot.Combine(config.file.savesRoot);
+			this.worldSavesManager = new WorldSavesManager(savesFile);
+			this.worldSerializer = new WorldSaveValidator(config.file.seedFile, config.file.chunksFolder);
 
 			this.debugMetricsService = new DebugMetricsService();
 			this.performanceMetrics = new PerformanceMetrics();
@@ -170,20 +169,23 @@ namespace SoulboundEngine.Client {
 		}
 
 		private void HandleInputTick() {
+			this.metricsHud.Tick();
+			this.commandLine.Tick();
+			this.logConsole.Tick();
+
 			if (this.activeWorldSession is { } worldSession) {
+				bool isPaused = worldSession.levelManager.paused;
+
 				PlayerEntity player = worldSession.level.GetPlayer();
 				this.clientPlayerInputHandler.Handle(player,
-					shouldBlockKeyboardActions: this.uiHandler.HasKeyboardFocus(),
-					shouldBlockMouse: this.uiHandler.IsPointerOverUI()
+					shouldBlockKeyboardActions: this.uiHandler.HasKeyboardFocus() || isPaused,
+					shouldBlockMouse: this.uiHandler.IsPointerOverUI() || isPaused
 				);
 
 				if (!this.uiHandler.HasKeyboardFocus() && this.inputManager.keyboard.WasPressed(Keyboard.GetControl(Key.Escape))) {
 					worldSession.levelManager.TogglePause();
 				}
 			}
-			this.metricsHud.Tick();
-			this.commandLine.Tick();
-			this.logConsole.Tick();
 		}
 
 		public IScreenHandle OpenScreen(Screen screen) {
@@ -210,34 +212,52 @@ namespace SoulboundEngine.Client {
 
 			WorldSave save = this.worldSavesManager.GetSave(world, this.worldSerializer);
 			WorldSaveSeedProvider seedProvider = new(save);
-			WorldLoader worldLoader = new(this, seedProvider, save, this.worldSerializer);
+			ClientWorldBootstrapper worldLoader = new(this, seedProvider, save);
 
-			this.worldSavesManager.OnWorldEntered(world);
-			this.uiHandler.FlushScreens();
-			this.worldRenderer.Reset();
+			UniTask<WorldBootData> worldBootTask = worldLoader.LoadWorld();
+			UniTask sceneLoadTask = SceneManager.LoadSceneAsync(this.config.unity.worldScene, LoadSceneMode.Additive).ToUniTask();
 
-			worldLoader.LoadWorld(
-				SceneManager.LoadSceneAsync(this.config.unity.worldScene).ToUniTask(),
-				Object.FindFirstObjectByType<WorldSceneRoot>
-			).ContinueWith(session => {
-				this.worldRenderer.SetLevel(session.level);
-				this.worldRenderer.SetTilemap(session.tilemap);
+			UniTask.WhenAll(worldBootTask, sceneLoadTask)
+				.ContinueWith(() => {
+					WorldSceneRoot sceneRoot = Object.FindFirstObjectByType<WorldSceneRoot>();
+					if (!sceneRoot) {
+						throw new InvalidOperationException("Root provider does not exist");
+					}
+					this.worldSavesManager.OnWorldEntered(world);
+					this.uiHandler.FlushScreens();
+					this.worldRenderer.Reset();
 
-				this.player = session.levelManager.StartSession();
+					SceneManager.UnloadSceneAsync(this.config.unity.mainScene);
+					WorldBootData bootData = worldBootTask.GetAwaiter().GetResult();
 
-				this.activeWorldSession = session;
-				this.uiHandler.SetUIDocument(session.uiDocument);
-				this.activeWorldScreen = new WorldScreen(this.player.GetInventory(), this.itemRenderManager);
-				this.uiHandler.PushScreen(this.activeWorldScreen);
+					WorldSession session = new() {
+						save = save,
+						level = bootData.level,
+						levelManager = bootData.levelManager,
+						canvas = sceneRoot.canvas,
+						uiDocument = sceneRoot.UIDocument,
+						tilemap = sceneRoot.tilemap
+					};
 
-				this.runtimeDataProvider.SetWorldSessionState(session, this.player);
-				this.runtimeExecutionServices.SetWorldSessionState(session, this.player);
-				this.commandProcessor.RegisterProvider(this.worldSessionCommands);
+					this.player = session.levelManager.StartSession();
 
-				// PROTOTYPICAL
-				AudioManager.RebuildPools();
-				this.worldAudioEventBank.Activate();
-			}).Forget(e => Logger.LogFatal(e));
+					this.worldRenderer.SetLevel(session.level);
+					this.worldRenderer.SetTilemap(session.tilemap);
+
+					this.activeWorldSession = session;
+					this.uiHandler.SetUIDocument(session.uiDocument);
+					this.activeWorldScreen = new WorldScreen(this.player.GetInventory(), this.itemRenderManager);
+					this.uiHandler.PushScreen(this.activeWorldScreen);
+
+					this.runtimeDataProvider.SetWorldSessionState(session, this.player);
+					this.runtimeExecutionServices.SetWorldSessionState(session, this.player);
+					this.commandProcessor.RegisterProvider(this.worldSessionCommands);
+
+					// PROTOTYPICAL
+					AudioManager.RebuildPools();
+					this.worldAudioEventBank.Activate();
+				})
+			.Forget(e => throw e);
 		}
 
 		public void QuitActiveWorld() {
@@ -246,7 +266,6 @@ namespace SoulboundEngine.Client {
 			WorldSession session = this.activeWorldSession.Value;
 			LevelManager levelManager = session.levelManager;
 			levelManager.StopSession();
-			this.worldSerializer.Serialize(levelManager, this.worldSavesManager.ToSaveDirectory(session.save));
 			this.player = null;
 			this.worldRenderer.SetLevel(null);
 			this.uiHandler.FlushScreens();
@@ -266,7 +285,7 @@ namespace SoulboundEngine.Client {
 					AudioManager.RebuildPools();
 					this.worldAudioEventBank.Deactivate();
 				})
-			.Forget(e => Logger.LogFatal(e));
+			.Forget(e => throw e);
 		}
 
 		public IEnumerable<WorldSave> ListWorldSaves() {
@@ -309,7 +328,7 @@ namespace SoulboundEngine.Client {
 			return UnityEngine.Random.Range(int.MinValue, int.MaxValue);
 		}
 
-		public Vector2 ScreenToWorldPoint(Vector2 screenPoint) {
+		public Vec2d ScreenToWorldPoint(Vector2 screenPoint) {
 			//Canvas canvas = SoulboundClient.Instance.UIHandler.GetCanvas();
 			//RectTransform rootTransform = canvas.GetComponent<RectTransform>();
 			//bool inWorldPoint = RectTransformUtility.ScreenPointToWorldPointInRectangle(
@@ -322,7 +341,8 @@ namespace SoulboundEngine.Client {
 
 			Vector3 pos = screenPoint;
 			pos.z = -Camera.main.transform.position.z;
-			return Camera.main.ScreenToWorldPoint(pos);
+			pos = Camera.main.ScreenToWorldPoint(pos);
+			return new Vec2d(pos.x, pos.y);
 		}
 
 		public WorldWidgetHandle ShowWorldWidget<TContext>(WorldWidgetType<TContext> type, TContext context) where TContext : WorldWidgetContext {
@@ -336,6 +356,8 @@ namespace SoulboundEngine.Client {
 		public void DestroyWorldWidget(WorldWidgetHandle handle) {
 			this.worldWidgetManager.DestroyWidget(handle);
 		}
+
+		[Obsolete] public WorldSession? GetActiveWorldSession() => this.activeWorldSession;
 
 		public static SoulboundClient Instance => instance;
 		public InputManager InputManager => this.inputManager;

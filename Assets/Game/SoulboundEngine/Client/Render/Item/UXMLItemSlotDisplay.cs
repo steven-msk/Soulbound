@@ -1,8 +1,8 @@
-﻿using SoulboundEngine.Client.Item;
-using SoulboundEngine.Client.Item.Container;
-using SoulboundEngine.Client.UI;
+﻿using SoulboundEngine.Client.UI;
 using SoulboundEngine.Client.UI.UXMLBindings;
-using SoulboundEngine.Core.Registry;
+using SoulboundEngine.Item;
+using SoulboundEngine.Item.Container;
+using SoulboundEngine.Registry;
 using System;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
@@ -25,7 +25,7 @@ namespace SoulboundEngine.Client.Render.Item {
 		private bool isTooltipVisible;
 		private bool showTooltip;
 		private ProgressBar durabilityBar = null!;
-		protected IItemView? view { get; private set; }
+		protected ItemViewHandle? view { get; private set; }
 		protected ItemStack stack { get; private set; }
 		protected IItemSlot? slot { get; private set; }
 
