@@ -1,13 +1,11 @@
-﻿using SoulboundEngine.World.Block;
-using SoulboundEngine.World.Block.State;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Tilemaps;
+﻿namespace SoulboundEngine.Client.Render.Block {
+	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Block.State;
+	using System.Collections.Generic;
+	using UnityEngine;
+	using UnityEngine.Tilemaps;
 
 #nullable enable
-
-namespace SoulboundEngine.Client.Render.Block {
-	using Block = SoulboundEngine.World.Block.Block;
 
 	public sealed class BlockRenderManager {
 		private readonly BlockModels blockModels;
@@ -16,8 +14,8 @@ namespace SoulboundEngine.Client.Render.Block {
 			this.blockModels = BlockModelRegistry.BuildModels(blocks);
 		}
 
-		public void Render(Tilemap tilemap, BlockPos blockPos, BlockState? blockState) {
-			Vector3Int position = this.ToTilemapPos(blockPos);
+		public void Render(Tilemap tilemap, int x, int y, BlockState? blockState) {
+			Vector3Int position = this.ToTilemapPos(x, y);
 
 			if (blockState == null) {
 				tilemap.SetTile(position, null);
@@ -30,10 +28,10 @@ namespace SoulboundEngine.Client.Render.Block {
 			tilemap.SetColor(position, model.color);
 		}
 
-		public void Clear(Tilemap tilemap, BlockPos blockPos) {
-			this.Render(tilemap, blockPos, Blocks.AIR.DefaultState);
+		public void Clear(Tilemap tilemap, int x, int y) {
+			this.Render(tilemap, x, y, Blocks.AIR.DefaultState);
 		}
 
-		private Vector3Int ToTilemapPos(BlockPos blockPos) => new(blockPos.x, blockPos.y);
+		private Vector3Int ToTilemapPos(int x, int y) => new(x, y);
 	}
 }

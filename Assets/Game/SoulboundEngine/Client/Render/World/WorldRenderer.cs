@@ -1,21 +1,21 @@
-using SoulboundEngine.Client.Render.Block;
-using SoulboundEngine.Client.Render.Entity;
-using SoulboundEngine.Client.Util;
-using SoulboundEngine.Common.Math;
-using SoulboundEngine.World.Block;
-using SoulboundEngine.World.Block.State;
-using SoulboundEngine.World.Chunk;
-using SoulboundEngine.World.Level;
-using SoulboundEngine.World.Physics;
-using System;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Tilemaps;
-
-#nullable enable
 
 namespace SoulboundEngine.Client.Render.World {
-	using Entity = SoulboundEngine.World.Entity.Entity;
+	using SoulboundEngine.Client.Render.Block;
+	using SoulboundEngine.Client.Render.Entity;
+	using SoulboundEngine.Client.Util;
+	using SoulboundEngine.Common.Math;
+	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Block.State;
+	using SoulboundEngine.World.Chunk;
+	using SoulboundEngine.World.Entity;
+	using SoulboundEngine.World.Level;
+	using SoulboundEngine.World.Physics;
+	using System;
+	using System.Collections.Generic;
+	using UnityEngine;
+	using UnityEngine.Tilemaps;
+
+#nullable enable
 
 	public sealed class WorldRenderer {
 		private const int DEBUG_BLOCK_COLLIDER_VIEW_RADIUS = 5;
@@ -46,7 +46,7 @@ namespace SoulboundEngine.Client.Render.World {
 			this.UpdateEntities(this.level);
 
 			this.ResolveQueue(this.stateChangedQueue, value => {
-				this.RenderBlock(value.pos, value.state);
+				this.RenderBlock(value.pos.x, value.pos.y, value.state);
 			});
 
 			if (this.showingChunkFeatures) {
@@ -79,7 +79,7 @@ namespace SoulboundEngine.Client.Render.World {
 			RectInt.PositionEnumerator pos = lastView.allPositionsWithin;
 			while (pos.MoveNext()) {
 				if (!currentView.Contains(pos.Current)) {
-					this.RenderBlock(new BlockPos(pos.Current.x, pos.Current.y), Blocks.AIR.DefaultState);
+					this.RenderBlock(pos.Current.x, pos.Current.y, Blocks.AIR.DefaultState);
 				}
 			}
 
@@ -91,15 +91,25 @@ namespace SoulboundEngine.Client.Render.World {
 				}
 
 				BlockState? blockState = level.GetBlockState(blockPos);
-				this.RenderBlock(blockPos, blockState);
+				this.RenderBlock(blockPos.x, blockPos.y, blockState);
 			}
 		}
 
-		private void RenderBlock(BlockPos blockPos, BlockState? blockState) {
+		private void RefreshAllBlocks() {
+			if (this.level == null) return;
+			RectInt renderView = this.ToRect(this.lastPivot);
+			RectInt.PositionEnumerator pos = renderView.allPositionsWithin;
+			while (pos.MoveNext()) {
+				BlockPos blockPos = new(pos.Current.x, pos.Current.y);
+				this.RenderBlock(pos.Current.x, pos.Current.y, this.level.GetBlockState(blockPos));
+			}
+		}
+
+		private void RenderBlock(int x, int y, BlockState? blockState) {
 			if (this.tilemap == null) {
 				throw new InvalidOperationException("Cannot render block: tilemap is null");
 			}
-			this.blockRenderManager.Render(this.tilemap, blockPos, blockState);
+			this.blockRenderManager.Render(this.tilemap, x, y, blockState);
 		}
 
 		private RectInt ToRect(Vec2i pivot) {
@@ -136,19 +146,19 @@ namespace SoulboundEngine.Client.Render.World {
 		}
 
 		private void RenderEntities(Level level) {
-			foreach (var entity in level.GetAllEntities()) {
+			foreach (Entity entity in level.GetAllEntities()) {
 				this.RenderEntity(entity);
 			}
 		}
 
 		private void DestroyEntities(Level level) {
-			foreach (var entity in level.GetAllEntities()) {
+			foreach (Entity entity in level.GetAllEntities()) {
 				this.DestroyEntity(entity);
 			}
 		}
 
 		private void UpdateEntities(Level level) {
-			foreach (var entity in level.GetAllEntities()) {
+			foreach (Entity entity in level.GetAllEntities()) {
 				this.UpdateEntity(entity);
 			}
 		}
@@ -169,16 +179,18 @@ namespace SoulboundEngine.Client.Render.World {
 			if (this.showingChunkFeatures) {
 				this.chunkOutlineRenderer.ShowOutline(chunk);
 			}
+			this.RefreshAllBlocks();
 		}
 
 		private void OnChunkUnloaded(Chunk chunk) {
 			this.chunkOutlineRenderer.HideOutline(chunk);
+			this.RefreshAllBlocks();
 		}
 
 		public void ShowChunkFeatures() {
 			this.showingChunkFeatures = true;
 			if (this.level == null) return;
-			foreach (var chunk in this.level.GetLoadedChunks()) {
+			foreach (Chunk chunk in this.level.GetLoadedChunks()) {
 				this.chunkOutlineRenderer.ShowOutline(chunk);
 			}
 		}
@@ -194,6 +206,8 @@ namespace SoulboundEngine.Client.Render.World {
 			this.level = level;
 			if (level != null) this.RenderEntities(level);
 			this.AddLevelEvents();
+			this.chunkOutlineRenderer.Clear();
+
 		}
 
 		public void Reset() {
@@ -201,6 +215,7 @@ namespace SoulboundEngine.Client.Render.World {
 			if (this.level != null) this.DestroyEntities(this.level);
 			if (this.tilemap != null) this.tilemap.ClearAllTiles();
 			this.showingChunkFeatures = false;
+			this.chunkOutlineRenderer.Clear();
 		}
 
 		private void AddLevelEvents() {
