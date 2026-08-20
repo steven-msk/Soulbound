@@ -30,16 +30,19 @@ namespace SoulboundEngine.Client {
 			}
 
 			if (!shouldBlockKeyboardActions) {
-				this.HandleJump(player);
 				this.HandleMovement(player);
+				this.HandleJump(player);
 				this.CheckHotbarKeyPressed(player);
 				this.HandleStackThrow(player);
 				this.HandleInventoryToggle(player);
+			} else {
+				player.SetMovementX(0f);
+				player.SetJumping(false);
 			}
 		}
 
 		private void CheckHotbarKeyPressed(PlayerEntity player) {
-			foreach (var (key, index) in HOTBAR_KEYS) {
+			foreach ((Key key, int index) in HOTBAR_KEYS) {
 				if (this.client.InputManager.keyboard.IsPressed(Keyboard.GetControl(key))) {
 					player.SetMainSlot(index);
 					return;

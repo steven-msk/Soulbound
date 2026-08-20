@@ -1,21 +1,21 @@
-using Brigadier.NET.Suggestion;
-using Cysharp.Threading.Tasks;
-using SoulboundEngine.Client.Debug.Commands;
-using SoulboundEngine.Client.Settings;
-using SoulboundEngine.Client.UI;
-using SoulboundEngine.Client.UI.UXMLBindings;
-using SoulboundEngine.Client.Assets;
-using SoulboundEngine.Registry;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.UIElements;
-using Keyboard = SoulboundEngine.Client.Input.Keyboard;
-using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
-
 namespace SoulboundEngine.Client.Debug {
+	using Brigadier.NET.Suggestion;
+	using Cysharp.Threading.Tasks;
+	using SoulboundEngine.Client.Assets;
+	using SoulboundEngine.Client.Debug.Commands;
+	using SoulboundEngine.Client.Settings;
+	using SoulboundEngine.Client.UI;
+	using SoulboundEngine.Client.UI.UXMLBindings;
+	using SoulboundEngine.Registry;
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using UnityEngine;
+	using UnityEngine.InputSystem;
+	using UnityEngine.UIElements;
+	using Keyboard = SoulboundEngine.Client.Input.Keyboard;
+	using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
+
 	public sealed class CommandLine : UXMLWidget, IInputFocusable {
 		private static readonly Identifier TEXT_FIELD_ELEMENT = Identifier.Of("soulbound:command_line/text_field");
 		private static readonly Identifier COMPLETION_LIST_ELEMENT = Identifier.Of("soulbound:command_line/completion_list");
@@ -56,10 +56,11 @@ namespace SoulboundEngine.Client.Debug {
 			};
 			this.completionList.makeNoneElement = () => new VisualElement();
 			this.completionList.itemsChosen += this.OnCompletionChosen;
+			this.Hide();
 		}
 
 		internal void Tick() {
-			if (GameSettings.keybinds.enterCommand.WasPressed()) {
+			if (!this.isVisible && GameSettings.keybinds.enterCommand.WasPressed()) {
 				this.Show();
 			}
 			if (this.isVisible && this.client.InputManager.keyboard.WasPressed(Keyboard.GetControl(Key.Escape))) {
@@ -85,6 +86,7 @@ namespace SoulboundEngine.Client.Debug {
 
 		public override void Show() {
 			base.Show();
+			this.root.style.display = DisplayStyle.Flex;
 			this.textField.value = "/";
 			this.client.PushInputFocus(this);
 
@@ -99,6 +101,7 @@ namespace SoulboundEngine.Client.Debug {
 			base.Hide();
 			this.textField.value = "/";
 			this.client.PopInputFocus(this);
+			this.root.style.display = DisplayStyle.None;
 		}
 
 		private void HandleKeyEvent(KeyDownEvent evt) {
@@ -125,11 +128,11 @@ namespace SoulboundEngine.Client.Debug {
 			}
 
 			switch (this.currentInputMode) {
-				case CommandInputMode.Typing: 
+				case CommandInputMode.Typing:
 					this.HandleTyping(key);
 					break;
-				case CommandInputMode.CyclingCompletions: 
-					this.HandleCompletion(key); 
+				case CommandInputMode.CyclingCompletions:
+					this.HandleCompletion(key);
 					break;
 				case CommandInputMode.CyclingHistory:
 					this.HandleHistory(key);
@@ -219,9 +222,11 @@ namespace SoulboundEngine.Client.Debug {
 		}
 
 		private void SetCaretToEnd() {
-			int end = this.textField.value.Length;
-			this.textField.cursorIndex = end;
-			this.textField.selectIndex = end;
+			this.textField.schedule.Execute(() => {
+				int end = this.textField.value.Length;
+				this.textField.cursorIndex = end;
+				this.textField.selectIndex = end;
+			});
 		}
 
 		public override void Dispose() {

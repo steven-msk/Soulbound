@@ -169,6 +169,10 @@ namespace SoulboundEngine.Client {
 		}
 
 		private void HandleInputTick() {
+			this.metricsHud.Tick();
+			this.commandLine.Tick();
+			this.logConsole.Tick();
+
 			if (this.activeWorldSession is { } worldSession) {
 				PlayerEntity player = worldSession.level.GetPlayer();
 				this.clientPlayerInputHandler.Handle(player,
@@ -180,9 +184,6 @@ namespace SoulboundEngine.Client {
 					worldSession.levelManager.TogglePause();
 				}
 			}
-			this.metricsHud.Tick();
-			this.commandLine.Tick();
-			this.logConsole.Tick();
 		}
 
 		public IScreenHandle OpenScreen(Screen screen) {
