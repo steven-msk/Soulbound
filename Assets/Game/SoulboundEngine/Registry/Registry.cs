@@ -1,12 +1,11 @@
-using SoulboundEngine.Client.Debug.Logging;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+namespace SoulboundEngine.Registry {
+	using System;
+	using System.Collections;
+	using System.Collections.Generic;
+	using System.Linq;
 
 #nullable enable
 
-namespace SoulboundEngine.Registry {
 	public sealed class Registry<T> : IRegistry, IRegistryEntryOwner<T>, IRegistryEntryLookup<T>, IEnumerable<T> {
 		private readonly Dictionary<Identifier, RegistryEntry<T>> idToEntry = new();
 		private readonly Dictionary<RegistryKey<T>, RegistryEntry<T>> keyToEntry = new(new KeyComparer());
@@ -87,10 +86,7 @@ namespace SoulboundEngine.Registry {
 		public IEnumerator<T> GetEnumerator() => this.valueToEntry.Keys.GetEnumerator();
 
 		public Identifier? GetIdentifier(T value) {
-			if (!this.valueToEntry.TryGetValue(value, out RegistryEntry<T> entry)) {
-				return null;
-			}
-			return entry.GetKey().value;
+			return !this.valueToEntry.TryGetValue(value, out RegistryEntry<T> entry) ? null : entry.GetKey().value;
 		}
 
 		public HashSet<Identifier> GetIdentifiers() => this.idToEntry.Keys.ToHashSet();

@@ -1,6 +1,5 @@
 namespace SoulboundEngine.World.Entity {
 	using Newtonsoft.Json.Linq;
-	using SoulboundEngine.Client.Debug.Logging;
 	using SoulboundEngine.Item;
 	using SoulboundEngine.World.Level;
 	using SoulboundEngine.World.Player;

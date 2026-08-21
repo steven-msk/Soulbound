@@ -1,10 +1,10 @@
-using SoulboundEngine.Registry;
-using System.Collections.Generic;
-using System.Linq;
+namespace SoulboundEngine.World.Entity.Attribute {
+	using SoulboundEngine.Registry;
+	using System.Collections.Generic;
+	using System.Linq;
 
 #nullable enable
 
-namespace SoulboundEngine.World.Entity.Attribute {
 	public sealed class AttributeContainer {
 		private readonly Dictionary<RegistryEntry<EntityAttribute>, AttributeInstance> instances = new();
 		private readonly DefaultAttributeContainer defaults;
@@ -12,7 +12,7 @@ namespace SoulboundEngine.World.Entity.Attribute {
 		public AttributeContainer(DefaultAttributeContainer defaults) {
 			this.defaults = defaults;
 
-			foreach (var defaultInstance in defaults.GetEntries()) {
+			foreach (DefaultAttributeContainer.DefaultAttributeInstance defaultInstance in defaults.GetEntries()) {
 				RegistryEntry<EntityAttribute> attribute = defaultInstance.entry;
 				AttributeInstance instance = defaults.CreateInstance(attribute, defaultInstance.ruleOverride);
 				this.instances.Add(attribute, instance);
@@ -20,7 +20,7 @@ namespace SoulboundEngine.World.Entity.Attribute {
 		}
 
 		public void AddPersistentModifiersFrom(AttributeContainer other) {
-			foreach (var otherAttribute in other.instances.Keys) {
+			foreach (RegistryEntry<EntityAttribute> otherAttribute in other.instances.Keys) {
 				AttributeInstance otherInstance = other.instances[otherAttribute];
 
 				if (!this.instances.TryGetValue(otherAttribute, out AttributeInstance instance)) {
@@ -40,7 +40,7 @@ namespace SoulboundEngine.World.Entity.Attribute {
 		}
 
 		public double GetModifierValue(RegistryEntry<EntityAttribute> attribute, Identifier identifier) {
-			return this.Require(attribute).TryGetModifier(identifier, out var modifier)
+			return this.Require(attribute).TryGetModifier(identifier, out AttributeModifier? modifier)
 				? modifier.value
 				: 0d;
 		}
@@ -54,8 +54,7 @@ namespace SoulboundEngine.World.Entity.Attribute {
 		}
 
 		public bool HasModifierForAttribute(RegistryEntry<EntityAttribute> attribute, Identifier identifier) {
-			if (!this.instances.TryGetValue(attribute, out AttributeInstance instance)) return false;
-			return instance.HasModifier(identifier);
+			return this.instances.TryGetValue(attribute, out AttributeInstance instance) && instance.HasModifier(identifier);
 		}
 
 		public void ResetToBaseValue(RegistryEntry<EntityAttribute> attribute) {
@@ -65,7 +64,7 @@ namespace SoulboundEngine.World.Entity.Attribute {
 		}
 
 		public void SetBaseFrom(AttributeContainer other) {
-			foreach (var customAttribute in other.instances.Keys) {
+			foreach (RegistryEntry<EntityAttribute> customAttribute in other.instances.Keys) {
 				double baseValue = other.instances[customAttribute].baseValue;
 
 				if (this.instances.TryGetValue(customAttribute, out AttributeInstance instance)) {
@@ -76,7 +75,7 @@ namespace SoulboundEngine.World.Entity.Attribute {
 
 		public void SetFrom(AttributeContainer other) {
 			this.SetBaseFrom(other);
-			foreach (var attribute in other.instances.Keys) {
+			foreach (RegistryEntry<EntityAttribute> attribute in other.instances.Keys) {
 				AttributeInstance otherInstance = other.instances[attribute];
 
 				if (!this.instances.TryGetValue(attribute, out AttributeInstance instance)) {
@@ -93,7 +92,7 @@ namespace SoulboundEngine.World.Entity.Attribute {
 		}
 
 		public void RemoveModifiers(params (RegistryEntry<EntityAttribute> attribute, AttributeModifier modifier)[] modifiers) {
-			foreach (var (attribute, modifier) in modifiers) {
+			foreach ((RegistryEntry<EntityAttribute>? attribute, AttributeModifier? modifier) in modifiers) {
 				if (this.instances.TryGetValue(attribute, out AttributeInstance instance)) {
 					instance.RemoveModifier(modifier);
 				}
@@ -101,7 +100,7 @@ namespace SoulboundEngine.World.Entity.Attribute {
 		}
 
 		private AttributeInstance Require(RegistryEntry<EntityAttribute> attribute) {
-			return this.instances.TryGetValue(attribute, out var instance)
+			return this.instances.TryGetValue(attribute, out AttributeInstance? instance)
 				? instance
 				: throw new KeyNotFoundException(attribute.GetIdAsString());
 		}

@@ -1,12 +1,10 @@
-using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.World.Serialization;
-using System;
-using System.Collections.Generic;
+namespace SoulboundEngine.Client.World {
+	using SoulboundEngine.World.Serialization;
+	using System;
+	using System.Collections.Generic;
+	using File = Serialization.File;
 
 #nullable enable
-
-namespace SoulboundEngine.Client.World {
-	using File = Serialization.File;
 
 	public sealed class WorldSavesManager {
 		private readonly File root;
@@ -17,7 +15,7 @@ namespace SoulboundEngine.Client.World {
 		}
 
 		public IEnumerable<WorldSave> ListSaves(IWorldSaveValidator saveValidator) {
-			foreach (var file in this.root.ListFiles()) {
+			foreach (File file in this.root.ListFiles()) {
 				if (saveValidator.Validate(file, out int seed, out string worldName, out File chunksFolder)) {
 					yield return new WorldSave(file, chunksFolder, worldName, seed, this.IsNew(worldName));
 				}
@@ -25,7 +23,7 @@ namespace SoulboundEngine.Client.World {
 		}
 
 		public WorldSave GetSave(string world, IWorldSaveValidator saveValidator) {
-			foreach (var save in this.ListSaves(saveValidator)) {
+			foreach (WorldSave save in this.ListSaves(saveValidator)) {
 				if (save.name == world) return save;
 			}
 			throw new ArgumentException("World not found: " + world);

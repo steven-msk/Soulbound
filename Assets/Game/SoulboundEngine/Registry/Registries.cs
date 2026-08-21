@@ -1,19 +1,16 @@
-using SoulboundEngine.Component;
-using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.Loot;
-using SoulboundEngine.Recipe;
-using SoulboundEngine.Client.UI.Screen;
-using SoulboundEngine.World.Block;
-using SoulboundEngine.World.Block.Entity;
-using SoulboundEngine.World.Entity;
-using SoulboundEngine.World.Entity.Attribute;
-using SoulboundEngine.Client.World.Widget;
-using SoulboundEngine.Item;
-using System;
-using System.Linq;
-
 namespace SoulboundEngine.Registry {
-	using Item = Item.Item;
+	using SoulboundEngine.Client.UI.Screen;
+	using SoulboundEngine.Client.World.Widget;
+	using SoulboundEngine.Component;
+	using SoulboundEngine.Item;
+	using SoulboundEngine.Loot;
+	using SoulboundEngine.Recipe;
+	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Block.Entity;
+	using SoulboundEngine.World.Entity;
+	using SoulboundEngine.World.Entity.Attribute;
+	using System;
+	using System.Linq;
 
 	public static class Registries {
 		private static bool freezed = false;
@@ -62,7 +59,7 @@ namespace SoulboundEngine.Registry {
 			freezed = true;
 			Logger.LogInfo("Freezing {} registries", ROOT.Count());
 
-			foreach (var registry in ROOT) {
+			foreach (IRegistry registry in ROOT) {
 				registry.Freeze();
 			}
 		}
