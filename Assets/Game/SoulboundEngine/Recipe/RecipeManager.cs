@@ -1,10 +1,10 @@
-﻿using SoulboundEngine.Registry;
-using System.Collections.Generic;
-using System.Linq;
+﻿namespace SoulboundEngine.Recipe {
+	using SoulboundEngine.Registry;
+	using System.Collections.Generic;
+	using System.Linq;
 
 #nullable enable
 
-namespace SoulboundEngine.Recipe {
 	/// <summary>
 	/// Central runtime entry point for recipe data. Owns the resolved recipe registry
 	/// (built once at construction from recipe assets) and the ingredient index lookup,
@@ -21,10 +21,10 @@ namespace SoulboundEngine.Recipe {
 		/// index registry entries into a lookup dictionary.
 		/// </summary>
 		/// <param name="entryLookup">Provides access to registered <see cref="RecipeIngredientIndex"/> entries.</param>
-		/// <param name="recipeAssetResolver">Resolves recipe assets (loaded via <see cref="AssetManager"/>) into recipe entries.</param>
-		public RecipeManager(IRegistryEntryLookup<RecipeIngredientIndex> entryLookup, IRecipeResolver recipeAssetResolver) {
+		/// <param name="recipeResolver">Resolves all the recipes</param>
+		public RecipeManager(IRegistryEntryLookup<RecipeIngredientIndex> entryLookup, IRecipeResolver recipeResolver) {
 			this.ingredientIndices = entryLookup.GetAllKeys().ToDictionary(key => key, key => entryLookup.Get(key)!.GetValue());
-			this.resolvedRecipes = recipeAssetResolver.Resolve(REGISTRY);
+			this.resolvedRecipes = recipeResolver.Resolve(REGISTRY);
 		}
 
 		/// <summary>

@@ -1,6 +1,6 @@
 ﻿namespace SoulboundEngine.Client.UI.Screen {
 	using SoulboundEngine.Client.Render.Item;
-	using SoulboundEngine.Client.UI.Screen.Slot;
+	using SoulboundEngine.Inventory;
 	using SoulboundEngine.Item;
 	using SoulboundEngine.Item.Container;
 	using SoulboundEngine.World.Player;
@@ -9,7 +9,7 @@
 	using UnityEngine;
 	using UnityEngine.UIElements;
 
-	public abstract class InventoryScreen<THandler> : UXMLScreen, InventoryScreenHandlerProvider<THandler> where THandler : InventoryScreenHandler {
+	public abstract class InventoryScreen<THandler> : UXMLScreen, IInventoryScreenHandlerProvider<THandler> where THandler : InventoryScreenHandler {
 		const float DOUBLE_CLICK_THRESHOLD = 0.15f;
 		const int LEFT_BUTTON = 0;
 		const int MIDDLE_BUTTON = 2;

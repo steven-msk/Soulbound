@@ -1,16 +1,12 @@
-﻿using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.Item;
-using SoulboundEngine.Item.Container;
-using SoulboundEngine.World.Player;
-using SoulboundEngine.Client.UI.Screen.Slot;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿namespace SoulboundEngine.Inventory {
+	using SoulboundEngine.Item;
+	using SoulboundEngine.Item.Container;
+	using SoulboundEngine.World.Player;
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
 
 #nullable enable
-
-namespace SoulboundEngine.Client.UI.Screen {
-	using Item = Item.Item;
 
 	public abstract class InventoryScreenHandler {
 		private readonly List<SlotRef> slots = new();
@@ -215,7 +211,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 		protected Dictionary<SlotRef, int> CreateCountSnapshot() {
 			Dictionary<SlotRef, int> snapshots = new();
-			foreach (var slot in this.slots) {
+			foreach (SlotRef slot in this.slots) {
 				ItemStack stack = slot.GetSlot().GetStack();
 				if (!stack.IsEmpty()) {
 					snapshots.Add(slot, stack.count);
@@ -259,7 +255,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 			}
 
 			this.transitStack = this.dragState.stack.CopyWithCount(toSplit - inserted);
-			foreach (var inventory in this.dragState.inventories) {
+			foreach (IInventory? inventory in this.dragState.inventories) {
 				this.OnContentChanged(inventory);
 			}
 		}
@@ -277,14 +273,14 @@ namespace SoulboundEngine.Client.UI.Screen {
 			if (slots == null || slots.Count == 0) return;
 			HashSet<IInventory> contentUpdates = new();
 
-			foreach (var slot in slots) {
+			foreach (IItemSlot slot in slots) {
 				ItemStack stack = slot.GetStack();
 				this.transitStack.FillFrom(ref stack);
 				contentUpdates.Add(slot.GetInventory());
 				slot.SetStack(stack);
 			}
 
-			foreach (var inventory in contentUpdates) {
+			foreach (IInventory inventory in contentUpdates) {
 				this.OnContentChanged(inventory);
 			}
 		}
@@ -374,7 +370,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 			if (reverse) targetSlots = targetSlots.Reverse();
 			bool consumed = InventoryUtils.TryAddStack(targetSlots, ref stack);
 
-			foreach (var inventory in contentUpdates) {
+			foreach (IInventory inventory in contentUpdates) {
 				this.OnContentChanged(inventory);
 			}
 
@@ -390,9 +386,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		/// Subclasses should override this to return false if the slot is used for output.
 		/// </summary>
 		public virtual bool CanInsertIntoSlot(ItemStack itemStack, IItemSlot slot) {
-			if (itemStack.IsEmpty()) return false;
-			if (!slot.HasStack()) return true;
-			return ItemStack.AreItemsEqual(itemStack, slot.GetStack());
+			return !itemStack.IsEmpty() && (!slot.HasStack() || ItemStack.AreItemsEqual(itemStack, slot.GetStack()));
 		}
 
 		protected List<IItemSlot> GetSlotsContaining(Item item) {

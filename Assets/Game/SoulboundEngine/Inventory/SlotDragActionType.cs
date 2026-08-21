@@ -1,4 +1,4 @@
-﻿namespace SoulboundEngine.Client.UI.Screen.Slot {
+﻿namespace SoulboundEngine.Inventory {
 	public enum SlotDragActionType {
 		/// <summary>
 		/// Fills each dragged slot with a full stack clone of the transit stack

@@ -1,13 +1,13 @@
-﻿using SoulboundEngine.Item;
-using SoulboundEngine.Item.Container;
-using SoulboundEngine.World.Player;
-using SoulboundEngine.Recipe;
-using System;
-using System.Linq;
+﻿namespace SoulboundEngine.Inventory {
+	using SoulboundEngine.Item;
+	using SoulboundEngine.Item.Container;
+	using SoulboundEngine.Recipe;
+	using SoulboundEngine.World.Player;
+	using System;
+	using System.Linq;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.UI.Screen {
 	public class PlayerInventoryScreenHandler : AbstractRecipeInventoryScreenHandler<StationlessCraftingRecipe, InventoryRecipeInput> {
 		public PlayerInventoryScreenHandler(InventoryScreenHandlerType<PlayerInventoryScreenHandler> type, PlayerInventory playerInventory)
 			: this(type, playerInventory, InventoryScreenHandlerContext.EMPTY) {

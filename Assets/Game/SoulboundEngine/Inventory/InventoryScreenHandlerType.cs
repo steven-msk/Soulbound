@@ -1,7 +1,7 @@
-﻿using SoulboundEngine.World.Player;
-using SoulboundEngine.Registry;
+﻿namespace SoulboundEngine.Inventory {
+	using SoulboundEngine.Registry;
+	using SoulboundEngine.World.Player;
 
-namespace SoulboundEngine.Client.UI.Screen {
 	public abstract class InventoryScreenHandlerType {
 		public delegate THandler Factory<THandler>(PlayerInventory playerInventory) where THandler : InventoryScreenHandler;
 

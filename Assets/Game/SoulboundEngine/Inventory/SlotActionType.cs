@@ -1,4 +1,4 @@
-﻿namespace SoulboundEngine.Client.UI.Screen.Slot {
+﻿namespace SoulboundEngine.Inventory {
 	public enum SlotActionType {
 		/// <summary>
 		/// Clones the item into the slot or transit stack.

@@ -1,26 +1,24 @@
-namespace SoulboundEngine.World.Level {
+namespace SoulboundEngine.Client.World {
 	using Cysharp.Threading.Tasks;
-	using SoulboundEngine.Client;
-	using SoulboundEngine.Client.World;
+	using SoulboundEngine.Recipe;
 	using SoulboundEngine.World.Chunk;
 	using SoulboundEngine.World.Gen;
+	using SoulboundEngine.World.Level;
 	using SoulboundEngine.World.Serialization;
 
 	public sealed class ClientWorldBootstrapper {
-		private readonly SoulboundClient client;
 		private readonly ISeedProvider seedProvider;
 		private readonly WorldSave save;
 
-		public ClientWorldBootstrapper(SoulboundClient client, ISeedProvider seedProvider, WorldSave save) {
-			this.client = client;
+		public ClientWorldBootstrapper(ISeedProvider seedProvider, WorldSave save) {
 			this.seedProvider = seedProvider;
 			this.save = save;
 		}
 
-		public async UniTask<WorldBootData> LoadWorld() {
+		public async UniTask<WorldBootData> LoadWorld(RecipeManager recipeManager) {
 			ChunkStorage chunkStorage = new(this.save.chunksFolder);
 			EntitySerializer entitySerializer = new(this.save);
-			LevelManager levelManager = new(this.client, this.seedProvider, this.save, chunkStorage, entitySerializer);
+			LevelManager levelManager = new(this.seedProvider, this.save, recipeManager, chunkStorage, entitySerializer);
 
 			return new WorldBootData {
 				level = levelManager.Bootstrap(),

@@ -1,10 +1,11 @@
-﻿using SoulboundEngine.Item.Container;
-using SoulboundEngine.Client.UI.Screen;
-using SoulboundEngine.Client.UI.UXMLBindings;
-using SoulboundEngine.Registry;
-using UnityEngine.UIElements;
+﻿namespace SoulboundEngine.Client.UI {
+	using SoulboundEngine.Client.UI.Screen;
+	using SoulboundEngine.Client.UI.UXMLBindings;
+	using SoulboundEngine.Inventory;
+	using SoulboundEngine.Item.Container;
+	using SoulboundEngine.Registry;
+	using UnityEngine.UIElements;
 
-namespace SoulboundEngine.Client.UI {
 	public class ChestInventoryScreen : InventoryScreen<ChestInventoryScreenHandler> {
 		private static readonly Identifier CHEST_SPACE_ELEMENT = Identifier.Of("soulbound:chest_inventory_screen/chest_space");
 		private static readonly Identifier HOTBAR_ELEMENT = Identifier.Of("soulbound:hotbar/hotbar");
@@ -21,7 +22,7 @@ namespace SoulboundEngine.Client.UI {
 			IInventory chestInventory = this.handler.GetChestInventory();
 			VisualElement chestRoot = this.GetChestRoot(root);
 
-			foreach (var slotIndex in chestInventory.GetSlots()) {
+			foreach (int slotIndex in chestInventory.GetSlots()) {
 				IItemSlot slot = chestInventory.GetSlot(slotIndex);
 				VisualElement slotElement = chestRoot[slotIndex];
 

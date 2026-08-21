@@ -1,7 +1,7 @@
-﻿using SoulboundEngine.World.Player;
-using System;
+﻿namespace SoulboundEngine.Inventory {
+	using SoulboundEngine.World.Player;
+	using System;
 
-namespace SoulboundEngine.Client.UI.Screen {
 	public class DelegatedInventoryScreenHandlerFactory : IInventoryScreenHandlerFactory {
 		private readonly Func<PlayerInventory, PlayerEntity, InventoryScreenHandler> factory;
 

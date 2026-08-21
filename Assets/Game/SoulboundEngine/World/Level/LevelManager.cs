@@ -1,8 +1,6 @@
 namespace SoulboundEngine.World.Level {
-	using SoulboundEngine.Client;
-	using SoulboundEngine.Client.UI.Screen;
-	using SoulboundEngine.Client.World;
 	using SoulboundEngine.Common.Math;
+	using SoulboundEngine.Recipe;
 	using SoulboundEngine.World.Biome;
 	using SoulboundEngine.World.Chunk;
 	using SoulboundEngine.World.Entity;
@@ -19,24 +17,21 @@ namespace SoulboundEngine.World.Level {
 		public const int TERRAIN_PLANE_Y = 0;
 		public static readonly RectInt simulationView = new(-128, -76, 256, 156);
 		private readonly Level level;
-		private readonly SoulboundClient client;
 		private readonly WorldSave save;
 		private readonly EntitySerializer entitySerializer;
 		private bool isBootstrapped;
 
 		public bool paused { get; private set; } = false;
 		private bool shouldTick;
-		private IScreenHandle? pauseScreenHandle;
 
-		public LevelManager(SoulboundClient client, ISeedProvider seedProvider, WorldSave save, ChunkStorage chunkStorage, EntitySerializer entitySerializer) {
+		public LevelManager(ISeedProvider seedProvider, WorldSave save, RecipeManager recipeManager, ChunkStorage chunkStorage, EntitySerializer entitySerializer) {
 			int seed = seedProvider.GetSeed();
 			PlainsBiome biome1 = new(seed);
-			var biome2 = new HillsBiome(seed);
+			HillsBiome biome2 = new(seed);
 			BiomeMap biomeMap = new(new IBiome[] { biome1, biome2 });
 			Heightmap heightmap = new(TERRAIN_PLANE_Y);
 			Cavemap cavemap = new(seed);
-			this.level = new Level(seed, new NoiseLevelChunkGenerator(biomeMap, heightmap, cavemap), CHUNK_RADIUS, chunkStorage);
-			this.client = client;
+			this.level = new Level(seed, recipeManager, new NoiseLevelChunkGenerator(biomeMap, heightmap, cavemap), CHUNK_RADIUS, chunkStorage);
 			this.save = save;
 			this.entitySerializer = entitySerializer;
 		}
@@ -48,11 +43,11 @@ namespace SoulboundEngine.World.Level {
 			return this.level;
 		}
 
-		public PlayerEntity StartSession() {
+		public PlayerEntity StartSession(Func<Level, PlayerEntity> playerFactory) {
 			if (!this.isBootstrapped) {
 				throw new InvalidOperationException("Cannot start session: Level is not bootstrapped");
 			}
-			PlayerEntity player = new(this.client, this.level);
+			PlayerEntity player = playerFactory(this.level);
 			// technically, player guid should match the client's guid
 			// but theres no proper way of making that guid persistent
 			// so fallback to unique guid per world save
@@ -80,7 +75,6 @@ namespace SoulboundEngine.World.Level {
 
 		public void StopSession() {
 			this.paused = false;
-			Time.timeScale = 1f;
 			this.level.OnSessionStop();
 			this.entitySerializer.SaveAll(this.level.GetEntities(this.level.GetPlayer(), Entity.ALL));
 			this.entitySerializer.SavePlayer(this.level.GetPlayer());
@@ -95,22 +89,18 @@ namespace SoulboundEngine.World.Level {
 			);
 		}
 
-		public void TogglePause() {
+		public bool TogglePause() {
 			if (this.paused) this.UnpauseGame();
 			else this.PauseGame();
+			return this.paused;
 		}
 
 		public void PauseGame() {
 			this.paused = true;
-			Time.timeScale = 0f;
-			this.pauseScreenHandle = this.client.OpenScreen(new GamePausedScreen(this.client, this));
 		}
 
 		public void UnpauseGame() {
 			this.paused = false;
-			Time.timeScale = 1f;
-			this.client.CloseScreen(this.pauseScreenHandle);
-			this.pauseScreenHandle = null;
 		}
 
 		public Level GetLevel() => this.level;

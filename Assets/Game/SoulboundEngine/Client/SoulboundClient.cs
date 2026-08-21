@@ -50,8 +50,10 @@ namespace SoulboundEngine.Client {
 	using StackTraceLogType = UnityEngine.StackTraceLogType;
 #endif
 
+#nullable enable
+
 	public sealed class SoulboundClient : IWorldAccessor, IDebugMetricsSource {
-		private static SoulboundClient instance;
+		private static SoulboundClient instance = null!;
 		private static readonly UnityClientLoggerWrapper clientLoggerWrapper = new(UnityEngine.Debug.unityLogger);
 		private readonly GameConfig config;
 		private readonly PlayerInputActions inputActions;
@@ -80,9 +82,10 @@ namespace SoulboundEngine.Client {
 		private readonly PerformanceMetrics performanceMetrics;
 		private readonly DebugMetricsService debugMetricsService;
 		private readonly WorldWidgetManager worldWidgetManager;
-		private WorldScreen activeWorldScreen;
-		private PlayerEntity player;
+		private WorldScreen? activeWorldScreen;
+		private PlayerEntity? player;
 		private WorldSession? activeWorldSession;
+		private IScreenHandle? pauseScreenHandle;
 
 		public SoulboundClient(GameConfig config) {
 			instance = this;
@@ -184,16 +187,22 @@ namespace SoulboundEngine.Client {
 			this.logConsole.Tick();
 
 			if (this.activeWorldSession is { } worldSession) {
+				LevelManager levelManager = worldSession.levelManager;
+				Level level = worldSession.level;
 				bool isPaused = worldSession.levelManager.paused;
 
-				PlayerEntity player = worldSession.level.GetPlayer();
+				PlayerEntity player = level.GetPlayer();
 				this.clientPlayerInputHandler.Handle(player,
 					shouldBlockKeyboardActions: this.uiHandler.HasKeyboardFocus() || isPaused,
 					shouldBlockMouse: this.uiHandler.IsPointerOverUI() || isPaused
 				);
 
 				if (!this.uiHandler.HasKeyboardFocus() && this.inputManager.keyboard.WasPressed(Keyboard.GetControl(Key.Escape))) {
-					worldSession.levelManager.TogglePause();
+					if (!levelManager.paused) {
+						this.PauseGame();
+					} else {
+						this.UnpauseGame();
+					}
 				}
 			}
 		}
@@ -225,9 +234,9 @@ namespace SoulboundEngine.Client {
 
 			WorldSave save = this.worldSavesManager.GetSave(world, this.worldSerializer);
 			WorldSaveSeedProvider seedProvider = new(save);
-			ClientWorldBootstrapper worldLoader = new(this, seedProvider, save);
+			ClientWorldBootstrapper worldLoader = new(seedProvider, save);
 
-			UniTask<WorldBootData> worldBootTask = worldLoader.LoadWorld();
+			UniTask<WorldBootData> worldBootTask = worldLoader.LoadWorld(this.recipeManager);
 			UniTask sceneLoadTask = SceneManager.LoadSceneAsync(this.config.unity.worldScene, LoadSceneMode.Additive).ToUniTask();
 
 			UniTask.WhenAll(worldBootTask, sceneLoadTask)
@@ -252,7 +261,7 @@ namespace SoulboundEngine.Client {
 						tilemap = sceneRoot.tilemap
 					};
 
-					this.player = session.levelManager.StartSession();
+					this.player = session.levelManager.StartSession(level => new PlayerEntity(this, level));
 
 					this.worldRenderer.SetLevel(session.level);
 					this.worldRenderer.SetTilemap(session.tilemap);
@@ -276,7 +285,7 @@ namespace SoulboundEngine.Client {
 		public void QuitActiveWorld() {
 			if (!this.IsWorldSessionActive()) return;
 
-			WorldSession session = this.activeWorldSession.Value;
+			WorldSession session = this.activeWorldSession!.Value;
 			LevelManager levelManager = session.levelManager;
 			levelManager.StopSession();
 			this.player = null;
@@ -301,6 +310,24 @@ namespace SoulboundEngine.Client {
 					this.worldAudioEventBank.Deactivate();
 				})
 			.Forget(e => throw e);
+		}
+
+		public void PauseGame() {
+			if (this.activeWorldSession is not { } session) return;
+			if (session.levelManager.paused) return;
+
+			session.levelManager.PauseGame();
+			if (this.pauseScreenHandle != null) this.CloseScreen(this.pauseScreenHandle);
+			this.pauseScreenHandle = this.OpenScreen(new GamePausedScreen(this));
+		}
+
+		public void UnpauseGame() {
+			if (this.activeWorldSession is not { } session) return;
+			if (!session.levelManager.paused) return;
+
+			session.levelManager.UnpauseGame();
+			if (this.pauseScreenHandle != null) this.CloseScreen(this.pauseScreenHandle!);
+			this.pauseScreenHandle = null;
 		}
 
 		public IEnumerable<WorldSave> ListWorldSaves() {

@@ -1,14 +1,14 @@
-﻿using SoulboundEngine.Item;
-using SoulboundEngine.Item.Container;
-using SoulboundEngine.World.Player;
-using SoulboundEngine.Recipe;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿namespace SoulboundEngine.Inventory {
+	using SoulboundEngine.Item;
+	using SoulboundEngine.Item.Container;
+	using SoulboundEngine.Recipe;
+	using SoulboundEngine.World.Player;
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.UI.Screen {
 	public abstract class AbstractRecipeInventoryScreenHandler<T, I> : InventoryScreenHandler where T : IRecipe<I> where I : IRecipeInput {
 		protected readonly PlayerInventory playerInventory;
 		protected readonly InventoryScreenHandlerContext context;
@@ -39,14 +39,14 @@ namespace SoulboundEngine.Client.UI.Screen {
 			ItemStack result = recipe.Craft(input);
 			IItemSlot[] inputSlots = this.GetInputSlots();
 
-			foreach (var ingredient in recipe.Ingredients) {
+			foreach (Ingredient? ingredient in recipe.Ingredients) {
 				this.ConsumeIngredient(ingredient, inputSlots);
 			}
 
 			ItemStack remainder = this.Pickup(result);
 			if (!remainder.IsEmpty()) {
 				if (!this.playerInventory.TryAddStack(ref remainder)) {
-					this.context.Run((client, blockPos, level) => {
+					this.context.Run((blockPos, level) => {
 						level.GetPlayer().DropStack(level, remainder);
 					});
 				}
@@ -58,9 +58,9 @@ namespace SoulboundEngine.Client.UI.Screen {
 		}
 
 		public void UpdateRecipes() {
-			this.context.Run((client, _, _) => {
+			this.context.Run((_, level) => {
 				I input = this.GetInput();
-				IEnumerable<RecipeEntry<T>> recipes = client.RecipeManager.GetMatching(this.recipeType, input);
+				IEnumerable<RecipeEntry<T>> recipes = level.RecipeManager.GetMatching(this.recipeType, input);
 				IEnumerable<RecipeView<T>> matching = recipes.Select(r => {
 					return new RecipeView<T>(r, r.tRecipe.Craft(input), r.tRecipe.Ingredients);
 				});
@@ -78,7 +78,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 			int remaining = ingredient.GetCount();
 			HashSet<IInventory> contentUpdates = new();
 
-			foreach (var slot in slots) {
+			foreach (IItemSlot slot in slots) {
 				if (remaining <= 0) break;
 
 				ItemStack stack = slot.GetStack();
@@ -91,7 +91,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 				contentUpdates.Add(slot.GetInventory());
 			}
 
-			foreach (var inventory in contentUpdates) {
+			foreach (IInventory inventory in contentUpdates) {
 				this.OnContentChanged(inventory);
 			}
 		}

@@ -5,6 +5,7 @@ namespace SoulboundEngine.World.Player {
 	using SoulboundEngine.Client.World.Widget;
 	using SoulboundEngine.Common.Math;
 	using SoulboundEngine.Interaction;
+	using SoulboundEngine.Inventory;
 	using SoulboundEngine.Item;
 	using SoulboundEngine.Item.Container;
 	using SoulboundEngine.World.Block;
@@ -69,7 +70,7 @@ namespace SoulboundEngine.World.Player {
 			if (!this.isInventoryOpen) {
 				this.OpenInventoryScreen(new DelegatedInventoryScreenHandlerFactory(
 					(inventory, _) => {
-						InventoryScreenHandlerContext context = InventoryScreenHandlerContext.Of(this.client, BlockPos.From(this.GetPosition()), this.level);
+						InventoryScreenHandlerContext context = InventoryScreenHandlerContext.Of(BlockPos.From(this.GetPosition()), this.level);
 						return new PlayerInventoryScreenHandler(InventoryScreenHandlerType.PLAYER_INVENTORY, inventory, context);
 					}
 				));

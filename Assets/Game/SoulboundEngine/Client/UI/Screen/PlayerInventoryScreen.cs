@@ -1,14 +1,15 @@
-﻿using SoulboundEngine.Item;
-using SoulboundEngine.Recipe;
-using SoulboundEngine.Client.Render.Item;
-using SoulboundEngine.Client.UI.UXMLBindings;
-using SoulboundEngine.Client.Assets;
-using SoulboundEngine.Registry;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine.UIElements;
+﻿namespace SoulboundEngine.Client.UI.Screen {
+	using SoulboundEngine.Client.Assets;
+	using SoulboundEngine.Client.Render.Item;
+	using SoulboundEngine.Client.UI.UXMLBindings;
+	using SoulboundEngine.Inventory;
+	using SoulboundEngine.Item;
+	using SoulboundEngine.Recipe;
+	using SoulboundEngine.Registry;
+	using System.Collections.Generic;
+	using System.Linq;
+	using UnityEngine.UIElements;
 
-namespace SoulboundEngine.Client.UI.Screen {
 	public class PlayerInventoryScreen : InventoryScreen<PlayerInventoryScreenHandler> {
 		private static readonly Identifier HOTBAR_ELEMENT = Identifier.Of("soulbound:hotbar/hotbar");
 		private static readonly Identifier POPUP_ELEMENT = Identifier.Of("soulbound:player_inventory/popup");
@@ -92,7 +93,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		}
 
 		private void DisposeCraftingPreviews() {
-			foreach (var preview in this.craftingResultPreviews) {
+			foreach (RecipePreviewElement preview in this.craftingResultPreviews) {
 				preview.Dispose();
 			}
 			this.craftingResultPreviews.Clear();

@@ -1,12 +1,12 @@
-﻿using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.World.Player;
-using SoulboundEngine.Client.Render.Item;
-using SoulboundEngine.Client.Assets;
-using System;
-using System.Collections.Generic;
-using UnityEngine.UIElements;
+﻿namespace SoulboundEngine.Client.UI.Screen {
+	using SoulboundEngine.Client.Assets;
+	using SoulboundEngine.Client.Render.Item;
+	using SoulboundEngine.Inventory;
+	using SoulboundEngine.World.Player;
+	using System;
+	using System.Collections.Generic;
+	using UnityEngine.UIElements;
 
-namespace SoulboundEngine.Client.UI.Screen {
 	public class InventoryScreens {
 		private static readonly Dictionary<InventoryScreenHandlerType, IProviderBase> providers = new();
 
@@ -43,7 +43,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		}
 
 		private static void Register<THandler, TScreen>(InventoryScreenHandlerType<THandler> type, IProvider<THandler, TScreen> provider)
-				where THandler : InventoryScreenHandler where TScreen : Screen, InventoryScreenHandlerProvider<THandler> {
+				where THandler : InventoryScreenHandler where TScreen : Screen, IInventoryScreenHandlerProvider<THandler> {
 			providers.Add(type, provider);
 		}
 
@@ -79,7 +79,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 			Screen Create(ProviderContext ctx);
 		}
 
-		private interface IProvider<THandler, TScreen> : IProviderBase where THandler : InventoryScreenHandler where TScreen : Screen, InventoryScreenHandlerProvider<THandler> {
+		private interface IProvider<THandler, TScreen> : IProviderBase where THandler : InventoryScreenHandler where TScreen : Screen, IInventoryScreenHandlerProvider<THandler> {
 			TScreen Create(InventoryScreen<THandler>.Context ctx);
 
 			Screen IProviderBase.Create(ProviderContext ctx) {

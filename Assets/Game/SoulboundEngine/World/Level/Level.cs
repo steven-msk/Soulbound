@@ -2,6 +2,7 @@ namespace SoulboundEngine.World.Level {
 	using SoulboundEngine.Common;
 	using SoulboundEngine.Common.Math;
 	using SoulboundEngine.Common.Math.Random;
+	using SoulboundEngine.Recipe;
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Block.Entity;
 	using SoulboundEngine.World.Block.State;
@@ -32,6 +33,9 @@ namespace SoulboundEngine.World.Level {
 		private readonly ChunkStorage chunkStorage;
 		private readonly LevelChunkManager chunkManager;
 		private readonly RandomSequences randomSequences;
+		// recipes should technically be on "server"
+		// but Level is currently the only source of truth
+		private readonly RecipeManager recipeManager;
 		private PlayerEntity player = null!;
 		public event Action<BlockPos, BlockState?, BlockState?>? blockStateChanged;
 		public event Action<Entity>? entityAdded;
@@ -45,8 +49,9 @@ namespace SoulboundEngine.World.Level {
 		private readonly Dictionary<Guid, Entity> entities = new();
 		private readonly List<ITickingEntity> tickingEntities = new();
 
-		public Level(int seed, ChunkGenerator chunkGenerator, int chunkRadius, ChunkStorage chunkStorage) {
+		public Level(int seed, RecipeManager recipeManager, ChunkGenerator chunkGenerator, int chunkRadius, ChunkStorage chunkStorage) {
 			this.seed = seed;
+			this.recipeManager = recipeManager;
 			this.chunkStorage = chunkStorage;
 			this.randomSequences = new RandomSequences(seed);
 			this.chunkManager = new LevelChunkManager(this, chunkGenerator, chunkRadius, new LevelChunkCache(this, CHUNK_TTL), chunkStorage);
@@ -332,5 +337,7 @@ namespace SoulboundEngine.World.Level {
 		public PlayerEntity GetPlayer() => this.player;
 
 		public RandomSequences RandomSequences => this.randomSequences;
+
+		public RecipeManager RecipeManager => this.recipeManager;
 	}
 }

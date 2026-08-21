@@ -1,7 +1,9 @@
-namespace SoulboundEngine.Item.Container {
+namespace SoulboundEngine.Client.UI.Screen {
 	using SoulboundEngine.Client.Assets;
 	using SoulboundEngine.Client.Render.Item;
 	using SoulboundEngine.Client.UI.UXMLBindings;
+	using SoulboundEngine.Item;
+	using SoulboundEngine.Item.Container;
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.World.Player;
 	using System.Collections.Generic;

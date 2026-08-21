@@ -1,7 +1,7 @@
 namespace SoulboundEngine.Registry {
-	using SoulboundEngine.Client.UI.Screen;
 	using SoulboundEngine.Client.World.Widget;
 	using SoulboundEngine.Component;
+	using SoulboundEngine.Inventory;
 	using SoulboundEngine.Item;
 	using SoulboundEngine.Loot;
 	using SoulboundEngine.Recipe;

@@ -1,11 +1,11 @@
-﻿using SoulboundEngine.Item;
-using SoulboundEngine.Item.Container;
-using SoulboundEngine.World.Player;
-using SoulboundEngine.World.Block.Entity;
-using System.Collections.Generic;
-using System.Linq;
+﻿namespace SoulboundEngine.Inventory {
+	using SoulboundEngine.Item;
+	using SoulboundEngine.Item.Container;
+	using SoulboundEngine.World.Block.Entity;
+	using SoulboundEngine.World.Player;
+	using System.Collections.Generic;
+	using System.Linq;
 
-namespace SoulboundEngine.Client.UI.Screen {
 	public class ChestInventoryScreenHandler : InventoryScreenHandler {
 		private readonly IInventory chestInventory;
 		private readonly PlayerInventory playerInventory;
@@ -15,7 +15,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 			this.chestInventory = chestInventory;
 			this.playerInventory = playerInventory;
 			this.AddPlayerSlots(playerInventory);
-			foreach (var slot in chestInventory.GetAllSlots()) {
+			foreach (IItemSlot slot in chestInventory.GetAllSlots()) {
 				this.AddSlot(slot);
 			}
 		}
