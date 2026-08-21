@@ -1,16 +1,13 @@
-using Newtonsoft.Json.Linq;
-using SoulboundEngine.World.Block;
-using SoulboundEngine.World.Block.Entity;
-using SoulboundEngine.World.Block.State;
-using System;
-using System.Collections.Generic;
-using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
+namespace SoulboundEngine.World.Chunk {
+	using Newtonsoft.Json.Linq;
+	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Block.Entity;
+	using SoulboundEngine.World.Block.State;
+	using SoulboundEngine.World.Level;
+	using System;
+	using System.Collections.Generic;
 
 #nullable enable
-
-namespace SoulboundEngine.World.Chunk {
-	using Block = Block.Block;
-	using Level = Level.Level;
 
 	public class WorldChunk : Chunk {
 		public const float HEIGHT_SPREAD = 0.01f;

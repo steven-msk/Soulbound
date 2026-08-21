@@ -1,13 +1,10 @@
-﻿using SoulboundEngine.Client.Assets;
-using SoulboundEngine.World.Block;
-using SoulboundEngine.World.Block.State;
-using System;
-using System.Collections.Generic;
-using UnityEngine.Tilemaps;
-
-namespace SoulboundEngine.Client.Render.Block {
-	using Block = SoulboundEngine.World.Block.Block;
-	using Logger = Debug.Logging.Logger;
+﻿namespace SoulboundEngine.Client.Render.Block {
+	using SoulboundEngine.Client.Assets;
+	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Block.State;
+	using System;
+	using System.Collections.Generic;
+	using UnityEngine.Tilemaps;
 
 	public static class BlockModelRegistry {
 		private static readonly Dictionary<Block, BlockModel.IFactory> MODEL_FACTORIES = new();

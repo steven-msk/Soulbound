@@ -16,7 +16,7 @@ namespace SoulboundEngine.World.Level {
 	using System.Collections.Generic;
 	using System.Linq;
 	using UnityEngine;
-	using Logger = Client.Debug.Logging.Logger;
+	using Logger = SoulboundEngine.Logger;
 
 #nullable enable
 
@@ -77,7 +77,7 @@ namespace SoulboundEngine.World.Level {
 		public void Tick(RectInt simulationRect) {
 			if (!this.IsLevelActive()) throw new InvalidOperationException("Cannot tick without an active session");
 
-			foreach (var pos in this.tickingBlocks.ToArray()) {
+			foreach (BlockPos pos in this.tickingBlocks.ToArray()) {
 				Vector2Int p = new(pos.x, pos.y);
 				if (!simulationRect.Contains(p)) continue;
 
@@ -85,7 +85,7 @@ namespace SoulboundEngine.World.Level {
 				((ITickingBlock)blockState.block).Tick(this, pos, blockState);
 			}
 
-			foreach (var entity in this.GetAllEntities()) {
+			foreach (Entity entity in this.GetAllEntities()) {
 				Vec2i p = entity.GetPosition().FloorToInt();
 				if (simulationRect.Contains(new Vector2Int(p.x, p.y))) {
 					entity.Tick();
@@ -129,7 +129,7 @@ namespace SoulboundEngine.World.Level {
 		}
 
 		private void NotifyNeighboringStates(BlockPos blockPos) {
-			foreach (var neighborPos in blockPos.GetCardinalNeighbors()) {
+			foreach (BlockPos neighborPos in blockPos.GetCardinalNeighbors()) {
 				Chunk? chunk = this.ChunkAt(blockPos);
 				if (chunk == null) return;
 
@@ -192,7 +192,7 @@ namespace SoulboundEngine.World.Level {
 			// linear scan over the entire entity list is fine to start
 			// if entity counts start becoming a bottleneck, switch to spatial hash or quadtree
 			// but for now its too much of a premature abstraction
-			foreach (var ent in this.entities.Values) {
+			foreach (Entity ent in this.entities.Values) {
 				if (!ent.boundingBox.Contains(worldPos)) continue;
 
 				double dist = Vec2d.Distance(worldPos, ent.boundingBox.GetCenter());
@@ -208,8 +208,7 @@ namespace SoulboundEngine.World.Level {
 		public IEnumerable<Entity> GetAllEntities() => this.entities.Values.ToList();
 
 		public IEnumerable<AABB> GetBlockCollisionBoxes(AABB testBox) {
-			if (testBox.GetSize() < 1.0E-7) return new List<AABB>();
-			return new BlockCollisionResolver(this, testBox);
+			return testBox.GetSize() < 1.0E-7 ? new List<AABB>() : new BlockCollisionResolver(this, testBox);
 		}
 
 		public IEnumerable<AABB> GetEntityCollisions(Entity? source, AABB testBox) {
@@ -232,7 +231,7 @@ namespace SoulboundEngine.World.Level {
 
 		public List<Entity> GetEntities(Entity? except, Predicate<Entity> selector) {
 			List<Entity> output = new();
-			foreach (var entity in this.GetAllEntities()) {
+			foreach (Entity entity in this.GetAllEntities()) {
 				if (entity != except && selector(entity)) {
 					output.Add(entity);
 				}

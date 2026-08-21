@@ -11,7 +11,6 @@ namespace SoulboundEngine.World.Level {
 	using SoulboundEngine.World.Serialization;
 	using System;
 	using UnityEngine;
-	using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 #nullable enable
 
@@ -75,7 +74,7 @@ namespace SoulboundEngine.World.Level {
 				Vec2d pivotPos = this.level.GetPlayer()?.GetPosition() ?? this.level.GetWorldSpawnPoint();
 				this.level.Tick(this.GetRelativeSimulationRect(pivotPos));
 			} catch (Exception e) {
-				Logger.LogFatal(e);
+				SoulboundEngine.Logger.LogFatal(e);
 			}
 		}
 

@@ -14,7 +14,6 @@ namespace SoulboundEngine.Client.Debug {
 	using UnityEngine.InputSystem;
 	using UnityEngine.UIElements;
 	using Keyboard = SoulboundEngine.Client.Input.Keyboard;
-	using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
 
 	public sealed class CommandLine : UXMLWidget, IInputFocusable {
 		private static readonly Identifier TEXT_FIELD_ELEMENT = Identifier.Of("soulbound:command_line/text_field");
@@ -186,7 +185,7 @@ namespace SoulboundEngine.Client.Debug {
 				})
 			.Forget(e => {
 				this.completionManager.SetCompletions(Array.Empty<Suggestion>().ToList());
-				Logger.LogFatal(e);
+				SoulboundEngine.Logger.LogFatal(e);
 			});
 		}
 

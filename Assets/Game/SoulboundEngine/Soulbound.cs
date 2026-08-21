@@ -1,23 +1,20 @@
-using Cysharp.Threading.Tasks;
-using Newtonsoft.Json;
-using SoulboundEngine.Client;
-using SoulboundEngine.Client.Assets;
-using SoulboundEngine.Common.Json;
-using SoulboundEngine.GameStates;
-using SoulboundEngine.Registry;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading;
-using UnityEditor;
-using UnityEngine;
-using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
-
 namespace SoulboundEngine {
+	using Cysharp.Threading.Tasks;
+	using Newtonsoft.Json;
+	using SoulboundEngine.Client;
+	using SoulboundEngine.Client.Assets;
+	using SoulboundEngine.Common.Json;
+	using SoulboundEngine.GameStates;
+	using System;
+	using System.Collections.Generic;
+	using System.Diagnostics;
+	using System.Threading;
+	using UnityEditor;
+	using UnityEngine;
+
 	public sealed class Soulbound {
 		public const float TICK_RATE = 1f / SharedConstants.TICKS_PER_SECOND;
 		private static Soulbound instance;
-		private static readonly Logger loggerInstance = new(UnityEngine.Debug.unityLogger);
 		public static readonly JsonSerializerSettings globalJsonSettings = new() {
 			TypeNameHandling = TypeNameHandling.Auto,
 			TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
@@ -39,11 +36,6 @@ namespace SoulboundEngine {
 			instance = this;
 			this.config = config;
 			GameStateManager.SetBootstrapping();
-
-			AssetManager.LoadAllWithPreloadLabel();
-
-			Registries.Init();
-			Registries.Freeze();
 
 			this.client = new SoulboundClient(config);
 

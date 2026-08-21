@@ -1,15 +1,14 @@
-﻿using SoulboundEngine.Client.Render.Item;
-using SoulboundEngine.Client.UI.Screen.Slot;
-using SoulboundEngine.Item;
-using SoulboundEngine.Item.Container;
-using SoulboundEngine.World.Player;
-using System;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UIElements;
-using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
+﻿namespace SoulboundEngine.Client.UI.Screen {
+	using SoulboundEngine.Client.Render.Item;
+	using SoulboundEngine.Client.UI.Screen.Slot;
+	using SoulboundEngine.Item;
+	using SoulboundEngine.Item.Container;
+	using SoulboundEngine.World.Player;
+	using System;
+	using System.Collections.Generic;
+	using UnityEngine;
+	using UnityEngine.UIElements;
 
-namespace SoulboundEngine.Client.UI.Screen {
 	public abstract class InventoryScreen<THandler> : UXMLScreen, InventoryScreenHandlerProvider<THandler> where THandler : InventoryScreenHandler {
 		const float DOUBLE_CLICK_THRESHOLD = 0.15f;
 		const int LEFT_BUTTON = 0;
@@ -69,7 +68,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		}
 
 		protected void BindPlayerPopup(PlayerInventory playerInventory, VisualElement inventoryRoot, bool interactable = true) {
-			foreach (var slotIndex in playerInventory.GetPopup()) {
+			foreach (int slotIndex in playerInventory.GetPopup()) {
 				IItemSlot slot = playerInventory.GetSlot(slotIndex);
 				VisualElement slotElement = this.GetPlayerPopup(inventoryRoot)[slotIndex - PlayerInventory.HOTBAR_SIZE];
 
@@ -78,7 +77,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 		}
 
 		protected void BindPlayerHotbar(PlayerInventory playerInventory, VisualElement inventoryRoot, bool interactable = true) {
-			foreach (var slotIndex in playerInventory.GetHotbar()) {
+			foreach (int slotIndex in playerInventory.GetHotbar()) {
 				IItemSlot slot = playerInventory.GetSlot(slotIndex);
 				VisualElement slotElement = this.GetPlayerHotbar(inventoryRoot)[slotIndex];
 
@@ -154,7 +153,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 				this.SyncTransitStack(this.handler.GetTransitStack());
 			} catch (Exception e) {
-				Logger.LogFatal(e);
+				SoulboundEngine.Logger.LogFatal(e);
 			}
 		}
 
@@ -172,7 +171,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 					this.handler.OnSlotDrag(slot.GetRef(), this.dragButton, this.player, slotDragActionType);
 					this.transitStackHandler.SetStack(this.handler.GetTransitStack());
 				} catch (Exception e) {
-					Logger.LogFatal(e);
+					SoulboundEngine.Logger.LogFatal(e);
 				}
 			}
 		}
@@ -183,12 +182,11 @@ namespace SoulboundEngine.Client.UI.Screen {
 		protected virtual SlotActionType GetClick(int slotIndex, IInventory inventory, int clickButton, bool doubleClick, EventModifiers modifiers) {
 			switch (clickButton) {
 				case LEFT_BUTTON: {
-						if (modifiers.HasFlag(EventModifiers.Shift)) {
-							return SlotActionType.QUICK_MOVE;
-						}
-						return this.handler.CanCollectAll() && doubleClick
-							? SlotActionType.COLLECT_ALL 
-							: SlotActionType.PICKUP;
+						return modifiers.HasFlag(EventModifiers.Shift)
+							? SlotActionType.QUICK_MOVE
+							: this.handler.CanCollectAll() && doubleClick
+								? SlotActionType.COLLECT_ALL
+								: SlotActionType.PICKUP;
 					}
 				case RIGHT_BUTTON: {
 						return SlotActionType.PICKUP;

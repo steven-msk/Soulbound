@@ -1,15 +1,15 @@
-using SoulboundEngine.Client.Settings;
-using SoulboundEngine.Client.UI;
-using SoulboundEngine.Client.UI.UXMLBindings;
-using SoulboundEngine.Client.Assets;
-using SoulboundEngine.Registry;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
-using UnityEngine.UIElements;
-
 namespace SoulboundEngine.Client.Debug.Logging.Console {
+	using SoulboundEngine.Client.Assets;
+	using SoulboundEngine.Client.Settings;
+	using SoulboundEngine.Client.UI;
+	using SoulboundEngine.Client.UI.UXMLBindings;
+	using SoulboundEngine.Registry;
+	using System.Collections.Generic;
+	using System.Linq;
+	using System.Text;
+	using UnityEngine;
+	using UnityEngine.UIElements;
+
 	public sealed class LogConsole : UXMLWidget, IInputFocusable {
 		private static readonly Identifier LOG_LIST_ELEMENT = Identifier.Of("soulbound:log_console/log_list");
 		private static readonly Identifier LOG_LABEL_ELEMENT = Identifier.Of("soulbound:log_entry/log_label");
@@ -111,9 +111,9 @@ namespace SoulboundEngine.Client.Debug.Logging.Console {
 			IEnumerable<string> lines = stackTrace.Split("\n").Skip(skipCount);
 			if (!lines.Any()) return string.Empty;
 
-			var builder = new StringBuilder();
+			StringBuilder builder = new();
 
-			foreach (var line in lines) {
+			foreach (string line in lines) {
 				if (string.IsNullOrWhiteSpace(line)) continue;
 
 				builder.Append('\t');

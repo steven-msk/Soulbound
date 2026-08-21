@@ -1,16 +1,15 @@
-using SoulboundEngine.Client.Settings.View;
-using SoulboundEngine.Common;
-using SoulboundEngine.Serialization;
-using System;
-using System.Linq;
-using Unity.VisualScripting;
-using UnityEngine;
-using UnityEngine.UI;
-using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
+namespace SoulboundEngine.Client.Settings {
+	using SoulboundEngine.Client.Settings.View;
+	using SoulboundEngine.Common;
+	using SoulboundEngine.Serialization;
+	using System;
+	using System.Linq;
+	using Unity.VisualScripting;
+	using UnityEngine;
+	using UnityEngine.UI;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.Settings {
 	public abstract class SettingEntry {
 		public readonly string id;
 		public abstract object boxedDefaultValue { get; }
@@ -50,13 +49,13 @@ namespace SoulboundEngine.Client.Settings {
 
 		public void SetValue(T value) {
 			if (value?.Equals(this.value) ?? true) return;
-			var oldValue = this.value;
+			T? oldValue = this.value;
 
 			if (this.valueSet.IsValid(value)) {
 				this.value = value;
 				valueChanged?.Invoke(oldValue, this.value);
 			} else {
-				Logger.LogWarning("Attempted to set invalid value '{}' to setting '{}'", value!, this.id);
+				SoulboundEngine.Logger.LogWarning("Attempted to set invalid value '{}' to setting '{}'", value, this.id);
 			}
 		}
 	}

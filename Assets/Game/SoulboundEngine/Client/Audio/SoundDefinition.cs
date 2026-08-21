@@ -1,8 +1,7 @@
-using System;
-using UnityEngine;
-using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
-
 namespace SoulboundEngine.Client.Audio {
+	using System;
+	using UnityEngine;
+
 	[CreateAssetMenu(menuName = "Audio/Sound", fileName = "sound")]
 	public class SoundDefinition : ScriptableObject {
 		[SerializeField] private SoundType soundType;
@@ -21,23 +20,21 @@ namespace SoulboundEngine.Client.Audio {
 		[SerializeField] private float pitchMax;
 
 		public AudioClip GetClip() {
-			if (clips == null || clips.Length == 0) {
-				Logger.LogWarning("SoundDefinition '{}' doesn't have any audio clips.", this.name);
+			if (this.clips == null || this.clips.Length == 0) {
+				SoulboundEngine.Logger.LogWarning("SoundDefinition '{}' doesn't have any audio clips.", this.name);
 				return null;
 			}
-			return clips[UnityEngine.Random.Range(0, clips.Length)];
+			return this.clips[UnityEngine.Random.Range(0, this.clips.Length)];
 		}
 
 		public float GetVolume() {
-			if (!randomizeVolume) return volume;
-			return UnityEngine.Random.Range(volumeMin, volumeMax);
+			return !this.randomizeVolume ? this.volume : UnityEngine.Random.Range(this.volumeMin, this.volumeMax);
 		}
 
 		public float GetPitch() {
-			if (!randomizePitch) return pitch;
-			return UnityEngine.Random.Range(pitchMin, pitchMax);
+			return !this.randomizePitch ? this.pitch : UnityEngine.Random.Range(this.pitchMin, this.pitchMax);
 		}
 
-		public SoundType GetSoundType() => soundType;
+		public SoundType GetSoundType() => this.soundType;
 	}
 }

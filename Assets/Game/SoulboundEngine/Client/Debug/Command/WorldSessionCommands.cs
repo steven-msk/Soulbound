@@ -1,17 +1,14 @@
-using Brigadier.NET;
-using Brigadier.NET.Builder;
-using Brigadier.NET.Context;
-using SoulboundEngine.Common.Math;
-using SoulboundEngine.Item;
-using SoulboundEngine.World.Block;
-using SoulboundEngine.World.Entity;
-using System;
-using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
+namespace SoulboundEngine.Client.Debug.Commands {
+	using Brigadier.NET;
+	using Brigadier.NET.Builder;
+	using Brigadier.NET.Context;
+	using SoulboundEngine.Common.Math;
+	using SoulboundEngine.Item;
+	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Entity;
+	using System;
 
 #nullable enable
-
-namespace SoulboundEngine.Client.Debug.Commands {
-	using Item = Item.Item;
 
 	public sealed class WorldSessionCommands : ICommandProvider {
 		void ICommandProvider.RegisterCommands(CommandDispatcher<RuntimeCommandSource> dispatcher) {
@@ -22,7 +19,7 @@ namespace SoulboundEngine.Client.Debug.Commands {
 							.Executes(ctx => {
 								Block block = ctx.GetArgument<Block>("block");
 								Vec2d playerPos = ctx.Source.data.Player.GetPos();
-								var blockPos = new BlockPos {
+								BlockPos blockPos = new() {
 									x = Maths.FloorToInt(ctx.GetArgument<Coordinate>("x").GetPos(playerPos.x)),
 									y = Maths.FloorToInt(ctx.GetArgument<Coordinate>("y").GetPos(playerPos.y))
 								};

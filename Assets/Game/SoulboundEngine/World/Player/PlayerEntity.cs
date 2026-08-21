@@ -16,7 +16,6 @@ namespace SoulboundEngine.World.Player {
 	using System;
 	using System.Collections.Generic;
 	using UnityEngine;
-	using Logger = Client.Debug.Logging.Logger;
 
 #nullable enable
 
@@ -157,8 +156,9 @@ namespace SoulboundEngine.World.Player {
 				};
 			}
 			BlockPos blockPos = BlockPos.From(this.GetWorldPointerPos());
-			if (this.activeItemUse?.type == type) this.HandleUseTick();
-			else if (this.activeItemUse == null && this.GetMainHandStack().ShouldContinueUse(type, this.level, this, blockPos)) {
+			if (this.activeItemUse?.type == type) {
+				this.HandleUseTick();
+			} else if (this.activeItemUse == null && this.GetMainHandStack().ShouldContinueUse(type, this.level, this, blockPos)) {
 				getInteractAction(type)();
 			}
 		}
@@ -227,8 +227,7 @@ namespace SoulboundEngine.World.Player {
 
 			BlockPos blockPos = BlockPos.From(interactionPoint);
 			BlockState? blockState = this.level.GetBlockState(blockPos);
-			if (blockState == null) return false;
-			return BlockInteract(blockState, blockPos, this.GetMainHandStack(), this, blockUse, blockUseWithItem);
+			return blockState != null && BlockInteract(blockState, blockPos, this.GetMainHandStack(), this, blockUse, blockUseWithItem);
 		}
 
 		private static bool ItemInteract(
@@ -257,8 +256,7 @@ namespace SoulboundEngine.World.Player {
 
 			blockPos = BlockPos.From(interactionPoint);
 			IActionResult result = inAir(stack, player.level, player, blockPos);
-			if (result is IActionResult.PassToBlockAction) return false;
-			return HandleActionResult(result, player);
+			return result is not IActionResult.PassToBlockAction && HandleActionResult(result, player);
 		}
 
 		private static bool BlockInteract(
@@ -309,8 +307,7 @@ namespace SoulboundEngine.World.Player {
 			}
 
 			blockState = state;
-			if (blockState == Blocks.AIR.DefaultState) return false;
-			return this.IsInBlockReach(blockPos.GetCenter());
+			return blockState != Blocks.AIR.DefaultState && this.IsInBlockReach(blockPos.GetCenter());
 		}
 
 		private bool TryBreakBlock(BlockPos blockPos) {
@@ -453,14 +450,14 @@ namespace SoulboundEngine.World.Player {
 			base.LoadAdditional(json);
 			JToken? inventoryToken = json["inventory"];
 			if (inventoryToken == null) {
-				Logger.LogError("No inventory property on PlayerEntity json: {}", json);
+				SoulboundEngine.Logger.LogError("No inventory property on PlayerEntity json: {}", json);
 			} else {
 				this.inventory.Load(inventoryToken);
 			}
 
 			int? mainSlot = (int?)json["mainSlot"];
 			if (mainSlot == null) {
-				Logger.LogError("No mainSlot property on PlayerEntity json: {}", json);
+				SoulboundEngine.Logger.LogError("No mainSlot property on PlayerEntity json: {}", json);
 			} else {
 				this.inventory.SetMainSlot(mainSlot.Value);
 			}

@@ -1,11 +1,11 @@
-﻿using SoulboundEngine.World.Entity;
-using SoulboundEngine.Registry;
-using System;
-using UnityEngine;
+﻿namespace SoulboundEngine.Client.Render.Entity {
+	using SoulboundEngine.Registry;
+	using SoulboundEngine.World.Entity;
+	using System;
+	using UnityEngine;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.Render.Entity {
 	public sealed class ScriptedEntityModelFactory<M> : IEntityModelFactory<M> where M : EntityModel {
 		public readonly Identifier identifier;
 		private readonly Func<GameObject, M> modelSupplier;
@@ -23,12 +23,13 @@ namespace SoulboundEngine.Client.Render.Entity {
 
 		public M GetModel(IEntityModelFactory.Context context) {
 			ScriptedEntityModel? model = context.scriptedEntityModelManager.Get(this.identifier);
-			if (model == null && this.fallback != null) return this.fallback();
-			else if (model == null) {
-				Debug.Logging.Logger.LogInfo("No fallback model available for {}", this.identifier);
+			if (model == null && this.fallback != null) {
+				return this.fallback();
+			} else if (model == null) {
+				SoulboundEngine.Logger.LogInfo("No fallback model available for {}", this.identifier);
 			}
 
-			GameObject? obj = model?.GetGameObject();
+			GameObject? obj = model.GetGameObject();
 			return this.modelSupplier(obj!);
 		}
 	}

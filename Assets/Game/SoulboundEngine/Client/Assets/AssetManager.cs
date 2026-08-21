@@ -1,19 +1,17 @@
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
-using UnityEngine.ResourceManagement.ResourceLocations;
-using Logger = SoulboundEngine.Client.Debug.Logging.Logger;
+namespace SoulboundEngine.Client.Assets {
+	using System;
+	using System.Collections.Concurrent;
+	using System.Collections.Generic;
+	using UnityEngine.AddressableAssets;
+	using UnityEngine.ResourceManagement.AsyncOperations;
+	using UnityEngine.ResourceManagement.ResourceLocations;
 
 #nullable enable
 
-namespace SoulboundEngine.Client.Assets {
 	public static class AssetManager {
 		const string preloadLabel = "preload";
 		private static readonly ConcurrentDictionary<AssetKey, AsyncOperationHandle> assets = new();
 		private static AsyncOperationHandle<IList<IResourceLocation>> locationsHandle;
-
 
 		public static void LoadAllWithPreloadLabel() {
 			LoadAllWithLabel(preloadLabel);
@@ -24,7 +22,7 @@ namespace SoulboundEngine.Client.Assets {
 			Logger.LogInfo("Loading assets with label '{}' from {} locations", label, locations.Count);
 			List<AssetKey> loadedKeys = new();
 
-			foreach (var location in locations) {
+			foreach (IResourceLocation location in locations) {
 				try {
 					AsyncOperationHandle handle = Addressables.LoadAssetAsync<UnityEngine.Object>(location);
 					handle.WaitForCompletion();
@@ -58,7 +56,7 @@ namespace SoulboundEngine.Client.Assets {
 
 		[Obsolete]
 		public static T Resolve<T>(AssetKey key) {
-			if (!assets.TryGetValue(key, out var handle)) {
+			if (!assets.TryGetValue(key, out AsyncOperationHandle handle)) {
 				Logger.LogError("Could not find asset with key {}", key);
 				return default!;
 			}
@@ -68,7 +66,7 @@ namespace SoulboundEngine.Client.Assets {
 
 		public static void Shutdown() {
 			locationsHandle.Release();
-			foreach (var handle in assets.Values) {
+			foreach (AsyncOperationHandle handle in assets.Values) {
 				handle.Release();
 			}
 		}

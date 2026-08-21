@@ -1,47 +1,49 @@
-using Cysharp.Threading.Tasks;
-using SoulboundEngine.Client.Audio;
-using SoulboundEngine.Client.Debug;
-using SoulboundEngine.Client.Debug.Commands;
-using SoulboundEngine.Client.Debug.Logging.Console;
-using SoulboundEngine.Client.Debug.Metrics;
-using SoulboundEngine.Client.Debug.Metrics.View;
-using SoulboundEngine.Client.Input;
-using SoulboundEngine.Client.IO;
-using SoulboundEngine.Client.Recipe.Asset;
-using SoulboundEngine.Client.Render.Block;
-using SoulboundEngine.Client.Render.Entity;
-using SoulboundEngine.Client.Render.Item;
-using SoulboundEngine.Client.Render.Sprite;
-using SoulboundEngine.Client.Render.World;
-using SoulboundEngine.Client.Settings;
-using SoulboundEngine.Client.UI;
-using SoulboundEngine.Client.UI.Screen;
-using SoulboundEngine.Client.UI.UXMLBindings;
-using SoulboundEngine.Client.World;
-using SoulboundEngine.Client.World.Widget;
-using SoulboundEngine.Common.Math;
-using SoulboundEngine.Recipe;
-using SoulboundEngine.Registry;
-using SoulboundEngine.Serialization;
-using SoulboundEngine.World;
-using SoulboundEngine.World.Level;
-using SoulboundEngine.World.Player;
-using SoulboundEngine.World.Serialization;
-using SoulboundEngine.World.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
-using UnityEngine.UIElements;
-
 namespace SoulboundEngine.Client {
+	using Cysharp.Threading.Tasks;
+	using SoulboundEngine.Client.Assets;
+	using SoulboundEngine.Client.Audio;
+	using SoulboundEngine.Client.Debug;
+	using SoulboundEngine.Client.Debug.Commands;
+	using SoulboundEngine.Client.Debug.Logging;
+	using SoulboundEngine.Client.Debug.Logging.Console;
+	using SoulboundEngine.Client.Debug.Metrics;
+	using SoulboundEngine.Client.Debug.Metrics.View;
+	using SoulboundEngine.Client.Input;
+	using SoulboundEngine.Client.IO;
+	using SoulboundEngine.Client.Recipe.Asset;
+	using SoulboundEngine.Client.Render.Block;
+	using SoulboundEngine.Client.Render.Entity;
+	using SoulboundEngine.Client.Render.Item;
+	using SoulboundEngine.Client.Render.Sprite;
+	using SoulboundEngine.Client.Render.World;
+	using SoulboundEngine.Client.Settings;
+	using SoulboundEngine.Client.UI;
+	using SoulboundEngine.Client.UI.Screen;
+	using SoulboundEngine.Client.UI.UXMLBindings;
+	using SoulboundEngine.Client.World;
+	using SoulboundEngine.Client.World.Widget;
+	using SoulboundEngine.Common.Math;
+	using SoulboundEngine.Recipe;
+	using SoulboundEngine.Registry;
+	using SoulboundEngine.Serialization;
+	using SoulboundEngine.World;
+	using SoulboundEngine.World.Level;
+	using SoulboundEngine.World.Player;
+	using SoulboundEngine.World.Serialization;
+	using SoulboundEngine.World.Services;
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using UnityEngine.InputSystem;
+	using UnityEngine.SceneManagement;
+	using UnityEngine.UIElements;
 	using Camera = UnityEngine.Camera;
 	using Keyboard = Input.Keyboard;
 	using Object = UnityEngine.Object;
 	using RectInt = UnityEngine.RectInt;
 	using Vector2 = UnityEngine.Vector2;
 	using Vector3 = UnityEngine.Vector3;
+
 #if !UNITY_EDITOR
 	using Application = UnityEngine.Application;
 	using LogType = UnityEngine.LogType;
@@ -50,6 +52,7 @@ namespace SoulboundEngine.Client {
 
 	public sealed class SoulboundClient : IWorldAccessor, IDebugMetricsSource {
 		private static SoulboundClient instance;
+		private static readonly UnityClientLoggerWrapper clientLoggerWrapper = new(UnityEngine.Debug.unityLogger);
 		private readonly GameConfig config;
 		private readonly PlayerInputActions inputActions;
 		private readonly InputManager inputManager;
@@ -84,7 +87,15 @@ namespace SoulboundEngine.Client {
 		public SoulboundClient(GameConfig config) {
 			instance = this;
 			this.config = config;
+			Logger.SetWrapper(clientLoggerWrapper);
 			UXMLSchema_Generated.RegisterAll();
+
+			this.logConsole = new LogConsole(this);
+
+			AssetManager.LoadAllWithPreloadLabel();
+
+			Registries.Init();
+			Registries.Freeze();
 
 			this.inputActions = new PlayerInputActions();
 			this.inputManager = new InputManager(this.inputActions.asset);
@@ -104,7 +115,6 @@ namespace SoulboundEngine.Client {
 			this.commandProcessor = new CommandProcessor(this.runtimeDataProvider, this.runtimeExecutionServices);
 			this.commandLine = new CommandLine(this.commandProcessor, this);
 			this.metricsHud = new MetricsHUD(this.debugMetricsService, this);
-			this.logConsole = new LogConsole(this);
 			this.uiHandler = new UIHandler(this.commandLine, this.logConsole, this.metricsHud);
 
 			this.uiAudioEventBank = new UIAudioEventBank();
