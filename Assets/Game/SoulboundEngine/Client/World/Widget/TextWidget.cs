@@ -1,19 +1,20 @@
-﻿using SoulboundEngine.Client.UI.UXMLBindings;
-using SoulboundEngine.Common.Math;
-using SoulboundEngine.Registry;
-using SoulboundEngine.World.Block;
-using UnityEngine.UIElements;
+﻿namespace SoulboundEngine.Client.World.Widget {
+	using SoulboundEngine.Client.UI.UXMLBindings;
+	using SoulboundEngine.Common.Math;
+	using SoulboundEngine.Registry;
+	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Widget;
+	using UnityEngine.UIElements;
 
-namespace SoulboundEngine.Client.World.Widget {
-	public class TextWidget : WorldWidget<TextWidget.Context> {
+	public class TextWidget : UXMLWorldWidget<TextWidget.Context> {
 		private static readonly Identifier TEXT_ELEMENT = Identifier.Of("soulbound:text_widget/text");
 
-		public TextWidget(WorldWidgetManager widgetManager, Context context, VisualTreeAsset asset) 
+		public TextWidget(ClientWorldWidgetManager widgetManager, Context context, VisualTreeAsset asset)
 			: base(widgetManager, context, asset) {
 		}
 
-		protected override void OnBind(UIDocument document, Context context) {
-			base.OnBind(document, context);
+		protected override void Bind(UIDocument document, Context context) {
+			base.Bind(document, context);
 			this.SetText(context.text);
 		}
 
@@ -22,8 +23,8 @@ namespace SoulboundEngine.Client.World.Widget {
 			return blockCenter + Vec2d.UNIT_Y;
 		}
 
-		protected override void OnUpdate(Context context) {
-			this.SetText(context.text);
+		protected override void OnUpdate(Context oldContext, Context newContext) {
+			this.SetText(newContext.text);
 		}
 
 		public void SetText(string text) {
@@ -31,8 +32,7 @@ namespace SoulboundEngine.Client.World.Widget {
 			label.text = text;
 		}
 
-		public class Context : WorldWidgetContext {
-			public string text;
+		public record Context(string text, BlockPos blockPos) : WorldWidgetContext(blockPos) {
 		}
 	}
 }

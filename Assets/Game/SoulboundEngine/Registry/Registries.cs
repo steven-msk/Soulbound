@@ -1,5 +1,4 @@
 namespace SoulboundEngine.Registry {
-	using SoulboundEngine.Client.World.Widget;
 	using SoulboundEngine.Component;
 	using SoulboundEngine.Inventory;
 	using SoulboundEngine.Item;
@@ -9,6 +8,7 @@ namespace SoulboundEngine.Registry {
 	using SoulboundEngine.World.Block.Entity;
 	using SoulboundEngine.World.Entity;
 	using SoulboundEngine.World.Entity.Attribute;
+	using SoulboundEngine.World.Widget;
 	using System;
 	using System.Linq;
 

@@ -2,7 +2,6 @@ namespace SoulboundEngine.World.Player {
 	using Newtonsoft.Json.Linq;
 	using SoulboundEngine.Client;
 	using SoulboundEngine.Client.UI.Screen;
-	using SoulboundEngine.Client.World.Widget;
 	using SoulboundEngine.Common.Math;
 	using SoulboundEngine.Interaction;
 	using SoulboundEngine.Inventory;
@@ -14,6 +13,7 @@ namespace SoulboundEngine.World.Player {
 	using SoulboundEngine.World.Entity;
 	using SoulboundEngine.World.Level;
 	using SoulboundEngine.World.Physics;
+	using SoulboundEngine.World.Widget;
 	using System;
 	using System.Collections.Generic;
 	using UnityEngine;

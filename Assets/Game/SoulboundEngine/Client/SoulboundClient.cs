@@ -31,6 +31,7 @@ namespace SoulboundEngine.Client {
 	using SoulboundEngine.World.Player;
 	using SoulboundEngine.World.Serialization;
 	using SoulboundEngine.World.Services;
+	using SoulboundEngine.World.Widget;
 	using System;
 	using System.Collections.Generic;
 	using System.Linq;
@@ -81,7 +82,7 @@ namespace SoulboundEngine.Client {
 		private readonly RecipeManager recipeManager;
 		private readonly PerformanceMetrics performanceMetrics;
 		private readonly DebugMetricsService debugMetricsService;
-		private readonly WorldWidgetManager worldWidgetManager;
+		private readonly ClientWorldWidgetManager worldWidgetManager;
 		private WorldScreen? activeWorldScreen;
 		private PlayerEntity? player;
 		private WorldSession? activeWorldSession;
@@ -131,7 +132,7 @@ namespace SoulboundEngine.Client {
 			this.blockRenderManager = new BlockRenderManager(Registries.BLOCKS.ToList());
 			this.worldRenderer = new WorldRenderer(RENDER_RECT, this.blockRenderManager, this.entityRenderManager);
 			_ = new InventoryScreens();
-			this.worldWidgetManager = new WorldWidgetManager();
+			this.worldWidgetManager = new ClientWorldWidgetManager();
 
 			Registry<RecipeIngredientIndex> ingredientIndexRegistry = new(RecipeIngredientIndex.REGISTRY);
 			this.recipeManager = new RecipeManager(ingredientIndexRegistry, new RecipeAssetResolver());

@@ -1,4 +1,4 @@
-﻿namespace SoulboundEngine.Client.World.Widget {
+﻿namespace SoulboundEngine.World.Widget {
 	public class WorldWidgetHandle {
 		public WorldWidgetType type { get; }
 		public WorldWidgetContext context { get; private set; }

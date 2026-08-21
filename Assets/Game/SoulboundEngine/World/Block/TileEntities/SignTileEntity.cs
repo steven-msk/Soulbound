@@ -1,11 +1,11 @@
-﻿using Newtonsoft.Json.Linq;
-using SoulboundEngine.Client.UI.Screen;
-using SoulboundEngine.Client.World.Widget;
-using SoulboundEngine.World.Block.State;
-
-#nullable enable
+﻿#nullable enable
 
 namespace SoulboundEngine.World.Block.Entity {
+	using Newtonsoft.Json.Linq;
+	using SoulboundEngine.Client.UI.Screen;
+	using SoulboundEngine.World.Block.State;
+	using SoulboundEngine.World.Widget;
+
 	public class SignTileEntity : TileEntity {
 		private string text = "a sign";
 

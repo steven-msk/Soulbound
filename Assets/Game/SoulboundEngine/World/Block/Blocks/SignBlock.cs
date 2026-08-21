@@ -1,12 +1,12 @@
-﻿using SoulboundEngine.Client.World.Widget;
-using SoulboundEngine.Interaction;
-using SoulboundEngine.Item;
-using SoulboundEngine.World.Block.Entity;
-using SoulboundEngine.World.Block.State;
-using SoulboundEngine.World.Player;
-
-namespace SoulboundEngine.World.Block {
-	using Level = Level.Level;
+﻿namespace SoulboundEngine.World.Block {
+	using SoulboundEngine.Client.World.Widget;
+	using SoulboundEngine.Interaction;
+	using SoulboundEngine.Item;
+	using SoulboundEngine.World.Block.Entity;
+	using SoulboundEngine.World.Block.State;
+	using SoulboundEngine.World.Level;
+	using SoulboundEngine.World.Player;
+	using SoulboundEngine.World.Widget;
 
 	public class SignBlock : Block, ITileEntityProvider {
 		public SignBlock(Settings settings) 
@@ -19,9 +19,7 @@ namespace SoulboundEngine.World.Block {
 
 		protected override void OnHoverEnter(BlockState state, ItemStack stack, Level level, PlayerEntity player, BlockPos pos) {
 			SignTileEntity tileEntity = (SignTileEntity)level.GetTileEntity(pos);
-			tileEntity.widgetHandle = player.ShowWorldWidget(WorldWidgetType.TEXT, new TextWidget.Context() { 
-				blockPos = pos, text = tileEntity.GetText()
-			});
+			tileEntity.widgetHandle = player.ShowWorldWidget(WorldWidgetType.TEXT, new TextWidget.Context(tileEntity.GetText(), pos));
 		}
 
 		protected override void OnHoverLeave(BlockState state, ItemStack stack, Level level, PlayerEntity player, BlockPos pos) {
