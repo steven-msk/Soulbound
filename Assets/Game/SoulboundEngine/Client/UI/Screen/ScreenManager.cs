@@ -1,13 +1,12 @@
-using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.Client.Input;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine.UIElements;
-
 #nullable enable
 
 namespace SoulboundEngine.Client.UI.Screen {
+	using SoulboundEngine.Client.Input;
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using UnityEngine.UIElements;
+
 	public sealed class ScreenManager {
 		private readonly List<ScreenEntry> stack = new();
 		private readonly UXMLScreenRoot screenRoot;
@@ -89,8 +88,15 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 		private ScreenEntry? GetTopEntry() => this.stack.First();
 
-		public bool HasKeyboardFocus() => this.GetFocus(f => f.HasKeyboardFocus())?.HasKeyboardFocus() ?? false;
-		public bool IsPointerOverUI() => this.GetFocus(f => f.IsPointerOverUI())?.IsPointerOverUI() ?? false;
+		public bool HasKeyboardFocus() {
+			bool hasFocusableKeyboard = this.GetFocus(f => f.HasKeyboardFocus())?.HasKeyboardFocus() ?? false;
+			return hasFocusableKeyboard || (this.GetActiveScreen()?.HasKeyboardFocus() ?? false);
+		}
+
+		public bool IsPointerOverUI() {
+			bool hasUIFocus = this.GetFocus(f => f.IsPointerOverUI())?.IsPointerOverUI() ?? false;
+			return hasUIFocus || (this.GetActiveScreen()?.IsPointerOverUI() ?? false);
+		}
 
 		private IInputFocusable? GetFocus(Predicate<IInputFocusable> predicate) {
 			foreach (IInputFocusable focusable in this.focusStack.Reverse()) {

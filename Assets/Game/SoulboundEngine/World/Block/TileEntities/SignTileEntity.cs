@@ -1,6 +1,5 @@
 ﻿namespace SoulboundEngine.World.Block.Entity {
 	using Newtonsoft.Json.Linq;
-	using SoulboundEngine.Client.UI.Screen;
 	using SoulboundEngine.World.Block.State;
 	using SoulboundEngine.World.Widget;
 
@@ -21,8 +20,7 @@
 			return new SignTileEntity(blockPos, state);
 		}
 
-		public WorldWidgetHandler? widgetHandler { get; set; }
-		public IScreenHandle? screenHandle { get; set; }
+		public TextWidgetHandler? widgetHandler { get; set; }
 
 		public override void ReadAdditional(JObject json) {
 			this.text = (string)json["text"]!;
@@ -33,6 +31,9 @@
 		}
 
 		public string GetText() => this.text;
-		public void SetText(string text) => this.text = text;
+		public void SetText(string text) {
+			this.text = text;
+			this.widgetHandler?.SetText(text);
+		}
 	}
 }

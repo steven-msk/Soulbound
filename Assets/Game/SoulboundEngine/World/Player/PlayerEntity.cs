@@ -29,6 +29,7 @@ namespace SoulboundEngine.World.Player {
 		private Vector2 screenPointerPos;
 		private InventoryScreenHandler? activeInventoryScreenHandler;
 		private IScreenHandle? activeInventoryScreen;
+		private IScreenHandle? signEditScreen;
 		private ActiveUseContext? activeItemUse;
 		private BlockPos previousPointerBlockPos;
 		private bool isHoldingLeft;
@@ -343,8 +344,17 @@ namespace SoulboundEngine.World.Player {
 			this.isJumping = jumping;
 		}
 
-		public IScreenHandle OpenSignEditScreen(SignTileEntity signEntity) {
-			return this.client.OpenScreen(new SignEditScreen(signEntity));
+		public bool OpenSignEditScreen(SignTileEntity signEntity) {
+			if (this.signEditScreen != null) return false;
+			this.signEditScreen = this.client.OpenScreen(new SignEditScreen(signEntity, this));
+			return true;
+		}
+
+		[Obsolete]
+		public void CloseSignEditScreen() {
+			if (this.signEditScreen == null) return;
+			this.client.CloseScreen(this.signEditScreen);
+			this.signEditScreen = null;
 		}
 
 		public void DropMainHandItem(bool ctrl) {

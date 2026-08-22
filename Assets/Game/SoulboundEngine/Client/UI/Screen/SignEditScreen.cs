@@ -1,15 +1,17 @@
-﻿using SoulboundEngine.Client.UI.UXMLBindings;
-using SoulboundEngine.World.Block.Entity;
-using SoulboundEngine.Client.Assets;
-using SoulboundEngine.Registry;
-using UnityEngine.UIElements;
+﻿namespace SoulboundEngine.Client.UI.Screen {
+	using SoulboundEngine.Client.Assets;
+	using SoulboundEngine.Client.UI.UXMLBindings;
+	using SoulboundEngine.Registry;
+	using SoulboundEngine.World.Block.Entity;
+	using SoulboundEngine.World.Player;
+	using UnityEngine.UIElements;
 
-namespace SoulboundEngine.Client.UI.Screen {
 	public class SignEditScreen : UXMLScreen {
 		private static readonly Identifier TEXT_FIELD_ELEMENT = Identifier.Of("soulbound:sign_edit_screen/text_field");
 		private static readonly Identifier CANCEL_ELEMENT = Identifier.Of("soulbound:sign_edit_screen/cancel");
 		private static readonly Identifier DONE_ELEMENT = Identifier.Of("soulbound:sign_edit_screen/done");
 		private readonly SignTileEntity signEntity;
+		private readonly PlayerEntity player;
 		private readonly string originalText;
 		private VisualElement root;
 		private TextField textField;
@@ -17,9 +19,10 @@ namespace SoulboundEngine.Client.UI.Screen {
 		public override bool CloseOnEsc => false;
 		public override bool IsOpaque => false;
 
-		public SignEditScreen(SignTileEntity signEntity) 
+		public SignEditScreen(SignTileEntity signEntity, PlayerEntity player) 
 			: base(AssetManager.Resolve<VisualTreeAsset>(new AssetKey("SignEditScreen"))) {
 			this.signEntity = signEntity;
+			this.player = player;
 			this.originalText = signEntity.GetText();
 		}
 
@@ -32,6 +35,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 				this.signEntity.SetText(evt.newValue);
 			});
 			this.textField.value = this.originalText;
+			this.CaptureFocus(this.textField);
 
 			Button cancelButton = root.Get<Button>(CANCEL_ELEMENT);
 			cancelButton.clicked += this.Cancel;
@@ -40,9 +44,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 			doneButton.clicked += this.Done;
 		}
 
-		public override void OnShow(IScreenHandle handle) {
-			this.signEntity.screenHandle = handle;
-		}
+		public override bool HasKeyboardFocus() => true;
 
 		private void KeyPressed(KeyDownEvent evt) {
 			if (evt.keyCode == UnityEngine.KeyCode.Escape) {
@@ -50,17 +52,17 @@ namespace SoulboundEngine.Client.UI.Screen {
 			}
 		}
 
+		private void CaptureFocus(VisualElement visualElement) {
+			visualElement.schedule.Execute(visualElement.Focus);
+		}
+
 		private void Cancel() {
 			this.signEntity.SetText(this.originalText);
-			this.ScreenManager.PopScreen(this.handle);
+			this.player.CloseSignEditScreen();
 		}
 
 		private void Done() {
-			this.ScreenManager.PopScreen(this.handle);
-		}
-
-		public override void OnHide(IScreenHandle handle) {
-			this.signEntity.screenHandle = null;
+			this.player.CloseSignEditScreen();
 		}
 
 		public override void OnDispose(IScreenHandle handle) {

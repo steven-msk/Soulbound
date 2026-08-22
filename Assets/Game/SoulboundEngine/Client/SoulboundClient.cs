@@ -182,6 +182,10 @@ namespace SoulboundEngine.Client {
 		}
 
 		private void HandleInputTick() {
+			// known issue: screen key presses are desynced with this method
+			// due to UIToolkit dispatching input the frame it was invoked
+			bool hasKeyboardFocus = this.uiHandler.HasKeyboardFocus();
+			bool isPointerOverUI = this.uiHandler.IsPointerOverUI();
 			this.metricsHud.Tick();
 			this.commandLine.Tick();
 			this.logConsole.Tick();
@@ -193,11 +197,11 @@ namespace SoulboundEngine.Client {
 
 				PlayerEntity player = level.GetPlayer();
 				this.clientPlayerInputHandler.Handle(player,
-					shouldBlockKeyboardActions: this.uiHandler.HasKeyboardFocus() || isPaused,
-					shouldBlockMouse: this.uiHandler.IsPointerOverUI() || isPaused
+					shouldBlockKeyboardActions: hasKeyboardFocus || isPaused,
+					shouldBlockMouse: isPointerOverUI || isPaused
 				);
 
-				if (!this.uiHandler.HasKeyboardFocus() && this.inputManager.keyboard.WasPressed(Keyboard.GetControl(Key.Escape))) {
+				if (!hasKeyboardFocus && this.inputManager.keyboard.WasPressed(Keyboard.GetControl(Key.Escape))) {
 					if (!levelManager.paused) {
 						this.PauseGame();
 					} else {

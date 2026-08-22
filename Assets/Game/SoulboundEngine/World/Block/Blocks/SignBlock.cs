@@ -22,7 +22,8 @@
 
 		protected override void OnHoverEnter(BlockState state, ItemStack stack, Level level, PlayerEntity player, BlockPos pos) {
 			SignTileEntity tileEntity = (SignTileEntity)level.GetTileEntity(pos);
-			tileEntity.widgetHandler = level.AddWidget(this, (level, pos) => new TextWidgetHandler.Context(level, pos, tileEntity.GetText()), pos);
+			tileEntity.widgetHandler = (TextWidgetHandler)level.AddWidget(this,
+				(level, pos) => new TextWidgetHandler.Context(level, pos, tileEntity.GetText()), pos);
 		}
 
 		protected override void OnHoverLeave(BlockState state, ItemStack stack, Level level, PlayerEntity player, BlockPos pos) {
@@ -35,10 +36,7 @@
 
 		protected override IActionResult OnSecondaryUse(BlockState state, Level level, PlayerEntity player, BlockPos pos) {
 			SignTileEntity tileEntity = (SignTileEntity)level.GetTileEntity(pos);
-			if (tileEntity.screenHandle != null) return IActionResult.FAIL;
-
-			player.OpenSignEditScreen(tileEntity);
-			return IActionResult.SUCCESS;
+			return !player.OpenSignEditScreen(tileEntity) ? IActionResult.FAIL : IActionResult.SUCCESS;
 		}
 	}
 }
