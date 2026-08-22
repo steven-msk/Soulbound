@@ -1,17 +1,15 @@
-﻿using SoulboundEngine.World.Biome;
-using SoulboundEngine.World.Block;
-using SoulboundEngine.World.Block.State;
-using SoulboundEngine.World.Chunk;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿namespace SoulboundEngine.World.Gen {
+	using SoulboundEngine.Common.Math;
+	using SoulboundEngine.World.Biome;
+	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Block.State;
+	using SoulboundEngine.World.Chunk;
+	using SoulboundEngine.World.Level;
+	using System;
+	using System.Collections;
+	using System.Collections.Generic;
 
 #nullable enable
-
-namespace SoulboundEngine.World.Gen {
-	using Chunk = Chunk.Chunk;
-	using Level = Level.Level;
 
 	public sealed class NoiseLevelChunkGenerator : ChunkGenerator {
 		private const int BIOME_BLEND_RANGE = 10;
@@ -42,13 +40,13 @@ namespace SoulboundEngine.World.Gen {
 				int x = chunkPos.ChunkXToWorldX(cx);
 
 				IEnumerable<BiomeWeight> weights = this.biomeMap.ResolveWeights(x);
-				this.biomeMap.ResolvePrimaryBiomes(weights, out var primary, out var secondary);
+				this.biomeMap.ResolvePrimaryBiomes(weights, out BiomeWeight primary, out BiomeWeight? secondary);
 				genData.biomeWeights[cx] = weights;
 
 				ChunkBiomePartition partition = this.ProcessBiomePartition(x, primary.biome, genData.biomePartition);
 				genData.biomePartition = partition;
 
-				int height = Mathf.FloorToInt(this.heightmap.SampleHeight(x, primary, secondary));
+				int height = Maths.FloorToInt(this.heightmap.SampleHeight(x, primary, secondary));
 				float surfaceY = this.heightmap.ToYCoord(height);
 
 				BlockResolver blockResolver = new(primary.biome, secondary?.biome);

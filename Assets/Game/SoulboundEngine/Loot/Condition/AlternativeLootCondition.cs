@@ -1,10 +1,10 @@
-﻿using Game.SoulboundEngine.Common;
-using SoulboundEngine.Loot.Context;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿namespace SoulboundEngine.Loot.Condition {
+	using SoulboundEngine.Common;
+	using SoulboundEngine.Loot.Context;
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
 
-namespace SoulboundEngine.Loot.Condition {
 	public abstract class AlternativeLootCondition : ILootCondition {
 		protected readonly List<ILootCondition> conditions;
 		private readonly IPredicate<LootContext> predicate;
@@ -38,10 +38,9 @@ namespace SoulboundEngine.Loot.Condition {
 			}
 
 			public ILootCondition Build() {
-				if (this.conditions.Count == 0) {
-					throw new ArgumentException("AlternativeLootCondition requires at least one condition");
-				}
-				return this.Build(this.conditions);
+				return this.conditions.Count == 0
+					? throw new ArgumentException("AlternativeLootCondition requires at least one condition")
+					: this.Build(this.conditions);
 			}
 
 			protected abstract ILootCondition Build(List<ILootCondition> conditions);

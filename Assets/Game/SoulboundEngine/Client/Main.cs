@@ -10,7 +10,7 @@ namespace SoulboundEngine.Client {
 		public ClientConfig GetClientConfig() {
 			ClientConfig config = this.gameConfig;
 			config.isRunningInEditor = Application.isEditor;
-			return this.gameConfig;
+			return config;
 		}
 	}
 }

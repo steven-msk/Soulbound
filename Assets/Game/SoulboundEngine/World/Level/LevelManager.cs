@@ -5,17 +5,17 @@ namespace SoulboundEngine.World.Level {
 	using SoulboundEngine.World.Chunk;
 	using SoulboundEngine.World.Entity;
 	using SoulboundEngine.World.Gen;
+	using SoulboundEngine.World.Physics;
 	using SoulboundEngine.World.Player;
 	using SoulboundEngine.World.Serialization;
 	using System;
-	using UnityEngine;
 
 #nullable enable
 
 	public class LevelManager {
 		public const int CHUNK_RADIUS = 2;
 		public const int TERRAIN_PLANE_Y = 0;
-		public static readonly RectInt simulationView = new(-128, -76, 256, 156);
+		private static readonly Vec2i SIMULATION_VIEW_SIZE = new(256, 156);
 		private readonly Level level;
 		private readonly WorldSave save;
 		private readonly EntitySerializer entitySerializer;
@@ -80,13 +80,8 @@ namespace SoulboundEngine.World.Level {
 			this.entitySerializer.SavePlayer(this.level.GetPlayer());
 		}
 
-		private RectInt GetRelativeSimulationRect(Vec2d pivot) {
-			return new(
-				Maths.FloorToInt(pivot.x) + simulationView.x,
-				Maths.FloorToInt(pivot.y) + simulationView.y,
-				simulationView.width,
-				simulationView.height
-			);
+		private AABB GetRelativeSimulationRect(Vec2d pivot) {
+			return AABB.OfSize(pivot.Floor(), SIMULATION_VIEW_SIZE.x, SIMULATION_VIEW_SIZE.y);
 		}
 
 		public bool TogglePause() {

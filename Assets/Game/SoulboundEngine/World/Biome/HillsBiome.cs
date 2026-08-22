@@ -1,14 +1,15 @@
-using SoulboundEngine.Common.Math.Noise;
-using SoulboundEngine.World.Block;
-using SoulboundEngine.World.Block.State;
-using SoulboundEngine.World.Gen;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-
 namespace SoulboundEngine.World.Biome {
-	using Chunk = Chunk.Chunk;
-	using Level = Level.Level;
+	using SoulboundEngine.Common.Math;
+	using SoulboundEngine.Common.Math.Noise;
+	using SoulboundEngine.Common.Math.Random;
+	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Block.State;
+	using SoulboundEngine.World.Chunk;
+	using SoulboundEngine.World.Gen;
+	using SoulboundEngine.World.Level;
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
 
 	public class HillsBiome : IBiome {
 		private readonly int seed;
@@ -18,6 +19,7 @@ namespace SoulboundEngine.World.Biome {
 		private readonly NoiseSampler densityNoise;
 		private readonly NoiseSampler forestNoise;
 		private readonly NoiseSampler forestDensityNoise;
+		private readonly IRandom random;
 		int lastTreeX = int.MinValue >> 1;
 
 		public HillsBiome(int seed) {
@@ -26,13 +28,14 @@ namespace SoulboundEngine.World.Biome {
 			this.densityNoise = new NoiseSampler(8, new NoiseSettings(seed, NoiseType.OpenSimplex2, 0.0012f));
 			this.forestNoise = new NoiseSampler(6, new NoiseSettings(seed, NoiseType.Value, 0.03f));
 			this.forestDensityNoise = new NoiseSampler(7, new NoiseSettings(seed, NoiseType.Value, 0.05f));
+			this.random = new Xoshiro256StarStarRandom(seed);
 		}
 
 		float IBiome.GetDensity(int blockX) {
 			float n = this.densityNoise.Sample1D(blockX);
 			n = (n + 1f) * 0.5f;
-			n = Mathf.SmoothStep(0f, 1f, n);
-			n = Mathf.Pow(n, 1.5f);
+			n = (float)Maths.SmoothStep(0f, 1f, n);
+			n = (float)Math.Pow(n, 1.5f);
 			return n;
 		}
 
@@ -46,13 +49,11 @@ namespace SoulboundEngine.World.Biome {
 		}
 
 		BlockState IBiome.ResolveBlock(BlockGenContext ctx) {
-			if (ctx.AboveSurface())
-				return Blocks.AIR.DefaultState;
-			if (ctx.distanceToSurface < 2)
-				return Blocks.GRASS.DefaultState;
-			if (ctx.distanceToSurface < 5)
-				return Blocks.DIRT.DefaultState;
-			return Blocks.STONE.DefaultState;
+			return ctx.AboveSurface()
+				? Blocks.AIR.DefaultState
+				: ctx.distanceToSurface < 2
+					? Blocks.GRASS.DefaultState
+					: ctx.distanceToSurface < 5 ? Blocks.DIRT.DefaultState : Blocks.STONE.DefaultState;
 		}
 
 		void PlaceTree(int originX, int originY, Chunk chunk, Level level) {
@@ -61,7 +62,7 @@ namespace SoulboundEngine.World.Biome {
 			const int trunkHeightMax = 20;
 
 			BlockPos trunkPos = new(originX, originY);
-			int height = UnityEngine.Random.Range(trunkHeightMin, trunkHeightMax + 1);
+			int height = this.random.NextInt(trunkHeightMin, trunkHeightMax + 1);
 
 			for (int y = 0; y < height; y++) {
 				chunk.SetBlockState(trunkPos, Blocks.WOOD.DefaultState);
@@ -71,9 +72,9 @@ namespace SoulboundEngine.World.Biome {
 			Dictionary<int, List<int>> rowToXs = new();
 			float angularStep = 1f;
 			for (float angle = 0; angle < 360f; angle += angularStep) {
-				float rad = angle * Mathf.Deg2Rad;
-				int x = Mathf.RoundToInt(trunkPos.x + crownRadius * Mathf.Cos(rad));
-				int y = Mathf.RoundToInt(trunkPos.y + crownRadius * Mathf.Sin(rad));
+				float rad = angle * (float)Maths.DEG_2_RAD;
+				int x = (int)Math.Round(trunkPos.x + crownRadius * Math.Cos(rad));
+				int y = (int)Math.Round(trunkPos.y + crownRadius * Math.Sin(rad));
 
 				if (!rowToXs.ContainsKey(y)) {
 					rowToXs[y] = new List<int>();
@@ -81,7 +82,7 @@ namespace SoulboundEngine.World.Biome {
 				rowToXs[y].Add(x);
 			}
 
-			foreach (var kvp in rowToXs) {
+			foreach (KeyValuePair<int, List<int>> kvp in rowToXs) {
 				int y = kvp.Key;
 				List<int> xs = kvp.Value;
 				for (int x = xs.Min(); x <= xs.Max(); x++) {
@@ -101,19 +102,19 @@ namespace SoulboundEngine.World.Biome {
 			const float densityAmp = 4f;
 
 			for (int x = partitionStartX; x <= partitionLimitX; x++) {
-				float forest = Mathf.Abs(this.forestNoise.Sample1D(x) * forestAmp);
+				float forest = Math.Abs(this.forestNoise.Sample1D(x) * forestAmp);
 				if (forest < threshold) {
 					continue;
 				}
 
-				float density = Mathf.Abs(this.forestDensityNoise.Sample1D(x) * densityAmp);
-				float distance = Mathf.Abs(x - this.lastTreeX);
+				float density = Math.Abs(this.forestDensityNoise.Sample1D(x) * densityAmp);
+				float distance = Math.Abs(x - this.lastTreeX);
 				if (distance < minTreeSpacing) {
 					continue;
 				}
 
-				float spawnChance = Mathf.Lerp(chanceMin, chanceMax, density);
-				if (UnityEngine.Random.value < spawnChance) {
+				float spawnChance = (float)Maths.Lerp(chanceMin, chanceMax, density);
+				if (this.random.NextFloat() < spawnChance) {
 					this.PlaceTree(x, genData.surfacePoints[chunk.GetPos().WorldXToChunkX(x)] + 1, chunk, level);
 					this.lastTreeX = x;
 				}
@@ -142,9 +143,7 @@ namespace SoulboundEngine.World.Biome {
 		}
 
 		BlockState IBiome.ResolveCaveBlock(BlockPos pos, float density) {
-			if (Mathf.Abs(density) <= 0.05f)
-				return Blocks.DIRT.DefaultState;
-			return Blocks.AIR.DefaultState;
+			return Math.Abs(density) <= 0.05f ? Blocks.DIRT.DefaultState : Blocks.AIR.DefaultState;
 		}
 	}
 }

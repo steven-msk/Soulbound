@@ -1,12 +1,8 @@
-using Newtonsoft.Json;
-using SoulboundEngine.Common.Json;
-using SoulboundEngine.Common.Math;
-using SoulboundEngine.World.Block;
-
 namespace SoulboundEngine.World.Chunk {
-	using Level = Level.Level;
+	using SoulboundEngine.Common.Math;
+	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Level;
 
-	[JsonConverter(typeof(ChunkBlockPosJsonConverter))]
 	public struct ChunkBlockPos {
 		public int x;
 		public int y;
@@ -48,7 +44,7 @@ namespace SoulboundEngine.World.Chunk {
 			if (obj is not ChunkBlockPos) {
 				return false;
 			}
-			var other = (ChunkBlockPos)obj;
+			ChunkBlockPos other = (ChunkBlockPos)obj;
 			return this == other;
 		}
 

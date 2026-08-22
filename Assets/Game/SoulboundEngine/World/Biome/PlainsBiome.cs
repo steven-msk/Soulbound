@@ -1,10 +1,11 @@
-using SoulboundEngine.World.Block;
-using SoulboundEngine.World.Block.State;
-using SoulboundEngine.World.Gen;
-using SoulboundEngine.Common.Math.Noise;
-using UnityEngine;
-
 namespace SoulboundEngine.World.Biome {
+	using SoulboundEngine.Common.Math;
+	using SoulboundEngine.Common.Math.Noise;
+	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Block.State;
+	using SoulboundEngine.World.Gen;
+	using System;
+
 	public class PlainsBiome : IBiome {
 		private readonly NoiseSampler largeNoise;
 		private readonly NoiseSampler mediumNoise;
@@ -19,8 +20,8 @@ namespace SoulboundEngine.World.Biome {
 		float IBiome.GetDensity(int blockX) {
 			float n = this.densityNoise.Sample1D(blockX);
 			n = (n + 1f) * 0.5f;
-			n = Mathf.SmoothStep(0f, 1f, n);
-			n = Mathf.Pow(n, 1.5f);
+			n = (float)Maths.SmoothStep(0f, 1f, n);
+			n = (float)Math.Pow(n, 1.5f);
 			return n;
 		}
 
@@ -34,9 +35,7 @@ namespace SoulboundEngine.World.Biome {
 		}
 
 		BlockState IBiome.ResolveBlock(BlockGenContext ctx) {
-			if (ctx.AboveSurface())
-				return Blocks.AIR.DefaultState;
-			return Blocks.DIRT.DefaultState;
+			return ctx.AboveSurface() ? Blocks.AIR.DefaultState : Blocks.DIRT.DefaultState;
 		}
 
 		TerrainModulation IBiome.SampleTerrain(int blockX) {
