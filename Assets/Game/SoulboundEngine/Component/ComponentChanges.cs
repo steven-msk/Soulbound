@@ -1,14 +1,13 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.Registry;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿namespace SoulboundEngine.Component {
+	using Newtonsoft.Json;
+	using Newtonsoft.Json.Linq;
+	using SoulboundEngine.Registry;
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
 
 #nullable enable
 
-namespace SoulboundEngine.Component {
 	public sealed class ComponentChanges {
 		private readonly Dictionary<ComponentType, object> changedComponents;
 		public static readonly ComponentChanges EMPTY = new(new Dictionary<ComponentType, object>());
@@ -38,7 +37,7 @@ namespace SoulboundEngine.Component {
 
 			foreach (Component? component in result) {
 				seen.Add(component.boxedType);
-				if (!baseValues.TryGetValue(component.boxedType, out var baseValue)
+				if (!baseValues.TryGetValue(component.boxedType, out object? baseValue)
 					|| !baseValue.Equals(component.boxedValue)) {
 					builder.AddRaw(component.boxedType, component.boxedValue);
 				}
@@ -76,8 +75,8 @@ namespace SoulboundEngine.Component {
 			}
 
 			IComponentMap.Builder builder = IComponentMap.Create();
-			foreach (var kvp in addedComponents) {
-				builder.Add(Component.Of(kvp.Key, kvp.Value));
+			foreach ((ComponentType type, object value) in addedComponents) {
+				builder.Add(Component.Of(type, value));
 			}
 
 			return new AddedRemovedPairs(builder.Build(), removed);
@@ -132,13 +131,14 @@ namespace SoulboundEngine.Component {
 		}
 
 		public bool Equals(ComponentChanges other) {
-			if (this.Size() != other.Size()) return false;
-			return this.changedComponents.All(kvp => other.changedComponents.TryGetValue(kvp.Key, out object v) && kvp.Value.Equals(v));
+			return this.Size() == other.Size() 
+				&& this.changedComponents.All(kvp => 
+					other.changedComponents.TryGetValue(kvp.Key, out object v) && kvp.Value.Equals(v));
 		}
 
 		public override int GetHashCode() {
 			int hash = 0;
-			foreach (var kvp in this.changedComponents.OrderBy(k => k.Key.GetHashCode())) {
+			foreach (KeyValuePair<ComponentType, object> kvp in this.changedComponents.OrderBy(k => k.Key.GetHashCode())) {
 				hash = HashCode.Combine(hash, kvp.Key, kvp.Value);
 			}
 			return hash;

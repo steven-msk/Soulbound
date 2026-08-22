@@ -1,6 +1,5 @@
 namespace SoulboundEngine.Item.Container {
 	using Newtonsoft.Json.Linq;
-	using SoulboundEngine.Client.Debug.Logging;
 	using SoulboundEngine.Common;
 	using SoulboundEngine.World.Player;
 	using System.Collections;
@@ -44,7 +43,7 @@ namespace SoulboundEngine.Item.Container {
 		}
 
 		void IClearable.Clear() {
-			foreach (var index in this.GetSlots()) {
+			foreach (int index in this.GetSlots()) {
 				this.GetSlot(index).SetStack(ItemStack.EMPTY);
 			}
 		}
@@ -66,7 +65,7 @@ namespace SoulboundEngine.Item.Container {
 			}
 
 			JArray array = (JArray)json;
-			foreach (var slotIndex in inventory.GetSlots()) {
+			foreach (int slotIndex in inventory.GetSlots()) {
 				ItemStack stack = ItemStack.FromJson(array[slotIndex]);
 				inventory.GetSlot(slotIndex).SetStack(stack);
 			}

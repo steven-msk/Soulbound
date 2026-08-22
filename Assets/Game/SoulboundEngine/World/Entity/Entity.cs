@@ -1,21 +1,19 @@
-using Newtonsoft.Json.Linq;
-using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.Common.Math;
-using SoulboundEngine.Common.Math.Random;
-using SoulboundEngine.Item;
-using SoulboundEngine.Registry;
-using SoulboundEngine.World.Block;
-using SoulboundEngine.World.Block.State;
-using SoulboundEngine.World.Chunk;
-using SoulboundEngine.World.Physics;
-using SoulboundEngine.World.Player;
-using System;
-using System.Collections.Generic;
+namespace SoulboundEngine.World.Entity {
+	using Newtonsoft.Json.Linq;
+	using SoulboundEngine.Common.Math;
+	using SoulboundEngine.Common.Math.Random;
+	using SoulboundEngine.Item;
+	using SoulboundEngine.Registry;
+	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Block.State;
+	using SoulboundEngine.World.Chunk;
+	using SoulboundEngine.World.Level;
+	using SoulboundEngine.World.Physics;
+	using SoulboundEngine.World.Player;
+	using System;
+	using System.Collections.Generic;
 
 #nullable enable
-
-namespace SoulboundEngine.World.Entity {
-	using Level = Level.Level;
 
 	public abstract class Entity {
 		public const double DEFAULT_BB_WIDTH = 1.0d;
@@ -203,9 +201,7 @@ namespace SoulboundEngine.World.Entity {
 
 			AABB box = this.boundingBox;
 			List<AABB> colliders = CollectColliders(this, this.level, box.ExpandBy(movement));
-			if (colliders.Count == 0) return movement;
-
-			return CollideWithShapes(movement, box, colliders);
+			return colliders.Count == 0 ? movement : CollideWithShapes(movement, box, colliders);
 		}
 
 		public static List<AABB> CollectColliders(Entity? entity, Level level, AABB box) {

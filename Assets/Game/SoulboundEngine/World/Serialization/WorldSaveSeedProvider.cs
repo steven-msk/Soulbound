@@ -1,6 +1,7 @@
-﻿using SoulboundEngine.World.Gen;
+﻿namespace SoulboundEngine.World {
+	using SoulboundEngine.World.Gen;
+	using SoulboundEngine.World.Serialization;
 
-namespace SoulboundEngine.Client.World {
 	public sealed class WorldSaveSeedProvider : ISeedProvider {
 		private readonly WorldSave worldSave;
 

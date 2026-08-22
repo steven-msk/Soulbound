@@ -1,6 +1,5 @@
 ﻿namespace SoulboundEngine.Item.Container {
 	using Newtonsoft.Json.Linq;
-	using SoulboundEngine.Client.Debug.Logging;
 	using SoulboundEngine.Loot;
 	using SoulboundEngine.Loot.Context;
 	using SoulboundEngine.Registry;

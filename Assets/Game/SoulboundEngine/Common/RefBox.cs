@@ -1,8 +1,9 @@
-using System;
+
+namespace SoulboundEngine.Common {
+	using System;
 
 #nullable enable
 
-namespace SoulboundEngine.Common.Patterns {
 	public delegate void RefAction<T>(ref T value);
 	public delegate RefAction<T> RefActionProvider<TTarget, T>(TTarget target);
 

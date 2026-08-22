@@ -1,12 +1,11 @@
-using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.Registry;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+namespace SoulboundEngine.World.Entity.Attribute {
+	using SoulboundEngine.Registry;
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
 
 #nullable enable
 
-namespace SoulboundEngine.World.Entity.Attribute {
 	public sealed class AttributeInstance {
 		private readonly Dictionary<Identifier, AttributeModifier> idToModifier = new();
 		private readonly Dictionary<Identifier, AttributeModifier> persistentModifiers = new();
@@ -40,12 +39,12 @@ namespace SoulboundEngine.World.Entity.Attribute {
 		}
 
 		public void AddPersistentModifiers(params AttributeModifier[] modifiers) {
-			foreach (var modifier in modifiers) {
+			foreach (AttributeModifier modifier in modifiers) {
 				this.AddPersistentModifier(modifier);
 			}
 		}
 		public void AddPredicateModifiers(params (AttributeModifier modifier, Func<bool> predicate)[] modifiers) {
-			foreach (var (modifier, predicate) in modifiers) {
+			foreach ((AttributeModifier? modifier, Func<bool>? predicate) in modifiers) {
 				this.AddPredicateModifier(modifier, predicate);
 			}
 		}
@@ -61,7 +60,7 @@ namespace SoulboundEngine.World.Entity.Attribute {
 			if (this.HasPredicateModifiers()) {
 				bool anyChanged = false;
 
-				foreach (var id in this.idToPredicate.Keys) {
+				foreach (Identifier id in this.idToPredicate.Keys) {
 					bool current = this.idToPredicate[id]();
 					if (current != this.lastPredicateState.GetValueOrDefault(id, !current)) {
 						anyChanged = true;
@@ -83,10 +82,10 @@ namespace SoulboundEngine.World.Entity.Attribute {
 			allModifiers.RemoveAll(m => targeting.Contains(m));
 
 			Dictionary<AttributeModifier, List<AttributeModifier>> modifierToItsTargeters = new();
-			foreach (var targeter in targeting) {
+			foreach (AttributeModifier targeter in targeting) {
 				IEnumerable<AttributeModifier> targets = targeter.target!.Resolve(allModifiers);
 
-				foreach (var target in targets) {
+				foreach (AttributeModifier target in targets) {
 					if (!modifierToItsTargeters.ContainsKey(target)) {
 						modifierToItsTargeters[target] = new List<AttributeModifier>();
 					}
@@ -108,7 +107,7 @@ namespace SoulboundEngine.World.Entity.Attribute {
 			Dictionary<AttributeModifier, double> effectiveOverrides = new();
 
 			// TODO: fix unordered modifier graph lookup, which is dangerous for recursion
-			foreach (var target in modifierToItsTargeters.Keys) {
+			foreach (AttributeModifier target in modifierToItsTargeters.Keys) {
 				List<AttributeModifier> targeters = modifierToItsTargeters[target];
 				List<AttributeModifier> predicate_targeters = this.GetPredicateModifiers(targeters).ToList();
 				targeters.RemoveAll(m => predicate_targeters.Contains(m));
@@ -160,20 +159,20 @@ namespace SoulboundEngine.World.Entity.Attribute {
 
 			// apply all flat adds/subtracts (A)
 			double A = baseValue;
-			foreach (var modifier in additive) {
+			foreach (AttributeModifier modifier in additive) {
 				modifier.Apply(effectiveOverrideSupplier(modifier), ref A);
 			}
 
 			// apply all percentage adds (B)
 			double percentSum = 0d;
-			foreach (var modifier in additivePercent) {
+			foreach (AttributeModifier modifier in additivePercent) {
 				modifier.Apply(effectiveOverrideSupplier(modifier), ref percentSum);
 			}
 			double B = A * (1d + percentSum);
 
 			// apply multipliers (C)
 			double multiplierProduct = 1d;
-			foreach (var modifier in multiplicative) {
+			foreach (AttributeModifier modifier in multiplicative) {
 				modifier.Apply(effectiveOverrideSupplier(modifier), ref multiplierProduct);
 			}
 			double C = B * multiplierProduct;
@@ -191,7 +190,7 @@ namespace SoulboundEngine.World.Entity.Attribute {
 			additivePercent = new List<AttributeModifier>();
 			multiplicative = new List<AttributeModifier>();
 
-			foreach (var modifier in modifiers) {
+			foreach (AttributeModifier modifier in modifiers) {
 				OperationType opType = modifier.GetOperationType();
 
 				if (opType == OperationType.Additive) additive.Add(modifier);

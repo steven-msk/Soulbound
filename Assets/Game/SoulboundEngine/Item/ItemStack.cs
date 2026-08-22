@@ -1,18 +1,17 @@
-using Newtonsoft.Json.Linq;
-using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.Component;
-using SoulboundEngine.Interaction;
-using SoulboundEngine.Registry;
-using SoulboundEngine.World.Block;
-using SoulboundEngine.World.Entity;
-using SoulboundEngine.World.Level;
-using SoulboundEngine.World.Player;
-using System;
-using System.Collections.Generic;
+namespace SoulboundEngine.Item {
+	using Newtonsoft.Json.Linq;
+	using SoulboundEngine.Component;
+	using SoulboundEngine.Interaction;
+	using SoulboundEngine.Registry;
+	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Entity;
+	using SoulboundEngine.World.Level;
+	using SoulboundEngine.World.Player;
+	using System;
+	using System.Collections.Generic;
 
 #nullable enable
 
-namespace SoulboundEngine.Item {
 	public struct ItemStack : IComponentHolder {
 		private static MergedComponentMap cachedEmptyComponents = null!;
 		private static MergedComponentMap CachedEmptyComponents => cachedEmptyComponents ??= MergedComponentMap.Create(Items.AIR.GetComponents(), ComponentChanges.EMPTY);
@@ -129,19 +128,15 @@ namespace SoulboundEngine.Item {
 			if (amount <= 0) return this;
 
 			int newCount = Math.Max(0, this.count - amount);
-			if (newCount <= 0) return EMPTY;
-
-			return this.CopyWithCount(newCount);
+			return newCount <= 0 ? EMPTY : this.CopyWithCount(newCount);
 		}
 
 		public readonly int GetSpaceLeft() {
-			if (this.IsOf(null)) return 0;
-			return this.item.GetMaxCount() - this.count;
+			return this.IsOf(null) ? 0 : this.item.GetMaxCount() - this.count;
 		}
 
 		public readonly bool IsOf(Item? item) {
-			if (item == null) return this.IsEmpty();
-			return Equals(item, this.item);
+			return item == null ? this.IsEmpty() : Equals(item, this.item);
 		}
 
 		public static bool AreItemsEqual(ItemStack a, ItemStack b) {
@@ -166,20 +161,17 @@ namespace SoulboundEngine.Item {
 
 		public ItemStack Split(int amount) {
 			int actualAmount = this.Decrement(amount);
-			if (actualAmount <= 0) return EMPTY;
-			return this.CopyWithCount(amount);
+			return actualAmount <= 0 ? EMPTY : this.CopyWithCount(amount);
 		}
-	
+
 		public readonly ItemStack CopyWithCount(int newCount) {
-			if (this.IsOf(null)) return EMPTY;
-			return new ItemStack(this.item, newCount, this.components.Copy());
+			return this.IsOf(null) ? EMPTY : new ItemStack(this.item, newCount, this.components.Copy());
 		}
 
 		public readonly ItemStack Copy() => this.CopyWithCount(this.count);
 
 		public readonly ItemStack CopyFullStack() {
-			if (this.IsOf(null)) return EMPTY;
-			return this.CopyWithCount(this.item.GetMaxCount());
+			return this.IsOf(null) ? EMPTY : this.CopyWithCount(this.item.GetMaxCount());
 		}
 
 		public ItemStack CopyAndEmpty() {
@@ -276,13 +268,11 @@ namespace SoulboundEngine.Item {
 		}
 
 		public readonly int GetCurrentDurability() {
-			if (!this.HasDurability()) return int.MaxValue;
-			return this.ComponentsNonNull.Get(ItemComponents.DURABILITY);
+			return !this.HasDurability() ? int.MaxValue : this.ComponentsNonNull.Get(ItemComponents.DURABILITY);
 		}
 
 		public readonly int GetMaxDurability() {
-			if (!this.HasDurability()) return int.MaxValue;
-			return this.GetItem().GetDurability();
+			return !this.HasDurability() ? int.MaxValue : this.GetItem().GetDurability();
 		}
 
 		public readonly void SetDurability(int amount) {
@@ -302,18 +292,17 @@ namespace SoulboundEngine.Item {
 			if (!stack.HasDurability()) return stack;
 
 			stack.SetDurability(stack.GetCurrentDurability() - amount);
-			if (stack.ShouldBreak()) return EMPTY;
-			return stack;
+			return stack.ShouldBreak() ? EMPTY : stack;
 		}
 
 		public static JToken ToJson(ItemStack stack) {
-			if (stack.IsEmpty()) return JValue.CreateNull();
-
-			return new JObject() {
-				["item"] = Items.GetIdentifier(stack.GetItem()).ToString(),
-				["count"] = stack.count,
-				["changes"] = ComponentChanges.ToJson(stack.GetComponentChanges())
-			};
+			return stack.IsEmpty()
+				? JValue.CreateNull()
+				: new JObject() {
+					["item"] = Items.GetIdentifier(stack.GetItem()).ToString(),
+					["count"] = stack.count,
+					["changes"] = ComponentChanges.ToJson(stack.GetComponentChanges())
+				};
 		}
 
 		public static ItemStack FromJson(JToken json) {

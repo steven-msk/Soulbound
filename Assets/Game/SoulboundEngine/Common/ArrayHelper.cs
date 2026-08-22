@@ -1,7 +1,12 @@
 namespace SoulboundEngine.Common.Collections {
+	using System;
+
 	public static class ArrayHelper {
-		public static T[,] CompressTo2D<T>(this T[] input, int rows, int columns) {
-			UnityEngine.Debug.Assert(input.Length == rows * columns);
+		public static T[,] CompressTo2DJagged<T>(this T[] input, int rows, int columns) {
+			if (input.Length != rows * columns) {
+				throw new ArgumentException($"Input length does not match given size:" +
+					$" expected {input.Length} but got {rows * columns} ({rows} rows, {columns} columns)");
+			}
 			T[,] result = new T[rows, columns];
 
 			for (int i = 0; i < input.Length; i++) {
@@ -21,6 +26,35 @@ namespace SoulboundEngine.Common.Collections {
 			for (int r = 0; r < rows; r++) {
 				for (int c = 0; c < columns; c++) {
 					result[index++] = other[r, c];
+				}
+			}
+			return result;
+		}
+
+		public static T[][] CompressTo2D<T>(this T[] input, int rows, int columns) {
+			if (input.Length != rows * columns) {
+				throw new ArgumentException($"Input length does not match given size:" +
+					$" expected {input.Length} but got {rows * columns} ({rows} rows, {columns} columns)");
+			}
+			T[][] result = new T[rows][];
+			for (int i = 0; i < input.Length; i++) {
+				result[i] = new T[columns];
+				int row = i / columns;
+				int column = i % columns;
+				result[row][column] = input[i];
+			}
+			return result;
+		}
+
+		public static T[] Flatten<T>(this T[][] mat) {
+			int rows = mat.Length;
+			int columns = mat[0].Length;
+			T[] result = new T[rows * columns];
+
+			int index = 0;
+			for (int r = 0; r < rows; r++) {
+				for (int c = 0; c < columns; c++) {
+					result[index++] = mat[r][c];
 				}
 			}
 			return result;

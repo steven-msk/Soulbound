@@ -1,6 +1,6 @@
 namespace SoulboundUnityEditor {
-	using SoulboundEngine.Client.UI.UXMLBindings;
 	using SoulboundEngine.Registry;
+	using SoulboundEngine.UnityClient.UI.UXMLBindings;
 	using System;
 	using System.Collections.Generic;
 	using System.IO;
@@ -13,7 +13,7 @@ namespace SoulboundUnityEditor {
 
 	public class UXMLSchemaGenerator : AssetPostprocessor {
 		private const string OUTPUT_FILE = "UXMLSchema_Generated.cs";
-		private const string OUTPUT_PATH = "Assets/Game/SoulboundEngine/Client/UI/UXMLBindings/Generated/" + OUTPUT_FILE;
+		private const string OUTPUT_PATH = "Assets/Game/SoulboundEngine/UnityClient/UI/UXMLBindings/Generated/" + OUTPUT_FILE;
 		private const string DEFAULT_NAMESPACE = "soulbound";
 		private static readonly string[] PROJECT_UXML_ROOTS = {
 			"Assets/Game/Content/"

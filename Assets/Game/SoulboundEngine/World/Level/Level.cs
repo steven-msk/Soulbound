@@ -2,6 +2,7 @@ namespace SoulboundEngine.World.Level {
 	using SoulboundEngine.Common;
 	using SoulboundEngine.Common.Math;
 	using SoulboundEngine.Common.Math.Random;
+	using SoulboundEngine.Recipe;
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Block.Entity;
 	using SoulboundEngine.World.Block.State;
@@ -12,11 +13,10 @@ namespace SoulboundEngine.World.Level {
 	using SoulboundEngine.World.Player;
 	using SoulboundEngine.World.Serialization;
 	using SoulboundEngine.World.Services;
+	using SoulboundEngine.World.Widget;
 	using System;
 	using System.Collections.Generic;
 	using System.Linq;
-	using UnityEngine;
-	using Logger = Client.Debug.Logging.Logger;
 
 #nullable enable
 
@@ -32,21 +32,28 @@ namespace SoulboundEngine.World.Level {
 		private readonly ChunkStorage chunkStorage;
 		private readonly LevelChunkManager chunkManager;
 		private readonly RandomSequences randomSequences;
+		// recipes should technically be on "server"
+		// but Level is currently the only source of truth
+		private readonly RecipeManager recipeManager;
 		private PlayerEntity player = null!;
 		public event Action<BlockPos, BlockState?, BlockState?>? blockStateChanged;
 		public event Action<Entity>? entityAdded;
 		public event Action<Entity>? entityRemoved;
 		public event Action<Chunk>? chunkLoaded;
 		public event Action<Chunk>? chunkUnloaded;
+		public event Action<WorldWidgetHandler>? widgetAdded;
+		public event Action<WorldWidgetHandler>? widgetRemoved;
 		private bool isLoaded;
 		private bool levelActive;
 
 		private readonly HashSet<BlockPos> tickingBlocks = new();
 		private readonly Dictionary<Guid, Entity> entities = new();
 		private readonly List<ITickingEntity> tickingEntities = new();
+		private readonly Dictionary<BlockPos, List<WorldWidgetHandler>> widgets = new();
 
-		public Level(int seed, ChunkGenerator chunkGenerator, int chunkRadius, ChunkStorage chunkStorage) {
+		public Level(int seed, RecipeManager recipeManager, ChunkGenerator chunkGenerator, int chunkRadius, ChunkStorage chunkStorage) {
 			this.seed = seed;
+			this.recipeManager = recipeManager;
 			this.chunkStorage = chunkStorage;
 			this.randomSequences = new RandomSequences(seed);
 			this.chunkManager = new LevelChunkManager(this, chunkGenerator, chunkRadius, new LevelChunkCache(this, CHUNK_TTL), chunkStorage);
@@ -74,20 +81,20 @@ namespace SoulboundEngine.World.Level {
 			this.AddEntity(player, player.guid);
 		}
 
-		public void Tick(RectInt simulationRect) {
+		public void Tick(AABB simulationRect) {
 			if (!this.IsLevelActive()) throw new InvalidOperationException("Cannot tick without an active session");
 
-			foreach (var pos in this.tickingBlocks.ToArray()) {
-				Vector2Int p = new(pos.x, pos.y);
+			foreach (BlockPos pos in this.tickingBlocks.ToArray()) {
+				Vec2d p = new(pos.x, pos.y);
 				if (!simulationRect.Contains(p)) continue;
 
 				BlockState blockState = this.GetBlockState(pos);
 				((ITickingBlock)blockState.block).Tick(this, pos, blockState);
 			}
 
-			foreach (var entity in this.GetAllEntities()) {
+			foreach (Entity entity in this.GetAllEntities()) {
 				Vec2i p = entity.GetPosition().FloorToInt();
-				if (simulationRect.Contains(new Vector2Int(p.x, p.y))) {
+				if (simulationRect.Contains(new Vec2d(p.x, p.y))) {
 					entity.Tick();
 				}
 			}
@@ -129,7 +136,7 @@ namespace SoulboundEngine.World.Level {
 		}
 
 		private void NotifyNeighboringStates(BlockPos blockPos) {
-			foreach (var neighborPos in blockPos.GetCardinalNeighbors()) {
+			foreach (BlockPos neighborPos in blockPos.GetCardinalNeighbors()) {
 				Chunk? chunk = this.ChunkAt(blockPos);
 				if (chunk == null) return;
 
@@ -192,7 +199,7 @@ namespace SoulboundEngine.World.Level {
 			// linear scan over the entire entity list is fine to start
 			// if entity counts start becoming a bottleneck, switch to spatial hash or quadtree
 			// but for now its too much of a premature abstraction
-			foreach (var ent in this.entities.Values) {
+			foreach (Entity ent in this.entities.Values) {
 				if (!ent.boundingBox.Contains(worldPos)) continue;
 
 				double dist = Vec2d.Distance(worldPos, ent.boundingBox.GetCenter());
@@ -208,8 +215,7 @@ namespace SoulboundEngine.World.Level {
 		public IEnumerable<Entity> GetAllEntities() => this.entities.Values.ToList();
 
 		public IEnumerable<AABB> GetBlockCollisionBoxes(AABB testBox) {
-			if (testBox.GetSize() < 1.0E-7) return new List<AABB>();
-			return new BlockCollisionResolver(this, testBox);
+			return testBox.GetSize() < 1.0E-7 ? new List<AABB>() : new BlockCollisionResolver(this, testBox);
 		}
 
 		public IEnumerable<AABB> GetEntityCollisions(Entity? source, AABB testBox) {
@@ -232,12 +238,69 @@ namespace SoulboundEngine.World.Level {
 
 		public List<Entity> GetEntities(Entity? except, Predicate<Entity> selector) {
 			List<Entity> output = new();
-			foreach (var entity in this.GetAllEntities()) {
+			foreach (Entity entity in this.GetAllEntities()) {
 				if (entity != except && selector(entity)) {
 					output.Add(entity);
 				}
 			}
 			return output;
+		}
+
+		public WorldWidgetHandler<TContext> AddWidget<TContext>(
+			IWorldWidgetProvider<TContext> widgetProvider, 
+			Func<Level, BlockPos, TContext> contextFactory, 
+			BlockPos pos
+		) where TContext : WorldWidgetContext {
+			TContext context = contextFactory(this, pos);
+			WorldWidgetHandler<TContext> handler = widgetProvider.CreateHandler(context);
+
+			if (!this.widgets.ContainsKey(pos)) {
+				this.widgets[pos] = new List<WorldWidgetHandler>();
+			}
+			this.widgets[pos].Add(handler);
+			widgetAdded?.Invoke(handler);
+
+			return handler;
+		}
+
+		public void RemoveWidget(WorldWidgetHandler handler) {
+			this.RemoveWidget(handler.GetContext().blockPos, handler);
+		}
+
+		public void RemoveWidget(BlockPos pos, WorldWidgetHandler handler) {
+			if (!this.widgets.ContainsKey(pos)) return;
+
+			List<WorldWidgetHandler> handlers = this.widgets[pos];
+			if (!handlers.Remove(handler)) return;
+
+			if (handlers.Count == 0) this.widgets.Remove(pos);
+			widgetRemoved?.Invoke(handler);
+		}
+
+		public bool RemoveAllWidgetsAt(BlockPos pos) {
+			if (this.widgets.Remove(pos, out List<WorldWidgetHandler> list)) {
+				foreach (WorldWidgetHandler handler in list) {
+					widgetRemoved?.Invoke(handler);
+				}
+				return true;
+			}
+			return false;
+		}
+
+		public IEnumerable<WorldWidgetHandler> GetWidgets(BlockPos pos) {
+			if (this.widgets.TryGetValue(pos, out List<WorldWidgetHandler> handlers)) {
+				foreach (WorldWidgetHandler handler in handlers) {
+					yield return handler;
+				}
+			}
+		}
+
+		public IEnumerable<WorldWidgetHandler> GetAllWidgets() {
+			foreach ((BlockPos pos, List<WorldWidgetHandler> handlers) in this.widgets) {
+				foreach (WorldWidgetHandler handler in handlers) {
+					yield return handler;
+				}
+			}
 		}
 
 		public void OnChunkLoaded(Chunk chunk) {
@@ -333,5 +396,7 @@ namespace SoulboundEngine.World.Level {
 		public PlayerEntity GetPlayer() => this.player;
 
 		public RandomSequences RandomSequences => this.randomSequences;
+
+		public RecipeManager RecipeManager => this.recipeManager;
 	}
 }

@@ -1,8 +1,6 @@
-using SoulboundEngine.Common.Math;
-using SoulboundEngine.World.Block;
-using UnityEngine;
-
 namespace SoulboundEngine.World.Chunk {
+	using SoulboundEngine.Common.Math;
+	using SoulboundEngine.World.Block;
 	using Level = Level.Level;
 
 	public struct ChunkWorldPos {
@@ -22,8 +20,8 @@ namespace SoulboundEngine.World.Chunk {
 			return new ChunkWorldPos(localX, blockPos.y, chunkX);
 		}
 
-		public static ChunkWorldPos FromWorld(Vector2 position) {
-			int chunkX = Mathf.FloorToInt(position.x / Level.CHUNK_LENGTH);
+		public static ChunkWorldPos FromWorld(Vec2d position) {
+			int chunkX = Maths.FloorToInt(position.x / Level.CHUNK_LENGTH);
 			return new ChunkWorldPos(position.x, position.y, chunkX);
 		}
 
@@ -44,7 +42,7 @@ namespace SoulboundEngine.World.Chunk {
 			if (obj is not ChunkWorldPos) {
 				return false;
 			}
-			var other = (ChunkWorldPos)obj;
+			ChunkWorldPos other = (ChunkWorldPos)obj;
 			return this == other;
 		}
 

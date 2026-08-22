@@ -1,8 +1,8 @@
-using SoulboundEngine.Common.Math.Noise;
-using UnityEngine;
-
 namespace SoulboundEngine.World.Gen {
-	using Level = Level.Level;
+	using SoulboundEngine.Common.Math;
+	using SoulboundEngine.Common.Math.Noise;
+	using SoulboundEngine.World.Level;
+	using System;
 
 	public sealed class Cavemap {
 		private readonly int seed;
@@ -27,17 +27,17 @@ namespace SoulboundEngine.World.Gen {
 
 			float d1 = this.ApplyModulation(blockX, blockY, m1);
 			float d2 = m2 != null ? this.ApplyModulation(blockX, blockY, m2.Value) : d1;
-			float blended = Mathf.Lerp(d1, d2, blendFactor);
+			float blended = (float)Maths.Lerp(d1, d2, blendFactor);
 
 			float s1 = m1.surfaceFalloff;
-			float? s2 = m2 != null ? m2.Value.surfaceFalloff : null;
+			float? s2 = m2?.surfaceFalloff;
 
 			float b1 = m1.bottomFalloff;
-			float? b2 = m2 != null ? m2.Value.bottomFalloff : null;
+			float? b2 = m2?.bottomFalloff;
 
 			const float solidBias = 1f;
 			float verticalMask = this.GetVerticalMask(blockY, surfaceY, s1, s2, b1, b2, blendFactor);
-			return Mathf.Lerp(blended, solidBias, verticalMask);
+			return (float)Maths.Lerp(blended, solidBias, verticalMask);
 		}
 
 		public float ApplyModulation(int blockX, int blockY, CaveModulation m) {
@@ -54,7 +54,7 @@ namespace SoulboundEngine.World.Gen {
 
 			for (int i = 0; i < m.octaves; i++) {
 				float n = this.caveNoise.Sample2D(x * frequency, y * frequency);
-				f += amplitude * (1f - Mathf.Abs(n));
+				f += amplitude * (1f - Math.Abs(n));
 
 				frequency *= m.lacunarity;
 				maxAmp += amplitude;
@@ -66,17 +66,17 @@ namespace SoulboundEngine.World.Gen {
 		}
 
 		public float GetSurfaceMask(int blockY, float surfaceY, float s1, float? s2, float blendFactor) {
-			float surfaceFalloff = Mathf.Lerp(s1, s2 ?? s1, blendFactor);
+			float surfaceFalloff = (float)Maths.Lerp(s1, s2 ?? s1, blendFactor);
 
-			float t = Mathf.InverseLerp(surfaceY - surfaceFalloff, surfaceY, blockY);
-			return 1f - Mathf.SmoothStep(1f, 0f, t);
+			float t = (float)Maths.InverseLerp(surfaceY - surfaceFalloff, surfaceY, blockY);
+			return (float)(1f - Maths.SmoothStep(1f, 0f, t));
 		}
 
 		private float GetBottomMask(int blockY, float b1, float? b2, float blendFactor) {
-			float bottomFalloff = Mathf.Lerp(b1, b2 ?? b1, blendFactor);
+			float bottomFalloff = (float)Maths.Lerp(b1, b2 ?? b1, blendFactor);
 			
-			float t = Mathf.InverseLerp(Level.MIN_Y, Level.MIN_Y + bottomFalloff, blockY);
-			return Mathf.SmoothStep(1f, 0f, t);
+			float t = (float)Maths.InverseLerp(Level.MIN_Y, Level.MIN_Y + bottomFalloff, blockY);
+			return (float)Maths.SmoothStep(1f, 0f, t);
 		}
 
 		private float GetVerticalMask(int blockY, float surfaceY, float s1, float? s2, float b1, float? b2, float blendFactor) {
@@ -90,7 +90,7 @@ namespace SoulboundEngine.World.Gen {
 
 		private float GetBlendFactor(float a, float b) {
 			float t = b / (a + b);
-			return Mathf.SmoothStep(0f, 1f, t);
+			return (float)Maths.SmoothStep(0f, 1f, t);
 			//return b / (a + b);
 		}
 
