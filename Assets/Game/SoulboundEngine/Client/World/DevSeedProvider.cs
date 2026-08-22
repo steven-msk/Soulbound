@@ -1,11 +1,12 @@
-using SoulboundEngine.Common;
-
 namespace SoulboundEngine.World.Gen {
+	using SoulboundEngine.Client;
+	using SoulboundEngine.Common;
+
 	[PROTOTYPICAL]
 	public sealed class DevSeedProvider : ISeedProvider {
-		private readonly DevConfig devConfig;
+		private readonly ClientConfig.Dev devConfig;
 
-		public DevSeedProvider(DevConfig devConfig) {
+		public DevSeedProvider(ClientConfig.Dev devConfig) {
 			this.devConfig = devConfig;
 		}
 

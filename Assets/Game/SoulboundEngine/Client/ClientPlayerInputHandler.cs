@@ -1,11 +1,12 @@
-﻿using SoulboundEngine.Client.Settings;
-using SoulboundEngine.World.Player;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.InputSystem;
-using Keyboard = SoulboundEngine.Client.Input.Keyboard;
+﻿namespace SoulboundEngine.Client {
+	using SoulboundEngine.Client.Settings;
+	using SoulboundEngine.Client.Util;
+	using SoulboundEngine.World.Player;
+	using System.Collections.Generic;
+	using UnityEngine;
+	using UnityEngine.InputSystem;
+	using Keyboard = SoulboundEngine.Client.Input.Keyboard;
 
-namespace SoulboundEngine.Client {
 	public class ClientPlayerInputHandler {
 		private readonly SoulboundClient client;
 		private static readonly Dictionary<Key, int> HOTBAR_KEYS = new() {
@@ -62,7 +63,7 @@ namespace SoulboundEngine.Client {
 
 		private void UpdateScreenPointerPos(PlayerEntity player) {
 			Vector2 pointerPos = this.client.InputManager.mouse.mousePos;
-			player.SetScreenPointerPos(pointerPos);
+			player.SetScreenPointerPos(pointerPos.ToVec2d());
 		}
 
 		private void HandleMouseClicks(PlayerEntity player) {

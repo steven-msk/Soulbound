@@ -339,7 +339,7 @@ namespace SoulboundEngine.Client {
 						tilemap = sceneRoot.tilemap
 					};
 
-					this.player = session.levelManager.StartSession(level => new PlayerEntity(this, level));
+					this.player = session.levelManager.StartSession(level => new ClientPlayerEntity(this, level));
 
 					this.worldRenderer.SetLevel(session.level);
 					this.worldRenderer.SetTilemap(session.tilemap);

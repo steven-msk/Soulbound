@@ -1,9 +1,9 @@
 ﻿namespace SoulboundEngine.Client.UI.Screen {
 	using SoulboundEngine.Client.Assets;
 	using SoulboundEngine.Client.UI.UXMLBindings;
+	using SoulboundEngine.Client.World;
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.World.Block.Entity;
-	using SoulboundEngine.World.Player;
 	using UnityEngine.UIElements;
 
 	public class SignEditScreen : UXMLScreen {
@@ -11,7 +11,7 @@
 		private static readonly Identifier CANCEL_ELEMENT = Identifier.Of("soulbound:sign_edit_screen/cancel");
 		private static readonly Identifier DONE_ELEMENT = Identifier.Of("soulbound:sign_edit_screen/done");
 		private readonly SignTileEntity signEntity;
-		private readonly PlayerEntity player;
+		private readonly ClientPlayerEntity player;
 		private readonly string originalText;
 		private VisualElement root;
 		private TextField textField;
@@ -19,7 +19,7 @@
 		public override bool CloseOnEsc => false;
 		public override bool IsOpaque => false;
 
-		public SignEditScreen(SignTileEntity signEntity, PlayerEntity player) 
+		public SignEditScreen(SignTileEntity signEntity, ClientPlayerEntity player) 
 			: base(AssetManager.Resolve<VisualTreeAsset>(new AssetKey("SignEditScreen"))) {
 			this.signEntity = signEntity;
 			this.player = player;
