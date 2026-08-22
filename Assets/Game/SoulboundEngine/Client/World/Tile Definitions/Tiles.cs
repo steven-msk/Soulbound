@@ -1,9 +1,8 @@
-using SoulboundEngine.Client.Assets;
-
-using UnityEngine;
-using UnityEngine.Tilemaps;
-
 namespace SoulboundEngine.World.Block {
+	using SoulboundEngine.Client.Assets;
+	using UnityEngine;
+	using UnityEngine.Tilemaps;
+
 	public class Tiles : IResourceModule {
 		public static Tile air => GetTile<Tile>(new AssetKey("air"));
 		public static RuleTile grass => GetTile<RuleTile>(new AssetKey("grass"));

@@ -1,8 +1,8 @@
-namespace SoulboundEngine.Client.World {
+namespace SoulboundEngine.World {
+	using SoulboundEngine.Serialization;
 	using SoulboundEngine.World.Serialization;
 	using System;
 	using System.Collections.Generic;
-	using File = Serialization.File;
 
 #nullable enable
 
