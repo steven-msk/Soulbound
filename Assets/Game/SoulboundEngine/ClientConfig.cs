@@ -1,11 +1,13 @@
-using System;
+namespace SoulboundEngine.Client {
+	using System;
+	using UnityEngine;
 
-namespace SoulboundEngine {
-    [Serializable]
-    public struct GameConfig {
+	[Serializable]
+    public struct ClientConfig {
         public FileConfig file;
         public DevConfig dev;
 		public UnityConfig unity;
+		[HideInInspector] public bool isRunningInEditor;
     }
 
     [Serializable]

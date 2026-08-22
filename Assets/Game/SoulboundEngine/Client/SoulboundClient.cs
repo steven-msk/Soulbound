@@ -23,6 +23,7 @@ namespace SoulboundEngine.Client {
 	using SoulboundEngine.Client.World;
 	using SoulboundEngine.Client.World.Widget;
 	using SoulboundEngine.Common.Math;
+	using SoulboundEngine.GameStates;
 	using SoulboundEngine.Recipe;
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.Serialization;
@@ -33,7 +34,9 @@ namespace SoulboundEngine.Client {
 	using SoulboundEngine.World.Services;
 	using System;
 	using System.Collections.Generic;
+	using System.Diagnostics;
 	using System.Linq;
+	using UnityEditor;
 	using UnityEngine.InputSystem;
 	using UnityEngine.SceneManagement;
 	using UnityEngine.UIElements;
@@ -44,18 +47,15 @@ namespace SoulboundEngine.Client {
 	using Vector2 = UnityEngine.Vector2;
 	using Vector3 = UnityEngine.Vector3;
 
-#if !UNITY_EDITOR
-	using Application = UnityEngine.Application;
-	using LogType = UnityEngine.LogType;
-	using StackTraceLogType = UnityEngine.StackTraceLogType;
-#endif
-
 #nullable enable
 
 	public sealed class SoulboundClient : IWorldAccessor, IDebugMetricsSource {
 		private static SoulboundClient instance = null!;
 		private static readonly UnityClientLoggerWrapper clientLoggerWrapper = new(UnityEngine.Debug.unityLogger);
-		private readonly GameConfig config;
+		private readonly Stopwatch tickStopwatch = new();
+		private readonly Stopwatch tpsWindowStopwatch = new();
+		public const float TICK_RATE = 1f / SharedConstants.TICKS_PER_SECOND;
+		private readonly ClientConfig config;
 		private readonly PlayerInputActions inputActions;
 		private readonly InputManager inputManager;
 		private readonly ClientPlayerInputHandler clientPlayerInputHandler;
@@ -82,14 +82,23 @@ namespace SoulboundEngine.Client {
 		private readonly PerformanceMetrics performanceMetrics;
 		private readonly DebugMetricsService debugMetricsService;
 		private readonly WorldWidgetManager worldWidgetManager;
+		private bool running;
+		private int ticksThisSecond;
 		private WorldScreen? activeWorldScreen;
 		private PlayerEntity? player;
 		private WorldSession? activeWorldSession;
 		private IScreenHandle? pauseScreenHandle;
 
-		public SoulboundClient(GameConfig config) {
+		[UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.AfterSceneLoad)]
+		public static void GameLaunch() {
+			new SoulboundClient(Main.instance.GetClientConfig()).Start();
+		}
+
+		private SoulboundClient(ClientConfig config) {
 			instance = this;
 			this.config = config;
+			GameStateManager.SetBootstrapping();
+
 			Logger.SetWrapper(clientLoggerWrapper);
 			UXMLSchema_Generated.RegisterAll();
 
@@ -135,33 +144,71 @@ namespace SoulboundEngine.Client {
 
 			Registry<RecipeIngredientIndex> ingredientIndexRegistry = new(RecipeIngredientIndex.REGISTRY);
 			this.recipeManager = new RecipeManager(ingredientIndexRegistry, new RecipeAssetResolver());
+
+			GameStateManager.SetInitialized();
 		}
 
-		/// <summary>
-		/// Called once when the game is launched
-		/// </summary>
-		internal void Start() {
+		public void Start() {
+			if (this.running) return;
+			GameStateManager.SetLaunching();
+
+			UnityEngine.Application.quitting += this.OnApplicationQuit;
+
+			this.running = true;
 			// not safe UIDocument resolution
 			// TODO: rework UIHandler init with UIDocument resolution
 			this.uiHandler.SetUIDocument(Object.FindFirstObjectByType<UIDocument>());
 			this.uiHandler.PushScreen(new TitleScreen(this));
 			this.inputManager.Enable();
+
+			UniTask.Post(this.FrameLoop);
+			UniTask.Post(this.TickLoop);
+			GameStateManager.SetRunning();
 		}
 
-		/// <summary>
-		/// Called once every frame
-		/// </summary>
-		internal void Update() {
+		private void Update() {
 			this.performanceMetrics.Update();
 			this.logConsole.Update();
 			this.metricsHud.Refresh();
 			this.worldRenderer.Render();
 		}
 
-		/// <summary>
-		/// Called every tick. See <seealso cref="SharedConstants.TICKS_PER_SECOND"/>
-		/// </summary>
-		internal void Tick() {
+		private async void TickLoop() {
+			while (this.running) {
+				this.StartTick();
+				try {
+					this.Tick();
+				} catch (Exception e) {
+					Logger.LogFatal(e);
+					if (this.config.isRunningInEditor) {
+						EditorApplication.isPlaying = false;
+					} else {
+						Environment.FailFast("Uncaught exception in tick loop", e);
+					}
+				}
+				this.EndTick();
+				await UniTask.WaitForSeconds(TICK_RATE, true);
+			}
+		}
+
+		private async void FrameLoop() {
+			while (this.running) {
+				try {
+					this.Update();
+				} catch (Exception e) {
+					// TODO: custom crash handling
+					Logger.LogFatal(e);
+					if (this.config.isRunningInEditor) {
+						EditorApplication.isPlaying = false;
+					} else {
+						Environment.FailFast("Uncaught exception in frame loop", e);
+					}
+				}
+				await UniTask.NextFrame();
+			}
+		}
+
+		private void Tick() {
 			this.HandleInputTick();
 
 			if (this.activeWorldSession is { } session) {
@@ -172,14 +219,41 @@ namespace SoulboundEngine.Client {
 			this.inputManager.Tick();
 		}
 
-		/// <summary>
-		/// Called once when the game is closed
-		/// </summary>
-		internal void Shutdown() {
+		private void StartTick() {
+			this.tickStopwatch.Restart();
+		}
+
+		private void EndTick() {
+			this.tickStopwatch.Stop();
+			double elapsedMs = this.tickStopwatch.Elapsed.TotalMilliseconds;
+			if (elapsedMs > TICK_RATE * 1000f * 1.5f) {
+				Logger.LogWarning($"Tick lag detected! Tick took {elapsedMs:F1}ms (target {TICK_RATE * 1000F}ms)");
+			}
+
+			this.ticksThisSecond++;
+			if (this.tpsWindowStopwatch.Elapsed.TotalSeconds >= 1.0d) {
+				if (this.ticksThisSecond < SharedConstants.TICKS_PER_SECOND - 1) {
+					Logger.LogWarning("Tick rate degraded: {} TPS (target {})", this.ticksThisSecond, SharedConstants.TICKS_PER_SECOND);
+				}
+				this.ticksThisSecond = 0;
+				this.tpsWindowStopwatch.Restart();
+			}
+		}
+
+		private void OnApplicationQuit() {
+			GameStateManager.SetShutdown();
+			this.Shutdown();
+			GameStateManager.SetTerminated();
+		}
+
+		private void Shutdown() {
+			AssetManager.Shutdown();
 			this.activeWorldSession?.levelManager.StopSession();
 			this.settings.Save();
 			this.inputActions.Dispose();
 		}
+
+		public void Close() => UnityEngine.Application.Quit();
 
 		private void HandleInputTick() {
 			// known issue: screen key presses are desynced with this method
@@ -375,16 +449,6 @@ namespace SoulboundEngine.Client {
 		}
 
 		public Vec2d ScreenToWorldPoint(Vector2 screenPoint) {
-			//Canvas canvas = SoulboundClient.Instance.UIHandler.GetCanvas();
-			//RectTransform rootTransform = canvas.GetComponent<RectTransform>();
-			//bool inWorldPoint = RectTransformUtility.ScreenPointToWorldPointInRectangle(
-			//	rootTransform,
-			//	screenPos,
-			//	Camera.main,
-			//	out var worldPoint
-			//);
-			//if (inWorldPoint) return worldPoint;
-
 			Vector3 pos = screenPoint;
 			pos.z = -Camera.main.transform.position.z;
 			pos = Camera.main.ScreenToWorldPoint(pos);

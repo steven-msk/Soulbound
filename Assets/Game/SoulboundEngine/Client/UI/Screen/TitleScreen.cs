@@ -1,10 +1,10 @@
-using SoulboundEngine.Client.Assets;
-using SoulboundEngine.Client.UI.UXMLBindings;
-using SoulboundEngine.Registry;
-using SoulboundEngine.World;
-using UnityEngine.UIElements;
-
 namespace SoulboundEngine.Client.UI.Screen {
+	using SoulboundEngine.Client.Assets;
+	using SoulboundEngine.Client.UI.UXMLBindings;
+	using SoulboundEngine.Registry;
+	using SoulboundEngine.World;
+	using UnityEngine.UIElements;
+
 	public class TitleScreen : UXMLScreen {
 		private static readonly Identifier PLAY_BUTTON_ELEMENT = Identifier.Of("soulbound:title_screen/play_button");
 		private static readonly Identifier EXIT_BUTTON_ELEMENT = Identifier.Of("soulbound:title_screen/exit_button");
@@ -20,7 +20,7 @@ namespace SoulboundEngine.Client.UI.Screen {
 
 		protected override void OnBind(VisualElement root) {
 			root.Get<Button>(PLAY_BUTTON_ELEMENT).clicked += () => this.ScreenManager.PushScreen(new WorldListScreen(this.worldAccessor));
-			root.Get<Button>(EXIT_BUTTON_ELEMENT).clicked += Soulbound.Instance.CloseGame;
+			root.Get<Button>(EXIT_BUTTON_ELEMENT).clicked += SoulboundClient.Instance.Close;
 		}
 	}
 }
