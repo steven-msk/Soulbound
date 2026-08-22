@@ -3,6 +3,7 @@ namespace SoulboundEngine.Client.Render.World {
 	using SoulboundEngine.Client.Render.Block;
 	using SoulboundEngine.Client.Render.Entity;
 	using SoulboundEngine.Client.Util;
+	using SoulboundEngine.Client.World.Widget;
 	using SoulboundEngine.Common.Math;
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Block.State;
@@ -21,6 +22,7 @@ namespace SoulboundEngine.Client.Render.World {
 		private const int DEBUG_BLOCK_COLLIDER_VIEW_RADIUS = 5;
 		private readonly BlockRenderManager blockRenderManager;
 		private readonly EntityRenderManager entityRenderManager;
+		private readonly WorldWidgetManager widgetManager;
 		private readonly ChunkOutlineRenderer chunkOutlineRenderer;
 		private readonly Queue<(BlockPos pos, BlockState? state)> stateChangedQueue = new();
 		private Vec2i lastPivot;
@@ -29,10 +31,11 @@ namespace SoulboundEngine.Client.Render.World {
 		private Level? level;
 		private bool showingChunkFeatures;
 
-		public WorldRenderer(RectInt renderView, BlockRenderManager blockRenderManager, EntityRenderManager entityRenderManager) {
+		public WorldRenderer(RectInt renderView, BlockRenderManager blockRenderManager, EntityRenderManager entityRenderManager, WorldWidgetManager widgetManager) {
 			this.renderView = renderView;
 			this.blockRenderManager = blockRenderManager;
 			this.entityRenderManager = entityRenderManager;
+			this.widgetManager = widgetManager;
 			this.chunkOutlineRenderer = new ChunkOutlineRenderer();
 		}
 
@@ -204,6 +207,7 @@ namespace SoulboundEngine.Client.Render.World {
 			this.RemoveLevelEvents();
 			if (this.level != null) this.DestroyEntities(this.level);
 			this.level = level;
+			this.widgetManager.SetLevel(level);
 			if (level != null) this.RenderEntities(level);
 			this.AddLevelEvents();
 			this.chunkOutlineRenderer.Clear();

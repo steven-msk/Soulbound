@@ -13,7 +13,6 @@ namespace SoulboundEngine.World.Player {
 	using SoulboundEngine.World.Entity;
 	using SoulboundEngine.World.Level;
 	using SoulboundEngine.World.Physics;
-	using SoulboundEngine.World.Widget;
 	using System;
 	using System.Collections.Generic;
 	using UnityEngine;
@@ -342,18 +341,6 @@ namespace SoulboundEngine.World.Player {
 
 		public void SetJumping(bool jumping) {
 			this.isJumping = jumping;
-		}
-
-		public WorldWidgetHandle ShowWorldWidget<TContext>(WorldWidgetType<TContext> type, TContext context) where TContext : WorldWidgetContext {
-			return this.client.ShowWorldWidget(type, context);
-		}
-
-		public void UpdateWorldWidget<TContext>(WorldWidgetHandle handle, TContext context) where TContext : WorldWidgetContext {
-			this.client.UpdateWorldWidget(handle, context);
-		}
-
-		public void DestroyWorldWidget(WorldWidgetHandle handle) {
-			this.client.DestroyWorldWidget(handle);
 		}
 
 		public IScreenHandle OpenSignEditScreen(SignTileEntity signEntity) {

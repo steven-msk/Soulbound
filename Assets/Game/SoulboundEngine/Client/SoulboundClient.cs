@@ -31,7 +31,6 @@ namespace SoulboundEngine.Client {
 	using SoulboundEngine.World.Player;
 	using SoulboundEngine.World.Serialization;
 	using SoulboundEngine.World.Services;
-	using SoulboundEngine.World.Widget;
 	using System;
 	using System.Collections.Generic;
 	using System.Linq;
@@ -82,7 +81,7 @@ namespace SoulboundEngine.Client {
 		private readonly RecipeManager recipeManager;
 		private readonly PerformanceMetrics performanceMetrics;
 		private readonly DebugMetricsService debugMetricsService;
-		private readonly ClientWorldWidgetManager worldWidgetManager;
+		private readonly WorldWidgetManager worldWidgetManager;
 		private WorldScreen? activeWorldScreen;
 		private PlayerEntity? player;
 		private WorldSession? activeWorldSession;
@@ -130,9 +129,9 @@ namespace SoulboundEngine.Client {
 			this.itemRenderManager = new ItemRenderManager(Registries.ITEMS.ToList(), this.spriteResolver);
 			this.entityRenderManager = new EntityRenderManager(Registries.ENTITIES.ToList(), this.itemRenderManager);
 			this.blockRenderManager = new BlockRenderManager(Registries.BLOCKS.ToList());
-			this.worldRenderer = new WorldRenderer(RENDER_RECT, this.blockRenderManager, this.entityRenderManager);
+			this.worldWidgetManager = new WorldWidgetManager(Registries.WORLD_WIDGET_TYPE);
+			this.worldRenderer = new WorldRenderer(RENDER_RECT, this.blockRenderManager, this.entityRenderManager, this.worldWidgetManager);
 			_ = new InventoryScreens();
-			this.worldWidgetManager = new ClientWorldWidgetManager();
 
 			Registry<RecipeIngredientIndex> ingredientIndexRegistry = new(RecipeIngredientIndex.REGISTRY);
 			this.recipeManager = new RecipeManager(ingredientIndexRegistry, new RecipeAssetResolver());
@@ -386,18 +385,6 @@ namespace SoulboundEngine.Client {
 			pos.z = -Camera.main.transform.position.z;
 			pos = Camera.main.ScreenToWorldPoint(pos);
 			return new Vec2d(pos.x, pos.y);
-		}
-
-		public WorldWidgetHandle ShowWorldWidget<TContext>(WorldWidgetType<TContext> type, TContext context) where TContext : WorldWidgetContext {
-			return this.worldWidgetManager.ShowWidget(type, context);
-		}
-
-		public void UpdateWorldWidget<TContext>(WorldWidgetHandle handle, TContext context) where TContext : WorldWidgetContext {
-			this.worldWidgetManager.UpdateWidget(handle, context);
-		}
-
-		public void DestroyWorldWidget(WorldWidgetHandle handle) {
-			this.worldWidgetManager.DestroyWidget(handle);
 		}
 
 		[Obsolete] public WorldSession? GetActiveWorldSession() => this.activeWorldSession;

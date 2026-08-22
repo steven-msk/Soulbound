@@ -21,7 +21,7 @@
 			return new SignTileEntity(blockPos, state);
 		}
 
-		public WorldWidgetHandle? widgetHandle { get; set; }
+		public WorldWidgetHandler? widgetHandler { get; set; }
 		public IScreenHandle? screenHandle { get; set; }
 
 		public override void ReadAdditional(JObject json) {

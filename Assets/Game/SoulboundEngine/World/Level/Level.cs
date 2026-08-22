@@ -13,6 +13,7 @@ namespace SoulboundEngine.World.Level {
 	using SoulboundEngine.World.Player;
 	using SoulboundEngine.World.Serialization;
 	using SoulboundEngine.World.Services;
+	using SoulboundEngine.World.Widget;
 	using System;
 	using System.Collections.Generic;
 	using System.Linq;
@@ -42,12 +43,15 @@ namespace SoulboundEngine.World.Level {
 		public event Action<Entity>? entityRemoved;
 		public event Action<Chunk>? chunkLoaded;
 		public event Action<Chunk>? chunkUnloaded;
+		public event Action<WorldWidgetHandler>? widgetAdded;
+		public event Action<WorldWidgetHandler>? widgetRemoved;
 		private bool isLoaded;
 		private bool levelActive;
 
 		private readonly HashSet<BlockPos> tickingBlocks = new();
 		private readonly Dictionary<Guid, Entity> entities = new();
 		private readonly List<ITickingEntity> tickingEntities = new();
+		private readonly Dictionary<BlockPos, List<WorldWidgetHandler>> widgets = new();
 
 		public Level(int seed, RecipeManager recipeManager, ChunkGenerator chunkGenerator, int chunkRadius, ChunkStorage chunkStorage) {
 			this.seed = seed;
@@ -242,6 +246,63 @@ namespace SoulboundEngine.World.Level {
 				}
 			}
 			return output;
+		}
+
+		public WorldWidgetHandler<TContext> AddWidget<TContext>(
+			IWorldWidgetProvider<TContext> widgetProvider, 
+			Func<Level, BlockPos, TContext> contextFactory, 
+			BlockPos pos
+		) where TContext : WorldWidgetContext {
+			TContext context = contextFactory(this, pos);
+			WorldWidgetHandler<TContext> handler = widgetProvider.CreateHandler(context);
+
+			if (!this.widgets.ContainsKey(pos)) {
+				this.widgets[pos] = new List<WorldWidgetHandler>();
+			}
+			this.widgets[pos].Add(handler);
+			widgetAdded?.Invoke(handler);
+
+			return handler;
+		}
+
+		public void RemoveWidget(WorldWidgetHandler handler) {
+			this.RemoveWidget(handler.GetContext().blockPos, handler);
+		}
+
+		public void RemoveWidget(BlockPos pos, WorldWidgetHandler handler) {
+			if (!this.widgets.ContainsKey(pos)) return;
+
+			List<WorldWidgetHandler> handlers = this.widgets[pos];
+			if (!handlers.Remove(handler)) return;
+
+			if (handlers.Count == 0) this.widgets.Remove(pos);
+			widgetRemoved?.Invoke(handler);
+		}
+
+		public bool RemoveAllWidgetsAt(BlockPos pos) {
+			if (this.widgets.Remove(pos, out List<WorldWidgetHandler> list)) {
+				foreach (WorldWidgetHandler handler in list) {
+					widgetRemoved?.Invoke(handler);
+				}
+				return true;
+			}
+			return false;
+		}
+
+		public IEnumerable<WorldWidgetHandler> GetWidgets(BlockPos pos) {
+			if (this.widgets.TryGetValue(pos, out List<WorldWidgetHandler> handlers)) {
+				foreach (WorldWidgetHandler handler in handlers) {
+					yield return handler;
+				}
+			}
+		}
+
+		public IEnumerable<WorldWidgetHandler> GetAllWidgets() {
+			foreach ((BlockPos pos, List<WorldWidgetHandler> handlers) in this.widgets) {
+				foreach (WorldWidgetHandler handler in handlers) {
+					yield return handler;
+				}
+			}
 		}
 
 		public void OnChunkLoaded(Chunk chunk) {
