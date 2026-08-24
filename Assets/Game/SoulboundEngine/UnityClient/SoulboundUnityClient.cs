@@ -54,7 +54,7 @@ namespace SoulboundEngine.UnityClient {
 		private static readonly UnityClientLoggerWrapper unityClientLoggerWrapper = new(UnityEngine.Debug.unityLogger);
 		private readonly Stopwatch tickStopwatch = new();
 		private readonly Stopwatch tpsWindowStopwatch = new();
-		public const float TICK_RATE = 1f / SharedConstants.TICKS_PER_SECOND;
+		public const double TICK_RATE = 1.0d / SharedConstants.TICKS_PER_SECOND;
 		private readonly UnityClientConfig config;
 		private readonly PlayerInputActions inputActions;
 		private readonly InputManager inputManager;
@@ -84,7 +84,7 @@ namespace SoulboundEngine.UnityClient {
 		private readonly WorldWidgetManager worldWidgetManager;
 		private bool running;
 		private int ticksThisSecond;
-		private float lastTickTime;
+		private double lastTickTime;
 		private int lastSecondTicks;
 		private WorldScreen? activeWorldScreen;
 		private PlayerEntity? player;
@@ -175,22 +175,46 @@ namespace SoulboundEngine.UnityClient {
 			this.worldRenderer.Render();
 		}
 
+		// implementation note:
+		// tick scheduling currently relies on Unity's player loop
+		// it would be recommended to decouple from it and run ticks on a separate thread
+		// however the tick loop must be completely Unity API free,
+		// and all necessary calls must be posted to the main thread
+		// this should be marked for beta
 		private async void TickLoop() {
 			this.tpsWindowStopwatch.Restart();
+			Stopwatch accumulatorStopwatch = Stopwatch.StartNew();
+			double accumulatedSeconds = 0.0d;
+
 			while (this.running) {
-				this.StartTick();
-				try {
-					this.Tick();
-				} catch (Exception e) {
-					Logger.LogFatal(e);
-					if (this.config.isRunningInEditor) {
-						EditorApplication.isPlaying = false;
-					} else {
-						Environment.FailFast("Uncaught exception in tick loop", e);
+				accumulatedSeconds += accumulatorStopwatch.Elapsed.TotalSeconds;
+				accumulatorStopwatch.Restart();
+				int ticksRanThisPass = 0;
+
+				while (accumulatedSeconds >= TICK_RATE && ticksRanThisPass < SharedConstants.MAX_TICKS_PER_PASS) {
+					this.StartTick();
+					try {
+						this.Tick();
+					} catch (Exception e) {
+						Logger.LogFatal(e);
+						// this part will need a rework
+						// if decoupling entirely from Unity API
+						if (this.config.isRunningInEditor) {
+							EditorApplication.isPlaying = false;
+						} else {
+							Environment.FailFast("Uncaught exception in tick loop", e);
+						}
 					}
+					this.EndTick();
+
+					accumulatedSeconds -= TICK_RATE;
+					ticksRanThisPass++;
 				}
-				this.EndTick();
-				await UniTask.WaitForSeconds(TICK_RATE, true);
+
+				if (ticksRanThisPass >= SharedConstants.MAX_TICKS_PER_PASS) {
+					accumulatedSeconds = 0.0d;
+				}
+				await UniTask.NextFrame();
 			}
 		}
 
@@ -232,7 +256,7 @@ namespace SoulboundEngine.UnityClient {
 			if (elapsedMs > TICK_RATE * 1000f * 1.5f) {
 				Logger.LogWarning($"Tick lag detected! Tick took {elapsedMs:F1}ms (target {TICK_RATE * 1000F}ms)");
 			}
-			this.lastTickTime = (float)elapsedMs;
+			this.lastTickTime = elapsedMs;
 
 			this.ticksThisSecond++;
 			if (this.tpsWindowStopwatch.Elapsed.TotalSeconds >= 1.0d) {

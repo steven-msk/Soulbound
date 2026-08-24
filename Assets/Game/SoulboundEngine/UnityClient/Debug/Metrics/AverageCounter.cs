@@ -3,17 +3,17 @@ namespace SoulboundEngine.UnityClient.Debug.Metrics {
 
 	public class AverageCounter {
 		private readonly int averageThreshold;
-		private float min = float.MaxValue;
-		private float max = float.MinValue;
-		private float average;
+		private double min = double.MaxValue;
+		private double max = double.MinValue;
+		private double average;
 		private int count;
-		private float currentAverage;
-		private float current;
+		private double currentAverage;
+		private double current;
 		private bool hasTickedOnce;
 
 		public AverageCounter(int averageThreshold) => this.averageThreshold = averageThreshold;
 
-		public void Tick(float value) {
+		public void Tick(double value) {
 			this.average += value;
 			this.current = value;
 			this.count++;
@@ -30,12 +30,14 @@ namespace SoulboundEngine.UnityClient.Debug.Metrics {
 
 		public void Tick(int value) => this.Tick((float)value);
 
-		public float GetAverage() => this.currentAverage;
+		public void Tick(float value) => this.Tick((double)value);
 
-		public float GetMin() => this.hasTickedOnce ? this.min : 0f;
+		public double GetAverage() => this.currentAverage;
 
-		public float GetMax() => this.hasTickedOnce ? this.max : 0f;
+		public double GetMin() => this.hasTickedOnce ? this.min : 0.0d;
 
-		public float GetCurrent() => this.current;
+		public double GetMax() => this.hasTickedOnce ? this.max : 0.0d;
+
+		public double GetCurrent() => this.current;
 	}
 }

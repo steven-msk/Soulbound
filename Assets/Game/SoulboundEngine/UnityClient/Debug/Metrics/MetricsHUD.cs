@@ -124,7 +124,7 @@ namespace SoulboundEngine.UnityClient.Debug.Metrics.View {
 			TickIfExistent(data, DebugMetricId.Fps, ReadFloat, this.fpsCounter.Tick);
 			TickIfExistent(data, DebugMetricId.FrameTime, ReadFloat, this.frameTimeCounter.Tick);
 			TickIfExistent(data, DebugMetricId.Tps, ReadInt, this.tpsCounter.Tick);
-			TickIfExistent(data, DebugMetricId.TickTime, ReadFloat, this.tickTimeCounter.Tick);
+			TickIfExistent(data, DebugMetricId.TickTime, ReadDouble, this.tickTimeCounter.Tick);
 			for (int i = 0; i < this.metrics.Length; i++) {
 				this.metrics[i].Refresh(data);
 			}
@@ -142,6 +142,10 @@ namespace SoulboundEngine.UnityClient.Debug.Metrics.View {
 
 		private static int? ReadInt(DebugMetricsSnapshot data, DebugMetricId id) {
 			return Read(data, id) as int?;
+		}
+
+		private static double? ReadDouble(DebugMetricsSnapshot data, DebugMetricId id) {
+			return Read(data, id) as double?;
 		}
 
 		private static object? Read(DebugMetricsSnapshot data, DebugMetricId id) {

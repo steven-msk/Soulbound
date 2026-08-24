@@ -3,5 +3,6 @@
 		public const int CHUNK_WIDTH = 32;
 		public const int WORLD_HEIGHT = 1024;
 		public const int TICKS_PER_SECOND = 50;
+		public const int MAX_TICKS_PER_PASS = 5;
 	}
 }

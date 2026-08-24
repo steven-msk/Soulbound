@@ -140,7 +140,7 @@
 		public sealed class Settings {
 			public RegistryKey<Block> registryKey { get; private set; }
 			public int minBreakLevel { get; private set; } = 0;
-			public Func<BlockState, List<ItemStack>> droppedStacks { get; private set; } = Block.DropAir();
+			public Func<BlockState, List<ItemStack>> droppedStacks { get; private set; } = Block.DropSingle();
 
 			public Settings RegistryKey(RegistryKey<Block> registryKey) {
 				this.registryKey = registryKey;
