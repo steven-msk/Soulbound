@@ -27,6 +27,14 @@
 		}
 
 		protected override void OnHoverLeave(BlockState state, ItemStack stack, Level level, PlayerEntity player, BlockPos pos) {
+			this.RemoveWidget(level, pos);
+		}
+
+		protected override void OnStateReplaced(BlockState state, BlockPos pos, Level level) {
+			this.RemoveWidget(level, pos);
+		}
+
+		private void RemoveWidget(Level level, BlockPos pos) {
 			SignTileEntity tileEntity = (SignTileEntity)level.GetTileEntity(pos);
 			if (tileEntity.widgetHandler == null) return;
 
