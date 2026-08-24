@@ -1,4 +1,5 @@
 namespace SoulboundEngine.UnityClient.Debug.Metrics.View {
+	using SoulboundEngine.Common;
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.UnityClient.Assets;
 	using SoulboundEngine.UnityClient.Settings;
@@ -6,10 +7,12 @@ namespace SoulboundEngine.UnityClient.Debug.Metrics.View {
 	using System;
 	using UnityEngine.UIElements;
 
+#nullable enable
+
 	public sealed class MetricsHUD : UXMLWidget {
+		private const string FORMAT_SEARCH = "{}";
 		private static readonly Identifier FPS_ELEMENT = Identifier.Of("soulbound:metrics_hud/fps");
 		private static readonly Identifier FRAME_TIME_ELEMENT = Identifier.Of("soulbound:metrics_hud/frame_time");
-		private static readonly Identifier FIXED_UPDATE_TIME_ELEMENT = Identifier.Of("soulbound:metrics_hud/fixed_update_time");
 		private static readonly Identifier TOTAL_MEMORY_ELEMENT = Identifier.Of("soulbound:metrics_hud/total_memory");
 		private static readonly Identifier GPU_MEMORY_ELEMENT = Identifier.Of("soulbound:metrics_hud/gpu_memory");
 		private static readonly Identifier GC_ALLOC_ELEMENT = Identifier.Of("soulbound:metrics_hud/gc_alloc");
@@ -48,40 +51,65 @@ namespace SoulboundEngine.UnityClient.Debug.Metrics.View {
 
 		private MetricBinding[] CreateMetricBindings(VisualElement root) {
 			return new[] {
-				new LabelMetricBinding(root, FPS_ELEMENT, data => {
-					this.fpsCounter.Tick(Read(data, DebugMetricId.Fps));
-					return $"FPS: {this.fpsCounter.GetAverage():F1}";
+				new LabelMetricBinding(root, FPS_ELEMENT, (data, format) => {
+					return FormatOutput(format, $"{this.fpsCounter.GetAverage():F1}");
 				}),
-				new LabelMetricBinding(root, FRAME_TIME_ELEMENT, data => {
-					this.frameTimeCounter.Tick(Read(data, DebugMetricId.FrameTime));
-					return $"Frame time: {this.frameTimeCounter.GetAverage():F1}ms";
+				new LabelMetricBinding(root, FRAME_TIME_ELEMENT, (data, format) => {
+					return FormatOutput(format, $"{this.frameTimeCounter.GetAverage():F1}ms");
 				}),
-				new LabelMetricBinding(root, FIXED_UPDATE_TIME_ELEMENT,
-					data => $"Fixed update time: {Read(data, DebugMetricId.FixedUpdateTime):F1}ms"
-				),
 				new LabelMetricBinding(root, TOTAL_MEMORY_ELEMENT,
-					data => $"Total memory: {Read(data, DebugMetricId.TotalManagedMemory):F1}MB / {Read(data, DebugMetricId.MonoHeap):F1}MB"
+					(data, format) => {
+						return FormatOutput(format,
+							FormatFloat(ReadFloat(data, DebugMetricId.TotalManagedMemory), v => $"{v:F1}MB"),
+							FormatFloat(ReadFloat(data, DebugMetricId.MonoHeap), v => $"{v:F1}MB"));
+					}
 				),
 				new LabelMetricBinding(root, GPU_MEMORY_ELEMENT,
-					data => $"GPU memory: {Read(data, DebugMetricId.GpuManagedMemory):F1}MB / {Read(data, DebugMetricId.GpuReservedMemory):F1}MB"
+					(data, format) => {
+						return FormatOutput(format,
+							FormatFloat(ReadFloat(data, DebugMetricId.GpuManagedMemory), v => $"{v:F1}MB"),
+							FormatFloat(ReadFloat(data, DebugMetricId.GpuReservedMemory), v => $"{v:F1}MB"));
+					}
 				),
 				new LabelMetricBinding(root, GC_ALLOC_ELEMENT,
-					data => $"GC alloc: {Read(data, DebugMetricId.GcAlloc):F0}B"
+					(data, format) => FormatOutput(format, FormatFloat(ReadFloat(data, DebugMetricId.GcAlloc), v => $"{v:F0}B"))
 				)
 			};
+		}
+
+		private static string FormatOutput(string format, params string[] args) {
+			string output = format;
+			foreach (string arg in args) {
+				output = output.ReplaceFirst(FORMAT_SEARCH, arg);
+			}
+			return output;
+		}
+
+		private static string FormatFloat(float? value, Func<float, string> transformer, string fallback = "N/A") {
+			return value is not { } nonNull ? fallback : transformer(nonNull);
 		}
 
 		public void Refresh() {
 			if (!this.isVisible) return;
 			DebugMetricsSnapshot data = this.metricsService.CaptureData();
 
+			if (ReadFloat(data, DebugMetricId.Fps) is { } fps) {
+				this.fpsCounter.Tick(fps);
+			}
+			if (ReadFloat(data, DebugMetricId.FrameTime) is { } frameTime) {
+				this.frameTimeCounter.Tick(frameTime);
+			}
 			for (int i = 0; i < this.metrics.Length; i++) {
 				this.metrics[i].Refresh(data);
 			}
 		}
 
-		private static float Read(DebugMetricsSnapshot data, DebugMetricId id) {
-			return data.TryGet(id, out float value) ? value : 0f;
+		private static float? ReadFloat(DebugMetricsSnapshot data, DebugMetricId id) {
+			return Read(data, id) as float?;
+		}
+
+		private static object? Read(DebugMetricsSnapshot data, DebugMetricId id) {
+			return data.TryGet(id, out object value) ? value : null;
 		}
 	}
 }

@@ -5,22 +5,23 @@ namespace SoulboundEngine.UnityClient.Debug.Metrics {
 
 		public DebugMetricsBuilder(DebugMetricData[] buffer) {
 			this.buffer = buffer;
-			count = 0;
+			this.count = 0;
 		}
 
 		public readonly DebugMetricsSnapshot Build() {
-			return new DebugMetricsSnapshot(buffer, count);
+			return new DebugMetricsSnapshot(this.buffer, this.count);
 		}
 
 		public void Add(DebugMetricId id, int value) {
-			buffer[count++] = new DebugMetricData {
-				id = id,
-				value = value
-			};
+			this.Add(id, (object)value);
 		}
 
 		public void Add(DebugMetricId id, float value) {
-			buffer[count++] = new DebugMetricData {
+			this.Add(id, (object)value);
+		}
+
+		public void Add(DebugMetricId id, object value) {
+			this.buffer[this.count++] = new DebugMetricData {
 				id = id,
 				value = value
 			};

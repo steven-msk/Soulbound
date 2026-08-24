@@ -1,18 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-using UnityEngine.Profiling;
-
 namespace SoulboundEngine.UnityClient.Debug.Metrics {
+	using System;
+	using UnityEngine;
+	using UnityEngine.Profiling;
+
 	public sealed class PerformanceMetrics {
 		private long lastFrameMemory;
-		public float InstantFps { get; private set; }
-		public float FrameTime { get; private set; }
-		public float FixedUpdateTime { get; private set; }
-		public int GcAllocBytesThisFrame { get; private set; }
+		public float instantFps { get; private set; }
+		public float frameTime { get; private set; }
+		public int gcAllocBytesThisFrame { get; private set; }
 		public float TotalManagedMemoryMB => GC.GetTotalMemory(false) / 1024f / 1024f;
 		public float TotalUnityReservedMemoryMB => Profiler.GetTotalReservedMemoryLong() / 1024f / 1024f;
 		public float MonoHeapMB => Profiler.GetMonoHeapSizeLong() / 1024f / 1024f;
@@ -21,13 +16,12 @@ namespace SoulboundEngine.UnityClient.Debug.Metrics {
 		public float GPUReservedMemoryMB => SystemInfo.graphicsMemorySize;
 
 		public void Update() {
-			InstantFps = 1f / Time.unscaledDeltaTime;
-			FrameTime = Time.unscaledDeltaTime * 1000f;
-			FixedUpdateTime = Time.fixedUnscaledDeltaTime * 1000f;
+			this.instantFps = 1f / Time.unscaledDeltaTime;
+			this.frameTime = Time.unscaledDeltaTime * 1000f;
 
 			long currentMemory = GC.GetTotalMemory(false);
-			GcAllocBytesThisFrame = (int)(currentMemory - lastFrameMemory);
-			lastFrameMemory = currentMemory;
+			this.gcAllocBytesThisFrame = (int)(currentMemory - this.lastFrameMemory);
+			this.lastFrameMemory = currentMemory;
 		}
 	}
 }

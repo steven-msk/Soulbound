@@ -422,16 +422,15 @@ namespace SoulboundEngine.UnityClient {
 
 		void IDebugMetricsSource.CollectDebugData(ref DebugMetricsBuilder builder) {
 			PerformanceMetrics metrics = this.performanceMetrics;
-			builder.Add(DebugMetricId.Fps, metrics.InstantFps);
-			builder.Add(DebugMetricId.FrameTime, metrics.FrameTime);
-			builder.Add(DebugMetricId.FixedUpdateTime, metrics.FixedUpdateTime);
+			builder.Add(DebugMetricId.Fps, metrics.instantFps);
+			builder.Add(DebugMetricId.FrameTime, metrics.frameTime);
 			builder.Add(DebugMetricId.TotalManagedMemory, metrics.TotalManagedMemoryMB);
 			builder.Add(DebugMetricId.TotalUnityReservedMemory, metrics.TotalUnityReservedMemoryMB);
 			builder.Add(DebugMetricId.MonoHeap, metrics.MonoHeapMB);
 			builder.Add(DebugMetricId.MonoUsed, metrics.MonoUsedMB);
 			builder.Add(DebugMetricId.GpuManagedMemory, metrics.GPUManagedMemoryMB);
 			builder.Add(DebugMetricId.GpuReservedMemory, metrics.GPUReservedMemoryMB);
-			builder.Add(DebugMetricId.GcAlloc, metrics.GcAllocBytesThisFrame);
+			builder.Add(DebugMetricId.GcAlloc, metrics.gcAllocBytesThisFrame);
 		}
 
 		public void RegisterDebugMetricsSource(IDebugMetricsSource source) {
