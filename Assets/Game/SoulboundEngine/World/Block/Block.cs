@@ -1,5 +1,3 @@
-
-
 namespace SoulboundEngine.World.Block {
 	using SoulboundEngine.Common.Math;
 	using SoulboundEngine.Item;
@@ -68,16 +66,14 @@ namespace SoulboundEngine.World.Block {
 		}
 
 		public static Block GetBlockFrom(Item? item) {
-			if (item == null) return Blocks.AIR;
-			return item is BlockItem blockItem
-				? blockItem.GetBlock()
-				: Blocks.AIR;
+			return item == null || item is not BlockItem blockItem ? Blocks.AIR : blockItem.GetBlock();
 		}
 
 		public static void DropStacks(BlockState blockState, Level level, BlockPos blockPos, World.Entity.Entity? owner) {
 			List<ItemStack> droppedStacks = GetDroppedStacks(blockState);
 
-			foreach (var stack in droppedStacks) {
+			foreach (ItemStack stack in droppedStacks) {
+				if (stack.IsEmpty()) continue;
 				Vec2d pos = blockPos.GetBottomCenter();
 				ItemEntity itemEntity = new(level, pos.x, pos.y, stack);
 				if (owner != null) itemEntity.SetOwner(owner);
