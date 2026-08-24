@@ -17,8 +17,8 @@ namespace SoulboundEngine.UnityClient.Debug.Metrics.View {
 		private static readonly Identifier GPU_MEMORY_ELEMENT = Identifier.Of("soulbound:metrics_hud/gpu_memory");
 		private static readonly Identifier GC_ALLOC_ELEMENT = Identifier.Of("soulbound:metrics_hud/gc_alloc");
 		private readonly DebugMetricsService metricsService;
-		private readonly AverageFrameCounter fpsCounter = new(10);
-		private readonly AverageFrameCounter frameTimeCounter = new(10);
+		private readonly AverageCounter fpsCounter = new(10);
+		private readonly AverageCounter frameTimeCounter = new(10);
 		private MetricBinding[] metrics = Array.Empty<MetricBinding>();
 		private readonly SoulboundUnityClient client;
 
@@ -52,10 +52,18 @@ namespace SoulboundEngine.UnityClient.Debug.Metrics.View {
 		private MetricBinding[] CreateMetricBindings(VisualElement root) {
 			return new[] {
 				new LabelMetricBinding(root, FPS_ELEMENT, (data, format) => {
-					return FormatOutput(format, $"{this.fpsCounter.GetAverage():F1}");
+					return FormatOutput(format, 
+						$"avg: {this.fpsCounter.GetAverage():F1}, " +
+						$"min: {this.fpsCounter.GetMin():F1}, " +
+						$"max: {this.fpsCounter.GetMax():F1}, " +
+						$"curr: {this.fpsCounter.GetCurrent():F1}");
 				}),
 				new LabelMetricBinding(root, FRAME_TIME_ELEMENT, (data, format) => {
-					return FormatOutput(format, $"{this.frameTimeCounter.GetAverage():F1}ms");
+					return FormatOutput(format,
+						$"avg: {this.frameTimeCounter.GetAverage():F1}ms, " +
+						$"min: {this.frameTimeCounter.GetMin():F1}, " +
+						$"max: {this.frameTimeCounter.GetMax():F1}, " +
+						$"curr: {this.frameTimeCounter.GetCurrent():F1}");
 				}),
 				new LabelMetricBinding(root, TOTAL_MEMORY_ELEMENT,
 					(data, format) => {
