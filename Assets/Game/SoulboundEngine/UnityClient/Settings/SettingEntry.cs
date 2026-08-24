@@ -1,10 +1,9 @@
 namespace SoulboundEngine.UnityClient.Settings {
-	using SoulboundEngine.UnityClient.Settings.View;
 	using SoulboundEngine.Common;
 	using SoulboundEngine.Serialization;
+	using SoulboundEngine.UnityClient.Settings.View;
 	using System;
 	using System.Linq;
-	using Unity.VisualScripting;
 	using UnityEngine;
 	using UnityEngine.UI;
 
