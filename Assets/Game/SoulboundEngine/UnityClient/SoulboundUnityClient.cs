@@ -84,6 +84,8 @@ namespace SoulboundEngine.UnityClient {
 		private readonly WorldWidgetManager worldWidgetManager;
 		private bool running;
 		private int ticksThisSecond;
+		private float lastTickTime;
+		private int lastSecondTicks;
 		private WorldScreen? activeWorldScreen;
 		private PlayerEntity? player;
 		private WorldSession? activeWorldSession;
@@ -174,6 +176,7 @@ namespace SoulboundEngine.UnityClient {
 		}
 
 		private async void TickLoop() {
+			this.tpsWindowStopwatch.Restart();
 			while (this.running) {
 				this.StartTick();
 				try {
@@ -229,12 +232,14 @@ namespace SoulboundEngine.UnityClient {
 			if (elapsedMs > TICK_RATE * 1000f * 1.5f) {
 				Logger.LogWarning($"Tick lag detected! Tick took {elapsedMs:F1}ms (target {TICK_RATE * 1000F}ms)");
 			}
+			this.lastTickTime = (float)elapsedMs;
 
 			this.ticksThisSecond++;
 			if (this.tpsWindowStopwatch.Elapsed.TotalSeconds >= 1.0d) {
 				if (this.ticksThisSecond < SharedConstants.TICKS_PER_SECOND - 1) {
 					Logger.LogWarning("Tick rate degraded: {} TPS (target {})", this.ticksThisSecond, SharedConstants.TICKS_PER_SECOND);
 				}
+				this.lastSecondTicks = this.ticksThisSecond;
 				this.ticksThisSecond = 0;
 				this.tpsWindowStopwatch.Restart();
 			}
@@ -431,6 +436,9 @@ namespace SoulboundEngine.UnityClient {
 			builder.Add(DebugMetricId.GpuManagedMemory, metrics.GPUManagedMemoryMB);
 			builder.Add(DebugMetricId.GpuReservedMemory, metrics.GPUReservedMemoryMB);
 			builder.Add(DebugMetricId.GcAlloc, metrics.gcAllocBytesThisFrame);
+
+			builder.Add(DebugMetricId.TickTime, this.lastTickTime);
+			builder.Add(DebugMetricId.Tps, this.lastSecondTicks);
 		}
 
 		public void RegisterDebugMetricsSource(IDebugMetricsSource source) {

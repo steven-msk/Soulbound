@@ -8,6 +8,8 @@ namespace SoulboundEngine.UnityClient.Debug.Metrics {
 		MonoUsed,
 		GpuManagedMemory,
 		GpuReservedMemory,
-		GcAlloc
+		GcAlloc,
+		TickTime,
+		Tps
 	}
 }

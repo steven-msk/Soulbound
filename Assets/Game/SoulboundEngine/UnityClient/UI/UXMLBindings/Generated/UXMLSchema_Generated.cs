@@ -21,6 +21,8 @@ namespace SoulboundEngine.UnityClient.UI.UXMLBindings {
             UXMLSchema.Register(Identifier.Of("soulbound:log_entry/log_label"), typeof(Label));
             UXMLSchema.Register(Identifier.Of("soulbound:metrics_hud/fps"), typeof(Label));
             UXMLSchema.Register(Identifier.Of("soulbound:metrics_hud/frame_time"), typeof(Label));
+            UXMLSchema.Register(Identifier.Of("soulbound:metrics_hud/tps"), typeof(Label));
+            UXMLSchema.Register(Identifier.Of("soulbound:metrics_hud/tick_time"), typeof(Label));
             UXMLSchema.Register(Identifier.Of("soulbound:metrics_hud/total_memory"), typeof(Label));
             UXMLSchema.Register(Identifier.Of("soulbound:metrics_hud/gpu_memory"), typeof(Label));
             UXMLSchema.Register(Identifier.Of("soulbound:metrics_hud/gc_alloc"), typeof(Label));

@@ -28,6 +28,8 @@ namespace SoulboundEngine.UnityClient.Debug.Metrics {
 			}
 		}
 
+		public void Tick(int value) => this.Tick((float)value);
+
 		public float GetAverage() => this.currentAverage;
 
 		public float GetMin() => this.hasTickedOnce ? this.min : 0f;

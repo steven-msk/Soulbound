@@ -4,6 +4,8 @@
         <ui:VisualElement name="" picking-mode="Ignore" style="flex-grow: 0; margin-bottom: 10px;">
             <ui:Label text="FPS: {}" name="fps" picking-mode="Ignore" class="metric-label"/>
             <ui:Label text="Frame time: {}" name="frame_time" picking-mode="Ignore" class="metric-label"/>
+            <ui:Label text="TPS: {}" name="tps" picking-mode="Ignore" class="metric-label"/>
+            <ui:Label text="Tick time: {}" name="tick_time" picking-mode="Ignore" class="metric-label"/>
         </ui:VisualElement>
         <ui:VisualElement style="flex-grow: 1;">
             <ui:Label text="Memory" name="" picking-mode="Ignore" class="metric-label"/>
