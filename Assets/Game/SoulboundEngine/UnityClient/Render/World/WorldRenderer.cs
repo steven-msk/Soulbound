@@ -1,10 +1,9 @@
-
 namespace SoulboundEngine.UnityClient.Render.World {
+	using SoulboundEngine.Common.Math;
+	using SoulboundEngine.UnityClient.Debug;
 	using SoulboundEngine.UnityClient.Render.Block;
 	using SoulboundEngine.UnityClient.Render.Entity;
-	using SoulboundEngine.UnityClient.Util;
 	using SoulboundEngine.UnityClient.World.Widget;
-	using SoulboundEngine.Common.Math;
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Block.State;
 	using SoulboundEngine.World.Chunk;
@@ -23,6 +22,7 @@ namespace SoulboundEngine.UnityClient.Render.World {
 		private readonly BlockRenderManager blockRenderManager;
 		private readonly EntityRenderManager entityRenderManager;
 		private readonly WorldWidgetManager widgetManager;
+		private readonly DebugRenderer debugRenderer;
 		private readonly ChunkOutlineRenderer chunkOutlineRenderer;
 		private readonly Queue<(BlockPos pos, BlockState? state)> stateChangedQueue = new();
 		private Vec2i lastPivot;
@@ -31,11 +31,12 @@ namespace SoulboundEngine.UnityClient.Render.World {
 		private Level? level;
 		private bool showingChunkFeatures;
 
-		public WorldRenderer(RectInt renderView, BlockRenderManager blockRenderManager, EntityRenderManager entityRenderManager, WorldWidgetManager widgetManager) {
+		public WorldRenderer(RectInt renderView, BlockRenderManager blockRenderManager, EntityRenderManager entityRenderManager, WorldWidgetManager widgetManager, DebugRenderer debugRenderer) {
 			this.renderView = renderView;
 			this.blockRenderManager = blockRenderManager;
 			this.entityRenderManager = entityRenderManager;
 			this.widgetManager = widgetManager;
+			this.debugRenderer = debugRenderer;
 			this.chunkOutlineRenderer = new ChunkOutlineRenderer();
 		}
 
@@ -55,20 +56,11 @@ namespace SoulboundEngine.UnityClient.Render.World {
 			if (this.showingChunkFeatures) {
 				AABB stretched = this.level.GetPlayer().boundingBox.Stretch(DEBUG_BLOCK_COLLIDER_VIEW_RADIUS);
 				foreach (AABB box in this.level.GetBlockCollisionBoxes(stretched)) {
-					this.DrawDebugBox(box, Color.green);
+					this.debugRenderer.AddLineBox(box, Color.green);
 				}
 				AABB playerBox = this.level.GetPlayer().boundingBox;
-				this.DrawDebugBox(playerBox, Color.cyan);
+				this.debugRenderer.AddLineBox(playerBox, Color.cyan);
 			}
-		}
-
-		private void DrawDebugBox(AABB box, Color color) {
-			Vector2 min = box.Min.ToVector2();
-			Vector2 max = box.Max.ToVector2();
-			UnityEngine.Debug.DrawLine(new Vector3(min.x, min.y), new Vector3(min.x, max.y), color);
-			UnityEngine.Debug.DrawLine(new Vector3(min.x, min.y), new Vector3(max.x, min.y), color);
-			UnityEngine.Debug.DrawLine(new Vector3(max.x, min.y), new Vector3(max.x, max.y), color);
-			UnityEngine.Debug.DrawLine(new Vector3(min.x, max.y), new Vector3(max.x, max.y), color);
 		}
 
 		private void RenderBlocks(Level level) {

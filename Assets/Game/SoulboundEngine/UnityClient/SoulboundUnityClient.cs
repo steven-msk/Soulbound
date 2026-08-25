@@ -39,6 +39,7 @@ namespace SoulboundEngine.UnityClient {
 	using System.Linq;
 	using UnityEditor;
 	using UnityEngine.InputSystem;
+	using UnityEngine.Rendering;
 	using UnityEngine.SceneManagement;
 	using UnityEngine.UIElements;
 	using Camera = UnityEngine.Camera;
@@ -78,6 +79,7 @@ namespace SoulboundEngine.UnityClient {
 		private readonly EntityRenderManager entityRenderManager;
 		private readonly BlockRenderManager blockRenderManager;
 		private readonly WorldRenderer worldRenderer;
+		private readonly DebugRenderer debugRenderer;
 		public static readonly RectInt RENDER_RECT = new(-32, -19, 65, 39);
 		private readonly RecipeManager recipeManager;
 		private readonly PerformanceMetrics performanceMetrics;
@@ -142,7 +144,9 @@ namespace SoulboundEngine.UnityClient {
 			this.entityRenderManager = new EntityRenderManager(Registries.ENTITIES.ToList(), this.itemRenderManager);
 			this.blockRenderManager = new BlockRenderManager(Registries.BLOCKS.ToList());
 			this.worldWidgetManager = new WorldWidgetManager(Registries.WORLD_WIDGET_TYPE);
-			this.worldRenderer = new WorldRenderer(RENDER_RECT, this.blockRenderManager, this.entityRenderManager, this.worldWidgetManager);
+			this.debugRenderer = new DebugRenderer();
+			RenderPipelineManager.endCameraRendering += this.debugRenderer.OnEndCameraRendering;
+			this.worldRenderer = new WorldRenderer(RENDER_RECT, this.blockRenderManager, this.entityRenderManager, this.worldWidgetManager, this.debugRenderer);
 			_ = new InventoryScreens();
 
 			Registry<RecipeIngredientIndex> ingredientIndexRegistry = new(RecipeIngredientIndex.REGISTRY);
@@ -173,6 +177,8 @@ namespace SoulboundEngine.UnityClient {
 			this.performanceMetrics.Update();
 			this.logConsole.Update();
 			this.metricsHud.Refresh();
+
+			this.debugRenderer.Clear();
 			this.worldRenderer.Render();
 		}
 
@@ -278,6 +284,7 @@ namespace SoulboundEngine.UnityClient {
 
 		private void Shutdown() {
 			AssetManager.Shutdown();
+			RenderPipelineManager.endCameraRendering -= this.debugRenderer.OnEndCameraRendering;
 			this.activeWorldSession?.levelManager.StopSession();
 			this.settings.Save();
 			this.inputActions.Dispose();
