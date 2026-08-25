@@ -7,14 +7,17 @@
             <ui:Label text="TPS: {}" name="tps" picking-mode="Ignore" class="metric-label"/>
             <ui:Label text="Tick time: {}" name="tick_time" picking-mode="Ignore" class="metric-label"/>
         </ui:VisualElement>
-        <ui:VisualElement picking-mode="Ignore" style="flex-grow: 0; margin-bottom: 10px;">
+        <ui:VisualElement picking-mode="Ignore" style="margin-bottom: 10px; position: absolute; right: 0; bottom: auto; top: 0; align-items: flex-end;">
             <ui:Label text="Memory" name="" picking-mode="Ignore" class="metric-label"/>
             <ui:Label text="Total: {} / {}" name="total_memory" picking-mode="Ignore" class="metric-label"/>
             <ui:Label text="GPU: {} / {}" name="gpu_memory" picking-mode="Ignore" class="metric-label"/>
             <ui:Label text="GC alloc: {}" name="gc_alloc" picking-mode="Ignore" class="metric-label"/>
         </ui:VisualElement>
-        <ui:VisualElement style="flex-grow: 0;">
+        <ui:VisualElement picking-mode="Ignore" style="flex-grow: 0; margin-bottom: 10px;">
             <ui:Label text="Player&#10;{}" name="player" picking-mode="Ignore" class="metric-label"/>
+        </ui:VisualElement>
+        <ui:VisualElement picking-mode="Ignore" style="flex-grow: 0;">
+            <ui:Label text="Pointer&#10;{}" name="pointer" picking-mode="Ignore" class="metric-label"/>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

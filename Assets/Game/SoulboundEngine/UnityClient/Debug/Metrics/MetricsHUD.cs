@@ -8,6 +8,7 @@ namespace SoulboundEngine.UnityClient.Debug.Metrics.View {
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Chunk;
 	using System;
+	using System.Text;
 	using UnityEngine.UIElements;
 
 #nullable enable
@@ -22,6 +23,7 @@ namespace SoulboundEngine.UnityClient.Debug.Metrics.View {
 		private static readonly Identifier TPS_ELEMENT = Identifier.Of("soulbound:metrics_hud/tps");
 		private static readonly Identifier TICK_TIME_ELEMENT = Identifier.Of("soulbound:metrics_hud/tick_time");
 		private static readonly Identifier PLAYER_ELEMENT = Identifier.Of("soulbound:metrics_hud/player");
+		private static readonly Identifier POINTER_ELEMENT = Identifier.Of("soulbound:metrics_hud/pointer");
 		private readonly DebugMetricsService metricsService;
 		private readonly AverageCounter fpsCounter = new(10);
 		private readonly AverageCounter frameTimeCounter = new(10);
@@ -110,11 +112,25 @@ namespace SoulboundEngine.UnityClient.Debug.Metrics.View {
 					Vec2d pos = (Read(data, DebugMetricId.Pos) as Vec2d?).GetValueOrDefault();
 					BlockPos blockPos = (Read(data, DebugMetricId.BlockPos) as BlockPos?).GetValueOrDefault();
 					ChunkPos chunkPos = (Read(data, DebugMetricId.ChunkPos) as ChunkPos?).GetValueOrDefault();
+					SectionPos sectionPos = ChunkSection.ComputeLocalPos(blockPos.x, blockPos.y);
 					return ReadBool(data, DebugMetricId.IsInWorld) ?? false
 						? FormatOutput(format, $"X:{pos.x:F4} / Y:{pos.y:F4}\n" +
-							$"BX:{blockPos.x} / BY: {blockPos.y}   C:{chunkPos.x}")
+							$"BX:{blockPos.x} / BY: {blockPos.y}   C: [ sx:{sectionPos.x} / sy:{sectionPos.y} : {chunkPos.x} ]")
 						: FormatOutput(format, "N/A");
-				})
+				}),
+				new LabelMetricBinding(root, POINTER_ELEMENT, (data, format) => {
+					Vec2d? targetPos = Read(data, DebugMetricId.PointerWorldPos) as Vec2d?;
+					string worldPos = targetPos.HasValue ? targetPos.Value.ToString() : "N/A";
+					StringBuilder targetBlock = new();
+					if (targetPos is { } pos && SoulboundUnityClient.Instance.GetActiveWorldSession() is { } session) {
+						BlockPos blockPos = BlockPos.From(pos);
+						targetBlock.Append(blockPos).Append('\n');
+						targetBlock.Append(session.level.GetBlockState(blockPos));
+					}
+
+					return FormatOutput(format, $"Screen: {SoulboundUnityClient.Instance.InputManager.mouse.mousePos}\n" +
+						$"World: {worldPos}{(string.IsNullOrEmpty(targetBlock.ToString()) ? string.Empty : $"\nTarget Block: {targetBlock}")}");
+				}),
 			};
 		}
 

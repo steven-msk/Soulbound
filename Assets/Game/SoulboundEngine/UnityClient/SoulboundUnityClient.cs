@@ -28,6 +28,7 @@ namespace SoulboundEngine.UnityClient {
 	using SoulboundEngine.UnityClient.World;
 	using SoulboundEngine.UnityClient.World.Widget;
 	using SoulboundEngine.World;
+	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Level;
 	using SoulboundEngine.World.Player;
 	using SoulboundEngine.World.Serialization;
@@ -469,6 +470,11 @@ namespace SoulboundEngine.UnityClient {
 				builder.Add(DebugMetricId.Pos, this.player.GetPosition());
 				builder.Add(DebugMetricId.BlockPos, this.player.blockPosition);
 				builder.Add(DebugMetricId.ChunkPos, this.player.chunkPosition);
+				builder.Add(DebugMetricId.PointerWorldPos, this.player.GetWorldPointerPos());
+
+				BlockPos targetBlockPos = BlockPos.From(this.player.GetWorldPointerPos());
+				builder.Add(DebugMetricId.TargetBlockPos, targetBlockPos);
+				builder.Add(DebugMetricId.TargetBlockState, this.player.GetLevel().GetBlockState(targetBlockPos));
 			}
 		}
 

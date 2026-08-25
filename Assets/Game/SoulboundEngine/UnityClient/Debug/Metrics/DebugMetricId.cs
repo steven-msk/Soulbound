@@ -14,6 +14,9 @@ namespace SoulboundEngine.UnityClient.Debug.Metrics {
 		IsInWorld,
 		Pos,
 		BlockPos,
-		ChunkPos
+		ChunkPos,
+		PointerWorldPos,
+		TargetBlockPos,
+		TargetBlockState
 	}
 }
