@@ -10,6 +10,10 @@ namespace SoulboundEngine.UnityClient.Debug.Metrics {
 		GpuReservedMemory,
 		GcAlloc,
 		TickTime,
-		Tps
+		Tps,
+		IsInWorld,
+		Pos,
+		BlockPos,
+		ChunkPos
 	}
 }

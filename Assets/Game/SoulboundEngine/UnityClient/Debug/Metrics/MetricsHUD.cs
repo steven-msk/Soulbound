@@ -1,9 +1,12 @@
 namespace SoulboundEngine.UnityClient.Debug.Metrics.View {
 	using SoulboundEngine.Common;
+	using SoulboundEngine.Common.Math;
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.UnityClient.Assets;
 	using SoulboundEngine.UnityClient.Settings;
 	using SoulboundEngine.UnityClient.UI;
+	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Chunk;
 	using System;
 	using UnityEngine.UIElements;
 
@@ -18,6 +21,7 @@ namespace SoulboundEngine.UnityClient.Debug.Metrics.View {
 		private static readonly Identifier GC_ALLOC_ELEMENT = Identifier.Of("soulbound:metrics_hud/gc_alloc");
 		private static readonly Identifier TPS_ELEMENT = Identifier.Of("soulbound:metrics_hud/tps");
 		private static readonly Identifier TICK_TIME_ELEMENT = Identifier.Of("soulbound:metrics_hud/tick_time");
+		private static readonly Identifier PLAYER_ELEMENT = Identifier.Of("soulbound:metrics_hud/player");
 		private readonly DebugMetricsService metricsService;
 		private readonly AverageCounter fpsCounter = new(10);
 		private readonly AverageCounter frameTimeCounter = new(10);
@@ -96,11 +100,20 @@ namespace SoulboundEngine.UnityClient.Debug.Metrics.View {
 				}),
 				new LabelMetricBinding(root, TICK_TIME_ELEMENT, (data, format) => {
 					return FormatOutput(format,
-						$"{this.tickTimeCounter.GetCurrent():F1}ms, " +
-						$"min: {this.tickTimeCounter.GetMin():F1}ms, " +
-						$"max: {this.tickTimeCounter.GetMax():F1}ms, " +
-						$"avg: {this.tickTimeCounter.GetAverage():F1}ms"
+						$"{this.tickTimeCounter.GetCurrent():F2}ms, " +
+						$"min: {this.tickTimeCounter.GetMin():F2}ms, " +
+						$"max: {this.tickTimeCounter.GetMax():F2}ms, " +
+						$"avg: {this.tickTimeCounter.GetAverage():F2}ms"
 					);
+				}),
+				new LabelMetricBinding(root, PLAYER_ELEMENT, (data, format) => {
+					Vec2d pos = (Read(data, DebugMetricId.Pos) as Vec2d?).GetValueOrDefault();
+					BlockPos blockPos = (Read(data, DebugMetricId.BlockPos) as BlockPos?).GetValueOrDefault();
+					ChunkPos chunkPos = (Read(data, DebugMetricId.ChunkPos) as ChunkPos?).GetValueOrDefault();
+					return ReadBool(data, DebugMetricId.IsInWorld) ?? false
+						? FormatOutput(format, $"X:{pos.x:F4} / Y:{pos.y:F4}\n" +
+							$"BX:{blockPos.x}, BY: {blockPos.y}, C:{chunkPos.x}")
+						: FormatOutput(format, "N/A");
 				})
 			};
 		}
@@ -146,6 +159,10 @@ namespace SoulboundEngine.UnityClient.Debug.Metrics.View {
 
 		private static double? ReadDouble(DebugMetricsSnapshot data, DebugMetricId id) {
 			return Read(data, id) as double?;
+		}
+
+		private static bool? ReadBool(DebugMetricsSnapshot data, DebugMetricId id) {
+			return Read(data, id) as bool?;
 		}
 
 		private static object? Read(DebugMetricsSnapshot data, DebugMetricId id) {

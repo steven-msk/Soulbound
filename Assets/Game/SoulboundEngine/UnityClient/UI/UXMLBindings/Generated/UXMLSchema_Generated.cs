@@ -26,6 +26,7 @@ namespace SoulboundEngine.UnityClient.UI.UXMLBindings {
             UXMLSchema.Register(Identifier.Of("soulbound:metrics_hud/total_memory"), typeof(Label));
             UXMLSchema.Register(Identifier.Of("soulbound:metrics_hud/gpu_memory"), typeof(Label));
             UXMLSchema.Register(Identifier.Of("soulbound:metrics_hud/gc_alloc"), typeof(Label));
+            UXMLSchema.Register(Identifier.Of("soulbound:metrics_hud/player"), typeof(Label));
             UXMLSchema.Register(Identifier.Of("soulbound:player_inventory/popup"), typeof(VisualElement));
             UXMLSchema.Register(Identifier.Of("soulbound:chest_inventory_screen/chest_space"), typeof(VisualElement));
             UXMLSchema.Register(Identifier.Of("soulbound:chest_inventory_screen/player_inventory_space"), typeof(VisualElement));

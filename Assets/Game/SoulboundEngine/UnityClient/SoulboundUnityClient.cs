@@ -463,6 +463,13 @@ namespace SoulboundEngine.UnityClient {
 
 			builder.Add(DebugMetricId.TickTime, this.lastTickTime);
 			builder.Add(DebugMetricId.Tps, this.lastSecondTicks);
+
+			builder.Add(DebugMetricId.IsInWorld, this.activeWorldSession.HasValue);
+			if (this.player != null) {
+				builder.Add(DebugMetricId.Pos, this.player.GetPosition());
+				builder.Add(DebugMetricId.BlockPos, this.player.blockPosition);
+				builder.Add(DebugMetricId.ChunkPos, this.player.chunkPosition);
+			}
 		}
 
 		public void RegisterDebugMetricsSource(IDebugMetricsSource source) {
