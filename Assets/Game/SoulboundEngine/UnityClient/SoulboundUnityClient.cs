@@ -430,7 +430,7 @@ namespace SoulboundEngine.UnityClient {
 			if (!session.levelManager.paused) return;
 
 			session.levelManager.UnpauseGame();
-			if (this.pauseScreenHandle != null) this.CloseScreen(this.pauseScreenHandle!);
+			if (this.pauseScreenHandle != null) this.CloseScreen(this.pauseScreenHandle);
 			this.pauseScreenHandle = null;
 		}
 

@@ -112,7 +112,7 @@ namespace SoulboundEngine.UnityClient.Debug.Metrics.View {
 					ChunkPos chunkPos = (Read(data, DebugMetricId.ChunkPos) as ChunkPos?).GetValueOrDefault();
 					return ReadBool(data, DebugMetricId.IsInWorld) ?? false
 						? FormatOutput(format, $"X:{pos.x:F4} / Y:{pos.y:F4}\n" +
-							$"BX:{blockPos.x}, BY: {blockPos.y}, C:{chunkPos.x}")
+							$"BX:{blockPos.x} / BY: {blockPos.y}   C:{chunkPos.x}")
 						: FormatOutput(format, "N/A");
 				})
 			};
