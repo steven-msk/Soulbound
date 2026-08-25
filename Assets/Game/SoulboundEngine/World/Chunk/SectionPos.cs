@@ -1,4 +1,6 @@
 ﻿namespace SoulboundEngine.World.Chunk {
+	using SoulboundEngine.Common.Math;
+
 	public readonly struct SectionPos {
 		public readonly int x;
 		public readonly int y;
@@ -12,8 +14,8 @@
 			return $"sectionPos[{this.x},{this.y}]";
 		}
 
-		public static int BlockToSectionY(int blockY) => blockY / ChunkSection.HEIGHT;
+		public static int BlockToSectionY(int blockY) => Maths.FloorToInt(1.0d * blockY / ChunkSection.HEIGHT);
 
-		public static int BlockToSectionCoord(int coord) => coord / ChunkSection.WIDTH;
+		public static int BlockToSectionCoord(int coord) => Maths.FloorToInt(1.0d * coord / ChunkSection.WIDTH);
 	}
 }
