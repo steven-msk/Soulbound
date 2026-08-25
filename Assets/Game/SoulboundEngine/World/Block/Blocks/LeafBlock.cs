@@ -1,7 +1,7 @@
-using SoulboundEngine.States;
-using SoulboundEngine.World.Block.State;
-
 namespace SoulboundEngine.World.Block {
+	using SoulboundEngine.State;
+	using SoulboundEngine.World.Block.State;
+
 	public class LeafBlock : Block {
 		public static readonly Property<bool> persistent = BoolProperty.Of("persistent");
 

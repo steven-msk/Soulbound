@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
+﻿namespace SoulboundEngine.State {
+	using System;
+	using System.Collections.Generic;
+	using System.Collections.ObjectModel;
+	using System.Linq;
 
-namespace SoulboundEngine.States {
 	public abstract class State<O, S> {
 		private readonly Entries entries;
 		protected O owner;
@@ -21,7 +21,7 @@ namespace SoulboundEngine.States {
 		public void CreateWithTable(Dictionary<Dictionary<Property, object>, S> states) {
 			Dictionary<Property, Dictionary<object, S>> table = new();
 
-			foreach (var property in this.entries.Keys) {
+			foreach (Property property in this.entries.Keys) {
 				table[property] = new Dictionary<object, S>();
 
 				foreach ((Dictionary<Property, object> propertyMap, S state) in states) {

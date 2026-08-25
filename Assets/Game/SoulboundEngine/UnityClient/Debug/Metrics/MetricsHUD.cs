@@ -2,10 +2,12 @@ namespace SoulboundEngine.UnityClient.Debug.Metrics.View {
 	using SoulboundEngine.Common;
 	using SoulboundEngine.Common.Math;
 	using SoulboundEngine.Registry;
+	using SoulboundEngine.State;
 	using SoulboundEngine.UnityClient.Assets;
 	using SoulboundEngine.UnityClient.Settings;
 	using SoulboundEngine.UnityClient.UI;
 	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Block.State;
 	using SoulboundEngine.World.Chunk;
 	using System;
 	using System.Text;
@@ -125,7 +127,14 @@ namespace SoulboundEngine.UnityClient.Debug.Metrics.View {
 					if (targetPos is { } pos && SoulboundUnityClient.Instance.GetActiveWorldSession() is { } session) {
 						BlockPos blockPos = BlockPos.From(pos);
 						targetBlock.Append(blockPos).Append('\n');
-						targetBlock.Append(session.level.GetBlockState(blockPos));
+
+						BlockState blockState = session.level.GetBlockState(blockPos);
+						Identifier? blockId = Blocks.GetIdentifier(blockState.block);
+						targetBlock.Append(Identifier.IsNull(blockId) ? "Unidentified block" : blockId);
+						State<Block, BlockState>.Entries entries = blockState.GetEntries();
+						if (entries.Count > 0) {
+							targetBlock.Append('\n').Append(entries);
+						}
 					}
 
 					return FormatOutput(format, $"Screen: {SoulboundUnityClient.Instance.InputManager.mouse.mousePos}\n" +

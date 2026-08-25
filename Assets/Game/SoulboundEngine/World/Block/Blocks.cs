@@ -1,7 +1,9 @@
-using SoulboundEngine.Registry;
-using System;
-
 namespace SoulboundEngine.World.Block {
+	using SoulboundEngine.Registry;
+	using System;
+
+#nullable enable
+
 	public partial class Blocks {
 		public static readonly Block AIR = Register("air", s => new AirBlock(s));
 		public static readonly Block GRASS = Register("grass");
@@ -46,7 +48,7 @@ namespace SoulboundEngine.World.Block {
 			return Registry<Block>.Register(Registries.BLOCKS, key, factory(settings));
 		}
 
-		public static Identifier GetIdentifier(Block block) {
+		public static Identifier? GetIdentifier(Block block) {
 			return Registries.BLOCKS.GetIdentifier(block);
 		}
 

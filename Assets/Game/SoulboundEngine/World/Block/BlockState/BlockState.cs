@@ -1,7 +1,7 @@
 #nullable enable
 
 namespace SoulboundEngine.World.Block.State {
-	using SoulboundEngine.States;
+	using SoulboundEngine.State;
 	using System.Collections.Generic;
 
 	public class BlockState : AbstractBlock.AbstractBlockState {

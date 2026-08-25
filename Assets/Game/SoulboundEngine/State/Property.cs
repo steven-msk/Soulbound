@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿#nullable enable
 
-#nullable enable
+namespace SoulboundEngine.State {
+	using System;
+	using System.Collections.Generic;
 
-namespace SoulboundEngine.States {
 	public abstract class Property {
 		public abstract string name { get; }
 		public abstract Type type { get; }

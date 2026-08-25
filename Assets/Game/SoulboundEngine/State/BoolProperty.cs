@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿namespace SoulboundEngine.State {
+	using System.Collections.Generic;
 
-namespace SoulboundEngine.States {
 	public sealed class BoolProperty : Property<bool> {
 		private BoolProperty(string name)
 			: base(name, typeof(bool)) {

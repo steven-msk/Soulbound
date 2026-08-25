@@ -3,7 +3,7 @@
 	using SoulboundEngine.Interaction;
 	using SoulboundEngine.Item;
 	using SoulboundEngine.Registry;
-	using SoulboundEngine.States;
+	using SoulboundEngine.State;
 	using SoulboundEngine.World.Block.State;
 	using SoulboundEngine.World.Player;
 	using System;

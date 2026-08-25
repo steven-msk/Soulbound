@@ -1,8 +1,7 @@
-﻿using SoulboundEngine.States;
-using System.Collections.Generic;
-using System.Linq;
+﻿namespace SoulboundEngine.State {
+	using System.Collections.Generic;
+	using System.Linq;
 
-namespace SoulboundEngine.State {
 	public class IntProperty : Property<int> {
 		private readonly int[] values;
 

@@ -1,6 +1,6 @@
 namespace SoulboundEngine.World.Block {
 	using SoulboundEngine.Interaction;
-	using SoulboundEngine.States;
+	using SoulboundEngine.State;
 	using SoulboundEngine.World.Block.State;
 	using SoulboundEngine.World.Level;
 	using SoulboundEngine.World.Player;

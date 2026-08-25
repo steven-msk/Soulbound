@@ -1,8 +1,8 @@
-﻿using SoulboundEngine.Common;
-using System.Collections.Generic;
-using System.Linq;
+﻿namespace SoulboundEngine.State {
+	using SoulboundEngine.Common;
+	using System.Collections.Generic;
+	using System.Linq;
 
-namespace SoulboundEngine.States {
 	public class StateManager<O, S> where S : State<O, S> {
 		public delegate S Factory(O owner, Dictionary<Property, object> entries);
 
@@ -17,7 +17,7 @@ namespace SoulboundEngine.States {
 			List<Dictionary<Property, object>> combinations = new() { new Dictionary<Property, object>() };
 
 			// cartesian product
-			foreach (var property in this.properties.Values) {
+			foreach (Property property in this.properties.Values) {
 				combinations = combinations.SelectMany(
 					_ => property.GetValues(),
 					(existing, value) => new Dictionary<Property, object>(existing) {
@@ -34,7 +34,7 @@ namespace SoulboundEngine.States {
 			// build with table and seal
 			Dictionary<Dictionary<Property, object>, S> statesByEntries = allStates
 				.ToDictionary(s => s.GetEntries().ToDictionary(kvp => kvp.Key, kvp => kvp.Value));
-			foreach (var state in allStates) {
+			foreach (S state in allStates) {
 				state.CreateWithTable(statesByEntries);
 			}
 
@@ -63,7 +63,7 @@ namespace SoulboundEngine.States {
 			}
 
 			public Builder Add(params Property[] properties) {
-				foreach (var property in properties) {
+				foreach (Property property in properties) {
 					this.namedProperties.Add(property.name, property);
 				}
 				return this;

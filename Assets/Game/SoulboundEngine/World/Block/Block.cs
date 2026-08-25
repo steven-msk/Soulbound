@@ -2,7 +2,7 @@ namespace SoulboundEngine.World.Block {
 	using SoulboundEngine.Common.Math;
 	using SoulboundEngine.Item;
 	using SoulboundEngine.Registry;
-	using SoulboundEngine.States;
+	using SoulboundEngine.State;
 	using SoulboundEngine.World.Block.State;
 	using SoulboundEngine.World.Entity;
 	using SoulboundEngine.World.Level;

@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿namespace SoulboundEngine.State {
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
 
-namespace SoulboundEngine.States {
 	public sealed class EnumProperty<E> : Property<E> where E : struct, Enum {
 		private readonly E[] values;
 
