@@ -1,12 +1,15 @@
-using SoulboundEngine.Registry;
-using SoulboundEngine.World.Player;
+namespace SoulboundEngine.World.Entity {
+	using SoulboundEngine.Registry;
+	using SoulboundEngine.World.Player;
 
 #nullable enable
 
-namespace SoulboundEngine.World.Entity {
 	public static class EntityType {
-		public static readonly EntityDescriptor<PlayerEntity> PLAYER = Register("player", EntityDescriptor<PlayerEntity>.Builder.OfNothing());
-		public static readonly EntityDescriptor<ItemEntity> ITEM = Register("item", EntityDescriptor<ItemEntity>.Builder.Of(ItemEntity.Create).Sized(1.0d, 1.0d));
+		public static readonly EntityDescriptor<PlayerEntity> PLAYER = Register("player", EntityDescriptor<PlayerEntity>.Builder.OfNothing(EntityCategory.PLAYER));
+		public static readonly EntityDescriptor<ItemEntity> ITEM = Register("item", 
+			EntityDescriptor<ItemEntity>.Builder.Of(EntityCategory.OTHER, ItemEntity.Create)
+				.Sized(1.0d, 1.0d)
+		);
 
 		//public static readonly EntityDescriptor<MovingEntity> MOVING_ENTITY = Register(
 		//	"moving_entity",

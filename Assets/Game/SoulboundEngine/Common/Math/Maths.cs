@@ -40,5 +40,13 @@ namespace SoulboundEngine.Common.Math {
 		public static double InverseLerp(double a, double b, double value) {
 			return a != b ? Clamp01((value - a) / (b - a)) : 0.0d;
 		}
+
+		public static double Clamp(double value, double min, double max) {
+			return Math.Clamp(value, min, max);
+		}
+
+		public static float Clamp(float value, float min, float max) {
+			return Math.Clamp(value, min, max);
+		}
 	}
 }

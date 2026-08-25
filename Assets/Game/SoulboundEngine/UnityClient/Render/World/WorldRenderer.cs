@@ -3,6 +3,7 @@ namespace SoulboundEngine.UnityClient.Render.World {
 	using SoulboundEngine.UnityClient.Debug;
 	using SoulboundEngine.UnityClient.Render.Block;
 	using SoulboundEngine.UnityClient.Render.Entity;
+	using SoulboundEngine.UnityClient.Util;
 	using SoulboundEngine.UnityClient.World.Widget;
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Block.State;
@@ -58,8 +59,11 @@ namespace SoulboundEngine.UnityClient.Render.World {
 				foreach (AABB box in this.level.GetBlockCollisionBoxes(stretched)) {
 					this.debugRenderer.AddLineBox(box, Color.green);
 				}
-				AABB playerBox = this.level.GetPlayer().boundingBox;
-				this.debugRenderer.AddLineBox(playerBox, Color.cyan);
+				foreach (Entity entity in this.level.GetAllEntities()) {
+					AABB boundingBox = entity.boundingBox;
+					Common.Color color = entity.GetDescriptor().GetCategory().debugBoxColor;
+					this.debugRenderer.AddLineBox(boundingBox, color.ToUnityColor());
+				}
 			}
 		}
 

@@ -1,8 +1,8 @@
-using SoulboundEngine.Common;
-using UnityEngine;
-using UnityEngine.UI;
-
 namespace SoulboundEngine.UnityClient.Settings.View {
+	using SoulboundEngine.Common;
+	using UnityEngine;
+	using UnityEngine.UI;
+
 	[PROTOTYPICAL]
 	public static class SliderFactory {
 		public static Slider CreateSlider(Transform parent) {
@@ -19,7 +19,7 @@ namespace SoulboundEngine.UnityClient.Settings.View {
 			bgRect.offsetMin = new Vector2(0f, 0f);
 			bgRect.offsetMax = new Vector2(0f, 0f);
 			Image bgImage = background.GetComponent<Image>();
-			bgImage.color = new Color(1f, 1f, 1f, 0.25f);
+			bgImage.color = new UnityEngine.Color(1f, 1f, 1f, 0.25f);
 
 			GameObject fillArea = new("Fill Area", typeof(RectTransform));
 			fillArea.transform.SetParent(sliderObject.transform, false);
@@ -35,7 +35,7 @@ namespace SoulboundEngine.UnityClient.Settings.View {
 			fillRect.anchorMax = new Vector2(0f, 1f);
 			fillRect.sizeDelta = new Vector2(10f, 0);
 			Image fillImage = fill.GetComponent<Image>();
-			fillImage.color = new Color(0.3f, 0.6f, 1f, 1f);
+			fillImage.color = new UnityEngine.Color(0.3f, 0.6f, 1f, 1f);
 
 			GameObject handleArea = new("Handle Slide Area", typeof(RectTransform));
 			handleArea.transform.SetParent(sliderObject.transform, false);
@@ -51,7 +51,7 @@ namespace SoulboundEngine.UnityClient.Settings.View {
 			SetStretchedLeftAnchor(handleRect);
 			handleRect.sizeDelta = new Vector2(10f, 10f);
 			Image handleImage = handle.GetComponent<Image>();
-			handleImage.color = Color.white;
+			handleImage.color = UnityEngine.Color.white;
 
 			Slider slider = sliderObject.GetComponent<Slider>();
 			slider.fillRect = fillRect;
