@@ -177,12 +177,6 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 73b53856178d60e448dda63bdce09c1c
-    m_Address: chunkOutline
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - preload
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 807b2af3fa5a28f45adb103b36cf1aaf
     m_Address: blockPlace
     m_ReadOnly: 0

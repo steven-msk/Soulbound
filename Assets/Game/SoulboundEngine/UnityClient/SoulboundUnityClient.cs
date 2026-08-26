@@ -57,7 +57,7 @@ namespace SoulboundEngine.UnityClient {
 		private readonly Stopwatch tickStopwatch = new();
 		private readonly Stopwatch tpsWindowStopwatch = new();
 		public const double TICK_RATE = 1.0d / SharedConstants.TICKS_PER_SECOND;
-		private readonly UnityClientConfig config;
+		public readonly UnityClientConfig config;
 		private readonly PlayerInputActions inputActions;
 		private readonly InputManager inputManager;
 		private readonly ClientPlayerInputHandler clientPlayerInputHandler;
