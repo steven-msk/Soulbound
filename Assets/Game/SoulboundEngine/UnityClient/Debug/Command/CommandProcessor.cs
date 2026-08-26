@@ -1,21 +1,15 @@
-using Brigadier.NET;
-using Brigadier.NET.Exceptions;
-using Brigadier.NET.Suggestion;
-using Cysharp.Threading.Tasks;
-using SoulboundEngine.UnityClient.Debug.Logging;
-using SoulboundEngine.World.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+namespace SoulboundEngine.UnityClient.Debug.Commands {
+	using Brigadier.NET;
+	using Brigadier.NET.Exceptions;
+	using Brigadier.NET.Suggestion;
+	using Cysharp.Threading.Tasks;
+	using SoulboundEngine.World.Services;
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using System.Threading.Tasks;
 
 #nullable enable
-
-namespace SoulboundEngine.UnityClient.Debug.Commands {
-	public sealed record RuntimeCommandSource(
-		IRuntimeDataProvider data,
-		IRuntimeExecutionServices execServices
-	);
 
 	public sealed class CommandProcessor {
 		private readonly List<ICommandProvider> providerBuffer = new();
@@ -31,15 +25,15 @@ namespace SoulboundEngine.UnityClient.Debug.Commands {
 		public void SubmitCommand(string input) {
 			if (input.StartsWith('/')) input = input[1..];
 
-			RuntimeCommandSource source = new(dataProvider, execServices);
-			ParseResults<RuntimeCommandSource> parseResults = dispatcher.Parse(input, source);
+			RuntimeCommandSource source = new(this.dataProvider, this.execServices);
+			ParseResults<RuntimeCommandSource> parseResults = this.dispatcher.Parse(input, source);
 
 			int code = 0;
 			try {
 				if (parseResults.Exceptions.Any()) {
 					throw parseResults.Exceptions.First().Value;
 				}
-				code = dispatcher.Execute(parseResults);
+				code = this.dispatcher.Execute(parseResults);
 			} catch (Exception e) when (e is CommandSyntaxException) {
 				Logger.LogFatal(e);
 				code = -1;
@@ -53,40 +47,41 @@ namespace SoulboundEngine.UnityClient.Debug.Commands {
 				input = input[1..];
 				caretPos--;
 			}
-			RuntimeCommandSource source = new(dataProvider, execServices);
+			RuntimeCommandSource source = new(this.dataProvider, this.execServices);
 			Task<Suggestions> task;
-			ParseResults<RuntimeCommandSource> parseResults = dispatcher.Parse(input, source);
+			ParseResults<RuntimeCommandSource> parseResults = this.dispatcher.Parse(input, source);
 
 			try {
-				task = dispatcher.GetCompletionSuggestions(parseResults, caretPos);
+				task = this.dispatcher.GetCompletionSuggestions(parseResults, caretPos);
 			} catch (CommandSyntaxException e) {
 				Logger.LogError(e);
 				task = Suggestions.Empty();
 			}
-			await task;
-
-			return task.Result;
+			return await task;
 		}
 
 		public void RegisterProvider(ICommandProvider provider) {
-			providerBuffer.Add(provider);
-			RebuildDispatcher();
+			this.providerBuffer.Add(provider);
+			this.RebuildDispatcher();
 		}
 		public void UnregisterProvider(ICommandProvider provider) {
-			providerBuffer.Remove(provider);
-			RebuildDispatcher();
+			this.providerBuffer.Remove(provider);
+			this.RebuildDispatcher();
 		}
 
 		private void RebuildDispatcher() {
-			dispatcher = new CommandDispatcher<RuntimeCommandSource>();
-			foreach (var provider in providerBuffer) {
-				provider.RegisterCommands(dispatcher);
+			this.dispatcher = new CommandDispatcher<RuntimeCommandSource>();
+			foreach (ICommandProvider provider in this.providerBuffer) {
+				provider.RegisterCommands(this.dispatcher);
 			}
-			dispatcher.FindAmbiguities((parent, child, sibling, inputs) => {
+			this.dispatcher.FindAmbiguities((parent, child, sibling, inputs) => {
 				Logger.LogFatal(new AmbiguousCommandException(
 					parent.UsageText, child.UsageText, sibling.UsageText, inputs
 				));
 			});
 		}
+
+
 	}
+	public sealed record RuntimeCommandSource(IRuntimeDataProvider data, IRuntimeExecutionServices execServices);
 }

@@ -24,13 +24,21 @@ namespace SoulboundEngine.UnityClient.Debug {
 		private readonly CommandProcessor commandProcessor;
 		private readonly List<string> history = new();
 		private readonly CompletionManager completionManager = new();
+		private readonly Keyboard keyboard;
 		private readonly SoulboundUnityClient client;
-		private CommandInputMode currentInputMode;
 		private int historyIndex;
+		private bool isCyclingHistory;
+		private bool isCyclingCompletions;
+		private bool hasEdited;
+		private int lastKnownCaretPos;
+		private static readonly HashSet<KeyCode> HANDLED_KEYS = new() {
+			KeyCode.UpArrow, KeyCode.DownArrow, KeyCode.Tab, KeyCode.Return, KeyCode.KeypadEnter, KeyCode.Escape
+		};
 
 		public CommandLine(CommandProcessor commandProcessor, SoulboundUnityClient client) {
 			this.client = client;
 			this.commandProcessor = commandProcessor;
+			this.keyboard = client.InputManager.keyboard;
 		}
 
 		public static void CreateRoot(VisualElement parent) {
@@ -40,60 +48,130 @@ namespace SoulboundEngine.UnityClient.Debug {
 
 		public override void OnBind(VisualElement root) {
 			base.OnBind(root);
-
 			this.textField = root.Get<TextField>(TEXT_FIELD_ELEMENT);
-			this.RegisterCaretChanged((caret) => {
-				string command = this.textField.value;
-				this.ShowCompletions(command, caret);
-			});
-			this.textField.RegisterCallback<KeyDownEvent>(this.HandleKeyEvent, TrickleDown.TrickleDown);
-
 			this.completionList = root.Get<ListView>(COMPLETION_LIST_ELEMENT);
 			this.completionList.bindItem = (element, index) => {
 				Suggestion suggestion = this.completionManager.Get(index);
 				element.Get<Label>(SUGGESTION_TEXT_ELEMENT).text = suggestion.Text;
 			};
+			this.textField.RegisterCallback<KeyDownEvent>(this.InterceptHandledKeys, TrickleDown.TrickleDown);
 			this.completionList.makeNoneElement = () => new VisualElement();
 			this.completionList.itemsChosen += this.OnCompletionChosen;
 			this.Hide();
+		}
+
+		private void InterceptHandledKeys(KeyDownEvent evt) {
+			if (!this.isVisible) return;
+			if (HANDLED_KEYS.Contains(evt.keyCode)) {
+				evt.StopImmediatePropagation();
+			}
 		}
 
 		internal void Tick() {
 			if (!this.isVisible && GameSettings.keybinds.enterCommand.WasPressed()) {
 				this.Show();
 			}
-			if (this.isVisible && this.client.InputManager.keyboard.WasPressed(Keyboard.GetControl(Key.Escape))) {
+			
+			this.HandleKeyInput();
+			if (this.isVisible) {
+				if (this.CheckCaret()) this.CaretChanged(this.GetCurrentCaret());
+			}
+		}
+
+		private void HandleKeyInput() {
+			if (!this.isVisible) return;
+			if (this.ShouldCloseOnEsc() && this.keyboard.WasPressed(Keyboard.GetControl(Key.Escape))) {
 				this.Hide();
+				return;
+			}
+			if (this.keyboard.WasPressed(Keyboard.GetControl(Key.Enter))) {
+				this.SubmitCommand(this.GetCommand());
+				this.Hide();
+				return;
+			}
+
+			if (this.CanCycleHistory() && !this.isCyclingCompletions) {
+				if (this.keyboard.WasPressed(Keyboard.GetControl(Key.UpArrow))) {
+					this.isCyclingHistory = true;
+					this.historyIndex--;
+					if (this.historyIndex < 0) this.historyIndex = this.history.Count - 1;
+					this.OverwriteWithHistory(this.historyIndex);
+				} else if (this.isCyclingHistory && this.keyboard.WasPressed(Keyboard.GetControl(Key.DownArrow))) {
+					this.historyIndex = (this.historyIndex + 1) % this.history.Count;
+					this.OverwriteWithHistory(this.historyIndex);
+				}
+			}
+
+			if (this.CanCycleCompletions() || this.isCyclingCompletions) {
+				if (this.keyboard.WasPressed(Keyboard.GetControl(Key.UpArrow))) {
+					this.isCyclingCompletions = true;
+					this.HighlightCompletion(this.completionManager.SelectPrevious());
+				} else if (this.keyboard.WasPressed(Keyboard.GetControl(Key.DownArrow))) {
+					this.isCyclingCompletions = true;
+					this.HighlightCompletion(this.completionManager.SelectNext());
+				}
+				if (this.keyboard.WasPressed(Keyboard.GetControl(Key.Escape))) {
+					this.ClearAndDisableCompletions();
+				}
+				if (this.completionManager.TryGetSelected(out Suggestion suggestion)) {
+					if (this.keyboard.WasPressed(Keyboard.GetControl(Key.Tab))) {
+						this.InsertCompletion(suggestion);
+					}
+				}
+			}
+
+		}
+
+		private bool ShouldCloseOnEsc() {
+			return !this.CanCycleCompletions() && !this.isCyclingCompletions;
+		}
+
+		private bool CheckCaret() {
+			if (!this.isVisible) return false;
+			int currentCaret = this.GetCurrentCaret();
+			if (currentCaret == this.lastKnownCaretPos) return false;
+			this.lastKnownCaretPos = currentCaret;
+			return true;
+		}
+
+		private void CaretChanged(int newCaret) {
+			if (newCaret > 0) {
+				this.ShowCompletions(this.GetCommand(), newCaret);
+			} else {
+				this.ClearAndDisableCompletions();
 			}
 		}
 
-		private void RegisterCaretChanged(Action<int> callback) {
-			int lastCursor = this.textField.cursorIndex;
-
-			void CheckCaret() {
-				if (!this.isVisible) return;
-				if (this.textField.cursorIndex == lastCursor) return;
-
-				lastCursor = this.textField.cursorIndex;
-				callback(lastCursor);
-			}
-			this.textField.RegisterCallback<KeyDownEvent>(_ => this.textField.schedule.Execute(CheckCaret), TrickleDown.TrickleDown);
-			this.textField.RegisterCallback<PointerUpEvent>(_ => this.textField.schedule.Execute(CheckCaret), TrickleDown.TrickleDown);
-			this.textField.RegisterCallback<FocusInEvent>(_ => this.textField.schedule.Execute(CheckCaret), TrickleDown.TrickleDown);
-			this.textField.RegisterCallback<ChangeEvent<string>>(_ => this.textField.schedule.Execute(CheckCaret), TrickleDown.TrickleDown);
+		private void ClearAndDisableCompletions() {
+			this.isCyclingCompletions = false;
+			this.completionManager.ClearCompletions();
+			this.completionList.itemsSource = Array.Empty<Suggestion>();
 		}
+
+		private int GetCurrentCaret() => this.textField.cursorIndex;
+
+		public string GetCommand() => this.textField.value;
 
 		public override void Show() {
 			base.Show();
 			this.root.style.display = DisplayStyle.Flex;
 			this.textField.value = "/";
 			this.client.PushInputFocus(this);
+			this.hasEdited = false;
+			this.isCyclingCompletions = false;
+			this.isCyclingHistory = false;
+
+			this.textField.RegisterCallback<ChangeEvent<string>>(FirstEdit, TrickleDown.TrickleDown);
+			void FirstEdit(ChangeEvent<string> evt) {
+				this.hasEdited = true;
+				this.textField.UnregisterCallback<ChangeEvent<string>>(FirstEdit, TrickleDown.TrickleDown);
+			}
 
 			this.GrabFocus();
 			this.SetCaretToEnd();
-			this.currentInputMode = this.history.Any()
-				? CommandInputMode.CyclingHistory
-				: CommandInputMode.Typing;
+			this.textField.schedule.Execute(() => {
+				this.ShowCompletions(this.GetCommand(), this.GetCurrentCaret());
+			});
 		}
 
 		public override void Hide() {
@@ -103,71 +181,12 @@ namespace SoulboundEngine.UnityClient.Debug {
 			this.root.style.display = DisplayStyle.None;
 		}
 
-		private void HandleKeyEvent(KeyDownEvent evt) {
-			if (evt.keyCode is KeyCode.UpArrow or KeyCode.DownArrow or KeyCode.Tab or KeyCode.Return or KeyCode.KeypadEnter) {
-				evt.StopImmediatePropagation();
-			}
-			this.HandleKey(evt.keyCode);
+		private bool CanCycleHistory() {
+			return this.history.Any() && !this.hasEdited;
 		}
 
-		private void HandleKey(KeyCode key) {
-			if (!this.isVisible) return;
-
-			if (key is KeyCode.Escape) return;
-
-			if (key is KeyCode.Return or KeyCode.KeypadEnter) {
-				string command = this.textField.value;
-				this.SubmitCommand(command);
-				this.Hide();
-				return;
-			}
-
-			if (key is not (KeyCode.UpArrow or KeyCode.DownArrow)) { 
-				this.currentInputMode = CommandInputMode.Typing;
-			}
-
-			switch (this.currentInputMode) {
-				case CommandInputMode.Typing:
-					this.HandleTyping(key);
-					break;
-				case CommandInputMode.CyclingCompletions:
-					this.HandleCompletion(key);
-					break;
-				case CommandInputMode.CyclingHistory:
-					this.HandleHistory(key);
-					break;
-				default:
-					break;
-			}
-		}
-
-		private void HandleTyping(KeyCode key) {
-			if ((key is KeyCode.Tab or KeyCode.UpArrow or KeyCode.DownArrow)
-					&& this.completionManager.GetCompletionCount() > 0) {
-				this.currentInputMode = CommandInputMode.CyclingCompletions;
-				this.HandleCompletion(key);
-			}
-		}
-
-		private void HandleCompletion(KeyCode key) {
-			if (key is KeyCode.DownArrow) {
-				this.HighlightCompletion(this.completionManager.SelectNext());
-			} else if (key is KeyCode.UpArrow) {
-				this.HighlightCompletion(this.completionManager.SelectPrevious());
-			} else if (key is KeyCode.Tab) {
-				this.InsertCompletion(this.completionManager.GetSelected());
-			}
-		}
-
-		private void HandleHistory(KeyCode key) {
-			if (key is KeyCode.UpArrow) {
-				this.historyIndex--;
-				if (this.historyIndex < 0) this.historyIndex = this.history.Count - 1;
-				this.InsertHistory();
-			} else if (key is KeyCode.DownArrow) {
-				this.historyIndex = (this.historyIndex + 1) % this.history.Count;
-				this.InsertHistory();
-			}
+		private bool CanCycleCompletions() {
+			return this.completionManager.GetCompletionCount() > 0;
 		}
 
 		private void SubmitCommand(string command) {
@@ -211,8 +230,8 @@ namespace SoulboundEngine.UnityClient.Debug {
 			this.completionList.ScrollToItem(index);
 		}
 
-		private void InsertHistory() {
-			this.textField.value = this.history[this.historyIndex];
+		private void OverwriteWithHistory(int historyIndex) {
+			this.textField.value = this.history[historyIndex];
 			this.SetCaretToEnd();
 		}
 
@@ -226,11 +245,6 @@ namespace SoulboundEngine.UnityClient.Debug {
 				this.textField.cursorIndex = end;
 				this.textField.selectIndex = end;
 			});
-		}
-
-		public override void Dispose() {
-			this.textField.UnregisterCallback<KeyDownEvent>(this.HandleKeyEvent, TrickleDown.TrickleDown);
-			this.completionList.itemsChosen -= this.OnCompletionChosen;
 		}
 
 		bool IInputFocusable.HasKeyboardFocus() => true;

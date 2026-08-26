@@ -1,9 +1,9 @@
-using Brigadier.NET.Suggestion;
-using System.Collections.Generic;
-
 #nullable enable
 
 namespace SoulboundEngine.UnityClient.Debug.Commands {
+	using Brigadier.NET.Suggestion;
+	using System.Collections.Generic;
+
 	public sealed class CompletionManager {
 		private List<Suggestion> completions = new();
 		private int selectedIndex = -1;
@@ -31,6 +31,15 @@ namespace SoulboundEngine.UnityClient.Debug.Commands {
 				: null;
 		}
 
+		public bool TryGetSelected(out Suggestion suggestion) {
+			if (this.selectedIndex >= 0 && this.selectedIndex < this.completions.Count) {
+				suggestion = this.completions[this.selectedIndex];
+				return true;
+			}
+			suggestion = default!;
+			return false;
+		}
+
 		public int GetSelectedIndex() => this.selectedIndex;
 
 		public int GetCompletionCount() => this.completions.Count;
@@ -38,5 +47,8 @@ namespace SoulboundEngine.UnityClient.Debug.Commands {
 		public void ClearCompletions() => this.completions.Clear();
 
 		public Suggestion Get(int index) => this.completions[index];
+
+		public IReadOnlyList<Suggestion> GetCompletions() => this.completions;
+
 	}
 }
