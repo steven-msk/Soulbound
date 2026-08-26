@@ -38,7 +38,7 @@ namespace SoulboundEngine.UnityClient.Render.World {
 			this.entityRenderManager = entityRenderManager;
 			this.widgetManager = widgetManager;
 			this.debugRenderer = debugRenderer;
-			this.chunkOutlineRenderer = new ChunkOutlineRenderer();
+			this.chunkOutlineRenderer = new ChunkOutlineRenderer(debugRenderer);
 		}
 
 		// NOTE: current implementation relies on single tilemap rendering (one tilemap for the entire render view)
@@ -55,6 +55,8 @@ namespace SoulboundEngine.UnityClient.Render.World {
 			});
 
 			if (this.showingChunkFeatures) {
+				this.chunkOutlineRenderer.Render();
+
 				AABB stretched = this.level.GetPlayer().boundingBox.Stretch(DEBUG_BLOCK_COLLIDER_VIEW_RADIUS);
 				foreach (AABB box in this.level.GetBlockCollisionBoxes(stretched)) {
 					this.debugRenderer.AddLineBox(box, Color.green);

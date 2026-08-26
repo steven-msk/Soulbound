@@ -1,45 +1,38 @@
 namespace SoulboundEngine.UnityClient.Render.World {
-	using SoulboundEngine.UnityClient.Assets;
+	using SoulboundEngine.UnityClient.Debug;
+	using SoulboundEngine.World;
 	using SoulboundEngine.World.Chunk;
 	using SoulboundEngine.World.Level;
 	using System.Collections.Generic;
 	using UnityEngine;
 
 	public sealed class ChunkOutlineRenderer {
-		private readonly Dictionary<Chunk, LineRenderer> outlines = new();
+		private readonly HashSet<Chunk> chunks = new();
+		private readonly DebugRenderer debugRenderer;
+
+		public ChunkOutlineRenderer(DebugRenderer debugRenderer) {
+			this.debugRenderer = debugRenderer;
+		}
 
 		public void ShowOutline(Chunk chunk) {
-			GameObject obj = GameObject.Instantiate(AssetManager.Resolve<GameObject>(new AssetKey("chunkOutline")));
-			LineRenderer renderer = obj.GetComponent<LineRenderer>();
-			this.outlines[chunk] = renderer;
+			this.chunks.Add(chunk);
+		}
 
-			int startX = chunk.GetPos().x * Level.CHUNK_LENGTH;
-			int height = Level.WORLD_HEIGHT;
-			int width = Level.CHUNK_LENGTH;
-			Vector3[] points = new Vector3[5] {
-				new(startX, Level.MIN_Y, 0),
-				new(startX, Level.MIN_Y + height, 0),
-				new(startX + width, Level.MIN_Y + height, 0),
-				new(startX + width, Level.MIN_Y, 0),
-				new(startX, Level.MIN_Y, 0)
-			};
-			renderer.positionCount = points.Length;
-			renderer.SetPositions(points);
-			renderer.startColor = renderer.endColor = Color.green;
+		public void Render() {
+			foreach (Chunk chunk in this.chunks) {
+				int startX = chunk.GetPos().x * Level.CHUNK_LENGTH;
+				int endX = startX + Level.CHUNK_LENGTH;
+				this.debugRenderer.AddLine(new Vector3(startX, chunk.GetBottomY()), new Vector3(startX, chunk.GetTopY()), Color.green);
+				this.debugRenderer.AddLine(new Vector3(endX, chunk.GetBottomY()), new Vector3(endX, chunk.GetTopY()), Color.green);
+			}
 		}
 
 		public void HideOutline(Chunk chunk) {
-			if (this.outlines.TryGetValue(chunk, out LineRenderer renderer)) {
-				GameObject.Destroy(renderer.gameObject);
-				this.outlines.Remove(chunk);
-			}
+			this.chunks.Remove(chunk);
 		}
 
 		public void Clear() {
-			foreach ((Chunk _, LineRenderer gameObject) in this.outlines) {
-				GameObject.Destroy(gameObject);
-			}
-			this.outlines.Clear();
+			this.chunks.Clear();
 		}
 	}
 }
