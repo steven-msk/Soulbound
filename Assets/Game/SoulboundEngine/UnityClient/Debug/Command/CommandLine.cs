@@ -79,6 +79,8 @@ namespace SoulboundEngine.UnityClient.Debug {
 			this.completionList.makeNoneElement = () => new VisualElement();
 			this.completionList.itemsChosen += this.OnCompletionChosen;
 			this.defaultFieldColor = Color.black;
+
+			this.textField.RegisterCallback<FocusOutEvent>(evt => this.GrabFocus());
 			this.Hide();
 		}
 
@@ -201,17 +203,21 @@ namespace SoulboundEngine.UnityClient.Debug {
 
 		public override void Show() {
 			base.Show();
-			this.root.style.display = DisplayStyle.Flex;
 			this.textField.value = "/";
 			this.client.PushInputFocus(this);
 			this.hasEdited = false;
 			this.isCyclingCompletions = false;
 			this.isCyclingHistory = false;
 
-			this.textField.RegisterCallback<ChangeEvent<string>>(FirstEdit, TrickleDown.TrickleDown);
+			this.textField.RegisterCallback<ChangeEvent<string>>(FirstEdit);
 			void FirstEdit(ChangeEvent<string> evt) {
 				this.hasEdited = true;
-				this.textField.UnregisterCallback<ChangeEvent<string>>(FirstEdit, TrickleDown.TrickleDown);
+				this.textField.UnregisterCallback<ChangeEvent<string>>(FirstEdit);
+			}
+			this.textField.RegisterCallback<GeometryChangedEvent>(GeometryChanged);
+			void GeometryChanged(GeometryChangedEvent evt) {
+				this.GrabFocus();
+				this.textField.UnregisterCallback<GeometryChangedEvent>(GeometryChanged);
 			}
 
 			this.GrabFocus();
@@ -225,7 +231,6 @@ namespace SoulboundEngine.UnityClient.Debug {
 			base.Hide();
 			this.textField.value = "/";
 			this.client.PopInputFocus(this);
-			this.root.style.display = DisplayStyle.None;
 		}
 
 		private bool CanCycleHistory() {
@@ -250,7 +255,7 @@ namespace SoulboundEngine.UnityClient.Debug {
 					this.HighlightCompletion(0);
 				})
 			.Forget(e => {
-				this.completionManager.SetCompletions(Array.Empty<Suggestion>().ToList());
+				this.ClearAndDisableCompletions();
 				SoulboundEngine.Logger.LogFatal(e);
 			});
 		}
