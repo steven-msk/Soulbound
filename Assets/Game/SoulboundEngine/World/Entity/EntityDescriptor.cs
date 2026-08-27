@@ -1,6 +1,7 @@
 namespace SoulboundEngine.World.Entity {
 	using SoulboundEngine.Common.Math;
 	using SoulboundEngine.Registry;
+	using SoulboundEngine.World.Entity.Attribute;
 	using SoulboundEngine.World.Level;
 
 #nullable enable
@@ -15,8 +16,12 @@ namespace SoulboundEngine.World.Entity {
 		}
 
 		public abstract EntityDimensions GetDimensions();
+
 		public abstract Entity? CreateBoxed(Level level, Vec2d pos);
+
 		public abstract EntityCategory GetCategory();
+
+		public abstract AttributeSupplier GetAttributes();
 
 		public Entity? Create(Level level) {
 			return this.CreateBoxed(level, Vec2d.ZERO);
@@ -27,12 +32,14 @@ namespace SoulboundEngine.World.Entity {
 		public delegate E? EntityFactory(EntityDescriptor<E> descriptor, Level level);
 		private readonly EntityDimensions dimensions;
 		private readonly EntityCategory category;
+		private readonly AttributeSupplier attributes;
 		private readonly EntityFactory factory;
 
-		protected EntityDescriptor(EntityFactory factory, EntityDimensions dimensions, EntityCategory category) {
+		protected EntityDescriptor(EntityFactory factory, EntityDimensions dimensions, EntityCategory category, AttributeSupplier attributes) {
 			this.factory = factory;
 			this.dimensions = dimensions;
 			this.category = category;
+			this.attributes = attributes;
 		}
 
 		public E? Create(Level level, Vec2d pos) {
@@ -52,23 +59,27 @@ namespace SoulboundEngine.World.Entity {
 		public override string ToString() => GetIdentifier(this).ToString();
 
 		public override EntityDimensions GetDimensions() => this.dimensions;
-			
+
+		public override AttributeSupplier GetAttributes() => this.attributes;
+
 		public sealed class Builder {
 			private EntityDimensions dimensions = EntityDimensions.Scalable(Entity.DEFAULT_BB_WIDTH, Entity.DEFAULT_BB_HEIGHT);
 			private readonly EntityFactory factory;
 			private readonly EntityCategory category;
+			private readonly AttributeSupplier attributes;
 
-			private Builder(EntityFactory factory, EntityCategory category) {
+			private Builder(EntityFactory factory, EntityCategory category, AttributeSupplier attributes) {
 				this.factory = factory;
 				this.category = category;
+				this.attributes = attributes;
 			}
 
-			public static Builder Of(EntityCategory category, EntityFactory factory) {
-				return new Builder(factory, category);
+			public static Builder Of(EntityCategory category, EntityFactory factory, AttributeSupplier attributes) {
+				return new Builder(factory, category, attributes);
 			}
 
-			public static Builder OfNothing(EntityCategory category) {
-				return new Builder((_, _) => null, category);
+			public static Builder OfNothing(EntityCategory category, AttributeSupplier attributes) {
+				return new Builder((_, _) => null, category, attributes);
 			}
 
 			public Builder Sized(double width, double height) {
@@ -77,7 +88,7 @@ namespace SoulboundEngine.World.Entity {
 			}
 
 			public EntityDescriptor<E> Build() {
-				return new EntityDescriptor<E>(this.factory, this.dimensions, this.category);
+				return new EntityDescriptor<E>(this.factory, this.dimensions, this.category, this.attributes);
 			}
 		}
 	}

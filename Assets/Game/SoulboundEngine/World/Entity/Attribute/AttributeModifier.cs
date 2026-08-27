@@ -1,15 +1,22 @@
-using SoulboundEngine.Registry;
+namespace SoulboundEngine.World.Entity.Attribute {
+	using SoulboundEngine.Registry;
 
 #nullable enable
 
-namespace SoulboundEngine.World.Entity.Attribute {
-	public record AttributeModifier(Identifier identifier, double value, IOperation operation, IModifierTarget? target) {
-		public void Apply(double? effectiveOverride, ref double targetValue) {
-			this.operation.Apply(effectiveOverride ?? this.value, ref targetValue);
+	public record AttributeModifier(Identifier id, double amount, AttributeModifier.Operation operation) {
+		public bool Matches(Identifier id) => id.Equals(this.id);
+
+		public readonly struct Operation {
+			public static readonly Operation ADDITIVE = new("additive", 0);                 // +A  or -A
+			public static readonly Operation ADDITIVE_PERCENT = new("additive_percent", 1); // +B% or -B%
+			public static readonly Operation MULTIPLICATIVE = new("multiplicative", 2);     // xC  or x1/C
+			public readonly string serializedName;
+			public readonly int id;
+
+			private Operation(string name, int id) {
+				this.serializedName = name;
+				this.id = id;
+			}
 		}
-
-		public OperationType GetOperationType() => this.operation.GetOperationType();
-
-		public bool IdMatches(Identifier identifier) => this.identifier.Equals(identifier);
 	}
 }
