@@ -7,6 +7,7 @@ namespace SoulboundEngine.World.Entity {
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Block.State;
 	using SoulboundEngine.World.Chunk;
+	using SoulboundEngine.World.Entity.Attribute;
 	using SoulboundEngine.World.Level;
 	using SoulboundEngine.World.Physics;
 	using SoulboundEngine.World.Player;
@@ -25,6 +26,7 @@ namespace SoulboundEngine.World.Entity {
 		private readonly EntityDescriptor descriptor;
 		private readonly EntityDimensions dimensions;
 		protected readonly IRandom random = RandomProvider.CreateWithUniqueSeed();
+		private readonly AttributeMap attributes;
 		protected Level level;
 		protected bool isAlive;
 		protected bool firstTick = true;
@@ -37,13 +39,19 @@ namespace SoulboundEngine.World.Entity {
 		public bool verticalCollisionBelow;
 		private Vec2d deltaMovement;
 		private bool isOnGround;
-		private float speed;
 
 		protected Entity(EntityDescriptor descriptor, Level level) {
 			this.descriptor = descriptor;
 			this.level = level;
 			this.dimensions = descriptor.GetDimensions();
+			this.attributes = new AttributeMap(descriptor.GetAttributes());
 			this.SetPos(0.0d, 0.0d);
+		}
+
+		public static AttributeSupplier.Builder CreateDefaultAttributes() {
+			return AttributeSupplier.Create()
+				.Add(Attributes.SPEED)
+				.Add(Attributes.GRAVITY);
 		}
 
 		public Vec2d position { get; private set; } = Vec2d.ZERO;
@@ -292,14 +300,9 @@ namespace SoulboundEngine.World.Entity {
 			return this.lastKnownSpeed;
 		}
 
-		public virtual float GetSpeed() => this.speed;
-		public virtual void SetSpeed(float speed) {
-			this.speed = speed;
-		}
+		public virtual float GetSpeed() => (float)this.GetAttributeValue(Attributes.SPEED);
 
-		protected virtual double GetGravity() {
-			return 0.0d;
-		}
+		protected virtual double GetGravity() => this.GetAttributeValue(Attributes.GRAVITY);
 
 		protected double GetAppliedGravity() {
 			return this.GetGravity();
@@ -326,10 +329,24 @@ namespace SoulboundEngine.World.Entity {
 			this.facing = facing;
 		}
 
+		public AttributeMap GetAttributes() => this.attributes;
+
+		public double GetAttributeValue(RegistryEntry<AttributeType> attribute) {
+			return this.GetAttributes().GetValue(attribute);
+		}
+
+		public AttributeInstance? GetAttributeInstance(RegistryEntry<AttributeType> attribute) {
+			return this.GetAttributes().GetInstance(attribute);
+		}
+
+		public double GetAttributeBaseValue(RegistryEntry<AttributeType> attribute) {
+			return this.GetAttributes().GetBaseValue(attribute);
+		}
+
 		public JToken Save() {
 			JObject json = new() {
 				["type"] = EntityDescriptor.GetIdentifier(this.descriptor).ToString(),
-				["id"] = this.guid.ToString(),
+				["descriptionId"] = this.guid.ToString(),
 				["x"] = this.GetX(),
 				["y"] = this.GetY(),
 				["motionX"] = this.GetDeltaMovement().x,
@@ -378,7 +395,7 @@ namespace SoulboundEngine.World.Entity {
 			this.SetDeltaMovement(motionX.GetValueOrDefault(0.0d), motionY.GetValueOrDefault(0.0d));
 			this.SetOnGround(onGround.GetValueOrDefault(false));
 
-			string? guidString = (string?)json["id"];
+			string? guidString = (string?)json["descriptionId"];
 			if (guidString != null) {
 				if (!Guid.TryParse(guidString, out Guid guid)) {
 					Logger.LogError("Failed to parse entity guid: {}", guidString);
@@ -405,7 +422,7 @@ namespace SoulboundEngine.World.Entity {
 				return null;
 			}
 			if (!Identifier.TryParse(typeIdString, out Identifier typeId)) {
-				Logger.LogError("Could not parse Entity type id: {}", typeIdString);
+				Logger.LogError("Could not parse Entity type descriptionId: {}", typeIdString);
 				return null;
 			}
 			EntityDescriptor? descriptor = EntityDescriptor.Get(typeId);

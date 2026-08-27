@@ -9,6 +9,7 @@ namespace SoulboundEngine.World.Player {
 	using SoulboundEngine.World.Block.Entity;
 	using SoulboundEngine.World.Block.State;
 	using SoulboundEngine.World.Entity;
+	using SoulboundEngine.World.Entity.Attribute;
 	using SoulboundEngine.World.Level;
 	using SoulboundEngine.World.Physics;
 	using System;
@@ -18,9 +19,9 @@ namespace SoulboundEngine.World.Player {
 
 	public abstract class PlayerEntity : Entity {
 		private const double MAX_BLOCK_REACH = 5d;
-		private const double PICKUP_BOX_STRETCH_X = 1.5d;
-		private const double PICKUP_BOX_STRETCH_Y = 1.0d;
-		private const int DROP_PICKUP_DELAY = 75;
+		private const double PICKUP_RANGE_X = 0.75d;
+		private const double PICKUP_RANGE_Y = 0.5d;
+		private const int DROP_PICKUP_DELAY_TICKS = 75;
 		private readonly PlayerInventory inventory;
 		private Vec2d screenPointerPos;
 		private ActiveUseContext? activeItemUse;
@@ -31,6 +32,14 @@ namespace SoulboundEngine.World.Player {
 		public PlayerEntity(Level level)
 			: base(EntityType.PLAYER, level) {
 			this.inventory = new PlayerInventory();
+		}
+
+		public new static AttributeSupplier.Builder CreateDefaultAttributes() {
+			return Entity.CreateDefaultAttributes()
+				.Add(Attributes.SPEED, 0.1f)
+				.Add(Attributes.GRAVITY, 0.019622225d)
+				.Add(Attributes.JUMP_POWER)
+				.Add(Attributes.LUCK);
 		}
 
 		public bool isJumping { get; private set; }
@@ -83,16 +92,12 @@ namespace SoulboundEngine.World.Player {
 		}
 
 		private AABB GetPickupArea() {
-			return this.boundingBox.Stretch(PICKUP_BOX_STRETCH_X, PICKUP_BOX_STRETCH_Y);
+			return this.boundingBox.Stretch(PICKUP_RANGE_X, PICKUP_RANGE_Y);
 		}
 
 		private void Touch(Entity entity) {
 			entity.PlayerTouch(this);
 		}
-
-		public override float GetSpeed() => 0.1f;
-
-		protected override double GetGravity() => 0.981d / SharedConstants.TICKS_PER_SECOND;
 
 		private void OnLeftHoldTick() {
 			this.HandleInteractTick(InteractionType.Primary);
@@ -316,7 +321,7 @@ namespace SoulboundEngine.World.Player {
 			this.SetOnGround(false);
 		}
 
-		private double GetJumpPower() => 0.4d;
+		private double GetJumpPower() => this.GetAttributeValue(Attributes.JUMP_POWER);
 
 		public void SetJumping(bool jumping) {
 			this.isJumping = jumping;
@@ -333,7 +338,7 @@ namespace SoulboundEngine.World.Player {
 			this.SetMainHandStack(mainHandStack.DecrementBy(throwAmount));
 
 			ItemEntity itemEntity = this.DropStack(this.level, thrownStack);
-			itemEntity.SetPickupDelay(DROP_PICKUP_DELAY);
+			itemEntity.SetPickupDelay(DROP_PICKUP_DELAY_TICKS);
 		}
 
 		public ItemStack Take(ItemStack itemStack) {
@@ -363,8 +368,7 @@ namespace SoulboundEngine.World.Player {
 
 		public PlayerInventory GetInventory() => this.inventory;
 
-		// temporary loot table implementation
-		public float GetLuck() => 0f;
+		public float GetLuck() => (float)this.GetAttributeValue(Attributes.LUCK);
 
 		public ItemStack GetMainHandStack() {
 			ItemStack transitStack = this.GetTransitStack() ?? ItemStack.EMPTY;

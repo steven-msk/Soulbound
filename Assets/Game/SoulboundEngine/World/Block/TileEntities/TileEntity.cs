@@ -54,7 +54,7 @@ namespace SoulboundEngine.World.Block.Entity {
 				return null;
 			}
 			if (!Identifier.TryParse(typeIdString, out Identifier typeId)) {
-				Logger.LogError("Could not parse tile entity type id: {}", typeIdString);
+				Logger.LogError("Could not parse tile entity type descriptionId: {}", typeIdString);
 				return null;
 			}
 			RegistryEntry<TileEntityType>? entry = Registries.TILE_ENTITIES.GetEntry(typeId);

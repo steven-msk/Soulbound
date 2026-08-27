@@ -92,12 +92,12 @@ namespace SoulboundEngine.UnityClient.Input
     ""maps"": [
         {
             ""name"": ""Player"",
-            ""id"": ""df70fa95-8a34-4494-b137-73ab6b9c7d37"",
+            ""descriptionId"": ""df70fa95-8a34-4494-b137-73ab6b9c7d37"",
             ""actions"": [
                 {
                     ""name"": ""Move"",
                     ""type"": ""Value"",
-                    ""id"": ""351f2ccd-1f9f-44bf-9bec-d62ac5c5f408"",
+                    ""descriptionId"": ""351f2ccd-1f9f-44bf-9bec-d62ac5c5f408"",
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -106,7 +106,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""LeftClick"",
                     ""type"": ""Button"",
-                    ""id"": ""6c2ab1b8-8984-453a-af3d-a3c78ae1679a"",
+                    ""descriptionId"": ""6c2ab1b8-8984-453a-af3d-a3c78ae1679a"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -115,7 +115,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""RightClick"",
                     ""type"": ""Button"",
-                    ""id"": ""9e1cf1dc-d17f-4ac4-86b9-94be5058624a"",
+                    ""descriptionId"": ""9e1cf1dc-d17f-4ac4-86b9-94be5058624a"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -124,7 +124,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""Toggle Inventory"",
                     ""type"": ""Button"",
-                    ""id"": ""852140f2-7766-474d-8707-702459ba45f3"",
+                    ""descriptionId"": ""852140f2-7766-474d-8707-702459ba45f3"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -133,7 +133,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""Jump"",
                     ""type"": ""Button"",
-                    ""id"": ""f1ba0d36-48eb-4cd5-b651-1c94a6531f70"",
+                    ""descriptionId"": ""f1ba0d36-48eb-4cd5-b651-1c94a6531f70"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -142,7 +142,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""MousePosition"",
                     ""type"": ""Value"",
-                    ""id"": ""c1957fbe-c3d7-4c7b-994f-1872be7c1d66"",
+                    ""descriptionId"": ""c1957fbe-c3d7-4c7b-994f-1872be7c1d66"",
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -151,7 +151,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""Change Hotbar Slot"",
                     ""type"": ""Button"",
-                    ""id"": ""92a43001-18dd-4c8f-a8a8-de8edab23f16"",
+                    ""descriptionId"": ""92a43001-18dd-4c8f-a8a8-de8edab23f16"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -160,7 +160,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""Scroll Hotbar Slot"",
                     ""type"": ""Value"",
-                    ""id"": ""92a902aa-c48b-4d4a-b9f8-2b153e6a315b"",
+                    ""descriptionId"": ""92a902aa-c48b-4d4a-b9f8-2b153e6a315b"",
                     ""expectedControlType"": ""Axis"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -169,7 +169,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""Drop Item"",
                     ""type"": ""Button"",
-                    ""id"": ""0f4fbb25-1d0f-40ad-bc6a-a0852b2375d1"",
+                    ""descriptionId"": ""0f4fbb25-1d0f-40ad-bc6a-a0852b2375d1"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -178,7 +178,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""Esc"",
                     ""type"": ""Button"",
-                    ""id"": ""32eac010-4470-4e64-9a81-8093495920d4"",
+                    ""descriptionId"": ""32eac010-4470-4e64-9a81-8093495920d4"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -188,7 +188,7 @@ namespace SoulboundEngine.UnityClient.Input
             ""bindings"": [
                 {
                     ""name"": ""WASD"",
-                    ""id"": ""00ca640b-d935-4593-8157-c05846ea39b3"",
+                    ""descriptionId"": ""00ca640b-d935-4593-8157-c05846ea39b3"",
                     ""path"": ""2DVector"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -199,7 +199,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": ""Up"",
-                    ""id"": ""e2062cb9-1b15-46a2-838c-2f8d72a0bdd9"",
+                    ""descriptionId"": ""e2062cb9-1b15-46a2-838c-2f8d72a0bdd9"",
                     ""path"": ""<Keyboard>/w"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -210,7 +210,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": ""Down"",
-                    ""id"": ""320bffee-a40b-4347-ac70-c210eb8bc73a"",
+                    ""descriptionId"": ""320bffee-a40b-4347-ac70-c210eb8bc73a"",
                     ""path"": ""<Keyboard>/s"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -221,7 +221,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": ""Left"",
-                    ""id"": ""97ba634f-f1b5-47bb-b9de-2516e7c5bdc3"",
+                    ""descriptionId"": ""97ba634f-f1b5-47bb-b9de-2516e7c5bdc3"",
                     ""path"": ""<Keyboard>/a"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -232,7 +232,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": ""Right"",
-                    ""id"": ""4b1419ec-e869-44e2-83b7-cc14d6f20d0c"",
+                    ""descriptionId"": ""4b1419ec-e869-44e2-83b7-cc14d6f20d0c"",
                     ""path"": ""<Keyboard>/d"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -243,7 +243,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""05f6913d-c316-48b2-a6bb-e225f14c7960"",
+                    ""descriptionId"": ""05f6913d-c316-48b2-a6bb-e225f14c7960"",
                     ""path"": ""<Mouse>/leftButton"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -254,7 +254,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""eb40bb66-4559-4dfa-9a2f-820438abb426"",
+                    ""descriptionId"": ""eb40bb66-4559-4dfa-9a2f-820438abb426"",
                     ""path"": ""<Keyboard>/space"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -265,7 +265,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""daba33a1-ad0c-4742-a909-43ad1cdfbeb6"",
+                    ""descriptionId"": ""daba33a1-ad0c-4742-a909-43ad1cdfbeb6"",
                     ""path"": ""<Gamepad>/buttonSouth"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -276,7 +276,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""603f3daf-40bd-4854-8724-93e8017f59e3"",
+                    ""descriptionId"": ""603f3daf-40bd-4854-8724-93e8017f59e3"",
                     ""path"": ""<XRController>/secondaryButton"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -287,7 +287,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""1c04ea5f-b012-41d1-a6f7-02e963b52893"",
+                    ""descriptionId"": ""1c04ea5f-b012-41d1-a6f7-02e963b52893"",
                     ""path"": ""<Keyboard>/e"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -298,7 +298,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""b3f66d0b-7751-423f-908b-a11c5bd95930"",
+                    ""descriptionId"": ""b3f66d0b-7751-423f-908b-a11c5bd95930"",
                     ""path"": ""<Gamepad>/buttonNorth"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -309,7 +309,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""451af653-de6c-4d17-8391-e56d893707ef"",
+                    ""descriptionId"": ""451af653-de6c-4d17-8391-e56d893707ef"",
                     ""path"": ""<Mouse>/position"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -320,7 +320,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""9e50be46-861d-49fa-b346-418cba124158"",
+                    ""descriptionId"": ""9e50be46-861d-49fa-b346-418cba124158"",
                     ""path"": ""<Mouse>/rightButton"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -331,7 +331,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""a2bebe80-28ca-48b7-b47b-c10630a0af6a"",
+                    ""descriptionId"": ""a2bebe80-28ca-48b7-b47b-c10630a0af6a"",
                     ""path"": ""<Keyboard>/1"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -342,7 +342,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""b3d4c7be-9f80-4043-8080-6114a89d674d"",
+                    ""descriptionId"": ""b3d4c7be-9f80-4043-8080-6114a89d674d"",
                     ""path"": ""<Keyboard>/2"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -353,7 +353,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""4fd20937-b53e-4259-b1a5-06e136a2cda2"",
+                    ""descriptionId"": ""4fd20937-b53e-4259-b1a5-06e136a2cda2"",
                     ""path"": ""<Keyboard>/3"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -364,7 +364,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""605af70f-ab58-4dbe-b1ef-b6067d2c35f8"",
+                    ""descriptionId"": ""605af70f-ab58-4dbe-b1ef-b6067d2c35f8"",
                     ""path"": ""<Keyboard>/4"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -375,7 +375,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""f949330d-4d17-43cb-9006-3265f9f06517"",
+                    ""descriptionId"": ""f949330d-4d17-43cb-9006-3265f9f06517"",
                     ""path"": ""<Keyboard>/5"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -386,7 +386,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""0e1048ed-4753-49c2-887d-3059629d384e"",
+                    ""descriptionId"": ""0e1048ed-4753-49c2-887d-3059629d384e"",
                     ""path"": ""<Keyboard>/6"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -397,7 +397,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""31e271ee-bc4d-465e-8eda-ff2016483b21"",
+                    ""descriptionId"": ""31e271ee-bc4d-465e-8eda-ff2016483b21"",
                     ""path"": ""<Keyboard>/7"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -408,7 +408,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""af4aa29b-2234-405c-8844-901c6873feaf"",
+                    ""descriptionId"": ""af4aa29b-2234-405c-8844-901c6873feaf"",
                     ""path"": ""<Keyboard>/8"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -419,7 +419,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""470aafb8-909d-47ab-b617-0b86daa6dadf"",
+                    ""descriptionId"": ""470aafb8-909d-47ab-b617-0b86daa6dadf"",
                     ""path"": ""<Keyboard>/9"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -430,7 +430,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""cefe888a-9de6-4053-b54e-2aba454cfda5"",
+                    ""descriptionId"": ""cefe888a-9de6-4053-b54e-2aba454cfda5"",
                     ""path"": ""<Mouse>/scroll/y"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -441,7 +441,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""e23fb5e5-75bf-4216-b857-356bce4f232e"",
+                    ""descriptionId"": ""e23fb5e5-75bf-4216-b857-356bce4f232e"",
                     ""path"": ""<Keyboard>/q"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -452,7 +452,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""13c1673b-f97f-46de-8c32-8b62b0cb849e"",
+                    ""descriptionId"": ""13c1673b-f97f-46de-8c32-8b62b0cb849e"",
                     ""path"": ""<Keyboard>/escape"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -465,12 +465,12 @@ namespace SoulboundEngine.UnityClient.Input
         },
         {
             ""name"": ""UI"",
-            ""id"": ""272f6d14-89ba-496f-b7ff-215263d3219f"",
+            ""descriptionId"": ""272f6d14-89ba-496f-b7ff-215263d3219f"",
             ""actions"": [
                 {
                     ""name"": ""Navigate"",
                     ""type"": ""PassThrough"",
-                    ""id"": ""c95b2375-e6d9-4b88-9c4c-c5e76515df4b"",
+                    ""descriptionId"": ""c95b2375-e6d9-4b88-9c4c-c5e76515df4b"",
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -479,7 +479,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""Submit"",
                     ""type"": ""Button"",
-                    ""id"": ""7607c7b6-cd76-4816-beef-bd0341cfe950"",
+                    ""descriptionId"": ""7607c7b6-cd76-4816-beef-bd0341cfe950"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -488,7 +488,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""Cancel"",
                     ""type"": ""Button"",
-                    ""id"": ""15cef263-9014-4fd5-94d9-4e4a6234a6ef"",
+                    ""descriptionId"": ""15cef263-9014-4fd5-94d9-4e4a6234a6ef"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -497,7 +497,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""Point"",
                     ""type"": ""PassThrough"",
-                    ""id"": ""32b35790-4ed0-4e9a-aa41-69ac6d629449"",
+                    ""descriptionId"": ""32b35790-4ed0-4e9a-aa41-69ac6d629449"",
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -506,7 +506,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""Click"",
                     ""type"": ""PassThrough"",
-                    ""id"": ""3c7022bf-7922-4f7c-a998-c437916075ad"",
+                    ""descriptionId"": ""3c7022bf-7922-4f7c-a998-c437916075ad"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -515,7 +515,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""RightClick"",
                     ""type"": ""PassThrough"",
-                    ""id"": ""44b200b1-1557-4083-816c-b22cbdf77ddf"",
+                    ""descriptionId"": ""44b200b1-1557-4083-816c-b22cbdf77ddf"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -524,7 +524,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""MiddleClick"",
                     ""type"": ""PassThrough"",
-                    ""id"": ""dad70c86-b58c-4b17-88ad-f5e53adf419e"",
+                    ""descriptionId"": ""dad70c86-b58c-4b17-88ad-f5e53adf419e"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -533,7 +533,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""ScrollWheel"",
                     ""type"": ""PassThrough"",
-                    ""id"": ""0489e84a-4833-4c40-bfae-cea84b696689"",
+                    ""descriptionId"": ""0489e84a-4833-4c40-bfae-cea84b696689"",
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -542,7 +542,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""TrackedDevicePosition"",
                     ""type"": ""PassThrough"",
-                    ""id"": ""24908448-c609-4bc3-a128-ea258674378a"",
+                    ""descriptionId"": ""24908448-c609-4bc3-a128-ea258674378a"",
                     ""expectedControlType"": ""Vector3"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -551,7 +551,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""TrackedDeviceOrientation"",
                     ""type"": ""PassThrough"",
-                    ""id"": ""9caa3d8a-6b2f-4e8e-8bad-6ede561bd9be"",
+                    ""descriptionId"": ""9caa3d8a-6b2f-4e8e-8bad-6ede561bd9be"",
                     ""expectedControlType"": ""Quaternion"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -561,7 +561,7 @@ namespace SoulboundEngine.UnityClient.Input
             ""bindings"": [
                 {
                     ""name"": ""Gamepad"",
-                    ""id"": ""809f371f-c5e2-4e7a-83a1-d867598f40dd"",
+                    ""descriptionId"": ""809f371f-c5e2-4e7a-83a1-d867598f40dd"",
                     ""path"": ""2DVector"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -572,7 +572,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": ""up"",
-                    ""id"": ""14a5d6e8-4aaf-4119-a9ef-34b8c2c548bf"",
+                    ""descriptionId"": ""14a5d6e8-4aaf-4119-a9ef-34b8c2c548bf"",
                     ""path"": ""<Gamepad>/leftStick/up"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -583,7 +583,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": ""up"",
-                    ""id"": ""9144cbe6-05e1-4687-a6d7-24f99d23dd81"",
+                    ""descriptionId"": ""9144cbe6-05e1-4687-a6d7-24f99d23dd81"",
                     ""path"": ""<Gamepad>/rightStick/up"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -594,7 +594,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": ""down"",
-                    ""id"": ""2db08d65-c5fb-421b-983f-c71163608d67"",
+                    ""descriptionId"": ""2db08d65-c5fb-421b-983f-c71163608d67"",
                     ""path"": ""<Gamepad>/leftStick/down"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -605,7 +605,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": ""down"",
-                    ""id"": ""58748904-2ea9-4a80-8579-b500e6a76df8"",
+                    ""descriptionId"": ""58748904-2ea9-4a80-8579-b500e6a76df8"",
                     ""path"": ""<Gamepad>/rightStick/down"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -616,7 +616,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": ""left"",
-                    ""id"": ""8ba04515-75aa-45de-966d-393d9bbd1c14"",
+                    ""descriptionId"": ""8ba04515-75aa-45de-966d-393d9bbd1c14"",
                     ""path"": ""<Gamepad>/leftStick/left"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -627,7 +627,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": ""left"",
-                    ""id"": ""712e721c-bdfb-4b23-a86c-a0d9fcfea921"",
+                    ""descriptionId"": ""712e721c-bdfb-4b23-a86c-a0d9fcfea921"",
                     ""path"": ""<Gamepad>/rightStick/left"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -638,7 +638,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": ""right"",
-                    ""id"": ""fcd248ae-a788-4676-a12e-f4d81205600b"",
+                    ""descriptionId"": ""fcd248ae-a788-4676-a12e-f4d81205600b"",
                     ""path"": ""<Gamepad>/leftStick/right"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -649,7 +649,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": ""right"",
-                    ""id"": ""1f04d9bc-c50b-41a1-bfcc-afb75475ec20"",
+                    ""descriptionId"": ""1f04d9bc-c50b-41a1-bfcc-afb75475ec20"",
                     ""path"": ""<Gamepad>/rightStick/right"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -660,7 +660,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""fb8277d4-c5cd-4663-9dc7-ee3f0b506d90"",
+                    ""descriptionId"": ""fb8277d4-c5cd-4663-9dc7-ee3f0b506d90"",
                     ""path"": ""<Gamepad>/dpad"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -671,7 +671,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": ""Joystick"",
-                    ""id"": ""e25d9774-381c-4a61-b47c-7b6b299ad9f9"",
+                    ""descriptionId"": ""e25d9774-381c-4a61-b47c-7b6b299ad9f9"",
                     ""path"": ""2DVector"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -682,7 +682,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": ""up"",
-                    ""id"": ""3db53b26-6601-41be-9887-63ac74e79d19"",
+                    ""descriptionId"": ""3db53b26-6601-41be-9887-63ac74e79d19"",
                     ""path"": ""<Joystick>/stick/up"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -693,7 +693,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": ""down"",
-                    ""id"": ""0cb3e13e-3d90-4178-8ae6-d9c5501d653f"",
+                    ""descriptionId"": ""0cb3e13e-3d90-4178-8ae6-d9c5501d653f"",
                     ""path"": ""<Joystick>/stick/down"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -704,7 +704,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": ""left"",
-                    ""id"": ""0392d399-f6dd-4c82-8062-c1e9c0d34835"",
+                    ""descriptionId"": ""0392d399-f6dd-4c82-8062-c1e9c0d34835"",
                     ""path"": ""<Joystick>/stick/left"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -715,7 +715,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": ""right"",
-                    ""id"": ""942a66d9-d42f-43d6-8d70-ecb4ba5363bc"",
+                    ""descriptionId"": ""942a66d9-d42f-43d6-8d70-ecb4ba5363bc"",
                     ""path"": ""<Joystick>/stick/right"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -726,7 +726,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": ""Keyboard"",
-                    ""id"": ""ff527021-f211-4c02-933e-5976594c46ed"",
+                    ""descriptionId"": ""ff527021-f211-4c02-933e-5976594c46ed"",
                     ""path"": ""2DVector"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -737,7 +737,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": ""up"",
-                    ""id"": ""563fbfdd-0f09-408d-aa75-8642c4f08ef0"",
+                    ""descriptionId"": ""563fbfdd-0f09-408d-aa75-8642c4f08ef0"",
                     ""path"": ""<Keyboard>/w"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -748,7 +748,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": ""up"",
-                    ""id"": ""eb480147-c587-4a33-85ed-eb0ab9942c43"",
+                    ""descriptionId"": ""eb480147-c587-4a33-85ed-eb0ab9942c43"",
                     ""path"": ""<Keyboard>/upArrow"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -759,7 +759,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": ""down"",
-                    ""id"": ""2bf42165-60bc-42ca-8072-8c13ab40239b"",
+                    ""descriptionId"": ""2bf42165-60bc-42ca-8072-8c13ab40239b"",
                     ""path"": ""<Keyboard>/s"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -770,7 +770,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": ""down"",
-                    ""id"": ""85d264ad-e0a0-4565-b7ff-1a37edde51ac"",
+                    ""descriptionId"": ""85d264ad-e0a0-4565-b7ff-1a37edde51ac"",
                     ""path"": ""<Keyboard>/downArrow"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -781,7 +781,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": ""left"",
-                    ""id"": ""74214943-c580-44e4-98eb-ad7eebe17902"",
+                    ""descriptionId"": ""74214943-c580-44e4-98eb-ad7eebe17902"",
                     ""path"": ""<Keyboard>/a"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -792,7 +792,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": ""left"",
-                    ""id"": ""cea9b045-a000-445b-95b8-0c171af70a3b"",
+                    ""descriptionId"": ""cea9b045-a000-445b-95b8-0c171af70a3b"",
                     ""path"": ""<Keyboard>/leftArrow"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -803,7 +803,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": ""right"",
-                    ""id"": ""8607c725-d935-4808-84b1-8354e29bab63"",
+                    ""descriptionId"": ""8607c725-d935-4808-84b1-8354e29bab63"",
                     ""path"": ""<Keyboard>/d"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -814,7 +814,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": ""right"",
-                    ""id"": ""4cda81dc-9edd-4e03-9d7c-a71a14345d0b"",
+                    ""descriptionId"": ""4cda81dc-9edd-4e03-9d7c-a71a14345d0b"",
                     ""path"": ""<Keyboard>/rightArrow"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -825,7 +825,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""9e92bb26-7e3b-4ec4-b06b-3c8f8e498ddc"",
+                    ""descriptionId"": ""9e92bb26-7e3b-4ec4-b06b-3c8f8e498ddc"",
                     ""path"": ""*/{Submit}"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -836,7 +836,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""82627dcc-3b13-4ba9-841d-e4b746d6553e"",
+                    ""descriptionId"": ""82627dcc-3b13-4ba9-841d-e4b746d6553e"",
                     ""path"": ""*/{Cancel}"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -847,7 +847,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""c52c8e0b-8179-41d3-b8a1-d149033bbe86"",
+                    ""descriptionId"": ""c52c8e0b-8179-41d3-b8a1-d149033bbe86"",
                     ""path"": ""<Mouse>/position"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -858,7 +858,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""e1394cbc-336e-44ce-9ea8-6007ed6193f7"",
+                    ""descriptionId"": ""e1394cbc-336e-44ce-9ea8-6007ed6193f7"",
                     ""path"": ""<Pen>/position"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -869,7 +869,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""5693e57a-238a-46ed-b5ae-e64e6e574302"",
+                    ""descriptionId"": ""5693e57a-238a-46ed-b5ae-e64e6e574302"",
                     ""path"": ""<Touchscreen>/touch*/position"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -880,7 +880,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""4faf7dc9-b979-4210-aa8c-e808e1ef89f5"",
+                    ""descriptionId"": ""4faf7dc9-b979-4210-aa8c-e808e1ef89f5"",
                     ""path"": ""<Mouse>/leftButton"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -891,7 +891,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""8d66d5ba-88d7-48e6-b1cd-198bbfef7ace"",
+                    ""descriptionId"": ""8d66d5ba-88d7-48e6-b1cd-198bbfef7ace"",
                     ""path"": ""<Pen>/tip"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -902,7 +902,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""47c2a644-3ebc-4dae-a106-589b7ca75b59"",
+                    ""descriptionId"": ""47c2a644-3ebc-4dae-a106-589b7ca75b59"",
                     ""path"": ""<Touchscreen>/touch*/press"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -913,7 +913,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""bb9e6b34-44bf-4381-ac63-5aa15d19f677"",
+                    ""descriptionId"": ""bb9e6b34-44bf-4381-ac63-5aa15d19f677"",
                     ""path"": ""<XRController>/trigger"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -924,7 +924,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""38c99815-14ea-4617-8627-164d27641299"",
+                    ""descriptionId"": ""38c99815-14ea-4617-8627-164d27641299"",
                     ""path"": ""<Mouse>/scroll"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -935,7 +935,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""4c191405-5738-4d4b-a523-c6a301dbf754"",
+                    ""descriptionId"": ""4c191405-5738-4d4b-a523-c6a301dbf754"",
                     ""path"": ""<Mouse>/rightButton"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -946,7 +946,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""24066f69-da47-44f3-a07e-0015fb02eb2e"",
+                    ""descriptionId"": ""24066f69-da47-44f3-a07e-0015fb02eb2e"",
                     ""path"": ""<Mouse>/middleButton"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -957,7 +957,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""7236c0d9-6ca3-47cf-a6ee-a97f5b59ea77"",
+                    ""descriptionId"": ""7236c0d9-6ca3-47cf-a6ee-a97f5b59ea77"",
                     ""path"": ""<XRController>/devicePosition"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -968,7 +968,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""23e01e3a-f935-4948-8d8b-9bcac77714fb"",
+                    ""descriptionId"": ""23e01e3a-f935-4948-8d8b-9bcac77714fb"",
                     ""path"": ""<XRController>/deviceRotation"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -981,12 +981,12 @@ namespace SoulboundEngine.UnityClient.Input
         },
         {
             ""name"": ""Debug"",
-            ""id"": ""358412a5-ca42-4f0a-8837-934e69407396"",
+            ""descriptionId"": ""358412a5-ca42-4f0a-8837-934e69407396"",
             ""actions"": [
                 {
                     ""name"": ""ToggleConsole"",
                     ""type"": ""Button"",
-                    ""id"": ""77e53503-d7c3-41db-8455-aa7667ff4ebf"",
+                    ""descriptionId"": ""77e53503-d7c3-41db-8455-aa7667ff4ebf"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -995,7 +995,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""EnterCommand"",
                     ""type"": ""Button"",
-                    ""id"": ""7a43f28e-d045-4ab0-a391-b47962b5a4c1"",
+                    ""descriptionId"": ""7a43f28e-d045-4ab0-a391-b47962b5a4c1"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1004,7 +1004,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""ToggleMetrics"",
                     ""type"": ""Button"",
-                    ""id"": ""bbc0a76d-7e7f-4f3e-a8de-208b651b0898"",
+                    ""descriptionId"": ""bbc0a76d-7e7f-4f3e-a8de-208b651b0898"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1014,7 +1014,7 @@ namespace SoulboundEngine.UnityClient.Input
             ""bindings"": [
                 {
                     ""name"": """",
-                    ""id"": ""e33c3800-9d0b-4935-9ef8-aeeae781e446"",
+                    ""descriptionId"": ""e33c3800-9d0b-4935-9ef8-aeeae781e446"",
                     ""path"": ""<Keyboard>/f1"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -1025,7 +1025,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""de40eac0-3e06-4f3e-b04e-fcf365a411ba"",
+                    ""descriptionId"": ""de40eac0-3e06-4f3e-b04e-fcf365a411ba"",
                     ""path"": ""<Keyboard>/slash"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -1036,7 +1036,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""8b587d8c-e692-4fd8-a961-c545b9ce8d34"",
+                    ""descriptionId"": ""8b587d8c-e692-4fd8-a961-c545b9ce8d34"",
                     ""path"": ""<Keyboard>/f2"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -1049,12 +1049,12 @@ namespace SoulboundEngine.UnityClient.Input
         },
         {
             ""name"": ""Keyboard"",
-            ""id"": ""04f6aea9-30a8-4c19-9026-533464acb434"",
+            ""descriptionId"": ""04f6aea9-30a8-4c19-9026-533464acb434"",
             ""actions"": [
                 {
                     ""name"": ""ESC"",
                     ""type"": ""Button"",
-                    ""id"": ""796a0de3-f3eb-438c-8198-8b1c824c6423"",
+                    ""descriptionId"": ""796a0de3-f3eb-438c-8198-8b1c824c6423"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1063,7 +1063,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""F1"",
                     ""type"": ""Button"",
-                    ""id"": ""3eafc50e-af8a-4773-b480-916b6f3cac85"",
+                    ""descriptionId"": ""3eafc50e-af8a-4773-b480-916b6f3cac85"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1072,7 +1072,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""F2"",
                     ""type"": ""Button"",
-                    ""id"": ""bba2981f-80d9-4233-8f36-3397ffb72b60"",
+                    ""descriptionId"": ""bba2981f-80d9-4233-8f36-3397ffb72b60"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1081,7 +1081,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""F3"",
                     ""type"": ""Button"",
-                    ""id"": ""1d49c3a3-2b75-479f-8fdf-b1a5cfd3c9e8"",
+                    ""descriptionId"": ""1d49c3a3-2b75-479f-8fdf-b1a5cfd3c9e8"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1090,7 +1090,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""F4"",
                     ""type"": ""Button"",
-                    ""id"": ""f5380df1-4e10-4ce8-abe6-56726d8fcaa0"",
+                    ""descriptionId"": ""f5380df1-4e10-4ce8-abe6-56726d8fcaa0"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1099,7 +1099,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""F5"",
                     ""type"": ""Button"",
-                    ""id"": ""bcb0fc1a-7b49-4b51-90b6-248f28a3fdab"",
+                    ""descriptionId"": ""bcb0fc1a-7b49-4b51-90b6-248f28a3fdab"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1108,7 +1108,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""F6"",
                     ""type"": ""Button"",
-                    ""id"": ""816f2368-3478-459b-90ff-23ac102d4c4d"",
+                    ""descriptionId"": ""816f2368-3478-459b-90ff-23ac102d4c4d"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1117,7 +1117,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""F7"",
                     ""type"": ""Button"",
-                    ""id"": ""8bd81696-7d1c-4c0b-b3dd-378e44095d83"",
+                    ""descriptionId"": ""8bd81696-7d1c-4c0b-b3dd-378e44095d83"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1126,7 +1126,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""F8"",
                     ""type"": ""Button"",
-                    ""id"": ""86c09f3e-49f0-4894-b58f-4464bdca82b0"",
+                    ""descriptionId"": ""86c09f3e-49f0-4894-b58f-4464bdca82b0"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1135,7 +1135,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""F9"",
                     ""type"": ""Button"",
-                    ""id"": ""0026782d-65b2-42a5-a62d-b09f07d7c60e"",
+                    ""descriptionId"": ""0026782d-65b2-42a5-a62d-b09f07d7c60e"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1144,7 +1144,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""F10"",
                     ""type"": ""Button"",
-                    ""id"": ""250f0652-6379-420a-aa92-3bcb9a589c3a"",
+                    ""descriptionId"": ""250f0652-6379-420a-aa92-3bcb9a589c3a"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1153,7 +1153,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""F11"",
                     ""type"": ""Button"",
-                    ""id"": ""99e660bb-c454-4e30-8b4f-3e43296d5816"",
+                    ""descriptionId"": ""99e660bb-c454-4e30-8b4f-3e43296d5816"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1162,7 +1162,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""F12"",
                     ""type"": ""Button"",
-                    ""id"": ""1e96e73e-2c2d-4871-aab3-953b3401e2b4"",
+                    ""descriptionId"": ""1e96e73e-2c2d-4871-aab3-953b3401e2b4"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1171,7 +1171,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""KEYPAD_1"",
                     ""type"": ""Button"",
-                    ""id"": ""4030c561-ce04-4250-9144-1d6753d3d31c"",
+                    ""descriptionId"": ""4030c561-ce04-4250-9144-1d6753d3d31c"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1180,7 +1180,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""KEYPAD_2"",
                     ""type"": ""Button"",
-                    ""id"": ""d73e2706-32b2-4b18-a1db-aec7db9e0b2f"",
+                    ""descriptionId"": ""d73e2706-32b2-4b18-a1db-aec7db9e0b2f"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1189,7 +1189,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""KEYPAD_3"",
                     ""type"": ""Button"",
-                    ""id"": ""efaf131a-1c32-4769-b546-20856d64e886"",
+                    ""descriptionId"": ""efaf131a-1c32-4769-b546-20856d64e886"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1198,7 +1198,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""KEYPAD_4"",
                     ""type"": ""Button"",
-                    ""id"": ""1001bfac-b738-465f-96f7-29dfbaff3ee0"",
+                    ""descriptionId"": ""1001bfac-b738-465f-96f7-29dfbaff3ee0"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1207,7 +1207,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""KEYPAD_5"",
                     ""type"": ""Button"",
-                    ""id"": ""a4628bc8-b3f0-4973-bd87-c62b0a199cce"",
+                    ""descriptionId"": ""a4628bc8-b3f0-4973-bd87-c62b0a199cce"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1216,7 +1216,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""KEYPAD_6"",
                     ""type"": ""Button"",
-                    ""id"": ""a1e39a17-8d0e-43f6-8174-f4cd5036d4d6"",
+                    ""descriptionId"": ""a1e39a17-8d0e-43f6-8174-f4cd5036d4d6"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1225,7 +1225,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""KEYPAD_7"",
                     ""type"": ""Button"",
-                    ""id"": ""56c63de7-f57f-48fb-9912-7645489e7866"",
+                    ""descriptionId"": ""56c63de7-f57f-48fb-9912-7645489e7866"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1234,7 +1234,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""KEYPAD_8"",
                     ""type"": ""Button"",
-                    ""id"": ""b492cc34-620d-4f49-9126-d79b002a72db"",
+                    ""descriptionId"": ""b492cc34-620d-4f49-9126-d79b002a72db"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1243,7 +1243,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""KEYPAD_9"",
                     ""type"": ""Button"",
-                    ""id"": ""3c68f59e-ce42-45cb-adc7-8727c7199cb2"",
+                    ""descriptionId"": ""3c68f59e-ce42-45cb-adc7-8727c7199cb2"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1252,7 +1252,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""KEYPAD_0"",
                     ""type"": ""Button"",
-                    ""id"": ""4d747ade-f3f7-4bbc-a4aa-566fd77fce9e"",
+                    ""descriptionId"": ""4d747ade-f3f7-4bbc-a4aa-566fd77fce9e"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1261,7 +1261,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""BACK_QUOTE"",
                     ""type"": ""Button"",
-                    ""id"": ""519cec79-846e-4392-98ab-314bc0f558b7"",
+                    ""descriptionId"": ""519cec79-846e-4392-98ab-314bc0f558b7"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1270,7 +1270,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""MINUS"",
                     ""type"": ""Button"",
-                    ""id"": ""cb086288-eb6d-4c09-a7ce-23ce34de37c3"",
+                    ""descriptionId"": ""cb086288-eb6d-4c09-a7ce-23ce34de37c3"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1279,7 +1279,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""EQUALS"",
                     ""type"": ""Button"",
-                    ""id"": ""caeecc51-f96b-4923-b31b-1cf4f85ca39f"",
+                    ""descriptionId"": ""caeecc51-f96b-4923-b31b-1cf4f85ca39f"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1288,7 +1288,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""BACKSPACE"",
                     ""type"": ""Button"",
-                    ""id"": ""e45c47fb-f355-467e-af1d-6ce526384e2e"",
+                    ""descriptionId"": ""e45c47fb-f355-467e-af1d-6ce526384e2e"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1297,7 +1297,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""Q"",
                     ""type"": ""Button"",
-                    ""id"": ""8738a035-d351-4bbf-a67a-b06ce65104e1"",
+                    ""descriptionId"": ""8738a035-d351-4bbf-a67a-b06ce65104e1"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1306,7 +1306,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""W"",
                     ""type"": ""Button"",
-                    ""id"": ""0b8152cf-8155-4c6a-b0e8-3f58f57ebd57"",
+                    ""descriptionId"": ""0b8152cf-8155-4c6a-b0e8-3f58f57ebd57"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1315,7 +1315,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""E"",
                     ""type"": ""Button"",
-                    ""id"": ""60410116-8b80-4694-b34b-eadd1f3b5bc1"",
+                    ""descriptionId"": ""60410116-8b80-4694-b34b-eadd1f3b5bc1"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1324,7 +1324,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""R"",
                     ""type"": ""Button"",
-                    ""id"": ""c5e45691-c5c3-4b77-90df-b890ee682127"",
+                    ""descriptionId"": ""c5e45691-c5c3-4b77-90df-b890ee682127"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1333,7 +1333,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""T"",
                     ""type"": ""Button"",
-                    ""id"": ""952ffd33-d788-41b4-b123-80308f98bb61"",
+                    ""descriptionId"": ""952ffd33-d788-41b4-b123-80308f98bb61"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1342,7 +1342,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""Y"",
                     ""type"": ""Button"",
-                    ""id"": ""4e2c759a-cf8e-491b-b279-0d358c9b6bf2"",
+                    ""descriptionId"": ""4e2c759a-cf8e-491b-b279-0d358c9b6bf2"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1351,7 +1351,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""U"",
                     ""type"": ""Button"",
-                    ""id"": ""5ccb4423-5744-4311-8e41-9992d8675613"",
+                    ""descriptionId"": ""5ccb4423-5744-4311-8e41-9992d8675613"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1360,7 +1360,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""I"",
                     ""type"": ""Button"",
-                    ""id"": ""dce2c1bd-17ca-4904-a2a6-5f504dc78a2d"",
+                    ""descriptionId"": ""dce2c1bd-17ca-4904-a2a6-5f504dc78a2d"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1369,7 +1369,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""O"",
                     ""type"": ""Button"",
-                    ""id"": ""57db788a-4f4c-4bc6-849e-3c8056e0e5b3"",
+                    ""descriptionId"": ""57db788a-4f4c-4bc6-849e-3c8056e0e5b3"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1378,7 +1378,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""P"",
                     ""type"": ""Button"",
-                    ""id"": ""9ccaced4-ed58-4569-a4ce-1bc764de8398"",
+                    ""descriptionId"": ""9ccaced4-ed58-4569-a4ce-1bc764de8398"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1387,7 +1387,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""A"",
                     ""type"": ""Button"",
-                    ""id"": ""3a7fe5c8-594d-49e3-867f-2da6591354f5"",
+                    ""descriptionId"": ""3a7fe5c8-594d-49e3-867f-2da6591354f5"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1396,7 +1396,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""S"",
                     ""type"": ""Button"",
-                    ""id"": ""7044ee0a-9e8c-4e85-abbc-8c6395da8d01"",
+                    ""descriptionId"": ""7044ee0a-9e8c-4e85-abbc-8c6395da8d01"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1405,7 +1405,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""D"",
                     ""type"": ""Button"",
-                    ""id"": ""0fb7f539-3932-43fd-be85-3dfd147aae49"",
+                    ""descriptionId"": ""0fb7f539-3932-43fd-be85-3dfd147aae49"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1414,7 +1414,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""F"",
                     ""type"": ""Button"",
-                    ""id"": ""36529320-377a-4965-a48f-2ff6b9adc956"",
+                    ""descriptionId"": ""36529320-377a-4965-a48f-2ff6b9adc956"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1423,7 +1423,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""G"",
                     ""type"": ""Button"",
-                    ""id"": ""01690a45-a482-4548-852d-6bf71ae4d59d"",
+                    ""descriptionId"": ""01690a45-a482-4548-852d-6bf71ae4d59d"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1432,7 +1432,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""H"",
                     ""type"": ""Button"",
-                    ""id"": ""b007ea10-fd3d-4500-a108-60ab73548397"",
+                    ""descriptionId"": ""b007ea10-fd3d-4500-a108-60ab73548397"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1441,7 +1441,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""J"",
                     ""type"": ""Button"",
-                    ""id"": ""51172d02-2b3a-4bdc-8d79-5e8f0f6b866c"",
+                    ""descriptionId"": ""51172d02-2b3a-4bdc-8d79-5e8f0f6b866c"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1450,7 +1450,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""K"",
                     ""type"": ""Button"",
-                    ""id"": ""18a3d214-63c1-4202-b66f-5e042ce1af58"",
+                    ""descriptionId"": ""18a3d214-63c1-4202-b66f-5e042ce1af58"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1459,7 +1459,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""L"",
                     ""type"": ""Button"",
-                    ""id"": ""f679024b-6707-405b-b1bd-3ac9945d991a"",
+                    ""descriptionId"": ""f679024b-6707-405b-b1bd-3ac9945d991a"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1468,7 +1468,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""Z"",
                     ""type"": ""Button"",
-                    ""id"": ""b03d857e-074d-4965-8a21-7e9a2b2ca73c"",
+                    ""descriptionId"": ""b03d857e-074d-4965-8a21-7e9a2b2ca73c"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1477,7 +1477,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""X"",
                     ""type"": ""Button"",
-                    ""id"": ""35b48f31-ea91-46e1-92b5-f9295997e904"",
+                    ""descriptionId"": ""35b48f31-ea91-46e1-92b5-f9295997e904"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1486,7 +1486,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""C"",
                     ""type"": ""Button"",
-                    ""id"": ""f17684e4-b2b5-44f9-b6f3-05f94decef66"",
+                    ""descriptionId"": ""f17684e4-b2b5-44f9-b6f3-05f94decef66"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1495,7 +1495,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""V"",
                     ""type"": ""Button"",
-                    ""id"": ""0f400e2e-27df-4a1e-a3ce-f5d37ba398d9"",
+                    ""descriptionId"": ""0f400e2e-27df-4a1e-a3ce-f5d37ba398d9"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1504,7 +1504,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""B"",
                     ""type"": ""Button"",
-                    ""id"": ""e6ca87d2-462e-40d0-96db-82e693e18e5b"",
+                    ""descriptionId"": ""e6ca87d2-462e-40d0-96db-82e693e18e5b"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1513,7 +1513,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""N"",
                     ""type"": ""Button"",
-                    ""id"": ""c39bce37-e0de-4d55-921f-d75d9e97a749"",
+                    ""descriptionId"": ""c39bce37-e0de-4d55-921f-d75d9e97a749"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1522,7 +1522,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""M"",
                     ""type"": ""Button"",
-                    ""id"": ""0ecf32a1-3e1a-4f37-8c1a-305bc40cfd29"",
+                    ""descriptionId"": ""0ecf32a1-3e1a-4f37-8c1a-305bc40cfd29"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1531,7 +1531,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""DELETE"",
                     ""type"": ""Button"",
-                    ""id"": ""43940094-2862-4d0d-8057-77282c203527"",
+                    ""descriptionId"": ""43940094-2862-4d0d-8057-77282c203527"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1540,7 +1540,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""TAB"",
                     ""type"": ""Button"",
-                    ""id"": ""0f70cf5c-d56a-4a95-bd7b-b95dd5178e63"",
+                    ""descriptionId"": ""0f70cf5c-d56a-4a95-bd7b-b95dd5178e63"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1549,7 +1549,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""BRACKET_LEFT"",
                     ""type"": ""Button"",
-                    ""id"": ""52a4041c-5b7c-43e1-9155-fa289f1a3469"",
+                    ""descriptionId"": ""52a4041c-5b7c-43e1-9155-fa289f1a3469"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1558,7 +1558,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""BRACKET_RIGHT"",
                     ""type"": ""Button"",
-                    ""id"": ""c6ebcaa8-799b-42a9-97b8-c450bd55c3be"",
+                    ""descriptionId"": ""c6ebcaa8-799b-42a9-97b8-c450bd55c3be"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1567,7 +1567,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""BACKSLASH"",
                     ""type"": ""Button"",
-                    ""id"": ""376d10d8-2f97-45c8-9e3f-8a058dd827e7"",
+                    ""descriptionId"": ""376d10d8-2f97-45c8-9e3f-8a058dd827e7"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1576,7 +1576,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""CAPS_LOCK"",
                     ""type"": ""Button"",
-                    ""id"": ""3e14f55f-0627-46ca-956a-06180e68ea3c"",
+                    ""descriptionId"": ""3e14f55f-0627-46ca-956a-06180e68ea3c"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1585,7 +1585,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""SEMICOLON"",
                     ""type"": ""Button"",
-                    ""id"": ""7531cc72-cec7-4e44-98c2-c823d4fa0f40"",
+                    ""descriptionId"": ""7531cc72-cec7-4e44-98c2-c823d4fa0f40"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1594,7 +1594,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""QUOTE"",
                     ""type"": ""Button"",
-                    ""id"": ""e1cf12a4-ff5c-45a3-9b74-322a3f9e8c1f"",
+                    ""descriptionId"": ""e1cf12a4-ff5c-45a3-9b74-322a3f9e8c1f"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1603,7 +1603,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""ENTER"",
                     ""type"": ""Button"",
-                    ""id"": ""bbdce508-13bc-404f-9a7e-0b2c18f2a86c"",
+                    ""descriptionId"": ""bbdce508-13bc-404f-9a7e-0b2c18f2a86c"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1612,7 +1612,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""COMMA"",
                     ""type"": ""Button"",
-                    ""id"": ""264e7397-bead-4ff4-9429-4838c227f327"",
+                    ""descriptionId"": ""264e7397-bead-4ff4-9429-4838c227f327"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1621,7 +1621,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""PERIOD"",
                     ""type"": ""Button"",
-                    ""id"": ""f803f28a-ae42-4c12-ab4d-c823d2612e53"",
+                    ""descriptionId"": ""f803f28a-ae42-4c12-ab4d-c823d2612e53"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1630,7 +1630,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""SLASH"",
                     ""type"": ""Button"",
-                    ""id"": ""c59de0c6-1c9c-4f2c-963a-8246777f0a45"",
+                    ""descriptionId"": ""c59de0c6-1c9c-4f2c-963a-8246777f0a45"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1639,7 +1639,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""LEFT_SHIFT"",
                     ""type"": ""Button"",
-                    ""id"": ""c613e5ab-6499-4e88-8569-348979fc4e05"",
+                    ""descriptionId"": ""c613e5ab-6499-4e88-8569-348979fc4e05"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1648,7 +1648,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""RIGHT_SHIFT"",
                     ""type"": ""Button"",
-                    ""id"": ""2ab4c9e1-c58b-44d4-b2eb-d2119d58aaf1"",
+                    ""descriptionId"": ""2ab4c9e1-c58b-44d4-b2eb-d2119d58aaf1"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1657,7 +1657,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""LEFT_CTRL"",
                     ""type"": ""Button"",
-                    ""id"": ""edf0cf84-5e35-4cce-9ca9-9b289bcf2e10"",
+                    ""descriptionId"": ""edf0cf84-5e35-4cce-9ca9-9b289bcf2e10"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1666,7 +1666,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""RIGHT_CTRL"",
                     ""type"": ""Button"",
-                    ""id"": ""0194e4ad-b049-40bd-a626-f4d7cf79b47d"",
+                    ""descriptionId"": ""0194e4ad-b049-40bd-a626-f4d7cf79b47d"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1675,7 +1675,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""LEFT_ALT"",
                     ""type"": ""Button"",
-                    ""id"": ""686ce6e2-5fc7-4717-9e25-5b8e879db4bc"",
+                    ""descriptionId"": ""686ce6e2-5fc7-4717-9e25-5b8e879db4bc"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1684,7 +1684,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""RIGHT_ALT"",
                     ""type"": ""Button"",
-                    ""id"": ""7416c762-1cdb-43bf-b69c-8f0dcbdb27a3"",
+                    ""descriptionId"": ""7416c762-1cdb-43bf-b69c-8f0dcbdb27a3"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1693,7 +1693,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""ARROW_LEFT"",
                     ""type"": ""Button"",
-                    ""id"": ""b5f2d333-f037-4830-adc6-5b63e0dd058a"",
+                    ""descriptionId"": ""b5f2d333-f037-4830-adc6-5b63e0dd058a"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1702,7 +1702,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""ARROW_RIGHT"",
                     ""type"": ""Button"",
-                    ""id"": ""905d84d8-d2ac-4baa-aa41-b591076fab43"",
+                    ""descriptionId"": ""905d84d8-d2ac-4baa-aa41-b591076fab43"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1711,7 +1711,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""ARROW_UP"",
                     ""type"": ""Button"",
-                    ""id"": ""7f07daaf-6e1b-4e7c-8c0b-5041d6f40840"",
+                    ""descriptionId"": ""7f07daaf-6e1b-4e7c-8c0b-5041d6f40840"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1720,7 +1720,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""ARROW_DOWN"",
                     ""type"": ""Button"",
-                    ""id"": ""588506f2-c717-4990-9148-c24437f8a492"",
+                    ""descriptionId"": ""588506f2-c717-4990-9148-c24437f8a492"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1729,7 +1729,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""HOME"",
                     ""type"": ""Button"",
-                    ""id"": ""746bd76e-c037-4926-b5c9-151d9f6a5e5f"",
+                    ""descriptionId"": ""746bd76e-c037-4926-b5c9-151d9f6a5e5f"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1738,7 +1738,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""END"",
                     ""type"": ""Button"",
-                    ""id"": ""1e6b734b-93fd-4b6a-9d24-62bca27fbf36"",
+                    ""descriptionId"": ""1e6b734b-93fd-4b6a-9d24-62bca27fbf36"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1747,7 +1747,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""PAGE_UP"",
                     ""type"": ""Button"",
-                    ""id"": ""95cf258a-1dd3-453c-85dc-c1b5e6ad55f6"",
+                    ""descriptionId"": ""95cf258a-1dd3-453c-85dc-c1b5e6ad55f6"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1756,7 +1756,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""PAGE_DOWN"",
                     ""type"": ""Button"",
-                    ""id"": ""d3ab0089-ff67-4348-a629-9396d4c3e3e1"",
+                    ""descriptionId"": ""d3ab0089-ff67-4348-a629-9396d4c3e3e1"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1765,7 +1765,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""PRINTSCREEN"",
                     ""type"": ""Button"",
-                    ""id"": ""0341ac6d-b4dc-4a9d-abad-a9c12c96f480"",
+                    ""descriptionId"": ""0341ac6d-b4dc-4a9d-abad-a9c12c96f480"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1774,7 +1774,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""SPACE"",
                     ""type"": ""Button"",
-                    ""id"": ""896327e9-bf55-497e-b63a-0d6b7e2bfc06"",
+                    ""descriptionId"": ""896327e9-bf55-497e-b63a-0d6b7e2bfc06"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -1784,7 +1784,7 @@ namespace SoulboundEngine.UnityClient.Input
             ""bindings"": [
                 {
                     ""name"": """",
-                    ""id"": ""f3e930b3-d25d-4b60-88ee-ecb976f56c32"",
+                    ""descriptionId"": ""f3e930b3-d25d-4b60-88ee-ecb976f56c32"",
                     ""path"": ""<Keyboard>/escape"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -1795,7 +1795,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""39cec1c3-9361-4aab-8031-3546eb59f520"",
+                    ""descriptionId"": ""39cec1c3-9361-4aab-8031-3546eb59f520"",
                     ""path"": ""<Keyboard>/f1"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -1806,7 +1806,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""8279aadc-c73f-4be8-b69a-260d9b847928"",
+                    ""descriptionId"": ""8279aadc-c73f-4be8-b69a-260d9b847928"",
                     ""path"": ""<Keyboard>/f2"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -1817,7 +1817,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""85ae89f9-4978-40d3-afb3-4636a9c3ac68"",
+                    ""descriptionId"": ""85ae89f9-4978-40d3-afb3-4636a9c3ac68"",
                     ""path"": ""<Keyboard>/f3"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -1828,7 +1828,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""01279bc5-8ac8-4a66-9dd1-bd5d700e90e2"",
+                    ""descriptionId"": ""01279bc5-8ac8-4a66-9dd1-bd5d700e90e2"",
                     ""path"": ""<Keyboard>/f4"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -1839,7 +1839,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""3ce5a1a4-c2e4-459e-9392-1032f12614df"",
+                    ""descriptionId"": ""3ce5a1a4-c2e4-459e-9392-1032f12614df"",
                     ""path"": ""<Keyboard>/f5"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -1850,7 +1850,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""bd97cdd9-3212-4804-a0fc-240b6c68aa14"",
+                    ""descriptionId"": ""bd97cdd9-3212-4804-a0fc-240b6c68aa14"",
                     ""path"": ""<Keyboard>/f6"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -1861,7 +1861,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""22097dfc-8bcf-4d2a-bbc8-d8c9632d3ff1"",
+                    ""descriptionId"": ""22097dfc-8bcf-4d2a-bbc8-d8c9632d3ff1"",
                     ""path"": ""<Keyboard>/f7"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -1872,7 +1872,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""0c69ba80-7ef1-4ba0-81c7-0a0e81701dcb"",
+                    ""descriptionId"": ""0c69ba80-7ef1-4ba0-81c7-0a0e81701dcb"",
                     ""path"": ""<Keyboard>/f8"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -1883,7 +1883,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""7e09afda-277a-4702-b50d-8166390f90d2"",
+                    ""descriptionId"": ""7e09afda-277a-4702-b50d-8166390f90d2"",
                     ""path"": ""<Keyboard>/f9"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -1894,7 +1894,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""dac52026-2bc0-4b64-8cf0-a7d2ea947d96"",
+                    ""descriptionId"": ""dac52026-2bc0-4b64-8cf0-a7d2ea947d96"",
                     ""path"": ""<Keyboard>/f10"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -1905,7 +1905,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""05a44d3e-4aff-4475-b570-3f13c40c327e"",
+                    ""descriptionId"": ""05a44d3e-4aff-4475-b570-3f13c40c327e"",
                     ""path"": ""<Keyboard>/f11"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -1916,7 +1916,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""c4843121-fde4-4654-8e2c-ad5674511801"",
+                    ""descriptionId"": ""c4843121-fde4-4654-8e2c-ad5674511801"",
                     ""path"": ""<Keyboard>/f12"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -1927,7 +1927,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""bf644fb8-452e-44e1-b7ce-d78b580301f5"",
+                    ""descriptionId"": ""bf644fb8-452e-44e1-b7ce-d78b580301f5"",
                     ""path"": ""<Keyboard>/1"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -1938,7 +1938,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""4e486aa4-2026-4180-9fd7-8c25c6848b3f"",
+                    ""descriptionId"": ""4e486aa4-2026-4180-9fd7-8c25c6848b3f"",
                     ""path"": ""<Keyboard>/2"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -1949,7 +1949,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""e79e5961-1aff-45b4-bf8d-4c33b3e79625"",
+                    ""descriptionId"": ""e79e5961-1aff-45b4-bf8d-4c33b3e79625"",
                     ""path"": ""<Keyboard>/3"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -1960,7 +1960,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""4459b65f-e7ac-4ab7-b84c-ef882aae1a7c"",
+                    ""descriptionId"": ""4459b65f-e7ac-4ab7-b84c-ef882aae1a7c"",
                     ""path"": ""<Keyboard>/4"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -1971,7 +1971,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""44e08915-2b1f-44ce-b4be-806ec7fdf1e7"",
+                    ""descriptionId"": ""44e08915-2b1f-44ce-b4be-806ec7fdf1e7"",
                     ""path"": ""<Keyboard>/5"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -1982,7 +1982,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""d8cdd164-5da6-4dfd-9add-590c6be5baf5"",
+                    ""descriptionId"": ""d8cdd164-5da6-4dfd-9add-590c6be5baf5"",
                     ""path"": ""<Keyboard>/6"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -1993,7 +1993,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""cb228af6-7079-4590-a3b6-b8fa8d395cde"",
+                    ""descriptionId"": ""cb228af6-7079-4590-a3b6-b8fa8d395cde"",
                     ""path"": ""<Keyboard>/7"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2004,7 +2004,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""b7a4261f-ce1d-454b-a543-b6c58652475d"",
+                    ""descriptionId"": ""b7a4261f-ce1d-454b-a543-b6c58652475d"",
                     ""path"": ""<Keyboard>/8"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2015,7 +2015,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""266632ce-1c49-4474-bbc4-0f72e7c5294d"",
+                    ""descriptionId"": ""266632ce-1c49-4474-bbc4-0f72e7c5294d"",
                     ""path"": ""<Keyboard>/9"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2026,7 +2026,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""2c203150-db49-45c1-90d1-aed63bef55ef"",
+                    ""descriptionId"": ""2c203150-db49-45c1-90d1-aed63bef55ef"",
                     ""path"": ""<Keyboard>/0"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2037,7 +2037,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""6ceab1b6-ec04-45cb-9e2a-88fc5234b30e"",
+                    ""descriptionId"": ""6ceab1b6-ec04-45cb-9e2a-88fc5234b30e"",
                     ""path"": ""<Keyboard>/backquote"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2048,7 +2048,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""9819e4da-b702-4d27-bffd-b8c322c1123b"",
+                    ""descriptionId"": ""9819e4da-b702-4d27-bffd-b8c322c1123b"",
                     ""path"": ""<Keyboard>/minus"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2059,7 +2059,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""0267dcaf-b4e1-49ca-bf8d-bbd19fbeb464"",
+                    ""descriptionId"": ""0267dcaf-b4e1-49ca-bf8d-bbd19fbeb464"",
                     ""path"": ""<Keyboard>/equals"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2070,7 +2070,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""ef26d6d3-248d-4202-861a-92e2050548d1"",
+                    ""descriptionId"": ""ef26d6d3-248d-4202-861a-92e2050548d1"",
                     ""path"": ""<Keyboard>/backspace"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2081,7 +2081,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""70bf1090-2aab-44f5-9463-28e893414892"",
+                    ""descriptionId"": ""70bf1090-2aab-44f5-9463-28e893414892"",
                     ""path"": ""<Keyboard>/q"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2092,7 +2092,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""27fe7644-5267-4cc7-ad42-6322a10ce64f"",
+                    ""descriptionId"": ""27fe7644-5267-4cc7-ad42-6322a10ce64f"",
                     ""path"": ""<Keyboard>/w"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2103,7 +2103,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""c1f190e6-4e15-4353-9a5e-ad587bf3a93c"",
+                    ""descriptionId"": ""c1f190e6-4e15-4353-9a5e-ad587bf3a93c"",
                     ""path"": ""<Keyboard>/e"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2114,7 +2114,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""a27da25e-27fa-4434-89cf-d790a959b81b"",
+                    ""descriptionId"": ""a27da25e-27fa-4434-89cf-d790a959b81b"",
                     ""path"": ""<Keyboard>/r"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2125,7 +2125,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""73a2b9d7-7025-4654-b42d-454b4f4ae648"",
+                    ""descriptionId"": ""73a2b9d7-7025-4654-b42d-454b4f4ae648"",
                     ""path"": ""<Keyboard>/t"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2136,7 +2136,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""bb6eaafb-97b7-482a-8b9a-16638ab79f1f"",
+                    ""descriptionId"": ""bb6eaafb-97b7-482a-8b9a-16638ab79f1f"",
                     ""path"": ""<Keyboard>/y"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2147,7 +2147,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""05b55776-ac3e-4591-ac2d-e850aa56f6b8"",
+                    ""descriptionId"": ""05b55776-ac3e-4591-ac2d-e850aa56f6b8"",
                     ""path"": ""<Keyboard>/u"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2158,7 +2158,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""06af146d-7145-498f-ba30-138b2302b2eb"",
+                    ""descriptionId"": ""06af146d-7145-498f-ba30-138b2302b2eb"",
                     ""path"": ""<Keyboard>/i"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2169,7 +2169,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""bd294d68-cc6c-4c4b-a04f-d06c11013663"",
+                    ""descriptionId"": ""bd294d68-cc6c-4c4b-a04f-d06c11013663"",
                     ""path"": ""<Keyboard>/o"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2180,7 +2180,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""012c683b-bd2f-4b6d-a54b-1a8864063ede"",
+                    ""descriptionId"": ""012c683b-bd2f-4b6d-a54b-1a8864063ede"",
                     ""path"": ""<Keyboard>/p"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2191,7 +2191,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""589cffe2-361d-4353-8a7a-df6c4fb941d1"",
+                    ""descriptionId"": ""589cffe2-361d-4353-8a7a-df6c4fb941d1"",
                     ""path"": ""<Keyboard>/a"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2202,7 +2202,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""2001291a-9610-4318-ae35-3a1e211f44f9"",
+                    ""descriptionId"": ""2001291a-9610-4318-ae35-3a1e211f44f9"",
                     ""path"": ""<Keyboard>/s"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2213,7 +2213,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""463b1650-aff8-411c-813b-fb0e965dd4e7"",
+                    ""descriptionId"": ""463b1650-aff8-411c-813b-fb0e965dd4e7"",
                     ""path"": ""<Keyboard>/d"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2224,7 +2224,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""248bc270-ddef-4118-b5e5-f4086ebef6e1"",
+                    ""descriptionId"": ""248bc270-ddef-4118-b5e5-f4086ebef6e1"",
                     ""path"": ""<Keyboard>/f"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2235,7 +2235,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""4478fe54-1242-4779-95e8-a4905869accc"",
+                    ""descriptionId"": ""4478fe54-1242-4779-95e8-a4905869accc"",
                     ""path"": ""<Keyboard>/g"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2246,7 +2246,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""077b872d-9bef-461e-9be6-d53c5201a41e"",
+                    ""descriptionId"": ""077b872d-9bef-461e-9be6-d53c5201a41e"",
                     ""path"": ""<Keyboard>/h"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2257,7 +2257,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""a054a201-4263-47f9-a4be-928735a0964b"",
+                    ""descriptionId"": ""a054a201-4263-47f9-a4be-928735a0964b"",
                     ""path"": ""<Keyboard>/j"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2268,7 +2268,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""3a465d9e-e207-431c-959c-74537a56962b"",
+                    ""descriptionId"": ""3a465d9e-e207-431c-959c-74537a56962b"",
                     ""path"": ""<Keyboard>/k"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2279,7 +2279,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""751b9f07-998a-4bdc-b231-96a1078265a8"",
+                    ""descriptionId"": ""751b9f07-998a-4bdc-b231-96a1078265a8"",
                     ""path"": ""<Keyboard>/l"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2290,7 +2290,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""14c92973-52ec-4cef-bd1e-25d6c015ca47"",
+                    ""descriptionId"": ""14c92973-52ec-4cef-bd1e-25d6c015ca47"",
                     ""path"": ""<Keyboard>/z"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2301,7 +2301,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""8bb4f44d-8f96-4579-9283-01c4662a081c"",
+                    ""descriptionId"": ""8bb4f44d-8f96-4579-9283-01c4662a081c"",
                     ""path"": ""<Keyboard>/x"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2312,7 +2312,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""bd039a2d-4c3b-4f51-bc0e-32e62157d1c4"",
+                    ""descriptionId"": ""bd039a2d-4c3b-4f51-bc0e-32e62157d1c4"",
                     ""path"": ""<Keyboard>/c"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2323,7 +2323,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""5e24350d-6746-44df-ae64-640d867f97f9"",
+                    ""descriptionId"": ""5e24350d-6746-44df-ae64-640d867f97f9"",
                     ""path"": ""<Keyboard>/v"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2334,7 +2334,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""fc016420-a2e1-4937-87b5-1e74c0171a18"",
+                    ""descriptionId"": ""fc016420-a2e1-4937-87b5-1e74c0171a18"",
                     ""path"": ""<Keyboard>/b"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2345,7 +2345,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""ab91ea99-fd78-4b9c-9e51-489db5a21a6d"",
+                    ""descriptionId"": ""ab91ea99-fd78-4b9c-9e51-489db5a21a6d"",
                     ""path"": ""<Keyboard>/n"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2356,7 +2356,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""a6e0cdcb-7988-4fb3-a7c5-2891f6b84bb0"",
+                    ""descriptionId"": ""a6e0cdcb-7988-4fb3-a7c5-2891f6b84bb0"",
                     ""path"": ""<Keyboard>/m"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2367,7 +2367,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""0d966191-3d3b-4d74-871e-f97fc83af23d"",
+                    ""descriptionId"": ""0d966191-3d3b-4d74-871e-f97fc83af23d"",
                     ""path"": ""<Keyboard>/delete"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2378,7 +2378,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""472a241b-9ff0-4077-a06b-26b6937c6440"",
+                    ""descriptionId"": ""472a241b-9ff0-4077-a06b-26b6937c6440"",
                     ""path"": ""<Keyboard>/tab"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2389,7 +2389,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""7d4a56fb-2e64-45b5-a45c-c2283518cb21"",
+                    ""descriptionId"": ""7d4a56fb-2e64-45b5-a45c-c2283518cb21"",
                     ""path"": ""<Keyboard>/leftBracket"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2400,7 +2400,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""0eb83f27-53c0-4f7b-9d26-a433329f9ba3"",
+                    ""descriptionId"": ""0eb83f27-53c0-4f7b-9d26-a433329f9ba3"",
                     ""path"": ""<Keyboard>/rightBracket"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2411,7 +2411,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""0c723848-94a7-4fc9-81fc-90fa45961b05"",
+                    ""descriptionId"": ""0c723848-94a7-4fc9-81fc-90fa45961b05"",
                     ""path"": ""<Keyboard>/backslash"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2422,7 +2422,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""d9eaff8f-136e-48ec-8ddb-3e8d792b0fd8"",
+                    ""descriptionId"": ""d9eaff8f-136e-48ec-8ddb-3e8d792b0fd8"",
                     ""path"": ""<Keyboard>/capsLock"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2433,7 +2433,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""d64193a7-911e-4ed9-8b20-49dfb15aa327"",
+                    ""descriptionId"": ""d64193a7-911e-4ed9-8b20-49dfb15aa327"",
                     ""path"": ""<Keyboard>/semicolon"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2444,7 +2444,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""6598bc1b-f155-4a01-b82b-ddd5b7706c92"",
+                    ""descriptionId"": ""6598bc1b-f155-4a01-b82b-ddd5b7706c92"",
                     ""path"": ""<Keyboard>/quote"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2455,7 +2455,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""055b043a-aaad-4e0f-a88a-42f347eda000"",
+                    ""descriptionId"": ""055b043a-aaad-4e0f-a88a-42f347eda000"",
                     ""path"": ""<Keyboard>/enter"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2466,7 +2466,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""35475db6-a7f4-4576-b42f-b5fb00f1f309"",
+                    ""descriptionId"": ""35475db6-a7f4-4576-b42f-b5fb00f1f309"",
                     ""path"": ""<Keyboard>/leftShift"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2477,7 +2477,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""65493e4a-2798-485e-b4ee-4aebfefa54a3"",
+                    ""descriptionId"": ""65493e4a-2798-485e-b4ee-4aebfefa54a3"",
                     ""path"": ""<Keyboard>/comma"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2488,7 +2488,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""0c14b4b1-5a7c-44e2-ac5c-12896b880e73"",
+                    ""descriptionId"": ""0c14b4b1-5a7c-44e2-ac5c-12896b880e73"",
                     ""path"": ""<Keyboard>/period"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2499,7 +2499,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""7532e569-e788-400f-8aaa-07b68a539981"",
+                    ""descriptionId"": ""7532e569-e788-400f-8aaa-07b68a539981"",
                     ""path"": ""<Keyboard>/slash"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2510,7 +2510,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""577649e1-d2d0-4e79-9e7d-fef8afcc5ceb"",
+                    ""descriptionId"": ""577649e1-d2d0-4e79-9e7d-fef8afcc5ceb"",
                     ""path"": ""<Keyboard>/rightShift"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2521,7 +2521,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""e226c189-a3a4-4bd5-9f38-53ce9c445255"",
+                    ""descriptionId"": ""e226c189-a3a4-4bd5-9f38-53ce9c445255"",
                     ""path"": ""<Keyboard>/leftCtrl"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2532,7 +2532,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""6fa979d4-432f-4d99-a081-f1e2b0fca003"",
+                    ""descriptionId"": ""6fa979d4-432f-4d99-a081-f1e2b0fca003"",
                     ""path"": ""<Keyboard>/leftAlt"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2543,7 +2543,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""dcd8cf73-1fb6-4966-a9f0-2fb49db6a687"",
+                    ""descriptionId"": ""dcd8cf73-1fb6-4966-a9f0-2fb49db6a687"",
                     ""path"": ""<Keyboard>/rightAlt"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2554,7 +2554,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""b0d5f282-4fde-4731-967f-8fd974e824b5"",
+                    ""descriptionId"": ""b0d5f282-4fde-4731-967f-8fd974e824b5"",
                     ""path"": ""<Keyboard>/leftArrow"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2565,7 +2565,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""b3ecfdfe-70f6-4bd2-8d05-8f654879a930"",
+                    ""descriptionId"": ""b3ecfdfe-70f6-4bd2-8d05-8f654879a930"",
                     ""path"": ""<Keyboard>/rightArrow"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2576,7 +2576,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""3bf7f213-6c81-443b-85b3-2a8ff610861a"",
+                    ""descriptionId"": ""3bf7f213-6c81-443b-85b3-2a8ff610861a"",
                     ""path"": ""<Keyboard>/upArrow"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2587,7 +2587,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""546d306e-5006-4ab5-8f46-c0387174644b"",
+                    ""descriptionId"": ""546d306e-5006-4ab5-8f46-c0387174644b"",
                     ""path"": ""<Keyboard>/downArrow"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2598,7 +2598,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""269f8126-53b9-4558-9f48-a839dc994049"",
+                    ""descriptionId"": ""269f8126-53b9-4558-9f48-a839dc994049"",
                     ""path"": ""<Keyboard>/home"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2609,7 +2609,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""fbb0940f-22a3-44d4-9720-9f745a7a6671"",
+                    ""descriptionId"": ""fbb0940f-22a3-44d4-9720-9f745a7a6671"",
                     ""path"": ""<Keyboard>/end"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2620,7 +2620,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""ca034400-dfcc-4648-af6c-a3af612990d4"",
+                    ""descriptionId"": ""ca034400-dfcc-4648-af6c-a3af612990d4"",
                     ""path"": ""<Keyboard>/pageUp"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2631,7 +2631,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""96e7a76b-13be-4eee-ab44-04551f294838"",
+                    ""descriptionId"": ""96e7a76b-13be-4eee-ab44-04551f294838"",
                     ""path"": ""<Keyboard>/pageDown"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2642,7 +2642,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""4ab6f4cd-e0c8-45e5-a89f-ba86458f2943"",
+                    ""descriptionId"": ""4ab6f4cd-e0c8-45e5-a89f-ba86458f2943"",
                     ""path"": ""<Keyboard>/printScreen"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2653,7 +2653,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""1ee83313-d45e-4332-8944-665ef1c97b84"",
+                    ""descriptionId"": ""1ee83313-d45e-4332-8944-665ef1c97b84"",
                     ""path"": ""<Keyboard>/rightCtrl"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2664,7 +2664,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""4f113240-5e72-4581-a4ea-403f86b16a7c"",
+                    ""descriptionId"": ""4f113240-5e72-4581-a4ea-403f86b16a7c"",
                     ""path"": ""<Keyboard>/space"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2677,12 +2677,12 @@ namespace SoulboundEngine.UnityClient.Input
         },
         {
             ""name"": ""Mouse"",
-            ""id"": ""5d62c64b-84fa-420f-abf2-f4d4b100c2ed"",
+            ""descriptionId"": ""5d62c64b-84fa-420f-abf2-f4d4b100c2ed"",
             ""actions"": [
                 {
                     ""name"": ""Position"",
                     ""type"": ""Value"",
-                    ""id"": ""708afba8-d747-4416-a854-f0f6103f4fcb"",
+                    ""descriptionId"": ""708afba8-d747-4416-a854-f0f6103f4fcb"",
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -2691,7 +2691,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""LeftClick"",
                     ""type"": ""Button"",
-                    ""id"": ""6017f032-1ef9-423e-93de-03f1610fecf0"",
+                    ""descriptionId"": ""6017f032-1ef9-423e-93de-03f1610fecf0"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -2700,7 +2700,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""RightClick"",
                     ""type"": ""Button"",
-                    ""id"": ""d40c7204-0280-46e2-b231-31af8001eac5"",
+                    ""descriptionId"": ""d40c7204-0280-46e2-b231-31af8001eac5"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -2709,7 +2709,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""MiddleClick"",
                     ""type"": ""Button"",
-                    ""id"": ""25f97e9c-a8a3-45cb-9fdf-aa7ddeac1f23"",
+                    ""descriptionId"": ""25f97e9c-a8a3-45cb-9fdf-aa7ddeac1f23"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -2718,7 +2718,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""Forward"",
                     ""type"": ""Button"",
-                    ""id"": ""5c694ae4-83fc-4123-9c1b-b47f125a55d1"",
+                    ""descriptionId"": ""5c694ae4-83fc-4123-9c1b-b47f125a55d1"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -2727,7 +2727,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""Backward"",
                     ""type"": ""Button"",
-                    ""id"": ""51faaad6-d09a-4d26-922a-71f1dc449401"",
+                    ""descriptionId"": ""51faaad6-d09a-4d26-922a-71f1dc449401"",
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
@@ -2736,7 +2736,7 @@ namespace SoulboundEngine.UnityClient.Input
                 {
                     ""name"": ""Scroll"",
                     ""type"": ""Value"",
-                    ""id"": ""cacdbfab-9fbe-41a4-a984-294714d2c87d"",
+                    ""descriptionId"": ""cacdbfab-9fbe-41a4-a984-294714d2c87d"",
                     ""expectedControlType"": ""Axis"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -2746,7 +2746,7 @@ namespace SoulboundEngine.UnityClient.Input
             ""bindings"": [
                 {
                     ""name"": """",
-                    ""id"": ""8ebc9995-fb92-493b-8f29-56e58d7ca661"",
+                    ""descriptionId"": ""8ebc9995-fb92-493b-8f29-56e58d7ca661"",
                     ""path"": ""<Mouse>/position"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2757,7 +2757,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""f624ae71-f945-4abf-badd-a29112c21faf"",
+                    ""descriptionId"": ""f624ae71-f945-4abf-badd-a29112c21faf"",
                     ""path"": ""<Mouse>/leftButton"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2768,7 +2768,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""ca088e32-a789-4694-97ea-dc85acca4b57"",
+                    ""descriptionId"": ""ca088e32-a789-4694-97ea-dc85acca4b57"",
                     ""path"": ""<Mouse>/rightButton"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2779,7 +2779,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""894c9b03-8073-45f8-9136-1e26119a3610"",
+                    ""descriptionId"": ""894c9b03-8073-45f8-9136-1e26119a3610"",
                     ""path"": ""<Mouse>/middleButton"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2790,7 +2790,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""9053e9da-8e22-49ac-a2f7-b9557e9ddc0c"",
+                    ""descriptionId"": ""9053e9da-8e22-49ac-a2f7-b9557e9ddc0c"",
                     ""path"": ""<Mouse>/forwardButton"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2801,7 +2801,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""a56b04ff-105d-444e-9311-0125c3d080cc"",
+                    ""descriptionId"": ""a56b04ff-105d-444e-9311-0125c3d080cc"",
                     ""path"": ""<Mouse>/{Back}"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -2812,7 +2812,7 @@ namespace SoulboundEngine.UnityClient.Input
                 },
                 {
                     ""name"": """",
-                    ""id"": ""2f5afb80-0952-4508-8c0f-9a308cdfec91"",
+                    ""descriptionId"": ""2f5afb80-0952-4508-8c0f-9a308cdfec91"",
                     ""path"": ""<Mouse>/scroll/y"",
                     ""interactions"": """",
                     ""processors"": """",

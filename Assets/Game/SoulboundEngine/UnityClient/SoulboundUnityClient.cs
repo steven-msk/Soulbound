@@ -96,7 +96,16 @@ namespace SoulboundEngine.UnityClient {
 
 		[UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.AfterSceneLoad)]
 		public static void GameLaunch() {
-			new SoulboundUnityClient(Main.instance.GetUnityClientConfig()).Start();
+			try {
+				new SoulboundUnityClient(Main.instance.GetUnityClientConfig()).Start();
+			} catch(Exception e) {
+				Logger.LogFatal(e, "Caught unhandled exception in client init");
+				if (UnityEngine.Application.isEditor) {
+					EditorApplication.isPlaying = false;
+				} else {
+					Environment.FailFast("Caught unhandled exception in client init", e);
+				}
+			}
 		}
 
 		private SoulboundUnityClient(UnityClientConfig config) {
