@@ -10,13 +10,13 @@ namespace SoulboundEngine.World.Entity.Attribute {
 		private readonly Dictionary<AttributeModifier.Operation, Dictionary<Identifier, AttributeModifier>> modifiersByOperation = new();
 		private readonly Dictionary<Identifier, AttributeModifier> modifierById = new();
 		private readonly Dictionary<Identifier, AttributeModifier> permanentModifiers = new();
-		private readonly RegistryEntry<Attribute> attribute;
+		private readonly RegistryEntry<AttributeType> attribute;
 		private readonly Action<AttributeInstance> onDirty;
 		private double baseValue;
 		private double cachedValue;
 		private bool dirty = true;
 
-		public AttributeInstance(RegistryEntry<Attribute> attribute, Action<AttributeInstance> onDirty) {
+		public AttributeInstance(RegistryEntry<AttributeType> attribute, Action<AttributeInstance> onDirty) {
 			this.attribute = attribute;
 			this.onDirty = onDirty;
 			this.baseValue = attribute.GetValue().defaultValue;
@@ -31,7 +31,7 @@ namespace SoulboundEngine.World.Entity.Attribute {
 			}
 		}
 
-		public RegistryEntry<Attribute> GetAttribute() => this.attribute;
+		public RegistryEntry<AttributeType> GetAttribute() => this.attribute;
 
 		public Dictionary<Identifier, AttributeModifier> GetModifiers(AttributeModifier.Operation operation) {
 			if (this.modifiersByOperation.TryGetValue(operation, out Dictionary<Identifier, AttributeModifier> modifiers)) {
@@ -180,6 +180,6 @@ namespace SoulboundEngine.World.Entity.Attribute {
 			this.SetDirty();
 		}
 
-		public record Packed(RegistryEntry<Attribute> attribute, double baseValue, List<AttributeModifier> permanentModifiers);
+		public record Packed(RegistryEntry<AttributeType> attribute, double baseValue, List<AttributeModifier> permanentModifiers);
 	}
 }

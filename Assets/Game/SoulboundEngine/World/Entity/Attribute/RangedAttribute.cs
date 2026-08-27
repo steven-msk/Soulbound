@@ -1,7 +1,7 @@
 ﻿namespace SoulboundEngine.World.Entity.Attribute {
 	using System;
 
-	public class RangedAttribute : Attribute {
+	public class RangedAttribute : AttributeType {
 		public double minValue { get; private set; }
 		public double maxValue { get; private set; }
 

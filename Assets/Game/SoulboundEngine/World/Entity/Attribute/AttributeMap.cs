@@ -5,7 +5,7 @@
 #nullable enable
 
 	public class AttributeMap {
-		private readonly Dictionary<RegistryEntry<Attribute>, AttributeInstance> attributes = new();
+		private readonly Dictionary<RegistryEntry<AttributeType>, AttributeInstance> attributes = new();
 		private readonly HashSet<AttributeInstance> attributesToUpdate = new();
 		private readonly AttributeSupplier supplier;
 
@@ -19,7 +19,7 @@
 
 		public HashSet<AttributeInstance> GetAttributesToUpdate() => this.attributesToUpdate;
 
-		public AttributeInstance? GetInstance(RegistryEntry<Attribute> attribute) {
+		public AttributeInstance? GetInstance(RegistryEntry<AttributeType> attribute) {
 			if (this.attributes.TryGetValue(attribute, out AttributeInstance? instance)) {
 				return instance;
 			}
@@ -28,28 +28,28 @@
 			return instance;
 		}
 
-		public bool HasAttribute(RegistryEntry<Attribute> attribute) {
+		public bool HasAttribute(RegistryEntry<AttributeType> attribute) {
 			return this.attributes.ContainsKey(attribute) || this.supplier.HasAttribute(attribute);
 		}
 
-		public bool HasModifier(RegistryEntry<Attribute> attribute, Identifier modifier) {
+		public bool HasModifier(RegistryEntry<AttributeType> attribute, Identifier modifier) {
 			return this.attributes.GetValueOrDefault(attribute)?.GetModifier(modifier) != null || this.supplier.HasModifier(attribute, modifier);
 		}
 
-		public double GetValue(RegistryEntry<Attribute> attribute) {
+		public double GetValue(RegistryEntry<AttributeType> attribute) {
 			return this.attributes.GetValueOrDefault(attribute)?.GetValue() ?? this.supplier.GetValue(attribute);
 		}
 
-		public double GetBaseValue(RegistryEntry<Attribute> attribute) {
+		public double GetBaseValue(RegistryEntry<AttributeType> attribute) {
 			return this.attributes.GetValueOrDefault(attribute)?.GetBaseValue() ?? this.supplier.GetBaseValue(attribute);
 		}
 
-		public double GetModifierValue(RegistryEntry<Attribute> attribute, Identifier modifier) {
+		public double GetModifierValue(RegistryEntry<AttributeType> attribute, Identifier modifier) {
 			return this.attributes.GetValueOrDefault(attribute)?.GetModifier(modifier)?.amount ?? this.supplier.GetModifierValue(attribute, modifier);
 		}
 
-		public void AddTransientModifiers(IDictionary<RegistryEntry<Attribute>, List<AttributeModifier>> modifiers) {
-			foreach ((RegistryEntry<Attribute> attribute, List<AttributeModifier> attributeModifiers) in modifiers) {
+		public void AddTransientModifiers(IDictionary<RegistryEntry<AttributeType>, List<AttributeModifier>> modifiers) {
+			foreach ((RegistryEntry<AttributeType> attribute, List<AttributeModifier> attributeModifiers) in modifiers) {
 				AttributeInstance? instance = this.GetInstance(attribute);
 				if (instance == null) continue;
 
@@ -60,8 +60,8 @@
 			}
 		}
 
-		public void RemoveAttributeModifiers(IDictionary<RegistryEntry<Attribute>, List<AttributeModifier>> modifiers) {
-			foreach ((RegistryEntry<Attribute> attribute, List<AttributeModifier> attributeModifiers) in modifiers) {
+		public void RemoveAttributeModifiers(IDictionary<RegistryEntry<AttributeType>, List<AttributeModifier>> modifiers) {
+			foreach ((RegistryEntry<AttributeType> attribute, List<AttributeModifier> attributeModifiers) in modifiers) {
 				AttributeInstance? instance = this.GetInstance(attribute);
 				if (instance == null) continue;
 
@@ -92,7 +92,7 @@
 			}
 		}
 
-		public bool ResetBaseValue(RegistryEntry<Attribute> attribute) {
+		public bool ResetBaseValue(RegistryEntry<AttributeType> attribute) {
 			if (!this.supplier.HasAttribute(attribute)) return false;
 
 			AttributeInstance? instance = this.attributes.GetValueOrDefault(attribute);

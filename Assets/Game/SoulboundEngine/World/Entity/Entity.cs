@@ -39,7 +39,6 @@ namespace SoulboundEngine.World.Entity {
 		public bool verticalCollisionBelow;
 		private Vec2d deltaMovement;
 		private bool isOnGround;
-		private float speed;
 
 		protected Entity(EntityDescriptor descriptor, Level level) {
 			this.descriptor = descriptor;
@@ -50,7 +49,9 @@ namespace SoulboundEngine.World.Entity {
 		}
 
 		public static AttributeSupplier.Builder CreateDefaultAttributes() {
-			return AttributeSupplier.Create();
+			return AttributeSupplier.Create()
+				.Add(Attributes.SPEED)
+				.Add(Attributes.GRAVITY);
 		}
 
 		public Vec2d position { get; private set; } = Vec2d.ZERO;
@@ -299,14 +300,9 @@ namespace SoulboundEngine.World.Entity {
 			return this.lastKnownSpeed;
 		}
 
-		public virtual float GetSpeed() => this.speed;
-		public virtual void SetSpeed(float speed) {
-			this.speed = speed;
-		}
+		public virtual float GetSpeed() => (float)this.GetAttributeValue(Attributes.SPEED);
 
-		protected virtual double GetGravity() {
-			return 0.0d;
-		}
+		protected virtual double GetGravity() => this.GetAttributeValue(Attributes.GRAVITY);
 
 		protected double GetAppliedGravity() {
 			return this.GetGravity();
@@ -334,6 +330,18 @@ namespace SoulboundEngine.World.Entity {
 		}
 
 		public AttributeMap GetAttributes() => this.attributes;
+
+		public double GetAttributeValue(RegistryEntry<AttributeType> attribute) {
+			return this.GetAttributes().GetValue(attribute);
+		}
+
+		public AttributeInstance? GetAttributeInstance(RegistryEntry<AttributeType> attribute) {
+			return this.GetAttributes().GetInstance(attribute);
+		}
+
+		public double GetAttributeBaseValue(RegistryEntry<AttributeType> attribute) {
+			return this.GetAttributes().GetBaseValue(attribute);
+		}
 
 		public JToken Save() {
 			JObject json = new() {

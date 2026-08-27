@@ -11,7 +11,7 @@ namespace SoulboundEngine.Registry {
 	using SoulboundEngine.World.Widget;
 	using System;
 	using System.Linq;
-	using Attribute = World.Entity.Attribute.Attribute;
+	using AttributeType = World.Entity.Attribute.AttributeType;
 
 	public static class Registries {
 		private static bool freezed = false;
@@ -21,7 +21,7 @@ namespace SoulboundEngine.Registry {
 		public static readonly Registry<Block> BLOCKS = Create<Block>(Identifier.Of("block"));
 		public static readonly Registry<Item> ITEMS = Create<Item>(Identifier.Of("item"));
 		public static readonly Registry<EntityDescriptor> ENTITIES = Create<EntityDescriptor>(Identifier.Of("entity"));
-		public static readonly Registry<Attribute> ATTRIBUTE = Create<Attribute>(Identifier.Of("attribute"));
+		public static readonly Registry<AttributeType> ATTRIBUTE = Create<AttributeType>(Identifier.Of("attribute"));
 		public static readonly Registry<TileEntityType> TILE_ENTITIES = Create<TileEntityType>(Identifier.Of("tile_entity"));
 		public static readonly Registry<InventoryScreenHandlerType> INVENTORY_SCREEN_HANDLES = Create<InventoryScreenHandlerType>(Identifier.Of("inventory_screen_handle"));
 		public static readonly Registry<RecipeType> RECIPE_TYPE = Create<RecipeType>(Identifier.Of("recipe_type"));

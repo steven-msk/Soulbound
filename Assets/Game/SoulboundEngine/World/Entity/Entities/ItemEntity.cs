@@ -1,6 +1,7 @@
 namespace SoulboundEngine.World.Entity {
 	using Newtonsoft.Json.Linq;
 	using SoulboundEngine.Item;
+	using SoulboundEngine.World.Entity.Attribute;
 	using SoulboundEngine.World.Level;
 	using SoulboundEngine.World.Player;
 	using System;
@@ -40,7 +41,10 @@ namespace SoulboundEngine.World.Entity {
 			return new ItemEntity(descriptor, level);
 		}
 
-		protected override double GetGravity() => 0.04d;
+		public new static AttributeSupplier.Builder CreateDefaultAttributes() {
+			return Entity.CreateDefaultAttributes()
+				.Add(Attributes.GRAVITY, 0.04d);
+		}
 
 		public override void Tick() {
 			if (this.itemStack.IsEmpty()) {
@@ -57,10 +61,13 @@ namespace SoulboundEngine.World.Entity {
 		}
 
 		public Guid? GetOwner() => this.owner;
+
 		public void SetOwner(Guid? owner) => this.owner = owner;
+
 		public void SetOwner(Entity entity) => this.owner = entity.guid;
 
 		public ItemStack GetStack() => this.itemStack;
+
 		public void SetStack(ItemStack stack) => this.itemStack = stack;
 
 		public override void PlayerTouch(PlayerEntity player) {
