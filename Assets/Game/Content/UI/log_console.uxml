@@ -1,10 +1,10 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/Game/Content/UI/Styles/LogEntry.uss?fileID=7433441132597879392&amp;guid=864800570a46cf446a2fd33d206f40c4&amp;type=3#LogEntry"/>
-    <ui:ListView virtualization-method="DynamicHeight" selection-type="None" name="log_list" item-template="project://database/Assets/Game/Content/UI/log_entry.uxml?fileID=9197481963319205126&amp;guid=fac28411c2da504439205f2742b62031&amp;type=3#log_entry" style="flex-grow: 1; position: absolute; left: 0; bottom: 0; right: 0; top: 0;"/>
-    <ui:VisualElement style="flex-grow: 0; align-items: flex-end;">
+    <Style src="project://database/Assets/Game/Content/UI/Styles/LogConsole.uss?fileID=7433441132597879392&amp;guid=864800570a46cf446a2fd33d206f40c4&amp;type=3#LogConsole"/>
+    <ui:VisualElement style="flex-grow: 0; align-items: flex-end; flex-direction: row;">
         <ui:Button text="INFO" name="info_filter" style="width: 100px; color: rgb(255, 255, 255); background-color: rgb(51, 51, 51);"/>
         <ui:Button text="WARNING" name="warning_filter" style="width: 100px; color: rgb(255, 235, 4); background-color: rgb(51, 51, 51);"/>
         <ui:Button text="ERROR" name="error_filter" style="width: 100px; color: rgb(255, 0, 0); background-color: rgb(51, 51, 51);"/>
         <ui:Button text="FATAL" name="fatal_filter" style="width: 100px; -unity-font-style: bold; color: rgb(255, 0, 0); background-color: rgb(51, 51, 51);"/>
     </ui:VisualElement>
+    <ui:ListView virtualization-method="DynamicHeight" selection-type="None" name="log_list" item-template="project://database/Assets/Game/Content/UI/log_entry.uxml?fileID=9197481963319205126&amp;guid=fac28411c2da504439205f2742b62031&amp;type=3#log_entry" style="flex-grow: 1; position: relative; left: 0; bottom: 0; right: 0; top: 0;"/>
 </ui:UXML>

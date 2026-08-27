@@ -21,11 +21,11 @@ namespace SoulboundEngine.UnityClient.UI.UXMLBindings {
             UXMLSchema.Register(Identifier.Of("soulbound:hotbar_slot/stack_count"), typeof(Label));
             UXMLSchema.Register(Identifier.Of("soulbound:hotbar_slot/slot_index"), typeof(Label));
             UXMLSchema.Register(Identifier.Of("soulbound:hotbar_slot/durability_bar"), typeof(ProgressBar));
-            UXMLSchema.Register(Identifier.Of("soulbound:log_console/log_list"), typeof(ListView));
             UXMLSchema.Register(Identifier.Of("soulbound:log_console/info_filter"), typeof(Button));
             UXMLSchema.Register(Identifier.Of("soulbound:log_console/warning_filter"), typeof(Button));
             UXMLSchema.Register(Identifier.Of("soulbound:log_console/error_filter"), typeof(Button));
             UXMLSchema.Register(Identifier.Of("soulbound:log_console/fatal_filter"), typeof(Button));
+            UXMLSchema.Register(Identifier.Of("soulbound:log_console/log_list"), typeof(ListView));
             UXMLSchema.Register(Identifier.Of("soulbound:log_entry/log_label"), typeof(Label));
             UXMLSchema.Register(Identifier.Of("soulbound:metrics_hud/fps"), typeof(Label));
             UXMLSchema.Register(Identifier.Of("soulbound:metrics_hud/frame_time"), typeof(Label));
