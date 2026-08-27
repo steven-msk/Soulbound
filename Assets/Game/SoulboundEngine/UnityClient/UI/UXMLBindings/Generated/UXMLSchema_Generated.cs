@@ -25,6 +25,8 @@ namespace SoulboundEngine.UnityClient.UI.UXMLBindings {
             UXMLSchema.Register(Identifier.Of("soulbound:log_console/warning_filter"), typeof(Button));
             UXMLSchema.Register(Identifier.Of("soulbound:log_console/error_filter"), typeof(Button));
             UXMLSchema.Register(Identifier.Of("soulbound:log_console/fatal_filter"), typeof(Button));
+            UXMLSchema.Register(Identifier.Of("soulbound:log_console/clear"), typeof(Button));
+            UXMLSchema.Register(Identifier.Of("soulbound:log_console/memory_usage"), typeof(Label));
             UXMLSchema.Register(Identifier.Of("soulbound:log_console/log_list"), typeof(ListView));
             UXMLSchema.Register(Identifier.Of("soulbound:log_entry/log_label"), typeof(Label));
             UXMLSchema.Register(Identifier.Of("soulbound:metrics_hud/fps"), typeof(Label));

@@ -1,4 +1,5 @@
 namespace SoulboundEngine.UnityClient.Debug.Logging.Console {
+	using SoulboundEngine.Common;
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.UnityClient.Assets;
 	using SoulboundEngine.UnityClient.Settings;
@@ -10,6 +11,7 @@ namespace SoulboundEngine.UnityClient.Debug.Logging.Console {
 	using System.Text;
 	using UnityEngine;
 	using UnityEngine.UIElements;
+	using Color = UnityEngine.Color;
 
 	public sealed class LogConsole : UXMLWidget, IInputFocusable {
 		private static readonly Identifier LOG_LIST_ELEMENT = Identifier.Of("soulbound:log_console/log_list");
@@ -18,6 +20,8 @@ namespace SoulboundEngine.UnityClient.Debug.Logging.Console {
 		private static readonly Identifier FILTER_WARNING_ELEMENT = Identifier.Of("soulbound:log_console/warning_filter");
 		private static readonly Identifier FILTER_ERROR_ELEMENT = Identifier.Of("soulbound:log_console/error_filter");
 		private static readonly Identifier FILTER_FATAL_ELEMENT = Identifier.Of("soulbound:log_console/fatal_filter");
+		private static readonly Identifier CLEAR_LOGS_ELEMENT = Identifier.Of("soulbound:log_console/clear");
+		private static readonly Identifier USAGE_ELEMENT = Identifier.Of("soulbound:log_console/memory_usage");
 		private const int MAX_ENTRIES_PER_FRAME = 3;
 		private const float FILTERED_ALPHA = 0.65f;
 		private readonly List<DisplayedLogEntry> logs = new();
@@ -33,16 +37,21 @@ namespace SoulboundEngine.UnityClient.Debug.Logging.Console {
 		private LogFilter filter = LogFilter.ALL;
 		private bool dirty = false;
 		private ListView logList;
+		private Label memoryUsageLabel;
+		private long totalEstimatedBytes;
+		private string memoryUsageFormat;
 
 		public LogConsole(SoulboundUnityClient client) {
 			this.client = client;
 			Application.logMessageReceivedThreaded += (condition, stackTrace, logType) => {
-				this.EnqueueLog(new LogEntry(condition, stackTrace, logType));
+				LogEntry entry = new(condition, stackTrace, logType);
+				this.totalEstimatedBytes += entry.EstimateSize();
+				this.EnqueueLog(entry);
 			};
 			if (!client.config.isRunningInEditor) {
 				Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.None);
 				Application.SetStackTraceLogType(LogType.Warning, StackTraceLogType.None);
-				Application.SetStackTraceLogType(LogType.Error, StackTraceLogType.None);
+				Application.SetStackTraceLogType(LogType.Error, StackTraceLogType.ScriptOnly);
 				Application.SetStackTraceLogType(LogType.Exception, StackTraceLogType.ScriptOnly);
 				Application.SetStackTraceLogType(LogType.Assert, StackTraceLogType.None);
 			}
@@ -65,6 +74,8 @@ namespace SoulboundEngine.UnityClient.Debug.Logging.Console {
 			this.logList = root.Get<ListView>(LOG_LIST_ELEMENT);
 			this.logList.bindItem = this.OnLogAdded;
 			this.logList.itemsSource = this.logs;
+			this.memoryUsageLabel = root.Get<Label>(USAGE_ELEMENT);
+			this.memoryUsageFormat = this.memoryUsageLabel.text;
 
 			static void SetBgColor(Button button, bool isOn) {
 				Color color = button.style.backgroundColor.value;
@@ -95,6 +106,9 @@ namespace SoulboundEngine.UnityClient.Debug.Logging.Console {
 				this.ToggleFilter(LogFilter.FATAL);
 				SetBgColor(filterFatal, this.IsVisible(LogFilter.FATAL));
 			};
+
+			Button clear = root.Get<Button>(CLEAR_LOGS_ELEMENT);
+			clear.clicked += this.Clear;
 		}
 
 		internal void Tick() {
@@ -187,7 +201,13 @@ namespace SoulboundEngine.UnityClient.Debug.Logging.Console {
 				this.dirty = this.pendingLogs.Count > 0;
 			}
 
+			this.UpdateMemoryUsage();
 			this.logList.Rebuild();
+		}
+
+		private void UpdateMemoryUsage() {
+			string text = this.memoryUsageFormat.ReplaceFirst("{}", $"{(this.totalEstimatedBytes / 1024.0d / 1024.0d):F4}MB");
+			this.memoryUsageLabel.text = text;
 		}
 
 		private void ShowFilters() {
@@ -244,6 +264,16 @@ namespace SoulboundEngine.UnityClient.Debug.Logging.Console {
 			}
 		}
 
+		public void Clear() {
+			this.logs.Clear();
+			this.normalLogs.Clear();
+			this.warningLogs.Clear();
+			this.errorLogs.Clear();
+			this.fatalLogs.Clear();
+			this.dirty = true;
+			this.totalEstimatedBytes = 0;
+		}
+
 		bool IInputFocusable.HasKeyboardFocus() => false;
 
 		bool IInputFocusable.IsPointerOverUI() => true;
@@ -254,6 +284,14 @@ namespace SoulboundEngine.UnityClient.Debug.Logging.Console {
 		}
 	}
 
-	public sealed record LogEntry(string condition, string stackTrace, LogType logType);
+	public sealed record LogEntry(string condition, string stackTrace, LogType logType) {
+		public int EstimateSize() {
+			const int OBJECT_HEADER = 24;
+			int size = OBJECT_HEADER;
+			size += this.condition.Length * sizeof(char);
+			size += this.stackTrace.Length * sizeof(char);
+			return size;
+		}
+	}
 
 }
