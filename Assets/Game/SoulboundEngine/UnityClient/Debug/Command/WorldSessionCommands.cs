@@ -111,6 +111,34 @@ namespace SoulboundEngine.UnityClient.Debug.Commands {
 				return 1;
 			}
 
+			dispatcher.Register(c => 
+				c.Literal("test")
+					.Executes(ctx => {
+						Logger.LogInfo("test");
+						return 1;
+					})
+					.Then(c => c.Literal("subtest1")
+						.Then(c => c.Argument("number", Arguments.Integer()) 
+							.Executes(ctx => {
+								Logger.LogInfo("subtest1: {}", ctx.GetArgument<int>("number"));
+								return 1;
+							})
+						)
+					)
+					.Then(c => c.Literal("subtest2")
+						.Executes(ctx => {
+							Logger.LogInfo("subtest2");
+							return 1;
+						})
+						.Then(c => c.Literal("subtest1sub")
+							.Executes(ctx => {
+								Logger.LogInfo("subtest1");
+								return 1;
+							})
+						)
+					)
+					
+			);
 		}
 
 	}

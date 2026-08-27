@@ -2,9 +2,9 @@ namespace SoulboundEngine.UnityClient.Debug.Commands {
 	using Brigadier.NET;
 	using Brigadier.NET.Exceptions;
 	using Brigadier.NET.Suggestion;
+	using Brigadier.NET.Tree;
 	using Cysharp.Threading.Tasks;
 	using SoulboundEngine.World.Services;
-	using System;
 	using System.Collections.Generic;
 	using System.Linq;
 	using System.Threading.Tasks;
@@ -23,18 +23,14 @@ namespace SoulboundEngine.UnityClient.Debug.Commands {
 		}
 
 		public void SubmitCommand(string input) {
-			if (input.StartsWith('/')) input = input[1..];
-
-			RuntimeCommandSource source = new(this.dataProvider, this.execServices);
-			ParseResults<RuntimeCommandSource> parseResults = this.dispatcher.Parse(input, source);
-
+			ParseResults<RuntimeCommandSource> parseResults = this.Parse(input);
 			int code = 0;
 			try {
 				if (parseResults.Exceptions.Any()) {
 					throw parseResults.Exceptions.First().Value;
 				}
 				code = this.dispatcher.Execute(parseResults);
-			} catch (Exception e) when (e is CommandSyntaxException) {
+			} catch (CommandSyntaxException e) {
 				Logger.LogFatal(e);
 				code = -1;
 			} finally {
@@ -42,14 +38,24 @@ namespace SoulboundEngine.UnityClient.Debug.Commands {
 			}
 		}
 
+		public IDictionary<CommandNode<RuntimeCommandSource>, string> GetSmartUsages(CommandNode<RuntimeCommandSource> node) {
+			RuntimeCommandSource source = new(this.dataProvider, this.execServices);
+			return this.dispatcher.GetSmartUsage(node, source);
+		}
+
+		public ParseResults<RuntimeCommandSource> Parse(string input) {
+			if (input.StartsWith('/')) input = input[1..];
+			RuntimeCommandSource source = new(this.dataProvider, this.execServices);
+			return this.dispatcher.Parse(input, source);
+		}
+
 		public async UniTask<Suggestions> GetCompletions(string input, int caretPos) {
 			if (input.StartsWith('/')) {
 				input = input[1..];
 				caretPos--;
 			}
-			RuntimeCommandSource source = new(this.dataProvider, this.execServices);
+			ParseResults<RuntimeCommandSource> parseResults = this.Parse(input);
 			Task<Suggestions> task;
-			ParseResults<RuntimeCommandSource> parseResults = this.dispatcher.Parse(input, source);
 
 			try {
 				task = this.dispatcher.GetCompletionSuggestions(parseResults, caretPos);

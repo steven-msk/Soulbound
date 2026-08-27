@@ -13,7 +13,7 @@ namespace SoulboundEngine.UnityClient.Debug {
 	using UnityEngine;
 	using UnityEngine.InputSystem;
 	using UnityEngine.UIElements;
-	using Keyboard = SoulboundEngine.UnityClient.Input.Keyboard;
+	using Keyboard = Input.Keyboard;
 
 	public sealed class CommandLine : UXMLWidget, IInputFocusable {
 		private static readonly Identifier TEXT_FIELD_ELEMENT = Identifier.Of("soulbound:command_line/text_field");
@@ -140,6 +140,26 @@ namespace SoulboundEngine.UnityClient.Debug {
 			} else {
 				this.ClearAndDisableCompletions();
 			}
+			//ParseResults<RuntimeCommandSource> parseResults = this.commandProcessor.Parse(this.GetCommand());
+			//IEnumerable<string> usages = parseResults.Context.Nodes
+			//	.SelectMany(c => this.commandProcessor.GetSmartUsages(c.Node))
+			//	.Select(kvp => kvp.Value);
+			//SoulboundEngine.Logger.LogInfo("all: {}", string.Join(", ", usages));
+
+			//if (parseResults.Context.Child != null) {
+			//	IEnumerable<string> childUsages = parseResults.Context.Child.Nodes
+			//		.SelectMany(c => this.commandProcessor.GetSmartUsages(c.Node))
+			//		.Select(kvp => kvp.Value);
+			//	SoulboundEngine.Logger.LogInfo("child: {}", string.Join(", ", usages));
+			//}
+
+			//foreach (ParsedCommandNode<RuntimeCommandSource> item in parseResults.Context.Nodes) {
+			//	SoulboundEngine.Logger.LogInfo(item.Node.Name);
+			//}
+			//foreach (KeyValuePair<string, IParsedArgument> item in parseResults.Context.GetArguments()) {
+			//	SoulboundEngine.Logger.LogInfo("{}: {}", item.Key, item.Value.Result);
+			//}
+
 		}
 
 		private void ClearAndDisableCompletions() {
@@ -214,7 +234,13 @@ namespace SoulboundEngine.UnityClient.Debug {
 
 		private void InsertCompletion(Suggestion suggestion) {
 			string withoutLeadingSlash = this.textField.value[1..];
-			string completed = $"/{suggestion.Apply(withoutLeadingSlash)}";
+			int caretInStripped = this.GetCurrentCaret() - 1;   // account for leading '/';
+			int tokenEnd = withoutLeadingSlash.IndexOf(' ', caretInStripped);
+			if (tokenEnd < 0) tokenEnd = withoutLeadingSlash.Length;
+
+			string before = withoutLeadingSlash[..suggestion.Range.Start];
+			string after = withoutLeadingSlash[tokenEnd..];
+			string completed = $"/{before}{suggestion.Text}{after}";
 			this.textField.SetValueWithoutNotify(completed);
 
 			int newCaret = suggestion.Range.Start + 1 + suggestion.Text.Length;
