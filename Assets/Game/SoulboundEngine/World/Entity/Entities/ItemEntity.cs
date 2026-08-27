@@ -23,7 +23,7 @@ namespace SoulboundEngine.World.Entity {
 			: base(EntityType.ITEM, level) {
 			this.SetPos(x, y);
 			this.SetStack(itemStack);
-			this.SetDeltaMovement(this.random.NextDouble() * 0.2d - 0.1d, 0.2d);
+			this.SetDeltaMovement(this.random.NextDouble() * 0.5d - 0.3d, 0.2d);
 		}
 
 		public ItemEntity(Level level, double x, double y, ItemStack itemStack, double deltaX, double deltaY)
