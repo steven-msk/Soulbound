@@ -7,9 +7,13 @@ namespace SoulboundEngine.UnityClient.UI.UXMLBindings {
 
     public static class UXMLSchema_Generated {
         public static void RegisterAll() {
+            UXMLSchema.Register(Identifier.Of("soulbound:command_exception/exception_text"), typeof(Label));
             UXMLSchema.Register(Identifier.Of("soulbound:command_line/completion_list"), typeof(ListView));
+            UXMLSchema.Register(Identifier.Of("soulbound:command_line/usage_list"), typeof(ListView));
+            UXMLSchema.Register(Identifier.Of("soulbound:command_line/exception_list"), typeof(ListView));
             UXMLSchema.Register(Identifier.Of("soulbound:command_line/text_field"), typeof(TextField));
             UXMLSchema.Register(Identifier.Of("soulbound:command_suggestion/suggestion_text"), typeof(Label));
+            UXMLSchema.Register(Identifier.Of("soulbound:command_usage/usage_text"), typeof(Label));
             UXMLSchema.Register(Identifier.Of("soulbound:durability_bar/durability_bar"), typeof(ProgressBar));
             UXMLSchema.Register(Identifier.Of("soulbound:hotbar/hotbar"), typeof(VisualElement));
             UXMLSchema.Register(Identifier.Of("soulbound:hotbar_slot/display_area"), typeof(VisualElement));

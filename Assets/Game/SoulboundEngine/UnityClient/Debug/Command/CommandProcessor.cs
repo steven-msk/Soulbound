@@ -43,6 +43,12 @@ namespace SoulboundEngine.UnityClient.Debug.Commands {
 			return this.dispatcher.GetSmartUsage(node, source);
 		}
 
+		public CommandNode<RuntimeCommandSource> GetLastNode(string input) {
+			if (input.StartsWith('/')) input = input[1..];
+			string[] path = input.Split(this.dispatcher.ArgumentSeparator);
+			return this.dispatcher.FindNode(path);
+		}
+
 		public ParseResults<RuntimeCommandSource> Parse(string input) {
 			if (input.StartsWith('/')) input = input[1..];
 			RuntimeCommandSource source = new(this.dataProvider, this.execServices);

@@ -85,8 +85,8 @@ namespace SoulboundEngine.UnityClient.Debug.Commands {
 			dispatcher.Register(c => c.Literal("give")
 				.Then(c => c.Argument("item", new ItemArgumentType())
 					.Executes(ctx => GiveItem(1, ctx))
-					.Then(c => c.Argument("quantity", Arguments.Integer(min: 1))
-						.Executes(ctx => GiveItem(ctx.GetArgument<int>("quantity"), ctx))
+					.Then(c => c.Argument("count", Arguments.Integer(min: 1))
+						.Executes(ctx => GiveItem(ctx.GetArgument<int>("count"), ctx))
 					)
 				)
 			);

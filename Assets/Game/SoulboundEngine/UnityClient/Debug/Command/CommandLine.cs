@@ -1,4 +1,6 @@
 namespace SoulboundEngine.UnityClient.Debug {
+	using Brigadier.NET;
+	using Brigadier.NET.Exceptions;
 	using Brigadier.NET.Suggestion;
 	using Cysharp.Threading.Tasks;
 	using SoulboundEngine.Registry;
@@ -19,13 +21,22 @@ namespace SoulboundEngine.UnityClient.Debug {
 		private static readonly Identifier TEXT_FIELD_ELEMENT = Identifier.Of("soulbound:command_line/text_field");
 		private static readonly Identifier COMPLETION_LIST_ELEMENT = Identifier.Of("soulbound:command_line/completion_list");
 		private static readonly Identifier SUGGESTION_TEXT_ELEMENT = Identifier.Of("soulbound:command_suggestion/suggestion_text");
-		private TextField textField;
-		private ListView completionList;
+		private static readonly Identifier USAGE_LIST_ELEMENT = Identifier.Of("soulbound:command_line/usage_list");
+		private static readonly Identifier USAGE_TEXT_ELEMENT = Identifier.Of("soulbound:command_usage/usage_text");
+		private static readonly Identifier EXCEPTION_LIST_ELEMENT = Identifier.Of("soulbound:command_line/exception_list");
+		private static readonly Identifier EXCEPTION_TEXT_ELEMENT = Identifier.Of("soulbound:command_exception/exception_text");
 		private readonly CommandProcessor commandProcessor;
 		private readonly List<string> history = new();
 		private readonly CompletionManager completionManager = new();
 		private readonly Keyboard keyboard;
 		private readonly SoulboundUnityClient client;
+		private TextField textField;
+		private ListView completionList;
+		private List<string> currentUsages;
+		private ListView usageList;
+		private List<CommandSyntaxException> currentExceptions;
+		private ListView exceptionList;
+		private Color defaultFieldColor;
 		private int historyIndex;
 		private bool isCyclingHistory;
 		private bool isCyclingCompletions;
@@ -54,9 +65,20 @@ namespace SoulboundEngine.UnityClient.Debug {
 				Suggestion suggestion = this.completionManager.Get(index);
 				element.Get<Label>(SUGGESTION_TEXT_ELEMENT).text = suggestion.Text;
 			};
+			this.usageList = root.Get<ListView>(USAGE_LIST_ELEMENT);
+			this.usageList.bindItem = (element, index) => {
+				element.Get<Label>(USAGE_TEXT_ELEMENT).text = this.currentUsages[index];
+			};
+			this.usageList.itemsSource = this.currentUsages;
+			this.exceptionList = root.Get<ListView>(EXCEPTION_LIST_ELEMENT);
+			this.exceptionList.bindItem = (element, index) => {
+				element.Get<Label>(EXCEPTION_TEXT_ELEMENT).text = this.currentExceptions[index].Message;
+			};
+			this.exceptionList.itemsSource = this.currentExceptions;
 			this.textField.RegisterCallback<KeyDownEvent>(this.InterceptHandledKeys, TrickleDown.TrickleDown);
 			this.completionList.makeNoneElement = () => new VisualElement();
 			this.completionList.itemsChosen += this.OnCompletionChosen;
+			this.defaultFieldColor = Color.black;
 			this.Hide();
 		}
 
@@ -140,26 +162,31 @@ namespace SoulboundEngine.UnityClient.Debug {
 			} else {
 				this.ClearAndDisableCompletions();
 			}
-			//ParseResults<RuntimeCommandSource> parseResults = this.commandProcessor.Parse(this.GetCommand());
-			//IEnumerable<string> usages = parseResults.Context.Nodes
-			//	.SelectMany(c => this.commandProcessor.GetSmartUsages(c.Node))
-			//	.Select(kvp => kvp.Value);
-			//SoulboundEngine.Logger.LogInfo("all: {}", string.Join(", ", usages));
 
-			//if (parseResults.Context.Child != null) {
-			//	IEnumerable<string> childUsages = parseResults.Context.Child.Nodes
-			//		.SelectMany(c => this.commandProcessor.GetSmartUsages(c.Node))
-			//		.Select(kvp => kvp.Value);
-			//	SoulboundEngine.Logger.LogInfo("child: {}", string.Join(", ", usages));
-			//}
+			ParseResults<RuntimeCommandSource> parseResults = this.commandProcessor.Parse(this.GetCommand());
+			if (parseResults.Context.Nodes.Count > 0) {
+				List<string> usages = this.commandProcessor.GetSmartUsages(parseResults.Context.Nodes.Last().Node)
+					.Select(kvp => kvp.Value)
+					.ToList();
+				this.currentUsages = usages;
+				this.usageList.itemsSource = this.currentUsages;
+				this.usageList.Rebuild();
+				this.usageList.style.display = usages.Count > 0 ? DisplayStyle.Flex : DisplayStyle.None;
+			} else {
+				this.usageList.style.display = DisplayStyle.None;
+			}
 
-			//foreach (ParsedCommandNode<RuntimeCommandSource> item in parseResults.Context.Nodes) {
-			//	SoulboundEngine.Logger.LogInfo(item.Node.Name);
-			//}
-			//foreach (KeyValuePair<string, IParsedArgument> item in parseResults.Context.GetArguments()) {
-			//	SoulboundEngine.Logger.LogInfo("{}: {}", item.Key, item.Value.Result);
-			//}
-
+			List<CommandSyntaxException> exceptions = parseResults.Exceptions
+				.Select(kvp => kvp.Value)
+				.ToList();
+			if (exceptions.Count > 0 && this.usageList.style.display == DisplayStyle.Flex) {
+				this.usageList.style.display = DisplayStyle.None;
+			}
+			this.currentExceptions = exceptions;
+			this.exceptionList.itemsSource = this.currentExceptions;
+			this.exceptionList.Rebuild();
+			this.exceptionList.style.display = exceptions.Count > 0 ? DisplayStyle.Flex : DisplayStyle.None;
+			this.textField.style.color = exceptions.Count > 0 ? Color.red : this.defaultFieldColor;
 		}
 
 		private void ClearAndDisableCompletions() {
