@@ -53,8 +53,6 @@ namespace SoulboundEngine.Item {
 
 		public int GetBreakLevel() => this.components.GetOrDefault(ItemComponents.BREAK_LEVEL, 0);
 
-		// TODO: implement inventory ticking across all IInventory implementations
-		[Obsolete]
 		public virtual void InventoryTick(Level level, Entity owner, ItemStack stack, EquipmentSlot? slot) {
 		}
 

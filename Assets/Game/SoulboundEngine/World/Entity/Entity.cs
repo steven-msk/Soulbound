@@ -27,7 +27,7 @@ namespace SoulboundEngine.World.Entity {
 		private readonly EntityDimensions dimensions;
 		protected readonly IRandom random = RandomProvider.CreateWithUniqueSeed();
 		private readonly AttributeMap attributes;
-		protected readonly EntityEquipment equipment;
+		private readonly EntityEquipment equipment;
 		protected Level level;
 		protected bool isAlive;
 		protected bool firstTick = true;
@@ -80,6 +80,7 @@ namespace SoulboundEngine.World.Entity {
 			this.CalculateSpeed();
 			this.inBlockState = null;
 			this.firstTick = false;
+			this.equipment.Tick(this);
 		}
 
 		protected void CalculateSpeed() {
@@ -356,9 +357,9 @@ namespace SoulboundEngine.World.Entity {
 		public virtual void OnEquipStack(EquipmentSlot slot, ItemStack oldStack, ItemStack stack) {
 		}
 
-		public bool HasItemInSlot(EquipmentSlot slot) => !this.GetItemInSlot(slot).IsEmpty();
+		public bool HasItemInSlot(EquipmentSlot slot) => !this.GetStack(slot).IsEmpty();
 
-		public ItemStack GetItemInSlot(EquipmentSlot slot) => this.equipment.Get(slot);
+		public ItemStack GetStack(EquipmentSlot slot) => this.equipment.Get(slot);
 
 		public virtual void OnEquippedItemBroke(Item brokenItem, EquipmentSlot slot) {
 		}

@@ -31,7 +31,7 @@ namespace SoulboundEngine.World.Player {
 
 		public PlayerEntity(Level level)
 			: base(EntityType.PLAYER, level) {
-			this.inventory = new PlayerInventory();
+			this.inventory = new PlayerInventory(this);
 		}
 
 		public new static AttributeSupplier.Builder CreateDefaultAttributes() {
@@ -67,10 +67,11 @@ namespace SoulboundEngine.World.Player {
 		public abstract InventoryScreenHandler? GetInventoryScreenHandler();
 
 		public override void Tick() {
-			base.Tick();
+			this.inventory.Tick();
 			Vec2d movementInput = new(this.movementX, 0.0d);
 			this.Travel(movementInput);
 
+			base.Tick();
 			this.DoBlockHover();
 			this.CheckItemUse();
 			if (this.isHoldingLeft) this.OnLeftHoldTick();
@@ -371,7 +372,7 @@ namespace SoulboundEngine.World.Player {
 
 		public float GetLuck() => (float)this.GetAttributeValue(Attributes.LUCK);
 
-		public ItemStack GetMainHandStack() => this.equipment.Get(EquipmentSlot.MAIN_HAND);
+		public ItemStack GetMainHandStack() => this.GetStack(EquipmentSlot.MAIN_HAND);
 
 		public ItemStack? GetTransitStack() => this.GetInventoryScreenHandler()?.GetTransitStack();
 
@@ -382,7 +383,7 @@ namespace SoulboundEngine.World.Player {
 
 		private void SetMainHandStackInternal(ItemStack stack) {
 			if (ItemStack.AreEqual(stack, this.GetMainHandStack())) return;
-			this.equipment.Set(EquipmentSlot.MAIN_HAND, stack);
+			this.SetStack(EquipmentSlot.MAIN_HAND, stack);
 		}
 
 		public void SetMainSlot(int slot) => this.inventory.SetMainSlot(slot);

@@ -1,6 +1,7 @@
 ﻿namespace SoulboundEngine.World.Player {
 	using SoulboundEngine.Item;
 	using SoulboundEngine.Item.Container;
+	using SoulboundEngine.World.Entity;
 	using System;
 	using System.Collections.Generic;
 	using System.Linq;
@@ -11,10 +12,12 @@
 		public const int POPUP_ROWS = 3;
 		private int mainSlot = 0;
 		private readonly ItemSlot[] slots;
+		private readonly PlayerEntity player;
 		public event Action<int, int> mainSlotChanged;
 
-		public PlayerInventory() {
+		public PlayerInventory(PlayerEntity player) {
 			IInventory.CreateSimple(this, ref this.slots);
+			this.player = player;
 		}
 
 		public IEnumerable<int> GetPopup() {
@@ -31,6 +34,15 @@
 				list.Add(i);
 			}
 			return list;
+		}
+
+		public void Tick() {
+			for (int i = 0; i < this.GetSize(); i++) {
+				ItemStack stack = this.GetSlot(i).GetStack();
+				if (stack.IsEmpty()) continue;
+
+				stack.InventoryTick(this.player.GetLevel(), this.player, i == this.mainSlot ? EquipmentSlot.MAIN_HAND : null);
+			}
 		}
 
 		public int GetMainSlot() => this.mainSlot;
