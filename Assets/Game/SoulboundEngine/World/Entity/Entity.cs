@@ -27,6 +27,7 @@ namespace SoulboundEngine.World.Entity {
 		private readonly EntityDimensions dimensions;
 		protected readonly IRandom random = RandomProvider.CreateWithUniqueSeed();
 		private readonly AttributeMap attributes;
+		protected readonly EntityEquipment equipment;
 		protected Level level;
 		protected bool isAlive;
 		protected bool firstTick = true;
@@ -45,6 +46,7 @@ namespace SoulboundEngine.World.Entity {
 			this.level = level;
 			this.dimensions = descriptor.GetDimensions();
 			this.attributes = new AttributeMap(descriptor.GetAttributes());
+			this.equipment = this.CreateEquipment();
 			this.SetPos(0.0d, 0.0d);
 		}
 
@@ -105,15 +107,15 @@ namespace SoulboundEngine.World.Entity {
 
 		public EntityDescriptor GetDescriptor() => this.descriptor;
 
-		public ItemEntity DropItem(Level level, IItemConvertible item) {
-			return this.DropStack(level, item.AsItem().GetDefaultStack(1));
+		public ItemEntity DropItem(IItemConvertible item) {
+			return this.DropStack(item.AsItem().GetDefaultStack(1));
 		}
 
-		public ItemEntity DropStack(Level level, ItemStack stack) {
+		public ItemEntity DropStack(ItemStack stack) {
 			Vec2d pos = this.GetPosition();
-			ItemEntity entity = new(level, pos.x, pos.y, stack);
+			ItemEntity entity = new(this.level, pos.x, pos.y, stack);
 			entity.SetOwner(this);
-			level.AddNewEntity(entity);
+			this.level.AddNewEntity(entity);
 			return entity;
 		}
 
@@ -343,6 +345,26 @@ namespace SoulboundEngine.World.Entity {
 			return this.GetAttributes().GetBaseValue(attribute);
 		}
 
+		protected virtual EntityEquipment CreateEquipment() {
+			return new EntityEquipment();
+		}
+
+		public void SetStack(EquipmentSlot slot, ItemStack stack) {
+			this.OnEquipStack(slot, this.equipment.Set(slot, stack), stack);
+		}
+
+		public virtual void OnEquipStack(EquipmentSlot slot, ItemStack oldStack, ItemStack stack) {
+		}
+
+		public bool HasItemInSlot(EquipmentSlot slot) => !this.GetItemInSlot(slot).IsEmpty();
+
+		public ItemStack GetItemInSlot(EquipmentSlot slot) => this.equipment.Get(slot);
+
+		public virtual void OnEquippedItemBroke(Item brokenItem, EquipmentSlot slot) {
+		}
+
+		public virtual bool CanUse(EquipmentSlot slot) => true;
+
 		public JToken Save() {
 			JObject json = new() {
 				["type"] = EntityDescriptor.GetIdentifier(this.descriptor).ToString(),
@@ -388,7 +410,6 @@ namespace SoulboundEngine.World.Entity {
 				Logger.LogError("No onGround property found on Entity json: {}", json);
 				return;
 			}
-
 
 			this.SetPosRaw(x.GetValueOrDefault(0.0d), y.GetValueOrDefault(0.0d));
 			this.ReapplyPosition();

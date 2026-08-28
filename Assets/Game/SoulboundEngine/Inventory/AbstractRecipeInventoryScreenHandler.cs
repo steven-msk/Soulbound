@@ -47,7 +47,7 @@
 			if (!remainder.IsEmpty()) {
 				if (!this.playerInventory.TryAddStack(ref remainder)) {
 					this.context.Run((blockPos, level) => {
-						level.GetPlayer().DropStack(level, remainder);
+						level.GetPlayer().DropStack(remainder);
 					});
 				}
 			}

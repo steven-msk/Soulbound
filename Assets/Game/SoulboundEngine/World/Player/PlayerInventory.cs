@@ -1,10 +1,10 @@
-﻿using SoulboundEngine.Item;
-using SoulboundEngine.Item.Container;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿namespace SoulboundEngine.World.Player {
+	using SoulboundEngine.Item;
+	using SoulboundEngine.Item.Container;
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
 
-namespace SoulboundEngine.World.Player {
 	public sealed class PlayerInventory : IInventory {
 		public const int HOTBAR_SIZE = 9;
 		public const int POPUP_COLUMNS = 9;
@@ -45,8 +45,10 @@ namespace SoulboundEngine.World.Player {
 			return this.slots[this.mainSlot].GetStack();
 		}
 
-		public void SetMainStack(ItemStack stack) {
+		public ItemStack SetMainStack(ItemStack stack) {
+			ItemStack old = this.slots[this.mainSlot].GetStack();
 			this.slots[this.mainSlot].SetStack(stack);
+			return old;
 		}
 
 		public IItemSlot GetSlot(int index) => this.slots[index];

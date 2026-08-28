@@ -265,7 +265,7 @@ namespace SoulboundEngine.World.Player {
 				IActionResult.ItemContext context = success.itemContext;
 				ItemStack? newHandStack = context.newHandStack;
 				ItemStack stack = newHandStack.GetValueOrDefault(player.GetMainHandStack()).Copy();
-				if (context.damageItem) stack = stack.Damage(1);
+				if (context.damageItem) stack.DamageAndBreak(1, player, EquipmentSlot.MAIN_HAND);
 				player.SetMainHandStack(stack);
 				return true;
 			} else if (result is IActionResult.Fail) {
@@ -308,7 +308,8 @@ namespace SoulboundEngine.World.Player {
 
 			this.level.SetBlockState(blockPos, blockState.block.OnBreak(this.level, blockPos, blockState, this));
 			Block.DropStacks(blockState, this.level, blockPos, null);
-			stack.Damage(1);
+			stack.DamageAndBreak(1, this, EquipmentSlot.MAIN_HAND);
+			this.SetMainHandStack(stack);
 			return true;
 		}
 
@@ -337,7 +338,7 @@ namespace SoulboundEngine.World.Player {
 			ItemStack thrownStack = mainHandStack.CopyWithCount(throwAmount);
 			this.SetMainHandStack(mainHandStack.DecrementBy(throwAmount));
 
-			ItemEntity itemEntity = this.DropStack(this.level, thrownStack);
+			ItemEntity itemEntity = this.DropStack(thrownStack);
 			itemEntity.SetPickupDelay(DROP_PICKUP_DELAY_TICKS);
 		}
 
@@ -370,10 +371,7 @@ namespace SoulboundEngine.World.Player {
 
 		public float GetLuck() => (float)this.GetAttributeValue(Attributes.LUCK);
 
-		public ItemStack GetMainHandStack() {
-			ItemStack transitStack = this.GetTransitStack() ?? ItemStack.EMPTY;
-			return transitStack.IsEmpty() ? this.inventory.GetMainStack() : transitStack;
-		}
+		public ItemStack GetMainHandStack() => this.equipment.Get(EquipmentSlot.MAIN_HAND);
 
 		public ItemStack? GetTransitStack() => this.GetInventoryScreenHandler()?.GetTransitStack();
 
@@ -384,16 +382,15 @@ namespace SoulboundEngine.World.Player {
 
 		private void SetMainHandStackInternal(ItemStack stack) {
 			if (ItemStack.AreEqual(stack, this.GetMainHandStack())) return;
-			InventoryScreenHandler? inventoryScreenHandler = this.GetInventoryScreenHandler();
-			if (inventoryScreenHandler != null && !inventoryScreenHandler.GetTransitStack().IsEmpty()) {
-				inventoryScreenHandler.SetTransitStack(stack);
-			} else {
-				this.inventory.SetMainStack(stack);
-			}
+			this.equipment.Set(EquipmentSlot.MAIN_HAND, stack);
 		}
 
 		public void SetMainSlot(int slot) => this.inventory.SetMainSlot(slot);
 		public int GetMainSlot() => this.inventory.GetMainSlot();
+
+		protected override EntityEquipment CreateEquipment() {
+			return new PlayerEquipment(this);
+		}
 
 		public void SetScreenPointerPos(Vec2d pos) => this.screenPointerPos = pos;
 		public Vec2d GetScreenPointerPos() => this.screenPointerPos;
@@ -415,14 +412,14 @@ namespace SoulboundEngine.World.Player {
 			base.LoadAdditional(json);
 			JToken? inventoryToken = json["inventory"];
 			if (inventoryToken == null) {
-				SoulboundEngine.Logger.LogError("No inventory property on PlayerEntity json: {}", json);
+				Logger.LogError("No inventory property on PlayerEntity json: {}", json);
 			} else {
 				this.inventory.Load(inventoryToken);
 			}
 
 			int? mainSlot = (int?)json["mainSlot"];
 			if (mainSlot == null) {
-				SoulboundEngine.Logger.LogError("No mainSlot property on PlayerEntity json: {}", json);
+				Logger.LogError("No mainSlot property on PlayerEntity json: {}", json);
 			} else {
 				this.inventory.SetMainSlot(mainSlot.Value);
 			}

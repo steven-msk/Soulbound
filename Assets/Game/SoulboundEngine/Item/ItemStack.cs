@@ -214,6 +214,10 @@ namespace SoulboundEngine.Item {
 			return this.ComponentsNonNull.GetOrDefault(ItemComponents.BREAK_LEVEL, this.GetItem().GetBreakLevel());
 		}
 
+		public readonly void InventoryTick(Level level, Entity owner, EquipmentSlot? slot) {
+			this.GetItem().InventoryTick(level, owner, this, slot);
+		}
+
 		public static IActionResult OnPrimaryUse(ItemStack stack, Level level, PlayerEntity player, BlockPos blockPos) {
 			return stack.GetItem().OnPrimaryUse(stack, level, player, blockPos);
 		}
@@ -277,22 +281,43 @@ namespace SoulboundEngine.Item {
 
 		public readonly void SetDurability(int amount) {
 			this.AssertComponentMutationNotOnEmpty();
-			this.components.Set(ItemComponents.DURABILITY, amount);
+			this.components.Set(ItemComponents.DURABILITY, Math.Clamp(amount, 0, this.GetMaxDurability()));
 		}
 
-		public readonly bool ShouldBreak() => this.GetCurrentDurability() <= 0;
+		public readonly bool IsBroken() => this.GetCurrentDurability() <= 0;
 
-		/// <summary>
-		/// Damages this item stack. This does not damage non-damageable stacks, returning the same stack.
-		/// If the stack's durability is less than 0, this will return <c>ItemStack.EMPTY</c>,
-		/// otherwise a copy of this stack with the decremented durability.
-		/// </summary>
-		public readonly ItemStack Damage(int amount) {
-			ItemStack stack = this;
-			if (!stack.HasDurability()) return stack;
+		public void DamageAndBreak(int amount, Entity owner, EquipmentSlot slot) {
+			this.DamageAndBreak(amount, brokenItem => owner.OnEquippedItemBroke(brokenItem, slot));
+		}
 
-			stack.SetDurability(stack.GetCurrentDurability() - amount);
-			return stack.ShouldBreak() ? EMPTY : stack;
+		public void DamageAndBreak(int amount, Action<Item> onBreak) {
+			int newAmount = this.ProcessDurabilityChange(amount);
+			if (newAmount != 0) {
+				this.ApplyDamage(amount, onBreak);
+			}
+		}
+
+		public void DamageWithoutBreaking(int amount) {
+			int newAmount = this.ProcessDurabilityChange(amount);
+			if (newAmount == 0) return;
+
+			if (this.GetCurrentDurability() - newAmount <= 0) return;
+			this.ApplyDamage(amount, _ => { });
+		}
+
+		private readonly int ProcessDurabilityChange(int amount) {
+			return !this.HasDurability() ? 0 : amount;
+		}
+
+		private void ApplyDamage(int damage, Action<Item> onBreak) {
+			if (!this.HasDurability()) return;
+
+			this.SetDurability(this.GetCurrentDurability() - damage);
+			if (this.IsBroken()) {
+				Item item = this.GetItem();
+				this.Decrement(1);
+				onBreak(item);
+			}
 		}
 
 		public static JToken ToJson(ItemStack stack) {
