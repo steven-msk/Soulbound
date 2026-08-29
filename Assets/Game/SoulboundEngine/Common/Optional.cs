@@ -14,13 +14,29 @@ namespace SoulboundEngine.Common.Patterns {
 			return value is null ? Empty() : new Optional<T>(value);
 		}
 
+		public static Optional<T> CastFrom<V>(Optional<V> other) where V : T {
+			return CastFrom(other, v => v);
+		}
+
+		public static Optional<T> CastFrom<V>(Optional<V> other, Func<V, T> valueFunction) where V : T {
+			return other.IsEmpty() ? Empty() : Of(valueFunction(other.GetValue()));
+		}
+
+		public static Optional<V> CastTo<V>(Optional<T> other) where V : T {
+			return CastTo(other, v => (V)v);
+		}
+
+		public static Optional<V> CastTo<V>(Optional<T> other, Func<T, V> valueFunction) where V : T {
+			return other.IsEmpty() ? Optional<V>.Empty() : Optional<V>.Of(valueFunction(other.GetValue()));
+		} 
+
 		public T GetValue() {
 			return this.IsPresent() ? this.value : throw new InvalidOperationException("No value present");
 		}
 
-		public bool IsPresent() {
-			return this.value is not null;
-		}
+		public bool IsPresent() => this.value is not null;
+
+		public bool IsEmpty() => this.value is null;
 
 		public void IfPresent(Action<T> method) {
 			if (this.IsPresent()) { 
