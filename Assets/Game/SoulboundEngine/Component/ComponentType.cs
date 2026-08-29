@@ -1,6 +1,7 @@
 ﻿namespace SoulboundEngine.Component {
 	using Newtonsoft.Json.Linq;
 	using SoulboundEngine.Registry;
+	using SoulboundEngine.Serialization;
 	using System;
 	using System.Collections.Generic;
 
@@ -30,12 +31,6 @@
 		public static Identifier GetId(ComponentType type) {
 			return type.key.value;
 		}
-
-		public sealed record Codec<T>(Func<T, JToken> encoder, Func<JToken, T> decoder) {
-			public JToken Encode(T value) => this.encoder(value);
-
-			public T Decode(JToken token) => this.decoder(token);
-		}
 	}
 
 	public class ComponentType<T> : ComponentType {
@@ -57,8 +52,9 @@
 		}
 
 		public override JToken ToJson(object value) {
-			if (value is not T typed) throw new InvalidCastException($"Component value {value} cannot be cast to {typeof(T)}");
-			return this.CodecOrThrow(new NotSupportedException($"Cannot serialize transient component '{GetId(this)}'")).Encode(typed);
+			return value is not T typed
+				? throw new InvalidCastException($"Component value {value} cannot be cast to {typeof(T)}")
+				: this.CodecOrThrow(new NotSupportedException($"Cannot serialize transient component '{GetId(this)}'")).Encode(typed);
 		}
 
 		public override object FromJson(JToken token) {

@@ -86,7 +86,7 @@ namespace SoulboundEngine.World.Entity {
 
 		public void SetAge(int age) => this.age = age;
 
-		protected override void SaveAdditional(JObject json) {
+		protected override void SaveAdditional(JToken json) {
 			base.SaveAdditional(json);
 			json["age"] = this.age;
 			json["owner"] = this.owner == null ? JValue.CreateNull() : this.owner;

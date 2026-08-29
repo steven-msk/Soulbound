@@ -1,52 +1,26 @@
 ﻿namespace SoulboundEngine.Item {
-	using Newtonsoft.Json.Linq;
-	using SoulboundEngine.Component;
 	using SoulboundEngine.Registry;
+	using SoulboundEngine.Serialization;
 	using SoulboundEngine.World.Entity;
 	using SoulboundEngine.World.Entity.Attribute;
 	using System;
 	using System.Collections;
 	using System.Collections.Generic;
+	using System.Linq;
 
 #nullable enable
 
 	public record ItemAttributeModifiers(List<ItemAttributeModifiers.Entry> modifiers) : IEnumerable<ItemAttributeModifiers.Entry> {
 		public static readonly ItemAttributeModifiers EMPTY = new(new List<Entry>());
-		public static readonly ComponentType.Codec<ItemAttributeModifiers> CODEC = new(
-			encoder: attributeModifiers => {
-				JArray array = new();
-				foreach (Entry entry in attributeModifiers) {
-					array.Add(new JObject() {
-						["attribute"] = entry.attribute.GetKey().value.ToString(),
-						["modifier"] = entry.modifier.ToJson(),
-						["slot"] = entry.slot.GetSerializedName()
-					});
-				}
-				return array;
-			},
-			decoder: json => {
-				if (json is not JArray array) {
-					Logger.LogError("Item attribute modifiers json is not array: {}", json);
-					return EMPTY;
-				}
-
+		public static readonly Codec<ItemAttributeModifiers> CODEC = Entry.CODEC.ListOf().Xmap(
+			list => {
 				Builder builder = Create();
-				foreach (JToken token in array) {
-					try {
-						string idString = (string?)token["attribute"] ?? throw new NotSupportedException("No attribute on item attribute modifier entry json");
-						Identifier id = Identifier.Of(idString);
-						RegistryEntry<AttributeType> attribute = Registries.ATTRIBUTE.GetEntry(id) ?? throw new NotSupportedException("Unknown attribute " + idString);
-						JToken modifierToken = token["modifier"] ?? throw new NotSupportedException("No modifier on item attribute modifier entry json");
-						AttributeModifier modifier = AttributeModifier.FromJson(modifierToken);
-						string slotString = (string?)token["slot"] ?? throw new NotSupportedException("No slot on item attribute modifier entry json");
-						EquipmentSlot slot = EquipmentSlot.BySerializedName(slotString) ?? throw new NotSupportedException("Could not parse slot " + slotString);
-						builder.Add(attribute, modifier, slot);
-					} catch (Exception e) {
-						Logger.LogFatal(e, "Failed to parse attribute modifier: {}", token);
-					}
+				foreach (Entry entry in list) {
+					builder.Add(entry.attribute, entry.modifier, entry.slot);
 				}
 				return builder.Build();
-			}
+			},
+			modifiers => modifiers.ToList()
 		);
 
 		public static Builder Create() => new();
@@ -97,6 +71,13 @@
 		IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 
 		public record Entry(RegistryEntry<AttributeType> attribute, AttributeModifier modifier, EquipmentSlot slot) {
+			public static readonly Codec<Entry> CODEC = RecordCodec<Entry, RegistryEntry<AttributeType>, AttributeModifier, EquipmentSlot>.Of(
+				Field.Required<Entry, RegistryEntry<AttributeType>>("attribute", RegistryEntry<AttributeType>.GetCodec(Registries.ATTRIBUTE), e => e.attribute),
+				Field.Required<Entry, AttributeModifier>("modifier", AttributeModifier.CODEC, e => e.modifier),
+				Field.Required<Entry, EquipmentSlot>("slot", EquipmentSlot.CODEC, e => e.slot),
+				(attribute, modifier, slot) => new Entry(attribute, modifier, slot)
+			);
+
 			public bool Matches(RegistryEntry<AttributeType> attribute, Identifier id) {
 				return attribute.Equals(this.attribute) && this.modifier.Matches(id);
 			}

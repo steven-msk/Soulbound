@@ -1,6 +1,7 @@
 ﻿namespace SoulboundEngine.Serialization {
 	using Newtonsoft.Json.Linq;
 	using System;
+	using System.Collections.Generic;
 
 	public abstract record Codec<T> {
 		public abstract JToken Encode(T value);
@@ -11,6 +12,8 @@
 		}
 
 		public Codec<T> WithDefault(T fallback) => new DefaultingCodec<T>(this, fallback);
+
+		public Codec<List<T>> ListOf() => new ListCodec<T>(this);
 
 		public Codec<U> Xmap<U>(Func<T, U> to, Func<U, T> from) {
 			return Codec<U>.Of(

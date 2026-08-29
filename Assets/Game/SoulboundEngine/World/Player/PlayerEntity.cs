@@ -403,7 +403,7 @@ namespace SoulboundEngine.World.Player {
 			this.movementX = movementX;
 		}
 
-		protected override void SaveAdditional(JObject json) {
+		protected override void SaveAdditional(JToken json) {
 			base.SaveAdditional(json);
 			json["inventory"] = this.inventory.Save();
 			json["mainSlot"] = this.inventory.GetMainSlot();

@@ -1,9 +1,16 @@
 ﻿namespace SoulboundEngine.World.Entity {
 	using SoulboundEngine.Item;
+	using SoulboundEngine.Serialization;
 	using System;
 	using System.Collections.Generic;
 
 	public readonly struct EquipmentSlot : IEquatable<EquipmentSlot> {
+		public static readonly Codec<EquipmentSlot> CODEC = BuiltinCodecs.STRING.FlatXmap(
+			encode: s => s.serializedName,
+			decode: s => BySerializedName(s) is { } slot
+				? DataResult<EquipmentSlot>.Success(slot)
+				: DataResult<EquipmentSlot>.Error($"Invalid equipment slot: {s}")
+		);
 		private static readonly Dictionary<string, EquipmentSlot> BY_SERIALIZED_NAME = new();
 		public static readonly EquipmentSlot MAIN_HAND = new("main_hand", 0, 1);
 		public static readonly IEnumerable<EquipmentSlot> VALUES = new[] {

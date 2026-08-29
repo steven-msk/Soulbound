@@ -1,5 +1,6 @@
 namespace SoulboundEngine.World.Entity.Attribute {
 	using SoulboundEngine.Registry;
+	using SoulboundEngine.Serialization;
 	using System;
 	using System.Collections.Generic;
 	using System.Linq;
@@ -184,6 +185,13 @@ namespace SoulboundEngine.World.Entity.Attribute {
 			this.SetDirty();
 		}
 
-		public record Packed(RegistryEntry<AttributeType> attribute, double baseValue, List<AttributeModifier> permanentModifiers);
+		public record Packed(RegistryEntry<AttributeType> attribute, double baseValue, List<AttributeModifier> permanentModifiers) {
+			public static readonly Codec<Packed> CODEC = RecordCodec<Packed, RegistryEntry<AttributeType>, double, List<AttributeModifier>>.Of(
+				Field.Required<Packed, RegistryEntry<AttributeType>>("attribute", RegistryEntry<AttributeType>.GetCodec(Registries.ATTRIBUTE), p => p.attribute),
+				Field.Required<Packed, double>("baseValue", BuiltinCodecs.DOUBLE, p => p.baseValue),
+				Field.Required<Packed, List<AttributeModifier>>("modifiers", AttributeModifier.CODEC.ListOf(), p => p.permanentModifiers),
+				(attribute, baseValue, modifiers) => new Packed(attribute, baseValue, modifiers)
+			);
+		}
 	}
 }

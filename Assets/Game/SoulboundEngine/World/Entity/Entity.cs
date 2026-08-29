@@ -3,6 +3,7 @@ namespace SoulboundEngine.World.Entity {
 	using SoulboundEngine.Common.Collection;
 	using SoulboundEngine.Common.Math;
 	using SoulboundEngine.Common.Math.Random;
+	using SoulboundEngine.Common.Patterns;
 	using SoulboundEngine.Item;
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.Serialization;
@@ -418,47 +419,29 @@ namespace SoulboundEngine.World.Entity {
 		public virtual bool CanUse(EquipmentSlot slot) => true;
 
 		public JToken Save() {
-			JObject json = new() {
-				["type"] = EntityDescriptor.CODEC.Encode(this.descriptor),
-				["guid"] = BuiltinCodecs.GUID.Encode(this.guid),
-				["x"] = BuiltinCodecs.DOUBLE.Encode(this.GetX()),
-				["y"] = BuiltinCodecs.DOUBLE.Encode(this.GetY()),
-				["motionX"] = BuiltinCodecs.DOUBLE.Encode(this.GetDeltaMovement().x),
-				["motionY"] = BuiltinCodecs.DOUBLE.Encode(this.GetDeltaMovement().y),
-				["onGround"] = BuiltinCodecs.BOOLEAN.Encode(this.isOnGround),
-			};
+			JToken json = (JObject)SerializedData.CODEC.Encode(SerializedData.Get(this));
+			json["type"] = EntityDescriptor.CODEC.Encode(this.descriptor);
+			json["guid"] = BuiltinCodecs.GUID.Encode(this.guid);
 			this.SaveAdditional(json);
 			return json;
 		}
 
-		protected virtual void SaveAdditional(JObject json) {
-			this.SaveAttributes(this.attributes.Pack(), json);
-		}
-
-		private void SaveAttributes(List<AttributeInstance.Packed> attributes, JObject json) {
-			JArray array = new();
-			foreach (AttributeInstance.Packed packedAttribute in attributes) {
-				array.Add(new JObject() {
-					["attribute"] = packedAttribute.attribute.GetKey().value.ToString(),
-					["baseValue"] = packedAttribute.baseValue,
-					["modifiers"] = AttributeModifier.ListToJson(packedAttribute.permanentModifiers)
-				});
-			}
-			json["attributes"] = array;
+		protected virtual void SaveAdditional(JToken json) {
+			json["attributes"] = AttributeInstance.Packed.CODEC.ListOf().Encode(this.attributes.Pack());
 		}
 
 		public void Load(JObject json) {
-			DataResult<double> x = BuiltinCodecs.DOUBLE.Decode(json["x"] ?? new JValue(0.0d));
-			DataResult<double> y = BuiltinCodecs.DOUBLE.Decode(json["y"] ?? new JValue(0.0d));
-			DataResult<double> motionX = BuiltinCodecs.DOUBLE.Decode(json["motionX"] ?? new JValue(0.0d));
-			DataResult<double> motionY = BuiltinCodecs.DOUBLE.Decode(json["motionY"] ?? new JValue(0.0d));
-			DataResult<bool> onGround = BuiltinCodecs.BOOLEAN.Decode(json["onGround"] ?? new JValue(false));
-			DataResult<Guid> guid = BuiltinCodecs.GUID.Decode(json["guid"] ?? new JValue(this.guid));
-			this.SetPosRaw(x.Result().OrElse(0.0d), y.Result().OrElse(0.0d));
+			SerializedData data = SerializedData.CODEC.Decode(json)
+				.ResultOrPartial(error => Logger.LogError("Failed to load entity data: {}", error))
+				.OrElse(SerializedData.Get(this));
+			this.SetPosRaw(data.x, data.y);
 			this.ReapplyPosition();
-			this.SetDeltaMovement(motionX.Result().OrElse(0.0d), motionY.Result().OrElse(0.0d));
-			this.SetOnGround(onGround.Result().OrElse(false));
-			this.guid = guid.Result().OrElse(this.guid);
+			this.SetDeltaMovement(data.motionX, data.motionY);
+			this.SetOnGround(data.onGround);
+
+			this.guid = BuiltinCodecs.GUID.Decode(json["guid"] ?? new JValue(this.guid))
+				.ResultOrPartial(error => Logger.LogError("Failed to load entity guid: {}", error))
+				.OrElse(this.guid);
 			this.LoadAdditional(json);
 		}
 
@@ -467,77 +450,49 @@ namespace SoulboundEngine.World.Entity {
 		}
 
 		private void LoadAttributes(JObject json) {
-			if (json["attributes"] is not JArray array) {
-				Logger.LogError("Entity attributes json is not array");
-				return;
-			}
-			List<AttributeInstance.Packed> attributes = new();
-			foreach (JToken token in array) {
-				if (token is not JObject obj) {
-					Logger.LogError("Entity attribute entry is not object: {}", token);
-					continue;
-				}
-				string? idString = (string?)obj["attribute"];
-				if (idString == null) {
-					Logger.LogError("No attribute id on entity attribute: {}", obj);
-					continue;
-				}
-				if (!Identifier.TryParse(idString, out Identifier id)) {
-					Logger.LogError("Could not parse entity attribute id: {}", idString);
-					continue;
-				}
-				RegistryEntry<AttributeType>? attribute = Registries.ATTRIBUTE.GetEntry(id);
-				if (attribute == null) {
-					Logger.LogError("Unknown attribute: {}", idString);
-					continue;
-				}
-				double? baseValue = (double?)obj["baseValue"];
-				if (baseValue == null) {
-					Logger.LogError("No base value on entity attribute: {}", obj);
-					continue;
-				}
-				JToken? modifiersToken = obj["modifiers"];
-				if (modifiersToken == null) {
-					Logger.LogError("No modifiers on entity attribute: {}", obj);
-					continue;
-				}
-				List<AttributeModifier> modifiers = new();
-				try {
-					foreach (AttributeModifier modifier in AttributeModifier.ListFromJson(modifiersToken)) {
-						modifiers.Add(modifier);
-					}
-				} catch (Exception e) {
-					Logger.LogError("Could not parse entity attribute modifiers: {}", e.Message);
-				}
-				attributes.Add(new AttributeInstance.Packed(attribute, baseValue.GetValueOrDefault(attribute.GetValue().defaultValue), modifiers));
-			}
-			this.attributes.Unpack(attributes);
+			JToken token = json["attributes"] ?? new JArray();
+			this.attributes.Unpack(AttributeInstance.Packed.CODEC.ListOf().Decode(token)
+				.ResultOrPartial(error => Logger.LogError("Failed to load entity attributes: {}", error))
+				.OrElse(new List<AttributeInstance.Packed>())
+			);
 		}
 
 		public static Entity? Load(JToken json, Level level) {
-			if (json.Type != JTokenType.Object) {
+			if (json is not JObject obj) {
 				Logger.LogError("Entity json is not object: {}", json);
 				return null;
 			}
-			JToken? typeToken = json["type"];
-			if (typeToken == null) {
-				Logger.LogError("Missing entity type: {}", json);
-				return null;
-			}
-			DataResult<EntityDescriptor> descriptor = EntityDescriptor.CODEC.Decode(typeToken);
-			if (descriptor.IsError()) {
-				Logger.LogError("Invalid entity type: {}", typeToken);
-				return null;
-			}
 
-			Entity? entity = descriptor.Result().OrElseThrow().Create(level);
+			JToken typeToken = obj["type"] ?? JValue.CreateNull();
+			Optional<EntityDescriptor> descriptor = EntityDescriptor.CODEC.Decode(typeToken)
+				.ResultOrPartial(error => Logger.LogError("Invalid entity type: {} ({})", typeToken, error));
+			if (descriptor.IsEmpty()) return null;
+
+			Entity? entity = descriptor.GetValue().Create(level);
 			if (entity == null) {
 				Logger.LogError("Cannot create entity: {}. Parsed data: {}", typeToken, json);
 				return null;
 			}
 
-			entity.Load((JObject)json);
+			entity.Load(obj);
 			return entity;
+		}
+
+		public sealed record SerializedData(double x, double y, double motionX, double motionY, bool onGround) {
+			public static readonly Codec<SerializedData> CODEC = RecordCodec<SerializedData, double, double, double, double, bool>.Of(
+				Field.Optional<SerializedData, double>("x", BuiltinCodecs.DOUBLE, d => d.x, 0.0d),
+				Field.Optional<SerializedData, double>("y", BuiltinCodecs.DOUBLE, d => d.y, 0.0d),
+				Field.Optional<SerializedData, double>("motionX", BuiltinCodecs.DOUBLE, d => d.motionX, 0.0d),
+				Field.Optional<SerializedData, double>("motionY", BuiltinCodecs.DOUBLE, d => d.motionY, 0.0d),
+				Field.Optional<SerializedData, bool>("onGround", BuiltinCodecs.BOOLEAN, d => d.onGround, false),
+				(x, y, motionX, motionY, onGround) => new SerializedData(x, y, motionX, motionY, onGround)
+			);
+
+			public static SerializedData Get(Entity entity) {
+				return new SerializedData(
+					entity.GetX(), entity.GetY(), entity.GetDeltaMovement().x, entity.GetDeltaMovement().y, entity.IsOnGround()
+				);
+			}
 		}
 	}
 }

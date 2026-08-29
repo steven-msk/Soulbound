@@ -1,12 +1,20 @@
 namespace SoulboundEngine.World.Entity.Attribute {
 	using Newtonsoft.Json.Linq;
 	using SoulboundEngine.Registry;
+	using SoulboundEngine.Serialization;
 	using System;
 	using System.Collections.Generic;
 
 #nullable enable
 
 	public record AttributeModifier(Identifier id, double amount, AttributeModifier.Operation operation) {
+		public static readonly Codec<AttributeModifier> CODEC = RecordCodec<AttributeModifier, Identifier, double, Operation>.Of(
+			Field.Required<AttributeModifier, Identifier>("id", Identifier.CODEC, m => m.id),
+			Field.Required<AttributeModifier, double>("amount", BuiltinCodecs.DOUBLE, m => m.amount),
+			Field.Required<AttributeModifier, Operation>("operation", Operation.CODEC, m => m.operation),
+			(id, amount, operation) => new AttributeModifier(id, amount, operation)
+		);
+
 		public bool Matches(Identifier id) => id.Equals(this.id);
 
 		public JToken ToJson() {
@@ -46,6 +54,12 @@ namespace SoulboundEngine.World.Entity.Attribute {
 		}
 
 		public readonly struct Operation {
+			public static readonly Codec<Operation> CODEC = BuiltinCodecs.STRING.FlatXmap(
+				encode: o => o.serializedName,
+				decode: s => BySerializedName(s) is { } operation
+					? DataResult<Operation>.Success(operation)
+					: DataResult<Operation>.Error($"Invalid operation: {s}")
+			);
 			private static readonly Dictionary<string, Operation> BY_SERIALIZED_NAME = new();
 			public static readonly Operation ADDITIVE = new("additive", 0);                 // +A  or -A
 			public static readonly Operation ADDITIVE_PERCENT = new("additive_percent", 1); // +B% or -B%
