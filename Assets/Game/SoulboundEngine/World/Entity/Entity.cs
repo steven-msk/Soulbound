@@ -434,6 +434,19 @@ namespace SoulboundEngine.World.Entity {
 		}
 
 		protected virtual void SaveAdditional(JObject json) {
+			this.SaveAttributes(this.attributes.Pack(), json);
+		}
+
+		private void SaveAttributes(List<AttributeInstance.Packed> attributes, JObject json) {
+			JArray array = new();
+			foreach (AttributeInstance.Packed packedAttribute in attributes) {
+				array.Add(new JObject() {
+					["attribute"] = packedAttribute.attribute.GetKey().value.ToString(),
+					["baseValue"] = packedAttribute.baseValue,
+					["modifiers"] = AttributeModifier.ListToJson(packedAttribute.permanentModifiers)
+				});
+			}
+			json["attributes"] = array;
 		}
 
 		public void Load(JObject json) {
@@ -483,6 +496,55 @@ namespace SoulboundEngine.World.Entity {
 		}
 
 		protected virtual void LoadAdditional(JObject json) {
+			this.LoadAttributes(json);
+		}
+
+		private void LoadAttributes(JObject json) {
+			if (json["attributes"] is not JArray array) {
+				Logger.LogError("Entity attributes json is not array");
+				return;
+			}
+			List<AttributeInstance.Packed> attributes = new();
+			foreach (JToken token in array) {
+				if (token is not JObject obj) {
+					Logger.LogError("Entity attribute entry is not object: {}", token);
+					continue;
+				}
+				string? idString = (string?)obj["attribute"];
+				if (idString == null) {
+					Logger.LogError("No attribute id on entity attribute: {}", obj);
+					continue;
+				}
+				if (!Identifier.TryParse(idString, out Identifier id)) {
+					Logger.LogError("Could not parse entity attribute id: {}", idString);
+					continue;
+				}
+				RegistryEntry<AttributeType>? attribute = Registries.ATTRIBUTE.GetEntry(id);
+				if (attribute == null) {
+					Logger.LogError("Unknown attribute: {}", idString);
+					continue;
+				}
+				double? baseValue = (double?)obj["baseValue"];
+				if (baseValue == null) {
+					Logger.LogError("No base value on entity attribute: {}", obj);
+					continue;
+				}
+				JToken? modifiersToken = obj["modifiers"];
+				if (modifiersToken == null) {
+					Logger.LogError("No modifiers on entity attribute: {}", obj);
+					continue;
+				}
+				List<AttributeModifier> modifiers = new();
+				try {
+					foreach (AttributeModifier modifier in AttributeModifier.ListFromJson(modifiersToken)) {
+						modifiers.Add(modifier);
+					}
+				} catch (Exception e) {
+					Logger.LogError("Could not parse entity attribute modifiers: {}", e.Message);
+				}
+				attributes.Add(new AttributeInstance.Packed(attribute, baseValue.GetValueOrDefault(attribute.GetValue().defaultValue), modifiers));
+			}
+			this.attributes.Unpack(attributes);
 		}
 
 		public static Entity? Load(JToken json, Level level) {

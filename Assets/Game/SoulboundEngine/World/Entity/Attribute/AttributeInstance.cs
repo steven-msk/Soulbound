@@ -174,7 +174,7 @@ namespace SoulboundEngine.World.Entity.Attribute {
 
 		public Packed Pack() => new(this.attribute, this.baseValue, new List<AttributeModifier>(this.permanentModifiers.Values));
 
-		public void Apply(Packed packed) {
+		public void Unpack(Packed packed) {
 			this.baseValue = packed.baseValue;
 			foreach (AttributeModifier modifier in packed.permanentModifiers) {
 				this.modifierById[modifier.id] = modifier;

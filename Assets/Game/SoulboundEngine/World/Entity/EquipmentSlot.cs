@@ -4,6 +4,7 @@
 	using System.Collections.Generic;
 
 	public readonly struct EquipmentSlot : IEquatable<EquipmentSlot> {
+		private static readonly Dictionary<string, EquipmentSlot> BY_SERIALIZED_NAME = new();
 		public static readonly EquipmentSlot MAIN_HAND = new("main_hand", 0, 1);
 		public static readonly IEnumerable<EquipmentSlot> VALUES = new[] {
 			MAIN_HAND
@@ -16,9 +17,14 @@
 			this.countLimit = countLimit;
 			this.serializedName = name;
 			this.id = id;
+			BY_SERIALIZED_NAME.Add(name, this);
 		}
 
 		public string GetSerializedName() => this.serializedName;
+
+		public static EquipmentSlot? BySerializedName(string name) {
+			return BY_SERIALIZED_NAME.TryGetValue(name, out EquipmentSlot slot) ? slot : null;
+		}
 
 		public ItemStack Limit(ItemStack stack) {
 			return this.countLimit > 0 ? stack.Split(this.countLimit) : stack;
