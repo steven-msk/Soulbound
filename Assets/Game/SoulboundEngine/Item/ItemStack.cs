@@ -5,6 +5,7 @@ namespace SoulboundEngine.Item {
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Entity;
+	using SoulboundEngine.World.Entity.Attribute;
 	using SoulboundEngine.World.Level;
 	using SoulboundEngine.World.Player;
 	using System;
@@ -209,6 +210,11 @@ namespace SoulboundEngine.Item {
 		public readonly Item GetItem() => this.item ?? Items.AIR;
 
 		public readonly int GetMaxCount() => this.GetItem().GetMaxCount();
+
+		public void ForEachAttributeModifier(EquipmentSlot slot, Action<RegistryEntry<AttributeType>, AttributeModifier> consumer) {
+			ItemAttributeModifiers modifiers = this.GetOrDefault(ItemComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
+			modifiers.ForEach(slot, consumer);
+		}
 
 		public readonly int GetBreakLevel() {
 			return this.ComponentsNonNull.GetOrDefault(ItemComponents.BREAK_LEVEL, this.GetItem().GetBreakLevel());

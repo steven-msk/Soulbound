@@ -1,9 +1,13 @@
 ﻿namespace SoulboundEngine.World.Entity {
 	using SoulboundEngine.Item;
 	using System;
+	using System.Collections.Generic;
 
 	public readonly struct EquipmentSlot : IEquatable<EquipmentSlot> {
 		public static readonly EquipmentSlot MAIN_HAND = new("main_hand", 0, 1);
+		public static readonly IEnumerable<EquipmentSlot> VALUES = new[] {
+			MAIN_HAND
+		};
 		private readonly string serializedName;
 		private readonly int id;
 		private readonly int countLimit;

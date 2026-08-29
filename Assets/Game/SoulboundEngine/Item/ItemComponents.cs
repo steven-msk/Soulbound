@@ -14,6 +14,7 @@
 		public static readonly ComponentType<int> MAX_STACK_COUNT = Register<int>("max_stack_count", b => b.Codec(INT_CODEC));
 		public static readonly ComponentType<int> BREAK_LEVEL = Register<int>("break_level", b => b.Codec(INT_CODEC));
 		public static readonly ComponentType<int> DURABILITY = Register<int>("durability", b => b.Codec(INT_CODEC));
+		public static readonly ComponentType<ItemAttributeModifiers> ATTRIBUTE_MODIFIERS = Register<ItemAttributeModifiers>("attributes", b => b.Codec(ItemAttributeModifiers.CODEC));
 
 		public static readonly IComponentMap DEFAULT_COMPONENTS = IComponentMap.Create()
 			.Add(MAX_STACK_COUNT, Item.DEFAULT_FULL_STACK)

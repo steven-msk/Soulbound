@@ -28,6 +28,11 @@
 			return instance;
 		}
 
+		public bool TryGetInstance(RegistryEntry<AttributeType> attribute, out AttributeInstance instance) {
+			instance = this.GetInstance(attribute)!;
+			return instance != null;
+		}
+
 		public bool HasAttribute(RegistryEntry<AttributeType> attribute) {
 			return this.attributes.ContainsKey(attribute) || this.supplier.HasAttribute(attribute);
 		}

@@ -140,6 +140,10 @@ namespace SoulboundEngine.World.Entity.Attribute {
 			return this.attribute.GetValue().ValidateValue(result);
 		}
 
+		public static double CalculateResult(double baseValue, double flatSum, double percentSum, double multiplierProduct) {
+			return (baseValue + flatSum) * (1.0d + percentSum) * multiplierProduct;
+		}
+
 		private IEnumerable<AttributeModifier> GetModifiersOrEmpty(AttributeModifier.Operation operation) {
 			if (this.modifiersByOperation.TryGetValue(operation, out Dictionary<Identifier, AttributeModifier> modifiers)) {
 				foreach ((Identifier _, AttributeModifier modifier) in modifiers) {

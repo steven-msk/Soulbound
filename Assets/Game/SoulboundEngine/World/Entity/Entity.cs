@@ -28,6 +28,7 @@ namespace SoulboundEngine.World.Entity {
 		protected readonly IRandom random = RandomProvider.CreateWithUniqueSeed();
 		private readonly AttributeMap attributes;
 		private readonly EntityEquipment equipment;
+		private readonly Dictionary<EquipmentSlot, ItemStack> lastEquipmentStacks = CreateLastEquipmentState(() => ItemStack.EMPTY);
 		protected Level level;
 		protected bool isAlive;
 		protected bool firstTick = true;
@@ -80,6 +81,8 @@ namespace SoulboundEngine.World.Entity {
 			this.CalculateSpeed();
 			this.inBlockState = null;
 			this.firstTick = false;
+
+			this.DetectAndHandleEquipmentChanges();
 			this.equipment.Tick(this);
 		}
 
@@ -348,6 +351,56 @@ namespace SoulboundEngine.World.Entity {
 
 		protected virtual EntityEquipment CreateEquipment() {
 			return new EntityEquipment();
+		}
+
+		private static Dictionary<EquipmentSlot, ItemStack> CreateLastEquipmentState(Func<ItemStack> stackFactory) {
+			Dictionary<EquipmentSlot, ItemStack> stacks = new();
+			foreach (EquipmentSlot slot in EquipmentSlot.VALUES) {
+				stacks.Add(slot, stackFactory());
+			}
+			return stacks;
+		}
+
+		private void DetectAndHandleEquipmentChanges() {
+			Dictionary<EquipmentSlot, ItemStack>? changedItems = this.CollectEquipmentChanges();
+			if (changedItems != null) this.HandleEquipmentChanges(changedItems);
+		}
+
+		private void HandleEquipmentChanges(Dictionary<EquipmentSlot, ItemStack> changedItems) {
+			foreach ((EquipmentSlot slot, ItemStack current) in changedItems) {
+				if (!current.IsEmpty() && !current.IsBroken()) {
+					current.ForEachAttributeModifier(slot, (attribute, modifier) => {
+						if (this.attributes.TryGetInstance(attribute, out AttributeInstance instance)) {
+							instance.RemoveModifier(modifier.id);
+							instance.AddTransientModifier(modifier);
+						}
+					});
+				}
+				this.lastEquipmentStacks[slot] = current;
+			}
+			this.OnEquipmentChanged(changedItems);
+		}
+
+		protected virtual void OnEquipmentChanged(Dictionary<EquipmentSlot, ItemStack> changedItems) {
+		}
+
+		private Dictionary<EquipmentSlot, ItemStack>? CollectEquipmentChanges() {
+			Dictionary<EquipmentSlot, ItemStack>? changedItems = new();
+
+			foreach (EquipmentSlot slot in EquipmentSlot.VALUES) {
+				ItemStack previous = this.lastEquipmentStacks[slot];
+				ItemStack current = this.GetStack(slot);
+				if (this.HasEquipmentStackChanged(previous, current)) {
+					changedItems ??= new Dictionary<EquipmentSlot, ItemStack>();
+					changedItems.Add(slot, current);
+				}
+			}
+
+			return changedItems;
+		}
+
+		public virtual bool HasEquipmentStackChanged(ItemStack previous, ItemStack current) {
+			return !ItemStack.AreEqual(current, previous);
 		}
 
 		public void SetStack(EquipmentSlot slot, ItemStack stack) {
