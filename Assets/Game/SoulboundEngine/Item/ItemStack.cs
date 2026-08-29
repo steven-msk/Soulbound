@@ -211,7 +211,7 @@ namespace SoulboundEngine.Item {
 
 		public readonly int GetMaxCount() => this.GetItem().GetMaxCount();
 
-		public void ForEachAttributeModifier(EquipmentSlot slot, Action<RegistryEntry<AttributeType>, AttributeModifier> consumer) {
+		public readonly void ForEachAttributeModifier(EquipmentSlot slot, Action<RegistryEntry<AttributeType>, AttributeModifier> consumer) {
 			ItemAttributeModifiers modifiers = this.GetOrDefault(ItemComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
 			modifiers.ForEach(slot, consumer);
 		}

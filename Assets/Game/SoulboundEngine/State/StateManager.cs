@@ -1,5 +1,5 @@
 ﻿namespace SoulboundEngine.State {
-	using SoulboundEngine.Common;
+	using SoulboundEngine.Common.Collection;
 	using System.Collections.Generic;
 	using System.Linq;
 
@@ -39,7 +39,7 @@
 			}
 
 			this.states = allStates;
-			this.defaultState = this.states.FirstOrDefault() ?? factory(owner, Dictionaries.Empty<Property, object>());
+			this.defaultState = this.states.FirstOrDefault() ?? factory(owner, Collections.Dictionary<Property, object>());
 		}
 
 		public S defaultState { get; set; }

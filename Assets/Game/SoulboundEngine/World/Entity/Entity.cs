@@ -1,5 +1,6 @@
 namespace SoulboundEngine.World.Entity {
 	using Newtonsoft.Json.Linq;
+	using SoulboundEngine.Common.Collection;
 	using SoulboundEngine.Common.Math;
 	using SoulboundEngine.Common.Math.Random;
 	using SoulboundEngine.Item;
@@ -28,7 +29,9 @@ namespace SoulboundEngine.World.Entity {
 		protected readonly IRandom random = RandomProvider.CreateWithUniqueSeed();
 		private readonly AttributeMap attributes;
 		private readonly EntityEquipment equipment;
-		private readonly Dictionary<EquipmentSlot, ItemStack> lastEquipmentStacks = CreateLastEquipmentState(() => ItemStack.EMPTY);
+		private readonly Dictionary<EquipmentSlot, ItemStack> lastEquipmentStacks = Collections.Dictionary(
+			() => EquipmentSlot.VALUES, _ => ItemStack.EMPTY
+		);
 		protected Level level;
 		protected bool isAlive;
 		protected bool firstTick = true;
@@ -101,10 +104,6 @@ namespace SoulboundEngine.World.Entity {
 
 		public bool IsAlive() => this.isAlive;
 		public void SetAlive(bool alive) => this.isAlive = alive;
-
-		protected void AssertAlive() {
-			if (!this.isAlive) throw new NotSupportedException("Entity is not alive.");
-		}
 
 		protected virtual void OnDisposed() {
 		}
@@ -351,14 +350,6 @@ namespace SoulboundEngine.World.Entity {
 
 		protected virtual EntityEquipment CreateEquipment() {
 			return new EntityEquipment();
-		}
-
-		private static Dictionary<EquipmentSlot, ItemStack> CreateLastEquipmentState(Func<ItemStack> stackFactory) {
-			Dictionary<EquipmentSlot, ItemStack> stacks = new();
-			foreach (EquipmentSlot slot in EquipmentSlot.VALUES) {
-				stacks.Add(slot, stackFactory());
-			}
-			return stacks;
 		}
 
 		private void DetectAndHandleEquipmentChanges() {

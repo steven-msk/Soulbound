@@ -1,4 +1,4 @@
-namespace SoulboundEngine.Common.Collections {
+namespace SoulboundEngine.Common.Collection {
 	using System;
 
 	public static class ArrayHelper {

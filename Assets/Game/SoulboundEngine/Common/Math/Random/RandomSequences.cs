@@ -1,7 +1,7 @@
-﻿using SoulboundEngine.Registry;
-using System.Collections.Generic;
+﻿namespace SoulboundEngine.Common.Math.Random {
+	using SoulboundEngine.Registry;
+	using System.Collections.Generic;
 
-namespace SoulboundEngine.Common.Math.Random {
 	public class RandomSequences {
 		private readonly long worldSeed;
 		private long salt;
@@ -13,7 +13,7 @@ namespace SoulboundEngine.Common.Math.Random {
 		}
 
 		public IRandom GetOrCreate(Identifier id) {
-			if (this.sequences.TryGetValue(id, out var existing)) {
+			if (this.sequences.TryGetValue(id, out IRandom existing)) {
 				return existing;
 			}
 
