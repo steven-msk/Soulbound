@@ -96,7 +96,7 @@ namespace SoulboundEngine.World.Entity.Attribute {
 		}
 
 		public bool RemoveModifier(Identifier id) {
-			if (!this.modifierById.TryGetValue(id, out AttributeModifier modifier)) {
+			if (!this.modifierById.Remove(id, out AttributeModifier modifier)) {
 				return false;
 			}
 			this.GetModifiers(modifier.operation).Remove(id);

@@ -393,6 +393,12 @@ namespace SoulboundEngine.World.Entity {
 				if (this.HasEquipmentStackChanged(previous, current)) {
 					changedItems ??= new Dictionary<EquipmentSlot, ItemStack>();
 					changedItems.Add(slot, current);
+
+					if (!previous.IsEmpty()) {
+						previous.ForEachAttributeModifier(slot, (attribute, modifier) => {
+							this.attributes.GetInstance(attribute)?.RemoveModifier(modifier);
+						});
+					}
 				}
 			}
 

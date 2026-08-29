@@ -170,6 +170,10 @@ namespace SoulboundEngine.Item {
 				return this.Component(ItemComponents.BREAK_LEVEL, breakLevel);
 			}
 
+			public Settings Attributes(Func<ItemAttributeModifiers.Builder, ItemAttributeModifiers.Builder> builder) {
+				return this.Component(ItemComponents.ATTRIBUTE_MODIFIERS, builder(ItemAttributeModifiers.Create()).Build());
+			}
+
 			public Settings Durability(int durability) {
 				return this.Component(ItemComponents.DURABILITY, durability);
 			}
