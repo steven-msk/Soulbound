@@ -27,6 +27,8 @@ namespace SoulboundEngine.World.Entity {
 		private readonly EntityDimensions dimensions;
 		protected readonly IRandom random = RandomProvider.CreateWithUniqueSeed();
 		private readonly AttributeMap attributes;
+		private readonly EntityEquipment equipment;
+		private readonly Dictionary<EquipmentSlot, ItemStack> lastEquipmentStacks = CreateLastEquipmentState(() => ItemStack.EMPTY);
 		protected Level level;
 		protected bool isAlive;
 		protected bool firstTick = true;
@@ -45,6 +47,7 @@ namespace SoulboundEngine.World.Entity {
 			this.level = level;
 			this.dimensions = descriptor.GetDimensions();
 			this.attributes = new AttributeMap(descriptor.GetAttributes());
+			this.equipment = this.CreateEquipment();
 			this.SetPos(0.0d, 0.0d);
 		}
 
@@ -78,6 +81,9 @@ namespace SoulboundEngine.World.Entity {
 			this.CalculateSpeed();
 			this.inBlockState = null;
 			this.firstTick = false;
+
+			this.DetectAndHandleEquipmentChanges();
+			this.equipment.Tick(this);
 		}
 
 		protected void CalculateSpeed() {
@@ -105,15 +111,15 @@ namespace SoulboundEngine.World.Entity {
 
 		public EntityDescriptor GetDescriptor() => this.descriptor;
 
-		public ItemEntity DropItem(Level level, IItemConvertible item) {
-			return this.DropStack(level, item.AsItem().GetDefaultStack(1));
+		public ItemEntity DropItem(IItemConvertible item) {
+			return this.DropStack(item.AsItem().GetDefaultStack(1));
 		}
 
-		public ItemEntity DropStack(Level level, ItemStack stack) {
+		public ItemEntity DropStack(ItemStack stack) {
 			Vec2d pos = this.GetPosition();
-			ItemEntity entity = new(level, pos.x, pos.y, stack);
+			ItemEntity entity = new(this.level, pos.x, pos.y, stack);
 			entity.SetOwner(this);
-			level.AddNewEntity(entity);
+			this.level.AddNewEntity(entity);
 			return entity;
 		}
 
@@ -343,6 +349,82 @@ namespace SoulboundEngine.World.Entity {
 			return this.GetAttributes().GetBaseValue(attribute);
 		}
 
+		protected virtual EntityEquipment CreateEquipment() {
+			return new EntityEquipment();
+		}
+
+		private static Dictionary<EquipmentSlot, ItemStack> CreateLastEquipmentState(Func<ItemStack> stackFactory) {
+			Dictionary<EquipmentSlot, ItemStack> stacks = new();
+			foreach (EquipmentSlot slot in EquipmentSlot.VALUES) {
+				stacks.Add(slot, stackFactory());
+			}
+			return stacks;
+		}
+
+		private void DetectAndHandleEquipmentChanges() {
+			Dictionary<EquipmentSlot, ItemStack>? changedItems = this.CollectEquipmentChanges();
+			if (changedItems != null) this.HandleEquipmentChanges(changedItems);
+		}
+
+		private void HandleEquipmentChanges(Dictionary<EquipmentSlot, ItemStack> changedItems) {
+			foreach ((EquipmentSlot slot, ItemStack current) in changedItems) {
+				if (!current.IsEmpty() && !current.IsBroken()) {
+					current.ForEachAttributeModifier(slot, (attribute, modifier) => {
+						if (this.attributes.TryGetInstance(attribute, out AttributeInstance instance)) {
+							instance.RemoveModifier(modifier.id);
+							instance.AddTransientModifier(modifier);
+						}
+					});
+				}
+				this.lastEquipmentStacks[slot] = current;
+			}
+			this.OnEquipmentChanged(changedItems);
+		}
+
+		protected virtual void OnEquipmentChanged(Dictionary<EquipmentSlot, ItemStack> changedItems) {
+		}
+
+		private Dictionary<EquipmentSlot, ItemStack>? CollectEquipmentChanges() {
+			Dictionary<EquipmentSlot, ItemStack>? changedItems = new();
+
+			foreach (EquipmentSlot slot in EquipmentSlot.VALUES) {
+				ItemStack previous = this.lastEquipmentStacks[slot];
+				ItemStack current = this.GetStack(slot);
+				if (this.HasEquipmentStackChanged(previous, current)) {
+					changedItems ??= new Dictionary<EquipmentSlot, ItemStack>();
+					changedItems.Add(slot, current);
+
+					if (!previous.IsEmpty()) {
+						previous.ForEachAttributeModifier(slot, (attribute, modifier) => {
+							this.attributes.GetInstance(attribute)?.RemoveModifier(modifier);
+						});
+					}
+				}
+			}
+
+			return changedItems;
+		}
+
+		public virtual bool HasEquipmentStackChanged(ItemStack previous, ItemStack current) {
+			return !ItemStack.AreEqual(current, previous);
+		}
+
+		public void SetStack(EquipmentSlot slot, ItemStack stack) {
+			this.OnEquipStack(slot, this.equipment.Set(slot, stack), stack);
+		}
+
+		public virtual void OnEquipStack(EquipmentSlot slot, ItemStack oldStack, ItemStack stack) {
+		}
+
+		public bool HasItemInSlot(EquipmentSlot slot) => !this.GetStack(slot).IsEmpty();
+
+		public ItemStack GetStack(EquipmentSlot slot) => this.equipment.Get(slot);
+
+		public virtual void OnEquippedItemBroke(Item brokenItem, EquipmentSlot slot) {
+		}
+
+		public virtual bool CanUse(EquipmentSlot slot) => true;
+
 		public JToken Save() {
 			JObject json = new() {
 				["type"] = EntityDescriptor.GetIdentifier(this.descriptor).ToString(),
@@ -358,6 +440,19 @@ namespace SoulboundEngine.World.Entity {
 		}
 
 		protected virtual void SaveAdditional(JObject json) {
+			this.SaveAttributes(this.attributes.Pack(), json);
+		}
+
+		private void SaveAttributes(List<AttributeInstance.Packed> attributes, JObject json) {
+			JArray array = new();
+			foreach (AttributeInstance.Packed packedAttribute in attributes) {
+				array.Add(new JObject() {
+					["attribute"] = packedAttribute.attribute.GetKey().value.ToString(),
+					["baseValue"] = packedAttribute.baseValue,
+					["modifiers"] = AttributeModifier.ListToJson(packedAttribute.permanentModifiers)
+				});
+			}
+			json["attributes"] = array;
 		}
 
 		public void Load(JObject json) {
@@ -389,7 +484,6 @@ namespace SoulboundEngine.World.Entity {
 				return;
 			}
 
-
 			this.SetPosRaw(x.GetValueOrDefault(0.0d), y.GetValueOrDefault(0.0d));
 			this.ReapplyPosition();
 			this.SetDeltaMovement(motionX.GetValueOrDefault(0.0d), motionY.GetValueOrDefault(0.0d));
@@ -408,6 +502,55 @@ namespace SoulboundEngine.World.Entity {
 		}
 
 		protected virtual void LoadAdditional(JObject json) {
+			this.LoadAttributes(json);
+		}
+
+		private void LoadAttributes(JObject json) {
+			if (json["attributes"] is not JArray array) {
+				Logger.LogError("Entity attributes json is not array");
+				return;
+			}
+			List<AttributeInstance.Packed> attributes = new();
+			foreach (JToken token in array) {
+				if (token is not JObject obj) {
+					Logger.LogError("Entity attribute entry is not object: {}", token);
+					continue;
+				}
+				string? idString = (string?)obj["attribute"];
+				if (idString == null) {
+					Logger.LogError("No attribute id on entity attribute: {}", obj);
+					continue;
+				}
+				if (!Identifier.TryParse(idString, out Identifier id)) {
+					Logger.LogError("Could not parse entity attribute id: {}", idString);
+					continue;
+				}
+				RegistryEntry<AttributeType>? attribute = Registries.ATTRIBUTE.GetEntry(id);
+				if (attribute == null) {
+					Logger.LogError("Unknown attribute: {}", idString);
+					continue;
+				}
+				double? baseValue = (double?)obj["baseValue"];
+				if (baseValue == null) {
+					Logger.LogError("No base value on entity attribute: {}", obj);
+					continue;
+				}
+				JToken? modifiersToken = obj["modifiers"];
+				if (modifiersToken == null) {
+					Logger.LogError("No modifiers on entity attribute: {}", obj);
+					continue;
+				}
+				List<AttributeModifier> modifiers = new();
+				try {
+					foreach (AttributeModifier modifier in AttributeModifier.ListFromJson(modifiersToken)) {
+						modifiers.Add(modifier);
+					}
+				} catch (Exception e) {
+					Logger.LogError("Could not parse entity attribute modifiers: {}", e.Message);
+				}
+				attributes.Add(new AttributeInstance.Packed(attribute, baseValue.GetValueOrDefault(attribute.GetValue().defaultValue), modifiers));
+			}
+			this.attributes.Unpack(attributes);
 		}
 
 		public static Entity? Load(JToken json, Level level) {

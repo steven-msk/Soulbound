@@ -96,7 +96,7 @@ namespace SoulboundEngine.World.Entity.Attribute {
 		}
 
 		public bool RemoveModifier(Identifier id) {
-			if (!this.modifierById.TryGetValue(id, out AttributeModifier modifier)) {
+			if (!this.modifierById.Remove(id, out AttributeModifier modifier)) {
 				return false;
 			}
 			this.GetModifiers(modifier.operation).Remove(id);
@@ -140,6 +140,10 @@ namespace SoulboundEngine.World.Entity.Attribute {
 			return this.attribute.GetValue().ValidateValue(result);
 		}
 
+		public static double CalculateResult(double baseValue, double flatSum, double percentSum, double multiplierProduct) {
+			return (baseValue + flatSum) * (1.0d + percentSum) * multiplierProduct;
+		}
+
 		private IEnumerable<AttributeModifier> GetModifiersOrEmpty(AttributeModifier.Operation operation) {
 			if (this.modifiersByOperation.TryGetValue(operation, out Dictionary<Identifier, AttributeModifier> modifiers)) {
 				foreach ((Identifier _, AttributeModifier modifier) in modifiers) {
@@ -170,7 +174,7 @@ namespace SoulboundEngine.World.Entity.Attribute {
 
 		public Packed Pack() => new(this.attribute, this.baseValue, new List<AttributeModifier>(this.permanentModifiers.Values));
 
-		public void Apply(Packed packed) {
+		public void Unpack(Packed packed) {
 			this.baseValue = packed.baseValue;
 			foreach (AttributeModifier modifier in packed.permanentModifiers) {
 				this.modifierById[modifier.id] = modifier;

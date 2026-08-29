@@ -5,7 +5,7 @@
 #nullable enable
 
 	public class AttributeMap {
-		private readonly Dictionary<RegistryEntry<AttributeType>, AttributeInstance> attributes = new();
+		public readonly Dictionary<RegistryEntry<AttributeType>, AttributeInstance> attributes = new();
 		private readonly HashSet<AttributeInstance> attributesToUpdate = new();
 		private readonly AttributeSupplier supplier;
 
@@ -17,6 +17,7 @@
 			this.attributesToUpdate.Add(instance);
 		}
 
+
 		public HashSet<AttributeInstance> GetAttributesToUpdate() => this.attributesToUpdate;
 
 		public AttributeInstance? GetInstance(RegistryEntry<AttributeType> attribute) {
@@ -26,6 +27,11 @@
 			instance = this.supplier.CreateInstance(this.OnAttributeModified, attribute);
 			if (instance != null) this.attributes.Add(attribute, instance);
 			return instance;
+		}
+
+		public bool TryGetInstance(RegistryEntry<AttributeType> attribute, out AttributeInstance instance) {
+			instance = this.GetInstance(attribute)!;
+			return instance != null;
 		}
 
 		public bool HasAttribute(RegistryEntry<AttributeType> attribute) {
@@ -108,10 +114,10 @@
 			return packed;
 		}
 
-		public void Apply(List<AttributeInstance.Packed> packedAttributes) {
+		public void Unpack(List<AttributeInstance.Packed> packedAttributes) {
 			foreach (AttributeInstance.Packed packed in packedAttributes) {
 				AttributeInstance? instance = this.GetInstance(packed.attribute);
-				instance?.Apply(packed);
+				instance?.Unpack(packed);
 			}
 		}
 	}

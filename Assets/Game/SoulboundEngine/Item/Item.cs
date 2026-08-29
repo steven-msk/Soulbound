@@ -53,6 +53,9 @@ namespace SoulboundEngine.Item {
 
 		public int GetBreakLevel() => this.components.GetOrDefault(ItemComponents.BREAK_LEVEL, 0);
 
+		public virtual void InventoryTick(Level level, Entity owner, ItemStack stack, EquipmentSlot? slot) {
+		}
+
 		/// <summary> 
 		/// Called when the player starts using the item (left click).
 		/// This method is called last in the entity -> block -> air dispatch order,
@@ -165,6 +168,10 @@ namespace SoulboundEngine.Item {
 
 			public Settings BreakLevel(int breakLevel) {
 				return this.Component(ItemComponents.BREAK_LEVEL, breakLevel);
+			}
+
+			public Settings Attributes(Func<ItemAttributeModifiers.Builder, ItemAttributeModifiers.Builder> builder) {
+				return this.Component(ItemComponents.ATTRIBUTE_MODIFIERS, builder(ItemAttributeModifiers.Create()).Build());
 			}
 
 			public Settings Durability(int durability) {
