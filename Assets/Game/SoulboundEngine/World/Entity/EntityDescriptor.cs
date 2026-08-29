@@ -1,12 +1,20 @@
 namespace SoulboundEngine.World.Entity {
 	using SoulboundEngine.Common.Math;
 	using SoulboundEngine.Registry;
+	using SoulboundEngine.Serialization;
 	using SoulboundEngine.World.Entity.Attribute;
 	using SoulboundEngine.World.Level;
 
 #nullable enable
 
 	public abstract class EntityDescriptor {
+		public static readonly Codec<EntityDescriptor> CODEC = Identifier.CODEC.FlatXmap(
+			decode: id => Get(id) is EntityDescriptor descriptor
+				? DataResult<EntityDescriptor>.Success(descriptor)
+				: DataResult<EntityDescriptor>.Error($"Unknown entity type: {id}"),
+			encode: GetIdentifier
+		);
+
 		public static Identifier? GetIdentifier(EntityDescriptor descriptor) {
 			return Registries.ENTITIES.GetIdentifier(descriptor);
 		}

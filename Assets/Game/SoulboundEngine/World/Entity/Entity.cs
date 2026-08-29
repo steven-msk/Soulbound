@@ -5,6 +5,7 @@ namespace SoulboundEngine.World.Entity {
 	using SoulboundEngine.Common.Math.Random;
 	using SoulboundEngine.Item;
 	using SoulboundEngine.Registry;
+	using SoulboundEngine.Serialization;
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Block.State;
 	using SoulboundEngine.World.Chunk;
@@ -418,13 +419,13 @@ namespace SoulboundEngine.World.Entity {
 
 		public JToken Save() {
 			JObject json = new() {
-				["type"] = EntityDescriptor.GetIdentifier(this.descriptor).ToString(),
-				["descriptionId"] = this.guid.ToString(),
-				["x"] = this.GetX(),
-				["y"] = this.GetY(),
-				["motionX"] = this.GetDeltaMovement().x,
-				["motionY"] = this.GetDeltaMovement().y,
-				["onGround"] = this.isOnGround,
+				["type"] = EntityDescriptor.CODEC.Encode(this.descriptor),
+				["guid"] = BuiltinCodecs.GUID.Encode(this.guid),
+				["x"] = BuiltinCodecs.DOUBLE.Encode(this.GetX()),
+				["y"] = BuiltinCodecs.DOUBLE.Encode(this.GetY()),
+				["motionX"] = BuiltinCodecs.DOUBLE.Encode(this.GetDeltaMovement().x),
+				["motionY"] = BuiltinCodecs.DOUBLE.Encode(this.GetDeltaMovement().y),
+				["onGround"] = BuiltinCodecs.BOOLEAN.Encode(this.isOnGround),
 			};
 			this.SaveAdditional(json);
 			return json;
@@ -447,48 +448,17 @@ namespace SoulboundEngine.World.Entity {
 		}
 
 		public void Load(JObject json) {
-			double? x = (double?)json["x"];
-			if (x == null) {
-				Logger.LogError("No x property found on Entity json: {}", json);
-				return;
-			}
-			double? y = (double?)json["y"];
-			if (y == null) {
-				Logger.LogError("No y property found on Entity json: {}", json);
-				return;
-			}
-
-			double? motionX = (double?)json["motionX"];
-			if (motionX == null) {
-				Logger.LogError("No motionX property found on Entity json: {}", json);
-				return;
-			}
-			double? motionY = (double?)json["motionY"];
-			if (motionY == null) {
-				Logger.LogError("No motionY property found on Entity json: {}", json);
-				return;
-			}
-
-			bool? onGround = (bool?)json["onGround"];
-			if (onGround == null) {
-				Logger.LogError("No onGround property found on Entity json: {}", json);
-				return;
-			}
-
-			this.SetPosRaw(x.GetValueOrDefault(0.0d), y.GetValueOrDefault(0.0d));
+			DataResult<double> x = BuiltinCodecs.DOUBLE.Decode(json["x"] ?? new JValue(0.0d));
+			DataResult<double> y = BuiltinCodecs.DOUBLE.Decode(json["y"] ?? new JValue(0.0d));
+			DataResult<double> motionX = BuiltinCodecs.DOUBLE.Decode(json["motionX"] ?? new JValue(0.0d));
+			DataResult<double> motionY = BuiltinCodecs.DOUBLE.Decode(json["motionY"] ?? new JValue(0.0d));
+			DataResult<bool> onGround = BuiltinCodecs.BOOLEAN.Decode(json["onGround"] ?? new JValue(false));
+			DataResult<Guid> guid = BuiltinCodecs.GUID.Decode(json["guid"] ?? new JValue(this.guid));
+			this.SetPosRaw(x.Result().OrElse(0.0d), y.Result().OrElse(0.0d));
 			this.ReapplyPosition();
-			this.SetDeltaMovement(motionX.GetValueOrDefault(0.0d), motionY.GetValueOrDefault(0.0d));
-			this.SetOnGround(onGround.GetValueOrDefault(false));
-
-			string? guidString = (string?)json["descriptionId"];
-			if (guidString != null) {
-				if (!Guid.TryParse(guidString, out Guid guid)) {
-					Logger.LogError("Failed to parse entity guid: {}", guidString);
-				} else {
-					this.guid = guid;
-				}
-			}
-
+			this.SetDeltaMovement(motionX.Result().OrElse(0.0d), motionY.Result().OrElse(0.0d));
+			this.SetOnGround(onGround.Result().OrElse(false));
+			this.guid = guid.Result().OrElse(this.guid);
 			this.LoadAdditional(json);
 		}
 
@@ -549,25 +519,20 @@ namespace SoulboundEngine.World.Entity {
 				Logger.LogError("Entity json is not object: {}", json);
 				return null;
 			}
-
-			string? typeIdString = (string?)json["type"];
-			if (typeIdString == null) {
-				Logger.LogError("No type property found on Entity json: {}", json);
+			JToken? typeToken = json["type"];
+			if (typeToken == null) {
+				Logger.LogError("Missing entity type: {}", json);
 				return null;
 			}
-			if (!Identifier.TryParse(typeIdString, out Identifier typeId)) {
-				Logger.LogError("Could not parse Entity type descriptionId: {}", typeIdString);
-				return null;
-			}
-			EntityDescriptor? descriptor = EntityDescriptor.Get(typeId);
-			if (descriptor == null) {
-				Logger.LogError("Entity descriptor not found: {}", typeIdString);
+			DataResult<EntityDescriptor> descriptor = EntityDescriptor.CODEC.Decode(typeToken);
+			if (descriptor.IsError()) {
+				Logger.LogError("Invalid entity type: {}", typeToken);
 				return null;
 			}
 
-			Entity? entity = descriptor.Create(level);
+			Entity? entity = descriptor.Result().OrElseThrow().Create(level);
 			if (entity == null) {
-				Logger.LogError("Cannot create entity: {}. Parsed data: {}", typeIdString, json);
+				Logger.LogError("Cannot create entity: {}. Parsed data: {}", typeToken, json);
 				return null;
 			}
 
