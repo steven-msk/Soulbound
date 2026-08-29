@@ -1,14 +1,20 @@
 namespace SoulboundEngine.Registry {
 	using Brigadier.NET;
+	using SoulboundEngine.Serialization;
 	using System;
 
 	public sealed class Identifier : IEquatable<Identifier> {
+		public static readonly Codec<Identifier> CODEC = BuiltinCodecs.STRING.FlatXmap(
+			decode: s => TryParse(s, out Identifier id)
+				? DataResult<Identifier>.Success(id)
+				: DataResult<Identifier>.Error($"Invalid identifier: {s}"),
+			encode: id => id.ToString()
+		);
 		public const string DEFAULT_NAMESPACE = "soulbound";
 		public const char NAMESPACE_SEPARATOR = ':';
 		public const char PATH_SEPARATOR = '/';
 		private const string ALLOWED_PATH_CHARACTERS = "abcdefghijklmnopqrstuvwxyz1234567890-_./";
 		private const string ALLOWED_NAMESPACE_CHARACTERS = "abcdefghijklmnopqrstuvwxyz1234567890-_";
-
 		private readonly string _namespace;
 		private readonly string path;
 
