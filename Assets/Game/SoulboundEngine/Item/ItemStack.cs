@@ -3,6 +3,7 @@ namespace SoulboundEngine.Item {
 	using SoulboundEngine.Component;
 	using SoulboundEngine.Interaction;
 	using SoulboundEngine.Registry;
+	using SoulboundEngine.Serialization;
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Entity;
 	using SoulboundEngine.World.Entity.Attribute;
@@ -14,6 +15,16 @@ namespace SoulboundEngine.Item {
 #nullable enable
 
 	public struct ItemStack : IComponentHolder {
+		public static readonly Codec<ItemStack> NON_EMPTY_CODEC = RecordCodec<ItemStack, Item, int, ComponentChanges>.Of(
+			Field.Required<ItemStack, Item>("item", Item.CODEC, s => s.GetItem()),
+			Field.Required<ItemStack, int>("count", BuiltinCodecs.INT, s => s.count),
+			Field.Optional<ItemStack, ComponentChanges>("changes", ComponentChanges.CODEC, s => s.GetComponentChanges(), ComponentChanges.EMPTY),
+			(item, count, components) => new ItemStack(item, count, components)
+		);
+		public static readonly Codec<ItemStack> EMPTY_ACCEPTING_CODEC = Codec<ItemStack>.Of(
+			encode: stack => !stack.IsEmpty() ? NON_EMPTY_CODEC.Encode(stack) : JValue.CreateNull(),
+			decode: json => json.Type == JTokenType.Null ? DataResult<ItemStack>.Success(EMPTY) : NON_EMPTY_CODEC.Decode(json)
+		);
 		private static MergedComponentMap cachedEmptyComponents = null!;
 		private static MergedComponentMap CachedEmptyComponents => cachedEmptyComponents ??= MergedComponentMap.Create(Items.AIR.GetComponents(), ComponentChanges.EMPTY);
 		public static readonly ItemStack EMPTY = new();
@@ -324,47 +335,6 @@ namespace SoulboundEngine.Item {
 				this.Decrement(1);
 				onBreak(item);
 			}
-		}
-
-		public static JToken ToJson(ItemStack stack) {
-			return stack.IsEmpty()
-				? JValue.CreateNull()
-				: new JObject() {
-					["item"] = Items.GetIdentifier(stack.GetItem()).ToString(),
-					["count"] = stack.count,
-					["changes"] = ComponentChanges.ToJson(stack.GetComponentChanges())
-				};
-		}
-
-		public static ItemStack FromJson(JToken json) {
-			if (json.Type == JTokenType.Null) return EMPTY;
-			if (json.Type != JTokenType.Object) {
-				Logger.LogError("ItemStack json is not object: {}", json);
-				return EMPTY;
-			}
-
-			string? itemIdString = (string?)json["item"];
-			if (itemIdString == null) {
-				Logger.LogError("No item property in stack json: {}", json);
-				return EMPTY;
-			}
-
-			Identifier itemId = Identifier.Of(itemIdString);
-			Item? item = Items.Get(itemId);
-			if (item == null) {
-				Logger.LogError("Unknown item: {}", itemId);
-				return EMPTY;
-			}
-
-			int? count = (int?)json["count"];
-			if (count == null) {
-				Logger.LogError("No count property in stack json: {}", json);
-				return EMPTY;
-			}
-
-			JToken componentsToken = json["changes"] ?? JValue.CreateNull();
-			ComponentChanges components = ComponentChanges.FromJson(componentsToken);
-			return new ItemStack(item, count.Value, components);
 		}
 
 		private readonly void AssertComponentMutationNotOnEmpty() {

@@ -1,7 +1,6 @@
 ﻿namespace SoulboundEngine.Component {
-	using Newtonsoft.Json;
 	using Newtonsoft.Json.Linq;
-	using SoulboundEngine.Registry;
+	using SoulboundEngine.Serialization;
 	using System;
 	using System.Collections.Generic;
 	using System.Linq;
@@ -9,8 +8,37 @@
 #nullable enable
 
 	public sealed class ComponentChanges {
-		private readonly Dictionary<ComponentType, object> changedComponents;
 		public static readonly ComponentChanges EMPTY = new(new Dictionary<ComponentType, object>());
+		public static readonly Codec<ComponentChanges> CODEC = Codec<ComponentChanges>.Of(
+			encode: componentChanges => {
+				if (componentChanges.IsEmpty()) return JValue.CreateNull();
+
+				JArray array = new();
+				foreach ((ComponentType type, object value) in componentChanges.changedComponents) {
+					Component component = Component.Of(type, value);
+					Codec<Component> codec = Component.MakeCodec(type);
+					array.Add(codec.Encode(component));
+				}
+				return array;
+			},
+			decode: json => {
+				if (json.Type == JTokenType.Null) return DataResult<ComponentChanges>.Success(EMPTY);
+				if (json is not JArray array) return DataResult<ComponentChanges>.Error("Json is not array", EMPTY);
+
+				Builder builder = Create();
+				foreach (JToken token in array) {
+					Component.GetTypeFrom(token)
+						.ResultOrPartial(error => Logger.LogError("Could not retrieve component type: {}", error))
+						.IfPresent(componentType => {
+							Component.MakeCodec(componentType).Decode(token)
+								.ResultOrPartial(error => Logger.LogError("Failed to parse component: {}", error))
+								.IfPresent(builder.AddRaw);
+						});
+				}
+				return DataResult<ComponentChanges>.Success(builder.Build());
+			}
+		);
+		private readonly Dictionary<ComponentType, object> changedComponents;
 
 		private ComponentChanges(Dictionary<ComponentType, object> changedComponents) {
 			this.changedComponents = changedComponents;
@@ -82,50 +110,6 @@
 			return new AddedRemovedPairs(builder.Build(), removed);
 		}
 
-		public static JToken ToJson(ComponentChanges changes) {
-			if (changes.Equals(EMPTY)) return JValue.CreateNull();
-
-			JObject json = new();
-			foreach ((ComponentType type, object value) in changes.changedComponents) {
-				Identifier id = ComponentType.GetId(type);
-				json.Add(id.ToString(), Component.IsRemoved(value) ? null : type.ToJson(value));
-			}
-			return json;
-		}
-
-		public static ComponentChanges FromJson(JToken json) {
-			if (json.Type == JTokenType.Null) return EMPTY;
-			if (json.Type != JTokenType.Object) {
-				Logger.LogError("ComponentChanges json is not object: {}", json);
-				return EMPTY;
-			}
-
-			Builder builder = Create();
-			foreach (JProperty property in ((JObject)json).Properties()) {
-				Identifier typeId = Identifier.Of(property.Name);
-				ComponentType? type = ComponentType.Get(typeId);
-				if (type == null) {
-					Logger.LogError("Skipping unknown component type {}", typeId);
-					continue;
-				}
-
-				JToken token = property.Value;
-				if (token.Type == JTokenType.Null) {
-					builder.AddRaw(type, Component.REMOVED);
-					continue;
-				}
-
-				try {
-					object value = type.FromJson(token);
-					builder.AddRaw(type, value);
-				} catch (Exception e) {
-					Logger.LogFatal(e, "Unable to parse component value {} (component type: {})", token.ToString(Formatting.None), typeId);
-				}
-			}
-
-			return builder.Build();
-		}
-
 		public override bool Equals(object obj) {
 			return obj is ComponentChanges other && this.Equals(other);
 		}
@@ -175,6 +159,10 @@
 			internal Builder AddRaw(ComponentType type, object value) {
 				this.changedComponents[type] = value;
 				return this;
+			}
+
+			internal void AddRaw(Component component) {
+				this.changedComponents[component.boxedType] = component.boxedValue;
 			}
 		}
 	}

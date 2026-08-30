@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿namespace SoulboundEngine.Component {
+	using System;
+	using System.Collections;
+	using System.Collections.Generic;
+	using System.Linq;
 
-namespace SoulboundEngine.Component {
 	public interface IComponentMap : IEnumerable<Component>, IComponentsAccess {
 		public static IComponentMap EMPTY = Create().Build();
 
@@ -35,7 +35,7 @@ namespace SoulboundEngine.Component {
 			public override bool Equals(object obj) {
 				if (obj is not DictionaryBackedComponentMap other) return false;
 				if (this.map.Count != other.map.Count) return false;
-				foreach (var (key, value) in this.map) {
+				foreach ((ComponentType key, object value) in this.map) {
 					if (!other.map.TryGetValue(key, out var otherValue) || !Equals(value, otherValue)) {
 						return false;
 					}
@@ -45,7 +45,7 @@ namespace SoulboundEngine.Component {
 
 			public override int GetHashCode() {
 				int hash = 0;
-				foreach (var kvp in this.map.OrderBy(k => k.Key.GetHashCode())) {
+				foreach (KeyValuePair<ComponentType, object> kvp in this.map.OrderBy(k => k.Key.GetHashCode())) {
 					hash = HashCode.Combine(hash, kvp.Key, kvp.Value);
 				}
 				return hash;
@@ -68,7 +68,7 @@ namespace SoulboundEngine.Component {
 			
 
 			public Builder AddAll(IComponentMap map) {
-				foreach (var component in map) {
+				foreach (Component component in map) {
 					this.Add(component);
 				}
 				return this;

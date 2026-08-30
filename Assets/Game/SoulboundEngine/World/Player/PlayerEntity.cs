@@ -5,6 +5,7 @@ namespace SoulboundEngine.World.Player {
 	using SoulboundEngine.Inventory;
 	using SoulboundEngine.Item;
 	using SoulboundEngine.Item.Container;
+	using SoulboundEngine.Serialization;
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Block.Entity;
 	using SoulboundEngine.World.Block.State;
@@ -406,24 +407,14 @@ namespace SoulboundEngine.World.Player {
 		protected override void SaveAdditional(JToken json) {
 			base.SaveAdditional(json);
 			json["inventory"] = this.inventory.Save();
-			json["mainSlot"] = this.inventory.GetMainSlot();
+			json["mainSlot"] = BuiltinCodecs.INT.Encode(this.inventory.GetMainSlot());
 		}
 
 		protected override void LoadAdditional(JObject json) {
 			base.LoadAdditional(json);
-			JToken? inventoryToken = json["inventory"];
-			if (inventoryToken == null) {
-				Logger.LogError("No inventory property on PlayerEntity json: {}", json);
-			} else {
-				this.inventory.Load(inventoryToken);
-			}
-
-			int? mainSlot = (int?)json["mainSlot"];
-			if (mainSlot == null) {
-				Logger.LogError("No mainSlot property on PlayerEntity json: {}", json);
-			} else {
-				this.inventory.SetMainSlot(mainSlot.Value);
-			}
+			this.inventory.Load(json["inventory"] ?? JValue.CreateNull());
+			BuiltinCodecs.INT.Decode(json["mainSlot"] ?? JValue.CreateNull())
+				.ResultOrPartial().IfPresent(this.inventory.SetMainSlot);
 		}
 
 	}

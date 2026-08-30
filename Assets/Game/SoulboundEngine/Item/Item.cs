@@ -2,6 +2,7 @@ namespace SoulboundEngine.Item {
 	using SoulboundEngine.Component;
 	using SoulboundEngine.Interaction;
 	using SoulboundEngine.Registry;
+	using SoulboundEngine.Serialization;
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Entity;
 	using SoulboundEngine.World.Level;
@@ -12,6 +13,12 @@ namespace SoulboundEngine.Item {
 #nullable enable
 
 	public class Item : IItemConvertible {
+		public static readonly Codec<Item> CODEC = Identifier.CODEC.FlatXmap<Item>(
+			encode: i => i.registryKey.value,
+			decode: i => Registries.ITEMS.GetEntry(i) is { } entry
+				? DataResult<Item>.Success(entry.GetValue())
+				: DataResult<Item>.Error($"Invalid item id: {i}")
+		);
 		public const int DEFAULT_FULL_STACK = 256;
 		public static readonly Dictionary<Block, Item> blockItems = new();
 		private readonly RegistryKey<Item> registryKey;

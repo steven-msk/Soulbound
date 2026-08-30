@@ -1,5 +1,6 @@
 ﻿namespace SoulboundEngine.Serialization {
 	using Newtonsoft.Json.Linq;
+	using SoulboundEngine.Common.Patterns;
 	using System;
 	using System.Collections.Generic;
 
@@ -13,7 +14,14 @@
 
 		public Codec<T> WithDefault(T fallback) => new DefaultingCodec<T>(this, fallback);
 
+		public Codec<object> XmapToObject() => this.Xmap<object>(v => v, o => (T)o);
+
 		public Codec<List<T>> ListOf() => new ListCodec<T>(this);
+
+		public Codec<Optional<T>> MakeOptional() => Codec<Optional<T>>.Of(
+			encode: v => v.IsEmpty() ? JValue.CreateNull() : this.Encode(v.GetValue()),
+			decode: json => json.Type == JTokenType.Null ? DataResult<Optional<T>>.Success(Optional<T>.Empty()) : this.Decode(json).Map(Optional<T>.Of)
+		);
 
 		public Codec<U> Xmap<U>(Func<T, U> to, Func<U, T> from) {
 			return Codec<U>.Of(

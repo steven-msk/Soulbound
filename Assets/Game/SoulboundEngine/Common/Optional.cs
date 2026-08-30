@@ -68,4 +68,12 @@ namespace SoulboundEngine.Common.Patterns {
 			return this.IsPresent() ? new Optional<TU>(method.Invoke(this.value)) : default;
 		}
 	}
+
+#nullable enable
+
+	public static class OptionalExtras {
+		public static Optional<T> OfUnmanaged<T>(T? value) where T : unmanaged {
+			return value.HasValue ? Optional<T>.Of(value.Value) : Optional<T>.Empty(); 
+		}
+	}
 }

@@ -43,12 +43,11 @@
 		}
 
 		public T Get<T>(ComponentType<T> type) {
-			if (this.changedComponents.TryGetValue(type, out object value)) {
-				return ReferenceEquals(value, Component.REMOVED)
+			return this.changedComponents.TryGetValue(type, out object value)
+				? ReferenceEquals(value, Component.REMOVED)
 					? throw new KeyNotFoundException($"Component {type} was removed from this patch.")
-					: (T)value;
-			}
-			return this.baseMap.Get(type);
+					: (T)value
+				: this.baseMap.Get(type);
 		}
 
 		public T GetOrDefault<T>(ComponentType<T> type, T fallback) {
@@ -132,7 +131,7 @@
 			return obj is MergedComponentMap other && this.baseMap.Equals(other.baseMap)
 				&& this.changedComponents.Count == other.changedComponents.Count
 				&& this.changedComponents.All(kvp =>
-					other.changedComponents.TryGetValue(kvp.Key, out var v)
+					other.changedComponents.TryGetValue(kvp.Key, out object v)
 					&& (ReferenceEquals(kvp.Value, Component.REMOVED) ? ReferenceEquals(v, Component.REMOVED) : kvp.Value.Equals(v)));
 		}
 

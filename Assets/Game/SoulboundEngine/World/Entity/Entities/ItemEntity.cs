@@ -1,6 +1,8 @@
 namespace SoulboundEngine.World.Entity {
 	using Newtonsoft.Json.Linq;
+	using SoulboundEngine.Common.Patterns;
 	using SoulboundEngine.Item;
+	using SoulboundEngine.Serialization;
 	using SoulboundEngine.World.Entity.Attribute;
 	using SoulboundEngine.World.Level;
 	using SoulboundEngine.World.Player;
@@ -88,42 +90,29 @@ namespace SoulboundEngine.World.Entity {
 
 		protected override void SaveAdditional(JToken json) {
 			base.SaveAdditional(json);
-			json["age"] = this.age;
-			json["owner"] = this.owner == null ? JValue.CreateNull() : this.owner;
-			json["pickupDelay"] = this.pickupDelay;
-			json["stack"] = ItemStack.ToJson(this.itemStack);
+			json["age"] = BuiltinCodecs.INT.Encode(this.age);
+			json["owner"] = BuiltinCodecs.GUID.MakeOptional().Encode(OptionalExtras.OfUnmanaged(this.owner));
+			json["pickupDelay"] = BuiltinCodecs.INT.Encode(this.pickupDelay);
+			json["stack"] = ItemStack.EMPTY_ACCEPTING_CODEC.Encode(this.itemStack);
 		}
 
 		protected override void LoadAdditional(JObject json) {
 			base.LoadAdditional(json);
-			int? age = (int?)json["age"];
-			if (age == null) Logger.LogError("No age property on ItemEntity json: {}", json);
+			this.SetAge(BuiltinCodecs.INT.Decode(json["age"] ?? JValue.CreateNull())
+				.ResultOrPartial(error => Logger.LogError("Could not load age: {}", error))
+				.OrElse(0)
+			);
+			this.SetPickupDelay(BuiltinCodecs.INT.Decode(json["pickupDelay"] ?? JValue.CreateNull())
+				.ResultOrPartial(error => Logger.LogError("Could not load pickup delay: {}", error))
+				.OrElse(0)
+			);
+			BuiltinCodecs.GUID.MakeOptional().Decode(json["owner"] ?? JValue.CreateNull())
+				.ResultOrPartial(error => Logger.LogError("Could not load owner: {}", error))
+				.IfPresent(guid => guid.IfPresent(g => this.SetOwner(g)));
 
-			int? pickupDelay = (int?)json["pickupDelay"];
-			if (pickupDelay == null) Logger.LogError("No pickupDelay property on ItemEntity json: {}", json);
-
-			JToken? stackToken = json["stack"];
-			if (stackToken == null) Logger.LogError("No stack property on ItemEntity json: {}", json);
-
-			JProperty? ownerProperty = json.Property("owner");
-			Guid? guid = null;
-			if (ownerProperty == null) {
-				Logger.LogError("No owner property on ItemEntity json: {}", json);
-			} else {
-				string? guidString = (string?)ownerProperty.Value;
-				if (guidString != null) {
-					if (Guid.TryParse(guidString, out Guid value)) {
-						guid = value;
-					} else {
-						Logger.LogError("Could not parse ItemEntity guid: {}", guidString);
-					}
-				}
-			}
-
-			this.SetOwner(guid);
-			this.SetAge(age.GetValueOrDefault(0));
-			this.SetPickupDelay(pickupDelay.GetValueOrDefault(0));
-			this.SetStack(stackToken != null ? ItemStack.FromJson(stackToken) : ItemStack.EMPTY);
+			ItemStack.EMPTY_ACCEPTING_CODEC.Decode(json["stack"] ?? JValue.CreateNull())
+				.ResultOrPartial(error => Logger.LogError("Could not load stack: {}", error))
+				.IfPresent(this.SetStack);
 		}
 	}
 }
