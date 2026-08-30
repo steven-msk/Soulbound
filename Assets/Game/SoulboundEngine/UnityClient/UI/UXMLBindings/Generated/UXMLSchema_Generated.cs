@@ -11,7 +11,9 @@ namespace SoulboundEngine.UnityClient.UI.UXMLBindings {
             UXMLSchema.Register(Identifier.Of("soulbound:command_line/completion_list"), typeof(ListView));
             UXMLSchema.Register(Identifier.Of("soulbound:command_line/usage_list"), typeof(ListView));
             UXMLSchema.Register(Identifier.Of("soulbound:command_line/exception_list"), typeof(ListView));
+            UXMLSchema.Register(Identifier.Of("soulbound:command_line/output_history_list"), typeof(ListView));
             UXMLSchema.Register(Identifier.Of("soulbound:command_line/text_field"), typeof(TextField));
+            UXMLSchema.Register(Identifier.Of("soulbound:command_output/output_text"), typeof(Label));
             UXMLSchema.Register(Identifier.Of("soulbound:command_suggestion/suggestion_text"), typeof(Label));
             UXMLSchema.Register(Identifier.Of("soulbound:command_usage/usage_text"), typeof(Label));
             UXMLSchema.Register(Identifier.Of("soulbound:durability_bar/durability_bar"), typeof(ProgressBar));

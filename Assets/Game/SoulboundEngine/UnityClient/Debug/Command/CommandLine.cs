@@ -3,6 +3,7 @@ namespace SoulboundEngine.UnityClient.Debug {
 	using Brigadier.NET.Exceptions;
 	using Brigadier.NET.Suggestion;
 	using Cysharp.Threading.Tasks;
+	using SoulboundEngine.Common;
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.UnityClient.Assets;
 	using SoulboundEngine.UnityClient.Debug.Command;
@@ -15,7 +16,10 @@ namespace SoulboundEngine.UnityClient.Debug {
 	using UnityEngine;
 	using UnityEngine.InputSystem;
 	using UnityEngine.UIElements;
+	using Color = UnityEngine.Color;
 	using Keyboard = Input.Keyboard;
+
+#nullable enable
 
 	public sealed class CommandLine : UXMLWidget, IInputFocusable {
 		private static readonly Identifier TEXT_FIELD_ELEMENT = Identifier.Of("soulbound:command_line/text_field");
@@ -25,22 +29,31 @@ namespace SoulboundEngine.UnityClient.Debug {
 		private static readonly Identifier USAGE_TEXT_ELEMENT = Identifier.Of("soulbound:command_usage/usage_text");
 		private static readonly Identifier EXCEPTION_LIST_ELEMENT = Identifier.Of("soulbound:command_line/exception_list");
 		private static readonly Identifier EXCEPTION_TEXT_ELEMENT = Identifier.Of("soulbound:command_exception/exception_text");
+		private static readonly Identifier OUTPUT_LIST_ELEMENT = Identifier.Of("soulbound:command_line/output_history_list");
+		private static readonly Identifier OUTPUT_TEXT_ELEMENT = Identifier.Of("soulbound:command_output/output_text");
+		private const int MAX_OUTPUT_COUNT = 30;
+		private const string OUTPUT_FORMAT = "> {}";
+		private static readonly Color DEFAULT_OUTPUT_COLOR = new(0.8f, 0.8f, 0.8f, 1f);
 		private readonly CommandProcessor commandProcessor;
-		private readonly List<string> history = new();
+		private readonly List<string> historyCache = new();
+		private readonly HashSet<string> history = new();
+		private readonly List<CommandOutput> outputHistory = new();
 		private readonly CompletionManager completionManager = new();
 		private readonly Keyboard keyboard;
 		private readonly SoulboundUnityClient client;
-		private TextField textField;
-		private ListView completionList;
-		private List<string> currentUsages;
-		private ListView usageList;
-		private List<CommandSyntaxException> currentExceptions;
-		private ListView exceptionList;
+		private TextField textField = null!;
+		private ListView completionList = null!;
+		private List<string> currentUsages = null!;
+		private ListView usageList = null!;
+		private List<CommandSyntaxException> currentExceptions = null!;
+		private ListView exceptionList = null!;
+		private ListView outputList = null!;
+		private string? lastReceivedOutput;
 		private Color defaultFieldColor;
-		private int historyIndex;
+		private int historyIndex = 0;
 		private bool isCyclingHistory;
 		private bool isCyclingCompletions;
-		private bool hasEdited;
+		private bool hasEditedManually;
 		private int lastKnownCaretPos;
 		private static readonly HashSet<KeyCode> HANDLED_KEYS = new() {
 			KeyCode.UpArrow, KeyCode.DownArrow, KeyCode.Tab, KeyCode.Return, KeyCode.KeypadEnter, KeyCode.Escape
@@ -75,6 +88,14 @@ namespace SoulboundEngine.UnityClient.Debug {
 				element.Get<Label>(EXCEPTION_TEXT_ELEMENT).text = this.currentExceptions[index].Message;
 			};
 			this.exceptionList.itemsSource = this.currentExceptions;
+			this.outputList = root.Get<ListView>(OUTPUT_LIST_ELEMENT);
+			this.outputList.itemsSource = this.outputHistory;
+			this.outputList.bindItem = (element, index) => {
+				Label label = element.Get<Label>(OUTPUT_TEXT_ELEMENT);
+				CommandOutput output = this.outputHistory[index];
+				label.text = OUTPUT_FORMAT.WithArgs(output.message);
+				label.style.color = output.isError ? Color.red : DEFAULT_OUTPUT_COLOR;
+			};
 			this.textField.RegisterCallback<KeyDownEvent>(this.InterceptHandledKeys, TrickleDown.TrickleDown);
 			this.completionList.makeNoneElement = () => new VisualElement();
 			this.completionList.itemsChosen += this.OnCompletionChosen;
@@ -89,21 +110,20 @@ namespace SoulboundEngine.UnityClient.Debug {
 			if (!this.isVisible) return;
 			if (HANDLED_KEYS.Contains(evt.keyCode)) {
 				evt.StopImmediatePropagation();
+			} else {
+				this.hasEditedManually = true;
+				this.isCyclingHistory = false;
 			}
-		}
-
-		private void OutputReceived(string output) {
-			SoulboundEngine.Logger.LogInfo(output);
 		}
 
 		internal void Tick() {
-			if (!this.isVisible && GameSettings.keybinds.enterCommand.WasPressed()) {
-				this.Show();
-			}
-			
-			this.HandleKeyInput();
 			if (this.isVisible) {
 				if (this.CheckCaret()) this.CaretChanged(this.GetCurrentCaret());
+				this.textField.Focus();
+			}
+			this.HandleKeyInput();
+			if (!this.isVisible && GameSettings.keybinds.enterCommand.WasPressed()) {
+				this.Show();
 			}
 		}
 
@@ -119,7 +139,7 @@ namespace SoulboundEngine.UnityClient.Debug {
 				return;
 			}
 
-			if (this.CanCycleHistory() && !this.isCyclingCompletions) {
+			if (this.CanCycleHistory() && !this.isCyclingCompletions || this.isCyclingHistory) {
 				if (this.keyboard.WasPressed(Keyboard.GetControl(Key.UpArrow))) {
 					this.isCyclingHistory = true;
 					this.historyIndex--;
@@ -129,6 +149,8 @@ namespace SoulboundEngine.UnityClient.Debug {
 					this.historyIndex = (this.historyIndex + 1) % this.history.Count;
 					this.OverwriteWithHistory(this.historyIndex);
 				}
+			} else if (!this.CanCycleHistory() && this.isCyclingHistory) {
+				this.isCyclingHistory = false;
 			}
 
 			if (this.CanCycleCompletions() || this.isCyclingCompletions) {
@@ -171,9 +193,7 @@ namespace SoulboundEngine.UnityClient.Debug {
 
 			ParseResults<RuntimeCommandSource> parseResults = this.commandProcessor.Parse(this.GetCommand());
 			if (parseResults.Context.Nodes.Count > 0) {
-				List<string> usages = this.commandProcessor.GetSmartUsages(parseResults.Context.Nodes.Last().Node)
-					.Select(kvp => kvp.Value)
-					.ToList();
+				List<string> usages = this.commandProcessor.GetSmartUsages(parseResults.Context.Nodes.Last().Node).Values.ToList();
 				this.currentUsages = usages;
 				this.usageList.itemsSource = this.currentUsages;
 				this.usageList.Rebuild();
@@ -182,9 +202,7 @@ namespace SoulboundEngine.UnityClient.Debug {
 				this.usageList.style.display = DisplayStyle.None;
 			}
 
-			List<CommandSyntaxException> exceptions = parseResults.Exceptions
-				.Select(kvp => kvp.Value)
-				.ToList();
+			List<CommandSyntaxException> exceptions = parseResults.Exceptions.Values.ToList();
 			if (exceptions.Count > 0 && this.usageList.style.display == DisplayStyle.Flex) {
 				this.usageList.style.display = DisplayStyle.None;
 			}
@@ -193,12 +211,21 @@ namespace SoulboundEngine.UnityClient.Debug {
 			this.exceptionList.Rebuild();
 			this.exceptionList.style.display = exceptions.Count > 0 ? DisplayStyle.Flex : DisplayStyle.None;
 			this.textField.style.color = exceptions.Count > 0 ? Color.red : this.defaultFieldColor;
+
+			this.ShowOutputHistory(this.ShouldShowOutputHistory());
 		}
 
 		private void ClearAndDisableCompletions() {
 			this.isCyclingCompletions = false;
 			this.completionManager.ClearCompletions();
 			this.completionList.itemsSource = Array.Empty<Suggestion>();
+		}
+
+		private bool ShouldShowOutputHistory() {
+			return this.outputHistory.Count > 0 && this.CanCycleHistory()
+				&& !this.CanCycleCompletions()
+				&& this.usageList.style.display == DisplayStyle.None
+				&& this.exceptionList.style.display == DisplayStyle.None;
 		}
 
 		private int GetCurrentCaret() => this.textField.cursorIndex;
@@ -208,15 +235,19 @@ namespace SoulboundEngine.UnityClient.Debug {
 		public override void Show() {
 			base.Show();
 			this.textField.value = "/";
+			this.lastKnownCaretPos = 1;
 			this.client.PushInputFocus(this);
-			this.hasEdited = false;
+			this.hasEditedManually = false;
 			this.isCyclingCompletions = false;
 			this.isCyclingHistory = false;
+			this.historyIndex = 0;
 
 			this.textField.RegisterCallback<ChangeEvent<string>>(FirstEdit);
 			void FirstEdit(ChangeEvent<string> evt) {
-				this.hasEdited = true;
-				this.textField.UnregisterCallback<ChangeEvent<string>>(FirstEdit);
+				if (!this.isCyclingHistory) {
+					this.hasEditedManually = true;
+					this.textField.UnregisterCallback<ChangeEvent<string>>(FirstEdit);
+				}
 			}
 			this.textField.RegisterCallback<GeometryChangedEvent>(GeometryChanged);
 			void GeometryChanged(GeometryChangedEvent evt) {
@@ -226,19 +257,23 @@ namespace SoulboundEngine.UnityClient.Debug {
 
 			this.GrabFocus();
 			this.SetCaretToEnd();
-			this.textField.schedule.Execute(() => {
-				this.ShowCompletions(this.GetCommand(), this.GetCurrentCaret());
-			});
+			this.ShowOutputHistory(true);
 		}
 
 		public override void Hide() {
 			base.Hide();
 			this.textField.value = "/";
 			this.client.PopInputFocus(this);
+			this.usageList.style.display = DisplayStyle.None;
+			this.exceptionList.style.display = DisplayStyle.None;
+		}
+
+		public void ShowOutputHistory(bool show) {
+			this.outputList.style.display = show ? DisplayStyle.Flex : DisplayStyle.None;
 		}
 
 		private bool CanCycleHistory() {
-			return this.history.Any() && !this.hasEdited;
+			return this.history.Any() && !this.hasEditedManually;
 		}
 
 		private bool CanCycleCompletions() {
@@ -246,8 +281,29 @@ namespace SoulboundEngine.UnityClient.Debug {
 		}
 
 		private void SubmitCommand(string command) {
-			this.history.Add(command);
-			this.commandProcessor.SubmitCommand(command);
+			if (string.IsNullOrEmpty(command)) return;
+
+			if (this.history.Add(command)) this.historyCache.Add(command);
+			string? errorMessage = this.commandProcessor.SubmitCommand(command);
+			if (errorMessage != null) {
+				this.AddOutput(errorMessage, true);
+			} else if (this.lastReceivedOutput != null) {
+				this.AddOutput(this.lastReceivedOutput, false);
+			}
+		}
+
+		private void AddOutput(string message, bool isError) {
+			this.outputHistory.Add(new CommandOutput { message = message, isError = isError });
+			if (this.outputHistory.Count > MAX_OUTPUT_COUNT) {
+				this.outputHistory.RemoveAt(0);
+			}
+			this.lastReceivedOutput = null;
+			this.outputList.itemsSource = this.outputHistory;
+			this.outputList.Rebuild();
+		}
+
+		private void OutputReceived(string output) {
+			this.lastReceivedOutput = output;
 		}
 
 		public void ShowCompletions(string value, int caretPos) {
@@ -293,7 +349,7 @@ namespace SoulboundEngine.UnityClient.Debug {
 		}
 
 		private void OverwriteWithHistory(int historyIndex) {
-			this.textField.value = this.history[historyIndex];
+			this.textField.value = this.historyCache[historyIndex];
 			this.SetCaretToEnd();
 		}
 
@@ -315,6 +371,12 @@ namespace SoulboundEngine.UnityClient.Debug {
 		public override void Dispose() {
 			base.Dispose();
 			this.commandProcessor.onOutputReceived -= this.OutputReceived;
+			this.lastKnownCaretPos = 0;
+		}
+
+		private struct CommandOutput {
+			public string message;
+			public bool isError;
 		}
 	}
 }
