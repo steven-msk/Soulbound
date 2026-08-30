@@ -3,7 +3,6 @@ namespace SoulboundEngine.UnityClient.Debug {
 	using Brigadier.NET.Exceptions;
 	using Brigadier.NET.Suggestion;
 	using Cysharp.Threading.Tasks;
-	using SoulboundEngine.Common;
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.UnityClient.Assets;
 	using SoulboundEngine.UnityClient.Debug.Command;
@@ -32,7 +31,6 @@ namespace SoulboundEngine.UnityClient.Debug {
 		private static readonly Identifier OUTPUT_LIST_ELEMENT = Identifier.Of("soulbound:command_line/output_history_list");
 		private static readonly Identifier OUTPUT_TEXT_ELEMENT = Identifier.Of("soulbound:command_output/output_text");
 		private const int MAX_OUTPUT_COUNT = 30;
-		private const string OUTPUT_FORMAT = "> {}";
 		private static readonly Color DEFAULT_OUTPUT_COLOR = new(0.8f, 0.8f, 0.8f, 1f);
 		private readonly CommandProcessor commandProcessor;
 		private readonly List<string> historyCache = new();
@@ -93,7 +91,7 @@ namespace SoulboundEngine.UnityClient.Debug {
 			this.outputList.bindItem = (element, index) => {
 				Label label = element.Get<Label>(OUTPUT_TEXT_ELEMENT);
 				CommandOutput output = this.outputHistory[index];
-				label.text = OUTPUT_FORMAT.WithArgs(output.message);
+				label.text = output.message;
 				label.style.color = output.isError ? Color.red : DEFAULT_OUTPUT_COLOR;
 			};
 			this.textField.RegisterCallback<KeyDownEvent>(this.InterceptHandledKeys, TrickleDown.TrickleDown);
@@ -257,7 +255,7 @@ namespace SoulboundEngine.UnityClient.Debug {
 
 			this.GrabFocus();
 			this.SetCaretToEnd();
-			this.ShowOutputHistory(true);
+			this.ShowOutputHistory(this.outputHistory.Count > 0);
 		}
 
 		public override void Hide() {

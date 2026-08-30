@@ -2,7 +2,7 @@
 }
 
 .unity-text-field .unity-text-field__input {
-    background-color: rgba(0, 0, 0, 0.24);
+    background-color: rgba(0, 0, 0, 0.71);
     color: rgb(229, 229, 229);
     font-size: 20px;
     --unity-cursor-color: rgb(229, 229, 229);
@@ -14,8 +14,17 @@
 }
 
 .unity-text-field .unity-text-field__input:focus {
+    background-color: rgba(0, 0, 0, 0.35);
 }
 
 .unity-list-view__empty-label {
     display: none;
+}
+
+.unity-collection-view__item--selected {
+    background-color: rgba(0, 0, 0, 0.67);
+}
+
+.unity-collection-view__item:hover {
+    background-color: rgba(0, 0, 0, 0.78);
 }
