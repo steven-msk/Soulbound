@@ -7,7 +7,7 @@ using SoulboundEngine.World.Entity;
 using SoulboundEngine.Registry;
 using System.Threading.Tasks;
 
-namespace SoulboundEngine.UnityClient.Debug.Commands {
+namespace SoulboundEngine.UnityClient.Debug.Command {
 	public class EntityDescriptorArgumentType : ArgumentType<EntityDescriptor> {
 		public override Task<Suggestions> ListSuggestions<TSource>(CommandContext<TSource> context, SuggestionsBuilder builder) {
 			string remaining = builder.RemainingLowerCase;

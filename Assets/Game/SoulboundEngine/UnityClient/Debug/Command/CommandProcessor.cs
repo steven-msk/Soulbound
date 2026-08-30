@@ -1,10 +1,11 @@
-namespace SoulboundEngine.UnityClient.Debug.Commands {
+namespace SoulboundEngine.UnityClient.Debug.Command {
 	using Brigadier.NET;
 	using Brigadier.NET.Exceptions;
 	using Brigadier.NET.Suggestion;
 	using Brigadier.NET.Tree;
 	using Cysharp.Threading.Tasks;
 	using SoulboundEngine.World.Services;
+	using System;
 	using System.Collections.Generic;
 	using System.Linq;
 	using System.Threading.Tasks;
@@ -16,13 +17,14 @@ namespace SoulboundEngine.UnityClient.Debug.Commands {
 		private readonly IRuntimeDataProvider dataProvider;
 		private readonly IRuntimeExecutionServices execServices;
 		private CommandDispatcher<RuntimeCommandSource> dispatcher = new();
+		public event Action<string>? onOutputReceived;
 
 		public CommandProcessor(IRuntimeDataProvider dataProvider, IRuntimeExecutionServices execServices) {
 			this.dataProvider = dataProvider;
 			this.execServices = execServices;
 		}
 
-		public void SubmitCommand(string input) {
+		public string? SubmitCommand(string input) {
 			ParseResults<RuntimeCommandSource> parseResults = this.Parse(input);
 			int code = 0;
 			try {
@@ -30,9 +32,11 @@ namespace SoulboundEngine.UnityClient.Debug.Commands {
 					throw parseResults.Exceptions.First().Value;
 				}
 				code = this.dispatcher.Execute(parseResults);
+				return null;
 			} catch (CommandSyntaxException e) {
 				Logger.LogFatal(e);
 				code = -1;
+				return e.Message;
 			} finally {
 				Logger.LogInfo("Command dispatched with exit code {}", code);
 			}
@@ -84,7 +88,7 @@ namespace SoulboundEngine.UnityClient.Debug.Commands {
 		private void RebuildDispatcher() {
 			this.dispatcher = new CommandDispatcher<RuntimeCommandSource>();
 			foreach (ICommandProvider provider in this.providerBuffer) {
-				provider.RegisterCommands(this.dispatcher);
+				provider.RegisterCommands(this.dispatcher, this.ReceiveOutput);
 			}
 			this.dispatcher.FindAmbiguities((parent, child, sibling, inputs) => {
 				Logger.LogFatal(new AmbiguousCommandException(
@@ -93,7 +97,9 @@ namespace SoulboundEngine.UnityClient.Debug.Commands {
 			});
 		}
 
-
+		public void ReceiveOutput(string message) {
+			onOutputReceived?.Invoke(message);
+		}
 	}
 	public sealed record RuntimeCommandSource(IRuntimeDataProvider data, IRuntimeExecutionServices execServices);
 }

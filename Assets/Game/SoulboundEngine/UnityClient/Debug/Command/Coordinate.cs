@@ -1,4 +1,4 @@
-namespace SoulboundEngine.UnityClient.Debug.Commands {
+namespace SoulboundEngine.UnityClient.Debug.Command {
 	public struct Coordinate {
 		public bool isRelative;
 		public double value;

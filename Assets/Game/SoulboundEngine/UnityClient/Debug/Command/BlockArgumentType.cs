@@ -1,18 +1,18 @@
-using Brigadier.NET;
-using Brigadier.NET.ArgumentTypes;
-using Brigadier.NET.Context;
-using Brigadier.NET.Exceptions;
-using Brigadier.NET.Suggestion;
-using SoulboundEngine.World.Block;
-using SoulboundEngine.Registry;
-using System.Threading.Tasks;
+namespace SoulboundEngine.UnityClient.Debug.Command {
+	using Brigadier.NET;
+	using Brigadier.NET.ArgumentTypes;
+	using Brigadier.NET.Context;
+	using Brigadier.NET.Exceptions;
+	using Brigadier.NET.Suggestion;
+	using SoulboundEngine.Registry;
+	using SoulboundEngine.World.Block;
+	using System.Threading.Tasks;
 
-namespace SoulboundEngine.UnityClient.Debug.Commands {
 	public class BlockArgumentType : ArgumentType<Block> {
 		public override Task<Suggestions> ListSuggestions<TSource>(CommandContext<TSource> context, SuggestionsBuilder builder) {
 			string remaining = builder.RemainingLowerCase;
 
-			foreach (var block in Registries.BLOCKS) {
+			foreach (Block block in Registries.BLOCKS) {
 				Identifier id = Blocks.GetIdentifier(block);
 
 				if (id.GetNamespace().StartsWith(remaining) || id.GetPath().StartsWith(remaining)) {
@@ -27,7 +27,7 @@ namespace SoulboundEngine.UnityClient.Debug.Commands {
 			int cursor = reader.Cursor;
 			string s = reader.ReadString();
 
-			if (!Identifier.TryFromCommandInput(reader, out var identifier)) {
+			if (!Identifier.TryFromCommandInput(reader, out Identifier identifier)) {
 				reader.Cursor = cursor;
 				throw CommandSyntaxException.BuiltInExceptions.ReaderExpectedSymbol().CreateWithContext(reader, s);
 			}

@@ -1,7 +1,6 @@
-using System;
-using System.Collections.Generic;
-
-namespace SoulboundEngine.UnityClient.Debug.Commands {
+namespace SoulboundEngine.UnityClient.Debug.Command {
+	using System;
+	using System.Collections.Generic;
 
 	[Serializable]
 	public class AmbiguousCommandException : Exception {

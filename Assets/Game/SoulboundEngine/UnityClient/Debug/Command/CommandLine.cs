@@ -5,7 +5,7 @@ namespace SoulboundEngine.UnityClient.Debug {
 	using Cysharp.Threading.Tasks;
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.UnityClient.Assets;
-	using SoulboundEngine.UnityClient.Debug.Commands;
+	using SoulboundEngine.UnityClient.Debug.Command;
 	using SoulboundEngine.UnityClient.Settings;
 	using SoulboundEngine.UnityClient.UI;
 	using SoulboundEngine.UnityClient.UI.UXMLBindings;
@@ -81,6 +81,7 @@ namespace SoulboundEngine.UnityClient.Debug {
 			this.defaultFieldColor = Color.black;
 
 			this.textField.RegisterCallback<FocusOutEvent>(evt => this.GrabFocus());
+			this.commandProcessor.onOutputReceived += this.OutputReceived;
 			this.Hide();
 		}
 
@@ -89,6 +90,10 @@ namespace SoulboundEngine.UnityClient.Debug {
 			if (HANDLED_KEYS.Contains(evt.keyCode)) {
 				evt.StopImmediatePropagation();
 			}
+		}
+
+		private void OutputReceived(string output) {
+			SoulboundEngine.Logger.LogInfo(output);
 		}
 
 		internal void Tick() {
@@ -143,7 +148,6 @@ namespace SoulboundEngine.UnityClient.Debug {
 					}
 				}
 			}
-
 		}
 
 		private bool ShouldCloseOnEsc() {
@@ -242,8 +246,8 @@ namespace SoulboundEngine.UnityClient.Debug {
 		}
 
 		private void SubmitCommand(string command) {
-			this.commandProcessor.SubmitCommand(command);
 			this.history.Add(command);
+			this.commandProcessor.SubmitCommand(command);
 		}
 
 		public void ShowCompletions(string value, int caretPos) {
@@ -307,5 +311,10 @@ namespace SoulboundEngine.UnityClient.Debug {
 
 		bool IInputFocusable.HasKeyboardFocus() => true;
 		bool IInputFocusable.IsPointerOverUI() => true;
+
+		public override void Dispose() {
+			base.Dispose();
+			this.commandProcessor.onOutputReceived -= this.OutputReceived;
+		}
 	}
 }

@@ -1,6 +1,6 @@
 #nullable enable
 
-namespace SoulboundEngine.UnityClient.Debug.Commands {
+namespace SoulboundEngine.UnityClient.Debug.Command {
 	using Brigadier.NET.Suggestion;
 	using System.Collections.Generic;
 

@@ -3,7 +3,7 @@ using Brigadier.NET.ArgumentTypes;
 using Brigadier.NET.Exceptions;
 using System;
 
-namespace SoulboundEngine.UnityClient.Debug.Commands {
+namespace SoulboundEngine.UnityClient.Debug.Command {
 	public class GuidArgumentType : ArgumentType<Guid> {
 		public override Guid Parse(IStringReader reader) {
 			int cursor = reader.Cursor;

@@ -1,7 +1,8 @@
-using Brigadier.NET;
+namespace SoulboundEngine.UnityClient.Debug.Command {
+	using Brigadier.NET;
+	using System;
 
-namespace SoulboundEngine.UnityClient.Debug.Commands {
 	public interface ICommandProvider {
-		void RegisterCommands(CommandDispatcher<RuntimeCommandSource> dispatcher);
+		void RegisterCommands(CommandDispatcher<RuntimeCommandSource> dispatcher, Action<string> outputConsumer);
 	}
 }

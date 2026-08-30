@@ -103,7 +103,7 @@
 		private void LogError_Method(string mesage) => this.unityLogger.Log(LogType.Error, mesage);
 
 		private static string GetFinalMessage(LogEntry entry) {
-			string message = PlaceArgs(entry.message, ARG_MARKER, entry.args);
+			string message = entry.message.WithArgs(ARG_MARKER, entry.args);
 			string timestamp = FormatTimestamp(entry.timestamp);
 			string thread = FormatThread(entry.thread);
 			string level = FormatLevel(entry.level);

@@ -7,7 +7,7 @@ using SoulboundEngine.Item;
 using SoulboundEngine.Registry;
 using System.Threading.Tasks;
 
-namespace SoulboundEngine.UnityClient.Debug.Commands {
+namespace SoulboundEngine.UnityClient.Debug.Command {
 	using Item = Item.Item;
 
 	public class ItemArgumentType : ArgumentType<Item> {

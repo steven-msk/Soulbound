@@ -8,7 +8,7 @@ namespace SoulboundEngine.UnityClient {
 	using SoulboundEngine.UnityClient.Assets;
 	using SoulboundEngine.UnityClient.Audio;
 	using SoulboundEngine.UnityClient.Debug;
-	using SoulboundEngine.UnityClient.Debug.Commands;
+	using SoulboundEngine.UnityClient.Debug.Command;
 	using SoulboundEngine.UnityClient.Debug.Logging;
 	using SoulboundEngine.UnityClient.Debug.Logging.Console;
 	using SoulboundEngine.UnityClient.Debug.Metrics;

@@ -1,8 +1,8 @@
-using Brigadier.NET;
-using Brigadier.NET.ArgumentTypes;
-using Brigadier.NET.Exceptions;
+namespace SoulboundEngine.UnityClient.Debug.Command {
+	using Brigadier.NET;
+	using Brigadier.NET.ArgumentTypes;
+	using Brigadier.NET.Exceptions;
 
-namespace SoulboundEngine.UnityClient.Debug.Commands {
 	public class CoordinateArgumentType : ArgumentType<Coordinate> {
 		public override Coordinate Parse(IStringReader reader) {
 			bool isRelative = reader.Peek() == '~';
