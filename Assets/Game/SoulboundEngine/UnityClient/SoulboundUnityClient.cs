@@ -97,14 +97,14 @@ namespace SoulboundEngine.UnityClient {
 		public static void GameLaunch() {
 			try {
 				new SoulboundUnityClient(Main.instance.GetUnityClientConfig()).Start();
-			} catch(Exception e) {
+			} catch (Exception e) {
 				UnityEngine.Debug.LogError("Caught unhandled exception in client init");
 				UnityEngine.Debug.LogException(e);
-				if (UnityEngine.Application.isEditor) {
-					EditorApplication.isPlaying = false;
-				} else {
-					Environment.FailFast("Caught unhandled exception in client init", e);
-				}
+#if !UNITY_EDITOR
+				Environment.FailFast("Caught unhandled exception in client init", e);
+#else
+				EditorApplication.isPlaying = false;
+#endif
 			}
 		}
 
@@ -218,11 +218,11 @@ namespace SoulboundEngine.UnityClient {
 						Logger.LogFatal(e);
 						// this part will need a rework
 						// if decoupling entirely from Unity API
-						if (this.config.isRunningInEditor) {
-							EditorApplication.isPlaying = false;
-						} else {
-							Environment.FailFast("Uncaught exception in tick loop", e);
-						}
+#if !UNITY_EDITOR
+						Environment.FailFast("Uncaught exception in tick loop", e);
+#else
+						EditorApplication.isPlaying = false;
+#endif
 					}
 					this.EndTick();
 
@@ -244,11 +244,11 @@ namespace SoulboundEngine.UnityClient {
 				} catch (Exception e) {
 					// TODO: custom crash handling
 					Logger.LogFatal(e);
-					if (this.config.isRunningInEditor) {
-						EditorApplication.isPlaying = false;
-					} else {
-						Environment.FailFast("Uncaught exception in frame loop", e);
-					}
+#if !UNITY_EDITOR
+					Environment.FailFast("Uncaught exception in frame loop", e);
+#else
+					EditorApplication.isPlaying = false;
+#endif
 				}
 				await UniTask.NextFrame();
 			}
@@ -305,6 +305,8 @@ namespace SoulboundEngine.UnityClient {
 		public void Close() => UnityEngine.Application.Quit();
 
 		private void HandleInputTick() {
+			bool hasKeyboardFocus = this.uiHandler.HasKeyboardFocus();
+			bool isPointerOverUI = this.uiHandler.IsPointerOverUI();
 			this.uiHandler.Tick();
 			this.metricsHud.Tick();
 			this.commandLine.Tick();
@@ -314,8 +316,6 @@ namespace SoulboundEngine.UnityClient {
 				LevelManager levelManager = worldSession.levelManager;
 				Level level = worldSession.level;
 				bool isPaused = worldSession.levelManager.paused;
-				bool hasKeyboardFocus = this.uiHandler.HasKeyboardFocus();
-				bool isPointerOverUI = this.uiHandler.IsPointerOverUI();
 
 				PlayerEntity player = level.GetPlayer();
 				this.clientPlayerInputHandler.Handle(player,
