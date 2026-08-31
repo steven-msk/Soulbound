@@ -34,6 +34,11 @@ namespace SoulboundEngine.Item {
 			// TEMP
 			.Attributes(b => b.Add(Attributes.SPEED, new AttributeModifier(Identifier.Of("speed_increase"), 1.0d, AttributeModifier.Operation.ADDITIVE), EquipmentSlot.MAIN_HAND))
 		);
+		// TEST ITEM
+		public static readonly Item JUMP_EFFECT_ITEM = Register("jump_effect_item", s => new JumpEffectItem(s), s => s
+			.NonStackable()
+			.Durability(10)
+		);
 
 		public static Item Register(string id) {
 			return Register(id, Item.Create, new Item.Settings());

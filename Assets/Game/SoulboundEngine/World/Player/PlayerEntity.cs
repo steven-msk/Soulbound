@@ -91,8 +91,6 @@ namespace SoulboundEngine.World.Player {
 			if (this.isJumping && this.IsOnGround()) {
 				this.JumpFromGround();
 			}
-
-			Logger.LogInfo(this.GetSpeed());
 		}
 
 		private AABB GetPickupArea() {
@@ -265,17 +263,10 @@ namespace SoulboundEngine.World.Player {
 		}
 
 		private static bool HandleActionResult(IActionResult result, PlayerEntity player) {
-			if (result is IActionResult.Success success) {
-				IActionResult.ItemContext context = success.itemContext;
-				ItemStack? newHandStack = context.newHandStack;
-				ItemStack stack = newHandStack.GetValueOrDefault(player.GetMainHandStack()).Copy();
-				if (context.damageItem) stack.DamageAndBreak(1, player, EquipmentSlot.MAIN_HAND);
-				player.SetMainHandStack(stack);
-				return true;
-			} else if (result is IActionResult.Fail) {
-				return true;
+			if (result.HasAction()) {
+				player.SetMainHandStack(result.ReplaceStack(player.GetMainHandStack().Copy()));
 			}
-			return false;
+			return result.HasAction();
 		}
 
 		public bool CanInteractWithEntityAt(Vec2d pos, out Entity entity) {

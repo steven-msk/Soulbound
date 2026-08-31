@@ -20,7 +20,7 @@
 			if (this.activeModifiers.Count == 0) return;
 
 			List<Identifier> expired = new();
-			foreach ((Identifier id, ModifierInstance instance) in this.activeModifiers) {
+			foreach ((Identifier id, ModifierInstance instance) in new Dictionary<Identifier, ModifierInstance>(this.activeModifiers)) {
 				int remaining = instance.remainingTicks - 1;
 				if (remaining <= 0) {
 					this.attributes.GetInstance(instance.attribute)?.RemoveModifier(id);
