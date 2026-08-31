@@ -1,9 +1,9 @@
 namespace SoulboundEngine.World.Entity {
 	using Newtonsoft.Json.Linq;
+	using SoulboundEngine.Common;
 	using SoulboundEngine.Common.Collection;
 	using SoulboundEngine.Common.Math;
 	using SoulboundEngine.Common.Math.Random;
-	using SoulboundEngine.Common.Patterns;
 	using SoulboundEngine.Item;
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.Serialization;
@@ -421,7 +421,7 @@ namespace SoulboundEngine.World.Entity {
 		public JToken Save() {
 			JToken json = (JObject)SerializedData.CODEC.Encode(SerializedData.Get(this));
 			json["type"] = EntityDescriptor.CODEC.Encode(this.descriptor);
-			json["guid"] = BuiltinCodecs.GUID.Encode(this.guid);
+			json["guid"] = Codecs.GUID.Encode(this.guid);
 			this.SaveAdditional(json);
 			return json;
 		}
@@ -439,7 +439,7 @@ namespace SoulboundEngine.World.Entity {
 			this.SetDeltaMovement(data.motionX, data.motionY);
 			this.SetOnGround(data.onGround);
 
-			this.guid = BuiltinCodecs.GUID.Decode(json["guid"] ?? new JValue(this.guid))
+			this.guid = Codecs.GUID.Decode(json["guid"] ?? new JValue(this.guid))
 				.ResultOrPartial(error => Logger.LogError("Failed to load entity guid: {}", error))
 				.OrElse(this.guid);
 			this.LoadAdditional(json);
@@ -480,11 +480,11 @@ namespace SoulboundEngine.World.Entity {
 
 		public sealed record SerializedData(double x, double y, double motionX, double motionY, bool onGround) {
 			public static readonly Codec<SerializedData> CODEC = RecordCodec<SerializedData, double, double, double, double, bool>.Of(
-				Field.Optional<SerializedData, double>("x", BuiltinCodecs.DOUBLE, d => d.x, 0.0d),
-				Field.Optional<SerializedData, double>("y", BuiltinCodecs.DOUBLE, d => d.y, 0.0d),
-				Field.Optional<SerializedData, double>("motionX", BuiltinCodecs.DOUBLE, d => d.motionX, 0.0d),
-				Field.Optional<SerializedData, double>("motionY", BuiltinCodecs.DOUBLE, d => d.motionY, 0.0d),
-				Field.Optional<SerializedData, bool>("onGround", BuiltinCodecs.BOOLEAN, d => d.onGround, false),
+				Field.Optional<SerializedData, double>("x", Codecs.DOUBLE, d => d.x, 0.0d),
+				Field.Optional<SerializedData, double>("y", Codecs.DOUBLE, d => d.y, 0.0d),
+				Field.Optional<SerializedData, double>("motionX", Codecs.DOUBLE, d => d.motionX, 0.0d),
+				Field.Optional<SerializedData, double>("motionY", Codecs.DOUBLE, d => d.motionY, 0.0d),
+				Field.Optional<SerializedData, bool>("onGround", Codecs.BOOLEAN, d => d.onGround, false),
 				(x, y, motionX, motionY, onGround) => new SerializedData(x, y, motionX, motionY, onGround)
 			);
 

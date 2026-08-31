@@ -1,5 +1,5 @@
 ﻿namespace SoulboundEngine.Serialization {
-	using SoulboundEngine.Common.Patterns;
+	using SoulboundEngine.Common;
 	using System;
 
 #nullable enable

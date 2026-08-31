@@ -17,7 +17,7 @@ namespace SoulboundEngine.Item {
 	public struct ItemStack : IComponentHolder {
 		public static readonly Codec<ItemStack> NON_EMPTY_CODEC = RecordCodec<ItemStack, Item, int, ComponentChanges>.Of(
 			Field.Required<ItemStack, Item>("item", Item.CODEC, s => s.GetItem()),
-			Field.Required<ItemStack, int>("count", BuiltinCodecs.INT, s => s.count),
+			Field.Required<ItemStack, int>("count", Codecs.INT, s => s.count),
 			Field.Optional<ItemStack, ComponentChanges>("changes", ComponentChanges.CODEC, s => s.GetComponentChanges(), ComponentChanges.EMPTY),
 			(item, count, components) => new ItemStack(item, count, components)
 		);

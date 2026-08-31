@@ -1,6 +1,6 @@
 namespace SoulboundEngine.World.Entity {
 	using Newtonsoft.Json.Linq;
-	using SoulboundEngine.Common.Patterns;
+	using SoulboundEngine.Common;
 	using SoulboundEngine.Item;
 	using SoulboundEngine.Serialization;
 	using SoulboundEngine.World.Entity.Attribute;
@@ -16,7 +16,7 @@ namespace SoulboundEngine.World.Entity {
 		public const int LIFETIME = 6000;
 		public const int INFINITE_LIFETIME = -1;
 		public const int DEFAULT_AGE = 0;
-		private Guid? owner;
+		private Guid? owner = null;
 		private ItemStack itemStack;
 		private int pickupDelay = DEFAULT_PICKUP_DELAY;
 		private int age = DEFAULT_AGE;
@@ -90,23 +90,23 @@ namespace SoulboundEngine.World.Entity {
 
 		protected override void SaveAdditional(JToken json) {
 			base.SaveAdditional(json);
-			json["age"] = BuiltinCodecs.INT.Encode(this.age);
-			json["owner"] = BuiltinCodecs.GUID.MakeOptional().Encode(OptionalExtras.OfUnmanaged(this.owner));
-			json["pickupDelay"] = BuiltinCodecs.INT.Encode(this.pickupDelay);
+			json["age"] = Codecs.INT.Encode(this.age);
+			json["owner"] = Codecs.GUID.MakeOptional<Guid>().Encode(UnmanagedOptional<Guid>.Of(this.owner));
+			json["pickupDelay"] = Codecs.INT.Encode(this.pickupDelay);
 			json["stack"] = ItemStack.EMPTY_ACCEPTING_CODEC.Encode(this.itemStack);
 		}
 
 		protected override void LoadAdditional(JObject json) {
 			base.LoadAdditional(json);
-			this.SetAge(BuiltinCodecs.INT.Decode(json["age"] ?? JValue.CreateNull())
+			this.SetAge(Codecs.INT.Decode(json["age"] ?? JValue.CreateNull())
 				.ResultOrPartial(error => Logger.LogError("Could not load age: {}", error))
 				.OrElse(0)
 			);
-			this.SetPickupDelay(BuiltinCodecs.INT.Decode(json["pickupDelay"] ?? JValue.CreateNull())
+			this.SetPickupDelay(Codecs.INT.Decode(json["pickupDelay"] ?? JValue.CreateNull())
 				.ResultOrPartial(error => Logger.LogError("Could not load pickup delay: {}", error))
 				.OrElse(0)
 			);
-			BuiltinCodecs.GUID.MakeOptional().Decode(json["owner"] ?? JValue.CreateNull())
+			Codecs.GUID.MakeOptional<Guid>().Decode(json["owner"] ?? JValue.CreateNull())
 				.ResultOrPartial(error => Logger.LogError("Could not load owner: {}", error))
 				.IfPresent(guid => guid.IfPresent(g => this.SetOwner(g)));
 

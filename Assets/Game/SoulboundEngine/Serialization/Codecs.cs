@@ -1,8 +1,9 @@
 ﻿namespace SoulboundEngine.Serialization {
 	using Newtonsoft.Json.Linq;
+	using SoulboundEngine.Common;
 	using System;
 
-	public static class BuiltinCodecs {
+	public static class Codecs {
 		public static readonly Codec<int> INT = new SimpleCodec<int>(
 			encoder: v => v,
 			decoder: json => json.Type is JTokenType.Integer
@@ -44,5 +45,14 @@
 				? DataResult<bool>.Success((bool)json)
 				: DataResult<bool>.Error($"Expected boolean, got {json.Type}")
 		);
+
+		public static Codec<UnmanagedOptional<T>> MakeOptional<T>(this Codec<T> codec) where T : unmanaged {
+			return Codec<UnmanagedOptional<T>>.Of(
+				encode: v => v.IsEmpty() ? JValue.CreateNull() : codec.Encode(v.GetValue()),
+				decode: json => json.Type == JTokenType.Null
+					? DataResult<UnmanagedOptional<T>>.Success(UnmanagedOptional<T>.Empty())
+					: codec.Decode(json).Map(UnmanagedOptional<T>.Of)
+			);
+		}
 	}
 }

@@ -4,7 +4,7 @@ namespace SoulboundEngine.Registry {
 	using System;
 
 	public sealed class Identifier : IEquatable<Identifier> {
-		public static readonly Codec<Identifier> CODEC = BuiltinCodecs.STRING.FlatXmap(
+		public static readonly Codec<Identifier> CODEC = Codecs.STRING.FlatXmap(
 			decode: s => TryParse(s, out Identifier id)
 				? DataResult<Identifier>.Success(id)
 				: DataResult<Identifier>.Error($"Invalid identifier: {s}"),

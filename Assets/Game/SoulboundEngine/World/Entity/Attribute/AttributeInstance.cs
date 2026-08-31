@@ -188,7 +188,7 @@ namespace SoulboundEngine.World.Entity.Attribute {
 		public record Packed(RegistryEntry<AttributeType> attribute, double baseValue, List<AttributeModifier> permanentModifiers) {
 			public static readonly Codec<Packed> CODEC = RecordCodec<Packed, RegistryEntry<AttributeType>, double, List<AttributeModifier>>.Of(
 				Field.Required<Packed, RegistryEntry<AttributeType>>("attribute", RegistryEntry<AttributeType>.GetCodec(Registries.ATTRIBUTE), p => p.attribute),
-				Field.Required<Packed, double>("baseValue", BuiltinCodecs.DOUBLE, p => p.baseValue),
+				Field.Required<Packed, double>("baseValue", Codecs.DOUBLE, p => p.baseValue),
 				Field.Required<Packed, List<AttributeModifier>>("modifiers", AttributeModifier.CODEC.ListOf(), p => p.permanentModifiers),
 				(attribute, baseValue, modifiers) => new Packed(attribute, baseValue, modifiers)
 			);

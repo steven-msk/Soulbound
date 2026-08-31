@@ -1,4 +1,4 @@
-namespace SoulboundEngine.Common.Patterns {
+namespace SoulboundEngine.Common {
 	using System;
 
 	public readonly struct Optional<T> {
@@ -66,14 +66,6 @@ namespace SoulboundEngine.Common.Patterns {
 
 		public Optional<TU> Map<TU>(Func<T, TU> method) {
 			return this.IsPresent() ? new Optional<TU>(method.Invoke(this.value)) : default;
-		}
-	}
-
-#nullable enable
-
-	public static class OptionalExtras {
-		public static Optional<T> OfUnmanaged<T>(T? value) where T : unmanaged {
-			return value.HasValue ? Optional<T>.Of(value.Value) : Optional<T>.Empty(); 
 		}
 	}
 }

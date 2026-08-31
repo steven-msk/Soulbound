@@ -10,7 +10,7 @@ namespace SoulboundEngine.World.Entity.Attribute {
 	public record AttributeModifier(Identifier id, double amount, AttributeModifier.Operation operation) {
 		public static readonly Codec<AttributeModifier> CODEC = RecordCodec<AttributeModifier, Identifier, double, Operation>.Of(
 			Field.Required<AttributeModifier, Identifier>("id", Identifier.CODEC, m => m.id),
-			Field.Required<AttributeModifier, double>("amount", BuiltinCodecs.DOUBLE, m => m.amount),
+			Field.Required<AttributeModifier, double>("amount", Codecs.DOUBLE, m => m.amount),
 			Field.Required<AttributeModifier, Operation>("operation", Operation.CODEC, m => m.operation),
 			(id, amount, operation) => new AttributeModifier(id, amount, operation)
 		);
@@ -54,7 +54,7 @@ namespace SoulboundEngine.World.Entity.Attribute {
 		}
 
 		public readonly struct Operation {
-			public static readonly Codec<Operation> CODEC = BuiltinCodecs.STRING.FlatXmap(
+			public static readonly Codec<Operation> CODEC = Codecs.STRING.FlatXmap(
 				encode: o => o.serializedName,
 				decode: s => BySerializedName(s) is { } operation
 					? DataResult<Operation>.Success(operation)

@@ -5,7 +5,7 @@
 	using System.Collections.Generic;
 
 	public readonly struct EquipmentSlot : IEquatable<EquipmentSlot> {
-		public static readonly Codec<EquipmentSlot> CODEC = BuiltinCodecs.STRING.FlatXmap(
+		public static readonly Codec<EquipmentSlot> CODEC = Codecs.STRING.FlatXmap(
 			encode: s => s.serializedName,
 			decode: s => BySerializedName(s) is { } slot
 				? DataResult<EquipmentSlot>.Success(slot)

@@ -91,6 +91,8 @@ namespace SoulboundEngine.World.Player {
 			if (this.isJumping && this.IsOnGround()) {
 				this.JumpFromGround();
 			}
+
+			Logger.LogInfo(this.GetSpeed());
 		}
 
 		private AABB GetPickupArea() {
@@ -407,13 +409,13 @@ namespace SoulboundEngine.World.Player {
 		protected override void SaveAdditional(JToken json) {
 			base.SaveAdditional(json);
 			json["inventory"] = this.inventory.Save();
-			json["mainSlot"] = BuiltinCodecs.INT.Encode(this.inventory.GetMainSlot());
+			json["mainSlot"] = Codecs.INT.Encode(this.inventory.GetMainSlot());
 		}
 
 		protected override void LoadAdditional(JObject json) {
 			base.LoadAdditional(json);
 			this.inventory.Load(json["inventory"] ?? JValue.CreateNull());
-			BuiltinCodecs.INT.Decode(json["mainSlot"] ?? JValue.CreateNull())
+			Codecs.INT.Decode(json["mainSlot"] ?? JValue.CreateNull())
 				.ResultOrPartial().IfPresent(this.inventory.SetMainSlot);
 		}
 

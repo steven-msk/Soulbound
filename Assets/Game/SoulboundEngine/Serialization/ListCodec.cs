@@ -1,6 +1,6 @@
 ﻿namespace SoulboundEngine.Serialization {
 	using Newtonsoft.Json.Linq;
-	using SoulboundEngine.Common.Patterns;
+	using SoulboundEngine.Common;
 	using System.Collections.Generic;
 
 	public record ListCodec<T>(Codec<T> elementCodec) : Codec<List<T>> {

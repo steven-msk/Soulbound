@@ -22,6 +22,8 @@ namespace SoulboundEngine.Item {
 		);
 		public static readonly Item chargeableItem = Register("chargeable_item", settings => new ChargeableItem(settings),
 			settings => settings.NonStackable()
+			// TEMP
+			.Attributes(b => b.Add(Attributes.SPEED, new AttributeModifier(Identifier.Of("speed_mult"), 5.0d, AttributeModifier.Operation.ADDITIVE_PERCENT), EquipmentSlot.MAIN_HAND))
 		);
 		public static readonly Item debugPointer = Register("debug_pointer", settings => new DebugPointerItem(settings),
 			settings => settings.NonStackable()
