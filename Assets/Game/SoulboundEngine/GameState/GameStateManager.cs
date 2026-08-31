@@ -1,7 +1,7 @@
-using System;
-
 namespace SoulboundEngine.GameStates {
-	internal static class GameStateManager {
+	using System;
+
+	public static class GameStateManager {
 		private static int currentState = GameState.UNINITIALIZED;
 
 		public static void SetBootstrapping() => SwitchOrThrow(GameState.BOOTSTRAPPING);

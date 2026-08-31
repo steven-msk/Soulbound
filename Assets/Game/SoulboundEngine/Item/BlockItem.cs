@@ -1,12 +1,12 @@
-using SoulboundEngine.Interaction;
-using SoulboundEngine.World.Block;
-using SoulboundEngine.World.Block.State;
-using SoulboundEngine.World.Level;
-using SoulboundEngine.World.Player;
-
 #nullable enable
 
 namespace SoulboundEngine.Item {
+	using SoulboundEngine.Interaction;
+	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Block.State;
+	using SoulboundEngine.World.Level;
+	using SoulboundEngine.World.Player;
+
 	public class BlockItem : Item {
 		private readonly Block block;
 
@@ -35,7 +35,7 @@ namespace SoulboundEngine.Item {
 			}
 
 			context.level.SetBlockState(context.blockPos, placementState);
-			return new IActionResult.Success(new IActionResult.ItemContext(context.stack.DecrementBy(1), false));
+			return IActionResult.SUCCESS.DecrementStack();
 		}
 
 		protected virtual bool CanPlace(ItemPlacementContext context, BlockState blockState) {

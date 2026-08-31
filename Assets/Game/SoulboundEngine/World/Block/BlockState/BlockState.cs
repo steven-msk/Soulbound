@@ -1,9 +1,9 @@
-using SoulboundEngine.States;
-using System.Collections.Generic;
-
 #nullable enable
 
 namespace SoulboundEngine.World.Block.State {
+	using SoulboundEngine.State;
+	using System.Collections.Generic;
+
 	public class BlockState : AbstractBlock.AbstractBlockState {
 		public Block block { get; }
 
@@ -19,7 +19,7 @@ namespace SoulboundEngine.World.Block.State {
 		public bool IsOf(Block block) => this.block == block;
 
 		public override string ToString() {
-			return $"block[{this.block}, properties={this.GetEntries()}]";
+			return $"{this.block}{(this.GetEntries().Count == 0 ? "" : this.GetEntries().ToString())}";
 		}
 	}
 }

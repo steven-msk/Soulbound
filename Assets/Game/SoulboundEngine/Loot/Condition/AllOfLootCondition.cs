@@ -1,9 +1,9 @@
-﻿using Game.SoulboundEngine.Common;
-using SoulboundEngine.Loot.Context;
-using System.Collections.Generic;
-using System.Linq;
+﻿namespace SoulboundEngine.Loot.Condition {
+	using SoulboundEngine.Common;
+	using SoulboundEngine.Loot.Context;
+	using System.Collections.Generic;
+	using System.Linq;
 
-namespace SoulboundEngine.Loot.Condition {
 	public class AllOfLootCondition : AlternativeLootCondition {
 		public AllOfLootCondition(List<ILootCondition> conditions) 
 			: base(conditions, conditions

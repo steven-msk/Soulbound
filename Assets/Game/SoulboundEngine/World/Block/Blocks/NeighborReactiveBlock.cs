@@ -1,10 +1,9 @@
-using SoulboundEngine.Common;
-using SoulboundEngine.Common.Math;
-using SoulboundEngine.States;
-using SoulboundEngine.World.Block.State;
-
 namespace SoulboundEngine.World.Block {
-	using Level = Level.Level;
+	using SoulboundEngine.Common;
+	using SoulboundEngine.Common.Math;
+	using SoulboundEngine.State;
+	using SoulboundEngine.World.Block.State;
+	using SoulboundEngine.World.Level;
 
 	[PROTOTYPICAL]
 	public sealed class NeighborReactiveBlock : Block, INeighborUpdateHandler {
@@ -26,7 +25,7 @@ namespace SoulboundEngine.World.Block {
 		public void OnNeighborChanged(Level level, BlockPos selfPos, BlockPos neighborPos) {
 			bool shouldActivate = false;
 
-			foreach (var pos in selfPos.GetCardinalNeighbors()) {
+			foreach (BlockPos pos in selfPos.GetCardinalNeighbors()) {
 				BlockState blockState = level.GetBlockState(pos);
 				// provisory for the toggle block
 				if (blockState?.block is ToggleBlock && blockState.TryGet(on, out bool isOn) && isOn) {

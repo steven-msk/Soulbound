@@ -1,13 +1,11 @@
-﻿using SoulboundEngine.Client.Debug.Logging;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿namespace SoulboundEngine.World.Chunk {
+	using SoulboundEngine.World.Level;
+	using System;
+	using System.Collections.Generic;
+	using System.IO;
+	using File = SoulboundEngine.Serialization.File;
 
 #nullable enable
-
-namespace SoulboundEngine.World.Chunk {
-	using File = SoulboundEngine.Serialization.File;
-	using Level = Level.Level;
 
 	public class ChunkStorage : IDisposable {
 		private const string FILE_EXTENSION = ".txt";
@@ -19,7 +17,7 @@ namespace SoulboundEngine.World.Chunk {
 			folder.Mkdir();
 			this.folder = folder;
 
-			foreach (var file in folder.ListFiles()) {
+			foreach (File file in folder.ListFiles()) {
 				if (!IsFileValid(file)) {
 					Logger.LogError("Chunk file '{}' is not valid, skipping", file.Name);
 					continue;

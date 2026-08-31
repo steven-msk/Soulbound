@@ -1,17 +1,16 @@
-﻿using Newtonsoft.Json.Linq;
-using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.Client.UI.Screen;
-using SoulboundEngine.Loot;
-using SoulboundEngine.Registry;
-using SoulboundEngine.World.Block;
-using SoulboundEngine.World.Block.Entity;
-using SoulboundEngine.World.Block.State;
-using SoulboundEngine.World.Player;
-using System.Collections.Generic;
+﻿namespace SoulboundEngine.Item.Container {
+	using Newtonsoft.Json.Linq;
+	using SoulboundEngine.Inventory;
+	using SoulboundEngine.Loot;
+	using SoulboundEngine.Registry;
+	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Block.Entity;
+	using SoulboundEngine.World.Block.State;
+	using SoulboundEngine.World.Player;
+	using System.Collections.Generic;
 
 #nullable enable
 
-namespace SoulboundEngine.Item.Container {
 	public abstract class LootableContainerTileEntity : TileEntity, IInventoryScreenHandlerFactory, ILootableInventory {
 		protected RegistryKey<LootTable>? lootTable;
 		protected long lootTableSeed;

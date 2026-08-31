@@ -1,20 +1,23 @@
-﻿using SoulboundEngine.Item;
-using SoulboundEngine.Item.Container;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿namespace SoulboundEngine.World.Player {
+	using SoulboundEngine.Item;
+	using SoulboundEngine.Item.Container;
+	using SoulboundEngine.World.Entity;
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
 
-namespace SoulboundEngine.World.Player {
 	public sealed class PlayerInventory : IInventory {
 		public const int HOTBAR_SIZE = 9;
 		public const int POPUP_COLUMNS = 9;
 		public const int POPUP_ROWS = 3;
 		private int mainSlot = 0;
 		private readonly ItemSlot[] slots;
+		private readonly PlayerEntity player;
 		public event Action<int, int> mainSlotChanged;
 
-		public PlayerInventory() {
+		public PlayerInventory(PlayerEntity player) {
 			IInventory.CreateSimple(this, ref this.slots);
+			this.player = player;
 		}
 
 		public IEnumerable<int> GetPopup() {
@@ -33,6 +36,15 @@ namespace SoulboundEngine.World.Player {
 			return list;
 		}
 
+		public void Tick() {
+			for (int i = 0; i < this.GetSize(); i++) {
+				ItemStack stack = this.GetSlot(i).GetStack();
+				if (stack.IsEmpty()) continue;
+
+				stack.InventoryTick(this.player.GetLevel(), this.player, i == this.mainSlot ? EquipmentSlot.MAIN_HAND : null);
+			}
+		}
+
 		public int GetMainSlot() => this.mainSlot;
 
 		public void SetMainSlot(int slot) {
@@ -45,8 +57,10 @@ namespace SoulboundEngine.World.Player {
 			return this.slots[this.mainSlot].GetStack();
 		}
 
-		public void SetMainStack(ItemStack stack) {
+		public ItemStack SetMainStack(ItemStack stack) {
+			ItemStack old = this.slots[this.mainSlot].GetStack();
 			this.slots[this.mainSlot].SetStack(stack);
+			return old;
 		}
 
 		public IItemSlot GetSlot(int index) => this.slots[index];

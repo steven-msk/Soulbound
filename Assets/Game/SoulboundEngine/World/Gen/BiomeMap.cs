@@ -1,9 +1,9 @@
-using SoulboundEngine.World.Biome;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-
 namespace SoulboundEngine.World.Gen {
+	using SoulboundEngine.World.Biome;
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+
 	public sealed class BiomeMap {
 		const float blendSharpness = 3f;
 		private readonly IEnumerable<IBiome> biomes;
@@ -16,9 +16,9 @@ namespace SoulboundEngine.World.Gen {
 			List<(IBiome biome, float value)> densities = new();
 			float maxDensity = 0f;
 
-			foreach (var biome in this.biomes) {
-				float density = Mathf.Abs(biome.GetDensity(blockX));
-				maxDensity = Mathf.Max(maxDensity, density);
+			foreach (IBiome biome in this.biomes) {
+				float density = Math.Abs(biome.GetDensity(blockX));
+				maxDensity = Math.Max(maxDensity, density);
 
 				if (density > 0) {
 					densities.Add((biome, density));
@@ -28,9 +28,9 @@ namespace SoulboundEngine.World.Gen {
 				yield break;
 			}
 
-			foreach (var (biome, density) in densities) {
+			foreach ((IBiome biome, float density) in densities) {
 				float weight = density / maxDensity;
-				weight = Mathf.Pow(weight, blendSharpness);
+				weight = (float)Math.Pow(weight, blendSharpness);
 
 				yield return new BiomeWeight(biome, weight);
 			}

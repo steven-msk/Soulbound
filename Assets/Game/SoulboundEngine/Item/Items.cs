@@ -1,10 +1,12 @@
-using SoulboundEngine.Registry;
-using SoulboundEngine.World.Block;
-using System;
+namespace SoulboundEngine.Item {
+	using SoulboundEngine.Registry;
+	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Entity;
+	using SoulboundEngine.World.Entity.Attribute;
+	using System;
 
 #nullable enable
 
-namespace SoulboundEngine.Item {
 	public partial class Items {
 		public static readonly Item AIR = Register("air", settings => settings.StackUpTo(0));
 		public static readonly Item GRASS = Register(Blocks.GRASS);
@@ -20,11 +22,23 @@ namespace SoulboundEngine.Item {
 		);
 		public static readonly Item chargeableItem = Register("chargeable_item", settings => new ChargeableItem(settings),
 			settings => settings.NonStackable()
+			// TEMP
+			.Attributes(b => b.Add(Attributes.SPEED, new AttributeModifier(Identifier.Of("speed_mult"), 5.0d, AttributeModifier.Operation.ADDITIVE_PERCENT), EquipmentSlot.MAIN_HAND))
 		);
 		public static readonly Item debugPointer = Register("debug_pointer", settings => new DebugPointerItem(settings),
 			settings => settings.NonStackable()
 		);
-		public static readonly Item blockBreakerItem = Register("block_breaker_item", settings => settings.NonStackable().BreakLevel(1));
+		public static readonly Item blockBreakerItem = Register("block_breaker_item", settings => settings
+			.NonStackable()
+			.BreakLevel(1)
+			// TEMP
+			.Attributes(b => b.Add(Attributes.SPEED, new AttributeModifier(Identifier.Of("speed_increase"), 1.0d, AttributeModifier.Operation.ADDITIVE), EquipmentSlot.MAIN_HAND))
+		);
+		// TEST ITEM
+		public static readonly Item JUMP_EFFECT_ITEM = Register("jump_effect_item", s => new JumpEffectItem(s), s => s
+			.NonStackable()
+			.Durability(10)
+		);
 
 		public static Item Register(string id) {
 			return Register(id, Item.Create, new Item.Settings());
@@ -88,8 +102,9 @@ namespace SoulboundEngine.Item {
 		}
 
 		public static RegistryEntry<Item> GetEntry(Item? item) {
-			if (item == null) return GetEntry(AIR);
-			return Registries.ITEMS.GetEntry(item) ?? throw new ArgumentException("Could not find item " + item.GetName());
+			return item == null
+				? GetEntry(AIR)
+				: Registries.ITEMS.GetEntry(item) ?? throw new ArgumentException("Could not find item " + item.GetName());
 		}
 
 		public static RegistryEntry<Item> GetEntry(RegistryKey<Item> key) {

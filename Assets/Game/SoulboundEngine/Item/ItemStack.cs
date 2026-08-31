@@ -1,19 +1,30 @@
-using Newtonsoft.Json.Linq;
-using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.Component;
-using SoulboundEngine.Interaction;
-using SoulboundEngine.Registry;
-using SoulboundEngine.World.Block;
-using SoulboundEngine.World.Entity;
-using SoulboundEngine.World.Level;
-using SoulboundEngine.World.Player;
-using System;
-using System.Collections.Generic;
+namespace SoulboundEngine.Item {
+	using Newtonsoft.Json.Linq;
+	using SoulboundEngine.Component;
+	using SoulboundEngine.Interaction;
+	using SoulboundEngine.Registry;
+	using SoulboundEngine.Serialization;
+	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Entity;
+	using SoulboundEngine.World.Entity.Attribute;
+	using SoulboundEngine.World.Level;
+	using SoulboundEngine.World.Player;
+	using System;
+	using System.Collections.Generic;
 
 #nullable enable
 
-namespace SoulboundEngine.Item {
 	public struct ItemStack : IComponentHolder {
+		public static readonly Codec<ItemStack> NON_EMPTY_CODEC = RecordCodec<ItemStack, Item, int, ComponentChanges>.Of(
+			Field.Required<ItemStack, Item>("item", Item.CODEC, s => s.GetItem()),
+			Field.Required<ItemStack, int>("count", Codecs.INT, s => s.count),
+			Field.Optional<ItemStack, ComponentChanges>("changes", ComponentChanges.CODEC, s => s.GetComponentChanges(), ComponentChanges.EMPTY),
+			(item, count, components) => new ItemStack(item, count, components)
+		);
+		public static readonly Codec<ItemStack> EMPTY_ACCEPTING_CODEC = Codec<ItemStack>.Of(
+			encode: stack => !stack.IsEmpty() ? NON_EMPTY_CODEC.Encode(stack) : JValue.CreateNull(),
+			decode: json => json.Type == JTokenType.Null ? DataResult<ItemStack>.Success(EMPTY) : NON_EMPTY_CODEC.Decode(json)
+		);
 		private static MergedComponentMap cachedEmptyComponents = null!;
 		private static MergedComponentMap CachedEmptyComponents => cachedEmptyComponents ??= MergedComponentMap.Create(Items.AIR.GetComponents(), ComponentChanges.EMPTY);
 		public static readonly ItemStack EMPTY = new();
@@ -129,19 +140,15 @@ namespace SoulboundEngine.Item {
 			if (amount <= 0) return this;
 
 			int newCount = Math.Max(0, this.count - amount);
-			if (newCount <= 0) return EMPTY;
-
-			return this.CopyWithCount(newCount);
+			return newCount <= 0 ? EMPTY : this.CopyWithCount(newCount);
 		}
 
 		public readonly int GetSpaceLeft() {
-			if (this.IsOf(null)) return 0;
-			return this.item.GetMaxCount() - this.count;
+			return this.IsOf(null) ? 0 : this.item.GetMaxCount() - this.count;
 		}
 
 		public readonly bool IsOf(Item? item) {
-			if (item == null) return this.IsEmpty();
-			return Equals(item, this.item);
+			return item == null ? this.IsEmpty() : Equals(item, this.item);
 		}
 
 		public static bool AreItemsEqual(ItemStack a, ItemStack b) {
@@ -166,20 +173,17 @@ namespace SoulboundEngine.Item {
 
 		public ItemStack Split(int amount) {
 			int actualAmount = this.Decrement(amount);
-			if (actualAmount <= 0) return EMPTY;
-			return this.CopyWithCount(amount);
+			return actualAmount <= 0 ? EMPTY : this.CopyWithCount(amount);
 		}
-	
+
 		public readonly ItemStack CopyWithCount(int newCount) {
-			if (this.IsOf(null)) return EMPTY;
-			return new ItemStack(this.item, newCount, this.components.Copy());
+			return this.IsOf(null) ? EMPTY : new ItemStack(this.item, newCount, this.components.Copy());
 		}
 
 		public readonly ItemStack Copy() => this.CopyWithCount(this.count);
 
 		public readonly ItemStack CopyFullStack() {
-			if (this.IsOf(null)) return EMPTY;
-			return this.CopyWithCount(this.item.GetMaxCount());
+			return this.IsOf(null) ? EMPTY : this.CopyWithCount(this.item.GetMaxCount());
 		}
 
 		public ItemStack CopyAndEmpty() {
@@ -218,8 +222,17 @@ namespace SoulboundEngine.Item {
 
 		public readonly int GetMaxCount() => this.GetItem().GetMaxCount();
 
+		public readonly void ForEachAttributeModifier(EquipmentSlot slot, Action<RegistryEntry<AttributeType>, AttributeModifier> consumer) {
+			ItemAttributeModifiers modifiers = this.GetOrDefault(ItemComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
+			modifiers.ForEach(slot, consumer);
+		}
+
 		public readonly int GetBreakLevel() {
 			return this.ComponentsNonNull.GetOrDefault(ItemComponents.BREAK_LEVEL, this.GetItem().GetBreakLevel());
+		}
+
+		public readonly void InventoryTick(Level level, Entity owner, EquipmentSlot? slot) {
+			this.GetItem().InventoryTick(level, owner, this, slot);
 		}
 
 		public static IActionResult OnPrimaryUse(ItemStack stack, Level level, PlayerEntity player, BlockPos blockPos) {
@@ -276,75 +289,52 @@ namespace SoulboundEngine.Item {
 		}
 
 		public readonly int GetCurrentDurability() {
-			if (!this.HasDurability()) return int.MaxValue;
-			return this.ComponentsNonNull.Get(ItemComponents.DURABILITY);
+			return !this.HasDurability() ? int.MaxValue : this.ComponentsNonNull.Get(ItemComponents.DURABILITY);
 		}
 
 		public readonly int GetMaxDurability() {
-			if (!this.HasDurability()) return int.MaxValue;
-			return this.GetItem().GetDurability();
+			return !this.HasDurability() ? int.MaxValue : this.GetItem().GetDurability();
 		}
 
 		public readonly void SetDurability(int amount) {
 			this.AssertComponentMutationNotOnEmpty();
-			this.components.Set(ItemComponents.DURABILITY, amount);
+			this.components.Set(ItemComponents.DURABILITY, Math.Clamp(amount, 0, this.GetMaxDurability()));
 		}
 
-		public readonly bool ShouldBreak() => this.GetCurrentDurability() <= 0;
+		public readonly bool IsBroken() => this.GetCurrentDurability() <= 0;
 
-		/// <summary>
-		/// Damages this item stack. This does not damage non-damageable stacks, returning the same stack.
-		/// If the stack's durability is less than 0, this will return <c>ItemStack.EMPTY</c>,
-		/// otherwise a copy of this stack with the decremented durability.
-		/// </summary>
-		public readonly ItemStack Damage(int amount) {
-			ItemStack stack = this;
-			if (!stack.HasDurability()) return stack;
-
-			stack.SetDurability(stack.GetCurrentDurability() - amount);
-			if (stack.ShouldBreak()) return EMPTY;
-			return stack;
+		public void DamageAndBreak(int amount, Entity owner, EquipmentSlot slot) {
+			this.DamageAndBreak(amount, brokenItem => owner.OnEquippedItemBroke(brokenItem, slot));
 		}
 
-		public static JToken ToJson(ItemStack stack) {
-			if (stack.IsEmpty()) return JValue.CreateNull();
-
-			return new JObject() {
-				["item"] = Items.GetIdentifier(stack.GetItem()).ToString(),
-				["count"] = stack.count,
-				["changes"] = ComponentChanges.ToJson(stack.GetComponentChanges())
-			};
+		public void DamageAndBreak(int amount, Action<Item> onBreak) {
+			int newAmount = this.ProcessDurabilityChange(amount);
+			if (newAmount != 0) {
+				this.ApplyDamage(amount, onBreak);
+			}
 		}
 
-		public static ItemStack FromJson(JToken json) {
-			if (json.Type == JTokenType.Null) return EMPTY;
-			if (json.Type != JTokenType.Object) {
-				Logger.LogError("ItemStack json is not object: {}", json);
-				return EMPTY;
-			}
+		public void DamageWithoutBreaking(int amount) {
+			int newAmount = this.ProcessDurabilityChange(amount);
+			if (newAmount == 0) return;
 
-			string? itemIdString = (string?)json["item"];
-			if (itemIdString == null) {
-				Logger.LogError("No item property in stack json: {}", json);
-				return EMPTY;
-			}
+			if (this.GetCurrentDurability() - newAmount <= 0) return;
+			this.ApplyDamage(amount, _ => { });
+		}
 
-			Identifier itemId = Identifier.Of(itemIdString);
-			Item? item = Items.Get(itemId);
-			if (item == null) {
-				Logger.LogError("Unknown item: {}", itemId);
-				return EMPTY;
-			}
+		private readonly int ProcessDurabilityChange(int amount) {
+			return !this.HasDurability() ? 0 : amount;
+		}
 
-			int? count = (int?)json["count"];
-			if (count == null) {
-				Logger.LogError("No count property in stack json: {}", json);
-				return EMPTY;
-			}
+		private void ApplyDamage(int damage, Action<Item> onBreak) {
+			if (!this.HasDurability()) return;
 
-			JToken componentsToken = json["changes"] ?? JValue.CreateNull();
-			ComponentChanges components = ComponentChanges.FromJson(componentsToken);
-			return new ItemStack(item, count.Value, components);
+			this.SetDurability(this.GetCurrentDurability() - damage);
+			if (this.IsBroken()) {
+				Item item = this.GetItem();
+				this.Decrement(1);
+				onBreak(item);
+			}
 		}
 
 		private readonly void AssertComponentMutationNotOnEmpty() {

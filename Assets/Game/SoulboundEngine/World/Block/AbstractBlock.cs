@@ -1,14 +1,13 @@
-﻿using SoulboundEngine.Common.Math;
-using SoulboundEngine.Interaction;
-using SoulboundEngine.Item;
-using SoulboundEngine.Registry;
-using SoulboundEngine.States;
-using SoulboundEngine.World.Block.State;
-using SoulboundEngine.World.Player;
-using System;
-using System.Collections.Generic;
-
-namespace SoulboundEngine.World.Block {
+﻿namespace SoulboundEngine.World.Block {
+	using SoulboundEngine.Common.Math;
+	using SoulboundEngine.Interaction;
+	using SoulboundEngine.Item;
+	using SoulboundEngine.Registry;
+	using SoulboundEngine.State;
+	using SoulboundEngine.World.Block.State;
+	using SoulboundEngine.World.Player;
+	using System;
+	using System.Collections.Generic;
 	using Item = Item.Item;
 	using Level = Level.Level;
 
@@ -26,7 +25,7 @@ namespace SoulboundEngine.World.Block {
 		protected virtual bool CanPlaceAt(BlockState blockState, Level level, BlockPos blockPos) {
 			if (level.GetBlock(blockPos) != Blocks.AIR) return false;
 
-			foreach (var pos in blockPos.GetCardinalNeighbors()) {
+			foreach (BlockPos pos in blockPos.GetCardinalNeighbors()) {
 				if (level.GetBlock(pos) != Blocks.AIR) return true;
 			}
 			return false;
@@ -164,10 +163,9 @@ namespace SoulboundEngine.World.Block {
 			}
 
 			public string GetTranslationKey() {
-				if (this.registryKey is null) {
-					throw new InvalidOperationException("Cannot derive block name: RegistryKey was not set before Build() was called.");
-				}
-				return this.registryKey.value.ToTranslationKey("block");
+				return this.registryKey is null
+					? throw new InvalidOperationException("Cannot derive block name: RegistryKey was not set before Build() was called.")
+					: this.registryKey.value.ToTranslationKey("block");
 			}
 		}
 	}

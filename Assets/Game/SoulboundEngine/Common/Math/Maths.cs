@@ -26,5 +26,27 @@ namespace SoulboundEngine.Common.Math {
 		public static bool AreEqual(double a, double b, double delta = 1.0E-5d) {
 			return Math.Abs(b - a) < delta;
 		}
+
+		public static double SmoothStep(double from, double to, double t) {
+			t = Clamp01(t);
+			t = -2.0d * t * t * t + 3.0d * t * t;
+			return to * t + from * (1.0d - t);
+		}
+
+		public static double Clamp01(double v) {
+			return Math.Clamp(v, 0.0d, 1.0d);
+		}
+
+		public static double InverseLerp(double a, double b, double value) {
+			return a != b ? Clamp01((value - a) / (b - a)) : 0.0d;
+		}
+
+		public static double Clamp(double value, double min, double max) {
+			return Math.Clamp(value, min, max);
+		}
+
+		public static float Clamp(float value, float min, float max) {
+			return Math.Clamp(value, min, max);
+		}
 	}
 }

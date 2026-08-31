@@ -1,18 +1,24 @@
-using SoulboundEngine.Component;
-using SoulboundEngine.Interaction;
-using SoulboundEngine.Registry;
-using SoulboundEngine.World.Block;
-using SoulboundEngine.World.Entity;
-using SoulboundEngine.World.Level;
-using SoulboundEngine.World.Player;
-using System;
-using System.Collections.Generic;
-using UnityEngine;
+namespace SoulboundEngine.Item {
+	using SoulboundEngine.Component;
+	using SoulboundEngine.Interaction;
+	using SoulboundEngine.Registry;
+	using SoulboundEngine.Serialization;
+	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Entity;
+	using SoulboundEngine.World.Level;
+	using SoulboundEngine.World.Player;
+	using System;
+	using System.Collections.Generic;
 
 #nullable enable
 
-namespace SoulboundEngine.Item {
 	public class Item : IItemConvertible {
+		public static readonly Codec<Item> CODEC = Identifier.CODEC.FlatXmap<Item>(
+			encode: i => i.registryKey.value,
+			decode: i => Registries.ITEMS.GetEntry(i) is { } entry
+				? DataResult<Item>.Success(entry.GetValue())
+				: DataResult<Item>.Error($"Invalid item id: {i}")
+		);
 		public const int DEFAULT_FULL_STACK = 256;
 		public static readonly Dictionary<Block, Item> blockItems = new();
 		private readonly RegistryKey<Item> registryKey;
@@ -43,7 +49,7 @@ namespace SoulboundEngine.Item {
 		}
 
 		public virtual ItemStack GetDefaultStack(int count = 1) {
-			return new ItemStack(this, Mathf.Clamp(count, 0, this.GetMaxCount()));
+			return new ItemStack(this, Math.Clamp(count, 0, this.GetMaxCount()));
 		}
 
 		public RegistryEntry<Item> GetRegistryEntry() => Items.GetEntry(this.registryKey);
@@ -53,6 +59,9 @@ namespace SoulboundEngine.Item {
 		}
 
 		public int GetBreakLevel() => this.components.GetOrDefault(ItemComponents.BREAK_LEVEL, 0);
+
+		public virtual void InventoryTick(Level level, Entity owner, ItemStack stack, EquipmentSlot? slot) {
+		}
 
 		/// <summary> 
 		/// Called when the player starts using the item (left click).
@@ -168,6 +177,10 @@ namespace SoulboundEngine.Item {
 				return this.Component(ItemComponents.BREAK_LEVEL, breakLevel);
 			}
 
+			public Settings Attributes(Func<ItemAttributeModifiers.Builder, ItemAttributeModifiers.Builder> builder) {
+				return this.Component(ItemComponents.ATTRIBUTE_MODIFIERS, builder(ItemAttributeModifiers.Create()).Build());
+			}
+
 			public Settings Durability(int durability) {
 				return this.Component(ItemComponents.DURABILITY, durability);
 			}
@@ -177,10 +190,9 @@ namespace SoulboundEngine.Item {
 			/// </summary>
 			/// <exception cref="InvalidOperationException"></exception>
 			internal string GetTranslationKey() {
-				if (this.registryKey is null) {
-					throw new InvalidOperationException("Cannot derive item name: RegistryKey was not set before Build() was called.");
-				}
-				return this.registryKey.value.ToTranslationKey("item");
+				return this.registryKey is null
+					? throw new InvalidOperationException("Cannot derive item name: RegistryKey was not set before Build() was called.")
+					: this.registryKey.value.ToTranslationKey("item");
 			}
 		}
 	}

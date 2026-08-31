@@ -1,6 +1,6 @@
-﻿using SoulboundEngine.Client.World;
+﻿namespace SoulboundEngine.World.Level {
+	using SoulboundEngine.World.Serialization;
 
-namespace SoulboundEngine.World.Level {
 	public struct WorldBootData {
 		public Level level;
 		public LevelManager levelManager;

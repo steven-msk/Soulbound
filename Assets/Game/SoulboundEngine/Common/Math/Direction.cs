@@ -1,9 +1,8 @@
-using SoulboundEngine.World.Block;
-using System;
-using System.Collections.Generic;
-using UnityEngine;
-
 namespace SoulboundEngine.Common.Math {
+	using SoulboundEngine.World.Block;
+	using System;
+	using System.Collections.Generic;
+
 	public enum Direction {
 		Up,
 		Down,
@@ -58,11 +57,15 @@ namespace SoulboundEngine.Common.Math {
 		}
 
 		public static Direction FromVector(int x, int y) {
-			if (x == 0 && y == 1) return Direction.Up;
-			if (x == 0 && y == -1) return Direction.Down;
-			if (x == -1 && y == 0) return Direction.Left;
-			if (x == 1 && y == 0) return Direction.Right;
-			throw new ArgumentException("Invalid vector for direction", nameof(x));
+			return x == 0 && y == 1
+				? Direction.Up
+				: x == 0 && y == -1
+					? Direction.Down
+					: x == -1 && y == 0
+						? Direction.Left
+						: x == 1 && y == 0 
+							? Direction.Right
+							: throw new ArgumentException("Invalid vector for direction", nameof(x));
 		}
 
 		public static Direction FromVector((int x, int y) vector) => FromVector(vector.x, vector.y);
@@ -74,8 +77,8 @@ namespace SoulboundEngine.Common.Math {
 		}
 
 		public static bool IsAdjacent(this BlockPos pos1, BlockPos pos2) {
-			int dx = Mathf.Abs(pos1.x - pos2.x);
-			int dy = Mathf.Abs(pos1.y - pos2.y);
+			int dx = Math.Abs(pos1.x - pos2.x);
+			int dy = Math.Abs(pos1.y - pos2.y);
 			return (dx == 1 && dy == 0) || (dx == 0 && dy == 1);
 		}
 

@@ -1,6 +1,6 @@
-﻿using System;
+﻿namespace SoulboundEngine.Common {
+	using System;
 
-namespace Game.SoulboundEngine.Common {
 	public interface IPredicate<T> {
 		public IPredicate<T> And(IPredicate<T> other) {
 			return Of(v => this.Test(v) && other.Test(v));

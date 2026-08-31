@@ -1,21 +1,23 @@
-using Newtonsoft.Json.Linq;
-using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.Common.Math;
-using SoulboundEngine.Common.Math.Random;
-using SoulboundEngine.Item;
-using SoulboundEngine.Registry;
-using SoulboundEngine.World.Block;
-using SoulboundEngine.World.Block.State;
-using SoulboundEngine.World.Chunk;
-using SoulboundEngine.World.Physics;
-using SoulboundEngine.World.Player;
-using System;
-using System.Collections.Generic;
+namespace SoulboundEngine.World.Entity {
+	using Newtonsoft.Json.Linq;
+	using SoulboundEngine.Common;
+	using SoulboundEngine.Common.Collection;
+	using SoulboundEngine.Common.Math;
+	using SoulboundEngine.Common.Math.Random;
+	using SoulboundEngine.Item;
+	using SoulboundEngine.Registry;
+	using SoulboundEngine.Serialization;
+	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Block.State;
+	using SoulboundEngine.World.Chunk;
+	using SoulboundEngine.World.Entity.Attribute;
+	using SoulboundEngine.World.Level;
+	using SoulboundEngine.World.Physics;
+	using SoulboundEngine.World.Player;
+	using System;
+	using System.Collections.Generic;
 
 #nullable enable
-
-namespace SoulboundEngine.World.Entity {
-	using Level = Level.Level;
 
 	public abstract class Entity {
 		public const double DEFAULT_BB_WIDTH = 1.0d;
@@ -27,6 +29,12 @@ namespace SoulboundEngine.World.Entity {
 		private readonly EntityDescriptor descriptor;
 		private readonly EntityDimensions dimensions;
 		protected readonly IRandom random = RandomProvider.CreateWithUniqueSeed();
+		private readonly AttributeMap attributes;
+		private readonly TimedModifierManager timedModifierManager;
+		private readonly EntityEquipment equipment;
+		private readonly Dictionary<EquipmentSlot, ItemStack> lastEquipmentStacks = Collections.Dictionary(
+			() => EquipmentSlot.VALUES, _ => ItemStack.EMPTY
+		);
 		protected Level level;
 		protected bool isAlive;
 		protected bool firstTick = true;
@@ -39,13 +47,21 @@ namespace SoulboundEngine.World.Entity {
 		public bool verticalCollisionBelow;
 		private Vec2d deltaMovement;
 		private bool isOnGround;
-		private float speed;
 
 		protected Entity(EntityDescriptor descriptor, Level level) {
 			this.descriptor = descriptor;
 			this.level = level;
 			this.dimensions = descriptor.GetDimensions();
+			this.attributes = new AttributeMap(descriptor.GetAttributes());
+			this.timedModifierManager = new TimedModifierManager(this.attributes);
+			this.equipment = this.CreateEquipment();
 			this.SetPos(0.0d, 0.0d);
+		}
+
+		public static AttributeSupplier.Builder CreateDefaultAttributes() {
+			return AttributeSupplier.Create()
+				.Add(Attributes.SPEED)
+				.Add(Attributes.GRAVITY);
 		}
 
 		public Vec2d position { get; private set; } = Vec2d.ZERO;
@@ -56,6 +72,7 @@ namespace SoulboundEngine.World.Entity {
 		public ChunkPos chunkPosition { get; private set; }
 
 		public void SetGuid(Guid guid) => this.guid = guid;
+		public Guid GetGuid() => this.guid;
 
 		public void OnAdd(Guid guid) {
 			if (this.IsAlive()) throw new InvalidOperationException($"Entity already added: {guid}");
@@ -70,8 +87,14 @@ namespace SoulboundEngine.World.Entity {
 
 		public void DefaultTick() {
 			this.CalculateSpeed();
+			this.UpdateDirtyAttributes();
+			this.timedModifierManager.Tick();
+
 			this.inBlockState = null;
 			this.firstTick = false;
+
+			this.DetectAndHandleEquipmentChanges();
+			this.equipment.Tick(this);
 		}
 
 		protected void CalculateSpeed() {
@@ -90,24 +113,20 @@ namespace SoulboundEngine.World.Entity {
 		public bool IsAlive() => this.isAlive;
 		public void SetAlive(bool alive) => this.isAlive = alive;
 
-		protected void AssertAlive() {
-			if (!this.isAlive) throw new NotSupportedException("Entity is not alive.");
-		}
-
 		protected virtual void OnDisposed() {
 		}
 
 		public EntityDescriptor GetDescriptor() => this.descriptor;
 
-		public ItemEntity DropItem(Level level, IItemConvertible item) {
-			return this.DropStack(level, item.AsItem().GetDefaultStack(1));
+		public ItemEntity DropItem(IItemConvertible item) {
+			return this.DropStack(item.AsItem().GetDefaultStack(1));
 		}
 
-		public ItemEntity DropStack(Level level, ItemStack stack) {
+		public ItemEntity DropStack(ItemStack stack) {
 			Vec2d pos = this.GetPosition();
-			ItemEntity entity = new(level, pos.x, pos.y, stack);
+			ItemEntity entity = new(this.level, pos.x, pos.y, stack);
 			entity.SetOwner(this);
-			level.AddNewEntity(entity);
+			this.level.AddNewEntity(entity);
 			return entity;
 		}
 
@@ -203,9 +222,7 @@ namespace SoulboundEngine.World.Entity {
 
 			AABB box = this.boundingBox;
 			List<AABB> colliders = CollectColliders(this, this.level, box.ExpandBy(movement));
-			if (colliders.Count == 0) return movement;
-
-			return CollideWithShapes(movement, box, colliders);
+			return colliders.Count == 0 ? movement : CollideWithShapes(movement, box, colliders);
 		}
 
 		public static List<AABB> CollectColliders(Entity? entity, Level level, AABB box) {
@@ -296,14 +313,9 @@ namespace SoulboundEngine.World.Entity {
 			return this.lastKnownSpeed;
 		}
 
-		public virtual float GetSpeed() => this.speed;
-		public virtual void SetSpeed(float speed) {
-			this.speed = speed;
-		}
+		public virtual float GetSpeed() => (float)this.GetAttributeValue(Attributes.SPEED);
 
-		protected virtual double GetGravity() {
-			return 0.0d;
-		}
+		protected virtual double GetGravity() => this.GetAttributeValue(Attributes.GRAVITY);
 
 		protected double GetAppliedGravity() {
 			return this.GetGravity();
@@ -330,102 +342,178 @@ namespace SoulboundEngine.World.Entity {
 			this.facing = facing;
 		}
 
+		public AttributeMap GetAttributes() => this.attributes;
+
+		public double GetAttributeValue(RegistryEntry<AttributeType> attribute) {
+			return this.GetAttributes().GetValue(attribute);
+		}
+
+		public AttributeInstance? GetAttributeInstance(RegistryEntry<AttributeType> attribute) {
+			return this.GetAttributes().GetInstance(attribute);
+		}
+
+		public double GetAttributeBaseValue(RegistryEntry<AttributeType> attribute) {
+			return this.GetAttributes().GetBaseValue(attribute);
+		}
+
+		public void AddTimedAttributeModifier(RegistryEntry<AttributeType> attribute, AttributeModifier modifier, int durationTicks) {
+			this.timedModifierManager.Add(attribute, modifier, durationTicks);
+		}
+
+		private void UpdateDirtyAttributes() {
+			HashSet<AttributeInstance> attributesToUpdate = this.GetAttributes().GetAttributesToUpdate();
+			foreach (AttributeInstance attributeInstance in attributesToUpdate) {
+				this.OnAttributeUpdated(attributeInstance.GetAttribute());
+			}
+			attributesToUpdate.Clear();
+		}
+
+		protected virtual void OnAttributeUpdated(RegistryEntry<AttributeType> attribute) {
+		}
+
+		protected virtual EntityEquipment CreateEquipment() {
+			return new EntityEquipment();
+		}
+
+		private void DetectAndHandleEquipmentChanges() {
+			Dictionary<EquipmentSlot, ItemStack>? changedItems = this.CollectEquipmentChanges();
+			if (changedItems != null) this.HandleEquipmentChanges(changedItems);
+		}
+
+		private void HandleEquipmentChanges(Dictionary<EquipmentSlot, ItemStack> changedItems) {
+			foreach ((EquipmentSlot slot, ItemStack current) in changedItems) {
+				if (!current.IsEmpty() && !current.IsBroken()) {
+					current.ForEachAttributeModifier(slot, (attribute, modifier) => {
+						if (this.attributes.TryGetInstance(attribute, out AttributeInstance instance)) {
+							instance.RemoveModifier(modifier.id);
+							instance.AddTransientModifier(modifier);
+						}
+					});
+				}
+				this.lastEquipmentStacks[slot] = current;
+			}
+			this.OnEquipmentChanged(changedItems);
+		}
+
+		protected virtual void OnEquipmentChanged(Dictionary<EquipmentSlot, ItemStack> changedItems) {
+		}
+
+		private Dictionary<EquipmentSlot, ItemStack>? CollectEquipmentChanges() {
+			Dictionary<EquipmentSlot, ItemStack>? changedItems = new();
+
+			foreach (EquipmentSlot slot in EquipmentSlot.VALUES) {
+				ItemStack previous = this.lastEquipmentStacks[slot];
+				ItemStack current = this.GetStack(slot);
+				if (this.HasEquipmentStackChanged(previous, current)) {
+					changedItems ??= new Dictionary<EquipmentSlot, ItemStack>();
+					changedItems.Add(slot, current);
+
+					if (!previous.IsEmpty()) {
+						previous.ForEachAttributeModifier(slot, (attribute, modifier) => {
+							this.attributes.GetInstance(attribute)?.RemoveModifier(modifier);
+						});
+					}
+				}
+			}
+
+			return changedItems;
+		}
+
+		public virtual bool HasEquipmentStackChanged(ItemStack previous, ItemStack current) {
+			return !ItemStack.AreEqual(current, previous);
+		}
+
+		public void SetStack(EquipmentSlot slot, ItemStack stack) {
+			this.OnEquipStack(slot, this.equipment.Set(slot, stack), stack);
+		}
+
+		public virtual void OnEquipStack(EquipmentSlot slot, ItemStack oldStack, ItemStack stack) {
+		}
+
+		public bool HasItemInSlot(EquipmentSlot slot) => !this.GetStack(slot).IsEmpty();
+
+		public ItemStack GetStack(EquipmentSlot slot) => this.equipment.Get(slot);
+
+		public virtual void OnEquippedItemBroke(Item brokenItem, EquipmentSlot slot) {
+		}
+
+		public virtual bool CanUse(EquipmentSlot slot) => true;
+
 		public JToken Save() {
-			JObject json = new() {
-				["type"] = EntityDescriptor.GetIdentifier(this.descriptor).ToString(),
-				["id"] = this.guid.ToString(),
-				["x"] = this.GetX(),
-				["y"] = this.GetY(),
-				["motionX"] = this.GetDeltaMovement().x,
-				["motionY"] = this.GetDeltaMovement().y,
-				["onGround"] = this.isOnGround,
-			};
+			JToken json = (JObject)SerializedData.CODEC.Encode(SerializedData.Get(this));
+			json["type"] = EntityDescriptor.CODEC.Encode(this.descriptor);
+			json["guid"] = Codecs.GUID.Encode(this.guid);
 			this.SaveAdditional(json);
 			return json;
 		}
 
-		protected virtual void SaveAdditional(JObject json) {
+		protected virtual void SaveAdditional(JToken json) {
+			json["attributes"] = AttributeInstance.Packed.CODEC.ListOf().Encode(this.attributes.Pack());
 		}
 
 		public void Load(JObject json) {
-			double? x = (double?)json["x"];
-			if (x == null) {
-				Logger.LogError("No x property found on Entity json: {}", json);
-				return;
-			}
-			double? y = (double?)json["y"];
-			if (y == null) {
-				Logger.LogError("No y property found on Entity json: {}", json);
-				return;
-			}
-
-			double? motionX = (double?)json["motionX"];
-			if (motionX == null) {
-				Logger.LogError("No motionX property found on Entity json: {}", json);
-				return;
-			}
-			double? motionY = (double?)json["motionY"];
-			if (motionY == null) {
-				Logger.LogError("No motionY property found on Entity json: {}", json);
-				return;
-			}
-
-			bool? onGround = (bool?)json["onGround"];
-			if (onGround == null) {
-				Logger.LogError("No onGround property found on Entity json: {}", json);
-				return;
-			}
-
-
-			this.SetPosRaw(x.GetValueOrDefault(0.0d), y.GetValueOrDefault(0.0d));
+			SerializedData data = SerializedData.CODEC.Decode(json)
+				.ResultOrPartial(error => Logger.LogError("Failed to load entity data: {}", error))
+				.OrElse(SerializedData.Get(this));
+			this.SetPosRaw(data.x, data.y);
 			this.ReapplyPosition();
-			this.SetDeltaMovement(motionX.GetValueOrDefault(0.0d), motionY.GetValueOrDefault(0.0d));
-			this.SetOnGround(onGround.GetValueOrDefault(false));
+			this.SetDeltaMovement(data.motionX, data.motionY);
+			this.SetOnGround(data.onGround);
 
-			string? guidString = (string?)json["id"];
-			if (guidString != null) {
-				if (!Guid.TryParse(guidString, out Guid guid)) {
-					Logger.LogError("Failed to parse entity guid: {}", guidString);
-				} else {
-					this.guid = guid;
-				}
-			}
-
+			this.guid = Codecs.GUID.Decode(json["guid"] ?? new JValue(this.guid))
+				.ResultOrPartial(error => Logger.LogError("Failed to load entity guid: {}", error))
+				.OrElse(this.guid);
 			this.LoadAdditional(json);
 		}
 
 		protected virtual void LoadAdditional(JObject json) {
+			this.LoadAttributes(json);
+		}
+
+		private void LoadAttributes(JObject json) {
+			JToken token = json["attributes"] ?? new JArray();
+			this.attributes.Unpack(AttributeInstance.Packed.CODEC.ListOf().Decode(token)
+				.ResultOrPartial(error => Logger.LogError("Failed to load entity attributes: {}", error))
+				.OrElse(new List<AttributeInstance.Packed>())
+			);
 		}
 
 		public static Entity? Load(JToken json, Level level) {
-			if (json.Type != JTokenType.Object) {
+			if (json is not JObject obj) {
 				Logger.LogError("Entity json is not object: {}", json);
 				return null;
 			}
 
-			string? typeIdString = (string?)json["type"];
-			if (typeIdString == null) {
-				Logger.LogError("No type property found on Entity json: {}", json);
-				return null;
-			}
-			if (!Identifier.TryParse(typeIdString, out Identifier typeId)) {
-				Logger.LogError("Could not parse Entity type id: {}", typeIdString);
-				return null;
-			}
-			EntityDescriptor? descriptor = EntityDescriptor.Get(typeId);
-			if (descriptor == null) {
-				Logger.LogError("Entity descriptor not found: {}", typeIdString);
-				return null;
-			}
+			JToken typeToken = obj["type"] ?? JValue.CreateNull();
+			Optional<EntityDescriptor> descriptor = EntityDescriptor.CODEC.Decode(typeToken)
+				.ResultOrPartial(error => Logger.LogError("Invalid entity type: {} ({})", typeToken, error));
+			if (descriptor.IsEmpty()) return null;
 
-			Entity? entity = descriptor.Create(level);
+			Entity? entity = descriptor.GetValue().Create(level);
 			if (entity == null) {
-				Logger.LogError("Cannot create entity: {}. Parsed data: {}", typeIdString, json);
+				Logger.LogError("Cannot create entity: {}. Parsed data: {}", typeToken, json);
 				return null;
 			}
 
-			entity.Load((JObject)json);
+			entity.Load(obj);
 			return entity;
+		}
+
+		public sealed record SerializedData(double x, double y, double motionX, double motionY, bool onGround) {
+			public static readonly Codec<SerializedData> CODEC = RecordCodec<SerializedData, double, double, double, double, bool>.Of(
+				Field.Optional<SerializedData, double>("x", Codecs.DOUBLE, d => d.x, 0.0d),
+				Field.Optional<SerializedData, double>("y", Codecs.DOUBLE, d => d.y, 0.0d),
+				Field.Optional<SerializedData, double>("motionX", Codecs.DOUBLE, d => d.motionX, 0.0d),
+				Field.Optional<SerializedData, double>("motionY", Codecs.DOUBLE, d => d.motionY, 0.0d),
+				Field.Optional<SerializedData, bool>("onGround", Codecs.BOOLEAN, d => d.onGround, false),
+				(x, y, motionX, motionY, onGround) => new SerializedData(x, y, motionX, motionY, onGround)
+			);
+
+			public static SerializedData Get(Entity entity) {
+				return new SerializedData(
+					entity.GetX(), entity.GetY(), entity.GetDeltaMovement().x, entity.GetDeltaMovement().y, entity.IsOnGround()
+				);
+			}
 		}
 	}
 }

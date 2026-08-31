@@ -1,11 +1,11 @@
-﻿using Game.SoulboundEngine.Common;
-using SoulboundEngine.Loot.Condition;
-using SoulboundEngine.Loot.Context;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿namespace SoulboundEngine.Loot.Entry {
+	using SoulboundEngine.Common;
+	using SoulboundEngine.Loot.Condition;
+	using SoulboundEngine.Loot.Context;
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
 
-namespace SoulboundEngine.Loot.Entry {
 	public abstract class LootPoolEntry : IEntryCombiner {
 		private readonly IPredicate<LootContext> conditionPredicate;
 		protected readonly List<ILootCondition> conditions;

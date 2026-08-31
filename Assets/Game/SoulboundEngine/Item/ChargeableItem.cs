@@ -1,12 +1,11 @@
-using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.Common;
-using SoulboundEngine.Interaction;
-using SoulboundEngine.World.Block;
-using SoulboundEngine.World.Entity;
-using SoulboundEngine.World.Level;
-using SoulboundEngine.World.Player;
-
 namespace SoulboundEngine.Item {
+	using SoulboundEngine.Common;
+	using SoulboundEngine.Interaction;
+	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Entity;
+	using SoulboundEngine.World.Level;
+	using SoulboundEngine.World.Player;
+
 	[PROTOTYPICAL]
 	public sealed class ChargeableItem : Item {
 		public ChargeableItem(Settings settings) : base(settings) {

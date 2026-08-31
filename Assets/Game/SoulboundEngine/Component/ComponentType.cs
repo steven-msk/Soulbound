@@ -1,12 +1,18 @@
 ﻿namespace SoulboundEngine.Component {
-	using Newtonsoft.Json.Linq;
 	using SoulboundEngine.Registry;
+	using SoulboundEngine.Serialization;
 	using System;
 	using System.Collections.Generic;
 
 #nullable enable
 
 	public abstract class ComponentType {
+		public static readonly Codec<ComponentType> CODEC = Identifier.CODEC.FlatXmap(
+			encode: c => c.key.value,
+			decode: i => Registries.COMPONENT_TYPE.GetEntry(i) is { } entry
+				? DataResult<ComponentType>.Success(entry.GetValue())
+				: DataResult<ComponentType>.Error($"Invalid component: {i}")
+		);
 		public static readonly Dictionary<Identifier, ComponentType> FROM_ID = new();
 		private readonly RegistryKey<ComponentType> key;
 
@@ -17,9 +23,7 @@
 
 		public abstract bool IsTransient();
 
-		public abstract JToken ToJson(object value);
-
-		public abstract object FromJson(JToken token);
+		public abstract Codec<object> GetBoxedValueCodec();
 
 		public RegistryKey<ComponentType> GetKey() => this.key;
 
@@ -30,18 +34,12 @@
 		public static Identifier GetId(ComponentType type) {
 			return type.key.value;
 		}
-
-		public sealed record Codec<T>(Func<T, JToken> encoder, Func<JToken, T> decoder) {
-			public JToken Encode(T value) => this.encoder(value);
-
-			public T Decode(JToken token) => this.decoder(token);
-		}
 	}
 
 	public class ComponentType<T> : ComponentType {
 		private readonly Codec<T>? codec;
 
-		private ComponentType(RegistryKey<ComponentType> key, Codec<T>? codec) 
+		private ComponentType(RegistryKey<ComponentType> key, Codec<T>? codec)
 			: base(key) {
 			this.codec = codec;
 		}
@@ -56,13 +54,12 @@
 			return this.codec == null;
 		}
 
-		public override JToken ToJson(object value) {
-			if (value is not T typed) throw new InvalidCastException($"Component value {value} cannot be cast to {typeof(T)}");
-			return this.CodecOrThrow(new NotSupportedException($"Cannot serialize transient component '{GetId(this)}'")).Encode(typed);
+		public override Codec<object> GetBoxedValueCodec() {
+			return this.CodecOrThrow().XmapToObject();
 		}
 
-		public override object FromJson(JToken token) {
-			return this.CodecOrThrow(new NotSupportedException($"Cannot serialize transient component '{GetId(this)}'")).Decode(token);
+		public Codec<T> CodecOrThrow() {
+			return this.CodecOrThrow(new NotSupportedException($"Cannot serialize transient component '{GetId(this)}'"));
 		}
 
 		public static Builder Create(RegistryKey<ComponentType> key) => new(key);
