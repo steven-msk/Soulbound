@@ -44,6 +44,8 @@
 
 		public override bool HasKeyboardFocus() => true;
 
+		public override bool IsPointerOverUI() => true;
+
 		public override void Tick() {
 			if (SoulboundUnityClient.Instance.InputManager.keyboard.WasPressed(Keyboard.GetControl(Key.Escape))) {
 				this.Cancel();
