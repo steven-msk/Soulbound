@@ -1,7 +1,5 @@
-﻿using SoulboundEngine.Client.Debug.Logging;
-using System;
-
-namespace SoulboundEngine.World.Serialization {
+﻿namespace SoulboundEngine.World.Serialization {
+	using System;
 	using File = SoulboundEngine.Serialization.File;
 
 	public class WorldSaveValidator : IWorldSaveValidator {

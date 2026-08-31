@@ -1,10 +1,8 @@
-using SoulboundEngine.Common;
-using SoulboundEngine.State;
-using SoulboundEngine.States;
-using SoulboundEngine.World.Block.State;
-
 namespace SoulboundEngine.World.Block {
-	using Level = Level.Level;
+	using SoulboundEngine.Common;
+	using SoulboundEngine.State;
+	using SoulboundEngine.World.Block.State;
+	using SoulboundEngine.World.Level;
 
 	[PROTOTYPICAL]
 	public sealed class TickingBlock : Block, ITickingBlock {

@@ -1,11 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+namespace SoulboundEngine.Serialization {
+	using System;
+	using System.Collections.Generic;
+	using System.IO;
+	using System.Linq;
 
 #nullable enable
 
-namespace SoulboundEngine.Serialization {
 	public static class BinaryIO {
 		public static void WriteArray<T>(this BinaryWriter writer, T[]? array, Action<BinaryWriter, T> write) {
 			if (array == null) {
@@ -14,7 +14,7 @@ namespace SoulboundEngine.Serialization {
 			}
 
 			writer.Write(array.Length);
-			foreach (var item in array) {
+			foreach (T? item in array) {
 				write(writer, item);
 			}
 		}
@@ -40,9 +40,9 @@ namespace SoulboundEngine.Serialization {
 			Action<BinaryWriter, V> writeValue
 		) {
 			writer.Write(dictionary.Count);
-			foreach (var kvp in dictionary) {
-				writeKey(writer, kvp.Key);
-				writeValue(writer, kvp.Value);
+			foreach ((K key, V value) in dictionary) {
+				writeKey(writer, key);
+				writeValue(writer, value);
 			}
 		}
 
@@ -52,7 +52,7 @@ namespace SoulboundEngine.Serialization {
 			Func<BinaryReader, V> readValue
 		) {
 			int count = reader.ReadInt32();
-			var dictionary = new Dictionary<K, V>(count);
+			Dictionary<K, V> dictionary = new(count);
 			for (int i = 0; i < count; i++) {
 				K key = readKey(reader);
 				V value = readValue(reader);

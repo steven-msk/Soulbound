@@ -1,9 +1,8 @@
-using SoulboundEngine.Common;
-using SoulboundEngine.Common.Math;
-using SoulboundEngine.States;
-using SoulboundEngine.World.Block.State;
-
 namespace SoulboundEngine.World.Block {
+	using SoulboundEngine.Common;
+	using SoulboundEngine.Common.Math;
+	using SoulboundEngine.State;
+	using SoulboundEngine.World.Block.State;
 	using Level = Level.Level;
 
 	[PROTOTYPICAL]

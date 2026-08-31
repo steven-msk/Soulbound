@@ -1,18 +1,15 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.World.Block;
-using SoulboundEngine.World.Block.Entity;
-using SoulboundEngine.World.Block.State;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿namespace SoulboundEngine.World.Chunk {
+	using Newtonsoft.Json;
+	using Newtonsoft.Json.Linq;
+	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Block.Entity;
+	using SoulboundEngine.World.Block.State;
+	using SoulboundEngine.World.Level;
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
 
 #nullable enable
-
-namespace SoulboundEngine.World.Chunk {
-	using Block = Block.Block;
-	using Level = Level.Level;
 
 	public record SerializableChunkData(
 		ChunkPos chunkPos,
@@ -37,7 +34,7 @@ namespace SoulboundEngine.World.Chunk {
 			}
 
 			List<JToken> tileEntities = new(chunk.GetTileEntityPositions().Count);
-			foreach (var blockPos in chunk.GetTileEntityPositions()) {
+			foreach (BlockPos blockPos in chunk.GetTileEntityPositions()) {
 				JToken? json = chunk.GetTileEntityJsonForSaving(blockPos);
 				if (json != null) tileEntities.Add(json);
 			}
@@ -85,7 +82,7 @@ namespace SoulboundEngine.World.Chunk {
 			ChunkSection[] sections = new ChunkSection[sectionCount];
 			Func<BlockStateContainer> containerFactory = level.BlockStateContainerFactory();
 
-			foreach (var section in this.sectionData) {
+			foreach (SectionData section in this.sectionData) {
 				if (section.chunkSection != null) {
 					sections[level.GetSectionIndexFromSectionY(section.y)] = section.chunkSection;
 				}
@@ -93,7 +90,7 @@ namespace SoulboundEngine.World.Chunk {
 
 			WorldChunk chunk = new(level, chunkPos, sections, containerFactory);
 
-			foreach (var token in this.tileEntities) {
+			foreach (JToken token in this.tileEntities) {
 				try {
 					BlockPos? blockPos = TileEntity.GetPosFromJson(token);
 					if (blockPos is not { } pos) {
@@ -118,7 +115,7 @@ namespace SoulboundEngine.World.Chunk {
 
 		public string Write() {
 			JObject sections = new();
-			foreach (var section in this.sectionData) {
+			foreach (SectionData section in this.sectionData) {
 				if (section.chunkSection != null) {
 					int sectionY = section.y;
 					IEnumerable<int> states = section.chunkSection.GetStatesImmutable().Select(Block.GetRawID);
@@ -128,7 +125,7 @@ namespace SoulboundEngine.World.Chunk {
 			}
 
 			JArray tileEntities = new();
-			foreach (var tileEntity in this.tileEntities) {
+			foreach (JToken tileEntity in this.tileEntities) {
 				tileEntities.Add(tileEntity);
 			}
 

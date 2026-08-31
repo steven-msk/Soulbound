@@ -1,270 +1,197 @@
-using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.Registry;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+namespace SoulboundEngine.World.Entity.Attribute {
+	using SoulboundEngine.Registry;
+	using SoulboundEngine.Serialization;
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
 
 #nullable enable
 
-namespace SoulboundEngine.World.Entity.Attribute {
-	public sealed class AttributeInstance {
-		private readonly Dictionary<Identifier, AttributeModifier> idToModifier = new();
-		private readonly Dictionary<Identifier, AttributeModifier> persistentModifiers = new();
-		private readonly Dictionary<Identifier, Func<bool>> idToPredicate = new();
-		private readonly Dictionary<Identifier, bool> lastPredicateState = new();
-		private readonly RegistryEntry<EntityAttribute> type;
-		private readonly IValueRule? ruleOverride;
-		private double value;
-		private bool dirty;
+	public class AttributeInstance {
+		private readonly Dictionary<AttributeModifier.Operation, Dictionary<Identifier, AttributeModifier>> modifiersByOperation = new();
+		private readonly Dictionary<Identifier, AttributeModifier> modifierById = new();
+		private readonly Dictionary<Identifier, AttributeModifier> permanentModifiers = new();
+		private readonly RegistryEntry<AttributeType> attribute;
+		private readonly Action<AttributeInstance> onDirty;
+		private double baseValue;
+		private double cachedValue;
+		private bool dirty = true;
 
-		public AttributeInstance(RegistryEntry<EntityAttribute> type, IValueRule? ruleOverride = null) {
-			this.type = type;
-			this.dirty = true;
-			this.ruleOverride = ruleOverride;
+		public AttributeInstance(RegistryEntry<AttributeType> attribute, Action<AttributeInstance> onDirty) {
+			this.attribute = attribute;
+			this.onDirty = onDirty;
+			this.baseValue = attribute.GetValue().defaultValue;
 		}
 
-		public double baseValue { get; set; }
+		public double GetBaseValue() => this.baseValue;
 
-		private void AddModifier(AttributeModifier modifier) {
-			this.idToModifier.Add(modifier.identifier, modifier);
-			this.dirty = true;
+		public void SetBaseValue(double value) {
+			if (this.baseValue != value) {
+				this.baseValue = value;
+				this.SetDirty();
+			}
 		}
 
-		public void AddPersistentModifier(AttributeModifier modifier) {
+		public RegistryEntry<AttributeType> GetAttribute() => this.attribute;
+
+		public Dictionary<Identifier, AttributeModifier> GetModifiers(AttributeModifier.Operation operation) {
+			if (this.modifiersByOperation.TryGetValue(operation, out Dictionary<Identifier, AttributeModifier> modifiers)) {
+				return modifiers;
+			}
+			modifiers = new Dictionary<Identifier, AttributeModifier>();
+			this.modifiersByOperation.Add(operation, modifiers);
+			return modifiers;
+		}
+
+		public HashSet<AttributeModifier> GetModifiers() => this.modifierById.Values.ToHashSet();
+
+		public HashSet<AttributeModifier> GetPermanentModifiers() => this.permanentModifiers.Values.ToHashSet();
+
+		public AttributeModifier? GetModifier(Identifier id) => this.modifierById.GetValueOrDefault(id);
+
+		public void AddModifier(AttributeModifier modifier) {
+			if (!this.modifierById.TryAdd(modifier.id, modifier)) {
+				throw new ArgumentException("Modifier is already applied on this attribute");
+			}
+			this.GetModifiers(modifier.operation).Add(modifier.id, modifier);
+			this.SetDirty();
+		}
+
+		public void AddOrUpdateTransientModifier(AttributeModifier modifier) {
+			if (this.modifierById.TryGetValue(modifier.id, out AttributeModifier old) && modifier == old) {
+				return;
+			}
+			this.modifierById[modifier.id] = modifier;
+			this.GetModifiers(modifier.operation)[modifier.id] = modifier;
+			this.SetDirty();
+		}
+
+		public void AddTransientModifier(AttributeModifier modifier) {
 			this.AddModifier(modifier);
-			this.persistentModifiers.Add(modifier.identifier, modifier);
-		}
-		public void AddPredicateModifier(AttributeModifier modifier, Func<bool> predicate) {
-			this.AddPersistentModifier(modifier);
-			this.idToPredicate.Add(modifier.identifier, predicate);
 		}
 
-		public void AddPersistentModifiers(params AttributeModifier[] modifiers) {
-			foreach (var modifier in modifiers) {
-				this.AddPersistentModifier(modifier);
-			}
+		public void AddOrReplacePermanentModifier(AttributeModifier modifier) {
+			this.RemoveModifier(modifier.id);
+			this.AddModifier(modifier);
+			this.permanentModifiers[modifier.id] = modifier;
 		}
-		public void AddPredicateModifiers(params (AttributeModifier modifier, Func<bool> predicate)[] modifiers) {
-			foreach (var (modifier, predicate) in modifiers) {
-				this.AddPredicateModifier(modifier, predicate);
+
+		public void AddPermanentModifier(AttributeModifier modifier) {
+			this.AddModifier(modifier);
+			this.permanentModifiers.Add(modifier.id, modifier);
+		}
+
+		public void AddPermanentModifiers(IEnumerable<AttributeModifier> modifiers) {
+			foreach (AttributeModifier modifier in modifiers) {
+				this.AddPermanentModifier(modifier);
 			}
 		}
 
-		public void ClearModifiers() {
-			this.idToModifier.Clear();
-			this.persistentModifiers.Clear();
-			this.idToPredicate.Clear();
+		protected void SetDirty() {
 			this.dirty = true;
+			this.onDirty(this);
 		}
 
-		public void OnUpdate() {
-			if (this.HasPredicateModifiers()) {
-				bool anyChanged = false;
-
-				foreach (var id in this.idToPredicate.Keys) {
-					bool current = this.idToPredicate[id]();
-					if (current != this.lastPredicateState.GetValueOrDefault(id, !current)) {
-						anyChanged = true;
-					}
-					this.lastPredicateState[id] = current;
-				}
-
-				if (anyChanged) this.dirty = true;
-			}
+		public void RemoveModifier(AttributeModifier modifier) {
+			this.RemoveModifier(modifier.id);
 		}
 
-		private double ComputeValue() {
-			if (!this.dirty) return this.value;
-
-			List<AttributeModifier> allModifiers = this.GetModifiers().ToList();
-
-			// filter targeting modifiers
-			IEnumerable<AttributeModifier> targeting = this.GetTargetingModifiers(allModifiers);
-			allModifiers.RemoveAll(m => targeting.Contains(m));
-
-			Dictionary<AttributeModifier, List<AttributeModifier>> modifierToItsTargeters = new();
-			foreach (var targeter in targeting) {
-				IEnumerable<AttributeModifier> targets = targeter.target!.Resolve(allModifiers);
-
-				foreach (var target in targets) {
-					if (!modifierToItsTargeters.ContainsKey(target)) {
-						modifierToItsTargeters[target] = new List<AttributeModifier>();
-					}
-					modifierToItsTargeters[target].Add(targeter);
-				}
+		public bool RemoveModifier(Identifier id) {
+			if (!this.modifierById.Remove(id, out AttributeModifier modifier)) {
+				return false;
 			}
-
-			// this design exposes a risk:
-			// predicates, and especially targeting predicates,
-			// may require another attribute's value.
-			// if that attribute has predicate modifiers
-			// which target the value of this attribute
-			// it ends up in a recursive loop.
-			// or even worse, a recursive cycle between multiple modifiers.
-			// TODO: fix recursive cycle risk of predicate modifiers
-
-
-			// calculate effective overrides from targeters
-			Dictionary<AttributeModifier, double> effectiveOverrides = new();
-
-			// TODO: fix unordered modifier graph lookup, which is dangerous for recursion
-			foreach (var target in modifierToItsTargeters.Keys) {
-				List<AttributeModifier> targeters = modifierToItsTargeters[target];
-				List<AttributeModifier> predicate_targeters = this.GetPredicateModifiers(targeters).ToList();
-				targeters.RemoveAll(m => predicate_targeters.Contains(m));
-
-				double effectiveOverride = this.CalculateModifiedValue(target.value, targeters, _ => null);
-
-				predicate_targeters.RemoveAll(m => !this.idToPredicate[m.identifier]());
-				effectiveOverride = this.CalculateModifiedValue(effectiveOverride, predicate_targeters, _ => null);
-
-				effectiveOverrides.Add(target, effectiveOverride);
-			}
-
-			// filter predicates
-			HashSet<AttributeModifier> predicateModifiers = this.GetPredicateModifiers(allModifiers).ToHashSet();
-			allModifiers.RemoveAll(m => predicateModifiers.Contains(m));
-			double? EffectiveOverrideSupplier(AttributeModifier attribute) {
-				return effectiveOverrides.TryGetValue(attribute, out double _override) ? _override : null;
-			}
-			double prePredicateResult = this.CalculateModifiedValue(this.baseValue, allModifiers, EffectiveOverrideSupplier);
-
-			predicateModifiers.RemoveWhere(m => !this.idToPredicate[m.identifier]());
-			double final = this.CalculateModifiedValue(prePredicateResult, predicateModifiers, EffectiveOverrideSupplier);
-
-			// apply value rule
-			try {
-				IValueRule? valueRule = this.ruleOverride ?? this.type.GetValue().ValueRule;
-				valueRule?.Apply(ref final);
-			} catch (AttributeValueRuleViolationException e) {
-				Logger.LogFatal(e);
-				final = this.baseValue;
-			} finally {
-				this.value = final;
-			}
-
-			this.dirty = false;
-			return this.value;
+			this.GetModifiers(modifier.operation).Remove(id);
+			this.permanentModifiers.Remove(id);
+			this.SetDirty();
+			return true;
 		}
 
-		// default numeric value computation:
-		// A = base + Σ(flat)
-		// B = A * (1 + Σ%) (% of A)
-		// C = B * Π(multipliers)
-		private double CalculateModifiedValue(double baseValue, IEnumerable<AttributeModifier> modifiers, Func<AttributeModifier, double?> effectiveOverrideSupplier) {
-			this.FilterOperations(modifiers,
-				out List<AttributeModifier> additive,
-				out List<AttributeModifier> additivePercent,
-				out List<AttributeModifier> multiplicative
-			);
-
-			// apply all flat adds/subtracts (A)
-			double A = baseValue;
-			foreach (var modifier in additive) {
-				modifier.Apply(effectiveOverrideSupplier(modifier), ref A);
-			}
-
-			// apply all percentage adds (B)
-			double percentSum = 0d;
-			foreach (var modifier in additivePercent) {
-				modifier.Apply(effectiveOverrideSupplier(modifier), ref percentSum);
-			}
-			double B = A * (1d + percentSum);
-
-			// apply multipliers (C)
-			double multiplierProduct = 1d;
-			foreach (var modifier in multiplicative) {
-				modifier.Apply(effectiveOverrideSupplier(modifier), ref multiplierProduct);
-			}
-			double C = B * multiplierProduct;
-
-			return C;
-		}
-
-		private void FilterOperations(
-			IEnumerable<AttributeModifier> modifiers,
-			out List<AttributeModifier> additive,
-			out List<AttributeModifier> additivePercent,
-			out List<AttributeModifier> multiplicative
-		) {
-			additive = new List<AttributeModifier>();
-			additivePercent = new List<AttributeModifier>();
-			multiplicative = new List<AttributeModifier>();
-
-			foreach (var modifier in modifiers) {
-				OperationType opType = modifier.GetOperationType();
-
-				if (opType == OperationType.Additive) additive.Add(modifier);
-				else if (opType == OperationType.AdditivePercent) additivePercent.Add(modifier);
-				else if (opType == OperationType.Multiplicative) multiplicative.Add(modifier);
+		public void RemoveModifiers() {
+			foreach (AttributeModifier modifier in this.GetModifiers()) {
+				this.RemoveModifier(modifier);
 			}
 		}
 
 		public double GetValue() {
-			if (this.dirty) this.ComputeValue();
-			return this.value;
+			if (this.dirty) {
+				this.cachedValue = this.ComputeValue();
+				this.dirty = false;
+			}
+			return this.cachedValue;
 		}
 
-		public IValueRule? GetValueRuleOverride() => this.ruleOverride;
+		private double ComputeValue() {
+			double value = this.GetBaseValue();
+			foreach (AttributeModifier modifier in this.GetModifiersOrEmpty(AttributeModifier.Operation.ADDITIVE)) {
+				value += modifier.amount;
+			}
 
-		private bool IsPredicate(AttributeModifier modifier) => this.idToPredicate.ContainsKey(modifier.identifier);
+			double percentSum = 0.0d;
+			foreach (AttributeModifier modifier in this.GetModifiersOrEmpty(AttributeModifier.Operation.ADDITIVE_PERCENT)) {
+				percentSum += modifier.amount;
+			}
+			double result = value * (1.0d + percentSum);
 
-		public RegistryEntry<EntityAttribute> GetAttribute() => this.type;
+			double multiplierProduct = 1.0d;
+			foreach (AttributeModifier modifier in this.GetModifiersOrEmpty(AttributeModifier.Operation.MULTIPLICATIVE)) {
+				multiplierProduct *= modifier.amount;
+			}
+			result *= multiplierProduct;
 
-		public bool TryGetModifier(Identifier identifier, out AttributeModifier modifier) {
-			return this.idToModifier.TryGetValue(identifier, out modifier);
+			return this.attribute.GetValue().ValidateValue(result);
 		}
 
-		public IEnumerable<AttributeModifier> GetModifiers() => this.idToModifier.Values.ToHashSet();
-		public IReadOnlyDictionary<Identifier, AttributeModifier> GetModifiersByOperation(IOperation operation) {
-			return this.idToModifier
-				.Where(kvp => kvp.Value.operation.Equals(operation))
-				.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+		public static double CalculateResult(double baseValue, double flatSum, double percentSum, double multiplierProduct) {
+			return (baseValue + flatSum) * (1.0d + percentSum) * multiplierProduct;
 		}
-		public bool HasModifier(Identifier identifier) => this.idToModifier.ContainsKey(identifier);
-		public bool HasPredicateModifier(Identifier identifier) => this.idToPredicate.ContainsKey(identifier);
-		public IEnumerable<AttributeModifier> GetPersistentModifiers() => this.persistentModifiers.Values.ToHashSet();
-		private IEnumerable<AttributeModifier> GetTargetingModifiers(IEnumerable<AttributeModifier> modifiers) {
-			return modifiers
-				.Where(m => m.target != null);
-		}
-		private IEnumerable<AttributeModifier> GetPredicateModifiers(IEnumerable<AttributeModifier> modifiers) {
-			return modifiers
-				.Where(m => this.IsPredicate(m));
-		}
-		public IEnumerable<(AttributeModifier attribute, Func<bool> predicate)> GetPredicateModifiers() {
-			return this.idToPredicate.Keys
-				.Where(id => this.idToModifier.ContainsKey(id))
-				.Select(id => (this.idToModifier[id], this.idToPredicate[id]));
-		}
-		public bool HasPredicateModifiers() => this.idToPredicate.Any();
 
-		public void OverwritePersistentModifier(AttributeModifier modifier) {
-			if (!this.idToModifier.ContainsKey(modifier.identifier)) return;
-
-			this.idToModifier[modifier.identifier] = modifier;
-			this.persistentModifiers[modifier.identifier] = modifier;
-			this.idToPredicate.Remove(modifier.identifier);
-
-			this.dirty = true;
-		}
-		public void OverwritePredicateModifier(AttributeModifier modifier, Func<bool> predicate) {
-			this.OverwritePersistentModifier(modifier);
-			this.idToPredicate.Add(modifier.identifier, predicate);
-		}
-		public void OverwritePredicate(Identifier identifier, Func<bool> predicate) {
-			if (this.idToPredicate.ContainsKey(identifier)) {
-				this.idToPredicate[identifier] = predicate;
+		private IEnumerable<AttributeModifier> GetModifiersOrEmpty(AttributeModifier.Operation operation) {
+			if (this.modifiersByOperation.TryGetValue(operation, out Dictionary<Identifier, AttributeModifier> modifiers)) {
+				foreach ((Identifier _, AttributeModifier modifier) in modifiers) {
+					yield return modifier;
+				}
 			}
 		}
 
-		public void RemoveModifier(AttributeModifier modifier) => this.RemoveModifier(modifier.identifier);
-		public void RemoveModifier(Identifier identifier) {
-			this.idToModifier.Remove(identifier);
-			this.persistentModifiers.Remove(identifier);
-			this.idToPredicate.Remove(identifier);
-			this.dirty = true;
+		public void ReplaceFrom(AttributeInstance other) {
+			this.baseValue = other.baseValue;
+			this.modifierById.Clear();
+			foreach ((Identifier id, AttributeModifier modifier) in other.modifierById) {
+				this.modifierById.Add(id, modifier);
+			}
+			this.permanentModifiers.Clear();
+			foreach ((Identifier id, AttributeModifier modifier) in other.permanentModifiers) {
+				this.permanentModifiers.Add(id, modifier);
+			}
+			this.modifiersByOperation.Clear();
+			foreach ((AttributeModifier.Operation operation, Dictionary<Identifier, AttributeModifier> modifiers) in other.modifiersByOperation) {
+				Dictionary<Identifier, AttributeModifier> currentModifiers = this.GetModifiers(operation);
+				foreach ((Identifier id, AttributeModifier modifier) in modifiers) {
+					currentModifiers.Add(id, modifier);
+				}
+			}
+			this.SetDirty();
 		}
 
+		public Packed Pack() => new(this.attribute, this.baseValue, new List<AttributeModifier>(this.permanentModifiers.Values));
+
+		public void Unpack(Packed packed) {
+			this.baseValue = packed.baseValue;
+			foreach (AttributeModifier modifier in packed.permanentModifiers) {
+				this.modifierById[modifier.id] = modifier;
+				this.GetModifiers(modifier.operation)[modifier.id] = modifier;
+				this.permanentModifiers[modifier.id] = modifier;
+			}
+			this.SetDirty();
+		}
+
+		public record Packed(RegistryEntry<AttributeType> attribute, double baseValue, List<AttributeModifier> permanentModifiers) {
+			public static readonly Codec<Packed> CODEC = RecordCodec<Packed, RegistryEntry<AttributeType>, double, List<AttributeModifier>>.Of(
+				Field.Required<Packed, RegistryEntry<AttributeType>>("attribute", RegistryEntry<AttributeType>.GetCodec(Registries.ATTRIBUTE), p => p.attribute),
+				Field.Required<Packed, double>("baseValue", Codecs.DOUBLE, p => p.baseValue),
+				Field.Required<Packed, List<AttributeModifier>>("modifiers", AttributeModifier.CODEC.ListOf(), p => p.permanentModifiers),
+				(attribute, baseValue, modifiers) => new Packed(attribute, baseValue, modifiers)
+			);
+		}
 	}
 }

@@ -1,16 +1,19 @@
-﻿using SoulboundEngine.Client.World.Widget;
-using SoulboundEngine.Interaction;
-using SoulboundEngine.Item;
-using SoulboundEngine.World.Block.Entity;
-using SoulboundEngine.World.Block.State;
-using SoulboundEngine.World.Player;
+﻿namespace SoulboundEngine.World.Block {
+	using SoulboundEngine.Interaction;
+	using SoulboundEngine.Item;
+	using SoulboundEngine.World.Block.Entity;
+	using SoulboundEngine.World.Block.State;
+	using SoulboundEngine.World.Level;
+	using SoulboundEngine.World.Player;
+	using SoulboundEngine.World.Widget;
 
-namespace SoulboundEngine.World.Block {
-	using Level = Level.Level;
-
-	public class SignBlock : Block, ITileEntityProvider {
+	public class SignBlock : Block, ITileEntityProvider, IWorldWidgetProvider<TextWidgetHandler.Context> {
 		public SignBlock(Settings settings) 
 			: base(settings) {
+		}
+
+		public WorldWidgetHandler<TextWidgetHandler.Context> CreateHandler(TextWidgetHandler.Context context) {
+			return TextWidgetHandler.Create(WorldWidgetType.TEXT, context);
 		}
 
 		public TileEntity CreateTileEntity(BlockPos pos, BlockState state) {
@@ -19,24 +22,29 @@ namespace SoulboundEngine.World.Block {
 
 		protected override void OnHoverEnter(BlockState state, ItemStack stack, Level level, PlayerEntity player, BlockPos pos) {
 			SignTileEntity tileEntity = (SignTileEntity)level.GetTileEntity(pos);
-			tileEntity.widgetHandle = player.ShowWorldWidget(WorldWidgetType.TEXT, new TextWidget.Context() { 
-				blockPos = pos, text = tileEntity.GetText()
-			});
+			tileEntity.widgetHandler = (TextWidgetHandler)level.AddWidget(this,
+				(level, pos) => new TextWidgetHandler.Context(level, pos, tileEntity.GetText()), pos);
 		}
 
 		protected override void OnHoverLeave(BlockState state, ItemStack stack, Level level, PlayerEntity player, BlockPos pos) {
+			this.RemoveWidget(level, pos);
+		}
+
+		protected override void OnStateReplaced(BlockState state, BlockPos pos, Level level) {
+			this.RemoveWidget(level, pos);
+		}
+
+		private void RemoveWidget(Level level, BlockPos pos) {
 			SignTileEntity tileEntity = (SignTileEntity)level.GetTileEntity(pos);
-			if (tileEntity.widgetHandle == null) return;
-			player.DestroyWorldWidget(tileEntity.widgetHandle);
-			tileEntity.widgetHandle = null;
+			if (tileEntity.widgetHandler == null) return;
+
+			level.RemoveWidget(tileEntity.widgetHandler);
+			tileEntity.widgetHandler = null;
 		}
 
 		protected override IActionResult OnSecondaryUse(BlockState state, Level level, PlayerEntity player, BlockPos pos) {
 			SignTileEntity tileEntity = (SignTileEntity)level.GetTileEntity(pos);
-			if (tileEntity.screenHandle != null) return IActionResult.FAIL;
-
-			player.OpenSignEditScreen(tileEntity);
-			return IActionResult.SUCCESS;
+			return !player.OpenSignEditScreen(tileEntity) ? IActionResult.FAIL : IActionResult.SUCCESS;
 		}
 	}
 }

@@ -1,8 +1,6 @@
 ﻿namespace SoulboundEngine.World.Serialization {
 	using Newtonsoft.Json;
 	using Newtonsoft.Json.Linq;
-	using SoulboundEngine.Client.Debug.Logging;
-	using SoulboundEngine.Client.World;
 	using SoulboundEngine.Serialization;
 	using SoulboundEngine.World.Entity;
 	using SoulboundEngine.World.Level;

@@ -1,9 +1,8 @@
-using UnityEngine;
+namespace SoulboundEngine.World.Gen {
+	using SoulboundEngine.Common.Math;
+	using SoulboundEngine.World.Level;
 
 #nullable enable
-
-namespace SoulboundEngine.World.Gen {
-	using Level = Level.Level;
 
 	public sealed class Heightmap {
 		public int planeY { get; private set; }
@@ -14,19 +13,19 @@ namespace SoulboundEngine.World.Gen {
 		}
 
 		public float SampleHeight(int blockX, BiomeWeight primary, BiomeWeight? secondary) {
-			var w1 = primary.value;
-			var w2 = secondary.GetValueOrDefault().value;
+			float w1 = primary.value;
+			float w2 = secondary.GetValueOrDefault().value;
 			float t = this.GetBlendFactor(w1, secondary != null ? w2 : 0f);
 
-			var m1 = primary.biome.SampleTerrain(blockX);
+			TerrainModulation m1 = primary.biome.SampleTerrain(blockX);
 			if (secondary == null) {
 				return this.ApplyModulation(m1);
 			}
-			var m2 = secondary.Value.biome.SampleTerrain(blockX);
+			TerrainModulation m2 = secondary.Value.biome.SampleTerrain(blockX);
 
-			var h1 = this.ApplyModulation(m1);
-			var h2 = this.ApplyModulation(m2);
-			var blended = Mathf.Lerp(h1, h2, t);
+			float h1 = this.ApplyModulation(m1);
+			float h2 = this.ApplyModulation(m2);
+			float blended = (float)Maths.Lerp(h1, h2, t);
 
 			return blended;
 		}
@@ -40,7 +39,7 @@ namespace SoulboundEngine.World.Gen {
 
 		private float GetBlendFactor(float a, float b) {
 			float t = b / (a + b);
-			return Mathf.SmoothStep(0f, 1f, t);
+			return (float)Maths.SmoothStep(0f, 1f, t);
 			//return b / (a + b);
 		}
 

@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using SoulboundEngine.Common.Math;
 using SoulboundEngine.World.Block;
 using SoulboundEngine.World.Chunk;
 using SoulboundEngine.World.Level;
@@ -7,9 +8,9 @@ using UnityEngine;
 public class ChunkWorldPosTests {
     [Test]
     public void EqualityOperators_ReturnCorrectValues() {
-        var a = new ChunkWorldPos(1.5f, 2.5f, 3);
-        var b = new ChunkWorldPos(1.5f, 2.5f, 3);
-        var c = new ChunkWorldPos(1.5f, 2.5f, 4);
+		ChunkWorldPos a = new(1.5f, 2.5f, 3);
+		ChunkWorldPos b = new(1.5f, 2.5f, 3);
+		ChunkWorldPos c = new(1.5f, 2.5f, 4);
 
         Assert.That(a == b, Is.True);
         Assert.That(a != b, Is.False);
@@ -19,9 +20,9 @@ public class ChunkWorldPosTests {
 
     [Test]
     public void EqualsAndHashCodeMethods_ReturnCorrectValues() {
-        var a = new ChunkWorldPos(1.0f, 2.0f, 3);
-        var b = new ChunkWorldPos(1.0f, 2.0f, 3);
-        var c = new ChunkWorldPos(2.0f, 2.0f, 3);
+		ChunkWorldPos a = new(1.0f, 2.0f, 3);
+		ChunkWorldPos b = new(1.0f, 2.0f, 3);
+		ChunkWorldPos c = new(2.0f, 2.0f, 3);
 
         Assert.That(a.Equals(b), Is.True);
         Assert.That(a.Equals(c), Is.False);
@@ -30,16 +31,16 @@ public class ChunkWorldPosTests {
 
     [Test]
     public void ToStringMethod_FormatsValueCorrectly() {
-        var pos = new ChunkWorldPos(3.25f, 4.75f, 2);
+		ChunkWorldPos pos = new(3.25f, 4.75f, 2);
         Assert.That(pos.ToString(), Is.EqualTo("cwx:3.25, cwy:4.75, c:2"));
     }
 
     [Test]
     public void FromBlockPosMethod_CalculatesValueCorrectly() {
         const int CHUNK_LENGTH = Level.CHUNK_LENGTH;
-        var blockPos = new BlockPos(34, 7);
+		BlockPos blockPos = new(34, 7);
 
-        var worldPos = ChunkWorldPos.FromBlockPos(blockPos);
+		ChunkWorldPos worldPos = ChunkWorldPos.FromBlockPos(blockPos);
 
         int expectedChunkX = Mathf.FloorToInt((float)blockPos.x / CHUNK_LENGTH);
         float expectedLocalX = blockPos.x - expectedChunkX * CHUNK_LENGTH;
@@ -51,10 +52,10 @@ public class ChunkWorldPosTests {
 
 	[Test]
 	public void FromWorldMethod_CalculatesChunkXCorrectly() {
-		var worldPos = new Vector2(40.2f, 15.8f);
-		var chunkWorld = ChunkWorldPos.FromWorld(worldPos);
+		Vec2d worldPos = new(40.2f, 15.8f);
+		ChunkWorldPos chunkWorld = ChunkWorldPos.FromWorld(worldPos);
 
-		Assert.That(chunkWorld.chunkX, Is.EqualTo(Mathf.FloorToInt(worldPos.x / Level.CHUNK_LENGTH)));
+		Assert.That(chunkWorld.chunkX, Is.EqualTo(Maths.FloorToInt(worldPos.x / Level.CHUNK_LENGTH)));
 		Assert.That(chunkWorld.x, Is.EqualTo(worldPos.x));
 		Assert.That(chunkWorld.y, Is.EqualTo(worldPos.y));
 	}

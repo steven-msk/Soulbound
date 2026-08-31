@@ -1,6 +1,5 @@
 namespace SoulboundEngine.World.Block.Entity {
 	using Newtonsoft.Json.Linq;
-	using SoulboundEngine.Client.Debug.Logging;
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.World.Block.State;
 	using SoulboundEngine.World.Level;
@@ -55,7 +54,7 @@ namespace SoulboundEngine.World.Block.Entity {
 				return null;
 			}
 			if (!Identifier.TryParse(typeIdString, out Identifier typeId)) {
-				Logger.LogError("Could not parse tile entity type id: {}", typeIdString);
+				Logger.LogError("Could not parse tile entity type descriptionId: {}", typeIdString);
 				return null;
 			}
 			RegistryEntry<TileEntityType>? entry = Registries.TILE_ENTITIES.GetEntry(typeId);

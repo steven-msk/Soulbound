@@ -1,6 +1,5 @@
 namespace SoulboundEngine.Item.Container {
 	using Newtonsoft.Json.Linq;
-	using SoulboundEngine.Client.Debug.Logging;
 	using SoulboundEngine.Common;
 	using SoulboundEngine.World.Player;
 	using System.Collections;
@@ -44,7 +43,7 @@ namespace SoulboundEngine.Item.Container {
 		}
 
 		void IClearable.Clear() {
-			foreach (var index in this.GetSlots()) {
+			foreach (int index in this.GetSlots()) {
 				this.GetSlot(index).SetStack(ItemStack.EMPTY);
 			}
 		}
@@ -52,24 +51,18 @@ namespace SoulboundEngine.Item.Container {
 
 	public static class InventoryDefaults {
 		public static JToken Save(this IInventory inventory) {
-			JArray array = new();
-			for (int i = 0; i < inventory.GetSize(); i++) {
-				array.Add(ItemStack.ToJson(inventory.GetSlot(i).GetStack()));
-			}
-			return array;
+			return ItemStack.EMPTY_ACCEPTING_CODEC.ListOf().Encode(inventory.ToList());
 		}
 
 		public static void Load(this IInventory inventory, JToken json) {
-			if (json.Type != JTokenType.Array) {
-				Logger.LogError("Inventory json is not array: {}", json);
-				return;
-			}
-
-			JArray array = (JArray)json;
-			foreach (var slotIndex in inventory.GetSlots()) {
-				ItemStack stack = ItemStack.FromJson(array[slotIndex]);
-				inventory.GetSlot(slotIndex).SetStack(stack);
-			}
+			ItemStack.EMPTY_ACCEPTING_CODEC.ListOf().Decode(json)
+				.ResultOrPartial(error => Logger.LogError(error))
+				.IfPresent(stacks => {
+					inventory.Clear();
+					for (int i = 0; i < stacks.Count; i++) {
+						inventory.GetSlot(i).SetStack(stacks[i]);
+					}
+				});
 		}
 	}
 }

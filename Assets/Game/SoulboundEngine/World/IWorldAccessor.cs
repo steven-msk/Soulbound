@@ -1,7 +1,7 @@
-﻿using SoulboundEngine.Client.World;
-using System.Collections.Generic;
+﻿namespace SoulboundEngine.World {
+	using SoulboundEngine.World.Serialization;
+	using System.Collections.Generic;
 
-namespace SoulboundEngine.World {
 	public interface IWorldAccessor {
 		void EnterWorld(string world);
 		void QuitActiveWorld();

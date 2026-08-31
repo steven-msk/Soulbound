@@ -1,0 +1,65 @@
+#nullable enable
+
+namespace SoulboundEngine.UnityClient.UI {
+	using SoulboundEngine.UnityClient.Debug;
+	using SoulboundEngine.UnityClient.Debug.Logging.Console;
+	using SoulboundEngine.UnityClient.Debug.Metrics.View;
+	using SoulboundEngine.UnityClient.UI.Screen;
+	using UnityEngine.UIElements;
+
+	public sealed class UIHandler {
+		private ScreenManager screenManager = null!;
+		private UXMLScreenRoot screenRoot = null!;
+		private readonly CommandLine commandLine;
+		private readonly LogConsole logConsole;
+		private readonly MetricsHUD metricsHud;
+
+		public UIHandler(CommandLine commandLine, LogConsole logConsole, MetricsHUD metricsHud) {
+			this.commandLine = commandLine;
+			this.logConsole = logConsole;
+			this.metricsHud = metricsHud;
+		}
+
+		public void SetUIDocument(UIDocument uiDocument) {
+			if (this.screenRoot != null) {
+				this.commandLine.Dispose();
+				this.logConsole.Dispose();
+				this.metricsHud.Dispose();
+				this.screenManager.Flush();
+			}
+			this.screenRoot = new UXMLScreenRoot(uiDocument);
+			this.screenManager = new ScreenManager(this.screenRoot);
+
+			VisualElement metricsHudRoot = this.screenManager.CreateScreenRoot();
+			metricsHudRoot.pickingMode = PickingMode.Ignore;
+			MetricsHUD.CreateRoot(metricsHudRoot);
+			this.screenRoot.AttachPersistentOverlay(metricsHudRoot);
+			this.metricsHud.OnBind(metricsHudRoot);
+
+			VisualElement logConsoleRoot = this.screenManager.CreateScreenRoot();
+			logConsoleRoot.pickingMode = PickingMode.Ignore;
+			LogConsole.CreateRoot(logConsoleRoot);
+			this.screenRoot.AttachPersistentOverlay(logConsoleRoot);
+			this.logConsole.OnBind(logConsoleRoot);
+
+			VisualElement commandLineRoot = this.screenManager.CreateScreenRoot();
+			commandLineRoot.pickingMode = PickingMode.Ignore;
+			CommandLine.CreateRoot(commandLineRoot);
+			this.screenRoot.AttachPersistentOverlay(commandLineRoot);
+			this.commandLine.OnBind(commandLineRoot);
+		}
+
+		public IScreenHandle PushScreen(Screen.Screen screen) => this.screenManager.PushScreen(screen);
+		public void PopScreen(IScreenHandle handle) => this.screenManager.PopScreen(handle);
+
+		public bool HasKeyboardFocus() => this.screenManager.HasKeyboardFocus();
+		public bool IsPointerOverUI() => this.screenManager.IsPointerOverUI();
+
+		public void PushInputFocus(IInputFocusable focus) => this.screenManager.PushInputFocus(focus);
+		public void PopInputFocus(IInputFocusable focus) => this.screenManager.PopInputFocus(focus);
+
+		public void Tick() => this.screenManager.Tick();
+
+		public void FlushScreens() => this.screenManager.Flush();
+	}
+}

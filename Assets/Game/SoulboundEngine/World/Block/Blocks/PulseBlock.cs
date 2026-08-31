@@ -1,9 +1,9 @@
-using SoulboundEngine.Common;
-using SoulboundEngine.States;
-using SoulboundEngine.World.Block.Entity;
-using SoulboundEngine.World.Block.State;
-
 namespace SoulboundEngine.World.Block {
+	using SoulboundEngine.Common;
+	using SoulboundEngine.State;
+	using SoulboundEngine.World.Block.Entity;
+	using SoulboundEngine.World.Block.State;
+
 	[PROTOTYPICAL]
 	public sealed class PulseBlock : Block, ITileEntityProvider {
 		public static readonly Property<bool> on = BoolProperty.Of("on");

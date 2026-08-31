@@ -1,6 +1,6 @@
-﻿using SoulboundEngine.Serialization;
+﻿namespace SoulboundEngine.World.Serialization {
+	using SoulboundEngine.Serialization;
 
-namespace SoulboundEngine.Client.World {
 	public readonly struct WorldSave {
 		public readonly File saveFolder;
 		public readonly File chunksFolder;

@@ -1,6 +1,6 @@
-﻿using System;
+﻿namespace SoulboundEngine.Common {
+	using System;
 
-namespace SoulboundEngine.Common {
 	public interface IFunction<I, R> {
 		R Apply(I input);
 

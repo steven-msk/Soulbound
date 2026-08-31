@@ -1,15 +1,14 @@
-﻿using Newtonsoft.Json.Linq;
-using SoulboundEngine.Client.Debug.Logging;
-using SoulboundEngine.World.Block;
-using SoulboundEngine.World.Block.Entity;
-using SoulboundEngine.World.Block.State;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿namespace SoulboundEngine.World.Chunk {
+	using Newtonsoft.Json.Linq;
+	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Block.Entity;
+	using SoulboundEngine.World.Block.State;
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
 
 #nullable enable
 
-namespace SoulboundEngine.World.Chunk {
 	public abstract class Chunk : IBlockGetter {
 		protected readonly Dictionary<BlockPos, TileEntity> tileEntities = new();
 		protected readonly IHeightLimitView heightLimitView;
