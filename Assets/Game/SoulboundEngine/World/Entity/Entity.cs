@@ -72,6 +72,7 @@ namespace SoulboundEngine.World.Entity {
 		public ChunkPos chunkPosition { get; private set; }
 
 		public void SetGuid(Guid guid) => this.guid = guid;
+		public Guid GetGuid() => this.guid;
 
 		public void OnAdd(Guid guid) {
 			if (this.IsAlive()) throw new InvalidOperationException($"Entity already added: {guid}");

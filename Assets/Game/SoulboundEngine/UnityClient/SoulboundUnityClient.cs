@@ -1,5 +1,6 @@
 namespace SoulboundEngine.UnityClient {
 	using Cysharp.Threading.Tasks;
+	using SoulboundEngine.Command;
 	using SoulboundEngine.Common.Math;
 	using SoulboundEngine.GameStates;
 	using SoulboundEngine.Recipe;
@@ -32,7 +33,6 @@ namespace SoulboundEngine.UnityClient {
 	using SoulboundEngine.World.Level;
 	using SoulboundEngine.World.Player;
 	using SoulboundEngine.World.Serialization;
-	using SoulboundEngine.World.Services;
 	using System;
 	using System.Collections.Generic;
 	using System.Diagnostics;
@@ -65,10 +65,9 @@ namespace SoulboundEngine.UnityClient {
 		private readonly LogConsole logConsole;
 		private readonly CommandLine commandLine;
 		private readonly MetricsHUD metricsHud;
-		private readonly CommandProcessor commandProcessor;
-		private readonly WorldSessionCommands worldSessionCommands;
-		private readonly RuntimeDataProvider runtimeDataProvider;
-		private readonly RuntimeExecutionServices runtimeExecutionServices;
+		private readonly CommandProcessor<ClientCommandContext> clientCommandProcessor;
+		private readonly ClientCommandContext clientCommandContext;
+		private readonly ClientLevelCommandProvider clientLevelCommands;
 		private readonly WorldSavesManager worldSavesManager;
 		private readonly WorldSaveValidator worldSerializer;
 		private readonly UIHandler uiHandler;
@@ -99,7 +98,8 @@ namespace SoulboundEngine.UnityClient {
 			try {
 				new SoulboundUnityClient(Main.instance.GetUnityClientConfig()).Start();
 			} catch(Exception e) {
-				Logger.LogFatal(e, "Caught unhandled exception in client init");
+				UnityEngine.Debug.LogError("Caught unhandled exception in client init");
+				UnityEngine.Debug.LogException(e);
 				if (UnityEngine.Application.isEditor) {
 					EditorApplication.isPlaying = false;
 				} else {
@@ -114,10 +114,9 @@ namespace SoulboundEngine.UnityClient {
 			GameStateManager.SetBootstrapping();
 
 			Logger.SetWrapper(unityClientLoggerWrapper);
-			UXMLSchema_Generated.RegisterAll();
-
 			this.logConsole = new LogConsole(this);
 
+			UXMLSchema_Generated.RegisterAll();
 			AssetManager.LoadAllWithPreloadLabel();
 
 			Registries.Init();
@@ -135,11 +134,15 @@ namespace SoulboundEngine.UnityClient {
 			this.debugMetricsService = new DebugMetricsService();
 			this.performanceMetrics = new PerformanceMetrics();
 			this.RegisterDebugMetricsSource(this);
-			this.runtimeDataProvider = new RuntimeDataProvider();
-			this.runtimeExecutionServices = new RuntimeExecutionServices();
-			this.worldSessionCommands = new WorldSessionCommands();
-			this.commandProcessor = new CommandProcessor(this.runtimeDataProvider, this.runtimeExecutionServices);
-			this.commandLine = new CommandLine(this.commandProcessor, this);
+			this.clientLevelCommands = new ClientLevelCommandProvider();
+			this.clientCommandContext = new ClientCommandContext(this);
+			this.clientCommandProcessor = new CommandProcessor<ClientCommandContext>(
+				ambiguityConsumer: (parent, child, sibling, inputs) => {
+					Logger.LogFatal(new AmbiguousCommandException(parent.UsageText, child.UsageText, sibling.UsageText, inputs));
+				},
+				contextSupplier: () => this.clientCommandContext
+			);
+			this.commandLine = new CommandLine(this.clientCommandProcessor, this);
 			this.metricsHud = new MetricsHUD(this.debugMetricsService, this);
 			this.uiHandler = new UIHandler(this.commandLine, this.logConsole, this.metricsHud);
 
@@ -392,9 +395,8 @@ namespace SoulboundEngine.UnityClient {
 					this.activeWorldScreen = new WorldScreen(this.player.GetInventory(), this.itemRenderManager);
 					this.uiHandler.PushScreen(this.activeWorldScreen);
 
-					this.runtimeDataProvider.SetWorldSessionState(session, this.player);
-					this.runtimeExecutionServices.SetWorldSessionState(session, this.player);
-					this.commandProcessor.RegisterProvider(this.worldSessionCommands);
+					this.clientCommandContext.SetLevel(session.level);
+					this.clientCommandProcessor.AddProvider(this.clientLevelCommands);
 
 					// PROTOTYPICAL
 					AudioManager.RebuildPools();
@@ -422,9 +424,8 @@ namespace SoulboundEngine.UnityClient {
 					this.activeWorldScreen = null;
 					this.uiHandler.PushScreen(new TitleScreen(this));
 
-					this.runtimeDataProvider.ExitWorldSessionState();
-					this.runtimeExecutionServices.ExitWorldSessionState();
-					this.commandProcessor.UnregisterProvider(this.worldSessionCommands);
+					this.clientCommandContext.SetLevel(null);
+					this.clientCommandProcessor.RemoveProvider(this.clientLevelCommands);
 
 					// PROTOTYPICAL
 					AudioManager.RebuildPools();

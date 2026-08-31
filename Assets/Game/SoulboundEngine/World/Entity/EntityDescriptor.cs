@@ -31,6 +31,8 @@ namespace SoulboundEngine.World.Entity {
 
 		public abstract AttributeSupplier GetAttributes();
 
+		public abstract bool CanSpawnByCommand();
+
 		public Entity? Create(Level level) {
 			return this.CreateBoxed(level, Vec2d.ZERO);
 		}
@@ -41,13 +43,21 @@ namespace SoulboundEngine.World.Entity {
 		private readonly EntityDimensions dimensions;
 		private readonly EntityCategory category;
 		private readonly AttributeSupplier attributes;
+		private readonly bool canSpawnByCommand;
 		private readonly EntityFactory factory;
 
-		protected EntityDescriptor(EntityFactory factory, EntityDimensions dimensions, EntityCategory category, AttributeSupplier attributes) {
+		protected EntityDescriptor(
+			EntityFactory factory,
+			EntityDimensions dimensions,
+			EntityCategory category,
+			AttributeSupplier attributes,
+			bool canSpawnByCommand
+		) {
 			this.factory = factory;
 			this.dimensions = dimensions;
 			this.category = category;
 			this.attributes = attributes;
+			this.canSpawnByCommand = canSpawnByCommand;
 		}
 
 		public E? Create(Level level, Vec2d pos) {
@@ -70,11 +80,14 @@ namespace SoulboundEngine.World.Entity {
 
 		public override AttributeSupplier GetAttributes() => this.attributes;
 
+		public override bool CanSpawnByCommand() => this.canSpawnByCommand;
+
 		public sealed class Builder {
 			private EntityDimensions dimensions = EntityDimensions.Scalable(Entity.DEFAULT_BB_WIDTH, Entity.DEFAULT_BB_HEIGHT);
 			private readonly EntityFactory factory;
 			private readonly EntityCategory category;
 			private readonly AttributeSupplier attributes;
+			private bool canSpawnByCommand = true;
 
 			private Builder(EntityFactory factory, EntityCategory category, AttributeSupplier attributes) {
 				this.factory = factory;
@@ -95,8 +108,13 @@ namespace SoulboundEngine.World.Entity {
 				return this;
 			}
 
+			public Builder CannotSpawnByCommand() {
+				this.canSpawnByCommand = false;
+				return this;
+			}
+
 			public EntityDescriptor<E> Build() {
-				return new EntityDescriptor<E>(this.factory, this.dimensions, this.category, this.attributes);
+				return new EntityDescriptor<E>(this.factory, this.dimensions, this.category, this.attributes, this.canSpawnByCommand);
 			}
 		}
 	}

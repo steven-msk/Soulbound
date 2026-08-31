@@ -53,7 +53,6 @@ namespace SoulboundEngine.Registry {
 
 		public static bool TryFromCommandInput(IStringReader reader, out Identifier identifier) {
 			string path;
-
 			string _namespace = reader.ReadUnquotedString();
 
 			if (reader.CanRead() && reader.Peek() == NAMESPACE_SEPARATOR) {

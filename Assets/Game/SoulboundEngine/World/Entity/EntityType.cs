@@ -6,11 +6,15 @@ namespace SoulboundEngine.World.Entity {
 
 	public static class EntityType {
 		public static readonly EntityDescriptor<PlayerEntity> PLAYER = Register("player", 
-			EntityDescriptor<PlayerEntity>.Builder.OfNothing(EntityCategory.PLAYER, PlayerEntity.CreateDefaultAttributes().Build())
+			EntityDescriptor<PlayerEntity>.Builder.OfNothing(
+				EntityCategory.PLAYER, PlayerEntity.CreateDefaultAttributes().Build()
+			).CannotSpawnByCommand()
 		);
 		public static readonly EntityDescriptor<ItemEntity> ITEM = Register("item", 
-			EntityDescriptor<ItemEntity>.Builder.Of(EntityCategory.OTHER, ItemEntity.Create, ItemEntity.CreateDefaultAttributes().Build())
-				.Sized(1.0d, 1.0d)
+			EntityDescriptor<ItemEntity>.Builder.Of(
+				EntityCategory.OTHER, ItemEntity.Create, ItemEntity.CreateDefaultAttributes().Build()
+			).CannotSpawnByCommand()
+			.Sized(1.0d, 1.0d)
 		);
 
 		private static EntityDescriptor<E> Register<E>(string id, EntityDescriptor<E>.Builder builder) where E : Entity {

@@ -3,6 +3,7 @@ namespace SoulboundEngine.UnityClient.Debug {
 	using Brigadier.NET.Exceptions;
 	using Brigadier.NET.Suggestion;
 	using Cysharp.Threading.Tasks;
+	using SoulboundEngine.Command;
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.UnityClient.Assets;
 	using SoulboundEngine.UnityClient.Debug.Command;
@@ -32,7 +33,7 @@ namespace SoulboundEngine.UnityClient.Debug {
 		private static readonly Identifier OUTPUT_TEXT_ELEMENT = Identifier.Of("soulbound:command_output/output_text");
 		private const int MAX_OUTPUT_COUNT = 30;
 		private static readonly Color DEFAULT_OUTPUT_COLOR = new(0.8f, 0.8f, 0.8f, 1f);
-		private readonly CommandProcessor commandProcessor;
+		private readonly CommandProcessor<ClientCommandContext> commandProcessor;
 		private readonly List<string> historyCache = new();
 		private readonly HashSet<string> history = new();
 		private readonly List<CommandOutput> outputHistory = new();
@@ -57,7 +58,7 @@ namespace SoulboundEngine.UnityClient.Debug {
 			KeyCode.UpArrow, KeyCode.DownArrow, KeyCode.Tab, KeyCode.Return, KeyCode.KeypadEnter, KeyCode.Escape
 		};
 
-		public CommandLine(CommandProcessor commandProcessor, SoulboundUnityClient client) {
+		public CommandLine(CommandProcessor<ClientCommandContext> commandProcessor, SoulboundUnityClient client) {
 			this.client = client;
 			this.commandProcessor = commandProcessor;
 			this.keyboard = client.InputManager.keyboard;
@@ -189,7 +190,7 @@ namespace SoulboundEngine.UnityClient.Debug {
 				this.ClearAndDisableCompletions();
 			}
 
-			ParseResults<RuntimeCommandSource> parseResults = this.commandProcessor.Parse(this.GetCommand());
+			ParseResults<ClientCommandContext> parseResults = this.commandProcessor.Parse(this.GetCommand());
 			if (parseResults.Context.Nodes.Count > 0) {
 				List<string> usages = this.commandProcessor.GetSmartUsages(parseResults.Context.Nodes.Last().Node).Values.ToList();
 				this.currentUsages = usages;
@@ -305,7 +306,7 @@ namespace SoulboundEngine.UnityClient.Debug {
 		}
 
 		public void ShowCompletions(string value, int caretPos) {
-			this.commandProcessor.GetCompletions(value, caretPos)
+			this.commandProcessor.GetCompletions(value, caretPos).AsUniTask()
 				.ContinueWith(suggestions => {
 					this.completionManager.SetCompletions(suggestions.List);
 					this.completionList.itemsSource = suggestions.List;

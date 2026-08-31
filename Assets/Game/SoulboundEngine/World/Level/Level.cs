@@ -12,7 +12,6 @@ namespace SoulboundEngine.World.Level {
 	using SoulboundEngine.World.Physics;
 	using SoulboundEngine.World.Player;
 	using SoulboundEngine.World.Serialization;
-	using SoulboundEngine.World.Services;
 	using SoulboundEngine.World.Widget;
 	using System;
 	using System.Collections.Generic;
@@ -20,7 +19,7 @@ namespace SoulboundEngine.World.Level {
 
 #nullable enable
 
-	public sealed class Level : IHeightLimitView, ILevelExecutionService, IEntityManager {
+	public sealed class Level : IHeightLimitView, IEntityManager {
 		public const int CHUNK_LENGTH = SharedConstants.CHUNK_WIDTH;
 		public const int WORLD_HEIGHT = 1024;
 		public const int MIN_Y = -WORLD_HEIGHT / 2;
@@ -48,7 +47,6 @@ namespace SoulboundEngine.World.Level {
 
 		private readonly HashSet<BlockPos> tickingBlocks = new();
 		private readonly Dictionary<Guid, Entity> entities = new();
-		private readonly List<ITickingEntity> tickingEntities = new();
 		private readonly Dictionary<BlockPos, List<WorldWidgetHandler>> widgets = new();
 
 		public Level(int seed, RecipeManager recipeManager, ChunkGenerator chunkGenerator, int chunkRadius, ChunkStorage chunkStorage) {
@@ -158,10 +156,6 @@ namespace SoulboundEngine.World.Level {
 			entity.OnAdd(guid);
 			entity.SetAlive(true);
 			this.entities[guid] = entity;
-
-			if (entity is ITickingEntity ticking) {
-				this.tickingEntities.Add(ticking);
-			}
 			entityAdded?.Invoke(entity);
 		}
 
@@ -170,26 +164,33 @@ namespace SoulboundEngine.World.Level {
 
 			this.entities.Remove(entity.guid);
 			entity.Dispose();
-
-			if (entity is ITickingEntity ticking) {
-				this.tickingEntities.Remove(ticking);
-			}
 			entityRemoved?.Invoke(entity);
 		}
 
-		public void SpawnEntity<E>(EntityDescriptor<E> descriptor, Vec2d pos) where E : Entity {
+		public bool SpawnEntity<E>(EntityDescriptor<E> descriptor, Vec2d pos) where E : Entity {
 			E? entity = descriptor.Create(this, pos);
-			if (entity != null) this.AddNewEntity(entity);
+			if (entity != null) {
+				this.AddNewEntity(entity);
+				return true;
+			}
+			return false;
 		}
 
-		void ILevelExecutionService.SpawnEntity(EntityDescriptor descriptor, Vec2d pos) {
-			Entity? entity = descriptor.CreateBoxed(this, pos);
-			if (entity != null) this.AddNewEntity(entity);
+		public bool SpawnEntity(EntityDescriptor descriptor, Vec2d pos) {
+			Entity? entity = descriptor.Create(this);
+			if (entity != null) {
+				entity.SetPos(pos);
+				this.AddNewEntity(entity);
+				return true;
+			}
+			return false;
 		}
 
 		public bool TryGetEntity(Guid guid, out Entity entity) {
 			return this.entities.TryGetValue(guid, out entity);
 		}
+
+		public Entity? GetEntity(Guid guid) => this.entities.GetValueOrDefault(guid);
 
 		/// <summary> Tries to get the closest entity at <c>worldPos</c> </summary>
 		public bool TryGetEntityAt(Vec2d worldPos, out Entity entity) {
