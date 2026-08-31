@@ -30,6 +30,7 @@ namespace SoulboundEngine.World.Entity {
 		private readonly EntityDimensions dimensions;
 		protected readonly IRandom random = RandomProvider.CreateWithUniqueSeed();
 		private readonly AttributeMap attributes;
+		private readonly TimedModifierManager timedModifierManager;
 		private readonly EntityEquipment equipment;
 		private readonly Dictionary<EquipmentSlot, ItemStack> lastEquipmentStacks = Collections.Dictionary(
 			() => EquipmentSlot.VALUES, _ => ItemStack.EMPTY
@@ -52,6 +53,7 @@ namespace SoulboundEngine.World.Entity {
 			this.level = level;
 			this.dimensions = descriptor.GetDimensions();
 			this.attributes = new AttributeMap(descriptor.GetAttributes());
+			this.timedModifierManager = new TimedModifierManager(this.attributes);
 			this.equipment = this.CreateEquipment();
 			this.SetPos(0.0d, 0.0d);
 		}
@@ -84,6 +86,9 @@ namespace SoulboundEngine.World.Entity {
 
 		public void DefaultTick() {
 			this.CalculateSpeed();
+			this.UpdateDirtyAttributes();
+			this.timedModifierManager.Tick();
+
 			this.inBlockState = null;
 			this.firstTick = false;
 
@@ -348,6 +353,21 @@ namespace SoulboundEngine.World.Entity {
 
 		public double GetAttributeBaseValue(RegistryEntry<AttributeType> attribute) {
 			return this.GetAttributes().GetBaseValue(attribute);
+		}
+
+		public void AddTimedAttributeModifier(RegistryEntry<AttributeType> attribute, AttributeModifier modifier, int durationTicks) {
+			this.timedModifierManager.Add(attribute, modifier, durationTicks);
+		}
+
+		private void UpdateDirtyAttributes() {
+			HashSet<AttributeInstance> attributesToUpdate = this.GetAttributes().GetAttributesToUpdate();
+			foreach (AttributeInstance attributeInstance in attributesToUpdate) {
+				this.OnAttributeUpdated(attributeInstance.GetAttribute());
+			}
+			attributesToUpdate.Clear();
+		}
+
+		protected virtual void OnAttributeUpdated(RegistryEntry<AttributeType> attribute) {
 		}
 
 		protected virtual EntityEquipment CreateEquipment() {

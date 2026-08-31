@@ -17,7 +17,6 @@
 			this.attributesToUpdate.Add(instance);
 		}
 
-
 		public HashSet<AttributeInstance> GetAttributesToUpdate() => this.attributesToUpdate;
 
 		public AttributeInstance? GetInstance(RegistryEntry<AttributeType> attribute) {

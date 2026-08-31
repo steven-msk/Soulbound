@@ -34,6 +34,10 @@ namespace SoulboundEngine.Registry {
 			return this.key.value.Equals(key.value) && this.key.registry.Equals(key.registry);
 		}
 
+		public bool Matches(RegistryEntry<T> entry) {
+			return this.MatchesKey(entry.key) && this.value.Equals(entry.value);
+		}
+
 		public override int GetHashCode() => HashCode.Combine(this.owner, this.key, this.value);
 
 		public override string ToString() {
