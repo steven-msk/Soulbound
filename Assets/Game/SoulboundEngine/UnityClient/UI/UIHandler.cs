@@ -1,12 +1,12 @@
-using SoulboundEngine.UnityClient.Debug;
-using SoulboundEngine.UnityClient.Debug.Logging.Console;
-using SoulboundEngine.UnityClient.Debug.Metrics.View;
-using SoulboundEngine.UnityClient.UI.Screen;
-using UnityEngine.UIElements;
-
 #nullable enable
 
 namespace SoulboundEngine.UnityClient.UI {
+	using SoulboundEngine.UnityClient.Debug;
+	using SoulboundEngine.UnityClient.Debug.Logging.Console;
+	using SoulboundEngine.UnityClient.Debug.Metrics.View;
+	using SoulboundEngine.UnityClient.UI.Screen;
+	using UnityEngine.UIElements;
+
 	public sealed class UIHandler {
 		private ScreenManager screenManager = null!;
 		private UXMLScreenRoot screenRoot = null!;
@@ -57,6 +57,8 @@ namespace SoulboundEngine.UnityClient.UI {
 
 		public void PushInputFocus(IInputFocusable focus) => this.screenManager.PushInputFocus(focus);
 		public void PopInputFocus(IInputFocusable focus) => this.screenManager.PopInputFocus(focus);
+
+		public void Tick() => this.screenManager.Tick();
 
 		public void FlushScreens() => this.screenManager.Flush();
 	}

@@ -305,10 +305,7 @@ namespace SoulboundEngine.UnityClient {
 		public void Close() => UnityEngine.Application.Quit();
 
 		private void HandleInputTick() {
-			// known issue: screen key presses are desynced with this method
-			// due to UIToolkit dispatching input the frame it was invoked
-			bool hasKeyboardFocus = this.uiHandler.HasKeyboardFocus();
-			bool isPointerOverUI = this.uiHandler.IsPointerOverUI();
+			this.uiHandler.Tick();
 			this.metricsHud.Tick();
 			this.commandLine.Tick();
 			this.logConsole.Tick();
@@ -317,6 +314,8 @@ namespace SoulboundEngine.UnityClient {
 				LevelManager levelManager = worldSession.levelManager;
 				Level level = worldSession.level;
 				bool isPaused = worldSession.levelManager.paused;
+				bool hasKeyboardFocus = this.uiHandler.HasKeyboardFocus();
+				bool isPointerOverUI = this.uiHandler.IsPointerOverUI();
 
 				PlayerEntity player = level.GetPlayer();
 				this.clientPlayerInputHandler.Handle(player,

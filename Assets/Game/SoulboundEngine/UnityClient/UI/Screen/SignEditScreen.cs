@@ -1,10 +1,12 @@
 ﻿namespace SoulboundEngine.UnityClient.UI.Screen {
+	using SoulboundEngine.Registry;
 	using SoulboundEngine.UnityClient.Assets;
 	using SoulboundEngine.UnityClient.UI.UXMLBindings;
 	using SoulboundEngine.UnityClient.World;
-	using SoulboundEngine.Registry;
 	using SoulboundEngine.World.Block.Entity;
+	using UnityEngine.InputSystem;
 	using UnityEngine.UIElements;
+	using Keyboard = Input.Keyboard;
 
 	public class SignEditScreen : UXMLScreen {
 		private static readonly Identifier TEXT_FIELD_ELEMENT = Identifier.Of("soulbound:sign_edit_screen/text_field");
@@ -13,7 +15,6 @@
 		private readonly SignTileEntity signEntity;
 		private readonly ClientPlayerEntity player;
 		private readonly string originalText;
-		private VisualElement root;
 		private TextField textField;
 
 		public override bool CloseOnEsc => false;
@@ -27,9 +28,6 @@
 		}
 
 		protected override void OnBind(VisualElement root) {
-			this.root = root;
-			root.RegisterCallback<KeyDownEvent>(this.KeyPressed, TrickleDown.TrickleDown);
-
 			this.textField = root.Get<TextField>(TEXT_FIELD_ELEMENT);
 			this.textField.RegisterValueChangedCallback(evt => {
 				this.signEntity.SetText(evt.newValue);
@@ -46,8 +44,8 @@
 
 		public override bool HasKeyboardFocus() => true;
 
-		private void KeyPressed(KeyDownEvent evt) {
-			if (evt.keyCode == UnityEngine.KeyCode.Escape) {
+		public override void Tick() {
+			if (SoulboundUnityClient.Instance.InputManager.keyboard.WasPressed(Keyboard.GetControl(Key.Escape))) {
 				this.Cancel();
 			}
 		}
@@ -63,11 +61,6 @@
 
 		private void Done() {
 			this.player.CloseSignEditScreen();
-		}
-
-		public override void OnDispose(IScreenHandle handle) {
-			base.OnDispose(handle);
-			this.root.UnregisterCallback<KeyDownEvent>(this.KeyPressed);
 		}
 	}
 }

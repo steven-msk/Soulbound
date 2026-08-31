@@ -115,6 +115,10 @@ namespace SoulboundEngine.UnityClient.UI.Screen {
 			}
 		}
 
+		public void Tick() {
+			this.GetActiveScreen()?.Tick();
+		}
+
 		public void PushInputFocus(IInputFocusable focus) {
 			this.focusStack.Push(focus);
 			Keyboard.ReleaseAll();
