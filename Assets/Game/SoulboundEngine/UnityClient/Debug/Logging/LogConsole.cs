@@ -1,6 +1,5 @@
 namespace SoulboundEngine.UnityClient.Debug.Logging.Console {
 	using SoulboundEngine.Common;
-	using SoulboundEngine.Registry;
 	using SoulboundEngine.UnityClient.Assets;
 	using SoulboundEngine.UnityClient.Settings;
 	using SoulboundEngine.UnityClient.UI;
@@ -14,14 +13,14 @@ namespace SoulboundEngine.UnityClient.Debug.Logging.Console {
 	using Color = UnityEngine.Color;
 
 	public sealed class LogConsole : UXMLWidget, IInputFocusable {
-		private static readonly Identifier LOG_LIST_ELEMENT = Identifier.Of("soulbound:log_console/log_list");
-		private static readonly Identifier LOG_LABEL_ELEMENT = Identifier.Of("soulbound:log_entry/log_label");
-		private static readonly Identifier FILTER_INFO_ELEMENT = Identifier.Of("soulbound:log_console/info_filter");
-		private static readonly Identifier FILTER_WARNING_ELEMENT = Identifier.Of("soulbound:log_console/warning_filter");
-		private static readonly Identifier FILTER_ERROR_ELEMENT = Identifier.Of("soulbound:log_console/error_filter");
-		private static readonly Identifier FILTER_FATAL_ELEMENT = Identifier.Of("soulbound:log_console/fatal_filter");
-		private static readonly Identifier CLEAR_LOGS_ELEMENT = Identifier.Of("soulbound:log_console/clear");
-		private static readonly Identifier USAGE_ELEMENT = Identifier.Of("soulbound:log_console/memory_usage");
+		private static readonly UXMLBinding<ListView> LOG_LIST_ELEMENT = new("soulbound:log_console/log_list");
+		private static readonly UXMLBinding<Label> LOG_LABEL_ELEMENT = new("soulbound:log_entry/log_label");
+		private static readonly UXMLBinding<Button> FILTER_INFO_ELEMENT = new("soulbound:log_console/info_filter");
+		private static readonly UXMLBinding<Button> FILTER_WARNING_ELEMENT = new("soulbound:log_console/warning_filter");
+		private static readonly UXMLBinding<Button> FILTER_ERROR_ELEMENT = new("soulbound:log_console/error_filter");
+		private static readonly UXMLBinding<Button> FILTER_FATAL_ELEMENT = new("soulbound:log_console/fatal_filter");
+		private static readonly UXMLBinding<Button> CLEAR_LOGS_ELEMENT = new("soulbound:log_console/clear");
+		private static readonly UXMLBinding<Label> USAGE_ELEMENT = new("soulbound:log_console/memory_usage");
 		private const int MAX_ENTRIES_PER_FRAME = 3;
 		private const float FILTERED_ALPHA = 0.65f;
 		private readonly List<DisplayedLogEntry> logs = new();
@@ -71,10 +70,10 @@ namespace SoulboundEngine.UnityClient.Debug.Logging.Console {
 		public override void OnBind(VisualElement root) {
 			base.OnBind(root);
 
-			this.logList = root.Get<ListView>(LOG_LIST_ELEMENT);
+			this.logList = LOG_LIST_ELEMENT.Get(root);
 			this.logList.bindItem = this.OnLogAdded;
 			this.logList.itemsSource = this.logs;
-			this.memoryUsageLabel = root.Get<Label>(USAGE_ELEMENT);
+			this.memoryUsageLabel = USAGE_ELEMENT.Get(root);
 			this.memoryUsageFormat = this.memoryUsageLabel.text;
 
 			static void SetBgColor(Button button, bool isOn) {
@@ -83,31 +82,31 @@ namespace SoulboundEngine.UnityClient.Debug.Logging.Console {
 				button.style.backgroundColor = color;
 			}
 
-			Button filterInfo = root.Get<Button>(FILTER_INFO_ELEMENT);
+			Button filterInfo = FILTER_INFO_ELEMENT.Get(root);
 			filterInfo.clicked += () => {
 				this.ToggleFilter(LogFilter.INFO);
 				SetBgColor(filterInfo, this.IsVisible(LogFilter.INFO));
 			};
 
-			Button filterWarning = root.Get<Button>(FILTER_WARNING_ELEMENT);
+			Button filterWarning = FILTER_WARNING_ELEMENT.Get(root);
 			filterWarning.clicked += () => {
 				this.ToggleFilter(LogFilter.WARNING);
 				SetBgColor(filterWarning, this.IsVisible(LogFilter.WARNING));
 			};
 
-			Button filterError = root.Get<Button>(FILTER_ERROR_ELEMENT);
+			Button filterError = FILTER_ERROR_ELEMENT.Get(root);
 			filterError.clicked += () => {
 				this.ToggleFilter(LogFilter.ERROR);
 				SetBgColor(filterError, this.IsVisible(LogFilter.ERROR));
 			};
 
-			Button filterFatal = root.Get<Button>(FILTER_FATAL_ELEMENT);
+			Button filterFatal = FILTER_FATAL_ELEMENT.Get(root);
 			filterFatal.clicked += () => {
 				this.ToggleFilter(LogFilter.FATAL);
 				SetBgColor(filterFatal, this.IsVisible(LogFilter.FATAL));
 			};
 
-			Button clear = root.Get<Button>(CLEAR_LOGS_ELEMENT);
+			Button clear = CLEAR_LOGS_ELEMENT.Get(root);
 			clear.clicked += this.Clear;
 		}
 
@@ -134,7 +133,7 @@ namespace SoulboundEngine.UnityClient.Debug.Logging.Console {
 			DisplayedLogEntry entry = this.logs[index];
 			entry.element = element;
 			this.logs[index] = entry;
-			Label label = element.Get<Label>(LOG_LABEL_ELEMENT);
+			Label label = LOG_LABEL_ELEMENT.Get(element);
 			label.text = entry.entry.condition + this.AddStackTrace(entry.entry);
 			label.style.unityFontStyleAndWeight = FontStyle.Normal;
 

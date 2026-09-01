@@ -1,12 +1,11 @@
-using SoulboundEngine.UnityClient.UI.UXMLBindings;
-using SoulboundEngine.Common.Math;
-using SoulboundEngine.Registry;
-using UnityEngine;
-using UnityEngine.UIElements;
+namespace SoulboundEngine.UnityClient.Render.Item {
+	using SoulboundEngine.Common.Math;
+	using System;
+	using UnityEngine;
+	using UnityEngine.UIElements;
 
 #nullable enable
 
-namespace SoulboundEngine.UnityClient.Render.Item {
 	public abstract class ItemRenderContext {
 
 		public sealed class UGUI : ItemRenderContext {
@@ -14,21 +13,21 @@ namespace SoulboundEngine.UnityClient.Render.Item {
 		}
 
 		public sealed class UXML : ItemRenderContext {
-			public readonly Identifier itemDisplayElement;
-			public readonly Identifier stackCountElement;
-			public readonly VisualElement root;
+			private readonly VisualElement root;
+			private readonly Func<VisualElement, VisualElement> displayElementSupplier;
+			private readonly Func<VisualElement, Label> countElementSupplier;
 
-			public UXML(VisualElement root, Identifier itemDisplayElement, Identifier stackCountElement) {
+			public UXML(VisualElement root, Func<VisualElement, VisualElement> displayElementSupplier, Func<VisualElement, Label> countElementSupplier) {
 				this.root = root;
-				this.itemDisplayElement = itemDisplayElement;
-				this.stackCountElement = stackCountElement;
+				this.displayElementSupplier = displayElementSupplier;
+				this.countElementSupplier = countElementSupplier;
 			}
 
-			public VisualElement GetItemDisplay() { 
-				return this.root.Get<VisualElement>(this.itemDisplayElement);
-			}
+			public VisualElement GetItemDisplay() => this.displayElementSupplier(this.root);
 
-			public Label GetStackCount() => this.root.Get<Label>(this.stackCountElement);
+			public Label GetStackCount() => this.countElementSupplier(this.root);
+
+			public VisualElement GetRoot() => this.root;
 
 			public void SetVisible(VisualElement visualElement, bool visible) {
 				visualElement.style.visibility = visible ? Visibility.Visible : Visibility.Hidden;

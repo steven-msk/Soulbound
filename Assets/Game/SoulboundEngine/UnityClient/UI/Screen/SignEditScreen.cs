@@ -1,5 +1,4 @@
 ﻿namespace SoulboundEngine.UnityClient.UI.Screen {
-	using SoulboundEngine.Registry;
 	using SoulboundEngine.UnityClient.Assets;
 	using SoulboundEngine.UnityClient.UI.UXMLBindings;
 	using SoulboundEngine.UnityClient.World;
@@ -9,9 +8,9 @@
 	using Keyboard = Input.Keyboard;
 
 	public class SignEditScreen : UXMLScreen {
-		private static readonly Identifier TEXT_FIELD_ELEMENT = Identifier.Of("soulbound:sign_edit_screen/text_field");
-		private static readonly Identifier CANCEL_ELEMENT = Identifier.Of("soulbound:sign_edit_screen/cancel");
-		private static readonly Identifier DONE_ELEMENT = Identifier.Of("soulbound:sign_edit_screen/done");
+		private static readonly UXMLBinding<TextField> TEXT_FIELD_ELEMENT = new("soulbound:sign_edit_screen/text_field");
+		private static readonly UXMLBinding<Button> CANCEL_ELEMENT = new("soulbound:sign_edit_screen/cancel");
+		private static readonly UXMLBinding<Button> DONE_ELEMENT = new("soulbound:sign_edit_screen/done");
 		private readonly SignTileEntity signEntity;
 		private readonly ClientPlayerEntity player;
 		private readonly string originalText;
@@ -28,17 +27,17 @@
 		}
 
 		protected override void OnBind(VisualElement root) {
-			this.textField = root.Get<TextField>(TEXT_FIELD_ELEMENT);
+			this.textField = TEXT_FIELD_ELEMENT.Get(root);
 			this.textField.RegisterValueChangedCallback(evt => {
 				this.signEntity.SetText(evt.newValue);
 			});
 			this.textField.value = this.originalText;
 			this.CaptureFocus(this.textField);
 
-			Button cancelButton = root.Get<Button>(CANCEL_ELEMENT);
+			Button cancelButton = CANCEL_ELEMENT.Get(root);
 			cancelButton.clicked += this.Cancel;
 
-			Button doneButton = root.Get<Button>(DONE_ELEMENT);
+			Button doneButton = DONE_ELEMENT.Get(root);
 			doneButton.clicked += this.Done;
 		}
 

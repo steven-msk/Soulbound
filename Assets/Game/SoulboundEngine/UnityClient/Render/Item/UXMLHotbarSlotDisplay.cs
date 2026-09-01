@@ -1,15 +1,14 @@
-﻿using SoulboundEngine.Item.Container;
-using SoulboundEngine.UnityClient.UI.UXMLBindings;
-using SoulboundEngine.Registry;
-using System;
-using UnityEngine;
-using UnityEngine.UIElements;
+﻿namespace SoulboundEngine.UnityClient.Render.Item {
+	using SoulboundEngine.Item.Container;
+	using SoulboundEngine.UnityClient.UI.UXMLBindings;
+	using System;
+	using UnityEngine;
+	using UnityEngine.UIElements;
 
-namespace SoulboundEngine.UnityClient.Render.Item {
 	public class UXMLHotbarSlotDisplay : UXMLItemSlotDisplay {
-		private static readonly Identifier DISPLAY_AREA_ELEMENT = Identifier.Of("soulbound:hotbar_slot/display_area");
-		private static readonly Identifier SLOT_INDEX_ELEMENT = Identifier.Of("soulbound:hotbar_slot/slot_index");
-		private static readonly Identifier DURABILITY_BAR_ELEMENT = Identifier.Of("soulbound:hotbar_slot/durability_bar");
+		private static readonly UXMLBinding<VisualElement> DISPLAY_AREA_ELEMENT = new("soulbound:hotbar_slot/display_area");
+		private static readonly UXMLBinding<Label> SLOT_INDEX_ELEMENT = new("soulbound:hotbar_slot/slot_index");
+		private static readonly UXMLBinding<ProgressBar> DURABILITY_BAR_ELEMENT = new("soulbound:hotbar_slot/durability_bar");
 		private bool isMainSlot;
 		private static readonly Color[] mainSlotBorders = {
 			Color.white, Color.white, Color.white, Color.white
@@ -26,10 +25,10 @@ namespace SoulboundEngine.UnityClient.Render.Item {
 		}
 
 		protected override void Prepare() {
-			this.root.Get<Label>(SLOT_INDEX_ELEMENT).text = (this.slot.GetIndex() + 1).ToString();
+			SLOT_INDEX_ELEMENT.Get(this.root).text = (this.slot.GetIndex() + 1).ToString();
 		}
 
-		protected override Identifier GetDurabilityBarId() => DURABILITY_BAR_ELEMENT;
+		protected override ProgressBar GetDurabilityBar(VisualElement root) => DURABILITY_BAR_ELEMENT.Get(root);
 
 		public override void SetAsMainSlot() {
 			if (this.isMainSlot) return;
@@ -44,7 +43,7 @@ namespace SoulboundEngine.UnityClient.Render.Item {
 		}
 
 		private void SetBorders(Color[] borders) {
-			VisualElement displayArea = this.root.Get<VisualElement>(DISPLAY_AREA_ELEMENT);
+			VisualElement displayArea = DISPLAY_AREA_ELEMENT.Get(this.root);
 			displayArea.style.borderTopColor = borders[0];
 			displayArea.style.borderRightColor = borders[1];
 			displayArea.style.borderBottomColor = borders[2];
@@ -52,10 +51,7 @@ namespace SoulboundEngine.UnityClient.Render.Item {
 		}
 
 		private static Color GetColorFromHex(string hex) {
-			if (!ColorUtility.TryParseHtmlString(hex, out Color color)) {
-				throw new ArgumentException("Unknown color hex: " + hex);
-			}
-			return color;
+			return !ColorUtility.TryParseHtmlString(hex, out Color color) ? throw new ArgumentException("Unknown color hex: " + hex) : color;
 		}
 	}
 }

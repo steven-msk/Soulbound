@@ -1,14 +1,13 @@
-using SoulboundEngine.Item.Container;
-using SoulboundEngine.World.Player;
-using SoulboundEngine.UnityClient.Render.Item;
-using SoulboundEngine.UnityClient.UI.UXMLBindings;
-using SoulboundEngine.UnityClient.Assets;
-using SoulboundEngine.Registry;
-using UnityEngine.UIElements;
-
 namespace SoulboundEngine.UnityClient.UI.Screen {
+	using SoulboundEngine.Item.Container;
+	using SoulboundEngine.UnityClient.Assets;
+	using SoulboundEngine.UnityClient.Render.Item;
+	using SoulboundEngine.UnityClient.UI.UXMLBindings;
+	using SoulboundEngine.World.Player;
+	using UnityEngine.UIElements;
+
 	public sealed class WorldScreen : UXMLScreen {
-		private static readonly Identifier HOTBAR_ELEMENT = Identifier.Of("soulbound:hotbar/hotbar");
+		private static readonly UXMLBinding<VisualElement> HOTBAR_ELEMENT = new("soulbound:hotbar/hotbar");
 		private readonly ItemRenderManager itemRenderManager;
 		private readonly PlayerInventory playerInventory;
 		private UXMLHotbarSlotDisplay[] hotbarDisplays;
@@ -23,14 +22,14 @@ namespace SoulboundEngine.UnityClient.UI.Screen {
 		public override bool CloseOnEsc => false;
 
 		protected override void OnBind(VisualElement root) {
-			this.hotbarRoot = root.Get<VisualElement>(HOTBAR_ELEMENT);
+			this.hotbarRoot = HOTBAR_ELEMENT.Get(root);
 			this.BindHotbar(this.hotbarRoot);
 		}
 
 		private void BindHotbar(VisualElement hotbarRoot) {
 			this.hotbarDisplays = new UXMLHotbarSlotDisplay[PlayerInventory.HOTBAR_SIZE];
 
-			foreach (var slotIndex in this.playerInventory.GetHotbar()) {
+			foreach (int slotIndex in this.playerInventory.GetHotbar()) {
 				IItemSlot slot = this.playerInventory.GetSlot(slotIndex);
 				VisualElement slotElement = hotbarRoot[slotIndex];
 

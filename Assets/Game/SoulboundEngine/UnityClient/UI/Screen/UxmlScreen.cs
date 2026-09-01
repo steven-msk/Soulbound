@@ -1,14 +1,13 @@
-﻿using SoulboundEngine.UnityClient.UI.UXMLBindings;
-using SoulboundEngine.UnityClient.Assets;
-using SoulboundEngine.Registry;
-using System;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UIElements;
+﻿namespace SoulboundEngine.UnityClient.UI.Screen {
+	using SoulboundEngine.UnityClient.Assets;
+	using SoulboundEngine.UnityClient.UI.UXMLBindings;
+	using System;
+	using System.Collections.Generic;
+	using UnityEngine;
+	using UnityEngine.UIElements;
 
-namespace SoulboundEngine.UnityClient.UI.Screen {
 	public abstract class UXMLScreen : Screen {
-		protected static readonly Identifier TOOLTIP_LABEL_ELEMENT = Identifier.Of("soulbound:tooltip/text");
+		protected static readonly UXMLBinding<Label> TOOLTIP_LABEL_ELEMENT = new("soulbound:tooltip/text");
 		private readonly VisualTreeAsset asset;
 		private readonly List<UXMLWidget> widgets = new();
 		private VisualElement root;
@@ -46,7 +45,7 @@ namespace SoulboundEngine.UnityClient.UI.Screen {
 			this.tooltip = tooltipRoot;
 			this.root.Add(tooltipRoot);
 
-			Label tooltipLabel = tooltipRoot.Get<Label>(TOOLTIP_LABEL_ELEMENT);
+			Label tooltipLabel = TOOLTIP_LABEL_ELEMENT.Get(tooltipRoot);
 			tooltipLabel.text = text;
 			this.SetTooltipPosition(this.mousePos);
 		}
@@ -73,7 +72,7 @@ namespace SoulboundEngine.UnityClient.UI.Screen {
 		public override bool HasKeyboardFocus() => false;
 
 		public override void OnDispose(IScreenHandle handle) {
-			foreach (var widget in this.widgets) {
+			foreach (UXMLWidget widget in this.widgets) {
 				widget.Dispose();
 			}
 			this.root.UnregisterCallback<MouseMoveEvent>(this.OnMouseMoved, TrickleDown.TrickleDown);
