@@ -18,6 +18,8 @@
 			return this.IsPresent() ? this.value.Value : throw new InvalidOperationException("No value present");
 		}
 
+		public T? GetAsIs() => this.value;
+
 		public bool IsPresent() => this.value.HasValue;
 
 		public bool IsEmpty() => !this.IsPresent();

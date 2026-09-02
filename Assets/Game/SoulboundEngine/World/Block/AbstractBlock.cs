@@ -22,6 +22,8 @@
 		protected virtual void OnStateReplaced(BlockState state, BlockPos pos, Level level) {
 		}
 
+		public abstract ToolType GetRequiredTool();
+
 		protected virtual bool CanPlaceAt(BlockState blockState, Level level, BlockPos blockPos) {
 			if (level.GetBlock(blockPos) != Blocks.AIR) return false;
 
@@ -140,6 +142,7 @@
 		public sealed class Settings {
 			public RegistryKey<Block> registryKey { get; private set; }
 			public int minBreakLevel { get; private set; } = 0;
+			public ToolType requiredToolType { get; private set; } = ToolType.NONE;
 			public Func<BlockState, List<ItemStack>> droppedStacks { get; private set; } = Block.DropSingle();
 
 			public Settings RegistryKey(RegistryKey<Block> registryKey) {
@@ -159,6 +162,11 @@
 
 			public Settings DropsAir() {
 				this.droppedStacks = Block.DropAir();
+				return this;
+			}
+
+			public Settings RequiresTool(ToolType type) {
+				this.requiredToolType = type;
 				return this;
 			}
 

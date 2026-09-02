@@ -2,6 +2,7 @@ namespace SoulboundEngine.World.Block {
 	using SoulboundEngine.Common.Math;
 	using SoulboundEngine.Item;
 	using SoulboundEngine.Registry;
+	using SoulboundEngine.Serialization;
 	using SoulboundEngine.State;
 	using SoulboundEngine.World.Block.State;
 	using SoulboundEngine.World.Entity;
@@ -13,6 +14,8 @@ namespace SoulboundEngine.World.Block {
 #nullable enable
 
 	public class Block : AbstractBlock {
+		public static readonly Codec<RegistryEntry<Block>> ENTRY_CODEC = RegistryEntry<Block>.GetCodec(Registries.BLOCKS);
+		public static readonly Codec<Block> CODEC = ENTRY_CODEC.Xmap(e => e.GetValue(), Registries.BLOCKS.GetEntry);
 		private static readonly List<BlockState> statesByID = new();
 		private readonly RegistryKey<Block> registryKey;
 		private readonly AbstractBlock.Settings settings;
@@ -25,7 +28,6 @@ namespace SoulboundEngine.World.Block {
 
 			StateManager<Block, BlockState>.Builder builder = new(this);
 			this.AppendProperties(builder);
-
 
 			this.stateManager = builder.Build((owner, propertyMap) => {
 				BlockState state = new(owner, propertyMap);
@@ -68,6 +70,8 @@ namespace SoulboundEngine.World.Block {
 		public static Block GetBlockFrom(Item? item) {
 			return item == null || item is not BlockItem blockItem ? Blocks.AIR : blockItem.GetBlock();
 		}
+
+		public override ToolType GetRequiredTool() => this.settings.requiredToolType;
 
 		public static void DropStacks(BlockState blockState, Level level, BlockPos blockPos, World.Entity.Entity? owner) {
 			List<ItemStack> droppedStacks = GetDroppedStacks(blockState);

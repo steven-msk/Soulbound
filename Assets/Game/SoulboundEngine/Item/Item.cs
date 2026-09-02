@@ -13,7 +13,8 @@ namespace SoulboundEngine.Item {
 #nullable enable
 
 	public class Item : IItemConvertible {
-		public static readonly Codec<Item> CODEC = Identifier.CODEC.FlatXmap<Item>(
+		public static readonly Codec<RegistryEntry<Item>> ENTRY_CODEC = RegistryEntry<Item>.GetCodec(Registries.ITEMS);
+		public static readonly Codec<Item> CODEC = Identifier.CODEC.FlatXmap(
 			encode: i => i.registryKey.value,
 			decode: i => Registries.ITEMS.GetEntry(i) is { } entry
 				? DataResult<Item>.Success(entry.GetValue())
