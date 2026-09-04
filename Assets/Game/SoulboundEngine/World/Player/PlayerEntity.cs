@@ -114,6 +114,7 @@ namespace SoulboundEngine.World.Player {
 		public void SetHoldingRight(bool holding) => this.isHoldingRight = holding;
 
 		public void OnLeftClick() {
+			this.blockBreakManager.Reset();
 			this.PrimaryInteract();
 		}
 

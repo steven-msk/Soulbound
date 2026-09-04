@@ -16,6 +16,8 @@
 			return true;
 		}
 
+		public void Reset() => this.accumulated = 0f;
+
 		public bool Tick(float speed) {
 			this.accumulated += speed;
 			return this.accumulated >= this.target.GetHardness();
