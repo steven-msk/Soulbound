@@ -122,6 +122,13 @@ namespace SoulboundEngine.World.Player {
 			this.SecondaryInteract();
 		}
 
+		public void OnLeftRelease() {
+			this.blockBreakManager.Reset();
+		}
+
+		public void OnRightRelease() {
+		}
+
 		private void DoBlockHover() {
 			Vec2d pointerPos = this.GetWorldPointerPos();
 			BlockPos pointerBlockPos = BlockPos.From(pointerPos);
@@ -316,6 +323,10 @@ namespace SoulboundEngine.World.Player {
 				this.SetMainHandStack(stack);
 			}
 		}
+
+		public float GetBreakProgress() => this.blockBreakManager.GetProgress();
+
+		public BlockPos? GetBlockBreakPos() => this.blockBreakManager.GetBlockPos();
 
 		public void JumpFromGround() {
 			double jumpPower = this.GetJumpPower();
