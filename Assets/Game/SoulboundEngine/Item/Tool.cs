@@ -6,10 +6,10 @@
 	using System.Collections.Generic;
 	using System.Linq;
 
-	public record Tool(List<Tool.Rule> rules, int damagePerBlock) {
+	public record Tool(List<Tool.Rule> rules, int durabilityCost) {
 		public static readonly Codec<Tool> CODEC = RecordCodec<Tool, List<Rule>, int>.Of(
 			Field.Required<Tool, List<Rule>>("rules", Rule.CODEC.ListOf(), t => t.rules),
-			Field.Required<Tool, int>("damagePerBlock", Codecs.INT, t => t.damagePerBlock),
+			Field.Required<Tool, int>("durabilityCost", Codecs.INT, t => t.durabilityCost),
 			(rules, damagePerBlock) => new Tool(rules, damagePerBlock)
 		);
 

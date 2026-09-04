@@ -21,6 +21,7 @@ namespace SoulboundEngine.Item {
 				: DataResult<Item>.Error($"Invalid item id: {i}")
 		);
 		public const int DEFAULT_FULL_STACK = 256;
+		public const float DEFAULT_MINING_SPEED = 1.0f;
 		public static readonly Dictionary<Block, Item> blockItems = new();
 		private readonly RegistryKey<Item> registryKey;
 		private readonly IComponentMap components;
@@ -59,7 +60,7 @@ namespace SoulboundEngine.Item {
 			return this.GetRegistryEntry().GetIdAsString();
 		}
 
-		public int GetBreakLevel() => this.components.GetOrDefault(ItemComponents.BREAK_LEVEL, 0);
+		public virtual ToolPower GetBreakPower() => ToolPower.NONE;
 
 		public virtual void InventoryTick(Level level, Entity owner, ItemStack stack, EquipmentSlot? slot) {
 		}
@@ -174,16 +175,16 @@ namespace SoulboundEngine.Item {
 				return this;
 			}
 
-			public Settings BreakLevel(int breakLevel) {
-				return this.Component(ItemComponents.BREAK_LEVEL, breakLevel);
-			}
-
 			public Settings Attributes(Func<ItemAttributeModifiers.Builder, ItemAttributeModifiers.Builder> builder) {
 				return this.Component(ItemComponents.ATTRIBUTE_MODIFIERS, builder(ItemAttributeModifiers.Create()).Build());
 			}
 
 			public Settings Durability(int durability) {
 				return this.Component(ItemComponents.DURABILITY, durability);
+			}
+
+			public Settings Tool(ToolSettings toolSettings) {
+				return toolSettings.Apply(this);
 			}
 
 			/// <summary>

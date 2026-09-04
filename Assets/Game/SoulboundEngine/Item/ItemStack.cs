@@ -5,6 +5,7 @@ namespace SoulboundEngine.Item {
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.Serialization;
 	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Block.State;
 	using SoulboundEngine.World.Entity;
 	using SoulboundEngine.World.Entity.Attribute;
 	using SoulboundEngine.World.Level;
@@ -227,8 +228,23 @@ namespace SoulboundEngine.Item {
 			modifiers.ForEach(slot, consumer);
 		}
 
-		public readonly int GetBreakLevel() {
-			return this.ComponentsNonNull.GetOrDefault(ItemComponents.BREAK_LEVEL, this.GetItem().GetBreakLevel());
+		public readonly ToolPower GetDefaultBreakPower() {
+			return this.GetItem().GetBreakPower();
+		}
+
+		public readonly float GetMiningSpeed(BlockState blockState) {
+			Tool? tool = this.ComponentsNonNull.GetOrDefault(ItemComponents.TOOL, null!);
+			return tool != null ? tool.GetMiningSpeed(blockState) ?? 0f : Item.DEFAULT_MINING_SPEED;
+		}
+
+		public readonly bool CanMine(BlockState blockState) {
+			Tool? tool = this.ComponentsNonNull.GetOrDefault(ItemComponents.TOOL, null!);
+			return tool != null ? tool.CanMine(blockState) : this.GetDefaultBreakPower().CanMine(blockState.block);
+		}
+
+		public void DamageTool(Entity entity, EquipmentSlot slot) {
+			Tool? tool = this.ComponentsNonNull.GetOrDefault(ItemComponents.TOOL, null!);
+			if (tool != null) this.DamageAndBreak(tool.durabilityCost, entity, slot);
 		}
 
 		public readonly void InventoryTick(Level level, Entity owner, EquipmentSlot? slot) {

@@ -7,7 +7,6 @@ namespace SoulboundEngine.World.Block {
 	using SoulboundEngine.World.Block.State;
 	using SoulboundEngine.World.Entity;
 	using SoulboundEngine.World.Level;
-	using SoulboundEngine.World.Player;
 	using System;
 	using System.Collections.Generic;
 
@@ -63,15 +62,13 @@ namespace SoulboundEngine.World.Block {
 			return BlockShape.FULL;
 		}
 
-		public virtual BlockState OnBreak(Level level, BlockPos blockPos, BlockState blockState, PlayerEntity player) {
-			return Blocks.AIR.DefaultState;
-		}
-
 		public static Block GetBlockFrom(Item? item) {
 			return item == null || item is not BlockItem blockItem ? Blocks.AIR : blockItem.GetBlock();
 		}
 
-		public override ToolType GetRequiredTool() => this.settings.requiredToolType;
+		public override ToolPower GetRequiredToolPower() => this.settings.requiredToolPower;
+
+		public override float GetHardness(BlockState blockState) => this.settings.hardness;
 
 		public static void DropStacks(BlockState blockState, Level level, BlockPos blockPos, World.Entity.Entity? owner) {
 			List<ItemStack> droppedStacks = GetDroppedStacks(blockState);
@@ -96,8 +93,6 @@ namespace SoulboundEngine.World.Block {
 		internal protected static Func<BlockState, List<ItemStack>> DropAir() => _ => {
 			return new List<ItemStack>();
 		};
-
-		public int MinBreakLevel => this.settings.minBreakLevel;
 
 		public string GetTranslationKey() => this.settings.GetTranslationKey();
 

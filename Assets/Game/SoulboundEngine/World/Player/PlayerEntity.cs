@@ -24,6 +24,7 @@ namespace SoulboundEngine.World.Player {
 		private const double PICKUP_RANGE_Y = 0.5d;
 		private const int DROP_PICKUP_DELAY_TICKS = 75;
 		private readonly PlayerInventory inventory;
+		private readonly BlockBreakManager blockBreakManager;
 		private Vec2d screenPointerPos;
 		private ActiveUseContext? activeItemUse;
 		private BlockPos previousPointerBlockPos;
@@ -33,6 +34,7 @@ namespace SoulboundEngine.World.Player {
 		public PlayerEntity(Level level)
 			: base(EntityType.PLAYER, level) {
 			this.inventory = new PlayerInventory(this);
+			this.blockBreakManager = new BlockBreakManager();
 		}
 
 		public new static AttributeSupplier.Builder CreateDefaultAttributes() {
@@ -155,7 +157,9 @@ namespace SoulboundEngine.World.Player {
 					ItemStack.OnPrimaryUseOnEntity, ItemStack.OnPrimaryUseOnBlock, ItemStack.OnPrimaryUse,
 					AbstractBlock.AbstractBlockState.OnPrimaryUse, AbstractBlock.AbstractBlockState.OnPrimaryUseWithItem
 				)) {
-				this.TryBreakBlock(BlockPos.From(this.GetWorldPointerPos()));
+				BlockPos blockPos = BlockPos.From(this.GetWorldPointerPos());
+				ItemStack stack = this.GetMainHandStack();
+				if (this.TryBreakBlock(blockPos, stack)) this.DoBlockBreakTick(blockPos, stack);
 			}
 		}
 
@@ -289,23 +293,26 @@ namespace SoulboundEngine.World.Player {
 			return blockState != Blocks.AIR.DefaultState && this.IsInBlockReach(blockPos.GetCenter());
 		}
 
-		private bool TryBreakBlock(BlockPos blockPos) {
+		private bool TryBreakBlock(BlockPos blockPos, ItemStack stack) {
 			if (!Level.IsInBounds(blockPos)) return false;
 			if (!this.CanBreakBlockAt(blockPos)) return false;
+			Logger.LogInfo(stack);
 
 			BlockState blockState = this.level.GetBlockState(blockPos) ?? Blocks.AIR.DefaultState;
-			if (blockState.block == Blocks.AIR) return false;
+			this.blockBreakManager.Reset(blockState, blockPos);
+			return blockState.block != Blocks.AIR && stack.CanMine(blockState);
+		}
 
-			ItemStack stack = this.GetMainHandStack();
-			int itemBreakLevel = stack.GetBreakLevel();
-			int minBreakLevel = blockState.block.MinBreakLevel;
-			if (itemBreakLevel < minBreakLevel) return false;
+		private void DoBlockBreakTick(BlockPos blockPos, ItemStack stack) {
+			BlockState blockState = this.level.GetBlockState(blockPos);
+			float speed = stack.GetMiningSpeed(blockState);
 
-			this.level.SetBlockState(blockPos, blockState.block.OnBreak(this.level, blockPos, blockState, this));
-			Block.DropStacks(blockState, this.level, blockPos, null);
-			stack.DamageAndBreak(1, this, EquipmentSlot.MAIN_HAND);
-			this.SetMainHandStack(stack);
-			return true;
+			if (this.blockBreakManager.Tick(speed)) {
+				this.level.SetBlockState(blockPos, blockState.GetBreakState(this.level, blockPos, blockState));
+				Block.DropStacks(blockState, this.level, blockPos, null);
+				stack.DamageTool(this, EquipmentSlot.MAIN_HAND);
+				this.SetMainHandStack(stack);
+			}
 		}
 
 		public void JumpFromGround() {
