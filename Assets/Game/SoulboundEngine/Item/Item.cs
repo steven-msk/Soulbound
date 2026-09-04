@@ -145,7 +145,7 @@ namespace SoulboundEngine.Item {
 		/// Returns whether the player can continue using this item the tick after this item has been used. 
 		/// This is false by default.
 		/// </summary>
-		public virtual bool ShouldContinueUse(ItemStack stack, InteractionType type, Level level, PlayerEntity player, BlockPos blockPos) => false;
+		public virtual bool ShouldContinueInteraction(ItemStack stack, InteractionType type, Level level, PlayerEntity player, BlockPos blockPos) => true;
 
 		public int GetDurability() => this.components.GetOrDefault(ItemComponents.DURABILITY, int.MaxValue);
 

@@ -46,7 +46,7 @@ namespace SoulboundEngine.Item {
 			return this.block.DefaultState;
 		}
 
-		public override bool ShouldContinueUse(ItemStack stack, InteractionType type, Level level, PlayerEntity player, BlockPos blockPos) {
+		public override bool ShouldContinueInteraction(ItemStack stack, InteractionType type, Level level, PlayerEntity player, BlockPos blockPos) {
 			ItemPlacementContext context = new(player, stack, blockPos);
 			BlockState? placementState = this.GetPlacementState(context);
 			return placementState != null && this.CanPlace(context, placementState);

@@ -137,18 +137,20 @@ namespace SoulboundEngine.World.Player {
 		}
 
 		private void HandleInteractTick(InteractionType type) {
-			Action getInteractAction(InteractionType type) {
-				return type switch {
-					InteractionType.Primary => this.PrimaryInteract,
-					InteractionType.Secondary => this.SecondaryInteract,
-					_ => throw new ArgumentException()
-				};
-			}
 			BlockPos blockPos = BlockPos.From(this.GetWorldPointerPos());
 			if (this.activeItemUse?.type == type) {
 				this.HandleUseTick();
-			} else if (this.activeItemUse == null && this.GetMainHandStack().ShouldContinueUse(type, this.level, this, blockPos)) {
-				getInteractAction(type)();
+			} else if (this.activeItemUse == null && this.GetMainHandStack().ShouldContinueInteraction(type, this.level, this, blockPos)) {
+				switch (type) {
+					case InteractionType.Primary:
+						this.PrimaryInteract();
+						break;
+					case InteractionType.Secondary:
+						this.SecondaryInteract();
+						break;
+					default:
+						throw new ArgumentException();
+				}
 			}
 		}
 
@@ -217,8 +219,8 @@ namespace SoulboundEngine.World.Player {
 			}
 
 			BlockPos blockPos = BlockPos.From(interactionPoint);
-			BlockState? blockState = this.level.GetBlockState(blockPos);
-			return blockState != null && BlockInteract(blockState, blockPos, this.GetMainHandStack(), this, blockUse, blockUseWithItem);
+			BlockState blockState = this.level.GetBlockState(blockPos);
+			return BlockInteract(blockState, blockPos, this.GetMainHandStack(), this, blockUse, blockUseWithItem);
 		}
 
 		private static bool ItemInteract(
@@ -296,7 +298,6 @@ namespace SoulboundEngine.World.Player {
 		private bool TryBreakBlock(BlockPos blockPos, ItemStack stack) {
 			if (!Level.IsInBounds(blockPos)) return false;
 			if (!this.CanBreakBlockAt(blockPos)) return false;
-			Logger.LogInfo(stack);
 
 			BlockState blockState = this.level.GetBlockState(blockPos) ?? Blocks.AIR.DefaultState;
 			this.blockBreakManager.Reset(blockState, blockPos);

@@ -292,8 +292,8 @@ namespace SoulboundEngine.Item {
 			return this.GetItem().GetUseTime(this, type, level, user);
 		}
 
-		public readonly bool ShouldContinueUse(InteractionType type, Level level, PlayerEntity player, BlockPos blockPos) {
-			return this.IsEmpty() || this.GetItem().ShouldContinueUse(this, type, level, player, blockPos);
+		public readonly bool ShouldContinueInteraction(InteractionType type, Level level, PlayerEntity player, BlockPos blockPos) {
+			return this.IsEmpty() || this.GetItem().ShouldContinueInteraction(this, type, level, player, blockPos);
 		}
 
 		public readonly bool HasDurability() {
