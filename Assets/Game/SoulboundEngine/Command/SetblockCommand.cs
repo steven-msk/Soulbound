@@ -30,7 +30,7 @@
 			};
 			ctx.Source.Run(level => {
 				level.SetBlockState(blockPos, block.DefaultState);
-				outputConsumer("Set block {} at {}".WithArgs(Blocks.GetIdentifier(block), blockPos));
+				outputConsumer("Reset block {} at {}".WithArgs(Blocks.GetIdentifier(block), blockPos));
 			});
 			return 1;
 		}

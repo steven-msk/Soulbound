@@ -8,7 +8,7 @@ namespace SoulboundEngine.World.Block {
 		public static readonly Block AIR = Register("air", s => new AirBlock(s));
 		public static readonly Block GRASS = Register("grass");
 		public static readonly Block DIRT = Register("dirt");
-		public static readonly Block STONE = Register("stone", settings => settings.MinBreakLevel(1));
+		public static readonly Block STONE = Register("stone");
 		public static readonly Block WOOD = Register("wood");
 		public static readonly Block LEAVES = Register("leaves", settings => new LeafBlock(settings));
 		public static readonly Block CHEST = Register("chest", settings => new ChestBlock(settings));

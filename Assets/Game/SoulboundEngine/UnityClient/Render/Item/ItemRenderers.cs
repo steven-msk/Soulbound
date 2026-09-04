@@ -1,10 +1,9 @@
-﻿using SoulboundEngine.UnityClient.Assets;
-using SoulboundEngine.UnityClient.Render.Sprite;
-using SoulboundEngine.Item;
-using System;
-using System.Collections.Generic;
-
-namespace SoulboundEngine.UnityClient.Render.Item {
+﻿namespace SoulboundEngine.UnityClient.Render.Item {
+	using SoulboundEngine.Item;
+	using SoulboundEngine.UnityClient.Assets;
+	using SoulboundEngine.UnityClient.Render.Sprite;
+	using System;
+	using System.Collections.Generic;
 	using Item = SoulboundEngine.Item.Item;
 
 	public static class ItemRenderers {
@@ -24,7 +23,6 @@ namespace SoulboundEngine.UnityClient.Render.Item {
 
 			Register(Items.placeableItem, DefaultResolverFactory("bluething"));
 			Register(Items.teleportPlayerItem, DefaultResolverFactory("bluething"));
-			Register(Items.chargeableItem, DefaultResolverFactory("bluething"));
 			Register(Items.debugPointer, DefaultResolverFactory("debugPointer"));
 			Register(Items.blockBreakerItem, DefaultResolverFactory("bluething"));
 		}
@@ -40,7 +38,7 @@ namespace SoulboundEngine.UnityClient.Render.Item {
 
 		public static Dictionary<Item, ItemRenderer> LoadRenderers(List<Item> items) {
 			Dictionary<Item, ItemRenderer> rendererByItem = new();
-			foreach (var item in items) {
+			foreach (Item item in items) {
 				rendererByItem.Add(item, RENDERER_FACTORIES.TryGetValue(item, out ItemRenderer.Factory factory)
 					? factory()
 					: GetDefaultRenderer()

@@ -36,7 +36,7 @@
 				if (obj is not DictionaryBackedComponentMap other) return false;
 				if (this.map.Count != other.map.Count) return false;
 				foreach ((ComponentType key, object value) in this.map) {
-					if (!other.map.TryGetValue(key, out var otherValue) || !Equals(value, otherValue)) {
+					if (!other.map.TryGetValue(key, out object otherValue) || !Equals(value, otherValue)) {
 						return false;
 					}
 				}
@@ -70,6 +70,13 @@
 			public Builder AddAll(IComponentMap map) {
 				foreach (Component component in map) {
 					this.Add(component);
+				}
+				return this;
+			}
+
+			public Builder AddAll(Builder other) {
+				foreach ((ComponentType type, object value) in other.map) {
+					this.Add(Component.Of(type, value));
 				}
 				return this;
 			}
