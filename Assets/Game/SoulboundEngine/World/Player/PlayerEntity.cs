@@ -321,6 +321,7 @@ namespace SoulboundEngine.World.Player {
 				Block.DropStacks(blockState, this.level, blockPos, null);
 				stack.DamageTool(this, EquipmentSlot.MAIN_HAND);
 				this.SetMainHandStack(stack);
+				this.blockBreakManager.Reset();
 			}
 		}
 

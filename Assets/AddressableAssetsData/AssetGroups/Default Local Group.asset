@@ -243,6 +243,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d746fc3c856a19442a5c272b31ffa2fa
+    m_Address: blockBreakOverlayAtlas
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d863461c1411eba4b9a64e81eecfc1ca
     m_Address: TickBlockOff
     m_ReadOnly: 0
@@ -293,6 +299,12 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: f6426e6fd6941634a8f5292711ce4db8
     m_Address: Urbanist-Bold SDF
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f8f6a38a4aa8d43448f5e672a02f6be7
+    m_Address: blockBreakOverlay
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload

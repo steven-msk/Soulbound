@@ -25,8 +25,9 @@ namespace SoulboundEngine.UnityClient.Render.World {
 		private readonly WorldWidgetManager widgetManager;
 		private readonly DebugRenderer debugRenderer;
 		private readonly ChunkOutlineRenderer chunkOutlineRenderer;
+		private readonly BlockBreakProgressRenderer blockBreakProgressRenderer;
 		private readonly Queue<(BlockPos pos, BlockState? state)> stateChangedQueue = new();
-		private Vec2i lastPivot;
+		private Vec2i lastPivot = Vec2i.ZERO;
 		private readonly RectInt renderView;
 		private Tilemap? tilemap;
 		private Level? level;
@@ -39,6 +40,7 @@ namespace SoulboundEngine.UnityClient.Render.World {
 			this.widgetManager = widgetManager;
 			this.debugRenderer = debugRenderer;
 			this.chunkOutlineRenderer = new ChunkOutlineRenderer(debugRenderer);
+			this.blockBreakProgressRenderer = new BlockBreakProgressRenderer();
 		}
 
 		// NOTE: current implementation relies on single tilemap rendering (one tilemap for the entire render view)
@@ -53,6 +55,7 @@ namespace SoulboundEngine.UnityClient.Render.World {
 			this.ResolveQueue(this.stateChangedQueue, value => {
 				this.RenderBlock(value.pos.x, value.pos.y, value.state);
 			});
+			this.blockBreakProgressRenderer.Render();
 
 			if (this.showingChunkFeatures) {
 				this.chunkOutlineRenderer.Render();
@@ -206,10 +209,13 @@ namespace SoulboundEngine.UnityClient.Render.World {
 			if (this.level != null) this.DestroyEntities(this.level);
 			this.level = level;
 			this.widgetManager.SetLevel(level);
-			if (level != null) this.RenderEntities(level);
+			if (level != null) {
+				this.RenderEntities(level);
+				this.blockBreakProgressRenderer.SetPlayer(level.GetPlayer());
+			}
+			this.blockBreakProgressRenderer.Reset();
 			this.AddLevelEvents();
 			this.chunkOutlineRenderer.Clear();
-
 		}
 
 		public void Reset() {
@@ -218,6 +224,7 @@ namespace SoulboundEngine.UnityClient.Render.World {
 			if (this.tilemap != null) this.tilemap.ClearAllTiles();
 			this.showingChunkFeatures = false;
 			this.chunkOutlineRenderer.Clear();
+			this.blockBreakProgressRenderer.Reset();
 		}
 
 		private void AddLevelEvents() {
