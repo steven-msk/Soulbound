@@ -1,8 +1,6 @@
 namespace SoulboundEngine.Item {
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.World.Block;
-	using SoulboundEngine.World.Entity;
-	using SoulboundEngine.World.Entity.Attribute;
 	using System;
 
 #nullable enable
@@ -15,8 +13,11 @@ namespace SoulboundEngine.Item {
 		public static readonly Item WOOD = Register(Blocks.WOOD);
 		public static readonly Item LEAVES = Register(Blocks.LEAVES);
 		public static readonly Item CHEST = Register(Blocks.CHEST);
-		public static readonly Item MINING_TOOL = Register("mining_tool", s => s
-			.Tool(new ToolSettings(ToolPower.WOOD, 100, 2.5f))
+		public static readonly Item WOODEN_PICKAXE = Register("wooden_pickaxe", s => s
+			.Tool(new ToolSettings(ToolPower.WOOD, 100, 1.5f))
+		);
+		public static readonly Item STONE_PICKAXE = Register("stone_pickaxe", s => s
+			.Tool(new ToolSettings(ToolPower.STONE, 250, 2f))
 		);
 		// TEST ITEM
 		public static readonly Item JUMP_EFFECT_ITEM = Register("jump_effect_item", s => new JumpEffectItem(s), s => s
@@ -30,11 +31,6 @@ namespace SoulboundEngine.Item {
 		);
 		public static readonly Item debugPointer = Register("debug_pointer", settings => new DebugPointerItem(settings),
 			settings => settings.NonStackable()
-		);
-		public static readonly Item blockBreakerItem = Register("block_breaker_item", settings => settings
-			.NonStackable()
-			// TEMP
-			.Attributes(b => b.Add(Attributes.SPEED, new AttributeModifier(Identifier.Of("speed_increase"), 1.0d, AttributeModifier.Operation.ADDITIVE), EquipmentSlot.MAIN_HAND))
 		);
 		
 		public static Item Register(string id) {

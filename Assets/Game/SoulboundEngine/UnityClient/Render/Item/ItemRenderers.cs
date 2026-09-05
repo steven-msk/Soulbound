@@ -24,7 +24,6 @@
 			Register(Items.placeableItem, DefaultResolverFactory("bluething"));
 			Register(Items.teleportPlayerItem, DefaultResolverFactory("bluething"));
 			Register(Items.debugPointer, DefaultResolverFactory("debugPointer"));
-			Register(Items.blockBreakerItem, DefaultResolverFactory("bluething"));
 		}
 
 		public static void Register(Item item, IItemModelResolver.Factory modelResolverFactory) {
