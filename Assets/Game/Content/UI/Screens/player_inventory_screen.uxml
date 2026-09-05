@@ -1,12 +1,16 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <ui:Template name="Hotbar" src="project://database/Assets/Game/Content/UI/Hotbar.uxml?fileID=9197481963319205126&amp;guid=ed08df87e99e44d428c348c8977151d7&amp;type=3#Hotbar"/>
-    <ui:Template name="PlayerInventory" src="project://database/Assets/Game/Content/UI/PlayerInventory.uxml?fileID=9197481963319205126&amp;guid=5fb502a4ef30a954d901962876e3adc0&amp;type=3#PlayerInventory"/>
+    <ui:Template name="Hotbar" src="project://database/Assets/Game/Content/UI/hotbar.uxml?fileID=9197481963319205126&amp;guid=ed08df87e99e44d428c348c8977151d7&amp;type=3#hotbar"/>
+    <ui:Template name="PlayerInventory" src="project://database/Assets/Game/Content/UI/player_inventory.uxml?fileID=9197481963319205126&amp;guid=5fb502a4ef30a954d901962876e3adc0&amp;type=3#player_inventory"/>
+    <ui:Template name="player_armor" src="project://database/Assets/Game/Content/UI/player_armor.uxml?fileID=9197481963319205126&amp;guid=be16e094b9ab92548af7440d5d90183d&amp;type=3#player_armor"/>
     <ui:VisualElement style="flex-grow: 1;">
         <ui:VisualElement style="flex-grow: 1; top: auto; bottom: auto; left: auto; right: auto; flex-direction: column-reverse; padding-bottom: 15px;"/>
         <ui:VisualElement name="crafting" style="flex-grow: 0; flex-direction: row; margin-top: 4px; margin-right: 4px; margin-bottom: 4px; margin-left: 4px; padding-bottom: 16px;"/>
-        <ui:VisualElement name="player_inventory_space" picking-mode="Ignore" style="flex-grow: 0; align-items: flex-start; align-self: flex-start; justify-content: flex-end;">
-            <ui:Instance template="PlayerInventory" name="" style="bottom: 4px;"/>
-            <ui:Instance template="Hotbar" name="" style="display: flex; visibility: visible;"/>
+        <ui:VisualElement name="player_inventory_space" picking-mode="Ignore" style="flex-grow: 0; align-items: flex-start; align-self: flex-start; justify-content: flex-end; flex-direction: row;">
+            <ui:VisualElement style="flex-grow: 0; flex-direction: column;">
+                <ui:Instance template="PlayerInventory" name="" style="bottom: 4px;"/>
+                <ui:Instance template="Hotbar" name="" style="display: flex; visibility: visible;"/>
+            </ui:VisualElement>
+            <ui:Instance template="player_armor" name="" style="margin-left: 4px;"/>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

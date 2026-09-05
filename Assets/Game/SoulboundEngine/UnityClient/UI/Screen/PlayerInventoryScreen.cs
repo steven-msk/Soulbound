@@ -10,8 +10,12 @@
 	using UnityEngine.UIElements;
 
 	public class PlayerInventoryScreen : InventoryScreen<PlayerInventoryScreenHandler> {
-		private static readonly UXMLBinding<VisualElement> HOTBAR_ELEMENT = new("soulbound:hotbar/hotbar");
-		private static readonly UXMLBinding<VisualElement> POPUP_ELEMENT = new("soulbound:player_inventory/popup");
+		public static readonly UXMLBinding<VisualElement> HOTBAR_ELEMENT = new("soulbound:hotbar/hotbar");
+		public static readonly UXMLBinding<VisualElement> POPUP_ELEMENT = new("soulbound:player_inventory/popup");
+		public static readonly UXMLBinding<VisualElement> HELMET_ELEMENT = new("soulbound:player_armor/helmet");
+		public static readonly UXMLBinding<VisualElement> CHESTPLATE_ELEMENT = new("soulbound:player_armor/chestplate");
+		public static readonly UXMLBinding<VisualElement> LEGGINGS_ELEMENT = new("soulbound:player_armor/leggings");
+		public static readonly UXMLBinding<VisualElement> BOOTS_ELEMENT = new("soulbound:player_armor/boots");
 		private static readonly UXMLBinding<VisualElement> PLAYER_INVENTORY_SPACE_ELEMENT = new("soulbound:player_inventory_screen/player_inventory_space");
 		private static readonly UXMLBinding<VisualElement> CRAFTING_ELEMENT = new("soulbound:player_inventory_screen/crafting");
 		private IEnumerable<RecipeView<StationlessCraftingRecipe>> currentRecipes;
@@ -42,6 +46,22 @@
 
 		protected override VisualElement GetPlayerInventoryRoot(VisualElement screenRoot) {
 			return PLAYER_INVENTORY_SPACE_ELEMENT.Get(screenRoot);
+		}
+
+		protected override VisualElement GetHelmetRoot(VisualElement root) {
+			return HELMET_ELEMENT.Get(root);
+		}
+
+		protected override VisualElement GetChestplateRoot(VisualElement root) {
+			return CHESTPLATE_ELEMENT.Get(root);
+		}
+
+		protected override VisualElement GetLeggingsRoot(VisualElement root) {
+			return LEGGINGS_ELEMENT.Get(root);
+		}
+
+		protected override VisualElement GetBootsRoot(VisualElement root) {
+			return BOOTS_ELEMENT.Get(root);
 		}
 
 		private void BindCrafting(VisualElement screenRoot) {

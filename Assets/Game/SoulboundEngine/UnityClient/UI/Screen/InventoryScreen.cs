@@ -3,6 +3,7 @@
 	using SoulboundEngine.Item;
 	using SoulboundEngine.Item.Container;
 	using SoulboundEngine.UnityClient.Render.Item;
+	using SoulboundEngine.World.Entity;
 	using SoulboundEngine.World.Player;
 	using System;
 	using System.Collections.Generic;
@@ -51,6 +52,7 @@
 
 			this.BindPlayerHotbar(playerInventory, inventoryRoot);
 			this.BindPlayerPopup(playerInventory, inventoryRoot);
+			this.BindPlayerArmor(playerInventory, inventoryRoot);
 
 			playerInventory.mainSlotChanged += this.OnMainSlotChanged;
 			this.SetMainSlotVisual(playerInventory.GetMainSlot());
@@ -80,17 +82,52 @@
 			foreach (int slotIndex in playerInventory.GetHotbar()) {
 				IItemSlot slot = playerInventory.GetSlot(slotIndex);
 				VisualElement slotElement = this.GetPlayerHotbar(inventoryRoot)[slotIndex];
-
-				UXMLHotbarSlotDisplay display = new(slot, this.itemRenderManager, interactable);
-				this.AddWidget(display);
-				display.OnBind(slotElement);
-				this.AddPointerListeners(slotElement, display, slot, playerInventory);
-				this.playerHotbarSlotDisplays.Add(display);
+				
+				this.playerHotbarSlotDisplays.Add(this.BindSlot(
+					(slot, itemRenderManager, interactable) => new UXMLHotbarSlotDisplay(slot, itemRenderManager, interactable),
+					slotElement, slot, playerInventory, interactable
+				));
 			}
 		}
 
+		protected void BindPlayerArmor(PlayerInventory playerInventory, VisualElement root, bool interactable = true) {
+			foreach ((int slotIndex, EquipmentSlot equipmentSlot) in PlayerInventory.EQUIPMENT_SLOT_MAPPING) {
+				IItemSlot slot = playerInventory.GetSlot(slotIndex);
+				VisualElement slotElement = slotIndex switch {
+					PlayerInventory.HELMET_SLOT => this.GetHelmetRoot(root),
+					PlayerInventory.CHESTPLATE_SLOT => this.GetChestplateRoot(root),
+					PlayerInventory.LEGGINGS_SLOT => this.GetLeggingsRoot(root),
+					PlayerInventory.BOOTS_SLOT => this.GetBootsRoot(root),
+					_ => throw new ArgumentException("Unknown armor slot index: " + slotIndex)
+				};
+
+				this.BindSlot(slotElement, slot, playerInventory, interactable);
+			}
+		}
+
+		protected abstract VisualElement GetHelmetRoot(VisualElement root);
+
+		protected abstract VisualElement GetChestplateRoot(VisualElement root);
+
+		protected abstract VisualElement GetLeggingsRoot(VisualElement root);
+
+		protected abstract VisualElement GetBootsRoot(VisualElement root);
+
 		protected UXMLItemSlotDisplay BindSlot(VisualElement slotElement, IItemSlot slot, IInventory inventory, bool interactable) {
-			UXMLItemSlotDisplay display = new(slot, this.itemRenderManager, interactable);
+			return this.BindSlot(
+				(slot, itemRenderManager, interactable) => new UXMLItemSlotDisplay(slot, itemRenderManager, interactable),
+				slotElement, slot, inventory, interactable
+			);
+		}
+
+		protected TDisplay BindSlot<TDisplay>(
+			Func<IItemSlot, ItemRenderManager, bool, TDisplay> displayFactory,
+			VisualElement slotElement,
+			IItemSlot slot,
+			IInventory inventory,
+			bool interactable
+		) where TDisplay : UXMLItemSlotDisplay {
+			TDisplay display = displayFactory(slot, this.itemRenderManager, interactable);
 			this.AddWidget(display);
 			display.OnBind(slotElement);
 			this.AddPointerListeners(slotElement, display, slot, inventory);

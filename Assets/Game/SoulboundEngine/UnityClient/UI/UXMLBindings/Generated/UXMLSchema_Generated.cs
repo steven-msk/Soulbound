@@ -40,6 +40,11 @@ namespace SoulboundEngine.UnityClient.UI.UXMLBindings {
             UXMLSchema.Register(Identifier.Of("soulbound:metrics_hud/gc_alloc"), typeof(Label));
             UXMLSchema.Register(Identifier.Of("soulbound:metrics_hud/player"), typeof(Label));
             UXMLSchema.Register(Identifier.Of("soulbound:metrics_hud/pointer"), typeof(Label));
+            UXMLSchema.Register(Identifier.Of("soulbound:player_armor/armor"), typeof(VisualElement));
+            UXMLSchema.Register(Identifier.Of("soulbound:player_armor/helmet"), typeof(TemplateContainer));
+            UXMLSchema.Register(Identifier.Of("soulbound:player_armor/chestplate"), typeof(TemplateContainer));
+            UXMLSchema.Register(Identifier.Of("soulbound:player_armor/leggings"), typeof(TemplateContainer));
+            UXMLSchema.Register(Identifier.Of("soulbound:player_armor/boots"), typeof(TemplateContainer));
             UXMLSchema.Register(Identifier.Of("soulbound:player_inventory/popup"), typeof(VisualElement));
             UXMLSchema.Register(Identifier.Of("soulbound:chest_inventory_screen/chest_space"), typeof(VisualElement));
             UXMLSchema.Register(Identifier.Of("soulbound:chest_inventory_screen/player_inventory_space"), typeof(VisualElement));
