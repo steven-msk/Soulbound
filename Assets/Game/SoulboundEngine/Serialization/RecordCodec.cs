@@ -32,7 +32,7 @@
 
 		public override JToken Encode(T value) {
 			return new JObject() {
-				[this.field1.name] = this.field1.codec.Encode(this.field1.valueSupplier(value))
+				[this.field1.name] = this.field1.codec.Encode(this.field1.valueSupplier(value)),
 				[this.field2.name] = this.field2.codec.Encode(this.field2.valueSupplier(value))
 			};
 		}
