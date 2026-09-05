@@ -10,13 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0e755463280ac4f489eda63ce8f3599e, type: 3}
-  m_Name: TestRecipe
-  m_EditorClassIdentifier: SoulboundEngine::SoulboundEngine.Client.Recipe.Asset.StationlessCraftingRecipeAsset
-  identifier: soulbound:test_recipe
+  m_Name: stone_pickaxe
+  m_EditorClassIdentifier: SoulboundEngine.UnityClient::SoulboundEngine.UnityClient.Recipe.Asset.StationlessCraftingRecipeAsset
+  identifier: soulbound:stone_pickaxe
   typeIdentifier: soulbound:stationless
   input:
-  - itemId: soulbound:dirt
+  - itemId: soulbound:stone
+    count: 3
+  - itemId: soulbound:wood
     count: 1
   result:
-    itemId: soulbound:stone
+    itemId: soulbound:stone_pickaxe
     count: 1
