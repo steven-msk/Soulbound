@@ -20,6 +20,8 @@
 			Register(Items.WOOD, DefaultResolverFactory("wood"));
 			Register(Items.LEAVES, DefaultResolverFactory("leaves"));
 			Register(Items.CHEST, DefaultResolverFactory("chest"));
+			Register(Items.WOODEN_PICKAXE, DefaultResolverFactory("woodenPickaxe"));
+			Register(Items.STONE_PICKAXE, DefaultResolverFactory("stone_pickaxe"));
 
 			Register(Items.placeableItem, DefaultResolverFactory("bluething"));
 			Register(Items.teleportPlayerItem, DefaultResolverFactory("bluething"));
