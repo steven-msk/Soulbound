@@ -4,9 +4,9 @@
 	using System;
 	using System.Collections.Generic;
 
-	public record ArmorMaterial(Dictionary<ArmorType, int> baseDefense, Func<ArmorType, ItemAttributeModifiers.Builder, ItemAttributeModifiers.Builder> attributeModifiers) {
-		public static readonly ArmorMaterial WOOD = new(MakeDefense(1, 2, 1, 1), (t, b) => b);
-		public static readonly ArmorMaterial STONE = new(MakeDefense(2, 4, 3, 2), (t, b) => b
+	public record ArmorSettings(Dictionary<ArmorType, int> baseDefense, Func<ArmorType, ItemAttributeModifiers.Builder, ItemAttributeModifiers.Builder> attributeModifiers) {
+		public static readonly ArmorSettings WOOD = new(MakeDefense(1, 2, 1, 1), (t, b) => b);
+		public static readonly ArmorSettings STONE = new(MakeDefense(2, 4, 3, 2), (t, b) => b
 			.Add(Attributes.SPEED, new AttributeModifier(Identifier.Of("stone_" + t.GetSerializedName()), -0.1d, AttributeModifier.Operation.ADDITIVE_PERCENT), t.GetSlot())
 		);
 

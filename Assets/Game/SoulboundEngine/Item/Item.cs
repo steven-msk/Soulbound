@@ -179,12 +179,20 @@ namespace SoulboundEngine.Item {
 				return this.Component(ItemComponents.ATTRIBUTE_MODIFIERS, builder(ItemAttributeModifiers.Create()).Build());
 			}
 
+			public Settings Attributes(ItemAttributeModifiers modifiers) {
+				return this.Component(ItemComponents.ATTRIBUTE_MODIFIERS, modifiers);
+			}
+
 			public Settings Durability(int durability) {
 				return this.Component(ItemComponents.DURABILITY, durability);
 			}
 
 			public Settings Tool(ToolSettings toolSettings) {
 				return toolSettings.Apply(this);
+			}
+
+			public Settings Armor(ArmorType armorType, ArmorSettings armorSettings) {
+				return this.NonStackable().Attributes(armorSettings.CreateAttributes(armorType));
 			}
 
 			/// <summary>
