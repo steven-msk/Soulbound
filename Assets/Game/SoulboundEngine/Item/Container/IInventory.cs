@@ -17,10 +17,6 @@ namespace SoulboundEngine.Item.Container {
 
 		bool CanPlayerUse(PlayerEntity player);
 
-		public IEnumerable<IItemSlot> GetAllSlots() {
-			return this.GetSlots().Select(i => this.GetSlot(i));
-		}
-
 		virtual void OnOpened(PlayerEntity player) {
 		}
 
@@ -63,6 +59,10 @@ namespace SoulboundEngine.Item.Container {
 						inventory.GetSlot(i).SetStack(stacks[i]);
 					}
 				});
+		}
+
+		public static IEnumerable<IItemSlot> GetAllSlots(this IInventory inventory) {
+			return inventory.GetSlots().Select(inventory.GetSlot);
 		}
 	}
 }

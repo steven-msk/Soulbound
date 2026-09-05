@@ -1,14 +1,13 @@
-using System;
-
 #nullable enable
 
 namespace SoulboundEngine.Item.Container {
+	using System;
+
 	public class ItemSlot : IItemSlot {
 		private readonly IInventory inventory;
 		private readonly int index;
 		private ItemStack stack;
-		[Obsolete]
-		public event Action<ItemStack>? setStack;
+		[Obsolete] public event Action<ItemStack>? setStack;
 		public event Action<ItemStack, ItemStack>? stackChanged;
 
 		public ItemSlot(IInventory inventory, int index) {
@@ -16,7 +15,7 @@ namespace SoulboundEngine.Item.Container {
 			this.index = index;
 		}
 
-		public void SetStack(ItemStack stack) {
+		public virtual void SetStack(ItemStack stack) {
 			if (stack.IsEmpty()) stack = ItemStack.EMPTY;
 			ItemStack oldStack = this.stack;
 			this.stack = stack;
