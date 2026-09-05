@@ -87,7 +87,9 @@
 		/// <summary> Must override if the durability bar element ID originates from a different UXML file </summary>
 		protected virtual ProgressBar GetDurabilityBar(VisualElement root) => DURABILITY_BAR_ELEMENT.Get(root);
 
-		private void StackChanged(ItemStack oldStack, ItemStack newStack) => this.SetStack(newStack);
+		private void StackChanged(ItemStack oldStack, ItemStack newStack) {
+			this.SetStack(newStack);
+		}
 
 		public void SetStack(ItemStack stack) {
 			this.stack = stack;

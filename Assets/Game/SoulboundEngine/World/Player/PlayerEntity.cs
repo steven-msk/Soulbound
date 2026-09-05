@@ -169,7 +169,7 @@ namespace SoulboundEngine.World.Player {
 				)) {
 				BlockPos blockPos = BlockPos.From(this.GetWorldPointerPos());
 				ItemStack stack = this.GetMainHandStack();
-				if (this.TryBreakBlock(blockPos, stack)) this.DoBlockBreakTick(blockPos, stack);
+				if (this.TryBreakBlock(blockPos, stack)) this.DoBlockBreakTick(blockPos, stack.Copy());
 			}
 		}
 

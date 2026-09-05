@@ -33,7 +33,7 @@ namespace SoulboundEngine.UnityClient.UI.Screen {
 				IItemSlot slot = this.playerInventory.GetSlot(slotIndex);
 				VisualElement slotElement = hotbarRoot[slotIndex];
 
-				UXMLHotbarSlotDisplay display = new(slot, this.itemRenderManager, false);
+				UXMLHotbarSlotDisplay display = new(slot, this.itemRenderManager, true);
 				this.AddWidget(display);
 				display.OnBind(slotElement);
 				this.hotbarDisplays[slotIndex] = display;
