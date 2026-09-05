@@ -58,7 +58,8 @@ namespace SoulboundEngine.UnityClient.UI.Screen {
 		private void UpdateViewPosition() {
 			Vector2 size = this.root.worldBound.size;
 			Vector2 pos = this.pointerPosition - size / 2f;
-			this.root.style.translate = pos;
+			this.root.style.left = pos.x;
+			this.root.style.bottom = pos.y;
 		}
 
 		IItemSlot IInventory.GetSlot(int index) => this.slot!;

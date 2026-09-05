@@ -62,7 +62,7 @@
 		}
 
 		private void UpdateScreenPointerPos(PlayerEntity player) {
-			Vector2 pointerPos = this.client.InputManager.mouse.mousePos;
+			Vector2 pointerPos = this.client.InputManager.mouse.position;
 			player.SetScreenPointerPos(pointerPos.ToVec2d());
 		}
 

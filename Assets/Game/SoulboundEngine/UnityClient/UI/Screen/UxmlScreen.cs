@@ -1,5 +1,6 @@
 ﻿namespace SoulboundEngine.UnityClient.UI.Screen {
 	using SoulboundEngine.UnityClient.Assets;
+	using SoulboundEngine.UnityClient.Input;
 	using SoulboundEngine.UnityClient.UI.UXMLBindings;
 	using System;
 	using System.Collections.Generic;
@@ -10,6 +11,7 @@
 		protected static readonly UXMLBinding<Label> TOOLTIP_LABEL_ELEMENT = new("soulbound:tooltip/text");
 		private readonly VisualTreeAsset asset;
 		private readonly List<UXMLWidget> widgets = new();
+		private readonly Mouse mouse;
 		private VisualElement root;
 		private TemplateContainer tooltip;
 		protected IScreenHandle handle;
@@ -17,6 +19,7 @@
 
 		protected UXMLScreen(VisualTreeAsset asset) {
 			this.asset = asset;
+			this.mouse = SoulboundUnityClient.Instance.InputManager.mouse;
 		}
 
 		protected sealed override void OnBuild(IScreenHandle handle) {
@@ -24,8 +27,8 @@
 			this.handle = handle;
 			this.asset.CloneTree(this.root);
 			this.OnBind(this.root);
-
-			this.root.RegisterCallback<MouseMoveEvent>(this.OnMouseMoved, TrickleDown.TrickleDown);
+			this.mousePos = this.mouse.position;
+			this.mouse.mouseMoved += this.OnMouseMoved;
 		}
 
 		protected abstract void OnBind(VisualElement root);
@@ -55,8 +58,8 @@
 			this.tooltip = null;
 		}
 
-		protected virtual void OnMouseMoved(MouseMoveEvent evt) {
-			this.mousePos = evt.mousePosition;
+		protected virtual void OnMouseMoved(Vector2 pos) {
+			this.mousePos = pos;
 			this.SetTooltipPosition(this.mousePos);
 		}
 
@@ -64,7 +67,7 @@
 			if (this.tooltip == null) return;
 			this.tooltip.style.position = Position.Absolute;
 			this.tooltip.style.left = pos.x;
-			this.tooltip.style.top = pos.y;
+			this.tooltip.style.bottom = pos.y;
 		}
 
 		public override bool IsPointerOverUI() => false;
@@ -75,7 +78,7 @@
 			foreach (UXMLWidget widget in this.widgets) {
 				widget.Dispose();
 			}
-			this.root.UnregisterCallback<MouseMoveEvent>(this.OnMouseMoved, TrickleDown.TrickleDown);
+			this.mouse.mouseMoved -= this.OnMouseMoved;
 		}
 	}
 }

@@ -1,8 +1,8 @@
 ﻿namespace SoulboundEngine.UnityClient.UI.Screen {
-	using SoulboundEngine.UnityClient.Render.Item;
 	using SoulboundEngine.Inventory;
 	using SoulboundEngine.Item;
 	using SoulboundEngine.Item.Container;
+	using SoulboundEngine.UnityClient.Render.Item;
 	using SoulboundEngine.World.Player;
 	using System;
 	using System.Collections.Generic;
@@ -215,8 +215,8 @@
 			}
 		}
 
-		protected override void OnMouseMoved(MouseMoveEvent evt) {
-			base.OnMouseMoved(evt);
+		protected override void OnMouseMoved(Vector2 pos) {
+			base.OnMouseMoved(pos);
 			this.transitStackHandler.SetPointerPosition(this.mousePos);
 		}
 
