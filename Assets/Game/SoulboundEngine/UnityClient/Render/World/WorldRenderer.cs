@@ -213,7 +213,6 @@ namespace SoulboundEngine.UnityClient.Render.World {
 				this.RenderEntities(level);
 				this.blockBreakProgressRenderer.SetPlayer(level.GetPlayer());
 			}
-			this.blockBreakProgressRenderer.Reset();
 			this.AddLevelEvents();
 			this.chunkOutlineRenderer.Clear();
 		}
@@ -224,7 +223,6 @@ namespace SoulboundEngine.UnityClient.Render.World {
 			if (this.tilemap != null) this.tilemap.ClearAllTiles();
 			this.showingChunkFeatures = false;
 			this.chunkOutlineRenderer.Clear();
-			this.blockBreakProgressRenderer.Reset();
 		}
 
 		private void AddLevelEvents() {

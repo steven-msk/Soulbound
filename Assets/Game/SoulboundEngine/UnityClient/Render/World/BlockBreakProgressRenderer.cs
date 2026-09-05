@@ -3,6 +3,8 @@
 	using SoulboundEngine.UnityClient.Assets;
 	using SoulboundEngine.UnityClient.Util;
 	using SoulboundEngine.World.Player;
+	using System;
+	using System.Collections.Generic;
 	using UnityEngine;
 	using UnityEngine.U2D;
 
@@ -16,7 +18,22 @@
 		public BlockBreakProgressRenderer() {
 			SpriteAtlas atlas = AssetManager.Resolve<SpriteAtlas>(new AssetKey("blockBreakOverlayAtlas"));
 			this.spriteCount = atlas.GetSprites(this.sprites);
+			Array.Sort(this.sprites, 0, this.spriteCount, Comparer<Sprite>.Create(
+				(a, b) => ExtractFrameIndex(a.name).CompareTo(ExtractFrameIndex(b.name))
+			));
 			this.progressStep = 1f / this.spriteCount;
+		}
+
+		private static int ExtractFrameIndex(string spriteName) {
+			int underscoreIndex = spriteName.LastIndexOf('_');
+			string suffix = spriteName[(underscoreIndex + 1)..];
+
+			int digitEnd = 0;
+			while (digitEnd < suffix.Length && char.IsDigit(suffix[digitEnd])) {
+				digitEnd++;
+			}
+
+			return int.Parse(suffix[..digitEnd]);
 		}
 
 		public void SetPlayer(PlayerEntity player) {
@@ -35,18 +52,13 @@
 			this.overlayRenderer.gameObject.transform.position = blockPos.GetCenter().ToVector2();
 
 			float progress = this.player.GetBreakProgress();
-			int index = Maths.FloorToInt(progress / this.progressStep);
+			int index = Mathf.Clamp(Maths.FloorToInt(progress / this.progressStep), 0, this.spriteCount - 1);
 			this.overlayRenderer.sprite = this.sprites[index];
-		}
-
-		public void Reset() {
-			if (this.overlayRenderer) Object.Destroy(this.overlayRenderer.gameObject);
-			this.overlayRenderer = CreateOverlay();
 		}
 
 		private static SpriteRenderer CreateOverlay() {
 			GameObject prefab = AssetManager.Resolve<GameObject>(new AssetKey("blockBreakOverlay"));
-			GameObject obj = Object.Instantiate(prefab);
+			GameObject obj = UnityEngine.Object.Instantiate(prefab);
 			return obj.GetComponent<SpriteRenderer>();
 		}
 	}
