@@ -32,10 +32,10 @@
 				ItemSlot slot = new(this, i);
 				this.slots[i] = slot;
 			}
-			this.slots[HELMET_SLOT] = new ArmorSlot(this, HELMET_SLOT, EQUIPMENT_SLOT_MAPPING[HELMET_SLOT], player);
-			this.slots[CHESTPLATE_SLOT] = new ArmorSlot(this, CHESTPLATE_SLOT, EQUIPMENT_SLOT_MAPPING[CHESTPLATE_SLOT], player);
-			this.slots[LEGGINGS_SLOT] = new ArmorSlot(this, LEGGINGS_SLOT, EQUIPMENT_SLOT_MAPPING[LEGGINGS_SLOT], player);
-			this.slots[BOOTS_SLOT] = new ArmorSlot(this, BOOTS_SLOT, EQUIPMENT_SLOT_MAPPING[BOOTS_SLOT], player);
+			this.slots[HELMET_SLOT] = new ArmorSlot(this, HELMET_SLOT, ArmorType.HELMET, player);
+			this.slots[CHESTPLATE_SLOT] = new ArmorSlot(this, CHESTPLATE_SLOT, ArmorType.CHESTPLATE, player);
+			this.slots[LEGGINGS_SLOT] = new ArmorSlot(this, LEGGINGS_SLOT, ArmorType.LEGGINGS, player);
+			this.slots[BOOTS_SLOT] = new ArmorSlot(this, BOOTS_SLOT, ArmorType.BOOTS, player);
 		}
 
 		public IEnumerable<int> GetPopup() {

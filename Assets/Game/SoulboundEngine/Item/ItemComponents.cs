@@ -12,6 +12,7 @@
 		public static readonly ComponentType<int> DURABILITY = Register<int>("durability", b => b.Codec(Codecs.INT));
 		public static readonly ComponentType<ItemAttributeModifiers> ATTRIBUTE_MODIFIERS = Register<ItemAttributeModifiers>("attributes", b => b.Codec(ItemAttributeModifiers.CODEC));
 		public static readonly ComponentType<Tool> TOOL = Register<Tool>("tool", b => b.Codec(Tool.CODEC));
+		public static readonly ComponentType<Equippable> EQUIPPABLE = Register<Equippable>("equippable", b => b.Codec(Equippable.CODEC));
 
 		public static readonly IComponentMap.Builder DEFAULT_COMPONENTS = IComponentMap.Create()
 			.Add(MAX_STACK_COUNT, Item.DEFAULT_FULL_STACK);

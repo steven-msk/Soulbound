@@ -101,7 +101,10 @@
 					_ => throw new ArgumentException("Unknown armor slot index: " + slotIndex)
 				};
 
-				this.BindSlot(slotElement, slot, playerInventory, interactable);
+				this.BindSlot(
+					(slot, itemRenderManager, interactable) => new UXMLArmorSlotDisplay(slot, itemRenderManager, interactable),
+					slotElement, slot, playerInventory, interactable
+				);
 			}
 		}
 

@@ -37,6 +37,10 @@
 			slot.SetStack(slotStack);
 		}
 
+		public override bool CanInsertIntoSlot(ItemStack itemStack, IItemSlot slot) {
+			return PlayerInventoryScreenHandler.CanInsertIntoSlot(base.CanInsertIntoSlot, itemStack, slot);
+		}
+
 		public IInventory GetChestInventory() => this.chestInventory;
 
 		private static IInventory CreateInventory() {

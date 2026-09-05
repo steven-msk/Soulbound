@@ -23,11 +23,11 @@ namespace SoulboundEngine.Item {
 		public static readonly Item WOODEN_HELMET = Register("wooden_helmet", s => s.Armor(ArmorType.HELMET, ArmorSettings.WOOD));
 		public static readonly Item WOODEN_CHESTPLATE = Register("wooden_chestplate", s => s.Armor(ArmorType.CHESTPLATE, ArmorSettings.WOOD));
 		public static readonly Item WOODEN_LEGGINGS = Register("wooden_leggings", s => s.Armor(ArmorType.LEGGINGS, ArmorSettings.WOOD));
-		public static readonly Item WOODEN_BOOTS = Register("wooden_boots", s => s.Armor(ArmorType.LEGGINGS, ArmorSettings.WOOD));
+		public static readonly Item WOODEN_BOOTS = Register("wooden_boots", s => s.Armor(ArmorType.BOOTS, ArmorSettings.WOOD));
 		public static readonly Item STONE_HELMET = Register("stone_helmet", s => s.Armor(ArmorType.HELMET, ArmorSettings.STONE));
 		public static readonly Item STONE_CHESTPLATE = Register("stone_chestplate", s => s.Armor(ArmorType.CHESTPLATE, ArmorSettings.STONE));
 		public static readonly Item STONE_LEGGINGS = Register("stone_leggings", s => s.Armor(ArmorType.LEGGINGS, ArmorSettings.STONE));
-		public static readonly Item STONE_BOOTS = Register("stone_boots", s => s.Armor(ArmorType.LEGGINGS, ArmorSettings.STONE));
+		public static readonly Item STONE_BOOTS = Register("stone_boots", s => s.Armor(ArmorType.BOOTS, ArmorSettings.STONE));
 
 		// TEST ITEM
 		public static readonly Item JUMP_EFFECT_ITEM = Register("jump_effect_item", s => new JumpEffectItem(s), s => s

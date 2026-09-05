@@ -7,6 +7,9 @@ namespace SoulboundEngine.UnityClient.UI.UXMLBindings {
 
     public static class UXMLSchema_Generated {
         public static void RegisterAll() {
+            UXMLSchema.Register(Identifier.Of("soulbound:armor_slot/item_display"), typeof(VisualElement));
+            UXMLSchema.Register(Identifier.Of("soulbound:armor_slot/stack_count"), typeof(Label));
+            UXMLSchema.Register(Identifier.Of("soulbound:armor_slot/durability_bar"), typeof(ProgressBar));
             UXMLSchema.Register(Identifier.Of("soulbound:command_exception/exception_text"), typeof(Label));
             UXMLSchema.Register(Identifier.Of("soulbound:command_line/completion_list"), typeof(ListView));
             UXMLSchema.Register(Identifier.Of("soulbound:command_line/usage_list"), typeof(ListView));

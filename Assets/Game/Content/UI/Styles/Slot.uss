@@ -69,3 +69,25 @@
     min-height: 12px;
     max-height: 12px;
 }
+
+.armor-slot {
+    -unity-background-image-tint-color: rgba(255, 255, 255, 0.39);
+    --overlay: url("project://database/Assets/Game/Content/Shared/Textures/boots_overlay.png?fileID=2800000&guid=2f543caed13126347b137e43a1170ce0&type=3#boots_overlay");
+    background-image: var(--overlay);
+}
+
+#helmet .armor-slot {
+    --overlay: url("project://database/Assets/Game/Content/Shared/Textures/helmet_overlay.png?fileID=2800000&guid=65493327acc64f84fb1c8842d00ca25a&type=3#helmet_overlay");
+}
+
+#chestplate .armor-slot {
+    --overlay: url("project://database/Assets/Game/Content/Shared/Textures/chestplate_overlay.png?fileID=2800000&guid=ef16657440a02a14f867fec9a1b4118d&type=3#chestplate_overlay");
+}
+
+#leggings .armor-slot {
+    --overlay: url("project://database/Assets/Game/Content/Shared/Textures/leggings_overlay.png?fileID=2800000&guid=758c50da8c619ae43bde1fe114a15648&type=3#leggings_overlay");
+}
+
+#boots .armor-slot {
+    --overlay: url("project://database/Assets/Game/Content/Shared/Textures/boots_overlay.png?fileID=2800000&guid=2f543caed13126347b137e43a1170ce0&type=3#boots_overlay");
+}

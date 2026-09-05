@@ -115,17 +115,14 @@
 			this.HandleOpenSlotPickup(slot, slotStack, button);
 		}
 
-		private void HandleOccupiedSlotPickup(IItemSlot slot, ItemStack slotStack, int button) {
-			if (!this.CanInsertIntoSlot(slot) || slotStack.IsFull() || this.transitStack.IsFull()) {
-				this.SwapTransitWithSlot(slot);
-				return;
-			}
+		// TODO: fix pickup actions
 
-			if (button == this.insertSingleButton) {
+		private void HandleOccupiedSlotPickup(IItemSlot slot, ItemStack slotStack, int button) {
+			if (button == this.insertSingleButton && this.CanInsertIntoSlot(slot)) {
 				this.InsertSingle(slot);
-			} else if (button == this.insertButton) {
+			} else if (button == this.insertButton && this.CanInsertIntoSlot(slot)) {
 				this.InsertInSlot(slot);
-			} else {
+			} else if (this.CanInsertIntoSlot(slot) && (slotStack.IsFull() || this.transitStack.IsFull())) {
 				this.SwapTransitWithSlot(slot);
 			}
 		}

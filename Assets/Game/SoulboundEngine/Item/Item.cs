@@ -188,11 +188,13 @@ namespace SoulboundEngine.Item {
 			}
 
 			public Settings Tool(ToolSettings toolSettings) {
-				return toolSettings.Apply(this);
+				return toolSettings.Apply(this).Component(ItemComponents.EQUIPPABLE, new Equippable(EquipmentSlot.MAIN_HAND));	
 			}
 
 			public Settings Armor(ArmorType armorType, ArmorSettings armorSettings) {
-				return this.NonStackable().Attributes(armorSettings.CreateAttributes(armorType));
+				return this.Component(ItemComponents.EQUIPPABLE, new Equippable(armorType.GetSlot()))
+					.NonStackable()
+					.Attributes(armorSettings.CreateAttributes(armorType));
 			}
 
 			/// <summary>

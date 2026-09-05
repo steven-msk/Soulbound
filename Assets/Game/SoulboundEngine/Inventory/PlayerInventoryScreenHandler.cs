@@ -20,6 +20,8 @@
 
 		public override bool CanUse(PlayerEntity player) => true;
 
+		// TODO: implement quick move for equipment slots
+
 		protected override void QuickMove(PlayerEntity player, IItemSlot slot) {
 			IItemSlot[] hotbarSlots = this.playerInventory.GetHotbar().Select(this.playerInventory.GetSlot).ToArray();
 			IItemSlot[] popupSlots = this.playerInventory.GetPopup().Select(this.playerInventory.GetSlot).ToArray();
@@ -31,6 +33,20 @@
 
 		public override InventoryRecipeInput GetInput() {
 			return new InventoryRecipeInput(this.GetInputSlots());
+		}
+
+		public override bool CanInsertIntoSlot(ItemStack itemStack, IItemSlot slot) {
+			return CanInsertIntoSlot(base.CanInsertIntoSlot, itemStack, slot);
+		}
+
+		// TODO: generalize equipment slot restrictions
+
+		public static bool CanInsertIntoSlot(Func<ItemStack, IItemSlot, bool> baseFunction, ItemStack stack, IItemSlot slot) {
+			if (slot is ArmorSlot armorSlot) {
+				Equippable? equippable = stack.GetComponents().GetOrDefault(ItemComponents.EQUIPPABLE, null!);
+				return equippable != null && armorSlot.GetArmorType().GetSlot().Equals(equippable.slot);
+			}
+			return baseFunction(stack, slot);
 		}
 
 		public override IItemSlot[] GetInputSlots() {
