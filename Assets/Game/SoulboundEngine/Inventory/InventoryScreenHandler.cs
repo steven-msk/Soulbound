@@ -379,11 +379,12 @@
 		/// until the entire stack is used.
 		/// </summary>
 		/// <returns>Whether the stack was fully consumed</returns>
-		protected bool InsertItem(ref ItemStack stack, IItemSlot[] slots, bool reverse) {
+		public bool InsertItem(ref ItemStack stack, IEnumerable<IItemSlot> slots, bool reverse) {
 			HashSet<IInventory> contentUpdates = new();
 
-			ItemStack copyOfStack = stack;
+			ItemStack copyOfStack = stack.Copy();
 			IEnumerable<IItemSlot> targetSlots = slots.Where(s => this.CanInsertIntoSlot(copyOfStack, s));
+			Logger.LogInfo(string.Join(", ", targetSlots.Select(s => s.GetIndex())));
 			if (reverse) targetSlots = targetSlots.Reverse();
 			bool consumed = InventoryUtils.TryAddStack(targetSlots, ref stack);
 

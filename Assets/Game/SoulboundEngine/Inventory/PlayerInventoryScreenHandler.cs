@@ -2,8 +2,10 @@
 	using SoulboundEngine.Item;
 	using SoulboundEngine.Item.Container;
 	using SoulboundEngine.Recipe;
+	using SoulboundEngine.World.Entity;
 	using SoulboundEngine.World.Player;
 	using System;
+	using System.Collections.Generic;
 	using System.Linq;
 
 #nullable enable
@@ -20,14 +22,32 @@
 
 		public override bool CanUse(PlayerEntity player) => true;
 
-		// TODO: implement quick move for equipment slots
-
 		protected override void QuickMove(PlayerEntity player, IItemSlot slot) {
-			IItemSlot[] hotbarSlots = this.playerInventory.GetHotbar().Select(this.playerInventory.GetSlot).ToArray();
-			IItemSlot[] popupSlots = this.playerInventory.GetPopup().Select(this.playerInventory.GetSlot).ToArray();
+			QuickMove(this, this.playerInventory, slot);
+		}
+
+		public static void QuickMove(InventoryScreenHandler handler, PlayerInventory playerInventory, IItemSlot slot) {
+			List<int> targetSlots = new();
 
 			ItemStack slotStack = slot.GetStack();
-			this.InsertItem(ref slotStack, hotbarSlots.Contains(slot) ? popupSlots : hotbarSlots, false);
+			Equippable? equippable = slotStack.GetComponents().GetOrDefault(ItemComponents.EQUIPPABLE, null!);
+			if (equippable != null) {
+				foreach ((int slotIndex, EquipmentSlot equipmentSlot) in PlayerInventory.EQUIPMENT_SLOT_MAPPING) {
+					if (equipmentSlot.Equals(equippable.slot) && slot.GetIndex() != slotIndex) {
+						targetSlots.Add(slotIndex);
+					}
+				}
+			}
+			if (playerInventory.IsHotbar(slot.GetIndex())) {
+				targetSlots.AddRange(playerInventory.GetPopup());
+			} else {
+				if (!playerInventory.IsMainArea(slot.GetIndex())) {
+					targetSlots.AddRange(playerInventory.GetPopup());
+				}
+				targetSlots.AddRange(playerInventory.GetHotbar());
+			}
+
+			handler.InsertItem(ref slotStack, playerInventory.MapToInstances(targetSlots), false);
 			slot.SetStack(slotStack);
 		}
 

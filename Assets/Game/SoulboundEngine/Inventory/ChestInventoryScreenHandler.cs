@@ -3,8 +3,6 @@
 	using SoulboundEngine.Item.Container;
 	using SoulboundEngine.World.Block.Entity;
 	using SoulboundEngine.World.Player;
-	using System.Collections.Generic;
-	using System.Linq;
 
 	public class ChestInventoryScreenHandler : InventoryScreenHandler {
 		private readonly IInventory chestInventory;
@@ -29,12 +27,7 @@
 		}
 
 		protected override void QuickMove(PlayerEntity player, IItemSlot slot) {
-			List<IItemSlot> playerSlots = this.playerInventory.GetAllSlots().ToList();
-
-			ItemStack slotStack = slot.GetStack();
-			IInventory targetInventory = playerSlots.Contains(slot) ? this.chestInventory : this.playerInventory;
-			InventoryUtils.TryAddStack(targetInventory, ref slotStack);
-			slot.SetStack(slotStack);
+			PlayerInventoryScreenHandler.QuickMove(this, this.playerInventory, slot);
 		}
 
 		public override bool CanInsertIntoSlot(ItemStack itemStack, IItemSlot slot) {

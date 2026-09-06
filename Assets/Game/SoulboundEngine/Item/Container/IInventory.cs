@@ -64,5 +64,9 @@ namespace SoulboundEngine.Item.Container {
 		public static IEnumerable<IItemSlot> GetAllSlots(this IInventory inventory) {
 			return inventory.GetSlots().Select(inventory.GetSlot);
 		}
+
+		public static IEnumerable<IItemSlot> MapToInstances(this IInventory inventory, IEnumerable<int> slots) {
+			return slots.Select(inventory.GetSlot);
+		}
 	}
 }

@@ -18,7 +18,7 @@
 			[HELMET_SLOT] = EquipmentSlot.HEAD,
 			[CHESTPLATE_SLOT] = EquipmentSlot.CHEST,
 			[LEGGINGS_SLOT] = EquipmentSlot.LEGS,
-			[BOOTS_SLOT] = EquipmentSlot.LEGS
+			[BOOTS_SLOT] = EquipmentSlot.FEET
 		};
 		private int mainSlot = 0;
 		private readonly ItemSlot[] slots;
@@ -104,6 +104,18 @@
 
 		public EquipmentSlot? GetEquipmentSlot(int slot) {
 			return EQUIPMENT_SLOT_MAPPING.TryGetValue(slot, out EquipmentSlot equipmentSlot) ? equipmentSlot : null;
+		}
+
+		public bool IsMainArea(int slot) {
+			return slot < GetMainAreaSize();
+		}
+
+		public bool IsHotbar(int slot) {
+			return slot < GetHotbarSize();
+		}
+
+		public bool IsPopup(int slot) {
+			return slot >= GetHotbarSize() && slot < GetPopupSize();
 		}
 
 		public IItemSlot GetSlot(int index) => this.slots[index];

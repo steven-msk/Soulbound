@@ -18,7 +18,7 @@
 		public static readonly EquipmentSlot LEGS = new("legs", 1);
 		public static readonly EquipmentSlot FEET = new("feet", 1);
 		public static readonly IEnumerable<EquipmentSlot> VALUES = new[] {
-			MAIN_HAND, HEAD, CHEST, LEGS
+			MAIN_HAND, HEAD, CHEST, LEGS, FEET
 		};
 		private readonly string serializedName;
 		private readonly int countLimit;
