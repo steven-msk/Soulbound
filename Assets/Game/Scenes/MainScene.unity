@@ -376,6 +376,7 @@ MonoBehaviour:
     unity:
       mainScene: MainScene
       worldScene: WorldScene
+    isRunningInEditor: 0
 --- !u!4 &2144701901
 Transform:
   m_ObjectHideFlags: 0

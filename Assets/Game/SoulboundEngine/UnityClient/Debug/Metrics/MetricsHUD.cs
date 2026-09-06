@@ -137,7 +137,7 @@ namespace SoulboundEngine.UnityClient.Debug.Metrics.View {
 						}
 					}
 
-					return FormatOutput(format, $"Screen: {SoulboundUnityClient.Instance.InputManager.mouse.mousePos}\n" +
+					return FormatOutput(format, $"Screen: {SoulboundUnityClient.Instance.InputManager.mouse.position}\n" +
 						$"World: {worldPos}{(string.IsNullOrEmpty(targetBlock.ToString()) ? string.Empty : $"\nTarget Block: {targetBlock}")}");
 				}),
 			};

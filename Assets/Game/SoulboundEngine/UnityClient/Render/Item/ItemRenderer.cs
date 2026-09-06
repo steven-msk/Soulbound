@@ -66,7 +66,7 @@ namespace SoulboundEngine.UnityClient.Render.Item {
 							display.pickingMode = PickingMode.Ignore;
 							stackText.pickingMode = PickingMode.Ignore;
 
-							uxmlContext.SetVisible(uxmlContext.root, true);
+							uxmlContext.SetVisible(uxmlContext.GetRoot(), true);
 							return ItemViewHandle.Of(display);
 						}
 					case ItemRenderContext.World world: {

@@ -1,20 +1,23 @@
 ﻿namespace SoulboundEngine.UnityClient.UI.Screen {
-	using SoulboundEngine.UnityClient.Assets;
-	using SoulboundEngine.UnityClient.Render.Item;
-	using SoulboundEngine.UnityClient.UI.UXMLBindings;
 	using SoulboundEngine.Inventory;
 	using SoulboundEngine.Item;
 	using SoulboundEngine.Recipe;
-	using SoulboundEngine.Registry;
+	using SoulboundEngine.UnityClient.Assets;
+	using SoulboundEngine.UnityClient.Render.Item;
+	using SoulboundEngine.UnityClient.UI.UXMLBindings;
 	using System.Collections.Generic;
 	using System.Linq;
 	using UnityEngine.UIElements;
 
 	public class PlayerInventoryScreen : InventoryScreen<PlayerInventoryScreenHandler> {
-		private static readonly Identifier HOTBAR_ELEMENT = Identifier.Of("soulbound:hotbar/hotbar");
-		private static readonly Identifier POPUP_ELEMENT = Identifier.Of("soulbound:player_inventory/popup");
-		private static readonly Identifier PLAYER_INVENTORY_SPACE_ELEMENT = Identifier.Of("soulbound:player_inventory_screen/player_inventory_space");
-		private static readonly Identifier CRAFTING_ELEMENT = Identifier.Of("soulbound:player_inventory_screen/crafting");
+		public static readonly UXMLBinding<VisualElement> HOTBAR_ELEMENT = new("soulbound:hotbar/hotbar");
+		public static readonly UXMLBinding<VisualElement> POPUP_ELEMENT = new("soulbound:player_inventory/popup");
+		public static readonly UXMLBinding<VisualElement> HELMET_ELEMENT = new("soulbound:player_armor/helmet");
+		public static readonly UXMLBinding<VisualElement> CHESTPLATE_ELEMENT = new("soulbound:player_armor/chestplate");
+		public static readonly UXMLBinding<VisualElement> LEGGINGS_ELEMENT = new("soulbound:player_armor/leggings");
+		public static readonly UXMLBinding<VisualElement> BOOTS_ELEMENT = new("soulbound:player_armor/boots");
+		private static readonly UXMLBinding<VisualElement> PLAYER_INVENTORY_SPACE_ELEMENT = new("soulbound:player_inventory_screen/player_inventory_space");
+		private static readonly UXMLBinding<VisualElement> CRAFTING_ELEMENT = new("soulbound:player_inventory_screen/crafting");
 		private IEnumerable<RecipeView<StationlessCraftingRecipe>> currentRecipes;
 		private readonly List<RecipePreviewElement> craftingResultPreviews = new();
 		private VisualElement craftingRoot;
@@ -34,15 +37,31 @@
 		}
 
 		protected override VisualElement GetPlayerHotbar(VisualElement inventoryRoot) {
-			return inventoryRoot.Get<VisualElement>(HOTBAR_ELEMENT);
+			return HOTBAR_ELEMENT.Get(inventoryRoot);
 		}
 
 		protected override VisualElement GetPlayerPopup(VisualElement inventoryRoot) {
-			return inventoryRoot.Get<VisualElement>(POPUP_ELEMENT);
+			return POPUP_ELEMENT.Get(inventoryRoot);
 		}
 
 		protected override VisualElement GetPlayerInventoryRoot(VisualElement screenRoot) {
-			return screenRoot.Get<VisualElement>(PLAYER_INVENTORY_SPACE_ELEMENT);
+			return PLAYER_INVENTORY_SPACE_ELEMENT.Get(screenRoot);
+		}
+
+		protected override VisualElement GetHelmetRoot(VisualElement root) {
+			return HELMET_ELEMENT.Get(root);
+		}
+
+		protected override VisualElement GetChestplateRoot(VisualElement root) {
+			return CHESTPLATE_ELEMENT.Get(root);
+		}
+
+		protected override VisualElement GetLeggingsRoot(VisualElement root) {
+			return LEGGINGS_ELEMENT.Get(root);
+		}
+
+		protected override VisualElement GetBootsRoot(VisualElement root) {
+			return BOOTS_ELEMENT.Get(root);
 		}
 
 		private void BindCrafting(VisualElement screenRoot) {
@@ -83,7 +102,7 @@
 		}
 
 		private VisualElement GetCraftingPreviewParent(VisualElement screenRoot) {
-			return screenRoot.Get<VisualElement>(CRAFTING_ELEMENT);
+			return CRAFTING_ELEMENT.Get(screenRoot);
 		}
 
 		public override void OnDispose(IScreenHandle handle) {

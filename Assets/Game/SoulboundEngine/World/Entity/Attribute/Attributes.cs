@@ -6,6 +6,7 @@
 		public static readonly RegistryEntry<AttributeType> GRAVITY = Ranged("gravity", 0.0d, 0.0d, double.MaxValue);
 		public static readonly RegistryEntry<AttributeType> JUMP_POWER = Ranged("jump_power", 0.4d, 0.0d, double.MaxValue);
 		public static readonly RegistryEntry<AttributeType> LUCK = Ranged("luck", 0.0d, double.MinValue, double.MaxValue);
+		public static readonly RegistryEntry<AttributeType> ARMOR = Ranged("armor", 0.0d, double.MinValue, double.MaxValue);
 
 		private static RegistryEntry<AttributeType> Ranged(string id, double defaultValue, double minValue, double maxValue) {
 			return Register(id, new RangedAttribute(GetTranslationKey(id), defaultValue, minValue, maxValue));

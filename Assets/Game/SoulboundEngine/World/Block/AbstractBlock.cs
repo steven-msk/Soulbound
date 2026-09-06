@@ -12,6 +12,8 @@
 	using Level = Level.Level;
 
 	public abstract class AbstractBlock : IItemConvertible {
+		public const float DEFAULT_HARDNESS = 15f;
+
 		public abstract Item AsItem();
 		protected abstract Block AsBlock();
 
@@ -22,6 +24,10 @@
 		protected virtual void OnStateReplaced(BlockState state, BlockPos pos, Level level) {
 		}
 
+		public abstract ToolPower GetRequiredToolPower();
+
+		public abstract float GetHardness(BlockState blockState);
+
 		protected virtual bool CanPlaceAt(BlockState blockState, Level level, BlockPos blockPos) {
 			if (level.GetBlock(blockPos) != Blocks.AIR) return false;
 
@@ -29,6 +35,10 @@
 				if (level.GetBlock(pos) != Blocks.AIR) return true;
 			}
 			return false;
+		}
+
+		protected virtual BlockState GetBreakState(Level level, BlockPos blockPos, BlockState blockState) {
+			return Blocks.AIR.DefaultState;
 		}
 
 		/// <summary> 
@@ -78,6 +88,14 @@
 
 			public BlockShape GetCollisionShape(BlockState state, Level level, BlockPos blockPos) {
 				return this.owner.GetShape(state, blockPos, level);
+			}
+
+			public float GetHardness() {
+				return this.owner.GetHardness(this.AsBlockState());
+			}
+
+			public virtual BlockState GetBreakState(Level level, BlockPos blockPos, BlockState blockState) {
+				return this.owner.GetBreakState(level, blockPos, blockState);
 			}
 
 			public List<ItemStack> GetDroppedStacks() {
@@ -139,16 +157,12 @@
 
 		public sealed class Settings {
 			public RegistryKey<Block> registryKey { get; private set; }
-			public int minBreakLevel { get; private set; } = 0;
+			public ToolPower requiredToolPower { get; private set; } = ToolPower.NONE;
 			public Func<BlockState, List<ItemStack>> droppedStacks { get; private set; } = Block.DropSingle();
+			public float hardness { get; private set; } = DEFAULT_HARDNESS;
 
 			public Settings RegistryKey(RegistryKey<Block> registryKey) {
 				this.registryKey = registryKey;
-				return this;
-			}
-
-			public Settings MinBreakLevel(int minBreakLevel) {
-				this.minBreakLevel = minBreakLevel;
 				return this;
 			}
 
@@ -159,6 +173,16 @@
 
 			public Settings DropsAir() {
 				this.droppedStacks = Block.DropAir();
+				return this;
+			}
+
+			public Settings RequiresTool(ToolPower type) {
+				this.requiredToolPower = type;
+				return this;
+			}
+
+			public Settings Hardness(float hardness) {
+				this.hardness = hardness;
 				return this;
 			}
 

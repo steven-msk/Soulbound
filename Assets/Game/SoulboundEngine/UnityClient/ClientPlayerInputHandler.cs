@@ -62,7 +62,7 @@
 		}
 
 		private void UpdateScreenPointerPos(PlayerEntity player) {
-			Vector2 pointerPos = this.client.InputManager.mouse.mousePos;
+			Vector2 pointerPos = this.client.InputManager.mouse.position;
 			player.SetScreenPointerPos(pointerPos.ToVec2d());
 		}
 
@@ -74,6 +74,10 @@
 			if (this.startedHoldingLeftThisTick) {
 				player.OnLeftClick();
 			}
+			bool stoppedHoldingLeft = previouslyHoldingLeft && !this.isHoldingLeft;
+			if (stoppedHoldingLeft) {
+				player.OnLeftRelease();
+			}
 
 			bool preivouslyHoldingRight = this.isHoldingRight;
 			this.isHoldingRight = this.client.InputManager.mouse.isRightPressed;
@@ -81,6 +85,10 @@
 			player.SetHoldingRight(!this.startedHoldingRightThisTick && this.isHoldingRight);
 			if (this.startedHoldingRightThisTick) {
 				player.OnRightClick();
+			}
+			bool stoppedHoldingRight = preivouslyHoldingRight && !this.isHoldingRight;
+			if (stoppedHoldingRight) {
+				player.OnRightRelease();
 			}
 		}
 

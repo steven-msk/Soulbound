@@ -12,18 +12,20 @@
 				: DataResult<EquipmentSlot>.Error($"Invalid equipment slot: {s}")
 		);
 		private static readonly Dictionary<string, EquipmentSlot> BY_SERIALIZED_NAME = new();
-		public static readonly EquipmentSlot MAIN_HAND = new("main_hand", 0, 1);
+		public static readonly EquipmentSlot MAIN_HAND = new("main_hand", 0);
+		public static readonly EquipmentSlot HEAD = new("head", 1);
+		public static readonly EquipmentSlot CHEST = new("chest", 1);
+		public static readonly EquipmentSlot LEGS = new("legs", 1);
+		public static readonly EquipmentSlot FEET = new("feet", 1);
 		public static readonly IEnumerable<EquipmentSlot> VALUES = new[] {
-			MAIN_HAND
+			MAIN_HAND, HEAD, CHEST, LEGS, FEET
 		};
 		private readonly string serializedName;
-		private readonly int id;
 		private readonly int countLimit;
 
-		public EquipmentSlot(string name, int countLimit, int id) {
+		public EquipmentSlot(string name, int countLimit) {
 			this.countLimit = countLimit;
 			this.serializedName = name;
-			this.id = id;
 			BY_SERIALIZED_NAME.Add(name, this);
 		}
 
@@ -37,8 +39,6 @@
 			return this.countLimit > 0 ? stack.Split(this.countLimit) : stack;
 		}
 
-		public int GetId() => this.id;
-
 		public static bool operator ==(EquipmentSlot a, EquipmentSlot b) => a.Equals(b);
 		
 		public static bool operator !=(EquipmentSlot a, EquipmentSlot b) => !a.Equals(b);
@@ -49,12 +49,11 @@
 
 		public bool Equals(EquipmentSlot other) {
 			return other.serializedName == this.serializedName
-				&& other.id == this.id
 				&& other.countLimit == this.countLimit;
 		}
 
 		public override int GetHashCode() {
-			return HashCode.Combine(this.serializedName, this.id, this.countLimit);
+			return HashCode.Combine(this.serializedName, this.countLimit);
 		}
 
 		public override string ToString() => this.serializedName;

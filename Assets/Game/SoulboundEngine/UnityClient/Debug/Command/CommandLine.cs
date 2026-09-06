@@ -4,7 +4,6 @@ namespace SoulboundEngine.UnityClient.Debug {
 	using Brigadier.NET.Suggestion;
 	using Cysharp.Threading.Tasks;
 	using SoulboundEngine.Command;
-	using SoulboundEngine.Registry;
 	using SoulboundEngine.UnityClient.Assets;
 	using SoulboundEngine.UnityClient.Debug.Command;
 	using SoulboundEngine.UnityClient.Settings;
@@ -22,15 +21,15 @@ namespace SoulboundEngine.UnityClient.Debug {
 #nullable enable
 
 	public sealed class CommandLine : UXMLWidget, IInputFocusable {
-		private static readonly Identifier TEXT_FIELD_ELEMENT = Identifier.Of("soulbound:command_line/text_field");
-		private static readonly Identifier COMPLETION_LIST_ELEMENT = Identifier.Of("soulbound:command_line/completion_list");
-		private static readonly Identifier SUGGESTION_TEXT_ELEMENT = Identifier.Of("soulbound:command_suggestion/suggestion_text");
-		private static readonly Identifier USAGE_LIST_ELEMENT = Identifier.Of("soulbound:command_line/usage_list");
-		private static readonly Identifier USAGE_TEXT_ELEMENT = Identifier.Of("soulbound:command_usage/usage_text");
-		private static readonly Identifier EXCEPTION_LIST_ELEMENT = Identifier.Of("soulbound:command_line/exception_list");
-		private static readonly Identifier EXCEPTION_TEXT_ELEMENT = Identifier.Of("soulbound:command_exception/exception_text");
-		private static readonly Identifier OUTPUT_LIST_ELEMENT = Identifier.Of("soulbound:command_line/output_history_list");
-		private static readonly Identifier OUTPUT_TEXT_ELEMENT = Identifier.Of("soulbound:command_output/output_text");
+		private static readonly UXMLBinding<TextField> TEXT_FIELD_ELEMENT = new("soulbound:command_line/text_field");
+		private static readonly UXMLBinding<ListView> COMPLETION_LIST_ELEMENT = new("soulbound:command_line/completion_list");
+		private static readonly UXMLBinding<Label> SUGGESTION_TEXT_ELEMENT = new("soulbound:command_suggestion/suggestion_text");
+		private static readonly UXMLBinding<ListView> USAGE_LIST_ELEMENT = new("soulbound:command_line/usage_list");
+		private static readonly UXMLBinding<Label> USAGE_TEXT_ELEMENT = new("soulbound:command_usage/usage_text");
+		private static readonly UXMLBinding<ListView> EXCEPTION_LIST_ELEMENT = new("soulbound:command_line/exception_list");
+		private static readonly UXMLBinding<Label> EXCEPTION_TEXT_ELEMENT = new("soulbound:command_exception/exception_text");
+		private static readonly UXMLBinding<ListView> OUTPUT_LIST_ELEMENT = new("soulbound:command_line/output_history_list");
+		private static readonly UXMLBinding<Label> OUTPUT_TEXT_ELEMENT = new("soulbound:command_output/output_text");
 		private const int MAX_OUTPUT_COUNT = 30;
 		private static readonly Color DEFAULT_OUTPUT_COLOR = new(0.8f, 0.8f, 0.8f, 1f);
 		private readonly CommandProcessor<ClientCommandContext> commandProcessor;
@@ -71,26 +70,26 @@ namespace SoulboundEngine.UnityClient.Debug {
 
 		public override void OnBind(VisualElement root) {
 			base.OnBind(root);
-			this.textField = root.Get<TextField>(TEXT_FIELD_ELEMENT);
-			this.completionList = root.Get<ListView>(COMPLETION_LIST_ELEMENT);
+			this.textField = TEXT_FIELD_ELEMENT.Get(root);
+			this.completionList = COMPLETION_LIST_ELEMENT.Get(root);
 			this.completionList.bindItem = (element, index) => {
 				Suggestion suggestion = this.completionManager.Get(index);
-				element.Get<Label>(SUGGESTION_TEXT_ELEMENT).text = suggestion.Text;
+				SUGGESTION_TEXT_ELEMENT.Get(element).text = suggestion.Text;
 			};
-			this.usageList = root.Get<ListView>(USAGE_LIST_ELEMENT);
+			this.usageList = USAGE_LIST_ELEMENT.Get(root);
 			this.usageList.bindItem = (element, index) => {
-				element.Get<Label>(USAGE_TEXT_ELEMENT).text = this.currentUsages[index];
+				USAGE_TEXT_ELEMENT.Get(root).text = this.currentUsages[index];
 			};
 			this.usageList.itemsSource = this.currentUsages;
-			this.exceptionList = root.Get<ListView>(EXCEPTION_LIST_ELEMENT);
+			this.exceptionList = EXCEPTION_LIST_ELEMENT.Get(root);
 			this.exceptionList.bindItem = (element, index) => {
-				element.Get<Label>(EXCEPTION_TEXT_ELEMENT).text = this.currentExceptions[index].Message;
+				EXCEPTION_TEXT_ELEMENT.Get(element).text = this.currentExceptions[index].Message;
 			};
 			this.exceptionList.itemsSource = this.currentExceptions;
-			this.outputList = root.Get<ListView>(OUTPUT_LIST_ELEMENT);
+			this.outputList = OUTPUT_LIST_ELEMENT.Get(root);
 			this.outputList.itemsSource = this.outputHistory;
 			this.outputList.bindItem = (element, index) => {
-				Label label = element.Get<Label>(OUTPUT_TEXT_ELEMENT);
+				Label label = OUTPUT_TEXT_ELEMENT.Get(root);
 				CommandOutput output = this.outputHistory[index];
 				label.text = output.message;
 				label.style.color = output.isError ? Color.red : DEFAULT_OUTPUT_COLOR;

@@ -1,8 +1,9 @@
-using System.Collections.Generic;
+namespace SoulboundEngine.Item.Container {
+	using System.Collections.Generic;
+	using System.Linq;
 
 #nullable enable
 
-namespace SoulboundEngine.Item.Container {
 	public static class InventoryUtils {
 		/// <summary>
 		/// Tries to add the stack into the inventory.
@@ -17,13 +18,14 @@ namespace SoulboundEngine.Item.Container {
 		/// Returns whether the stack was fully consumed.
 		/// </summary>
 		public static bool TryAddStack(IEnumerable<IItemSlot> slots, ref ItemStack itemStack) {
-			foreach (var slot in FilterContaining(slots, itemStack.GetItem())) {
+			List<IItemSlot> slotList = slots.ToList();
+			foreach (IItemSlot slot in FilterContaining(slotList, itemStack.GetItem())) {
 				ItemStack slotStack = slot.GetStack();
 				slotStack.FillFrom(ref itemStack);
 				slot.SetStack(slotStack);
 				if (itemStack.IsEmpty()) return true;
 			}
-			if (TryGetFirstEmpty(slots, out IItemSlot emptySlot)) {
+			if (TryGetFirstEmpty(slotList, out IItemSlot emptySlot)) {
 				emptySlot.SetStack(itemStack);
 				itemStack = ItemStack.EMPTY;
 				return true;
@@ -32,7 +34,7 @@ namespace SoulboundEngine.Item.Container {
 		}
 
 		public static IEnumerable<IItemSlot> GetSlotsContaining(this IInventory inventory, Item? item) {
-			foreach (var slot in inventory.GetAllSlots()) {
+			foreach (IItemSlot slot in inventory.GetAllSlots()) {
 				if (slot.GetStack().IsOf(item)) {
 					yield return slot;
 				}
@@ -41,7 +43,7 @@ namespace SoulboundEngine.Item.Container {
 
 		public static IEnumerable<IItemSlot> FilterContaining(IEnumerable<IItemSlot> slots, Item? item) {
 			List<IItemSlot> filtered = new();
-			foreach (var slot in slots) {
+			foreach (IItemSlot slot in slots) {
 				if (slot.GetStack().IsOf(item)) {
 					filtered.Add(slot);
 				}
@@ -50,7 +52,7 @@ namespace SoulboundEngine.Item.Container {
 		}
 
 		public static bool TryGetFirstEmpty(IEnumerable<IItemSlot> slots, out IItemSlot empty) {
-			foreach (var slot in slots) {
+			foreach (IItemSlot slot in slots) {
 				if (!slot.HasStack()) {
 					empty = slot;
 					return true;
@@ -61,14 +63,14 @@ namespace SoulboundEngine.Item.Container {
 		}
 
 		public static bool ContainsItem(this IInventory inventory, Item? item) {
-			foreach (var _ in inventory.GetSlotsContaining(item)) {
+			foreach (IItemSlot _ in inventory.GetSlotsContaining(item)) {
 				return true;
 			}
 			return false;
 		}
 
 		public static bool TryGetFirstEmptySlot(this IInventory inventory, out IItemSlot slot) {
-			foreach (var emptySlot in inventory.GetSlotsContaining(null)) {
+			foreach (IItemSlot emptySlot in inventory.GetSlotsContaining(null)) {
 				slot = emptySlot;
 				return true;
 			}

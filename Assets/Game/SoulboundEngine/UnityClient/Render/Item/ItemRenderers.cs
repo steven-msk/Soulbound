@@ -1,10 +1,9 @@
-﻿using SoulboundEngine.UnityClient.Assets;
-using SoulboundEngine.UnityClient.Render.Sprite;
-using SoulboundEngine.Item;
-using System;
-using System.Collections.Generic;
-
-namespace SoulboundEngine.UnityClient.Render.Item {
+﻿namespace SoulboundEngine.UnityClient.Render.Item {
+	using SoulboundEngine.Item;
+	using SoulboundEngine.UnityClient.Assets;
+	using SoulboundEngine.UnityClient.Render.Sprite;
+	using System;
+	using System.Collections.Generic;
 	using Item = SoulboundEngine.Item.Item;
 
 	public static class ItemRenderers {
@@ -21,12 +20,20 @@ namespace SoulboundEngine.UnityClient.Render.Item {
 			Register(Items.WOOD, DefaultResolverFactory("wood"));
 			Register(Items.LEAVES, DefaultResolverFactory("leaves"));
 			Register(Items.CHEST, DefaultResolverFactory("chest"));
+			Register(Items.WOODEN_PICKAXE, DefaultResolverFactory("wooden_pickaxe"));
+			Register(Items.STONE_PICKAXE, DefaultResolverFactory("stone_pickaxe"));
+			Register(Items.WOODEN_BOOTS, DefaultResolverFactory("wooden_boots"));
+			Register(Items.WOODEN_LEGGINGS, DefaultResolverFactory("wooden_leggings"));
+			Register(Items.WOODEN_CHESTPLATE, DefaultResolverFactory("wooden_chestplate"));
+			Register(Items.WOODEN_HELMET, DefaultResolverFactory("wooden_helmet"));
+			Register(Items.STONE_BOOTS, DefaultResolverFactory("stone_boots"));
+			Register(Items.STONE_LEGGINGS, DefaultResolverFactory("stone_leggings"));
+			Register(Items.STONE_CHESTPLATE, DefaultResolverFactory("stone_chestplate"));
+			Register(Items.STONE_HELMET, DefaultResolverFactory("stone_helmet"));
 
 			Register(Items.placeableItem, DefaultResolverFactory("bluething"));
 			Register(Items.teleportPlayerItem, DefaultResolverFactory("bluething"));
-			Register(Items.chargeableItem, DefaultResolverFactory("bluething"));
 			Register(Items.debugPointer, DefaultResolverFactory("debugPointer"));
-			Register(Items.blockBreakerItem, DefaultResolverFactory("bluething"));
 		}
 
 		public static void Register(Item item, IItemModelResolver.Factory modelResolverFactory) {
@@ -40,7 +47,7 @@ namespace SoulboundEngine.UnityClient.Render.Item {
 
 		public static Dictionary<Item, ItemRenderer> LoadRenderers(List<Item> items) {
 			Dictionary<Item, ItemRenderer> rendererByItem = new();
-			foreach (var item in items) {
+			foreach (Item item in items) {
 				rendererByItem.Add(item, RENDERER_FACTORIES.TryGetValue(item, out ItemRenderer.Factory factory)
 					? factory()
 					: GetDefaultRenderer()

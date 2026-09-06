@@ -1,0 +1,12 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Template name="armor_slot" src="project://database/Assets/Game/Content/UI/armor_slot.uxml?fileID=9197481963319205126&amp;guid=a37f5379a1c88b3499559d50c67e7eb7&amp;type=3#armor_slot"/>
+    <Style src="project://database/Assets/Game/Content/UI/Styles/Slot.uss?fileID=7433441132597879392&amp;guid=3c695142df27d314eb16e841ce896c57&amp;type=3#Slot"/>
+    <ui:VisualElement name="" style="flex-grow: 1;">
+        <ui:VisualElement name="armor" style="flex-grow: 1;">
+            <ui:Instance template="armor_slot" name="helmet" style="margin-bottom: 4px;"/>
+            <ui:Instance template="armor_slot" name="chestplate" style="margin-bottom: 4px;"/>
+            <ui:Instance template="armor_slot" name="leggings" style="margin-bottom: 4px;"/>
+            <ui:Instance template="armor_slot" name="boots" style="margin-bottom: 4px;"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
