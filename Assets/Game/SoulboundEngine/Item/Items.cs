@@ -1,8 +1,6 @@
 namespace SoulboundEngine.Item {
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.World.Block;
-	using SoulboundEngine.World.Entity;
-	using SoulboundEngine.World.Entity.Attribute;
 	using System;
 
 #nullable enable
@@ -15,31 +13,36 @@ namespace SoulboundEngine.Item {
 		public static readonly Item WOOD = Register(Blocks.WOOD);
 		public static readonly Item LEAVES = Register(Blocks.LEAVES);
 		public static readonly Item CHEST = Register(Blocks.CHEST);
+		public static readonly Item WOODEN_PICKAXE = Register("wooden_pickaxe", s => s
+			.Tool(new ToolSettings(ToolPower.WOOD, 100, 1.5f))
+		);
+		public static readonly Item STONE_PICKAXE = Register("stone_pickaxe", s => s
+			.Tool(new ToolSettings(ToolPower.STONE, 250, 2f))
+		);
+		// TODO: implement item families (beta roadmap point)
+		public static readonly Item WOODEN_HELMET = Register("wooden_helmet", s => s.Armor(ArmorType.HELMET, ArmorSettings.WOOD));
+		public static readonly Item WOODEN_CHESTPLATE = Register("wooden_chestplate", s => s.Armor(ArmorType.CHESTPLATE, ArmorSettings.WOOD));
+		public static readonly Item WOODEN_LEGGINGS = Register("wooden_leggings", s => s.Armor(ArmorType.LEGGINGS, ArmorSettings.WOOD));
+		public static readonly Item WOODEN_BOOTS = Register("wooden_boots", s => s.Armor(ArmorType.BOOTS, ArmorSettings.WOOD));
+		public static readonly Item STONE_HELMET = Register("stone_helmet", s => s.Armor(ArmorType.HELMET, ArmorSettings.STONE));
+		public static readonly Item STONE_CHESTPLATE = Register("stone_chestplate", s => s.Armor(ArmorType.CHESTPLATE, ArmorSettings.STONE));
+		public static readonly Item STONE_LEGGINGS = Register("stone_leggings", s => s.Armor(ArmorType.LEGGINGS, ArmorSettings.STONE));
+		public static readonly Item STONE_BOOTS = Register("stone_boots", s => s.Armor(ArmorType.BOOTS, ArmorSettings.STONE));
 
-		public static readonly Item placeableItem = Register(Blocks.MOVING_TICKING_BLOCK);
-		public static readonly Item teleportPlayerItem = Register("teleport_player_item", settings => new TeleportPlayerItem(settings),
-			settings => settings.NonStackable().Durability(50)
-		);
-		public static readonly Item chargeableItem = Register("chargeable_item", settings => new ChargeableItem(settings),
-			settings => settings.NonStackable()
-			// TEMP
-			.Attributes(b => b.Add(Attributes.SPEED, new AttributeModifier(Identifier.Of("speed_mult"), 5.0d, AttributeModifier.Operation.ADDITIVE_PERCENT), EquipmentSlot.MAIN_HAND))
-		);
-		public static readonly Item debugPointer = Register("debug_pointer", settings => new DebugPointerItem(settings),
-			settings => settings.NonStackable()
-		);
-		public static readonly Item blockBreakerItem = Register("block_breaker_item", settings => settings
-			.NonStackable()
-			.BreakLevel(1)
-			// TEMP
-			.Attributes(b => b.Add(Attributes.SPEED, new AttributeModifier(Identifier.Of("speed_increase"), 1.0d, AttributeModifier.Operation.ADDITIVE), EquipmentSlot.MAIN_HAND))
-		);
 		// TEST ITEM
 		public static readonly Item JUMP_EFFECT_ITEM = Register("jump_effect_item", s => new JumpEffectItem(s), s => s
 			.NonStackable()
 			.Durability(10)
 		);
 
+		public static readonly Item placeableItem = Register(Blocks.MOVING_TICKING_BLOCK);
+		public static readonly Item teleportPlayerItem = Register("teleport_player_item", settings => new TeleportPlayerItem(settings),
+			settings => settings.NonStackable().Durability(50)
+		);
+		public static readonly Item debugPointer = Register("debug_pointer", settings => new DebugPointerItem(settings),
+			settings => settings.NonStackable()
+		);
+		
 		public static Item Register(string id) {
 			return Register(id, Item.Create, new Item.Settings());
 		}

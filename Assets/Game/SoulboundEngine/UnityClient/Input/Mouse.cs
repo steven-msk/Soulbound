@@ -1,7 +1,8 @@
-﻿using UnityEngine;
-using UnityEngine.InputSystem;
+﻿namespace SoulboundEngine.UnityClient.Input {
+	using System;
+	using UnityEngine;
+	using UnityEngine.InputSystem;
 
-namespace SoulboundEngine.UnityClient.Input {
 	public sealed class Mouse : InputManager.MappedInputActions {
 		public const string ACTION_MAP = "Mouse";
 		public const string LEFT_PATH = "LeftClick";
@@ -10,6 +11,7 @@ namespace SoulboundEngine.UnityClient.Input {
 		public const string FORWARD_PATH = "Forward";
 		public const string BACK_PATH = "Backward";
 		public const string SCROLL_PATH = "Scroll";
+		public event Action<Vector2> mouseMoved;
 		private int leftClicks;
 		private int rightClicks;
 		private int forwardClicks;
@@ -56,7 +58,7 @@ namespace SoulboundEngine.UnityClient.Input {
 		public bool isRightPressed { get; private set; }
 		public bool isForwardPressed { get; private set; }
 		public bool isBackPressed { get; private set; }
-		public Vector2 mousePos { get; private set; }
+		public Vector2 position { get; private set; }
 		public float scrollDelta { get; private set; }
 
 		public bool WasLeftPressed() {
@@ -120,7 +122,8 @@ namespace SoulboundEngine.UnityClient.Input {
 		}
 
 		private void MouseMoved(InputAction.CallbackContext ctx) {
-			this.mousePos = ctx.ReadValue<Vector2>();
+			this.position = ctx.ReadValue<Vector2>();
+			mouseMoved?.Invoke(this.position);
 		}
 
 		private void Scrolled(InputAction.CallbackContext ctx) {

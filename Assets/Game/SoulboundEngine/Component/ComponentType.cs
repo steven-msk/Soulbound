@@ -34,6 +34,10 @@
 		public static Identifier GetId(ComponentType type) {
 			return type.key.value;
 		}
+
+		public override string ToString() {
+			return this.key.value.ToString();
+		}
 	}
 
 	public class ComponentType<T> : ComponentType {

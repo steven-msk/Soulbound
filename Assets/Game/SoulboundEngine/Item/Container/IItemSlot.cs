@@ -1,11 +1,9 @@
-using System;
+namespace SoulboundEngine.Item.Container {
+	using System;
 
 #nullable enable
 
-namespace SoulboundEngine.Item.Container {
 	public interface IItemSlot {
-		[Obsolete]
-		event Action<ItemStack> setStack;
 		event Action<ItemStack, ItemStack>? stackChanged;
 
 		ItemStack GetStack();
@@ -13,9 +11,15 @@ namespace SoulboundEngine.Item.Container {
 
 		int GetIndex();
 		IInventory GetInventory();
+	}
 
-		public bool HasStack() => !this.GetStack().IsEmpty();
+	public static class ItemSlotDefaults {
+		public static SlotRef GetRef(this IItemSlot slot) {
+			return new SlotRef(slot.GetInventory(), slot.GetIndex());
+		}
 
-		public SlotRef GetRef() => new(this.GetInventory(), this.GetIndex());
+		public static bool HasStack(this IItemSlot slot) => !slot.GetStack().IsEmpty();
+
+		public static bool IsEmpty(this IItemSlot slot) => slot.GetStack().IsEmpty();
 	}
 }

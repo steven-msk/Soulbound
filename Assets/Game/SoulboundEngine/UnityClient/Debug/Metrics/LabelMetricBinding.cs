@@ -18,7 +18,7 @@
 		}
 
 		public LabelMetricBinding(VisualElement root, Identifier labelId, Func<DebugMetricsSnapshot, string, string> formatter) 
-			: this(root.Get<Label>(labelId), formatter) {
+			: this(new UXMLBinding<Label>(labelId).Get(root), formatter) {
 		}
 
 		public override void Refresh(DebugMetricsSnapshot data) {

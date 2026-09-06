@@ -16,9 +16,9 @@
 		private bool isInventoryOpen;
 		private IScreenHandle? signEditScreen;
 
-		public ClientPlayerEntity(SoulboundUnityClient UnityClient, Level level) 
+		public ClientPlayerEntity(SoulboundUnityClient client, Level level) 
 			: base(level) {
-			this.client = UnityClient;
+			this.client = client;
 		}
 
 		public override void OpenInventoryScreen(IInventoryScreenHandlerFactory handlerFactory) {

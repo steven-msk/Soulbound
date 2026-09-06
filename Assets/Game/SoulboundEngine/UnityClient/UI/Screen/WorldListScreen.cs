@@ -1,23 +1,22 @@
-﻿using SoulboundEngine.UnityClient.Assets;
-using SoulboundEngine.UnityClient.Debug.Logging;
-using SoulboundEngine.UnityClient.UI.UXMLBindings;
-using SoulboundEngine.Registry;
-using SoulboundEngine.World;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine.UIElements;
+﻿namespace SoulboundEngine.UnityClient.UI.Screen {
+	using SoulboundEngine.UnityClient.Assets;
+	using SoulboundEngine.UnityClient.UI.UXMLBindings;
+	using SoulboundEngine.World;
+	using SoulboundEngine.World.Serialization;
+	using System.Collections.Generic;
+	using System.Linq;
+	using UnityEngine.UIElements;
 
-namespace SoulboundEngine.UnityClient.UI.Screen {
 	public sealed class WorldListScreen : UXMLScreen {
 		public const int MAX_WORLDS = 10;
-		private static readonly Identifier WORLD_LIST_ELEMENT = Identifier.Of("soulbound:world_list_screen/world_list");
-		private static readonly Identifier CREATE_WORLD_ELEMENT = Identifier.Of("soulbound:world_list_screen/create_world");
-		private static readonly Identifier NAME_FIELD_ELEMENT = Identifier.Of("soulbound:world_list_screen/name_field");
-		private static readonly Identifier SEED_FIELD_ELEMENT = Identifier.Of("soulbound:world_list_screen/seed_field");
-		private static readonly Identifier WORLD_NAME_FIELD_ELEMENT = Identifier.Of("soulbound:world_entry/world_name");
-		private static readonly Identifier WORLD_SEED_FIELD_ELEMENT = Identifier.Of("soulbound:world_entry/world_seed");
-		private static readonly Identifier ENTER_WORLD_ELEMENT = Identifier.Of("soulbound:world_entry/enter_world");
-		private static readonly Identifier DELETE_WORLD_ELEMENT = Identifier.Of("soulbound:world_entry/delete_world");
+		private static readonly UXMLBinding<VisualElement> WORLD_LIST_ELEMENT = new("soulbound:world_list_screen/world_list");
+		private static readonly UXMLBinding<Button> CREATE_WORLD_ELEMENT = new("soulbound:world_list_screen/create_world");
+		private static readonly UXMLBinding<TextField> NAME_FIELD_ELEMENT = new("soulbound:world_list_screen/name_field");
+		private static readonly UXMLBinding<TextField> SEED_FIELD_ELEMENT = new("soulbound:world_list_screen/seed_field");
+		private static readonly UXMLBinding<Label> WORLD_NAME_FIELD_ELEMENT = new("soulbound:world_entry/world_name");
+		private static readonly UXMLBinding<Label> WORLD_SEED_FIELD_ELEMENT = new("soulbound:world_entry/world_seed");
+		private static readonly UXMLBinding<Button> ENTER_WORLD_ELEMENT = new("soulbound:world_entry/enter_world");
+		private static readonly UXMLBinding<Button> DELETE_WORLD_ELEMENT = new("soulbound:world_entry/delete_world");
 		private readonly IWorldAccessor worldAccessor;
 		private readonly VisualTreeAsset worldEntryAsset;
 		private int nextWorldIndex;
@@ -31,21 +30,21 @@ namespace SoulboundEngine.UnityClient.UI.Screen {
 		}
 
 		protected override void OnBind(VisualElement root) {
-			VisualElement worldList = root.Get<VisualElement>(WORLD_LIST_ELEMENT);
+			VisualElement worldList = WORLD_LIST_ELEMENT.Get(root);
 			this.CreateSlots(worldList);
 			this.nextWorldIndex = 0;
 			int i = 0;
 
-			foreach (var save in this.worldAccessor.ListWorldSaves()) {
+			foreach (WorldSave save in this.worldAccessor.ListWorldSaves()) {
 				if (this.SpaceAvailable() <= 0) break;
 
 				VisualElement slot = this.GetNextSlot(worldList);
 				this.AddWorldToList(save.name, save.seed, slot, i++);
 			}
 
-			root.Get<Button>(CREATE_WORLD_ELEMENT).clicked += () => {
-				TextField nameField = root.Get<TextField>(NAME_FIELD_ELEMENT);
-				TextField seedField = root.Get<TextField>(SEED_FIELD_ELEMENT);
+			CREATE_WORLD_ELEMENT.Get(root).clicked += () => {
+				TextField nameField = NAME_FIELD_ELEMENT.Get(root);
+				TextField seedField = SEED_FIELD_ELEMENT.Get(root);
 
 				if (!string.IsNullOrEmpty(nameField.value) && this.SpaceAvailable() > 0) {
 					int seed = SoulboundUnityClient.GetRandomWorldSeed();
@@ -60,7 +59,7 @@ namespace SoulboundEngine.UnityClient.UI.Screen {
 
 					this.worldAccessor.CreateNewWorld(nameField.value, seed);
 
-					VisualElement listRoot = root.Get<VisualElement>(WORLD_LIST_ELEMENT);
+					VisualElement listRoot = WORLD_LIST_ELEMENT.Get(root);
 					VisualElement slot = this.GetNextSlot(listRoot);
 					int index = listRoot.hierarchy.IndexOf(slot);
 					this.AddWorldToList(nameField.value, seed, slot, index);
@@ -122,11 +121,11 @@ namespace SoulboundEngine.UnityClient.UI.Screen {
 			seed.style.display = DisplayStyle.None;
 		}
 
-		private Label GetName(VisualElement slot) => slot.Get<Label>(WORLD_NAME_FIELD_ELEMENT);
-		private Label GetSeed(VisualElement slot) => slot.Get<Label>(WORLD_SEED_FIELD_ELEMENT);
+		private Label GetName(VisualElement slot) => WORLD_NAME_FIELD_ELEMENT.Get(slot);
+		private Label GetSeed(VisualElement slot) => WORLD_SEED_FIELD_ELEMENT.Get(slot);
 
-		private Button GetEnterButton(VisualElement slot) => slot.Get<Button>(ENTER_WORLD_ELEMENT);
-		private Button GetDeleteButton(VisualElement slot) => slot.Get<Button>(DELETE_WORLD_ELEMENT);
+		private Button GetEnterButton(VisualElement slot) => ENTER_WORLD_ELEMENT.Get(slot);
+		private Button GetDeleteButton(VisualElement slot) => DELETE_WORLD_ELEMENT.Get(slot);
 
 		private VisualElement GetNextSlot(VisualElement listRoot) {
 			if (this.removedSlots.Any()) {

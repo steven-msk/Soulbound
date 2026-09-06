@@ -1,15 +1,14 @@
 ﻿namespace SoulboundEngine.UnityClient.World.Widget {
+	using SoulboundEngine.Common.Math;
 	using SoulboundEngine.UnityClient.Assets;
 	using SoulboundEngine.UnityClient.UI.UXMLBindings;
-	using SoulboundEngine.Common.Math;
-	using SoulboundEngine.Registry;
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Widget;
 	using UnityEngine;
 	using UnityEngine.UIElements;
 
 	public class TextWidgetRenderer : WorldWidgetRenderer<TextWidgetHandler, TextWidgetHandler.Context> {
-		private static readonly Identifier TEXT_ELEMENT = Identifier.Of("soulbound:text_widget/text");
+		private static readonly UXMLBinding<Label> TEXT_ELEMENT = new("soulbound:text_widget/text");
 		private readonly TextWidgetHandler.Context creationContext;
 		private readonly VisualTreeAsset asset;
 		private UIDocument document;
@@ -41,7 +40,7 @@
 		}
 
 		public void SetText(string text) {
-			Label label = this.document.rootVisualElement.Get<Label>(TEXT_ELEMENT);
+			Label label = TEXT_ELEMENT.Get(this.document.rootVisualElement);
 			label.text = text;
 		}
 

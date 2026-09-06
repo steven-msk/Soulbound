@@ -69,12 +69,6 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 2052768fc90321c4c8ef963e26a3d1f0
-    m_Address: TestRecipe2
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - recipe
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 22de33d73f0feda4e9a52553b3394a28
     m_Address: grass
     m_ReadOnly: 0
@@ -152,12 +146,6 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 6efedd66d5f1dd0479f24cd8f1ad1e92
-    m_Address: TestRecipe
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - recipe
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 714a27d172464694bbafd67b6569eace
     m_Address: ReactInactiveTile
@@ -243,6 +231,18 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d26a4a1538192614793a3e52107f78d1
+    m_Address: stone_pickaxe
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - recipe
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d746fc3c856a19442a5c272b31ffa2fa
+    m_Address: blockBreakOverlayAtlas
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d863461c1411eba4b9a64e81eecfc1ca
     m_Address: TickBlockOff
     m_ReadOnly: 0
@@ -273,6 +273,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e85990a1a57b00846b14a5495bec627b
+    m_Address: wooden_pickaxe
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - recipe
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e97c1c3954a6faa4da45ed9eef7f1918
     m_Address: missingTile
     m_ReadOnly: 0
@@ -293,6 +299,12 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: f6426e6fd6941634a8f5292711ce4db8
     m_Address: Urbanist-Bold SDF
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f8f6a38a4aa8d43448f5e672a02f6be7
+    m_Address: blockBreakOverlay
     m_ReadOnly: 0
     m_SerializedLabels:
     - preload

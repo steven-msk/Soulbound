@@ -37,6 +37,10 @@ namespace SoulboundEngine.Common.Math {
 			return Math.Clamp(v, 0.0d, 1.0d);
 		}
 
+		public static float Clamp01(float v) {
+			return Math.Clamp(v, 0f, 1f);
+		}
+
 		public static double InverseLerp(double a, double b, double value) {
 			return a != b ? Clamp01((value - a) / (b - a)) : 0.0d;
 		}

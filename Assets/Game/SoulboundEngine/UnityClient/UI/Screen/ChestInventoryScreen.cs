@@ -1,18 +1,15 @@
 ﻿namespace SoulboundEngine.UnityClient.UI {
-	using SoulboundEngine.UnityClient.UI.Screen;
-	using SoulboundEngine.UnityClient.UI.UXMLBindings;
 	using SoulboundEngine.Inventory;
 	using SoulboundEngine.Item.Container;
-	using SoulboundEngine.Registry;
+	using SoulboundEngine.UnityClient.UI.Screen;
+	using SoulboundEngine.UnityClient.UI.UXMLBindings;
 	using UnityEngine.UIElements;
 
 	public class ChestInventoryScreen : InventoryScreen<ChestInventoryScreenHandler> {
-		private static readonly Identifier CHEST_SPACE_ELEMENT = Identifier.Of("soulbound:chest_inventory_screen/chest_space");
-		private static readonly Identifier HOTBAR_ELEMENT = Identifier.Of("soulbound:hotbar/hotbar");
-		private static readonly Identifier POPUP_ELEMENT = Identifier.Of("soulbound:player_inventory/popup");
-		private static readonly Identifier PLAYER_INVENTORY_SPACE_ELEMENT = Identifier.Of("soulbound:chest_inventory_screen/player_inventory_space");
+		private static readonly UXMLBinding<VisualElement> CHEST_SPACE_ELEMENT = new("soulbound:chest_inventory_screen/chest_space");
+		private static readonly UXMLBinding<VisualElement> PLAYER_INVENTORY_SPACE_ELEMENT = new("soulbound:chest_inventory_screen/player_inventory_space");
 
-		public ChestInventoryScreen(Context ctx, VisualTreeAsset asset) 
+		public ChestInventoryScreen(Context ctx, VisualTreeAsset asset)
 			: base(ctx, asset) {
 		}
 
@@ -31,19 +28,35 @@
 		}
 
 		private VisualElement GetChestRoot(VisualElement inventoryRoot) {
-			return inventoryRoot.Get<VisualElement>(CHEST_SPACE_ELEMENT);
+			return CHEST_SPACE_ELEMENT.Get(inventoryRoot);
 		} 
 
 		protected override VisualElement GetPlayerHotbar(VisualElement inventoryRoot) {
-			return inventoryRoot.Get<VisualElement>(HOTBAR_ELEMENT);
+			return PlayerInventoryScreen.HOTBAR_ELEMENT.Get(inventoryRoot);
 		}
 
 		protected override VisualElement GetPlayerPopup(VisualElement inventoryRoot) {
-			return inventoryRoot.Get<VisualElement>(POPUP_ELEMENT);
+			return PlayerInventoryScreen.POPUP_ELEMENT.Get(inventoryRoot);
 		}
 
 		protected override VisualElement GetPlayerInventoryRoot(VisualElement screenRoot) {
-			return screenRoot.Get<VisualElement>(PLAYER_INVENTORY_SPACE_ELEMENT);
+			return PLAYER_INVENTORY_SPACE_ELEMENT.Get(screenRoot);
+		}
+
+		protected override VisualElement GetHelmetRoot(VisualElement root) {
+			return PlayerInventoryScreen.HELMET_ELEMENT.Get(root);
+		}
+
+		protected override VisualElement GetChestplateRoot(VisualElement root) {
+			return PlayerInventoryScreen.CHESTPLATE_ELEMENT.Get(root);
+		}
+
+		protected override VisualElement GetLeggingsRoot(VisualElement root) {
+			return PlayerInventoryScreen.LEGGINGS_ELEMENT.Get(root);
+		}
+
+		protected override VisualElement GetBootsRoot(VisualElement root) {
+			return PlayerInventoryScreen.BOOTS_ELEMENT.Get(root);
 		}
 	}
 }

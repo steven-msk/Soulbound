@@ -1,10 +1,9 @@
 namespace SoulboundEngine.UnityClient.UI.Screen {
+	using SoulboundEngine.Item;
+	using SoulboundEngine.Item.Container;
 	using SoulboundEngine.UnityClient.Assets;
 	using SoulboundEngine.UnityClient.Render.Item;
 	using SoulboundEngine.UnityClient.UI.UXMLBindings;
-	using SoulboundEngine.Item;
-	using SoulboundEngine.Item.Container;
-	using SoulboundEngine.Registry;
 	using SoulboundEngine.World.Player;
 	using System.Collections.Generic;
 	using UnityEngine;
@@ -13,10 +12,10 @@ namespace SoulboundEngine.UnityClient.UI.Screen {
 #nullable enable
 
 	public sealed class TransitStackHandler : UXMLItemSlotDisplay, IInventory {
-		private static readonly Identifier TRANSIT_STACK_ELEMENT = Identifier.Of("soulbound:transit_stack/transit_stack");
-		private static readonly Identifier ITEM_DISPLAY_ELEMENT = Identifier.Of("soulbound:transit_stack/item_display");
-		private static readonly Identifier STACK_COUNT_ELEMENT = Identifier.Of("soulbound:transit_stack/stack_count");
-		private static readonly Identifier DURABILITY_BAR_ELEMENT = Identifier.Of("soulbound:transit_stack/durability_bar");
+		private static readonly UXMLBinding<VisualElement> TRANSIT_STACK_ELEMENT = new("soulbound:transit_stack/transit_stack");
+		private static readonly UXMLBinding<VisualElement> ITEM_DISPLAY_ELEMENT = new("soulbound:transit_stack/item_display");
+		private static readonly UXMLBinding<Label> STACK_COUNT_ELEMENT = new("soulbound:transit_stack/stack_count");
+		private static readonly UXMLBinding<ProgressBar> DURABILITY_BAR_ELEMENT = new("soulbound:transit_stack/durability_bar");
 		private Vector2 pointerPosition;
 
 		private TransitStackHandler(ItemRenderManager itemRenderManager, VisualElement root) 
@@ -28,9 +27,11 @@ namespace SoulboundEngine.UnityClient.UI.Screen {
 			return new TransitStackHandler(itemRenderManager, CreateVisualElement(screenRoot));
 		}
 
-		protected override Identifier GetItemDisplayId() => ITEM_DISPLAY_ELEMENT;
-		protected override Identifier GetStackCountId() => STACK_COUNT_ELEMENT;
-		protected override Identifier GetDurabilityBarId() => DURABILITY_BAR_ELEMENT;
+		protected override VisualElement GetDisplayElement(VisualElement root) => ITEM_DISPLAY_ELEMENT.Get(root);
+
+		protected override Label GetStackCountElement(VisualElement root) => STACK_COUNT_ELEMENT.Get(root);
+
+		protected override ProgressBar GetDurabilityBar(VisualElement root) => DURABILITY_BAR_ELEMENT.Get(root);
 
 		protected override void Render(ItemStack stack) {
 			base.Render(stack);
@@ -57,7 +58,8 @@ namespace SoulboundEngine.UnityClient.UI.Screen {
 		private void UpdateViewPosition() {
 			Vector2 size = this.root.worldBound.size;
 			Vector2 pos = this.pointerPosition - size / 2f;
-			this.root.style.translate = pos;
+			this.root.style.left = pos.x;
+			this.root.style.bottom = pos.y;
 		}
 
 		IItemSlot IInventory.GetSlot(int index) => this.slot!;
@@ -72,7 +74,7 @@ namespace SoulboundEngine.UnityClient.UI.Screen {
 			// TODO: rework UI asset resolution
 			VisualTreeAsset asset = AssetManager.Resolve<VisualTreeAsset>(new AssetKey("TransitStack"));
 			asset.CloneTree(screenRoot);
-			return screenRoot.Get<VisualElement>(TRANSIT_STACK_ELEMENT);
+			return TRANSIT_STACK_ELEMENT.Get(screenRoot);
 
 			//VisualElement root = new() {
 			//	name = "TransitStack",

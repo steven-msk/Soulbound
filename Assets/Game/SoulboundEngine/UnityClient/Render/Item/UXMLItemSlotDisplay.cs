@@ -1,19 +1,18 @@
-﻿using SoulboundEngine.UnityClient.UI;
-using SoulboundEngine.UnityClient.UI.UXMLBindings;
-using SoulboundEngine.Item;
-using SoulboundEngine.Item.Container;
-using SoulboundEngine.Registry;
-using System;
-using System.Collections.Generic;
-using UnityEngine.UIElements;
+﻿namespace SoulboundEngine.UnityClient.Render.Item {
+	using SoulboundEngine.Item;
+	using SoulboundEngine.Item.Container;
+	using SoulboundEngine.UnityClient.UI;
+	using SoulboundEngine.UnityClient.UI.UXMLBindings;
+	using System;
+	using System.Collections.Generic;
+	using UnityEngine.UIElements;
 
 #nullable enable
 
-namespace SoulboundEngine.UnityClient.Render.Item {
 	public class UXMLItemSlotDisplay : UXMLWidget, IItemSlotDisplay {
-		private static readonly Identifier ITEM_DISPLAY_ELEMENT = Identifier.Of("soulbound:slot/item_display");
-		private static readonly Identifier STACK_COUNT_ELEMENT = Identifier.Of("soulbound:slot/stack_count");
-		private static readonly Identifier DURABILITY_BAR_ELEMENT = Identifier.Of("soulbound:slot/durability_bar");
+		private static readonly UXMLBinding<VisualElement> ITEM_DISPLAY_ELEMENT = new("soulbound:slot/item_display");
+		private static readonly UXMLBinding<Label> STACK_COUNT_ELEMENT = new("soulbound:slot/stack_count");
+		private static readonly UXMLBinding<ProgressBar> DURABILITY_BAR_ELEMENT = new("soulbound:slot/durability_bar");
 		protected readonly ItemRenderManager itemRenderManager;
 		protected readonly ItemRenderHandle renderHandle;
 		public event Action<PointerDownEvent>? onPointerDown;
@@ -41,7 +40,7 @@ namespace SoulboundEngine.UnityClient.Render.Item {
 			: this(null!, itemRenderManager, interactable, showTooltip) {
 		}
 
-		protected ItemRenderContext RenderContext => new ItemRenderContext.UXML(this.root, this.GetItemDisplayId(), this.GetStackCountId());
+		protected ItemRenderContext RenderContext => new ItemRenderContext.UXML(this.root, this.GetDisplayElement, this.GetStackCountElement);
 		
 		/// <summary> Used to bind the VisualElement to the current slot. </summary>
 		public sealed override void OnBind(VisualElement root) {
@@ -66,7 +65,7 @@ namespace SoulboundEngine.UnityClient.Render.Item {
 		}
 
 		private void OnBind() {
-			this.durabilityBar = this.root.Get<ProgressBar>(this.GetDurabilityBarId());
+			this.durabilityBar = this.GetDurabilityBar(this.root);
 			if (this.interactable) this.RegisterPointerCallbacks();
 			if (this.slot != null) this.slot.stackChanged += this.StackChanged;
 			this.Prepare();
@@ -80,15 +79,17 @@ namespace SoulboundEngine.UnityClient.Render.Item {
 		}
 
 		/// <summary> Must override if the item display element ID originates from a different UXML file </summary>
-		protected virtual Identifier GetItemDisplayId() => ITEM_DISPLAY_ELEMENT;
+		protected virtual VisualElement GetDisplayElement(VisualElement root) => ITEM_DISPLAY_ELEMENT.Get(root);
 
 		/// <summary> Must override if the stack count element ID originates from a different UXML file </summary>
-		protected virtual Identifier GetStackCountId() => STACK_COUNT_ELEMENT;
+		protected virtual Label GetStackCountElement(VisualElement root) => STACK_COUNT_ELEMENT.Get(root);
 
 		/// <summary> Must override if the durability bar element ID originates from a different UXML file </summary>
-		protected virtual Identifier GetDurabilityBarId() => DURABILITY_BAR_ELEMENT;
+		protected virtual ProgressBar GetDurabilityBar(VisualElement root) => DURABILITY_BAR_ELEMENT.Get(root);
 
-		private void StackChanged(ItemStack oldStack, ItemStack newStack) => this.SetStack(newStack);
+		private void StackChanged(ItemStack oldStack, ItemStack newStack) {
+			this.SetStack(newStack);
+		}
 
 		public void SetStack(ItemStack stack) {
 			this.stack = stack;
