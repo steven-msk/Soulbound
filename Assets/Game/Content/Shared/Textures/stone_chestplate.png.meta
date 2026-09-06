@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 65493327acc64f84fb1c8842d00ca25a
+guid: 883bf8ee60841b84686a0faddb7e7544
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 3149553395027010549
-    second: helmet_overlay_0
+      213: -2238473142667066096
+    second: stone_chestplate_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: helmet_overlay_0
+      name: stone_chestplate_0
       rect:
         serializedVersion: 2
-        x: 2
-        y: 3
-        width: 12
-        height: 11
+        x: 0
+        y: 0
+        width: 16
+        height: 15
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 5f3e5bf202675bb20800000000000000
-      internalID: 3149553395027010549
+      spriteID: 015c31469885fe0e0800000000000000
+      internalID: -2238473142667066096
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      helmet_overlay_0: 3149553395027010549
+      stone_chestplate_0: -2238473142667066096
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

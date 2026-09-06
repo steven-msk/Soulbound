@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 65493327acc64f84fb1c8842d00ca25a
+guid: 337aa43df250d324baf03ccef0205705
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 3149553395027010549
-    second: helmet_overlay_0
+      213: -3908623678091155712
+    second: stone_helmet_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,7 +100,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: helmet_overlay_0
+      name: stone_helmet_0
       rect:
         serializedVersion: 2
         x: 2
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 5f3e5bf202675bb20800000000000000
-      internalID: 3149553395027010549
+      spriteID: 00722ba3977c1c9c0800000000000000
+      internalID: -3908623678091155712
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      helmet_overlay_0: 3149553395027010549
+      stone_helmet_0: -3908623678091155712
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

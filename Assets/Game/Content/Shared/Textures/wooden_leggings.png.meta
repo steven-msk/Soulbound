@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 65493327acc64f84fb1c8842d00ca25a
+guid: bfc39ea023edd874f926a88f9e8eba20
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 3149553395027010549
-    second: helmet_overlay_0
+      213: -5003649524329548392
+    second: wooden_leggings_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: helmet_overlay_0
+      name: wooden_leggings_0
       rect:
         serializedVersion: 2
         x: 2
-        y: 3
+        y: 0
         width: 12
-        height: 11
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 5f3e5bf202675bb20800000000000000
-      internalID: 3149553395027010549
+      spriteID: 895f8c1a4477f8ab0800000000000000
+      internalID: -5003649524329548392
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      helmet_overlay_0: 3149553395027010549
+      wooden_leggings_0: -5003649524329548392
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
