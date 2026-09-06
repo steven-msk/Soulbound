@@ -19,9 +19,9 @@
 			this.type = type;
 		}
 
-		protected virtual int insertSingleButton => 1;
-		protected virtual int pickupHalfButton => 1;
-		protected virtual int insertButton => 0;
+		protected virtual int InsertSingleButton => 1;
+		protected virtual int PickupHalfButton => 1;
+		protected virtual int InsertButton => 0;
 
 		protected void AddPlayerInventorySlots(PlayerInventory playerInventory) {
 			this.slots.AddRange(GetRefs(playerInventory.GetPopup(), playerInventory));
@@ -31,9 +31,14 @@
 			this.slots.AddRange(GetRefs(playerInventory.GetHotbar(), playerInventory));
 		}
 
+		protected void AddPlayerArmorSlots(PlayerInventory playerInventory) {
+			this.slots.AddRange(GetRefs(PlayerInventory.EQUIPMENT_SLOT_MAPPING.Keys, playerInventory));
+		}
+
 		protected void AddPlayerSlots(PlayerInventory playerInventory) {
 			this.AddPlayerInventorySlots(playerInventory);
 			this.AddPlayerHotbarSlots(playerInventory);
+			this.AddPlayerArmorSlots(playerInventory);
 		}
 
 		protected SlotRef AddSlot(IItemSlot slot) {
@@ -54,7 +59,7 @@
 		/// </summary>
 		public abstract bool CanUse(PlayerEntity player);
 
-		public virtual void OnSlotAction(SlotRef slotRef, int button, PlayerEntity player, SlotActionType actionType) {
+		public void OnSlotAction(SlotRef slotRef, int button, PlayerEntity player, SlotActionType actionType) {
 			try {
 				this.InternalSlotAction(slotRef, button, player, actionType);
 			} catch (Exception e) {
@@ -65,19 +70,76 @@
 		// Implementation note:
 		// The current implementation is subject to change. 
 		// As the game evolves, more QOL features will be available, and this includes inventory management features
-		private void InternalSlotAction(SlotRef slotRef, int button, PlayerEntity player, SlotActionType actionType) {
+		protected virtual void InternalSlotAction(SlotRef slotRef, int button, PlayerEntity player, SlotActionType actionType) {
 			IItemSlot slot = slotRef.GetSlot();
 			ItemStack slotStack = slot.GetStack();
 			switch (actionType) {
 				case SlotActionType.COLLECT_ALL:
-					this.CollectAll(this.transitStack.GetItem());
+					Item item = this.transitStack.GetItem();
+					List<IItemSlot> slots = this.GetSlotsContaining(item);
+					if (slots == null || slots.Count == 0) return;
+					HashSet<IInventory> contentUpdates = new();
+
+					foreach (IItemSlot s in slots) {
+						ItemStack stack = s.GetStack();
+						this.transitStack.FillFrom(ref stack);
+						contentUpdates.Add(s.GetInventory());
+						s.SetStack(stack);
+					}
+
+					foreach (IInventory inventory in contentUpdates) {
+						this.OnContentChanged(inventory);
+					}
 					break;
+
 				case SlotActionType.PICKUP:
-					this.HandlePickup(slot, slotStack, button);
+					bool hasTransitStack = !this.transitStack.IsEmpty();
+					bool hasSlotStack = !slotStack.IsEmpty();
+
+					if (hasTransitStack && hasSlotStack) {
+						if (button == this.InsertButton && !this.IsValidPickupOrInsert(this.transitStack, slot)) {
+							if (this.CanInsertIntoSlot(this.transitStack, slot)) {
+								this.SwapTransitWithSlot(slot);
+							}
+							return;
+						}
+						if (this.IsValidPickupOrInsert(this.transitStack, slot)) {
+							if (button == this.InsertSingleButton && this.CanInsertIntoSlot(slot)) {
+								this.InsertSingle(slot);
+							} else if (button == this.InsertButton && this.CanInsertIntoSlot(slot)) {
+								if (slotStack.IsFull()) {
+									this.SwapTransitWithSlot(slot);
+								} else {
+									this.InsertTransitInSlot(slot);
+								}
+							}
+						}
+					} else {
+						if (slot.HasStack()) {
+							if (button == this.PickupHalfButton) {
+								this.PickupHalf(slot);
+							} else if (button == this.InsertButton) {
+								this.SwapTransitWithSlot(slot);
+							}
+						} else if (this.CanInsertIntoSlot(slot)) {
+							if (button == this.InsertButton) {
+								this.InsertTransitInSlot(slot);
+							} else if (button == this.InsertSingleButton) {
+								this.InsertSingle(slot);
+							}
+						}
+					}
 					break;
+
 				case SlotActionType.CLONE:
-					this.HandleClone(slot, slotStack);
+					if (this.transitStack.IsEmpty() && !slotStack.IsEmpty()) {
+						this.transitStack = slotStack.CopyFullStack();
+					} else if (this.CanInsertIntoSlot(slot)) {
+						slot.SetStack(this.transitStack.CopyFullStack());
+						this.OnContentChanged(slot.GetInventory());
+					}
 					break;
+
 				case SlotActionType.QUICK_MOVE:
 					this.HandleQuickMove(player, slot);
 					break;
@@ -103,53 +165,6 @@
 		/// </summary>
 		protected abstract void QuickMove(PlayerEntity player, IItemSlot slot);
 
-		private void HandlePickup(IItemSlot slot, ItemStack slotStack, int button) {
-			bool hasTransitStack = !this.transitStack.IsEmpty();
-			bool hasSlotStack = !slotStack.IsEmpty();
-
-			if (hasTransitStack && hasSlotStack) {
-				this.HandleOccupiedSlotPickup(slot, slotStack, button);
-				return;
-			}
-
-			this.HandleOpenSlotPickup(slot, slotStack, button);
-		}
-
-		// TODO: fix pickup actions
-
-		private void HandleOccupiedSlotPickup(IItemSlot slot, ItemStack slotStack, int button) {
-			if (button == this.insertSingleButton && this.CanInsertIntoSlot(slot)) {
-				this.InsertSingle(slot);
-			} else if (button == this.insertButton && this.CanInsertIntoSlot(slot)) {
-				this.InsertInSlot(slot);
-			} else if (this.CanInsertIntoSlot(slot) && (slotStack.IsFull() || this.transitStack.IsFull())) {
-				this.SwapTransitWithSlot(slot);
-			}
-		}
-
-		private void HandleOpenSlotPickup(IItemSlot slot, ItemStack slotStack, int button) {
-			if (!slotStack.IsEmpty() && slotStack.IsFull()) {
-				this.SwapTransitWithSlot(slot);
-			} else if (button == this.insertButton && this.CanInsertIntoSlot(slot)) {
-				this.InsertInSlot(slot);
-			} else if (!slotStack.IsEmpty() && button == this.pickupHalfButton) {
-				this.PickupHalf(slot);
-			} else if (!this.transitStack.IsEmpty() && button == this.insertSingleButton && this.CanInsertIntoSlot(slot)) {
-				this.InsertSingle(slot);
-			} else {
-				this.SwapTransitWithSlot(slot);
-			}
-		}
-
-		private void HandleClone(IItemSlot slot, ItemStack slotStack) {
-			if (this.transitStack.IsEmpty() && !slotStack.IsEmpty()) {
-				this.transitStack = slotStack.CopyFullStack();
-			} else if (this.CanInsertIntoSlot(slot)) {
-				slot.SetStack(this.transitStack.CopyFullStack());
-				this.OnContentChanged(slot.GetInventory());
-			}
-		}
-
 		public bool TryStartDrag(ItemStack originStack, SlotRef originSlot, int button, bool stackFromOriginSlot = false) {
 			if (this.IsDragging()) return false;
 
@@ -172,21 +187,22 @@
 
 			IItemSlot slot = slotRef.GetSlot();
 			switch (dragActionType) {
-				case SlotDragActionType.SPLIT: {
-						if (this.CanInsertIntoSlot(this.dragState.stack, slot) && !this.dragState.IsSlotDragged(slotRef)) {
+				case SlotDragActionType.SPLIT:
+					if (this.CanInsertIntoSlot(this.dragState.stack, slot) && !this.dragState.IsSlotDragged(slotRef)) {
+						if (this.IsValidPickupOrInsert(this.dragState.stack, slot)) {
 							this.SplitDistributeToDragged(slotRef);
 						}
 					}
 					break;
-				case SlotDragActionType.INSERT: {
-						if (this.CanInsertIntoSlot(slot)) {
-							this.InsertSingle(ref this.transitStack, slot);
-							this.dragState.ExtendDrag(slotRef);
-						}
+				case SlotDragActionType.INSERT:
+					if (this.CanInsertIntoSlot(slot) && this.IsValidPickupOrInsert(this.dragState.stack, slot)) {
+						this.InsertSingle(ref this.transitStack, slot);
+						this.dragState.ExtendDrag(slotRef);
 					}
 					break;
-				case SlotDragActionType.CLONE: {
-						if (this.CanInsertIntoSlot(this.dragState.stack, slot) && !this.dragState.IsSlotDragged(slotRef)) {
+				case SlotDragActionType.CLONE:
+					if (this.CanInsertIntoSlot(this.dragState.stack, slot) && !this.dragState.IsSlotDragged(slotRef)) {
+						if (this.IsValidPickupOrInsert(this.dragState.stack, slot)) {
 							slot.SetStack(this.dragState.stack.CopyFullStack());
 							this.dragState.ExtendDrag(slotRef);
 							this.OnContentChanged(slot.GetInventory());
@@ -334,24 +350,28 @@
 			this.OnContentChanged(slot.GetInventory());
 		}
 
-		protected void InsertInSlot(IItemSlot slot) {
+		protected void InsertTransitInSlot(IItemSlot slot) {
+			this.transitStack = this.InsertInSlot(this.transitStack, slot);
+		}
+
+		protected ItemStack InsertInSlot(ItemStack stack, IItemSlot slot) {
 			if (!slot.HasStack()) {
 				slot.SetStack(this.transitStack);
-				this.transitStack = ItemStack.EMPTY;
 				this.OnContentChanged(slot.GetInventory());
-				return;
+				return ItemStack.EMPTY;
 			}
 			int space = slot.GetStack().GetSpaceLeft();
-			if (space <= 0) return;
+			if (space <= 0) return stack;
 
 			int transfer = Math.Min(space, this.transitStack.count);
 
 			ItemStack slotStack = slot.GetStack();
 			slotStack.Increment(transfer);
 			slot.SetStack(slotStack);
-			this.transitStack.Decrement(transfer);
+			stack.Decrement(transfer);
 
 			this.OnContentChanged(slot.GetInventory());
+			return stack;
 		}
 
 		/// <summary>
@@ -383,7 +403,11 @@
 		/// Subclasses should override this to return false if the slot is used for output.
 		/// </summary>
 		public virtual bool CanInsertIntoSlot(ItemStack itemStack, IItemSlot slot) {
-			return !itemStack.IsEmpty() && (!slot.HasStack() || ItemStack.AreItemsEqual(itemStack, slot.GetStack()));
+			return true;
+		}
+
+		public bool IsValidPickupOrInsert(ItemStack stack, IItemSlot slot) {
+			return stack.IsEmpty() || !slot.HasStack() || (stack.CanBeStackedWith(slot.GetStack()) && slot.GetStack().CanBeStackedWith(stack));
 		}
 
 		protected List<IItemSlot> GetSlotsContaining(Item item) {

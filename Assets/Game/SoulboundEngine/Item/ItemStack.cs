@@ -223,6 +223,10 @@ namespace SoulboundEngine.Item {
 
 		public readonly int GetMaxCount() => this.GetItem().GetMaxCount();
 
+		public readonly bool CanBeStackedWith(ItemStack other) {
+			return AreItemsEqual(this, other) && !this.HasDurability() && this.GetMaxCount() > 1;
+		}
+
 		public readonly void ForEachAttributeModifier(EquipmentSlot slot, Action<RegistryEntry<AttributeType>, AttributeModifier> consumer) {
 			ItemAttributeModifiers modifiers = this.GetOrDefault(ItemComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
 			modifiers.ForEach(slot, consumer);
