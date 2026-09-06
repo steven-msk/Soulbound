@@ -39,14 +39,12 @@
 			return CanInsertIntoSlot(base.CanInsertIntoSlot, itemStack, slot);
 		}
 
-		// TODO: generalize equipment slot restrictions
-
-		public static bool CanInsertIntoSlot(Func<ItemStack, IItemSlot, bool> baseFunction, ItemStack stack, IItemSlot slot) {
-			if (slot is ArmorSlot armorSlot) {
+		public static bool CanInsertIntoSlot(Func<ItemStack, IItemSlot, bool> fallback, ItemStack stack, IItemSlot slot) {
+			if (slot is IEquipmentSlot equipmentSlot) {
 				Equippable? equippable = stack.GetComponents().GetOrDefault(ItemComponents.EQUIPPABLE, null!);
-				return equippable != null && armorSlot.GetArmorType().GetSlot().Equals(equippable.slot);
+				return equippable != null && equipmentSlot.GetEquipmentSlot().Equals(equippable.slot);
 			}
-			return baseFunction(stack, slot);
+			return fallback(stack, slot);
 		}
 
 		public override IItemSlot[] GetInputSlots() {

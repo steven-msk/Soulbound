@@ -1,7 +1,7 @@
 ﻿namespace SoulboundEngine.Item.Container {
 	using SoulboundEngine.World.Entity;
 
-	public class ArmorSlot : ItemSlot {
+	public class ArmorSlot : ItemSlot, IEquipmentSlot {
 		private readonly ArmorType armorType;
 		private readonly Entity owner;
 
@@ -17,5 +17,7 @@
 		}
 
 		public ArmorType GetArmorType() => this.armorType;
+
+		public EquipmentSlot GetEquipmentSlot() => this.armorType.GetSlot();
 	}
 }
