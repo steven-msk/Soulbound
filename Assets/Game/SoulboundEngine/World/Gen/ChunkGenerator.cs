@@ -1,4 +1,5 @@
 ﻿namespace SoulboundEngine.World.Gen {
+	using SoulboundEngine.Common;
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.Serialization;
 	using SoulboundEngine.World.Chunk;
@@ -9,7 +10,12 @@
 			RegistryKey<MapCodec<ChunkGenerator>>.Codec(Registries.CHUNK_GENERATOR.GetKey()),
 			"key",
 			g => Registries.CHUNK_GENERATOR.GetKey(g.Codec()),
-			key => Registries.CHUNK_GENERATOR.Get(key).GetValue()
+			key => {
+				Optional<MapCodec<ChunkGenerator>> entry = Optional<MapCodec<ChunkGenerator>>.Of(Registries.CHUNK_GENERATOR.Get(key)?.GetValue());
+				return entry.IsPresent()
+					? DataResult<MapCodec<ChunkGenerator>>.Success(entry.GetValue())
+					: DataResult<MapCodec<ChunkGenerator>>.Error($"Unknown chunk generator {key}");
+			}
 		);
 
 		public abstract void Generate(Level level, Chunk chunk, bool placeBlocks);
