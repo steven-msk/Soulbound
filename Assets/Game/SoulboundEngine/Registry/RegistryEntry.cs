@@ -22,6 +22,10 @@ namespace SoulboundEngine.Registry {
 			);
 		}
 
+		public static Codec<T> MapCodec(Registry<T> registry) {
+			return GetCodec(registry).Xmap(e => e.value, registry.GetEntry);
+		}
+
 		public RegistryKey<T> GetKey() => this.key;
 		public T GetValue() => this.value;
 
@@ -30,6 +34,7 @@ namespace SoulboundEngine.Registry {
 		public bool MatchesId(Identifier id) {
 			return this.key.value.Equals(id);
 		}
+
 		public bool MatchesKey(RegistryKey<T> key) {
 			return this.key.value.Equals(key.value) && this.key.registry.Equals(key.registry);
 		}

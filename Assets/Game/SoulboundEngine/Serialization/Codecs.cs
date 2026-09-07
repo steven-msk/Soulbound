@@ -54,5 +54,9 @@
 					: codec.Decode(json).Map(UnmanagedOptional<T>.Of)
 			);
 		}
+
+		public static MapCodec<TBase> Widen<TDerived, TBase>(this MapCodec<TDerived> codec) where TDerived : TBase {
+			return codec.Xmap<TBase>(d => d, b => (TDerived)b);
+		}
 	}
 }

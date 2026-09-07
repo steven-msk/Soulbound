@@ -4,14 +4,16 @@ namespace SoulboundEngine.Registry {
 	using SoulboundEngine.Item;
 	using SoulboundEngine.Loot;
 	using SoulboundEngine.Recipe;
+	using SoulboundEngine.Serialization;
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Block.Entity;
 	using SoulboundEngine.World.Entity;
 	using SoulboundEngine.World.Entity.Attribute;
+	using SoulboundEngine.World.Gen;
+	using SoulboundEngine.World.Level;
 	using SoulboundEngine.World.Widget;
 	using System;
 	using System.Linq;
-	using AttributeType = World.Entity.Attribute.AttributeType;
 
 	public static class Registries {
 		private static bool freezed = false;
@@ -27,6 +29,9 @@ namespace SoulboundEngine.Registry {
 		public static readonly Registry<RecipeType> RECIPE_TYPE = Create<RecipeType>(Identifier.Of("recipe_type"));
 		public static readonly Registry<ComponentType> COMPONENT_TYPE = Create<ComponentType>(Identifier.Of("component_type"));
 		public static readonly Registry<WorldWidgetType> WORLD_WIDGET_TYPE = Create<WorldWidgetType>(Identifier.Of("world_widget"));
+		public static readonly Registry<WorldPreset> WORLD_PRESET = Create<WorldPreset>(Identifier.Of("world_preset"));
+		public static readonly Registry<LevelType> LEVEL_TYPE = Create<LevelType>(Identifier.Of("level_type"));
+		public static readonly Registry<Codec<ChunkGenerator>> CHUNK_GENERATOR = Create<Codec<ChunkGenerator>>(Identifier.Of("chunk_generator"));
 
 		// temporary, see LootTables
 		public static readonly Registry<LootTable> LOOT_TABLES = Create<LootTable>(Identifier.Of("loot_table"));

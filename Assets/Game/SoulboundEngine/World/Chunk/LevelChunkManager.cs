@@ -1,13 +1,11 @@
-﻿using SoulboundEngine.World.Gen;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
+﻿namespace SoulboundEngine.World.Chunk {
+	using SoulboundEngine.World.Gen;
+	using SoulboundEngine.World.Level;
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
 
 #nullable enable
-
-namespace SoulboundEngine.World.Chunk {
-	using Level = Level.Level;
 
 	public class LevelChunkManager : ChunkManager {
 		private readonly WorldChunk?[] loadedChunks;
@@ -139,7 +137,7 @@ namespace SoulboundEngine.World.Chunk {
 		public override void Dispose() {
 			this.chunkCache.Dispose();
 			this.chunkStorage.Dispose();
-			foreach (var chunk in this.loadedChunks) {
+			foreach (WorldChunk? chunk in this.loadedChunks) {
 				if (chunk != null) this.level.DropChunk(chunk);
 			}
 		}

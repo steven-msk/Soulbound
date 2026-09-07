@@ -1,6 +1,7 @@
-using System;
-
 namespace SoulboundEngine.Registry {
+	using SoulboundEngine.Serialization;
+	using System;
+
 	public sealed class RegistryKey<T> {
 		public Identifier registry { get; }
 		public Identifier value { get; }
@@ -18,11 +19,15 @@ namespace SoulboundEngine.Registry {
 			return new RegistryKey<T>(registry, value);
 		}
 
-		public RegistryKey<Registry<T>> GetRegistryRef() => OfRegistry(this.registry);
-
 		public static RegistryKey<Registry<T>> OfRegistry(Identifier registry) {
 			return new(Registries.ROOT_IDENTIFIER, registry);
 		}
+
+		public static Codec<RegistryKey<T>> Codec(RegistryKey<Registry<T>> registryKey) {
+			return Identifier.CODEC.Xmap(i => Of(registryKey, i), k => k.value);
+		}
+
+		public RegistryKey<Registry<T>> GetRegistryRef() => OfRegistry(this.registry);
 
 		public override int GetHashCode() => HashCode.Combine(this.registry, this.value);
 
