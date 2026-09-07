@@ -31,7 +31,7 @@ namespace SoulboundEngine.Registry {
 		public static readonly Registry<WorldWidgetType> WORLD_WIDGET_TYPE = Create<WorldWidgetType>(Identifier.Of("world_widget"));
 		public static readonly Registry<WorldPreset> WORLD_PRESET = Create<WorldPreset>(Identifier.Of("world_preset"));
 		public static readonly Registry<LevelType> LEVEL_TYPE = Create<LevelType>(Identifier.Of("level_type"));
-		public static readonly Registry<Codec<ChunkGenerator>> CHUNK_GENERATOR = Create<Codec<ChunkGenerator>>(Identifier.Of("chunk_generator"));
+		public static readonly Registry<MapCodec<ChunkGenerator>> CHUNK_GENERATOR = Create<MapCodec<ChunkGenerator>>(Identifier.Of("chunk_generator"));
 
 		// temporary, see LootTables
 		public static readonly Registry<LootTable> LOOT_TABLES = Create<LootTable>(Identifier.Of("loot_table"));
