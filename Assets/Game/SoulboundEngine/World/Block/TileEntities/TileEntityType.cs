@@ -1,13 +1,13 @@
-﻿using SoulboundEngine.Common;
-using SoulboundEngine.Registry;
-using SoulboundEngine.World.Block.State;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
-#nullable enable
+﻿#nullable enable
 
 namespace SoulboundEngine.World.Block.Entity {
+	using SoulboundEngine.Common;
+	using SoulboundEngine.Registry;
+	using SoulboundEngine.World.Block.State;
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+
 	public abstract class TileEntityType {
 		public static readonly TileEntityType<ChestTileEntity> CHEST = Register("soulbound:chest", ITileEntityFactory.Of(ChestTileEntity.Create), new[] { Blocks.CHEST });
 		public static readonly TileEntityType<SignTileEntity> SIGN = Register("soulbound:sign", ITileEntityFactory.Of(SignTileEntity.Create), new[] { Blocks.SIGN });
@@ -21,8 +21,8 @@ namespace SoulboundEngine.World.Block.Entity {
 			return Registry<TileEntityType>.Register(Registries.TILE_ENTITIES, key, tileEntityType);
 		}
 
-		public static void Init() {
-		}
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter")]
+		public static TileEntityType Init(Registry<TileEntityType> registry) => CHEST;
 
 		protected readonly RegistryKey<TileEntityType> key;
 		protected readonly ITileEntityFactory factory;

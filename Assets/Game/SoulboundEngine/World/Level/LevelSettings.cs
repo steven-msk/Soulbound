@@ -13,10 +13,7 @@
 		public static readonly RegistryKey<LevelSettings> DEFAULT = MakeKey("default");
 
 		private static RegistryKey<LevelSettings> MakeKey(string id) {
-			return RegistryKey<LevelSettings>.Of(Registries.LEVEL_SETTINGS.GetKey(), Identifier.Of(id));
-		}
-
-		public static void Init() {
+			return RegistryKey<LevelSettings>.Of(RegistryKeys.LEVEL_SETTINGS, Identifier.Of(id));
 		}
 	}
 }

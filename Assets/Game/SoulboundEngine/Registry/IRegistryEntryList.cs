@@ -1,10 +1,10 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace SoulboundEngine.Registry {
-	public interface IRegistryEntryList<T> : IEnumerable<RegistryEntry<T>> {
+	using System;
+	using System.Collections;
+	using System.Collections.Generic;
+	using System.Linq;
+
+	public interface IRegistryEntryList<T> : IEnumerable<RegistryEntry<T>> where T : class {
 		int size { get; }
 		bool Contains(RegistryEntry<T> entry);
 

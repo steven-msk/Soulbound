@@ -1,5 +1,6 @@
 ﻿namespace SoulboundEngine.World.Gen {
 	using SoulboundEngine.Common.Math;
+	using SoulboundEngine.Serialization;
 	using SoulboundEngine.World.Biome;
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Block.State;
@@ -12,6 +13,11 @@
 #nullable enable
 
 	public sealed class NoiseLevelChunkGenerator : ChunkGenerator {
+		// TEMPORARY
+		public new static readonly MapCodec<ChunkGenerator> CODEC = RecordMapCodec<ChunkGenerator, int>.Of(
+			Field.Required<ChunkGenerator, int>("temp", Codecs.INT, v => 1),
+			i => default
+		);
 		private const int BIOME_BLEND_RANGE = 10;
 		private readonly BiomeMap biomeMap;
 		private readonly Heightmap heightmap;
@@ -22,6 +28,8 @@
 			this.heightmap = heightmap;
 			this.cavemap = cavemap;
 		}
+
+		protected override MapCodec<ChunkGenerator> Codec() => CODEC;
 
 		public override void Generate(Level level, Chunk chunk, bool placeBlocks) {
 			ChunkGenData genData = new() {

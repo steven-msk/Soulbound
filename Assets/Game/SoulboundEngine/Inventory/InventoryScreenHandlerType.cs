@@ -20,7 +20,8 @@
 			);
 		}
 
-		public static void Init() { }
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter")]
+		public static InventoryScreenHandlerType Init(Registry<InventoryScreenHandlerType> registry) => PLAYER_INVENTORY;
 	}
 
 	public class InventoryScreenHandlerType<THandler> : InventoryScreenHandlerType where THandler : InventoryScreenHandler {

@@ -116,11 +116,9 @@ namespace SoulboundEngine.UnityClient {
 			Logger.SetWrapper(unityClientLoggerWrapper);
 			this.logConsole = new LogConsole(this);
 
+			Registries.Init();
 			UXMLSchema_Generated.RegisterAll();
 			AssetManager.LoadAllWithPreloadLabel();
-
-			Registries.Init();
-			Registries.Freeze();
 
 			this.inputActions = new PlayerInputActions();
 			this.inputManager = new InputManager(this.inputActions.asset);
@@ -152,9 +150,9 @@ namespace SoulboundEngine.UnityClient {
 			AudioManager.RebuildPools();
 
 			this.spriteResolver = new AtlasSpriteResolver();
-			this.itemRenderManager = new ItemRenderManager(Registries.ITEMS.ToList(), this.spriteResolver);
-			this.entityRenderManager = new EntityRenderManager(Registries.ENTITIES.ToList(), this.itemRenderManager);
-			this.blockRenderManager = new BlockRenderManager(Registries.BLOCKS.ToList());
+			this.itemRenderManager = new ItemRenderManager(Registries.ITEM.ToList(), this.spriteResolver);
+			this.entityRenderManager = new EntityRenderManager(Registries.ENTITY.ToList(), this.itemRenderManager);
+			this.blockRenderManager = new BlockRenderManager(Registries.BLOCK.ToList());
 			this.worldWidgetManager = new WorldWidgetManager(Registries.WORLD_WIDGET_TYPE);
 			this.debugRenderer = new DebugRenderer();
 			RenderPipelineManager.endCameraRendering += this.debugRenderer.OnEndCameraRendering;

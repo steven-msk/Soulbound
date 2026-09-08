@@ -20,7 +20,7 @@
 			return Identifier.GetTranslationKey("attribute", id);
 		}
 
-		public static void Init() {
-		}
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter")]
+		public static AttributeType Init(Registry<AttributeType> registry) => GRAVITY.GetValue();
 	}
 }

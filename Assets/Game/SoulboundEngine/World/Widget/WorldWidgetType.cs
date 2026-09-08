@@ -16,8 +16,8 @@
 			return RegistryKey<WorldWidgetType>.Of(Registries.WORLD_WIDGET_TYPE.GetKey(), Identifier.Of(id));
 		}
 
-		public static void Init() {
-		}
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter")]
+		public static WorldWidgetType Init(Registry<WorldWidgetType> registry) => TEXT;
 
 		public RegistryKey<WorldWidgetType> key { get; private set; }
 

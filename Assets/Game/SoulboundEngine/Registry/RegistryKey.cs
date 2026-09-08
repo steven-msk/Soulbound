@@ -2,7 +2,7 @@ namespace SoulboundEngine.Registry {
 	using SoulboundEngine.Serialization;
 	using System;
 
-	public sealed class RegistryKey<T> {
+	public sealed class RegistryKey<T> where T : class {
 		public Identifier registry { get; }
 		public Identifier value { get; }
 
@@ -32,7 +32,7 @@ namespace SoulboundEngine.Registry {
 		public override int GetHashCode() => HashCode.Combine(this.registry, this.value);
 
 		public override string ToString() {
-			return $"key[{this.registry}/{this.value}]";
+			return $"RegistryKey[{this.registry}/{this.value}]";
 		}
 	}
 }

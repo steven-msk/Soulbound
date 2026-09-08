@@ -13,8 +13,8 @@ namespace SoulboundEngine.World.Block {
 #nullable enable
 
 	public class Block : AbstractBlock {
-		public static readonly Codec<RegistryEntry<Block>> ENTRY_CODEC = RegistryEntry<Block>.GetCodec(Registries.BLOCKS);
-		public static readonly Codec<Block> CODEC = ENTRY_CODEC.Xmap(e => e.GetValue(), Registries.BLOCKS.GetEntry);
+		public static readonly Codec<RegistryEntry<Block>> ENTRY_CODEC = RegistryEntry<Block>.GetCodec(Registries.BLOCK);
+		public static readonly Codec<Block> CODEC = ENTRY_CODEC.Xmap(e => e.GetValue(), Registries.BLOCK.GetEntry);
 		private static readonly List<BlockState> statesByID = new();
 		private readonly RegistryKey<Block> registryKey;
 		private readonly AbstractBlock.Settings settings;

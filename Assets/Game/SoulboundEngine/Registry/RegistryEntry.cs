@@ -2,7 +2,7 @@ namespace SoulboundEngine.Registry {
 	using SoulboundEngine.Serialization;
 	using System;
 
-	public class RegistryEntry<T> {
+	public class RegistryEntry<T> where T : class {
 		private readonly IRegistryEntryOwner<T> owner;
 		private readonly RegistryKey<T> key;
 		private readonly T value;

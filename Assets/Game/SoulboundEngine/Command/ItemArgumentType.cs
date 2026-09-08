@@ -16,7 +16,7 @@ namespace SoulboundEngine.Command {
 		public override Task<Suggestions> ListSuggestions<TSource>(CommandContext<TSource> context, SuggestionsBuilder builder) {
 			string remaining = builder.RemainingLowerCase;
 
-			foreach (Item item in Registries.ITEMS) {
+			foreach (Item item in Registries.ITEM) {
 				if (item == Items.AIR) continue;
 				Identifier id = Items.GetIdentifier(item);
 
@@ -33,7 +33,7 @@ namespace SoulboundEngine.Command {
 				throw new SimpleCommandExceptionType(new LiteralMessage("Invalid identifier")).CreateWithContext(reader);
 			}
 
-			RegistryEntry<Item>? item = Registries.ITEMS.GetEntry(identifier);
+			RegistryEntry<Item>? item = Registries.ITEM.GetEntry(identifier);
 			return item == null || item.GetValue() == Items.AIR
 				? throw new DynamicCommandExceptionType(o => new LiteralMessage("Unknown item '{}'".WithArgs(o))).CreateWithContext(reader, identifier)
 				: item.GetValue();

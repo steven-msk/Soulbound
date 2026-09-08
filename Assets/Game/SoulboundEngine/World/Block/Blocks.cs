@@ -46,17 +46,18 @@ namespace SoulboundEngine.World.Block {
 		private static Block Register(string id, Func<AbstractBlock.Settings, Block> factory, AbstractBlock.Settings settings) {
 			RegistryKey<Block> key = KeyOf(id);
 			settings.RegistryKey(key);
-			return Registry<Block>.Register(Registries.BLOCKS, key, factory(settings));
+			return Registry<Block>.Register(Registries.BLOCK, key, factory(settings));
 		}
 
 		public static Identifier? GetIdentifier(Block block) {
-			return Registries.BLOCKS.GetIdentifier(block);
+			return Registries.BLOCK.GetIdentifier(block);
 		}
 
 		private static RegistryKey<Block> KeyOf(string id) {
-			return RegistryKey<Block>.Of(Registries.BLOCKS.GetKey(), Identifier.Of(id));
+			return RegistryKey<Block>.Of(Registries.BLOCK.GetKey(), Identifier.Of(id));
 		}
 
-		public static void Init() { }
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter")]
+		public static Block Init(Registry<Block> registry) => AIR;
 	}
 }

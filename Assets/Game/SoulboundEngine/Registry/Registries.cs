@@ -13,65 +13,74 @@ namespace SoulboundEngine.Registry {
 	using SoulboundEngine.World.Level;
 	using SoulboundEngine.World.Widget;
 	using System;
-	using System.Linq;
+	using System.Collections.Generic;
 
 	public static class Registries {
+		private delegate object RegistryBootstrapper<T>(Registry<T> registry) where T : class;
+		private static readonly Dictionary<Identifier, Func<object>> LOADERS = new();
 		private static bool freezed = false;
 		public static readonly Identifier ROOT_IDENTIFIER = Identifier.Of("root");
-		public static readonly Registry<IRegistry> ROOT = CreateRoot(ROOT_IDENTIFIER);
-
-		public static readonly Registry<Block> BLOCKS = Create<Block>(Identifier.Of("block"));
-		public static readonly Registry<Item> ITEMS = Create<Item>(Identifier.Of("item"));
-		public static readonly Registry<EntityDescriptor> ENTITIES = Create<EntityDescriptor>(Identifier.Of("entity"));
-		public static readonly Registry<AttributeType> ATTRIBUTE = Create<AttributeType>(Identifier.Of("attribute"));
-		public static readonly Registry<TileEntityType> TILE_ENTITIES = Create<TileEntityType>(Identifier.Of("tile_entity"));
-		public static readonly Registry<InventoryScreenHandlerType> INVENTORY_SCREEN_HANDLES = Create<InventoryScreenHandlerType>(Identifier.Of("inventory_screen_handle"));
-		public static readonly Registry<RecipeType> RECIPE_TYPE = Create<RecipeType>(Identifier.Of("recipe_type"));
-		public static readonly Registry<ComponentType> COMPONENT_TYPE = Create<ComponentType>(Identifier.Of("component_type"));
-		public static readonly Registry<WorldWidgetType> WORLD_WIDGET_TYPE = Create<WorldWidgetType>(Identifier.Of("world_widget"));
-		public static readonly Registry<WorldPreset> WORLD_PRESET = Create<WorldPreset>(Identifier.Of("world_preset"));
-		public static readonly Registry<LevelType> LEVEL_TYPE = Create<LevelType>(Identifier.Of("level_type"));
-		public static readonly Registry<MapCodec<ChunkGenerator>> CHUNK_GENERATOR = Create<MapCodec<ChunkGenerator>>(Identifier.Of("chunk_generator"));
-		public static readonly Registry<LevelSettings> LEVEL_SETTINGS = Create<LevelSettings>(Identifier.Of("level_settings"));
-
+		public static readonly Registry<IRegistry> ROOT = new(RegistryKey<IRegistry>.OfRegistry(ROOT_IDENTIFIER));
+		public static readonly Registry<Block> BLOCK = Create(RegistryKeys.BLOCK, Blocks.Init);
+		public static readonly Registry<Item> ITEM = Create(RegistryKeys.ITEM, Items.Init);
+		public static readonly Registry<EntityDescriptor> ENTITY = Create(RegistryKeys.ENTITY, EntityType.Init);
+		public static readonly Registry<AttributeType> ATTRIBUTE = Create(RegistryKeys.ATTRIBUTE, Attributes.Init);
+		public static readonly Registry<TileEntityType> TILE_ENTITIES = Create(RegistryKeys.TILE_ENTITY, TileEntityType.Init);
+		public static readonly Registry<InventoryScreenHandlerType> INVENTORY_SCREEN_HANDLES = Create(RegistryKeys.INVENTORY_SCREEN_HANDLER, InventoryScreenHandlerType.Init);
+		public static readonly Registry<RecipeType> RECIPE_TYPE = Create(RegistryKeys.RECIPE_TYPE, RecipeType.Init);
+		public static readonly Registry<ComponentType> COMPONENT_TYPE = Create(RegistryKeys.COMPONENT_TYPE, r => ItemComponents.DEFAULT_COMPONENTS);
+		public static readonly Registry<WorldWidgetType> WORLD_WIDGET_TYPE = Create(RegistryKeys.WORLD_WIDGET, WorldWidgetType.Init);
+		public static readonly Registry<MapCodec<ChunkGenerator>> CHUNK_GENERATOR = Create(RegistryKeys.CHUNK_GENERATOR, ChunkGenerators.Init);
 		// temporary, see LootTables
-		public static readonly Registry<LootTable> LOOT_TABLES = Create<LootTable>(Identifier.Of("loot_table"));
+		public static readonly Registry<LootTable> LOOT_TABLES = Create(RegistryKeys.LOOT_TABLE, LootTables.Init);
+		// not definitive
+		public static readonly Registry<LevelType> LEVEL_TYPE = Create(RegistryKeys.LEVEL_TYPE, LevelType.Init);
+		public static readonly Registry<WorldPreset> WORLD_PRESET = Create(RegistryKeys.WORLD_PRESET, WorldPreset.Init);
 
-		private static Registry<T> Create<T>(Identifier id) {
-			if (freezed) throw new InvalidOperationException("Registries already freezed");
-
-			RegistryKey<Registry<T>> registryKey = RegistryKey<T>.OfRegistry(id);
-			Registry<T> registry = Registry<IRegistry>.RegisterVariant(ROOT, registryKey, new Registry<T>(registryKey));
-
-			return registry;
+		private static Registry<T> Create<T>(RegistryKey<Registry<T>> key, RegistryBootstrapper<T> bootstrapper) where T : class {
+			return Register(key, new Registry<T>(key), bootstrapper);
 		}
 
-		private static Registry<IRegistry> CreateRoot(Identifier identifier) {
-			return new Registry<IRegistry>(RegistryKey<IRegistry>.OfRegistry(identifier));
+		private static Registry<T> Register<T>(RegistryKey<Registry<T>> key, Registry<T> registry, RegistryBootstrapper<T> bootstrapper) where T : class {
+			if (freezed) throw new InvalidOperationException("Registries already freezed");
+			Identifier id = key.value;
+			LOADERS.Add(id, () => bootstrapper(registry));
+			return Registry<IRegistry>.RegisterVariant(ROOT, key, registry);
 		}
 
 		public static void Init() {
-			Blocks.Init();
-			Items.Init();
-			EntityType.Init();
-			Attributes.Init();
-			TileEntityType.Init();
-			InventoryScreenHandlerType.Init();
-			RecipeType.Init();
-			LootTables.Init();
-			WorldWidgetType.Init();
-			WorldPreset.Init();
-			LevelType.Init();
-			LevelSettings.Init();
-			ChunkGenerators.Init();
+			AddContents();
+			Freeze();
+			Validate(ROOT);
+		}
+
+		private static void AddContents() {
+			foreach ((Identifier id, Func<object> loader) in LOADERS) {
+				if (loader() == null) {
+					Logger.LogError("Unable to load registry '{}'", id);
+				}
+			}
 		}
 
 		public static void Freeze() {
+			Logger.LogInfo("Freezing registries");
+			if (freezed) throw new InvalidOperationException("Registries already freezed");
 			freezed = true;
-			Logger.LogInfo("Freezing {} registries", ROOT.Count());
+			ROOT.Freeze();
 
+			int c = 0;
 			foreach (IRegistry registry in ROOT) {
 				registry.Freeze();
+				c++;
+			}
+			Logger.LogInfo("Freezed {} registries", c);
+		}
+
+		private static void Validate(Registry<IRegistry> registry) {
+			foreach (IRegistry r in registry) {
+				if (r.GetIdentifiers().Count == 0) {
+					Logger.LogError("Registry '{}' was empty after loading", registry.GetKey(r));
+				}
 			}
 		}
 	}

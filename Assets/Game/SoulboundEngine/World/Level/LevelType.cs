@@ -7,10 +7,11 @@
 		public static readonly RegistryKey<LevelType> DEFAULT = Register("default");
 
 		private static RegistryKey<LevelType> Register(string id) {
-			return RegistryKey<LevelType>.Of(Registries.LEVEL_TYPE.GetKey(), Identifier.Of(id));
+			return RegistryKey<LevelType>.Of(RegistryKeys.LEVEL_TYPE, Identifier.Of(id));
 		}
 
-		public static void Init() {
+		public static LevelType Init(Registry<LevelType> registry) {
+			return Registry<LevelType>.Register(registry, DEFAULT, new LevelType(Level.MIN_Y, Level.MAX_Y));
 		}
 	}
 }
