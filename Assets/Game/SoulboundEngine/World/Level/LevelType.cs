@@ -9,5 +9,8 @@
 		private static RegistryKey<LevelType> Register(string id) {
 			return RegistryKey<LevelType>.Of(Registries.LEVEL_TYPE.GetKey(), Identifier.Of(id));
 		}
+
+		public static void Init() {
+		}
 	}
 }

@@ -9,5 +9,14 @@
 			Field.Required<LevelSettings, ChunkGenerator>("generator", ChunkGenerator.CODEC, s => s.chunkGenerator),
 			(typeEntry, chunkGenerator) => new LevelSettings(typeEntry, chunkGenerator)
 		);
+
+		public static readonly RegistryKey<LevelSettings> DEFAULT = MakeKey("default");
+
+		private static RegistryKey<LevelSettings> MakeKey(string id) {
+			return RegistryKey<LevelSettings>.Of(Registries.LEVEL_SETTINGS.GetKey(), Identifier.Of(id));
+		}
+
+		public static void Init() {
+		}
 	}
 }

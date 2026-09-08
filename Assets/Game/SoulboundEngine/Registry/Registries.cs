@@ -32,6 +32,7 @@ namespace SoulboundEngine.Registry {
 		public static readonly Registry<WorldPreset> WORLD_PRESET = Create<WorldPreset>(Identifier.Of("world_preset"));
 		public static readonly Registry<LevelType> LEVEL_TYPE = Create<LevelType>(Identifier.Of("level_type"));
 		public static readonly Registry<MapCodec<ChunkGenerator>> CHUNK_GENERATOR = Create<MapCodec<ChunkGenerator>>(Identifier.Of("chunk_generator"));
+		public static readonly Registry<LevelSettings> LEVEL_SETTINGS = Create<LevelSettings>(Identifier.Of("level_settings"));
 
 		// temporary, see LootTables
 		public static readonly Registry<LootTable> LOOT_TABLES = Create<LootTable>(Identifier.Of("loot_table"));
@@ -59,6 +60,10 @@ namespace SoulboundEngine.Registry {
 			RecipeType.Init();
 			LootTables.Init();
 			WorldWidgetType.Init();
+			WorldPreset.Init();
+			LevelType.Init();
+			LevelSettings.Init();
+			ChunkGenerators.Init();
 		}
 
 		public static void Freeze() {

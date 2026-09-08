@@ -20,5 +20,9 @@
 		private static RegistryKey<WorldPreset> Register(string id) {
 			return RegistryKey<WorldPreset>.Of(Registries.WORLD_PRESET.GetKey(), Identifier.Of(id));
 		}
+
+		public static void Init() {
+			Registry<WorldPreset>.Register(Registries.WORLD_PRESET, DEFAULT, new LevelSettings(LevelType.DEFAULT, new NoiseLevelChunkGenerator()));
+		}
 	}
 }
