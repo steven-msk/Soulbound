@@ -367,7 +367,7 @@ MonoBehaviour:
   gameConfig:
     file:
       savesRoot: saves
-      seedFile: seed
+      propertiesFile: levelProperties.json
       chunksFolder: chunks
     dev:
       overrideSaves: 0

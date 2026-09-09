@@ -1,12 +1,14 @@
 namespace SoulboundEngine.World.Gen {
 	using SoulboundEngine.Common.Math;
 	using SoulboundEngine.World.Level;
+	using System;
 
 #nullable enable
 
+	[Obsolete]
 	public sealed class Heightmap {
 		public int planeY { get; private set; }
-		public int planeHeight => Level.MAX_Y - this.planeY;
+		public int planeHeight => Level.DEFAULT_MAX_Y - this.planeY;
 
 		public Heightmap(int planeY) {
 			this.planeY = planeY;
@@ -45,11 +47,11 @@ namespace SoulboundEngine.World.Gen {
 
 
 		public int ToHeightValue(int yCoord) {
-			return Level.MAX_Y - yCoord;
+			return Level.DEFAULT_MAX_Y - yCoord;
 		}
 
 		public int ToYCoord(int heightValue) {
-			return Level.MIN_Y + heightValue;
+			return Level.DEFAULT_MIN_Y + heightValue;
 		}
 	}
 }

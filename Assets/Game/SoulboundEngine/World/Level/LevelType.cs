@@ -11,7 +11,7 @@
 		}
 
 		public static LevelType Init(Registry<LevelType> registry) {
-			return Registry<LevelType>.Register(registry, DEFAULT, new LevelType(Level.MIN_Y, Level.MAX_Y));
+			return Registry<LevelType>.Register(registry, DEFAULT, new LevelType(Level.DEFAULT_MIN_Y, Level.DEFAULT_MAX_Y));
 		}
 	}
 }

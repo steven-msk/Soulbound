@@ -38,7 +38,7 @@ namespace SoulboundEngine.World.Chunk {
 
 		public readonly int WorldYToIndex() => WorldYToIndex(this.y);
 
-		public static int WorldYToIndex(int worldY) => worldY - Level.MAX_Y;
+		public static int WorldYToIndex(int worldY) => worldY - Level.DEFAULT_MAX_Y;
 
 		public readonly override bool Equals(object obj) {
 			if (obj is not ChunkBlockPos) {

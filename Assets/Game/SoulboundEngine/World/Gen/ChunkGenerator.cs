@@ -3,7 +3,6 @@
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.Serialization;
 	using SoulboundEngine.World.Chunk;
-	using SoulboundEngine.World.Level;
 
 	public abstract class ChunkGenerator {
 		public static readonly Codec<ChunkGenerator> CODEC = new DispatchCodec<ChunkGenerator, RegistryKey<MapCodec<ChunkGenerator>>>(
@@ -18,12 +17,28 @@
 			}
 		);
 
-		public abstract void Generate(Level level, Chunk chunk, bool placeBlocks);
-
 		/// <summary>
 		/// <b>Must return a stable instance.
 		/// Reverse lookup will fail if the codec is constructed fresh every call</b>
 		/// </summary>
 		protected abstract MapCodec<ChunkGenerator> Codec();
+
+		public abstract Chunk GenerateSurface(Chunk chunk);
+
+		public abstract Chunk Fill(Chunk chunk);
+
+		public abstract int GetMinGenY();
+
+		public abstract int GetGenHeight();
+
+		public abstract int GetBaseHeight(int x, IHeightLimitView heightLimit);
+
+		public int GetFirstFreeHeight(int x, IHeightLimitView heightLimit) {
+			return this.GetBaseHeight(x, heightLimit);
+		}
+
+		public int GetFirstOccupiedHeight(int x, IHeightLimitView heightLimit) {
+			return this.GetBaseHeight(x, heightLimit) - 1;
+		}
 	}
 }

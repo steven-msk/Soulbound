@@ -24,6 +24,7 @@
 			BiomeMap biomeMap = new(new IBiome[] { biome1, biome2 });
 			Heightmap heightmap = new(0);
 			Cavemap cavemap = new(seed);
+			Registry<WorldPreset>.Register(registry, FLAT, new WorldPreset(new LevelSettings(LevelType.DEFAULT, new FlatLevelGenerator())));
 			return Registry<WorldPreset>.Register(registry, DEFAULT, new WorldPreset(new LevelSettings(LevelType.DEFAULT, new NoiseLevelChunkGenerator(biomeMap, heightmap, cavemap))));
 		}
 	}

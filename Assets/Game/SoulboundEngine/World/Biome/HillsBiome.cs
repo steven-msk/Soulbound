@@ -61,20 +61,20 @@ namespace SoulboundEngine.World.Biome {
 			const int trunkHeightMin = 5;
 			const int trunkHeightMax = 20;
 
-			BlockPos trunkPos = new(originX, originY);
+			BlockPos.Mutable trunkPos = new(originX, originY);
 			int height = this.random.NextInt(trunkHeightMin, trunkHeightMax + 1);
 
 			for (int y = 0; y < height; y++) {
 				chunk.SetBlockState(trunkPos, Blocks.WOOD.DefaultState);
-				trunkPos.y++;
+				trunkPos.Move(Direction.Up);
 			}
 
 			Dictionary<int, List<int>> rowToXs = new();
 			float angularStep = 1f;
 			for (float angle = 0; angle < 360f; angle += angularStep) {
 				float rad = angle * (float)Maths.DEG_2_RAD;
-				int x = (int)Math.Round(trunkPos.x + crownRadius * Math.Cos(rad));
-				int y = (int)Math.Round(trunkPos.y + crownRadius * Math.Sin(rad));
+				int x = (int)Math.Round(trunkPos.X + crownRadius * Math.Cos(rad));
+				int y = (int)Math.Round(trunkPos.Y + crownRadius * Math.Sin(rad));
 
 				if (!rowToXs.ContainsKey(y)) {
 					rowToXs[y] = new List<int>();

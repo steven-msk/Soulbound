@@ -31,7 +31,8 @@
 
 		protected override MapCodec<ChunkGenerator> Codec() => CODEC;
 
-		public override void Generate(Level level, Chunk chunk, bool placeBlocks) {
+		[Obsolete]
+		public void Generate(Level level, Chunk chunk, bool placeBlocks) {
 			ChunkGenData genData = new() {
 				genContexts = new BlockGenContext[Level.CHUNK_LENGTH][],
 				surfacePoints = new int[Level.CHUNK_LENGTH],
@@ -42,9 +43,9 @@
 			ChunkPos chunkPos = chunk.GetPos();
 
 			for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
-				genData.caveDensities[cx] = new float[Level.WORLD_HEIGHT];
-				genData.caveMask[cx] = new BitArray(Level.WORLD_HEIGHT);
-				genData.genContexts[cx] = new BlockGenContext[Level.WORLD_HEIGHT];
+				genData.caveDensities[cx] = new float[Level.DEFAULT_WORLD_HEIGHT];
+				genData.caveMask[cx] = new BitArray(Level.DEFAULT_WORLD_HEIGHT);
+				genData.genContexts[cx] = new BlockGenContext[Level.DEFAULT_WORLD_HEIGHT];
 				int x = chunkPos.ChunkXToWorldX(cx);
 
 				IEnumerable<BiomeWeight> weights = this.biomeMap.ResolveWeights(x);
@@ -59,7 +60,7 @@
 
 				BlockResolver blockResolver = new(primary.biome, secondary?.biome);
 
-				for (int y = 0; y < Level.WORLD_HEIGHT; y++) {
+				for (int y = 0; y < Level.DEFAULT_WORLD_HEIGHT; y++) {
 					BlockPos blockPos = new(x, WorldChunk.IndexToWorldY(y));
 					float caveDensity = this.cavemap.SampleDensity(x, blockPos.y, surfaceY, primary, secondary);
 					bool isCave = this.cavemap.IsCave(caveDensity);
@@ -152,5 +153,24 @@
 			}
 		}
 
+		public override Chunk GenerateSurface(Chunk chunk) {
+			throw new NotImplementedException();
+		}
+
+		public override Chunk Fill(Chunk chunk) {
+			throw new NotImplementedException();
+		}
+
+		public override int GetMinGenY() {
+			throw new NotImplementedException();
+		}
+
+		public override int GetGenHeight() {
+			throw new NotImplementedException();
+		}
+
+		public override int GetBaseHeight(int x, IHeightLimitView heightLimit) {
+			throw new NotImplementedException();
+		}
 	}
 }

@@ -3,12 +3,12 @@ namespace SoulboundEngine.World.Level {
 	using SoulboundEngine.Common.Math;
 	using SoulboundEngine.Common.Math.Random;
 	using SoulboundEngine.Recipe;
+	using SoulboundEngine.Registry;
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Block.Entity;
 	using SoulboundEngine.World.Block.State;
 	using SoulboundEngine.World.Chunk;
 	using SoulboundEngine.World.Entity;
-	using SoulboundEngine.World.Gen;
 	using SoulboundEngine.World.Physics;
 	using SoulboundEngine.World.Player;
 	using SoulboundEngine.World.Serialization;
@@ -21,12 +21,13 @@ namespace SoulboundEngine.World.Level {
 
 	public sealed class Level : IHeightLimitView, IEntityManager {
 		public const int CHUNK_LENGTH = SharedConstants.CHUNK_WIDTH;
-		public const int WORLD_HEIGHT = 1024;
-		public const int MIN_Y = -WORLD_HEIGHT / 2;
-		public const int MAX_Y = WORLD_HEIGHT / 2;
+		public const int DEFAULT_WORLD_HEIGHT = 1024;
+		public const int DEFAULT_MIN_Y = -DEFAULT_WORLD_HEIGHT / 2;
+		public const int DEFAULT_MAX_Y = DEFAULT_WORLD_HEIGHT / 2;
 		public const int RENDER_DISTANCE = 8;
 		private const int CHUNK_TTL = 750;
-
+		private readonly RegistryEntry<LevelType> levelType;
+		private readonly LevelSettings levelSettings;
 		public readonly int seed;
 		private readonly ChunkStorage chunkStorage;
 		private readonly LevelChunkManager chunkManager;
@@ -35,7 +36,7 @@ namespace SoulboundEngine.World.Level {
 		// but Level is currently the only source of truth
 		private readonly RecipeManager recipeManager;
 		private PlayerEntity player = null!;
-		public event Action<BlockPos, BlockState?, BlockState?>? blockStateChanged;
+		public event Action<BlockPos, BlockState, BlockState>? blockStateChanged;
 		public event Action<Entity>? entityAdded;
 		public event Action<Entity>? entityRemoved;
 		public event Action<Chunk>? chunkLoaded;
@@ -49,12 +50,21 @@ namespace SoulboundEngine.World.Level {
 		private readonly Dictionary<Guid, Entity> entities = new();
 		private readonly Dictionary<BlockPos, List<WorldWidgetHandler>> widgets = new();
 
-		public Level(int seed, RecipeManager recipeManager, ChunkGenerator chunkGenerator, int chunkRadius, ChunkStorage chunkStorage) {
+		public Level(
+			RegistryEntry<LevelType> levelType,
+			LevelSettings levelSettings,
+			int seed,
+			RecipeManager recipeManager, 
+			int chunkRadius,
+			ChunkStorage chunkStorage
+		) {
+			this.levelType = levelType;
+			this.levelSettings = levelSettings;
 			this.seed = seed;
 			this.recipeManager = recipeManager;
 			this.chunkStorage = chunkStorage;
 			this.randomSequences = new RandomSequences(seed);
-			this.chunkManager = new LevelChunkManager(this, chunkGenerator, chunkRadius, new LevelChunkCache(this, CHUNK_TTL), chunkStorage);
+			this.chunkManager = new LevelChunkManager(this, levelSettings.chunkGenerator, chunkRadius, new LevelChunkCache(this, CHUNK_TTL), chunkStorage);
 		}
 
 		// known issue: current chunk generation takes way too long (60-65ms per chunk in one tick)
@@ -353,8 +363,8 @@ namespace SoulboundEngine.World.Level {
 		}
 		public Chunk? ChunkAt(BlockPos blockPos) => this.ChunkAt(blockPos.x);
 
-		public int GetBottomY() => MIN_Y;
-		public int GetHeight() => WORLD_HEIGHT;
+		public int GetBottomY() => DEFAULT_MIN_Y;
+		public int GetHeight() => DEFAULT_WORLD_HEIGHT;
 
 		public Chunk? GetChunk(int chunkX) => this.chunkManager.GetChunk(chunkX, false);
 
@@ -367,7 +377,7 @@ namespace SoulboundEngine.World.Level {
 		}
 
 		public static bool IsInBounds(int x, int y) {
-			return y <= MAX_Y && y >= MIN_Y;
+			return y <= DEFAULT_MAX_Y && y >= DEFAULT_MIN_Y;
 		}
 
 		public int GetSurfaceY(int xpos) {
@@ -395,6 +405,10 @@ namespace SoulboundEngine.World.Level {
 		public bool IsLoaded() => this.isLoaded;
 
 		public PlayerEntity GetPlayer() => this.player;
+
+		public LevelType GetLevelType() => this.levelType.GetValue();
+
+		public LevelSettings GetSettings() => this.levelSettings;
 
 		public RandomSequences RandomSequences => this.randomSequences;
 

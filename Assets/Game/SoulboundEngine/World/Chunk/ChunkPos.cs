@@ -11,9 +11,9 @@
 			this.x = x;
 		}
 
-		public static int WorldYToIndex(int worldY) => worldY - Level.MIN_Y;
+		public static int WorldYToIndex(int worldY) => worldY - Level.DEFAULT_MIN_Y;
 
-		public static int IndexToWorldY(int yIndex) => yIndex + Level.MIN_Y;
+		public static int IndexToWorldY(int yIndex) => yIndex + Level.DEFAULT_MIN_Y;
 
 		public int WorldXToChunkX(int worldX) => worldX - this.x * Level.CHUNK_LENGTH;
 

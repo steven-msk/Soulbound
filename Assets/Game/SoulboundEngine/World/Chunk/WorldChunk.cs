@@ -27,13 +27,13 @@ namespace SoulboundEngine.World.Chunk {
 			this.level = level;
 		}
 
-		public int[]? surfacePoints { get; set; }
+		[Obsolete] public int[]? surfacePoints { get; set; }
 
 		public override void Tick() => this.tickManager.Tick();
 
-		public static int WorldYToIndex(int worldY) => worldY - Level.MIN_Y;
+		public static int WorldYToIndex(int worldY) => worldY - Level.DEFAULT_MIN_Y;
 
-		public static int IndexToWorldY(int yIndex) => yIndex + Level.MIN_Y;
+		public static int IndexToWorldY(int yIndex) => yIndex + Level.DEFAULT_MIN_Y;
 
 		public int WorldXToChunkX(int x) => x - this.ChunkX * Level.CHUNK_LENGTH;
 

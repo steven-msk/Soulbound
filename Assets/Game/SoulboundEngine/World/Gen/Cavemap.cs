@@ -75,7 +75,7 @@ namespace SoulboundEngine.World.Gen {
 		private float GetBottomMask(int blockY, float b1, float? b2, float blendFactor) {
 			float bottomFalloff = (float)Maths.Lerp(b1, b2 ?? b1, blendFactor);
 			
-			float t = (float)Maths.InverseLerp(Level.MIN_Y, Level.MIN_Y + bottomFalloff, blockY);
+			float t = (float)Maths.InverseLerp(Level.DEFAULT_MIN_Y, Level.DEFAULT_MIN_Y + bottomFalloff, blockY);
 			return (float)Maths.SmoothStep(1f, 0f, t);
 		}
 

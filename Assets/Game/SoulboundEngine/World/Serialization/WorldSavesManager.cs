@@ -1,5 +1,6 @@
 namespace SoulboundEngine.World {
 	using SoulboundEngine.Serialization;
+	using SoulboundEngine.World.Gen;
 	using SoulboundEngine.World.Serialization;
 	using System;
 	using System.Collections.Generic;
@@ -16,8 +17,9 @@ namespace SoulboundEngine.World {
 
 		public IEnumerable<WorldSave> ListSaves(IWorldSaveValidator saveValidator) {
 			foreach (File file in this.root.ListFiles()) {
-				if (saveValidator.Validate(file, out int seed, out string worldName, out File chunksFolder)) {
-					yield return new WorldSave(file, chunksFolder, worldName, seed, this.IsNew(worldName));
+				if (saveValidator.Validate(file) is WorldSave save) {
+					save.isNew = this.IsNew(save.name);
+					yield return save;
 				}
 			}
 		}
@@ -33,7 +35,7 @@ namespace SoulboundEngine.World {
 			this.newWorlds.Remove(world);
 		}
 
-		public void CreateNewWorld(string world, int seed, IWorldSaveValidator saveValidator) {
+		public void CreateNewWorld(string world, int seed, WorldPreset preset, IWorldSaveValidator saveValidator) {
 			File saveDirectory = this.ToSaveDirectory(world);
 			if (!saveDirectory.Mkdir()) {
 				Logger.LogError("Failed to create world: {}", world);
@@ -41,7 +43,7 @@ namespace SoulboundEngine.World {
 			}
 
 			this.newWorlds.Add(world);
-			saveValidator.ValidateNewSave(saveDirectory, seed);
+			saveValidator.ValidateNewSave(saveDirectory, seed, preset);
 		}
 
 		public void DeleteWorld(string world) {
