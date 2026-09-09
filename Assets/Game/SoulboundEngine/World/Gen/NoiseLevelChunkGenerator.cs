@@ -83,9 +83,9 @@
 					}
 				}
 			}
-			if (chunk is WorldChunk worldChunk) {
-				worldChunk.surfacePoints = genData.surfacePoints;
-			}
+			//if (chunk is WorldChunk worldChunk) {
+			//	worldChunk.surfacePoints = genData.surfacePoints;
+			//}
 			if (placeBlocks) {
 				this.BlendBiomeBorder(genData.biomePartition);
 				this.PostProcess(genData, level, chunk);

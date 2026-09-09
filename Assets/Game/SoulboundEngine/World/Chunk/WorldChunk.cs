@@ -27,8 +27,6 @@ namespace SoulboundEngine.World.Chunk {
 			this.level = level;
 		}
 
-		[Obsolete] public int[]? surfacePoints { get; set; }
-
 		public override void Tick() => this.tickManager.Tick();
 
 		public static int WorldYToIndex(int worldY) => worldY - Level.DEFAULT_MIN_Y;
