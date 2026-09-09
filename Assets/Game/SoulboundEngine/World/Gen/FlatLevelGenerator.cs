@@ -58,7 +58,9 @@
 			List<BlockState> layers = this.settings.layers.Select(b => b.DefaultState).ToList();
 			for (int layerIndex = Math.Min(layers.Count - 1, heightLimit.GetTopY()); layerIndex >= 0; layerIndex--) {
 				BlockState state = layers[layerIndex];
-				return heightLimit.GetBottomY() + layerIndex + 1;
+				if (!state.IsAir()) {
+					return heightLimit.GetBottomY() + layerIndex + 1;
+				}
 			}
 			return heightLimit.GetBottomY();
 		}
