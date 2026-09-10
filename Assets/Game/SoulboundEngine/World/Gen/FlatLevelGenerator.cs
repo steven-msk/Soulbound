@@ -47,7 +47,7 @@
 		}
 
 		public override Chunk GenerateSurface(Chunk chunk) {
-			int[] heightmap = chunk.GetOrCreateHeightmap();
+			int[] heightmap = chunk.GetHeightmap();
 			for (int i = 0; i < heightmap.Length; i++) {
 				heightmap[i] = this.GetBaseHeight(i, chunk);
 			}

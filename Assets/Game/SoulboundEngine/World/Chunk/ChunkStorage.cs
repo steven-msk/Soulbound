@@ -57,12 +57,12 @@
 			return data.Read(level, chunkPos);
 		}
 
-		public void Save(Level level, Chunk chunk) {
+		public void Save(Chunk chunk) {
 			File chunkFile = ToChunkFile(chunk, this.folder);
 			chunkFile.CreateNewFile();
 			using StreamWriter writer = chunkFile.CreateText();
 
-			SerializableChunkData data = SerializableChunkData.Of(level, chunk);
+			SerializableChunkData data = SerializableChunkData.Of(chunk);
 			writer.Write(data.Write());
 
 			int chunkX = chunk.GetPos().x;

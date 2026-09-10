@@ -1,6 +1,7 @@
 ﻿namespace SoulboundEngine.World.Chunk {
 	using Newtonsoft.Json;
 	using Newtonsoft.Json.Linq;
+	using SoulboundEngine.Serialization;
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Block.Entity;
 	using SoulboundEngine.World.Block.State;
@@ -13,10 +14,11 @@
 
 	public record SerializableChunkData(
 		ChunkPos chunkPos,
+		int[]? heightmap,
 		List<SerializableChunkData.SectionData> sectionData,
 		List<JToken> tileEntities
 	) {
-		public static SerializableChunkData Of(Level level, Chunk chunk) {
+		public static SerializableChunkData Of(Chunk chunk) {
 			if (!chunk.CanBeSerialized()) {
 				throw new ArgumentException("Chunk cant be serialized: " + chunk);
 			}
@@ -25,7 +27,7 @@
 			List<SectionData> sectionData = new();
 			ChunkSection[] sections = chunk.GetSections();
 
-			for (int sectionY = level.GetBottomSectionY(); sectionY < level.GetTopSectionY(); sectionY++) {
+			for (int sectionY = chunk.GetBottomSectionY(); sectionY < chunk.GetTopSectionY(); sectionY++) {
 				int sectionIndex = chunk.GetSectionIndexFromSectionY(sectionY);
 				if (sectionIndex >= 0 && sectionIndex < sections.Length) {
 					ChunkSection section = sections[sectionIndex];
@@ -39,7 +41,7 @@
 				if (json != null) tileEntities.Add(json);
 			}
 
-			return new SerializableChunkData(pos, sectionData, tileEntities);
+			return new SerializableChunkData(pos, chunk.HasHeightmap() ? chunk.GetHeightmap() : null, sectionData, tileEntities);
 		}
 
 		public static SerializableChunkData Parse(string jsonString, Level level) {
@@ -70,7 +72,19 @@
 				tileEntities.Add(token);
 			}
 
-			return new SerializableChunkData(chunkPos, sectionData, tileEntities);
+			JToken? heightmapToken = jsonObject["heightmap"];
+			int[]? heightmap = null;
+			if (heightmapToken != null) {
+				JArray array = (JArray)heightmapToken;
+				heightmap = new int[array.Count];
+
+				for (int i = 0; i < array.Count; i++) {
+					DataResult<int> heightResult = Codecs.INT.Decode(array[i]);
+					heightmap[i] = heightResult.GetOrThrow();
+				}
+			}
+
+			return new SerializableChunkData(chunkPos, heightmap, sectionData, tileEntities);
 		}
 
 		public Chunk Read(Level level, ChunkPos chunkPos) {
@@ -110,6 +124,15 @@
 			}
 			chunk.SyncBlocksWithTileEntities();
 
+			if (this.heightmap != null) {
+				int[] chunkHeightmap = chunk.GetHeightmap();
+				if (chunkHeightmap.Length != this.heightmap.Length) {
+					Logger.LogError("Mismatched chunk heightmap length! Expected {}, got {}", this.heightmap.Length, chunkHeightmap.Length);
+				} else {
+					Array.Copy(this.heightmap, chunkHeightmap, this.heightmap.Length);
+				}
+			}
+
 			return chunk;
 		}
 
@@ -129,8 +152,16 @@
 				tileEntities.Add(tileEntity);
 			}
 
+			JArray? heightmapArray = this.heightmap == null ? null : new JArray();
+			if (heightmapArray != null) {
+				foreach (int height in this.heightmap!) {
+					heightmapArray.Add(Codecs.INT.Encode(height));	
+				}
+			}
+
 			JObject json = new() {
 				["pos"] = this.chunkPos.ToString(),
+				["heightmap"] = heightmapArray == null ? JValue.CreateNull() : heightmapArray,
 				["sections"] = sections,
 				["tileEntities"] = tileEntities
 			};

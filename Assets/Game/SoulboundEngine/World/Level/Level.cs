@@ -323,7 +323,7 @@ namespace SoulboundEngine.World.Level {
 		}
 
 		public void DropChunk(Chunk chunk) {
-			this.chunkStorage.Save(this, chunk);
+			this.chunkStorage.Save(chunk);
 		}
 
 		public void OnSessionStop() {
@@ -383,7 +383,7 @@ namespace SoulboundEngine.World.Level {
 		public int GetSurfaceY(int xpos) {
 			Chunk? chunk = this.ChunkAt(xpos);
 			int cx = ToChunkX(xpos);
-			return chunk?.GetOrCreateHeightmap()[cx] ?? this.GetBottomY();
+			return chunk?.GetHeightmap()[cx] ?? this.GetBottomY();
 		}
 
 		public int GetSurfaceAirY(int xpos) => this.GetSurfaceY(xpos) + 1;

@@ -69,8 +69,10 @@
 		public ChunkSection[] GetSections() => this.sections;
 		public ChunkSection GetSection(int yIndex) => this.sections[yIndex];
 
-		public int[] GetOrCreateHeightmap() {
+		public int[] GetHeightmap() {
 			return this.heightmap ??= new int[Level.CHUNK_LENGTH];
 		}
+
+		public bool HasHeightmap() => this.heightmap != null;
 	}
 }
