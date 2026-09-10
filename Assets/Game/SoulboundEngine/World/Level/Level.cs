@@ -383,7 +383,7 @@ namespace SoulboundEngine.World.Level {
 		public int GetSurfaceY(int xpos) {
 			Chunk? chunk = this.ChunkAt(xpos);
 			int cx = ToChunkX(xpos);
-			return chunk?.GetHeightmap()[cx] ?? this.GetBottomY();
+			return chunk?.GetHeightmap().GetFirstFree(cx) ?? this.GetBottomY();
 		}
 
 		public int GetSurfaceAirY(int xpos) => this.GetSurfaceY(xpos) + 1;

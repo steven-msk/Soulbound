@@ -5,6 +5,7 @@
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Block.Entity;
 	using SoulboundEngine.World.Block.State;
+	using SoulboundEngine.World.Gen;
 	using SoulboundEngine.World.Level;
 	using System;
 	using System.Collections.Generic;
@@ -41,7 +42,7 @@
 				if (json != null) tileEntities.Add(json);
 			}
 
-			return new SerializableChunkData(pos, chunk.HasHeightmap() ? chunk.GetHeightmap() : null, sectionData, tileEntities);
+			return new SerializableChunkData(pos, chunk.HasHeightmap() ? chunk.GetHeightmap().GetRaw() : null, sectionData, tileEntities);
 		}
 
 		public static SerializableChunkData Parse(string jsonString, Level level) {
@@ -125,12 +126,8 @@
 			chunk.SyncBlocksWithTileEntities();
 
 			if (this.heightmap != null) {
-				int[] chunkHeightmap = chunk.GetHeightmap();
-				if (chunkHeightmap.Length != this.heightmap.Length) {
-					Logger.LogError("Mismatched chunk heightmap length! Expected {}, got {}", this.heightmap.Length, chunkHeightmap.Length);
-				} else {
-					Array.Copy(this.heightmap, chunkHeightmap, this.heightmap.Length);
-				}
+				Heightmap chunkHeightmap = chunk.GetHeightmap();
+				chunkHeightmap.SetRaw(this.heightmap);
 			}
 
 			return chunk;

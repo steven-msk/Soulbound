@@ -33,9 +33,10 @@ namespace SoulboundEngine.World.Gen {
 				}
 				return false;
 			}
-			BlockPos.Mutable pos = new();
 
 			if (localY + 1 == firstFree) {
+				BlockPos.Mutable pos = new();
+
 				for (int y = localY - 1; y >= this.chunk.GetBottomY(); y--) {
 					pos.Set(this.chunk.GetPos().ToWorldX(localX), y);
 					if (this.isOpaque(this.chunk.GetBlockState(pos))) {
@@ -55,7 +56,7 @@ namespace SoulboundEngine.World.Gen {
 			return this.heights[index] + this.chunk.GetBottomY();
 		}
 
-		public int GetFirstFree(int localX) => this.GetFirstFree(GetIndex(localX));
+		public int GetFirstFree(int localX) => this.GetFirstFreeFromIndex(GetIndex(localX));
 
 		public void SetRaw(int[] data) {
 			if (data.Length != this.size) {
@@ -64,7 +65,7 @@ namespace SoulboundEngine.World.Gen {
 			Array.Copy(data, this.heights, this.size);
 		}
 
-		public int[] GetRawImmutable() => (int[])this.heights.Clone();
+		public int[] GetRaw() => (int[])this.heights.Clone();
 
 		private void SetHeight(int x, int height) {
 			this.heights[GetIndex(x)] = height - this.chunk.GetBottomY();
