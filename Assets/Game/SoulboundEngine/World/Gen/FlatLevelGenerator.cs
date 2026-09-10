@@ -32,6 +32,7 @@
 
 		public override Chunk Fill(Chunk chunk) {
 			List<BlockState> layers = this.settings.layers.Select(b => b.DefaultState).ToList();
+			Heightmap heightmap = chunk.GetHeightmap();
 			BlockPos.Mutable blockPos = new();
 
 			for (int layerIndex = 0; layerIndex < Math.Min(chunk.GetHeight(), layers.Count); layerIndex++) {
@@ -40,6 +41,7 @@
 
 				for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
 					chunk.SetBlockState(blockPos.Set(x, y), blockState);
+					heightmap.Update(x, y, blockState);
 				}
 			}
 
@@ -47,10 +49,6 @@
 		}
 
 		public override Chunk BuildSurface(Chunk chunk) {
-			//int[] heightmap = chunk.GetHeightmap();
-			//for (int i = 0; i < heightmap.Length; i++) {
-			//	heightmap[i] = this.GetBaseHeight(i, chunk);
-			//}
 			return chunk;
 		}
 

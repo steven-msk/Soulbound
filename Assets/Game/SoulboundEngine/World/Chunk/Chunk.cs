@@ -3,6 +3,7 @@
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Block.Entity;
 	using SoulboundEngine.World.Block.State;
+	using SoulboundEngine.World.Gen;
 	using SoulboundEngine.World.Level;
 	using System;
 	using System.Collections.Generic;
@@ -15,7 +16,7 @@
 		protected readonly IHeightLimitView heightLimitView;
 		protected readonly ChunkSection[] sections;
 		protected readonly ChunkPos chunkPos;
-		private int[]? heightmap;
+		private Heightmap? heightmap;
 
 		public Chunk(ChunkPos chunkPos, ChunkSection[]? sections, IHeightLimitView heightLimitView, Func<BlockStateContainer> containerFactory) {
 			this.chunkPos = chunkPos;
@@ -69,8 +70,10 @@
 		public ChunkSection[] GetSections() => this.sections;
 		public ChunkSection GetSection(int yIndex) => this.sections[yIndex];
 
-		public int[] GetHeightmap() {
-			return this.heightmap ??= new int[Level.CHUNK_LENGTH];
+		public Heightmap GetHeightmap() => this.heightmap ?? CreateHeightmap(this, s => !s.IsAir());
+
+		private static Heightmap CreateHeightmap(Chunk chunk, Predicate<BlockState> isOpaque) {
+			return chunk.heightmap = new Heightmap(Level.CHUNK_LENGTH, isOpaque, chunk);
 		}
 
 		public bool HasHeightmap() => this.heightmap != null;
