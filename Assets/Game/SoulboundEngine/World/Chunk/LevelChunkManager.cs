@@ -86,35 +86,41 @@
 			}
 		}
 
-		public void InitialLoad(int centerX, bool placeBlocks) {
+		public void InitialLoad(int centerX) {
 			for (int dx = -this.chunkRadius; dx <= this.chunkRadius; dx++) {
 				int chunkX = centerX + dx;
 				int index = this.GetIndex(chunkX);
-				this.GenerateAndLoadChunk(index, chunkX, placeBlocks);
+				this.GenerateAndLoadChunk(index, chunkX);
 			}
 		}
 
-		private WorldChunk GenerateAndLoadChunk(int index, int x, bool placeBlocks) {
-			WorldChunk chunk = this.GenerateChunk(x, placeBlocks);
+		private WorldChunk GenerateAndLoadChunk(int index, int x) {
+			WorldChunk chunk = this.GenerateChunk(x);
 			this.loadedChunks[index] = chunk;
 			this.level.OnChunkLoaded(chunk);
 			return chunk;
 		}
 
-		private WorldChunk GenerateChunk(int x, bool placeBlocks) {
+		private WorldChunk GenerateChunk(int x) {
 			if (this.chunkStorage.Read(this.level, x) is WorldChunk existing) {
-				return (WorldChunk)this.chunkGenerator.BuildSurface(existing);
+				return existing;
 			}
 			WorldChunk chunk = new(this.level, new ChunkPos(x));
-			chunk = (WorldChunk)this.chunkGenerator.BuildSurface(chunk);
-			if (placeBlocks) {
-				chunk = (WorldChunk)this.chunkGenerator.Fill(chunk);
-			}
+			return this.ExecuteGenerationSteps(chunk);
+		}
+
+		private WorldChunk ExecuteGenerationSteps(WorldChunk chunk) {
+			chunk = DoStep(this.chunkGenerator, chunk, (generator, chunk) => generator.Fill(chunk));
+			chunk = DoStep(this.chunkGenerator, chunk, (generator, chunk) => generator.BuildSurface(chunk));
 			return chunk;
 		}
 
+		private static WorldChunk DoStep(ChunkGenerator generator, Chunk chunk, Func<ChunkGenerator, Chunk, Chunk> step) {
+			return (WorldChunk)step(generator, chunk);
+		}
+
 		private WorldChunk ResolveAndLoad(int index, int x) {
-			WorldChunk resolved = this.chunkCache.TryClaim(x) ?? this.GenerateChunk(x, true);
+			WorldChunk resolved = this.chunkCache.TryClaim(x) ?? this.GenerateChunk(x);
 			this.loadedChunks[index] = resolved;
 			this.level.OnChunkLoaded(resolved);
 			return resolved;

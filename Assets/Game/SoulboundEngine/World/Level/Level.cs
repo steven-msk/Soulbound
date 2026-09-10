@@ -68,9 +68,9 @@ namespace SoulboundEngine.World.Level {
 		}
 
 		// known issue: current chunk generation takes way too long (60-65ms per chunk in one tick)
-		public void GenerateSpawn(bool placeBlocks) {
+		public void GenerateSpawn() {
 			Logger.LogInfo("Generating terrain with seed {}", this.seed);
-			this.chunkManager.InitialLoad(0, placeBlocks);
+			this.chunkManager.InitialLoad(0);
 			this.isLoaded = true;
 		}
 

@@ -39,7 +39,7 @@ namespace SoulboundEngine.World.Level {
 		}
 
 		public Level Bootstrap() {
-			this.level.GenerateSpawn(this.save.isNew);
+			this.level.GenerateSpawn();
 			this.level.DeserializeEntities(this.entitySerializer);
 			this.isBootstrapped = true;
 			return this.level;
