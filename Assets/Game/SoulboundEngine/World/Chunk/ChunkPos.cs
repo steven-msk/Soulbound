@@ -15,9 +15,9 @@
 
 		public static int IndexToWorldY(int yIndex) => yIndex + Level.DEFAULT_MIN_Y;
 
-		public int WorldXToChunkX(int worldX) => worldX - this.x * Level.CHUNK_LENGTH;
+		public int ToLocalX(int worldX) => worldX - this.x * Level.CHUNK_LENGTH;
 
-		public int ChunkXToWorldX(int chunkX) => chunkX + this.x * Level.CHUNK_LENGTH;
+		public int ToWorldX(int chunkX) => chunkX + this.x * Level.CHUNK_LENGTH;
 
 		public static ChunkPos Containing(BlockPos pos) {
 			return new ChunkPos(SectionPos.BlockToSectionCoord(pos.x));

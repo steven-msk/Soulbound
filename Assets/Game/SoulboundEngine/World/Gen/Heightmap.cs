@@ -1,57 +1,73 @@
 namespace SoulboundEngine.World.Gen {
-	using SoulboundEngine.Common.Math;
-	using SoulboundEngine.World.Level;
+	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Block.State;
+	using SoulboundEngine.World.Chunk;
 	using System;
 
 #nullable enable
 
-	[Obsolete]
 	public sealed class Heightmap {
-		public int planeY { get; private set; }
-		public int planeHeight => Level.DEFAULT_MAX_Y - this.planeY;
+		private readonly int size;
+		private readonly int[] heights;
+		private readonly Predicate<BlockState> isOpaque;
+		private readonly Chunk chunk;
 
-		public Heightmap(int planeY) {
-			this.planeY = planeY;
+		public Heightmap(int size, Predicate<BlockState> isOpaque, Chunk chunk) {
+			this.size = size;
+			this.isOpaque = isOpaque;
+			this.chunk = chunk;
+			this.heights = new int[size];
+			Array.Fill(this.heights, chunk.GetBottomY());
 		}
 
-		public float SampleHeight(int blockX, BiomeWeight primary, BiomeWeight? secondary) {
-			float w1 = primary.value;
-			float w2 = secondary.GetValueOrDefault().value;
-			float t = this.GetBlendFactor(w1, secondary != null ? w2 : 0f);
+		private static int GetIndex(int localX) => localX;
 
-			TerrainModulation m1 = primary.biome.SampleTerrain(blockX);
-			if (secondary == null) {
-				return this.ApplyModulation(m1);
+		public bool Update(int localX, int localY, BlockState blockState) {
+			int index = GetIndex(localX);
+			int firstFree = this.GetFirstFreeFromIndex(index);
+
+			if (this.isOpaque(blockState)) {
+				if (localY + 1 > firstFree) {
+					this.SetHeight(localX, localY + 1);
+					return true;
+				}
+				return false;
 			}
-			TerrainModulation m2 = secondary.Value.biome.SampleTerrain(blockX);
+			BlockPos.Mutable pos = new();
 
-			float h1 = this.ApplyModulation(m1);
-			float h2 = this.ApplyModulation(m2);
-			float blended = (float)Maths.Lerp(h1, h2, t);
+			if (localY + 1 == firstFree) {
+				for (int y = localY - 1; y >= this.chunk.GetBottomY(); y--) {
+					pos.Set(this.chunk.GetPos().ToWorldX(localX), y);
+					if (this.isOpaque(this.chunk.GetBlockState(pos))) {
+						this.SetHeight(localX, localY + 1);
+						return true;
+					}
+				}
 
-			return blended;
+				this.SetHeight(localX, this.chunk.GetBottomY());
+				return true;
+			}
+
+			return false;
 		}
 
-		public float ApplyModulation(TerrainModulation m) {
-			float baseHeight = this.planeHeight + m.heightOffset;
-			float variation = (this.planeHeight * (m.amplitude - 1f));
-			variation *= m.erosion;
-			return baseHeight + variation;
+		private int GetFirstFreeFromIndex(int index) {
+			return this.heights[index] + this.chunk.GetBottomY();
 		}
 
-		private float GetBlendFactor(float a, float b) {
-			float t = b / (a + b);
-			return (float)Maths.SmoothStep(0f, 1f, t);
-			//return b / (a + b);
+		public int GetFirstFree(int localX) => this.GetFirstFree(GetIndex(localX));
+
+		public void SetRaw(int[] data) {
+			if (data.Length != this.size) {
+				throw new ArgumentException($"Mismatched heightmap array length: expected {this.size}, got {data.Length}");
+			}
+			Array.Copy(data, this.heights, this.size);
 		}
 
+		public int[] GetRawImmutable() => (int[])this.heights.Clone();
 
-		public int ToHeightValue(int yCoord) {
-			return Level.DEFAULT_MAX_Y - yCoord;
-		}
-
-		public int ToYCoord(int heightValue) {
-			return Level.DEFAULT_MIN_Y + heightValue;
+		private void SetHeight(int x, int height) {
+			this.heights[GetIndex(x)] = height - this.chunk.GetBottomY();
 		}
 	}
 }

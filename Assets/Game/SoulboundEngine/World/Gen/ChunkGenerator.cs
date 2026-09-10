@@ -23,7 +23,7 @@
 		/// </summary>
 		protected abstract MapCodec<ChunkGenerator> Codec();
 
-		public abstract Chunk GenerateSurface(Chunk chunk);
+		public abstract Chunk BuildSurface(Chunk chunk);
 
 		public abstract Chunk Fill(Chunk chunk);
 

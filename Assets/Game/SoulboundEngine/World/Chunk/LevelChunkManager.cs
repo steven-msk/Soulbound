@@ -103,10 +103,10 @@
 
 		private WorldChunk GenerateChunk(int x, bool placeBlocks) {
 			if (this.chunkStorage.Read(this.level, x) is WorldChunk existing) {
-				return (WorldChunk)this.chunkGenerator.GenerateSurface(existing);
+				return (WorldChunk)this.chunkGenerator.BuildSurface(existing);
 			}
 			WorldChunk chunk = new(this.level, new ChunkPos(x));
-			chunk = (WorldChunk)this.chunkGenerator.GenerateSurface(chunk);
+			chunk = (WorldChunk)this.chunkGenerator.BuildSurface(chunk);
 			if (placeBlocks) {
 				chunk = (WorldChunk)this.chunkGenerator.Fill(chunk);
 			}

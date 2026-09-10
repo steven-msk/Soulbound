@@ -115,7 +115,7 @@ namespace SoulboundEngine.World.Biome {
 
 				float spawnChance = (float)Maths.Lerp(chanceMin, chanceMax, density);
 				if (this.random.NextFloat() < spawnChance) {
-					this.PlaceTree(x, genData.surfacePoints[chunk.GetPos().WorldXToChunkX(x)] + 1, chunk, level);
+					this.PlaceTree(x, genData.surfacePoints[chunk.GetPos().ToLocalX(x)] + 1, chunk, level);
 					this.lastTreeX = x;
 				}
 			}

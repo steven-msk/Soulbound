@@ -1,14 +1,9 @@
 ﻿namespace SoulboundEngine.World.Gen {
-	using SoulboundEngine.Common.Math;
 	using SoulboundEngine.Serialization;
 	using SoulboundEngine.World.Biome;
-	using SoulboundEngine.World.Block;
-	using SoulboundEngine.World.Block.State;
 	using SoulboundEngine.World.Chunk;
 	using SoulboundEngine.World.Level;
 	using System;
-	using System.Collections;
-	using System.Collections.Generic;
 
 #nullable enable
 
@@ -20,12 +15,12 @@
 		);
 		private const int BIOME_BLEND_RANGE = 10;
 		private readonly BiomeMap biomeMap;
-		private readonly Heightmap heightmap;
+		//private readonly Heightmap heightmap;
 		private readonly Cavemap cavemap;
 
-		public NoiseLevelChunkGenerator(BiomeMap biomeMap, Heightmap heightmap, Cavemap cavemap) {
+		public NoiseLevelChunkGenerator(BiomeMap biomeMap, Cavemap cavemap) {
 			this.biomeMap = biomeMap;
-			this.heightmap = heightmap;
+			//this.heightmap = heightmap;
 			this.cavemap = cavemap;
 		}
 
@@ -33,63 +28,63 @@
 
 		[Obsolete]
 		public void Generate(Level level, Chunk chunk, bool placeBlocks) {
-			ChunkGenData genData = new() {
-				genContexts = new BlockGenContext[Level.CHUNK_LENGTH][],
-				surfacePoints = new int[Level.CHUNK_LENGTH],
-				biomeWeights = new IEnumerable<BiomeWeight>[Level.CHUNK_LENGTH],
-				caveDensities = new float[Level.CHUNK_LENGTH][],
-				caveMask = new BitArray[Level.CHUNK_LENGTH]
-			};
-			ChunkPos chunkPos = chunk.GetPos();
+			//ChunkGenData genData = new() {
+			//	genContexts = new BlockGenContext[Level.CHUNK_LENGTH][],
+			//	surfacePoints = new int[Level.CHUNK_LENGTH],
+			//	biomeWeights = new IEnumerable<BiomeWeight>[Level.CHUNK_LENGTH],
+			//	caveDensities = new float[Level.CHUNK_LENGTH][],
+			//	caveMask = new BitArray[Level.CHUNK_LENGTH]
+			//};
+			//ChunkPos chunkPos = chunk.GetPos();
 
-			for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
-				genData.caveDensities[cx] = new float[Level.DEFAULT_WORLD_HEIGHT];
-				genData.caveMask[cx] = new BitArray(Level.DEFAULT_WORLD_HEIGHT);
-				genData.genContexts[cx] = new BlockGenContext[Level.DEFAULT_WORLD_HEIGHT];
-				int x = chunkPos.ChunkXToWorldX(cx);
+			//for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
+			//	genData.caveDensities[cx] = new float[Level.DEFAULT_WORLD_HEIGHT];
+			//	genData.caveMask[cx] = new BitArray(Level.DEFAULT_WORLD_HEIGHT);
+			//	genData.genContexts[cx] = new BlockGenContext[Level.DEFAULT_WORLD_HEIGHT];
+			//	int x = chunkPos.ToWorldX(cx);
 
-				IEnumerable<BiomeWeight> weights = this.biomeMap.ResolveWeights(x);
-				this.biomeMap.ResolvePrimaryBiomes(weights, out BiomeWeight primary, out BiomeWeight? secondary);
-				genData.biomeWeights[cx] = weights;
+			//	IEnumerable<BiomeWeight> weights = this.biomeMap.ResolveWeights(x);
+			//	this.biomeMap.ResolvePrimaryBiomes(weights, out BiomeWeight primary, out BiomeWeight? secondary);
+			//	genData.biomeWeights[cx] = weights;
 
-				ChunkBiomePartition partition = this.ProcessBiomePartition(x, primary.biome, genData.biomePartition);
-				genData.biomePartition = partition;
+			//	ChunkBiomePartition partition = this.ProcessBiomePartition(x, primary.biome, genData.biomePartition);
+			//	genData.biomePartition = partition;
 
-				int height = Maths.FloorToInt(this.heightmap.SampleHeight(x, primary, secondary));
-				float surfaceY = this.heightmap.ToYCoord(height);
+			//	int height = Maths.FloorToInt(this.heightmap.SampleHeight(x, primary, secondary));
+			//	float surfaceY = this.heightmap.ToYCoord(height);
 
-				BlockResolver blockResolver = new(primary.biome, secondary?.biome);
+			//	BlockResolver blockResolver = new(primary.biome, secondary?.biome);
 
-				for (int y = 0; y < Level.DEFAULT_WORLD_HEIGHT; y++) {
-					BlockPos blockPos = new(x, WorldChunk.IndexToWorldY(y));
-					float caveDensity = this.cavemap.SampleDensity(x, blockPos.y, surfaceY, primary, secondary);
-					bool isCave = this.cavemap.IsCave(caveDensity);
+			//	for (int y = 0; y < Level.DEFAULT_WORLD_HEIGHT; y++) {
+			//		BlockPos blockPos = new(x, WorldChunk.IndexToWorldY(y));
+			//		float caveDensity = this.cavemap.SampleDensity(x, blockPos.y, surfaceY, primary, secondary);
+			//		bool isCave = this.cavemap.IsCave(caveDensity);
 
-					BlockGenContext ctx = new() {
-						pos = blockPos,
-						surfaceY = this.heightmap.ToYCoord(height),
-						caveDensity = caveDensity,
-						isCave = isCave,
-					};
+			//		BlockGenContext ctx = new() {
+			//			pos = blockPos,
+			//			surfaceY = this.heightmap.ToYCoord(height),
+			//			caveDensity = caveDensity,
+			//			isCave = isCave,
+			//		};
 
-					genData.genContexts[cx][y] = ctx;
-					genData.caveDensities[cx][y] = caveDensity;
-					genData.caveMask[cx][y] = isCave;
-					genData.surfacePoints[cx] = ctx.surfaceY;
+			//		genData.genContexts[cx][y] = ctx;
+			//		genData.caveDensities[cx][y] = caveDensity;
+			//		genData.caveMask[cx][y] = isCave;
+			//		genData.surfacePoints[cx] = ctx.surfaceY;
 
-					if (placeBlocks) {
-						BlockState blockState = blockResolver.ResolveBlock(ctx);
-						chunk.SetBlockState(blockPos, blockState);
-					}
-				}
-			}
-			//if (chunk is WorldChunk worldChunk) {
-			//	worldChunk.surfacePoints = genData.surfacePoints;
+			//		if (placeBlocks) {
+			//			BlockState blockState = blockResolver.ResolveBlock(ctx);
+			//			chunk.SetBlockState(blockPos, blockState);
+			//		}
+			//	}
 			//}
-			if (placeBlocks) {
-				this.BlendBiomeBorder(genData.biomePartition);
-				this.PostProcess(genData, level, chunk);
-			}
+			////if (chunk is WorldChunk worldChunk) {
+			////	worldChunk.surfacePoints = genData.surfacePoints;
+			////}
+			//if (placeBlocks) {
+			//	this.BlendBiomeBorder(genData.biomePartition);
+			//	this.PostProcess(genData, level, chunk);
+			//}
 		}
 
 		private ChunkBiomePartition ProcessBiomePartition(int x, IBiome primary, ChunkBiomePartition partition) {
@@ -138,8 +133,8 @@
 			ChunkPos chunkPos = chunk.GetPos();
 
 			int splitX = genData.biomePartition.splitX;
-			int chunkStartX = chunkPos.ChunkXToWorldX(0);
-			int chunkEndX = chunkPos.ChunkXToWorldX(Level.CHUNK_LENGTH - 1);
+			int chunkStartX = chunkPos.ToWorldX(0);
+			int chunkEndX = chunkPos.ToWorldX(Level.CHUNK_LENGTH - 1);
 
 			int partitionStartX = chunkStartX;
 			int partitionLimitX = secondary == null ? chunkEndX : splitX;
@@ -153,7 +148,7 @@
 			}
 		}
 
-		public override Chunk GenerateSurface(Chunk chunk) {
+		public override Chunk BuildSurface(Chunk chunk) {
 			throw new NotImplementedException();
 		}
 
