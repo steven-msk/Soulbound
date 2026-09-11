@@ -10,6 +10,10 @@
 			this.parameters = parameters;
 		}
 
+		public MultiNoiseBiomeSource(RegistryEntry<MultiNoiseBiomeSourceParamList> parameters)
+			: this(parameters.GetValue().GetParameters()) {
+		}
+
 		public override RegistryEntry<Biome> GetNoiseBiome(int x, int y, Climate.Sampler sampler) {
 			Climate.TargetPoint target = sampler.Sample(x, y);
 			return this.parameters.FindBruteForce(target);
