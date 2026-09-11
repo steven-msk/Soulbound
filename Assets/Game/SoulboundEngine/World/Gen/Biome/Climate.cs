@@ -1,5 +1,6 @@
 ﻿namespace SoulboundEngine.World.Gen.Biome {
 	using SoulboundEngine.Common;
+	using SoulboundEngine.Registry;
 	using System;
 	using System.Collections.Generic;
 	using System.Linq;
@@ -43,16 +44,18 @@
 		public record TargetPoint(long[] values);
 
 		public readonly struct ParameterType {
-			public static readonly ParameterType SHAPE = new(0, "shape");
+			public static readonly ParameterType SHAPE = new(0, "shape", NoiseTypes.SHAPE);
 			public static readonly ParameterType[] VALUES = new[] {
 				SHAPE
 			};
+			public readonly RegistryKey<NormalNoise.Parameters> noiseKey;
 			public readonly int index;
 			public readonly string serializedName;
 
-			public ParameterType(int index, string serializedName) {
+			public ParameterType(int index, string serializedName, RegistryKey<NormalNoise.Parameters> noiseKey) {
 				this.index = index;
 				this.serializedName = serializedName;
+				this.noiseKey = noiseKey;
 			}
 
 			public static T[] Map<T>(Func<ParameterType, T> valueFunction) {
@@ -61,6 +64,14 @@
 					result[i] = valueFunction(VALUES[i]);
 				}
 				return result;
+			}
+
+			public static IDensityFunction ToDensityFunction(
+				ParameterType type, 
+				Func<RegistryKey<NormalNoise.Parameters>, RegistryEntry<NormalNoise.Parameters>> lookup
+			) {
+				IDensityFunction.NoiseEntry entry = new(lookup(type.noiseKey), null);
+				return new DensityFunctions.Noise(entry);
 			}
 		}
 

@@ -17,9 +17,8 @@
 		}
 
 		public static WorldPreset Init(Registry<WorldPreset> registry) {
-			int seed = 0;
-			Registry<WorldPreset>.Register(registry, FLAT, new WorldPreset(new LevelSettings(LevelType.DEFAULT, new FlatLevelGenerator())));
-			return Registry<WorldPreset>.Register(registry, DEFAULT, new WorldPreset(new LevelSettings(LevelType.DEFAULT, new NoiseLevelChunkGenerator())));
+			Registry<WorldPreset>.Register(registry, DEFAULT, new WorldPreset(new LevelSettings(LevelType.DEFAULT, new NoiseLevelChunkGenerator())));
+			return Registry<WorldPreset>.Register(registry, FLAT, new WorldPreset(new LevelSettings(LevelType.DEFAULT, new FlatLevelGenerator())));
 		}
 	}
 }

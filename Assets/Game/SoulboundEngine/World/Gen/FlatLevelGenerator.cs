@@ -21,8 +21,13 @@
 			Blocks.DIRT
 		};
 
-		[Obsolete]
-		public FlatLevelGenerator() : this(new Settings(Registries.BIOME.Get(Biome.Biome.PLAINS), DEFAULT_LAYERS)) { }
+		[Obsolete("Provisory plains biome default: forces WorldPreset registration to run after Biome registration due to entry lookup")]
+		public FlatLevelGenerator() : this(new Settings(GetBiome(), DEFAULT_LAYERS)) { }
+
+		private static RegistryEntry<Biome.Biome> GetBiome() {
+			Logger.LogInfo(Registries.BIOME.Get(Biome.Biome.PLAINS));
+			return Registries.BIOME.Get(Biome.Biome.PLAINS);
+		}
 
 		public FlatLevelGenerator(Settings settings)
 			: base(new SingleBiomeSource(settings.biome)) {

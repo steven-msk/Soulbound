@@ -19,7 +19,7 @@
 		protected readonly ChunkSection[] sections;
 		protected readonly ChunkPos chunkPos;
 		private Heightmap? heightmap;
-		private RegistryEntry<Biome>[] biomes;
+		private readonly RegistryEntry<Biome>[] biomes = new RegistryEntry<Biome>[Level.CHUNK_LENGTH];
 
 		public Chunk(ChunkPos chunkPos, ChunkSection[]? sections, IHeightLimitView heightLimitView, Func<BlockStateContainer> containerFactory) {
 			this.chunkPos = chunkPos;

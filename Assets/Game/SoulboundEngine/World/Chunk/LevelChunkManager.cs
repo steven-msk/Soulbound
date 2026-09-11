@@ -1,5 +1,8 @@
 ﻿namespace SoulboundEngine.World.Chunk {
+	using SoulboundEngine.Common.Math.Random;
+	using SoulboundEngine.Registry;
 	using SoulboundEngine.World.Gen;
+	using SoulboundEngine.World.Gen.Biome;
 	using SoulboundEngine.World.Level;
 	using System;
 	using System.Collections.Generic;
@@ -110,9 +113,20 @@
 		}
 
 		private WorldChunk DoGeneration(WorldChunk chunk) {
-			chunk = DoStep(this.chunkGenerator, chunk, (generator, chunk) => generator.Fill(chunk));
-			chunk = DoStep(this.chunkGenerator, chunk, (generator, chunk) => generator.BuildSurface(chunk));
+			RandomState randomState = this.CreateRandomState();
+			chunk = DoStep(this.chunkGenerator, chunk, (generator, chunk) => generator.MapBiomes(randomState, chunk));
+			chunk = DoStep(this.chunkGenerator, chunk, (generator, chunk) => generator.Fill(randomState, chunk));
+			chunk = DoStep(this.chunkGenerator, chunk, (generator, chunk) => generator.BuildSurface(randomState, chunk));
 			return chunk;
+		}
+
+		private RandomState CreateRandomState() {
+			return RandomState.Create(
+				new Xoshiro256StarStarRandom(this.level.seed),
+				new NoiseRouter(Climate.MapParameters(p => Climate.ParameterType.ToDensityFunction(p, Registries.NOISE.Get))),
+				Registries.NOISE,
+				this.level.seed
+			);
 		}
 
 		private static WorldChunk DoStep(ChunkGenerator generator, Chunk chunk, Func<ChunkGenerator, Chunk, Chunk> step) {

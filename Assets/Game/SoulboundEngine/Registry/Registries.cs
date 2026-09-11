@@ -35,10 +35,10 @@ namespace SoulboundEngine.Registry {
 		// temporary, see LootTables
 		public static readonly Registry<LootTable> LOOT_TABLES = Create(RegistryKeys.LOOT_TABLE, LootTables.Init);
 		// not definitive
+		public static readonly Registry<NormalNoise.Parameters> NOISE = Create(RegistryKeys.NOISE, NoiseData.Init);
+		public static readonly Registry<Biome> BIOME = Create(RegistryKeys.BIOME, Biome.Init);
 		public static readonly Registry<LevelType> LEVEL_TYPE = Create(RegistryKeys.LEVEL_TYPE, LevelType.Init);
 		public static readonly Registry<WorldPreset> WORLD_PRESET = Create(RegistryKeys.WORLD_PRESET, WorldPreset.Init);
-		public static readonly Registry<Biome> BIOME = Create(RegistryKeys.BIOME, Biome.Init);
-		public static readonly Registry<NormalNoise.Parameters> NOISE = Create(RegistryKeys.NOISE, NoiseData.Init);
 
 		private static Registry<T> Create<T>(RegistryKey<Registry<T>> key, RegistryBootstrapper<T> bootstrapper) where T : class {
 			return Register(key, new Registry<T>(key), bootstrapper);
