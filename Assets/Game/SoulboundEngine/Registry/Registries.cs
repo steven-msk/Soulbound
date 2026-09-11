@@ -10,6 +10,7 @@ namespace SoulboundEngine.Registry {
 	using SoulboundEngine.World.Entity;
 	using SoulboundEngine.World.Entity.Attribute;
 	using SoulboundEngine.World.Gen;
+	using SoulboundEngine.World.Gen.Biome;
 	using SoulboundEngine.World.Level;
 	using SoulboundEngine.World.Widget;
 	using System;
@@ -36,6 +37,8 @@ namespace SoulboundEngine.Registry {
 		// not definitive
 		public static readonly Registry<LevelType> LEVEL_TYPE = Create(RegistryKeys.LEVEL_TYPE, LevelType.Init);
 		public static readonly Registry<WorldPreset> WORLD_PRESET = Create(RegistryKeys.WORLD_PRESET, WorldPreset.Init);
+		public static readonly Registry<Biome> BIOME = Create(RegistryKeys.BIOME, Biomes.Init);
+		public static readonly Registry<NormalNoise.Parameters> NOISE = Create(RegistryKeys.NOISE, NoiseData.Init);
 
 		private static Registry<T> Create<T>(RegistryKey<Registry<T>> key, RegistryBootstrapper<T> bootstrapper) where T : class {
 			return Register(key, new Registry<T>(key), bootstrapper);

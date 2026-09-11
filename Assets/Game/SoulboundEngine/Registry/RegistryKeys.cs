@@ -10,6 +10,7 @@
 	using SoulboundEngine.World.Entity;
 	using SoulboundEngine.World.Entity.Attribute;
 	using SoulboundEngine.World.Gen;
+	using SoulboundEngine.World.Gen.Biome;
 	using SoulboundEngine.World.Level;
 	using SoulboundEngine.World.Widget;
 
@@ -28,6 +29,8 @@
 		public static readonly RegistryKey<Registry<LevelType>> LEVEL_TYPE = Create<LevelType>("level_type");
 		public static readonly RegistryKey<Registry<LevelSettings>> LEVEL_SETTINGS = Create<LevelSettings>("level_settings");
 		public static readonly RegistryKey<Registry<MapCodec<ChunkGenerator>>> CHUNK_GENERATOR = Create<MapCodec<ChunkGenerator>>("chunk_generator");
+		public static readonly RegistryKey<Registry<Biome>> BIOME = Create<Biome>("biome");
+		public static readonly RegistryKey<Registry<NormalNoise.Parameters>> NOISE = Create<NormalNoise.Parameters>("noise");
 
 		private static RegistryKey<Registry<T>> Create<T>(string id) where T : class {
 			return RegistryKey<T>.OfRegistry(Identifier.Of(id));
