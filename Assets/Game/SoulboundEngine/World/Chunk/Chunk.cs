@@ -1,5 +1,6 @@
 ﻿namespace SoulboundEngine.World.Chunk {
 	using Newtonsoft.Json.Linq;
+	using SoulboundEngine.Common;
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Block.Entity;
@@ -87,5 +88,16 @@
 				this.biomes[cx] = biomeResolver.GetNoiseBiome(x, 0, sampler);
 			}
 		}
+
+		public RegistryEntry<Biome>? GetBiome(int chunkX) => this.biomes[chunkX];
+
+		public void ReplaceBiomes(RegistryEntry<Biome>[] biomes) {
+			if (biomes.Length != this.biomes.Length) {
+				throw new InvalidOperationException("Mismatched biome replacement array length: expected {} got {}".WithArgs(this.biomes.Length, biomes.Length));
+			}
+			Array.Copy(biomes, this.biomes, biomes.Length);
+		}
+
+		public RegistryEntry<Biome>[] GetBiomes() => (RegistryEntry<Biome>[])this.biomes.Clone();
 	}
 }

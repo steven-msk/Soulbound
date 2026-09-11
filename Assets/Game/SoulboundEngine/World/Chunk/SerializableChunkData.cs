@@ -1,11 +1,13 @@
 ﻿namespace SoulboundEngine.World.Chunk {
 	using Newtonsoft.Json;
 	using Newtonsoft.Json.Linq;
+	using SoulboundEngine.Registry;
 	using SoulboundEngine.Serialization;
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Block.Entity;
 	using SoulboundEngine.World.Block.State;
 	using SoulboundEngine.World.Gen;
+	using SoulboundEngine.World.Gen.Biome;
 	using SoulboundEngine.World.Level;
 	using System;
 	using System.Collections.Generic;
@@ -17,7 +19,8 @@
 		ChunkPos chunkPos,
 		int[]? heightmap,
 		List<SerializableChunkData.SectionData> sectionData,
-		List<JToken> tileEntities
+		List<JToken> tileEntities,
+		RegistryEntry<Biome>[] biomes
 	) {
 		public static SerializableChunkData Of(Chunk chunk) {
 			if (!chunk.CanBeSerialized()) {
@@ -42,7 +45,7 @@
 				if (json != null) tileEntities.Add(json);
 			}
 
-			return new SerializableChunkData(pos, chunk.HasHeightmap() ? chunk.GetHeightmap().GetRaw() : null, sectionData, tileEntities);
+			return new SerializableChunkData(pos, chunk.HasHeightmap() ? chunk.GetHeightmap().GetRaw() : null, sectionData, tileEntities, chunk.GetBiomes());
 		}
 
 		public static SerializableChunkData Parse(string jsonString, Level level) {
@@ -85,7 +88,16 @@
 				}
 			}
 
-			return new SerializableChunkData(chunkPos, heightmap, sectionData, tileEntities);
+			RegistryEntry<Biome>[] biomes = new RegistryEntry<Biome>[Level.CHUNK_LENGTH];
+			JToken? biomesToken = jsonObject["biomes"];
+			if (biomesToken != null) {
+				JArray array = (JArray)biomesToken;
+				for (int i = 0; i < array.Count; i++) {
+					biomes[i] = Biome.ENTRY_CODEC.Decode(array[i]).GetOrThrow();
+				}
+			}
+
+			return new SerializableChunkData(chunkPos, heightmap, sectionData, tileEntities, biomes);
 		}
 
 		public Chunk Read(Level level, ChunkPos chunkPos) {
@@ -130,6 +142,8 @@
 				chunkHeightmap.SetRaw(this.heightmap);
 			}
 
+			chunk.ReplaceBiomes(this.biomes);
+
 			return chunk;
 		}
 
@@ -156,11 +170,17 @@
 				}
 			}
 
+			JArray biomes = new();
+			foreach (RegistryEntry<Biome> biome in this.biomes) {
+				biomes.Add(biome == null ? JValue.CreateNull() : Biome.ENTRY_CODEC.Encode(biome));
+			}
+
 			JObject json = new() {
 				["pos"] = this.chunkPos.ToString(),
 				["heightmap"] = heightmapArray == null ? JValue.CreateNull() : heightmapArray,
 				["sections"] = sections,
-				["tileEntities"] = tileEntities
+				["tileEntities"] = tileEntities,
+				["biomes"] = biomes
 			};
 			return json.ToString(Formatting.None);
 		}
