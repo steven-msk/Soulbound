@@ -1,7 +1,6 @@
 ﻿namespace SoulboundEngine.World.Gen {
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.Serialization;
-	using SoulboundEngine.World.Biome;
 	using SoulboundEngine.World.Level;
 
 	public sealed record WorldPreset(LevelSettings levelSettings) {
@@ -19,13 +18,8 @@
 
 		public static WorldPreset Init(Registry<WorldPreset> registry) {
 			int seed = 0;
-			PlainsBiome biome1 = new(seed);
-			HillsBiome biome2 = new(seed);
-			BiomeMap biomeMap = new(new IBiome[] { biome1, biome2 });
-			//Heightmap heightmap = new(0);
-			Cavemap cavemap = new(seed);
 			Registry<WorldPreset>.Register(registry, FLAT, new WorldPreset(new LevelSettings(LevelType.DEFAULT, new FlatLevelGenerator())));
-			return Registry<WorldPreset>.Register(registry, DEFAULT, new WorldPreset(new LevelSettings(LevelType.DEFAULT, new NoiseLevelChunkGenerator(biomeMap, cavemap))));
+			return Registry<WorldPreset>.Register(registry, DEFAULT, new WorldPreset(new LevelSettings(LevelType.DEFAULT, new NoiseLevelChunkGenerator())));
 		}
 	}
 }

@@ -8,7 +8,7 @@
 
 		public MultiNoiseBiomeSourceParamList(Preset preset, IRegistryEntryLookup<Biome> registryLookup) {
 			this.preset = preset;
-			this.parameters = preset.provider.Apply(registryLookup.Get);
+			this.parameters = preset.provider.Apply(registryLookup.GetOrThrow);
 		}
 
 		public Climate.ParameterList<RegistryEntry<Biome>> GetParameters() => this.parameters;

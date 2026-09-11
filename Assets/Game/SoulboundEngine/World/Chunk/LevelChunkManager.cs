@@ -106,10 +106,10 @@
 				return existing;
 			}
 			WorldChunk chunk = new(this.level, new ChunkPos(x));
-			return this.ExecuteGenerationSteps(chunk);
+			return this.DoGeneration(chunk);
 		}
 
-		private WorldChunk ExecuteGenerationSteps(WorldChunk chunk) {
+		private WorldChunk DoGeneration(WorldChunk chunk) {
 			chunk = DoStep(this.chunkGenerator, chunk, (generator, chunk) => generator.Fill(chunk));
 			chunk = DoStep(this.chunkGenerator, chunk, (generator, chunk) => generator.BuildSurface(chunk));
 			return chunk;

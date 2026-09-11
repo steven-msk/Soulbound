@@ -1,7 +1,9 @@
 ﻿namespace SoulboundEngine.World.Gen.Biome {
 	using SoulboundEngine.Registry;
+	using SoulboundEngine.Serialization;
 
 	public sealed class Biome {
+		public static readonly Codec<RegistryEntry<Biome>> ENTRY_CODEC = RegistryEntry<Biome>.GetCodec(Registries.BIOME);
 		public static readonly RegistryKey<Biome> PLAINS = Register("plains");
 		public static readonly RegistryKey<Biome> HILLS = Register("hills");
 

@@ -3,6 +3,7 @@
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.Serialization;
 	using SoulboundEngine.World.Chunk;
+	using SoulboundEngine.World.Gen.Biome;
 
 	public abstract class ChunkGenerator {
 		public static readonly Codec<ChunkGenerator> CODEC = new DispatchCodec<ChunkGenerator, RegistryKey<MapCodec<ChunkGenerator>>>(
@@ -16,6 +17,11 @@
 					: DataResult<MapCodec<ChunkGenerator>>.Error($"Unknown chunk generator {key}");
 			}
 		);
+		protected readonly BiomeSource biomeSource;
+
+		public ChunkGenerator(BiomeSource biomeSource) {
+			this.biomeSource = biomeSource;
+		}
 
 		/// <summary>
 		/// <b>Must return a stable instance.
@@ -23,9 +29,14 @@
 		/// </summary>
 		protected abstract MapCodec<ChunkGenerator> Codec();
 
-		public abstract Chunk BuildSurface(Chunk chunk);
+		public virtual Chunk MapBiomes(RandomState randomState, Chunk chunk) {
+			chunk.FillBiomesFromNoise(this.biomeSource, randomState.Sampler);
+			return chunk;
+		}
 
-		public abstract Chunk Fill(Chunk chunk);
+		public abstract Chunk Fill(RandomState randomState, Chunk chunk);
+
+		public abstract Chunk BuildSurface(RandomState randomState, Chunk chunk);
 
 		public abstract int GetMinGenY();
 

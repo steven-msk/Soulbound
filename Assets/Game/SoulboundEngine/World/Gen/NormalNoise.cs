@@ -11,7 +11,7 @@
 		private readonly double valueFactor;
 		private readonly Parameters parameters;
 
-		public NormalNoise(IRandom random, Parameters parameters) {
+		private NormalNoise(IRandom random, Parameters parameters) {
 			this.octaveMultipliers = parameters.octaveMultipliers;
 			this.firstOctave = parameters.firstOctave;
 			this.parameters = parameters;
@@ -27,6 +27,14 @@
 				}
 			}
 			this.valueFactor = 0.16666666666666666 / ExpectedDeviation(maxOctave - minOctave);
+		}
+
+		public static NormalNoise Create(IRandom random, int firstOctave, params double[] octaveMultipliers) {
+			return new NormalNoise(random, new Parameters(firstOctave, octaveMultipliers));
+		}
+
+		public static NormalNoise Create(IRandom random, Parameters parameters) {
+			return new NormalNoise(random, parameters);
 		}
 
 		public double Get(double x, double y, double z) {

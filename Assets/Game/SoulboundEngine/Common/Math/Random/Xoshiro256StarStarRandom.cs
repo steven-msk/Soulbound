@@ -61,6 +61,8 @@
 
 		public IPositionalRandomFactory ForkPositional() => new PositionalFactory(this.NextLong());
 
+		public IRandom NewInstance(long seed) => new Xoshiro256StarStarRandom(seed);
+
 		public sealed class PositionalFactory : IPositionalRandomFactory {
 			private readonly ulong s0, s1, s2, s3;
 

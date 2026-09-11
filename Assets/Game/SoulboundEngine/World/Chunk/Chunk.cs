@@ -1,9 +1,11 @@
 ﻿namespace SoulboundEngine.World.Chunk {
 	using Newtonsoft.Json.Linq;
+	using SoulboundEngine.Registry;
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Block.Entity;
 	using SoulboundEngine.World.Block.State;
 	using SoulboundEngine.World.Gen;
+	using SoulboundEngine.World.Gen.Biome;
 	using SoulboundEngine.World.Level;
 	using System;
 	using System.Collections.Generic;
@@ -17,6 +19,7 @@
 		protected readonly ChunkSection[] sections;
 		protected readonly ChunkPos chunkPos;
 		private Heightmap? heightmap;
+		private RegistryEntry<Biome>[] biomes;
 
 		public Chunk(ChunkPos chunkPos, ChunkSection[]? sections, IHeightLimitView heightLimitView, Func<BlockStateContainer> containerFactory) {
 			this.chunkPos = chunkPos;
@@ -77,5 +80,12 @@
 		}
 
 		public bool HasHeightmap() => this.heightmap != null;
+
+		public virtual void FillBiomesFromNoise(IBiomeResolver biomeResolver, Climate.Sampler sampler) {
+			for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
+				int x = this.chunkPos.ToWorldX(cx);
+				this.biomes[cx] = biomeResolver.GetNoiseBiome(x, 0, sampler);
+			}
+		}
 	}
 }

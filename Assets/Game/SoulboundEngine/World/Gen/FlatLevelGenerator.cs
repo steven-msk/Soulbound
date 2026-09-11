@@ -1,8 +1,10 @@
 ﻿namespace SoulboundEngine.World.Gen {
+	using SoulboundEngine.Registry;
 	using SoulboundEngine.Serialization;
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Block.State;
 	using SoulboundEngine.World.Chunk;
+	using SoulboundEngine.World.Gen.Biome;
 	using SoulboundEngine.World.Level;
 	using System;
 	using System.Collections.Generic;
@@ -13,24 +15,23 @@
 			Field.Required<ChunkGenerator, Settings>("settings", Settings.CODEC , v => ((FlatLevelGenerator)v).settings),
 			settings => new FlatLevelGenerator(settings)
 		);
-		private static readonly List<Block> DEFAULT_LAYERS = new() {
+		private readonly Settings settings;
+		[Obsolete] private static readonly List<Block> DEFAULT_LAYERS = new() {
 			Blocks.STONE, Blocks.STONE, Blocks.STONE, Blocks.STONE,
 			Blocks.DIRT
 		};
-		private readonly Settings settings;
 
 		[Obsolete]
-		public FlatLevelGenerator()
-			: this(new Settings(DEFAULT_LAYERS)) {
-		}
+		public FlatLevelGenerator() : this(new Settings(Registries.BIOME.Get(Biome.Biome.PLAINS), DEFAULT_LAYERS)) { }
 
-		public FlatLevelGenerator(Settings settings) {
+		public FlatLevelGenerator(Settings settings)
+			: base(new SingleBiomeSource(settings.biome)) {
 			this.settings = settings;
 		}
 
 		protected override MapCodec<ChunkGenerator> Codec() => CODEC;
 
-		public override Chunk Fill(Chunk chunk) {
+		public override Chunk Fill(RandomState randomState, Chunk chunk) {
 			List<BlockState> layers = this.settings.layers.Select(b => b.DefaultState).ToList();
 			Heightmap heightmap = chunk.GetHeightmap();
 			BlockPos.Mutable blockPos = new();
@@ -48,7 +49,7 @@
 			return chunk;
 		}
 
-		public override Chunk BuildSurface(Chunk chunk) {
+		public override Chunk BuildSurface(RandomState randomState, Chunk chunk) {
 			return chunk;
 		}
 
@@ -69,8 +70,12 @@
 
 		public Settings GetSettings() => this.settings;
 
-		public sealed record Settings(List<Block> layers) {
-			public static readonly Codec<Settings> CODEC = Block.CODEC.ListOf().Xmap(l => new Settings(l), s => s.layers);
+		public sealed record Settings(RegistryEntry<Biome.Biome> biome, List<Block> layers) {
+			public static readonly Codec<Settings> CODEC = RecordCodec<Settings, RegistryEntry<Biome.Biome>, List<Block>>.Of(
+				Field.Required<Settings, RegistryEntry<Biome.Biome>>("biome", Biome.Biome.ENTRY_CODEC, s => s.biome),
+				Field.Required<Settings, List<Block>>("blocks", Block.CODEC.ListOf(), s => s.layers),
+				(biome, layers) => new Settings(biome, layers)
+			);
 		}
 	}
 }
