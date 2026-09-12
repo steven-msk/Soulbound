@@ -33,6 +33,9 @@
 		public static readonly RegistryKey<Registry<NormalNoise.Parameters>> NOISE = Create<NormalNoise.Parameters>("noise");
 		public static readonly RegistryKey<Registry<NoiseGeneratorSettings>> NOISE_SETTINGS = Create<NoiseGeneratorSettings>("noise_settings");
 		public static readonly RegistryKey<Registry<IDensityFunction>> DENSITY_FUNCTION = Create<IDensityFunction>("density_function");
+		public static readonly RegistryKey<Registry<MultiNoiseBiomeSourceParamList>> MULTI_NOISE_BIOME_SOURCE_PARAMETER_LIST = Create<MultiNoiseBiomeSourceParamList>(
+			"multi_noise_biome_source_parameter_list"
+		);
 
 		private static RegistryKey<Registry<T>> Create<T>(string id) where T : class {
 			return RegistryKey<T>.OfRegistry(Identifier.Of(id));

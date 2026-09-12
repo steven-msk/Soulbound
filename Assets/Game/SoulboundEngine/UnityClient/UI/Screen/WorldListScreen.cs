@@ -59,8 +59,8 @@
 						}
 					}
 
-					// TEMPORARY FORCED FLAT PRESET
-					RegistryEntry<WorldPreset> preset = Registries.WORLD_PRESET.Get(WorldPreset.FLAT);
+					// TEMPORARY FORCED DEFAULT PRESET
+					RegistryEntry<WorldPreset> preset = Registries.WORLD_PRESET.Get(WorldPreset.DEFAULT);
 					this.worldAccessor.CreateNewWorld(nameField.value, seed, preset);
 
 					VisualElement listRoot = WORLD_LIST_ELEMENT.Get(root);

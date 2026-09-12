@@ -40,7 +40,9 @@ namespace SoulboundEngine.Registry {
 		// not definitive
 		public static readonly Registry<NormalNoise.Parameters> NOISE = Create(RegistryKeys.NOISE, NoiseData.Init);
 		public static readonly Registry<IDensityFunction> DENSITY_FUNCTION = Create(RegistryKeys.DENSITY_FUNCTION, NoiseRouter.Init);
+		public static readonly Registry<NoiseGeneratorSettings> NOISE_SETTINGS = Create(RegistryKeys.NOISE_SETTINGS, NoiseGeneratorSettings.Init);
 		public static readonly Registry<Biome> BIOME = Create(RegistryKeys.BIOME, Biome.Init);
+		public static readonly Registry<MultiNoiseBiomeSourceParamList> MULTI_NOISE_BIOME_SOURCE_PARAMETER_LIST = Create(RegistryKeys.MULTI_NOISE_BIOME_SOURCE_PARAMETER_LIST, MultiNoiseBiomeSourceParamList.Init);
 		public static readonly Registry<LevelType> LEVEL_TYPE = Create(RegistryKeys.LEVEL_TYPE, LevelType.Init);
 		public static readonly Registry<WorldPreset> WORLD_PRESET = Create(RegistryKeys.WORLD_PRESET, WorldPreset.Init);
 

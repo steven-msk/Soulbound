@@ -11,13 +11,5 @@ namespace SoulboundEngine.Registry {
 		}
 
 		IEnumerable<RegistryKey<T>> GetAllKeys();
-
-		public interface IRegistryLookup {
-			IRegistryEntryLookup<T>? Get<TRegistry>(RegistryKey<TRegistry> registryRef) where TRegistry : class, IRegistry;
-
-			public IRegistryEntryLookup<T> GetOrThrow<TRegistry>(RegistryKey<TRegistry> registryRef) where TRegistry : class, IRegistry {
-				return this.Get(registryRef) ?? throw new KeyNotFoundException($"Registry not found: {registryRef}");
-			}
-		}
 	}
 }

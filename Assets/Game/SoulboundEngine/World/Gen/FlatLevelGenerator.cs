@@ -12,22 +12,10 @@
 
 	public class FlatLevelGenerator : ChunkGenerator {
 		public new static readonly MapCodec<ChunkGenerator> CODEC = RecordMapCodec<ChunkGenerator, Settings>.Of(
-			Field.Required<ChunkGenerator, Settings>("settings", Settings.CODEC , v => ((FlatLevelGenerator)v).settings),
+			Field.Required<ChunkGenerator, Settings>("settings", Settings.CODEC, v => ((FlatLevelGenerator)v).settings),
 			settings => new FlatLevelGenerator(settings)
 		);
 		private readonly Settings settings;
-		[Obsolete] private static readonly List<Block> DEFAULT_LAYERS = new() {
-			Blocks.STONE, Blocks.STONE, Blocks.STONE, Blocks.STONE,
-			Blocks.DIRT
-		};
-
-		[Obsolete("Provisory plains biome default: forces WorldPreset registration to run after Biome registration due to entry lookup")]
-		public FlatLevelGenerator() : this(new Settings(GetBiome(), DEFAULT_LAYERS)) { }
-
-		private static RegistryEntry<Biome.Biome> GetBiome() {
-			Logger.LogInfo(Registries.BIOME.Get(Biome.Biome.PLAINS));
-			return Registries.BIOME.Get(Biome.Biome.PLAINS);
-		}
 
 		public FlatLevelGenerator(Settings settings)
 			: base(new SingleBiomeSource(settings.biome)) {
@@ -76,11 +64,23 @@
 		public Settings GetSettings() => this.settings;
 
 		public sealed record Settings(RegistryEntry<Biome.Biome> biome, List<Block> layers) {
+			public static readonly List<Block> DEFAULT_LAYERS = new() {
+				Blocks.STONE, Blocks.STONE, Blocks.STONE, Blocks.STONE,
+				Blocks.DIRT
+			};
 			public static readonly Codec<Settings> CODEC = RecordCodec<Settings, RegistryEntry<Biome.Biome>, List<Block>>.Of(
 				Field.Required<Settings, RegistryEntry<Biome.Biome>>("biome", Biome.Biome.ENTRY_CODEC, s => s.biome),
 				Field.Required<Settings, List<Block>>("blocks", Block.CODEC.ListOf(), s => s.layers),
 				(biome, layers) => new Settings(biome, layers)
 			);
+
+			public static Settings CreateDefault(IRegistryEntryLookup<Biome.Biome> biomes) {
+				return new Settings(GetDefaultBiome(biomes), DEFAULT_LAYERS);
+			}
+
+			public static RegistryEntry<Biome.Biome> GetDefaultBiome(IRegistryEntryLookup<Biome.Biome> biomes) {
+				return biomes.GetOrThrow(Biome.Biome.PLAINS);
+			}
 		}
 	}
 }

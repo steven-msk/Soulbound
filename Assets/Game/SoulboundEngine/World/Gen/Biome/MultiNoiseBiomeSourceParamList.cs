@@ -3,8 +3,22 @@
 	using System;
 
 	public class MultiNoiseBiomeSourceParamList {
+		public static readonly RegistryKey<MultiNoiseBiomeSourceParamList> DEFAULT = Create("default");
 		private readonly Preset preset;
 		private readonly Climate.ParameterList<RegistryEntry<Biome>> parameters;
+
+		private static RegistryKey<MultiNoiseBiomeSourceParamList> Create(string id) {
+			return RegistryKey<MultiNoiseBiomeSourceParamList>.Of(RegistryKeys.MULTI_NOISE_BIOME_SOURCE_PARAMETER_LIST, Identifier.Of(id));
+		}
+
+		public static MultiNoiseBiomeSourceParamList Init(RegistryBootstrapContext context, Registry<MultiNoiseBiomeSourceParamList> registry) {
+			IRegistryEntryLookup<Biome> biomes = context.Lookup(RegistryKeys.BIOME);
+			return Registry<MultiNoiseBiomeSourceParamList>.Register(registry, DEFAULT, FromPreset(Preset.DEFAULT, biomes));
+		}
+
+		private static MultiNoiseBiomeSourceParamList FromPreset(Preset preset, IRegistryEntryLookup<Biome> biomes) {
+			return new MultiNoiseBiomeSourceParamList(preset, biomes);
+		}
 
 		public MultiNoiseBiomeSourceParamList(Preset preset, IRegistryEntryLookup<Biome> registryLookup) {
 			this.preset = preset;
