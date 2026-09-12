@@ -8,13 +8,10 @@
 #nullable enable
 
 	public sealed class NoiseLevelChunkGenerator : ChunkGenerator {
-		// TEMPORARY
-		public new static readonly MapCodec<ChunkGenerator> CODEC = RecordMapCodec<ChunkGenerator, int>.Of(
-			Field.Required<ChunkGenerator, int>("temp", Codecs.INT, v => 1),
-			i => {
-				Logger.LogError("temporary codec hit!");
-				return default;
-			}
+		public new static readonly MapCodec<ChunkGenerator> CODEC = RecordMapCodec<ChunkGenerator, BiomeSource, RegistryEntry<NoiseGeneratorSettings>>.Of(
+			Field.Required<ChunkGenerator, BiomeSource>("biome_source", BiomeSource.CODEC, g => ((NoiseLevelChunkGenerator)g).biomeSource),
+			Field.Required<ChunkGenerator, RegistryEntry<NoiseGeneratorSettings>>("noise_settings", NoiseGeneratorSettings.CODEC, g => ((NoiseLevelChunkGenerator)g).noiseSettings),
+			(biomeSource, noiseSettings) => new NoiseLevelChunkGenerator(biomeSource, noiseSettings)
 		);
 		private readonly RegistryEntry<NoiseGeneratorSettings> noiseSettings;
 

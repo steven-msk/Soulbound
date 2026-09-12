@@ -71,9 +71,11 @@ namespace SoulboundEngine.Registry {
 			return entry.GetValue();
 		}
 
-		public RegistryEntry<T> GetEntryOrThrow(Identifier id) => this.idToEntry.GetOrThrow(id);
+		public RegistryEntry<T> GetOrThrow(RegistryKey<T> key) => this.keyToEntry.GetOrThrow(key);
 
-		public RegistryEntry<T> GetEntryOrThrow(T value) => this.valueToEntry.GetOrThrow(value);
+		public RegistryEntry<T> GetOrThrow(Identifier id) => this.idToEntry.GetOrThrow(id);
+
+		public RegistryEntry<T> GetOrThrow(T value) => this.valueToEntry.GetOrThrow(value);
 
 		public RegistryEntry<T>? GetEntry(Identifier id) => this.idToEntry.GetValueOrDefault(id);
 

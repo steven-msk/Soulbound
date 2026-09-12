@@ -1,9 +1,11 @@
 ﻿namespace SoulboundEngine.World.Gen {
 	using SoulboundEngine.Registry;
+	using SoulboundEngine.Serialization;
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Block.State;
 
 	public record NoiseGeneratorSettings(NoiseSize noiseSize, NoiseRouter noiseRouter, BlockState defaultBlock) {
+		public static readonly Codec<RegistryEntry<NoiseGeneratorSettings>> CODEC = RegistryEntry<NoiseGeneratorSettings>.GetCodec(Registries.NOISE_SETTINGS);
 		public static RegistryKey<NoiseGeneratorSettings> DEFAULT = CreateKey("default");
 
 		private static RegistryKey<NoiseGeneratorSettings> CreateKey(string id) {

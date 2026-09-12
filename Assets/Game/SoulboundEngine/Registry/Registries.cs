@@ -43,6 +43,7 @@ namespace SoulboundEngine.Registry {
 		public static readonly Registry<NoiseGeneratorSettings> NOISE_SETTINGS = Create(RegistryKeys.NOISE_SETTINGS, NoiseGeneratorSettings.Init);
 		public static readonly Registry<Biome> BIOME = Create(RegistryKeys.BIOME, Biome.Init);
 		public static readonly Registry<MultiNoiseBiomeSourceParamList> MULTI_NOISE_BIOME_SOURCE_PARAMETER_LIST = Create(RegistryKeys.MULTI_NOISE_BIOME_SOURCE_PARAMETER_LIST, MultiNoiseBiomeSourceParamList.Init);
+		public static readonly Registry<MapCodec<BiomeSource>> BIOME_SOURCE = Create(RegistryKeys.BIOME_SOURCE, BiomeSource.Init);
 		public static readonly Registry<LevelType> LEVEL_TYPE = Create(RegistryKeys.LEVEL_TYPE, LevelType.Init);
 		public static readonly Registry<WorldPreset> WORLD_PRESET = Create(RegistryKeys.WORLD_PRESET, WorldPreset.Init);
 
@@ -65,7 +66,7 @@ namespace SoulboundEngine.Registry {
 			return LOOKUP ??= IRegistryLookup.Of(identifier => {
 				return !LOADED.Contains(identifier)
 					? throw new InvalidOperationException("Attempted to access a registry that has not been loaded yet")
-					: ROOT.GetEntryOrThrow(identifier).GetValue();
+					: ROOT.GetOrThrow(identifier).GetValue();
 			});
 		}
 

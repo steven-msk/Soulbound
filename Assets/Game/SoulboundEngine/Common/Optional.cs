@@ -1,16 +1,18 @@
 namespace SoulboundEngine.Common {
 	using System;
 
-	public readonly struct Optional<T> {
-		private readonly T value;
+#nullable enable
 
-		private Optional(T value) {
+	public readonly struct Optional<T> {
+		private readonly T? value;
+
+		private Optional(T? value) {
 			this.value = value;
 		}
 
 		public static Optional<T> Empty() => new(default);
 
-		public static Optional<T> Of(T value) {
+		public static Optional<T> Of(T? value) {
 			return value is null ? Empty() : new Optional<T>(value);
 		}
 
@@ -23,7 +25,7 @@ namespace SoulboundEngine.Common {
 		}
 
 		public static Optional<V> CastTo<V>(Optional<T> other) where V : T {
-			return CastTo(other, v => (V)v);
+			return CastTo(other, v => (V)v!);
 		}
 
 		public static Optional<V> CastTo<V>(Optional<T> other, Func<T, V> valueFunction) where V : T {
@@ -31,7 +33,7 @@ namespace SoulboundEngine.Common {
 		} 
 
 		public T GetValue() {
-			return this.IsPresent() ? this.value : throw new InvalidOperationException("No value present");
+			return this.IsPresent() ? this.value! : throw new InvalidOperationException("No value present");
 		}
 
 		public bool IsPresent() => this.value is not null;
@@ -40,7 +42,7 @@ namespace SoulboundEngine.Common {
 
 		public void IfPresent(Action<T> method) {
 			if (this.IsPresent()) { 
-				method.Invoke(this.value); 
+				method.Invoke(this.value!); 
 			}
 		}
 
@@ -51,15 +53,15 @@ namespace SoulboundEngine.Common {
 		}
 
 		public T OrElse(T other) {
-			return this.IsPresent() ? this.value : other;
+			return this.IsPresent() ? this.value! : other;
 		}
 
 		public T OrElseGet(Func<T> method) {
-			return this.IsPresent() ? this.value : method.Invoke();
+			return this.IsPresent() ? this.value! : method.Invoke();
 		}
 
 		public T OrElseThrow(Func<Exception> method) {
-			return this.IsPresent() ? this.value : throw method.Invoke();
+			return this.IsPresent() ? this.value! : throw method.Invoke();
 		}
 
 		public T OrElseThrow() => this.OrElseThrow(() => new InvalidOperationException("Empty optional"));

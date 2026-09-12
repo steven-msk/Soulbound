@@ -30,6 +30,7 @@
 		public static readonly RegistryKey<Registry<LevelSettings>> LEVEL_SETTINGS = Create<LevelSettings>("level_settings");
 		public static readonly RegistryKey<Registry<MapCodec<ChunkGenerator>>> CHUNK_GENERATOR = Create<MapCodec<ChunkGenerator>>("chunk_generator");
 		public static readonly RegistryKey<Registry<Biome>> BIOME = Create<Biome>("biome");
+		public static readonly RegistryKey<Registry<MapCodec<BiomeSource>>> BIOME_SOURCE = Create<MapCodec<BiomeSource>>("biome_source");
 		public static readonly RegistryKey<Registry<NormalNoise.Parameters>> NOISE = Create<NormalNoise.Parameters>("noise");
 		public static readonly RegistryKey<Registry<NoiseGeneratorSettings>> NOISE_SETTINGS = Create<NoiseGeneratorSettings>("noise_settings");
 		public static readonly RegistryKey<Registry<IDensityFunction>> DENSITY_FUNCTION = Create<IDensityFunction>("density_function");

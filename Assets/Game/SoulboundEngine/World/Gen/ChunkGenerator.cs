@@ -7,7 +7,7 @@
 
 	public abstract class ChunkGenerator {
 		public static readonly Codec<ChunkGenerator> CODEC = new DispatchCodec<ChunkGenerator, RegistryKey<MapCodec<ChunkGenerator>>>(
-			RegistryKey<MapCodec<ChunkGenerator>>.Codec(Registries.CHUNK_GENERATOR.GetKey()),
+			RegistryKey<MapCodec<ChunkGenerator>>.Codec(RegistryKeys.CHUNK_GENERATOR),
 			"key",
 			g => Registries.CHUNK_GENERATOR.GetKey(g.Codec()),
 			key => {

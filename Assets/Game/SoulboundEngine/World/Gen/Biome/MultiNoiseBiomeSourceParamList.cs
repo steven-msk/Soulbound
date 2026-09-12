@@ -1,8 +1,12 @@
 ﻿namespace SoulboundEngine.World.Gen.Biome {
 	using SoulboundEngine.Registry;
+	using SoulboundEngine.Serialization;
 	using System;
+	using System.Collections.Generic;
 
 	public class MultiNoiseBiomeSourceParamList {
+		public static readonly Codec<MultiNoiseBiomeSourceParamList> DIRECT_CODEC = Preset.CODEC.Xmap(p => new MultiNoiseBiomeSourceParamList(p, Registries.BIOME), l => l.preset);
+		public static readonly Codec<RegistryEntry<MultiNoiseBiomeSourceParamList>> CODEC = RegistryEntry<MultiNoiseBiomeSourceParamList>.GetCodec(Registries.MULTI_NOISE_BIOME_SOURCE_PARAMETER_LIST);
 		public static readonly RegistryKey<MultiNoiseBiomeSourceParamList> DEFAULT = Create("default");
 		private readonly Preset preset;
 		private readonly Climate.ParameterList<RegistryEntry<Biome>> parameters;
@@ -28,7 +32,20 @@
 		public Climate.ParameterList<RegistryEntry<Biome>> GetParameters() => this.parameters;
 
 		public record Preset(Identifier id, Preset.ISourceProvider provider) {
-			public static readonly Preset DEFAULT = new(Identifier.Of("default"), new DefaultBiomeMapSourceProvider());
+			private static readonly Dictionary<Identifier, Preset> BY_ID = new();
+			public static readonly Codec<Preset> CODEC = Identifier.CODEC.FlatXmap(
+				encode: p => p.id,
+				decode: id => BY_ID.TryGetValue(id, out Preset preset)
+					? DataResult<Preset>.Success(preset)
+					: DataResult<Preset>.Error($"Unknown preset: {id}")
+			);
+			public static readonly Preset DEFAULT = Register(Identifier.Of("default"), new DefaultBiomeMapSourceProvider());
+
+			private static Preset Register(Identifier id, ISourceProvider sourceProvider) {
+				Preset preset = new(id, sourceProvider);
+				BY_ID.Add(id, preset);
+				return preset;
+			}
 
 			public interface ISourceProvider {
 				Climate.ParameterList<T> Apply<T>(Func<RegistryKey<Biome>, T> lookup);
