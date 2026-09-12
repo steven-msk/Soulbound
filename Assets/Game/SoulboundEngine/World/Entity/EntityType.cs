@@ -34,6 +34,6 @@ namespace SoulboundEngine.World.Entity {
 		}
 
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter")]
-		public static EntityDescriptor Init(Registry<EntityDescriptor> registry) => PLAYER;
+		public static EntityDescriptor Init(RegistryBootstrapContext context, Registry<EntityDescriptor> registry) => PLAYER;
 	}
 }

@@ -17,7 +17,7 @@
 		}
 
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter")]
-		public static WorldWidgetType Init(Registry<WorldWidgetType> registry) => TEXT;
+		public static WorldWidgetType Init(RegistryBootstrapContext context, Registry<WorldWidgetType> registry) => TEXT;
 
 		public RegistryKey<WorldWidgetType> key { get; private set; }
 

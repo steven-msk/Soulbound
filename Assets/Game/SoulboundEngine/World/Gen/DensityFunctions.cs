@@ -1,4 +1,5 @@
-﻿namespace SoulboundEngine.World.Gen.Biome {
+﻿namespace SoulboundEngine.World.Gen {
+	using SoulboundEngine.Registry;
 	using System;
 
 	public sealed class DensityFunctions {
@@ -6,6 +7,10 @@
 
 		public static IDensityFunction Map(IDensityFunction function, Mapped.Type type) {
 			return new Mapped(type, function);
+		}
+
+		public static IDensityFunction CreateNoise(RegistryEntry<NormalNoise.Parameters> parameters) {
+			return new Noise(new IDensityFunction.NoiseEntry(parameters, null));
 		}
 
 		public interface ITransformer : IDensityFunction {

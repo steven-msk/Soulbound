@@ -65,14 +65,6 @@
 				}
 				return result;
 			}
-
-			public static IDensityFunction ToDensityFunction(
-				ParameterType type, 
-				Func<RegistryKey<NormalNoise.Parameters>, RegistryEntry<NormalNoise.Parameters>> lookup
-			) {
-				IDensityFunction.NoiseEntry entry = new(lookup(type.noiseKey), null);
-				return new DensityFunctions.Noise(entry);
-			}
 		}
 
 		public sealed record Parameter(long min, long max) {

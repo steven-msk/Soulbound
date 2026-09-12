@@ -12,7 +12,7 @@
 
 		// TEMP implementation made for simplicity convenience
 		[Obsolete]
-		public static LootTable Init(Registry<LootTable> registry) {
+		public static LootTable Init(RegistryBootstrapContext context, Registry<LootTable> registry) {
 			return Registry<LootTable>.Register(registry, CHEST_TEST, LootTable.Create()
 				.Pool(LootPool.Create()
 					.Rolls(UniformLootNumberProvider.Create(1, 3))

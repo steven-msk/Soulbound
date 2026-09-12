@@ -31,6 +31,8 @@
 		public static readonly RegistryKey<Registry<MapCodec<ChunkGenerator>>> CHUNK_GENERATOR = Create<MapCodec<ChunkGenerator>>("chunk_generator");
 		public static readonly RegistryKey<Registry<Biome>> BIOME = Create<Biome>("biome");
 		public static readonly RegistryKey<Registry<NormalNoise.Parameters>> NOISE = Create<NormalNoise.Parameters>("noise");
+		public static readonly RegistryKey<Registry<NoiseGeneratorSettings>> NOISE_SETTINGS = Create<NoiseGeneratorSettings>("noise_settings");
+		public static readonly RegistryKey<Registry<IDensityFunction>> DENSITY_FUNCTION = Create<IDensityFunction>("density_function");
 
 		private static RegistryKey<Registry<T>> Create<T>(string id) where T : class {
 			return RegistryKey<T>.OfRegistry(Identifier.Of(id));

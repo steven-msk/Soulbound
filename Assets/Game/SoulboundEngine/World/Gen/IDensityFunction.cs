@@ -1,4 +1,4 @@
-﻿namespace SoulboundEngine.World.Gen.Biome {
+﻿namespace SoulboundEngine.World.Gen {
 	using SoulboundEngine.Registry;
 	using System;
 

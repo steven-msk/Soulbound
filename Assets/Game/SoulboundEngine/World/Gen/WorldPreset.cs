@@ -16,7 +16,7 @@
 			return RegistryKey<WorldPreset>.Of(RegistryKeys.WORLD_PRESET, Identifier.Of(id));
 		}
 
-		public static WorldPreset Init(Registry<WorldPreset> registry) {
+		public static WorldPreset Init(RegistryBootstrapContext context, Registry<WorldPreset> registry) {
 			Registry<WorldPreset>.Register(registry, DEFAULT, new WorldPreset(new LevelSettings(LevelType.DEFAULT, new NoiseLevelChunkGenerator())));
 			return Registry<WorldPreset>.Register(registry, FLAT, new WorldPreset(new LevelSettings(LevelType.DEFAULT, new FlatLevelGenerator())));
 		}

@@ -119,6 +119,6 @@ namespace SoulboundEngine.Item {
 		}
 
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter")]
-		public static Item Init(Registry<Item> registry) => AIR;
+		public static Item Init(RegistryBootstrapContext context, Registry<Item> registry) => AIR;
 	}
 }

@@ -22,7 +22,7 @@ namespace SoulboundEngine.World.Block.Entity {
 		}
 
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter")]
-		public static TileEntityType Init(Registry<TileEntityType> registry) => CHEST;
+		public static TileEntityType Init(RegistryBootstrapContext context, Registry<TileEntityType> registry) => CHEST;
 
 		protected readonly RegistryKey<TileEntityType> key;
 		protected readonly ITileEntityFactory factory;

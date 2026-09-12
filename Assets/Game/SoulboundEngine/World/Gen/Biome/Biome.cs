@@ -11,7 +11,8 @@
 			return RegistryKey<Biome>.Of(RegistryKeys.BIOME, Identifier.Of(id));
 		}
 
-		public static Biome Init(Registry<Biome> registry) {
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter")]
+		public static Biome Init(RegistryBootstrapContext context, Registry<Biome> registry) {
 			Registry<Biome>.Register(registry, PLAINS, new Biome());
 			return Registry<Biome>.Register(registry, HILLS, new Biome());
 		}

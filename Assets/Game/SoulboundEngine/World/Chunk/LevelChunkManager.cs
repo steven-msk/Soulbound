@@ -2,7 +2,6 @@
 	using SoulboundEngine.Common.Math.Random;
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.World.Gen;
-	using SoulboundEngine.World.Gen.Biome;
 	using SoulboundEngine.World.Level;
 	using System;
 	using System.Collections.Generic;
@@ -121,10 +120,11 @@
 		}
 
 		private RandomState CreateRandomState() {
+			IRegistryLookup registries = Registries.GetOrCreateLookup();
 			return RandomState.Create(
 				new Xoshiro256StarStarRandom(this.level.seed),
-				new NoiseRouter(Climate.MapParameters(p => Climate.ParameterType.ToDensityFunction(p, Registries.NOISE.Get))),
-				Registries.NOISE,
+				NoiseRouter.CreateDefault(registries.Lookup(RegistryKeys.DENSITY_FUNCTION), registries.Lookup(RegistryKeys.NOISE)),
+				registries.Lookup(RegistryKeys.NOISE),
 				this.level.seed
 			);
 		}

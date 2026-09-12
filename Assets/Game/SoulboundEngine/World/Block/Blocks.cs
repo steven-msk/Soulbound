@@ -58,6 +58,6 @@ namespace SoulboundEngine.World.Block {
 		}
 
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter")]
-		public static Block Init(Registry<Block> registry) => AIR;
+		public static Block Init(RegistryBootstrapContext context, Registry<Block> registry) => AIR;
 	}
 }

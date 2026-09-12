@@ -17,9 +17,12 @@ namespace SoulboundEngine.Registry {
 	using System.Collections.Generic;
 
 	public static class Registries {
-		private delegate object RegistryBootstrapper<T>(Registry<T> registry) where T : class;
-		private static readonly Dictionary<Identifier, Func<object>> LOADERS = new();
+		private delegate object RegistryBootstrapper<T>(RegistryBootstrapContext context, Registry<T> registry) where T : class;
+		private static readonly List<(Identifier registry, Func<object> loader)> LOADERS = new(30);
+		private static readonly HashSet<Identifier> LOADED = new();
 		private static bool freezed = false;
+		private static RegistryBootstrapContext BOOTSTRAP_CONTEXT;
+		public static IRegistryLookup LOOKUP;
 		public static readonly Identifier ROOT_IDENTIFIER = Identifier.Of("root");
 		public static readonly Registry<IRegistry> ROOT = new(RegistryKey<IRegistry>.OfRegistry(ROOT_IDENTIFIER));
 		public static readonly Registry<Block> BLOCK = Create(RegistryKeys.BLOCK, Blocks.Init);
@@ -29,13 +32,14 @@ namespace SoulboundEngine.Registry {
 		public static readonly Registry<TileEntityType> TILE_ENTITIES = Create(RegistryKeys.TILE_ENTITY, TileEntityType.Init);
 		public static readonly Registry<InventoryScreenHandlerType> INVENTORY_SCREEN_HANDLES = Create(RegistryKeys.INVENTORY_SCREEN_HANDLER, InventoryScreenHandlerType.Init);
 		public static readonly Registry<RecipeType> RECIPE_TYPE = Create(RegistryKeys.RECIPE_TYPE, RecipeType.Init);
-		public static readonly Registry<ComponentType> COMPONENT_TYPE = Create(RegistryKeys.COMPONENT_TYPE, r => ItemComponents.DEFAULT_COMPONENTS);
+		public static readonly Registry<ComponentType> COMPONENT_TYPE = Create(RegistryKeys.COMPONENT_TYPE, (_, _) => ItemComponents.DEFAULT_COMPONENTS);
 		public static readonly Registry<WorldWidgetType> WORLD_WIDGET_TYPE = Create(RegistryKeys.WORLD_WIDGET, WorldWidgetType.Init);
 		public static readonly Registry<MapCodec<ChunkGenerator>> CHUNK_GENERATOR = Create(RegistryKeys.CHUNK_GENERATOR, ChunkGenerators.Init);
 		// temporary, see LootTables
 		public static readonly Registry<LootTable> LOOT_TABLES = Create(RegistryKeys.LOOT_TABLE, LootTables.Init);
 		// not definitive
 		public static readonly Registry<NormalNoise.Parameters> NOISE = Create(RegistryKeys.NOISE, NoiseData.Init);
+		public static readonly Registry<IDensityFunction> DENSITY_FUNCTION = Create(RegistryKeys.DENSITY_FUNCTION, NoiseRouter.Init);
 		public static readonly Registry<Biome> BIOME = Create(RegistryKeys.BIOME, Biome.Init);
 		public static readonly Registry<LevelType> LEVEL_TYPE = Create(RegistryKeys.LEVEL_TYPE, LevelType.Init);
 		public static readonly Registry<WorldPreset> WORLD_PRESET = Create(RegistryKeys.WORLD_PRESET, WorldPreset.Init);
@@ -47,8 +51,20 @@ namespace SoulboundEngine.Registry {
 		private static Registry<T> Register<T>(RegistryKey<Registry<T>> key, Registry<T> registry, RegistryBootstrapper<T> bootstrapper) where T : class {
 			if (freezed) throw new InvalidOperationException("Registries already freezed");
 			Identifier id = key.value;
-			LOADERS.Add(id, () => bootstrapper(registry));
+			LOADERS.Add((id, () => bootstrapper(BOOTSTRAP_CONTEXT ??= CreateBootstrapContext(), registry)));
 			return Registry<IRegistry>.RegisterVariant(ROOT, key, registry);
+		}
+
+		private static RegistryBootstrapContext CreateBootstrapContext() {
+			return new RegistryBootstrapContext(GetOrCreateLookup());
+		}
+
+		public static IRegistryLookup GetOrCreateLookup() {
+			return LOOKUP ??= IRegistryLookup.Of(identifier => {
+				return !LOADED.Contains(identifier)
+					? throw new InvalidOperationException("Attempted to access a registry that has not been loaded yet")
+					: ROOT.GetEntryOrThrow(identifier).GetValue();
+			});
 		}
 
 		public static void Init() {
@@ -58,9 +74,12 @@ namespace SoulboundEngine.Registry {
 		}
 
 		private static void AddContents() {
-			foreach ((Identifier id, Func<object> loader) in LOADERS) {
+			foreach ((Identifier registry, Func<object> loader) in LOADERS) {
 				if (loader() == null) {
-					Logger.LogError("Unable to load registry '{}'", id);
+					Logger.LogError("Unable to load registry '{}'", registry);
+				}
+				if (!LOADED.Add(registry)) {
+					Logger.LogError("Registry loaded multiple times: {}. This should not happen", registry);
 				}
 			}
 		}

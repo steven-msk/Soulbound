@@ -10,7 +10,8 @@
 			return RegistryKey<LevelType>.Of(RegistryKeys.LEVEL_TYPE, Identifier.Of(id));
 		}
 
-		public static LevelType Init(Registry<LevelType> registry) {
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter")]
+		public static LevelType Init(RegistryBootstrapContext context, Registry<LevelType> registry) {
 			return Registry<LevelType>.Register(registry, DEFAULT, new LevelType(Level.DEFAULT_MIN_Y, Level.DEFAULT_MAX_Y));
 		}
 	}

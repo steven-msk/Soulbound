@@ -21,6 +21,6 @@
 		}
 
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter")]
-		public static AttributeType Init(Registry<AttributeType> registry) => GRAVITY.GetValue();
+		public static AttributeType Init(RegistryBootstrapContext context, Registry<AttributeType> registry) => GRAVITY.GetValue();
 	}
 }

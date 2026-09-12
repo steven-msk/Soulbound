@@ -1,4 +1,5 @@
 namespace SoulboundEngine.Registry {
+	using SoulboundEngine.Common.Collection;
 	using System;
 	using System.Collections;
 	using System.Collections.Generic;
@@ -69,6 +70,10 @@ namespace SoulboundEngine.Registry {
 			RegistryEntry<T> entry = this.idToEntry.GetValueOrDefault(id) ?? throw new KeyNotFoundException();
 			return entry.GetValue();
 		}
+
+		public RegistryEntry<T> GetEntryOrThrow(Identifier id) => this.idToEntry.GetOrThrow(id);
+
+		public RegistryEntry<T> GetEntryOrThrow(T value) => this.valueToEntry.GetOrThrow(value);
 
 		public RegistryEntry<T>? GetEntry(Identifier id) => this.idToEntry.GetValueOrDefault(id);
 

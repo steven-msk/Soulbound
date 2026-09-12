@@ -16,7 +16,7 @@
 		}
 
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter")]
-		public static RecipeType Init(Registry<RecipeType> registry) => STATIONLESS;
+		public static RecipeType Init(RegistryBootstrapContext context, Registry<RecipeType> registry) => STATIONLESS;
 	}
 
 	public class RecipeType<TRecipe> : RecipeType where TRecipe : IRecipe {
