@@ -4,6 +4,7 @@
 	using SoulboundEngine.World.Gen.Biome;
 	using System;
 	using System.Collections.Generic;
+	using static DensityFunctions;
 
 	public record NoiseRouter(IDensityFunction[] densityFunctions) {
 		private static readonly Dictionary<Climate.ParameterType, RegistryKey<IDensityFunction>> PARAMETER_DENSITY_KEYS = new();
@@ -47,14 +48,13 @@
 		}
 
 		private static IDensityFunction CreateShapeFunction(IRegistryEntryLookup<NormalNoise.Parameters> noises) {
-			return DensityFunctions.CreateNoise(noises.GetOrThrow(NoiseTypes.SHAPE));
+			return CreateNoise(noises.GetOrThrow(NoiseTypes.SHAPE)) * 80.0d;
 		}
 
 		public NoiseRouter MapAll(IDensityFunction.IVisitor visitor) {
 			IDensityFunction[] newFunctions = new IDensityFunction[this.densityFunctions.Length];
 			for (int i = 0; i < this.densityFunctions.Length; i++) {
 				newFunctions[i] = this.densityFunctions[i].MapAll(visitor);
-				Logger.LogInfo(((DensityFunctions.Noise)newFunctions[i]).noise.noise);
 			}
 			return new NoiseRouter(newFunctions);
 		}

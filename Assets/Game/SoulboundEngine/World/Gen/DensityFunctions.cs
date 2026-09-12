@@ -13,6 +13,30 @@
 			return new Noise(new IDensityFunction.NoiseEntry(parameters, null));
 		}
 
+		public static IDensityFunction Add(IDensityFunction first, IDensityFunction second) {
+			return new OperationBasedFunction(IOperationBasedFunction.Type.ADD, first, second);
+		}
+
+		public static IDensityFunction Mul(IDensityFunction first, IDensityFunction second) {
+			return new OperationBasedFunction(IOperationBasedFunction.Type.MULTIPLY, first, second);
+		}
+
+		public static IDensityFunction Min(IDensityFunction first, IDensityFunction second) {
+			return new OperationBasedFunction(IOperationBasedFunction.Type.MIN, first, second);
+		}
+
+		public static IDensityFunction Max(IDensityFunction first, IDensityFunction second) {
+			return new OperationBasedFunction(IOperationBasedFunction.Type.MAX, first, second);
+		}
+
+		public static IDensityFunction Const(double value) => new Constant(value);
+
+		public static IDensityFunction MapFromUnitTo(IDensityFunction function, double min, double max) {
+			double middle = (min + max) * 0.5d;
+			double factor = (max - min) * 0.5d;
+			return Add(Const(middle), Mul(Const(factor), function));
+		}
+
 		public interface ITransformer : IDensityFunction {
 			IDensityFunction input { get; }
 
@@ -27,6 +51,19 @@
 				for (int i = 0; i < output.Length; i++) {
 					output[i] = this.Transform(output[i]);
 				}
+			}
+		}
+
+		public interface IOperationBasedFunction : IDensityFunction {
+			IDensityFunction second { get; }
+			IDensityFunction first { get; }
+			Type type { get; }
+
+			public enum Type {
+				ADD,
+				MULTIPLY,
+				MIN,
+				MAX
 			}
 		}
 
@@ -90,7 +127,56 @@
 				INVERT,
 				SQUEEZE
 			}
-		}		
+		}
+
+		private sealed record OperationBasedFunction(IOperationBasedFunction.Type type, IDensityFunction first, IDensityFunction second) : IOperationBasedFunction {
+			public double Compute(IDensityFunction.IContext context) {
+				double value1 = this.first.Compute(context);
+				return this.type switch {
+					IOperationBasedFunction.Type.ADD => value1 + this.GetSecond(context),
+					IOperationBasedFunction.Type.MULTIPLY => value1 == 0.0d ? 0.0d : value1 * this.GetSecond(context),
+					IOperationBasedFunction.Type.MIN => Math.Min(value1, this.GetSecond(context)),
+					IOperationBasedFunction.Type.MAX => Math.Max(value1, this.GetSecond(context)),
+					_ => throw new NotImplementedException()
+				};
+			}
+
+			private double GetSecond(IDensityFunction.IContext context) => this.second.Compute(context);
+
+			private double GetFirst(IDensityFunction.IContext context) => this.first.Compute(context);
+
+			public void FillArray(double[] output, IDensityFunction.IContextProvider contextProvider) {
+				this.first.FillArray(output, contextProvider);
+				switch (this.type) {
+					case IOperationBasedFunction.Type.ADD:
+						double[] value2 = new double[output.Length];
+						this.second.FillArray(value2, contextProvider);
+						for (int i = 0; i < output.Length; i++) {
+							output[i] += value2[i];
+						}
+						break;
+					case IOperationBasedFunction.Type.MULTIPLY:
+						for (int i = 0; i < output.Length; i++) {
+							output[i] = output[i] == 0.0d ? 0.0d : this.second.Compute(contextProvider.ForIndex(i)) * output[i];
+						}
+						break;
+					case IOperationBasedFunction.Type.MIN:
+						for (int i = 0; i < output.Length; i++) {
+							output[i] = Math.Min(output[i], this.second.Compute(contextProvider.ForIndex(i)));
+						}
+						break;
+					case IOperationBasedFunction.Type.MAX:
+						for (int i = 0; i < output.Length; i++) {
+							output[i] = Math.Max(output[i], this.second.Compute(contextProvider.ForIndex(i)));
+						}
+						break;
+				}
+			}
+
+			public IDensityFunction MapAll(IDensityFunction.IVisitor visitor) {
+				return visitor.Apply(new OperationBasedFunction(this.type, this.first.MapAll(visitor), this.second.MapAll(visitor)));
+			}
+		}
 
 		public record Clamp(IDensityFunction input, double minValue, double maxValue) : ITransformer {
 			public IDensityFunction MapAll(IDensityFunction.IVisitor visitor) {

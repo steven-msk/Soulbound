@@ -11,8 +11,7 @@
 			NoiseSize noiseSize, 
 			NoiseRouter noiseRouter, 
 			BlockState defaultBlock,
-			int baseHeight,
-			float amplitude
+			int baseHeight
 		) {
 		public static readonly Codec<RegistryEntry<NoiseGeneratorSettings>> CODEC = RegistryEntry<NoiseGeneratorSettings>.GetCodec(Registries.NOISE_SETTINGS);
 		public static RegistryKey<NoiseGeneratorSettings> DEFAULT = CreateKey("default");
@@ -28,8 +27,7 @@
 				NoiseSize.DEFAULT, 
 				NoiseRouter.Zero(),
 				Blocks.STONE.DefaultState,
-				baseHeight: 0,
-				amplitude: 1f
+				baseHeight: 0
 			);
 		}
 
@@ -39,8 +37,7 @@
 				NoiseSize.DEFAULT,
 				NoiseRouter.CreateDefault(functions, noises),
 				Blocks.STONE.DefaultState,
-				baseHeight: 0,
-				amplitude: 1f
+				baseHeight: 0
 			);
 		}
 

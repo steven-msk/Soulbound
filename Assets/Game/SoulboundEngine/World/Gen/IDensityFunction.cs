@@ -1,6 +1,7 @@
 ﻿namespace SoulboundEngine.World.Gen {
 	using SoulboundEngine.Registry;
 	using System;
+	using static DensityFunctions;
 
 #nullable enable
 
@@ -63,25 +64,37 @@
 				return this.noise?.Get(x, y, z) ?? 0.0d;
 			}
 		}
+
+		public static IDensityFunction operator *(IDensityFunction first, IDensityFunction second) => Mul(first, second);
+
+		public static IDensityFunction operator *(IDensityFunction first, double value) => Mul(first, Const(value));
+
+		public static IDensityFunction operator +(IDensityFunction first, IDensityFunction second) => Add(first, second);
+
+		public static IDensityFunction operator +(IDensityFunction first, double value) => Add(first, Const(value));
+
+		public static IDensityFunction operator -(IDensityFunction first, double value) => Add(first, Const(-value));
+
+		public static IDensityFunction operator /(IDensityFunction first, double value) => Mul(first, Const(1.0d / value));
 	}
 
 	public static class DensityFunctionDefaults {
 		public static IDensityFunction Clamp(this IDensityFunction function, double min, double max) {
-			return new DensityFunctions.Clamp(function, min, max);
+			return new Clamp(function, min, max);
 		}
 
-		public static IDensityFunction Abs(this IDensityFunction function) => DensityFunctions.Map(function, DensityFunctions.Mapped.Type.ABS);
+		public static IDensityFunction Abs(this IDensityFunction function) => Map(function, Mapped.Type.ABS);
 
-		public static IDensityFunction Square(this IDensityFunction function) => DensityFunctions.Map(function, DensityFunctions.Mapped.Type.SQUARE);
+		public static IDensityFunction Square(this IDensityFunction function) => Map(function, Mapped.Type.SQUARE);
 
-		public static IDensityFunction Cube(this IDensityFunction function) => DensityFunctions.Map(function, DensityFunctions.Mapped.Type.CUBE);
+		public static IDensityFunction Cube(this IDensityFunction function) => Map(function, Mapped.Type.CUBE);
 
-		public static IDensityFunction HalfNegative(this IDensityFunction function) => DensityFunctions.Map(function, DensityFunctions.Mapped.Type.HALF_NEGATIVE);
+		public static IDensityFunction HalfNegative(this IDensityFunction function) => Map(function, Mapped.Type.HALF_NEGATIVE);
 
-		public static IDensityFunction QuarterNegative(this IDensityFunction function) => DensityFunctions.Map(function, DensityFunctions.Mapped.Type.QUARTER_NEGATIVE);
+		public static IDensityFunction QuarterNegative(this IDensityFunction function) => Map(function, Mapped.Type.QUARTER_NEGATIVE);
 
-		public static IDensityFunction Invert(this IDensityFunction function) => DensityFunctions.Map(function, DensityFunctions.Mapped.Type.INVERT);
+		public static IDensityFunction Invert(this IDensityFunction function) => Map(function, Mapped.Type.INVERT);
 
-		public static IDensityFunction Squeeze(this IDensityFunction function) => DensityFunctions.Map(function, DensityFunctions.Mapped.Type.SQUEEZE);
+		public static IDensityFunction Squeeze(this IDensityFunction function) => Map(function, Mapped.Type.SQUEEZE);
 	}
 }
