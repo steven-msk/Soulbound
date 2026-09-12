@@ -1,5 +1,4 @@
 ﻿namespace SoulboundEngine.World.Chunk {
-	using SoulboundEngine.Common.Math.Random;
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.World.Gen;
 	using SoulboundEngine.World.Level;
@@ -19,6 +18,7 @@
 		private readonly int chunkRadius;
 		private readonly int loadRange;
 		private int centerX;
+		private readonly RandomState randomState;
 
 		public LevelChunkManager(Level level, ChunkGenerator chunkGenerator, int chunkRadius, IChunkCache chunkCache, ChunkStorage chunkStorage) {
 			this.level = level;
@@ -29,6 +29,18 @@
 			this.loadRange = chunkRadius * 2 + 1;
 			this.emptyChunk = new EmptyWorldChunk(level, new ChunkPos(0));
 			this.loadedChunks = new WorldChunk?[this.loadRange];
+			this.randomState = this.CreateRandomState(chunkGenerator, this.level.seed);
+		}
+
+		private RandomState CreateRandomState(ChunkGenerator chunkGenerator, int seed) {
+			IRegistryLookup registries = Registries.GetOrCreateLookup();
+			return RandomState.Create(
+				chunkGenerator is NoiseLevelChunkGenerator noiseGenerator
+					? noiseGenerator.NoiseSettings.GetValue()
+					: NoiseGeneratorSettings.Zero(),
+				registries.Lookup(RegistryKeys.NOISE),
+				seed
+			);
 		}
 
 		private static bool IsChunkValid(WorldChunk? chunk, int x) {
@@ -112,21 +124,10 @@
 		}
 
 		private WorldChunk DoGeneration(WorldChunk chunk) {
-			RandomState randomState = this.CreateRandomState();
-			chunk = DoStep(this.chunkGenerator, chunk, (generator, chunk) => generator.MapBiomes(randomState, chunk));
-			chunk = DoStep(this.chunkGenerator, chunk, (generator, chunk) => generator.Fill(randomState, chunk));
-			chunk = DoStep(this.chunkGenerator, chunk, (generator, chunk) => generator.BuildSurface(randomState, chunk));
+			chunk = DoStep(this.chunkGenerator, chunk, (generator, chunk) => generator.MapBiomes(this.randomState, chunk));
+			chunk = DoStep(this.chunkGenerator, chunk, (generator, chunk) => generator.Fill(this.randomState, chunk));
+			chunk = DoStep(this.chunkGenerator, chunk, (generator, chunk) => generator.BuildSurface(this.randomState, chunk));
 			return chunk;
-		}
-
-		private RandomState CreateRandomState() {
-			IRegistryLookup registries = Registries.GetOrCreateLookup();
-			return RandomState.Create(
-				new Xoshiro256StarStarRandom(this.level.seed),
-				NoiseRouter.CreateDefault(registries.Lookup(RegistryKeys.DENSITY_FUNCTION), registries.Lookup(RegistryKeys.NOISE)),
-				registries.Lookup(RegistryKeys.NOISE),
-				this.level.seed
-			);
 		}
 
 		private static WorldChunk DoStep(ChunkGenerator generator, Chunk chunk, Func<ChunkGenerator, Chunk, Chunk> step) {

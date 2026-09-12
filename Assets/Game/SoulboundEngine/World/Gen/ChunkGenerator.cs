@@ -42,14 +42,14 @@
 
 		public abstract int GetGenHeight();
 
-		public abstract int GetBaseHeight(int x, IHeightLimitView heightLimit);
+		public abstract int GetBaseHeight(RandomState randomState, int x, IHeightLimitView heightLimit);
 
-		public int GetFirstFreeHeight(int x, IHeightLimitView heightLimit) {
-			return this.GetBaseHeight(x, heightLimit);
+		public int GetFirstFreeHeight(RandomState randomState, int x, IHeightLimitView heightLimit) {
+			return this.GetBaseHeight(randomState, x, heightLimit);
 		}
 
-		public int GetFirstOccupiedHeight(int x, IHeightLimitView heightLimit) {
-			return this.GetBaseHeight(x, heightLimit) - 1;
+		public int GetFirstOccupiedHeight(RandomState randomState, int x, IHeightLimitView heightLimit) {
+			return this.GetBaseHeight(randomState, x, heightLimit) - 1;
 		}
 	}
 }

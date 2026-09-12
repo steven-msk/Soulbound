@@ -46,7 +46,7 @@
 			return chunk;
 		}
 
-		public override int GetBaseHeight(int x, IHeightLimitView heightLimit) {
+		public override int GetBaseHeight(RandomState randomState, int x, IHeightLimitView heightLimit) {
 			List<BlockState> layers = this.settings.layers.Select(b => b.DefaultState).ToList();
 			for (int layerIndex = Math.Min(layers.Count - 1, heightLimit.GetTopY()); layerIndex >= 0; layerIndex--) {
 				BlockState state = layers[layerIndex];

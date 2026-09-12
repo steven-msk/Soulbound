@@ -65,6 +65,10 @@
 				}
 				return result;
 			}
+
+			public T Get<T>(T[] array) {
+				return array[this.index];
+			}
 		}
 
 		public sealed record Parameter(long min, long max) {

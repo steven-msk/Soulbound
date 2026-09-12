@@ -2,7 +2,6 @@
 	using SoulboundEngine.Common.Math.Random;
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.World.Gen.Biome;
-	using System;
 	using System.Collections.Generic;
 
 	public sealed class RandomState {
@@ -13,8 +12,8 @@
 		private readonly Dictionary<RegistryKey<NormalNoise.Parameters>, NormalNoise> noiseInstances = new();
 		private readonly Dictionary<Identifier, IPositionalRandomFactory> positionalRandoms = new();
 
-		private RandomState(long seed, IRandom random, NoiseRouter noiseRouter, IRegistryEntryLookup<NormalNoise.Parameters> noises, Func<IRandom, long, IRandom> randomSupplier) {
-			this.random = randomSupplier(random, seed).ForkPositional();
+		private RandomState(long seed, NoiseGeneratorSettings noiseSettings, IRegistryEntryLookup<NormalNoise.Parameters> noises) {
+			this.random = noiseSettings.randomFactory(seed).ForkPositional();
 			this.noises = noises;
 
 			IDensityFunction.IVisitor noiseWiringVisitor = IDensityFunction.IVisitor.Of(
@@ -25,12 +24,12 @@
 				},
 				apply: f => f
 			);
-			this.noiseRouter = noiseRouter.MapAll(noiseWiringVisitor);
-			this.sampler = new Climate.Sampler(noiseRouter.densityFunctions);
+			this.noiseRouter = noiseSettings.noiseRouter.MapAll(noiseWiringVisitor);
+			this.sampler = new Climate.Sampler(this.noiseRouter.densityFunctions);
 		}
 
-		public static RandomState Create(IRandom random, NoiseRouter router, IRegistryEntryLookup<NormalNoise.Parameters> noises, long seed) {
-			return new RandomState(seed, random, router, noises, (random, seed) => random.NewInstance(seed));
+		public static RandomState Create(NoiseGeneratorSettings noiseSettings, IRegistryEntryLookup<NormalNoise.Parameters> noises, long seed) {
+			return new RandomState(seed, noiseSettings, noises);
 		}
 
 		public NormalNoise GetOrCreateNoise(RegistryKey<NormalNoise.Parameters> noise) {

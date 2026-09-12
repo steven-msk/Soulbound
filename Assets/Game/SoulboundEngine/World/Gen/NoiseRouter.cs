@@ -31,9 +31,15 @@
 		}
 
 		public static NoiseRouter CreateDefault(IRegistryEntryLookup<IDensityFunction> densityFunctions, IRegistryEntryLookup<NormalNoise.Parameters> noises) {
-			return new NoiseRouter(Climate.ParameterType.Map(parameter => {
-				return GetFunction(densityFunctions, PARAMETER_DENSITY_KEYS.GetOrThrow(parameter));
-			}));
+			return ParameterTypeMapped(parameter => GetFunction(densityFunctions, PARAMETER_DENSITY_KEYS.GetOrThrow(parameter)));
+		}
+
+		public static NoiseRouter Zero() {
+			return ParameterTypeMapped(_ => DensityFunctions.Zero());
+		}
+
+		private static NoiseRouter ParameterTypeMapped(Func<Climate.ParameterType, IDensityFunction> densityFunctionFactory) {
+			return new NoiseRouter(Climate.ParameterType.Map(densityFunctionFactory));
 		}
 
 		private static IDensityFunction GetFunction(IRegistryEntryLookup<IDensityFunction> functions, RegistryKey<IDensityFunction> key) {
@@ -48,8 +54,13 @@
 			IDensityFunction[] newFunctions = new IDensityFunction[this.densityFunctions.Length];
 			for (int i = 0; i < this.densityFunctions.Length; i++) {
 				newFunctions[i] = this.densityFunctions[i].MapAll(visitor);
+				Logger.LogInfo(((DensityFunctions.Noise)newFunctions[i]).noise.noise);
 			}
 			return new NoiseRouter(newFunctions);
+		}
+
+		public IDensityFunction GetParameterNoise(Climate.ParameterType parameterType) {
+			return parameterType.Get(this.densityFunctions);
 		}
 	}
 }
