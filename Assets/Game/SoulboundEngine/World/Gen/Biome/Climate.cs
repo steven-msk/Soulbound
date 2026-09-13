@@ -75,7 +75,7 @@
 			public static Parameter Point(float value) => Span(value, value);
 
 			public static Parameter Span(float min, float max) {
-				return min > max ? throw new ArgumentException($"min > max ({min} > {max})") 
+				return min > max ? throw new ArgumentException($"min > max ({min} > {max})")
 					: new Parameter(QuantizeCoord(min), QuantizeCoord(max));
 			}
 

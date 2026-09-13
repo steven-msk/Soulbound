@@ -73,7 +73,11 @@
 
 		public static IDensityFunction operator +(IDensityFunction first, double value) => Add(first, Const(value));
 
+		public static IDensityFunction operator -(IDensityFunction first, IDensityFunction second) => Add(first, Mul(Const(-1.0d), second));
+
 		public static IDensityFunction operator -(IDensityFunction first, double value) => Add(first, Const(-value));
+
+		public static IDensityFunction operator /(IDensityFunction first, IDensityFunction second) => Mul(first, second.Invert());
 
 		public static IDensityFunction operator /(IDensityFunction first, double value) => Mul(first, Const(1.0d / value));
 	}

@@ -31,6 +31,20 @@
 
 		public static IDensityFunction Const(double value) => new Constant(value);
 
+		public static IDensityFunction Abs(IDensityFunction function) => function.Abs();
+
+		public static IDensityFunction Square(IDensityFunction function) => function.Square();
+
+		public static IDensityFunction Cube(IDensityFunction function) => function.Cube();
+
+		public static IDensityFunction HalfNegative(IDensityFunction function) => function.HalfNegative();
+
+		public static IDensityFunction QuarterNegative(IDensityFunction function) => function.QuarterNegative();
+
+		public static IDensityFunction Invert(IDensityFunction function) => function.Invert();
+
+		public static IDensityFunction Squeeze(IDensityFunction function) => function.Squeeze();
+
 		public static IDensityFunction MapFromUnitTo(IDensityFunction function, double min, double max) {
 			double middle = (min + max) * 0.5d;
 			double factor = (max - min) * 0.5d;
