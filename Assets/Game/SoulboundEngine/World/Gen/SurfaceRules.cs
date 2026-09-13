@@ -1,6 +1,8 @@
 ﻿namespace SoulboundEngine.World.Gen {
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.World.Block.State;
+	using SoulboundEngine.World.Chunk;
+	using SoulboundEngine.World.Level;
 	using System;
 	using System.Collections.Generic;
 	using System.Linq;
@@ -8,13 +10,15 @@
 #nullable enable
 
 	public class SurfaceRules {
-		public static readonly IConditionSource AT_SURFACE = new StoneDepthConditionSource(1);
+		public static readonly int MIN_SURFACE_STEEPNESS = 3;
+		public static readonly IConditionSource ON_FLOOR = new StoneDepthConditionSource(1);
+		private static IConditionSource? steep = null;
 
 		public static IConditionSource IsBiome(params RegistryKey<Biome.Biome>[] biomes) {
 			return new BiomeConditionSource(biomes.ToHashSet());
 		}
 
-		public static IConditionSource DepthCheck(int maxDepth) {
+		public static IConditionSource UnderFloor(int maxDepth) {
 			return new StoneDepthConditionSource(maxDepth);
 		}
 
@@ -30,7 +34,9 @@
 
 		public static IRuleSource IfTrue(IConditionSource condition, IRuleSource run) {
 			return new ConditionRuleSource(condition, run);
-		} 
+		}
+
+		public static IConditionSource Steep => steep ??= new SteepConditionSource();
 
 		public sealed class Context {
 			private long lastUpdateX = long.MinValue;
@@ -38,9 +44,11 @@
 			private int blockX, blockY;
 			private RegistryEntry<Biome.Biome>? biome;
 			private int stoneDepthAbove;
+			private readonly Chunk chunk;
 			private readonly Func<int, RegistryEntry<Biome.Biome>> biomeGetter;
 
-			public Context(Func<int, RegistryEntry<Biome.Biome>> biomeGetter) {
+			public Context(Chunk chunk, Func<int, RegistryEntry<Biome.Biome>> biomeGetter) {
+				this.chunk = chunk;
 				this.biomeGetter = biomeGetter;
 			}
 
@@ -49,6 +57,7 @@
 			public int BlockX => this.blockX;
 			public int BlockY => this.blockY;
 			public int StoneDepthAbove => this.stoneDepthAbove;
+			public Chunk Chunk => this.chunk;
 
 			public RegistryEntry<Biome.Biome> Biome => this.biome ??= this.biomeGetter(this.blockX);
 
@@ -195,5 +204,25 @@
 			protected override long GetContextLastUpdate() => this.context.LastUpdateY;
 		}
 
+		private sealed record SteepConditionSource : IConditionSource {
+			public ICondition Apply(Context context) => new SteepCondition(context);
+
+			private sealed class SteepCondition : LazyXCondition {
+				public SteepCondition(Context context)
+					: base(context) {
+				}
+
+				protected override bool Compute() {
+					int localX = this.context.Chunk.GetPos().ToLocalX(this.context.BlockX);
+					int xLeft = Math.Max(localX - 1, 0);
+					int xRight = Math.Min(localX + 1, Level.CHUNK_LENGTH - 1);
+
+					int heightLeft = this.context.Chunk.GetHeightmap().GetFirstFree(xLeft);
+					int heightRight = this.context.Chunk.GetHeightmap().GetFirstFree(xRight);
+
+					return Math.Abs(heightRight - heightLeft) >= MIN_SURFACE_STEEPNESS;
+				}
+			}
+		}
 	}
 }

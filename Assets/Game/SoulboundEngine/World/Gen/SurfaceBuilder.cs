@@ -14,7 +14,7 @@
 		}
 
 		public void BuildSurface(Chunk chunk, SurfaceRules.IRuleSource ruleSource) {
-			SurfaceRules.Context context = new(x => chunk.GetBiome(chunk.GetPos().ToLocalX(x)));
+			SurfaceRules.Context context = new(chunk, x => chunk.GetBiome(chunk.GetPos().ToLocalX(x)));
 			SurfaceRules.ISurfaceRule rule = ruleSource.Apply(context);
 			Heightmap heightmap = chunk.GetHeightmap();
 			BlockPos.Mutable blockPos = new();

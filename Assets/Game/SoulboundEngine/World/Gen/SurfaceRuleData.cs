@@ -9,10 +9,17 @@
 		private static readonly IRuleSource STONE = State(Blocks.STONE.DefaultState);
 
 		public static IRuleSource Default() {
-			return Sequence(
-				IfTrue(AT_SURFACE, GRASS),
-				IfTrue(DepthCheck(4), DIRT),
+			IRuleSource defaultSurface = Sequence(
+				IfTrue(ON_FLOOR, GRASS),
+				IfTrue(UnderFloor(4), DIRT),
 				STONE
+			);
+			return Sequence(
+				IfTrue(IsBiome(Biome.Biome.HILLS), Sequence(
+					IfTrue(Steep, STONE),
+					defaultSurface
+				)),
+				defaultSurface
 			);
 		}
 
