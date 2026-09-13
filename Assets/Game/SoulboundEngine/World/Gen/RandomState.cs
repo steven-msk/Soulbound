@@ -9,12 +9,14 @@
 		private readonly IRegistryEntryLookup<NormalNoise.Parameters> noises;
 		private readonly NoiseRouter noiseRouter;
 		private readonly Climate.Sampler sampler;
+		private readonly SurfaceBuilder surfaceBuilder;
 		private readonly Dictionary<RegistryKey<NormalNoise.Parameters>, NormalNoise> noiseInstances = new();
 		private readonly Dictionary<Identifier, IPositionalRandomFactory> positionalRandoms = new();
 
 		private RandomState(long seed, NoiseGeneratorSettings noiseSettings, IRegistryEntryLookup<NormalNoise.Parameters> noises) {
 			this.random = noiseSettings.randomFactory(seed).ForkPositional();
 			this.noises = noises;
+			this.surfaceBuilder = new SurfaceBuilder(noiseSettings.defaultBlock);
 
 			IDensityFunction.IVisitor noiseWiringVisitor = IDensityFunction.IVisitor.Of(
 				visitNoise: noise => {
@@ -53,5 +55,7 @@
 		public NoiseRouter Router => this.noiseRouter;
 
 		public Climate.Sampler Sampler => this.sampler;
+
+		public SurfaceBuilder SurfaceBuilder => this.surfaceBuilder;
 	}
 }

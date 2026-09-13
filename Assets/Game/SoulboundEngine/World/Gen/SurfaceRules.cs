@@ -38,12 +38,10 @@
 			private int blockX, blockY;
 			private RegistryEntry<Biome.Biome>? biome;
 			private int stoneDepthAbove;
-			private readonly Func<int, int, RegistryEntry<Biome.Biome>> biomeGetter;
-			private readonly Func<int, int, bool> isAirGetter;
+			private readonly Func<int, RegistryEntry<Biome.Biome>> biomeGetter;
 
-			public Context(Func<int, int, RegistryEntry<Biome.Biome>> biomeGetter, Func<int, int, bool> isAirGetter) {
+			public Context(Func<int, RegistryEntry<Biome.Biome>> biomeGetter) {
 				this.biomeGetter = biomeGetter;
-				this.isAirGetter = isAirGetter;
 			}
 
 			public long LastUpdateX => this.lastUpdateX;
@@ -52,19 +50,19 @@
 			public int BlockY => this.blockY;
 			public int StoneDepthAbove => this.stoneDepthAbove;
 
-			public RegistryEntry<Biome.Biome> Biome => this.biome ??= this.biomeGetter(this.blockX, this.blockY);
+			public RegistryEntry<Biome.Biome> Biome => this.biome ??= this.biomeGetter(this.blockX);
 
 			public void UpdateX(int x) {
 				this.lastUpdateX++;
 				this.lastUpdateY++;
 				this.blockX = x;
+				this.biome = null;
 			}
 
 			public void UpdateY(int y, int stoneDepthAbove) {
 				this.lastUpdateY++;
 				this.blockY = y;
 				this.stoneDepthAbove = stoneDepthAbove;
-				this.biome = null;
 			}
 		}
 
