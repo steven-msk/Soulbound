@@ -45,6 +45,7 @@
 		}
 
 		public override Chunk BuildSurface(RandomState randomState, Chunk chunk) {
+			randomState.SurfaceBuilder.BuildSurface(chunk, this.noiseSettings.GetValue().surfaceRule);
 			return chunk;
 		}
 

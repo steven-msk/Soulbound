@@ -3,6 +3,7 @@
 	using static SoulboundEngine.World.Gen.SurfaceRules;
 
 	public static class SurfaceRuleData {
+		private static readonly IRuleSource AIR = State(Blocks.AIR.DefaultState);
 		private static readonly IRuleSource GRASS = State(Blocks.GRASS.DefaultState);
 		private static readonly IRuleSource DIRT = State(Blocks.DIRT.DefaultState);
 		private static readonly IRuleSource STONE = State(Blocks.STONE.DefaultState);
@@ -14,5 +15,7 @@
 				STONE
 			);
 		}
+
+		public static IRuleSource Air() => AIR;
 	}
 }
