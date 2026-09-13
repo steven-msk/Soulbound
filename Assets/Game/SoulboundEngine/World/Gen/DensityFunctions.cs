@@ -29,6 +29,14 @@
 			return new OperationBasedFunction(IOperationBasedFunction.Type.MAX, first, second);
 		}
 
+		public static IDensityFunction Max(IDensityFunction function, double value) {
+			return Max(function, Const(value));
+		}
+
+		public static IDensityFunction Min(IDensityFunction function, double value) {
+			return Min(function, Const(value));
+		}
+
 		public static IDensityFunction Const(double value) => new Constant(value);
 
 		public static IDensityFunction Abs(IDensityFunction function) => function.Abs();

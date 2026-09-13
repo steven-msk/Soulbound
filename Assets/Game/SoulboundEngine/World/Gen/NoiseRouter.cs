@@ -29,7 +29,7 @@
 			Climate.ParameterType.Map(PARAMETER_DENSITY_KEYS.GetOrThrow).ForEach(densityKey => {
 				Registry<IDensityFunction>.Register(registry, densityKey, FUNCTION_FACTORIES.GetOrThrow(densityKey)(noises));
 			});
-			Registry<IDensityFunction>.Register(registry, TERRAIN_HEIGHT, CreateShapeFunction(noises) * 80.0d);
+			Registry<IDensityFunction>.Register(registry, TERRAIN_HEIGHT, CreateTerrainHeightFunction(noises));
 			return Registry<IDensityFunction>.Register(registry, ZERO, DensityFunctions.Zero());
 		}
 
@@ -55,6 +55,17 @@
 
 		private static IDensityFunction CreateShapeFunction(IRegistryEntryLookup<NormalNoise.Parameters> noises) {
 			return CreateNoise(noises.GetOrThrow(NoiseTypes.SHAPE));
+		}
+
+		private static IDensityFunction CreateTerrainHeightFunction(IRegistryEntryLookup<NormalNoise.Parameters> noises) {
+			IDensityFunction shape = CreateNoise(noises.GetOrThrow(NoiseTypes.SHAPE));
+			IDensityFunction roughness = CreateNoise(noises.GetOrThrow(NoiseTypes.ROUGHNESS));
+			IDensityFunction hilliness = Max(shape, 0.0d);
+
+			IDensityFunction baseHeight = shape * 80.0d;
+			IDensityFunction extraAmp = hilliness * shape * 600.0d;
+			IDensityFunction roughnessTerm = hilliness * roughness * 40.0d;
+			return baseHeight + roughnessTerm + extraAmp;
 		}
 
 		public NoiseRouter MapAll(IDensityFunction.IVisitor visitor) {
