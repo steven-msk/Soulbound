@@ -38,5 +38,14 @@ namespace SoulboundEngine.Common.Collection {
 		public static V GetOrThrow<K, V>(this IDictionary<K, V> dictionary, K key) {
 			return dictionary[key];
 		}
+
+		public static V AddIfAbsent<K, V>(this IDictionary<K, V> dictionary, K key, Func<K, V> valueSupplier) {
+			if (dictionary.TryGetValue(key, out V value)) {
+				return value;
+			}
+			value = valueSupplier(key);
+			dictionary.Add(key, value);
+			return value;
+		}
 	}
 }

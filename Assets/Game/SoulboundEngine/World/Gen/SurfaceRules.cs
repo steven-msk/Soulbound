@@ -1,4 +1,5 @@
 ﻿namespace SoulboundEngine.World.Gen {
+	using SoulboundEngine.Common.Collection;
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.World.Block.State;
 	using SoulboundEngine.World.Chunk;
@@ -46,6 +47,7 @@
 			private int stoneDepthAbove;
 			private readonly Chunk chunk;
 			private readonly Func<int, RegistryEntry<Biome.Biome>> biomeGetter;
+			private readonly Dictionary<int, int> localXCache = new();
 
 			public Context(Chunk chunk, Func<int, RegistryEntry<Biome.Biome>> biomeGetter) {
 				this.chunk = chunk;
@@ -55,6 +57,7 @@
 			public long LastUpdateX => this.lastUpdateX;
 			public long LastUpdateY => this.lastUpdateY;
 			public int BlockX => this.blockX;
+			public int LocalX => this.ToLocalX(this.BlockX);
 			public int BlockY => this.blockY;
 			public int StoneDepthAbove => this.stoneDepthAbove;
 			public Chunk Chunk => this.chunk;
@@ -72,6 +75,10 @@
 				this.lastUpdateY++;
 				this.blockY = y;
 				this.stoneDepthAbove = stoneDepthAbove;
+			}
+
+			public int ToLocalX(int x) {
+				return this.localXCache.AddIfAbsent(x, this.chunk.GetPos().ToLocalX);
 			}
 		}
 
@@ -213,7 +220,7 @@
 				}
 
 				protected override bool Compute() {
-					int localX = this.context.Chunk.GetPos().ToLocalX(this.context.BlockX);
+					int localX = this.context.LocalX;
 					int xLeft = Math.Max(localX - 1, 0);
 					int xRight = Math.Min(localX + 1, Level.CHUNK_LENGTH - 1);
 
