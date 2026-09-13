@@ -1,10 +1,11 @@
-﻿namespace SoulboundEngine.World.Gen {
+﻿namespace SoulboundEngine.World.Gen.Noise {
 	using SoulboundEngine.Common.Collection;
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.World.Gen.Biome;
+	using SoulboundEngine.World.Gen.Function;
 	using System;
 	using System.Collections.Generic;
-	using static DensityFunctions;
+	using static Function.DensityFunctions;
 
 	public record NoiseRouter(IDensityFunction[] parameterFunctions, IDensityFunction terrainHeight) {
 		private static readonly Dictionary<Climate.ParameterType, RegistryKey<IDensityFunction>> PARAMETER_DENSITY_KEYS = new();

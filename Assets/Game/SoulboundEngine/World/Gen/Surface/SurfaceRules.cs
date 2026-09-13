@@ -1,8 +1,9 @@
-﻿namespace SoulboundEngine.World.Gen {
+﻿namespace SoulboundEngine.World.Gen.Surface {
 	using SoulboundEngine.Common.Collection;
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.World.Block.State;
 	using SoulboundEngine.World.Chunk;
+	using SoulboundEngine.World.Gen.Biome;
 	using SoulboundEngine.World.Level;
 	using System;
 	using System.Collections.Generic;
@@ -15,7 +16,7 @@
 		public static readonly IConditionSource ON_FLOOR = new StoneDepthConditionSource(1);
 		private static IConditionSource? steep = null;
 
-		public static IConditionSource IsBiome(params RegistryKey<Biome.Biome>[] biomes) {
+		public static IConditionSource IsBiome(params RegistryKey<Biome>[] biomes) {
 			return new BiomeConditionSource(biomes.ToHashSet());
 		}
 
@@ -43,13 +44,13 @@
 			private long lastUpdateX = long.MinValue;
 			private long lastUpdateY = long.MinValue;
 			private int blockX, blockY;
-			private RegistryEntry<Biome.Biome>? biome;
+			private RegistryEntry<Biome>? biome;
 			private int stoneDepthAbove;
 			private readonly Chunk chunk;
-			private readonly Func<int, RegistryEntry<Biome.Biome>> biomeGetter;
+			private readonly Func<int, RegistryEntry<Biome>> biomeGetter;
 			private readonly Dictionary<int, int> localXCache = new();
 
-			public Context(Chunk chunk, Func<int, RegistryEntry<Biome.Biome>> biomeGetter) {
+			public Context(Chunk chunk, Func<int, RegistryEntry<Biome>> biomeGetter) {
 				this.chunk = chunk;
 				this.biomeGetter = biomeGetter;
 			}
@@ -62,7 +63,7 @@
 			public int StoneDepthAbove => this.stoneDepthAbove;
 			public Chunk Chunk => this.chunk;
 
-			public RegistryEntry<Biome.Biome> Biome => this.biome ??= this.biomeGetter(this.blockX);
+			public RegistryEntry<Biome> Biome => this.biome ??= this.biomeGetter(this.blockX);
 
 			public void UpdateX(int x) {
 				this.lastUpdateX++;
@@ -127,13 +128,13 @@
 			}
 		}
 
-		public sealed record BiomeConditionSource(HashSet<RegistryKey<Biome.Biome>> biomes) : IConditionSource {
+		public sealed record BiomeConditionSource(HashSet<RegistryKey<Biome>> biomes) : IConditionSource {
 			public ICondition Apply(Context context) => new BiomeCondition(context, this.biomes);
 
 			private sealed class BiomeCondition : LazyXCondition {
-				private readonly HashSet<RegistryKey<Biome.Biome>> biomes;
+				private readonly HashSet<RegistryKey<Biome>> biomes;
 
-				public BiomeCondition(Context context, HashSet<RegistryKey<Biome.Biome>> biomes) 
+				public BiomeCondition(Context context, HashSet<RegistryKey<Biome>> biomes) 
 					: base(context) {
 					this.biomes = biomes;
 				}

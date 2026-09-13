@@ -1,6 +1,6 @@
-﻿namespace SoulboundEngine.World.Gen {
+﻿namespace SoulboundEngine.World.Gen.Surface {
 	using SoulboundEngine.World.Block;
-	using static SoulboundEngine.World.Gen.SurfaceRules;
+	using static SoulboundEngine.World.Gen.Surface.SurfaceRules;
 
 	public static class SurfaceRuleData {
 		private static readonly IRuleSource AIR = State(Blocks.AIR.DefaultState);

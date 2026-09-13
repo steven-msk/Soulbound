@@ -1,5 +1,6 @@
-﻿namespace SoulboundEngine.World.Gen {
+﻿namespace SoulboundEngine.World.Gen.Function {
 	using SoulboundEngine.Registry;
+	using SoulboundEngine.World.Gen.Noise;
 	using System;
 	using static DensityFunctions;
 

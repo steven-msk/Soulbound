@@ -1,9 +1,11 @@
-﻿namespace SoulboundEngine.World.Gen {
+﻿namespace SoulboundEngine.World.Gen.Noise {
 	using SoulboundEngine.Common.Math.Random;
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.Serialization;
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Block.State;
+	using SoulboundEngine.World.Gen.Function;
+	using SoulboundEngine.World.Gen.Surface;
 	using System;
 
 	public record NoiseGeneratorSettings(

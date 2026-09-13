@@ -1,4 +1,4 @@
-﻿namespace SoulboundEngine.World.Gen {
+﻿namespace SoulboundEngine.World.Gen.Surface {
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Block.State;
 	using SoulboundEngine.World.Chunk;

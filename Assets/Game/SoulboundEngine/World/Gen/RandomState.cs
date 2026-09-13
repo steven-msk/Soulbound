@@ -2,6 +2,9 @@
 	using SoulboundEngine.Common.Math.Random;
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.World.Gen.Biome;
+	using SoulboundEngine.World.Gen.Function;
+	using SoulboundEngine.World.Gen.Noise;
+	using SoulboundEngine.World.Gen.Surface;
 	using System.Collections.Generic;
 
 	public sealed class RandomState {

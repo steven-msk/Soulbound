@@ -1,6 +1,7 @@
 ﻿namespace SoulboundEngine.World.Chunk {
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.World.Gen;
+	using SoulboundEngine.World.Gen.Noise;
 	using SoulboundEngine.World.Level;
 	using System;
 	using System.Collections.Generic;

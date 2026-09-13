@@ -4,6 +4,8 @@
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Chunk;
 	using SoulboundEngine.World.Gen.Biome;
+	using SoulboundEngine.World.Gen.Function;
+	using SoulboundEngine.World.Gen.Noise;
 	using SoulboundEngine.World.Level;
 	using System;
 

@@ -1,6 +1,8 @@
 ﻿namespace SoulboundEngine.World.Gen.Biome {
 	using SoulboundEngine.Common;
 	using SoulboundEngine.Registry;
+	using SoulboundEngine.World.Gen.Function;
+	using SoulboundEngine.World.Gen.Noise;
 	using System;
 	using System.Collections.Generic;
 	using System.Linq;

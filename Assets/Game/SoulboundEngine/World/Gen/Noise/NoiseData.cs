@@ -1,4 +1,4 @@
-﻿namespace SoulboundEngine.World.Gen {
+﻿namespace SoulboundEngine.World.Gen.Noise {
 	using SoulboundEngine.Registry;
 
 	public static class NoiseData {

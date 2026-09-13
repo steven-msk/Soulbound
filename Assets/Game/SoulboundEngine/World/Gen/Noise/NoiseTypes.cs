@@ -1,4 +1,4 @@
-﻿namespace SoulboundEngine.World.Gen {
+﻿namespace SoulboundEngine.World.Gen.Noise {
 	using SoulboundEngine.Common.Math.Random;
 	using SoulboundEngine.Registry;
 
