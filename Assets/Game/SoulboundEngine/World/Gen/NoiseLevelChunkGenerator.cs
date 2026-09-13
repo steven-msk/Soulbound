@@ -28,13 +28,13 @@
 
 		public override Chunk Fill(RandomState randomState, Chunk chunk) {
 			NoiseGeneratorSettings settings = this.noiseSettings.GetValue();
-			IDensityFunction shapeFunction = randomState.Router.GetParameterNoise(Climate.ParameterType.SHAPE);
+			IDensityFunction heightFunction = randomState.Router.terrainHeight;
 			Heightmap heightmap = chunk.GetHeightmap();
 			BlockPos.Mutable blockPos = new();
 
 			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
 				int blockX = chunk.GetPos().ToWorldX(x);
-				int height = this.SampleHeight(shapeFunction, blockX, settings.baseHeight, 1f);
+				int height = this.SampleHeight(heightFunction, blockX, settings.baseHeight, 1f);
 
 				for (int y = this.GetMinGenY(); y < height; y++) {
 					chunk.SetBlockState(blockPos.Set(blockX, y), settings.defaultBlock);
@@ -54,8 +54,8 @@
 
 		public override int GetBaseHeight(RandomState randomState, int x, IHeightLimitView heightLimit) {
 			NoiseGeneratorSettings settings = this.noiseSettings.GetValue();
-			IDensityFunction shapeFunction = randomState.Router.GetParameterNoise(Climate.ParameterType.SHAPE);
-			return this.SampleHeight(shapeFunction, x, settings.baseHeight, 1f);
+			IDensityFunction heightFunction = randomState.Router.terrainHeight;
+			return this.SampleHeight(heightFunction, x, settings.baseHeight, 1f);
 		}
 
 		private int SampleHeight(IDensityFunction densityFunction, int blockX, int baseHeight, float amplitude) {

@@ -25,7 +25,7 @@
 				apply: f => f
 			);
 			this.noiseRouter = noiseSettings.noiseRouter.MapAll(noiseWiringVisitor);
-			this.sampler = new Climate.Sampler(this.noiseRouter.densityFunctions);
+			this.sampler = new Climate.Sampler(this.noiseRouter.parameterFunctions);
 		}
 
 		public static RandomState Create(NoiseGeneratorSettings noiseSettings, IRegistryEntryLookup<NormalNoise.Parameters> noises, long seed) {
