@@ -22,8 +22,16 @@
 				return this.Register(NoiseTypes.SHAPE, -5, 1.0d, 1.0d, 2.0d, 2.0d, 2.0d, 1.0d, 1.0d);
 			}
 
+			private NormalNoise.Parameters Create(int firstOctave, params double[] octaveMultipliers) {
+				return NormalNoise.Parameters.Of(firstOctave, octaveMultipliers);
+			}
+
 			private NormalNoise.Parameters Register(RegistryKey<NormalNoise.Parameters> key, int firstOctave, params double[] octaveMultipliers) {
-				return Registry<NormalNoise.Parameters>.Register(this.registry, key, NormalNoise.Parameters.Of(firstOctave, octaveMultipliers));
+				return this.Register(key, this.Create(firstOctave, octaveMultipliers));
+			}
+
+			private NormalNoise.Parameters Register(RegistryKey<NormalNoise.Parameters> key, NormalNoise.Parameters parameters) {
+				return Registry<NormalNoise.Parameters>.Register(this.registry, key, parameters);
 			}
 		}
 	}

@@ -16,8 +16,8 @@
 			this.firstOctave = parameters.firstOctave;
 			this.parameters = parameters;
 
-			this.first = new OctavePerlinNoise(random, this.firstOctave, this.octaveMultipliers);
-			this.second = new OctavePerlinNoise(random, this.firstOctave, this.octaveMultipliers);
+			this.first = new OctavePerlinNoise(random, "first", this.firstOctave, this.octaveMultipliers, parameters.lacunarity, parameters.persistence);
+			this.second = new OctavePerlinNoise(random, "second", this.firstOctave, this.octaveMultipliers, parameters.lacunarity, parameters.persistence);
 			int minOctave = int.MaxValue;
 			int maxOctave = int.MinValue;
 			for (int i = 0; i < this.octaveMultipliers.Length; i++) {
@@ -27,10 +27,6 @@
 				}
 			}
 			this.valueFactor = 0.16666666666666666 / ExpectedDeviation(maxOctave - minOctave);
-		}
-
-		public static NormalNoise Create(IRandom random, int firstOctave, params double[] octaveMultipliers) {
-			return new NormalNoise(random, new Parameters(firstOctave, octaveMultipliers));
 		}
 
 		public static NormalNoise Create(IRandom random, Parameters parameters) {
@@ -50,12 +46,25 @@
 
 		public Parameters GetParameters() => this.parameters;
 
-		public sealed record Parameters(int firstOctave, double[] octaveMultipliers) {
+		public sealed record Parameters(int firstOctave, double[] octaveMultipliers, double lacunarity, double persistence) {
+			public const double DEFAULT_LACUNARITY = 2.0d;
+			public const double DEFAULT_PERSISTENCE = 0.5f;
+
 			public static Parameters Of(int firstOctave, params double[] octaveMultipliers) {
-				return new Parameters(firstOctave, octaveMultipliers);
+				return new Parameters(firstOctave, octaveMultipliers, DEFAULT_LACUNARITY, DEFAULT_PERSISTENCE);
+			}
+
+			public Parameters Lacunarity(double lacunarity) {
+				return lacunarity < 1.0d
+					? throw new ArgumentException("fBm lacunarity cannot be <1.0")
+					: (new Parameters(this) with { lacunarity = lacunarity });
+			}
+
+			public Parameters Persistence(double persistence) {
+				return persistence <= 0.0d ? throw new ArgumentException("fBm persistence cannot be <=0.0")
+					: persistence >= 1.0d ? throw new ArgumentException("fBm persistence >=1.0 is not allowed here")
+					: (new Parameters(this) with { persistence = persistence });
 			}
 		}
 	}
-
-
 }
