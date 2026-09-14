@@ -29,10 +29,7 @@
 				for (int y = surfaceY; y >= endY; y--) {
 					blockPos.Set(worldX, y);
 					BlockState current = chunk.GetBlockState(blockPos);
-					if (current.IsAir()) {
-						stoneAboveDepth = 0;
-						continue;
-					}
+					if (current.IsAir()) continue;
 
 					stoneAboveDepth++;
 					context.UpdateY(y, stoneAboveDepth);
