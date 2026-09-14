@@ -54,7 +54,7 @@
 		}
 
 		public override Chunk BuildSurface(RandomState randomState, Chunk chunk) {
-			randomState.SurfaceBuilder.BuildSurface(chunk, this.noiseSettings.GetValue().surfaceRule);
+			randomState.SurfaceBuilder.BuildSurface(randomState, chunk, this.noiseSettings.GetValue().surfaceRule);
 			return chunk;
 		}
 
@@ -63,15 +63,8 @@
 		public override int GetGenHeight() => Level.DEFAULT_WORLD_HEIGHT;
 
 		public override int GetBaseHeight(RandomState randomState, int x, IHeightLimitView heightLimit) {
-			NoiseGeneratorSettings settings = this.noiseSettings.GetValue();
-			IDensityFunction heightFunction = randomState.Router.finalTerrain;
-			return this.SampleHeight(heightFunction, x, settings.baseHeight, 1f);
+			return (int)Math.Round(randomState.Router.terrainHeight.Compute(new IDensityFunction.SinglePointContext(x, 0)));
 		}
 
-		[Obsolete]
-		private int SampleHeight(IDensityFunction densityFunction, int blockX, int baseHeight, float amplitude) {
-			double density = densityFunction.Compute(new IDensityFunction.SinglePointContext(blockX, 0));
-			return baseHeight + (int)Math.Round(density * amplitude);
-		}
 	}
 }
