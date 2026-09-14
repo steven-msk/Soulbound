@@ -19,7 +19,7 @@
 
 		public NoiseSize ClampToHeightLimit(IHeightLimitView heightLimit) {
 			int newMinY = Math.Max(this.minY, heightLimit.GetBottomY());
-			int newHeight = Math.Min(this.minY + this.height, heightLimit.GetTopY() + 1);
+			int newHeight = Math.Min(this.minY + this.height, heightLimit.GetTopY() + 1) - newMinY;
 			return new NoiseSize(newMinY, newHeight, this.horizontalSize, this.verticalSize);
 		}
 	}
