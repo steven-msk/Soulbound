@@ -19,7 +19,7 @@ namespace SoulboundEngine.Registry {
 	using System.Collections.Generic;
 
 	public static class Registries {
-		private delegate object RegistryBootstrapper<T>(RegistryBootstrapContext context, Registry<T> registry) where T : class;
+		public delegate object RegistryBootstrapper<T>(RegistryBootstrapContext context, Registry<T> registry) where T : class;
 		private static readonly List<(Identifier registry, Func<object> loader)> LOADERS = new(30);
 		private static readonly HashSet<Identifier> LOADED = new();
 		private static bool freezed = false;
@@ -84,7 +84,7 @@ namespace SoulboundEngine.Registry {
 					Logger.LogError("Unable to load registry '{}'", registry);
 				}
 				if (!LOADED.Add(registry)) {
-					Logger.LogError("Registry loaded multiple times: {}. This should not happen", registry);
+					Logger.LogError("Registry is already loaded: {}", registry);
 				}
 			}
 		}

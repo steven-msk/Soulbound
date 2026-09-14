@@ -1,6 +1,6 @@
 {
     "name": "SoulboundUnityEditor",
-    "rootNamespace": "",
+    "rootNamespace": "SoulboundEngine.UnityClient.Editor",
     "references": [
         "GUID:26a9ff0bf5fee744f9994a185347dd8a",
         "GUID:95dbc6ae5ee5c5d48a8e2438240fa58f",

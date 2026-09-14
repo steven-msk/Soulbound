@@ -47,5 +47,19 @@ namespace SoulboundEngine.Common.Collection {
 			dictionary.Add(key, value);
 			return value;
 		}
+
+		public static V Put<K, V>(this IDictionary<K, V> dictionary, K key, V value) {
+			dictionary.Add(key, value);
+			return value;
+		}
+
+		public static VDerived Put<K, V, VDerived>(this IDictionary<K, V> dictionary, K key, VDerived derivedValue) where VDerived : V {
+			dictionary.Add(key, derivedValue);
+			return derivedValue;
+		}
+
+		public static V Set<K, V>(this IDictionary<K, V> dictionary, K key, V value) {
+			return dictionary[key] = value;
+		}
 	}
 }
