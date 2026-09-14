@@ -1,5 +1,6 @@
 namespace SoulboundEngine.Registry {
 	using SoulboundEngine.Component;
+	using SoulboundEngine.GameStates;
 	using SoulboundEngine.Inventory;
 	using SoulboundEngine.Item;
 	using SoulboundEngine.Loot;
@@ -73,6 +74,9 @@ namespace SoulboundEngine.Registry {
 		}
 
 		public static void Init() {
+			if (GameStateManager.GetCurrent() != GameState.BOOTSTRAPPING) {
+				throw new InvalidOperationException("Registry.Init() can only be called while bootstrapping");
+			}
 			AddContents();
 			Freeze();
 			Validate(ROOT);
