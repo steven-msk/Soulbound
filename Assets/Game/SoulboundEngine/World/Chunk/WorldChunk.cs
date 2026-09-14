@@ -5,7 +5,6 @@ namespace SoulboundEngine.World.Chunk {
 	using SoulboundEngine.World.Block.State;
 	using SoulboundEngine.World.Level;
 	using System;
-	using System.Collections.Generic;
 
 #nullable enable
 
@@ -183,7 +182,5 @@ namespace SoulboundEngine.World.Chunk {
 		}
 
 		public override bool IsEmpty() => false;
-
-		public IEnumerable<TileEntity> GetTileEntities() => this.tileEntities.Values;
 	}
 }

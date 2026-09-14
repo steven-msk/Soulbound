@@ -8,7 +8,6 @@
 	using System;
 	using System.Collections.Generic;
 
-
 #nullable enable
 
 	public sealed class EditorWorldGenContext {
@@ -43,10 +42,18 @@
 			this.requiredRegistries.Values.ForEach(r => r.Freeze());
 		}
 
-		public NoiseLevelChunkGenerator CreateChunkGenerator(RegistryKey<NoiseGeneratorSettings> noiseGenerator, RegistryKey<MultiNoiseBiomeSourceParamList> noiseParameterPreset) {
+		public NoiseLevelChunkGenerator CreateChunkGenerator(RegistryKey<NoiseGeneratorSettings> noiseGeneratorSettings, RegistryKey<MultiNoiseBiomeSourceParamList> noiseParameterPreset) {
 			return new NoiseLevelChunkGenerator(
 				MultiNoiseBiomeSource.FromPreset(this.multiNoiseBiomeSourceParamLists.GetOrThrow(noiseParameterPreset)),
-				this.noiseGeneratorSettings.GetOrThrow(noiseGenerator)
+				this.noiseGeneratorSettings.GetOrThrow(noiseGeneratorSettings)
+			);
+		}
+
+		public RandomState CreateRandomState(RegistryKey<NoiseGeneratorSettings> noiseGeneratorSettings, long seed) {
+			return RandomState.Create(
+				this.noiseGeneratorSettings.GetOrThrow(noiseGeneratorSettings).GetValue(),
+				this.noises,
+				seed
 			);
 		}
 
