@@ -2,6 +2,7 @@
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.Serialization;
 	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Block.State;
 	using SoulboundEngine.World.Chunk;
 	using SoulboundEngine.World.Gen.Biome;
 	using SoulboundEngine.World.Gen.Function;
@@ -17,6 +18,7 @@
 			Field.Required<ChunkGenerator, RegistryEntry<NoiseGeneratorSettings>>("noise_settings", NoiseGeneratorSettings.CODEC, g => ((NoiseLevelChunkGenerator)g).noiseSettings),
 			(biomeSource, noiseSettings) => new NoiseLevelChunkGenerator(biomeSource, noiseSettings)
 		);
+		private static readonly BlockState AIR = Blocks.AIR.DefaultState;
 		private readonly RegistryEntry<NoiseGeneratorSettings> noiseSettings;
 
 		public NoiseLevelChunkGenerator(BiomeSource biomeSource, RegistryEntry<NoiseGeneratorSettings> noiseSettings)
@@ -29,19 +31,24 @@
 		public RegistryEntry<NoiseGeneratorSettings> NoiseSettings => this.noiseSettings;
 
 		public override Chunk Fill(RandomState randomState, Chunk chunk) {
-			NoiseGeneratorSettings settings = this.noiseSettings.GetValue();
-			IDensityFunction heightFunction = randomState.Router.terrainHeight;
+			IDensityFunction finalDensity = randomState.Router.finalTerrain;
 			Heightmap heightmap = chunk.GetHeightmap();
 			BlockPos.Mutable blockPos = new();
 
-			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
-				int blockX = chunk.GetPos().ToWorldX(x);
-				int height = this.SampleHeight(heightFunction, blockX, settings.baseHeight, 1f);
+			for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
+				int worldX = chunk.GetPos().ToWorldX(cx);
+				int topmostSolid = int.MinValue;
 
-				for (int y = this.GetMinGenY(); y < height; y++) {
-					chunk.SetBlockState(blockPos.Set(blockX, y), settings.defaultBlock);
+				for (int y = chunk.GetTopY(); y >= this.GetMinGenY(); y--) {
+					blockPos.Set(worldX, y);
+					double density = finalDensity.Compute(new IDensityFunction.SinglePointContext(worldX, y));
+					if (density > 0) {
+						chunk.SetBlockState(blockPos, this.noiseSettings.GetValue().defaultBlock);
+						if (topmostSolid == int.MinValue) topmostSolid = y;
+					}
 				}
-				heightmap.Update(x, height, settings.defaultBlock);
+
+				heightmap.Update(cx, topmostSolid, chunk.GetBlockState(blockPos.Set(worldX, topmostSolid)));
 			}
 			return chunk;
 		}
@@ -57,10 +64,11 @@
 
 		public override int GetBaseHeight(RandomState randomState, int x, IHeightLimitView heightLimit) {
 			NoiseGeneratorSettings settings = this.noiseSettings.GetValue();
-			IDensityFunction heightFunction = randomState.Router.terrainHeight;
+			IDensityFunction heightFunction = randomState.Router.finalTerrain;
 			return this.SampleHeight(heightFunction, x, settings.baseHeight, 1f);
 		}
 
+		[Obsolete]
 		private int SampleHeight(IDensityFunction densityFunction, int blockX, int baseHeight, float amplitude) {
 			double density = densityFunction.Compute(new IDensityFunction.SinglePointContext(blockX, 0));
 			return baseHeight + (int)Math.Round(density * amplitude);

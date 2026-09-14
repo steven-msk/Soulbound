@@ -7,12 +7,12 @@
 	using System.Collections.Generic;
 	using static Function.DensityFunctions;
 
-	public record NoiseRouter(IDensityFunction[] parameterFunctions, IDensityFunction terrainHeight) {
+	public record NoiseRouter(IDensityFunction[] parameterFunctions, IDensityFunction finalTerrain) {
 		private static readonly Dictionary<Climate.ParameterType, RegistryKey<IDensityFunction>> PARAMETER_DENSITY_KEYS = new();
 		private static readonly Dictionary<RegistryKey<IDensityFunction>, Func<IRegistryEntryLookup<NormalNoise.Parameters>, IDensityFunction>> FUNCTION_FACTORIES = new();
 		public static readonly RegistryKey<IDensityFunction> ZERO = CreateKey("zero");
 		public static readonly RegistryKey<IDensityFunction> SHAPE = CreateParameterKey("shape", Climate.ParameterType.SHAPE, CreateShapeFunction);
-		public static readonly RegistryKey<IDensityFunction> TERRAIN_HEIGHT = CreateKey("terrain_height");
+		public static readonly RegistryKey<IDensityFunction> FINAL_TERRAIN = CreateKey("final_terrain");
 
 		private static RegistryKey<IDensityFunction> CreateKey(string id) {
 			return RegistryKey<IDensityFunction>.Of(RegistryKeys.DENSITY_FUNCTION, Identifier.Of(id));
@@ -30,7 +30,7 @@
 			Climate.ParameterType.Map(PARAMETER_DENSITY_KEYS.GetOrThrow).ForEach(densityKey => {
 				Registry<IDensityFunction>.Register(registry, densityKey, FUNCTION_FACTORIES.GetOrThrow(densityKey)(noises));
 			});
-			Registry<IDensityFunction>.Register(registry, TERRAIN_HEIGHT, CreateTerrainHeightFunction(noises));
+			Registry<IDensityFunction>.Register(registry, FINAL_TERRAIN, CreateTerrain(noises));
 			return Registry<IDensityFunction>.Register(registry, ZERO, DensityFunctions.Zero());
 		}
 
@@ -47,7 +47,7 @@
 		}
 
 		private static NoiseRouter ParameterTypeMapped(IRegistryEntryLookup<IDensityFunction> functions, Func<Climate.ParameterType, IDensityFunction> densityFunctionFactory) {
-			return new NoiseRouter(Climate.ParameterType.Map(densityFunctionFactory), GetFunction(functions, TERRAIN_HEIGHT));
+			return new NoiseRouter(Climate.ParameterType.Map(densityFunctionFactory), GetFunction(functions, FINAL_TERRAIN));
 		}
 
 		private static IDensityFunction GetFunction(IRegistryEntryLookup<IDensityFunction> functions, RegistryKey<IDensityFunction> key) {
@@ -58,7 +58,7 @@
 			return CreateNoise(noises.GetOrThrow(NoiseTypes.SHAPE));
 		}
 
-		private static IDensityFunction CreateTerrainHeightFunction(IRegistryEntryLookup<NormalNoise.Parameters> noises) {
+		private static IDensityFunction CreateTerrain(IRegistryEntryLookup<NormalNoise.Parameters> noises) {
 			IDensityFunction shape = CreateNoise(noises.GetOrThrow(NoiseTypes.SHAPE));
 			IDensityFunction roughness = CreateNoise(noises.GetOrThrow(NoiseTypes.ROUGHNESS));
 			IDensityFunction hilliness = Max(shape, 0.0d);
@@ -66,7 +66,14 @@
 			IDensityFunction baseHeight = shape * 80.0d;
 			IDensityFunction extraAmp = hilliness * shape * 600.0d;
 			IDensityFunction roughnessTerm = hilliness * roughness * 40.0d;
-			return baseHeight + roughnessTerm + extraAmp;
+			IDensityFunction terrainHeight = baseHeight + roughnessTerm + extraAmp;
+			IDensityFunction terrainDensity = terrainHeight - Y;
+
+			IDensityFunction caveNoise = CreateNoise(noises.GetOrThrow(NoiseTypes.BASE_CAVE));
+			const double CAVE_SIZE = 0.02d;
+			IDensityFunction caveDensity = Abs(caveNoise) - CAVE_SIZE;
+
+			return Min(terrainDensity, caveDensity);
 		}
 
 		public NoiseRouter MapAll(IDensityFunction.IVisitor visitor) {
@@ -74,7 +81,7 @@
 			for (int i = 0; i < this.parameterFunctions.Length; i++) {
 				newFunctions[i] = this.parameterFunctions[i].MapAll(visitor);
 			}
-			return new NoiseRouter(newFunctions, this.terrainHeight.MapAll(visitor));
+			return new NoiseRouter(newFunctions, this.finalTerrain.MapAll(visitor));
 		}
 
 		public IDensityFunction GetParameterNoise(Climate.ParameterType parameterType) {

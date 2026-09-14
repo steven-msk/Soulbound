@@ -60,6 +60,10 @@
 			return Add(Const(middle), Mul(Const(factor), function));
 		}
 
+		public static IDensityFunction X => new XCoordinate();
+
+		public static IDensityFunction Y => new YCoordinate();
+
 		public interface ITransformer : IDensityFunction {
 			IDensityFunction input { get; }
 
@@ -208,6 +212,18 @@
 
 			public double Transform(double input) {
 				return Math.Clamp(input, this.minValue, this.maxValue);
+			}
+		}
+
+		public record YCoordinate : IDensityFunction.ISimple {
+			public double Compute(IDensityFunction.IContext context) {
+				return context.blockY;
+			}
+		}
+
+		public record XCoordinate : IDensityFunction.ISimple {
+			public double Compute(IDensityFunction.IContext context) {
+				return context.blockX;
 			}
 		}
 	}

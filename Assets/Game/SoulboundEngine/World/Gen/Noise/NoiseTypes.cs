@@ -5,6 +5,7 @@
 	public static class NoiseTypes {
 		public static readonly RegistryKey<NormalNoise.Parameters> SHAPE = Create("shape");
 		public static readonly RegistryKey<NormalNoise.Parameters> ROUGHNESS = Create("roughness");
+		public static readonly RegistryKey<NormalNoise.Parameters> BASE_CAVE = Create("base_cave");
 
 		private static RegistryKey<NormalNoise.Parameters> Create(string id) {
 			return RegistryKey<NormalNoise.Parameters>.Of(RegistryKeys.NOISE, Identifier.Of(id));

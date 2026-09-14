@@ -37,7 +37,7 @@ namespace SoulboundEngine.Item {
 
 		public static readonly Item placeableItem = Register(Blocks.MOVING_TICKING_BLOCK);
 		public static readonly Item teleportPlayerItem = Register("teleport_player_item", settings => new TeleportPlayerItem(settings),
-			settings => settings.NonStackable().Durability(50)
+			settings => settings.NonStackable()
 		);
 		public static readonly Item debugPointer = Register("debug_pointer", settings => new DebugPointerItem(settings),
 			settings => settings.NonStackable()

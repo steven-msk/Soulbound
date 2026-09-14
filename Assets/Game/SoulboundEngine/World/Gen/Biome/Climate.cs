@@ -126,6 +126,11 @@
 					return this;
 				}
 
+				public Builder Add(ParameterType type, Parameter parameter) {
+					this.values.Add(type, parameter);
+					return this;
+				}
+
 				public ParameterPoint Build() {
 					foreach (ParameterType type in ParameterType.VALUES) {
 						if (!this.values.ContainsKey(type)) {
