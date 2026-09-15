@@ -49,13 +49,19 @@
 			);
 		}
 
-		public RandomState CreateRandomState(RegistryKey<NoiseGeneratorSettings> noiseGeneratorSettings, long seed) {
+		public RandomState CreateRandomStateWithOverrides(
+			RegistryKey<NoiseGeneratorSettings> noiseGeneratorSettings, 
+			long seed,
+			Dictionary<RegistryKey<NormalNoise.Parameters>, NormalNoise.Parameters> overrides
+		) {
 			return RandomState.Create(
 				this.noiseGeneratorSettings.GetOrThrow(noiseGeneratorSettings).GetValue(),
-				this.noises,
+				new OverridableNoiseLookup(this.noises, this.noises, overrides),
 				seed
 			);
 		}
+
+		public Registry<NormalNoise.Parameters> Noises => this.noises;
 
 		private Registry<T> AddRequiredRegistry<T>(RegistryKey<Registry<T>> registryKey, Func<RegistryBootstrapContext, Registry<T>, object> bootstrapper) where T : class {
 			Registry<T> registry = this.requiredRegistries.Put(registryKey.value, new Registry<T>(registryKey));
