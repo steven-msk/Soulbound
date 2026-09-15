@@ -31,6 +31,10 @@ namespace SoulboundEngine.Registry {
 
 		public override int GetHashCode() => HashCode.Combine(this.registry, this.value);
 
+		public override bool Equals(object obj) {
+			return obj is RegistryKey<T> other && this.registry.Equals(other.registry) && this.value.Equals(other.value); 
+		}
+
 		public override string ToString() {
 			return $"RegistryKey[{this.registry}/{this.value}]";
 		}
