@@ -65,6 +65,8 @@
 					: persistence >= 1.0d ? throw new ArgumentException("fBm persistence >=1.0 is not allowed here")
 					: (new Parameters(this) with { persistence = persistence });
 			}
+
+			public Parameters Copy() => new(this);
 		}
 	}
 }

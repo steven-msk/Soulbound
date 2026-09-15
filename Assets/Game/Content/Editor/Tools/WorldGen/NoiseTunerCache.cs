@@ -4,7 +4,8 @@
 
 	public class NoiseTunerCache : ScriptableObject {
 		public int chunkCount = 1;
-		public long seed;
+		public long seed = 0L;
+		public int chunkStartX = 0;
 		public List<NoiseOverrideEntry> overrideEntries = new();
 	}
 }
