@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e881b604f4f5747478682930a3777c9e, type: 3}
   m_Name: TunerCache
   m_EditorClassIdentifier: SoulboundUnityEditor::SoulboundEngine.UnityClient.Editor.Tools.WorldGen.NoiseTunerCache
-  chunkCount: 5
+  chunkCount: 250
   seed: 0
   chunkStartX: 0
   overrideEntries: []

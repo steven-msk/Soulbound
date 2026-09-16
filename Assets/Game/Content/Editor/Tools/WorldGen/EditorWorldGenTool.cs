@@ -9,10 +9,10 @@
 	using SoulboundEngine.World.Gen.Biome;
 	using SoulboundEngine.World.Gen.Noise;
 	using SoulboundEngine.World.Level;
+	using System;
 	using System.Collections.Generic;
 	using System.Diagnostics;
 	using System.Linq;
-	using UnityEngine;
 	using UnityEngine.Tilemaps;
 
 	public class EditorWorldGenTool {
@@ -22,11 +22,14 @@
 			NoiseLevelChunkGenerator chunkGenerator = context.CreateChunkGenerator(NoiseGeneratorSettings.DEFAULT, MultiNoiseBiomeSourceParamList.DEFAULT);
 			RandomState randomState = context.CreateRandomStateWithOverrides(NoiseGeneratorSettings.DEFAULT, seed, overrides);
 			IHeightLimitView heightLimit = IHeightLimitView.Create(Level.DEFAULT_MIN_Y, Level.DEFAULT_WORLD_HEIGHT);
-			Tilemap tilemap = Object.FindFirstObjectByType<Tilemap>();
+			Tilemap tilemap = UnityEngine.Object.FindFirstObjectByType<Tilemap>();
 			tilemap.ClearAllTiles();
 			Stopwatch stopwatch = Stopwatch.StartNew();
 
-			List<UniTask<(Chunk chunk, long elapsed)>> tasks = new();
+			List<UniTask> tasks = new();
+			long total = 0L;
+			object totalLock = new();
+			int tilesPerBatch = (Level.CHUNK_LENGTH * Level.DEFAULT_WORLD_HEIGHT) >> 6;
 
 			for (int i = 0; i < chunkCount; i++) {
 				ChunkPos pos = new(i + chunkStartX);
@@ -38,44 +41,52 @@
 						ChunkSection.HEIGHT
 					)
 				);
-				tasks.Add(GenerateChunkAsync(randomState, chunk, chunkGenerator));
+				tasks.Add(GenerateAndRenderAsync(i, chunkStartX, randomState, chunk, chunkGenerator, tilemap, blockRenderManager, elapsed => {
+					lock (totalLock) { total += elapsed; }
+				}, tilesPerBatch));
 			}
 
-			(Chunk chunk, long elapsed)[] results = await UniTask.WhenAll(tasks);
-			long total = 0L;
-			double average = 0.0d;
-			for (int i = 0; i < results.Length; i++) {
-				SoulboundEngine.Logger.LogWarning("Chunk {} took {}ms to generate", i, results[i].elapsed);
-				average += (double)results[i].elapsed / chunkCount;
-				total += results[i].elapsed;
-				RenderChunk(chunkStartX, tilemap, results[i].chunk, blockRenderManager);
-			}
-			SoulboundEngine.Logger.LogWarning("Finished generating {} chunks in {} total ms ({}ms average)", chunkCount, total, average);
+			await UniTask.WhenAll(tasks);
+			SoulboundEngine.Logger.LogWarning("Finished generating {} chunks in {} total ms ({}ms average)", chunkCount, total, (double)total / chunkCount);
 		}
 
-		private static UniTask<(Chunk chunk, long elapsed)> GenerateChunkAsync(
+		private static async UniTask GenerateAndRenderAsync(
+			int index,
+			int chunkStartX,
 			RandomState randomState,
 			Chunk chunk,
-			ChunkGenerator chunkGenerator
+			ChunkGenerator chunkGenerator,
+			Tilemap tilemap,
+			BlockRenderManager blockRenderManager,
+			Action<long> reportElapsed,
+			int tilesPerBatch
 		) {
-			return UniTask.RunOnThreadPool(() => {
+			(Chunk generated, long elapsed) = await UniTask.RunOnThreadPool(() => {
 				Stopwatch stopwatch = Stopwatch.StartNew();
-
-				chunk = chunkGenerator.MapBiomes(randomState, chunk);
-				chunk = chunkGenerator.Fill(randomState, chunk);
-				chunk = chunkGenerator.BuildSurface(randomState, chunk);
-
-				return (chunk, stopwatch.ElapsedMilliseconds);
+				Chunk result = chunkGenerator.MapBiomes(randomState, chunk);
+				result = chunkGenerator.Fill(randomState, result);
+				result = chunkGenerator.BuildSurface(randomState, result);
+				return (result, stopwatch.ElapsedMilliseconds);
 			});
+
+			await UniTask.SwitchToMainThread(PlayerLoopTiming.Update);
+			SoulboundEngine.Logger.LogWarning("Chunk {} took {}ms to generate", index, elapsed);
+			RenderChunk(chunkStartX, tilesPerBatch, tilemap, generated, blockRenderManager);
+			reportElapsed(elapsed);
 		}
 
-		public static void RenderChunk(int chunkStartX, Tilemap tilemap, Chunk chunk, BlockRenderManager blockRenderManager) {
+		public static async void RenderChunk(int chunkStartX, int tilesPerBatch, Tilemap tilemap, Chunk chunk, BlockRenderManager blockRenderManager) {
 			BlockPos.Mutable blockPos = new();
-			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
-				for (int y = chunk.GetBottomY(); y <= chunk.GetTopY(); y++) {
+			int counter = 0;
+			for (int y = chunk.GetBottomY(); y <= chunk.GetTopY(); y++) {
+				for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
 					int tilemapX = Level.CHUNK_LENGTH * (chunk.GetPos().x - chunkStartX) + x;
 					int worldX = chunk.GetPos().ToWorldX(x);
 					blockRenderManager.Render(tilemap, tilemapX, y, chunk.GetBlockState(blockPos.Set(worldX, y)));
+
+					if (++counter % tilesPerBatch == 0) {
+						await UniTask.Yield(PlayerLoopTiming.Update);
+					}
 				}
 			}
 		}
