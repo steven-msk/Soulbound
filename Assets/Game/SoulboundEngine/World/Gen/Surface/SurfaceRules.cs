@@ -12,7 +12,7 @@
 #nullable enable
 
 	public class SurfaceRules {
-		public static readonly int MIN_SURFACE_STEEPNESS = 3;
+		public const int MIN_SURFACE_STEEPNESS = 4;
 		public static readonly IConditionSource ON_FLOOR = new StoneDepthConditionSource(1);
 		private static IConditionSource? steep = null;
 

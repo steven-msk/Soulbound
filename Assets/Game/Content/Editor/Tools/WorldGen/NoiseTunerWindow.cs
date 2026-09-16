@@ -1,4 +1,5 @@
 ﻿namespace SoulboundEngine.UnityClient.Editor.Tools.WorldGen {
+	using Cysharp.Threading.Tasks;
 	using SoulboundEngine.Common;
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.UnityClient.Assets;
@@ -62,7 +63,7 @@
 				AssetDatabase.SaveAssetIfDirty(this.cache);
 			});
 			Button regenerate = new(
-				() => EditorWorldGenTool.Regenerate(this.seed, this.chunkCount, this.chunkStartX, this.overrides, this.context)
+				() => EditorWorldGenTool.Regenerate(this.seed, this.chunkCount, this.chunkStartX, this.overrides, this.context).Forget(SoulboundEngine.Logger.LogFatal)
 			) { text = "Regenerate" };
 			regenerate.style.height = 32;
 			this.rootVisualElement.Add(regenerate);

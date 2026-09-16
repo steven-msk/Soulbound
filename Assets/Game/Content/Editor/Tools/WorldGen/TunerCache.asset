@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: SoulboundUnityEditor::SoulboundEngine.UnityClient.Editor.Tools.WorldGen.NoiseTunerCache
   chunkCount: 5
   seed: 0
-  chunkStartX: -2
+  chunkStartX: 0
   overrideEntries: []

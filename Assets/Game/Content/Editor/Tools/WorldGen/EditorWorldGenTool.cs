@@ -1,4 +1,5 @@
 ﻿namespace SoulboundEngine.UnityClient.Editor.Tools.WorldGen {
+	using Cysharp.Threading.Tasks;
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.UnityClient.Render.Block;
 	using SoulboundEngine.World;
@@ -15,7 +16,7 @@
 	using UnityEngine.Tilemaps;
 
 	public class EditorWorldGenTool {
-		public static void Regenerate(long seed, int chunkCount, int chunkStartX, Dictionary<RegistryKey<NormalNoise.Parameters>, NormalNoise.Parameters> overrides, EditorWorldGenContext context) {
+		public static async UniTask Regenerate(long seed, int chunkCount, int chunkStartX, Dictionary<RegistryKey<NormalNoise.Parameters>, NormalNoise.Parameters> overrides, EditorWorldGenContext context) {
 			BlockRenderManager blockRenderManager = new(Registries.BLOCK.ToList());
 
 			NoiseLevelChunkGenerator chunkGenerator = context.CreateChunkGenerator(NoiseGeneratorSettings.DEFAULT, MultiNoiseBiomeSourceParamList.DEFAULT);
@@ -24,25 +25,48 @@
 			Tilemap tilemap = Object.FindFirstObjectByType<Tilemap>();
 			tilemap.ClearAllTiles();
 			Stopwatch stopwatch = Stopwatch.StartNew();
-			long totalElapsed = 0L;
-			long average = 0L;
+
+			List<UniTask<(Chunk chunk, long elapsed)>> tasks = new();
+
 			for (int i = 0; i < chunkCount; i++) {
 				ChunkPos pos = new(i + chunkStartX);
-				Chunk chunk = new EditorWorldGenChunk(pos, heightLimit, () => new BlockStateContainer(ChunkSection.WIDTH, ChunkSection.HEIGHT));
+				Chunk chunk = new EditorWorldGenChunk(
+					pos,
+					heightLimit,
+					() => new BlockStateContainer(
+						ChunkSection.WIDTH,
+						ChunkSection.HEIGHT
+					)
+				);
+				tasks.Add(GenerateChunkAsync(randomState, chunk, chunkGenerator));
+			}
 
-				stopwatch.Restart();
+			(Chunk chunk, long elapsed)[] results = await UniTask.WhenAll(tasks);
+			long total = 0L;
+			double average = 0.0d;
+			for (int i = 0; i < results.Length; i++) {
+				SoulboundEngine.Logger.LogWarning("Chunk {} took {}ms to generate", i, results[i].elapsed);
+				average += (double)results[i].elapsed / chunkCount;
+				total += results[i].elapsed;
+				RenderChunk(chunkStartX, tilemap, results[i].chunk, blockRenderManager);
+			}
+			SoulboundEngine.Logger.LogWarning("Finished generating {} chunks in {} total ms ({}ms average)", chunkCount, total, average);
+		}
+
+		private static UniTask<(Chunk chunk, long elapsed)> GenerateChunkAsync(
+			RandomState randomState,
+			Chunk chunk,
+			ChunkGenerator chunkGenerator
+		) {
+			return UniTask.RunOnThreadPool(() => {
+				Stopwatch stopwatch = Stopwatch.StartNew();
+
 				chunk = chunkGenerator.MapBiomes(randomState, chunk);
 				chunk = chunkGenerator.Fill(randomState, chunk);
 				chunk = chunkGenerator.BuildSurface(randomState, chunk);
 
-				long elapsed = stopwatch.ElapsedMilliseconds;
-				SoulboundEngine.Logger.LogWarning("Chunk {} took {}ms to finish generating", i, elapsed);
-				average += elapsed / chunkCount;
-				totalElapsed += elapsed;
-
-				RenderChunk(chunkStartX, tilemap, chunk, blockRenderManager);
-			}
-			SoulboundEngine.Logger.LogWarning("Finished generating {} chunks in {} total ms (average {}ms per chunk)", chunkCount, totalElapsed, average);
+				return (chunk, stopwatch.ElapsedMilliseconds);
+			});
 		}
 
 		public static void RenderChunk(int chunkStartX, Tilemap tilemap, Chunk chunk, BlockRenderManager blockRenderManager) {
