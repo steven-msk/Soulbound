@@ -24,6 +24,7 @@
 		private int chunkCount = 1;
 		private long seed = 0L;
 		private int chunkStartX = 0;
+		private int maxConcurrentChunks = 5;
 
 		[MenuItem("Soulbound/World gen tools/Open Noise Tuner")]
 		public static void Open() {
@@ -44,6 +45,7 @@
 				this.seed = this.cache.seed;
 				this.chunkCount = this.cache.chunkCount;
 				this.chunkStartX = this.cache.chunkStartX;
+				this.maxConcurrentChunks = cache.maxConcurrentChunks;
 				this.LoadOverridesFromCache(this.cache);
 			} else {
 				this.cache = ScriptableObject.CreateInstance<NoiseTunerCache>();
@@ -63,7 +65,8 @@
 				AssetDatabase.SaveAssetIfDirty(this.cache);
 			});
 			Button regenerate = new(
-				() => EditorWorldGenTool.Regenerate(this.seed, this.chunkCount, this.chunkStartX, this.overrides, this.context).Forget(SoulboundEngine.Logger.LogFatal)
+				() => EditorWorldGenTool.Regenerate(this.maxConcurrentChunks, this.seed, this.chunkCount, this.chunkStartX, this.overrides, this.context)
+					.Forget(SoulboundEngine.Logger.LogFatal)
 			) { text = "Regenerate" };
 			regenerate.style.height = 32;
 			this.rootVisualElement.Add(regenerate);
@@ -95,6 +98,15 @@
 				this.SaveOverridesToCache(this.cache);
 			}) { text = "Reset noises" };
 			this.rootVisualElement.Add(resetNoises);
+
+			IntegerField maxConcurrentChunks = new("Max Concurrent Chunks") { value = this.maxConcurrentChunks };
+			maxConcurrentChunks.RegisterValueChangedCallback(v => {
+				this.cache.maxConcurrentChunks = this.maxConcurrentChunks = v.newValue;
+				this.RecreateCacheIfNeeded();
+				EditorUtility.SetDirty(this.cache);
+				AssetDatabase.SaveAssetIfDirty(this.cache);
+			});
+			this.rootVisualElement.Add(maxConcurrentChunks);
 		}
 
 		private void BuildNoises(ScrollView scroll) {
