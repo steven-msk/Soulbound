@@ -16,6 +16,9 @@
 	using UnityEngine.Tilemaps;
 
 	public class EditorWorldGenTool {
+		private const int TILES_PER_BATCH = (Level.CHUNK_LENGTH * Level.DEFAULT_WORLD_HEIGHT) >> 6;
+		private const int MAX_CONCURRENT_CHUNKS = 10;
+
 		public static async UniTask Regenerate(long seed, int chunkCount, int chunkStartX, Dictionary<RegistryKey<NormalNoise.Parameters>, NormalNoise.Parameters> overrides, EditorWorldGenContext context) {
 			BlockRenderManager blockRenderManager = new(Registries.BLOCK.ToList());
 
@@ -28,22 +31,27 @@
 
 			List<UniTask> tasks = new();
 			long total = 0L;
-			object totalLock = new();
-			int tilesPerBatch = (Level.CHUNK_LENGTH * Level.DEFAULT_WORLD_HEIGHT) >> 6;
+			object taskLock = new();
+			int activeTasks = 0;
 
-			for (int i = 0; i < chunkCount; i++) {
-				ChunkPos pos = new(i + chunkStartX);
-				Chunk chunk = new EditorWorldGenChunk(
-					pos,
-					heightLimit,
-					() => new BlockStateContainer(
-						ChunkSection.WIDTH,
-						ChunkSection.HEIGHT
-					)
-				);
-				tasks.Add(GenerateAndRenderAsync(i, chunkStartX, randomState, chunk, chunkGenerator, tilemap, blockRenderManager, elapsed => {
-					lock (totalLock) { total += elapsed; }
-				}, tilesPerBatch));
+			int i = 0;
+			while (i < chunkCount) {
+				while (activeTasks < MAX_CONCURRENT_CHUNKS && i < chunkCount) {
+					await UniTask.Yield(PlayerLoopTiming.Update);
+					ChunkPos pos = new(i + chunkStartX);
+					Chunk chunk = new EditorWorldGenChunk(pos, heightLimit, () => new BlockStateContainer(ChunkSection.WIDTH, ChunkSection.HEIGHT));
+					UniTask task = GenerateAndRenderAsync(i, chunkStartX, randomState, chunk, chunkGenerator, tilemap, blockRenderManager, elapsed => {
+						lock (taskLock) { 
+							total += elapsed;
+							activeTasks--;
+						}
+					}, TILES_PER_BATCH);
+					tasks.Add(task);
+
+					activeTasks++;
+					i++;
+				}
+				await UniTask.Yield(PlayerLoopTiming.Update);
 			}
 
 			await UniTask.WhenAll(tasks);
@@ -58,7 +66,7 @@
 			ChunkGenerator chunkGenerator,
 			Tilemap tilemap,
 			BlockRenderManager blockRenderManager,
-			Action<long> reportElapsed,
+			Action<long> reportDone,
 			int tilesPerBatch
 		) {
 			(Chunk generated, long elapsed) = await UniTask.RunOnThreadPool(() => {
@@ -72,7 +80,7 @@
 			await UniTask.SwitchToMainThread(PlayerLoopTiming.Update);
 			SoulboundEngine.Logger.LogWarning("Chunk {} took {}ms to generate", index, elapsed);
 			RenderChunk(chunkStartX, tilesPerBatch, tilemap, generated, blockRenderManager);
-			reportElapsed(elapsed);
+			reportDone(elapsed);
 		}
 
 		public static async void RenderChunk(int chunkStartX, int tilesPerBatch, Tilemap tilemap, Chunk chunk, BlockRenderManager blockRenderManager) {
