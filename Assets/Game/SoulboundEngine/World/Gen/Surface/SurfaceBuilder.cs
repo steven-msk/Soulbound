@@ -30,7 +30,7 @@
 				int endY = chunk.GetBottomY();
 				context.UpdateX(worldX);
 
-				int analyticSurfaceY = (int)Math.Round(terrainHeight.Compute(new IDensityFunction.SinglePointContext(worldX, 0)));
+				int analyticSurfaceY = (int)Math.Round(terrainHeight.Compute(new IDensityFunction.SinglePointContext(worldX, surfaceY)));
 				int stoneAboveDepth = 0;
 				for (int y = surfaceY; y >= endY; y--) {
 					blockPos.Set(worldX, y);

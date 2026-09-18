@@ -19,7 +19,7 @@
 	public class EditorWorldGenTool {
 		private const int TILES_PER_BATCH = (Level.CHUNK_LENGTH * Level.DEFAULT_WORLD_HEIGHT) >> 6;
 
-		public static async UniTask Regenerate(int maxConcurrentChunks, long seed, int chunkCount, int chunkStartX, Dictionary<RegistryKey<NormalNoise.Parameters>, NormalNoise.Parameters> overrides, EditorWorldGenContext context) {
+		public static async UniTask Regenerate(int targetState, int maxConcurrentChunks, long seed, int chunkCount, int chunkStartX, Dictionary<RegistryKey<NormalNoise.Parameters>, NormalNoise.Parameters> overrides, EditorWorldGenContext context) {
 			BlockRenderManager blockRenderManager = new(Registries.BLOCK.ToList());
 
 			NoiseLevelChunkGenerator chunkGenerator = context.CreateChunkGenerator(NoiseGeneratorSettings.DEFAULT, MultiNoiseBiomeSourceParamList.DEFAULT);
@@ -41,7 +41,7 @@
 					await UniTask.Yield(PlayerLoopTiming.Update);
 					ChunkPos pos = new(i + chunkStartX);
 					Chunk chunk = new EditorWorldGenChunk(pos, heightLimit, () => new BlockStateContainer(ChunkSection.WIDTH, ChunkSection.HEIGHT));
-					UniTask<Chunk> genTask = GenerateAsync(i, randomState, chunk, chunkGenerator, elapsed => {
+					UniTask<Chunk> genTask = GenerateAsync(i, randomState, chunk, chunkGenerator, targetState, elapsed => {
 						lock (taskLock) {
 							genTime += elapsed;
 							activeTasks--;
@@ -75,6 +75,7 @@
 			RandomState randomState,
 			Chunk chunk,
 			ChunkGenerator chunkGenerator,
+			int targetState,
 			Action<GenTime> reportDone
 		) {
 			(Chunk generated, GenTime elapsed) = await UniTask.RunOnThreadPool(() => {
@@ -83,11 +84,15 @@
 				long biomes = stopwatch.ElapsedMilliseconds;
 
 				stopwatch.Restart();
-				result = chunkGenerator.Fill(randomState, result);
+				if (targetState > 1) {
+					result = chunkGenerator.Fill(randomState, result);
+				}
 				long fill = stopwatch.ElapsedMilliseconds;
 
 				stopwatch.Restart();
-				result = chunkGenerator.BuildSurface(randomState, result);
+				if (targetState > 2) {
+					result = chunkGenerator.BuildSurface(randomState, result);
+				}
 				long surface = stopwatch.ElapsedMilliseconds;
 
 				return (result, new GenTime {

@@ -25,6 +25,7 @@
 		private long seed = 0L;
 		private int chunkStartX = 0;
 		private int maxConcurrentChunks = 5;
+		private int targetState = 3;
 
 		[MenuItem("Soulbound/World gen tools/Open Noise Tuner")]
 		public static void Open() {
@@ -65,7 +66,7 @@
 				AssetDatabase.SaveAssetIfDirty(this.cache);
 			});
 			Button regenerate = new(
-				() => EditorWorldGenTool.Regenerate(this.maxConcurrentChunks, this.seed, this.chunkCount, this.chunkStartX, this.overrides, this.context)
+				() => EditorWorldGenTool.Regenerate(this.targetState, this.maxConcurrentChunks, this.seed, this.chunkCount, this.chunkStartX, this.overrides, this.context)
 					.Forget(SoulboundEngine.Logger.LogFatal)
 			) { text = "Regenerate" };
 			regenerate.style.height = 32;
@@ -107,6 +108,15 @@
 				AssetDatabase.SaveAssetIfDirty(this.cache);
 			});
 			this.rootVisualElement.Add(maxConcurrentChunks);
+
+			IntegerField targetField = new("Target state") { value = this.targetState };
+			targetField.RegisterValueChangedCallback(v => {
+				this.cache.targetState = this.targetState = v.newValue;
+				this.RecreateCacheIfNeeded();
+				EditorUtility.SetDirty(this.cache);
+				AssetDatabase.SaveAssetIfDirty(this.cache);
+			});
+			this.rootVisualElement.Add(targetField);
 		}
 
 		private void BuildNoises(ScrollView scroll) {
