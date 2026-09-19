@@ -85,6 +85,7 @@ namespace SoulboundEngine.UnityClient {
 		private readonly PerformanceMetrics performanceMetrics;
 		private readonly DebugMetricsService debugMetricsService;
 		private readonly WorldWidgetManager worldWidgetManager;
+		private readonly IRegistryManager registryManager;
 		private bool running;
 		private int ticksThisSecond;
 		private double lastTickTime;
@@ -118,6 +119,7 @@ namespace SoulboundEngine.UnityClient {
 			this.logConsole = new LogConsole(this);
 
 			Registries.Init();
+			this.registryManager = IRegistryManager.Of(Registries.ROOT.ToList());
 			UXMLSchema_Generated.RegisterAll();
 			AssetManager.LoadAllWithPreloadLabel();
 
@@ -356,7 +358,7 @@ namespace SoulboundEngine.UnityClient {
 
 			WorldSave save = this.worldSavesManager.GetSave(world, this.saveValidator);
 			WorldSaveSeedProvider seedProvider = new(save);
-			ClientWorldBootstrapper worldLoader = new(seedProvider, save);
+			ClientWorldBootstrapper worldLoader = new(seedProvider, save, this.registryManager);
 
 			WorldPreset preset = save.levelProperties.preset;
 			RegistryEntry<LevelType>? levelType = Registries.LEVEL_TYPE.Get(preset.levelSettings.typeEntry);

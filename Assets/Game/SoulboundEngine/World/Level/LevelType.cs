@@ -6,6 +6,8 @@
 		public static readonly Codec<RegistryKey<LevelType>> KEY_CODEC = RegistryKey<LevelType>.Codec(Registries.LEVEL_TYPE.GetKey());
 		public static readonly RegistryKey<LevelType> DEFAULT = Register("default");
 
+		public int Height => this.maxY - this.minY;
+
 		private static RegistryKey<LevelType> Register(string id) {
 			return RegistryKey<LevelType>.Of(RegistryKeys.LEVEL_TYPE, Identifier.Of(id));
 		}

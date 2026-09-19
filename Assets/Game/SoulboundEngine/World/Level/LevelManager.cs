@@ -27,13 +27,14 @@ namespace SoulboundEngine.World.Level {
 		public LevelManager(
 			RegistryEntry<LevelType> levelType,
 			LevelSettings levelSettings,
+			IRegistryManager registryManager,
 			ISeedProvider seedProvider,
 			WorldSave save,
 			RecipeManager recipeManager, 
 			ChunkStorage chunkStorage, 
 			EntitySerializer entitySerializer
 		) {
-			this.level = new Level(levelType, levelSettings, seedProvider.GetSeed(), recipeManager, CHUNK_RADIUS, chunkStorage);
+			this.level = new Level(levelType, levelSettings, registryManager, seedProvider.GetSeed(), recipeManager, CHUNK_RADIUS, chunkStorage);
 			this.save = save;
 			this.entitySerializer = entitySerializer;
 		}

@@ -12,6 +12,7 @@ namespace SoulboundEngine.Registry {
 	using SoulboundEngine.World.Entity.Attribute;
 	using SoulboundEngine.World.Gen;
 	using SoulboundEngine.World.Gen.Biome;
+	using SoulboundEngine.World.Gen.Feature;
 	using SoulboundEngine.World.Gen.Function;
 	using SoulboundEngine.World.Gen.Noise;
 	using SoulboundEngine.World.Level;
@@ -38,6 +39,7 @@ namespace SoulboundEngine.Registry {
 		public static readonly Registry<ComponentType> COMPONENT_TYPE = Create(RegistryKeys.COMPONENT_TYPE, (_, _) => ItemComponents.DEFAULT_COMPONENTS);
 		public static readonly Registry<WorldWidgetType> WORLD_WIDGET_TYPE = Create(RegistryKeys.WORLD_WIDGET, WorldWidgetType.Init);
 		public static readonly Registry<MapCodec<ChunkGenerator>> CHUNK_GENERATOR = Create(RegistryKeys.CHUNK_GENERATOR, ChunkGenerators.Init);
+		public static readonly Registry<Feature> FEATURE = Create(RegistryKeys.FEATURE, Feature.Init);
 		// temporary, see LootTables
 		public static readonly Registry<LootTable> LOOT_TABLES = Create(RegistryKeys.LOOT_TABLE, LootTables.Init);
 		// not definitive

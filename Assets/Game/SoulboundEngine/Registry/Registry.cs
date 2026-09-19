@@ -58,6 +58,8 @@ namespace SoulboundEngine.Registry {
 			Logger.LogInfo("Freezed registry {} with {} entries", this.key.value, this.idToEntry.Count);
 		}
 
+		public Identifier GetKeyIdentifier() => this.key.value;
+
 		public bool TryGet(RegistryKey<T> key, out T value) {
 			RegistryEntry<T>? entry = this.keyToEntry.GetValueOrDefault(key);
 			value = entry != null ? entry.GetValue() : default;

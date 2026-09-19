@@ -14,7 +14,7 @@
 
 #nullable enable
 
-	public abstract class Chunk : IBlockGetter {
+	public abstract class Chunk : IBlockView {
 		protected readonly Dictionary<BlockPos, TileEntity> tileEntities = new();
 		protected readonly IHeightLimitView heightLimitView;
 		protected readonly ChunkSection[] sections;
@@ -60,6 +60,10 @@
 		public int GetBottomY() => this.heightLimitView.GetBottomY();
 
 		public int GetHeight() => this.heightLimitView.GetHeight();
+
+		public int GetHeight(int localX) {
+			return this.GetHeightmap().GetFirstFree(localX);
+		}
 
 		public HashSet<BlockPos> GetTileEntityPositions() {
 			return this.tileEntities.Keys.ToHashSet();

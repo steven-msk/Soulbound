@@ -1,5 +1,4 @@
 namespace SoulboundEngine.World.Level {
-	using SoulboundEngine.Common;
 	using SoulboundEngine.Common.Math;
 	using SoulboundEngine.Common.Math.Random;
 	using SoulboundEngine.Recipe;
@@ -9,6 +8,7 @@ namespace SoulboundEngine.World.Level {
 	using SoulboundEngine.World.Block.State;
 	using SoulboundEngine.World.Chunk;
 	using SoulboundEngine.World.Entity;
+	using SoulboundEngine.World.Gen.Biome;
 	using SoulboundEngine.World.Physics;
 	using SoulboundEngine.World.Player;
 	using SoulboundEngine.World.Serialization;
@@ -19,7 +19,7 @@ namespace SoulboundEngine.World.Level {
 
 #nullable enable
 
-	public sealed class Level : IHeightLimitView, IEntityManager {
+	public sealed class Level : ILevelAccess, IEntityQueriable<Entity> {
 		public const int CHUNK_LENGTH = SharedConstants.CHUNK_WIDTH;
 		public const int DEFAULT_WORLD_HEIGHT = 1024;
 		public const int DEFAULT_MIN_Y = -DEFAULT_WORLD_HEIGHT / 2;
@@ -32,6 +32,7 @@ namespace SoulboundEngine.World.Level {
 		private readonly ChunkStorage chunkStorage;
 		private readonly LevelChunkManager chunkManager;
 		private readonly RandomSequences randomSequences;
+		private readonly IRegistryManager registryManager;
 		// recipes should technically be on "server"
 		// but Level is currently the only source of truth
 		private readonly RecipeManager recipeManager;
@@ -53,6 +54,7 @@ namespace SoulboundEngine.World.Level {
 		public Level(
 			RegistryEntry<LevelType> levelType,
 			LevelSettings levelSettings,
+			IRegistryManager registryManager,
 			int seed,
 			RecipeManager recipeManager, 
 			int chunkRadius,
@@ -60,6 +62,7 @@ namespace SoulboundEngine.World.Level {
 		) {
 			this.levelType = levelType;
 			this.levelSettings = levelSettings;
+			this.registryManager = registryManager;
 			this.seed = seed;
 			this.recipeManager = recipeManager;
 			this.chunkStorage = chunkStorage;
@@ -115,16 +118,16 @@ namespace SoulboundEngine.World.Level {
 			return new Vec2d(0f, this.GetSurfaceAirY(0));
 		}
 
-		[PROTOTYPICAL]
-		public void SetBlockState(BlockPos blockPos, BlockState blockState) {
+		public bool SetBlockState(BlockPos blockPos, BlockState blockState) {
+			if (this.IsOutOfHeightLimit(blockPos)) return false;
 			Chunk? chunk = this.ChunkAt(blockPos);
 			if (chunk == null) {
 				Logger.LogError("Block pos not valid: " + blockPos);
-				return;
+				return false;
 			}
-			BlockState? oldState = this.GetBlockState(blockPos);
+			BlockState oldState = this.GetBlockState(blockPos);
 
-			oldState?.OnStateReplaced(blockPos, this);
+			oldState.OnStateReplaced(blockPos, this);
 			chunk.SetBlockState(blockPos, blockState);
 			blockStateChanged?.Invoke(blockPos, oldState, blockState);
 
@@ -141,6 +144,15 @@ namespace SoulboundEngine.World.Level {
 			}
 
 			this.NotifyNeighboringStates(blockPos);
+			return true;
+		}
+
+		public bool RemoveBlock(BlockPos blockPos) {
+			return this.SetBlockState(blockPos, Blocks.AIR.DefaultState);
+		}
+
+		public bool IsStateAtPosition(BlockPos blockPos, Predicate<BlockState> predicate) {
+			return predicate(this.GetBlockState(blockPos));
 		}
 
 		private void NotifyNeighboringStates(BlockPos blockPos) {
@@ -157,18 +169,28 @@ namespace SoulboundEngine.World.Level {
 			}
 		}
 
-		public void AddNewEntity(Entity entity) {
-			Guid guid = Guid.NewGuid();
-			this.AddEntity(entity, guid);
+		public int GetHeight(int blockX) {
+			if (!this.HasChunk(blockX)) return this.GetBottomY();
+
+			Chunk chunk = this.GetChunk(SectionPos.BlockToSectionCoord(blockX))!;
+			return chunk.GetHeight(chunk.GetPos().ToLocalX(blockX));
 		}
 
-		public void AddEntity(Entity entity, Guid guid) {
+		public bool AddNewEntity(Entity entity) {
+			Guid guid = Guid.NewGuid();
+			return this.AddEntity(entity, guid);
+		}
+
+		public bool AddEntity(Entity entity, Guid guid) {
+			if (!this.entities.TryAdd(guid, entity)) return false;
+
 			entity.OnAdd(guid);
 			entity.SetAlive(true);
-			this.entities[guid] = entity;
 			entityAdded?.Invoke(entity);
+			return true;
 		}
 
+		[Obsolete]
 		public void RemoveEntity(Entity entity) {
 			if (!this.entities.ContainsKey(entity.guid)) return;
 
@@ -196,9 +218,6 @@ namespace SoulboundEngine.World.Level {
 			return false;
 		}
 
-		public bool TryGetEntity(Guid guid, out Entity entity) {
-			return this.entities.TryGetValue(guid, out entity);
-		}
 
 		public Entity? GetEntity(Guid guid) => this.entities.GetValueOrDefault(guid);
 
@@ -314,6 +333,10 @@ namespace SoulboundEngine.World.Level {
 			}
 		}
 
+		public Chunk? GetChunk(int worldX, bool loadOrGenerate) {
+			return this.chunkManager.GetChunk(worldX, loadOrGenerate);
+		}
+
 		public void OnChunkLoaded(Chunk chunk) {
 			this.chunkLoaded?.Invoke(chunk);
 		}
@@ -330,6 +353,10 @@ namespace SoulboundEngine.World.Level {
 			this.chunkManager.Dispose();
 		}
 
+		public ChunkManager GetChunkManager() => this.chunkManager;
+
+		public IRegistryManager GetRegistries() => this.registryManager;
+
 		public BlockState GetBlockState(BlockPos blockPos) {
 			if (!this.IsInHeightLimit(blockPos.y)) return Blocks.AIR.DefaultState;
 
@@ -345,6 +372,10 @@ namespace SoulboundEngine.World.Level {
 		public Block GetBlock(BlockPos blockPos) {
 			BlockState blockState = this.GetBlockState(blockPos);
 			return blockState.GetBlock();
+		}
+
+		public RegistryEntry<Biome> GetBiome(BlockPos blockPos) {
+			return this.GetChunk(blockPos.x, true).GetBiome(blockPos.ToChunkPos().x);
 		}
 
 		public Func<BlockStateContainer> BlockStateContainerFactory() {

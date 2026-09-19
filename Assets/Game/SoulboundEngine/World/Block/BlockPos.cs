@@ -2,7 +2,9 @@ namespace SoulboundEngine.World.Block {
 	using SoulboundEngine.Common.Math;
 	using SoulboundEngine.World.Chunk;
 	using SoulboundEngine.World.Level;
+	using SoulboundEngine.World.Physics;
 	using System;
+	using System.Collections.Generic;
 
 	public readonly struct BlockPos {
 		public const int BOTTOM_LEFT_CORNER = 0;
@@ -96,6 +98,25 @@ namespace SoulboundEngine.World.Block {
 			int xAmount = axis.Is(Axis.X) ? amount : 0;
 			int yAmount = axis.Is(Axis.Y) ? amount : 0;
 			return new BlockPos(this.x + xAmount, this.y + yAmount);
+		}
+
+		public static IEnumerable<BlockPos> Inside(AABB box) {
+			return Inside(Maths.FloorToInt(box.minX), Maths.FloorToInt(box.minY), Maths.FloorToInt(box.maxX), Maths.FloorToInt(box.maxY));
+		}
+
+		public static IEnumerable<BlockPos> Inside(int minX, int minY, int maxX, int maxY) {
+			int width = maxX - minX + 1;
+			int height = maxY - minY + 1;
+			int end = width * height;
+			int index = 0;
+			Mutable pos = new();
+			
+			while (index != end) {
+				int x = index % width;
+				int y = index / height;
+				index++;
+				yield return pos.Set(minX + x, minY + y);
+			}
 		}
 
 		public override bool Equals(object obj) {

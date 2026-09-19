@@ -3,7 +3,11 @@ namespace SoulboundEngine.Registry {
 
 	public interface IRegistry {
 		bool ContainsId(Identifier id);
+
 		HashSet<Identifier> GetIdentifiers();
+
 		void Freeze();
+
+		Identifier GetKeyIdentifier();
 	}
 }

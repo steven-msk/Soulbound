@@ -18,6 +18,8 @@
 
 		bool Test(T value);
 
+		public Predicate<T> AsPredicate() => this.Test;
+		
 		public static IPredicate<T> Of(Predicate<T> predicate) {
 			return new DelegateImpl(predicate);
 		}

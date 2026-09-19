@@ -1,7 +1,7 @@
-﻿using SoulboundEngine.World.Block;
-using SoulboundEngine.World.Chunk;
+﻿namespace SoulboundEngine.World {
+	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Chunk;
 
-namespace SoulboundEngine.World {
 	public interface IHeightLimitView {
 		int GetBottomY();
 		int GetHeight();
