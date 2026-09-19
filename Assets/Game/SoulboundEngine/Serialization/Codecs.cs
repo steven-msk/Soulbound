@@ -46,12 +46,12 @@
 				: DataResult<bool>.Error($"Expected boolean, got {json.Type}")
 		);
 
-		public static Codec<UnmanagedOptional<T>> MakeOptional<T>(this Codec<T> codec) where T : unmanaged {
-			return Codec<UnmanagedOptional<T>>.Of(
+		public static Codec<ValueOptional<T>> MakeOptional<T>(this Codec<T> codec) where T : struct {
+			return Codec<ValueOptional<T>>.Of(
 				encode: v => v.IsEmpty() ? JValue.CreateNull() : codec.Encode(v.GetValue()),
 				decode: json => json.Type == JTokenType.Null
-					? DataResult<UnmanagedOptional<T>>.Success(UnmanagedOptional<T>.Empty())
-					: codec.Decode(json).Map(UnmanagedOptional<T>.Of)
+					? DataResult<ValueOptional<T>>.Success(ValueOptional<T>.Empty())
+					: codec.Decode(json).Map(ValueOptional<T>.Of)
 			);
 		}
 

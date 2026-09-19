@@ -32,10 +32,10 @@
 		}
 
 		public record Rule(HashSet<Block> blocks, float? speed, bool? canBreak) {
-			public static readonly Codec<Rule> CODEC = RecordCodec<Rule, List<Block>, UnmanagedOptional<float>, UnmanagedOptional<bool>>.Of(
+			public static readonly Codec<Rule> CODEC = RecordCodec<Rule, List<Block>, ValueOptional<float>, ValueOptional<bool>>.Of(
 				Field.Required<Rule, List<Block>>("blocks", Block.CODEC.ListOf(), r => r.blocks.ToList()),
-				Field.Required<Rule, UnmanagedOptional<float>>("speed", Codecs.FLOAT.MakeOptional<float>(), r => UnmanagedOptional<float>.Of(r.speed)),
-				Field.Required<Rule, UnmanagedOptional<bool>>("canBreak", Codecs.BOOLEAN.MakeOptional<bool>(), r => UnmanagedOptional<bool>.Of(r.canBreak)),
+				Field.Required<Rule, ValueOptional<float>>("speed", Codecs.FLOAT.MakeOptional<float>(), r => ValueOptional<float>.Of(r.speed)),
+				Field.Required<Rule, ValueOptional<bool>>("canBreak", Codecs.BOOLEAN.MakeOptional<bool>(), r => ValueOptional<bool>.Of(r.canBreak)),
 				(blocks, speed, canBreak) => new Rule(blocks.ToHashSet(), speed.GetAsIs(), canBreak.GetAsIs())
 			);
 

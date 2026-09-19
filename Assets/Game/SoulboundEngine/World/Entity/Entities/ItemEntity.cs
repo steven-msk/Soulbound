@@ -91,7 +91,7 @@ namespace SoulboundEngine.World.Entity {
 		protected override void SaveAdditional(JToken json) {
 			base.SaveAdditional(json);
 			json["age"] = Codecs.INT.Encode(this.age);
-			json["owner"] = Codecs.GUID.MakeOptional<Guid>().Encode(UnmanagedOptional<Guid>.Of(this.owner));
+			json["owner"] = Codecs.GUID.MakeOptional<Guid>().Encode(ValueOptional<Guid>.Of(this.owner));
 			json["pickupDelay"] = Codecs.INT.Encode(this.pickupDelay);
 			json["stack"] = ItemStack.EMPTY_ACCEPTING_CODEC.Encode(this.itemStack);
 		}
