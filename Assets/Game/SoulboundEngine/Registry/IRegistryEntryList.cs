@@ -8,6 +8,10 @@ namespace SoulboundEngine.Registry {
 		int size { get; }
 		bool Contains(RegistryEntry<T> entry);
 
+		public static IRegistryEntryList<T> CreateDirect(List<RegistryEntry<T>> entries) {
+			return new Direct(entries);
+		}
+
 		public abstract class ListBacked : IRegistryEntryList<T> {
 			protected abstract List<RegistryEntry<T>> entries { get; }
 
