@@ -4,6 +4,7 @@
 	using SoulboundEngine.World.Gen;
 	using SoulboundEngine.World.Gen.Biome;
 	using SoulboundEngine.World.Gen.Function;
+	using SoulboundEngine.World.Gen.Generator;
 	using SoulboundEngine.World.Gen.Noise;
 	using System;
 	using System.Collections.Generic;

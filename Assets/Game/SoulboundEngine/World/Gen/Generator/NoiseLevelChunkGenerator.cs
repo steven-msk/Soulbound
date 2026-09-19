@@ -1,4 +1,4 @@
-﻿namespace SoulboundEngine.World.Gen {
+﻿namespace SoulboundEngine.World.Gen.Generator {
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.Serialization;
 	using SoulboundEngine.World.Block;
@@ -36,7 +36,7 @@
 			BlockPos.Mutable blockPos = new();
 
 			for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
-				int worldX = chunk.GetPos().ToWorldX(cx);
+				int worldX = chunk.pos.ToWorldX(cx);
 				int topmostSolid = int.MinValue;
 
 				for (int y = chunk.GetTopY(); y >= this.GetMinGenY(); y--) {

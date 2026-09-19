@@ -14,7 +14,7 @@ namespace SoulboundEngine.World.Chunk {
 		public const float UNDERGROUND_HEIGHT_RANGE = 20f;
 		private readonly TileEntityTickManager tickManager = new();
 		private readonly Level level;
-		public int ChunkX => this.chunkPos.x;
+		public int ChunkX => this.pos.x;
 
 		public WorldChunk(Level level, ChunkPos chunkPos) 
 			: this(level, chunkPos, null, level.BlockStateContainerFactory()) { 

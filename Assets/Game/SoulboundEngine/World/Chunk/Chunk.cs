@@ -18,12 +18,12 @@
 		protected readonly Dictionary<BlockPos, TileEntity> tileEntities = new();
 		protected readonly IHeightLimitView heightLimitView;
 		protected readonly ChunkSection[] sections;
-		protected readonly ChunkPos chunkPos;
+		public ChunkPos pos { get; }
 		private Heightmap? heightmap;
 		private readonly RegistryEntry<Biome>[] biomes = new RegistryEntry<Biome>[Level.CHUNK_LENGTH];
 
 		public Chunk(ChunkPos chunkPos, ChunkSection[]? sections, IHeightLimitView heightLimitView, Func<BlockStateContainer> containerFactory) {
-			this.chunkPos = chunkPos;
+			this.pos = chunkPos;
 			this.sections = new ChunkSection[heightLimitView.GetSectionCount()];
 			this.heightLimitView = heightLimitView;
 			if (sections != null) {
@@ -71,8 +71,6 @@
 
 		public virtual bool CanBeSerialized() => true;
 
-		public ChunkPos GetPos() => this.chunkPos;
-
 		public abstract bool IsEmpty();
 
 		public ChunkSection[] GetSections() => this.sections;
@@ -88,7 +86,7 @@
 
 		public virtual void FillBiomesFromNoise(IBiomeResolver biomeResolver, Climate.Sampler sampler) {
 			for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
-				int x = this.chunkPos.ToWorldX(cx);
+				int x = this.pos.ToWorldX(cx);
 				this.biomes[cx] = biomeResolver.GetNoiseBiome(x, 0, sampler);
 			}
 		}

@@ -1,6 +1,7 @@
 ﻿namespace SoulboundEngine.World.Chunk {
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.World.Gen;
+	using SoulboundEngine.World.Gen.Generator;
 	using SoulboundEngine.World.Gen.Noise;
 	using SoulboundEngine.World.Level;
 	using System;
@@ -46,7 +47,7 @@
 
 		private static bool IsChunkValid(WorldChunk? chunk, int x) {
 			if (chunk == null) return false;
-			ChunkPos pos = chunk.GetPos();
+			ChunkPos pos = chunk.pos;
 			return pos.x == x;
 		}
 
@@ -128,6 +129,7 @@
 			chunk = DoStep(this.chunkGenerator, chunk, (generator, chunk) => generator.MapBiomes(this.randomState, chunk));
 			chunk = DoStep(this.chunkGenerator, chunk, (generator, chunk) => generator.Fill(this.randomState, chunk));
 			chunk = DoStep(this.chunkGenerator, chunk, (generator, chunk) => generator.BuildSurface(this.randomState, chunk));
+			chunk = DoStep(this.chunkGenerator, chunk, (generator, chunk) => generator.ApplyDecor(this.level, this.randomState, chunk));
 			return chunk;
 		}
 

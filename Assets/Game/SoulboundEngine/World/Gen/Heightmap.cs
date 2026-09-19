@@ -38,7 +38,7 @@ namespace SoulboundEngine.World.Gen {
 				BlockPos.Mutable pos = new();
 
 				for (int y = localY - 1; y >= this.chunk.GetBottomY(); y--) {
-					pos.Set(this.chunk.GetPos().ToWorldX(localX), y);
+					pos.Set(this.chunk.pos.ToWorldX(localX), y);
 					if (this.isOpaque(this.chunk.GetBlockState(pos))) {
 						this.SetHeight(localX, localY + 1);
 						return true;

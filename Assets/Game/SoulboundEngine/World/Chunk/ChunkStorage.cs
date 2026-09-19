@@ -65,7 +65,7 @@
 			SerializableChunkData data = SerializableChunkData.Of(chunk);
 			writer.Write(data.Write());
 
-			int chunkX = chunk.GetPos().x;
+			int chunkX = chunk.pos.x;
 			this.savedChunks.Add(chunkX);
 		}
 
@@ -73,7 +73,7 @@
 		}
 
 		public static File ToChunkFile(Chunk chunk, File parent) {
-			return ToChunkFile(chunk.GetPos().x, parent);
+			return ToChunkFile(chunk.pos.x, parent);
 		}
 
 		public static File ToChunkFile(int chunkX, File parent) {

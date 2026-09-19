@@ -13,6 +13,7 @@
 	using SoulboundEngine.World.Gen.Biome;
 	using SoulboundEngine.World.Gen.Feature;
 	using SoulboundEngine.World.Gen.Function;
+	using SoulboundEngine.World.Gen.Generator;
 	using SoulboundEngine.World.Gen.Noise;
 	using SoulboundEngine.World.Level;
 	using SoulboundEngine.World.Widget;
@@ -41,6 +42,8 @@
 			"multi_noise_biome_source_parameter_list"
 		);
 		public static readonly RegistryKey<Registry<Feature>> FEATURE = Create<Feature>("feature");
+		public static readonly RegistryKey<Registry<ConfiguredFeature>> CONFIGURED_FEATURE = Create<ConfiguredFeature>("configured_feature");
+		public static readonly RegistryKey<Registry<PlacedFeature>> PLACED_FEATURE = Create<PlacedFeature>("placed_feature");
 
 		private static RegistryKey<Registry<T>> Create<T>(string id) where T : class {
 			return RegistryKey<T>.OfRegistry(Identifier.Of(id));

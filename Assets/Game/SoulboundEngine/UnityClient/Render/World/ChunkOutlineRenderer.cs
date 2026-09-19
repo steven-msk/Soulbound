@@ -20,7 +20,7 @@ namespace SoulboundEngine.UnityClient.Render.World {
 
 		public void Render() {
 			foreach (Chunk chunk in this.chunks) {
-				int startX = chunk.GetPos().x * Level.CHUNK_LENGTH;
+				int startX = chunk.pos.x * Level.CHUNK_LENGTH;
 				int endX = startX + Level.CHUNK_LENGTH;
 				this.debugRenderer.AddLine(new Vector3(startX, chunk.GetBottomY()), new Vector3(startX, chunk.GetTopY()), Color.green);
 				this.debugRenderer.AddLine(new Vector3(endX, chunk.GetBottomY()), new Vector3(endX, chunk.GetTopY()), Color.green);

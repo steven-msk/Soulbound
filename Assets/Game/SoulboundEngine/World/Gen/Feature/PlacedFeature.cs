@@ -3,11 +3,16 @@
 	using SoulboundEngine.Common.Math.Random;
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Gen.Generator;
 	using SoulboundEngine.World.Level;
 	using System.Collections.Generic;
 	using System.Linq;
 
 	public record PlacedFeature(RegistryEntry<ConfiguredFeature> feature, List<IPlacementModifier> placement) {
+		public static PlacedFeature Init(RegistryBootstrapContext context, Registry<PlacedFeature> registry) {
+			return null;
+		}
+
 		public bool GenerateUnregistered(IWorldGenLevel level, ChunkGenerator chunkGenerator, IRandom random, BlockPos origin) {
 			return this.Generate(new PlacementContext(level, chunkGenerator, null), random, origin);
 		}

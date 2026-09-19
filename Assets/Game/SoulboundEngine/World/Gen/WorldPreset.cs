@@ -2,6 +2,7 @@
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.Serialization;
 	using SoulboundEngine.World.Gen.Biome;
+	using SoulboundEngine.World.Gen.Generator;
 	using SoulboundEngine.World.Gen.Noise;
 	using SoulboundEngine.World.Level;
 

@@ -2,10 +2,15 @@
 	using SoulboundEngine.Common.Math.Random;
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Gen.Generator;
 	using SoulboundEngine.World.Level;
 	using System.Collections.Generic;
 
 	public abstract record ConfiguredFeature {
+		public static ConfiguredFeature Init(RegistryBootstrapContext context, Registry<ConfiguredFeature> registry) {
+			return null;
+		}
+
 		public abstract IFeatureConfig GetConfig();
 
 		public abstract Feature GetFeature();

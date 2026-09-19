@@ -1,4 +1,4 @@
-﻿namespace SoulboundEngine.World.Gen {
+﻿namespace SoulboundEngine.World.Gen.Generator {
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.Serialization;
 

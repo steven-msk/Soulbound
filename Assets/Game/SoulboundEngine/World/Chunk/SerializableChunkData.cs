@@ -27,7 +27,7 @@
 				throw new ArgumentException("Chunk cant be serialized: " + chunk);
 			}
 
-			ChunkPos pos = chunk.GetPos();
+			ChunkPos pos = chunk.pos;
 			List<SectionData> sectionData = new();
 			ChunkSection[] sections = chunk.GetSections();
 

@@ -1,4 +1,5 @@
 ﻿namespace SoulboundEngine.World.Gen {
+	using SoulboundEngine.World.Gen.Generator;
 	using System;
 
 	public class WorldGenContext {

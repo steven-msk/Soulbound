@@ -16,7 +16,7 @@
 		}
 
 		public void BuildSurface(RandomState randomState, Chunk chunk, SurfaceRules.IRuleSource ruleSource) {
-			SurfaceRules.Context context = new(chunk, x => chunk.GetBiome(chunk.GetPos().ToLocalX(x)));
+			SurfaceRules.Context context = new(chunk, x => chunk.GetBiome(chunk.pos.ToLocalX(x)));
 			IDensityFunction terrainHeight = randomState.Router.terrainHeight;
 			SurfaceRules.ISurfaceRule rule = ruleSource.Apply(context);
 			Heightmap heightmap = chunk.GetHeightmap();
@@ -25,7 +25,7 @@
 			const int SURFACE_TOLERANCE = 5;
 
 			for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
-				int worldX = chunk.GetPos().ToWorldX(x);
+				int worldX = chunk.pos.ToWorldX(x);
 				int surfaceY = heightmap.GetFirstFree(x);
 				int endY = chunk.GetBottomY();
 				context.UpdateX(worldX);

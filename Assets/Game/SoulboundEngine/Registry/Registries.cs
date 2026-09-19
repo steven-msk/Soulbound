@@ -14,6 +14,7 @@ namespace SoulboundEngine.Registry {
 	using SoulboundEngine.World.Gen.Biome;
 	using SoulboundEngine.World.Gen.Feature;
 	using SoulboundEngine.World.Gen.Function;
+	using SoulboundEngine.World.Gen.Generator;
 	using SoulboundEngine.World.Gen.Noise;
 	using SoulboundEngine.World.Level;
 	using SoulboundEngine.World.Widget;
@@ -51,6 +52,8 @@ namespace SoulboundEngine.Registry {
 		public static readonly Registry<MapCodec<BiomeSource>> BIOME_SOURCE = Create(RegistryKeys.BIOME_SOURCE, BiomeSource.Init);
 		public static readonly Registry<LevelType> LEVEL_TYPE = Create(RegistryKeys.LEVEL_TYPE, LevelType.Init);
 		public static readonly Registry<WorldPreset> WORLD_PRESET = Create(RegistryKeys.WORLD_PRESET, WorldPreset.Init);
+		public static readonly Registry<ConfiguredFeature> CONFIGURED_FEATURE = Create(RegistryKeys.CONFIGURED_FEATURE, ConfiguredFeature.Init);
+		public static readonly Registry<PlacedFeature> PLACED_FEATURE = Create(RegistryKeys.PLACED_FEATURE, PlacedFeature.Init);
 
 		private static Registry<T> Create<T>(RegistryKey<Registry<T>> key, RegistryBootstrapper<T> bootstrapper) where T : class {
 			return Register(key, new Registry<T>(key), bootstrapper);
@@ -112,7 +115,7 @@ namespace SoulboundEngine.Registry {
 		private static void Validate(Registry<IRegistry> registry) {
 			foreach (IRegistry r in registry) {
 				if (r.GetIdentifiers().Count == 0) {
-					Logger.LogError("Registry '{}' was empty after loading", registry.GetKey(r));
+					Logger.LogError("Registry '{}' was empty after loading", registry.GetKey(r).value);
 				}
 			}
 		}

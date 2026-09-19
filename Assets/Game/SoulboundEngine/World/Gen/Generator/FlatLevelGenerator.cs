@@ -1,4 +1,4 @@
-﻿namespace SoulboundEngine.World.Gen {
+﻿namespace SoulboundEngine.World.Gen.Generator {
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.Serialization;
 	using SoulboundEngine.World.Block;
@@ -63,23 +63,23 @@
 
 		public Settings GetSettings() => this.settings;
 
-		public sealed record Settings(RegistryEntry<Biome.Biome> biome, List<Block> layers) {
+		public sealed record Settings(RegistryEntry<Biome> biome, List<Block> layers) {
 			public static readonly List<Block> DEFAULT_LAYERS = new() {
 				Blocks.STONE, Blocks.STONE, Blocks.STONE, Blocks.STONE,
 				Blocks.DIRT
 			};
-			public static readonly Codec<Settings> CODEC = RecordCodec<Settings, RegistryEntry<Biome.Biome>, List<Block>>.Of(
-				Field.Required<Settings, RegistryEntry<Biome.Biome>>("biome", Biome.Biome.ENTRY_CODEC, s => s.biome),
+			public static readonly Codec<Settings> CODEC = RecordCodec<Settings, RegistryEntry<Biome>, List<Block>>.Of(
+				Field.Required<Settings, RegistryEntry<Biome>>("biome", Biome.ENTRY_CODEC, s => s.biome),
 				Field.Required<Settings, List<Block>>("blocks", Block.CODEC.ListOf(), s => s.layers),
 				(biome, layers) => new Settings(biome, layers)
 			);
 
-			public static Settings CreateDefault(IRegistryEntryLookup<Biome.Biome> biomes) {
+			public static Settings CreateDefault(IRegistryEntryLookup<Biome> biomes) {
 				return new Settings(GetDefaultBiome(biomes), DEFAULT_LAYERS);
 			}
 
-			public static RegistryEntry<Biome.Biome> GetDefaultBiome(IRegistryEntryLookup<Biome.Biome> biomes) {
-				return biomes.GetOrThrow(Biome.Biome.PLAINS);
+			public static RegistryEntry<Biome> GetDefaultBiome(IRegistryEntryLookup<Biome> biomes) {
+				return biomes.GetOrThrow(Biome.PLAINS);
 			}
 		}
 	}

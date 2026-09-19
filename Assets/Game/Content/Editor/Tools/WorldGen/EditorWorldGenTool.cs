@@ -7,6 +7,7 @@
 	using SoulboundEngine.World.Chunk;
 	using SoulboundEngine.World.Gen;
 	using SoulboundEngine.World.Gen.Biome;
+	using SoulboundEngine.World.Gen.Generator;
 	using SoulboundEngine.World.Gen.Noise;
 	using SoulboundEngine.World.Level;
 	using System;
@@ -95,6 +96,9 @@
 				}
 				long surface = stopwatch.ElapsedMilliseconds;
 
+				// TODO: integrate decor in editor gen tool
+				Logger.LogError("Chunk decor is not supported in the editor gen tool");
+
 				return (result, new GenTime {
 					total = biomes + fill + surface,
 					biomes = biomes,
@@ -115,8 +119,8 @@
 			int counter = 0;
 			for (int y = chunk.GetBottomY(); y <= chunk.GetTopY(); y++) {
 				for (int x = 0; x < Level.CHUNK_LENGTH; x++) {
-					int tilemapX = Level.CHUNK_LENGTH * (chunk.GetPos().x - chunkStartX) + x;
-					int worldX = chunk.GetPos().ToWorldX(x);
+					int tilemapX = Level.CHUNK_LENGTH * (chunk.pos.x - chunkStartX) + x;
+					int worldX = chunk.pos.ToWorldX(x);
 					blockRenderManager.Render(tilemap, tilemapX, y, chunk.GetBlockState(blockPos.Set(worldX, y)));
 
 					if (++counter % tilesPerBatch == 0) {

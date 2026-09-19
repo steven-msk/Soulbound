@@ -79,7 +79,7 @@
 			}
 
 			public int ToLocalX(int x) {
-				return this.localXCache.AddIfAbsent(x, this.chunk.GetPos().ToLocalX);
+				return this.localXCache.AddIfAbsent(x, this.chunk.pos.ToLocalX);
 			}
 		}
 

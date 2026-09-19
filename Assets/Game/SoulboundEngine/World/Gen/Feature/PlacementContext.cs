@@ -1,6 +1,7 @@
 ﻿namespace SoulboundEngine.World.Gen.Feature {
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Block.State;
+	using SoulboundEngine.World.Gen.Generator;
 	using SoulboundEngine.World.Level;
 
 #nullable enable

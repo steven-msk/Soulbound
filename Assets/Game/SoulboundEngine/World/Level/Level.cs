@@ -173,7 +173,7 @@ namespace SoulboundEngine.World.Level {
 			if (!this.HasChunk(blockX)) return this.GetBottomY();
 
 			Chunk chunk = this.GetChunk(SectionPos.BlockToSectionCoord(blockX))!;
-			return chunk.GetHeight(chunk.GetPos().ToLocalX(blockX));
+			return chunk.GetHeight(chunk.pos.ToLocalX(blockX));
 		}
 
 		public bool AddNewEntity(Entity entity) {
