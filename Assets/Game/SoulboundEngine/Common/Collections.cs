@@ -1,6 +1,7 @@
 namespace SoulboundEngine.Common.Collection {
 	using System;
 	using System.Collections.Generic;
+	using System.Linq;
 
 	public static class Collections {
 		public static Dictionary<K, V> Dictionary<K, V>() => new();
@@ -22,6 +23,8 @@ namespace SoulboundEngine.Common.Collection {
 			}
 			return result;
 		}
+
+		public static IEnumerable<T> Single<T>(T value) => Enumerable.Repeat(value, 1);
 
 		public static void ForEach<T>(this IEnumerable<T> values, Action<T> action) {
 			foreach (T value in values) {

@@ -1,17 +1,17 @@
-﻿using SoulboundEngine.Common;
-using SoulboundEngine.Common.Math.Random;
-using SoulboundEngine.Item;
-using SoulboundEngine.Item.Container;
-using SoulboundEngine.Loot.Context;
-using SoulboundEngine.Loot.Function;
-using SoulboundEngine.Registry;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿namespace SoulboundEngine.Loot {
+	using SoulboundEngine.Common;
+	using SoulboundEngine.Common.Math.Random;
+	using SoulboundEngine.Item;
+	using SoulboundEngine.Item.Container;
+	using SoulboundEngine.Loot.Context;
+	using SoulboundEngine.Loot.Function;
+	using SoulboundEngine.Registry;
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
 
 #nullable enable
 
-namespace SoulboundEngine.Loot {
 	public class LootTable {
 		private readonly List<LootPool> pools;
 		private readonly IFunction<ItemStack, LootContext, ItemStack> combinedFunction;
@@ -26,7 +26,7 @@ namespace SoulboundEngine.Loot {
 		public static Builder Create() => new();
 
 		public ItemStack[] GenerateLoot(LootWorldContext worldContext) {
-			return this.GenerateLoot(worldContext, worldContext.level.seed);
+			return this.GenerateLoot(worldContext, worldContext.level.GetSeed());
 		}
 
 		public ItemStack[] GenerateLoot(LootWorldContext worldContext, long seed) {
@@ -59,7 +59,7 @@ namespace SoulboundEngine.Loot {
 		public void GenerateLoot(LootContext context, Action<ItemStack> lootConsumer) {
 			lootConsumer = ILootFunction.Apply(this.combinedFunction, lootConsumer, context);
 
-			foreach (var pool in this.pools) {
+			foreach (LootPool pool in this.pools) {
 				pool.AddGeneratedLoot(lootConsumer, context);
 			}
 		}
@@ -82,7 +82,7 @@ namespace SoulboundEngine.Loot {
 				List<ItemStack> finalized = new();
 				List<ItemStack> splittable = new();
 
-				foreach (var stack in stacks) {
+				foreach (ItemStack stack in stacks) {
 					if (stack.IsEmpty()) continue;
 					if (stack.count > 1) splittable.Add(stack);
 					else finalized.Add(stack);

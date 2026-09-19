@@ -19,7 +19,7 @@ namespace SoulboundEngine.World.Level {
 
 #nullable enable
 
-	public sealed class Level : ILevelAccess, IEntityQueriable<Entity> {
+	public sealed class Level : IWorldGenLevel, IEntityQueriable<Entity> {
 		public const int CHUNK_LENGTH = SharedConstants.CHUNK_WIDTH;
 		public const int DEFAULT_WORLD_HEIGHT = 1024;
 		public const int DEFAULT_MIN_Y = -DEFAULT_WORLD_HEIGHT / 2;
@@ -28,7 +28,7 @@ namespace SoulboundEngine.World.Level {
 		private const int CHUNK_TTL = 750;
 		private readonly RegistryEntry<LevelType> levelType;
 		private readonly LevelSettings levelSettings;
-		public readonly int seed;
+		private readonly long seed;
 		private readonly ChunkStorage chunkStorage;
 		private readonly LevelChunkManager chunkManager;
 		private readonly RandomSequences randomSequences;
@@ -55,7 +55,7 @@ namespace SoulboundEngine.World.Level {
 			RegistryEntry<LevelType> levelType,
 			LevelSettings levelSettings,
 			IRegistryManager registryManager,
-			int seed,
+			long seed,
 			RecipeManager recipeManager, 
 			int chunkRadius,
 			ChunkStorage chunkStorage
@@ -434,6 +434,8 @@ namespace SoulboundEngine.World.Level {
 
 		public bool IsLevelActive() => this.levelActive;
 		public bool IsLoaded() => this.isLoaded;
+
+		public long GetSeed() => this.seed;
 
 		public PlayerEntity GetPlayer() => this.player;
 

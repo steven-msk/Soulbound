@@ -30,10 +30,10 @@
 			this.loadRange = chunkRadius * 2 + 1;
 			this.emptyChunk = new EmptyWorldChunk(level, new ChunkPos(0));
 			this.loadedChunks = new WorldChunk?[this.loadRange];
-			this.randomState = this.CreateRandomState(chunkGenerator, this.level.seed);
+			this.randomState = this.CreateRandomState(chunkGenerator, this.level.GetSeed());
 		}
 
-		private RandomState CreateRandomState(ChunkGenerator chunkGenerator, int seed) {
+		private RandomState CreateRandomState(ChunkGenerator chunkGenerator, long seed) {
 			IRegistryLookup registries = Registries.GetOrCreateLookup();
 			return RandomState.Create(
 				chunkGenerator is NoiseLevelChunkGenerator noiseGenerator
