@@ -77,7 +77,7 @@
 		}
 
 		public IWorldGenLevel CreateLevel(long seed, int chunkCount, int chunkStartX) {
-			return new EditorWorldGenLevel(this.levelType, seed, chunkCount, this.registries, index => {
+			return new EditorWorldGenLevel(this.levelType, seed, chunkCount, chunkStartX, this.registries, index => {
                 ChunkPos chunkPos = new(index + chunkStartX);
 				return new EditorWorldGenChunk(chunkPos, this.heightLimit, () => new BlockStateContainer(ChunkSection.WIDTH, ChunkSection.HEIGHT));
 			});

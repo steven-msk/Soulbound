@@ -85,7 +85,7 @@
 			IDensityFunction hilliness = Max(shape, 0.0d);
 
 			IDensityFunction baseHeight = shape * 80.0d;
-			IDensityFunction extraAmp = hilliness * shape * 600.0d;
+			IDensityFunction extraAmp = hilliness * shape * 150.0d;
 			IDensityFunction roughnessTerm = hilliness * roughness * 40.0d;
 			return baseHeight + roughnessTerm + extraAmp;
 		}

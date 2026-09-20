@@ -1,11 +1,11 @@
 ﻿namespace SoulboundEngine.World.Gen.Feature {
-    using SoulboundEngine.Common.Math.Random;
-    using SoulboundEngine.World.Block;
-    using SoulboundEngine.World.Block.State;
-    using SoulboundEngine.World.Level;
-    using System.Collections.Generic;
+	using SoulboundEngine.Common.Math.Random;
+	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Block.State;
+	using SoulboundEngine.World.Level;
+	using System.Collections.Generic;
 
-    public class TreeFeature : Feature<TreeFeature.Config> {
+	public class TreeFeature : Feature<TreeFeature.Config> {
 		public override bool Generate(FeaturePlaceContext<Config> context) {
             Config config = context.config;
             IWorldGenLevel level = context.level;
@@ -17,8 +17,8 @@
             int trunkHeight = config.minTrunkHeight + random.NextInt(0, config.trunkHeightVariance + 1);
             if (!HasRoom(level, origin, trunkHeight, config.canopyRadius)) return false;
 
-            PlaceTrunk(level, origin, trunkHeight, config.trunkState);
-            PlaceCanopy(level, origin, trunkHeight, random, config);
+			PlaceTrunk(level, origin, trunkHeight, config.trunkState);
+			PlaceCanopy(level, origin, trunkHeight, random, config);
             return true;
 		}
 

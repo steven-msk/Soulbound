@@ -47,7 +47,8 @@
             while (i < chunkCount) {
                 while (activeTasks < maxConcurrentChunks && i < chunkCount) {
                     await UniTask.Yield(PlayerLoopTiming.Update);
-                    Chunk chunk = level.GetChunk(i, false);
+					int chunkPos = i + chunkStartX;
+                    Chunk chunk = level.GetChunk(chunkPos, false);
                     UniTask<Chunk> genTask = GenerateAsync(level, i, randomState, chunk, chunkGenerator, targetState, elapsed => {
                         lock (taskLock) {
                             genTime += elapsed;

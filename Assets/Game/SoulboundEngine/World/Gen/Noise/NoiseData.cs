@@ -17,9 +17,9 @@
 			}
 
 			public NormalNoise.Parameters Register() {
-				this.Register(NoiseTypes.ROUGHNESS, -3, 1.0d, 1.0d, 1.0d);
+				this.Register(NoiseTypes.ROUGHNESS, -1, 1.0d, 1.0d, 1.0d, 1.0d, 1.0d);
 				this.Register(NoiseTypes.BASE_CAVE, -2, 1.0d, 1.0d, 1.0d, 1.0d, 1.0d);
-				return this.Register(NoiseTypes.SHAPE, -5, 1.0d, 1.0d, 2.0d, 2.0d, 2.0d, 1.0d, 1.0d);
+				return this.Register(NoiseTypes.SHAPE, -5, 1.5d, 1.0d, 2.0d, 2.0d, 2.0d, 1.0d, 1.0d);
 			}
 
 			private NormalNoise.Parameters Create(int firstOctave, params double[] octaveMultipliers) {
