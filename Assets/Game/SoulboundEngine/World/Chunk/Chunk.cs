@@ -91,7 +91,7 @@
 			}
 		}
 
-		public RegistryEntry<Biome>? GetBiome(int chunkX) => this.biomes[chunkX];
+		public RegistryEntry<Biome>? GetBiome(int localX) => this.biomes[localX];
 
 		public void ReplaceBiomes(RegistryEntry<Biome>[] biomes) {
 			if (biomes.Length != this.biomes.Length) {

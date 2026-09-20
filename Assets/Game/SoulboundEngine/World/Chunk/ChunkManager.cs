@@ -1,9 +1,8 @@
-﻿
+﻿namespace SoulboundEngine.World.Chunk {
+    using System;
+
 #nullable enable
 
-using System;
-
-namespace SoulboundEngine.World.Chunk {
 	public abstract class ChunkManager : IDisposable {
 
 		public abstract Chunk? GetChunk(int x, bool loadOrCreate);

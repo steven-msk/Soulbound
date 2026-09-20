@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: SoulboundUnityEditor::SoulboundEngine.UnityClient.Editor.Tools.WorldGen.NoiseTunerCache
   chunkCount: 100
   seed: 0
-  chunkStartX: 50
+  chunkStartX: 0
   maxConcurrentChunks: 18
-  targetState: 3
+  targetState: 10000
   overrideEntries: []

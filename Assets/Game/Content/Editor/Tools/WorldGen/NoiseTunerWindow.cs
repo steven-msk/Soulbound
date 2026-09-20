@@ -5,7 +5,8 @@
 	using SoulboundEngine.UnityClient.Assets;
 	using SoulboundEngine.UnityClient.Debug.Logging;
 	using SoulboundEngine.World.Gen.Noise;
-	using System;
+    using SoulboundEngine.World.Level;
+    using System;
 	using System.Collections.Generic;
 	using System.Linq;
 	using UnityEditor;
@@ -65,10 +66,11 @@
 				EditorUtility.SetDirty(this.cache);
 				AssetDatabase.SaveAssetIfDirty(this.cache);
 			});
-			Button regenerate = new(
-				() => EditorWorldGenTool.Regenerate(this.targetState, this.maxConcurrentChunks, this.seed, this.chunkCount, this.chunkStartX, this.overrides, this.context)
-					.Forget(SoulboundEngine.Logger.LogFatal)
-			) { text = "Regenerate" };
+			Button regenerate = new(() => {
+                IWorldGenLevel level = this.context.CreateLevel(this.seed, this.chunkCount, this.chunkStartX);
+				EditorWorldGenTool.Regenerate(level, this.targetState, this.maxConcurrentChunks, this.chunkStartX, this.overrides, this.context)
+				    .Forget(SoulboundEngine.Logger.LogFatal);
+			}) { text = "Regenerate" };
 			regenerate.style.height = 32;
 			this.rootVisualElement.Add(regenerate);
 			this.rootVisualElement.Add(chunkCount);
