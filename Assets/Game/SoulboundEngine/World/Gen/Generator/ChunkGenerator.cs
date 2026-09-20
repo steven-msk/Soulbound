@@ -66,7 +66,13 @@
 			);
 			WorldGenRandom random = new(RandomProvider.CreateWithUniqueSeed());
 			long decorSeed = random.SetDecorationSeed(level.GetSeed(), origin.x);
-			List<RegistryEntry<Biome>> possibleBiomes = new(this.biomeSource.GetPossibleBiomes());
+			HashSet<RegistryEntry<Biome>> possibleBiomes = new();
+			for (int cx = 0; cx < ChunkSection.WIDTH; cx++) {
+				RegistryEntry<Biome> biome = chunk.GetBiome(cx);
+				if (this.biomeSource.GetPossibleBiomes().Contains(biome)) {
+					possibleBiomes.Add(biome);
+				}
+			}
 			int featureStepCount = featureList.Count;
 
 			try {

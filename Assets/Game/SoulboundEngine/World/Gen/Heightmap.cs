@@ -56,7 +56,9 @@ namespace SoulboundEngine.World.Gen {
 			return this.heights[index] + this.chunk.GetBottomY();
 		}
 
-		public int GetFirstFree(int localX) => this.GetFirstFreeFromIndex(GetIndex(localX));
+		public int GetFirstFree(int localX) {
+			return this.GetFirstFreeFromIndex(GetIndex(localX));
+		}
 
 		public void SetRaw(int[] data) {
 			if (data.Length != this.size) {

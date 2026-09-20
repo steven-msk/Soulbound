@@ -30,14 +30,14 @@
 
 		public EditorWorldGenContext() {
 			_ = Registries.ROOT_IDENTIFIER;
-			this.AddRequiredRegistry(RegistryKeys.BIOME, Biome.Init);
-			this.multiNoiseBiomeSourceParamLists = this.AddRequiredRegistry(RegistryKeys.MULTI_NOISE_BIOME_SOURCE_PARAMETER_LIST, MultiNoiseBiomeSourceParamList.Init);
 			this.noises = this.AddRequiredRegistry(RegistryKeys.NOISE, NoiseData.Init);
 			this.AddRequiredRegistry(RegistryKeys.DENSITY_FUNCTION, NoiseRouter.Init);
 			this.noiseGeneratorSettings = this.AddRequiredRegistry(RegistryKeys.NOISE_SETTINGS, NoiseGeneratorSettings.Init);
             this.AddRequiredRegistry(RegistryKeys.FEATURE, Feature.Init);
             this.AddRequiredRegistry(RegistryKeys.CONFIGURED_FEATURE, ConfiguredFeature.Init);
             this.AddRequiredRegistry(RegistryKeys.PLACED_FEATURE, PlacedFeature.Init);
+			this.AddRequiredRegistry(RegistryKeys.BIOME, Biome.Init);
+			this.multiNoiseBiomeSourceParamLists = this.AddRequiredRegistry(RegistryKeys.MULTI_NOISE_BIOME_SOURCE_PARAMETER_LIST, MultiNoiseBiomeSourceParamList.Init);
             this.levelTypes = this.AddRequiredRegistry(RegistryKeys.LEVEL_TYPE, LevelType.Init);
 
             this.registries = IRegistryManager.Of(this.requiredRegistries.Values.ToList());

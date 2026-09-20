@@ -47,7 +47,8 @@
 				this.seed = this.cache.seed;
 				this.chunkCount = this.cache.chunkCount;
 				this.chunkStartX = this.cache.chunkStartX;
-				this.maxConcurrentChunks = cache.maxConcurrentChunks;
+				this.maxConcurrentChunks = this.cache.maxConcurrentChunks;
+				this.targetState = this.cache.targetState;
 				this.LoadOverridesFromCache(this.cache);
 			} else {
 				this.cache = ScriptableObject.CreateInstance<NoiseTunerCache>();

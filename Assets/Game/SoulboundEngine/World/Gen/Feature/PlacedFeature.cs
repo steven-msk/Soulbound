@@ -9,8 +9,23 @@
 	using System.Linq;
 
 	public record PlacedFeature(RegistryEntry<ConfiguredFeature> feature, List<IPlacementModifier> placement) {
+		public static readonly RegistryKey<PlacedFeature> TREE = Create("tree");
+
 		public static PlacedFeature Init(RegistryBootstrapContext context, Registry<PlacedFeature> registry) {
-			return null;
+			Registry<ConfiguredFeature> configured = context.Lookup(RegistryKeys.CONFIGURED_FEATURE);
+			return Registry<PlacedFeature>.Register(registry, TREE, new PlacedFeature(
+                configured.GetOrThrow(ConfiguredFeature.TREE),
+                new List<IPlacementModifier> {
+                    new CountPlacement(4),
+                    InLinePlacement.INSTANCE,
+                    HeightmapPlacement.WORLD_SURFACE,
+                    new BlockFilter(state => state.GetBlock() == Blocks.GRASS || state.GetBlock() == Blocks.DIRT)
+                }
+			));
+		}
+
+		private static RegistryKey<PlacedFeature> Create(string id) {
+			return RegistryKey<PlacedFeature>.Of(RegistryKeys.PLACED_FEATURE, Identifier.Of(id));
 		}
 
 		public bool GenerateUnregistered(IWorldGenLevel level, ChunkGenerator chunkGenerator, IRandom random, BlockPos origin) {

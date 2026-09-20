@@ -41,7 +41,7 @@
         }
 
         private static void PlaceCanopy(IWorldGenLevel level, BlockPos origin, int trunkHeight, IRandom random, Config config) {
-            BlockPos center = new(origin.x, origin.y + trunkHeight);
+            BlockPos center = origin.Up(trunkHeight);
             int r = config.canopyRadius;
             for (int dx = -r; dx <= r; dx++) {
                 for (int dy = -r; dy <= r; dy++) {

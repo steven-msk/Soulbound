@@ -170,7 +170,7 @@ namespace SoulboundEngine.World.Level {
 		}
 
 		public int GetHeight(int blockX) {
-			if (!this.HasChunk(blockX)) return this.GetBottomY();
+			if (!this.HasChunk(SectionPos.BlockToSectionCoord(blockX))) return this.GetBottomY();
 
 			Chunk chunk = this.GetChunk(SectionPos.BlockToSectionCoord(blockX))!;
 			return chunk.GetHeight(chunk.pos.ToLocalX(blockX));
@@ -397,7 +397,9 @@ namespace SoulboundEngine.World.Level {
 		public int GetBottomY() => DEFAULT_MIN_Y;
 		public int GetHeight() => DEFAULT_WORLD_HEIGHT;
 
-		public Chunk? GetChunk(int chunkX) => this.chunkManager.GetChunk(chunkX, false);
+		public Chunk? GetChunk(int chunkX) {
+			return this.chunkManager.GetChunk(chunkX, false);
+		}
 
 		public IEnumerable<Chunk> GetLoadedChunks() {
 			return this.chunkManager.GetLoadedChunks();

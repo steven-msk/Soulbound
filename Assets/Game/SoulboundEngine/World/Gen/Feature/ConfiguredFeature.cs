@@ -7,8 +7,26 @@
 	using System.Collections.Generic;
 
 	public abstract record ConfiguredFeature {
-		public static ConfiguredFeature Init(RegistryBootstrapContext context, Registry<ConfiguredFeature> registry) {
-			return null;
+		public static readonly RegistryKey<ConfiguredFeature> TREE = Create("tree");
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter")]
+        public static ConfiguredFeature Init(RegistryBootstrapContext context, Registry<ConfiguredFeature> registry) {
+            return Registry<ConfiguredFeature>.Register(registry, TREE, new ConfiguredFeature<TreeFeature.Config, TreeFeature>(
+                (TreeFeature)Feature.TREE,
+                new TreeFeature.Config(
+                    trunkState: Blocks.WOOD.DefaultState,
+                    leafState: Blocks.LEAVES.DefaultState,
+                    plantableOn: new HashSet<Block>() { Blocks.GRASS, Blocks.DIRT },
+                    minTrunkHeight: 4,
+                    trunkHeightVariance: 2,
+                    canopyRadius: 2,
+                    leafDensity: 0.8f
+                )
+            ));
+		}
+
+		private static RegistryKey<ConfiguredFeature> Create(string id) {
+			return RegistryKey<ConfiguredFeature>.Of(RegistryKeys.CONFIGURED_FEATURE, Identifier.Of(id));
 		}
 
 		public abstract IFeatureConfig GetConfig();

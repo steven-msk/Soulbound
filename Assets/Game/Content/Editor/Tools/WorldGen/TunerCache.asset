@@ -16,5 +16,5 @@ MonoBehaviour:
   seed: 0
   chunkStartX: 0
   maxConcurrentChunks: 18
-  targetState: 10000
+  targetState: 5
   overrideEntries: []

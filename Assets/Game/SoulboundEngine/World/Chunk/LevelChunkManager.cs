@@ -65,7 +65,7 @@
 			if (IsChunkValid(chunk, x)) return chunk;
 
 			if (!loadOrGenerate || !this.IsInRange(x)) {
-				return this.emptyChunk;
+				return null;
 			}
 
 			if (chunk != null) {
@@ -111,17 +111,18 @@
 		}
 
 		private WorldChunk GenerateAndLoadChunk(int index, int x) {
-			WorldChunk chunk = this.GenerateChunk(x);
+			WorldChunk chunk = this.GenerateChunk(x, index);
 			this.loadedChunks[index] = chunk;
 			this.level.OnChunkLoaded(chunk);
 			return chunk;
 		}
 
-		private WorldChunk GenerateChunk(int x) {
+		private WorldChunk GenerateChunk(int x, int index) {
 			if (this.chunkStorage.Read(this.level, x) is WorldChunk existing) {
 				return existing;
 			}
 			WorldChunk chunk = new(this.level, new ChunkPos(x));
+			this.loadedChunks[index] = chunk;
 			return this.DoGeneration(chunk);
 		}
 
@@ -138,7 +139,7 @@
 		}
 
 		private WorldChunk ResolveAndLoad(int index, int x) {
-			WorldChunk resolved = this.chunkCache.TryClaim(x) ?? this.GenerateChunk(x);
+			WorldChunk resolved = this.chunkCache.TryClaim(x) ?? this.GenerateChunk(x, index);
 			this.loadedChunks[index] = resolved;
 			this.level.OnChunkLoaded(resolved);
 			return resolved;
