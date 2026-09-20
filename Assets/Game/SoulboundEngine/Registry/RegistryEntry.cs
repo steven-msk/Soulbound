@@ -48,5 +48,10 @@ namespace SoulboundEngine.Registry {
 		public override string ToString() {
 			return $"entry[key={this.key}, value={this.value}]";
 		}
+
+        public void Deconstruct(out RegistryKey<T> key, out T value) {
+            key = this.key;
+            value = this.value;
+        }
 	}
 }

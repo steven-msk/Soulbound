@@ -85,6 +85,14 @@ namespace SoulboundEngine.World.Block {
 			return new BlockPos(this.x + x, this.y + y);
 		}
 
+        public BlockPos Down(int amount = 1) => this.Offset(0, -amount);
+
+        public BlockPos Up(int amount = 1) => this.Offset(0, amount);
+
+        public BlockPos Left(int amount = 1) => this.Offset(-amount, 0);
+
+        public BlockPos Right(int amount = 1) => this.Offset(amount, 0);
+
 		public BlockPos Multiply(int scale) {
 			return new BlockPos(this.x * scale, this.y * scale);
 		}
