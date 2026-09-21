@@ -74,15 +74,6 @@ namespace SoulboundEngine.World.Chunk {
 			return oldState;
 		}
 
-		[Obsolete]
-		public void SetBlock(ChunkBlockPos chunkPos, BlockState blockState) {
-			this.SetBlock(chunkPos.x, WorldYToIndex(chunkPos.y), blockState);
-		}
-		[Obsolete]
-		public void SetBlock(int cx, int yIndex, BlockState blockState) {
-			this.SetBlockState(new BlockPos(this.ChunkXToWorldX(cx), IndexToWorldY(yIndex)), blockState);
-		}
-
 		public BlockState GetBlockState(ChunkBlockPos chunkPos) => this.GetBlockState(chunkPos.ToBlock());
 
 		public override BlockState GetBlockState(BlockPos blockPos) {

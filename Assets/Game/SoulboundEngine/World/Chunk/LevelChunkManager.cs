@@ -65,7 +65,7 @@
 			if (IsChunkValid(chunk, x)) return chunk;
 
 			if (!loadOrGenerate || !this.IsInRange(x)) {
-				return null;
+				return this.emptyChunk;
 			}
 
 			if (chunk != null) {
@@ -118,11 +118,16 @@
 		}
 
 		private WorldChunk GenerateChunk(int x, int index) {
-			if (this.chunkStorage.Read(this.level, x) is WorldChunk existing) {
-				return existing;
-			}
+			Chunk? existing = this.chunkStorage.Read(this.level, x);
+			if (existing != null) return (WorldChunk)existing;
+
 			WorldChunk chunk = new(this.level, new ChunkPos(x));
+			// feature placement may depend on heightmap which is unavailable since the chunk is not "loaded",
+			// where "loaded" means "full data and ready to use".
+			// chunks that are not yet fully generated arent "loaded", but heightmap placements query the chunk by position,
+			// which leads to wrong feature positioning or features not being placed at all
 			this.loadedChunks[index] = chunk;
+
 			return this.DoGeneration(chunk);
 		}
 

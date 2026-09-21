@@ -23,7 +23,7 @@
 					continue;
 				}
 				if (!TryGetChunkX(file, out int chunkX)) {
-					Logger.LogError("Failed to get chunkX: {}, skipping this chunk", file.Name);
+					Logger.LogError("Failed to get chunkPos: {}, skipping this chunk", file.Name);
 					continue;
 				}
 				if (!this.savedChunks.Add(chunkX)) {

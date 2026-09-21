@@ -38,7 +38,7 @@
 				int faceType = this.cursor.GetNextType();
 				if (faceType == Cursor2D.CORNER || faceType == Cursor2D.EDGE) continue;
 
-				Chunk? chunk = this.level.ChunkAt(x);
+				Chunk? chunk = this.level.GetChunk(SectionPos.BlockToSectionCoord(x));
 				if (chunk == null) continue;
 
 				this.blockPos.Set(x, y);

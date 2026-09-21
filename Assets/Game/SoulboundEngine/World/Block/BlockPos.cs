@@ -1,7 +1,6 @@
 namespace SoulboundEngine.World.Block {
 	using SoulboundEngine.Common.Math;
 	using SoulboundEngine.World.Chunk;
-	using SoulboundEngine.World.Level;
 	using SoulboundEngine.World.Physics;
 	using System;
 	using System.Collections.Generic;
@@ -33,11 +32,7 @@ namespace SoulboundEngine.World.Block {
 
 		public override string ToString() => $"bx:{this.x},by:{this.y}";
 
-        public ChunkBlockPos ToChunkPos() {
-            int cx = Level.ToChunkX(this.x);
-            int chunkX = Level.ChunkXAt(this.x);
-            return new ChunkBlockPos(cx, this.y, chunkX);
-        }
+		public ChunkBlockPos ToChunkPos() => ChunkBlockPos.FromBlockPos(this);
 
         public static bool operator !=(BlockPos pos1, BlockPos pos2) => !(pos1 == pos2);
 
@@ -129,22 +124,6 @@ namespace SoulboundEngine.World.Block {
 
 		public override bool Equals(object obj) {
 			return obj is BlockPos other && this == other;
-		}
-
-		public static BlockPos Parse(string s) {
-			string[] coords = s.Split(',');
-			if (coords.Length != 2) throw ParseException(s);
-
-			string bx = coords[0].Replace("bx:", string.Empty);
-			string by = coords[1].Replace("by:", string.Empty);
-
-			int x = int.Parse(bx);
-			int y = int.Parse(by);
-			return new BlockPos(x, y);
-		}
-
-		private static ArgumentException ParseException(string s) {
-			return new ArgumentException("Could not parse BlockPos: " + s);
 		}
 
         public override int GetHashCode() {

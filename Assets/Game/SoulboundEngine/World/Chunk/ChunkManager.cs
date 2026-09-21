@@ -1,5 +1,5 @@
 ﻿namespace SoulboundEngine.World.Chunk {
-    using System;
+	using System;
 
 #nullable enable
 
@@ -11,9 +11,9 @@
 			return this.GetChunk(x, loadOrCreate) as WorldChunk;
 		}
 
-		public virtual WorldChunk? GetChunkNow(int x) => this.GetWorldChunk(x, false);
+		public virtual WorldChunk GetChunkNow(int x) => this.GetWorldChunk(x, false)!;
 
-		public bool HasChunk(int x) => this.GetChunk(x, false) != null;
+		public bool HasChunk(int x) => this.GetChunk(x, true) != null;
 
 		public virtual void OnSectionStatusChanged(int x, int sectionY, bool previouslyEmpty) {
 		}

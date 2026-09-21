@@ -110,17 +110,18 @@ namespace SoulboundEngine.World.Level {
 				}
 			}
 
-			this.chunkManager.SetCenterX(ChunkXAt(this.player.GetPosition()));
+			int chunkPos = SectionPos.BlockToSectionCoord(Maths.FloorToInt(this.player.GetX()));
+			this.chunkManager.SetCenterX(chunkPos);
 			this.chunkManager.Tick(true);
 		}
 
 		public Vec2d GetWorldSpawnPoint() {
-			return new Vec2d(0f, this.GetSurfaceAirY(0));
+			return new Vec2d(0f, this.GetHeight(0));
 		}
 
 		public bool SetBlockState(BlockPos blockPos, BlockState blockState) {
 			if (this.IsOutOfHeightLimit(blockPos)) return false;
-			Chunk? chunk = this.ChunkAt(blockPos);
+			Chunk? chunk = this.GetChunk(blockPos);
 			if (chunk == null) {
 				Logger.LogError("Block pos not valid: " + blockPos);
 				return false;
@@ -157,7 +158,7 @@ namespace SoulboundEngine.World.Level {
 
 		private void NotifyNeighboringStates(BlockPos blockPos) {
 			foreach (BlockPos neighborPos in blockPos.GetCardinalNeighbors()) {
-				Chunk? chunk = this.ChunkAt(blockPos);
+				Chunk? chunk = this.GetChunk(blockPos);
 				if (chunk == null) return;
 
 				BlockState? blockState = this.GetBlockState(neighborPos);
@@ -333,10 +334,6 @@ namespace SoulboundEngine.World.Level {
 			}
 		}
 
-		public Chunk? GetChunk(int worldX, bool loadOrGenerate) {
-			return this.chunkManager.GetChunk(worldX, loadOrGenerate);
-		}
-
 		public void OnChunkLoaded(Chunk chunk) {
 			this.chunkLoaded?.Invoke(chunk);
 		}
@@ -360,12 +357,12 @@ namespace SoulboundEngine.World.Level {
 		public BlockState GetBlockState(BlockPos blockPos) {
 			if (!this.IsInHeightLimit(blockPos.y)) return Blocks.AIR.DefaultState;
 
-			Chunk? chunk = this.ChunkAt(blockPos);
+			Chunk? chunk = this.GetChunk(blockPos);
 			return chunk?.GetBlockState(blockPos) ?? Blocks.AIR.DefaultState;
 		}
 
 		public TileEntity? GetTileEntity(BlockPos blockPos) {
-			Chunk? chunk = this.ChunkAt(blockPos);
+			Chunk? chunk = this.GetChunk(blockPos);
 			return chunk?.GetTileEntity(blockPos);
 		}
 
@@ -375,51 +372,43 @@ namespace SoulboundEngine.World.Level {
 		}
 
 		public RegistryEntry<Biome> GetBiome(BlockPos blockPos) {
-			return this.GetChunk(blockPos.x, true).GetBiome(blockPos.ToChunkPos().x);
+			int chunkX = SectionPos.BlockToSectionCoord(blockPos.x);
+			return this.GetChunk(chunkX).GetBiome(blockPos.ToChunkPos().xInChunk);
 		}
 
 		public Func<BlockStateContainer> BlockStateContainerFactory() {
 			return () => new BlockStateContainer(ChunkSection.WIDTH, ChunkSection.HEIGHT);
 		}
 
-		public static int ChunkXAt(Vec2d worldPos) => ChunkXAt(worldPos.x);
-		public static int ChunkXAt(int x) => ChunkXAt((float)x);
-		public static int ChunkXAt(double x) => Maths.FloorToInt(x / CHUNK_LENGTH);
-
-		public static int ToWorldX(int cx, int chunkX) => cx + chunkX * CHUNK_LENGTH;
-		public static int ToChunkX(int x) => x - ChunkXAt(x) * CHUNK_LENGTH;
-
-		public Chunk? ChunkAt(int worldX) {
-			return this.chunkManager.GetChunk(ChunkXAt(worldX), false);
-		}
-		public Chunk? ChunkAt(BlockPos blockPos) => this.ChunkAt(blockPos.x);
-
 		public int GetBottomY() => DEFAULT_MIN_Y;
+
 		public int GetHeight() => DEFAULT_WORLD_HEIGHT;
 
-		public Chunk? GetChunk(int chunkX) {
-			return this.chunkManager.GetChunk(chunkX, false);
+		public Chunk? GetChunk(int chunkX, bool loadOrGenerate) {
+			return this.chunkManager.GetChunk(chunkX, loadOrGenerate);
+		}
+
+		public Chunk? GetChunk(BlockPos blockPos) { 
+			return this.GetChunk(SectionPos.BlockToSectionCoord(blockPos.x));
+		}
+
+		public Chunk? GetChunk(int chunkPos) {
+			return this.chunkManager.GetChunk(chunkPos, true);
 		}
 
 		public IEnumerable<Chunk> GetLoadedChunks() {
 			return this.chunkManager.GetLoadedChunks();
 		}
 
+		[Obsolete]
 		public static bool IsInBounds(BlockPos pos) {
 			return IsInBounds(pos.x, pos.y);
 		}
 
+		[Obsolete]
 		public static bool IsInBounds(int x, int y) {
 			return y <= DEFAULT_MAX_Y && y >= DEFAULT_MIN_Y;
 		}
-
-		public int GetSurfaceY(int xpos) {
-			Chunk? chunk = this.ChunkAt(xpos);
-			int cx = ToChunkX(xpos);
-			return chunk?.GetHeightmap().GetFirstFree(cx) ?? this.GetBottomY();
-		}
-
-		public int GetSurfaceAirY(int xpos) => this.GetSurfaceY(xpos) + 1;
 
 		public List<BlockPos> GetTilesCovered(AABB bounds) {
 			List<BlockPos> coveredTiles = new();
@@ -435,6 +424,7 @@ namespace SoulboundEngine.World.Level {
 		}
 
 		public bool IsLevelActive() => this.levelActive;
+
 		public bool IsLoaded() => this.isLoaded;
 
 		public long GetSeed() => this.seed;

@@ -3,7 +3,7 @@
 	using SoulboundEngine.World.Level;
 	using System;
 
-	public readonly struct ChunkPos {
+	public readonly struct ChunkPos : IEquatable<ChunkPos> {
 		public static readonly ChunkPos ORIGIN = new(0);
 		public readonly int x;
 
@@ -23,6 +23,7 @@
 			return new ChunkPos(SectionPos.BlockToSectionCoord(pos.x));
 		}
 
+		[Obsolete]
 		public static ChunkPos Parse(string s) {
 			if (!s.StartsWith("chunk[")) throw new ArgumentException("Cannot parse chunk pos: " + s);
 
@@ -44,5 +45,19 @@
 		}
 
 		public override string ToString() => $"chunk[{this.x}]";
+
+		public static bool operator ==(ChunkPos a, ChunkPos b) => a.Equals(b);
+
+		public static bool operator !=(ChunkPos a, ChunkPos b) => !(a == b);
+
+		public override bool Equals(object obj) {
+			return obj is ChunkPos other && other.Equals(this);
+		}
+
+		public bool Equals(ChunkPos other) => other.x == this.x;
+
+		public override int GetHashCode() {
+			return HashCode.Combine(this.x);
+		}
 	}
 }
