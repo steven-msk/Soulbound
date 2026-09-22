@@ -62,7 +62,7 @@ namespace SoulboundEngine.Registry {
 
 		public bool TryGet(RegistryKey<T> key, out T value) {
 			RegistryEntry<T>? entry = this.keyToEntry.GetValueOrDefault(key);
-			value = entry != null ? entry.GetValue() : default;
+			value = entry != null ? entry.GetValue() : default!;
 			return entry != null;
 		}
 

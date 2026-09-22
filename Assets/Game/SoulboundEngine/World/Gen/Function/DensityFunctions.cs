@@ -10,8 +10,8 @@
 			return new Mapped(type, function);
 		}
 
-		public static IDensityFunction CreateNoise(RegistryEntry<NormalNoise.Parameters> parameters) {
-			return new Noise(new IDensityFunction.NoiseEntry(parameters, null));
+		public static IDensityFunction CreateNoise(RegistryEntry<NormalNoise.Parameters> parameters, double xScale = 1, double yScale = 1) {
+			return new Noise(new IDensityFunction.NoiseEntry(parameters, null), xScale, yScale);
 		}
 
 		public static IDensityFunction Add(IDensityFunction first, IDensityFunction second) {
@@ -64,6 +64,10 @@
 
 		public static IDensityFunction Y => new YCoordinate();
 
+		public static IDensityFunction CacheLastX(IDensityFunction function) {
+			return new CachedFunction(CachedFunction.Type.CACHE_LAST_X, function);
+		}
+
 		public interface ITransformer : IDensityFunction {
 			IDensityFunction input { get; }
 
@@ -94,9 +98,9 @@
 			}
 		}
 
-		public record Noise(IDensityFunction.NoiseEntry noise) : IDensityFunction {
+		public record Noise(IDensityFunction.NoiseEntry noise, double xScale, double yScale) : IDensityFunction {
 			public double Compute(IDensityFunction.IContext context) {
-				return this.noise.Get(context.blockX, context.blockY, 0.0d);
+				return this.noise.Get(context.blockX * this.xScale, context.blockY * this.yScale, 0.0d);
 			}
 
 			public void FillArray(double[] output, IDensityFunction.IContextProvider contextProvider) {
@@ -104,7 +108,7 @@
 			}
 
 			public IDensityFunction MapAll(IDensityFunction.IVisitor visitor) {
-				return visitor.Apply(new Noise(visitor.VisitNoise(this.noise)));
+				return visitor.Apply(new Noise(visitor.VisitNoise(this.noise), this.xScale, this.yScale));
 			}
 		}
 
@@ -158,7 +162,7 @@
 
 		private sealed record OperationBasedFunction(IOperationBasedFunction.Type type, IDensityFunction first, IDensityFunction second) : IOperationBasedFunction {
 			public double Compute(IDensityFunction.IContext context) {
-				double value1 = this.first.Compute(context);
+				double value1 = this.GetFirst(context);
 				return this.type switch {
 					IOperationBasedFunction.Type.ADD => value1 + this.GetSecond(context),
 					IOperationBasedFunction.Type.MULTIPLY => value1 == 0.0d ? 0.0d : value1 * this.GetSecond(context),
@@ -224,6 +228,30 @@
 		public record XCoordinate : IDensityFunction.ISimple {
 			public double Compute(IDensityFunction.IContext context) {
 				return context.blockX;
+			}
+		}
+
+		public interface ICacheFunction : IDensityFunction {
+			CachedFunction.Type type { get; }
+
+			IDensityFunction wrapped { get; }
+
+			IDensityFunction IDensityFunction.MapAll(IVisitor visitor) {
+				return visitor.Apply(new CachedFunction(this.type, this.wrapped.MapAll(visitor)));
+			}
+		}
+
+		public record CachedFunction(CachedFunction.Type type, IDensityFunction wrapped) : ICacheFunction {
+			public double Compute(IDensityFunction.IContext context) {
+				return this.wrapped.Compute(context);
+			}
+
+			public void FillArray(double[] output, IDensityFunction.IContextProvider contextProvider) {
+				this.wrapped.FillArray(output, contextProvider);
+			}
+
+			public enum Type {
+				CACHE_LAST_X
 			}
 		}
 	}

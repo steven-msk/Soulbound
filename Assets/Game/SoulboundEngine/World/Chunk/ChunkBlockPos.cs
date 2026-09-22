@@ -2,7 +2,6 @@ namespace SoulboundEngine.World.Chunk {
 	using SoulboundEngine.Common.Math;
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Level;
-	using System;
 
 	public struct ChunkBlockPos {
 		public int xInChunk;
@@ -37,9 +36,7 @@ namespace SoulboundEngine.World.Chunk {
 
 		public readonly BlockPos ToBlock() => new(this.chunkPos.ToWorldX(this.xInChunk), this.chunkY);
 
-		[Obsolete] public readonly int WorldYToIndex() => WorldYToIndex(this.chunkY);
-
-		[Obsolete] public static int WorldYToIndex(int worldY) => worldY - Level.DEFAULT_MAX_Y;
+		public static int ToLocalX(int blockX) => blockX - SectionPos.BlockToSectionCoord(blockX) * ChunkSection.WIDTH;
 
 		public readonly override bool Equals(object obj) {
 			if (obj is not ChunkBlockPos) {

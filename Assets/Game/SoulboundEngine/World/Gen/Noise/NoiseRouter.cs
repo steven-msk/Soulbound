@@ -80,14 +80,14 @@
 		}
 
 		private static IDensityFunction CreateTerrainHeight(IRegistryEntryLookup<NormalNoise.Parameters> noises) {
-			IDensityFunction shape = CreateNoise(noises.GetOrThrow(NoiseTypes.SHAPE));
-			IDensityFunction roughness = CreateNoise(noises.GetOrThrow(NoiseTypes.ROUGHNESS));
+			IDensityFunction shape = CreateNoise(noises.GetOrThrow(NoiseTypes.SHAPE), yScale: 0.0d);
+			IDensityFunction roughness = CreateNoise(noises.GetOrThrow(NoiseTypes.ROUGHNESS), yScale: 0.0d);
 			IDensityFunction hilliness = Max(shape, 0.0d);
 
 			IDensityFunction baseHeight = shape * 80.0d;
 			IDensityFunction extraAmp = hilliness * shape * 150.0d;
 			IDensityFunction roughnessTerm = hilliness * roughness * 40.0d;
-			return baseHeight + roughnessTerm + extraAmp;
+			return CacheLastX(baseHeight + roughnessTerm + extraAmp);
 		}
 
 		public NoiseRouter MapAll(IDensityFunction.IVisitor visitor) {

@@ -400,16 +400,6 @@ namespace SoulboundEngine.World.Level {
 			return this.chunkManager.GetLoadedChunks();
 		}
 
-		[Obsolete]
-		public static bool IsInBounds(BlockPos pos) {
-			return IsInBounds(pos.x, pos.y);
-		}
-
-		[Obsolete]
-		public static bool IsInBounds(int x, int y) {
-			return y <= DEFAULT_MAX_Y && y >= DEFAULT_MIN_Y;
-		}
-
 		public List<BlockPos> GetTilesCovered(AABB bounds) {
 			List<BlockPos> coveredTiles = new();
 			Vec2i min = bounds.Min.FloorToInt();

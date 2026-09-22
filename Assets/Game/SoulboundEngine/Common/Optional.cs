@@ -67,7 +67,7 @@ namespace SoulboundEngine.Common {
 		public T OrElseThrow() => this.OrElseThrow(() => new InvalidOperationException("Empty optional"));
 
 		public Optional<TU> Map<TU>(Func<T, TU> method) {
-			return this.IsPresent() ? new Optional<TU>(method.Invoke(this.value)) : default;
+			return this.IsPresent() ? new Optional<TU>(method.Invoke(this.value!)) : default;
 		}
 	}
 }

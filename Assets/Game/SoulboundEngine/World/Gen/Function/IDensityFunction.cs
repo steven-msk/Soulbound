@@ -58,7 +58,35 @@
 			}
 		}
 
-		public sealed record SinglePointContext(int blockX, int blockY) : IContext;
+		public class SinglePointContext : IContext {
+			public int blockX { get; private set; }
+			public int blockY { get; private set; }
+
+			public SinglePointContext()
+				: this(0, 0) { 
+			}
+
+			public SinglePointContext(int blockX, int blockY) {
+				this.blockX = blockX;
+				this.blockY = blockY;
+			}
+
+			public SinglePointContext Set(int blockX, int blockY) {
+				this.blockX = blockX;
+				this.blockY = blockY;
+				return this;
+			}
+
+			public SinglePointContext SetX(int blockX) {
+				this.blockX = blockX;
+				return this;
+			}
+
+			public SinglePointContext SetY(int blockY) {
+				this.blockY = blockY;
+				return this;
+			}
+		}
 
 		public sealed record NoiseEntry(RegistryEntry<NormalNoise.Parameters> parameters, NormalNoise? noise) {
 			public double Get(double x, double y, double z) {

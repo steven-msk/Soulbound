@@ -50,7 +50,7 @@
 
 		public static SerializableChunkData Parse(string jsonString, Level level) {
 			JObject jsonObject = JObject.Parse(jsonString);
-			ChunkPos chunkPos = ChunkPos.Parse((string)jsonObject["pos"]!);
+			ChunkPos chunkPos = ChunkPos.CODEC.Decode(jsonObject["pos"] ?? JValue.CreateNull()).GetOrThrow();
 
 			List<SectionData> sectionData = new();
 			JObject sections = (JObject)jsonObject["sections"]!;
@@ -176,7 +176,7 @@
 			}
 
 			JObject json = new() {
-				["pos"] = this.chunkPos.ToString(),
+				["pos"] = ChunkPos.CODEC.Encode(this.chunkPos),
 				["heightmap"] = heightmapArray == null ? JValue.CreateNull() : heightmapArray,
 				["sections"] = sections,
 				["tileEntities"] = tileEntities,

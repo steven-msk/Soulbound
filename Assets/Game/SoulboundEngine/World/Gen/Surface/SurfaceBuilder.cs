@@ -21,6 +21,7 @@
 			SurfaceRules.ISurfaceRule rule = ruleSource.Apply(context);
 			Heightmap heightmap = chunk.GetHeightmap();
 			BlockPos.Mutable blockPos = new();
+			IDensityFunction.SinglePointContext point = new();
 
 			const int SURFACE_TOLERANCE = 5;
 
@@ -30,7 +31,7 @@
 				int endY = chunk.GetBottomY();
 				context.UpdateX(worldX);
 
-				int analyticSurfaceY = (int)Math.Round(terrainHeight.Compute(new IDensityFunction.SinglePointContext(worldX, surfaceY)));
+				int analyticSurfaceY = (int)Math.Round(terrainHeight.Compute(point.SetX(worldX)));
 				int stoneAboveDepth = 0;
 				for (int y = surfaceY; y >= endY; y--) {
 					blockPos.Set(worldX, y);
