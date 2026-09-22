@@ -33,12 +33,14 @@
 			Heightmap heightmap = chunk.GetHeightmap();
 			BlockPos.Mutable blockPos = new();
 			IDensityFunction.SinglePointContext point = new();
+			int minY = this.GetMinGenY();
+			int topY = chunk.GetTopY();
 
 			for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
 				int worldX = chunk.pos.ToWorldX(cx);
 				int topmostSolid = int.MinValue;
 
-				for (int y = chunk.GetTopY(); y >= this.GetMinGenY(); y--) {
+				for (int y = topY; y >= minY; y--) {
 					double density = noiseChunk.GetFinalDensity(point.Set(worldX, y));
 					if (density > 0) {
 						chunk.SetBlockState(blockPos.Set(worldX, y), this.noiseSettings.GetValue().defaultBlock);
@@ -46,7 +48,11 @@
 					}
 				}
 
-				heightmap.Update(cx, topmostSolid, chunk.GetBlockState(blockPos.Set(worldX, topmostSolid)));
+				if (topmostSolid != int.MinValue) {
+					heightmap.Update(cx, topmostSolid, chunk.GetBlockState(blockPos.Set(worldX, topmostSolid)));
+				} else {
+					heightmap.Update(cx, this.GetMinGenY(), Blocks.AIR.DefaultState);
+				}
 			}
 			return chunk;
 		}

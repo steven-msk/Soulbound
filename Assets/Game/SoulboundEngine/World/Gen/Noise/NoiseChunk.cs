@@ -1,6 +1,5 @@
 ﻿namespace SoulboundEngine.World.Gen.Noise {
 	using SoulboundEngine.Common.Collection;
-	using SoulboundEngine.World.Chunk;
 	using SoulboundEngine.World.Gen.Function;
 	using System;
 	using System.Collections.Generic;
@@ -33,19 +32,18 @@
 		}
 
 		public record CacheLastX(IDensityFunction wrapped) : DensityFunctions.ICacheFunction {
-			private int lastChunkX = int.MinValue;
+			private int lastX = int.MinValue;
 			private double lastValue;
 
 			public DensityFunctions.CachedFunction.Type type => DensityFunctions.CachedFunction.Type.CACHE_LAST_X;
 
 			public double Compute(IDensityFunction.IContext context) {
 				int blockX = context.blockX;
-				int chunkX = ChunkBlockPos.ToLocalX(blockX);
-				if (this.lastChunkX == chunkX) {
+				if (this.lastX == blockX) {
 					return this.lastValue;
 				}
 
-				this.lastChunkX = chunkX;
+				this.lastX = blockX;
 				double value = this.wrapped.Compute(context);
 				this.lastValue = value;
 				return value;
