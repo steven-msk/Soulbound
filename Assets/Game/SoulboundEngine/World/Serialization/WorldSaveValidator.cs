@@ -24,7 +24,7 @@
 			if (!propertiesFile.CreateNewFile()) {
 				throw new InvalidOperationException("Failed to create properties file: " + propertiesFile.FullPath);
 			}
-			LevelPropertyInfo info = new(seed, preset);
+			LevelPropertyInfo info = new(seed, preset, GlobalSaveVersion.Current);
 			propertiesFile.WriteAllText(LevelPropertyInfo.CODEC.Encode(info).ToString(Formatting.Indented));
 
 			File chunksFolder = saveFolder.Combine(this.chunksFolder);
@@ -48,6 +48,7 @@
 				return new WorldSave(saveFolder, chunksFolder, saveFolder.Name, info);
 			} catch (Exception e) {
 				Logger.LogFatal(e);
+				saveFolder.Delete();
 				return null;
 			}
 		}

@@ -3,7 +3,7 @@
 	using SoulboundEngine.Serialization;
 
 	public record LevelType(int minY, int maxY) {
-		public static readonly Codec<RegistryKey<LevelType>> KEY_CODEC = RegistryKey<LevelType>.Codec(Registries.LEVEL_TYPE.GetKey());
+		public static readonly Codec<RegistryKey<LevelType>> KEY_CODEC = RegistryKey<LevelType>.Codec(RegistryKeys.LEVEL_TYPE);
 		public static readonly RegistryKey<LevelType> DEFAULT = Register("default");
 
 		public int Height => this.maxY - this.minY;

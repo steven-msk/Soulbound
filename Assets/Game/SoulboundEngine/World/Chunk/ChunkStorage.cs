@@ -1,4 +1,5 @@
 ﻿namespace SoulboundEngine.World.Chunk {
+	using SoulboundEngine.Serialization;
 	using SoulboundEngine.World.Level;
 	using System;
 	using System.Collections.Generic;
@@ -8,7 +9,7 @@
 #nullable enable
 
 	public class ChunkStorage : IDisposable {
-		private const string FILE_EXTENSION = ".txt";
+		private const string FILE_EXTENSION = ".json";
 		private readonly HashSet<int> savedChunks = new();
 		private readonly File folder;
 
@@ -62,7 +63,7 @@
 			chunkFile.CreateNewFile();
 			using StreamWriter writer = chunkFile.CreateText();
 
-			SerializableChunkData data = SerializableChunkData.Of(chunk);
+			SerializableChunkData data = SerializableChunkData.Of(chunk, GlobalSaveVersion.Current);
 			writer.Write(data.Write());
 
 			int chunkX = chunk.pos.x;

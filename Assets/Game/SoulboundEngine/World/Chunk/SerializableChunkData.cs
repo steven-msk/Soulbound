@@ -16,13 +16,14 @@
 #nullable enable
 
 	public record SerializableChunkData(
+		int sinceVersion,
 		ChunkPos chunkPos,
 		int[]? heightmap,
 		List<SerializableChunkData.SectionData> sectionData,
 		List<JToken> tileEntities,
 		RegistryEntry<Biome>[] biomes
 	) {
-		public static SerializableChunkData Of(Chunk chunk) {
+		public static SerializableChunkData Of(Chunk chunk, int version) {
 			if (!chunk.CanBeSerialized()) {
 				throw new ArgumentException("Chunk cant be serialized: " + chunk);
 			}
@@ -45,11 +46,19 @@
 				if (json != null) tileEntities.Add(json);
 			}
 
-			return new SerializableChunkData(pos, chunk.HasHeightmap() ? chunk.GetHeightmap().GetRaw() : null, sectionData, tileEntities, chunk.GetBiomes());
+			return new SerializableChunkData(
+				version, 
+				pos, 
+				chunk.HasHeightmap() ? chunk.GetHeightmap().GetRaw() : null, 
+				sectionData, 
+				tileEntities, 
+				chunk.GetBiomes()
+			);
 		}
 
 		public static SerializableChunkData Parse(string jsonString, Level level) {
 			JObject jsonObject = JObject.Parse(jsonString);
+			int sinceVersion = GlobalSaveVersion.GetSinceVersion(jsonObject);
 			ChunkPos chunkPos = ChunkPos.CODEC.Decode(jsonObject["pos"] ?? JValue.CreateNull()).GetOrThrow();
 
 			List<SectionData> sectionData = new();
@@ -97,7 +106,7 @@
 				}
 			}
 
-			return new SerializableChunkData(chunkPos, heightmap, sectionData, tileEntities, biomes);
+			return new SerializableChunkData(sinceVersion, chunkPos, heightmap, sectionData, tileEntities, biomes);
 		}
 
 		public Chunk Read(Level level, ChunkPos chunkPos) {
@@ -175,13 +184,13 @@
 				biomes.Add(biome == null ? JValue.CreateNull() : Biome.ENTRY_CODEC.Encode(biome));
 			}
 
-			JObject json = new() {
-				["pos"] = ChunkPos.CODEC.Encode(this.chunkPos),
-				["heightmap"] = heightmapArray == null ? JValue.CreateNull() : heightmapArray,
-				["sections"] = sections,
-				["tileEntities"] = tileEntities,
-				["biomes"] = biomes
-			};
+			JObject json = new();
+			GlobalSaveVersion.WriteVersion(json, this.sinceVersion);
+			json["pos"] = ChunkPos.CODEC.Encode(this.chunkPos);
+			json["heightmap"] = heightmapArray == null ? JValue.CreateNull() : heightmapArray;
+			json["sections"] = sections;
+			json["tileEntities"] = tileEntities;
+			json["biomes"] = biomes;
 			return json.ToString(Formatting.None);
 		}
 

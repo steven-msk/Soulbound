@@ -6,8 +6,6 @@
 
 		public override DataResult<T> Decode(JToken json) => this.decoder(json);
 
-		public override JToken Encode(T value) {
-			return new JValue(this.encoder(value));
-		}
+		public override JToken Encode(T value) => new JValue(this.encoder(value));
 	}
 }

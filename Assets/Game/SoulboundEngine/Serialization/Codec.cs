@@ -9,7 +9,7 @@
 		public abstract DataResult<T> Decode(JToken json);
 
 		public static Codec<T> Of(Func<T, JToken> encode, Func<JToken, DataResult<T>> decode) {
-			return new Impl(encode, decode);
+			return new DirectCodec<T>(encode, decode);
 		}
 
 		public Codec<T> WithDefault(T fallback) => new DefaultingCodec<T>(this, fallback);
@@ -37,10 +37,5 @@
 			);
 		}
 
-		private sealed record Impl(Func<T, JToken> encode, Func<JToken, DataResult<T>> decode) : Codec<T> {
-			public override DataResult<T> Decode(JToken json) => this.decode(json);
-
-			public override JToken Encode(T value) => this.encode(value);
-		}
 	}
 }
