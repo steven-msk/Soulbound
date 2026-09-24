@@ -16,11 +16,11 @@ namespace SoulboundEngine.World.Entity {
 		);
 
 		public static Identifier? GetIdentifier(EntityDescriptor descriptor) {
-			return Registries.ENTITIES.GetIdentifier(descriptor);
+			return Registries.ENTITY.GetIdentifier(descriptor);
 		}
 
 		public static EntityDescriptor? Get(Identifier id) {
-			return Registries.ENTITIES.GetEntry(id)?.GetValue();
+			return Registries.ENTITY.GetEntry(id)?.GetValue();
 		}
 
 		public abstract EntityDimensions GetDimensions();

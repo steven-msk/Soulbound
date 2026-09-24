@@ -1,5 +1,7 @@
 ﻿namespace SoulboundEngine.Common.Math {
-	public readonly struct Axis {
+	using System;
+
+	public readonly struct Axis : IEquatable<Axis> {
 		private readonly bool isHorizontal;
 
 		public static readonly Axis X = new(true, Direction.Right);
@@ -23,5 +25,7 @@
 		public bool Is(Axis axis) {
 			return this.isHorizontal == axis.isHorizontal && this.positive == axis.positive;
 		}
+
+		public bool Equals(Axis other) => this.Is(other);
 	}
 }

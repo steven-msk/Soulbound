@@ -52,5 +52,11 @@ namespace SoulboundEngine.Common.Math {
 		public static float Clamp(float value, float min, float max) {
 			return Math.Clamp(value, min, max);
 		}
+
+		public static long PositionHash(int x, int y, int z) {
+			long l = x * 3129871L ^ z * 116129781L ^ y;
+			l = l * l * 42317861L + l * 11L;
+			return l >> 16;
+		}
 	}
 }

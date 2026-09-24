@@ -1,22 +1,29 @@
 ﻿namespace SoulboundEngine.World.Chunk {
 	using Newtonsoft.Json.Linq;
+	using SoulboundEngine.Common;
+	using SoulboundEngine.Registry;
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Block.Entity;
 	using SoulboundEngine.World.Block.State;
+	using SoulboundEngine.World.Gen;
+	using SoulboundEngine.World.Gen.Biome;
+	using SoulboundEngine.World.Level;
 	using System;
 	using System.Collections.Generic;
 	using System.Linq;
 
 #nullable enable
 
-	public abstract class Chunk : IBlockGetter {
+	public abstract class Chunk : IBlockView {
 		protected readonly Dictionary<BlockPos, TileEntity> tileEntities = new();
 		protected readonly IHeightLimitView heightLimitView;
 		protected readonly ChunkSection[] sections;
-		protected readonly ChunkPos chunkPos;
+		public ChunkPos pos { get; }
+		private Heightmap? heightmap;
+		private readonly RegistryEntry<Biome>[] biomes = new RegistryEntry<Biome>[Level.CHUNK_LENGTH];
 
 		public Chunk(ChunkPos chunkPos, ChunkSection[]? sections, IHeightLimitView heightLimitView, Func<BlockStateContainer> containerFactory) {
-			this.chunkPos = chunkPos;
+			this.pos = chunkPos;
 			this.sections = new ChunkSection[heightLimitView.GetSectionCount()];
 			this.heightLimitView = heightLimitView;
 			if (sections != null) {
@@ -54,17 +61,45 @@
 
 		public int GetHeight() => this.heightLimitView.GetHeight();
 
+		public int GetHeight(int localX) {
+			return this.GetHeightmap().GetFirstFree(localX);
+		}
+
 		public HashSet<BlockPos> GetTileEntityPositions() {
 			return this.tileEntities.Keys.ToHashSet();
 		}
 
 		public virtual bool CanBeSerialized() => true;
 
-		public ChunkPos GetPos() => this.chunkPos;
-
 		public abstract bool IsEmpty();
 
 		public ChunkSection[] GetSections() => this.sections;
 		public ChunkSection GetSection(int yIndex) => this.sections[yIndex];
+
+		public Heightmap GetHeightmap() => this.heightmap ?? CreateHeightmap(this, s => !s.IsAir());
+
+		private static Heightmap CreateHeightmap(Chunk chunk, Predicate<BlockState> isOpaque) {
+			return chunk.heightmap = new Heightmap(Level.CHUNK_LENGTH, isOpaque, chunk);
+		}
+
+		public bool HasHeightmap() => this.heightmap != null;
+
+		public virtual void FillBiomesFromNoise(IBiomeResolver biomeResolver, Climate.Sampler sampler) {
+			for (int cx = 0; cx < Level.CHUNK_LENGTH; cx++) {
+				int x = this.pos.ToWorldX(cx);
+				this.biomes[cx] = biomeResolver.GetNoiseBiome(x, 0, sampler);
+			}
+		}
+
+		public RegistryEntry<Biome>? GetBiome(int localX) => this.biomes[localX];
+
+		public void ReplaceBiomes(RegistryEntry<Biome>[] biomes) {
+			if (biomes.Length != this.biomes.Length) {
+				throw new InvalidOperationException("Mismatched biome replacement array length: expected {} got {}".WithArgs(this.biomes.Length, biomes.Length));
+			}
+			Array.Copy(biomes, this.biomes, biomes.Length);
+		}
+
+		public RegistryEntry<Biome>[] GetBiomes() => (RegistryEntry<Biome>[])this.biomes.Clone();
 	}
 }

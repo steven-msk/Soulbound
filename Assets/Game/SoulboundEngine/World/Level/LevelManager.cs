@@ -1,7 +1,7 @@
 namespace SoulboundEngine.World.Level {
 	using SoulboundEngine.Common.Math;
 	using SoulboundEngine.Recipe;
-	using SoulboundEngine.World.Biome;
+	using SoulboundEngine.Registry;
 	using SoulboundEngine.World.Chunk;
 	using SoulboundEngine.World.Entity;
 	using SoulboundEngine.World.Gen;
@@ -24,20 +24,23 @@ namespace SoulboundEngine.World.Level {
 		public bool paused { get; private set; } = false;
 		private bool shouldTick;
 
-		public LevelManager(ISeedProvider seedProvider, WorldSave save, RecipeManager recipeManager, ChunkStorage chunkStorage, EntitySerializer entitySerializer) {
-			int seed = seedProvider.GetSeed();
-			PlainsBiome biome1 = new(seed);
-			HillsBiome biome2 = new(seed);
-			BiomeMap biomeMap = new(new IBiome[] { biome1, biome2 });
-			Heightmap heightmap = new(TERRAIN_PLANE_Y);
-			Cavemap cavemap = new(seed);
-			this.level = new Level(seed, recipeManager, new NoiseLevelChunkGenerator(biomeMap, heightmap, cavemap), CHUNK_RADIUS, chunkStorage);
+		public LevelManager(
+			RegistryEntry<LevelType> levelType,
+			LevelSettings levelSettings,
+			IRegistryManager registryManager,
+			ISeedProvider seedProvider,
+			WorldSave save,
+			RecipeManager recipeManager, 
+			ChunkStorage chunkStorage, 
+			EntitySerializer entitySerializer
+		) {
+			this.level = new Level(levelType, levelSettings, registryManager, seedProvider.GetSeed(), recipeManager, CHUNK_RADIUS, chunkStorage);
 			this.save = save;
 			this.entitySerializer = entitySerializer;
 		}
 
 		public Level Bootstrap() {
-			this.level.GenerateSpawn(this.save.isNew);
+			this.level.GenerateSpawn();
 			this.level.DeserializeEntities(this.entitySerializer);
 			this.isBootstrapped = true;
 			return this.level;

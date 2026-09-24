@@ -1,7 +1,7 @@
-﻿using SoulboundEngine.Registry;
-using System.Collections.Generic;
+﻿namespace SoulboundEngine.Recipe {
+	using SoulboundEngine.Registry;
+	using System.Collections.Generic;
 
-namespace SoulboundEngine.Recipe {
 	public abstract class RecipeType {
 		protected static readonly Dictionary<Identifier, RecipeType> typeById = new();
 
@@ -15,8 +15,8 @@ namespace SoulboundEngine.Recipe {
 			Registry<RecipeType>.Register(Registries.RECIPE_TYPE, id, this);
 		}
 
-		public static void Init() {
-		}
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter")]
+		public static RecipeType Init(RegistryBootstrapContext context, Registry<RecipeType> registry) => STATIONLESS;
 	}
 
 	public class RecipeType<TRecipe> : RecipeType where TRecipe : IRecipe {

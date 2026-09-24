@@ -1,52 +1,56 @@
 ﻿namespace SoulboundEngine.World.Serialization {
+	using Newtonsoft.Json;
+	using Newtonsoft.Json.Linq;
+	using SoulboundEngine.Serialization;
+	using SoulboundEngine.World.Gen;
 	using System;
 	using File = SoulboundEngine.Serialization.File;
 
 	public class WorldSaveValidator : IWorldSaveValidator {
-		private readonly string seedFileName;
-		private readonly string chunksFolderName;
+		private readonly string propertiesFile;
+		private readonly string chunksFolder;
 
-		public WorldSaveValidator(string seedFileName, string chunksFolderName) {
-			this.seedFileName = seedFileName;
-			this.chunksFolderName = chunksFolderName;
+		public WorldSaveValidator(string propertiesFile, string chunksFolder) {
+			this.propertiesFile = propertiesFile;
+			this.chunksFolder = chunksFolder;
 		}
 
 		public bool IsValid(File saveFolder) {
-			return saveFolder.HasChild(this.seedFileName);
+			return saveFolder.HasChild(this.propertiesFile);
 		}
 
-		public void ValidateNewSave(File saveFolder, int seed) {
-			File seedFile = saveFolder.Combine(this.seedFileName);
-			if (!seedFile.CreateNewFile()) {
-				throw new InvalidOperationException("Failed to create seed file: " + seedFile.FullPath);
+		public void ValidateNewSave(File saveFolder, int seed, WorldPreset preset) {
+			File propertiesFile = saveFolder.Combine(this.propertiesFile);
+			if (!propertiesFile.CreateNewFile()) {
+				throw new InvalidOperationException("Failed to create properties file: " + propertiesFile.FullPath);
 			}
-			seedFile.WriteAllText(seed.ToString());
+			LevelPropertyInfo info = new(seed, preset);
+			propertiesFile.WriteAllText(LevelPropertyInfo.CODEC.Encode(info).ToString(Formatting.Indented));
 
-			File chunksFolder = saveFolder.Combine(this.chunksFolderName);
+			File chunksFolder = saveFolder.Combine(this.chunksFolder);
 			chunksFolder.Mkdir();
 		}
 
-		public bool Validate(File saveFolder, out int seed, out string worldName, out File chunksFolder) {
-			seed = 0;
-			worldName = saveFolder.Name;
-			chunksFolder = default;
-
-			File seedFile = saveFolder.Combine(this.seedFileName);
-			if (!seedFile.Exists) {
-				Logger.LogError("Save validation failed: seed file does not exist: " + seedFile.FullPath);
-				return false;
+		public WorldSave? Validate(File saveFolder) {
+			File propertiesFile = saveFolder.Combine(this.propertiesFile);
+			if (!propertiesFile.Exists) {
+				Logger.LogError("Properties file not found: " + propertiesFile.FullPath);
+				return null;
 			}
 			try {
-				string seedText = seedFile.ReadAllText();
-				seed = int.Parse(seedText);
-			} catch (Exception e) {
-				Logger.LogFatal(e, "Save validation failed: could not parse seed");
-				return false;
-			}
+				JObject json = JObject.Parse(propertiesFile.ReadAllText());
+				DataResult<LevelPropertyInfo> infoResult = LevelPropertyInfo.CODEC.Decode(json);
+				LevelPropertyInfo info = infoResult.GetOrThrow(m => new InvalidOperationException("Failed to read level properties: " + m));
 
-			chunksFolder = saveFolder.Combine(this.chunksFolderName);
-			chunksFolder.Mkdir();
-			return true;
+				File chunksFolder = saveFolder.Combine(this.chunksFolder);
+				chunksFolder.Mkdir();
+
+				return new WorldSave(saveFolder, chunksFolder, saveFolder.Name, info);
+			} catch (Exception e) {
+				Logger.LogFatal(e);
+				return null;
+			}
 		}
+
 	}
 }

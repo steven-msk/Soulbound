@@ -9,6 +9,7 @@ namespace SoulboundEngine.UnityClient.Debug.Metrics.View {
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Block.State;
 	using SoulboundEngine.World.Chunk;
+	using SoulboundEngine.World.Level;
 	using System;
 	using System.Text;
 	using UnityEngine.UIElements;
@@ -111,13 +112,15 @@ namespace SoulboundEngine.UnityClient.Debug.Metrics.View {
 					);
 				}),
 				new LabelMetricBinding(root, PLAYER_ELEMENT, (data, format) => {
+					WorldSession session = SoulboundUnityClient.Instance.GetActiveWorldSession().GetValueOrDefault();
 					Vec2d pos = (Read(data, DebugMetricId.Pos) as Vec2d?).GetValueOrDefault();
 					BlockPos blockPos = (Read(data, DebugMetricId.BlockPos) as BlockPos?).GetValueOrDefault();
 					ChunkPos chunkPos = (Read(data, DebugMetricId.ChunkPos) as ChunkPos?).GetValueOrDefault();
 					SectionPos sectionPos = ChunkSection.ComputeLocalPos(blockPos.x, blockPos.y);
 					return ReadBool(data, DebugMetricId.IsInWorld) ?? false
 						? FormatOutput(format, $"X:{pos.x:F4} / Y:{pos.y:F4}\n" +
-							$"BX:{blockPos.x} / BY: {blockPos.y}   C: [ sx:{sectionPos.x} / sy:{sectionPos.y} : {chunkPos.x} ]")
+							$"BX: {blockPos.x} / BY: {blockPos.y}   C: [ sx:{sectionPos.x} / sy:{sectionPos.y} : {chunkPos.x} ]\n" +
+							$"Biome: {session.level.GetChunk(chunkPos.x)!.GetBiome(sectionPos.x)!.GetKey()?.value}")
 						: FormatOutput(format, "N/A");
 				}),
 				new LabelMetricBinding(root, POINTER_ELEMENT, (data, format) => {

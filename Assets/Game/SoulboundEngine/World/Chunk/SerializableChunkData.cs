@@ -1,9 +1,13 @@
 ﻿namespace SoulboundEngine.World.Chunk {
 	using Newtonsoft.Json;
 	using Newtonsoft.Json.Linq;
+	using SoulboundEngine.Registry;
+	using SoulboundEngine.Serialization;
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Block.Entity;
 	using SoulboundEngine.World.Block.State;
+	using SoulboundEngine.World.Gen;
+	using SoulboundEngine.World.Gen.Biome;
 	using SoulboundEngine.World.Level;
 	using System;
 	using System.Collections.Generic;
@@ -13,19 +17,21 @@
 
 	public record SerializableChunkData(
 		ChunkPos chunkPos,
+		int[]? heightmap,
 		List<SerializableChunkData.SectionData> sectionData,
-		List<JToken> tileEntities
+		List<JToken> tileEntities,
+		RegistryEntry<Biome>[] biomes
 	) {
-		public static SerializableChunkData Of(Level level, Chunk chunk) {
+		public static SerializableChunkData Of(Chunk chunk) {
 			if (!chunk.CanBeSerialized()) {
 				throw new ArgumentException("Chunk cant be serialized: " + chunk);
 			}
 
-			ChunkPos pos = chunk.GetPos();
+			ChunkPos pos = chunk.pos;
 			List<SectionData> sectionData = new();
 			ChunkSection[] sections = chunk.GetSections();
 
-			for (int sectionY = level.GetBottomSectionY(); sectionY < level.GetTopSectionY(); sectionY++) {
+			for (int sectionY = chunk.GetBottomSectionY(); sectionY < chunk.GetTopSectionY(); sectionY++) {
 				int sectionIndex = chunk.GetSectionIndexFromSectionY(sectionY);
 				if (sectionIndex >= 0 && sectionIndex < sections.Length) {
 					ChunkSection section = sections[sectionIndex];
@@ -39,12 +45,12 @@
 				if (json != null) tileEntities.Add(json);
 			}
 
-			return new SerializableChunkData(pos, sectionData, tileEntities);
+			return new SerializableChunkData(pos, chunk.HasHeightmap() ? chunk.GetHeightmap().GetRaw() : null, sectionData, tileEntities, chunk.GetBiomes());
 		}
 
 		public static SerializableChunkData Parse(string jsonString, Level level) {
 			JObject jsonObject = JObject.Parse(jsonString);
-			ChunkPos chunkPos = ChunkPos.Parse((string)jsonObject["pos"]!);
+			ChunkPos chunkPos = ChunkPos.CODEC.Decode(jsonObject["pos"] ?? JValue.CreateNull()).GetOrThrow();
 
 			List<SectionData> sectionData = new();
 			JObject sections = (JObject)jsonObject["sections"]!;
@@ -70,7 +76,28 @@
 				tileEntities.Add(token);
 			}
 
-			return new SerializableChunkData(chunkPos, sectionData, tileEntities);
+			JToken? heightmapToken = jsonObject["heightmap"];
+			int[]? heightmap = null;
+			if (heightmapToken != null) {
+				JArray array = (JArray)heightmapToken;
+				heightmap = new int[array.Count];
+
+				for (int i = 0; i < array.Count; i++) {
+					DataResult<int> heightResult = Codecs.INT.Decode(array[i]);
+					heightmap[i] = heightResult.GetOrThrow();
+				}
+			}
+
+			RegistryEntry<Biome>[] biomes = new RegistryEntry<Biome>[Level.CHUNK_LENGTH];
+			JToken? biomesToken = jsonObject["biomes"];
+			if (biomesToken != null) {
+				JArray array = (JArray)biomesToken;
+				for (int i = 0; i < array.Count; i++) {
+					biomes[i] = Biome.ENTRY_CODEC.Decode(array[i]).GetOrThrow();
+				}
+			}
+
+			return new SerializableChunkData(chunkPos, heightmap, sectionData, tileEntities, biomes);
 		}
 
 		public Chunk Read(Level level, ChunkPos chunkPos) {
@@ -110,6 +137,13 @@
 			}
 			chunk.SyncBlocksWithTileEntities();
 
+			if (this.heightmap != null) {
+				Heightmap chunkHeightmap = chunk.GetHeightmap();
+				chunkHeightmap.SetRaw(this.heightmap);
+			}
+
+			chunk.ReplaceBiomes(this.biomes);
+
 			return chunk;
 		}
 
@@ -129,10 +163,24 @@
 				tileEntities.Add(tileEntity);
 			}
 
+			JArray? heightmapArray = this.heightmap == null ? null : new JArray();
+			if (heightmapArray != null) {
+				foreach (int height in this.heightmap!) {
+					heightmapArray.Add(Codecs.INT.Encode(height));	
+				}
+			}
+
+			JArray biomes = new();
+			foreach (RegistryEntry<Biome> biome in this.biomes) {
+				biomes.Add(biome == null ? JValue.CreateNull() : Biome.ENTRY_CODEC.Encode(biome));
+			}
+
 			JObject json = new() {
-				["pos"] = this.chunkPos.ToString(),
+				["pos"] = ChunkPos.CODEC.Encode(this.chunkPos),
+				["heightmap"] = heightmapArray == null ? JValue.CreateNull() : heightmapArray,
 				["sections"] = sections,
-				["tileEntities"] = tileEntities
+				["tileEntities"] = tileEntities,
+				["biomes"] = biomes
 			};
 			return json.ToString(Formatting.None);
 		}

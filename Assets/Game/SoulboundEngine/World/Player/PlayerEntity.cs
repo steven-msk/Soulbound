@@ -304,7 +304,7 @@ namespace SoulboundEngine.World.Player {
 		}
 
 		private bool TryBreakBlock(BlockPos blockPos, ItemStack stack) {
-			if (!Level.IsInBounds(blockPos)) return false;
+			if (this.level.IsOutOfHeightLimit(blockPos)) return false;
 			if (!this.CanBreakBlockAt(blockPos)) return false;
 
 			BlockState blockState = this.level.GetBlockState(blockPos) ?? Blocks.AIR.DefaultState;

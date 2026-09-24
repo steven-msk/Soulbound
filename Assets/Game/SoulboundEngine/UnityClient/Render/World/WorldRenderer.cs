@@ -5,6 +5,7 @@ namespace SoulboundEngine.UnityClient.Render.World {
 	using SoulboundEngine.UnityClient.Render.Entity;
 	using SoulboundEngine.UnityClient.Util;
 	using SoulboundEngine.UnityClient.World.Widget;
+	using SoulboundEngine.World;
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Block.State;
 	using SoulboundEngine.World.Chunk;
@@ -90,7 +91,7 @@ namespace SoulboundEngine.UnityClient.Render.World {
 			pos = currentView.allPositionsWithin;
 			while (pos.MoveNext()) {
 				BlockPos blockPos = new(pos.Current.x, pos.Current.y);
-				if (!Level.IsInBounds(blockPos) || lastView.Contains(pos.Current)) {
+				if (level.IsOutOfHeightLimit(blockPos) || lastView.Contains(pos.Current)) {
 					continue;
 				}
 

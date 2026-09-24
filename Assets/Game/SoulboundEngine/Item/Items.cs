@@ -37,7 +37,7 @@ namespace SoulboundEngine.Item {
 
 		public static readonly Item placeableItem = Register(Blocks.MOVING_TICKING_BLOCK);
 		public static readonly Item teleportPlayerItem = Register("teleport_player_item", settings => new TeleportPlayerItem(settings),
-			settings => settings.NonStackable().Durability(50)
+			settings => settings.NonStackable()
 		);
 		public static readonly Item debugPointer = Register("debug_pointer", settings => new DebugPointerItem(settings),
 			settings => settings.NonStackable()
@@ -72,11 +72,11 @@ namespace SoulboundEngine.Item {
 		}
 
 		public static Item Register(Block block, Item.Settings settings) {
-			return Register(KeyOf(Registries.BLOCKS.GetKey(block)), CreateBlockItem(block), settings);
+			return Register(KeyOf(Registries.BLOCK.GetKey(block)), CreateBlockItem(block), settings);
 		}
 
 		public static Item Register(Block block, Func<Block, Item.Settings, Item> factory, Item.Settings settings) {
-			return Register(KeyOf(Registries.BLOCKS.GetKey(block)), settings => factory(block, settings), settings);
+			return Register(KeyOf(Registries.BLOCK.GetKey(block)), settings => factory(block, settings), settings);
 		}
 
 		public static Item Register(RegistryKey<Item> key, Func<Item.Settings, Item> factory) {
@@ -85,7 +85,7 @@ namespace SoulboundEngine.Item {
 
 		public static Item Register(RegistryKey<Item> key, Func<Item.Settings, Item> factory, Item.Settings settings) {
 			settings.RegistryKey(key);
-			return Registry<Item>.Register(Registries.ITEMS, key, factory(settings));
+			return Registry<Item>.Register(Registries.ITEM, key, factory(settings));
 		}
 
 		private static Func<Item.Settings, Item> CreateBlockItem(Block block) {
@@ -93,31 +93,32 @@ namespace SoulboundEngine.Item {
 		}
 
 		private static RegistryKey<Item> KeyOf(string id) {
-			return RegistryKey<Item>.Of(Registries.ITEMS.GetKey(), Identifier.Of(id));
+			return RegistryKey<Item>.Of(Registries.ITEM.GetKey(), Identifier.Of(id));
 		}
 
 		private static RegistryKey<Item> KeyOf(RegistryKey<Block> blockKey) {
-			return RegistryKey<Item>.Of(Registries.ITEMS.GetKey(), blockKey.value);
+			return RegistryKey<Item>.Of(Registries.ITEM.GetKey(), blockKey.value);
 		}
 
 		public static Identifier GetIdentifier(Item item) {
-			return Registries.ITEMS.GetIdentifier(item) ?? throw new ArgumentException("Could not find item " + item.GetName());
+			return Registries.ITEM.GetIdentifier(item) ?? throw new ArgumentException("Could not find item " + item.GetName());
 		}
 
 		public static RegistryEntry<Item> GetEntry(Item? item) {
 			return item == null
 				? GetEntry(AIR)
-				: Registries.ITEMS.GetEntry(item) ?? throw new ArgumentException("Could not find item " + item.GetName());
+				: Registries.ITEM.GetEntry(item) ?? throw new ArgumentException("Could not find item " + item.GetName());
 		}
 
 		public static RegistryEntry<Item> GetEntry(RegistryKey<Item> key) {
-			return Registries.ITEMS.GetEntry(key.value) ?? throw new ArgumentException("Could not find item " + key);
+			return Registries.ITEM.GetEntry(key.value) ?? throw new ArgumentException("Could not find item " + key);
 		}
 
 		public static Item? Get(Identifier id) {
-			return Registries.ITEMS.Get(id);
+			return Registries.ITEM.Get(id);
 		}
 
-		public static void Init() { }
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter")]
+		public static Item Init(RegistryBootstrapContext context, Registry<Item> registry) => AIR;
 	}
 }

@@ -12,8 +12,8 @@
 			return this.ApplyCommonSettings(settings)
 				.Component(ItemComponents.TOOL, new Tool(
 					new List<Tool.Rule>() {
-						Tool.Rule.Mines(this.toolType.GetBlocksThatMines(Registries.BLOCKS), this.speed),
-						Tool.Rule.CantMine(this.toolType.GetBlocksThatCantMine(Registries.BLOCKS))
+						Tool.Rule.Mines(this.toolType.GetBlocksThatMines(Registries.BLOCK), this.speed),
+						Tool.Rule.CantMine(this.toolType.GetBlocksThatCantMine(Registries.BLOCK))
 					},
 					this.durabilityCost
 				)

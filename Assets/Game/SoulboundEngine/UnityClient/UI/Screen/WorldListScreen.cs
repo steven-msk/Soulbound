@@ -1,7 +1,9 @@
 ﻿namespace SoulboundEngine.UnityClient.UI.Screen {
+	using SoulboundEngine.Registry;
 	using SoulboundEngine.UnityClient.Assets;
 	using SoulboundEngine.UnityClient.UI.UXMLBindings;
 	using SoulboundEngine.World;
+	using SoulboundEngine.World.Gen;
 	using SoulboundEngine.World.Serialization;
 	using System.Collections.Generic;
 	using System.Linq;
@@ -57,7 +59,9 @@
 						}
 					}
 
-					this.worldAccessor.CreateNewWorld(nameField.value, seed);
+					// TEMPORARY FORCED DEFAULT PRESET
+					RegistryEntry<WorldPreset> preset = Registries.WORLD_PRESET.Get(WorldPreset.DEFAULT);
+					this.worldAccessor.CreateNewWorld(nameField.value, seed, preset);
 
 					VisualElement listRoot = WORLD_LIST_ELEMENT.Get(root);
 					VisualElement slot = this.GetNextSlot(listRoot);

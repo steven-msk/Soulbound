@@ -1,17 +1,19 @@
-﻿using SoulboundEngine.Item;
-using SoulboundEngine.Loot.Entry;
-using SoulboundEngine.Loot.Provider.Number;
-using SoulboundEngine.Registry;
-using System.Collections.Generic;
+﻿namespace SoulboundEngine.Loot {
+	using SoulboundEngine.Item;
+	using SoulboundEngine.Loot.Entry;
+	using SoulboundEngine.Loot.Provider.Number;
+	using SoulboundEngine.Registry;
+	using System;
+	using System.Collections.Generic;
 
-namespace SoulboundEngine.Loot {
-	// implementation made for simplicity convenience
 	public static class LootTables {
 		private static readonly Dictionary<string, RegistryKey<LootTable>> keyByString = new();
 		public static readonly RegistryKey<LootTable> CHEST_TEST = Register(Identifier.Of("chest/test"));
 
-		public static void Init() {
-			Registry<LootTable>.Register(Registries.LOOT_TABLES, CHEST_TEST, LootTable.Create()
+		// TEMP implementation made for simplicity convenience
+		[Obsolete]
+		public static LootTable Init(RegistryBootstrapContext context, Registry<LootTable> registry) {
+			return Registry<LootTable>.Register(registry, CHEST_TEST, LootTable.Create()
 				.Pool(LootPool.Create()
 					.Rolls(UniformLootNumberProvider.Create(1, 3))
 					.With(ItemEntry.Create(Items.WOOD).Weight(5))

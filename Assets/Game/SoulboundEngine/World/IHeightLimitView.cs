@@ -1,9 +1,10 @@
-﻿using SoulboundEngine.World.Block;
-using SoulboundEngine.World.Chunk;
+﻿namespace SoulboundEngine.World {
+	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Chunk;
 
-namespace SoulboundEngine.World {
 	public interface IHeightLimitView {
 		int GetBottomY();
+
 		int GetHeight();
 
 		public static IHeightLimitView Create(int bottomY, int height) {
@@ -20,6 +21,7 @@ namespace SoulboundEngine.World {
 			}
 
 			int IHeightLimitView.GetBottomY() => this.bottomY;
+
 			int IHeightLimitView.GetHeight() => this.height;
 		}
 	}
@@ -63,6 +65,14 @@ namespace SoulboundEngine.World {
 
 		public static int GetSectionCount(this IHeightLimitView heightLimitView) {
 			return heightLimitView.GetTopSectionY() - heightLimitView.GetBottomSectionY() + 1;
+		}
+
+		public static int GetBottomY(this IHeightLimitView heightLimitView) {
+			return heightLimitView.GetBottomY();
+		}
+
+		public static int GetHeight(this IHeightLimitView heightLimitView) {
+			return heightLimitView.GetHeight();
 		}
 	}
 }
