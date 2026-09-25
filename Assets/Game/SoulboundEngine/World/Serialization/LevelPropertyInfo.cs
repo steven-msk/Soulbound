@@ -7,7 +7,7 @@
 				Field.Required<LevelPropertyInfo, int>("sinceVersion", GlobalSaveVersion.VERSION_CODEC, i => i.sinceVersion),
 				Field.Required<LevelPropertyInfo, int>("seed", Codecs.INT, i => i.seed),
 				Field.Required<LevelPropertyInfo, WorldPreset>("preset", WorldPreset.CODEC, i => i.preset),
-				(seed, sinceVersion, preset) => new LevelPropertyInfo(seed, preset, sinceVersion)
+				(sinceVersion, seed, preset) => new LevelPropertyInfo(seed, preset, sinceVersion)
 			);
 		}
 }

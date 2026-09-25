@@ -85,7 +85,7 @@
 
 			if (errors.Count > 0) {
 				string message = string.Join("; ", errors);
-				return v1.IsPresent() && v2.IsPresent() && v3.IsEmpty()
+				return v1.IsPresent() && v2.IsPresent() && v3.IsPresent()
 					? DataResult<T>.Error(message, construct(v1.GetValue(), v2.GetValue(), v3.GetValue()))
 					: DataResult<T>.Error(message);
 			}

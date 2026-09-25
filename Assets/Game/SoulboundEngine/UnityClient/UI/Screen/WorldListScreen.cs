@@ -37,11 +37,11 @@
 			this.nextWorldIndex = 0;
 			int i = 0;
 
-			foreach (WorldSave save in this.worldAccessor.ListWorldSaves()) {
-				if (this.SpaceAvailable() <= 0) break;
-
-				VisualElement slot = this.GetNextSlot(worldList);
-				this.AddWorldToList(save.name, save.seed, slot, i++);
+			if (this.SpaceAvailable() > 0) {
+				foreach (WorldSave save in this.worldAccessor.ListWorldSaves()) {
+					VisualElement slot = this.GetNextSlot(worldList);
+					this.AddWorldToList(save.name, save.Seed, slot, i++);
+				}
 			}
 
 			CREATE_WORLD_ELEMENT.Get(root).clicked += () => {

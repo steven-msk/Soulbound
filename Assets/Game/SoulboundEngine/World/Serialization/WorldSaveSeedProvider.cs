@@ -9,6 +9,6 @@
 			this.worldSave = save;
 		}
 
-		public int GetSeed() => this.worldSave.seed;
+		public int GetSeed() => this.worldSave.Seed;
 	}
 }

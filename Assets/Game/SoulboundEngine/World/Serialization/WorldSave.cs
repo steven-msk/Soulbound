@@ -8,7 +8,7 @@
 		public LevelPropertyInfo levelProperties;
 		public bool isNew;
 
-		public readonly int seed => this.levelProperties.seed;
+		public readonly int Seed => this.levelProperties.seed;
 
 		public WorldSave(File saveFolder, File chunksFolder, string name, LevelPropertyInfo levelProperties) {
 			this.saveFolder = saveFolder;
