@@ -99,7 +99,7 @@
 			Level level = context.level;
 			LootTable? table = level.GetRegistries().GetOrThrow(RegistryKeys.LOOT_TABLE).Get(this.drops)?.GetValue();
 			if (table == null) {
-				Logger.LogWarning("Missing loot table for block: {}", this);
+				Logger.LogWarning("Missing loot table entry for block: {}, did you forget to register it?", this);
 				return Collections.EmptyList<ItemStack>();
 			}
 			return table.GenerateLoot(context.Build());
