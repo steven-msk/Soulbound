@@ -60,6 +60,8 @@ namespace SoulboundEngine.World.Block {
 
 		public Vec2d GetBottomCenter() => new(this.x + 0.5d, this.y);
 
+		public BlockPos AtY(int y) => new(this.x, y);
+
 		public Vec2d GetCorner(int corner) {
 			return corner switch {
 				BOTTOM_LEFT_CORNER => new Vec2d(this.x, this.y),

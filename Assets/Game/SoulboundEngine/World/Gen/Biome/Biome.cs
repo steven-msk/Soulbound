@@ -19,6 +19,7 @@
 			Registry<Biome>.Register(registry, PLAINS, new Biome(BiomeGenSettings.EMPTY));
 			return Registry<Biome>.Register(registry, HILLS, new Biome(BiomeGenSettings.RegistryBacked(placedFeatures)
 				.AddFeature(FeatureGenStep.VEGETATION, placedFeatures.GetOrThrow(PlacedFeature.TREE))
+				.AddFeature(FeatureGenStep.ORES, placedFeatures.GetOrThrow(PlacedFeature.RUBY_ORE))
 				.Build()
 			));
 		}

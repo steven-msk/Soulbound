@@ -10,9 +10,19 @@
 
 	public record PlacedFeature(RegistryEntry<ConfiguredFeature> feature, List<IPlacementModifier> placement) {
 		public static readonly RegistryKey<PlacedFeature> TREE = Create("tree");
+		public static readonly RegistryKey<PlacedFeature> RUBY_ORE = Create("ore/ruby");
 
 		public static PlacedFeature Init(RegistryBootstrapContext context, Registry<PlacedFeature> registry) {
 			Registry<ConfiguredFeature> configured = context.Lookup(RegistryKeys.CONFIGURED_FEATURE);
+			Registry<PlacedFeature>.Register(registry, RUBY_ORE, new PlacedFeature(
+				configured.GetOrThrow(ConfiguredFeature.RUBY_ORE),
+				new List<IPlacementModifier> {
+					new CountPlacement(70),
+					InLinePlacement.Spread,
+					HeightRangePlacement.Uniform(IVerticalAnchor.Bottom, IVerticalAnchor.Top),
+					BiomeFilter.FromGenSettings
+				}
+			));
 			return Registry<PlacedFeature>.Register(registry, TREE, new PlacedFeature(
                 configured.GetOrThrow(ConfiguredFeature.TREE),
                 new List<IPlacementModifier> {

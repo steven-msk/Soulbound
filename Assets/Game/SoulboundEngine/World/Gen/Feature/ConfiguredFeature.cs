@@ -8,9 +8,17 @@
 
 	public abstract record ConfiguredFeature {
 		public static readonly RegistryKey<ConfiguredFeature> TREE = Create("tree");
+		public static readonly RegistryKey<ConfiguredFeature> RUBY_ORE = Create("ore/ruby");
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter")]
         public static ConfiguredFeature Init(RegistryBootstrapContext context, Registry<ConfiguredFeature> registry) {
+			Registry<ConfiguredFeature>.Register(registry, RUBY_ORE, new ConfiguredFeature<OreFeature.Config, OreFeature>(
+				(OreFeature)Feature.ORE,
+				new OreFeature.Config(
+					size: 2,
+					Blocks.LEAVES.DefaultState
+				)
+			));
             return Registry<ConfiguredFeature>.Register(registry, TREE, new ConfiguredFeature<TreeFeature.Config, TreeFeature>(
                 (TreeFeature)Feature.TREE,
                 new TreeFeature.Config(

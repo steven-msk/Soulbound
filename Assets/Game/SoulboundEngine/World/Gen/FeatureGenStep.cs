@@ -10,6 +10,7 @@
 	public readonly struct FeatureGenStep {
 		private static readonly List<FeatureGenStep> INDEXED_VALUES = new();
 		public static readonly FeatureGenStep VEGETATION = Register("vegetation", 0);
+		public static readonly FeatureGenStep ORES = Register("ores", 1);
 		private static FeatureGenStep[]? ordinalSteps;
 		public readonly int ordinalIndex;
 		public readonly string serializedName;
