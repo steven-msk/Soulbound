@@ -4,7 +4,9 @@ namespace SoulboundEngine.Common.Collection {
 	using System.Linq;
 
 	public static class Collections {
-		public static Dictionary<K, V> Dictionary<K, V>() => new();
+		public static Dictionary<K, V> EmptyDictionary<K, V>() => new();
+
+		public static List<T> EmptyList<T>() => new();
 
 		public static Dictionary<E, V> Dictionary<E, V>(Func<IEnumerable<E>> keysSupplier, Func<E, V> valueSupplier) {
 			Dictionary<E, V> dictionary = new();

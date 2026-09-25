@@ -151,6 +151,10 @@ namespace SoulboundEngine.Registry {
 			return $"{prefix}.{s}";
 		}
 
+		public Identifier WithPrefix(string prefix) {
+			return Of(this._namespace, $"{prefix}{this.path}");
+		}
+
 		public string[] SplitPath() {
 			return this.path.Split(PATH_SEPARATOR);
 		}
