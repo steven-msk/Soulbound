@@ -120,7 +120,7 @@ namespace SoulboundEngine.UnityClient.Debug.Metrics.View {
 					return ReadBool(data, DebugMetricId.IsInWorld) ?? false
 						? FormatOutput(format, $"X:{pos.x:F4} / Y:{pos.y:F4}\n" +
 							$"BX: {blockPos.x} / BY: {blockPos.y}   C: [ sx:{sectionPos.x} / sy:{sectionPos.y} : {chunkPos.x} ]\n" +
-							$"Biome: {session.level.GetChunk(chunkPos.x)!.GetBiome(sectionPos.x)!.GetKey()?.value}")
+							$"FromGenSettings: {session.level.GetChunk(chunkPos.x)!.GetBiome(sectionPos.x)!.GetKey()?.value}")
 						: FormatOutput(format, "N/A");
 				}),
 				new LabelMetricBinding(root, POINTER_ELEMENT, (data, format) => {

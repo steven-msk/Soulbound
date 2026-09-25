@@ -5,7 +5,8 @@
     using System.Collections.Generic;
 
     public class InLinePlacement : IPlacementModifier {
-        public static readonly InLinePlacement INSTANCE = new();
+        private static readonly InLinePlacement INSTANCE = new();
+		public static InLinePlacement Spread => INSTANCE;
 
         private InLinePlacement() {
         }

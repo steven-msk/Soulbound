@@ -47,6 +47,10 @@
 		/// </summary>
 		protected abstract MapCodec<ChunkGenerator> Codec();
 
+		public BiomeGenSettings GetBiomeGenSettings(RegistryEntry<Biome> biome) {
+			return this.generationSettingsGetter(biome);
+		}
+
 		public virtual Chunk MapBiomes(RandomState randomState, Chunk chunk) {
 			chunk.FillBiomesFromNoise(this.biomeSource, randomState.Sampler);
 			return chunk;

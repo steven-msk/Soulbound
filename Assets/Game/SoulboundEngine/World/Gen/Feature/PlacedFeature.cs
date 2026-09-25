@@ -17,8 +17,9 @@
                 configured.GetOrThrow(ConfiguredFeature.TREE),
                 new List<IPlacementModifier> {
                     new CountPlacement(4),
-                    InLinePlacement.INSTANCE,
-                    HeightmapPlacement.WORLD_SURFACE,
+                    InLinePlacement.Spread,
+                    HeightmapPlacement.WorldSurface,
+					BiomeFilter.FromGenSettings,
                     new BlockFilter(state => state.GetBlock() == Blocks.GRASS || state.GetBlock() == Blocks.DIRT)
                 }
 			));

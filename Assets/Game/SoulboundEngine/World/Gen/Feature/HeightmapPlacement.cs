@@ -4,7 +4,8 @@
     using System.Collections.Generic;
 
     public class HeightmapPlacement : IPlacementModifier {
-        public static readonly HeightmapPlacement WORLD_SURFACE = new();
+        private static readonly HeightmapPlacement WORLD_SURFACE = new();
+		public static HeightmapPlacement WorldSurface => WORLD_SURFACE;
 
         private HeightmapPlacement() {
         }
