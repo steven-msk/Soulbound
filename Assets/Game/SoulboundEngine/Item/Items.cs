@@ -28,6 +28,7 @@ namespace SoulboundEngine.Item {
 		public static readonly Item STONE_CHESTPLATE = Register("stone_chestplate", s => s.Armor(ArmorType.CHESTPLATE, ArmorSettings.STONE));
 		public static readonly Item STONE_LEGGINGS = Register("stone_leggings", s => s.Armor(ArmorType.LEGGINGS, ArmorSettings.STONE));
 		public static readonly Item STONE_BOOTS = Register("stone_boots", s => s.Armor(ArmorType.BOOTS, ArmorSettings.STONE));
+		public static readonly Item RUBY = Register("ruby");
 
 		// TEST ITEM
 		public static readonly Item JUMP_EFFECT_ITEM = Register("jump_effect_item", s => new JumpEffectItem(s), s => s

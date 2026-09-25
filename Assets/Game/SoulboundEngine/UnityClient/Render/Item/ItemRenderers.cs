@@ -30,6 +30,7 @@
 			Register(Items.STONE_LEGGINGS, DefaultResolverFactory("stone_leggings"));
 			Register(Items.STONE_CHESTPLATE, DefaultResolverFactory("stone_chestplate"));
 			Register(Items.STONE_HELMET, DefaultResolverFactory("stone_helmet"));
+			Register(Items.RUBY, DefaultResolverFactory("ruby"));
 
 			Register(Items.placeableItem, DefaultResolverFactory("bluething"));
 			Register(Items.teleportPlayerItem, DefaultResolverFactory("bluething"));

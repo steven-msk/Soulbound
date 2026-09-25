@@ -19,7 +19,7 @@
 					size: 2,
 					density: 0.8d,
 					new List<OreFeature.TargetBlockState> {
-						OreFeature.Target(defaultOreReplaceables, Blocks.LEAVES.DefaultState)
+						OreFeature.Target(defaultOreReplaceables, Blocks.RUBY_ORE.DefaultState)
 					}
 				)
 			));

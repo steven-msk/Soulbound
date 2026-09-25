@@ -93,6 +93,12 @@ MonoBehaviour:
     m_SerializedLabels:
     - preload
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3252efe14d34d2d4bb9c4669c88b34cb
+    m_Address: ruby_ore
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - preload
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 3ddab628e43f7114c804ef2cf0dff34b
     m_Address: JosefinSans-Regular SDF
     m_ReadOnly: 0
