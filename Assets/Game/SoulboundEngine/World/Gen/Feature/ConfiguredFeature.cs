@@ -12,11 +12,15 @@
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter")]
         public static ConfiguredFeature Init(RegistryBootstrapContext context, Registry<ConfiguredFeature> registry) {
+			IBlockStateTest defaultOreReplaceables = IBlockStateTest.MatchBlock(Blocks.STONE);
 			Registry<ConfiguredFeature>.Register(registry, RUBY_ORE, new ConfiguredFeature<OreFeature.Config, OreFeature>(
 				(OreFeature)Feature.ORE,
 				new OreFeature.Config(
 					size: 2,
-					Blocks.LEAVES.DefaultState
+					density: 0.8d,
+					new List<OreFeature.TargetBlockState> {
+						OreFeature.Target(defaultOreReplaceables, Blocks.LEAVES.DefaultState)
+					}
 				)
 			));
             return Registry<ConfiguredFeature>.Register(registry, TREE, new ConfiguredFeature<TreeFeature.Config, TreeFeature>(

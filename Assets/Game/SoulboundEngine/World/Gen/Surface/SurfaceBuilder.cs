@@ -1,10 +1,10 @@
 ﻿namespace SoulboundEngine.World.Gen.Surface {
+	using SoulboundEngine.Common.Math;
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Block.State;
 	using SoulboundEngine.World.Chunk;
 	using SoulboundEngine.World.Gen.Function;
 	using SoulboundEngine.World.Level;
-	using System;
 
 #nullable enable
 
@@ -31,7 +31,7 @@
 				int endY = chunk.GetBottomY();
 				context.UpdateX(worldX);
 
-				int analyticSurfaceY = (int)Math.Round(terrainHeight.Compute(point.SetX(worldX)));
+				int analyticSurfaceY = Maths.FloorToInt(terrainHeight.Compute(point.SetX(worldX)));
 				int stoneAboveDepth = 0;
 				for (int y = surfaceY; y >= endY; y--) {
 					blockPos.Set(worldX, y);

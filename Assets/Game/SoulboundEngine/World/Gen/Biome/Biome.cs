@@ -16,7 +16,10 @@
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter")]
 		public static Biome Init(RegistryBootstrapContext context, Registry<Biome> registry) {
 			Registry<PlacedFeature> placedFeatures = context.Lookup(RegistryKeys.PLACED_FEATURE);
-			Registry<Biome>.Register(registry, PLAINS, new Biome(BiomeGenSettings.EMPTY));
+			Registry<Biome>.Register(registry, PLAINS, new Biome(BiomeGenSettings.RegistryBacked(placedFeatures)
+				.AddFeature(FeatureGenStep.ORES, placedFeatures.GetOrThrow(PlacedFeature.RUBY_ORE))
+				.Build()
+			));
 			return Registry<Biome>.Register(registry, HILLS, new Biome(BiomeGenSettings.RegistryBacked(placedFeatures)
 				.AddFeature(FeatureGenStep.VEGETATION, placedFeatures.GetOrThrow(PlacedFeature.TREE))
 				.AddFeature(FeatureGenStep.ORES, placedFeatures.GetOrThrow(PlacedFeature.RUBY_ORE))
