@@ -14,7 +14,7 @@ namespace SoulboundEngine.World.Block {
 		public static readonly Block LEAVES = Register("leaves", settings => new LeafBlock(settings));
 		public static readonly Block CHEST = Register("chest", settings => new ChestBlock(settings));
 		public static readonly Block SIGN = Register("sign", settings => new SignBlock(settings));
-		public static readonly Block RUBY_ORE = Register("ruby_ore");
+		public static readonly Block RUBY_ORE = Register("ruby_ore", s => s.RequiresTool(ToolPower.STONE).Hardness(70f));
 
 		// PROTOTYPICAL
 		public static readonly Block TOGGLE_BLOCK = Register("toggle_block", settings => new ToggleBlock(settings));
