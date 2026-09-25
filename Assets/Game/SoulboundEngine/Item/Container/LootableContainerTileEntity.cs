@@ -53,15 +53,15 @@
 			}
 		}
 
-		public override void ReadAdditional(JObject json) {
-			base.ReadAdditional(json);
+		public override void ReadAdditional(JObject json, int sinceVersion) {
+			base.ReadAdditional(json, sinceVersion);
 			if (!this.TryLoadLootTable(json)) {
 				JToken? contentsJson = json["contents"];
 				if (contentsJson == null) {
 					Logger.LogError("No contents property found on LootableContainerTileEntity json: {}", json);
 					return;
 				}
-				this.Load(contentsJson);
+				this.Load(contentsJson, sinceVersion);
 			}
 		}
 

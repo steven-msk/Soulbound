@@ -9,8 +9,8 @@
 			return new RecordCodec<T, V>(field, construct);
 		}
 
-		public override DataResult<T> Decode(JToken json) {
-			DataResult<V> fieldResult = this.field.DecodeFrom(json);
+		public override DataResult<T> Decode(JToken json, int sinceVersion) {
+			DataResult<V> fieldResult = this.field.DecodeFrom(json, sinceVersion);
 			return fieldResult.Map<T>(this.construct);
 		}
 
@@ -26,8 +26,8 @@
 			return new RecordCodec<T, V1, V2>(field1, field2, construct);
 		}
 
-		public override DataResult<T> Decode(JToken json) {
-			return Apply(this.field1.DecodeFrom(json), this.field2.DecodeFrom(json), this.construct);
+		public override DataResult<T> Decode(JToken json, int sinceVersion) {
+			return Apply(this.field1.DecodeFrom(json, sinceVersion), this.field2.DecodeFrom(json, sinceVersion), this.construct);
 		}
 
 		public override JToken Encode(T value) {
@@ -60,8 +60,13 @@
 			return new RecordCodec<T, V1, V2, V3>(field1, field2, field3, construct);
 		}
 
-		public override DataResult<T> Decode(JToken json) {
-			return Apply(this.field1.DecodeFrom(json), this.field2.DecodeFrom(json), this.field3.DecodeFrom(json), this.construct);
+		public override DataResult<T> Decode(JToken json, int sinceVersion) {
+			return Apply(
+				this.field1.DecodeFrom(json, sinceVersion), 
+				this.field2.DecodeFrom(json, sinceVersion), 
+				this.field3.DecodeFrom(json, sinceVersion), 
+				this.construct
+			);
 		}
 
 		public override JToken Encode(T value) {
@@ -99,8 +104,8 @@
 			return new RecordCodec<T, V1, V2, V3, V4>(field1, field2, field3, field4, construct);
 		}
 
-		public override DataResult<T> Decode(JToken json) {
-			return Apply(this.field1.DecodeFrom(json), this.field2.DecodeFrom(json), this.field3.DecodeFrom(json), this.field4.DecodeFrom(json), this.construct);
+		public override DataResult<T> Decode(JToken json, int sinceVersion) {
+			return Apply(this.field1.DecodeFrom(json, sinceVersion), this.field2.DecodeFrom(json, sinceVersion), this.field3.DecodeFrom(json, sinceVersion), this.field4.DecodeFrom(json, sinceVersion), this.construct);
 		}
 
 		public override JToken Encode(T value) {
@@ -140,8 +145,15 @@
 			return new RecordCodec<T, V1, V2, V3, V4, V5>(field1, field2, field3, field4, field5, construct);
 		}
 
-		public override DataResult<T> Decode(JToken json) {
-			return Apply(this.field1.DecodeFrom(json), this.field2.DecodeFrom(json), this.field3.DecodeFrom(json), this.field4.DecodeFrom(json), this.field5.DecodeFrom(json), this.construct);
+		public override DataResult<T> Decode(JToken json, int sinceVersion) {
+			return Apply(
+				this.field1.DecodeFrom(json, sinceVersion),
+				this.field2.DecodeFrom(json, sinceVersion),
+				this.field3.DecodeFrom(json, sinceVersion), 
+				this.field4.DecodeFrom(json, sinceVersion), 
+				this.field5.DecodeFrom(json, sinceVersion),
+				this.construct
+			);
 		}
 
 		public override JToken Encode(T value) {
@@ -183,8 +195,16 @@
 			return new RecordCodec<T, V1, V2, V3, V4, V5, V6>(field1, field2, field3, field4, field5, field6, construct);
 		}
 
-		public override DataResult<T> Decode(JToken json) {
-			return Apply(this.field1.DecodeFrom(json), this.field2.DecodeFrom(json), this.field3.DecodeFrom(json), this.field4.DecodeFrom(json), this.field5.DecodeFrom(json), this.field6.DecodeFrom(json), this.construct);
+		public override DataResult<T> Decode(JToken json, int sinceVersion) {
+			return Apply(
+				this.field1.DecodeFrom(json, sinceVersion), 
+				this.field2.DecodeFrom(json, sinceVersion), 
+				this.field3.DecodeFrom(json, sinceVersion), 
+				this.field4.DecodeFrom(json, sinceVersion), 
+				this.field5.DecodeFrom(json, sinceVersion), 
+				this.field6.DecodeFrom(json, sinceVersion), 
+				this.construct
+			);
 		}
 
 		public override JToken Encode(T value) {

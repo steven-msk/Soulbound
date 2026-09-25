@@ -59,7 +59,7 @@
 		public static SerializableChunkData Parse(string jsonString, Level level) {
 			JObject jsonObject = JObject.Parse(jsonString);
 			int sinceVersion = GlobalSaveVersion.GetSinceVersion(jsonObject);
-			ChunkPos chunkPos = ChunkPos.CODEC.Decode(jsonObject["pos"] ?? JValue.CreateNull()).GetOrThrow();
+			ChunkPos chunkPos = ChunkPos.CODEC.Decode(jsonObject["pos"] ?? JValue.CreateNull(), sinceVersion).GetOrThrow();
 
 			List<SectionData> sectionData = new();
 			JObject sections = (JObject)jsonObject["sections"]!;
@@ -92,7 +92,7 @@
 				heightmap = new int[array.Count];
 
 				for (int i = 0; i < array.Count; i++) {
-					DataResult<int> heightResult = Codecs.INT.Decode(array[i]);
+					DataResult<int> heightResult = Codecs.INT.Decode(array[i], sinceVersion);
 					heightmap[i] = heightResult.GetOrThrow();
 				}
 			}
@@ -102,7 +102,7 @@
 			if (biomesToken != null) {
 				JArray array = (JArray)biomesToken;
 				for (int i = 0; i < array.Count; i++) {
-					biomes[i] = Biome.ENTRY_CODEC.Decode(array[i]).GetOrThrow();
+					biomes[i] = Biome.ENTRY_CODEC.Decode(array[i], sinceVersion).GetOrThrow();
 				}
 			}
 
@@ -136,7 +136,7 @@
 					ChunkSection section = sections[level.GetSectionIndexFromBlock(pos.y)];
 					SectionPos sectionPos = ChunkSection.ComputeLocalPos(pos.x, pos.y);
 					BlockState state = section.GetBlockState(sectionPos.x, sectionPos.y);
-					TileEntity? tileEntity = TileEntity.FromJson(token, pos, state);
+					TileEntity? tileEntity = TileEntity.FromJson(token, pos, state, this.sinceVersion);
 					if (tileEntity != null) {
 						chunk.SetTileEntity(tileEntity);
 					}

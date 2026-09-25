@@ -452,7 +452,7 @@ namespace SoulboundEngine.World.Entity {
 		}
 
 		public void Load(JObject json, int sinceVersion) {
-			SerializedData data = SerializedData.CODEC.Decode(json)
+			SerializedData data = SerializedData.CODEC.Decode(json, sinceVersion)
 				.ResultOrPartial(error => Logger.LogError("Failed to load entity data: {}", error))
 				.OrElse(SerializedData.Get(this));
 			this.SetPosRaw(data.x, data.y);
@@ -460,19 +460,19 @@ namespace SoulboundEngine.World.Entity {
 			this.SetDeltaMovement(data.motionX, data.motionY);
 			this.SetOnGround(data.onGround);
 
-			this.guid = Codecs.GUID.Decode(json["guid"] ?? new JValue(this.guid))
+			this.guid = Codecs.GUID.Decode(json["guid"] ?? new JValue(this.guid), sinceVersion)
 				.ResultOrPartial(error => Logger.LogError("Failed to load entity guid: {}", error))
 				.OrElse(this.guid);
-			this.LoadAdditional(json);
+			this.LoadAdditional(json, sinceVersion);
 		}
 
-		protected virtual void LoadAdditional(JObject json) {
-			this.LoadAttributes(json);
+		protected virtual void LoadAdditional(JObject json, int sinceVersion) {
+			this.LoadAttributes(json, sinceVersion);
 		}
 
-		private void LoadAttributes(JObject json) {
+		private void LoadAttributes(JObject json, int sinceVersion) {
 			JToken token = json["attributes"] ?? new JArray();
-			this.attributes.Unpack(AttributeInstance.Packed.CODEC.ListOf().Decode(token)
+			this.attributes.Unpack(AttributeInstance.Packed.CODEC.ListOf().Decode(token, sinceVersion)
 				.ResultOrPartial(error => Logger.LogError("Failed to load entity attributes: {}", error))
 				.OrElse(new List<AttributeInstance.Packed>())
 			);
@@ -486,7 +486,7 @@ namespace SoulboundEngine.World.Entity {
 
 			int sinceVersion = GlobalSaveVersion.GetSinceVersion(obj);
 			JToken typeToken = obj["type"] ?? JValue.CreateNull();
-			Optional<EntityDescriptor> descriptor = EntityDescriptor.CODEC.Decode(typeToken)
+			Optional<EntityDescriptor> descriptor = EntityDescriptor.CODEC.Decode(typeToken, sinceVersion)
 				.ResultOrPartial(error => Logger.LogError("Invalid entity type: {} ({})", typeToken, error));
 			if (descriptor.IsEmpty()) return null;
 

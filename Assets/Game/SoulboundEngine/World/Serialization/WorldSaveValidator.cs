@@ -39,7 +39,8 @@
 			}
 			try {
 				JObject json = JObject.Parse(propertiesFile.ReadAllText());
-				DataResult<LevelPropertyInfo> infoResult = LevelPropertyInfo.CODEC.Decode(json);
+				int sinceVersion = GlobalSaveVersion.GetSinceVersion(json);
+				DataResult<LevelPropertyInfo> infoResult = LevelPropertyInfo.CODEC.Decode(json, sinceVersion);
 				LevelPropertyInfo info = infoResult.GetOrThrow(m => new InvalidOperationException("Failed to read level properties: " + m));
 
 				File chunksFolder = saveFolder.Combine(this.chunksFolder);

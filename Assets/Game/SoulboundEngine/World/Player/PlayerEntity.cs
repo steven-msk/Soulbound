@@ -424,10 +424,10 @@ namespace SoulboundEngine.World.Player {
 			json["mainSlot"] = Codecs.INT.Encode(this.inventory.GetMainSlot());
 		}
 
-		protected override void LoadAdditional(JObject json) {
-			base.LoadAdditional(json);
-			this.inventory.Load(json["inventory"] ?? JValue.CreateNull());
-			Codecs.INT.Decode(json["mainSlot"] ?? JValue.CreateNull())
+		protected override void LoadAdditional(JObject json, int sinceVersion) {
+			base.LoadAdditional(json, sinceVersion);
+			this.inventory.Load(json["inventory"] ?? JValue.CreateNull(), sinceVersion);
+			Codecs.INT.Decode(json["mainSlot"] ?? JValue.CreateNull(), sinceVersion)
 				.ResultOrPartial().IfPresent(this.inventory.SetMainSlot);
 		}
 

@@ -96,21 +96,21 @@ namespace SoulboundEngine.World.Entity {
 			json["stack"] = ItemStack.EMPTY_ACCEPTING_CODEC.Encode(this.itemStack);
 		}
 
-		protected override void LoadAdditional(JObject json) {
-			base.LoadAdditional(json);
-			this.SetAge(Codecs.INT.Decode(json["age"] ?? JValue.CreateNull())
+		protected override void LoadAdditional(JObject json, int sinceVersion) {
+			base.LoadAdditional(json, sinceVersion);
+			this.SetAge(Codecs.INT.Decode(json["age"] ?? JValue.CreateNull(), sinceVersion)
 				.ResultOrPartial(error => Logger.LogError("Could not load age: {}", error))
 				.OrElse(0)
 			);
-			this.SetPickupDelay(Codecs.INT.Decode(json["pickupDelay"] ?? JValue.CreateNull())
+			this.SetPickupDelay(Codecs.INT.Decode(json["pickupDelay"] ?? JValue.CreateNull(), sinceVersion)
 				.ResultOrPartial(error => Logger.LogError("Could not load pickup delay: {}", error))
 				.OrElse(0)
 			);
-			Codecs.GUID.MakeOptional<Guid>().Decode(json["owner"] ?? JValue.CreateNull())
+			Codecs.GUID.MakeOptional<Guid>().Decode(json["owner"] ?? JValue.CreateNull(), sinceVersion)
 				.ResultOrPartial(error => Logger.LogError("Could not load owner: {}", error))
 				.IfPresent(guid => guid.IfPresent(g => this.SetOwner(g)));
 
-			ItemStack.EMPTY_ACCEPTING_CODEC.Decode(json["stack"] ?? JValue.CreateNull())
+			ItemStack.EMPTY_ACCEPTING_CODEC.Decode(json["stack"] ?? JValue.CreateNull(), sinceVersion)
 				.ResultOrPartial(error => Logger.LogError("Could not load stack: {}", error))
 				.IfPresent(this.SetStack);
 		}

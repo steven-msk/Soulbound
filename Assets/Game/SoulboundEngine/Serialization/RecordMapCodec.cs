@@ -7,8 +7,8 @@
 			return new RecordMapCodec<T, V>(field, construct);
 		}
 
-		public override DataResult<T> Decode(JObject json) {
-			return this.field.DecodeFrom(json).Map<T>(this.construct);
+		public override DataResult<T> Decode(JObject json, int sinceVersion) {
+			return this.field.DecodeFrom(json, sinceVersion).Map<T>(this.construct);
 		}
 
 		public override void Encode(T value, JObject json) {
@@ -21,8 +21,8 @@
 			return new RecordMapCodec<T, V1, V2>(field1, field2, construct);
 		}
 
-		public override DataResult<T> Decode(JObject obj) {
-			return RecordCodec<T, V1, V2>.Apply(this.field1.DecodeFrom(obj), this.field2.DecodeFrom(obj), this.construct);
+		public override DataResult<T> Decode(JObject obj, int sinceVersion) {
+			return RecordCodec<T, V1, V2>.Apply(this.field1.DecodeFrom(obj, sinceVersion), this.field2.DecodeFrom(obj, sinceVersion), this.construct);
 		}
 
 		public override void Encode(T value, JObject target) {
@@ -39,11 +39,11 @@
 			return new RecordMapCodec<T, V1, V2, V3>(field1, field2, field3, construct);
 		}
 
-		public override DataResult<T> Decode(JObject json) {
+		public override DataResult<T> Decode(JObject json, int sinceVersion) {
 			return RecordCodec<T, V1, V2, V3>.Apply(
-				this.field1.DecodeFrom(json), 
-				this.field2.DecodeFrom(json), 
-				this.field3.DecodeFrom(json), 
+				this.field1.DecodeFrom(json, sinceVersion), 
+				this.field2.DecodeFrom(json, sinceVersion), 
+				this.field3.DecodeFrom(json, sinceVersion), 
 				this.construct
 			);
 		}
@@ -66,12 +66,12 @@
 			return new RecordMapCodec<T, V1, V2, V3, V4>(field1, field2, field3, field4, construct);
 		}
 
-		public override DataResult<T> Decode(JObject json) {
+		public override DataResult<T> Decode(JObject json, int sinceVersion) {
 			return RecordCodec<T, V1, V2, V3, V4>.Apply(
-				this.field1.DecodeFrom(json),
-				this.field2.DecodeFrom(json), 
-				this.field3.DecodeFrom(json),
-				this.field4.DecodeFrom(json),
+				this.field1.DecodeFrom(json, sinceVersion),
+				this.field2.DecodeFrom(json, sinceVersion), 
+				this.field3.DecodeFrom(json, sinceVersion),
+				this.field4.DecodeFrom(json, sinceVersion),
 				this.construct
 			);
 		}
@@ -95,13 +95,13 @@
 			return new RecordMapCodec<T, V1, V2, V3, V4, V5>(field1, field2, field3, field4, field5, construct);
 		}
 
-		public override DataResult<T> Decode(JObject json) {
+		public override DataResult<T> Decode(JObject json, int sinceVersion) {
 			return RecordCodec<T, V1, V2, V3, V4, V5>.Apply(
-				this.field1.DecodeFrom(json),
-				this.field2.DecodeFrom(json),
-				this.field3.DecodeFrom(json), 
-				this.field4.DecodeFrom(json), 
-				this.field5.DecodeFrom(json), 
+				this.field1.DecodeFrom(json, sinceVersion),
+				this.field2.DecodeFrom(json, sinceVersion),
+				this.field3.DecodeFrom(json, sinceVersion), 
+				this.field4.DecodeFrom(json, sinceVersion), 
+				this.field5.DecodeFrom(json, sinceVersion), 
 				this.construct
 			);
 		}

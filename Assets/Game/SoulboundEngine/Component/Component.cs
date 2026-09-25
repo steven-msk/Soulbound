@@ -37,11 +37,13 @@
 
 		public static Codec<object> WithRemovedSentinelCodec(Codec<object> boxedValueCodec) => Codec<object>.Of(
 			encode: o => IsRemoved(o) ? JValue.CreateNull() : boxedValueCodec.Encode(o),
-			decode: json => json.Type == JTokenType.Null ? DataResult<object>.Success(REMOVED) : boxedValueCodec.Decode(json)
+			decode: (json, sinceVersion) => json.Type == JTokenType.Null 
+				? DataResult<object>.Success(REMOVED) 
+				: boxedValueCodec.Decode(json, sinceVersion)
 		);
 
-		public static DataResult<ComponentType> GetTypeFrom(JToken token) {
-			return ComponentTypeField().DecodeFrom(token);
+		public static DataResult<ComponentType> GetTypeFrom(JToken token, int sinceVersion) {
+			return ComponentTypeField().DecodeFrom(token, sinceVersion);
 		} 
 
 		private static Field<Component, ComponentType> ComponentTypeField() {

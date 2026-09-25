@@ -6,9 +6,9 @@
 
 	public abstract record Codec<T> {
 		public abstract JToken Encode(T value);
-		public abstract DataResult<T> Decode(JToken json);
+		public abstract DataResult<T> Decode(JToken json, int sinceVersion);
 
-		public static Codec<T> Of(Func<T, JToken> encode, Func<JToken, DataResult<T>> decode) {
+		public static Codec<T> Of(Func<T, JToken> encode, Func<JToken, int, DataResult<T>> decode) {
 			return new DirectCodec<T>(encode, decode);
 		}
 
@@ -20,20 +20,22 @@
 
 		public Codec<Optional<T>> MakeOptional() => Codec<Optional<T>>.Of(
 			encode: v => v.IsEmpty() ? JValue.CreateNull() : this.Encode(v.GetValue()),
-			decode: json => json.Type == JTokenType.Null ? DataResult<Optional<T>>.Success(Optional<T>.Empty()) : this.Decode(json).Map(Optional<T>.Of)
+			decode: (json, sinceVersion) => json.Type == JTokenType.Null 
+				? DataResult<Optional<T>>.Success(Optional<T>.Empty()) 
+				: this.Decode(json, sinceVersion).Map(Optional<T>.Of)
 		);
 
 		public Codec<U> Xmap<U>(Func<T, U> to, Func<U, T> from) {
 			return Codec<U>.Of(
 				encode: u => this.Encode(from(u)),
-				decode: json => this.Decode(json).Map<U>(to)
+				decode: (json, sinceVersion) => this.Decode(json, sinceVersion).Map<U>(to)
 			);
 		}
 
 		public Codec<U> FlatXmap<U>(Func<T, DataResult<U>> decode, Func<U, T> encode) {
 			return Codec<U>.Of(
 				encode: u => this.Encode(encode(u)),
-				decode: json => this.Decode(json).FlatMap(decode)
+				decode: (json, sinceVersion) => this.Decode(json, sinceVersion).FlatMap(decode)
 			);
 		}
 

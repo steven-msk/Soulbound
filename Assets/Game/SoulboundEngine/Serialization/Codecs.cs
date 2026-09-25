@@ -49,9 +49,9 @@
 		public static Codec<ValueOptional<T>> MakeOptional<T>(this Codec<T> codec) where T : struct {
 			return Codec<ValueOptional<T>>.Of(
 				encode: v => v.IsEmpty() ? JValue.CreateNull() : codec.Encode(v.GetValue()),
-				decode: json => json.Type == JTokenType.Null
+				decode: (json, sinceVersion) => json.Type == JTokenType.Null
 					? DataResult<ValueOptional<T>>.Success(ValueOptional<T>.Empty())
-					: codec.Decode(json).Map(ValueOptional<T>.Of)
+					: codec.Decode(json, sinceVersion).Map(ValueOptional<T>.Of)
 			);
 		}
 
