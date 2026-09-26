@@ -205,6 +205,11 @@ namespace SoulboundEngine.UnityClient.Render.World {
 			this.chunkOutlineRenderer.Clear();
 		}
 
+		public void ToggleChunkFeatures() {
+			if (this.showingChunkFeatures) this.HideChunkFeatures();
+			else this.ShowChunkFeatures();
+		}
+
 		public void SetLevel(Level? level) {
 			this.RemoveLevelEvents();
 			if (this.level != null) this.DestroyEntities(this.level);

@@ -54,10 +54,8 @@ namespace SoulboundEngine.UnityClient.Debug.Metrics.View {
 			if (GameSettings.keybinds.toggleDebugMetrics.WasPressed()) {
 				if (!this.isVisible) {
 					this.Show();
-					this.client.ShowChunkFeatures(true);
 				} else {
 					this.Hide();
-					this.client.ShowChunkFeatures(false);
 				}
 			}
 		}

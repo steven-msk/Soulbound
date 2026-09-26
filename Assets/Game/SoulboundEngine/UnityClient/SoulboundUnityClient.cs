@@ -54,7 +54,7 @@ namespace SoulboundEngine.UnityClient {
 
 	public sealed class SoulboundUnityClient : IWorldAccessor, IDebugMetricsSource {
 		private static SoulboundUnityClient instance = null!;
-		private static readonly UnityClientLoggerWrapper unityClientLoggerWrapper = new(UnityEngine.Debug.unityLogger);
+		private static readonly UnityClientLoggerWrapper UNITY_CLIENT_LOGGER_WRAPPER = new(UnityEngine.Debug.unityLogger);
 		private readonly Stopwatch tickStopwatch = new();
 		private readonly Stopwatch tpsWindowStopwatch = new();
 		public const double TICK_RATE = 1.0d / SharedConstants.TICKS_PER_SECOND;
@@ -115,7 +115,7 @@ namespace SoulboundEngine.UnityClient {
 			this.config = config;
 			GameStateManager.SetBootstrapping();
 
-			Logger.SetWrapper(unityClientLoggerWrapper);
+			Logger.SetWrapper(UNITY_CLIENT_LOGGER_WRAPPER);
 			this.logConsole = new LogConsole(this);
 
 			Registries.Init();
@@ -324,13 +324,21 @@ namespace SoulboundEngine.UnityClient {
 					shouldBlockMouse: isPointerOverUI || isPaused
 				);
 
-				if (!hasKeyboardFocus && this.inputManager.keyboard.WasPressed(Keyboard.GetControl(Key.Escape))) {
-					if (!levelManager.paused) {
-						this.PauseGame();
-					} else {
-						this.UnpauseGame();
+				if (!hasKeyboardFocus) {
+					if (this.inputManager.keyboard.WasPressed(Keyboard.GetControl(Key.Escape))) {
+						if (!levelManager.paused) {
+							this.PauseGame();
+						} else {
+							this.UnpauseGame();
+						}
+					}
+					if (this.inputManager.keyboard.IsPressed(Keyboard.GetControl(Key.F3))
+							&& this.inputManager.keyboard.WasPressed(Keyboard.GetControl(Key.C))) {
+						this.worldRenderer.ToggleChunkFeatures();
 					}
 				}
+
+
 			}
 		}
 
