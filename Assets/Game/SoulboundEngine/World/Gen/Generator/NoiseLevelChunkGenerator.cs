@@ -2,6 +2,7 @@
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.Serialization;
 	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Block.State;
 	using SoulboundEngine.World.Chunk;
 	using SoulboundEngine.World.Gen.Biome;
 	using SoulboundEngine.World.Gen.Function;
@@ -33,6 +34,7 @@
 			Heightmap heightmap = chunk.GetHeightmap();
 			BlockPos.Mutable blockPos = new();
 			IDensityFunction.SinglePointContext point = new();
+			BlockState defaultBlock = noiseSettings.GetValue().defaultBlock;
 			int minY = this.GetMinGenY();
 			int topY = chunk.GetTopY();
 
@@ -43,7 +45,7 @@
 				for (int y = topY; y >= minY; y--) {
 					double density = noiseChunk.GetFinalDensity(point.Set(worldX, y));
 					if (density > 0) {
-						chunk.SetBlockState(blockPos.Set(worldX, y), this.noiseSettings.GetValue().defaultBlock);
+						chunk.SetBlockState(blockPos.Set(worldX, y), defaultBlock);
 						if (topmostSolid == int.MinValue) topmostSolid = y;
 					}
 				}
@@ -51,7 +53,7 @@
 				if (topmostSolid != int.MinValue) {
 					heightmap.Update(cx, topmostSolid, chunk.GetBlockState(blockPos.Set(worldX, topmostSolid)));
 				} else {
-					heightmap.Update(cx, this.GetMinGenY(), Blocks.AIR.DefaultState);
+					heightmap.Update(cx, minY, Blocks.AIR.DefaultState);
 				}
 			}
 			return chunk;

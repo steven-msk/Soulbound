@@ -97,17 +97,29 @@ namespace SoulboundEngine.UnityClient {
 
 		[UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.AfterSceneLoad)]
 		public static void GameLaunch() {
-			try {
-				new SoulboundUnityClient(Main.instance.GetUnityClientConfig()).Start();
-			} catch (Exception e) {
-				UnityEngine.Debug.LogError("Caught unhandled exception in client init");
-				UnityEngine.Debug.LogException(e);
-#if !UNITY_EDITOR
-				Environment.FailFast("Caught unhandled exception in client init", e);
-#else
-				EditorApplication.isPlaying = false;
-#endif
+			bool delayBoot = false;
+			Logger.SetWrapper(UNITY_CLIENT_LOGGER_WRAPPER);
+#if UNITY_EDITOR
+			string scene = SceneManager.GetActiveScene().name;
+			if (scene != "MainScene") {
+				SceneManager.LoadScene("MainScene", LoadSceneMode.Single);
+				Logger.LogInfo("Started game in incorrect scene '{}'. Automatically switched to 'MainScene'", scene);
+				delayBoot = true;
 			}
+#endif
+			UniTask.Post(async () => {
+				try {
+					if (delayBoot) await UniTask.NextFrame();
+					new SoulboundUnityClient(Main.instance.GetUnityClientConfig()).Start();
+				} catch (Exception e) {
+					Logger.LogFatal(e, "Caught unhandled exception in client init");
+#if !UNITY_EDITOR
+					Environment.FailFast("Caught unhandled exception in client init", e);
+#else
+					EditorApplication.isPlaying = false;
+#endif
+				}
+			});
 		}
 
 		private SoulboundUnityClient(UnityClientConfig config) {
@@ -115,7 +127,6 @@ namespace SoulboundEngine.UnityClient {
 			this.config = config;
 			GameStateManager.SetBootstrapping();
 
-			Logger.SetWrapper(UNITY_CLIENT_LOGGER_WRAPPER);
 			this.logConsole = new LogConsole(this);
 
 			Registries.Init();
@@ -177,6 +188,7 @@ namespace SoulboundEngine.UnityClient {
 			this.running = true;
 			// not safe UIDocument resolution
 			// TODO: rework UIHandler init with UIDocument resolution
+
 			this.uiHandler.SetUIDocument(Object.FindFirstObjectByType<UIDocument>());
 			this.uiHandler.PushScreen(new TitleScreen(this));
 			this.inputManager.Enable();
@@ -201,6 +213,7 @@ namespace SoulboundEngine.UnityClient {
 		// however the tick loop must be completely Unity API free,
 		// and all necessary calls must be posted to the main thread
 		// this should be marked for beta
+
 		private async void TickLoop() {
 			this.tpsWindowStopwatch.Restart();
 			Stopwatch accumulatorStopwatch = Stopwatch.StartNew();
@@ -219,10 +232,12 @@ namespace SoulboundEngine.UnityClient {
 						Logger.LogFatal(e);
 						// this part will need a rework
 						// if decoupling entirely from Unity API
+
 #if !UNITY_EDITOR
 						Environment.FailFast("Uncaught exception in tick loop", e);
 #else
 						EditorApplication.isPlaying = false;
+
 #endif
 					}
 					this.EndTick();
@@ -244,11 +259,14 @@ namespace SoulboundEngine.UnityClient {
 					this.Update();
 				} catch (Exception e) {
 					// TODO: custom crash handling
+
 					Logger.LogFatal(e);
+
 #if !UNITY_EDITOR
 					Environment.FailFast("Uncaught exception in frame loop", e);
 #else
 					EditorApplication.isPlaying = false;
+
 #endif
 				}
 				await UniTask.NextFrame();
@@ -263,6 +281,7 @@ namespace SoulboundEngine.UnityClient {
 			}
 
 			// this must be called last, otherwise WasPressed always returns false
+
 			this.inputManager.Tick();
 		}
 
@@ -414,6 +433,7 @@ namespace SoulboundEngine.UnityClient {
 					this.clientCommandProcessor.AddProvider(this.clientLevelCommands);
 
 					// PROTOTYPICAL
+
 					AudioManager.RebuildPools();
 					this.worldAudioEventBank.Activate();
 				})
@@ -443,6 +463,7 @@ namespace SoulboundEngine.UnityClient {
 					this.clientCommandProcessor.RemoveProvider(this.clientLevelCommands);
 
 					// PROTOTYPICAL
+
 					AudioManager.RebuildPools();
 					this.worldAudioEventBank.Deactivate();
 				})
