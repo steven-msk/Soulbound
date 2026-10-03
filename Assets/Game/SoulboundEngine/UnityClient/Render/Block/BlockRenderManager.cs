@@ -29,8 +29,10 @@
 		}
 
 		public void Clear(Tilemap tilemap, int x, int y) {
-			this.Render(tilemap, x, y, Blocks.AIR.DefaultState);
+			this.Render(tilemap, x, y, null);
 		}
+
+		public void Clear(Tilemap tilemap) => tilemap.ClearAllTiles();
 
 		private Vector3Int ToTilemapPos(int x, int y) => new(x, y);
 	}
