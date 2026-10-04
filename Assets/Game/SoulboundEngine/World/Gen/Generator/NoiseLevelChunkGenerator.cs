@@ -1,18 +1,17 @@
 ﻿namespace SoulboundEngine.World.Gen.Generator {
-	using SoulboundEngine.Registry;
-	using SoulboundEngine.Serialization;
-	using SoulboundEngine.World.Block;
-	using SoulboundEngine.World.Block.State;
-	using SoulboundEngine.World.Chunk;
-	using SoulboundEngine.World.Gen.Biome;
-	using SoulboundEngine.World.Gen.Function;
-	using SoulboundEngine.World.Gen.Noise;
-	using SoulboundEngine.World.Level;
-	using System;
-
 #nullable enable
+    using Biome;
+    using Block;
+    using Block.State;
+    using Chunk;
+    using Function;
+    using Level;
+    using Noise;
+    using Registry;
+    using SoulboundEngine.Serialization;
+    using System;
 
-	public sealed class NoiseLevelChunkGenerator : ChunkGenerator {
+    public sealed class NoiseLevelChunkGenerator : ChunkGenerator {
 		public new static readonly MapCodec<ChunkGenerator> CODEC = RecordMapCodec<ChunkGenerator, BiomeSource, RegistryEntry<NoiseGeneratorSettings>>.Of(
 			Field.Required<ChunkGenerator, BiomeSource>("biome_source", BiomeSource.CODEC, g => ((NoiseLevelChunkGenerator)g).biomeSource),
 			Field.Required<ChunkGenerator, RegistryEntry<NoiseGeneratorSettings>>("noise_settings", NoiseGeneratorSettings.CODEC, g => ((NoiseLevelChunkGenerator)g).noiseSettings),
@@ -22,19 +21,19 @@
 
 		public NoiseLevelChunkGenerator(BiomeSource biomeSource, RegistryEntry<NoiseGeneratorSettings> noiseSettings)
 			: base(biomeSource) {
-			this.noiseSettings = noiseSettings;
+            this.noiseSettings = noiseSettings;
 		}
 
 		protected override MapCodec<ChunkGenerator> Codec() => CODEC;
-
+        
 		public RegistryEntry<NoiseGeneratorSettings> NoiseSettings => this.noiseSettings;
 
 		public override Chunk Fill(RandomState randomState, Chunk chunk) {
-			NoiseChunk noiseChunk = new(randomState);
+            NoiseChunk noiseChunk = new(randomState); 
 			Heightmap heightmap = chunk.GetHeightmap();
 			BlockPos.Mutable blockPos = new();
 			IDensityFunction.SinglePointContext point = new();
-			BlockState defaultBlock = noiseSettings.GetValue().defaultBlock;
+            BlockState defaultBlock = this.noiseSettings.GetValue().defaultBlock;
 			int minY = this.GetMinGenY();
 			int topY = chunk.GetTopY();
 

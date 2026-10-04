@@ -1,23 +1,22 @@
 namespace SoulboundEngine.World.Level {
-	using SoulboundEngine.Common.Math;
-	using SoulboundEngine.Common.Math.Random;
-	using SoulboundEngine.Recipe;
-	using SoulboundEngine.Registry;
-	using SoulboundEngine.World.Block;
-	using SoulboundEngine.World.Block.Entity;
-	using SoulboundEngine.World.Block.State;
-	using SoulboundEngine.World.Chunk;
-	using SoulboundEngine.World.Entity;
-	using SoulboundEngine.World.Gen.Biome;
-	using SoulboundEngine.World.Physics;
-	using SoulboundEngine.World.Player;
-	using SoulboundEngine.World.Serialization;
-	using SoulboundEngine.World.Widget;
+#nullable enable
+	using Block;
+	using Block.Entity;
+	using Block.State;
+	using Chunk;
+	using Common.Math;
+	using Common.Math.Random;
+	using Entity;
+	using Gen.Biome;
+	using Physics;
+	using Player;
+	using Recipe;
+	using Registry;
+	using Serialization;
 	using System;
 	using System.Collections.Generic;
 	using System.Linq;
-
-#nullable enable
+	using Widget;
 
 	public sealed class Level : IWorldGenLevel, IEntityQueriable<Entity> {
 		public const int CHUNK_LENGTH = SharedConstants.CHUNK_WIDTH;
@@ -33,6 +32,7 @@ namespace SoulboundEngine.World.Level {
 		private readonly LevelChunkManager chunkManager;
 		private readonly RandomSequences randomSequences;
 		private readonly IRegistryManager registryManager;
+
 		// recipes should technically be on "server"
 		// but Level is currently the only source of truth
 		private readonly RecipeManager recipeManager;
@@ -56,7 +56,7 @@ namespace SoulboundEngine.World.Level {
 			LevelSettings levelSettings,
 			IRegistryManager registryManager,
 			long seed,
-			RecipeManager recipeManager, 
+			RecipeManager recipeManager,
 			int chunkRadius,
 			ChunkStorage chunkStorage
 		) {
@@ -70,7 +70,6 @@ namespace SoulboundEngine.World.Level {
 			this.chunkManager = new LevelChunkManager(this, levelSettings.chunkGenerator, chunkRadius, new LevelChunkCache(this, CHUNK_TTL), chunkStorage);
 		}
 
-		// known issue: current chunk generation takes way too long (60-65ms per chunk in one tick)
 		public void GenerateSpawn() {
 			Logger.LogInfo("Generating terrain with seed {}", this.seed);
 			this.chunkManager.InitialLoad(0);
@@ -130,7 +129,7 @@ namespace SoulboundEngine.World.Level {
 
 			oldState.OnStateReplaced(blockPos, this);
 			chunk.SetBlockState(blockPos, blockState);
-			blockStateChanged?.Invoke(blockPos, oldState, blockState);
+			this.blockStateChanged?.Invoke(blockPos, oldState, blockState);
 
 			bool oldTicks = oldState?.block is ITickingBlock;
 			bool newTicks = blockState?.block is ITickingBlock;
@@ -187,7 +186,7 @@ namespace SoulboundEngine.World.Level {
 
 			entity.OnAdd(guid);
 			entity.SetAlive(true);
-			entityAdded?.Invoke(entity);
+			this.entityAdded?.Invoke(entity);
 			return true;
 		}
 
@@ -197,7 +196,7 @@ namespace SoulboundEngine.World.Level {
 
 			this.entities.Remove(entity.guid);
 			entity.Dispose();
-			entityRemoved?.Invoke(entity);
+			this.entityRemoved?.Invoke(entity);
 		}
 
 		public bool SpawnEntity<E>(EntityDescriptor<E> descriptor, Vec2d pos) where E : Entity {
@@ -278,8 +277,8 @@ namespace SoulboundEngine.World.Level {
 		}
 
 		public WorldWidgetHandler<TContext> AddWidget<TContext>(
-			IWorldWidgetProvider<TContext> widgetProvider, 
-			Func<Level, BlockPos, TContext> contextFactory, 
+			IWorldWidgetProvider<TContext> widgetProvider,
+			Func<Level, BlockPos, TContext> contextFactory,
 			BlockPos pos
 		) where TContext : WorldWidgetContext {
 			TContext context = contextFactory(this, pos);
@@ -289,7 +288,7 @@ namespace SoulboundEngine.World.Level {
 				this.widgets[pos] = new List<WorldWidgetHandler>();
 			}
 			this.widgets[pos].Add(handler);
-			widgetAdded?.Invoke(handler);
+			this.widgetAdded?.Invoke(handler);
 
 			return handler;
 		}
@@ -305,13 +304,13 @@ namespace SoulboundEngine.World.Level {
 			if (!handlers.Remove(handler)) return;
 
 			if (handlers.Count == 0) this.widgets.Remove(pos);
-			widgetRemoved?.Invoke(handler);
+			this.widgetRemoved?.Invoke(handler);
 		}
 
 		public bool RemoveAllWidgetsAt(BlockPos pos) {
 			if (this.widgets.Remove(pos, out List<WorldWidgetHandler> list)) {
 				foreach (WorldWidgetHandler handler in list) {
-					widgetRemoved?.Invoke(handler);
+					this.widgetRemoved?.Invoke(handler);
 				}
 				return true;
 			}
@@ -388,7 +387,7 @@ namespace SoulboundEngine.World.Level {
 			return this.chunkManager.GetChunk(chunkX, loadOrGenerate);
 		}
 
-		public Chunk? GetChunk(BlockPos blockPos) { 
+		public Chunk? GetChunk(BlockPos blockPos) {
 			return this.GetChunk(SectionPos.BlockToSectionCoord(blockPos.x));
 		}
 

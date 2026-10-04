@@ -1,15 +1,14 @@
 ﻿namespace SoulboundEngine.Loot {
-	using SoulboundEngine.Item;
-	using SoulboundEngine.Loot.Entry;
-	using SoulboundEngine.Loot.Provider.Number;
-	using SoulboundEngine.Registry;
-	using SoulboundEngine.World.Block;
-	using System;
-	using System.Collections.Generic;
-
 #nullable enable
+    using Entry;
+    using Item;
+    using Provider.Number;
+    using Registry;
+    using System;
+    using System.Collections.Generic;
+    using World.Block;
 
-	public static class LootTables {
+    public static class LootTables {
 		private static readonly Dictionary<string, RegistryKey<LootTable>> KEY_BY_STRING = new();
 		public static readonly RegistryKey<LootTable> CHEST_TEST = Register(Identifier.Of("chest/test"));
 
@@ -35,7 +34,7 @@
 		}
 
 		private static RegistryKey<LootTable> Register(Identifier id) {
-			RegistryKey<LootTable> key = RegistryKey<LootTable>.Of(Registries.LOOT_TABLES.GetKey(), id);
+            RegistryKey<LootTable> key = RegistryKey<LootTable>.Of(Registries.LOOT_TABLES.GetKey(), id); 
 			KEY_BY_STRING.Add(key.value.ToString(), key);
 			return key;
 		}

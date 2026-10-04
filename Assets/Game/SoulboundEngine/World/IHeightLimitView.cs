@@ -1,8 +1,8 @@
 ﻿namespace SoulboundEngine.World {
-	using SoulboundEngine.World.Block;
-	using SoulboundEngine.World.Chunk;
+    using Block;
+    using Chunk;
 
-	public interface IHeightLimitView {
+    public interface IHeightLimitView { 
 		int GetBottomY();
 
 		int GetHeight();

@@ -1,33 +1,33 @@
 namespace SoulboundEngine.Registry {
-	using SoulboundEngine.Component;
-	using SoulboundEngine.GameStates;
-	using SoulboundEngine.Inventory;
-	using SoulboundEngine.Item;
-	using SoulboundEngine.Loot;
-	using SoulboundEngine.Recipe;
-	using SoulboundEngine.Serialization;
-	using SoulboundEngine.World.Block;
-	using SoulboundEngine.World.Block.Entity;
-	using SoulboundEngine.World.Entity;
-	using SoulboundEngine.World.Entity.Attribute;
-	using SoulboundEngine.World.Gen;
-	using SoulboundEngine.World.Gen.Biome;
-	using SoulboundEngine.World.Gen.Feature;
-	using SoulboundEngine.World.Gen.Function;
-	using SoulboundEngine.World.Gen.Generator;
-	using SoulboundEngine.World.Gen.Noise;
-	using SoulboundEngine.World.Level;
-	using SoulboundEngine.World.Widget;
-	using System;
-	using System.Collections.Generic;
+    using Component;
+    using GameStates;
+    using Inventory;
+    using Item;
+    using Loot;
+    using Recipe;
+    using Serialization;
+    using System;
+    using System.Collections.Generic;
+    using World.Block;
+    using World.Block.Entity;
+    using World.Entity;
+    using World.Entity.Attribute;
+    using World.Gen;
+    using World.Gen.Biome;
+    using World.Gen.Feature;
+    using World.Gen.Function;
+    using World.Gen.Generator;
+    using World.Gen.Noise;
+    using World.Level;
+    using World.Widget;
 
-	public static class Registries {
+    public static class Registries {
 		public delegate object RegistryBootstrapper<T>(RegistryBootstrapContext context, Registry<T> registry) where T : class;
 		private static readonly List<(Identifier registry, Func<object> loader)> LOADERS = new(30);
 		private static readonly HashSet<Identifier> LOADED = new();
-		private static bool freezed = false;
-		private static RegistryBootstrapContext BOOTSTRAP_CONTEXT;
-		public static IRegistryLookup LOOKUP;
+        private static bool frozen;
+        private static RegistryBootstrapContext bootstrapContext;
+        public static IRegistryLookup lookup;
 		public static readonly Identifier ROOT_IDENTIFIER = Identifier.Of("root");
 		public static readonly Registry<IRegistry> ROOT = new(RegistryKey<IRegistry>.OfRegistry(ROOT_IDENTIFIER));
 		public static readonly Registry<Block> BLOCK = Create(RegistryKeys.BLOCK, Blocks.Init);
@@ -60,9 +60,9 @@ namespace SoulboundEngine.Registry {
 		}
 
 		private static Registry<T> Register<T>(RegistryKey<Registry<T>> key, Registry<T> registry, RegistryBootstrapper<T> bootstrapper) where T : class {
-			if (freezed) throw new InvalidOperationException("Registries already freezed");
+            if (frozen) throw new InvalidOperationException("Registries already frozen");
 			Identifier id = key.value;
-			LOADERS.Add((id, () => bootstrapper(BOOTSTRAP_CONTEXT ??= CreateBootstrapContext(), registry)));
+            LOADERS.Add((id, () => bootstrapper(bootstrapContext ??= CreateBootstrapContext(), registry)));
 			return Registry<IRegistry>.RegisterVariant(ROOT, key, registry);
 		}
 
@@ -71,11 +71,10 @@ namespace SoulboundEngine.Registry {
 		}
 
 		public static IRegistryLookup GetOrCreateLookup() {
-			return LOOKUP ??= IRegistryLookup.Of(identifier => {
-				return !LOADED.Contains(identifier)
-					? throw new InvalidOperationException("Attempted to access a registry that has not been loaded yet")
-					: ROOT.GetOrThrow(identifier).GetValue();
-			});
+            return lookup ??= IRegistryLookup.Of(identifier => !LOADED.Contains(identifier)
+                ? throw new InvalidOperationException("Attempted to access a registry that has not been loaded yet")
+                : ROOT.GetOrThrow(identifier).GetValue()
+            );
 		}
 
 		public static void Init() {
@@ -100,8 +99,8 @@ namespace SoulboundEngine.Registry {
 
 		public static void Freeze() {
 			Logger.LogInfo("Freezing registries");
-			if (freezed) throw new InvalidOperationException("Registries already freezed");
-			freezed = true;
+            if (frozen) throw new InvalidOperationException("Registries already frozen");
+            frozen = true;
 			ROOT.Freeze();
 
 			int c = 0;
@@ -109,7 +108,7 @@ namespace SoulboundEngine.Registry {
 				registry.Freeze();
 				c++;
 			}
-			Logger.LogInfo("Freezed {} registries", c);
+            Logger.LogInfo("Frozen {} registries", c);
 		}
 
 		private static void Validate(Registry<IRegistry> registry) {
