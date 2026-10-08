@@ -2,7 +2,7 @@ namespace SoulboundEngine.Registry {
 	using SoulboundEngine.Serialization;
 	using System;
 
-	public class RegistryEntry<T> {
+	public class RegistryEntry<T> where T : class {
 		private readonly IRegistryEntryOwner<T> owner;
 		private readonly RegistryKey<T> key;
 		private readonly T value;
@@ -22,6 +22,10 @@ namespace SoulboundEngine.Registry {
 			);
 		}
 
+		public static Codec<T> MapCodec(Registry<T> registry) {
+			return GetCodec(registry).Xmap(e => e.value, registry.GetEntry);
+		}
+
 		public RegistryKey<T> GetKey() => this.key;
 		public T GetValue() => this.value;
 
@@ -30,6 +34,7 @@ namespace SoulboundEngine.Registry {
 		public bool MatchesId(Identifier id) {
 			return this.key.value.Equals(id);
 		}
+
 		public bool MatchesKey(RegistryKey<T> key) {
 			return this.key.value.Equals(key.value) && this.key.registry.Equals(key.registry);
 		}
@@ -43,5 +48,10 @@ namespace SoulboundEngine.Registry {
 		public override string ToString() {
 			return $"entry[key={this.key}, value={this.value}]";
 		}
+
+        public void Deconstruct(out RegistryKey<T> key, out T value) {
+            key = this.key;
+            value = this.value;
+        }
 	}
 }

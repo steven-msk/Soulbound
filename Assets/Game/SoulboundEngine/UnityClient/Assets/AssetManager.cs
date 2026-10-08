@@ -69,6 +69,7 @@ namespace SoulboundEngine.UnityClient.Assets {
 			foreach (AsyncOperationHandle handle in assets.Values) {
 				handle.Release();
 			}
+			assets.Clear();
 		}
 	}
 }

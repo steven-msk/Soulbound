@@ -14,6 +14,7 @@ namespace SoulboundEngine.World.Block {
 		public static readonly Block LEAVES = Register("leaves", settings => new LeafBlock(settings));
 		public static readonly Block CHEST = Register("chest", settings => new ChestBlock(settings));
 		public static readonly Block SIGN = Register("sign", settings => new SignBlock(settings));
+		public static readonly Block RUBY_ORE = Register("ruby_ore", s => s.RequiresTool(ToolPower.STONE).Hardness(70f));
 
 		// PROTOTYPICAL
 		public static readonly Block TOGGLE_BLOCK = Register("toggle_block", settings => new ToggleBlock(settings));
@@ -46,17 +47,18 @@ namespace SoulboundEngine.World.Block {
 		private static Block Register(string id, Func<AbstractBlock.Settings, Block> factory, AbstractBlock.Settings settings) {
 			RegistryKey<Block> key = KeyOf(id);
 			settings.RegistryKey(key);
-			return Registry<Block>.Register(Registries.BLOCKS, key, factory(settings));
+			return Registry<Block>.Register(Registries.BLOCK, key, factory(settings));
 		}
 
 		public static Identifier? GetIdentifier(Block block) {
-			return Registries.BLOCKS.GetIdentifier(block);
+			return Registries.BLOCK.GetIdentifier(block);
 		}
 
 		private static RegistryKey<Block> KeyOf(string id) {
-			return RegistryKey<Block>.Of(Registries.BLOCKS.GetKey(), Identifier.Of(id));
+			return RegistryKey<Block>.Of(Registries.BLOCK.GetKey(), Identifier.Of(id));
 		}
 
-		public static void Init() { }
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter")]
+		public static Block Init(RegistryBootstrapContext context, Registry<Block> registry) => AIR;
 	}
 }

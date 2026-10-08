@@ -22,7 +22,7 @@
 
 		public TextWidgetHandler? widgetHandler { get; set; }
 
-		public override void ReadAdditional(JObject json) {
+		public override void ReadAdditional(JObject json, int sinceVersion) {
 			this.text = (string)json["text"]!;
 		}
 

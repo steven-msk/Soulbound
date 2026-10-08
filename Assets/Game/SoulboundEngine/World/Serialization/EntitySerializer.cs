@@ -46,7 +46,7 @@
 
 			JArray array = new();
 			foreach (Entity entity in entities) {
-				array.Add(entity.Save());
+				array.Add(entity.Save(GlobalSaveVersion.Current));
 			}
 
 			entitiesFile.WriteAllText(array.ToString(Formatting.Indented));
@@ -56,7 +56,7 @@
 			File playerFile = ToPlayerFile(this.save.saveFolder);
 			playerFile.CreateNewFile();
 
-			JToken token = player.Save();
+			JToken token = player.Save(GlobalSaveVersion.Current);
 			playerFile.WriteAllText(token.ToString(Formatting.Indented));
 		}
 
@@ -72,7 +72,8 @@
 			try {
 				string jsonText = playerFile.ReadAllText();
 				JObject json = JObject.Parse(jsonText);
-				player.Load(json);
+				int sinceVersion = GlobalSaveVersion.GetSinceVersion(json);
+				player.Load(json, sinceVersion);
 			} catch (Exception e) {
 				Logger.LogFatal(e, "Failed to read player data");
 				return false;

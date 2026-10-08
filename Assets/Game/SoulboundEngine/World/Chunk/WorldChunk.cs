@@ -5,7 +5,6 @@ namespace SoulboundEngine.World.Chunk {
 	using SoulboundEngine.World.Block.State;
 	using SoulboundEngine.World.Level;
 	using System;
-	using System.Collections.Generic;
 
 #nullable enable
 
@@ -15,7 +14,7 @@ namespace SoulboundEngine.World.Chunk {
 		public const float UNDERGROUND_HEIGHT_RANGE = 20f;
 		private readonly TileEntityTickManager tickManager = new();
 		private readonly Level level;
-		public int ChunkX => this.chunkPos.x;
+		public int ChunkX => this.pos.x;
 
 		public WorldChunk(Level level, ChunkPos chunkPos) 
 			: this(level, chunkPos, null, level.BlockStateContainerFactory()) { 
@@ -27,13 +26,11 @@ namespace SoulboundEngine.World.Chunk {
 			this.level = level;
 		}
 
-		public int[]? surfacePoints { get; set; }
-
 		public override void Tick() => this.tickManager.Tick();
 
-		public static int WorldYToIndex(int worldY) => worldY - Level.MIN_Y;
+		public static int WorldYToIndex(int worldY) => worldY - Level.DEFAULT_MIN_Y;
 
-		public static int IndexToWorldY(int yIndex) => yIndex + Level.MIN_Y;
+		public static int IndexToWorldY(int yIndex) => yIndex + Level.DEFAULT_MIN_Y;
 
 		public int WorldXToChunkX(int x) => x - this.ChunkX * Level.CHUNK_LENGTH;
 
@@ -75,15 +72,6 @@ namespace SoulboundEngine.World.Chunk {
 			}
 
 			return oldState;
-		}
-
-		[Obsolete]
-		public void SetBlock(ChunkBlockPos chunkPos, BlockState blockState) {
-			this.SetBlock(chunkPos.x, WorldYToIndex(chunkPos.y), blockState);
-		}
-		[Obsolete]
-		public void SetBlock(int cx, int yIndex, BlockState blockState) {
-			this.SetBlockState(new BlockPos(this.ChunkXToWorldX(cx), IndexToWorldY(yIndex)), blockState);
 		}
 
 		public BlockState GetBlockState(ChunkBlockPos chunkPos) => this.GetBlockState(chunkPos.ToBlock());
@@ -185,7 +173,5 @@ namespace SoulboundEngine.World.Chunk {
 		}
 
 		public override bool IsEmpty() => false;
-
-		public IEnumerable<TileEntity> GetTileEntities() => this.tileEntities.Values;
 	}
 }

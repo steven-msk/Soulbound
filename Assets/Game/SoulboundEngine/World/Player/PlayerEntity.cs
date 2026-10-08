@@ -304,7 +304,7 @@ namespace SoulboundEngine.World.Player {
 		}
 
 		private bool TryBreakBlock(BlockPos blockPos, ItemStack stack) {
-			if (!Level.IsInBounds(blockPos)) return false;
+			if (this.level.IsOutOfHeightLimit(blockPos)) return false;
 			if (!this.CanBreakBlockAt(blockPos)) return false;
 
 			BlockState blockState = this.level.GetBlockState(blockPos) ?? Blocks.AIR.DefaultState;
@@ -424,10 +424,10 @@ namespace SoulboundEngine.World.Player {
 			json["mainSlot"] = Codecs.INT.Encode(this.inventory.GetMainSlot());
 		}
 
-		protected override void LoadAdditional(JObject json) {
-			base.LoadAdditional(json);
-			this.inventory.Load(json["inventory"] ?? JValue.CreateNull());
-			Codecs.INT.Decode(json["mainSlot"] ?? JValue.CreateNull())
+		protected override void LoadAdditional(JObject json, int sinceVersion) {
+			base.LoadAdditional(json, sinceVersion);
+			this.inventory.Load(json["inventory"] ?? JValue.CreateNull(), sinceVersion);
+			Codecs.INT.Decode(json["mainSlot"] ?? JValue.CreateNull(), sinceVersion)
 				.ResultOrPartial().IfPresent(this.inventory.SetMainSlot);
 		}
 

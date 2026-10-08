@@ -1,4 +1,5 @@
 namespace SoulboundEngine.Registry {
+	using SoulboundEngine.Common.Collection;
 	using System;
 	using System.Collections;
 	using System.Collections.Generic;
@@ -6,7 +7,7 @@ namespace SoulboundEngine.Registry {
 
 #nullable enable
 
-	public sealed class Registry<T> : IRegistry, IRegistryEntryOwner<T>, IRegistryEntryLookup<T>, IEnumerable<T> {
+	public sealed class Registry<T> : IRegistry, IRegistryEntryOwner<T>, IRegistryEntryLookup<T>, IEnumerable<T> where T : class {
 		private readonly Dictionary<Identifier, RegistryEntry<T>> idToEntry = new();
 		private readonly Dictionary<RegistryKey<T>, RegistryEntry<T>> keyToEntry = new(new KeyComparer());
 		private readonly Dictionary<T, RegistryEntry<T>> valueToEntry = new();
@@ -19,7 +20,7 @@ namespace SoulboundEngine.Registry {
 			return (V)RegisterEntry(registry, key, value).GetValue();
 		}
 
-		public static V RegisterVariant<V>(Registry<T> registry, RegistryKey<V> key, V value) where V : T {
+		public static V RegisterVariant<V>(Registry<T> registry, RegistryKey<V> key, V value) where V : class, T {
 			return (V)registry.CreateEntry(key, value).GetValue();
 		}
 
@@ -35,8 +36,9 @@ namespace SoulboundEngine.Registry {
 			return registry.CreateEntry(key, value);
 		}
 
-		private RegistryEntry<T> CreateEntry<V>(RegistryKey<V> key, V value) where V : T {
+		private RegistryEntry<T> CreateEntry<V>(RegistryKey<V> key, V value) where V : class, T {
 			if (this.freezed) throw new InvalidOperationException("Registry already freezed");
+			if (value == null) throw new ArgumentNullException(nameof(value), "Tried to register a null entry");
 
 			RegistryKey<T> registryKey = RegistryKey<T>.Of(this.key, key.value);
 			RegistryEntry<T> entry = new(this, registryKey, value);
@@ -51,14 +53,16 @@ namespace SoulboundEngine.Registry {
 		public bool Contains(RegistryKey<T> key) => this.keyToEntry.ContainsKey(key);
 		public bool ContainsId(Identifier id) => this.idToEntry.ContainsKey(id);
 
-		void IRegistry.Freeze() {
+		public void Freeze() {
 			this.freezed = true;
 			Logger.LogInfo("Freezed registry {} with {} entries", this.key.value, this.idToEntry.Count);
 		}
 
+		public Identifier GetKeyIdentifier() => this.key.value;
+
 		public bool TryGet(RegistryKey<T> key, out T value) {
 			RegistryEntry<T>? entry = this.keyToEntry.GetValueOrDefault(key);
-			value = entry != null ? entry.GetValue() : default;
+			value = entry != null ? entry.GetValue() : default!;
 			return entry != null;
 		}
 
@@ -68,6 +72,12 @@ namespace SoulboundEngine.Registry {
 			RegistryEntry<T> entry = this.idToEntry.GetValueOrDefault(id) ?? throw new KeyNotFoundException();
 			return entry.GetValue();
 		}
+
+		public RegistryEntry<T> GetOrThrow(RegistryKey<T> key) => this.keyToEntry.GetOrThrow(key);
+
+		public RegistryEntry<T> GetOrThrow(Identifier id) => this.idToEntry.GetOrThrow(id);
+
+		public RegistryEntry<T> GetOrThrow(T value) => this.valueToEntry.GetOrThrow(value);
 
 		public RegistryEntry<T>? GetEntry(Identifier id) => this.idToEntry.GetValueOrDefault(id);
 

@@ -12,7 +12,7 @@
 			return array;
 		}
 
-		public override DataResult<List<T>> Decode(JToken json) {
+		public override DataResult<List<T>> Decode(JToken json, int sinceVersion) {
 			if (json is not JArray array) {
 				return DataResult<List<T>>.Error($"Expected array, got {json.Type}");
 			}
@@ -21,7 +21,7 @@
 			List<string> errors = new();
 
 			for (int i = 0; i < array.Count; i++) {
-				DataResult<T> elementResult = this.elementCodec.Decode(array[i]);
+				DataResult<T> elementResult = this.elementCodec.Decode(array[i], sinceVersion);
 				Optional<T> value = elementResult.ResultOrPartial(msg => errors.Add($"[{i}]: msg"));
 				if (value.IsPresent()) {
 					results.Add(value.GetValue());

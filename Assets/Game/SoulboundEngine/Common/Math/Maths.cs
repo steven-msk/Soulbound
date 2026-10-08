@@ -1,4 +1,5 @@
 namespace SoulboundEngine.Common.Math {
+	using SoulboundEngine.Common.Math.Random;
 	using Math = System.Math;
 
 	public static class Maths {
@@ -51,6 +52,20 @@ namespace SoulboundEngine.Common.Math {
 
 		public static float Clamp(float value, float min, float max) {
 			return Math.Clamp(value, min, max);
+		}
+
+		public static long PositionHash(int x, int y, int z) {
+			long l = x * 3129871L ^ z * 116129781L ^ y;
+			l = l * l * 42317861L + l * 11L;
+			return l >> 16;
+		}
+
+		public static int RandomBetweenInclusive(IRandom random, int min, int max) {
+			return random.NextInt(min, max + 1);
+		}
+
+		public static int RandomBetween(IRandom random, int min, int maxExclusive) {
+			return random.NextInt(min, maxExclusive);
 		}
 	}
 }

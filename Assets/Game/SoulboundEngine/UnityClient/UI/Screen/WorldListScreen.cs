@@ -1,7 +1,9 @@
 ﻿namespace SoulboundEngine.UnityClient.UI.Screen {
+	using SoulboundEngine.Registry;
 	using SoulboundEngine.UnityClient.Assets;
 	using SoulboundEngine.UnityClient.UI.UXMLBindings;
 	using SoulboundEngine.World;
+	using SoulboundEngine.World.Gen;
 	using SoulboundEngine.World.Serialization;
 	using System.Collections.Generic;
 	using System.Linq;
@@ -35,11 +37,11 @@
 			this.nextWorldIndex = 0;
 			int i = 0;
 
-			foreach (WorldSave save in this.worldAccessor.ListWorldSaves()) {
-				if (this.SpaceAvailable() <= 0) break;
-
-				VisualElement slot = this.GetNextSlot(worldList);
-				this.AddWorldToList(save.name, save.seed, slot, i++);
+			if (this.SpaceAvailable() > 0) {
+				foreach (WorldSave save in this.worldAccessor.ListWorldSaves()) {
+					VisualElement slot = this.GetNextSlot(worldList);
+					this.AddWorldToList(save.name, save.Seed, slot, i++);
+				}
 			}
 
 			CREATE_WORLD_ELEMENT.Get(root).clicked += () => {
@@ -57,7 +59,9 @@
 						}
 					}
 
-					this.worldAccessor.CreateNewWorld(nameField.value, seed);
+					// TEMPORARY FORCED DEFAULT PRESET
+					RegistryEntry<WorldPreset> preset = Registries.WORLD_PRESET.Get(WorldPreset.DEFAULT);
+					this.worldAccessor.CreateNewWorld(nameField.value, seed, preset);
 
 					VisualElement listRoot = WORLD_LIST_ELEMENT.Get(root);
 					VisualElement slot = this.GetNextSlot(listRoot);

@@ -30,6 +30,7 @@ namespace SoulboundEngine.UnityClient {
 	using SoulboundEngine.UnityClient.World.Widget;
 	using SoulboundEngine.World;
 	using SoulboundEngine.World.Block;
+	using SoulboundEngine.World.Gen;
 	using SoulboundEngine.World.Level;
 	using SoulboundEngine.World.Player;
 	using SoulboundEngine.World.Serialization;
@@ -53,7 +54,7 @@ namespace SoulboundEngine.UnityClient {
 
 	public sealed class SoulboundUnityClient : IWorldAccessor, IDebugMetricsSource {
 		private static SoulboundUnityClient instance = null!;
-		private static readonly UnityClientLoggerWrapper unityClientLoggerWrapper = new(UnityEngine.Debug.unityLogger);
+		private static readonly UnityClientLoggerWrapper UNITY_CLIENT_LOGGER_WRAPPER = new(UnityEngine.Debug.unityLogger);
 		private readonly Stopwatch tickStopwatch = new();
 		private readonly Stopwatch tpsWindowStopwatch = new();
 		public const double TICK_RATE = 1.0d / SharedConstants.TICKS_PER_SECOND;
@@ -69,7 +70,7 @@ namespace SoulboundEngine.UnityClient {
 		private readonly ClientCommandContext clientCommandContext;
 		private readonly ClientLevelCommandProvider clientLevelCommands;
 		private readonly WorldSavesManager worldSavesManager;
-		private readonly WorldSaveValidator worldSerializer;
+		private readonly WorldSaveValidator saveValidator;
 		private readonly UIHandler uiHandler;
 		private readonly UIAudioEventBank uiAudioEventBank;
 		private readonly WorldAudioEventBank worldAudioEventBank;
@@ -84,6 +85,7 @@ namespace SoulboundEngine.UnityClient {
 		private readonly PerformanceMetrics performanceMetrics;
 		private readonly DebugMetricsService debugMetricsService;
 		private readonly WorldWidgetManager worldWidgetManager;
+		private readonly IRegistryManager registryManager;
 		private bool running;
 		private int ticksThisSecond;
 		private double lastTickTime;
@@ -95,17 +97,29 @@ namespace SoulboundEngine.UnityClient {
 
 		[UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.AfterSceneLoad)]
 		public static void GameLaunch() {
-			try {
-				new SoulboundUnityClient(Main.instance.GetUnityClientConfig()).Start();
-			} catch (Exception e) {
-				UnityEngine.Debug.LogError("Caught unhandled exception in client init");
-				UnityEngine.Debug.LogException(e);
-#if !UNITY_EDITOR
-				Environment.FailFast("Caught unhandled exception in client init", e);
-#else
-				EditorApplication.isPlaying = false;
-#endif
+			bool delayBoot = false;
+			Logger.SetWrapper(UNITY_CLIENT_LOGGER_WRAPPER);
+#if UNITY_EDITOR
+			string scene = SceneManager.GetActiveScene().name;
+			if (scene != "MainScene") {
+				SceneManager.LoadScene("MainScene", LoadSceneMode.Single);
+				Logger.LogInfo("Started game in incorrect scene '{}'. Automatically switched to 'MainScene'", scene);
+				delayBoot = true;
 			}
+#endif
+			UniTask.Post(async () => {
+				try {
+					if (delayBoot) await UniTask.NextFrame();
+					new SoulboundUnityClient(Main.instance.GetUnityClientConfig()).Start();
+				} catch (Exception e) {
+					Logger.LogFatal(e, "Caught unhandled exception in client init");
+#if !UNITY_EDITOR
+					Environment.FailFast("Caught unhandled exception in client init", e);
+#else
+					EditorApplication.isPlaying = false;
+#endif
+				}
+			});
 		}
 
 		private SoulboundUnityClient(UnityClientConfig config) {
@@ -113,14 +127,12 @@ namespace SoulboundEngine.UnityClient {
 			this.config = config;
 			GameStateManager.SetBootstrapping();
 
-			Logger.SetWrapper(unityClientLoggerWrapper);
 			this.logConsole = new LogConsole(this);
 
+			Registries.Init();
+			this.registryManager = IRegistryManager.Of(Registries.ROOT.ToList());
 			UXMLSchema_Generated.RegisterAll();
 			AssetManager.LoadAllWithPreloadLabel();
-
-			Registries.Init();
-			Registries.Freeze();
 
 			this.inputActions = new PlayerInputActions();
 			this.inputManager = new InputManager(this.inputActions.asset);
@@ -129,7 +141,7 @@ namespace SoulboundEngine.UnityClient {
 
 			File savesFile = UnityPaths.PersistentDataRoot.Combine(config.file.savesRoot);
 			this.worldSavesManager = new WorldSavesManager(savesFile);
-			this.worldSerializer = new WorldSaveValidator(config.file.seedFile, config.file.chunksFolder);
+			this.saveValidator = new WorldSaveValidator(config.file.propertiesFile, config.file.chunksFolder);
 
 			this.debugMetricsService = new DebugMetricsService();
 			this.performanceMetrics = new PerformanceMetrics();
@@ -152,9 +164,9 @@ namespace SoulboundEngine.UnityClient {
 			AudioManager.RebuildPools();
 
 			this.spriteResolver = new AtlasSpriteResolver();
-			this.itemRenderManager = new ItemRenderManager(Registries.ITEMS.ToList(), this.spriteResolver);
-			this.entityRenderManager = new EntityRenderManager(Registries.ENTITIES.ToList(), this.itemRenderManager);
-			this.blockRenderManager = new BlockRenderManager(Registries.BLOCKS.ToList());
+			this.itemRenderManager = new ItemRenderManager(Registries.ITEM.ToList(), this.spriteResolver);
+			this.entityRenderManager = new EntityRenderManager(Registries.ENTITY.ToList(), this.itemRenderManager);
+			this.blockRenderManager = new BlockRenderManager(Registries.BLOCK.ToList());
 			this.worldWidgetManager = new WorldWidgetManager(Registries.WORLD_WIDGET_TYPE);
 			this.debugRenderer = new DebugRenderer();
 			RenderPipelineManager.endCameraRendering += this.debugRenderer.OnEndCameraRendering;
@@ -176,6 +188,7 @@ namespace SoulboundEngine.UnityClient {
 			this.running = true;
 			// not safe UIDocument resolution
 			// TODO: rework UIHandler init with UIDocument resolution
+
 			this.uiHandler.SetUIDocument(Object.FindFirstObjectByType<UIDocument>());
 			this.uiHandler.PushScreen(new TitleScreen(this));
 			this.inputManager.Enable();
@@ -200,6 +213,7 @@ namespace SoulboundEngine.UnityClient {
 		// however the tick loop must be completely Unity API free,
 		// and all necessary calls must be posted to the main thread
 		// this should be marked for beta
+
 		private async void TickLoop() {
 			this.tpsWindowStopwatch.Restart();
 			Stopwatch accumulatorStopwatch = Stopwatch.StartNew();
@@ -218,10 +232,12 @@ namespace SoulboundEngine.UnityClient {
 						Logger.LogFatal(e);
 						// this part will need a rework
 						// if decoupling entirely from Unity API
+
 #if !UNITY_EDITOR
 						Environment.FailFast("Uncaught exception in tick loop", e);
 #else
 						EditorApplication.isPlaying = false;
+
 #endif
 					}
 					this.EndTick();
@@ -243,11 +259,14 @@ namespace SoulboundEngine.UnityClient {
 					this.Update();
 				} catch (Exception e) {
 					// TODO: custom crash handling
+
 					Logger.LogFatal(e);
+
 #if !UNITY_EDITOR
 					Environment.FailFast("Uncaught exception in frame loop", e);
 #else
 					EditorApplication.isPlaying = false;
+
 #endif
 				}
 				await UniTask.NextFrame();
@@ -262,6 +281,7 @@ namespace SoulboundEngine.UnityClient {
 			}
 
 			// this must be called last, otherwise WasPressed always returns false
+
 			this.inputManager.Tick();
 		}
 
@@ -323,13 +343,21 @@ namespace SoulboundEngine.UnityClient {
 					shouldBlockMouse: isPointerOverUI || isPaused
 				);
 
-				if (!hasKeyboardFocus && this.inputManager.keyboard.WasPressed(Keyboard.GetControl(Key.Escape))) {
-					if (!levelManager.paused) {
-						this.PauseGame();
-					} else {
-						this.UnpauseGame();
+				if (!hasKeyboardFocus) {
+					if (this.inputManager.keyboard.WasPressed(Keyboard.GetControl(Key.Escape))) {
+						if (!levelManager.paused) {
+							this.PauseGame();
+						} else {
+							this.UnpauseGame();
+						}
+					}
+					if (this.inputManager.keyboard.IsPressed(Keyboard.GetControl(Key.F3))
+							&& this.inputManager.keyboard.WasPressed(Keyboard.GetControl(Key.C))) {
+						this.worldRenderer.ToggleChunkFeatures();
 					}
 				}
+
+
 			}
 		}
 
@@ -344,25 +372,32 @@ namespace SoulboundEngine.UnityClient {
 		public void PushInputFocus(IInputFocusable focus) => this.uiHandler.PushInputFocus(focus);
 		public void PopInputFocus(IInputFocusable focus) => this.uiHandler.PopInputFocus(focus);
 
-		public void CreateNewWorld(string world, int seed) {
+		public void CreateNewWorld(string world, int seed, RegistryEntry<WorldPreset> preset) {
 			if (this.config.dev.overrideSaves) {
 				seed = this.config.dev.seed;
 				world = this.config.dev.devWorld;
 			}
-			this.worldSavesManager.CreateNewWorld(world, seed, this.worldSerializer);
+			this.worldSavesManager.CreateNewWorld(world, seed, preset.GetValue(), this.saveValidator);
 		}
 
 		public void EnterWorld(string world) {
 			if (this.IsWorldSessionActive()) return;
 
+			WorldSave save = this.worldSavesManager.GetSave(world, this.saveValidator);
+			WorldSaveSeedProvider seedProvider = new(save);
+			ClientWorldBootstrapper worldLoader = new(seedProvider, save, this.registryManager);
+
+			WorldPreset preset = save.levelProperties.preset;
+			RegistryEntry<LevelType>? levelType = Registries.LEVEL_TYPE.Get(preset.levelSettings.typeEntry);
+			if (levelType == null) {
+				Logger.LogError("Could not enter world '{}'. Unknown level type: {}", world, preset.levelSettings.typeEntry);
+				return;
+			}
+
 			this.worldRenderer.Reset();
 			this.metricsHud.Hide();
 
-			WorldSave save = this.worldSavesManager.GetSave(world, this.worldSerializer);
-			WorldSaveSeedProvider seedProvider = new(save);
-			ClientWorldBootstrapper worldLoader = new(seedProvider, save);
-
-			UniTask<WorldBootData> worldBootTask = worldLoader.LoadWorld(this.recipeManager);
+			UniTask<WorldBootData> worldBootTask = worldLoader.LoadWorld(levelType, preset.levelSettings, this.recipeManager);
 			UniTask sceneLoadTask = SceneManager.LoadSceneAsync(this.config.unity.worldScene, LoadSceneMode.Additive).ToUniTask();
 
 			UniTask.WhenAll(worldBootTask, sceneLoadTask)
@@ -398,6 +433,7 @@ namespace SoulboundEngine.UnityClient {
 					this.clientCommandProcessor.AddProvider(this.clientLevelCommands);
 
 					// PROTOTYPICAL
+
 					AudioManager.RebuildPools();
 					this.worldAudioEventBank.Activate();
 				})
@@ -427,6 +463,7 @@ namespace SoulboundEngine.UnityClient {
 					this.clientCommandProcessor.RemoveProvider(this.clientLevelCommands);
 
 					// PROTOTYPICAL
+
 					AudioManager.RebuildPools();
 					this.worldAudioEventBank.Deactivate();
 				})
@@ -452,7 +489,7 @@ namespace SoulboundEngine.UnityClient {
 		}
 
 		public IEnumerable<WorldSave> ListWorldSaves() {
-			return this.worldSavesManager.ListSaves(this.worldSerializer);
+			return this.worldSavesManager.ListSaves(this.saveValidator);
 		}
 
 		public void DeleteWorld(string world) {

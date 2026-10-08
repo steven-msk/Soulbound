@@ -1,28 +1,28 @@
 namespace SoulboundEngine.World.Block {
 	using SoulboundEngine.Common.Math;
 	using SoulboundEngine.Item;
+	using SoulboundEngine.Loot.Context;
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.Serialization;
 	using SoulboundEngine.State;
 	using SoulboundEngine.World.Block.State;
 	using SoulboundEngine.World.Entity;
 	using SoulboundEngine.World.Level;
+	using SoulboundEngine.World.Player;
 	using System;
 	using System.Collections.Generic;
 
 #nullable enable
 
 	public class Block : AbstractBlock {
-		public static readonly Codec<RegistryEntry<Block>> ENTRY_CODEC = RegistryEntry<Block>.GetCodec(Registries.BLOCKS);
-		public static readonly Codec<Block> CODEC = ENTRY_CODEC.Xmap(e => e.GetValue(), Registries.BLOCKS.GetEntry);
-		private static readonly List<BlockState> statesByID = new();
+		public static readonly Codec<RegistryEntry<Block>> ENTRY_CODEC = RegistryEntry<Block>.GetCodec(Registries.BLOCK);
+		public static readonly Codec<Block> CODEC = ENTRY_CODEC.Xmap(e => e.GetValue(), Registries.BLOCK.GetEntry);
+		private static readonly List<BlockState> STATES_BY_ID = new();
 		private readonly RegistryKey<Block> registryKey;
-		private readonly AbstractBlock.Settings settings;
 		private BlockState defaultState;
 		protected StateManager<Block, BlockState> stateManager;
 
-		public Block(AbstractBlock.Settings settings) {
-			this.settings = settings;
+		public Block(AbstractBlock.Settings settings) : base(settings) {
 			this.registryKey = settings.registryKey ?? throw new NotSupportedException("Block is not added to a registry");
 
 			StateManager<Block, BlockState>.Builder builder = new(this);
@@ -30,7 +30,7 @@ namespace SoulboundEngine.World.Block {
 
 			this.stateManager = builder.Build((owner, propertyMap) => {
 				BlockState state = new(owner, propertyMap);
-				statesByID.Add(state);
+				STATES_BY_ID.Add(state);
 				return state;
 			});
 
@@ -71,7 +71,9 @@ namespace SoulboundEngine.World.Block {
 		public override float GetHardness(BlockState blockState) => this.settings.hardness;
 
 		public static void DropStacks(BlockState blockState, Level level, BlockPos blockPos, World.Entity.Entity? owner) {
-			List<ItemStack> droppedStacks = GetDroppedStacks(blockState);
+			LootWorldContext.Builder context = new(level);
+			if (owner is PlayerEntity player) context.Luck(player.GetLuck());
+			IReadOnlyList<ItemStack> droppedStacks = blockState.GetDrops(context);
 
 			foreach (ItemStack stack in droppedStacks) {
 				if (stack.IsEmpty()) continue;
@@ -82,26 +84,14 @@ namespace SoulboundEngine.World.Block {
 			}
 		}
 
-		public static List<ItemStack> GetDroppedStacks(BlockState blockState) {
-			return blockState.block.settings.droppedStacks(blockState);
-		}
-
-		internal protected static Func<BlockState, List<ItemStack>> DropSingle() => blockState => {
-			return new List<ItemStack>() { blockState.block.AsItem().GetDefaultStack(1) };
-		};
-
-		internal protected static Func<BlockState, List<ItemStack>> DropAir() => _ => {
-			return new List<ItemStack>();
-		};
-
 		public string GetTranslationKey() => this.settings.GetTranslationKey();
 
 		public static int GetRawID(BlockState state) {
-			return statesByID.IndexOf(state);
+			return STATES_BY_ID.IndexOf(state);
 		}
 
 		public static BlockState GetState(int id) {
-			return statesByID[id];
+			return STATES_BY_ID[id];
 		}
 
 		public override string ToString() {

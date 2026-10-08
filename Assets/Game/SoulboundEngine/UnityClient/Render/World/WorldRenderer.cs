@@ -5,6 +5,7 @@ namespace SoulboundEngine.UnityClient.Render.World {
 	using SoulboundEngine.UnityClient.Render.Entity;
 	using SoulboundEngine.UnityClient.Util;
 	using SoulboundEngine.UnityClient.World.Widget;
+	using SoulboundEngine.World;
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Block.State;
 	using SoulboundEngine.World.Chunk;
@@ -27,7 +28,7 @@ namespace SoulboundEngine.UnityClient.Render.World {
 		private readonly ChunkOutlineRenderer chunkOutlineRenderer;
 		private readonly BlockBreakProgressRenderer blockBreakProgressRenderer;
 		private readonly Queue<(BlockPos pos, BlockState? state)> stateChangedQueue = new();
-		private Vec2i lastPivot = Vec2i.ZERO;
+		private Vec2i? lastPivot;
 		private readonly RectInt renderView;
 		private Tilemap? tilemap;
 		private Level? level;
@@ -76,32 +77,34 @@ namespace SoulboundEngine.UnityClient.Render.World {
 			Vec2i currentPivot = level.GetPlayer().GetPosition().FloorToInt();
 			if (this.lastPivot == currentPivot) return;
 
-			RectInt lastView = this.ToRect(this.lastPivot);
-			this.lastPivot = currentPivot;
 			RectInt currentView = this.ToRect(currentPivot);
-
-			RectInt.PositionEnumerator pos = lastView.allPositionsWithin;
-			while (pos.MoveNext()) {
-				if (!currentView.Contains(pos.Current)) {
-					this.RenderBlock(pos.Current.x, pos.Current.y, Blocks.AIR.DefaultState);
+			RectInt? lastView = null;
+			if (lastPivot is { } last) {
+				lastView = this.ToRect(last);
+				RectInt.PositionEnumerator posEnum = lastView.Value.allPositionsWithin;
+				while (posEnum.MoveNext()) {
+					if (!currentView.Contains(posEnum.Current)) {
+						this.RenderBlock(posEnum.Current.x, posEnum.Current.y, null);
+					}
 				}
 			}
 
-			pos = currentView.allPositionsWithin;
+			RectInt.PositionEnumerator pos = currentView.allPositionsWithin;
 			while (pos.MoveNext()) {
 				BlockPos blockPos = new(pos.Current.x, pos.Current.y);
-				if (!Level.IsInBounds(blockPos) || lastView.Contains(pos.Current)) {
+				if (level.IsOutOfHeightLimit(blockPos) || (lastView?.Contains(pos.Current) ?? false)) {
 					continue;
 				}
 
 				BlockState? blockState = level.GetBlockState(blockPos);
 				this.RenderBlock(blockPos.x, blockPos.y, blockState);
 			}
+			this.lastPivot = currentPivot;
 		}
 
 		private void RefreshAllBlocks() {
-			if (this.level == null) return;
-			RectInt renderView = this.ToRect(this.lastPivot);
+			if (this.level == null || lastPivot == null) return;
+			RectInt renderView = this.ToRect(this.lastPivot.Value);
 			RectInt.PositionEnumerator pos = renderView.allPositionsWithin;
 			while (pos.MoveNext()) {
 				BlockPos blockPos = new(pos.Current.x, pos.Current.y);
@@ -110,10 +113,9 @@ namespace SoulboundEngine.UnityClient.Render.World {
 		}
 
 		private void RenderBlock(int x, int y, BlockState? blockState) {
-			if (this.tilemap == null) {
-				throw new InvalidOperationException("Cannot render block: tilemap is null");
+			if (tilemap != null) {
+				this.blockRenderManager.Render(this.tilemap, x, y, blockState);
 			}
-			this.blockRenderManager.Render(this.tilemap, x, y, blockState);
 		}
 
 		private RectInt ToRect(Vec2i pivot) {
@@ -126,8 +128,9 @@ namespace SoulboundEngine.UnityClient.Render.World {
 		}
 
 		public bool IsInRenderView(BlockPos blockPos) {
+			if (lastPivot == null) return false;
 			Vec2i pos = blockPos.ToVec2i();
-			return this.ToRect(this.lastPivot).Contains(new Vector2Int(pos.x, pos.y));
+			return this.ToRect(this.lastPivot.Value).Contains(new Vector2Int(pos.x, pos.y));
 		}
 
 		private void ResolveQueue<T>(Queue<T> queue, Action<T> action) {
@@ -204,6 +207,11 @@ namespace SoulboundEngine.UnityClient.Render.World {
 			this.chunkOutlineRenderer.Clear();
 		}
 
+		public void ToggleChunkFeatures() {
+			if (this.showingChunkFeatures) this.HideChunkFeatures();
+			else this.ShowChunkFeatures();
+		}
+
 		public void SetLevel(Level? level) {
 			this.RemoveLevelEvents();
 			if (this.level != null) this.DestroyEntities(this.level);
@@ -218,7 +226,7 @@ namespace SoulboundEngine.UnityClient.Render.World {
 		}
 
 		public void Reset() {
-			this.lastPivot = Vec2i.ZERO;
+			this.lastPivot = null;
 			if (this.level != null) this.DestroyEntities(this.level);
 			if (this.tilemap != null) this.tilemap.ClearAllTiles();
 			this.showingChunkFeatures = false;

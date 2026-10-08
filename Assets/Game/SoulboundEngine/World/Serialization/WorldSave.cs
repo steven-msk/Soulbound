@@ -1,19 +1,21 @@
 ﻿namespace SoulboundEngine.World.Serialization {
 	using SoulboundEngine.Serialization;
 
-	public readonly struct WorldSave {
-		public readonly File saveFolder;
-		public readonly File chunksFolder;
-		public readonly string name;
-		public readonly int seed;
-		public readonly bool isNew;
+	public struct WorldSave {
+		public File saveFolder;
+		public File chunksFolder;
+		public string name;
+		public LevelPropertyInfo levelProperties;
+		public bool isNew;
 
-		public WorldSave(File saveFolder, File chunksFolder, string name, int seed, bool isNew) {
+		public readonly int Seed => this.levelProperties.seed;
+
+		public WorldSave(File saveFolder, File chunksFolder, string name, LevelPropertyInfo levelProperties) {
 			this.saveFolder = saveFolder;
 			this.chunksFolder = chunksFolder;
 			this.name = name;
-			this.seed = seed;
-			this.isNew = isNew;
+			this.levelProperties = levelProperties;
+			this.isNew = false;
 		}
 	}
 }

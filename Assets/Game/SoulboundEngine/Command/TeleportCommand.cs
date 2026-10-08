@@ -37,7 +37,7 @@
 
 			ctx.Source.Run(level => {
 				entity.SetPos(x, y);
-				outputConsumer("Teleported {} to ({}, {})".WithArgs(target, x, y));
+				outputConsumer("Teleported {} to ({}, {})".WithArgs(entity, x, y));
 			});
 			return 1;
 		}

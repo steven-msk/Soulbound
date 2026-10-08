@@ -24,7 +24,9 @@ namespace SoulboundEngine.Item {
 		);
 		public static readonly Codec<ItemStack> EMPTY_ACCEPTING_CODEC = Codec<ItemStack>.Of(
 			encode: stack => !stack.IsEmpty() ? NON_EMPTY_CODEC.Encode(stack) : JValue.CreateNull(),
-			decode: json => json.Type == JTokenType.Null ? DataResult<ItemStack>.Success(EMPTY) : NON_EMPTY_CODEC.Decode(json)
+			decode: (json, sinceVersion) => json.Type == JTokenType.Null
+				? DataResult<ItemStack>.Success(EMPTY) 
+				: NON_EMPTY_CODEC.Decode(json, sinceVersion)
 		);
 		private static MergedComponentMap cachedEmptyComponents = null!;
 		private static MergedComponentMap CachedEmptyComponents => cachedEmptyComponents ??= MergedComponentMap.Create(Items.AIR.GetComponents(), ComponentChanges.EMPTY);

@@ -16,13 +16,13 @@ namespace SoulboundEngine.Command {
 			string remaining = builder.RemainingLowerCase;
 			return new IdentifierArgumentType(
 				id => id.GetNamespace().StartsWith(remaining) || id.GetPath().StartsWith(remaining),
-				Registries.BLOCKS.GetIdentifiers
+				Registries.BLOCK.GetIdentifiers
 			).ListSuggestions(context, builder);
 		}
 
 		public override Block Parse(IStringReader reader) {
 			Identifier identifier = new IdentifierArgumentType().Parse(reader);
-			RegistryEntry<Block>? block = Registries.BLOCKS.GetEntry(identifier);
+			RegistryEntry<Block>? block = Registries.BLOCK.GetEntry(identifier);
 			return block == null
 				? throw new DynamicCommandExceptionType(o => new LiteralMessage("Invalid block '{}'".WithArgs(o))).CreateWithContext(reader, identifier)
 				: block.GetValue();

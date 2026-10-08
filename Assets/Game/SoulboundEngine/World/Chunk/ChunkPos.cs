@@ -1,48 +1,44 @@
 ﻿namespace SoulboundEngine.World.Chunk {
+	using SoulboundEngine.Serialization;
 	using SoulboundEngine.World.Block;
 	using SoulboundEngine.World.Level;
 	using System;
 
-	public readonly struct ChunkPos {
+	public readonly struct ChunkPos : IEquatable<ChunkPos> {
 		public static readonly ChunkPos ORIGIN = new(0);
+		public static readonly Codec<ChunkPos> CODEC = Codecs.INT.Xmap(x => new ChunkPos(x), c => c.x);
 		public readonly int x;
 
 		public ChunkPos(int x) {
 			this.x = x;
 		}
 
-		public static int WorldYToIndex(int worldY) => worldY - Level.MIN_Y;
+		public static int WorldYToIndex(int worldY) => worldY - Level.DEFAULT_MIN_Y;
 
-		public static int IndexToWorldY(int yIndex) => yIndex + Level.MIN_Y;
+		public static int IndexToWorldY(int yIndex) => yIndex + Level.DEFAULT_MIN_Y;
 
-		public int WorldXToChunkX(int worldX) => worldX - this.x * Level.CHUNK_LENGTH;
+		public int ToLocalX(int worldX) => worldX - this.x * Level.CHUNK_LENGTH;
 
-		public int ChunkXToWorldX(int chunkX) => chunkX + this.x * Level.CHUNK_LENGTH;
+		public int ToWorldX(int chunkX) => chunkX + this.x * Level.CHUNK_LENGTH;
 
 		public static ChunkPos Containing(BlockPos pos) {
 			return new ChunkPos(SectionPos.BlockToSectionCoord(pos.x));
 		}
 
-		public static ChunkPos Parse(string s) {
-			if (!s.StartsWith("chunk[")) throw new ArgumentException("Cannot parse chunk pos: " + s);
+		public override string ToString() => $"chunk[{this.x}]";
 
-			int start = "chunk[".Length;
-			int end = s.IndexOf(']', start);
-			if (end < 0) throw new ArgumentException("Cannot parse chunk pos: " + s);
+		public static bool operator ==(ChunkPos a, ChunkPos b) => a.Equals(b);
 
-			string num = s[start..end];
-			if (string.IsNullOrEmpty(num)) throw new ArgumentException("Cannot parse chunk pos: " + s);
+		public static bool operator !=(ChunkPos a, ChunkPos b) => !(a == b);
 
-			for (int j = 0; j < num.Length; j++) {
-				char c = num[j];
-				bool validDigit = char.IsDigit(c);
-				bool validSign = c == '-' && j == 0;
-				if (!validDigit && !validSign) throw new ArgumentException("Cannot parse chunk pos: " + s);
-			}
-
-			return new ChunkPos(int.Parse(num));
+		public override bool Equals(object obj) {
+			return obj is ChunkPos other && other.Equals(this);
 		}
 
-		public override string ToString() => $"chunk[{this.x}]";
+		public bool Equals(ChunkPos other) => other.x == this.x;
+
+		public override int GetHashCode() {
+			return HashCode.Combine(this.x);
+		}
 	}
 }

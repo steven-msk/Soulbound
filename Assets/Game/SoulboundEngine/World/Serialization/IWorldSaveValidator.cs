@@ -1,10 +1,11 @@
-﻿using SoulboundEngine.Serialization;
+﻿namespace SoulboundEngine.World.Serialization {
+	using SoulboundEngine.Serialization;
+	using SoulboundEngine.World.Gen;
 
-namespace SoulboundEngine.World.Serialization {
 	public interface IWorldSaveValidator {
 		bool IsValid(File saveFolder);
-		void ValidateNewSave(File saveFolder, int seed);
+		void ValidateNewSave(File saveFolder, int seed, WorldPreset preset);
 
-		bool Validate(File saveFolder, out int seed, out string worldName, out File chunksFolder);
+		WorldSave? Validate(File saveFolder);
 	}
 }
