@@ -23,7 +23,7 @@ namespace SoulboundEngine.World.Chunk {
 		}
 
 		public void Return(WorldChunk chunk) {
-			int x = chunk.GetPos().x;
+			int x = chunk.pos.x;
 			this.entries[x] = new CachedEntry(chunk, this.ticksToLive);
 		}
 

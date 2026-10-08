@@ -21,16 +21,16 @@
 				}
 				return array;
 			},
-			decode: json => {
+			decode: (json, sinceVersion) => {
 				if (json.Type == JTokenType.Null) return DataResult<ComponentChanges>.Success(EMPTY);
 				if (json is not JArray array) return DataResult<ComponentChanges>.Error("Json is not array", EMPTY);
 
 				Builder builder = Create();
 				foreach (JToken token in array) {
-					Component.GetTypeFrom(token)
+					Component.GetTypeFrom(token, sinceVersion)
 						.ResultOrPartial(error => Logger.LogError("Could not retrieve component type: {}", error))
 						.IfPresent(componentType => {
-							Component.MakeCodec(componentType).Decode(token)
+							Component.MakeCodec(componentType).Decode(token, sinceVersion)
 								.ResultOrPartial(error => Logger.LogError("Failed to parse component: {}", error))
 								.IfPresent(builder.AddRaw);
 						});

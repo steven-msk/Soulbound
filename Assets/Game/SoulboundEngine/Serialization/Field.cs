@@ -16,14 +16,14 @@
 	}
 
 	public record Field<O, V>(string name, Codec<V> codec, Func<O, V> valueSupplier, Optional<V> defaultValue) {
-		public DataResult<V> DecodeFrom(JToken json) {
+		public DataResult<V> DecodeFrom(JToken json, int sinceVersion) {
 			JToken? value = json[this.name];
 			if (value == null) {
 				return this.defaultValue.IsPresent()
 					? DataResult<V>.Success(this.defaultValue.GetValue())
 					: DataResult<V>.Error($"Missing field '{this.name}'");
 			}
-			DataResult<V> result = this.codec.Decode(value);
+			DataResult<V> result = this.codec.Decode(value, sinceVersion);
 			return this.defaultValue.IsPresent()
 				? DataResult<V>.Success(result.ResultOrPartial().OrElse(this.defaultValue.GetValue()))
 				: result;

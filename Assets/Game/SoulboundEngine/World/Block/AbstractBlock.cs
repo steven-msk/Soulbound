@@ -1,7 +1,10 @@
 ﻿namespace SoulboundEngine.World.Block {
+	using SoulboundEngine.Common.Collection;
 	using SoulboundEngine.Common.Math;
 	using SoulboundEngine.Interaction;
 	using SoulboundEngine.Item;
+	using SoulboundEngine.Loot;
+	using SoulboundEngine.Loot.Context;
 	using SoulboundEngine.Registry;
 	using SoulboundEngine.State;
 	using SoulboundEngine.World.Block.State;
@@ -11,8 +14,18 @@
 	using Item = Item.Item;
 	using Level = Level.Level;
 
+#nullable enable
+
 	public abstract class AbstractBlock : IItemConvertible {
+		public const string BLOCK_PREFIX = "block/";
+		protected readonly Settings settings;
+		protected readonly RegistryKey<LootTable>? drops;
 		public const float DEFAULT_HARDNESS = 15f;
+
+		public AbstractBlock(Settings settings) {
+			this.settings = settings;
+			this.drops = settings.GetDrops();
+		}
 
 		public abstract Item AsItem();
 		protected abstract Block AsBlock();
@@ -80,6 +93,18 @@
 		protected virtual void OnPlace(Level level, BlockPos blockPos, BlockState oldState) {
 		}
 
+		protected virtual IReadOnlyList<ItemStack> GetDrops(BlockState blockState, LootWorldContext.Builder context) {
+			if (this.drops == null) return Collections.EmptyList<ItemStack>();
+
+			Level level = context.level;
+			LootTable? table = level.GetRegistries().GetOrThrow(RegistryKeys.LOOT_TABLE).Get(this.drops)?.GetValue();
+			if (table == null) {
+				Logger.LogWarning("Missing loot table entry for block: {}, did you forget to register it?", this);
+				return Collections.EmptyList<ItemStack>();
+			}
+			return table.GenerateLoot(context.Build());
+		}
+
 		public abstract class AbstractBlockState : State<Block, BlockState> {
 			protected AbstractBlockState(Block owner, Entries entries) : base(owner, entries) {
 			}
@@ -98,8 +123,8 @@
 				return this.owner.GetBreakState(level, blockPos, blockState);
 			}
 
-			public List<ItemStack> GetDroppedStacks() {
-				return Block.GetDroppedStacks(this.AsBlockState());
+			public IReadOnlyList<ItemStack> GetDrops(LootWorldContext.Builder context) {
+				return this.owner.GetDrops(this.AsBlockState(), context);
 			}
 
 			public void OnStateReplaced(BlockPos pos, Level level) {
@@ -156,9 +181,11 @@
 		}
 
 		public sealed class Settings {
-			public RegistryKey<Block> registryKey { get; private set; }
+			private IRegistryKeyedValue<Block, RegistryKey<LootTable>?> drops = IRegistryKeyedValue<Block, RegistryKey<LootTable>?>.Of(
+				key => RegistryKey<LootTable>.Of(RegistryKeys.LOOT_TABLE, key.value.WithPrefix(BLOCK_PREFIX))
+			);
+			public RegistryKey<Block>? registryKey { get; private set; }
 			public ToolPower requiredToolPower { get; private set; } = ToolPower.NONE;
-			public Func<BlockState, List<ItemStack>> droppedStacks { get; private set; } = Block.DropSingle();
 			public float hardness { get; private set; } = DEFAULT_HARDNESS;
 
 			public Settings RegistryKey(RegistryKey<Block> registryKey) {
@@ -166,13 +193,13 @@
 				return this;
 			}
 
-			public Settings Drops(Func<BlockState, List<ItemStack>> droppedStacks) {
-				this.droppedStacks = droppedStacks;
+			public Settings OverrideDrops(RegistryKey<LootTable>? table) {
+				this.drops = IRegistryKeyedValue<Block, RegistryKey<LootTable>?>.Fixed(table);
 				return this;
 			}
 
-			public Settings DropsAir() {
-				this.droppedStacks = Block.DropAir();
+			public Settings DropsNothing() {
+				this.drops = IRegistryKeyedValue<Block, RegistryKey<LootTable>?>.Fixed(null);
 				return this;
 			}
 
@@ -187,9 +214,11 @@
 			}
 
 			public string GetTranslationKey() {
-				return this.registryKey is null
-					? throw new InvalidOperationException("Cannot derive block name: RegistryKey was not set before Build() was called.")
-					: this.registryKey.value.ToTranslationKey("block");
+				return this.registryKey?.value.ToTranslationKey("block") ?? throw new InvalidOperationException("Block id not set");
+			}
+
+			public RegistryKey<LootTable>? GetDrops() {
+				return this.drops.Get(this.registryKey ?? throw new InvalidOperationException("Block id not set"));
 			}
 		}
 	}

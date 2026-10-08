@@ -39,7 +39,7 @@
 			}
 
 			this.states = allStates;
-			this.defaultState = this.states.FirstOrDefault() ?? factory(owner, Collections.Dictionary<Property, object>());
+			this.defaultState = this.states.FirstOrDefault() ?? factory(owner, Collections.EmptyDictionary<Property, object>());
 		}
 
 		public S defaultState { get; set; }

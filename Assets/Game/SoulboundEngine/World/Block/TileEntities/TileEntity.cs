@@ -42,7 +42,7 @@ namespace SoulboundEngine.World.Block.Entity {
 			return json;
 		}
 
-		public static TileEntity? FromJson(JToken json, BlockPos pos, BlockState blockState) {
+		public static TileEntity? FromJson(JToken json, BlockPos pos, BlockState blockState, int sinceVersion) {
 			if (json.Type != JTokenType.Object) {
 				Logger.LogError("TileEntity json is not object: {}", json);
 				return null;
@@ -65,7 +65,7 @@ namespace SoulboundEngine.World.Block.Entity {
 
 			TileEntityType type = entry.GetValue();
 			TileEntity tileEntity = type.Instantiate(pos, blockState);
-			tileEntity.ReadAdditional((JObject)json);
+			tileEntity.ReadAdditional((JObject)json, sinceVersion);
 			return tileEntity;
 		}
 
@@ -90,7 +90,7 @@ namespace SoulboundEngine.World.Block.Entity {
 		public virtual void WriteAdditional(JObject json) {
 		}
 
-		public virtual void ReadAdditional(JObject json) {
+		public virtual void ReadAdditional(JObject json, int sinceVersion) {
 		}
 
 		public bool IsValidBlockState(BlockState blockState) {

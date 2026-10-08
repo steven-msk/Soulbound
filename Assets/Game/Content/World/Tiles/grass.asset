@@ -9,10 +9,28 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 99d35313596c85c4292673539245f6f9, type: 3}
+  m_Script: {fileID: 13312, guid: 0000000000000000e000000000000000, type: 0}
   m_Name: grass
   m_EditorClassIdentifier: 
-  m_DefaultSprite: {fileID: 562522146, guid: 1fee4674ec04dc648bc7ea595e1f5d3e, type: 3}
-  m_DefaultGameObject: {fileID: 0}
-  m_DefaultColliderType: 1
-  m_TilingRules: []
+  m_Sprite: {fileID: 562522146, guid: 1fee4674ec04dc648bc7ea595e1f5d3e, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Transform:
+    e00: 1
+    e01: 0
+    e02: 0
+    e03: 0
+    e10: 0
+    e11: 1
+    e12: 0
+    e13: 0
+    e20: 0
+    e21: 0
+    e22: 1
+    e23: 0
+    e30: 0
+    e31: 0
+    e32: 0
+    e33: 1
+  m_InstancedGameObject: {fileID: 0}
+  m_Flags: 0
+  m_ColliderType: 0

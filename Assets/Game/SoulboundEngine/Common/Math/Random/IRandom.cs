@@ -7,6 +7,10 @@
 		int NextInt();
 		long NextLong();
 
+		IPositionalRandomFactory ForkPositional();
+
+		IRandom NewInstance(long seed);
+
 		public int NextInt(int minInclusive, int maxExclusive) {
 			double t = this.NextDouble();
 			return (int)(minInclusive + (maxExclusive - minInclusive) * t);

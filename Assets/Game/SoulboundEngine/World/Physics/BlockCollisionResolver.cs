@@ -14,12 +14,12 @@
 		private readonly Level level;
 		private readonly Cursor2D cursor;
 		private readonly AABB box;
-		private BlockPos blockPos;
+		private readonly BlockPos.Mutable blockPos;
 
 		public BlockCollisionResolver(Level level, AABB box) {
 			this.level = level;
 			this.box = box;
-			this.blockPos = new BlockPos();
+			this.blockPos = new BlockPos.Mutable();
 			int minX = Maths.FloorToInt(box.minX - 1.0E-7) - 1;
 			int maxX = Maths.FloorToInt(box.maxX + 1.0E-7) + 1;
 			int minY = Maths.FloorToInt(box.minY - 1.0E-7) - 1;
@@ -38,11 +38,10 @@
 				int faceType = this.cursor.GetNextType();
 				if (faceType == Cursor2D.CORNER || faceType == Cursor2D.EDGE) continue;
 
-				Chunk? chunk = this.level.ChunkAt(x);
+				Chunk? chunk = this.level.GetChunk(SectionPos.BlockToSectionCoord(x));
 				if (chunk == null) continue;
 
-				this.blockPos.x = x;
-				this.blockPos.y = y;
+				this.blockPos.Set(x, y);
 				BlockState blockState = chunk.GetBlockState(this.blockPos);
 				BlockShape blockShape = blockState.GetCollisionShape(blockState, this.level, this.blockPos);
 
@@ -56,7 +55,7 @@
 
 		public static bool Intersect(AABB box, BlockShape blockShape, BlockPos blockPos, ref AABB[] intersecting, out int count) {
 			count = 0;
-			foreach (var shapeBox in blockShape.boxes) {
+			foreach (AABB shapeBox in blockShape.boxes) {
 				AABB movedBox = shapeBox.Move(blockPos);
 				if (box.Overlaps(movedBox)) {
 					intersecting[count++] = movedBox;

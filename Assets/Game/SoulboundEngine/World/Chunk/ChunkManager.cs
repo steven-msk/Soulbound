@@ -1,9 +1,8 @@
-﻿
+﻿namespace SoulboundEngine.World.Chunk {
+	using System;
+
 #nullable enable
 
-using System;
-
-namespace SoulboundEngine.World.Chunk {
 	public abstract class ChunkManager : IDisposable {
 
 		public abstract Chunk? GetChunk(int x, bool loadOrCreate);
@@ -12,9 +11,9 @@ namespace SoulboundEngine.World.Chunk {
 			return this.GetChunk(x, loadOrCreate) as WorldChunk;
 		}
 
-		public virtual WorldChunk? GetChunkNow(int x) => this.GetWorldChunk(x, false);
+		public virtual WorldChunk GetChunkNow(int x) => this.GetWorldChunk(x, false)!;
 
-		public bool HasChunk(int x) => this.GetChunk(x, false) != null;
+		public bool HasChunk(int x) => this.GetChunk(x, true) != null;
 
 		public virtual void OnSectionStatusChanged(int x, int sectionY, bool previouslyEmpty) {
 		}

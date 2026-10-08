@@ -11,7 +11,7 @@
 		private Dictionary<ComponentType, object> changedComponents;
 
 		public MergedComponentMap(IComponentMap baseMap)
-			: this(baseMap, Collections.Dictionary<ComponentType, object>()) {
+			: this(baseMap, Collections.EmptyDictionary<ComponentType, object>()) {
 		}
 
 		private MergedComponentMap(IComponentMap baseMap, Dictionary<ComponentType, object> changedComponents) {

@@ -1,4 +1,5 @@
 ﻿namespace SoulboundEngine.World.Chunk {
+	using SoulboundEngine.Serialization;
 	using SoulboundEngine.World.Level;
 	using System;
 	using System.Collections.Generic;
@@ -8,7 +9,7 @@
 #nullable enable
 
 	public class ChunkStorage : IDisposable {
-		private const string FILE_EXTENSION = ".txt";
+		private const string FILE_EXTENSION = ".json";
 		private readonly HashSet<int> savedChunks = new();
 		private readonly File folder;
 
@@ -23,7 +24,7 @@
 					continue;
 				}
 				if (!TryGetChunkX(file, out int chunkX)) {
-					Logger.LogError("Failed to get chunkX: {}, skipping this chunk", file.Name);
+					Logger.LogError("Failed to get chunkPos: {}, skipping this chunk", file.Name);
 					continue;
 				}
 				if (!this.savedChunks.Add(chunkX)) {
@@ -57,15 +58,15 @@
 			return data.Read(level, chunkPos);
 		}
 
-		public void Save(Level level, Chunk chunk) {
+		public void Save(Chunk chunk) {
 			File chunkFile = ToChunkFile(chunk, this.folder);
 			chunkFile.CreateNewFile();
 			using StreamWriter writer = chunkFile.CreateText();
 
-			SerializableChunkData data = SerializableChunkData.Of(level, chunk);
+			SerializableChunkData data = SerializableChunkData.Of(chunk, GlobalSaveVersion.Current);
 			writer.Write(data.Write());
 
-			int chunkX = chunk.GetPos().x;
+			int chunkX = chunk.pos.x;
 			this.savedChunks.Add(chunkX);
 		}
 
@@ -73,7 +74,7 @@
 		}
 
 		public static File ToChunkFile(Chunk chunk, File parent) {
-			return ToChunkFile(chunk.GetPos().x, parent);
+			return ToChunkFile(chunk.pos.x, parent);
 		}
 
 		public static File ToChunkFile(int chunkX, File parent) {

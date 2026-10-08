@@ -19,6 +19,7 @@
 			Register(Blocks.LEAVES, _ => new BlockModel(ResolveTile("leaves")));
 			Register(Blocks.CHEST, _ => new BlockModel(ResolveTile("chest")));
 			Register(Blocks.SIGN, _ => new BlockModel(ResolveTile("sign")));
+			Register(Blocks.RUBY_ORE, _ => new BlockModel(ResolveTile("ruby_ore")));
 
 			Register(Blocks.TOGGLE_BLOCK, blockState => new BlockModel(ResolveTile(
 				blockState.Get(ToggleBlock.on)
@@ -55,13 +56,13 @@
 		public static BlockModels BuildModels(List<Block> blocks) {
 			Dictionary<BlockState, BlockModel> models = new();
 
-			foreach (var block in blocks) {
+			foreach (Block block in blocks) {
 				if (!MODEL_FACTORIES.TryGetValue(block, out BlockModel.IFactory factory)) {
 					Logger.LogError("Block model factory not found: {}", Blocks.GetIdentifier(block));
 					factory = BlockModel.IFactory.Of(_ => MISSING);
 				}
 
-				foreach (var blockState in block.StateManager.GetStates()) {
+				foreach (BlockState blockState in block.StateManager.GetStates()) {
 					models[blockState] = factory.Create(blockState);
 				}
 			}

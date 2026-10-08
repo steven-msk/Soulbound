@@ -46,7 +46,6 @@ namespace SoulboundEngine.UnityClient.Debug {
 		private List<CommandSyntaxException> currentExceptions = null!;
 		private ListView exceptionList = null!;
 		private ListView outputList = null!;
-		private string? lastReceivedOutput;
 		private Color defaultFieldColor;
 		private int historyIndex = 0;
 		private bool isCyclingHistory;
@@ -89,7 +88,7 @@ namespace SoulboundEngine.UnityClient.Debug {
 			this.outputList = OUTPUT_LIST_ELEMENT.Get(root);
 			this.outputList.itemsSource = this.outputHistory;
 			this.outputList.bindItem = (element, index) => {
-				Label label = OUTPUT_TEXT_ELEMENT.Get(root);
+				Label label = OUTPUT_TEXT_ELEMENT.Get(element);
 				CommandOutput output = this.outputHistory[index];
 				label.text = output.message;
 				label.style.color = output.isError ? Color.red : DEFAULT_OUTPUT_COLOR;
@@ -238,7 +237,7 @@ namespace SoulboundEngine.UnityClient.Debug {
 			this.hasEditedManually = false;
 			this.isCyclingCompletions = false;
 			this.isCyclingHistory = false;
-			this.historyIndex = 0;
+			this.historyIndex = this.history.Count;
 
 			this.textField.RegisterCallback<ChangeEvent<string>>(FirstEdit);
 			void FirstEdit(ChangeEvent<string> evt) {
@@ -285,8 +284,6 @@ namespace SoulboundEngine.UnityClient.Debug {
 			string? errorMessage = this.commandProcessor.SubmitCommand(command);
 			if (errorMessage != null) {
 				this.AddOutput(errorMessage, true);
-			} else if (this.lastReceivedOutput != null) {
-				this.AddOutput(this.lastReceivedOutput, false);
 			}
 		}
 
@@ -295,13 +292,12 @@ namespace SoulboundEngine.UnityClient.Debug {
 			if (this.outputHistory.Count > MAX_OUTPUT_COUNT) {
 				this.outputHistory.RemoveAt(0);
 			}
-			this.lastReceivedOutput = null;
 			this.outputList.itemsSource = this.outputHistory;
 			this.outputList.Rebuild();
 		}
 
 		private void OutputReceived(string output) {
-			this.lastReceivedOutput = output;
+			this.AddOutput(output, false);
 		}
 
 		public void ShowCompletions(string value, int caretPos) {

@@ -24,10 +24,10 @@
 			Block block = ctx.GetArgument<Block>("block");
 			Vec2d playerPos = ctx.Source.Get(level => level.GetPlayer().GetPosition());
 			Vec2d target = ctx.Source.Get(level => level.GetPlayer().GetWorldPointerPos());
-			BlockPos blockPos = new() {
-				x = Maths.FloorToInt(ctx.GetArgument<Coordinate>("x").GetPos(playerPos.x, target.x)),
-				y = Maths.FloorToInt(ctx.GetArgument<Coordinate>("y").GetPos(playerPos.y, target.y))
-			};
+			BlockPos blockPos = new(
+				x: Maths.FloorToInt(ctx.GetArgument<Coordinate>("x").GetPos(playerPos.x, target.x)),
+				y: Maths.FloorToInt(ctx.GetArgument<Coordinate>("y").GetPos(playerPos.y, target.y))
+			);
 			ctx.Source.Run(level => {
 				level.SetBlockState(blockPos, block.DefaultState);
 				outputConsumer("Reset block {} at {}".WithArgs(Blocks.GetIdentifier(block), blockPos));

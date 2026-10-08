@@ -1,13 +1,14 @@
-﻿using SoulboundEngine.World.Gen;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
+﻿namespace SoulboundEngine.World.Chunk {
+	using SoulboundEngine.Registry;
+	using SoulboundEngine.World.Gen;
+	using SoulboundEngine.World.Gen.Generator;
+	using SoulboundEngine.World.Gen.Noise;
+	using SoulboundEngine.World.Level;
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
 
 #nullable enable
-
-namespace SoulboundEngine.World.Chunk {
-	using Level = Level.Level;
 
 	public class LevelChunkManager : ChunkManager {
 		private readonly WorldChunk?[] loadedChunks;
@@ -19,6 +20,7 @@ namespace SoulboundEngine.World.Chunk {
 		private readonly int chunkRadius;
 		private readonly int loadRange;
 		private int centerX;
+		private readonly RandomState randomState;
 
 		public LevelChunkManager(Level level, ChunkGenerator chunkGenerator, int chunkRadius, IChunkCache chunkCache, ChunkStorage chunkStorage) {
 			this.level = level;
@@ -29,11 +31,23 @@ namespace SoulboundEngine.World.Chunk {
 			this.loadRange = chunkRadius * 2 + 1;
 			this.emptyChunk = new EmptyWorldChunk(level, new ChunkPos(0));
 			this.loadedChunks = new WorldChunk?[this.loadRange];
+			this.randomState = this.CreateRandomState(chunkGenerator, this.level.GetSeed());
+		}
+
+		private RandomState CreateRandomState(ChunkGenerator chunkGenerator, long seed) {
+			IRegistryLookup registries = Registries.GetOrCreateLookup();
+			return RandomState.Create(
+				chunkGenerator is NoiseLevelChunkGenerator noiseGenerator
+					? noiseGenerator.NoiseSettings.GetValue()
+					: NoiseGeneratorSettings.Zero(),
+				registries.Lookup(RegistryKeys.NOISE),
+				seed
+			);
 		}
 
 		private static bool IsChunkValid(WorldChunk? chunk, int x) {
 			if (chunk == null) return false;
-			ChunkPos pos = chunk.GetPos();
+			ChunkPos pos = chunk.pos;
 			return pos.x == x;
 		}
 
@@ -88,33 +102,49 @@ namespace SoulboundEngine.World.Chunk {
 			}
 		}
 
-		public void InitialLoad(int centerX, bool placeBlocks) {
+		public void InitialLoad(int centerX) {
 			for (int dx = -this.chunkRadius; dx <= this.chunkRadius; dx++) {
 				int chunkX = centerX + dx;
 				int index = this.GetIndex(chunkX);
-				this.GenerateAndLoadChunk(index, chunkX, placeBlocks);
+				this.GenerateAndLoadChunk(index, chunkX);
 			}
 		}
 
-		private WorldChunk GenerateAndLoadChunk(int index, int x, bool placeBlocks) {
-			WorldChunk chunk = this.GenerateChunk(x, placeBlocks);
+		private WorldChunk GenerateAndLoadChunk(int index, int x) {
+			WorldChunk chunk = this.GenerateChunk(x, index);
 			this.loadedChunks[index] = chunk;
 			this.level.OnChunkLoaded(chunk);
 			return chunk;
 		}
 
-		private WorldChunk GenerateChunk(int x, bool placeBlocks) {
-			if (this.chunkStorage.Read(this.level, x) is WorldChunk existing) {
-				this.chunkGenerator.Generate(this.level, existing, false);
-				return existing;
-			}
+		private WorldChunk GenerateChunk(int x, int index) {
+			Chunk? existing = this.chunkStorage.Read(this.level, x);
+			if (existing != null) return (WorldChunk)existing;
+
 			WorldChunk chunk = new(this.level, new ChunkPos(x));
-			this.chunkGenerator.Generate(this.level, chunk, placeBlocks);
+			// feature placement may depend on heightmap which is unavailable since the chunk is not "loaded",
+			// where "loaded" means "full data and ready to use".
+			// chunks that are not yet fully generated arent "loaded", but heightmap placements query the chunk by position,
+			// which leads to wrong feature positioning or features not being placed at all
+			this.loadedChunks[index] = chunk;
+
+			return this.DoGeneration(chunk);
+		}
+
+		private WorldChunk DoGeneration(WorldChunk chunk) {
+			chunk = DoStep(this.chunkGenerator, chunk, (generator, chunk) => generator.MapBiomes(this.randomState, chunk));
+			chunk = DoStep(this.chunkGenerator, chunk, (generator, chunk) => generator.Fill(this.randomState, chunk));
+			chunk = DoStep(this.chunkGenerator, chunk, (generator, chunk) => generator.BuildSurface(this.randomState, chunk));
+			chunk = DoStep(this.chunkGenerator, chunk, (generator, chunk) => generator.ApplyDecor(this.level, this.randomState, chunk));
 			return chunk;
 		}
 
+		private static WorldChunk DoStep(ChunkGenerator generator, Chunk chunk, Func<ChunkGenerator, Chunk, Chunk> step) {
+			return (WorldChunk)step(generator, chunk);
+		}
+
 		private WorldChunk ResolveAndLoad(int index, int x) {
-			WorldChunk resolved = this.chunkCache.TryClaim(x) ?? this.GenerateChunk(x, true);
+			WorldChunk resolved = this.chunkCache.TryClaim(x) ?? this.GenerateChunk(x, index);
 			this.loadedChunks[index] = resolved;
 			this.level.OnChunkLoaded(resolved);
 			return resolved;
@@ -139,7 +169,7 @@ namespace SoulboundEngine.World.Chunk {
 		public override void Dispose() {
 			this.chunkCache.Dispose();
 			this.chunkStorage.Dispose();
-			foreach (var chunk in this.loadedChunks) {
+			foreach (WorldChunk? chunk in this.loadedChunks) {
 				if (chunk != null) this.level.DropChunk(chunk);
 			}
 		}

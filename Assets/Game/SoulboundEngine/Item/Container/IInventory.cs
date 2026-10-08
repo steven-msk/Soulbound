@@ -50,8 +50,8 @@ namespace SoulboundEngine.Item.Container {
 			return ItemStack.EMPTY_ACCEPTING_CODEC.ListOf().Encode(inventory.ToList());
 		}
 
-		public static void Load(this IInventory inventory, JToken json) {
-			ItemStack.EMPTY_ACCEPTING_CODEC.ListOf().Decode(json)
+		public static void Load(this IInventory inventory, JToken json, int sinceVersion) {
+			ItemStack.EMPTY_ACCEPTING_CODEC.ListOf().Decode(json, sinceVersion)
 				.ResultOrPartial(error => Logger.LogError(error))
 				.IfPresent(stacks => {
 					inventory.Clear();

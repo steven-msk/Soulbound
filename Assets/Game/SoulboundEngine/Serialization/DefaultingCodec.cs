@@ -4,8 +4,8 @@
 	public record DefaultingCodec<T>(Codec<T> codec, T fallback) : Codec<T> {
 		public override JToken Encode(T value) => this.codec.Encode(value);
 
-		public override DataResult<T> Decode(JToken json) {
-			DataResult<T> result = this.codec.Decode(json);
+		public override DataResult<T> Decode(JToken json, int sinceVersion) {
+			DataResult<T> result = this.codec.Decode(json, sinceVersion);
 			return result.IsSuccess() ? result : DataResult<T>.Success(this.fallback);
 		}
 	}

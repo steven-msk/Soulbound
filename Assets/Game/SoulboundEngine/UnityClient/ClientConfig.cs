@@ -12,7 +12,7 @@ namespace SoulboundEngine.UnityClient {
 		[Serializable]
 		public struct File {
 			public string savesRoot;
-			public string seedFile;
+			public string propertiesFile;
 			public string chunksFolder;
 		}
 

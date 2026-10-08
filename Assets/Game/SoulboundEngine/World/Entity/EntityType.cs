@@ -26,13 +26,14 @@ namespace SoulboundEngine.World.Entity {
 		}
 
 		private static EntityDescriptor<E> Register<E>(RegistryKey<EntityDescriptor> key, EntityDescriptor<E> descriptor) where E : Entity {
-			return Registry<EntityDescriptor>.Register(Registries.ENTITIES, key, descriptor);
+			return Registry<EntityDescriptor>.Register(Registries.ENTITY, key, descriptor);
 		}
 
 		private static RegistryKey<EntityDescriptor> KeyOf(string id) {
-			return RegistryKey<EntityDescriptor>.Of(Registries.ENTITIES.GetKey(), Identifier.Of(id));
+			return RegistryKey<EntityDescriptor>.Of(Registries.ENTITY.GetKey(), Identifier.Of(id));
 		}
 
-		public static void Init() { }
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter")]
+		public static EntityDescriptor Init(RegistryBootstrapContext context, Registry<EntityDescriptor> registry) => PLAYER;
 	}
 }
